@@ -7,7 +7,7 @@
 <h1 align="center">
  <span> Alemon-Bot</span> 
 <a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
-<img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg?theme=dark'  alt='star'>
+<img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg'  alt='star'>
 
 [![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)    
 
