@@ -1,10 +1,11 @@
 
 <p align="center">
   <a href="https://github.com/ningmengchongshui/alemon-bot">
-    <img width="200" src="https://github.com/ningmengchongshui/alemon-bot/raw/main/src/assets/alemon.png">
+    <img width="200" src="https://github.com/ningmengchongshui/alemon-bot/blob/main/src/assets/alemon.png">
   </a>
 </p>
-<h1 align="center">Alemon-Bot 
+<h1 align="center">
+ <span> Alemon-Bot</span> 
 <a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
 <img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg?theme=dark'  alt='star'>
 
