@@ -1,8 +1,35 @@
-# 频道机器人
 
-插件开发[☞参考文档](./README_README.md)
+<p align="center">
+  <a href="https://github.com/ningmengchongshui/alemon-bot">
+    <img width="200" src="https://github.com/ningmengchongshui/alemon-bot/raw/main/src/assets/alemon.png">
+  </a>
+</p>
+<h1 align="center">Alemon-Bot 
+<a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
+<img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg?theme=dark'  alt='star'>
+
+[![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)    
+
+Node.js>=V16
+
+[☞参考文档](./README_README.md) 
+</img>
+</a>
+</h1>
+
+
+## 频道机器人
+
+基础环境Windows or Linux,Node.js,Redis
 
 ## 起步
+拉取代码
+```
+#github
+git clone --depth=1 https://github.com/ningmengchongshui/alemon-bot.git
+#gitee
+git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
+```
 
 安装 pnpm
 
@@ -57,8 +84,8 @@ pm2 install ts-node@latest
 npm run pm2
 ```
 
-## linux puppeteer
-
+## linux 
+puppeteer环境
 #### centos
 
 ```
