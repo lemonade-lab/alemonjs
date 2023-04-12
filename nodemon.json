@@ -1,0 +1,4 @@
+{
+  "verbose": true,
+  "ignore": [".cache", "node_modules", "dist", "dist_pkg", "config", "data", "plugins"]
+}

@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    //编译版本
+    "target": "ESNext",
+    //模块化规范
+    "module": "commonjs",
+    // noImplicitAny 不允许隐式的 any 类型
+    "noImplicitAny": true,
+    // allowJs 是否对 js 文件进行编译，默认是false
+    "allowJs": true,
+    // 用于选择模块解析策略，有'node'和'classic'两种类型'
+    // 可隐藏文件类型
+    "moduleResolution": "node",
+    //严格
+    // "strict": true,
+    //编译路径
+    "rootDir": "./",
+    // outDir用来指定输出文件夹，值为一个文件夹路径字符串，输出的文件都将放置在这个文件夹
+    "outDir": "./dist",
+    // 是否编译注释
+    "removeComments": true,
+    // noEmit 不生成编译后的文件（只执行编译过程）
+    "noEmit": false,
+    //版本控制
+    "ignoreDeprecations": "5.0",
+    //是否抑制隐式any索引的错误，默认：false
+    "suppressImplicitAnyIndexErrors": true,
+    // 保留 const 和 enum 声明
+    "preserveConstEnums": true,
+    // sourceMap的值为true或false，用来指定编译时是否生成.map文件
+    "sourceMap": false,
+    // 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性
+    "esModuleInterop": true,
+    //跳过对所有.d.ts文件的类型检
+    "skipLibCheck": true,
+    // 是否在编译的时候生成相应的".d.ts"声明文件。如果设为true，编译每个ts文件之后会生成一个js文件和一个声明文件。
+    // 但是declaration和allowJs不能同时设为true
+    "declaration": false
+  },
+  // 要编译的路径列表（用于指定那些ts文件需要被编译），
+  "include": [
+    "src",
+    "program",
+    "example",
+    "plugins",
+    "index.ts"
+  ],
+  // 要排除的、不编译的文件，它也可以指定一个列表，
+  "exclude": [
+    "node_modules",
+    "dist",
+    "dist_pkg"
+  ]
+}
