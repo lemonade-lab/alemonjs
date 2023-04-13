@@ -10,7 +10,7 @@ export class show extends plugin {
           fnc: 'alementShowHelp'
         },
         {
-          reg: '^/来张图片$',
+          reg: '^/专属图标$',
           fnc: 'getImg'
         }
       ]
