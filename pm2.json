@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "alemont-bot",
-      "interpreter": "node_modules/.bin/ts-node",
+      "interpreter": "./node_modules/.bin/ts-node",
       "interpreter_args": "-P ../ -r tsconfig-paths/register",
       "script": "./index.ts",
       "exec_mode": "cluster",

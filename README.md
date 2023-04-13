@@ -1,13 +1,5 @@
-
-<p align="center">
-  <a href="https://github.com/ningmengchongshui/alemon-bot">
-    <img width="200" src="https://github.com/ningmengchongshui/alemon-bot/blob/main/src/assets/alemon.png">
-  </a>
-</p>
 <h1 align="center">
  <span> Alemon-Bot</span> 
-<a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
-<img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg'  alt='star'>
 
 [![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)    
 
@@ -32,17 +24,19 @@ git clone --depth=1 https://github.com/ningmengchongshui/alemon-bot.git
 git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
 ```
 
-安装 pnpm
+安装管理包
 
 ```
-npm i pnpm -g
+npm i pnpm -g  #选其一
+npm i cnpm -g  #选其二
 ```
 
 加载依赖
 
 ```
 cd alemon-bot
-pnpm i
+pnpm i         #选其一
+cnpm i         #选其二
 ```
 
 ## 运行
@@ -60,13 +54,13 @@ npm run start
 基础环境
 
 ```
-npm i ts-node -g
+npm install ts-node -g
 ```
 
 前台运行
 
 ```
-ts-node app.ts
+ts-node index.ts
 ```
 
 #### 后台运行 3 负载均衡

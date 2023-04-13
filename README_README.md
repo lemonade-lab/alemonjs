@@ -10,6 +10,8 @@ example/  子插件目录
 plugins/  插件包目录
     test-plugin/  测试插件
     apps/         应用文件
+    db/     数据层
+      mysql/ mysql连接
     lib/          工程包
     resources/    资源包
     app.config.ts 路径配置
@@ -20,7 +22,6 @@ src/       工程目录
    config  工程配置
    db/     数据层
      redis/ redis连接
-     mysql/ mysql连接
    lib/    服务层
       algorithm.ts     算法
       channel.ts       快捷方法
@@ -224,10 +225,12 @@ plugins/test-plugin/api
 import plugin from '../../../src/lib/plugins'
 import { pluginType, messgetype } from '../../../src/lib/types'
 import { showPuppeteer } from '../lib/img'
-export { plugin, pluginType, messgetype, showPuppeteer }
+import * as config from '../db/local/config'
+export { plugin, pluginType, messgetype }
+export { showPuppeteer, config }
 ```
 
-调用此api可用于html截图
+调用此api可用于html截图并发送图片
 
 ```TypeScript
 import { screenshot } from '../../../src/lib/puppeteer'
