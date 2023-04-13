@@ -6,10 +6,8 @@
 Node.js>=V16
 
 [☞参考文档](./README_README.md) 
-</img>
-</a>
-</h1>
 
+</h1>
 
 ## 频道机器人
 
@@ -77,6 +75,7 @@ pm2 install ts-node@latest
 
 ```
 npm run pm2
+
 ```
 
 ## linux 
