@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "alemon-bot",
   "author": "ningmengchongshui",
-  "license": "MIT",
+  "license": "GNU",
   "bin": "./src/index.ts",
   "scripts": {
     "pm2": "pm2 start pm2.json",
@@ -54,7 +54,6 @@
     "node": ">16"
   },
   "keywords": [
-    "qq机器人",
     "nodejs",
     "typescript",
     "qq-guild-bot"

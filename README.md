@@ -27,18 +27,10 @@ git clone --depth=1 https://github.com/ningmengchongshui/alemon-bot.git
 #gitee
 git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
 ```
-
-安装管理包
-
-```
-npm install cnpm -g  
-```
-
 加载依赖
-
 ```
 cd alemon-bot
-cnpm install         
+npm install         
 ```
 
 ## 运行
