@@ -1,22 +1,24 @@
-import { plugin, showPuppeteer, messgetype, pluginType } from '../../api'
+import { plugin, showPuppeteer, messgetype, pluginType, config } from '../../api'
 export class show extends plugin {
   [parameter: string]: pluginType
   constructor() {
     super({
-      dsc: '显示类',
+      dsc: '发送图片',
       rule: [
         {
-          reg: '^/来张图片$',
-          fnc: 'showImg'
+          reg: '^/柠檬帮助$',
+          fnc: 'alementShowHelp'
         }
       ]
     })
   }
-  async showImg(e: messgetype) {
+  async alementShowHelp(e: messgetype) {
     /* 判断是否是私聊 */
     if (e.isGroup) return false
-    const img = await showPuppeteer({ path: 'map', name: 'map' })
+    const data = config.getConfig('help', 'help')
+    const img = await showPuppeteer({ path: 'help', name: 'help', data })
     e.sendImage('', img)
     return false
   }
 }
+ 

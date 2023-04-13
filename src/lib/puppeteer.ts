@@ -25,6 +25,7 @@ const watch = (tplFile: string, AdressHtml: string) => {
 
 export const screenshot = async (name: string, data = {}) => {
   let { tplFile, AppName = name, saveId = name }: any = data
+  console.log(data)
   /* 生成后的html地址 */
   const AdressHtml = `${process.cwd()}/data/${AppName}/html/${name}/${saveId}.html`
   /*生成后的png地址 */
