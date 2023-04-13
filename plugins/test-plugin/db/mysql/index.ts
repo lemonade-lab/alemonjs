@@ -8,7 +8,7 @@ export const sequelize = new Sequelize(database, user, password, { host, port, d
 export const mysqlInit = async () => {
   try {
     await sequelize.authenticate()
-    console.log(green(`[mysql] OK`))
+    console.log(green(`[mysql]`), ` OK`)
   } catch (error) {
     console.log(red(`[mysql] ${error}`))
   }
