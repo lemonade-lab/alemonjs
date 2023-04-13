@@ -52,7 +52,7 @@ async function loadExample(dir: string) {
     }
   }
   command = lodash.orderBy(command, ['priority'], ['asc'])
-  console.info(green(`[example]`), ` ${Object.keys(Apps).length} app`)
+  console.info(green(`[EXAMPLE]`), ` ${Object.keys(Apps).length} app`)
   global.Apps = Apps
   global.command = command
   await saveCommand(command)
@@ -96,7 +96,7 @@ async function loadProgram(dir: string) {
     }
   }
   command = lodash.orderBy(command, ['priority'], ['asc'])
-  console.info(green(`[program]`), ` ${Object.keys(Apps).length} apps`)
+  console.info(green(`[PROGRAM]`), ` ${Object.keys(Apps).length} apps`)
   global.Apps = { ...global.Apps, ...Apps }
   global.command = command
   await saveCommand(command)
@@ -137,7 +137,7 @@ async function loadPlugins(dir: string) {
     }
   }
   command = lodash.orderBy(command, ['priority'], ['asc'])
-  console.info(green(`[plugin]`), ` ${Object.keys(Apps).length} apps`)
+  console.info(green(`[PLUGINS]`), ` ${Object.keys(Apps).length} apps`)
   global.Apps = { ...global.Apps, ...Apps }
   global.command = command
   await saveCommand(command)
@@ -168,7 +168,7 @@ async function saveCommand(command: any[]) {
   if (!commswich) {
     commswich = true
     /* 初始打印 */
-    console.log(green('[rulelist]'), `/config/command.json OK`)
+    console.log(green('[RULE]'), `/config/command.json OK`)
   }
 }
 

@@ -9,6 +9,9 @@ travel(filepath, (item: any) => {
   if (item.search('.ts') != -1) {
     arr.push(item)
   }
+  if (item.search('.js') != -1) {
+    arr.push(item)
+  }
 })
 arr.forEach(async (item: any) => {
   const AppDir = `.${item.replace(/\\/g, '/').replace(place, '')}`

@@ -1,7 +1,6 @@
 <h1 align="center">
  <span> Alemon-Bot</span> 
 <a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
-<img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg'  alt='star'>
 
 [![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)
 
@@ -11,7 +10,6 @@ Node.js>=V16
 
 Windows/Linux,Node.js,Redis,Sequelize
 
-</img>
 </a>
 </h1>
 
@@ -64,9 +62,7 @@ ts-node index.ts
 基础环境
 
 ```
-npm install -g pm2
-pm2 install typescript
-pm2 install ts-node@latest
+npm install pm2 -g
 ```
 
 后台运行
