@@ -6,7 +6,7 @@
 
 Node.js>=V16
 
-[☞ 参考文档](./README_README.md)
+[☞ 参考文档](./README_.md)
 
 Windows/Linux,Node.js,Redis,Sequelize
 
@@ -35,41 +35,24 @@ npm install
 
 ## 运行
 
-#### 脚本运行 1
-
-前台运行
+#### 脚本运行 1 登录验证
 
 ```
-npm run start
+npm run start  #前台运行
 ```
-
-#### 解析运行 2
-
-基础环境
+#### 后台运行 2 负载均衡
 
 ```
-npm install ts-node -g
+npm install pm2 -g #安装pm2全局
 ```
 
-前台运行
+```
+npm run pm2 #后台运行
 
 ```
-ts-node index.ts
-```
-
-#### 后台运行 3 负载均衡
-
-基础环境
 
 ```
-npm install pm2 -g
-```
-
-后台运行
-
-```
-npm run pm2
-
+pm2 log #打印后台记录
 ```
 
 ## linux
