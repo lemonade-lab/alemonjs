@@ -3,7 +3,7 @@ export class show extends plugin {
   [parameter: string]: pluginType
   constructor() {
     super({
-      describe: '显示类',
+      dsc: '显示类',
       rule: [
         {
           reg: '^/来张图片$',

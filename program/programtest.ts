@@ -6,7 +6,7 @@ const apps = {
     constructor() {
       super({
         /* 说明集*/
-        describe: '集合类',
+        dsc: '集合类',
         /* 指令集 */
         rule: [
           {

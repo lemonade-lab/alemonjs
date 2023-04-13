@@ -12,8 +12,8 @@ interface msgType extends IMessage {
 }
 /* 核心处理e消息对象类型 */
 interface messgetype {
+  event: string //事件类型
   eventType: string //消息类型
-  event: string //类型转换
   msg: msgType //消息对象
   isGroup: boolean //是否是私聊
   recall: boolean //是否是撤回
@@ -34,7 +34,7 @@ interface cmdTyoe {
   type: string //插件类型
   name: string //插件名
   reg: string //正则
-  describe: any //指令说明
+  dsc: any //指令说明
   priority: number //优先级
   event: string //事件类型
 }

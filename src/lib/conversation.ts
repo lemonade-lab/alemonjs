@@ -5,7 +5,7 @@ import { IOpenAPI } from 'qq-guild-bot'
 import { init, dealMsg } from './dealmsg'
 import { messgetype } from './types'
 import { sendImage } from './tool'
-import { segment } from './channel'
+import { segment } from './segment'
 
 declare global {
   var segment: any //快捷方法
@@ -61,7 +61,7 @@ const READY = () => {
     global.bot = e.msg.user
     /* 初始化指令 */
     init()
-    console.info(green('[READY]'),`[${bot.username}]`)
+    console.info(green('[READY]'), `[${bot.username}]`)
   })
 }
 
@@ -83,27 +83,54 @@ GUILDS (1 << 0)
  */
 const GUILDS = () => {
   ws.on('GUILDS', (e: messgetype) => {
+    /* 事件匹配 */
+    e.event = 'GUILDS'
+    console.log(e.eventType)
+  })
+}
+
+
+/**
+GUILD_MEMBERS (1 << 1)
+  - GUILD_MEMBER_ADD       // 当成员加入时
+  - GUILD_MEMBER_UPDATE    // 当成员资料变更时
+  - GUILD_MEMBER_REMOVE    // 当成员被移除时
+ */
+const GUILD_MEMBERS = () => {
+  /*监听新人事件*/
+  ws.on('GUILD_MEMBERS', async (e: messgetype) => {
+    /* 事件匹配 */
+    e.event = 'GUILD_MEMBERS'
+    console.log(e.eventType)
+
+    /* 消息类型*/
     switch (e.eventType) {
-      case 'GUILD_CREATE': {
+      case 'DIRECT_MESSAGE_CREATE': {
+        await client.directMessageApi.postDirectMessage(e.msg.guild_id, {
+          msg_id: e.msg.id,
+          content: '请在子频道中使用',
+        })
         break
       }
-      case 'GUILD_UPDATE': {
+      /* 进群 */
+      case 'GUILD_MEMBER_ADD': {
+        await client.messageApi.postMessage(e.msg.channel_id, {
+          msg_id: e.msg.id, // 可选,消息id,如果指定则会回复该消息
+          content: `${segment.at(e.msg.user.id)} 欢迎新人 ~ `,
+          image: 'http://tva1.sinaimg.cn/bmiddle/6af89bc8gw1f8ub7pm00oj202k022t8i.jpg'
+        })
         break
       }
-      case 'GUILD_DELETE': {
+      /* 退群 */
+      case 'GUILD_MEMBER_REMOVE': {
+        await client.messageApi.postMessage(e.msg.channel_id, {
+          content: `${segment.at(e.msg.user.id)}${e.msg.user.username} 离开了我们...`
+        })
         break
       }
-      case 'CHANNEL_CREATE': {
-        break
-      }
-      case 'CHANNEL_UPDATE': {
-        break
-      }
-      case 'CHANNEL_DELETE': {
-        break
+      default: {
       }
     }
-    e.event = 'robot'
   })
 }
 
@@ -118,7 +145,8 @@ const GUILD_MESSAGES = () => {
   ws.on('GUILD_MESSAGES', async (e: messgetype) => {
     /* 屏蔽测回消息 */
     if (e.eventType === 'MESSAGE_DELETE') return
-    /*  */
+    /* 事件匹配 */
+    e.event = 'GUILD_MESSAGES'
     guildMessges(e)
   })
 }
@@ -129,10 +157,11 @@ const PUBLIC_GUILD_MESSAGES = () => {
    AT_MESSAGE_CREATE       // 当收到@机器人的消息时
    PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
    */
-  ws.on('PUBLIC_MESSAGE_DELETE', async (e: messgetype) => {
+  ws.on('PUBLIC_GUILD_MESSAGES', async (e: messgetype) => {
     /* 屏蔽测回消息 */
-    if (e.eventType === 'MESSAGE_DELETE') return
-    /*  */
+    if (e.eventType === 'PUBLIC_MESSAGE_DELETE') return
+    /* 事件匹配 */
+    e.event = 'PUBLIC_GUILD_MESSAGES'
     guildMessges(e)
   })
 }
@@ -239,7 +268,6 @@ const guildMessges = async (e: messgetype) => {
       }`
     )
   )
-  e.event = 'messge'
   /* 消息处理 */
   dealMsg(e)
 }
@@ -253,7 +281,8 @@ const DIRECT_MESSAGE = () => {
   ws.on('DIRECT_MESSAGE', async (e: messgetype) => {
     /* 屏蔽测回消息 */
     if (e.eventType === 'DIRECT_MESSAGE_DELETE') return
-    /*  */
+    /* 事件匹配 */
+    e.event = 'DIRECT_MESSAGE'
     directMessge(e)
   })
 }
@@ -294,7 +323,6 @@ const directMessge = async (e: messgetype) => {
       }`
     )
   )
-  e.event = 'messge'
   /* 消息处理 */
   dealMsg(e)
 }
@@ -307,7 +335,9 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
  */
 const GUILD_MESSAGE_REACTIONS = () => {
   ws.on('GUILD_MESSAGE_REACTIONS', (e: messgetype) => {
-    e.event = 'messageions'
+    /* 事件匹配 */
+    e.event = 'GUILD_MESSAGE_REACTIONS'
+    console.log(e.eventType)
   })
 }
 
@@ -316,7 +346,11 @@ INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
 const INTERACTION = () => {
-  ws.on('INTERACTION', (e: messgetype) => { })
+  ws.on('INTERACTION', (e: messgetype) => {
+    /* 事件匹配 */
+    e.event = 'INTERACTION'
+    console.log(e.eventType)
+  })
 }
 
 /**
@@ -325,7 +359,11 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
 const MESSAGE_AUDIT = () => {
-  ws.on('MESSAGE_AUDIT', (e: messgetype) => { })
+  ws.on('MESSAGE_AUDIT', (e: messgetype) => {
+    /* 事件匹配 */
+    e.event = 'MESSAGE_AUDIT'
+    console.log(e.eventType)
+  })
 }
 
 /**
@@ -340,16 +378,29 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
 const FORUMS_EVENT = () => {
-  ws.on('FORUMS_EVENT', (e: messgetype) => { })
+  ws.on('FORUMS_EVENT', (e: messgetype) => {
+    /* 事件匹配 */
+    e.event = 'FORUMS_EVENT'
+    console.log(e.eventType)
+  })
 }
 
 /**
-  PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
-  - AT_MESSAGE_CREATE       // 当收到@机器人的消息时
-  - PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
+ OPEN_FORUMS_EVENT (1 << 18)      // 论坛事件, 此为公域的论坛事件
+  - OPEN_FORUM_THREAD_CREATE     // 当用户创建主题时
+  - OPEN_FORUM_THREAD_UPDATE     // 当用户更新主题时
+  - OPEN_FORUM_THREAD_DELETE     // 当用户删除主题时
+  - OPEN_FORUM_POST_CREATE       // 当用户创建帖子时
+  - OPEN_FORUM_POST_DELETE       // 当用户删除帖子时
+  - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
+  - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
  */
 const OPEN_FORUMS_EVENT = () => {
-  ws.on('OPEN_FORUMS_EVENT', (e: messgetype) => { })
+  ws.on('OPEN_FORUMS_EVENT', (e: messgetype) => {
+    /* 事件匹配 */
+    e.event = 'OPEN_FORUMS_EVENT'
+    console.log(e.eventType)
+  })
 }
 
 
@@ -362,42 +413,11 @@ AUDIO_ACTION (1 << 29)
  */
 const AUDIO_ACTION = () => {
   ws.on('AUDIO_ACTION', (e: messgetype) => {
-    e.event = 'audio'
+    /* 事件匹配 */
+    e.event = 'AUDIO_ACTION'
+    console.log(e.eventType)
   })
 }
 
-const GUILD_MEMBERS = () => {
-  /*监听新人事件*/
-  ws.on('GUILD_MEMBERS', async (e: messgetype) => {
-    const { data: res } = await client.channelApi.channels(e.msg.guild_id)
-    const channel = res.find((item: any) => item.type === 0)
-    /* 消息类型*/
-    switch (e.eventType) {
-      case 'DIRECT_MESSAGE_CREATE': {
-        await client.directMessageApi.postDirectMessage(e.msg.guild_id, {
-          content: '请在子频道中使用',
-          msg_id: e.msg.id
-        })
-        break
-      }
-      /* 进群 */
-      case 'GUILD_MEMBER_ADD': {
-        await client.messageApi.postMessage(e.msg.channel_id, {
-          content: `<@!${e.msg.user.id}>欢迎新人 `,
-          image: 'http://tva1.sinaimg.cn/bmiddle/6af89bc8gw1f8ub7pm00oj202k022t8i.jpg',
-          msg_id: e.msg.id // 可选,消息id,如果指定则会回复该消息
-        })
-        break
-      }
-      /* 退群 */
-      case 'GUILD_MEMBER_REMOVE': {
-        await client.messageApi.postMessage(e.msg.channel_id, {
-          content: `<@!${e.msg.user.id}> ${e.msg.user.username} 离开了我们`
-        })
-        break
-      }
-      default: {
-      }
-    }
-  })
-}
+
+

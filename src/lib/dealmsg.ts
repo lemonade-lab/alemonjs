@@ -78,7 +78,7 @@ async function loadProgram(dir: string) {
     Apps[appname] = {}
     for (const item in apps) {
       let keys = new apps[item]()
-      if (!keys['rule'] || !keys['describe'] || !keys['event'] || !keys['priority']) continue
+      if (!keys['rule'] || !keys['dsc'] || !keys['event'] || !keys['priority']) continue
       Apps[appname][item] = keys['rule']
       keys['rule'].forEach((key: any) => {
         const FncName = key['fnc']
@@ -88,7 +88,7 @@ async function loadProgram(dir: string) {
           type: item,
           name: FncName,
           reg: key['reg'],
-          describe: keys['describe'],
+          dsc: keys['dsc'],
           priority: keys['priority'],
           event: keys['event']
         })
@@ -119,7 +119,7 @@ async function loadPlugins(dir: string) {
     Apps[appname] = {}
     for (const item in apps) {
       let keys = new apps[item]()
-      if (!keys['rule'] || !keys['describe'] || !keys['event'] || !keys['priority']) continue
+      if (!keys['rule'] || !keys['dsc'] || !keys['event'] || !keys['priority']) continue
       Apps[appname][item] = keys['rule']
       keys['rule'].forEach((key: any) => {
         const FncName = key['fnc']
@@ -129,7 +129,7 @@ async function loadPlugins(dir: string) {
           type: item,
           name: FncName,
           reg: key['reg'],
-          describe: keys['describe'],
+          dsc: keys['dsc'],
           priority: keys['priority'],
           event: keys['event']
         })
@@ -161,7 +161,7 @@ async function saveCommand(command: any[]) {
       reg: val.reg,
       event: val.event,
       priority: val.priority,
-      describe: val.describe
+      dsc: val.dsc
     }
   }
   writeFileSync(join(process.cwd(), '/config/command.json'), JSON.stringify(data, null, '\t'))

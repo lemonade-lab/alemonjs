@@ -4,7 +4,7 @@ export class test extends plugin {
   constructor() {
     super({
       /* 说明集*/
-      describe: '测试类',
+      dsc: '测试类',
       /* 指令集 */
       rule: [
         {
