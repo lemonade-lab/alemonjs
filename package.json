@@ -6,10 +6,10 @@
   "license": "GNU",
   "bin": "./src/index.ts",
   "scripts": {
-    "pm2": "pm2 start pm2.json",
+    "pm2": "pm2 start pm2.config.js",
     "start": "ts-node --files index.ts",
     "dev": "nodemon --exec ts-node index.ts",
-    "lint": "prettier --config .prettierrc.yaml --write ./src/**/*.ts ./example/**/*.ts ./plugins/**/*.ts ./config/**/*.yaml"
+    "lint": "npx prettier --write ."
   },
   "dependencies": {
     "@types/validator": "^13.7.14",

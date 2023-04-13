@@ -41,6 +41,6 @@ export class test extends plugin {
     /* 不允许私聊 */
     if (e.isGroup) return false
     /* 频道转私聊 */
-     super.reply(e, '私聊你了哟')
+    super.reply(e, '私聊你了哟')
   }
 }

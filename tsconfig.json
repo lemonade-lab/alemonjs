@@ -38,17 +38,7 @@
     "declaration": false
   },
   // 要编译的路径列表（用于指定那些ts文件需要被编译），
-  "include": [
-    "src",
-    "program",
-    "example",
-    "plugins",
-    "index.ts"
-  ],
+  "include": ["src", "program", "example", "plugins", "index.ts"],
   // 要排除的、不编译的文件，它也可以指定一个列表，
-  "exclude": [
-    "node_modules",
-    "dist",
-    "dist_pkg"
-  ]
+  "exclude": ["node_modules", "dist", "dist_pkg"]
 }

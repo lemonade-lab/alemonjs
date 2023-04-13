@@ -1,6 +1,7 @@
-import fs from "fs";
-import { MyDirPath } from "../../app.config";
+import fs from 'fs'
+import { MyDirPath } from '../../app.config'
 /* 配置生成地址 */
-const PathConfig = `${MyDirPath}/resources/defset`;
+const PathConfig = `${MyDirPath}/resources/defset`
 /* 得到指定配置的数据 */
-export const getConfig = (app: string, name: string) => JSON.parse(fs.readFileSync(`${PathConfig}/${app}/${name}.json`, "utf8"))
+export const getConfig = (app: string, name: string) =>
+  JSON.parse(fs.readFileSync(`${PathConfig}/${app}/${name}.json`, 'utf8'))

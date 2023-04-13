@@ -40,7 +40,7 @@ package.hson     工程管理
 tsconfig.ts      TS配置
 ```
 
-##  **框架简介**
+## **框架简介**
 
 index.ts 入口按顺序执行事件,立即定义立即执行
 
@@ -181,9 +181,9 @@ export async function init() {
 
 plugins/test-plugin/index.ts
 
-识别plugins/test-plugin/apps目录下
+识别 plugins/test-plugin/apps 目录下
 
-所有子ts文件
+所有子 ts 文件
 
 并从中导出所有类
 
@@ -219,7 +219,7 @@ export { apps }
 
 plugins/test-plugin/api
 
-此处专用于调用api插件框架功能
+此处专用于调用 api 插件框架功能
 
 ```TypeScript
 import plugin from '../../../src/lib/plugins'
@@ -230,7 +230,7 @@ export { plugin, pluginType, messgetype }
 export { showPuppeteer, config }
 ```
 
-调用此api可用于html截图并发送图片
+调用此 api 可用于 html 截图并发送图片
 
 ```TypeScript
 import { screenshot } from '../../../src/lib/puppeteer'
@@ -314,7 +314,6 @@ export class show extends plugin {
 
 ```
 
-
 ```TypeScript
 import { messgetype, pluginType } from './types'
 export default class plugin {
@@ -323,24 +322,24 @@ export default class plugin {
 
    /**
    * @param dsc 插件描述   用于描述对象类型
-   * @param event 事件类型    
-   * 
+   * @param event 事件类型
+   *
    * 机器人进出 GUILDS
-   * 成员进出 GUILD_MEMBERS 
-   * 
+   * 成员进出 GUILD_MEMBERS
+   *
    * 下方可能会归类为 message 事件
-   * - 表情点击 GUILD_MESSAGE_REACTIONS   
-   * - 频道 PUBLIC_GUILD_MESSAGES (公)  GUILD_MESSAGES (私)  
-   * - 私信 DIRECT_MESSAGE  
-   * 
+   * - 表情点击 GUILD_MESSAGE_REACTIONS
+   * - 频道 PUBLIC_GUILD_MESSAGES (公)  GUILD_MESSAGES (私)
+   * - 私信 DIRECT_MESSAGE
+   *
    * 互动事件 INTERACTION
    * 消息审核事件 MESSAGE_AUDIT
-   * 
+   *
    * 论坛事件  OPEN_FORUMS_EVENT （公）  FORUMS_EVENT （私）
-   * 
+   *
    * 音频会话 AUDIO_ACTION
    * @param eventType 消息类型   该事件暂未开始设计（默认排除撤回消息）
-   * 
+   *
    * @param priority 优先级      数字越小优先级越高
    * @param rule.reg 命令正则      RegExp(rule.reg)
    * @param rule.fnc 命令执行方法    function
@@ -394,12 +393,12 @@ export default class plugin {
 
 ```
 
-## 框架特殊API
+## 框架特殊 API
 
 #### 消息发送机制
 
 ```TypeScript
-const content = '消息内容' 
+const content = '消息内容'
 const obj = {} //可选
 e.reply(content,boj)
 ```
@@ -416,7 +415,7 @@ e.sendImage(content,file_image)
 
 ```TypeScript
 /**
-     * 表情表态 
+     * 表情表态
      * @param boj 表情对象
      * @param swich  Boolean是否转为删除  可选
  */

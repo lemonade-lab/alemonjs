@@ -1,44 +1,44 @@
 {
-    "information": [
+  "information": [
+    {
+      "key": "alement-bot",
+      "value": "V1.0.0"
+    },
+    {
+      "key": "&& author",
+      "value": "@柠檬冲水"
+    }
+  ],
+  "body": [
+    {
+      "group": "指令示范效果",
+      "list": [
         {
-            "key": "alement-bot",
-            "value": "V1.0.0"
+          "icon": 14,
+          "title": "/回答我",
+          "desc": "被动回复消息"
         },
         {
-            "key": "&& author",
-            "value": "@柠檬冲水"
-        }
-    ],
-    "body": [
-        {
-            "group": "指令示范效果",
-            "list": [
-                {
-                    "icon": 14,
-                    "title": "/回答我",
-                    "desc": "被动回复消息"
-                },
-                {
-                    "icon": 21,
-                    "title": "/艾特我",
-                    "desc": "机器人艾特效果"
-                },
-                {
-                    "icon": 21,
-                    "title": "/私聊我",
-                    "desc": "频道发送转为私聊发送"
-                }
-            ]
+          "icon": 21,
+          "title": "/艾特我",
+          "desc": "机器人艾特效果"
         },
         {
-            "group": "帮助图调用示范",
-            "list": [
-                {
-                    "icon": 51,
-                    "title": "/柠檬帮助",
-                    "desc": "查看插件指令"
-                }
-            ]
+          "icon": 21,
+          "title": "/私聊我",
+          "desc": "频道发送转为私聊发送"
         }
-    ]
+      ]
+    },
+    {
+      "group": "帮助图调用示范",
+      "list": [
+        {
+          "icon": 51,
+          "title": "/柠檬帮助",
+          "desc": "查看插件指令"
+        }
+      ]
+    }
+  ]
 }

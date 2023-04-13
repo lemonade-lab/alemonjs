@@ -13,7 +13,6 @@ declare global {
   var client: IOpenAPI
 }
 
-
 /**
  * ws.on方法可以监听机器人所在频道的所有事件
  * 根据其e.eventType，判断出事件的具体类型
@@ -24,7 +23,6 @@ export const createConversation = () => {
 
   //会话失败
   ERROR()
-
 
   //私
   /* 频道会话消息 */
@@ -37,8 +35,6 @@ export const createConversation = () => {
   PUBLIC_GUILD_MESSAGES()
   /* 论坛消息 */
   OPEN_FORUMS_EVENT()
-
-
 
   /* 机器人进出频道消息 */
   GUILDS()
@@ -89,7 +85,6 @@ const GUILDS = () => {
   })
 }
 
-
 /**
 GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_ADD       // 当成员加入时
@@ -108,7 +103,7 @@ const GUILD_MEMBERS = () => {
       case 'DIRECT_MESSAGE_CREATE': {
         await client.directMessageApi.postDirectMessage(e.msg.guild_id, {
           msg_id: e.msg.id,
-          content: '请在子频道中使用',
+          content: '请在子频道中使用'
         })
         break
       }
@@ -133,8 +128,6 @@ const GUILD_MEMBERS = () => {
     }
   })
 }
-
-
 
 const GUILD_MESSAGES = () => {
   /** 
@@ -264,7 +257,8 @@ const guildMessges = async (e: messgetype) => {
   })
   console.info(
     green(
-      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
+      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${
+        e.msg.content ? e.msg.content : ''
       }`
     )
   )
@@ -319,14 +313,14 @@ const directMessge = async (e: messgetype) => {
   }
   console.info(
     green(
-      `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
+      `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${
+        e.msg.content ? e.msg.content : ''
       }`
     )
   )
   /* 消息处理 */
   dealMsg(e)
 }
-
 
 /**
 GUILD_MESSAGE_REACTIONS (1 << 10)
@@ -403,7 +397,6 @@ const OPEN_FORUMS_EVENT = () => {
   })
 }
 
-
 /**
 AUDIO_ACTION (1 << 29)
   - AUDIO_START             // 音频开始播放时
@@ -418,6 +411,3 @@ const AUDIO_ACTION = () => {
     console.log(e.eventType)
   })
 }
-
-
-

@@ -21,4 +21,3 @@ export class show extends plugin {
     return false
   }
 }
- 

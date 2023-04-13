@@ -1,14 +1,13 @@
-
 <h1 align="center">
  <span> Alemon-Bot</span> 
 <a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
 <img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg'  alt='star'>
 
-[![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)    
+[![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)
 
 Node.js>=V16
 
-[☞参考文档](./README_README.md) 
+[☞ 参考文档](./README_README.md)
 
 Windows/Linux,Node.js,Redis,Sequelize
 
@@ -16,21 +15,24 @@ Windows/Linux,Node.js,Redis,Sequelize
 </a>
 </h1>
 
-
 ## 频道机器人
 
 ## 起步
+
 拉取代码
+
 ```
 #github
 git clone --depth=1 https://github.com/ningmengchongshui/alemon-bot.git
 #gitee
 git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
 ```
+
 加载依赖
+
 ```
 cd alemon-bot
-npm install         
+npm install
 ```
 
 ## 运行
@@ -74,8 +76,10 @@ npm run pm2
 
 ```
 
-## linux 
-puppeteer环境
+## linux
+
+puppeteer 环境
+
 #### centos
 
 ```
@@ -96,6 +100,6 @@ yum groupinstall fonts -y
 
 官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
 
-函数名命名部分借鉴于oicq/icqq
+函数名命名部分借鉴于 oicq/icqq
 
-插件设计思想借鉴于Yunzai-Bot
+插件设计思想借鉴于 Yunzai-Bot

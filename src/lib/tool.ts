@@ -28,7 +28,7 @@ export function readYaml(url: string) {
     const data = parse(file)
     return data
   } else {
-    console.log(red(`[undifind]`),` ${url}`)
+    console.log(red(`[undifind]`), ` ${url}`)
     return false
   }
 }
