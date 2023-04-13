@@ -4,7 +4,6 @@
   "description": "alemon-bot",
   "author": "ningmengchongshui",
   "license": "GNU",
-  "bin": "./src/index.ts",
   "scripts": {
     "pm2": "pm2 start pm2.config.js",
     "start": "ts-node index.ts",

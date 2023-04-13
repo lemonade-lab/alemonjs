@@ -8,6 +8,10 @@ export class show extends plugin {
         {
           reg: '^/柠檬帮助$',
           fnc: 'alementShowHelp'
+        },
+        {
+          reg: '^/来张图片$',
+          fnc: 'getImg'
         }
       ]
     })
@@ -20,4 +24,12 @@ export class show extends plugin {
     e.sendImage('', img)
     return false
   }
+  async getImg(e: messgetype) {
+    /* 判断是否是私聊 */
+    if (e.isGroup) return false
+    const img = await showPuppeteer({ path: 'map', name: 'map' })
+    e.sendImage('', img)
+    return false
+  }
+
 }
