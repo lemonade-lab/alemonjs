@@ -1,17 +1,34 @@
 <h1 align="center">
- <span> Alemon-Bot</span> 
+
+Alemon-Bot
+
+</h1>
+
+<h1 align="center">
 
 [![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)    
 
+</h1>
+
+<h1 align="center">
+
 Node.js>=V16
+
+</h1>
+
+<h1 align="center">
 
 [☞参考文档](./README_README.md) 
 
 </h1>
 
-## 频道机器人
+<h1 align="center">
 
-基础环境Windows or Linux,Node.js,Redis
+Windows or Linux,Node.js,Redis,sequelize
+
+</h1>
+
+## 频道机器人
 
 ## 起步
 拉取代码
