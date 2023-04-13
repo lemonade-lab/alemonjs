@@ -1,32 +1,21 @@
-<h1 align="center">
-
-Alemon-Bot
-
-</h1>
 
 <h1 align="center">
+ <span> Alemon-Bot</span> 
+<a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
+<img src='https://github.com/ningmengchongshui/alemon-bot/badge/star.svg'  alt='star'>
 
 [![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)    
 
-</h1>
-
-<h1 align="center">
-
 Node.js>=V16
-
-</h1>
-
-<h1 align="center">
 
 [☞参考文档](./README_README.md) 
 
+Windows/Linux,Node.js,Redis,Sequelize
+
+</img>
+</a>
 </h1>
 
-<h1 align="center">
-
-Windows or Linux,Node.js,Redis,sequelize
-
-</h1>
 
 ## 频道机器人
 
@@ -42,16 +31,14 @@ git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
 安装管理包
 
 ```
-npm i pnpm -g  #选其一
-npm i cnpm -g  #选其二
+npm install cnpm -g  
 ```
 
 加载依赖
 
 ```
 cd alemon-bot
-pnpm i         #选其一
-cnpm i         #选其二
+cnpm install         
 ```
 
 ## 运行
