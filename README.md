@@ -51,8 +51,15 @@ npm run pm2 #后台运行
 
 ```
 
+#### 扩展指令
+
 ```
-pm2 log #打印后台记录
+pm2 log #查看pm2打印记录
+pm2 update #更新pm2版本
+pm2 all #查看所有pm2程序
+pm2 start all #启动所有pm2程序
+pm2 delete all #关掉所有pm2程序
+pm2 delete 0 #关掉ID为0的程序
 ```
 
 ## linux
