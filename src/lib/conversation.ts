@@ -57,7 +57,7 @@ const READY = () => {
     global.bot = e.msg.user
     /* 初始化指令 */
     init()
-    console.info(green('[READY]'), `[${bot.username}]`)
+    console.info(green('[READY]'), ` 欢迎回来 ${bot.username} ~`)
   })
 }
 

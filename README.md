@@ -6,9 +6,11 @@
 
 Node.js>=V16
 
-[☞ 参考文档](./README_.md)
+[☞ 参考文档](http://three-point-of-water.gitee.io/point/)
 
-Windows/Linux,Node.js,Redis,Sequelize
+Windows/Linux,Node.js,TypeScript
+
+Express,Redis,Sequelize,PM2
 
 </a>
 </h1>
