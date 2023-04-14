@@ -19,6 +19,8 @@ Express,Redis,Sequelize,PM2
 
 一款基于官方SDK所构造的频道机器人开发框架,让开发者更专注于业务逻辑,是一种面向执行消息匹配指令的开发模式.
 
+
+
 ## 起步
 
 拉取代码
@@ -92,6 +94,8 @@ yum groupinstall fonts -y
 
 官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
 
-函数名命名部分借鉴于 oicq/icqq
+开发交流地可搜素 806943302
+
+函数命名部分借鉴于 oicq/icqq
 
 插件设计思想借鉴于 Yunzai-Bot
