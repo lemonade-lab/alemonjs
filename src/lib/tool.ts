@@ -28,7 +28,7 @@ export function readYaml(url: string) {
     const data = parse(file)
     return data
   } else {
-    console.log(red(`[undifind]`), ` ${url}`)
+    console.log(yellow(`[NOFIND]${url}`))
     return false
   }
 }
@@ -93,9 +93,7 @@ export function download() {
         chromePath = revisionInfo.executablePath
         resolve('完成')
       } else {
-        console.log(
-          yellow('no find puppeteer,Start downloading, please pay attention to the traffic')
-        )
+        console.log(yellow('[NOFIND]puppeteer,Start downloading, please pay attention to the traffic'))
         // 下载
         browserFetcher
           .download(PUPPETEER_REVISIONS.chromium, onProgress)
