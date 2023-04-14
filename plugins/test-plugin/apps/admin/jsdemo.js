@@ -7,7 +7,7 @@ export class jsdemo extends plugin {
             /* 指令集 */
             rule: [
                 {
-                    reg: '^/测试JS指令$', //正则指令
+                    reg: '^/测试指令$', //正则指令
                     fnc: 'ontest' //函数匹配10
                 }
             ]

@@ -58,11 +58,12 @@ npm run pm2 #后台运行
 
 ```
 pm2 log #查看pm2打印记录
-pm2 update #更新pm2版本
 pm2 list #查看所有pm2程序
 pm2 start all #启动所有pm2程序
+pm2 stop all #停止所有pm2程序
 pm2 delete all #关掉所有pm2程序
 pm2 delete 0 #关掉ID为0的程序
+pm2 update #更新pm2版本
 ```
 
 ## linux

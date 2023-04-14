@@ -6,17 +6,17 @@ export class show extends plugin {
       dsc: '发送图片',
       rule: [
         {
-          reg: '^/柠檬帮助$',
-          fnc: 'alementShowHelp'
+          reg: '^/柠檬帮助.*$',
+          fnc: 'getHelp'
         },
         {
-          reg: '^/专属图标$',
-          fnc: 'getImg'
+          reg: '^/柠檬版本.*$',
+          fnc: 'getVersion'
         }
       ]
     })
   }
-  async alementShowHelp(e: messgetype) {
+  async getHelp(e: messgetype) {
     /* 判断是否是私聊 */
     if (e.isGroup) return false
     const data = config.getConfig('help', 'help')
@@ -24,10 +24,11 @@ export class show extends plugin {
     e.sendImage('', img)
     return false
   }
-  async getImg(e: messgetype) {
+  async getVersion(e: messgetype) {
     /* 判断是否是私聊 */
     if (e.isGroup) return false
-    const img = await showPuppeteer({ path: 'map', name: 'map' })
+    const data = config.getConfig('version', 'html')
+    const img = await showPuppeteer({ path: 'version', name: 'version', data })
     e.sendImage('', img)
     return false
   }

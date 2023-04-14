@@ -212,7 +212,7 @@ export async function getImg(htmlPath: PathLike, tab: string, imgPath: string): 
   let body = await page.$(tab)
   await body.screenshot({
     type: 'jpeg',
-    quality: 90,
+    quality: 100,
     path: imgPath
   })
   pic++
