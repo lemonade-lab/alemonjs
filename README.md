@@ -94,7 +94,7 @@ yum groupinstall fonts -y
 
 官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
 
-开发交流地可搜素 806943302
+开发交流地 806943302
 
 函数命名部分借鉴于 oicq/icqq
 
