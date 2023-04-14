@@ -163,14 +163,15 @@ const guildMessges = async (e: messgetype) => {
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
   /* 自身机器人权限检测 */
-  const {
-    data: { permissions: botmiss }
-  }: any = await client.channelPermissionsApi
+  const authority: any = await client.channelPermissionsApi
     .channelPermissions(e.msg.channel_id, bot.id)
     .catch((err) => {
       console.log(err)
     })
+  /* 查看报错 */
+  if (!authority) return
   /* 权限不通过则不反馈 */
+  const { data: { permissions: botmiss } }:any = authority
   if (botmiss < 7) return
   /* 查看当前用户权限 */
   const {
@@ -257,8 +258,7 @@ const guildMessges = async (e: messgetype) => {
   })
   console.info(
     green(
-      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${
-        e.msg.content ? e.msg.content : ''
+      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
       }`
     )
   )
@@ -313,8 +313,7 @@ const directMessge = async (e: messgetype) => {
   }
   console.info(
     green(
-      `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${
-        e.msg.content ? e.msg.content : ''
+      `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
       }`
     )
   )
