@@ -15,6 +15,8 @@ Windows/Linux,Node.js,Redis,Sequelize
 
 ## 频道机器人
 
+一款基于官方SDK所构造的频道机器人开发框架,让开发者更专注于业务逻辑,是一种面向执行消息匹配指令的开发模式.
+
 ## 起步
 
 拉取代码
@@ -40,23 +42,24 @@ npm install
 ```
 npm run start  #前台运行
 ```
+
 #### 后台运行 2 负载均衡
 
 ```
-npm install pm2 -g #安装pm2全局
+npm install pm2 -g #安装全局pm2
+npm install ts-node -g #安装全局ts-node
 ```
 
 ```
 npm run pm2 #后台运行
 
 ```
-
 #### 扩展指令
 
 ```
 pm2 log #查看pm2打印记录
 pm2 update #更新pm2版本
-pm2 all #查看所有pm2程序
+pm2 list #查看所有pm2程序
 pm2 start all #启动所有pm2程序
 pm2 delete all #关掉所有pm2程序
 pm2 delete 0 #关掉ID为0的程序
