@@ -28,13 +28,14 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # craete file
-.cache
+/.cache/
 /config/
-/xiuxiandata/
 /data/
-node_modules
+/logs/
+/dist/
+/node_modules/
+
 .DS_Store
-dist
 dist-ssr
 coverage
 *.local

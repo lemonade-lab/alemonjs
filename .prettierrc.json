@@ -4,5 +4,11 @@
   "tabWidth": 2,
   "singleQuote": true,
   "printWidth": 100,
-  "trailingComma": "none"
+  "trailingComma": "none",
+  "useTabs": false,
+  "proseWrap": "preserve",
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "endOfLine": "auto",
+  "quoteProps": "consistent"
 }
