@@ -2,8 +2,6 @@ import { plugin } from '../../api'
 export class jsdemo extends plugin {
   constructor() {
     super({
-      /* 说明集*/
-      dsc: '指令用法示范',
       /* 指令集 */
       rule: [
         {

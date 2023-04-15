@@ -6,20 +6,20 @@ export const rule = [
   {
     name: 'hello', //中文名
     dsc: '[/你好呀]开发简单示例演示', //【命令】功能说明
-    event: 'GUILD_MESSAGES',  //频道
+    event: 'GUILD_MESSAGES', //频道
     eventType: 'MESSAGE_CREATE', //
     priority: 5000, //优先级，越小优先度越高
     reg: '^/你好呀$', //匹配消息正则，命令正则
-    fnc: 'test'  //函数
+    fnc: 'test' //函数
   },
   {
     name: 'hello', //中文名
     dsc: '[/你好呀]开发简单示例演示', //【命令】功能说明
-    event: 'DIRECT_MESSAGE',  // 私聊
+    event: 'DIRECT_MESSAGE', // 私聊
     eventType: 'DIRECT_MESSAGE_CREATE', //
     priority: 5000, //优先级，越小优先度越高
     reg: '^/你好呀$', //匹配消息正则，命令正则
-    fnc: 'test'  //函数
+    fnc: 'test' //函数
   }
 ]
 

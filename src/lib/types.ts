@@ -16,7 +16,7 @@ interface messgetype {
   eventType: string //消息类型
   msg: msgType //消息对象
   isGroup: boolean //是否是私聊
-  recall: boolean //是否是撤回
+  isRecall: boolean //是否是撤回
   atuid: IUser[] // 艾特得到的qq
   at: boolean // 是否艾特
   isMaster: boolean //是否是管理员
@@ -30,32 +30,5 @@ interface messgetype {
   //发送表态
   postEmoji: (boj: any) => Promise<boolean>
 }
-
-interface ruleType {
-  reg: string
-  fnc: string
-}
-
-interface dataType {
-  belong: string //导出类型
-  type: string //插件名
-  name: string //类名
-  eventType: string //消息类型
-  dsc: any //指令说明
-  fnc: string //
-}
-
-interface cmdTyoe {
-  req: string //指令
-  priority: number //优先级
-  data: dataType[] //
-  belong: string //导出类型
-  type: string //插件类型
-  name: string //插件名
-  rule: ruleType[] //对象数组
-  event: string //事件类型
-  eventType: string //消息类型
-  dsc: any //指令说明
-}
 type pluginType = string | any[] | Number | ((e: messgetype, content: string) => Promise<boolean>)
-export { READY, messgetype, pluginType, cmdTyoe }
+export { READY, messgetype, pluginType }

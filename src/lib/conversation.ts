@@ -2,7 +2,7 @@ import { green, red } from 'kolorist'
 import { IOpenAPI } from 'qq-guild-bot'
 
 /* 非依赖引用 */
-import { init, InstructionMatching } from './dealmsg'
+import { init, InstructionMatching, RecallMessage } from './dealmsg'
 import { messgetype } from './types'
 import { sendImage } from './tool'
 import { segment } from './segment'
@@ -152,10 +152,16 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
  * */
 const GUILD_MESSAGES = () => {
   ws.on('GUILD_MESSAGES', async (e: messgetype) => {
-    /* 屏蔽测回消息 */
-    if (e.eventType === 'MESSAGE_DELETE') return
     /* 事件匹配 */
     e.event = 'GUILD_MESSAGES'
+    console.log(e)
+    /* 屏蔽测回消息 */
+    e.isRecall = false
+    if (e.eventType === 'MESSAGE_DELETE') {
+      e.isRecall = true
+      RecallMessage(e)
+      return
+    }
     guildMessges(e).catch((err: any) => console.log(red(err)))
   })
 }
@@ -167,10 +173,16 @@ const GUILD_MESSAGES = () => {
  */
 const PUBLIC_GUILD_MESSAGES = () => {
   ws.on('PUBLIC_GUILD_MESSAGES', async (e: messgetype) => {
-    /* 屏蔽测回消息 */
-    if (e.eventType === 'PUBLIC_MESSAGE_DELETE') return
     /* 事件匹配 */
     e.event = 'PUBLIC_GUILD_MESSAGES'
+    console.log(e)
+    /* 屏蔽测回消息 */
+    e.isRecall = false
+    if (e.eventType === 'PUBLIC_MESSAGE_DELETE') {
+      e.isRecall = true
+      RecallMessage(e)
+      return
+    }
     guildMessges(e).catch((err: any) => console.log(red(err)))
   })
 }
@@ -301,11 +313,15 @@ DIRECT_MESSAGE (1 << 12)
  */
 const DIRECT_MESSAGE = () => {
   ws.on('DIRECT_MESSAGE', async (e: messgetype) => {
-    console.log(e)
-    /* 屏蔽测回消息 */
-    if (e.eventType === 'DIRECT_MESSAGE_DELETE') return
     /* 事件匹配 */
     e.event = 'DIRECT_MESSAGE'
+    console.log(e)
+    /* 屏蔽测回消息 */
+    e.isRecall = false
+    if (e.eventType === 'DIRECT_MESSAGE_DELETE') {
+      e.isRecall = true
+      return
+    }
 
     /* 是私聊 */
     e.isGroup = true

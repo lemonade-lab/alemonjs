@@ -5,7 +5,7 @@ import lodash from 'lodash'
 
 /* 非依赖引用 */
 import { readYaml } from './tool'
-import { messgetype, cmdTyoe } from './types'
+import { messgetype } from './types'
 
 /* 全局 */
 declare global {
@@ -13,20 +13,7 @@ declare global {
   var command: {}
 }
 
-// const command={
-//   event:[
-//     {
-//       req:'',
-//       fuc:'',
-//       data:{
-
-//       }
-//     }
-//   ]
-// }
-
 const createApps = () => {
-
   global.Apps = {
     /* 频道会话消息 */
     GUILD_MESSAGES: {},
@@ -49,7 +36,7 @@ const createApps = () => {
     /* 互动事件监听 */
     INTERACTION: {},
     /* 音频事件 */
-    AUDIO_ACTION: {},
+    AUDIO_ACTION: {}
   }
 
   global.command = {
@@ -74,11 +61,9 @@ const createApps = () => {
     /* 互动事件监听 */
     INTERACTION: [],
     /* 音频事件 */
-    AUDIO_ACTION: [],
+    AUDIO_ACTION: []
   }
 }
-
-
 
 function watchC() {
   watch(join(process.cwd(), '/config/config.yaml'), async (event, filename) => {
@@ -115,13 +100,11 @@ async function loadExample(dir: string) {
     })
     if (!tmp) return
     if (!tmp.rule) continue
-
-    console.log(tmp.rule)
-
     for (let item of tmp.rule) {
       if (!item['event']) continue
       if (!global.Apps[item['event']][belong]) global.Apps[item['event']][belong] = {}
-      if (!global.Apps[item['event']][belong][appname]) global.Apps[item['event']][belong][appname] = {}
+      if (!global.Apps[item['event']][belong][appname])
+        global.Apps[item['event']][belong][appname] = {}
       global.Apps[item['event']][belong][appname][item['name']] = {}
       global.Apps[item['event']][belong][appname][item['name']][item['fnc']] = tmp[item['fnc']]
       global.command[item['event']].push({
@@ -129,6 +112,7 @@ async function loadExample(dir: string) {
         priority: item['priority'],
         data: {
           event: item['event'],
+          eventType: item['eventType'],
           belong,
           type: appname,
           name: item['name'],
@@ -136,20 +120,18 @@ async function loadExample(dir: string) {
           fnc: item['fnc']
         }
       })
-    
     }
   }
-
 }
 
-
-async function synthesis(apps,appname,belong) {
+async function synthesis(apps, appname, belong) {
   for (const item in apps) {
     let keys = new apps[item]()
     // 没有类型和指令
     if (!keys['event'] || !keys['rule']) continue
     if (!global.Apps[keys['event']][belong]) global.Apps[keys['event']][belong] = {}
-    if (!global.Apps[keys['event']][belong][appname]) global.Apps[keys['event']][belong][appname] = {}
+    if (!global.Apps[keys['event']][belong][appname])
+      global.Apps[keys['event']][belong][appname] = {}
     /* 类名 */
     global.Apps[keys['event']][belong][appname][item] = {}
     keys['rule'].forEach((key: any) => {
@@ -160,6 +142,7 @@ async function synthesis(apps,appname,belong) {
         priority: keys['priority'],
         data: {
           event: keys['event'],
+          eventType: keys['eventType'],
           belong,
           type: appname,
           name: item,
@@ -187,7 +170,7 @@ async function loadProgram(dir: string) {
       console.error(red(error))
       process.exit()
     })
-    synthesis(apps,appname,belong)
+    synthesis(apps, appname, belong)
   }
 }
 
@@ -204,7 +187,7 @@ async function loadPlugins(dir: string) {
       console.error(red(error))
       process.exit()
     })
-    synthesis(apps,appname,belong)
+    synthesis(apps, appname, belong)
   }
 }
 
@@ -252,10 +235,43 @@ export async function InstructionMatching(e: messgetype) {
     if (!Apps[e.event][data.belong][data.type]) continue
     if (!Apps[e.event][data.belong][data.type][data.name]) continue
     /* 信息正则匹配 */
+    if (e.isRecall) continue
     if (!new RegExp(reg).test(e.cmd_msg)) continue
     try {
       /* 执行函数 */
-      const ret = await Apps[e.event][data.belong][data.type][data.name][data.fnc](e).catch((err: any) => console.log(red(err)))
+      const ret = await Apps[e.event][data.belong][data.type][data.name]
+        [data.fnc](e)
+        .catch((err: any) => console.log(red(err)))
+      /* 真:强制不再匹配 */
+      if (ret) break
+    } catch (error) {
+      /* 出错啦 */
+      console.error(red(`[${e.event}][${data.belong}][${data.type}][${data.name}][${data.fnc}]`))
+      let err = JSON.stringify(error, null, 2)
+      if (err + '' === '{}') {
+        console.log(red(error))
+      } else {
+        console.log(red(err))
+      }
+      return
+    }
+  }
+}
+
+export async function RecallMessage(e: any) {
+  for (const val of command[e.event]) {
+    const { data } = val
+    if (!Apps[e.event][data.belong]) continue
+    if (!Apps[e.event][data.belong][data.type]) continue
+    if (!Apps[e.event][data.belong][data.type][data.name]) continue
+    /* 信息正则匹配 */
+    if (!e.isRecall) continue
+    if (e.eventType != data.eventType) continue
+    try {
+      /* 执行函数 */
+      const ret = await Apps[e.event][data.belong][data.type][data.name]
+        [data.fnc](e)
+        .catch((err: any) => console.log(red(err)))
       /* 真:强制不再匹配 */
       if (ret) break
     } catch (error) {

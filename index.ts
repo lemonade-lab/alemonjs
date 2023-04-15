@@ -9,16 +9,17 @@ declare global {
   var client: IOpenAPI
   var ws: EventEmitter
 }
-; (async function run(): Promise<void> {
-  
+;(async function run(): Promise<void> {
   console.info(green('[HELLO]'), ' 欢迎使用Alemon-Bot ~ ')
 
   /* 启动redis数据库 */
-  redisInit().then(() => {
-    console.info(green('[REIDS]'), ' OK ')
-  }).catch((err) => {
-    console.info(red('[REIDS]'), err)
-  })
+  redisInit()
+    .then(() => {
+      console.info(green('[REIDS]'), ' OK ')
+    })
+    .catch(err => {
+      console.info(red('[REIDS]'), err)
+    })
 
   // 下载puppeteer
   await download()
