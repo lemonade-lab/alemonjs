@@ -296,7 +296,6 @@ const guildMessges = async (e: messgetype) => {
 
   /* 艾特消息处理 */
   e.at = false
-  
   if (e.msg.mentions) {
     // 去掉@ 转为纯消息
     e.atuid = e.msg.mentions
