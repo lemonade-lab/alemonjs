@@ -291,11 +291,12 @@ const guildMessges = async (e: messgetype) => {
     )
   )
 
-  /* 简化消息 */
   /* 消息 */
   e.cmd_msg = e.msg.content
-  /* 默认不存在艾特 */
+
+  /* 艾特消息处理 */
   e.at = false
+  
   if (e.msg.mentions) {
     // 去掉@ 转为纯消息
     e.atuid = e.msg.mentions

@@ -201,7 +201,6 @@ export async function InstructionMatching(e: messgetype) {
     const { belong, type, name, reg, event } = val
     if (!Apps[belong][type] || !Apps[belong][type][name]) continue
     /* 信息正则匹配 */
-      console.log('123')
     if (!new RegExp(reg).test(e.cmd_msg)) continue
     try {
       /* 执行函数 */
