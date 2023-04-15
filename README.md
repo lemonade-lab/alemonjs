@@ -36,7 +36,8 @@ git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
 
 ```
 cd alemon-bot
-npm install
+npm install cnpm -g #全局安装cnpm
+cnpm install  
 ```
 
 ## 运行

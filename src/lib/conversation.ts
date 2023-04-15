@@ -2,7 +2,7 @@ import { green } from 'kolorist'
 import { IOpenAPI } from 'qq-guild-bot'
 
 /* 非依赖引用 */
-import { init, dealMsg } from './dealmsg'
+import { init, InstructionMatching } from './dealmsg'
 import { messgetype } from './types'
 import { sendImage } from './tool'
 import { segment } from './segment'
@@ -25,16 +25,21 @@ export const createConversation = () => {
   ERROR()
 
   //私
-  /* 频道会话消息 */
-  GUILD_MESSAGES()
-  /* 论坛消息 */
-  FORUMS_EVENT()
+  {
+    /* 频道会话消息 */
+    GUILD_MESSAGES()
+    /* 论坛消息 */
+    FORUMS_EVENT()
+  }
 
   //公
-  /* 频道会话消息 */
-  PUBLIC_GUILD_MESSAGES()
-  /* 论坛消息 */
-  OPEN_FORUMS_EVENT()
+  {
+    /* 频道会话消息 */
+    PUBLIC_GUILD_MESSAGES()
+    /* 论坛消息 */
+    OPEN_FORUMS_EVENT()
+  }
+
 
   /* 机器人进出频道消息 */
   GUILDS()
@@ -47,6 +52,13 @@ export const createConversation = () => {
 
   /* 私聊会话消息 */
   DIRECT_MESSAGE()
+
+  /* 互动事件监听 */
+  INTERACTION()
+
+
+  /* 音频事件 */
+  AUDIO_ACTION()
 }
 
 const READY = () => {
@@ -129,12 +141,12 @@ const GUILD_MEMBERS = () => {
   })
 }
 
+/** 
+GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置此 intents。
+  - MESSAGE_CREATE         // 发送消息事件，代表频道内的全部消息，而不只是 at 机器人的消息。内容与 AT_MESSAGE_CREATE 相同
+  - MESSAGE_DELETE         // 删除（撤回）消息事件
+ * */
 const GUILD_MESSAGES = () => {
-  /** 
-  GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置此 intents。
-    - MESSAGE_CREATE         // 发送消息事件，代表频道内的全部消息，而不只是 at 机器人的消息。内容与 AT_MESSAGE_CREATE 相同
-    - MESSAGE_DELETE         // 删除（撤回）消息事件
-   * */
   ws.on('GUILD_MESSAGES', async (e: messgetype) => {
     /* 屏蔽测回消息 */
     if (e.eventType === 'MESSAGE_DELETE') return
@@ -144,12 +156,14 @@ const GUILD_MESSAGES = () => {
   })
 }
 
+
+
+/**
+ PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
+ AT_MESSAGE_CREATE       // 当收到@机器人的消息时
+ PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
+ */
 const PUBLIC_GUILD_MESSAGES = () => {
-  /**
-   PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
-   AT_MESSAGE_CREATE       // 当收到@机器人的消息时
-   PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
-   */
   ws.on('PUBLIC_GUILD_MESSAGES', async (e: messgetype) => {
     /* 屏蔽测回消息 */
     if (e.eventType === 'PUBLIC_MESSAGE_DELETE') return
@@ -159,20 +173,27 @@ const PUBLIC_GUILD_MESSAGES = () => {
   })
 }
 
+
+
 const guildMessges = async (e: messgetype) => {
+
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
+
   /* 自身机器人权限检测 */
   const authority: any = await client.channelPermissionsApi
     .channelPermissions(e.msg.channel_id, bot.id)
     .catch((err) => {
       console.log(err)
     })
+
   /* 查看报错 */
   if (!authority) return
+
   /* 权限不通过则不反馈 */
-  const { data: { permissions: botmiss } }:any = authority
+  const { data: { permissions: botmiss } }: any = authority
   if (botmiss < 7) return
+
   /* 查看当前用户权限 */
   const {
     data: { permissions: usermiss }
@@ -181,13 +202,16 @@ const guildMessges = async (e: messgetype) => {
     .catch((err) => {
       console.log(err)
     })
+
   if (usermiss < 7) {
     e.isMaster = false
   } else {
     e.isMaster = true
   }
+
   /* 不是私聊 */
   e.isGroup = false
+
   /**
    * 消息发送机制
    * @param content 消息内容
@@ -205,6 +229,7 @@ const guildMessges = async (e: messgetype) => {
       })
     return true
   }
+
   /**
    * 表情表态
    * @param boj 表情对象
@@ -221,6 +246,7 @@ const guildMessges = async (e: messgetype) => {
       })
     return true
   }
+
   e.postEmoji = async (boj: any): Promise<boolean> => {
     await client.reactionApi
       .postReaction(e.msg.channel_id, boj)
@@ -232,6 +258,7 @@ const guildMessges = async (e: messgetype) => {
       })
     return true
   }
+
   /**
    * 发送本地图片
    * @param content 消息内容  可选
@@ -250,6 +277,7 @@ const guildMessges = async (e: messgetype) => {
     })
     return true
   }
+
   //获得频道名
   const {
     data: { name }
@@ -262,8 +290,24 @@ const guildMessges = async (e: messgetype) => {
       }`
     )
   )
+
+  /* 简化消息 */
+  /* 消息 */
+  e.cmd_msg = e.msg.content
+  /* 默认不存在艾特 */
+  e.at = false
+  if (e.msg.mentions) {
+    // 去掉@ 转为纯消息
+    e.atuid = e.msg.mentions
+    e.at = true
+    /* 循环删除文本中的ati信息 */
+    e.atuid.forEach((item) => {
+      e.cmd_msg = e.cmd_msg.replace(`<@!${item.id}>`, '').trim()
+    })
+  }
+
   /* 消息处理 */
-  dealMsg(e)
+  InstructionMatching(e)
 }
 
 /**
@@ -273,53 +317,51 @@ DIRECT_MESSAGE (1 << 12)
  */
 const DIRECT_MESSAGE = () => {
   ws.on('DIRECT_MESSAGE', async (e: messgetype) => {
+    console.log(e)
     /* 屏蔽测回消息 */
     if (e.eventType === 'DIRECT_MESSAGE_DELETE') return
     /* 事件匹配 */
-    e.event = 'DIRECT_MESSAGE'
-    directMessge(e)
+    e.event = 'DIRECT_MESSAGE' 
+
+    /* 是私聊 */
+    e.isGroup = true
+
+    /**
+     * 私聊交互仅能发表情，发文字,发图片，发特殊消息
+     * 
+     * 缺失发送本地图片
+     */
+
+    /* 消息发送机制 */
+    e.reply = async (content?: string,boj?:any) => {
+      await client.directMessageApi
+        .postDirectMessage(e.msg.guild_id, {
+          msg_id: e.msg.id,
+          content,
+          ...boj
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      return true
+    }
+
+    console.info(
+      green(
+        `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
+        }`
+      )
+    )
+
+    
+  /* 消息 */
+  e.cmd_msg = e.msg.content
+
+    /* 消息处理 */
+    InstructionMatching(e)
   })
 }
 
-const directMessge = async (e: messgetype) => {
-  /* 屏蔽其他机器人的消息 */
-  if (e.msg.author.bot) return
-  /* 是私聊 */
-  e.isGroup = true
-  /* 查看当前用户权限 */
-  const {
-    data: { permissions: usermiss }
-  }: any = await client.channelPermissionsApi
-    .channelPermissions(e.msg.channel_id, e.msg.author.id)
-    .catch((err) => {
-      console.log(err)
-    })
-  if (usermiss < 7) {
-    e.isMaster = false
-  } else {
-    e.isMaster = true
-  }
-  /* 消息发送机制 */
-  e.reply = async (content: any) => {
-    await client.directMessageApi
-      .postDirectMessage(e.msg.guild_id, {
-        msg_id: e.msg.id,
-        content
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-    return true
-  }
-  console.info(
-    green(
-      `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
-      }`
-    )
-  )
-  /* 消息处理 */
-  dealMsg(e)
-}
 
 /**
 GUILD_MESSAGE_REACTIONS (1 << 10)

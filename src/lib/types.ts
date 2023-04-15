@@ -20,6 +20,7 @@ interface messgetype {
   atuid: IUser[] // 艾特得到的qq
   at: boolean // 是否艾特
   isMaster: boolean //是否是管理员
+  cmd_msg:string
   //消息发送机制
   reply: (content?: any, obj?: any) => Promise<boolean>
   //发送本地图片机制

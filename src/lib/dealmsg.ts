@@ -2,9 +2,11 @@ import { existsSync, mkdirSync, readdirSync, watch, writeFileSync } from 'fs'
 import { green, red, yellow } from 'kolorist'
 import { join } from 'path'
 import lodash from 'lodash'
+
 /* 非依赖引用 */
 import { readYaml } from './tool'
 import { messgetype, cmdTyoe } from './types'
+/* 全局 */
 declare global {
   var Apps: {}
   var command: Array<cmdTyoe>
@@ -12,9 +14,11 @@ declare global {
 
 function watchC() {
   watch(join(process.cwd(), '/config/config.yaml'), async (event, filename) => {
+
     setTimeout(async () => {
       const file = join(process.cwd(), '/config/config.yaml')
       const config = readYaml(file)
+
       if (
         (config ?? '') === '' ||
         (config.account ?? '') === '' ||
@@ -144,7 +148,6 @@ async function loadPlugins(dir: string) {
 }
 
 let commswich = false
-
 /* create command  */
 async function saveCommand(command: any[]) {
   let data = {
@@ -152,11 +155,14 @@ async function saveCommand(command: any[]) {
   }
   for (let val of command) {
     if (!data[val.belong]) {
+      /* 初始化插件类型 */
       data[val.belong] = {}
     }
     if (!data[val.belong][val.type]) {
+      /* 初始化插件名 */
       data[val.belong][val.type] = {}
     }
+    /* 处理指令 */
     data[val.belong][val.type][val.name] = {
       reg: val.reg,
       event: val.event,
@@ -180,32 +186,23 @@ export async function init() {
   watchC()
 }
 
-// 消息对象
-// 参数为监听到的事件对象e
-// id	string	消息 id
-// channel_id	string	子频道 ID
-// guild_id	string	频道 ID
-// content	string	消息内容
-export async function dealMsg(e: messgetype) {
+// 指令匹配
+export async function InstructionMatching(e: messgetype) {
   /* 循环所有指令 */
   for (const val of command) {
+    /**
+     * belong 插件类型
+     * type  插件名
+     * name  类名
+     * event 消息事件
+     * eventType 消息类型
+     * req   指令
+     */
     const { belong, type, name, reg, event } = val
     if (!Apps[belong][type] || !Apps[belong][type][name]) continue
-    /* 消息 */
-    let msg = e.msg.content
-    /* 默认不存在艾特 */
-    e.at = false
-    if (e.msg.mentions) {
-      // 去掉@ 转为纯消息
-      e.atuid = e.msg.mentions
-      e.at = true
-      /* 循环删除文本中的ati信息 */
-      e.atuid.forEach((item) => {
-        msg = msg.replace(`<@!${item.id}>`, '').trim()
-      })
-    }
     /* 信息正则匹配 */
-    if (!new RegExp(reg).test(msg)) continue
+      console.log('123')
+    if (!new RegExp(reg).test(e.cmd_msg)) continue
     try {
       /* 执行函数 */
       const res = await Apps[belong][type][name](e)
