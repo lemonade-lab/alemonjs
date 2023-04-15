@@ -9,7 +9,7 @@ export const rule = {
     event: 'GUILD_MESSAGES',
     priority: 5000, //优先级，越小优先度越高
     dsc: '[/你好呀]开发简单示例演示', //【命令】功能说明
-    eventType: '' //暂未定义
+    eventType: 'MESSAGE_CREATE' //暂未定义
   }
 }
 

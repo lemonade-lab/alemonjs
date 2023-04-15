@@ -46,13 +46,17 @@ async function loadExample(dir: string) {
     if (!tmp) return
     if (!tmp.rule) continue
     Apps['example'] = {}
-    Apps['example'][name] = tmp
     for (let item in tmp.rule) {
       tmp.rule[item].belong = 'example'
-      tmp.rule[item].type = name
-      tmp.rule[item].name = item
+      tmp.rule[item].type = name  //类型名
+      tmp.rule[item].fnc = item  //执行方法  原名被覆盖了
+      //推送了改方法中的所有参数
       command.push(tmp.rule[item])
     }
+
+    Apps['example'][name] = tmp
+    console.log(tmp)
+
   }
   command = lodash.orderBy(command, ['priority'], ['asc'])
   console.info(green(`[EXAMPLE]`), ` ${Object.keys(Apps).length} app`)
@@ -89,11 +93,13 @@ async function loadProgram(dir: string) {
         command.push({
           belong: appname,
           type: item,
-          name: FncName,
+          fnc: FncName,
+          name: keys['name'],
+          event: keys['event'],
+          eventType: keys['eventType'],
           reg: key['reg'],
           dsc: keys['dsc'],
           priority: keys['priority'],
-          event: keys['event']
         })
       })
     }
@@ -130,11 +136,13 @@ async function loadPlugins(dir: string) {
         command.push({
           belong: appname,
           type: item,
-          name: FncName,
+          fnc: FncName,
+          name: keys['name'],
+          event: keys['event'],
+          eventType: keys['eventType'],
           reg: key['reg'],
           dsc: keys['dsc'],
           priority: keys['priority'],
-          event: keys['event']
         })
       })
     }
@@ -162,9 +170,12 @@ async function saveCommand(command: any[]) {
       data[val.belong][val.type] = {}
     }
     /* 处理指令 */
-    data[val.belong][val.type][val.name] = {
+    data[val.belong][val.type] = {
+      name: val.name,
       reg: val.reg,
+      fnc: val.fnc,
       event: val.event,
+      eventType: val.eventType,
       priority: val.priority,
       dsc: val.dsc
     }
@@ -195,20 +206,21 @@ export async function InstructionMatching(e: messgetype) {
      * name  类名
      * event 消息事件
      * eventType 消息类型
+     * fnc  函数
      * req   指令
      */
-    const { belong, type, name, reg, event } = val
-    if (!Apps[belong][type] || !Apps[belong][type][name]) continue
+    const { belong, type, event, eventType, fnc, reg } = val
+    if (!Apps[belong][type] || !Apps[belong][type][fnc]) continue
     /* 信息正则匹配 */
     if (!new RegExp(reg).test(e.cmd_msg)) continue
     try {
       /* 执行函数 */
-      const res = await Apps[belong][type][name](e).catch((err: any) => console.log(red(err)))
+      const ret = await Apps[belong][type][fnc](e).catch((err: any) => console.log(red(err)))
       /* 真:强制不再匹配 */
-      if (res) break
+      if (ret) break
     } catch (error) {
       /* 出错啦 */
-      console.error(red(`[${belong}][${type}][${name}]`))
+      console.error(red(`[${belong}][${type}][${fnc}]`))
       let err = JSON.stringify(error, null, 2)
       if (err + '' === '{}') {
         console.log(red(error))

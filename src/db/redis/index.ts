@@ -9,7 +9,7 @@ export const redisInit = async () => {
     port: 6379,
   });
   redis.on('error', (error) => {
-    console.log(red('[Redis]'), error);
+    console.log(red('[REDIS]'), error);
     process.exit()
   });
   global.redis = redis

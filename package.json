@@ -41,10 +41,10 @@
     "@types/lodash": "^4.14.186",
     "@types/node": "^18.11.5",
     "@types/node-schedule": "^2.1.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
     "nodemon": "^2.0.20",
-    "pkg": "5.8.0"
+    "pkg": "5.8.0",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2"
   },
   "engines": {
     "node": ">16"
