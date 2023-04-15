@@ -76,6 +76,22 @@ pm2 delete 0 #关掉ID为0的程序
 pm2 update #更新pm2版本
 ```
 
+#### 可能出现的问题
+
+pm2 环境变量问题
+```
+pm2 env #检查
+```
+```
+pm2 env set PATH "./node_modules/.bin:$PATH" #没有则需要添加
+```
+pm2 Modules with id set not found  没找到
+```
+pm2 updata  #更新最新版
+pm2 kill   #杀死所有进程
+rm -rf ~/.pm2  #删除后重新启动即可
+```
+
 ## linux
 
 puppeteer 环境
