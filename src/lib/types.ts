@@ -36,7 +36,19 @@ interface ruleType {
   fnc: string
 }
 
+interface dataType {
+  belong: string //导出类型
+  type: string //插件名
+  name: string //类名
+  eventType: string //消息类型
+  dsc: any //指令说明
+  fnc: string //
+}
+
 interface cmdTyoe {
+  req: string //指令
+  priority: number //优先级
+  data: dataType[] //
   belong: string //导出类型
   type: string //插件类型
   name: string //插件名
@@ -44,7 +56,6 @@ interface cmdTyoe {
   event: string //事件类型
   eventType: string //消息类型
   dsc: any //指令说明
-  priority: number //优先级
 }
 type pluginType = string | any[] | Number | ((e: messgetype, content: string) => Promise<boolean>)
 export { READY, messgetype, pluginType, cmdTyoe }

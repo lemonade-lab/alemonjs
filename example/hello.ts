@@ -4,22 +4,22 @@ import { messgetype } from '../src/lib/types'
  */
 export const rule = [
   {
-    name: 'rule-name', //中文名
+    name: 'hello', //中文名
     dsc: '[/你好呀]开发简单示例演示', //【命令】功能说明
-    event: 'GUILD_MESSAGES',  //
+    event: 'GUILD_MESSAGES',  //频道
     eventType: 'MESSAGE_CREATE', //
     priority: 5000, //优先级，越小优先度越高
     reg: '^/你好呀$', //匹配消息正则，命令正则
     fnc: 'test'  //函数
   },
   {
-    name: 'rule-name', //中文名
+    name: 'hello', //中文名
     dsc: '[/你好呀]开发简单示例演示', //【命令】功能说明
-    event: 'GUILD_MESSAGES',  //
-    eventType: 'MESSAGE_CREATE', //
+    event: 'DIRECT_MESSAGE',  // 私聊
+    eventType: 'DIRECT_MESSAGE_CREATE', //
     priority: 5000, //优先级，越小优先度越高
     reg: '^/你好呀$', //匹配消息正则，命令正则
-    fnc: 'sad'  //函数
+    fnc: 'test'  //函数
   }
 ]
 
@@ -33,8 +33,4 @@ export async function test(e: messgetype) {
     image: 'http://tva1.sinaimg.cn/bmiddle/6af89bc8gw1f8ub7pm00oj202k022t8i.jpg'
   })
   return true
-}
-
-export async function sad(e) {
-  
 }

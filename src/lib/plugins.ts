@@ -1,5 +1,6 @@
 import { red } from 'kolorist'
 import { messgetype, pluginType } from './types'
+import { Pcf } from '../config'
 export default class plugin {
   /* 字段类型 */
   [parameter: string]: pluginType
@@ -28,14 +29,14 @@ export default class plugin {
    * @param rule.fnc 命令执行方法    function
    */
   constructor({
-    name = 'your-name',
-    dsc = 'undifind',
+    name = Pcf.name,
+    dsc = Pcf.dsc,
     //默认为私域
-    event = 'GUILD_MESSAGES',
+    event = Pcf.event,
     // 私域且非测回消息
-    eventType = 'MESSAGE_CREATE',
-    priority = 5000,
-    rule = <any>[]
+    eventType = Pcf.eventType,
+    priority = Pcf.priority,
+    rule = Pcf.rule
   }) {
     this.name = name
     this.dsc = dsc

@@ -17,8 +17,6 @@ const apps = {
       })
     }
     async gerAlmanac(e: messgetype) {
-      /* 不允许私聊 */
-      if (e.isGroup) return false
       /* 网上图片url */
       e.reply(`${segment.at(e.msg.author.id)}`, {
         image: 'https://api.xingzhige.com/API/yshl/'

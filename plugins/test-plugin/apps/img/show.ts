@@ -17,16 +17,12 @@ export class show extends plugin {
     })
   }
   async getHelp(e: messgetype) {
-    /* 判断是否是私聊 */
-    if (e.isGroup) return false
     const data = config.getConfig('help', 'help')
     const img = await showPuppeteer({ path: 'help', name: 'help', data })
     e.sendImage('', img)
     return false
   }
   async getVersion(e: messgetype) {
-    /* 判断是否是私聊 */
-    if (e.isGroup) return false
     const data = config.getConfig('version', 'html')
     const img = await showPuppeteer({ path: 'version', name: 'version', data })
     e.sendImage('', img)

@@ -6,18 +6,85 @@ import lodash from 'lodash'
 /* 非依赖引用 */
 import { readYaml } from './tool'
 import { messgetype, cmdTyoe } from './types'
+
 /* 全局 */
 declare global {
   var Apps: {}
-  var command: Array<cmdTyoe>
+  var command: {}
 }
+
+// const command={
+//   event:[
+//     {
+//       req:'',
+//       fuc:'',
+//       data:{
+
+//       }
+//     }
+//   ]
+// }
+
+const createApps = () => {
+
+  global.Apps = {
+    /* 频道会话消息 */
+    GUILD_MESSAGES: {},
+    /* 论坛消息 */
+    FORUMS_EVENT: {},
+    //公
+    /* 频道会话消息 */
+    PUBLIC_GUILD_MESSAGES: {},
+    /* 论坛消息 */
+    OPEN_FORUMS_EVENT: {},
+    //私
+    /* 机器人进出频道消息 */
+    GUILDS: {},
+    /* 成员频道进出变动消息 */
+    GUILD_MEMBERS: {},
+    /* 频道表情点击会话消息 */
+    GUILD_MESSAGE_REACTIONS: {},
+    /* 私聊会话消息 */
+    DIRECT_MESSAGE: {},
+    /* 互动事件监听 */
+    INTERACTION: {},
+    /* 音频事件 */
+    AUDIO_ACTION: {},
+  }
+
+  global.command = {
+    /* 频道会话消息 */
+    GUILD_MESSAGES: [],
+    /* 论坛消息 */
+    FORUMS_EVENT: [],
+    //公
+    /* 频道会话消息 */
+    PUBLIC_GUILD_MESSAGES: [],
+    /* 论坛消息 */
+    OPEN_FORUMS_EVENT: [],
+    //私
+    /* 机器人进出频道消息 */
+    GUILDS: [],
+    /* 成员频道进出变动消息 */
+    GUILD_MEMBERS: [],
+    /* 频道表情点击会话消息 */
+    GUILD_MESSAGE_REACTIONS: [],
+    /* 私聊会话消息 */
+    DIRECT_MESSAGE: [],
+    /* 互动事件监听 */
+    INTERACTION: [],
+    /* 音频事件 */
+    AUDIO_ACTION: [],
+  }
+}
+
+
 
 function watchC() {
   watch(join(process.cwd(), '/config/config.yaml'), async (event, filename) => {
     setTimeout(async () => {
       const file = join(process.cwd(), '/config/config.yaml')
       const config = readYaml(file)
-
       if (
         (config ?? '') === '' ||
         (config.account ?? '') === '' ||
@@ -32,8 +99,10 @@ function watchC() {
 
 /* example */
 async function loadExample(dir: string) {
-  let Apps = {}
-  let command = []
+  //初始化
+  createApps()
+  const belong = 'example'
+
   let readDir = readdirSync(dir)
   readDir = readDir.filter(item => /.(js|ts)$/.test(item))
 
@@ -49,32 +118,62 @@ async function loadExample(dir: string) {
 
     console.log(tmp.rule)
 
-    const belong = `example.${name}`
-    Apps[belong] = {}
     for (let item of tmp.rule) {
-      if (!Apps[belong][item['event']]) Apps[belong][item['event']] = {}
-      if (!Apps[belong][item['event']][name]) Apps[belong][item['event']][name] = {}
-      Apps[belong][item['event']][name][item['fnc']] = tmp[item['fnc']]
-      command.push({
-        belong,
-        type: name,
-        ...item,
-        rule: tmp.rule
+      if (!item['event']) continue
+      if (!global.Apps[item['event']][belong]) global.Apps[item['event']][belong] = {}
+      if (!global.Apps[item['event']][belong][appname]) global.Apps[item['event']][belong][appname] = {}
+      global.Apps[item['event']][belong][appname][item['name']] = {}
+      global.Apps[item['event']][belong][appname][item['name']][item['fnc']] = tmp[item['fnc']]
+      global.command[item['event']].push({
+        reg: item['reg'],
+        priority: item['priority'],
+        data: {
+          event: item['event'],
+          belong,
+          type: appname,
+          name: item['name'],
+          dsc: item['dsc'],
+          fnc: item['fnc']
+        }
       })
+    
     }
   }
 
-  command = lodash.orderBy(command, ['priority'], ['asc'])
-  console.info(green(`[EXAMPLE]`), ` ${Object.keys(Apps).length} app`)
-  global.Apps = Apps
-  global.command = command
-  await saveCommand(command).catch((err: any) => console.log(red(err)))
+}
+
+
+async function synthesis(apps,appname,belong) {
+  for (const item in apps) {
+    let keys = new apps[item]()
+    // 没有类型和指令
+    if (!keys['event'] || !keys['rule']) continue
+    if (!global.Apps[keys['event']][belong]) global.Apps[keys['event']][belong] = {}
+    if (!global.Apps[keys['event']][belong][appname]) global.Apps[keys['event']][belong][appname] = {}
+    /* 类名 */
+    global.Apps[keys['event']][belong][appname][item] = {}
+    keys['rule'].forEach((key: any) => {
+      //保存方法
+      global.Apps[keys['event']][belong][appname][item][key['fnc']] = keys[key['fnc']]
+      global.command[keys['event']].push({
+        reg: key['reg'],
+        priority: keys['priority'],
+        data: {
+          event: keys['event'],
+          belong,
+          type: appname,
+          name: item,
+          dsc: keys['dsc'],
+          fnc: key['fnc']
+        }
+      })
+    })
+  }
 }
 
 /* program */
 async function loadProgram(dir: string) {
-  let Apps = {}
-  let command = global.command || []
+  const belong = 'program'
   /* 初始化 */
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   /* 读取文件 */
@@ -88,45 +187,13 @@ async function loadProgram(dir: string) {
       console.error(red(error))
       process.exit()
     })
-    Apps[appname] = {}
-    for (const item in apps) {
-      //类
-      let keys = new apps[item]()
-      //没有事件和指令集
-      if (!keys['event'] || !keys['rule']) continue
-      //插件名、类名、
-      Apps[appname][keys['event']] = {}
-      //插件名、类名、事件名
-      Apps[appname][keys['event']][item] = {}
-      //有很多的方法
-      keys['rule'].forEach((key: any) => {
-        //保存方法
-        Apps[appname][keys['event']][item][key['fnc']] = keys[key['fnc']]
-        //记录方法参数
-        command.push({
-          belong: appname,
-          type: item,
-          name: keys['name'],
-          event: keys['event'],
-          eventType: keys['eventType'],
-          rule: keys['rule'],
-          dsc: keys['dsc'],
-          priority: keys['priority']
-        })
-      })
-    }
+    synthesis(apps,appname,belong)
   }
-  command = lodash.orderBy(command, ['priority'], ['asc'])
-  console.info(green(`[PROGRAM]`), ` ${Object.keys(Apps).length} apps`)
-  global.Apps = { ...global.Apps, ...Apps }
-  global.command = command
-  await saveCommand(command).catch((err: any) => console.log(red(err)))
 }
 
 /* plugins */
 async function loadPlugins(dir: string) {
-  let Apps = {}
-  let command = global.command || []
+  const belong = 'plugins'
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   const readDir = readdirSync(dir)
   for (let appname of readDir) {
@@ -137,65 +204,22 @@ async function loadPlugins(dir: string) {
       console.error(red(error))
       process.exit()
     })
-    //插件名
-    Apps[appname] = {}
-    for (const item in apps) {
-      //类
-      let keys = new apps[item]()
-      //没有事件和指令集
-      if (!keys['event'] || !keys['rule']) continue
-      //插件名、类名、
-      Apps[appname][keys['event']] = {}
-      //插件名、类名、事件名
-      Apps[appname][keys['event']][item] = {}
-      //有很多的方法
-      keys['rule'].forEach((key: any) => {
-        //保存方法
-        Apps[appname][keys['event']][item][key['fnc']] = keys[key['fnc']]
-        //记录方法参数
-        command.push({
-          belong: appname,
-          type: item,
-          name: keys['name'],
-          event: keys['event'],
-          eventType: keys['eventType'],
-          rule: keys['rule'],
-          dsc: keys['dsc'],
-          priority: keys['priority']
-        })
-      })
-    }
+    synthesis(apps,appname,belong)
   }
-  command = lodash.orderBy(command, ['priority'], ['asc'])
-  console.info(green(`[PLUGINS]`), ` ${Object.keys(Apps).length} apps`)
-  global.Apps = { ...global.Apps, ...Apps }
-  global.command = command
-  await saveCommand(command).catch(err => console.log(red(err)))
 }
 
 let commswich = false
 /* create command  */
-async function saveCommand(command: any[]) {
+async function saveCommand(command) {
   let data = {
-    dec: '命令总览json'
+    dec: '命令总览'
   }
-  for (let val of command) {
-    if (!data[val.belong]) {
-      /* 初始化插件类型 */
-      data[val.belong] = {}
-    }
-    if (!data[val.belong][val.event]) {
-      /* 初始化插件名 */
-      data[val.belong][val.event] = {}
-    }
-    /* 处理指令 */
-    data[val.belong][val.event][val.type] = {
-      name: val.name,
-      dsc: val.dsc,
-      event: val.event,
-      eventType: val.eventType,
-      priority: val.priority,
-      rule: val.rule
+  //消息事件
+  for (let val in command) {
+    data[val] = []
+    //消息中的数组
+    for (let item of command[val]) {
+      data[val].push(item)
     }
   }
   writeFileSync(join(process.cwd(), '/config/command.json'), JSON.stringify(data, null, '\t'))
@@ -206,51 +230,44 @@ async function saveCommand(command: any[]) {
   }
 }
 
-// 初始化指令
+// 收集指令
 export async function init() {
   await loadExample(join(process.cwd(), '/example'))
   await loadProgram(join(process.cwd(), '/program'))
   await loadPlugins(join(process.cwd(), '/plugins'))
+  /** 全部收集完了之后重新排序*/
+  for (let val in command) {
+    command[val] = lodash.orderBy(command[val], ['priority'], ['asc'])
+  }
+  saveCommand(command)
   watchC()
 }
 
 // 指令匹配
 export async function InstructionMatching(e: messgetype) {
   /* 循环所有指令 */
-  for (const val of command) {
-    /**
-     * belong 插件类型
-     * type  插件名
-     * name  类名
-     * event 消息事件
-     * eventType 消息类型
-     * fnc  函数
-     * req   指令
-     */
-    const { belong, type, event, eventType, rule } = val
-    if (rule) {
-      for (let item of rule) {
-        if (!Apps[belong][event]) continue
-        if (!Apps[belong][event][type]) continue
-        /* 信息正则匹配 */
-        if (!new RegExp(item.reg).test(e.cmd_msg)) continue
-        try {
-          /* 执行函数 */
-          const ret = await Apps[belong][event][type][item.fnc](e).catch((err: any) => console.log(red(err)))
-          /* 真:强制不再匹配 */
-          if (ret) break
-        } catch (error) {
-          /* 出错啦 */
-          console.error(red(`[${belong}][${event}][${type}][${item.fnc}]`))
-          let err = JSON.stringify(error, null, 2)
-          if (err + '' === '{}') {
-            console.log(red(error))
-          } else {
-            console.log(red(err))
-          }
-          return
-        }
+  for (const val of command[e.event]) {
+    const { reg, data } = val
+    if (!Apps[e.event][data.belong]) continue
+    if (!Apps[e.event][data.belong][data.type]) continue
+    if (!Apps[e.event][data.belong][data.type][data.name]) continue
+    /* 信息正则匹配 */
+    if (!new RegExp(reg).test(e.cmd_msg)) continue
+    try {
+      /* 执行函数 */
+      const ret = await Apps[e.event][data.belong][data.type][data.name][data.fnc](e).catch((err: any) => console.log(red(err)))
+      /* 真:强制不再匹配 */
+      if (ret) break
+    } catch (error) {
+      /* 出错啦 */
+      console.error(red(`[${e.event}][${data.belong}][${data.type}][${data.name}][${data.fnc}]`))
+      let err = JSON.stringify(error, null, 2)
+      if (err + '' === '{}') {
+        console.log(red(error))
+      } else {
+        console.log(red(err))
       }
+      return
     }
   }
 }
