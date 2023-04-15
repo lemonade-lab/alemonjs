@@ -60,6 +60,7 @@ async function loadExample(dir: string) {
   global.Apps = Apps
   global.command = command
   await saveCommand(command)
+  .catch((err:any)=>console.log(red(err)))
 }
 
 /* program */
@@ -104,6 +105,7 @@ async function loadProgram(dir: string) {
   global.Apps = { ...global.Apps, ...Apps }
   global.command = command
   await saveCommand(command)
+  .catch((err:any)=>console.log(red(err)))
 }
 
 /* plugins */
@@ -144,7 +146,7 @@ async function loadPlugins(dir: string) {
   console.info(green(`[PLUGINS]`), ` ${Object.keys(Apps).length} apps`)
   global.Apps = { ...global.Apps, ...Apps }
   global.command = command
-  await saveCommand(command)
+  await saveCommand(command).catch(err=>console.log(red(err)))
 }
 
 let commswich = false
@@ -205,6 +207,7 @@ export async function InstructionMatching(e: messgetype) {
     try {
       /* 执行函数 */
       const res = await Apps[belong][type][name](e)
+      .catch((err:any)=>console.log(red(err)))
       /* 真:强制不再匹配 */
       if (res) break
     } catch (error) {

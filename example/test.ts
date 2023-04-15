@@ -18,11 +18,8 @@ export const rule = {
  * @param e 消息对象
  * @returns 
  */
-
 export async function test(e: messgetype) {
-  /* 不是私聊不执行 */
-  if (!e.isGroup) return false
-  e.reply('你好呀~',{
+  e.reply('你好呀~', {
     image: 'http://tva1.sinaimg.cn/bmiddle/6af89bc8gw1f8ub7pm00oj202k022t8i.jpg'
   })
   return true

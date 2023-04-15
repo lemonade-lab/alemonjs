@@ -33,6 +33,16 @@ export function readYaml(url: string) {
   }
 }
 
+const getUrl=()=>{
+  if (client.config.sandbox) {
+    //沙箱环境
+    return 'https://sandbox.api.sgroup.qq.com'
+  } else {
+    //正式环境
+    return 'https://api.sgroup.qq.com'
+  }
+}
+
 /**
  * 执行指令
  * @param command
@@ -117,27 +127,19 @@ export function download() {
 export async function sendImage(
   channelID: string,
   message: {
+    msg_id: string
+    content?: string
     /* 路径类型？ */
     file_image: PathLike
-    content?: string
-    msg_id: string
   }
 ) {
-  let url = ''
-  //tudo
-  if (client.config.sandbox) {
-    //沙箱环境
-    url = 'https://sandbox.api.sgroup.qq.com'
-  } else {
-    //正式环境
-    url = 'https://api.sgroup.qq.com'
-  }
+  const url = getUrl()
 
   /**读取 */
-  var picData = createReadStream(message.file_image)
+  let picData = createReadStream(message.file_image)
 
   /* 请求数据包 */
-  var formdata = new FormData()
+  let formdata = new FormData()
   formdata.append('msg_id', message.msg_id)
   if (typeof message.content === 'string') formdata.append('content', message.content)
   formdata.append('file_image', picData)
@@ -152,6 +154,7 @@ export async function sendImage(
     },
     data: formdata
   })
+  .catch((err:any)=>console.log(red(err)))
 }
 
 let pic = 0

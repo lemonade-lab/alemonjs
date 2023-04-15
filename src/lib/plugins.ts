@@ -1,3 +1,4 @@
+import { red } from 'kolorist'
 import { messgetype, pluginType } from './types'
 export default class plugin {
   /* 字段类型 */
@@ -11,7 +12,6 @@ export default class plugin {
    * 机器人进出 GUILDS
    * 成员进出 GUILD_MEMBERS
    *
-   * 下方可能会归类为 message 事件
    * - 表情点击 GUILD_MESSAGE_REACTIONS
    * - 频道 PUBLIC_GUILD_MESSAGES (公)  GUILD_MESSAGES (私)
    * - 私信 DIRECT_MESSAGE
@@ -30,9 +30,11 @@ export default class plugin {
   constructor({
     name = 'your-name',
     dsc = 'undifind',
-    event = 'GUILD_MESSAGES',
-    eventType = '',
-    priority = 500,
+    //默认为私域
+    event = 'GUILD_MESSAGES',  
+    // 私域且非测回消息
+    eventType = 'MESSAGE_CREATE',
+    priority = 5000,
     rule = <any>[]
   }) {
     this.name = name
@@ -54,9 +56,7 @@ export default class plugin {
         source_guild_id: e.msg.guild_id,
         recipient_id: e.msg.author.id
       })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch((err:any)=>console.log(red(err)))
     if (!postSessionRes) return false
     const {
       data: { guild_id }
@@ -66,10 +66,7 @@ export default class plugin {
         msg_id: e.msg.id,
         content
       })
-      .catch((err) => {
-        // err信息错误码请参考API文档错误码描述
-        console.log(err)
-      })
+      .catch((err:any)=>console.log(red(err)))
     return true
   }
 }

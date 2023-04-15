@@ -1,4 +1,4 @@
-import { green } from 'kolorist'
+import { green, red } from 'kolorist'
 import { IOpenAPI } from 'qq-guild-bot'
 
 /* 非依赖引用 */
@@ -117,6 +117,7 @@ const GUILD_MEMBERS = () => {
           msg_id: e.msg.id,
           content: '请在子频道中使用'
         })
+        .catch((err:any)=>console.log(red(err)))
         break
       }
       /* 进群 */
@@ -126,6 +127,7 @@ const GUILD_MEMBERS = () => {
           content: `${segment.at(e.msg.user.id)} 欢迎新人 ~ `,
           image: 'http://tva1.sinaimg.cn/bmiddle/6af89bc8gw1f8ub7pm00oj202k022t8i.jpg'
         })
+        .catch((err:any)=>console.log(red(err)))
         break
       }
       /* 退群 */
@@ -133,6 +135,7 @@ const GUILD_MEMBERS = () => {
         await client.messageApi.postMessage(e.msg.channel_id, {
           content: `${segment.at(e.msg.user.id)}${e.msg.user.username} 离开了我们...`
         })
+        .catch((err:any)=>console.log(red(err)))
         break
       }
       default: {
@@ -153,6 +156,7 @@ const GUILD_MESSAGES = () => {
     /* 事件匹配 */
     e.event = 'GUILD_MESSAGES'
     guildMessges(e)
+    .catch((err:any)=>console.log(red(err)))
   })
 }
 
@@ -170,6 +174,7 @@ const PUBLIC_GUILD_MESSAGES = () => {
     /* 事件匹配 */
     e.event = 'PUBLIC_GUILD_MESSAGES'
     guildMessges(e)
+    .catch((err:any)=>console.log(red(err)))
   })
 }
 
@@ -183,9 +188,7 @@ const guildMessges = async (e: messgetype) => {
   /* 自身机器人权限检测 */
   const authority: any = await client.channelPermissionsApi
     .channelPermissions(e.msg.channel_id, bot.id)
-    .catch((err) => {
-      console.log(err)
-    })
+    .catch((err:any)=>console.log(red(err)))
 
   /* 查看报错 */
   if (!authority) return
@@ -199,9 +202,7 @@ const guildMessges = async (e: messgetype) => {
     data: { permissions: usermiss }
   }: any = await client.channelPermissionsApi
     .channelPermissions(e.msg.channel_id, e.msg.author.id)
-    .catch((err) => {
-      console.log(err)
-    })
+    .catch((err:any)=>console.log(red(err)))
 
   if (usermiss < 7) {
     e.isMaster = false
@@ -224,9 +225,7 @@ const guildMessges = async (e: messgetype) => {
         content,
         ...obj
       })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch((err:any)=>console.log(red(err)))
     return true
   }
 
@@ -238,24 +237,14 @@ const guildMessges = async (e: messgetype) => {
   e.deleteEmoji = async (boj: any): Promise<boolean> => {
     await client.reactionApi
       .deleteReaction(e.msg.channel_id, boj)
-      .catch((err) => {
-        console.log(err)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch((err:any)=>console.log(red(err)))
     return true
   }
 
   e.postEmoji = async (boj: any): Promise<boolean> => {
     await client.reactionApi
       .postReaction(e.msg.channel_id, boj)
-      .catch((err) => {
-        console.log(err)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch((err:any)=>console.log(red(err)))
     return true
   }
 
@@ -272,18 +261,16 @@ const guildMessges = async (e: messgetype) => {
       msg_id: e.msg.id, //消息id, 必须
       content,
       file_image //本地图片 路径 必须
-    }).catch((err) => {
-      console.log(err)
     })
+    .catch((err:any)=>console.log(red(err)))
     return true
   }
 
   //获得频道名
   const {
     data: { name }
-  }: any = await client.channelApi.channel(e.msg.channel_id).catch((err) => {
-    console.log(err)
-  })
+  }: any = await client.channelApi.channel(e.msg.channel_id)
+  .catch((err:any)=>console.log(red(err)))
   console.info(
     green(
       `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
@@ -308,6 +295,7 @@ const guildMessges = async (e: messgetype) => {
 
   /* 消息处理 */
   InstructionMatching(e)
+  .catch((err:any)=>console.log(red(err)))
 }
 
 /**
@@ -340,9 +328,7 @@ const DIRECT_MESSAGE = () => {
           content,
           ...boj
         })
-        .catch((err) => {
-          console.log(err)
-        })
+        .catch((err:any)=>console.log(red(err)))
       return true
     }
 
@@ -359,6 +345,7 @@ const DIRECT_MESSAGE = () => {
 
     /* 消息处理 */
     InstructionMatching(e)
+    .catch((err:any)=>console.log(red(err)))
   })
 }
 
