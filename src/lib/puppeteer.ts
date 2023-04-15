@@ -49,8 +49,7 @@ export const screenshot = async (name: string, data = {}) => {
   /* 写入成功 */
   console.log(green('[ctreate][models][html]'), AdressHtml)
   /* 截图 */
-  await getImg(AdressHtml, 'body', AdressImg)
-  .catch((err:any)=>console.log(red(err)))
+  await getImg(AdressHtml, 'body', AdressImg).catch((err: any) => console.log(red(err)))
   /* 返回图片地址 */
   return AdressImg
 }

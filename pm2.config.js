@@ -15,8 +15,8 @@ module.exports = {
       out_file: './logs/alemont-bot/out.log',
       log_date_format: 'YYYY-MM-DD HH:mm Z',
       env: {
-        NODE_ENV: 'production',
-      },
+        NODE_ENV: 'production'
+      }
     }
   ]
 }

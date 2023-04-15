@@ -33,7 +33,7 @@ export function readYaml(url: string) {
   }
 }
 
-const getUrl=()=>{
+const getUrl = () => {
   if (client.config.sandbox) {
     //沙箱环境
     return 'https://sandbox.api.sgroup.qq.com'
@@ -103,17 +103,19 @@ export function download() {
         chromePath = revisionInfo.executablePath
         resolve('完成')
       } else {
-        console.log(yellow('[NOFIND]puppeteer,Start downloading, please pay attention to the traffic'))
+        console.log(
+          yellow('[NOFIND]puppeteer,Start downloading, please pay attention to the traffic')
+        )
         // 下载
         browserFetcher
           .download(PUPPETEER_REVISIONS.chromium, onProgress)
-          .then((res) => {
+          .then(res => {
             // 获取路径
             chromePath = res.executablePath
             console.log(green('get it done'))
             resolve('下载完成')
           })
-          .catch((err) => {
+          .catch(err => {
             console.error(red('be defeated'))
             console.error(err)
             reject('失败')
@@ -150,11 +152,10 @@ export async function sendImage(
     url: `${url}/channels/${channelID}/messages`,
     headers: {
       'Content-Type': formdata.getHeaders()['content-type'],
-      Authorization: `Bot ${client.config.appID}.${client.config.token}`
+      'Authorization': `Bot ${client.config.appID}.${client.config.token}`
     },
     data: formdata
-  })
-  .catch((err:any)=>console.log(red(err)))
+  }).catch((err: any) => console.log(red(err)))
 }
 
 let pic = 0
@@ -194,7 +195,7 @@ export async function getImg(htmlPath: PathLike, tab: string, imgPath: string): 
           '--single-process'
         ]
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(red(err.toString()))
         if (String(err).includes('correct Chromium')) {
           console.error(
@@ -221,7 +222,7 @@ export async function getImg(htmlPath: PathLike, tab: string, imgPath: string): 
   pic++
   // 大于等于30次重开
   if (pic >= 30) {
-    ;(browser as Browser).close().catch((err) => console.error(red(err.toString())))
+    ;(browser as Browser).close().catch(err => console.error(red(err.toString())))
     console.info(green('puppeteer Closed successfully'))
     pic = 0
   }

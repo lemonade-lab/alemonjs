@@ -32,5 +32,4 @@ export class show extends plugin {
     e.sendImage('', img)
     return false
   }
-
 }

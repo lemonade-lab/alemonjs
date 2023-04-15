@@ -10,6 +10,6 @@ export const showPuppeteer = async ({ path = '', name = '', data = {} }): Promis
     AppName,
     /** 数据 */
     ...data
-  }).catch((err) => {
+  }).catch(err => {
     console.log(err)
   })

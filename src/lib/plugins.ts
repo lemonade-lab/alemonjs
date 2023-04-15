@@ -31,7 +31,7 @@ export default class plugin {
     name = 'your-name',
     dsc = 'undifind',
     //默认为私域
-    event = 'GUILD_MESSAGES',  
+    event = 'GUILD_MESSAGES',
     // 私域且非测回消息
     eventType = 'MESSAGE_CREATE',
     priority = 5000,
@@ -56,7 +56,7 @@ export default class plugin {
         source_guild_id: e.msg.guild_id,
         recipient_id: e.msg.author.id
       })
-      .catch((err:any)=>console.log(red(err)))
+      .catch((err: any) => console.log(red(err)))
     if (!postSessionRes) return false
     const {
       data: { guild_id }
@@ -66,7 +66,7 @@ export default class plugin {
         msg_id: e.msg.id,
         content
       })
-      .catch((err:any)=>console.log(red(err)))
+      .catch((err: any) => console.log(red(err)))
     return true
   }
 }

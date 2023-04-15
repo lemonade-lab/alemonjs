@@ -19,23 +19,10 @@
     // 是否对 js 文件进行编译，默认是false
     "allowJs": true, //编译js
     // 是否抑制隐式any索引的错误，默认：false
-    "suppressImplicitAnyIndexErrors": true, //抑制
+    "suppressImplicitAnyIndexErrors": true //抑制
   },
   // 要编译的路径列表（用于指定那些ts文件需要被编译），
-  "include": [
-    "src",
-    "program",
-    "example",
-    "plugins",
-    "index.ts"
-  ],
+  "include": ["src", "program", "example", "plugins", "index.ts"],
   // 要排除的、不编译的文件，它也可以指定一个列表，
-  "exclude": [
-    ".cache",
-    "node_modules",
-    "dist",
-    "config",
-    "data",
-    "logs"
-  ]
+  "exclude": [".cache", "node_modules", "dist", "config", "data", "logs"]
 }

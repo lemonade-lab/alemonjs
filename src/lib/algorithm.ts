@@ -11,14 +11,14 @@ export const getMenuArr = (path: string): string[] => {
   const files = fs.readdirSync(path)
   const shield = ['.git']
   const sum: string[] = []
-  files.forEach((item) => {
+  files.forEach(item => {
     const newpath = `${path}/${item}`
     const stat = fs.statSync(newpath)
     //不是文件？
     if (!stat.isFile()) {
       //是目录名
       const file = newpath.replace(`${path}/`, '')
-      shield.forEach((item) => {
+      shield.forEach(item => {
         if (item != file) {
           sum.push(file)
         }
@@ -30,7 +30,7 @@ export const getMenuArr = (path: string): string[] => {
 /**得到指定目录下的所有指定类型文件*/
 export const getMenuPathType = (menupath: string, type: string): string[] => {
   const travel = (dir: string, callback: any) => {
-    fs.readdirSync(dir).forEach((file) => {
+    fs.readdirSync(dir).forEach(file => {
       let pathname = path.join(dir, file)
       if (fs.statSync(pathname).isDirectory()) {
         travel(pathname, callback)
@@ -84,7 +84,7 @@ export const getThePathNameData = ({ NAME, PATH, DATA, TYPE = 'json' }: any) => 
 export const ctrateFile = (req: string) => {
   let name = req.split('/')
   let newname = path.resolve().replace(/\\/g, '/')
-  name.forEach((item) => {
+  name.forEach(item => {
     newname += `${item}/`
     if (!fs.existsSync(`${newname}`)) {
       fs.mkdirSync(`${newname}`)
@@ -95,7 +95,7 @@ export const ctrateFile = (req: string) => {
 export const ctrateFilePath = (req: string, path: string) => {
   let name = req.split('/')
   let newname = path
-  name.forEach((item) => {
+  name.forEach(item => {
     newname += `${item}/`
     if (!fs.existsSync(`${newname}`)) {
       fs.mkdirSync(`${newname}`)

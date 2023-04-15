@@ -47,5 +47,5 @@ export const segment = {
     }
   },
   image: () => {}, //创建图片元素
-  video: () => {}, //创建视频元素
+  video: () => {} //创建视频元素
 }

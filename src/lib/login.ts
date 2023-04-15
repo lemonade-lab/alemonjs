@@ -38,13 +38,13 @@ export async function check(): Promise<any> {
         type: 'text',
         name: 'appID',
         message: green('your appID: '),
-        validate: (value) => (value !== '' && typeof value === 'string' ? true : 'your appID')
+        validate: value => (value !== '' && typeof value === 'string' ? true : 'your appID')
       },
       {
         type: 'text',
         name: 'token',
         message: green('your token: '),
-        validate: (value) => (value !== '' && typeof value === 'string' ? true : 'your token')
+        validate: value => (value !== '' && typeof value === 'string' ? true : 'your token')
       }
     ])
 

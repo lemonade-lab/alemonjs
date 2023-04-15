@@ -17,9 +17,13 @@ Express,Redis,Sequelize,PM2
 
 ## 频道机器人
 
-一款基于官方SDK所构造的频道机器人开发框架,让开发者更专注于业务逻辑,是一种面向执行消息匹配指令的开发模式.
+一款基于官方 SDK 所构造的频道机器人开发框架,让开发者更专注于业务逻辑,是一种面向执行消息匹配指令的开发模式.
 
-
+| 指令      | 说明         |
+| --------- | ------------ |
+| /柠檬帮助 | 查看所以指令 |
+| /柠檬版本 | 查看版本记录 |
+| /原神黄历 | 简单调用功能 |
 
 ## 起步
 
@@ -37,7 +41,7 @@ git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
 ```
 cd alemon-bot
 npm install cnpm -g #全局安装cnpm
-cnpm install  
+cnpm install
 ```
 
 ## 运行
@@ -59,6 +63,7 @@ npm install ts-node -g #安装全局ts-node
 npm run pm2 #后台运行
 
 ```
+
 #### 扩展指令
 
 ```

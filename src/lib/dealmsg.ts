@@ -14,7 +14,6 @@ declare global {
 
 function watchC() {
   watch(join(process.cwd(), '/config/config.yaml'), async (event, filename) => {
-
     setTimeout(async () => {
       const file = join(process.cwd(), '/config/config.yaml')
       const config = readYaml(file)
@@ -36,10 +35,10 @@ async function loadExample(dir: string) {
   let Apps = {}
   let command = []
   let readDir = readdirSync(dir)
-  readDir = readDir.filter((item) => /.(js|ts)$/.test(item))
+  readDir = readDir.filter(item => /.(js|ts)$/.test(item))
   for (let appname of readDir) {
     let name = appname.slice(0, appname.lastIndexOf('.'))
-    let tmp = await import(`${dir}/${name}`).catch((error) => {
+    let tmp = await import(`${dir}/${name}`).catch(error => {
       console.error(red(`报错:${appname}`))
       console.error(error)
       process.exit()
@@ -59,8 +58,7 @@ async function loadExample(dir: string) {
   console.info(green(`[EXAMPLE]`), ` ${Object.keys(Apps).length} app`)
   global.Apps = Apps
   global.command = command
-  await saveCommand(command)
-  .catch((err:any)=>console.log(red(err)))
+  await saveCommand(command).catch((err: any) => console.log(red(err)))
 }
 
 /* program */
@@ -72,10 +70,10 @@ async function loadProgram(dir: string) {
   /* 读取文件 */
   let readDir = readdirSync(dir)
   /* 正则匹配ts文件并返回 */
-  readDir = readDir.filter((item) => /.ts$/.test(item))
+  readDir = readDir.filter(item => /.ts$/.test(item))
   for (let appname of readDir) {
     if (!existsSync(`${dir}/${appname}`)) continue
-    const { apps } = await import(`${dir}/${appname}`).catch((error) => {
+    const { apps } = await import(`${dir}/${appname}`).catch(error => {
       console.error(red(`err:${appname}`))
       console.error(red(error))
       process.exit()
@@ -104,8 +102,7 @@ async function loadProgram(dir: string) {
   console.info(green(`[PROGRAM]`), ` ${Object.keys(Apps).length} apps`)
   global.Apps = { ...global.Apps, ...Apps }
   global.command = command
-  await saveCommand(command)
-  .catch((err:any)=>console.log(red(err)))
+  await saveCommand(command).catch((err: any) => console.log(red(err)))
 }
 
 /* plugins */
@@ -117,7 +114,7 @@ async function loadPlugins(dir: string) {
   for (let appname of readDir) {
     if (!existsSync(`${dir}/${appname}/index.js`) && !existsSync(`${dir}/${appname}/index.ts`))
       continue
-    const { apps } = await import(`${dir}/${appname}`).catch((error) => {
+    const { apps } = await import(`${dir}/${appname}`).catch(error => {
       console.error(red(`err:${appname}`))
       console.error(red(error))
       process.exit()
@@ -146,7 +143,7 @@ async function loadPlugins(dir: string) {
   console.info(green(`[PLUGINS]`), ` ${Object.keys(Apps).length} apps`)
   global.Apps = { ...global.Apps, ...Apps }
   global.command = command
-  await saveCommand(command).catch(err=>console.log(red(err)))
+  await saveCommand(command).catch(err => console.log(red(err)))
 }
 
 let commswich = false
@@ -206,8 +203,7 @@ export async function InstructionMatching(e: messgetype) {
     if (!new RegExp(reg).test(e.cmd_msg)) continue
     try {
       /* 执行函数 */
-      const res = await Apps[belong][type][name](e)
-      .catch((err:any)=>console.log(red(err)))
+      const res = await Apps[belong][type][name](e).catch((err: any) => console.log(red(err)))
       /* 真:强制不再匹配 */
       if (res) break
     } catch (error) {

@@ -40,7 +40,6 @@ export const createConversation = () => {
     OPEN_FORUMS_EVENT()
   }
 
-
   /* 机器人进出频道消息 */
   GUILDS()
 
@@ -55,7 +54,6 @@ export const createConversation = () => {
 
   /* 互动事件监听 */
   INTERACTION()
-
 
   /* 音频事件 */
   AUDIO_ACTION()
@@ -113,29 +111,32 @@ const GUILD_MEMBERS = () => {
     /* 消息类型*/
     switch (e.eventType) {
       case 'DIRECT_MESSAGE_CREATE': {
-        await client.directMessageApi.postDirectMessage(e.msg.guild_id, {
-          msg_id: e.msg.id,
-          content: '请在子频道中使用'
-        })
-        .catch((err:any)=>console.log(red(err)))
+        await client.directMessageApi
+          .postDirectMessage(e.msg.guild_id, {
+            msg_id: e.msg.id,
+            content: '请在子频道中使用'
+          })
+          .catch((err: any) => console.log(red(err)))
         break
       }
       /* 进群 */
       case 'GUILD_MEMBER_ADD': {
-        await client.messageApi.postMessage(e.msg.channel_id, {
-          msg_id: e.msg.id, // 可选,消息id,如果指定则会回复该消息
-          content: `${segment.at(e.msg.user.id)} 欢迎新人 ~ `,
-          image: 'http://tva1.sinaimg.cn/bmiddle/6af89bc8gw1f8ub7pm00oj202k022t8i.jpg'
-        })
-        .catch((err:any)=>console.log(red(err)))
+        await client.messageApi
+          .postMessage(e.msg.channel_id, {
+            msg_id: e.msg.id, // 可选,消息id,如果指定则会回复该消息
+            content: `${segment.at(e.msg.user.id)} 欢迎新人 ~ `,
+            image: 'http://tva1.sinaimg.cn/bmiddle/6af89bc8gw1f8ub7pm00oj202k022t8i.jpg'
+          })
+          .catch((err: any) => console.log(red(err)))
         break
       }
       /* 退群 */
       case 'GUILD_MEMBER_REMOVE': {
-        await client.messageApi.postMessage(e.msg.channel_id, {
-          content: `${segment.at(e.msg.user.id)}${e.msg.user.username} 离开了我们...`
-        })
-        .catch((err:any)=>console.log(red(err)))
+        await client.messageApi
+          .postMessage(e.msg.channel_id, {
+            content: `${segment.at(e.msg.user.id)}${e.msg.user.username} 离开了我们...`
+          })
+          .catch((err: any) => console.log(red(err)))
         break
       }
       default: {
@@ -155,12 +156,9 @@ const GUILD_MESSAGES = () => {
     if (e.eventType === 'MESSAGE_DELETE') return
     /* 事件匹配 */
     e.event = 'GUILD_MESSAGES'
-    guildMessges(e)
-    .catch((err:any)=>console.log(red(err)))
+    guildMessges(e).catch((err: any) => console.log(red(err)))
   })
 }
-
-
 
 /**
  PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
@@ -173,28 +171,26 @@ const PUBLIC_GUILD_MESSAGES = () => {
     if (e.eventType === 'PUBLIC_MESSAGE_DELETE') return
     /* 事件匹配 */
     e.event = 'PUBLIC_GUILD_MESSAGES'
-    guildMessges(e)
-    .catch((err:any)=>console.log(red(err)))
+    guildMessges(e).catch((err: any) => console.log(red(err)))
   })
 }
 
-
-
 const guildMessges = async (e: messgetype) => {
-
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
 
   /* 自身机器人权限检测 */
   const authority: any = await client.channelPermissionsApi
     .channelPermissions(e.msg.channel_id, bot.id)
-    .catch((err:any)=>console.log(red(err)))
+    .catch((err: any) => console.log(red(err)))
 
   /* 查看报错 */
   if (!authority) return
 
   /* 权限不通过则不反馈 */
-  const { data: { permissions: botmiss } }: any = authority
+  const {
+    data: { permissions: botmiss }
+  }: any = authority
   if (botmiss < 7) return
 
   /* 查看当前用户权限 */
@@ -202,7 +198,7 @@ const guildMessges = async (e: messgetype) => {
     data: { permissions: usermiss }
   }: any = await client.channelPermissionsApi
     .channelPermissions(e.msg.channel_id, e.msg.author.id)
-    .catch((err:any)=>console.log(red(err)))
+    .catch((err: any) => console.log(red(err)))
 
   if (usermiss < 7) {
     e.isMaster = false
@@ -225,7 +221,7 @@ const guildMessges = async (e: messgetype) => {
         content,
         ...obj
       })
-      .catch((err:any)=>console.log(red(err)))
+      .catch((err: any) => console.log(red(err)))
     return true
   }
 
@@ -237,14 +233,14 @@ const guildMessges = async (e: messgetype) => {
   e.deleteEmoji = async (boj: any): Promise<boolean> => {
     await client.reactionApi
       .deleteReaction(e.msg.channel_id, boj)
-      .catch((err:any)=>console.log(red(err)))
+      .catch((err: any) => console.log(red(err)))
     return true
   }
 
   e.postEmoji = async (boj: any): Promise<boolean> => {
     await client.reactionApi
       .postReaction(e.msg.channel_id, boj)
-      .catch((err:any)=>console.log(red(err)))
+      .catch((err: any) => console.log(red(err)))
     return true
   }
 
@@ -261,19 +257,20 @@ const guildMessges = async (e: messgetype) => {
       msg_id: e.msg.id, //消息id, 必须
       content,
       file_image //本地图片 路径 必须
-    })
-    .catch((err:any)=>console.log(red(err)))
+    }).catch((err: any) => console.log(red(err)))
     return true
   }
 
   //获得频道名
   const {
     data: { name }
-  }: any = await client.channelApi.channel(e.msg.channel_id)
-  .catch((err:any)=>console.log(red(err)))
+  }: any = await client.channelApi
+    .channel(e.msg.channel_id)
+    .catch((err: any) => console.log(red(err)))
   console.info(
     green(
-      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
+      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${
+        e.msg.content ? e.msg.content : ''
       }`
     )
   )
@@ -288,14 +285,13 @@ const guildMessges = async (e: messgetype) => {
     e.atuid = e.msg.mentions
     e.at = true
     /* 循环删除文本中的ati信息 */
-    e.atuid.forEach((item) => {
+    e.atuid.forEach(item => {
       e.cmd_msg = e.cmd_msg.replace(`<@!${item.id}>`, '').trim()
     })
   }
 
   /* 消息处理 */
-  InstructionMatching(e)
-  .catch((err:any)=>console.log(red(err)))
+  InstructionMatching(e).catch((err: any) => console.log(red(err)))
 }
 
 /**
@@ -309,46 +305,44 @@ const DIRECT_MESSAGE = () => {
     /* 屏蔽测回消息 */
     if (e.eventType === 'DIRECT_MESSAGE_DELETE') return
     /* 事件匹配 */
-    e.event = 'DIRECT_MESSAGE' 
+    e.event = 'DIRECT_MESSAGE'
 
     /* 是私聊 */
     e.isGroup = true
 
     /**
      * 私聊交互仅能发表情，发文字,发图片，发特殊消息
-     * 
+     *
      * 缺失发送本地图片
      */
 
     /* 消息发送机制 */
-    e.reply = async (content?: string,boj?:any) => {
+    e.reply = async (content?: string, boj?: any) => {
       await client.directMessageApi
         .postDirectMessage(e.msg.guild_id, {
           msg_id: e.msg.id,
           content,
           ...boj
         })
-        .catch((err:any)=>console.log(red(err)))
+        .catch((err: any) => console.log(red(err)))
       return true
     }
 
     console.info(
       green(
-        `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
+        `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${
+          e.msg.content ? e.msg.content : ''
         }`
       )
     )
 
-    
-  /* 消息 */
-  e.cmd_msg = e.msg.content
+    /* 消息 */
+    e.cmd_msg = e.msg.content
 
     /* 消息处理 */
-    InstructionMatching(e)
-    .catch((err:any)=>console.log(red(err)))
+    InstructionMatching(e).catch((err: any) => console.log(red(err)))
   })
 }
-
 
 /**
 GUILD_MESSAGE_REACTIONS (1 << 10)
