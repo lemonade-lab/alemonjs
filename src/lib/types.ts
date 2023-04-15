@@ -30,14 +30,19 @@ interface messgetype {
   //发送表态
   postEmoji: (boj: any) => Promise<boolean>
 }
+
+interface ruleType {
+  reg: string
+  fnc: string
+}
+
 interface cmdTyoe {
   belong: string //导出类型
   type: string //插件类型
   name: string //插件名
-  fnc:string  //函数名
+  rule: ruleType[] //对象数组
   event: string //事件类型
   eventType: string //消息类型
-  reg: string //正则
   dsc: any //指令说明
   priority: number //优先级
 }

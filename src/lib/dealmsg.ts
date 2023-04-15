@@ -36,6 +36,7 @@ async function loadExample(dir: string) {
   let command = []
   let readDir = readdirSync(dir)
   readDir = readDir.filter(item => /.(js|ts)$/.test(item))
+
   for (let appname of readDir) {
     let name = appname.slice(0, appname.lastIndexOf('.'))
     let tmp = await import(`${dir}/${name}`).catch(error => {
@@ -45,19 +46,24 @@ async function loadExample(dir: string) {
     })
     if (!tmp) return
     if (!tmp.rule) continue
-    Apps['example'] = {}
-    for (let item in tmp.rule) {
-      tmp.rule[item].belong = 'example'
-      tmp.rule[item].type = name  //类型名
-      tmp.rule[item].fnc = item  //执行方法  原名被覆盖了
-      //推送了改方法中的所有参数
-      command.push(tmp.rule[item])
+
+    console.log(tmp.rule)
+
+    const belong = `example.${name}`
+    Apps[belong] = {}
+    for (let item of tmp.rule) {
+      if (!Apps[belong][item['event']]) Apps[belong][item['event']] = {}
+      if (!Apps[belong][item['event']][name]) Apps[belong][item['event']][name] = {}
+      Apps[belong][item['event']][name][item['fnc']] = tmp[item['fnc']]
+      command.push({
+        belong,
+        type: name,
+        ...item,
+        rule: tmp.rule
+      })
     }
-
-    Apps['example'][name] = tmp
-    console.log(tmp)
-
   }
+
   command = lodash.orderBy(command, ['priority'], ['asc'])
   console.info(green(`[EXAMPLE]`), ` ${Object.keys(Apps).length} app`)
   global.Apps = Apps
@@ -84,22 +90,28 @@ async function loadProgram(dir: string) {
     })
     Apps[appname] = {}
     for (const item in apps) {
+      //类
       let keys = new apps[item]()
-      if (!keys['rule'] || !keys['dsc'] || !keys['event'] || !keys['priority']) continue
-      Apps[appname][item] = keys['rule']
+      //没有事件和指令集
+      if (!keys['event'] || !keys['rule']) continue
+      //插件名、类名、
+      Apps[appname][keys['event']] = {}
+      //插件名、类名、事件名
+      Apps[appname][keys['event']][item] = {}
+      //有很多的方法
       keys['rule'].forEach((key: any) => {
-        const FncName = key['fnc']
-        Apps[appname][item][FncName] = keys[FncName]
+        //保存方法
+        Apps[appname][keys['event']][item][key['fnc']] = keys[key['fnc']]
+        //记录方法参数
         command.push({
           belong: appname,
           type: item,
-          fnc: FncName,
           name: keys['name'],
           event: keys['event'],
           eventType: keys['eventType'],
-          reg: key['reg'],
+          rule: keys['rule'],
           dsc: keys['dsc'],
-          priority: keys['priority'],
+          priority: keys['priority']
         })
       })
     }
@@ -125,24 +137,31 @@ async function loadPlugins(dir: string) {
       console.error(red(error))
       process.exit()
     })
+    //插件名
     Apps[appname] = {}
     for (const item in apps) {
+      //类
       let keys = new apps[item]()
-      if (!keys['rule'] || !keys['dsc'] || !keys['event'] || !keys['priority']) continue
-      Apps[appname][item] = keys['rule']
+      //没有事件和指令集
+      if (!keys['event'] || !keys['rule']) continue
+      //插件名、类名、
+      Apps[appname][keys['event']] = {}
+      //插件名、类名、事件名
+      Apps[appname][keys['event']][item] = {}
+      //有很多的方法
       keys['rule'].forEach((key: any) => {
-        const FncName = key['fnc']
-        Apps[appname][item][FncName] = keys[FncName]
+        //保存方法
+        Apps[appname][keys['event']][item][key['fnc']] = keys[key['fnc']]
+        //记录方法参数
         command.push({
           belong: appname,
           type: item,
-          fnc: FncName,
           name: keys['name'],
           event: keys['event'],
           eventType: keys['eventType'],
-          reg: key['reg'],
+          rule: keys['rule'],
           dsc: keys['dsc'],
-          priority: keys['priority'],
+          priority: keys['priority']
         })
       })
     }
@@ -165,19 +184,18 @@ async function saveCommand(command: any[]) {
       /* 初始化插件类型 */
       data[val.belong] = {}
     }
-    if (!data[val.belong][val.type]) {
+    if (!data[val.belong][val.event]) {
       /* 初始化插件名 */
-      data[val.belong][val.type] = {}
+      data[val.belong][val.event] = {}
     }
     /* 处理指令 */
-    data[val.belong][val.type] = {
+    data[val.belong][val.event][val.type] = {
       name: val.name,
-      reg: val.reg,
-      fnc: val.fnc,
+      dsc: val.dsc,
       event: val.event,
       eventType: val.eventType,
       priority: val.priority,
-      dsc: val.dsc
+      rule: val.rule
     }
   }
   writeFileSync(join(process.cwd(), '/config/command.json'), JSON.stringify(data, null, '\t'))
@@ -209,25 +227,30 @@ export async function InstructionMatching(e: messgetype) {
      * fnc  函数
      * req   指令
      */
-    const { belong, type, event, eventType, fnc, reg } = val
-    if (!Apps[belong][type] || !Apps[belong][type][fnc]) continue
-    /* 信息正则匹配 */
-    if (!new RegExp(reg).test(e.cmd_msg)) continue
-    try {
-      /* 执行函数 */
-      const ret = await Apps[belong][type][fnc](e).catch((err: any) => console.log(red(err)))
-      /* 真:强制不再匹配 */
-      if (ret) break
-    } catch (error) {
-      /* 出错啦 */
-      console.error(red(`[${belong}][${type}][${fnc}]`))
-      let err = JSON.stringify(error, null, 2)
-      if (err + '' === '{}') {
-        console.log(red(error))
-      } else {
-        console.log(red(err))
+    const { belong, type, event, eventType, rule } = val
+    if (rule) {
+      for (let item of rule) {
+        if (!Apps[belong][event]) continue
+        if (!Apps[belong][event][type]) continue
+        /* 信息正则匹配 */
+        if (!new RegExp(item.reg).test(e.cmd_msg)) continue
+        try {
+          /* 执行函数 */
+          const ret = await Apps[belong][event][type][item.fnc](e).catch((err: any) => console.log(red(err)))
+          /* 真:强制不再匹配 */
+          if (ret) break
+        } catch (error) {
+          /* 出错啦 */
+          console.error(red(`[${belong}][${event}][${type}][${item.fnc}]`))
+          let err = JSON.stringify(error, null, 2)
+          if (err + '' === '{}') {
+            console.log(red(error))
+          } else {
+            console.log(red(err))
+          }
+          return
+        }
       }
-      return
     }
   }
 }
