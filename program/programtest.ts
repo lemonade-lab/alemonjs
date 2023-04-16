@@ -11,12 +11,12 @@ const apps = {
         rule: [
           {
             reg: '^/原神黄历$', //正则指令
-            fnc: 'gerAlmanac' //函数匹配
+            fnc: 'getAlmanac' //函数匹配
           }
         ]
       })
     }
-    async gerAlmanac(e: messgetype) {
+    async getAlmanac(e: messgetype) {
       /* 网上图片url */
       e.reply(`${segment.at(e.msg.author.id)}`, {
         image: 'https://api.xingzhige.com/API/yshl/'
