@@ -87,10 +87,8 @@ async function loadExample(dir: string) {
   //初始化
   createApps()
   const belong = 'example'
-
   let readDir = readdirSync(dir)
   readDir = readDir.filter(item => /.(js|ts)$/.test(item))
-
   for (let appname of readDir) {
     let name = appname.slice(0, appname.lastIndexOf('.'))
     let tmp = await import(`${dir}/${name}`).catch(error => {
@@ -124,7 +122,7 @@ async function loadExample(dir: string) {
   }
 }
 
-async function synthesis(apps, appname, belong) {
+async function synthesis(apps: object, appname: string, belong: string) {
   for (const item in apps) {
     let keys = new apps[item]()
     // 没有类型和指令
@@ -162,7 +160,7 @@ async function loadProgram(dir: string) {
   /* 读取文件 */
   let readDir = readdirSync(dir)
   /* 正则匹配ts文件并返回 */
-  readDir = readDir.filter(item => /.ts$/.test(item))
+  readDir = readDir.filter(item => /.(ts|js)$/.test(item))
   for (let appname of readDir) {
     if (!existsSync(`${dir}/${appname}`)) continue
     const { apps } = await import(`${dir}/${appname}`).catch(error => {
@@ -193,7 +191,7 @@ async function loadPlugins(dir: string) {
 
 let commswich = false
 /* create command  */
-async function saveCommand(command) {
+async function saveCommand(command: object) {
   let data = {
     dec: '命令总览'
   }
@@ -240,7 +238,7 @@ export async function InstructionMatching(e: messgetype) {
     try {
       /* 执行函数 */
       const ret = await Apps[e.event][data.belong][data.type][data.name]
-        [data.fnc](e)
+      [data.fnc](e)
         .catch((err: any) => console.log(red(err)))
       /* 真:强制不再匹配 */
       if (ret) break
@@ -270,7 +268,7 @@ export async function RecallMessage(e: any) {
     try {
       /* 执行函数 */
       const ret = await Apps[e.event][data.belong][data.type][data.name]
-        [data.fnc](e)
+      [data.fnc](e)
         .catch((err: any) => console.log(red(err)))
       /* 真:强制不再匹配 */
       if (ret) break
