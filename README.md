@@ -68,6 +68,7 @@ npm run restart #重启
 npm run delete #删除
 npm run login #登录
 npm run log #打印
+npm run monit #管理
 
 ```
 

@@ -12,6 +12,7 @@
     "stop": "pm2 stop pm2.config.js",
     "delete": "pm2 delete pm2.config.js",
     "log": "pm2 logs --lines 20 alemont-bot",
+    "monit":"pm2 monit",
     "dev": "npx nodemon --exec ts-node index.ts",
     "lint": "npx prettier --write ."
   },
