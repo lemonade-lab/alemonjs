@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-export async function check(): Promise<any> {
+export async function check(login?:number): Promise<any> {
   const file = join(process.cwd(), Bcf)
   const config = readYaml(file)
   /* 检查配置 */
@@ -24,7 +24,8 @@ export async function check(): Promise<any> {
     (config ?? '') !== '' &&
     (config.account ?? '') !== '' &&
     (config.account.appID ?? '') !== '' &&
-    (config.account.token ?? '') !== ''
+    (config.account.token ?? '') !== '' &&
+    (login) !== 0
   ) {
     /* 转为全局变量 */
     global.cfg = config.account

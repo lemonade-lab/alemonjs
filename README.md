@@ -49,7 +49,7 @@ cnpm install
 #### 脚本运行 1 登录验证
 
 ```
-npm run start  #前台运行
+npm run app  #前台运行
 ```
 
 #### 后台运行 2 负载均衡
@@ -59,21 +59,16 @@ npm install pm2 -g #安装全局pm2
 npm install ts-node -g #安装全局ts-node
 ```
 
-```
-npm run pm2 #后台运行
-
-```
-
 #### 扩展指令
 
 ```
-pm2 log #查看pm2打印记录
-pm2 list #查看所有pm2程序
-pm2 start all #启动所有pm2程序
-pm2 stop all #停止所有pm2程序
-pm2 delete all #关掉所有pm2程序
-pm2 delete 0 #关掉ID为0的程序
-pm2 update #更新pm2版本
+npm run start #运行
+npm run stop #停止
+npm run restart #重启
+npm run delete #删除
+npm run login #登录
+npm run log #打印
+
 ```
 
 #### 可能出现的问题

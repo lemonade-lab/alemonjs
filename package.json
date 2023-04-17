@@ -1,12 +1,17 @@
 {
   "name": "alemon-bot",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "alemon-bot",
   "author": "ningmengchongshui",
   "license": "GNU",
   "scripts": {
-    "start": "npx ts-node index.ts",
-    "pm2": "pm2 start pm2.config.js",
+    "app": "npx ts-node index.ts",
+    "login": "npx ts-node login.ts",
+    "start": "pm2 start pm2.config.js",
+    "restart": "pm2 restart pm2.config.js",
+    "stop": "pm2 stop pm2.config.js",
+    "delete": "pm2 delete pm2.config.js",
+    "log": "pm2 logs --lines 20 alemont-bot",
     "dev": "npx nodemon --exec ts-node index.ts",
     "lint": "npx prettier --write ."
   },

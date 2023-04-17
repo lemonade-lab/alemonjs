@@ -11,8 +11,8 @@ module.exports = {
       watch: false,
       autodump: true,
       merge_logs: true,
-      error_file: './logs/alemont-bot/err.log',
-      out_file: './logs/alemont-bot/out.log',
+      error_file: '/logs/alemont-bot/err.log',
+      out_file: '/logs/alemont-bot/out.log',
       log_date_format: 'YYYY-MM-DD HH:mm Z',
       env: {
         NODE_ENV: 'production'
