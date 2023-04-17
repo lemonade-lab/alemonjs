@@ -1,4 +1,7 @@
 import { plugin } from '../../api'
+/**
+ * 同时支持TS与JS写法
+ */
 export class jsdemo extends plugin {
   constructor() {
     super({

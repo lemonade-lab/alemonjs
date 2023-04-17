@@ -59,9 +59,10 @@ export const createConversation = () => {
   AUDIO_ACTION()
 }
 
+/* 监听登录事件 */
 const READY = () => {
-  /* 监听登录事件 */
   ws.on('READY', (e: messgetype) => {
+    /* 配置快捷方法 */
     global.segment = segment
     /* 记录本机 */
     global.bot = e.msg.user
@@ -71,8 +72,8 @@ const READY = () => {
   })
 }
 
+/* 监听登录失败事件 */
 const ERROR = () => {
-  /* 监听登录失败事件 */
   ws.on('ERROR', (e: any) => {
     console.log('[ERROR]  :', e)
   })
@@ -281,8 +282,7 @@ const guildMessges = async (e: messgetype) => {
     .catch((err: any) => console.log(red(err)))
   console.info(
     green(
-      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${
-        e.msg.content ? e.msg.content : ''
+      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
       }`
     )
   )
@@ -346,8 +346,7 @@ const DIRECT_MESSAGE = () => {
 
     console.info(
       green(
-        `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${
-          e.msg.content ? e.msg.content : ''
+        `[isGroup] [${e.msg.author.username}] [${e.msg.author.id}] : ${e.msg.content ? e.msg.content : ''
         }`
       )
     )

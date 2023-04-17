@@ -57,8 +57,14 @@ export default class plugin {
         source_guild_id: e.msg.guild_id,
         recipient_id: e.msg.author.id
       })
-      .catch((err: any) => console.log(red(err)))
-    if (!postSessionRes) return false
+      .catch((err: any) => {
+        e.reply('出错啦')
+        console.log(red(err))
+      })
+    if (!postSessionRes) {
+      e.reply('出错啦')
+      return false
+    }
     const {
       data: { guild_id }
     } = postSessionRes
@@ -67,7 +73,10 @@ export default class plugin {
         msg_id: e.msg.id,
         content
       })
-      .catch((err: any) => console.log(red(err)))
+      .catch((err) => {
+        e.reply('出错啦')
+        console.log(red(err))
+      })
     return true
   }
 }

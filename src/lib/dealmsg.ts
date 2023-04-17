@@ -65,20 +65,25 @@ const createApps = () => {
   }
 }
 
+const watchDir = `/config/config.yaml`
+
 function watchC() {
-  watch(join(process.cwd(), '/config/config.yaml'), async (event, filename) => {
+  watch(join(process.cwd(), watchDir), async (event, filename) => {
     setTimeout(async () => {
-      const file = join(process.cwd(), '/config/config.yaml')
+      /* 配置地址 */
+      const file = join(process.cwd(), watchDir)
+      /* 读取配置 */
       const config = readYaml(file)
       if (
         (config ?? '') === '' ||
         (config.account ?? '') === '' ||
         JSON.stringify(cfg) !== JSON.stringify(config.account)
       ) {
-        console.warn(yellow(join(process.cwd(), '/config/config.yaml updata deed reboot')))
+        console.log(yellow('[updata]'), watchDir, ' you deed reboot ')
         process.exit()
       }
     }, 500)
+
   })
 }
 

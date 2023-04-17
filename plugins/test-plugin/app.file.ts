@@ -1,5 +1,10 @@
 import fs from 'fs'
 import path from 'path'
+/**
+ * 递归算法
+ * @param dir 
+ * @param callback 
+ */
 export const travel = (dir: any, callback: any) => {
   fs.readdirSync(dir).forEach(file => {
     const pathname = path.join(dir, file)

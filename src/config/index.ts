@@ -1,3 +1,15 @@
+/**
+ * --------------------------
+ * 这里是工程的固定配置文件
+ * ----------------------
+ */
+
+
+
+/**
+ *  plugin-config
+ * 是插件的解构初始配置
+ */
 const Pcf = {
   name: 'your-name',
   dsc: 'undifind',
@@ -8,4 +20,22 @@ const Pcf = {
   priority: 5000,
   rule: <any>[]
 }
-export { Pcf }
+
+/**
+ * redis-config
+ * 数据库初始配置
+ */
+const Rcf = {
+  host: '127.0.0.1',
+  port: 6379
+}
+
+/**
+ * 机器人登录配置文件
+ */
+
+const Bcf = '/config/config.yaml'
+
+const Dcf = '/src/config/config_default.yaml'
+
+export { Pcf, Rcf, Bcf, Dcf }

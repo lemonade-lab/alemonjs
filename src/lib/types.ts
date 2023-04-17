@@ -1,15 +1,22 @@
 import { IMessage, IUser } from 'qq-guild-bot'
+/**
+ * 
+ */
 interface READY {
   id: string
   username: string
   status: number
 }
+/**
+ * 消息类
+ */
 interface msgType extends IMessage {
   user: {
     id: string
     username: string
   }
 }
+
 /* 核心处理e消息对象类型 */
 interface messgetype {
   event: string //事件类型
@@ -30,5 +37,8 @@ interface messgetype {
   //发送表态
   postEmoji: (boj: any) => Promise<boolean>
 }
+/**
+ * 插件类
+ */
 type pluginType = string | any[] | Number | ((e: messgetype, content: string) => Promise<boolean>)
 export { READY, messgetype, pluginType }

@@ -14,6 +14,7 @@ export class recall extends plugin {
       ]
     })
   }
+  
   async onrecall(e: any) {
     /* 该功能可用于记录所有撤回消息并存到本地 */
     /* 注意e消息选择any类型以确保正确运行 */

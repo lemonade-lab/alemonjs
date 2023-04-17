@@ -86,6 +86,8 @@ function onProgress(downloadedBytes: number, totalBytes: any) {
   progressBar.tick(delta)
 }
 
+const PUcf = '.cache/puppeteer'
+
 /**
  * 下载
  * @returns
@@ -95,7 +97,7 @@ export function download() {
     // 获取puppeteer安装路径
     if (chromePath === '') {
       const browserFetcher = new BrowserFetcher({
-        path: join(process.cwd(), '.cache/puppeteer')
+        path: join(process.cwd(), PUcf)
       })
       const revisionInfo = browserFetcher.revisionInfo(PUPPETEER_REVISIONS.chromium)
       // 判断是否下载
@@ -104,7 +106,7 @@ export function download() {
         resolve('完成')
       } else {
         console.log(
-          yellow('[NOFIND]puppeteer,Start downloading, please pay attention to the traffic')
+          yellow('[NOFIND] puppeteer,Start downloading, please pay attention to the traffic')
         )
         // 下载
         browserFetcher
@@ -123,6 +125,65 @@ export function download() {
       }
     }
   })
+}
+
+/**
+ * @description:
+ * @param {PathLike} htmlPath html完整路径
+ * @param {string} tab html tab标签
+ * @param {string} imgPath 生成的图片完整路径
+ * @return {Promise<boolean>}
+ */
+export async function getImg(htmlPath: PathLike, tab: string, imgPath: string): Promise<boolean> {
+  if (pic === 0) {
+    browser = false
+    console.info(green('puppeteer start...'))
+    browser = await puppeteer
+      .launch({
+        executablePath: chromePath,
+        headless: true,
+        args: [
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--no-first-run',
+          '--no-sandbox',
+          '--no-zygote',
+          '--single-process'
+        ]
+      })
+      .catch(err => {
+        console.error(red(err.toString()))
+        if (String(err).includes('correct Chromium')) {
+          console.error(
+            red('Not installed correctly,try shell : node ./node_modules/puppeteer/install.js')
+          )
+        }
+        return false
+      })
+    if (typeof browser === 'boolean' && !browser) {
+      console.error(red('puppeteer Startup failed'))
+      return false
+    }
+    console.info(green('puppeteer Successfully started'))
+  }
+  const page = await (browser as Browser).newPage()
+  /* 截图工具 */
+  await page.goto(`file://${htmlPath}`)
+  let body = await page.$(tab)
+  await body.screenshot({
+    type: 'jpeg',
+    quality: 100,
+    path: imgPath
+  })
+  pic++
+  // 大于等于30次重开
+  if (pic >= 30) {
+    ; (browser as Browser).close().catch(err => console.error(red(err.toString())))
+    console.info(green('puppeteer Closed successfully'))
+    pic = 0
+  }
+  return true
 }
 
 // 发送本地图片
@@ -168,63 +229,4 @@ let lastDownloadedBytes = 0
 function toMegabytes(bytes: number) {
   const mb = bytes / 1024 / 1024
   return `${Math.round(mb * 10) / 10} Mb`
-}
-
-/**
- * @description:
- * @param {PathLike} htmlPath html完整路径
- * @param {string} tab html tab标签
- * @param {string} imgPath 生成的图片完整路径
- * @return {Promise<boolean>}
- */
-export async function getImg(htmlPath: PathLike, tab: string, imgPath: string): Promise<boolean> {
-  if (pic === 0) {
-    browser = false
-    console.info(green('puppeteer start...'))
-    browser = await puppeteer
-      .launch({
-        executablePath: chromePath,
-        headless: true,
-        args: [
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--disable-setuid-sandbox',
-          '--no-first-run',
-          '--no-sandbox',
-          '--no-zygote',
-          '--single-process'
-        ]
-      })
-      .catch(err => {
-        console.error(red(err.toString()))
-        if (String(err).includes('correct Chromium')) {
-          console.error(
-            red('Not installed correctly,try shell:node ./node_modules/puppeteer/install.js')
-          )
-        }
-        return false
-      })
-    if (typeof browser === 'boolean' && !browser) {
-      console.error(red('puppeteer Startup failed'))
-      return false
-    }
-    console.info(green('puppeteer Successfully started'))
-  }
-  const page = await (browser as Browser).newPage()
-  /* 截图工具 */
-  await page.goto(`file://${htmlPath}`)
-  let body = await page.$(tab)
-  await body.screenshot({
-    type: 'jpeg',
-    quality: 100,
-    path: imgPath
-  })
-  pic++
-  // 大于等于30次重开
-  if (pic >= 30) {
-    ;(browser as Browser).close().catch(err => console.error(red(err.toString())))
-    console.info(green('puppeteer Closed successfully'))
-    pic = 0
-  }
-  return true
 }

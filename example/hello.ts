@@ -1,4 +1,7 @@
 import { messgetype } from '../src/lib/types'
+
+/**该文件将示范如何同一条指令同时推送频道域私聊都同时起作用 */
+
 const HellpConfig = {
   name: 'hello',  //中文名
   dsc: '[/你好呀]开发简单示例演示', //【命令】功能说明
@@ -11,14 +14,17 @@ const HellpConfig = {
  * 指令集
  */
 export const rule = [
+  /**
+   * 这里推送了两个响应事件，同时指向了  reg这一条指令
+   */
   {
     event: 'GUILD_MESSAGES', //响应频道事件
-    eventType: 'MESSAGE_CREATE', //
-    ...HellpConfig
+    eventType: 'MESSAGE_CREATE', //非撤回类型
+    ...HellpConfig   //扩展配置属性
   },
   {
     event: 'DIRECT_MESSAGE', // 响应私聊事件
-    eventType: 'DIRECT_MESSAGE_CREATE', //
+    eventType: 'DIRECT_MESSAGE_CREATE', //非撤回类型
     ...HellpConfig
   }
 ]
