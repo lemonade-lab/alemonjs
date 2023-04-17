@@ -52,7 +52,7 @@ export async function check(): Promise<any> {
 
     if (!appID || !token) process.exit()
 
-    let str = readFileSync(join(__dirname, Dcf), 'utf-8')
+    let str = readFileSync(join(process.cwd(), Dcf), 'utf-8')
 
     str = str.replace(/appID(.*)''/g, `appID: '${appID}'`)
     str = str.replace(/token(.*)''/g, `token: '${token}'`)
