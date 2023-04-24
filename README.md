@@ -83,7 +83,7 @@ pm2 env set PATH "./node_modules/.bin:$PATH" #没有则需要添加
 ```
 pm2 Modules with id set not found  没找到
 ```
-pm2 updata  #更新最新版
+pm2 update  #更新最新版
 pm2 kill   #杀死所有进程
 rm -rf ~/.pm2  #删除后重新启动即可
 ```
