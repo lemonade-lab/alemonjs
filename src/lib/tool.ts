@@ -26,9 +26,7 @@ export function exe(command: string) {
  * @returns
  */
 export function readYaml(url: string) {
-  /* 是否存在 */
   if (existsSync(url)) {
-    /* 读取 */
     const file = readFileSync(url, 'utf8')
     const data = parse(file)
     return data

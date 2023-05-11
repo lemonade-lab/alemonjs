@@ -67,7 +67,7 @@ export interface SegmentType {
    */
   video: () => void
   /**
-   * 卡片消息对象: e.reply('',segment.embed('','','',[]))
+   * 卡片消息对象
    * @param title 标题:'小黑子'
    * @param prompt 消息弹窗内容:'消息通知'
    * @param url 缩略图地址:'xxx.png'
@@ -76,8 +76,6 @@ export interface SegmentType {
    */
   embed: (title: string, prompt: string, url: string, arr: Array<any>) => object
   /**
-   * 发生按钮消息,该功能暂未测试,且需要申请
-   * e.reply('',[ {desc:'哎呦',link:'hppt:www.xiaoheizi.com/api/xiaoheizi/show'} ])
    * @param arr   [{
         desc: '文本',
         link: '链接'  //可选,没有将会是纯文本
@@ -141,7 +139,7 @@ export interface CmdType {
 export interface BotType {
   version: number
   session_id: string
-  user: UserType
+  user: UserType //机器人信息
   shard: Array<number> //分发建议
 }
 
@@ -150,7 +148,7 @@ export interface MsgType extends IMessage {
   /* 机器人 */
   version: number
   session_id: string
-  user: UserType
+  user: UserType  //机器人信息
   shard: Array<number> //分发建议
   /* 用户 */
   author: IUser //消息作者
@@ -258,7 +256,7 @@ export interface Messgetype {
 export interface RuleType {
   //正则
   reg?: string
-  //方法/函数
+  //方法(函数)
   fnc: string
 }
 
