@@ -1,0 +1,6 @@
+/.cache/
+/config/
+/data/
+/logs/
+/dist/
+/node_modules/

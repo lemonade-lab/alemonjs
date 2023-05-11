@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    // 标准代码
+    "target": "ESNext",
+    // 模块系统
+    "module": "CommonJS",
+    // 不允许隐式的 any 类型
+    "noImplicitAny": false,
+    // 实现CommonJS和ES模块之间的互操作性
+    "esModuleInterop": true,
+    // 可隐藏文件类型
+    "moduleResolution": "node",
+    // noEmit 不生成编译后的文件（只执行编译过程）
+    "noEmit": true, //不生
+    // 保留 const 和 enum 声明
+    "preserveConstEnums": true, //保留
+    // 版本控制
+    "ignoreDeprecations": "5.0",
+    // 是否对 js 文件进行编译，默认是false
+    "allowJs": true, //编译js
+    // 是否抑制隐式any索引的错误，默认：false
+    "suppressImplicitAnyIndexErrors": true //抑制
+  },
+  // 要编译的路径列表（用于指定那些ts文件需要被编译），
+  "include": [
+    "develop",
+    "example",
+    "plugins",
+    "program",
+    "src",
+    "app.config.ts",
+    "index.ts",
+    "login.ts",
+    "main.ts"
+  ],
+  // 要排除的、不编译的文件，它也可以指定一个列表，
+  "exclude": [".cache", "node_modules", "dist", "config", "data", "logs"]
+}

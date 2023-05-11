@@ -1,0 +1,57 @@
+{
+  "plugin插件": {
+    "scope": "typescript",
+    "prefix": "plugin",
+    "body": [
+      "import { plugin, PluginType, Messgetype } from '../../api'",
+      "\nexport class ${1:PluginName} extends plugin {",
+      "  [parameter: string]: PluginType",
+      "  constructor() {",
+      "    super({",
+      "      dsc: '${2:插件描述}',",
+      "      rule: [",
+      "        {",
+      "          reg: '${3:/正则表达式/}',",
+      "          fnc: '${4:方法名}'",
+      "        }",
+      "      ]",
+      "    })",
+      "  }",
+      "  async ${4:方法名}(e: Messgetype) {",
+      "    e.reply('${5:回复内容}')",
+      "    return ${6:false}",
+      "  }",
+      "}\n"
+    ],
+    "description": "功能插件模板"
+  },
+  "program插件": {
+    "scope": "typescript",
+    "prefix": "program",
+    "body": [
+      "import plugin from '../src/lib/plugins'",
+      "import { PluginType, Messgetype } from '../src/lib/types'\n",
+      "export class ${1:PluginName} extends plugin {",
+      "  [parameter: string]: PluginType",
+      "  constructor() {",
+      "    super({",
+      "      //说明",
+      "      dsc: '${2:插件描述}',",
+      "      //正则集",
+      "      rule: [",
+      "        {",
+      "          reg: '${3:/正则表达式/}',",
+      "          fnc: '${4:方法名}'",
+      "        }",
+      "      ]",
+      "    })",
+      "  }",
+      "  async ${4:方法名}(e: Messgetype) {",
+      "    e.reply('${5:回复内容}')",
+      "    return ${6:true}",
+      "  }",
+      "}\n"
+    ],
+    "description": "简单插件模板"
+  }
+}
