@@ -4,6 +4,7 @@ import { join } from 'path'
 import { orderBy } from 'lodash'
 /* 非依赖引用 */
 import { Messgetype, CmdType } from './types'
+import { Tcf } from '../../app.config'
 
 /* 全局 */
 declare global {
@@ -140,8 +141,12 @@ async function loadProgram(dir: string) {
 async function loadPlugins(dir: string) {
   const belong = 'plugins'
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
-  const readDir = readdirSync(dir)
-  for (let appname of readDir) {
+  let files = readdirSync(dir)
+  if (!Tcf.switch) {
+    console.log(files)
+    files = files.filter(item => item != 'test-plugin')
+  }
+  for (let appname of files) {
     if (!existsSync(`${dir}/${appname}/index.js`) && !existsSync(`${dir}/${appname}/index.ts`)) {
       continue
     }
