@@ -91,10 +91,7 @@ async function loadExample(dir: string) {
   /* 读取文件 */
   const readDir = readdirSync(dir)
   /* 正则匹配ts文件并返回 */
-  let flies = readDir.filter(item => /.(ts|js)$/.test(item))
-  if (!Tcf.switch) {
-    flies = flies.filter(item => item != 'alemon-test.ts')
-  }
+  const flies = readDir.filter(item => /.(ts|js)$/.test(item))
   for (let appname of flies) {
     if (!existsSync(`${dir}/${appname}`)) {
       continue
@@ -125,7 +122,7 @@ async function loadPlugins(dir: string) {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   let flies = readdirSync(dir)
   if (!Tcf.switch) {
-    flies = flies.filter(item => item != 'test-plugin')
+    flies = flies.filter(item => item != 'point-plugin')
   }
   for (let appname of flies) {
     if (!existsSync(`${dir}/${appname}/index.js`) && !existsSync(`${dir}/${appname}/index.ts`)) {

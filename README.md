@@ -19,11 +19,6 @@ Express,Redis,Sequelize,PM2
 
 一款基于官方 SDK 所构造的频道机器人,让开发者更专注于业务逻辑,是一种面向消息正则匹配的开发模式.
 
-| 指令      | 说明         |
-| --------- | ------------ |
-| /柠檬帮助 | 查看所有指令 |
-| /柠檬版本 | 查看版本记录 |
-
 ## 起步
 
 拉取代码
@@ -45,7 +40,7 @@ cnpm install
 
 ## 运行
 
-> 以下指令可自行换成 cnpm 或 pnpm
+> 以下指令可根据需求换成 cnpm/pnpm
 
 #### 脚本运行 1 登录验证
 
@@ -58,12 +53,28 @@ npm run app  #前台运行
 ```
 npm install pm2 -g #安装全局pm2
 npm install ts-node -g #安装全局ts-node
+npm run start #后台允许
 ```
+
+[☞ 运行失败了?](./README_admin.md)
+
+> config/config.yaml 机器登录配置
+
+> app.config.ts 机器逻辑配置
+
+此时,确保设备已经能正常运行阿柠檬
+
+你可以通过安装测试插件来体验功能
+
+[☞ 测试插件](https://gitee.com/three-point-of-water/point-plugin)
+
+亦或者直接选择功能来制作个性化机器人
+
+[☞ 更多插件](https://gitee.com/three-point-of-water/point)
 
 #### 扩展指令
 
 ```
-npm run start #运行
 npm run stop #停止
 npm run restart #重启
 npm run delete #删除
@@ -75,42 +86,8 @@ npm run dev #热开发启动
 npm run dev:img #图片调试开发启动
 ```
 
-#### 可能出现的问题
-
-1.使用`npm run start`后发现没有生效
-
-或提示`pm2 Modules with id set not found`
-
-```
-pm2 update  #更新最新版
-pm2 kill   #杀死所有进程
-rm -rf ~/.pm2  #删除后重新启动即可
-```
-
-2.环境变量问题导致的 pm2 启动失败
-
-```
-pm2 env #检查
-```
-
-```
-pm2 env set PATH "./node_modules/.bin:$PATH"  #添加
-```
-
-#### 特殊配置更改
-
-> app.config.ts
-
-> config/config.yaml
-
 ## 友情链接
 
 官方代码包[☞SDK](https://github.com/tencent-connect/bot-node-sdk)
 
 官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
-
-开发交流地 806943302
-
-函数命名部分借鉴于 oicq/icqq
-
-插件设计思想借鉴于 Yunzai-Bot
