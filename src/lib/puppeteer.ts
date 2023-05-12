@@ -63,6 +63,7 @@ export function download() {
       }
     } else {
       console.info('[Chromium]启用自定义配置')
+      resolve('完成')
     }
   })
 }
