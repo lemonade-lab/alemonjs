@@ -295,7 +295,12 @@ const guildMessges = async (e: Messgetype) => {
   const UserPS = await channewlPermissions(e.msg.channel_id, e.msg.author.id)
   e.user_permissions = UserPS
 
-  /* 不是私聊 */
+  e.isMaster = false
+
+  if (e.msg.author.id == cfg.masterID) {
+    e.isMaster = true
+  }
+
   e.isGroup = false
 
   /**
