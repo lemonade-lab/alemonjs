@@ -14,6 +14,7 @@
     "logs": "pm2 logs",
     "monit": "pm2 monit",
     "redis": "pm2 start redis.config.js",
+    "redis:arm64": "pm2 start redis.arm64.config.js",
     "dev": "npx nodemon --exec ts-node index.ts",
     "dev:img": "npx nodemon --exec ts-node main.ts",
     "format": "npx prettier --write ."
