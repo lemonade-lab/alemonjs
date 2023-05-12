@@ -18,32 +18,6 @@ export type ConversationHandler = (e: Messgetype, state: ConversationState) => P
 /* 注册对话处理器 */
 export const conversationHandlers: Map<string, ConversationHandler> = new Map()
 
-/* 注册对话处理函数 */
-conversationHandlers.set('start-conversation', async (e, state) => {
-  /* 处理会话的开始 */
-  console.log(`开始与用户 ${e.msg.author.id} 进行会话`)
-  /* 更新会话状态 */
-  state.step = 1
-  /* 保存会话状态 */
-  await setConversationState(e.msg.author.id, state)
-})
-
-conversationHandlers.set('continue-conversation', async (e, state) => {
-  /* 处理会话的继续 */
-  console.log(`用户 ${e.msg.author.id} 继续进行会话`)
-  /* 更新会话状态 */
-  state.step += 1
-  /* 保存会话状态 */
-  await setConversationState(e.msg.author.id, state)
-})
-
-conversationHandlers.set('end-conversation', async (e, state) => {
-  /* 处理会话的结束 */
-  console.log(`结束与用户 ${e.msg.author.id} 进行会话`)
-  /* 删除会话状态 */
-  await deleteConversationState(e.msg.author.id)
-})
-
 /**
  * 获取对话状态
  * @param userId 根据id获取
