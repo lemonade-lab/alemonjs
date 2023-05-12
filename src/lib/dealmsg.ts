@@ -104,15 +104,18 @@ async function synthesis(apps: object, appname: string, belong: string) {
   }
 }
 
-/* program */
-async function loadProgram(dir: string) {
-  const belong = 'program'
+/* example */
+async function loadExample(dir: string) {
+  const belong = 'example'
   /* 初始化 */
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   /* 读取文件 */
   const readDir = readdirSync(dir)
   /* 正则匹配ts文件并返回 */
-  const flies = readDir.filter(item => /.(ts|js)$/.test(item))
+  let flies = readDir.filter(item => /.(ts|js)$/.test(item))
+  if (!Tcf.switch) {
+    flies = flies.filter(item => item != 'alemon-test.ts')
+  }
   for (let appname of flies) {
     if (!existsSync(`${dir}/${appname}`)) {
       continue
@@ -141,12 +144,11 @@ async function loadProgram(dir: string) {
 async function loadPlugins(dir: string) {
   const belong = 'plugins'
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
-  let files = readdirSync(dir)
+  let flies = readdirSync(dir)
   if (!Tcf.switch) {
-    console.log(files)
-    files = files.filter(item => item != 'test-plugin')
+    flies = flies.filter(item => item != 'test-plugin')
   }
-  for (let appname of files) {
+  for (let appname of flies) {
     if (!existsSync(`${dir}/${appname}/index.js`) && !existsSync(`${dir}/${appname}/index.ts`)) {
       continue
     }
@@ -184,7 +186,7 @@ async function saveCommand(command: CmdType) {
 // 收集指令
 export async function cmdInit() {
   createApps()
-  await loadProgram(join(process.cwd(), '/example'))
+  await loadExample(join(process.cwd(), '/example'))
   await loadPlugins(join(process.cwd(), '/plugins'))
   for (let val in command) {
     command[val] = orderBy(command[val], ['priority'], ['asc'])
