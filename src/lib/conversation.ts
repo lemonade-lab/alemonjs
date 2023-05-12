@@ -295,6 +295,19 @@ const guildMessges = async (e: Messgetype) => {
   const UserPS = await channewlPermissions(e.msg.channel_id, e.msg.author.id)
   e.user_permissions = UserPS
 
+  const channeldata = await client.channelApi
+    .channel(e.msg.channel_id)
+    .then(res => {
+      return res.data
+    })
+    .catch((err: any) => console.error(err))
+
+  e.msg.channel_name = channeldata['name']
+
+  const guilddata = guilds.find(item => item.id == e.msg.guild_id)
+
+  e.msg.owner_id = guilddata.id
+
   e.isMaster = false
 
   if (e.msg.author.id == cfg.masterID) {
@@ -424,16 +437,11 @@ const guildMessges = async (e: Messgetype) => {
   /* 消息处理 */
   InstructionMatching(e).catch((err: any) => console.error(err))
 
-  //获得频道名
-  const {
-    data: { name }
-  }: any = await client.channelApi.channel(e.msg.channel_id).catch((err: any) => console.error(err))
+  /* 消息处理 */
+  InstructionMatching(e).catch((err: any) => console.error(err))
+
   console.info(
-    green(
-      `[${e.msg.channel_id}] [${name}] [${e.msg.author.username}] [${e.msg.author.id}] : ${
-        e.msg.content ? e.msg.content : ''
-      }`
-    )
+    green(`\n[${guilddata.name}][${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}`)
   )
 }
 

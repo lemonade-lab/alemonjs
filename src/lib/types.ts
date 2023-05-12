@@ -152,8 +152,11 @@ export interface MsgType extends IMessage {
   shard: Array<number> //分发建议
   /* 用户 */
   author: IUser //消息作者
+  channel_name: string //子频道名称
   channel_id: string //子频道号
   content: string //消息内容
+  guild_name: string //频道名
+  owner_id: string //频道主
   guild_id: string //频道号
   id: string //消息id
   member: IMember //消息用户
