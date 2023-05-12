@@ -162,7 +162,7 @@ export async function cmdInit() {
   for (let val in command) {
     command[val] = orderBy(command[val], ['priority'], ['asc'])
   }
-  saveCommand(command)
+  if (cfg.sandbox) saveCommand(command)
 }
 
 // 指令匹配
