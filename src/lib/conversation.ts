@@ -437,9 +437,6 @@ const guildMessges = async (e: Messgetype) => {
   /* 消息处理 */
   InstructionMatching(e).catch((err: any) => console.error(err))
 
-  /* 消息处理 */
-  InstructionMatching(e).catch((err: any) => console.error(err))
-
   console.info(
     green(`\n[${guilddata.name}][${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}`)
   )
