@@ -1,11 +1,11 @@
 import './src/console'
+import { BotConfigType } from './src/lib/types'
+import { download } from './src/lib/puppeteer'
+import { ctreateRedis } from './src/db/redis/index'
+import { check } from './src/lib/login'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
-import { download } from './src/lib/puppeteer'
-import { check } from './src/lib/login'
-import { redisInit } from './src/db/redis/index'
 import { createConversation } from './src/lib/conversation'
-import { BotConfigType } from './src/lib/types'
 declare global {
   //接口对象
   var client: IOpenAPI
@@ -16,10 +16,10 @@ declare global {
 }
 {
   ;(async function run() {
+    /* 启动redis数据库 */
+    ctreateRedis()
     // 下载puppeteer
     await download()
-    /* 启动redis数据库 */
-    await redisInit()
     //  登录
     await check()
     console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
