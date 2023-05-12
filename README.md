@@ -45,6 +45,8 @@ cnpm install
 
 ## 运行
 
+> 以下指令可自行换成 cnpm 或 pnpm
+
 #### 脚本运行 1 登录验证
 
 ```
@@ -66,9 +68,12 @@ npm run stop #停止
 npm run restart #重启
 npm run delete #删除
 npm run login #登录
-npm run log #打印
-npm run monit #管理
+npm run logs #打印
+npm run monit #监听管理
 npm run redis #linux-redis启动
+npm run redis:arm64 #ARM64:linux-redis启动
+npm run dev #热开发启动
+npm run dev:img #图片调试开发启动
 ```
 
 #### 可能出现的问题
@@ -92,6 +97,12 @@ pm2 env #检查
 ```
 pm2 env set PATH "./node_modules/.bin:$PATH"  #添加
 ```
+
+#### 特殊配置更改
+
+> app.config.ts
+
+> config/config.yaml
 
 ## 友情链接
 
