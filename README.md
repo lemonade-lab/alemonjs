@@ -71,7 +71,6 @@ npm run login #登录
 npm run logs #打印
 npm run monit #监听管理
 npm run redis #linux-redis启动
-npm run redis:arm64 #ARM64:linux-redis启动
 npm run dev #热开发启动
 npm run dev:img #图片调试开发启动
 ```
