@@ -9,18 +9,9 @@ export class urlimg extends plugin {
         {
           reg: '^/原神黄历$',
           fnc: 'getAlmanac'
-        },
-        {
-          reg: '^/你好呀$',
-          fnc: 'postHolle'
         }
       ]
     })
-  }
-
-  async postHolle(e: Messgetype) {
-    e.reply(segment.at(e.msg.author.id))
-    return false
   }
 
   /**
