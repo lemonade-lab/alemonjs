@@ -1,31 +1,16 @@
-import {
-  IOpenAPI,
-  IGuild,
-  ReactionObj,
-  SessionEvents,
-  AvailableIntentsEventsEnum
-} from 'qq-guild-bot'
+import { IOpenAPI, IGuild, ReactionObj, SessionEvents } from 'qq-guild-bot'
 import { green } from 'kolorist'
 import { PathLike } from 'fs'
 
 /* 非依赖引用 */
 import { cmdInit, InstructionMatching, typeMessage } from './dealmsg'
-import { Messgetype, BotType, SegmentType } from './types'
+import { Messgetype, BotType, SegmentType, BotConfigType } from './types'
 import { sendImage, postImage } from './alemonapi'
 import { channewlPermissions } from './permissions'
 import { segment } from './segment'
 
 declare global {
-  var cfg: {
-    //机器人ID
-    appID: string
-    //机器人token
-    token: string
-    //机器人权限
-    intents: Array<AvailableIntentsEventsEnum>
-    //是否是开发环境
-    sandbox: boolean
-  }
+  var cfg: BotConfigType
 }
 
 declare global {

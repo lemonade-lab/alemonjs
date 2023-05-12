@@ -148,7 +148,7 @@ export interface MsgType extends IMessage {
   /* 机器人 */
   version: number
   session_id: string
-  user: UserType  //机器人信息
+  user: UserType //机器人信息
   shard: Array<number> //分发建议
   /* 用户 */
   author: IUser //消息作者
@@ -284,6 +284,10 @@ export interface BotConfigType {
   intents: Array<AvailableIntentsEventsEnum>
   //是否是开发环境
   sandbox: boolean
+  //密钥
+  secretKey: string
+  //主人ID
+  masterID: string
 }
 
 type ParameterType = string | Array<RuleType> | Number | EType

@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { green, yellow } from 'kolorist'
 import { dirname, join } from 'path'
+import { createHash } from 'crypto'
 import { watch } from 'fs'
 import prompts from 'prompts'
 
@@ -41,6 +42,7 @@ export async function check(login?: number): Promise<any> {
     (config.account ?? '') !== '' &&
     (config.account.appID ?? '') !== '' &&
     (config.account.token ?? '') !== '' &&
+    (config.account.secretKey ?? '') !== '' &&
     login !== 0
   ) {
     if (!config.account.intents) {
@@ -54,6 +56,7 @@ export async function check(login?: number): Promise<any> {
     if (!config.account.intents) {
       config.account.intents = false
     }
+    config.account.masterID = createHash('sha256').update(config.account.appID).digest('hex')
     global.cfg = config.account
   } else {
     console.info('[LOGIN]', '-----------------------')
@@ -64,48 +67,52 @@ export async function check(login?: number): Promise<any> {
     console.info('[LOGIN]', '退出重来？可按', yellow('[CTRL+C]'))
     console.info('[LOGIN]', '更改登录？执行', yellow('npm run login'))
     console.info('[LOGIN]', yellow('现在,请先根据指令提示输入基础信息~'))
-    const { appID, token }: prompts.Answers<'appID' | 'token'> = await prompts([
+
+    const { appID, token, imputPwd, inputBot, imputDev } = await prompts([
       {
         type: 'password',
         name: 'appID',
         message: green('机器人 appID: '),
-        validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 appID')
+        validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 appID: ')
       },
       {
         type: 'password',
         name: 'token',
         message: green('机器人 token: '),
-        validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 token')
+        validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 token: ')
+      },
+      {
+        type: 'password',
+        name: 'imputPwd',
+        message: green('自定义 secretKey: '),
+        validate: value =>
+          value !== '' && typeof value === 'string' && value.length >= 6 && value.length <= 16
+            ? true
+            : '自定义 secretKey: '
+      },
+      {
+        type: 'text',
+        name: 'inputBot',
+        message: green('是否是私域机器人?(y/n)'),
+        validate: value => {
+          if (value === 'y' || value === 'n') return true
+          return '是否是私域机器人?(y/n)'
+        }
+      },
+      {
+        type: 'text',
+        name: 'imputDev',
+        message: green('是否启用开发环境?(y/n)'),
+        validate: value => {
+          if (value === 'y' || value === 'n') return true
+          return '是否启用开发环境?(y/n)'
+        }
       }
     ])
 
-    if (!appID || !token) process.exit()
+    if (!appID || !token || !imputPwd || !inputBot || !imputDev) process.exit()
 
-    const { inputBot } = await prompts({
-      type: 'text',
-      name: 'inputBot',
-      message: green('是否是私域机器人?(y/n)'),
-      validate: value => {
-        if (value === 'y') return true
-        if (value === 'n') return true
-        return '是否是私域机器人?(y/n)'
-      }
-    })
-
-    if (!inputBot) process.exit()
-
-    const { imputDev } = await prompts({
-      type: 'text',
-      name: 'imputDev',
-      message: green('是否启用开发环境?(y/n)'),
-      validate: value => {
-        if (value === 'y') return true
-        if (value === 'n') return true
-        return '是否启用开发环境?(y/n)'
-      }
-    })
-
-    if (!token) process.exit()
+    const secretKey = createHash('sha256').update(`${appID}:${imputPwd}`).digest('hex')
 
     let intents = [
       AvailableIntentsEventsEnum.GUILDS,
@@ -113,7 +120,6 @@ export async function check(login?: number): Promise<any> {
       AvailableIntentsEventsEnum.DIRECT_MESSAGE,
       AvailableIntentsEventsEnum.GUILD_MEMBERS
     ]
-
     if (inputBot == 'y') intents = []
 
     let sandbox = false
@@ -124,26 +130,25 @@ export async function check(login?: number): Promise<any> {
 
     str = str.replace(/appID(.*)''/g, `appID: '${appID}'`)
     str = str.replace(/token(.*)''/g, `token: '${token}'`)
+    str = str.replace(/secretKey(.*)''/g, `secretKey: '${secretKey}'`)
     str = str.replace(/intents:\s*\[\s*\]/g, `intents: [${intents}]`)
     str = str.replace(/sandbox:\s*false/g, `sandbox: ${sandbox}`)
 
-    // 以递归的方式创建目录
     mkdirSync(dirname(join(process.cwd(), Bcf)), { recursive: true })
 
-    /* 写入 */
     writeFileSync(join(process.cwd(), Bcf), str)
 
     console.info('[CTRETE]', Bcf)
 
-    /* 转为全局变量 */
     global.cfg = {
       appID,
       token,
       intents,
-      sandbox
+      sandbox,
+      secretKey,
+      masterID: createHash('sha256').update(appID).digest('hex')
     }
   }
 
-  /** 监听登录配置  */
   watchC()
 }
