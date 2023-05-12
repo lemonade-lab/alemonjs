@@ -156,9 +156,8 @@ async function saveCommand(command: CmdType) {
 // 收集指令
 export async function cmdInit() {
   createApps()
-  await loadProgram(join(process.cwd(), '/program'))
+  await loadProgram(join(process.cwd(), '/example'))
   await loadPlugins(join(process.cwd(), '/plugins'))
-  /** 全部收集完了之后重新排序*/
   for (let val in command) {
     command[val] = orderBy(command[val], ['priority'], ['asc'])
   }
@@ -167,11 +166,10 @@ export async function cmdInit() {
 
 // 指令匹配
 export async function InstructionMatching(e: Messgetype) {
+  if (e.isRecall) return
   if (!command[e.event]) return
   /* 循环所有指令 */
   for (const val of command[e.event]) {
-    /* 不匹配撤回的指令 */
-    if (e.isRecall) continue
     const { reg, data } = val
     /* 正则匹配 */
     if (!new RegExp(reg).test(e.cmd_msg)) continue
