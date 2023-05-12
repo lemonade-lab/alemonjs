@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'fs'
-import { promisify } from 'util'
 import { join } from 'path'
 import { orderBy } from 'lodash'
 /* 非依赖引用 */
 import { Messgetype, CmdType } from './types'
 import { Tcf } from '../../app.config'
+
+import { conversationHandlers, getConversationState } from './dialogue'
 
 /* 全局 */
 declare global {
@@ -13,15 +14,6 @@ declare global {
   //指令对象
   var command: CmdType
 }
-
-/* 对话状态类型 */
-type ConversationState = {
-  step: number
-  data: any
-}
-
-/* 对话处理函数类型 */
-type ConversationHandler = (e: Messgetype, state: ConversationState) => Promise<void>
 
 const createApps = () => {
   global.Apps = {
@@ -54,19 +46,6 @@ const createApps = () => {
     AUDIO_ACTION: []
   }
 }
-
-/* Redis操作函数 */
-const getAsync = promisify(redis.get).bind(redis)
-const setAsync = promisify(redis.set).bind(redis)
-const delAsync = promisify(redis.del).bind(redis)
-
-// const getAsync = s => ''
-// const setAsync = (s, q, a, b) => {}
-// const delAsync = s => {}
-
-// const getAsync = global.redis.get
-// const setAsync = global.redis.set
-// const delAsync = global.redis.del
 
 async function synthesis(apps: object, appname: string, belong: string) {
   for (const item in apps) {
@@ -198,6 +177,18 @@ export async function cmdInit() {
 export async function InstructionMatching(e: Messgetype) {
   if (e.isRecall) return
   if (!command[e.event]) return
+
+  /* 获取对话状态 */
+  const state = await getConversationState(e.msg.author.id)
+
+  /* 获取对话处理函数 */
+  const handler = conversationHandlers.get(e.msg.author.id)
+  if (handler && state) {
+    /* 如果用户处于对话状态，则调用对话处理函数 */
+    await handler(e, state)
+    return
+  }
+
   /* 循环所有指令 */
   for (const val of command[e.event]) {
     const { reg, data } = val
@@ -206,20 +197,11 @@ export async function InstructionMatching(e: Messgetype) {
     /* 搜索函数 */
     if (!cmdDetection(e, data)) continue
     try {
-      /* 获取对话状态 */
-      const state = await getConversationState(e.msg.author.id)
-      /* 获取对话处理函数 */
-      const handler = conversationHandlers.get(data.fnc)
-      if (handler && state) {
-        /* 如果用户处于对话状态，则调用对话处理函数 */
-        await handler(e, state)
-      } else {
-        /* 否则，调用普通处理函数 */
-        const ret = await Apps[data.event][data.belong][data.type][data.name]
-          [data.fnc](e)
-          .catch((err: any) => console.error(err))
-        if (ret) break
-      }
+      /* 否则，调用普通处理函数 */
+      const ret = await Apps[data.event][data.belong][data.type][data.name]
+        [data.fnc](e)
+        .catch((err: any) => console.error(err))
+      if (ret) break
     } catch (err) {
       logErr(err, data)
     }
@@ -260,62 +242,3 @@ function logErr(err: any, data: any) {
   console.error(`[${data.event}][${data.belong}][${data.type}][${data.name}]]`)
   console.error(err)
 }
-
-/* 对话处理器 */
-const conversationHandlers: Map<string, ConversationHandler> = new Map()
-
-/* 注册对话处理函数 */
-const registerConversationHandler = (name: string, handler: ConversationHandler) => {
-  conversationHandlers.set(name, handler)
-}
-
-/* 获取对话状态 */
-const getConversationState = async (userId: string): Promise<ConversationState | null> => {
-  const state = await getAsync(`conversation-state:${userId}`)
-  return state ? JSON.parse(state) : null
-}
-
-/* 保存对话状态 */
-const setConversationState = async (userId: string, state: ConversationState): Promise<void> => {
-  await setAsync(`conversation-state:${userId}`, JSON.stringify(state), 'EX', 3600)
-}
-
-/* 删除对话状态 */
-const deleteConversationState = async (userId: string): Promise<void> => {
-  await delAsync(`conversation-state:${userId}`)
-}
-
-/* 注册对话处理函数 */
-registerConversationHandler('start-conversation', async (e, state) => {
-  /* 处理会话的开始 */
-  console.log(`开始与用户 ${e.msg.author.id} 进行会话`)
-  /* 更新会话状态 */
-  state.step = 1
-  /* 保存会话状态 */
-  await setConversationState(e.msg.author.id, state)
-})
-
-registerConversationHandler('continue-conversation', async (e, state) => {
-  /* 处理会话的继续 */
-  console.log(`用户 ${e.msg.author.id} 继续进行会话`)
-  /* 更新会话状态 */
-  state.step += 1
-  /* 保存会话状态 */
-  await setConversationState(e.msg.author.id, state)
-})
-
-registerConversationHandler('end-conversation', async (e, state) => {
-  /* 处理会话的结束 */
-  console.log(`结束与用户 ${e.msg.author.id} 进行会话`)
-  /* 删除会话状态 */
-  await deleteConversationState(e.msg.author.id)
-})
-
-/* 普通处理函数 */
-const normalHandler = async (e: Messgetype) => {
-  /* 处理普通指令 */
-  console.log(`执行普通指令: ${e.cmd_msg}`)
-}
-
-/* 注册普通处理函数 */
-registerConversationHandler('normal-handler', normalHandler)
