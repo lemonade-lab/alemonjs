@@ -42,7 +42,7 @@ export function download() {
         chromePath = revisionInfo.executablePath
         resolve('完成')
       } else {
-        console.info('[Chromium]开始下载，请注意流量')
+        console.info('[Chromium]开始下载,请耐心等候~')
         browserFetcher
           .download(PUPPETEER_REVISIONS.chromium, onProgress)
           .then(res => {
