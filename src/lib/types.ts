@@ -1,4 +1,11 @@
-import { IMessage, IUser, ReactionObj, IMember, AvailableIntentsEventsEnum,  MessageReference} from 'qq-guild-bot'
+import {
+  IMessage,
+  IUser,
+  ReactionObj,
+  IMember,
+  AvailableIntentsEventsEnum,
+  MessageReference
+} from 'qq-guild-bot'
 import { PathLike } from 'fs'
 
 export enum ScreenshotType {
@@ -242,7 +249,7 @@ export interface Messgetype {
   cmd_msg: string
 
   //消息发送机制
-  reply: (content?: string | object, obj?: object) => Promise<boolean>
+  reply: (content?: string | object | Array<string>, obj?: object) => Promise<boolean>
 
   //发送本地图片
   sendImage: (file_image: PathLike, content?: string) => Promise<boolean>

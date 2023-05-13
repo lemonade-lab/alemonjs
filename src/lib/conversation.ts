@@ -192,9 +192,13 @@ const GUILD_MEMBERS = () => {
      * @param content 消息内容
      * @param obj 额外消息 可选
      */
-    e.reply = async (msg?: string | object, obj?: object): Promise<boolean> => {
+    e.reply = async (msg?: string | object | Array<string>, obj?: object): Promise<boolean> => {
       if (channel) {
-        const content = typeof msg === 'string' ? msg : undefined
+        const content = Array.isArray(msg)
+          ? msg.join('')
+          : typeof msg === 'string'
+          ? msg
+          : undefined
         const options = typeof msg === 'object' && !obj ? msg : obj
         return await client.messageApi
           .postMessage(channel.id, {
@@ -321,8 +325,8 @@ const guildMessges = async (e: Messgetype) => {
    * @param content 消息内容
    * @param obj 额外消息 可选
    */
-  e.reply = async (msg?: string | object, obj?: object): Promise<boolean> => {
-    const content = typeof msg === 'string' ? msg : undefined
+  e.reply = async (msg?: string | object | Array<string>, obj?: object): Promise<boolean> => {
+    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
     const options = typeof msg === 'object' && !obj ? msg : obj
     return await client.messageApi
       .postMessage(e.msg.channel_id, {
@@ -485,8 +489,8 @@ const DIRECT_MESSAGE = () => {
     }
 
     /* 消息发送机制 */
-    e.reply = async (msg?: string | object, obj?: object) => {
-      const content = typeof msg === 'string' ? msg : undefined
+    e.reply = async (msg?: string | object | Array<string>, obj?: object) => {
+      const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
       const options = typeof msg === 'object' && !obj ? msg : obj
       return await client.directMessageApi
         .postDirectMessage(e.msg.guild_id, {

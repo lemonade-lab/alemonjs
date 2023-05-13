@@ -15,6 +15,9 @@ export const segment: SegmentType = {
   face: (id: string | number) => `<emoji:${id}>`,
   channel: (channel_id: string) => `<#${channel_id}>`,
   image: (url: string) => {
+    /**
+     * 如果是.php
+     */
     return {
       image: url
     }
