@@ -1,4 +1,4 @@
-import { IMessage, IUser, ReactionObj, IMember, AvailableIntentsEventsEnum } from 'qq-guild-bot'
+import { IMessage, IUser, ReactionObj, IMember, AvailableIntentsEventsEnum,  MessageReference} from 'qq-guild-bot'
 import { PathLike } from 'fs'
 
 export enum ScreenshotType {
@@ -151,6 +151,7 @@ export interface MsgType extends IMessage {
   user: UserType //机器人信息
   shard: Array<number> //分发建议
   /* 用户 */
+  message_reference: MessageReference //引用消息
   author: IUser //消息作者
   channel_name: string //子频道名称
   channel_id: string //子频道号
