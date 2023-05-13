@@ -1,7 +1,7 @@
 {
   // 保存自动格式化
   "editor.formatOnSave": true,
-  //需要安装插件prettier
+  // 需要安装插件prettier
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
