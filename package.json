@@ -11,7 +11,7 @@
     "restart": "pm2 restart pm2.config.js",
     "stop": "pm2 stop pm2.config.js",
     "delete": "pm2 delete pm2.config.js",
-    "logs": "pm2 logs",
+    "logs": "pm2 logs alemon",
     "monit": "pm2 monit",
     "redis": "pm2 start redis.config.js",
     "dev": "npx nodemon --exec ts-node index.ts",
