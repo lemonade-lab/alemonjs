@@ -69,21 +69,21 @@ export const createConversation = () => {
   let size: number = 0
 
   ws.on(SessionEvents.ERROR, (e: any) => {
-    // console.error(e)
+    console.error(e)
   })
 
   ws.on(SessionEvents.EVENT_WS, e => {
-    console.log('测试', e)
+    console.log('出错', e)
     if (e.eventType == 'DISCONNECT') {
       size++
-      if (size >= 5) {
+      if (size >= 9) {
         console.error('重连失败~')
         console.error('请确认配置config/config.taml')
         console.error('账户密码是否正确,事件是否匹配!')
         process.exit()
       }
     } else {
-      if (size >= 5) {
+      if (size >= 9) {
         size = 0
       }
     }
