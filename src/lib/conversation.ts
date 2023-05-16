@@ -313,8 +313,11 @@ const guildMessges = async (e: Messgetype) => {
   e.msg.channel_name = channeldata['name']
 
   const guilddata = guilds.find(item => item.id == e.msg.guild_id)
-
-  e.msg.owner_id = guilddata.id
+  if (guilddata) {
+    e.msg.owner_id = guilddata.id
+  } else {
+    e.msg.owner_id = 'false'
+  }
 
   e.isMaster = false
 
