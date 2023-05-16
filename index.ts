@@ -1,3 +1,4 @@
+import './src/lib/consolo'
 import { BotConfigType } from './src/lib/types'
 import { download } from './src/lib/puppeteer'
 import { ctreateRedis } from './src/db/redis/index'
@@ -5,6 +6,7 @@ import { check } from './src/lib/login'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { createConversation } from './src/lib/conversation'
+
 declare global {
   //接口对象
   var client: IOpenAPI

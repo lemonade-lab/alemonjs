@@ -69,10 +69,11 @@ export const createConversation = () => {
   let size: number = 0
 
   ws.on(SessionEvents.ERROR, (e: any) => {
-    console.error(e)
+    // console.error(e)
   })
 
   ws.on(SessionEvents.EVENT_WS, e => {
+    console.log('测试', e)
     if (e.eventType == 'DISCONNECT') {
       size++
       if (size >= 5) {

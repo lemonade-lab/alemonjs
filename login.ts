@@ -1,3 +1,4 @@
+import './src/lib/consolo'
 import { BotConfigType } from './src/lib/types'
 import { download } from './src/lib/puppeteer'
 import { ctreateRedis } from './src/db/redis/index'
