@@ -1,7 +1,7 @@
 import './src/lib/consolog'
-import { BotConfigType } from './src/lib/types'
-import { download } from './src/lib/puppeteer'
 import { ctreateRedis } from './src/db/redis/index'
+import { download } from './src/lib/puppeteer'
+import { BotConfigType } from './src/lib/types'
 import { check } from './src/lib/login'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
@@ -15,10 +15,11 @@ declare global {
   //配置
   var cfg: BotConfigType
 }
+
 {
   ;(async function run() {
     /* 启动redis数据库 */
-    ctreateRedis()
+    await ctreateRedis()
     // 下载puppeteer
     await download()
     //  登录
