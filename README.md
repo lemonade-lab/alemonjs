@@ -53,7 +53,7 @@ npm run app  #前台运行
 ```
 npm install pm2 -g #安装全局pm2
 npm install ts-node -g #安装全局ts-node
-npm run start #后台允许
+npm run start #后台启动
 ```
 
 [☞ 运行失败了?](./README_admin.md)
