@@ -1,4 +1,3 @@
-import './src/console'
 import express from 'express'
 import { getData, AppName } from './develop'
 const app = express()
