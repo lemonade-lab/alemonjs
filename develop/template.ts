@@ -12,6 +12,9 @@ export const dealTpl = (data: DataTyoe) => {
     return template.render(tpl, data)
   } catch (error) {
     console.error(`[加载html错误]${tplFile}`, error)
+    console.info('未安装测试插件~无法进行示例启动')
+    console.info('未安装测试插件~无法进行示例启动')
+    console.info('未安装测试插件~无法进行示例启动')
     return false
   }
 }

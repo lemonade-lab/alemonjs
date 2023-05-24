@@ -2,7 +2,7 @@ import path from 'path'
 import { dealTpl } from './template'
 
 /*  插件名字 */
-export const AppName = 'test-plugin'
+export const AppName = 'point-plugin'
 
 /* 插件路径 */
 const baseFile = `${path.resolve().replace(/\\/g, '/')}/plugins/${AppName}`
