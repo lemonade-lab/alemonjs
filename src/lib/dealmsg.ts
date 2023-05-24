@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { orderBy } from 'lodash'
 /* 非依赖引用 */
-import { Messgetype, CmdType } from './types'
+import { Messagetype, CmdType } from './types'
 import { Tcf } from '../../app.config'
 
 import { conversationHandlers, getConversationState } from './dialogue'
@@ -171,7 +171,7 @@ export async function cmdInit() {
 }
 
 /* 指令匹配 */
-export async function InstructionMatching(e: Messgetype) {
+export async function InstructionMatching(e: Messagetype) {
   if (e.isRecall) return
   if (!command[e.event]) return
 
@@ -211,7 +211,7 @@ export async function InstructionMatching(e: Messgetype) {
  * @param e
  * @returns
  */
-export async function typeMessage(e: Messgetype) {
+export async function typeMessage(e: Messagetype) {
   if (!command[e.event]) return
   for (const val of command[e.event]) {
     const { data } = val
@@ -229,7 +229,7 @@ export async function typeMessage(e: Messgetype) {
   }
 }
 
-function cmdDetection(e: Messgetype, data: any) {
+function cmdDetection(e: Messagetype, data: any) {
   if (e.eventType != data.eventType) return false
   if (!Apps[data.event][data.belong][data.type][data.name][data.fnc]) return false
   return true

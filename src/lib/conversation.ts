@@ -4,7 +4,7 @@ import { PathLike } from 'fs'
 
 /* 非依赖引用 */
 import { cmdInit, InstructionMatching, typeMessage } from './dealmsg'
-import { Messgetype, BotType, SegmentType, BotConfigType } from './types'
+import { Messagetype, BotType, SegmentType, BotConfigType } from './types'
 import { sendImage, postImage } from './alemonapi'
 import { channewlPermissions } from './permissions'
 import { segment } from './segment'
@@ -30,7 +30,7 @@ declare global {
  */
 export const createConversation = () => {
   /**  建权通过 */
-  ws.on(SessionEvents.READY, async (e: Messgetype) => {
+  ws.on(SessionEvents.READY, async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 配置快捷方法 */
     global.segment = segment
@@ -101,7 +101,7 @@ GUILDS (1 << 0)
   - CHANNEL_DELETE         // 当channel被删除时
  */
 const GUILDS = () => {
-  ws.on('GUILDS', (e: Messgetype) => {
+  ws.on('GUILDS', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = 'GUILDS'
@@ -176,7 +176,7 @@ GUILD_MEMBERS (1 << 1)
  */
 const GUILD_MEMBERS = () => {
   /*监听新人事件*/
-  ws.on('GUILD_MEMBERS', async (e: Messgetype) => {
+  ws.on('GUILD_MEMBERS', async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
     /* 事件匹配 */
@@ -232,7 +232,7 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
   - MESSAGE_DELETE         // 删除（撤回）消息事件
  * */
 const GUILD_MESSAGES = () => {
-  ws.on('GUILD_MESSAGES', async (e: Messgetype) => {
+  ws.on('GUILD_MESSAGES', async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
     // 撤回转交为公域监听处理
@@ -264,7 +264,7 @@ const GUILD_MESSAGES = () => {
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
 const PUBLIC_GUILD_MESSAGES = () => {
-  ws.on('PUBLIC_GUILD_MESSAGES', async (e: Messgetype) => {
+  ws.on('PUBLIC_GUILD_MESSAGES', async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
     /* 事件匹配 */
@@ -293,7 +293,7 @@ const PUBLIC_GUILD_MESSAGES = () => {
   })
 }
 
-const guildMessges = async (e: Messgetype) => {
+const guildMessges = async (e: Messagetype) => {
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
 
@@ -459,7 +459,7 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 const DIRECT_MESSAGE = () => {
-  ws.on('DIRECT_MESSAGE', async (e: Messgetype) => {
+  ws.on('DIRECT_MESSAGE', async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
     if (e.eventType === 'DIRECT_MESSAGE_DELETE') {
@@ -594,7 +594,7 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
   - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
  */
 const GUILD_MESSAGE_REACTIONS = () => {
-  ws.on('GUILD_MESSAGE_REACTIONS', (e: Messgetype) => {
+  ws.on('GUILD_MESSAGE_REACTIONS', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = 'GUILD_MESSAGE_REACTIONS'
@@ -608,7 +608,7 @@ INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
 const INTERACTION = () => {
-  ws.on('INTERACTION', (e: Messgetype) => {
+  ws.on('INTERACTION', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = 'INTERACTION'
@@ -623,7 +623,7 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
 const MESSAGE_AUDIT = () => {
-  ws.on('MESSAGE_AUDIT', (e: Messgetype) => {
+  ws.on('MESSAGE_AUDIT', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = 'MESSAGE_AUDIT'
@@ -647,7 +647,7 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
 const FORUMS_EVENT = () => {
-  ws.on('FORUMS_EVENT', (e: Messgetype) => {
+  ws.on('FORUMS_EVENT', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = 'FORUMS'
@@ -671,7 +671,7 @@ const FORUMS_EVENT = () => {
   - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
  */
 const OPEN_FORUMS_EVENT = () => {
-  ws.on('OPEN_FORUMS_EVENT', (e: Messgetype) => {
+  ws.on('OPEN_FORUMS_EVENT', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = 'FORUMS'
@@ -690,7 +690,7 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_OFF_MIC           // 下麦时
  */
 const AUDIO_ACTION = () => {
-  ws.on('AUDIO_ACTION', (e: Messgetype) => {
+  ws.on('AUDIO_ACTION', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = 'AUDIO_ACTION'

@@ -1,4 +1,4 @@
-import { Messgetype } from './types'
+import { Messagetype } from './types'
 import { promisify } from 'util'
 
 /* Redis操作函数 */
@@ -13,7 +13,7 @@ export type ConversationState = {
 }
 
 /* 对话处理函数类型 */
-export type ConversationHandler = (e: Messgetype, state: ConversationState) => Promise<void>
+export type ConversationHandler = (e: Messagetype, state: ConversationState) => Promise<void>
 
 /* 注册对话处理器 */
 export const conversationHandlers: Map<string, ConversationHandler> = new Map()

@@ -1,4 +1,4 @@
-import { Messgetype, EType, RuleType, SuperType } from './types'
+import { Messagetype, EType, RuleType, SuperType } from './types'
 export default class plugin {
   name?: string
   dsc?: string
@@ -34,7 +34,7 @@ export default class plugin {
    * 专用于在频道中转为私聊回复
    * 需要设置机器人允许私聊
    */
-  async reply(e: Messgetype, content: string): Promise<boolean> {
+  async reply(e: Messagetype, content: string): Promise<boolean> {
     if (e.isGroup) return false
 
     const postSessionRes: any = await client.directMessageApi

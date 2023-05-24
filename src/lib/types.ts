@@ -205,7 +205,7 @@ export type IdentityType = {
 }
 
 /* e消息对象类型 */
-export interface Messgetype {
+export interface Messagetype {
   //消息事件
   eventId: string
 
@@ -300,11 +300,3 @@ export interface BotConfigType {
   //主人ID
   masterID: string
 }
-
-/** 插件类型*/
-export type PluginType =
-  | string
-  | Array<RuleType>
-  | Number
-  | EType
-  | ((e: Messgetype, content: string) => Promise<boolean>)
