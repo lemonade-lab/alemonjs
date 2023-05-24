@@ -301,7 +301,10 @@ export interface BotConfigType {
   masterID: string
 }
 
-type ParameterType = string | Array<RuleType> | Number | EType
-
 /** 插件类型*/
-export type PluginType = ParameterType | ((e: Messgetype, content: string) => Promise<boolean>)
+export type PluginType =
+  | string
+  | Array<RuleType>
+  | Number
+  | EType
+  | ((e: Messgetype, content: string) => Promise<boolean>)
