@@ -9,7 +9,7 @@ import prompts from 'prompts'
 /* 非依赖引入 */
 import { readYaml } from './tool'
 import { Bcf, Dcf } from '../../app.config'
-import { BotConfigType } from './types'
+import { BotConfigType } from 'alemon/types'
 
 declare global {
   var cfg: BotConfigType

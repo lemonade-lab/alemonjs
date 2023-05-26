@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { orderBy } from 'lodash'
 /* 非依赖引用 */
-import { Messagetype, CmdType } from './types'
+import { Messagetype, CmdType } from 'alemon/types'
 import { Tcf } from '../../app.config'
 
 import { conversationHandlers, getConversationState } from './dialogue'

@@ -1,4 +1,4 @@
-import { Messagetype } from './types'
+import { Messagetype } from 'alemon/types'
 import { promisify } from 'util'
 
 /* Redis操作函数 */

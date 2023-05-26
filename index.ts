@@ -1,7 +1,7 @@
 import './src/lib/consolog'
 import { ctreateRedis } from './src/db/redis/index'
 import { download } from './src/lib/puppeteer'
-import { BotConfigType } from './src/lib/types'
+import { BotConfigType } from 'alemon/types'
 import { check } from './src/lib/login'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'

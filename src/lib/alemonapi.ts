@@ -4,7 +4,7 @@ import FormData from 'form-data'
 import axios from 'axios'
 
 import { Acf } from '../../app.config'
-import { BotConfigType } from './types'
+import { BotConfigType } from 'alemon/types'
 
 declare global {
   var cfg: BotConfigType

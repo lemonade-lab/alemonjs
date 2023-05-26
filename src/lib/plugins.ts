@@ -1,4 +1,4 @@
-import { Messagetype, EType, RuleType, SuperType } from './types'
+import { Messagetype, EType, RuleType, SuperType } from 'alemon/types'
 export default class plugin {
   name?: string
   dsc?: string

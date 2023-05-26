@@ -4,10 +4,10 @@ import { PathLike } from 'fs'
 
 /* 非依赖引用 */
 import { cmdInit, InstructionMatching, typeMessage } from './dealmsg'
-import { Messagetype, BotType, SegmentType, BotConfigType } from './types'
+import { Messagetype, BotType, SegmentType, BotConfigType } from 'alemon/types'
 import { sendImage, postImage } from './alemonapi'
 import { channewlPermissions } from './permissions'
-import { segment } from './segment'
+import { segment } from 'alemon/lib/segment'
 
 declare global {
   var cfg: BotConfigType

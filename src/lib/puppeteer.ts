@@ -2,7 +2,7 @@ import { PathLike } from 'fs'
 import { join } from 'path'
 import { PuPcf } from '../../app.config'
 import ProgressBar from 'progress'
-import { ScreenshotType } from './types'
+import { ScreenshotType } from 'alemon/types'
 // @ts-ignore
 import puppeteer, { Browser, BrowserFetcher, PUPPETEER_REVISIONS } from 'puppeteer'
 
