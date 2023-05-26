@@ -1,11 +1,11 @@
-import path from 'path'
+import { resolve } from 'path'
 import { dealTpl } from './template'
 
 /*  插件名字 */
 export const AppName = 'point-plugin'
 
 /* 插件路径 */
-const baseFile = `${path.resolve().replace(/\\/g, '/')}/plugins/${AppName}`
+const baseFile = `${resolve().replace(/\\/g, '/')}/plugins/${AppName}`
 
 /* 选择调试文件并重启 */
 const tplFile = `${baseFile}/resources/html/version/version.html`
