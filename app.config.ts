@@ -29,9 +29,4 @@ const PuPcf = {
    */
 }
 
-/* 测试插件开关 */
-const Tcf = {
-  switch: true //开
-}
-
-export { Rcf, Bcf, Dcf, Acf, PuPcf, Tcf }
+export { Rcf, Bcf, Dcf, Acf, PuPcf }
