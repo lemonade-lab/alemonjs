@@ -5,11 +5,11 @@ import { dirname, join } from 'path'
 import { createHash } from 'crypto'
 import { watch } from 'fs'
 import prompts from 'prompts'
+import { BotConfigType } from 'alemon/types'
 
 /* 非依赖引入 */
 import { readYaml } from './tool'
 import { Bcf, Dcf } from '../../app.config'
-import { BotConfigType } from 'alemon/types'
 
 declare global {
   var cfg: BotConfigType

@@ -1,13 +1,13 @@
 import { IOpenAPI, IGuild, ReactionObj, SessionEvents } from 'qq-guild-bot'
 import { green } from 'kolorist'
 import { PathLike } from 'fs'
+import { Messagetype, BotType, SegmentType, BotConfigType } from 'alemon/types'
+import { segment } from 'alemon'
 
 /* 非依赖引用 */
 import { cmdInit, InstructionMatching, typeMessage } from './dealmsg'
-import { Messagetype, BotType, SegmentType, BotConfigType } from 'alemon/types'
 import { sendImage, postImage } from './alemonapi'
 import { channewlPermissions } from './permissions'
-import { segment } from 'alemon/lib/segment'
 
 declare global {
   var cfg: BotConfigType
