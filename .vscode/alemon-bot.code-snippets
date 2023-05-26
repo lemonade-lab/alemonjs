@@ -3,7 +3,8 @@
     "scope": "typescript",
     "prefix": "plugin",
     "body": [
-      "import { plugin,  Messagetype } from '../../api'",
+      "import { plugin } from 'alemon'",
+      "import { Messagetype } from 'alemon/types'",
       "\nexport class ${1:PluginName} extends plugin {",
       "  constructor() {",
       "    super({",
@@ -16,40 +17,12 @@
       "      ]",
       "    })",
       "  }",
-      "  async ${4:方法名}async (e: Messagetype): Promise<boolean> {",
+      "  async ${4:方法名}async(e: Messagetype): Promise<boolean> {",
       "    e.reply('${5:回复内容}')",
       "    return ${6:false}",
       "  }",
       "}\n"
     ],
     "description": "生成功能插件模板"
-  },
-  "example": {
-    "scope": "typescript",
-    "prefix": "example",
-    "body": [
-      "import plugin from '../src/lib/plugins'",
-      "import {  Messagetype } from '../src/lib/types'",
-      "\nexport class ${1:PluginName} extends plugin {",
-      "  constructor() {",
-      "    super({",
-      "      //说明",
-      "      dsc: '${2:插件描述}',",
-      "      //正则集",
-      "      rule: [",
-      "        {",
-      "          reg: '${3:/正则表达式/}',",
-      "          fnc: '${4:方法名}'",
-      "        }",
-      "      ]",
-      "    })",
-      "  }",
-      "  async ${4:方法名}async (e: Messagetype): Promise<boolean> {",
-      "    e.reply('${5:回复内容}')",
-      "    return ${6:true}",
-      "  }",
-      "}\n"
-    ],
-    "description": "生成简单插件模板"
   }
 }
