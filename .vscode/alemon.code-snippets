@@ -17,7 +17,7 @@
       "      ]",
       "    })",
       "  }",
-      "  async ${4:方法名}async(e: Messagetype): Promise<boolean> {",
+      "  async ${4:方法名}(e: Messagetype): Promise<boolean> {",
       "    e.reply('${5:回复内容}')",
       "    return ${6:false}",
       "  }",
