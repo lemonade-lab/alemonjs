@@ -1,21 +1,6 @@
-<h1 align="center">
- <span> Alemon-Bot</span> 
-<a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
+## Alemon-Bot
 
-[![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)
-
-Node.js>=V16
-
-[☞ Alemon官网](http://three-point-of-water.gitee.io/point/)
-
-Windows/Linux,Node.js,TypeScript
-
-Express,Redis,Sequelize,PM2
-
-</a>
-</h1>
-
-
+点击前往[☞ Alemon官网](http://three-point-of-water.gitee.io/alemon-bot/)
 
 ## 一、快速开始
 
