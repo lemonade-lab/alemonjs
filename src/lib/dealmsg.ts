@@ -128,12 +128,15 @@ async function loadPlugins(dir: string) {
     if (!existsSync(`${dir}/${appname}/index.js`) && !existsSync(`${dir}/${appname}/index.ts`)) {
       continue
     }
-    const { apps } = await import(`${dir}/${appname}`).catch(error => {
+    const { init } = await import(`${dir}/${appname}`).catch(error => {
       console.error(appname)
       console.error(error)
       process.exit()
     })
-    await synthesis(apps, appname, belong)
+    if (typeof init == 'function') {
+      const apps = await init()
+      await synthesis(apps, appname, belong)
+    }
   }
 }
 
