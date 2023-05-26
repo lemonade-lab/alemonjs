@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // 标准代码
-    "target": "ESNext",
+    "target": "es2022",
     // 模块系统
     "module": "CommonJS",
     // 不允许隐式的 any 类型
@@ -28,7 +28,6 @@
     "develop",
     "example",
     "plugins",
-    "program",
     "src",
     "app.config.ts",
     "index.ts",
