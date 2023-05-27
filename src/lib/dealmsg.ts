@@ -4,6 +4,7 @@ import { orderBy } from 'lodash'
 import { Messagetype, CmdType } from 'alemon/types'
 /* 非依赖引用 */
 import { conversationHandlers, getConversationState } from './dialogue'
+import { getApp, delApp } from 'alemon'
 
 const Apps: CmdType = {
   GUILD_MESSAGES: {},
@@ -109,19 +110,17 @@ async function loadPlugins(dir: string) {
   const belong = 'plugins'
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   let flies = readdirSync(dir)
-  for (let appname of flies) {
+  for await (let appname of flies) {
     if (!existsSync(`${dir}/${appname}/index.js`) && !existsSync(`${dir}/${appname}/index.ts`)) {
       continue
     }
-    const { init } = await import(`${dir}/${appname}`).catch(error => {
+    await import(`${dir}/${appname}`).catch(error => {
       console.error(appname)
       console.error(error)
       process.exit()
     })
-    if (typeof init == 'function') {
-      const apps = await init()
-      await synthesis(apps, appname, belong)
-    }
+    await synthesis(getApp(appname), appname, belong)
+    delApp(appname)
   }
 }
 
