@@ -119,8 +119,8 @@ async function loadPlugins(dir: string) {
       console.error(error)
       process.exit()
     })
-    await synthesis(getApp(appname), appname, belong)
-    delApp(appname)
+    const apps = getApp(appname)
+    await synthesis(apps, appname, belong)
   }
 }
 
