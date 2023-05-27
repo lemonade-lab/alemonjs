@@ -1,36 +1,38 @@
-<h1 align="center">
- <span> Alemon-Bot</span> 
-<a  href='https://github.com/ningmengchongshui/alemon-bot/stargazers'>
+## Alemon-Bot
 
-[![](https://profile-counter.glitch.me/alemon-bot/count.svg)](https://gitee.com/ningmengchongshui/alemon-bot)
+点击前往[☞ Alemon官网](http://three-point-of-water.gitee.io/alemon-bot/)
 
-Node.js>=V16
+## 一、快速开始
 
-[☞ 参考文档](http://three-point-of-water.gitee.io/point/)
+### 必要环境
 
-Windows/Linux,Node.js,TypeScript
+> 已安装可忽略此步骤
 
-Express,Redis,Sequelize,PM2
+需要下载并安装好运行环境[Node.js](https://nodejs.org/en)
 
-</a>
-</h1>
+注：nodejs 版本至少需要 V16
 
-## 频道机器人
+同时,需要安装并运行好[Redis 数据库](https://github.com/tporadowski/redis/releases)
 
-一款基于官方 SDK 所构造的频道机器人,让开发者更专注于业务逻辑,是一种面向消息正则匹配的开发模式.
+注：windows 推荐使用 redis-x64.msi 包以自启数据库
 
-## 起步
+### 安装工程
 
-拉取代码
+> 选择其中一种仓库安装源码即可
+
+1.github 仓库源
 
 ```
-#github
 git clone --depth=1 https://github.com/ningmengchongshui/alemon-bot.git
-#gitee
+```
+
+2.gitee 仓库源
+
+```
 git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
 ```
 
-加载依赖
+3.加载依赖
 
 ```
 cd alemon-bot
@@ -38,56 +40,27 @@ npm install cnpm -g #全局安装cnpm
 cnpm install
 ```
 
-## 运行
-
-> 以下指令可根据需求换成 cnpm/pnpm
-
-#### 脚本运行 1 登录验证
+### 运行
 
 ```
-npm run app  #前台运行
+npm run app  #直接启动
 ```
 
-#### 后台运行 2 负载均衡
-
-```
-npm install pm2 -g #安装全局pm2
-npm install ts-node -g #安装全局ts-node
-npm run start #后台启动
-```
-
-[☞ 运行失败了?](./README_admin.md)
-
-> config/config.yaml 机器登录配置
-
-> app.config.ts 机器逻辑配置
-
-此时,确保设备已经能正常运行阿柠檬
-
-你可以通过安装测试插件来体验功能
-
-[☞ 测试插件](https://gitee.com/three-point-of-water/point-plugin)
-
-亦或者直接选择功能来制作个性化机器人
-
-[☞ 更多插件](https://gitee.com/three-point-of-water/point)
-
-#### 扩展指令
-
-```
-npm run stop #停止
-npm run restart #重启
-npm run delete #删除
-npm run login #登录
-npm run logs #打印
-npm run monit #监听管理
-npm run redis #linux-redis启动
-npm run dev #热开发启动
-npm run dev:img #图片调试开发启动
-```
-
-## 友情链接
+## 三、友情链接
 
 官方代码包[☞SDK](https://github.com/tencent-connect/bot-node-sdk)
 
 官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
+
+## 四、发电赞助
+
+[https://afdian.net/a/threepointofwater](https://gitee.com/link?target=https%3A%2F%2Fafdian.net%2Fa%2Fthreepointofwater)
+
+## 五、统一开源协议
+
+GNU GPL 是使用最广泛的自由软件许可证,并有强烈的版权要求
+
+分发衍生作品时,作品的源代码必须在同一许可证下可用
+
+GNUGPL 有多种变体,每个变体都有不同的要求
+
