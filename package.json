@@ -26,7 +26,7 @@
     "@types/prompts": "^2.4.1",
     "@types/qrcode": "^1.5.0",
     "@types/ws": "^8.5.3",
-    "alemon": "^1.1.1",
+    "alemon": "^1.1.2",
     "art-template": "^4.13.2",
     "axios": "^1.1.3",
     "chokidar": "^3.5.3",

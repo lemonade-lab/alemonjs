@@ -6,7 +6,7 @@ import { segment } from 'alemon'
 
 /* 非依赖引用 */
 import { cmdInit, InstructionMatching, typeMessage } from './dealmsg'
-import { sendImage, postImage } from './alemonapi'
+import { sendImage, postImage, createApi } from 'alemon'
 import { channewlPermissions } from './permissions'
 
 declare global {
@@ -29,6 +29,7 @@ declare global {
  * 根据其e.eventType，判断出事件的具体类型
  */
 export const createConversation = () => {
+  createApi(cfg)
   /**  建权通过 */
   ws.on(SessionEvents.READY, async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
