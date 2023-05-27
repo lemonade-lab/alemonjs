@@ -1,6 +1,7 @@
+node_modules
+dist
+*.logs
+*.log
 /.cache/
 /config/
 /data/
-/logs/
-/dist/
-/node_modules/
