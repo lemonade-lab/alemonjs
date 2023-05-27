@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import { watch } from 'chokidar'
 import { render } from 'art-template'
 
-import { ctrateFilePath } from './algorithm'
+import { algorithm } from 'alemon'
 import { screenshot } from './puppeteer'
 
 /*保存html模板*/
@@ -49,8 +49,8 @@ export const createPicture = async (name: string, data = {}, address?: string) =
 }
 
 function createHtml(AppName: string, name: string, tplFile: string, AdressHtml: string) {
-  /** 读取html模板 */
-  ctrateFilePath(`/data/${AppName}/html/${name}`, process.cwd())
+  /** 创建html目录 */
+  algorithm.ctrateFile(`/data/${AppName}/html/${name}`)
 
   try {
     html[tplFile] = readFileSync(tplFile, 'utf8')
