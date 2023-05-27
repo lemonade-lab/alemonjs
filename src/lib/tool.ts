@@ -25,13 +25,12 @@ export function exe(command: string) {
  * @param url
  * @returns
  */
-export function readYaml(url: string) {
-  if (existsSync(url)) {
-    const file = readFileSync(url, 'utf8')
-    const data = parse(file)
-    return data
-  } else {
-    console.error('[NOFIND]', url)
-    return false
-  }
+export function getYaml(url: string) {
+  if (existsSync(url)) return parse(readFileSync(url, 'utf8'))
+  return false
+}
+
+export function getJson(url: string) {
+  if (existsSync(url)) return JSON.parse(readFileSync(url, 'utf8'))
+  return false
 }

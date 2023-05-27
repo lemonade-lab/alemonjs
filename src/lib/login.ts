@@ -8,7 +8,7 @@ import prompts from 'prompts'
 import { BotConfigType } from 'alemon/types'
 
 /* 非依赖引入 */
-import { readYaml } from './tool'
+import { getYaml } from './tool'
 import { Bcf, Dcf } from '../../app.config'
 
 declare global {
@@ -20,7 +20,7 @@ function watchC() {
   watch(join(process.cwd(), Bcf), async () => {
     setTimeout(async () => {
       const file = join(process.cwd(), Bcf)
-      const config = readYaml(file)
+      const config = getYaml(file)
       if (
         (config ?? '') === '' ||
         (config.account ?? '') === '' ||
@@ -36,7 +36,7 @@ function watchC() {
 
 export async function check(login?: number): Promise<any> {
   const file = join(process.cwd(), Bcf)
-  const config = readYaml(file)
+  const config = getYaml(file)
   if (
     (config ?? '') !== '' &&
     (config.account ?? '') !== '' &&
