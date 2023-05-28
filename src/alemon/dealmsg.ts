@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { orderBy } from 'lodash'
-import { Messagetype, CmdType, getApp, delApp } from 'alemon'
+import { Messagetype, CmdType, getApp, delApp, getMessage } from 'alemon'
 /* 非依赖引用 */
 import { conversationHandlers, getConversationState } from './dialogue'
 
@@ -180,6 +180,10 @@ export async function InstructionMatching(e: Messagetype) {
     /* 搜索函数 */
     if (!cmdDetection(e, data)) continue
     try {
+      const { type } = data
+      const fnc = getMessage(type)
+      if (typeof fnc == 'function') e = fnc(e)
+      console.log(e)
       /* 否则，调用普通处理函数 */
       const ret = await Apps[data.event][data.belong][data.type][data.name]
         [data.fnc](e)
@@ -201,9 +205,12 @@ export async function typeMessage(e: Messagetype) {
   if (!Command[e.event]) return
   for (const val of Command[e.event]) {
     const { data } = val
+    const { type } = data
     /* 搜索函数 */
     if (!cmdDetection(e, data)) continue
     try {
+      const fnc = getMessage(type)
+      if (typeof fnc == 'function') e = fnc(e)
       const ret = await Apps[data.event][data.belong][data.type][data.name]
         [data.fnc](e)
         .catch((err: any) => console.error(err))

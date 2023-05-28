@@ -9,7 +9,8 @@ const delAsync = promisify(redis.del).bind(redis)
 /* 对话状态类型 */
 export type ConversationState = {
   step: number //会话次数
-  data: any
+  data: Array<any> | string | number | object //携带的数据
+  fnc: Function //携带的方法
 }
 
 /* 对话处理函数类型 */
