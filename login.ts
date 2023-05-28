@@ -25,7 +25,7 @@ declare global {
     //  登录
     await check(0)
     console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
-    console.info('[DOCS] http://three-point-of-water.gitee.io/point')
+    console.info('[DOCS] http://three-point-of-water.gitee.io/alemon-bot')
     console.info('[GIT] https://github.com/ningmengchongshui')
     if (cfg.sandbox) {
       console.info('[SDK] https://bot.q.qq.com/wiki/develop/nodesdk/')
