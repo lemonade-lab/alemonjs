@@ -35,6 +35,7 @@ declare global {
  * 根据其e.eventType，判断出事件的具体类型
  */
 export const createConversation = () => {
+  /* 创建API */
   createApi(cfg)
   /**  建权通过 */
   ws.on(SessionEvents.READY, async (e: Messagetype) => {

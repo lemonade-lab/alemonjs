@@ -34,7 +34,7 @@ function watchC() {
   })
 }
 
-export async function check(login?: number): Promise<any> {
+export async function check(val?: number): Promise<any> {
   const file = join(process.cwd(), Bcf)
   const config = getYaml(file)
   if (
@@ -43,7 +43,7 @@ export async function check(login?: number): Promise<any> {
     (config.account.appID ?? '') !== '' &&
     (config.account.token ?? '') !== '' &&
     (config.account.secretKey ?? '') !== '' &&
-    login !== 0
+    val !== 0
   ) {
     if (!config.account.intents) {
       config.account.intents = [
