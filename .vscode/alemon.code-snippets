@@ -3,8 +3,7 @@
     "scope": "typescript",
     "prefix": "plugin",
     "body": [
-      "import { plugin } from 'alemon'",
-      "import { Messagetype } from 'alemon/types'",
+      "import { plugin , Messagetype } from 'alemon'",
       "\nexport class ${1:PluginName} extends plugin {",
       "  constructor() {",
       "    super({",
