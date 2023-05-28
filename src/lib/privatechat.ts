@@ -1,4 +1,4 @@
-import { Messagetype } from 'alemon/types'
+import { Messagetype } from 'alemon'
 export const replyPrivate = async (e: Messagetype, content: string): Promise<boolean> => {
   if (e.isGroup) return false
 

@@ -5,7 +5,7 @@ import { dirname, join } from 'path'
 import { createHash } from 'crypto'
 import { watch } from 'fs'
 import prompts from 'prompts'
-import { BotConfigType } from 'alemon/types'
+import { BotConfigType } from 'alemon'
 
 /* 非依赖引入 */
 import { getYaml } from './tool'
