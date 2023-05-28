@@ -1,10 +1,9 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { orderBy } from 'lodash'
-import { Messagetype, CmdType } from 'alemon'
+import { Messagetype, CmdType, getApp, delApp } from 'alemon'
 /* 非依赖引用 */
 import { conversationHandlers, getConversationState } from './dialogue'
-import { getApp, delApp } from 'alemon'
 
 const Apps: CmdType = {
   GUILD_MESSAGES: {},

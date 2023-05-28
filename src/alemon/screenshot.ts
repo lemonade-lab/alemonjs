@@ -3,6 +3,7 @@ import { watch } from 'chokidar'
 import { render } from 'art-template'
 import { ctrateFile } from 'alemon'
 
+/* 非依赖引用 */
 import { screenshot } from './puppeteer'
 
 /*保存html模板*/

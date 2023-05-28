@@ -1,5 +1,5 @@
 import './consolog'
-import { ctreateRedis } from '../db/redis/index'
+import { ctreateRedis } from '../db/redis'
 import { download } from './puppeteer'
 import { BotConfigType } from 'alemon'
 import { check } from './login'
@@ -24,8 +24,8 @@ export async function createAlemon(val?: number) {
   //  登录
   await check(val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
-  console.info('[DOCS] http://three-point-of-water.gitee.io/point')
-  console.info('[GIT] https://github.com/ningmengchongshui')
+  console.info('[DOCS] http://three-point-of-water.gitee.io/alemon-bot')
+  console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')
   if (cfg.sandbox) {
     console.info('[SDK] https://bot.q.qq.com/wiki/develop/nodesdk/')
     console.info('[API] https://bot.q.qq.com/wiki/develop/api/')

@@ -1,10 +1,12 @@
 import { PathLike } from 'fs'
 import { join } from 'path'
-import { PuPcf } from '../../app.config'
 import ProgressBar from 'progress'
 import { ScreenshotType } from 'alemon'
 // @ts-ignore
 import puppeteer, { Browser, BrowserFetcher, PUPPETEER_REVISIONS } from 'puppeteer'
+
+// 非依赖引用
+import { PuPcf } from '../../app.config'
 
 let pic: number = 0
 
