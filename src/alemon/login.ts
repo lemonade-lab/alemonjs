@@ -8,7 +8,7 @@ import prompts from 'prompts'
 import { BotConfigType } from 'alemon'
 
 /* 非依赖引入 */
-import { getYaml } from './tool'
+import { getYaml } from 'alemon'
 import { Bcf, Dcf } from '../../app.config'
 
 declare global {
