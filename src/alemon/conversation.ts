@@ -440,7 +440,8 @@ const guildMessges = async (e: Messagetype) => {
     if (e.msg.member.roles.find(item => item == '4')) e.identity.master = true //频道主人
     if (e.msg.member.roles.find(item => item == '5')) e.identity.wardens = true //子频道管理
     const arr = e.msg.member.roles.filter(item => item != '2' && item != '4' && item != '5')
-    e.identity.grade = arr[0].split(/(?<=1)/)[1]
+    const grade = arr[0].split(/(?<=1)/)
+    if (grade.length > 1) e.identity.grade = grade[1]
   }
 
   /* 艾特消息处理 */

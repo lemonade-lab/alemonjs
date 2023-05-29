@@ -1,9 +1,9 @@
 import './consolog'
+import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
+import { BotConfigType } from 'alemon'
 import { ctreateRedis } from '../db/redis'
 import { download } from './puppeteer'
-import { BotConfigType } from 'alemon'
 import { check } from './login'
-import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
 
