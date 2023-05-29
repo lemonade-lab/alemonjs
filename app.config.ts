@@ -18,8 +18,6 @@ const Acf = {
 
 /* 浏览器配置 */
 const PuPcf = {
-  //浏览器路径
-  chromePath: ''
   /**
    * 因部分架构不同可自行配置以正常使用截图功能
    * 如 C:/Users/alemon/Desktop/alemon-bot/.cache/puppeteer/win64-1108766/chrome-win/chrome.exe
@@ -27,6 +25,8 @@ const PuPcf = {
    *.cache/puppeteer/win64-1108766/chrome-win/chrome.exe  是起步时候下载好的浏览器
    * 如果没有下载浏览器,可根据自己的需求下载并配置
    */
+  chromePath: '', //浏览器路径
+  downloadPath: '.cache/puppeteer' //自定义下载地址
 }
 
 export { Rcf, Bcf, Dcf, Acf, PuPcf }

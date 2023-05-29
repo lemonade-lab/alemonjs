@@ -6,6 +6,7 @@ import { download } from './puppeteer'
 import { check } from './login'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
+import { PuPcf } from '../../app.config'
 
 declare global {
   //接口对象
@@ -20,7 +21,7 @@ export async function createAlemon(val?: number) {
   /* 启动redis数据库 */
   await ctreateRedis()
   // 下载puppeteer
-  await download()
+  await download(PuPcf.chromePath, PuPcf.downloadPath)
   //  登录
   await check(val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')

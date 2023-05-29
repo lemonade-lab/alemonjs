@@ -5,9 +5,6 @@ import { ScreenshotType } from 'alemon'
 // @ts-ignore
 import puppeteer, { Browser, BrowserFetcher, PUPPETEER_REVISIONS } from 'puppeteer'
 
-// 非依赖引用
-import { PuPcf } from '../../app.config'
-
 let pic: number = 0
 
 //重启控制
@@ -16,7 +13,7 @@ const RestartControl: number = 30
 let browser: boolean | Browser | void = false
 
 //浏览器路径
-let chromePath: string = PuPcf.chromePath
+let chromePath: string
 
 let progressBar: ProgressBar = null
 
@@ -27,17 +24,16 @@ function toMegabytes(bytes: number) {
   return `${Math.round(mb * 10) / 10} MB`
 }
 
-const PUcf = '.cache/puppeteer'
-
 /**
  * 下载
  * @returns
  */
-export function download() {
+export function download(val: string, downloadPath: string) {
+  chromePath = val
   return new Promise((resolve, reject) => {
     if (chromePath == '') {
       const browserFetcher = new BrowserFetcher({
-        path: join(process.cwd(), PUcf)
+        path: join(process.cwd(), downloadPath)
       })
       const revisionInfo = browserFetcher.revisionInfo(PUPPETEER_REVISIONS.chromium)
       if (revisionInfo.local) {
