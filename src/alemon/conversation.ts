@@ -9,11 +9,13 @@ import {
   segment,
   sendImage,
   postImage,
-  createApi
+  createApi,
+  cmdInit,
+  InstructionMatching,
+  typeMessage
 } from 'alemon'
 
 /* 非依赖引用 */
-import { cmdInit, InstructionMatching, typeMessage } from './dealmsg'
 import { channewlPermissions } from './permissions'
 declare global {
   var cfg: BotConfigType
