@@ -8,6 +8,7 @@ module.exports = {
       autorestart: true,
       exec_mode: 'cluster',
       max_memory_restart: '1G',
+      cron_restart: '0 */6 * * *',
       watch: false,
       autodump: true,
       merge_logs: true,
