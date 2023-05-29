@@ -1,14 +1,7 @@
 /**
- * 此处用于简化api
- * 并就官方api请求做错容错处理
- * 信息获取失败时,返回false
- */
-
-/**
  * 获得频道列表
  * @returns
  */
-
 export const getGuildList = async () => {
   const data = await client.meApi
     .meGuilds()

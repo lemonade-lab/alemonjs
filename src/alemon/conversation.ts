@@ -4,9 +4,7 @@ import { PathLike } from 'fs'
 import {
   Messagetype,
   BotType,
-  SegmentType,
   BotConfigType,
-  segment,
   sendImage,
   postImage,
   createApi,
@@ -22,8 +20,6 @@ declare global {
 }
 
 declare global {
-  //快捷方法
-  var segment: SegmentType
   //机器信息
   var botmsg: BotType
   //接口对象
@@ -42,8 +38,6 @@ export const createConversation = () => {
   /**  建权通过 */
   ws.on(SessionEvents.READY, async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
-    /* 配置快捷方法 */
-    global.segment = segment
     /* 记录机器人信息 */
     global.botmsg = e.msg
     /* 初始化指令 */

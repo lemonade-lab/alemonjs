@@ -2,11 +2,10 @@ import './consolog'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { BotConfigType } from 'alemon'
 import { ctreateRedis } from '../db/redis'
-import { download } from 'alemon'
-import { check } from './login'
+import { download, checkRobot } from 'alemon'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
-import { PuPcf } from '../../app.config'
+import { PuPcf, Dcf, Bcf } from '../../app.config'
 
 declare global {
   //接口对象
@@ -18,23 +17,23 @@ declare global {
 }
 
 export async function createAlemon(val?: number) {
-  /* 启动redis数据库 */
-  await ctreateRedis()
   // 下载puppeteer
   await download(PuPcf.chromePath, PuPcf.downloadPath)
+  /* 启动redis数据库 */
+  await ctreateRedis()
   //  登录
-  await check(val)
+  global.cfg = await checkRobot(Dcf, Bcf, val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
   console.info('[DOCS] http://three-point-of-water.gitee.io/alemon-bot')
   console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')
-  if (cfg.sandbox) {
+  if (global.cfg.sandbox) {
     console.info('[SDK] https://bot.q.qq.com/wiki/develop/nodesdk/')
     console.info('[API] https://bot.q.qq.com/wiki/develop/api/')
   }
   // 创建 client
-  global.client = createOpenAPI(cfg)
+  global.client = createOpenAPI(global.cfg)
   // 创建 websocket 连接
-  global.ws = createWebsocket(cfg)
+  global.ws = createWebsocket(global.cfg)
   /* 创建会话 */
   createConversation()
 }
