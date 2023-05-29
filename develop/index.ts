@@ -8,22 +8,24 @@ export const AppName = 'point-plugin'
 const baseFile = `${resolve().replace(/\\/g, '/')}/plugins/${AppName}`
 
 /* 选择调试文件并重启 */
-const tplFile = `${baseFile}/resources/html/version/version.html`
+const tplFile = `${baseFile}/resources/html/help/help.html`
 
 /* 直接那一份假数据 */
 const data = {
-  botname: 'Alemon-Bot',
-  version: 'V1.0.0',
-  center: [
+  body: [
     {
-      sub: 'V1.0.1',
-      content: ['-优化插件类,并增加JS继承实例']
-    },
-    {
-      sub: 'V1.0.0',
-      content: ['-增加pm2运行管理、']
+      group: '原神相关',
+      list: [
+        {
+          icon: 14,
+          title: '/原神黄历',
+          desc: '今日看黄历没有'
+        }
+      ]
     }
-  ]
+  ],
+  name: 'alemon',
+  version: '~1.2.3'
 }
 
 export const getData = () => {
