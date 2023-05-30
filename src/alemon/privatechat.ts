@@ -11,6 +11,7 @@ export const replyPrivate = async (
     })
     .catch((err: any) => {
       console.error(err)
+      return false
     })
 
   if (!postSessionRes) return false
@@ -31,7 +32,7 @@ export const replyPrivate = async (
     })
     .then(() => true)
     .catch(err => {
-      console.error(err)
+      console.error('出错啦', err)
       return false
     })
 }
