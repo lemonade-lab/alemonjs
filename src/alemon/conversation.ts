@@ -456,7 +456,7 @@ const guildMessges = async (e: AlemonMsgType) => {
     msg?: string | object | Array<string>,
     obj?: object
   ): Promise<boolean> => {
-    return await replyPrivate(e, msg, obj)
+    return await replyPrivate(e.msg, msg, obj)
   }
 
   /* 消息处理 */
