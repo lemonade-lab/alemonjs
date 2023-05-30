@@ -85,7 +85,6 @@ export const createConversation = () => {
     console.error('请确认配置！')
     console.error('账户密码是否正确？')
     console.error('域事件是否匹配？')
-    process.exit()
   })
 
   /* 关闭 */

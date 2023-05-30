@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "alemon-bot",
   "author": "ningmengchongshui",
-  "license": "GNU",
+  "license": "GPL-2.0",
   "scripts": {
     "app": "npx ts-node index.ts",
     "login": "npx ts-node login.ts",
