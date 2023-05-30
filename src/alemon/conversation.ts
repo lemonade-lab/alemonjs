@@ -18,6 +18,16 @@ import {
 
 /* 非依赖引用 */
 import { channewlPermissions } from './permissions'
+import { replyPrivate } from './privatechat'
+
+interface AlemonMsgType extends Messagetype {
+  replyPrivate: (
+    e: Messagetype,
+    msg?: string | object | Array<string>,
+    obj?: object
+  ) => Promise<boolean>
+}
+
 declare global {
   var cfg: BotConfigType
 }
@@ -140,7 +150,7 @@ GUILDS (1 << 0)
   - CHANNEL_DELETE         // 当channel被删除时
  */
 const GUILDS = () => {
-  ws.on(AvailableIntentsEventsEnum.GUILDS, (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILDS, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     if (new RegExp(e.event).test('/^GUILD.*$/')) {
       e.event = EType.GUILD
@@ -167,7 +177,7 @@ GUILD_MEMBERS (1 << 1)
  */
 const GUILD_MEMBERS = () => {
   /*监听新人事件*/
-  ws.on(AvailableIntentsEventsEnum.GUILD_MEMBERS, async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILD_MEMBERS, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
 
     if (new RegExp(e.eventType).test('/^GUILD_MEMBER_ADD$/')) {
@@ -228,7 +238,7 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
   - MESSAGE_DELETE         // 删除（撤回）消息事件
  * */
 const GUILD_MESSAGES = () => {
-  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGES, async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGES, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
 
     // 撤回转交为公域监听处理
@@ -261,7 +271,7 @@ const GUILD_MESSAGES = () => {
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
 const PUBLIC_GUILD_MESSAGES = () => {
-  ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
 
     /* 事件匹配 */
@@ -289,7 +299,7 @@ const PUBLIC_GUILD_MESSAGES = () => {
   })
 }
 
-const guildMessges = async (e: Messagetype) => {
+const guildMessges = async (e: AlemonMsgType) => {
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
 
@@ -442,6 +452,13 @@ const guildMessges = async (e: Messagetype) => {
     })
   }
 
+  e.replyPrivate = async (
+    msg?: string | object | Array<string>,
+    obj?: object
+  ): Promise<boolean> => {
+    return await replyPrivate(e, msg, obj)
+  }
+
   /* 消息处理 */
   InstructionMatching(e).catch((err: any) => console.error(err))
 
@@ -456,7 +473,7 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 const DIRECT_MESSAGE = () => {
-  ws.on(AvailableIntentsEventsEnum.DIRECT_MESSAGE, async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.DIRECT_MESSAGE, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
 
     if (new RegExp(e.eventType).test('/^DIRECT_MESSAGE_DELETE$/')) {
@@ -590,7 +607,7 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
   - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
  */
 const GUILD_MESSAGE_REACTIONS = () => {
-  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.GUILD_MESSAGE_REACTIONS
@@ -604,7 +621,7 @@ INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
 const INTERACTION = () => {
-  ws.on(AvailableIntentsEventsEnum.INTERACTION, (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.INTERACTION, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.INTERACTION
@@ -619,7 +636,7 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
 const MESSAGE_AUDIT = () => {
-  ws.on(AvailableIntentsEventsEnum.MESSAGE_AUDIT, (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.MESSAGE_AUDIT, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.MESSAGE_AUDIT
@@ -636,7 +653,7 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_OFF_MIC           // 下麦时
  */
 const AUDIO_ACTION = () => {
-  ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.AUDIO_ACTION
@@ -667,7 +684,7 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
 const FORUMS_EVENT = () => {
-  ws.on(AvailableIntentsEventsEnum.FORUMS_EVENT, (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.FORUMS_EVENT, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.FORUMS
@@ -698,7 +715,7 @@ const FORUMS_EVENT = () => {
     - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
    */
 const OPEN_FORUMS_EVENT = () => {
-  ws.on('OPEN_FORUMS_EVENT', (e: Messagetype) => {
+  ws.on('OPEN_FORUMS_EVENT', (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.FORUMS

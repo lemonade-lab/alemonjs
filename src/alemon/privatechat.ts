@@ -1,5 +1,9 @@
 import { Messagetype } from 'alemon'
-export const replyPrivate = async (e: Messagetype, content: string): Promise<boolean> => {
+export const replyPrivate = async (
+  e: Messagetype,
+  msg?: string | object | Array<string>,
+  obj?: object
+): Promise<boolean> => {
   if (e.isGroup) return false
 
   const postSessionRes: any = await client.directMessageApi
@@ -26,10 +30,13 @@ export const replyPrivate = async (e: Messagetype, content: string): Promise<boo
     return false
   }
 
+  const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+  const options = typeof msg === 'object' && !obj ? msg : obj
   return await client.directMessageApi
     .postDirectMessage(guild_id, {
       msg_id: e.msg.id,
-      content
+      content,
+      ...options
     })
     .then(() => true)
     .catch(err => {
