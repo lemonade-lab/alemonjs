@@ -1,7 +1,8 @@
+const { join } = require('path')
 /**
  * @type {import("puppeteer").Configuration}
  */
 module.exports = {
   //适配pnpm
-  downloadPath: '/.cache/puppeteer/'
+  downloadPath: join(process.cwd(), '.cache', 'puppeteer')
 }
