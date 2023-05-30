@@ -1,4 +1,5 @@
-import { IOpenAPI, IGuild, ReactionObj, SessionEvents } from 'qq-guild-bot'
+import { IOpenAPI, IGuild, ReactionObj } from 'qq-guild-bot'
+import { SessionEvents, AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { green } from 'kolorist'
 import { PathLike } from 'fs'
 import {
@@ -6,6 +7,8 @@ import {
   BotType,
   BotConfigType,
   sendImage,
+  EventType,
+  EType,
   postImage,
   createApi,
   cmdInit,
@@ -35,11 +38,12 @@ declare global {
 export const createConversation = () => {
   /* 创建API */
   createApi(cfg)
-  /**  建权通过 */
-  ws.on(SessionEvents.READY, async (e: Messagetype) => {
-    if (cfg.sandbox) console.info(e)
+
+  /** 准备 */
+  ws.on(SessionEvents.READY, async one => {
+    if (cfg.sandbox) console.info(one)
     /* 记录机器人信息 */
-    global.botmsg = e.msg
+    global.botmsg = one.msg
     /* 初始化指令 */
     cmdInit()
     global.guilds = await client.meApi
@@ -70,28 +74,60 @@ export const createConversation = () => {
     console.info('[READY]', ` 欢迎回来 ${botmsg.user.username} ~`)
   })
 
-  let size: number = 0
-
-  ws.on(SessionEvents.ERROR, (e: any) => {
-    console.error(e)
+  /** 权限错误 */
+  ws.on(SessionEvents.ERROR, (one: any) => {
+    console.error('ERROR', one)
   })
 
-  ws.on(SessionEvents.EVENT_WS, async e => {
-    if (e.eventType == 'DISCONNECT') {
-      console.log('出错', e)
-      if (size > 8) {
-        console.error('重连失败~')
-        console.error('请确认配置config/config.taml')
-        console.error('账户密码是否正确,事件是否匹配!')
-        process.exit()
-      }
-      size++
-    } else {
-      if (size < 0) size = 0
-      size--
+  /**  超长断连 */
+  ws.on(SessionEvents.DEAD, (one: any) => {
+    console.error('DEAD', one)
+    console.error('请确认配置！')
+    console.error('账户密码是否正确？')
+    console.error('域事件是否匹配？')
+    process.exit()
+  })
+
+  /* 关闭 */
+  ws.on(SessionEvents.CLOSED, (one: any) => {
+    console.error('CLOSED', one)
+  })
+
+  /** 断开连接 */
+  ws.on(SessionEvents.DISCONNECT, (one: any) => {
+    console.error('DISCONNECT', one)
+  })
+
+  /* 无效会话 */
+  ws.on(SessionEvents.INVALID_SESSION, (one: any) => {
+    console.error('INVALID_SESSION', one)
+  })
+
+  /* 再连接 */
+  ws.on(SessionEvents.RECONNECT, (one: any) => {
+    console.error('RECONNECT', one)
+  })
+
+  /* 重新开始 */
+  ws.on(SessionEvents.RESUMED, (one: any) => {
+    console.error('RESUMED', one)
+  })
+
+  /* WS断连 */
+  ws.on(SessionEvents.EVENT_WS, async one => {
+    if (one.eventType == 'DISCONNECT') {
+      console.log('EVENT_WS-DISCONNECT', one)
     }
   })
 }
+
+/**
+ * ***********************
+ * 特殊拆分,以正确能区分频道与子频道事件
+ * ***********************
+ * 即 GUILDS  演化为  GUILD/CHANNEL
+ * **************
+ */
 
 /**
 GUILDS (1 << 0)
@@ -105,71 +141,23 @@ GUILDS (1 << 0)
   - CHANNEL_DELETE         // 当channel被删除时
  */
 const GUILDS = () => {
-  ws.on('GUILDS', (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILDS, (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
-    /* 事件匹配 */
-    e.event = 'GUILDS'
-    /** 匹配主频道消息类型 */
-    guildMsg(e.eventType)
-    /** 匹配子频道消息类型 */
-    channelMsg(e.eventType)
+    if (new RegExp(e.event).test('/^GUILD.*$/')) {
+      e.event = EType.GUILD
+    } else {
+      e.event = EType.CHANNEL
+    }
+    if (new RegExp(e.eventType).test('/CREATE$/')) {
+      e.eventType = EventType.CREATE
+    } else if (new RegExp(e.eventType).test('/UPDATE$/')) {
+      e.eventType = EventType.UPDATE
+    } else {
+      e.eventType = EventType.DELETE
+    }
     //只匹配类型
     typeMessage(e)
   })
-}
-
-const channelMsg = (eventType: string) => {
-  switch (eventType) {
-    case 'CHANNEL_CREATE': {
-      console.info(eventType)
-      break
-    }
-    case 'CHANNEL_UPDATE': {
-      console.info(eventType)
-      break
-    }
-    case 'CHANNEL_DELETE': {
-      console.info(eventType)
-      break
-    }
-    default: {
-    }
-  }
-}
-
-const guildMsg = (eventType: string) => {
-  switch (eventType) {
-    case 'GUILD_CREATE': {
-      /**
-       * 当机器人加入新guild时
-       * 更新频道列表信息
-       *
-       * 加入频道到会发送额外的监听事件
-       *
-       * GUILD_MEMBER_UPDATE
-       *
-       * 也就是某频道的成员资料变更事件响应
-       *
-       */
-      break
-    }
-    case 'GUILD_UPDATE': {
-      /**
-       * 当guild资料发生变更时
-       *  indexof找出频道资料并更换为最新信息
-       */
-      break
-    }
-    case 'GUILD_DELETE': {
-      /**
-       * 退出？
-       * 对于游戏来说可以考虑留不留存档
-       */
-      break
-    }
-    default: {
-    }
-  }
 }
 
 /**
@@ -180,11 +168,16 @@ GUILD_MEMBERS (1 << 1)
  */
 const GUILD_MEMBERS = () => {
   /*监听新人事件*/
-  ws.on('GUILD_MEMBERS', async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILD_MEMBERS, async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
-    /* 事件匹配 */
-    e.event = 'GUILD_MEMBERS'
+    if (new RegExp(e.eventType).test('/^GUILD_MEMBER_ADD$/')) {
+      e.eventType = EventType.CREATE
+    } else if (new RegExp(e.eventType).test('/^GUILD_MEMBER_UPDATE$/')) {
+      e.eventType = EventType.UPDATE
+    } else {
+      e.eventType = EventType.DELETE
+    }
 
     const { data } = await client.channelApi.channels(e.msg.guild_id)
 
@@ -236,20 +229,21 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
   - MESSAGE_DELETE         // 删除（撤回）消息事件
  * */
 const GUILD_MESSAGES = () => {
-  ws.on('GUILD_MESSAGES', async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGES, async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
     // 撤回转交为公域监听处理
-    if (e.eventType === 'MESSAGE_DELETE') return
+
+    if (new RegExp(e.eventType).test('/^MESSAGE_DELETE$/')) return
 
     // 艾特机器人消息转交为公域监听处理
     if (new RegExp(`<@!${botmsg.user.id}>`).test(e.msg.content)) return
 
     /* 事件匹配 */
-    e.event = 'MESSAGES'
+    e.event = EType.MESSAGES
 
     /* 类型匹配 */
-    e.eventType = 'CREATE'
+    e.eventType = EventType.CREATE
 
     /* 是私域 */
     e.isPrivate = true
@@ -268,11 +262,11 @@ const GUILD_MESSAGES = () => {
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
 const PUBLIC_GUILD_MESSAGES = () => {
-  ws.on('PUBLIC_GUILD_MESSAGES', async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
     /* 事件匹配 */
-    e.event = 'MESSAGES'
+    e.event = EType.MESSAGES
 
     /*   是私域 */
     e.isPrivate = true
@@ -280,17 +274,16 @@ const PUBLIC_GUILD_MESSAGES = () => {
     /* 屏蔽测回消息 */
     e.isRecall = false
 
-    if (e.eventType === 'PUBLIC_MESSAGE_DELETE') {
-      e.eventType = 'DELETE'
+    if (new RegExp(e.eventType).test('/^PUBLIC_MESSAGE_DELETE$/')) {
+      e.eventType = EventType.DELETE
       e.isRecall = true
       //只匹配类型函数
       typeMessage(e)
-      return
     }
 
-    if (e.eventType == 'AT_MESSAGE_CREATE') {
+    if (new RegExp(e.eventType).test('/^AT_MESSAGE_CREATE$/')) {
       /* 类型匹配 */
-      e.eventType = 'CREATE'
+      e.eventType = EventType.CREATE
       /* 消息方法 */
       guildMessges(e).catch((err: any) => console.error(err))
     }
@@ -464,21 +457,20 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 const DIRECT_MESSAGE = () => {
-  ws.on('DIRECT_MESSAGE', async (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.DIRECT_MESSAGE, async (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
 
-    if (e.eventType === 'DIRECT_MESSAGE_DELETE') {
-      e.eventType = 'DELETE'
+    if (new RegExp(e.eventType).test('/^DIRECT_MESSAGE_DELETE$/')) {
+      e.eventType = EventType.DELETE
       e.isRecall = true
       //只匹配类型函数
       typeMessage(e)
-      return
     }
 
     /* 事件匹配 */
-    e.event = 'MESSAGES'
+    e.event = EType.MESSAGES
 
-    e.eventType = 'CREATE'
+    e.eventType = EventType.CREATE
 
     /* 屏蔽测回消息 */
     e.isRecall = false
@@ -599,10 +591,10 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
   - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
  */
 const GUILD_MESSAGE_REACTIONS = () => {
-  ws.on('GUILD_MESSAGE_REACTIONS', (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
-    e.event = 'GUILD_MESSAGE_REACTIONS'
+    e.event = EType.GUILD_MESSAGE_REACTIONS
     //只匹配类型
     typeMessage(e)
   })
@@ -613,10 +605,10 @@ INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
 const INTERACTION = () => {
-  ws.on('INTERACTION', (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.INTERACTION, (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
-    e.event = 'INTERACTION'
+    e.event = EType.INTERACTION
     //只匹配类型
     typeMessage(e)
   })
@@ -628,14 +620,38 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
 const MESSAGE_AUDIT = () => {
-  ws.on('MESSAGE_AUDIT', (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.MESSAGE_AUDIT, (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
-    e.event = 'MESSAGE_AUDIT'
+    e.event = EType.MESSAGE_AUDIT
     //只匹配类型
     typeMessage(e)
   })
 }
+
+/**
+AUDIO_ACTION (1 << 29)
+  - AUDIO_START             // 音频开始播放时
+  - AUDIO_FINISH            // 音频播放结束时
+  - AUDIO_ON_MIC            // 上麦时
+  - AUDIO_OFF_MIC           // 下麦时
+ */
+const AUDIO_ACTION = () => {
+  ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, (e: Messagetype) => {
+    if (cfg.sandbox) console.info(e)
+    /* 事件匹配 */
+    e.event = EType.AUDIO_ACTION
+    //只匹配类型
+    typeMessage(e)
+  })
+}
+
+/**
+ * todo
+ * *************************
+ * 以下处理未做测试
+ * *************************
+ */
 
 /**
 FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 intents。
@@ -652,10 +668,10 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
 const FORUMS_EVENT = () => {
-  ws.on('FORUMS_EVENT', (e: Messagetype) => {
+  ws.on(AvailableIntentsEventsEnum.FORUMS_EVENT, (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
-    e.event = 'FORUMS'
+    e.event = EType.FORUMS
     //是私域
     e.isPrivate = true
     //只匹配类型
@@ -664,41 +680,31 @@ const FORUMS_EVENT = () => {
 }
 
 /**
- OPEN_FORUMS_EVENT (1 << 18)      // 论坛事件, 此为公域的论坛事件
-
-  - OPEN_FORUM_THREAD_CREATE     // 当用户创建主题时
-  - OPEN_FORUM_THREAD_UPDATE     // 当用户更新主题时
-  - OPEN_FORUM_THREAD_DELETE     // 当用户删除主题时
-
-  - OPEN_FORUM_POST_CREATE       // 当用户创建帖子时
-  - OPEN_FORUM_POST_DELETE       // 当用户删除帖子时
-  - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
-  - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
+ * todo
+ * ***********
+ * 公域论坛事件未能匹配
+ * ***********
  */
+
+/**
+   OPEN_FORUMS_EVENT (1 << 18)      // 论坛事件, 此为公域的论坛事件
+  
+    - OPEN_FORUM_THREAD_CREATE     // 当用户创建主题时
+    - OPEN_FORUM_THREAD_UPDATE     // 当用户更新主题时
+    - OPEN_FORUM_THREAD_DELETE     // 当用户删除主题时
+  
+    - OPEN_FORUM_POST_CREATE       // 当用户创建帖子时
+    - OPEN_FORUM_POST_DELETE       // 当用户删除帖子时
+    - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
+    - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
+   */
 const OPEN_FORUMS_EVENT = () => {
   ws.on('OPEN_FORUMS_EVENT', (e: Messagetype) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
-    e.event = 'FORUMS'
+    e.event = EType.FORUMS
     //是私域
     e.isPrivate = false
-    //只匹配类型
-    typeMessage(e)
-  })
-}
-
-/**
-AUDIO_ACTION (1 << 29)
-  - AUDIO_START             // 音频开始播放时
-  - AUDIO_FINISH            // 音频播放结束时
-  - AUDIO_ON_MIC            // 上麦时
-  - AUDIO_OFF_MIC           // 下麦时
- */
-const AUDIO_ACTION = () => {
-  ws.on('AUDIO_ACTION', (e: Messagetype) => {
-    if (cfg.sandbox) console.info(e)
-    /* 事件匹配 */
-    e.event = 'AUDIO_ACTION'
     //只匹配类型
     typeMessage(e)
   })
