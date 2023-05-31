@@ -1,6 +1,12 @@
-## Alemon-Bot
+## 什么是 Alemon ?
 
-点击前往[☞ Alemon 官网](http://three-point-of-water.gitee.io/alemon-bot/)
+[Alemon](http://three-point-of-water.gitee.io/alemon-bot/) ( 发音为 /əˈlemən/ )是一种面向消息正则匹配的更注重于业务逻辑实现的开发框架。
+
+它基于 JavaScript 所构建,并提供了一系列快捷的接口和方法来快速实现业务逻辑。
+
+> 如果你是初学者。不用担心！理解教程和指南的内容只需要具备基础的 JavaScript 知识。
+
+> 我们提供了模板与工程测试插件包来给你快速体验和实现功能~
 
 ## 一、快速开始
 
@@ -8,34 +14,36 @@
 
 > 已安装可忽略此步骤
 
-需要下载并安装好运行环境[Node.js](https://nodejs.org/en)
+`windows `[Node.js](https://nodejs.org)
 
-注：nodejs 版本至少需要 V16
+`windows `[redis-x64.msi](https://github.com/tporadowski/redis/releases)
 
-同时,需要安装并运行好[Redis 数据库](https://github.com/tporadowski/redis/releases)
+`windows `[Git](ttps://git-scm.com)
 
-注：windows 推荐使用 redis-x64.msi 包以自启数据库
+`Centos `yum install nodejs
 
-### 安装工程
+`Centos `yum install redis
 
-> 选择其中一种仓库安装源码即可
+`Centos `yum install git
 
-1.github 仓库源
+### 安装
 
-```
-git clone --depth=1 https://github.com/ningmengchongshui/alemon-bot.git
-```
-
-2.gitee 仓库源
+1.部署工具
 
 ```
-git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-bot.git
+npm install alemon-cli -g
+```
+
+2.初始化
+
+```
+alemon-cli init
 ```
 
 3.加载依赖
 
 ```
-cd alemon-bot
+cd <robot name>
 npm install cnpm -g #全局安装cnpm
 cnpm install
 ```
@@ -44,6 +52,38 @@ cnpm install
 
 ```
 npm run app  #直接启动
+```
+
+## 二、更多详情
+
+后台运行-负载均衡-记录监控
+
+以下指令可根据需求换成 cnpm/pnpm
+
+```
+npm install pm2 -g #安装全局pm2
+npm install ts-node -g #安装全局ts-node
+npm run start #后台允许
+```
+
+倘若遇到问题,可在导航栏处找到`关于-常见问题`
+
+> config/config.yaml 机器登录配置
+
+> app.config.ts 机器逻辑配置
+
+#### 扩展指令
+
+```
+npm run stop #停止
+npm run restart #重启
+npm run delete #删除
+npm run login #登录
+npm run logs #打印
+npm run monit #监听管理
+npm run redis #linux-redis启动
+npm run dev #热开发启动
+npm run dev:img #图片调试开发启动
 ```
 
 ## 三、友情链接
