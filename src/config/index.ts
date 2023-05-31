@@ -1,7 +1,7 @@
 import { getYaml } from 'alemon'
 import { join } from 'path'
 import { existsSync, copyFileSync } from 'fs'
-import { ConfigType } from './types'
+import { ConfigType } from '../alemon/types'
 export const defaultLoginConfigPath = 'config_default/login.yaml'
 export const configLoginPath = 'config/login.yaml'
 export const defaultConfigPath = 'config_default/app.yaml'

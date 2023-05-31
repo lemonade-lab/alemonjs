@@ -1,5 +1,5 @@
 import redisClient, { Redis } from 'ioredis'
-import { AppConfig } from '../../alemon/config'
+import { AppConfig } from '../../config'
 declare global {
   //数据库对象
   var redis: Redis

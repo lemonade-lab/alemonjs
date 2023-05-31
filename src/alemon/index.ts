@@ -5,7 +5,7 @@ import { BotConfigType } from 'alemon'
 import { download, checkRobot } from 'alemon'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
-import { AppConfig, defaultLoginConfigPath, configLoginPath } from './config'
+import { AppConfig, defaultLoginConfigPath, configLoginPath } from '../config'
 
 declare global {
   //接口对象
