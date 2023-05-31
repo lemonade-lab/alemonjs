@@ -2,6 +2,8 @@ import { getYaml } from 'alemon'
 import { join } from 'path'
 import { existsSync, copyFileSync } from 'fs'
 import { ConfigType } from './types'
+export const defaultLoginConfigPath = 'config_default/login.yaml'
+export const configLoginPath = 'config/login.yaml'
 export const defaultConfigPath = 'config_default/app.yaml'
 export const configPath = 'config/app.yaml'
 if (existsSync(defaultConfigPath) && !existsSync(configPath)) {
