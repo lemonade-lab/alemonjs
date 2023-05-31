@@ -15,7 +15,7 @@
     "monit": "pm2 monit",
     "redis": "pm2 start redis.config.js",
     "dev": "npx nodemon --exec ts-node index.ts",
-    "dev:img": "npx nodemon --exec ts-node src/express.ts",
+    "dev:img": "npx nodemon --exec ts-node src/express/index.ts",
     "format": "npx prettier --write ."
   },
   "dependencies": {
