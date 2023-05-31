@@ -1,7 +1,7 @@
 import './consolog'
+import '../db/redis'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { BotConfigType } from 'alemon'
-import { ctreateRedis } from '../db/redis'
 import { download, checkRobot } from 'alemon'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
@@ -19,8 +19,6 @@ declare global {
 export async function createAlemon(val?: number) {
   // 下载puppeteer
   await download(PuPcf.chromePath, PuPcf.downloadPath)
-  /* 启动redis数据库 */
-  await ctreateRedis()
   //  登录
   global.cfg = await checkRobot(Dcf, Bcf, val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')

@@ -5,10 +5,10 @@ const Rcf = {
 }
 
 /** 机器人登录默认配置文件 */
-const Dcf = '/src/config/config_default.yaml'
+const Dcf = '/config_default/login.yaml'
 
 /** 机器人登录启动配置文件 */
-const Bcf = '/config/config.yaml'
+const Bcf = '/config/login.yaml'
 
 /** 环境配置 */
 const Acf = {

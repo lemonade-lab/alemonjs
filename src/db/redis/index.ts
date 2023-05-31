@@ -5,10 +5,8 @@ declare global {
   var redis: Redis
 }
 const redis = new redisClient({ ...Rcf })
+redis.on('error', error => {
+  console.error('\n[REDIS]', error)
+  process.exit()
+})
 global.redis = redis
-export const ctreateRedis = async () => {
-  redis.on('error', error => {
-    console.error('[REDIS]', error)
-    process.exit()
-  })
-}
