@@ -5,7 +5,7 @@ import { BotConfigType } from 'alemon'
 import { download, checkRobot } from 'alemon'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
-import { PuPcf, Dcf, Bcf } from '../../app.config'
+import { AppConfig } from './config'
 
 declare global {
   //接口对象
@@ -16,11 +16,15 @@ declare global {
   var cfg: BotConfigType
 }
 
+const defaultConfigPath = 'config_default/login.yaml'
+
+const configPath = 'config/login.yaml'
+
 export async function createAlemon(val?: number) {
   // 下载puppeteer
-  await download(PuPcf.chromePath, PuPcf.downloadPath)
+  await download(AppConfig.PuPcf.chromePath, AppConfig.PuPcf.downloadPath)
   //  登录
-  global.cfg = await checkRobot(Dcf, Bcf, val)
+  global.cfg = await checkRobot(defaultConfigPath, configPath, val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
   console.info('[DOCS] http://three-point-of-water.gitee.io/alemon-bot')
   console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')

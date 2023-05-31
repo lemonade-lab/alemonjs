@@ -22,7 +22,7 @@
     "suppressImplicitAnyIndexErrors": true //抑制
   },
   // 要编译的路径列表（用于指定那些ts文件需要被编译），
-  "include": ["example", "plugins", "src", "app.config.ts", "index.ts", "login.ts"],
+  "include": ["example", "plugins", "src", "src/alemon/config.ts", "index.ts", "login.ts"],
   // 要排除的、不编译的文件，它也可以指定一个列表，
   "exclude": [".cache", "node_modules", "config_default", "dist", "config", "data", "logs"]
 }

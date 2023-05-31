@@ -1,0 +1,20 @@
+# 数据库初始配置
+Rcf:
+  host: '127.0.0.1'
+  port: 6379
+
+# 浏览器配置
+PuPcf:
+  # 因部分架构不同可自行配置以正常使用截图功能
+  # 如果启动时没有下载浏览器,可自定配置浏览器路径
+  chromePath: '' #浏览器路径
+  # chromePath = 'C:/Users/alemon/Desktop/alemon-bot/.cache/puppeteer/win64-1108766/chrome-win/chrome.exe'
+  # 如果启动时下载有浏览器,地址与示例地址应该基本相同
+  # C:/Users/alemon/Desktop/alemon-bot
+  # 机器人的根目录
+  # /.cache/puppeteer
+  # 下载地址(如果更改了自定义地址请自行替换)
+  # /win64-1108766/chrome-win/chrome.exe
+  # 起步时候下载好的浏览器
+  # 自定义下载地址
+  downloadPath: '.cache/puppeteer'
