@@ -25,9 +25,9 @@ declare global {
   var client: IOpenAPI
   //连接对象
   var ws: EventEmitter
+  //机器人信息
+  var robot: BotType
 }
-
-let robot: BotType
 
 let guilds: Array<IGuild>
 /**
