@@ -1,16 +1,15 @@
 import { IOpenAPI, IGuild, ReactionObj } from 'qq-guild-bot'
+import { EventEmitter } from 'ws'
 import { SessionEvents, AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { green } from 'kolorist'
 import { PathLike } from 'fs'
 import {
-  Messagetype,
   BotType,
   BotConfigType,
   sendImage,
   EventType,
   EType,
   postImage,
-  createApi,
   cmdInit,
   InstructionMatching,
   typeMessage
@@ -19,44 +18,31 @@ import {
 /* 非依赖引用 */
 import { channewlPermissions } from './permissions'
 import { replyPrivate } from './privatechat'
-
-interface AlemonMsgType extends Messagetype {
-  replyPrivate: (
-    e: Messagetype,
-    msg?: string | object | Array<string>,
-    obj?: object
-  ) => Promise<boolean>
-}
+import { AlemonMsgType } from './types'
 
 declare global {
-  var cfg: BotConfigType
-}
-
-declare global {
-  //机器信息
-  var botmsg: BotType
   //接口对象
   var client: IOpenAPI
-  //所有频道
-  var guilds: Array<IGuild>
+  //连接对象
+  var ws: EventEmitter
 }
 
+let robot: BotType
+
+let guilds: Array<IGuild>
 /**
  * ws.on方法可以监听机器人所在频道的所有事件
  * 根据其e.eventType，判断出事件的具体类型
  */
-export const createConversation = () => {
-  /* 创建API */
-  createApi(cfg)
-
+export const createConversation = (cfg: BotConfigType) => {
   /** 准备 */
   ws.on(SessionEvents.READY, async one => {
-    if (cfg.sandbox) console.info(one)
+    if (cfg.sandbox) console.info('[READY]', one)
     /* 记录机器人信息 */
-    global.botmsg = one.msg
+    robot = one.msg
     /* 初始化指令 */
     cmdInit()
-    global.guilds = await client.meApi
+    guilds = await client.meApi
       .meGuilds()
       .then(res => {
         const { data } = res
@@ -67,26 +53,26 @@ export const createConversation = () => {
         return []
       })
     /* 基础权限 */
-    GUILDS() //机器人进出频道消息
-    GUILD_MEMBERS() //成员频道进出变动消息
-    DIRECT_MESSAGE() //私聊会话消息
+    GUILDS(cfg) //机器人进出频道消息
+    GUILD_MEMBERS(cfg) //成员频道进出变动消息
+    DIRECT_MESSAGE(cfg) //私聊会话消息
     /* 基础权限 */
-    PUBLIC_GUILD_MESSAGES() //频道会话消息（公域）
+    PUBLIC_GUILD_MESSAGES(cfg) //频道会话消息（公域）
     /* 需申请权限 */
-    GUILD_MESSAGES() //频道会话消息（私域）
+    GUILD_MESSAGES(cfg) //频道会话消息（私域）
     /* 需申请权限 */
-    FORUMS_EVENT() //论坛消息（私域）
-    OPEN_FORUMS_EVENT() //论坛消息（公域）
-    GUILD_MESSAGE_REACTIONS() //频道表情点击会话消息
-    INTERACTION() //互动事件监听
-    MESSAGE_AUDIT() //审核事件监听
-    AUDIO_ACTION() //音频事件
-    console.info('[READY]', ` 欢迎回来 ${botmsg.user.username} ~`)
+    FORUMS_EVENT(cfg) //论坛消息（私域）
+    OPEN_FORUMS_EVENT(cfg) //论坛消息（公域）
+    GUILD_MESSAGE_REACTIONS(cfg) //频道表情点击会话消息
+    INTERACTION(cfg) //互动事件监听
+    MESSAGE_AUDIT(cfg) //审核事件监听
+    AUDIO_ACTION(cfg) //音频事件
+    console.info('[READY]', ` 欢迎回来 ${robot.user.username} ~`)
   })
 
   /** 权限错误 */
   ws.on(SessionEvents.ERROR, (one: any) => {
-    console.error('ERROR', one)
+    console.error('[ERROR]', one)
   })
 
   /**  超长断连 */
@@ -99,33 +85,33 @@ export const createConversation = () => {
 
   /* 关闭 */
   ws.on(SessionEvents.CLOSED, (one: any) => {
-    console.error('CLOSED', one)
+    console.error('[CLOSED]', one)
   })
 
   /** 断开连接 */
   ws.on(SessionEvents.DISCONNECT, (one: any) => {
-    console.error('DISCONNECT', one)
+    console.error('[DISCONNECT]', one)
   })
 
   /* 无效会话 */
   ws.on(SessionEvents.INVALID_SESSION, (one: any) => {
-    console.error('INVALID_SESSION', one)
+    console.error('[INVALID_SESSION]', one)
   })
 
   /* 再连接 */
   ws.on(SessionEvents.RECONNECT, (one: any) => {
-    console.error('RECONNECT', one)
+    console.error('[RECONNECT]', one)
   })
 
   /* 重新开始 */
   ws.on(SessionEvents.RESUMED, (one: any) => {
-    console.error('RESUMED', one)
+    console.error('[RESUMED]', one)
   })
 
   /* WS断连 */
   ws.on(SessionEvents.EVENT_WS, async one => {
     if (one.eventType == 'DISCONNECT') {
-      console.log('EVENT_WS-DISCONNECT', one)
+      console.log('[EVENT_WS][DISCONNECT]', one)
     }
   })
 }
@@ -149,7 +135,7 @@ GUILDS (1 << 0)
   - CHANNEL_UPDATE         // 当channel被更新时
   - CHANNEL_DELETE         // 当channel被删除时
  */
-const GUILDS = () => {
+const GUILDS = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.GUILDS, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     if (new RegExp(e.event).test('/^GUILD.*$/')) {
@@ -175,7 +161,7 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_UPDATE    // 当成员资料变更时
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
-const GUILD_MEMBERS = () => {
+const GUILD_MEMBERS = (cfg: BotConfigType) => {
   /*监听新人事件*/
   ws.on(AvailableIntentsEventsEnum.GUILD_MEMBERS, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
@@ -193,7 +179,7 @@ const GUILD_MEMBERS = () => {
     const channel = data.find(item => item.type === 0)
 
     if (channel) {
-      const BotPS = await channewlPermissions(channel.id, botmsg.user.id)
+      const BotPS = await channewlPermissions(channel.id, robot.user.id)
       e.bot_permissions = BotPS
     }
 
@@ -237,7 +223,7 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
   内容与 AT_MESSAGE_CREATE 相同
   - MESSAGE_DELETE         // 删除（撤回）消息事件
  * */
-const GUILD_MESSAGES = () => {
+const GUILD_MESSAGES = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGES, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
 
@@ -246,7 +232,7 @@ const GUILD_MESSAGES = () => {
     if (new RegExp(e.eventType).test('/^MESSAGE_DELETE$/')) return
 
     // 艾特机器人消息转交为公域监听处理
-    if (new RegExp(`<@!${botmsg.user.id}>`).test(e.msg.content)) return
+    if (new RegExp(`<@!${robot.user.id}>`).test(e.msg.content)) return
 
     /* 事件匹配 */
     e.event = EType.MESSAGES
@@ -261,7 +247,7 @@ const GUILD_MESSAGES = () => {
     e.isRecall = false
 
     /* 消息方法 */
-    guildMessges(e).catch((err: any) => console.error(err))
+    guildMessges(cfg, e).catch((err: any) => console.error(err))
   })
 }
 
@@ -270,7 +256,7 @@ const GUILD_MESSAGES = () => {
  AT_MESSAGE_CREATE       // 当收到@机器人的消息时
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
-const PUBLIC_GUILD_MESSAGES = () => {
+const PUBLIC_GUILD_MESSAGES = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
 
@@ -294,16 +280,16 @@ const PUBLIC_GUILD_MESSAGES = () => {
       /* 类型匹配 */
       e.eventType = EventType.CREATE
       /* 消息方法 */
-      guildMessges(e).catch((err: any) => console.error(err))
+      guildMessges(cfg, e).catch((err: any) => console.error(err))
     }
   })
 }
 
-const guildMessges = async (e: AlemonMsgType) => {
+const guildMessges = async (cfg: BotConfigType, e: AlemonMsgType) => {
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
 
-  const BotPS = await channewlPermissions(e.msg.channel_id, botmsg.user.id)
+  const BotPS = await channewlPermissions(e.msg.channel_id, robot.user.id)
   e.bot_permissions = BotPS
 
   const UserPS = await channewlPermissions(e.msg.channel_id, e.msg.author.id)
@@ -480,7 +466,7 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_CREATE   // 当收到用户发给机器人的私信消息时
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
-const DIRECT_MESSAGE = () => {
+const DIRECT_MESSAGE = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.DIRECT_MESSAGE, async (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
 
@@ -502,7 +488,7 @@ const DIRECT_MESSAGE = () => {
     /* 是私聊 */
     e.isGroup = true
 
-    const BotPS = await channewlPermissions(e.msg.channel_id, botmsg.user.id)
+    const BotPS = await channewlPermissions(e.msg.channel_id, robot.user.id)
     const UserPS = await channewlPermissions(e.msg.channel_id, e.msg.author.id)
 
     e.bot_permissions = BotPS
@@ -614,7 +600,7 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
   - MESSAGE_REACTION_ADD    // 为消息添加表情表态
   - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
  */
-const GUILD_MESSAGE_REACTIONS = () => {
+const GUILD_MESSAGE_REACTIONS = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
@@ -628,7 +614,7 @@ const GUILD_MESSAGE_REACTIONS = () => {
 INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
-const INTERACTION = () => {
+const INTERACTION = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.INTERACTION, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
@@ -643,7 +629,7 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_PASS     // 消息审核通过
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
-const MESSAGE_AUDIT = () => {
+const MESSAGE_AUDIT = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.MESSAGE_AUDIT, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
@@ -660,7 +646,7 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_ON_MIC            // 上麦时
   - AUDIO_OFF_MIC           // 下麦时
  */
-const AUDIO_ACTION = () => {
+const AUDIO_ACTION = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
@@ -691,7 +677,7 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
-const FORUMS_EVENT = () => {
+const FORUMS_EVENT = (cfg: BotConfigType) => {
   ws.on(AvailableIntentsEventsEnum.FORUMS_EVENT, (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
@@ -722,7 +708,7 @@ const FORUMS_EVENT = () => {
     - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
     - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
    */
-const OPEN_FORUMS_EVENT = () => {
+const OPEN_FORUMS_EVENT = (cfg: BotConfigType) => {
   ws.on('OPEN_FORUMS_EVENT', (e: AlemonMsgType) => {
     if (cfg.sandbox) console.info(e)
     /* 事件匹配 */

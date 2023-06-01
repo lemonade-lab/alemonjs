@@ -1,3 +1,4 @@
+import { Messagetype } from 'alemon'
 export interface ConfigType {
   Rcf: {
     host: string
@@ -8,4 +9,11 @@ export interface ConfigType {
     chromePath: string
     downloadPath: string
   }
+}
+export interface AlemonMsgType extends Messagetype {
+  replyPrivate: (
+    e: Messagetype,
+    msg?: string | object | Array<string>,
+    obj?: object
+  ) => Promise<boolean>
 }
