@@ -39,7 +39,7 @@ export const createConversation = (cfg: BotConfigType) => {
   ws.on(SessionEvents.READY, async one => {
     if (cfg.sandbox) console.info('[READY]', one)
     /* 记录机器人信息 */
-    robot = one.msg
+    global.robot = one.msg
     /* 初始化指令 */
     cmdInit()
     guilds = await client.meApi
