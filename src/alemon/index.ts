@@ -1,4 +1,4 @@
-import './consolog'
+import './console'
 import '../db/redis'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { download, checkRobot, BotConfigType, createApi } from 'alemon'
