@@ -7,6 +7,7 @@ declare global {
 const redis = new redisClient({ ...AppConfig.Rcf })
 redis.on('error', error => {
   console.error('\n[REDIS]', error)
+  console.error('\n[REDIS]', '请检查app配置~')
   process.exit()
 })
 global.redis = redis
