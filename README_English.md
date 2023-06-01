@@ -1,9 +1,9 @@
 ## what Alemon ?
 
-[Alemon](http://three-point-of-water.gitee.io/alemon-bot/) ( pronounce /əˈlemən/ ) is a 
+[Alemon](http://three-point-of-water.gitee.io/alemon-bot/) ( pronounce /əˈlemən/ ) is a
 more business-logic implementation oriented development framework for message regex matching.
 
-It is built based on JavaScript and provides a series of fast interfaces and methods to 
+It is built based on JavaScript and provides a series of fast interfaces and methods to
 quickly implement business logic.
 
 > if you are a beginner,don't worry! Basic JavaScript knowledge is all you need to understand the content of the tutorials and guides!
@@ -12,23 +12,21 @@ quickly implement business logic.
 
 ## Quick Start
 
-### Necessary environment
+#### windows
 
-> if those is installed,you can skip this
+installed[Node.js](https://nodejs.org)
 
-`windows `[Node.js](https://nodejs.org)
+installed[Git](ttps://git-scm.com)
 
-`windows `[redis-x64.msi](https://github.com/tporadowski/redis/releases)
+installed[redis-x64.msi](https://github.com/tporadowski/redis/releases)
 
-`windows `[Git](ttps://git-scm.com)
+#### Centos
 
-----------------------------------------
+`yum install nodejs`
 
-`Centos `yum install nodejs
+`yum install redis`
 
-`Centos `yum install redis
-
-`Centos `yum install git
+`yum install git`
 
 ### install
 
@@ -41,21 +39,21 @@ npm install alemon-cli -g
 2.Initialize
 
 ```
-alemon-cli init
+alemon-cli install
 ```
 
 3.Loading dependence
 
 ```
 cd <robot name>
-npm install cnpm -g 
+npm install cnpm -g
 cnpm install
 ```
 
 ### Running
 
 ```
-npm run app  
+npm run app
 ```
 
 ## More details
@@ -65,9 +63,9 @@ Backgrounder-Load Balancing-Record Monitoring
 the following instructions can be replaced by cnpm/pnpm as required
 
 ```
-npm install pm2 -g 
-npm install ts-node -g 
-npm run start 
+npm install pm2 -g
+npm install ts-node -g
+npm run start
 ```
 
 if you run into problems,you can find them in the navigation bar `About-Problem`
@@ -79,15 +77,15 @@ if you run into problems,you can find them in the navigation bar `About-Problem`
 #### Explosion Command
 
 ```
-npm run stop 
-npm run restart 
-npm run delete 
-npm run login 
+npm run stop
+npm run restart
+npm run delete
+npm run login
 npm run logs
-npm run monit 
+npm run monit
 npm run redis
-npm run dev 
-npm run dev:img 
+npm run dev
+npm run dev:img
 ```
 
 ## Friendly link

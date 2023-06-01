@@ -45,7 +45,7 @@ npm install alemon-cli -g
 2.初始化
 
 ```
-alemon-cli init
+alemon-cli install
 ```
 
 3.加载依赖
