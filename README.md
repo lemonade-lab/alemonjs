@@ -75,9 +75,9 @@ npm run start #后台允许
 
 倘若遇到问题,可在导航栏处找到`关于-常见问题`
 
-> config/config.yaml 机器登录配置
+> config/login.yaml 机器登录配置
 
-> app.config.ts 机器逻辑配置
+> config/app.yaml 机器应用配置
 
 #### 扩展指令
 
