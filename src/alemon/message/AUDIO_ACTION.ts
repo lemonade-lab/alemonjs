@@ -1,0 +1,35 @@
+import { IOpenAPI, IGuild } from 'qq-guild-bot'
+import { EventEmitter } from 'ws'
+import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
+import { BotType, BotConfigType, EType, typeMessage } from 'alemon'
+
+/* 非依赖引用 */
+import { AlemonMsgType } from '../types'
+
+declare global {
+  //接口对象
+  var client: IOpenAPI
+  //连接对象
+  var ws: EventEmitter
+  //机器人信息
+  var robot: BotType
+  //频道管理
+  var guilds: Array<IGuild>
+}
+
+/**
+AUDIO_ACTION (1 << 29)
+  - AUDIO_START             // 音频开始播放时
+  - AUDIO_FINISH            // 音频播放结束时
+  - AUDIO_ON_MIC            // 上麦时
+  - AUDIO_OFF_MIC           // 下麦时
+ */
+export const AUDIO_ACTION = (cfg: BotConfigType) => {
+  ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, (e: AlemonMsgType) => {
+    if (cfg.sandbox) console.info(e)
+    /* 事件匹配 */
+    e.event = EType.AUDIO_ACTION
+    //只匹配类型
+    typeMessage(e)
+  })
+}
