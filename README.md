@@ -1,4 +1,5 @@
 [English](./README_English.md)
+
 ## 什么是 Alemon ?
 
 [Alemon](http://three-point-of-water.gitee.io/alemon-bot/) ( 发音为 /əˈlemən/ )是一种面向消息正则匹配的更注重于业务逻辑实现的开发框架。
@@ -15,23 +16,23 @@
 
 > 已安装可忽略此步骤
 
-`windows `[Node.js](https://nodejs.org)
+#### windows
 
-`windows `[redis-x64.msi](https://github.com/tporadowski/redis/releases)
+安装[Node.js](https://nodejs.org)
 
-`windows `[Git](ttps://git-scm.com)
+安装[Git](ttps://git-scm.com)
 
-`Centos `yum install nodejs
+安装[redis-x64.msi](https://github.com/tporadowski/redis/releases)
 
-`Centos `yum install redis
+#### Centos
 
-`Centos `yum install git
+`yum install nodejs`
+
+`yum install redis`
+
+`yum install git`
 
 ### 安装
-
-在安装前，你需要检车以下内容：
-* cnpm 是否已经全局安装并且是最新版本？
-* redis 数据库是否已经安装？
 
 如果内容已经准备好了就开始我们的 alemon 之旅吧！
 
