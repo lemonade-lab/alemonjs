@@ -15,6 +15,8 @@ declare global {
   var robot: BotType
   //频道管理
   var guilds: Array<IGuild>
+  //机器人配置
+  var cfg: BotConfigType
 }
 
 /**
@@ -24,9 +26,8 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_ON_MIC            // 上麦时
   - AUDIO_OFF_MIC           // 下麦时
  */
-export const AUDIO_ACTION = (cfg: BotConfigType) => {
+export const AUDIO_ACTION = () => {
   ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, (e: AlemonMsgType) => {
-    if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.AUDIO_ACTION
     //只匹配类型

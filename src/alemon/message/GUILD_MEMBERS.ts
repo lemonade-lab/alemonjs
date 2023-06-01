@@ -1,7 +1,7 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { BotType, BotConfigType, EventType, typeMessage } from 'alemon'
+import { BotType, EventType, typeMessage, BotConfigType } from 'alemon'
 
 /* 非依赖引用 */
 import { channewlPermissions } from '../permissions'
@@ -16,6 +16,8 @@ declare global {
   var robot: BotType
   //频道管理
   var guilds: Array<IGuild>
+  //机器人配置
+  var cfg: BotConfigType
 }
 
 /**
@@ -24,11 +26,9 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_UPDATE    // 当成员资料变更时
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
-export const GUILD_MEMBERS = (cfg: BotConfigType) => {
+export const GUILD_MEMBERS = () => {
   /*监听新人事件*/
   ws.on(AvailableIntentsEventsEnum.GUILD_MEMBERS, async (e: AlemonMsgType) => {
-    if (cfg.sandbox) console.info(e)
-
     if (new RegExp(e.eventType).test('/^GUILD_MEMBER_ADD$/')) {
       e.eventType = EventType.CREATE
     } else if (new RegExp(e.eventType).test('/^GUILD_MEMBER_UPDATE$/')) {

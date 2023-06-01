@@ -1,7 +1,7 @@
 import './consolog'
 import '../db/redis'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
-import { download, checkRobot, createApi } from 'alemon'
+import { download, checkRobot, BotConfigType, createApi } from 'alemon'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
 import { AppConfig, defaultConfigLoginPath, configLoginPath } from '../config'
@@ -11,13 +11,15 @@ declare global {
   var client: IOpenAPI
   //连接对象
   var ws: EventEmitter
+  //机器人配置
+  var cfg: BotConfigType
 }
 
 export async function createAlemon(val?: number) {
   // 下载puppeteer
   await download(AppConfig.PuPcf.chromePath, AppConfig.PuPcf.downloadPath)
   //  登录
-  const cfg = await checkRobot(defaultConfigLoginPath, configLoginPath, val)
+  global.cfg = await checkRobot(defaultConfigLoginPath, configLoginPath, val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
   console.info('[DOCS] http://three-point-of-water.gitee.io/alemon-bot')
   console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')
@@ -32,5 +34,5 @@ export async function createAlemon(val?: number) {
   // 创建api
   createApi(cfg)
   /* 创建会话 */
-  createConversation(cfg)
+  createConversation()
 }

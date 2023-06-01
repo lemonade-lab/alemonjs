@@ -1,6 +1,6 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
-import { BotType, BotConfigType, EType, typeMessage } from 'alemon'
+import { BotType, EType, typeMessage, BotConfigType } from 'alemon'
 
 /* 非依赖引用 */
 import { AlemonMsgType } from '../types'
@@ -14,6 +14,8 @@ declare global {
   var robot: BotType
   //频道管理
   var guilds: Array<IGuild>
+  //机器人配置
+  var cfg: BotConfigType
 }
 
 /**
@@ -35,9 +37,8 @@ declare global {
     - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
     - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
    */
-export const OPEN_FORUMS_EVENT = (cfg: BotConfigType) => {
+export const OPEN_FORUMS_EVENT = () => {
   ws.on('OPEN_FORUMS_EVENT', (e: AlemonMsgType) => {
-    if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.FORUMS
     //是私域

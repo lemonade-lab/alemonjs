@@ -1,7 +1,7 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { BotType, BotConfigType, EType, typeMessage } from 'alemon'
+import { BotType, EType, typeMessage, BotConfigType } from 'alemon'
 
 /* 非依赖引用 */
 import { AlemonMsgType } from '../types'
@@ -15,6 +15,8 @@ declare global {
   var robot: BotType
   //频道管理
   var guilds: Array<IGuild>
+  //机器人配置
+  var cfg: BotConfigType
 }
 
 /**
@@ -38,9 +40,8 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
-export const FORUMS_EVENT = (cfg: BotConfigType) => {
+export const FORUMS_EVENT = () => {
   ws.on(AvailableIntentsEventsEnum.FORUMS_EVENT, (e: AlemonMsgType) => {
-    if (cfg.sandbox) console.info(e)
     /* 事件匹配 */
     e.event = EType.FORUMS
     //是私域

@@ -24,12 +24,14 @@ declare global {
   var robot: BotType
   //频道管理
   var guilds: Array<IGuild>
+  //机器人配置
+  var cfg: BotConfigType
 }
 /**
  * ws.on方法可以监听机器人所在频道的所有事件
  * 根据其e.eventType，判断出事件的具体类型
  */
-export const createConversation = (cfg: BotConfigType) => {
+export const createConversation = () => {
   /** 准备 */
   ws.on(SessionEvents.READY, async one => {
     if (cfg.sandbox) console.info('[READY]', one)
@@ -48,20 +50,20 @@ export const createConversation = (cfg: BotConfigType) => {
         return []
       })
     /* 基础权限 */
-    GUILDS(cfg) //机器人进出频道消息
-    GUILD_MEMBERS(cfg) //成员频道进出变动消息
-    DIRECT_MESSAGE(cfg) //私聊会话消息
+    GUILDS() //机器人进出频道消息
+    GUILD_MEMBERS() //成员频道进出变动消息
+    DIRECT_MESSAGE() //私聊会话消息
     /* 基础权限 */
-    PUBLIC_GUILD_MESSAGES(cfg) //频道会话消息（公域）
+    PUBLIC_GUILD_MESSAGES() //频道会话消息（公域）
     /* 需申请权限 */
-    GUILD_MESSAGES(cfg) //频道会话消息（私域）
+    GUILD_MESSAGES() //频道会话消息（私域）
     /* 需申请权限 */
-    FORUMS_EVENT(cfg) //论坛消息（私域）
-    OPEN_FORUMS_EVENT(cfg) //论坛消息（公域）
-    GUILD_MESSAGE_REACTIONS(cfg) //频道表情点击会话消息
-    INTERACTION(cfg) //互动事件监听
-    MESSAGE_AUDIT(cfg) //审核事件监听
-    AUDIO_ACTION(cfg) //音频事件
+    FORUMS_EVENT() //论坛消息（私域）
+    OPEN_FORUMS_EVENT() //论坛消息（公域）
+    GUILD_MESSAGE_REACTIONS() //频道表情点击会话消息
+    INTERACTION() //互动事件监听
+    MESSAGE_AUDIT() //审核事件监听
+    AUDIO_ACTION() //音频事件
     console.info('[READY]', ` 欢迎回来 ${robot.user.username} ~`)
   })
 

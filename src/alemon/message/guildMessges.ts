@@ -18,9 +18,11 @@ declare global {
   var robot: BotType
   //频道管理
   var guilds: Array<IGuild>
+  //机器人配置
+  var cfg: BotConfigType
 }
 
-export const guildMessges = async (cfg: BotConfigType, e: AlemonMsgType) => {
+export const guildMessges = async (e: AlemonMsgType) => {
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
 
