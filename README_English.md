@@ -33,7 +33,7 @@ installed[redis-x64.msi](https://github.com/tporadowski/redis/releases)
 1.Deployment tool
 
 ```
-npm install alemon-cli@latest -g
+npm install alemon-cli -g
 ```
 
 2.Initialize
