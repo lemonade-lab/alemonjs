@@ -39,7 +39,7 @@
 1.部署工具
 
 ```
-npm install alemon-cli -g
+npm install alemon-cli@latest -g
 ```
 
 2.初始化
