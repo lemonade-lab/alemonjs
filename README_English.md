@@ -18,13 +18,9 @@ installed[Node.js](https://nodejs.org)
 
 installed[Git](ttps://git-scm.com)
 
-installed[redis-x64.msi](https://github.com/tporadowski/redis/releases)
-
 #### Centos
 
 `yum install nodejs`
-
-`yum install redis`
 
 `yum install git`
 
