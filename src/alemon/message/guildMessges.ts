@@ -1,6 +1,5 @@
 import { IOpenAPI, IGuild, ReactionObj } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
-import { green } from 'kolorist'
 import { PathLike } from 'fs'
 import { BotType, BotConfigType, sendImage, postImage, InstructionMatching } from 'alemon'
 
@@ -194,6 +193,6 @@ export const guildMessges = async (e: AlemonMsgType) => {
   InstructionMatching(e).catch((err: any) => console.error(err))
 
   console.info(
-    green(`\n[${guilddata.name}][${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}`)
+    `\n[${guilddata.name}][${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}`
   )
 }

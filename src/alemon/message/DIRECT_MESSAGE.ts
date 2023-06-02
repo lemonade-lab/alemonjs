@@ -1,7 +1,6 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { green } from 'kolorist'
 import { PathLike } from 'fs'
 import {
   BotType,
@@ -153,11 +152,9 @@ export const DIRECT_MESSAGE = () => {
     InstructionMatching(e).catch((err: any) => console.error(err))
 
     console.info(
-      green(
-        `[${e.msg.author.username}][${e.msg.author.id}][${e.isGroup}] ${
-          e.msg.content ? e.msg.content : ''
-        }`
-      )
+      `\n[${e.msg.author.username}][${e.msg.author.id}][${e.isGroup}] ${
+        e.msg.content ? e.msg.content : ''
+      }`
     )
   })
 }
