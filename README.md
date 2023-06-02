@@ -52,7 +52,7 @@ alemon-cli install
 
 ```
 cd <robot name>
-npm install cnpm -g #全局安装cnpm
+npm install cnpm -g
 cnpm install
 ```
 
@@ -69,8 +69,7 @@ npm run app  #直接启动
 以下指令可根据需求换成 cnpm/pnpm
 
 ```
-npm install pm2 -g #安装全局pm2
-npm install ts-node -g #安装全局ts-node
+npm install pm2 ts-node -g #安装
 npm run start #后台允许
 ```
 
