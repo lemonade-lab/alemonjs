@@ -4,6 +4,7 @@ export interface ConfigType {
     host: string
     port: number
     password: string
+    db: number
   }
   PuPcf: {
     chromePath: string

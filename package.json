@@ -19,6 +19,7 @@
     "format": "npx prettier --write ."
   },
   "dependencies": {
+    "@types/sqlite3": "^3.1.8",
     "alemon": "^1.2.8",
     "art-template": "^4.13.2",
     "express": "^4.18.2",
