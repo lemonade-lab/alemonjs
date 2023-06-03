@@ -35,7 +35,7 @@ npm install alemon-cli -g
 2.Initialize
 
 ```
-alemon-cli install
+alemon-cli init
 ```
 
 3.Loading dependence
