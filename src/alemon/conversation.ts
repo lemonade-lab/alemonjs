@@ -53,13 +53,12 @@ export const createConversation = () => {
     GUILDS() //机器人进出频道消息
     GUILD_MEMBERS() //成员频道进出变动消息
     DIRECT_MESSAGE() //私聊会话消息
-    /* 基础权限 */
     PUBLIC_GUILD_MESSAGES() //频道会话消息（公域）
+
     /* 需申请权限 */
     GUILD_MESSAGES() //频道会话消息（私域）
-    /* 需申请权限 */
     FORUMS_EVENT() //论坛消息（私域）
-    OPEN_FORUMS_EVENT() //论坛消息（公域）
+    OPEN_FORUMS_EVENT() //论坛消息（公域）//
     GUILD_MESSAGE_REACTIONS() //频道表情点击会话消息
     INTERACTION() //互动事件监听
     MESSAGE_AUDIT() //审核事件监听

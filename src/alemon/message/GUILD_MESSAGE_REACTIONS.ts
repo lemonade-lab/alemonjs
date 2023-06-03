@@ -37,3 +37,8 @@ export const GUILD_MESSAGE_REACTIONS = () => {
     typeMessage(e)
   })
 }
+
+/**
+ * 拥有表态消息权限时
+ * 管理员机器人可以做分组管理员
+ */
