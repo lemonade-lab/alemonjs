@@ -31,9 +31,7 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
 export const GUILD_MESSAGES = () => {
   ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGES, async (e: AlemonMsgType) => {
     // 撤回转交为公域监听处理
-
     if (new RegExp(e.eventType).test('/^MESSAGE_DELETE$/')) return
-
     // 艾特机器人消息转交为公域监听处理
     if (new RegExp(`<@!${robot.user.id}>`).test(e.msg.content)) return
 

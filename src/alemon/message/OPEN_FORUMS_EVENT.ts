@@ -1,6 +1,6 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
-import { BotType, EType, typeMessage, BotConfigType } from 'alemon'
+import { BotType, EType, typeMessage, BotConfigType, EventType } from 'alemon'
 
 /* 非依赖引用 */
 import { AlemonMsgType } from '../types'
@@ -19,9 +19,15 @@ declare global {
 }
 
 /**
- * todo
  * ***********
- * 公域论坛事件未能匹配
+ * 公域可能已删除公域论坛事件
+ * ***********
+ */
+
+/**
+ * *********
+ * todo
+ * 该事件需要拆分
  * ***********
  */
 
@@ -41,8 +47,17 @@ export const OPEN_FORUMS_EVENT = () => {
   ws.on('OPEN_FORUMS_EVENT', (e: AlemonMsgType) => {
     /* 事件匹配 */
     e.event = EType.FORUMS
-    //是私域
+    //是公域
     e.isPrivate = false
+
+    if (new RegExp(e.eventType).test('/CREATE$/')) {
+      e.eventType = EventType.CREATE
+    } else if (new RegExp(e.eventType).test('/UPDATE$/')) {
+      e.eventType = EventType.UPDATE
+    } else {
+      e.eventType = EventType.DELETE
+    }
+
     //只匹配类型
     typeMessage(e)
   })

@@ -1,7 +1,7 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { BotType, EventType, typeMessage, BotConfigType } from 'alemon'
+import { BotType, EventType, typeMessage, BotConfigType, EType } from 'alemon'
 
 /* 非依赖引用 */
 import { channewlPermissions } from '../permissions'
@@ -29,9 +29,11 @@ GUILD_MEMBERS (1 << 1)
 export const GUILD_MEMBERS = () => {
   /*监听新人事件*/
   ws.on(AvailableIntentsEventsEnum.GUILD_MEMBERS, async (e: AlemonMsgType) => {
-    if (new RegExp(e.eventType).test('/^GUILD_MEMBER_ADD$/')) {
+    /* 分配 */
+    e.event = EType.GUILD_MEMBERS
+    if (new RegExp(e.eventType).test('/ADD$/')) {
       e.eventType = EventType.CREATE
-    } else if (new RegExp(e.eventType).test('/^GUILD_MEMBER_UPDATE$/')) {
+    } else if (new RegExp(e.eventType).test('/UPDATE$/')) {
       e.eventType = EventType.UPDATE
     } else {
       e.eventType = EventType.DELETE

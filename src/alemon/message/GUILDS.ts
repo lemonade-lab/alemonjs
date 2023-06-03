@@ -20,14 +20,6 @@ declare global {
 }
 
 /**
- * ***********************
- * 特殊拆分,以正确能区分频道与子频道事件
- * ***********************
- * 即 GUILDS  演化为  GUILD/CHANNEL
- * **************
- */
-
-/**
 GUILDS (1 << 0)
   - 主频道
   - GUILD_CREATE           // 当机器人加入新guild时
@@ -40,6 +32,7 @@ GUILDS (1 << 0)
  */
 export const GUILDS = () => {
   ws.on(AvailableIntentsEventsEnum.GUILDS, (e: AlemonMsgType) => {
+    /* 拆分事件 */
     if (new RegExp(e.event).test('/^GUILD.*$/')) {
       e.event = EType.GUILD
     } else {

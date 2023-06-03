@@ -1,7 +1,7 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { BotType, EType, typeMessage, BotConfigType } from 'alemon'
+import { BotType, EType, typeMessage, BotConfigType, EventType } from 'alemon'
 
 /* 非依赖引用 */
 import { AlemonMsgType } from '../types'
@@ -27,6 +27,11 @@ export const INTERACTION = () => {
   ws.on(AvailableIntentsEventsEnum.INTERACTION, (e: AlemonMsgType) => {
     /* 事件匹配 */
     e.event = EType.INTERACTION
+    if (new RegExp(e.eventType).test('/CREATE$/')) {
+      e.eventType = EventType.CREATE
+    } else {
+      e.eventType = EventType.DELETE
+    }
     //只匹配类型
     typeMessage(e)
   })

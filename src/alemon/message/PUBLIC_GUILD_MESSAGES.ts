@@ -33,14 +33,13 @@ export const PUBLIC_GUILD_MESSAGES = () => {
     /* 私域 */
     e.isPrivate = true
     e.isRecall = false
-    if (new RegExp(e.eventType).test('/^PUBLIC_MESSAGE_DELETE$/')) {
+    if (new RegExp(e.eventType).test('/DELETE$/')) {
       e.eventType = EventType.DELETE
       /* 测回消息 */
       e.isRecall = true
       typeMessage(e)
     }
-
-    if (new RegExp(e.eventType).test('/^AT_MESSAGE_CREATE$/')) {
+    if (new RegExp(e.eventType).test('/CREATE$/')) {
       e.eventType = EventType.CREATE
       guildMessges(e).catch((err: any) => console.error(err))
     }
