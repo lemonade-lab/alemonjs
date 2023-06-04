@@ -36,7 +36,7 @@ DIRECT_MESSAGE (1 << 12)
  */
 export const DIRECT_MESSAGE = () => {
   ws.on(AvailableIntentsEventsEnum.DIRECT_MESSAGE, async (e: AlemonMsgType) => {
-    if (new RegExp(e.eventType).test('/^DIRECT_MESSAGE_DELETE$/')) {
+    if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(e.eventType)) {
       e.eventType = EventType.DELETE
       e.isRecall = true
       //只匹配类型函数

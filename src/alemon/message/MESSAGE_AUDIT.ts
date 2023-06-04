@@ -28,7 +28,7 @@ export const MESSAGE_AUDIT = () => {
   ws.on(AvailableIntentsEventsEnum.MESSAGE_AUDIT, (e: AlemonMsgType) => {
     /* 事件匹配 */
     e.event = EType.MESSAGE_AUDIT
-    if (new RegExp(e.eventType).test('/PASS$/')) {
+    if (new RegExp(/PASS$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
     } else {
       e.eventType = EventType.DELETE

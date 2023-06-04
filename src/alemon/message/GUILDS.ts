@@ -33,14 +33,14 @@ GUILDS (1 << 0)
 export const GUILDS = () => {
   ws.on(AvailableIntentsEventsEnum.GUILDS, (e: AlemonMsgType) => {
     /* 拆分事件 */
-    if (new RegExp(e.event).test('/^GUILD.*$/')) {
+    if (new RegExp(/^GUILD.*$/).test(e.event)) {
       e.event = EType.GUILD
     } else {
       e.event = EType.CHANNEL
     }
-    if (new RegExp(e.eventType).test('/CREATE$/')) {
+    if (new RegExp(/CREATE$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
-    } else if (new RegExp(e.eventType).test('/UPDATE$/')) {
+    } else if (new RegExp(/UPDATE$/).test(e.eventType)) {
       e.eventType = EventType.UPDATE
     } else {
       e.eventType = EventType.DELETE

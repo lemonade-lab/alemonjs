@@ -50,9 +50,9 @@ export const OPEN_FORUMS_EVENT = () => {
     //是公域
     e.isPrivate = false
 
-    if (new RegExp(e.eventType).test('/CREATE$/')) {
+    if (new RegExp(/CREATE$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
-    } else if (new RegExp(e.eventType).test('/UPDATE$/')) {
+    } else if (new RegExp(/UPDATE$/).test(e.eventType)) {
       e.eventType = EventType.UPDATE
     } else {
       e.eventType = EventType.DELETE

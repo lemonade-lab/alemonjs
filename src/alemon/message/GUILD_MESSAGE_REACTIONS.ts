@@ -28,7 +28,7 @@ export const GUILD_MESSAGE_REACTIONS = () => {
   ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, (e: AlemonMsgType) => {
     /* 事件匹配 */
     e.event = EType.GUILD_MESSAGE_REACTIONS
-    if (new RegExp(e.eventType).test('/ADD$/')) {
+    if (new RegExp(/ADD$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
     } else {
       e.eventType = EventType.DELETE

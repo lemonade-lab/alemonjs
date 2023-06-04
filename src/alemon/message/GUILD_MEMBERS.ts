@@ -31,9 +31,9 @@ export const GUILD_MEMBERS = () => {
   ws.on(AvailableIntentsEventsEnum.GUILD_MEMBERS, async (e: AlemonMsgType) => {
     /* 分配 */
     e.event = EType.GUILD_MEMBERS
-    if (new RegExp(e.eventType).test('/ADD$/')) {
+    if (new RegExp(/ADD$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
-    } else if (new RegExp(e.eventType).test('/UPDATE$/')) {
+    } else if (new RegExp(/UPDATE$/).test(e.eventType)) {
       e.eventType = EventType.UPDATE
     } else {
       e.eventType = EventType.DELETE

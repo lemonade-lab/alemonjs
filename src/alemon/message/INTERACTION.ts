@@ -27,7 +27,7 @@ export const INTERACTION = () => {
   ws.on(AvailableIntentsEventsEnum.INTERACTION, (e: AlemonMsgType) => {
     /* 事件匹配 */
     e.event = EType.INTERACTION
-    if (new RegExp(e.eventType).test('/CREATE$/')) {
+    if (new RegExp(/CREATE$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
     } else {
       e.eventType = EventType.DELETE

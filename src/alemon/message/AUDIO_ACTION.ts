@@ -39,7 +39,7 @@ export const AUDIO_ACTION = () => {
   ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, (e: AlemonMsgType) => {
     /* 事件匹配 */
     e.event = EType.AUDIO_ACTION
-    if (new RegExp(e.eventType).test('/ON_MIC$/')) {
+    if (new RegExp(/ON_MIC$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
     } else {
       e.eventType = EventType.DELETE
