@@ -28,7 +28,7 @@ declare global {
  */
 export const PUBLIC_GUILD_MESSAGES = () => {
   ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: AlemonMsgType) => {
-    /* 是否是公域：私域 */
+    /* 是否是私域：公域 */
     e.isPrivate = false
     if (new RegExp(/DELETE$/).test(e.eventType)) {
       e.event = EType.MESSAGES
