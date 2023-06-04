@@ -9,11 +9,10 @@ export async function channewlPermissions(channel_id: any, id: any) {
   /* 自身机器人权限检测 */
   const authority: any = await client.channelPermissionsApi
     .channelPermissions(channel_id, id)
-    .catch((err: any) => console.error(err))
+    .catch((err: any) => {})
 
   /* 机器人没有权限 */
   if (!authority) {
-    console.error(`[${channel_id}][${id}] 没有权限`)
     return not_permissions
   }
 
@@ -23,7 +22,6 @@ export async function channewlPermissions(channel_id: any, id: any) {
 
   /** 错误的解构对象 */
   if (!botmiss) {
-    console.error(`[${channel_id}][${id}] 获取失败`)
     return not_permissions
   }
 
