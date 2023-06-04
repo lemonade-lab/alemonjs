@@ -6,7 +6,7 @@ import { BotType, EType, typeMessage, EventType, BotConfigType } from 'alemon'
 /* 非依赖引用 */
 import { AlemonMsgType } from '../types'
 
-import { guildMessges } from './guildMessges'
+import { guildMessges } from './GUILD_MESSAGE'
 
 declare global {
   //接口对象
@@ -28,20 +28,19 @@ declare global {
  */
 export const PUBLIC_GUILD_MESSAGES = () => {
   ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: AlemonMsgType) => {
-    /* 事件匹配 */
-    e.event = EType.MESSAGES
-    /* 私域 */
-    e.isPrivate = true
-    e.isRecall = false
+    /* 是否是公域：私域 */
+    e.isPrivate = false
+    if (new RegExp(e.eventType).test('/CREATE$/')) {
+      /* 是否是撤回：不是 */
+      e.isRecall = false
+      guildMessges(e).catch((err: any) => console.error(err))
+    }
     if (new RegExp(e.eventType).test('/DELETE$/')) {
+      e.event = EType.MESSAGES
       e.eventType = EventType.DELETE
-      /* 测回消息 */
+      /* 测回消息：是 */
       e.isRecall = true
       typeMessage(e)
-    }
-    if (new RegExp(e.eventType).test('/CREATE$/')) {
-      e.eventType = EventType.CREATE
-      guildMessges(e).catch((err: any) => console.error(err))
     }
   })
 }

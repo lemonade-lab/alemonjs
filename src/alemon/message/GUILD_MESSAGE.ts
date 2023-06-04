@@ -1,7 +1,15 @@
 import { IOpenAPI, IGuild, ReactionObj } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { PathLike } from 'fs'
-import { BotType, BotConfigType, sendImage, postImage, InstructionMatching } from 'alemon'
+import {
+  BotType,
+  BotConfigType,
+  sendImage,
+  postImage,
+  InstructionMatching,
+  EType,
+  EventType
+} from 'alemon'
 
 /* 非依赖引用 */
 import { channewlPermissions } from '../permissions'
@@ -21,9 +29,22 @@ declare global {
   var cfg: BotConfigType
 }
 
+/**
+ * 公私合并
+ * @param e
+ * @returns
+ */
+
 export const guildMessges = async (e: AlemonMsgType) => {
+  /* 事件匹配 */
+  e.event = EType.MESSAGES
+  /* 类型匹配 */
+  e.eventType = EventType.CREATE
+
   /* 屏蔽其他机器人的消息 */
   if (e.msg.author.bot) return
+
+  /* 权限问题；todo 待优化 */
 
   const BotPS = await channewlPermissions(e.msg.channel_id, robot.user.id)
   e.bot_permissions = BotPS
@@ -77,21 +98,36 @@ export const guildMessges = async (e: AlemonMsgType) => {
   }
 
   /**
-   * 表情表态
+   * 删除表情表态
    * @param boj 表情对象
    */
   e.deleteEmoji = async (boj: ReactionObj): Promise<boolean> => {
-    await client.reactionApi
+    return await client.reactionApi
       .deleteReaction(e.msg.channel_id, boj)
-      .catch((err: any) => console.error(err))
-    return true
+      .then(res => {
+        return true
+      })
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
   }
 
+  /**
+   * 发送表情表态
+   * @param boj
+   * @returns
+   */
   e.postEmoji = async (boj: ReactionObj): Promise<boolean> => {
-    await client.reactionApi
+    return await client.reactionApi
       .postReaction(e.msg.channel_id, boj)
-      .catch((err: any) => console.error(err))
-    return true
+      .then(res => {
+        return true
+      })
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
   }
 
   /**
@@ -145,12 +181,13 @@ export const guildMessges = async (e: AlemonMsgType) => {
   /* 消息 */
   e.cmd_msg = e.msg.content
 
+  /* 身份转换 */
   e.identity = {
     master: false, //频道主人
     member: false, //成员
     grade: '1', //等级
     admins: false, //管理员
-    wardens: false //子频道管理也
+    wardens: false //子频道管理员
   }
 
   if (e.msg.member) {
