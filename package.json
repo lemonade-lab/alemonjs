@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "qq-guild-bot": "^2.9.5",
-    "alemon": "^1.2.11",
+    "alemon": "^1.2.13",
     "pm2": "^5.3.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4",

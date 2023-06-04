@@ -235,3 +235,7 @@ export const guildMessges = async (e: AlemonMsgType) => {
     `\n[${guilddata.name}][${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}`
   )
 }
+
+export const deleteMessage = async (e: AlemonMsgType) => {
+  console.log('撤回消息事件')
+}
