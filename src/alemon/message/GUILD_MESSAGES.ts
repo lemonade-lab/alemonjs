@@ -33,7 +33,7 @@ export const GUILD_MESSAGES = () => {
     // 撤回转交为公域监听处理
     if (new RegExp(e.eventType).test('/^MESSAGE_DELETE$/')) return
     // 艾特机器人消息转交为公域监听处理
-    if (e.msg.content.includes(`<@!${robot.user.id}>`)) return
+    if (e.msg.content && e.msg.content.includes(`<@!${robot.user.id}>`)) return
 
     /* 事件匹配 */
     e.event = EType.MESSAGES
