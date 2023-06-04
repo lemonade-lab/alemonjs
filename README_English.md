@@ -56,10 +56,7 @@ npm run app
 
 Backgrounder-Load Balancing-Record Monitoring
 
-the following instructions can be replaced by cnpm/pnpm as required
-
 ```
-npm install pm2 ts-node -g
 npm run start
 ```
 

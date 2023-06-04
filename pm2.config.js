@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'alemon',
-      script: 'index.ts',
-      interpreter: 'node_modules/.bin/ts-node',
+      script: './pm2-run.js',
+      interpreter: './node_modules/.bin/ts-node',
       instances: 1,
       autorestart: true,
       exec_mode: 'cluster',
@@ -12,8 +12,8 @@ module.exports = {
       watch: false,
       autodump: true,
       merge_logs: true,
-      error_file: 'logs/alemon/err.log',
-      out_file: 'logs/alemon/out.log',
+      error_file: './logs/alemon/err.log',
+      out_file: './logs/alemon/out.log',
       log_date_format: 'YYYY-MM-DD HH:mm',
       env: {
         NODE_ENV: 'production'

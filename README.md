@@ -48,8 +48,7 @@ alemon-cli init
 
 ```
 cd <robot name>
-npm install cnpm -g
-cnpm install
+npm install
 ```
 
 ### 运行
@@ -62,11 +61,8 @@ npm run app  #直接启动
 
 后台运行-负载均衡-记录监控
 
-以下指令可根据需求换成 cnpm/pnpm
-
 ```
-npm install pm2 ts-node -g #安装
-npm run start #后台允许
+npm run start #后台启动
 ```
 
 倘若遇到问题,可在导航栏处找到`关于-常见问题`
