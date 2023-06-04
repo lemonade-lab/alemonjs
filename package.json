@@ -14,6 +14,7 @@
     "logs": "pm2 logs alemon",
     "monit": "pm2 monit",
     "kill": "pm2 kill",
+    "update": "pm2 update",
     "redis": "pm2 start redis.config.js",
     "dev": "npx nodemon --exec ts-node index.ts",
     "dev:img": "npx nodemon --exec ts-node src/express/index.ts",

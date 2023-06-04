@@ -75,6 +75,8 @@ npm run delete
 npm run login
 npm run logs
 npm run monit
+npm run kill
+npm run uptate
 npm run redis
 npm run dev
 npm run dev:img

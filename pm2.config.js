@@ -3,7 +3,6 @@ module.exports = {
     {
       name: 'alemon',
       script: './pm2-run.js',
-      interpreter: './node_modules/.bin/ts-node',
       instances: 1,
       autorestart: true,
       exec_mode: 'cluster',
