@@ -34,6 +34,8 @@ export const GUILD_MESSAGES = () => {
     e.isPrivate = true
     /* 撤回消息 */
     if (new RegExp(/DELETE$/).test(e.eventType)) {
+      e.event = EType.MESSAGES
+      e.eventType = EventType.DELETE
       e.isRecall = true
       typeMessage(e).catch((err: any) => console.error(err))
       return
