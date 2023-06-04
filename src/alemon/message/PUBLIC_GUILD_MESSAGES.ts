@@ -31,7 +31,6 @@ export const PUBLIC_GUILD_MESSAGES = () => {
     /* 是否是公域：私域 */
     e.isPrivate = false
     if (new RegExp(/CREATE$/).test(e.eventType)) {
-      console.log('123')
       /* 是否是撤回：不是 */
       e.isRecall = false
       guildMessges(e).catch((err: any) => console.error(err))

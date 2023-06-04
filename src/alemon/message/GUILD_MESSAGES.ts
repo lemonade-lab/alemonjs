@@ -1,7 +1,7 @@
 import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { BotType, EventType, EType, BotConfigType } from 'alemon'
+import { BotType, EventType, EType, BotConfigType, typeMessage } from 'alemon'
 
 /* 非依赖引用 */
 import { AlemonMsgType } from '../types'
@@ -30,20 +30,16 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
  * */
 export const GUILD_MESSAGES = () => {
   ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGES, async (e: AlemonMsgType) => {
-    // 已具体划分事件,不用再转交处理,切记私域不可添加公域事件
-
-    // 撤回转交为公域监听处理
-    // if (new RegExp(e.eventType).test('/^MESSAGE_DELETE$/')) return
-
-    // 艾特机器人消息转交为公域监听处理
-    // if (e.msg.content && e.msg.content.includes(`<@!${robot.user.id}>`)) return
-
     /* 是私域 */
     e.isPrivate = true
-
+    /* 撤回消息 */
+    if (new RegExp(/DELETE$/).test(e.eventType)) {
+      e.isRecall = true
+      typeMessage(e).catch((err: any) => console.error(err))
+      return
+    }
     /* 测回消息 */
     e.isRecall = false
-
     /* 消息方法 */
     guildMessges(e).catch((err: any) => console.error(err))
   })
