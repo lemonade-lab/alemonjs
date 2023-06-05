@@ -1,6 +1,6 @@
 ## what Alemon ?
 
-[Alemon](http://three-point-of-water.gitee.io/alemon-bot/) ( pronounce /əˈlemən/ ) is a
+[Alemon](http://ningmengchongshui.gitee.io/lemonade/) ( pronounce /əˈlemən/ ) is a
 more business-logic implementation oriented development framework for message regex matching.
 
 It is built based on JavaScript and provides a series of fast interfaces and methods to
@@ -42,8 +42,7 @@ alemon-cli init
 
 ```
 cd <robot name>
-npm install cnpm -g
-cnpm install
+npm install
 ```
 
 ### Running
@@ -90,7 +89,7 @@ Official development document[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/
 
 ## Sponsor Us
 
-[https://afdian.net/a/threepointofwater](https://gitee.com/link?target=https%3A%2F%2Fafdian.net%2Fa%2Fthreepointofwater)
+[https://afdian.net/a/lemonade-studio](https://afdian.net/a/lemonade-studio)
 
 ## Unified open source protocol
 

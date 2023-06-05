@@ -2,7 +2,7 @@
 
 ## 什么是 Alemon ?
 
-[Alemon](http://three-point-of-water.gitee.io/alemon-bot/) ( 发音为 /əˈlemən/ )是一种面向消息正则匹配的更注重于业务逻辑实现的开发框架。
+[Alemon](http://ningmengchongshui.gitee.io/lemonade/) ( 发音为 /əˈlemən/ )是一种面向消息正则匹配的更注重于业务逻辑实现的开发框架。
 
 它基于 JavaScript 所构建,并提供了一系列快捷的接口和方法来快速实现业务逻辑。
 
@@ -29,8 +29,6 @@
 `yum install git`
 
 ### 安装
-
-如果内容已经准备好了就开始我们的 alemon 之旅吧！
 
 1.部署工具
 
@@ -95,7 +93,7 @@ npm run dev:img #图片调试开发启动
 
 ## 四、发电赞助
 
-[https://afdian.net/a/threepointofwater](https://gitee.com/link?target=https%3A%2F%2Fafdian.net%2Fa%2Fthreepointofwater)
+[https://afdian.net/a/lemonade-studio](https://afdian.net/a/lemonade-studio)
 
 ## 五、统一开源协议
 
