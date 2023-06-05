@@ -20,7 +20,7 @@ export async function createAlemon(val?: number) {
   //  登录
   global.cfg = await checkRobot(defaultConfigLoginPath, configLoginPath, val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
-  console.info('[DOCS] http://three-point-of-water.gitee.io/alemon-bot')
+  console.info('[DOCS] http://ningmengchongshui.gitee.io/lemonade')
   console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')
   if (cfg.sandbox) {
     console.info('[SDK] https://bot.q.qq.com/wiki/develop/nodesdk/')
