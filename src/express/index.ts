@@ -8,7 +8,7 @@ app.use('/resources', express.static(`plugins/${AppName}/resources`))
 
 /*  挂载 */
 app.get('/', (req: any, res: any) => {
-  let html = getData()
+  const html = getData()
   res.send(html)
 })
 

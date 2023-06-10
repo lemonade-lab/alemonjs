@@ -6,7 +6,7 @@ type DataTyoe = {
   version: string
 }
 export const dealTpl = (data: DataTyoe) => {
-  let { tplFile } = data
+  const { tplFile } = data
   try {
     const tpl = readFileSync(tplFile, 'utf8')
     return template.render(tpl, data)
