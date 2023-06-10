@@ -1,7 +1,6 @@
-import { IOpenAPI, IGuild } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { BotType, EType, typeMessage, EventType, BotConfigType } from 'alemon'
+import { EType, typeMessage, EventType } from 'alemon'
 
 /* 非依赖引用 */
 import { AlemonMsgType } from '../types'
@@ -9,16 +8,8 @@ import { AlemonMsgType } from '../types'
 import { guildMessges } from './GUILD_MESSAGE'
 
 declare global {
-  //接口对象
-  var client: IOpenAPI
   //连接对象
   var ws: EventEmitter
-  //机器人信息
-  var robot: BotType
-  //频道管理
-  var guilds: Array<IGuild>
-  //机器人配置
-  var cfg: BotConfigType
 }
 
 /**

@@ -1,7 +1,6 @@
-import { IOpenAPI, IGuild } from 'qq-guild-bot'
-import { EventEmitter } from 'ws'
+import { IGuild } from 'qq-guild-bot'
 import { SessionEvents } from 'qq-guild-bot'
-import { BotType, BotConfigType, cmdInit } from 'alemon'
+import { BotType, cmdInit } from 'alemon'
 /* 监听消息 */
 import { GUILDS } from './message/GUILDS'
 import { GUILD_MEMBERS } from './message/GUILD_MEMBERS'
@@ -16,16 +15,10 @@ import { AUDIO_ACTION } from './message/AUDIO_ACTION'
 import { FORUMS_EVENT } from './message/FORUMS_EVENT'
 
 declare global {
-  //接口对象
-  var client: IOpenAPI
-  //连接对象
-  var ws: EventEmitter
   //机器人信息
   var robot: BotType
   //频道管理
   var guilds: Array<IGuild>
-  //机器人配置
-  var cfg: BotConfigType
 }
 /**
  * ws.on方法可以监听机器人所在频道的所有事件

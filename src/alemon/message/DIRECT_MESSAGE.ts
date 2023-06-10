@@ -1,10 +1,9 @@
-import { IOpenAPI, IGuild } from 'qq-guild-bot'
+import { IOpenAPI } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { PathLike } from 'fs'
 import {
   BotType,
-  BotConfigType,
   sendImage,
   EventType,
   EType,
@@ -24,10 +23,6 @@ declare global {
   var ws: EventEmitter
   //机器人信息
   var robot: BotType
-  //频道管理
-  var guilds: Array<IGuild>
-  //机器人配置
-  var cfg: BotConfigType
 }
 /**
 DIRECT_MESSAGE (1 << 12)
