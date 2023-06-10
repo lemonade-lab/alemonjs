@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { dealTpl } from './template'
 
 /*  插件名字 */
-export const AppName = 'point-plugin'
+export const AppName = 'alemon-plugin'
 
 /* 插件路径 */
 const baseFile = `${resolve().replace(/\\/g, '/')}/plugins/${AppName}`
