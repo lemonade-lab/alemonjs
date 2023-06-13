@@ -11,9 +11,11 @@ module.exports = {
       watch: false,
       autodump: true,
       merge_logs: true,
-      error_file: './logs/alemon/err.log',
-      out_file: './logs/alemon/out.log',
-      log_date_format: 'YYYY-MM-DD HH:mm',
+      error_file: './logs/alemon.log',
+      out_file: './logs/alemon.log',
+      log_max_size: '10M',
+      log_rotate_interval: 'daily',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss',
       env: {
         NODE_ENV: 'production'
       },
