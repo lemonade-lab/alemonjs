@@ -1,15 +1,4 @@
 import { Messagetype } from 'alemon'
-export interface ConfigType {
-  Rcf: {
-    host: string
-    port: number
-    password: string
-    db: number
-  }
-  PuPcf: {
-    chromePath: string
-  }
-}
 export interface AlemonMsgType extends Messagetype {
   //公信转私信
   replyPrivate: (

@@ -1,9 +1,9 @@
 import './console'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
-import { checkRobot, BotConfigType, createApi } from 'alemon'
+import { checkRobot, BotConfigType, createApi, setLanchConfig } from 'alemon'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
-import { defaultConfigLoginPath, configLoginPath } from '../config'
+import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig } from '../config'
 
 declare global {
   //接口对象
@@ -15,8 +15,10 @@ declare global {
 }
 
 export async function createAlemon(val?: number) {
+  // 设置浏览器配置
+  setLanchConfig(PuppeteerConfig)
   //  登录
-  global.cfg = await checkRobot(defaultConfigLoginPath, configLoginPath, val)
+  global.cfg = await checkRobot(DefaultConfigLogin, ConfigLogin, val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
   console.info('[DOCS] http://ningmengchongshui.gitee.io/lemonade')
   console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')
@@ -26,10 +28,10 @@ export async function createAlemon(val?: number) {
   }
   // 创建 client
   global.client = createOpenAPI(cfg)
-  // 创建 websocket 连接
+  // 创建 websocket
   global.ws = createWebsocket(cfg)
-  // 创建api
+  // 创建 api
   createApi(cfg)
-  /* 创建会话 */
+  // 创建 conversation
   createConversation()
 }
