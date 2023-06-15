@@ -1,9 +1,9 @@
 import './console'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
-import { download, checkRobot, BotConfigType, createApi } from 'alemon'
+import { checkRobot, BotConfigType, createApi } from 'alemon'
 import { EventEmitter } from 'ws'
 import { createConversation } from './conversation'
-import { AppConfig, defaultConfigLoginPath, configLoginPath } from '../config'
+import { defaultConfigLoginPath, configLoginPath } from '../config'
 
 declare global {
   //接口对象
@@ -15,8 +15,6 @@ declare global {
 }
 
 export async function createAlemon(val?: number) {
-  // 下载puppeteer
-  await download(AppConfig.PuPcf.chromePath, AppConfig.PuPcf.downloadPath)
   //  登录
   global.cfg = await checkRobot(defaultConfigLoginPath, configLoginPath, val)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')

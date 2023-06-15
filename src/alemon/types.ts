@@ -8,7 +8,6 @@ export interface ConfigType {
   }
   PuPcf: {
     chromePath: string
-    downloadPath: string
   }
 }
 export interface AlemonMsgType extends Messagetype {
