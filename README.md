@@ -8,11 +8,7 @@
 
 官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
 
-## 三、发电赞助
-
-[https://afdian.net/a/lemonade-studio](https://afdian.net/a/lemonade-studio)
-
-## 四、开源协议
+## 三、开源协议
 
 GNU GPL 是使用最广泛的自由软件许可证,并有强烈的版权要求
 
