@@ -4,6 +4,11 @@
   "description": "alemon-bot",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
+  "private": true,
+  "workspaces": [
+    "example/*",
+    "plugins/*"
+  ],
   "scripts": {
     "app": "ts-node index.ts",
     "login": "ts-node login.ts",
