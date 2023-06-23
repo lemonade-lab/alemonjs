@@ -15,15 +15,10 @@ declare global {
 }
 
 export async function createAlemon() {
-  let val = 1
-  if (process.argv[2] == 'login') {
-    console.log(process.argv[2])
-    val = 0
-  }
   // 设置浏览器配置
   setLanchConfig(PuppeteerConfig)
   //  登录
-  global.cfg = await checkRobot(DefaultConfigLogin, ConfigLogin, val)
+  global.cfg = await checkRobot(DefaultConfigLogin, ConfigLogin, process.argv[2] == 'login' ? 0 : 1)
   console.info('[HELLO] 欢迎使用Alemon-Bot ~ ')
   console.info('[DOCS] http://ningmengchongshui.gitee.io/lemonade')
   console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')
