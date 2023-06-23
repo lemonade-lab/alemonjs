@@ -12,7 +12,7 @@
   "type": "module",
   "scripts": {
     "app": "ts-node index.ts",
-    "login": "ts-node login.ts",
+    "login": "ts-node index.ts login",
     "start": "pm2 startOrRestart pm2.json",
     "stop": "pm2 stop pm2.json",
     "delete": "pm2 delete pm2.json",

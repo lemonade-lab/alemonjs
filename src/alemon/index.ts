@@ -14,7 +14,12 @@ declare global {
   var cfg: BotConfigType
 }
 
-export async function createAlemon(val?: number) {
+export async function createAlemon() {
+  let val = 1
+  if (process.argv[2] == 'login') {
+    console.log(process.argv[2])
+    val = 0
+  }
   // 设置浏览器配置
   setLanchConfig(PuppeteerConfig)
   //  登录
