@@ -1,2 +1,4 @@
-require('ts-node').register()
-require('./index')
+import node from 'ts-node'
+node.register()
+// 识别不到.js
+import './index.js'

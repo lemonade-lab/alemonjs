@@ -34,6 +34,10 @@
   //     "path": "./tsconfig.node.json"
   //   }
   // ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
   // 要编译的路径列表（用于指定那些ts文件需要被编译），
   "include": ["example", "plugins", "src", "index.ts", "login.ts"],
   // 要排除的、不编译的文件，它也可以指定一个列表，
