@@ -3,9 +3,9 @@ import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { EType, typeMessage, EventType } from 'alemon'
 
 /* 非依赖引用 */
-import { AlemonMsgType } from '../types'
+import { AlemonMsgType } from '../types.js'
 
-import { guildMessges } from './GUILD_MESSAGE'
+import { guildMessges } from './GUILD_MESSAGE.js'
 
 declare global {
   //连接对象

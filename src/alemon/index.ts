@@ -1,9 +1,9 @@
-import './console'
+import './console.js'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { checkRobot, BotConfigType, createApi, setLanchConfig } from 'alemon'
 import { EventEmitter } from 'ws'
-import { createConversation } from './conversation'
-import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig } from '../config'
+import { createConversation } from './conversation.js'
+import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig } from '../config/index.js'
 
 declare global {
   //接口对象

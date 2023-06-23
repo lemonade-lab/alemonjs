@@ -12,9 +12,9 @@ import {
 } from 'alemon'
 
 /* 非依赖引用 */
-import { channewlPermissions } from '../permissions'
-import { replyPrivate } from '../privatechat'
-import { AlemonMsgType } from '../types'
+import { channewlPermissions } from '../permissions.js'
+import { replyPrivate } from '../privatechat.js'
+import { AlemonMsgType } from '../types.js'
 
 declare global {
   //接口对象

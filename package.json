@@ -1,7 +1,7 @@
 {
   "name": "alemon-bot",
   "version": "1.0.0",
-  "description": "alemon-bot",
+  "description": "阿柠檬机器人",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
   "private": true,
@@ -9,8 +9,9 @@
     "example/*",
     "plugins/*"
   ],
+  "type": "module",
   "scripts": {
-    "app": "ts-node index.ts",
+    "app": "ts-node --esm index.ts",
     "login": "ts-node login.ts",
     "start": "pm2 startOrRestart pm2.config.js",
     "stop": "pm2 stop pm2.config.js",
@@ -21,7 +22,6 @@
     "update": "pm2 update",
     "redis": "pm2 start redis.config.js",
     "dev": "nodemon --exec ts-node index.ts",
-    "dev:img": "nodemon --exec ts-node src/express/index.ts",
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },

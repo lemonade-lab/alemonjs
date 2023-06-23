@@ -4,8 +4,8 @@ import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { BotType, EventType, typeMessage, EType } from 'alemon'
 
 /* 非依赖引用 */
-import { channewlPermissions } from '../permissions'
-import { AlemonMsgType } from '../types'
+import { channewlPermissions } from '../permissions.js'
+import { AlemonMsgType } from '../types.js'
 
 declare global {
   //接口对象
