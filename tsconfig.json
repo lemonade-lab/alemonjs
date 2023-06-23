@@ -23,7 +23,7 @@
     // 版本控制
     "ignoreDeprecations": "5.0",
     // 是否对 js 文件进行编译，默认是false
-    "allowJs": true, //编译js
+    "allowJs": false, //编译js
     // 是否抑制隐式any索引的错误，默认：false
     "suppressImplicitAnyIndexErrors": true, //抑制
     // 类型声明

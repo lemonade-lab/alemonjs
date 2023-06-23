@@ -2,7 +2,7 @@
     "apps": [
         {
             "name": "alemon",
-            "script": "./pm2-run.js",
+            "script": "pm2-run.js",
             "instances": 1,
             "autorestart": true,
             "exec_mode": "cluster",
