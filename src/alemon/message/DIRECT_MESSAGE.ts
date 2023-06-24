@@ -75,42 +75,6 @@ async function directMessage(e: AlemonMsgType) {
     wardens: false //子频道管理也
   }
 
-  /* 消息发送机制 */
-  e.reply = async (msg?: string | object | Array<string>, obj?: object) => {
-    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
-    const options = typeof msg === 'object' && !obj ? msg : obj
-    return await client.directMessageApi
-      .postDirectMessage(e.msg.guild_id, {
-        msg_id: e.msg.id,
-        content,
-        ...options
-      })
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
-
-  /**
-   * 删除表情表态
-   * @param boj 表情对象
-   */
-  e.deleteEmoji = async (boj: any): Promise<boolean> => {
-    console.info('私信无此功能')
-    return false
-  }
-
-  /**
-   * 发送表情表态
-   * @param boj
-   * @returns
-   */
-  e.postEmoji = async (boj: any): Promise<boolean> => {
-    console.info('私信无此功能')
-    return false
-  }
-
   /**
    * 发送本地图片
    * @param content 消息内容  可选
@@ -155,6 +119,58 @@ async function directMessage(e: AlemonMsgType) {
         console.error(err)
         return false
       })
+  }
+
+  /* 消息发送机制 */
+  e.reply = async (msg?: string | object | Array<string> | Buffer, obj?: object | Buffer) => {
+    if (Buffer.isBuffer(msg)) {
+      try {
+        return await e.postImage(msg)
+      } catch (err) {
+        console.error(err)
+        return false
+      }
+    }
+    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+    const options = typeof msg === 'object' && !obj ? msg : obj
+    if (Buffer.isBuffer(obj)) {
+      try {
+        return await e.postImage(obj, content)
+      } catch (err) {
+        console.error(err)
+        return false
+      }
+    }
+    return await client.directMessageApi
+      .postDirectMessage(e.msg.guild_id, {
+        msg_id: e.msg.id,
+        content,
+        ...options
+      })
+      .then(() => true)
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
+  }
+
+  /**
+   * 删除表情表态
+   * @param boj 表情对象
+   */
+  e.deleteEmoji = async (boj: any): Promise<boolean> => {
+    console.info('私信无此功能')
+    return false
+  }
+
+  /**
+   * 发送表情表态
+   * @param boj
+   * @returns
+   */
+  e.postEmoji = async (boj: any): Promise<boolean> => {
+    console.info('私信无此功能')
+    return false
   }
 
   /**

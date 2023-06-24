@@ -77,60 +77,6 @@ export const guildMessges = async (e: AlemonMsgType) => {
   e.isGroup = false
 
   /**
-   * 消息发送机制
-   * @param content 消息内容
-   * @param obj 额外消息 可选
-   */
-  e.reply = async (msg?: string | object | Array<string>, obj?: object): Promise<boolean> => {
-    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
-    const options = typeof msg === 'object' && !obj ? msg : obj
-    return await client.messageApi
-      .postMessage(e.msg.channel_id, {
-        msg_id: e.msg.id,
-        content,
-        ...options
-      })
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
-
-  /**
-   * 删除表情表态
-   * @param boj 表情对象
-   */
-  e.deleteEmoji = async (boj: ReactionObj): Promise<boolean> => {
-    return await client.reactionApi
-      .deleteReaction(e.msg.channel_id, boj)
-      .then(res => {
-        return true
-      })
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
-
-  /**
-   * 发送表情表态
-   * @param boj
-   * @returns
-   */
-  e.postEmoji = async (boj: ReactionObj): Promise<boolean> => {
-    return await client.reactionApi
-      .postReaction(e.msg.channel_id, boj)
-      .then(res => {
-        return true
-      })
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
-
-  /**
    * 发送本地图片
    * @param content 消息内容  可选
    * @param file_image 消息图片
@@ -172,6 +118,81 @@ export const guildMessges = async (e: AlemonMsgType) => {
       e.isGroup
     )
       .then(() => true)
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
+  }
+
+  /**
+   * 消息发送机制
+   * @param content 消息内容
+   * @param obj 额外消息 可选
+   */
+  e.reply = async (
+    msg?: string | object | Array<string> | Buffer,
+    obj?: object | Buffer
+  ): Promise<boolean> => {
+    if (Buffer.isBuffer(msg)) {
+      if (e.isGroup) return false
+      try {
+        return await e.postImage(msg)
+      } catch (err) {
+        console.error(err)
+        return false
+      }
+    }
+    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+    if (Buffer.isBuffer(obj)) {
+      if (e.isGroup) return false
+      try {
+        return await e.postImage(obj, content)
+      } catch (err) {
+        console.error(err)
+        return false
+      }
+    }
+    const options = typeof msg === 'object' && !obj ? msg : obj
+    return await client.messageApi
+      .postMessage(e.msg.channel_id, {
+        msg_id: e.msg.id,
+        content,
+        ...options
+      })
+      .then(() => true)
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
+  }
+
+  /**
+   * 删除表情表态
+   * @param boj 表情对象
+   */
+  e.deleteEmoji = async (boj: ReactionObj): Promise<boolean> => {
+    return await client.reactionApi
+      .deleteReaction(e.msg.channel_id, boj)
+      .then(res => {
+        return true
+      })
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
+  }
+
+  /**
+   * 发送表情表态
+   * @param boj
+   * @returns
+   */
+  e.postEmoji = async (boj: ReactionObj): Promise<boolean> => {
+    return await client.reactionApi
+      .postReaction(e.msg.channel_id, boj)
+      .then(res => {
+        return true
+      })
       .catch((err: any) => {
         console.error(err)
         return false
