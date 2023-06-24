@@ -5,12 +5,7 @@ let skipDownload = false
 let executablePath
 //win32
 if (process.platform == 'win32') {
-  if (existsSync('C:/Program Files/Google/Chrome/Application/chrome.exe')) {
-    // 存在 chrome
-    skipDownload = true
-    executablePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
-    console.log('[chrome] start ~')
-  } else if (existsSync('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')) {
+  if (existsSync('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')) {
     // 存在 Edge
     skipDownload = true
     executablePath = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
