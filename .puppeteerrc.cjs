@@ -3,11 +3,18 @@ const { existsSync } = require('fs')
 const arch = os.arch()
 let skipDownload = false
 let executablePath
-//win32 存在 Edge 优先选择
+//win32
 if (process.platform == 'win32') {
-  if (existsSync('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')) {
+  if (existsSync('C:/Program Files/Google/Chrome/Application/chrome.exe')) {
+    // 存在 chrome
+    skipDownload = true
+    executablePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+    console.log('[chrome] start ~')
+  } else if (existsSync('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')) {
+    // 存在 Edge
     skipDownload = true
     executablePath = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+    console.log('[Edge] start ~')
   }
 } else if (process.platform == 'linux') {
   //如果arm64架构跳过下载
@@ -18,6 +25,7 @@ if (process.platform == 'win32') {
   if (existsSync('/usr/bin/chromium')) {
     skipDownload = true
     executablePath = '/usr/bin/chromium'
+    console.log('[chromium] start ~')
   }
 }
 
