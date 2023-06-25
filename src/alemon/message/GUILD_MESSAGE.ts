@@ -59,7 +59,7 @@ export const guildMessges = async (e: AlemonMsgType) => {
     })
     .catch((err: any) => console.error(err))
 
-  e.msg.channel_name = channeldata['name']
+  e.msg.channel_name = channeldata && channeldata['name']
 
   const guilddata = guilds.find(item => item.id == e.msg.guild_id)
   if (guilddata) {
