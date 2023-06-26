@@ -27,30 +27,22 @@
   },
   "dependencies": {
     "alemon": "^1.4.0",
+    "alemon-qq": "^1.0.0",
     "alemon-redis": "^1.0.0",
     "qq-guild-bot": "^2.9.5",
     "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
     "@types/node": "^20.3.1",
     "@types/ws": "^8.5.5",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
-    "art-template": "^4.13.2",
-    "axios": "^1.4.0",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "form-data": "^4.0.0",
-    "lodash": "^4.17.21",
     "nodemon": "^2.0.22",
     "pm2": "^5.3.0",
     "prettier": "^2.8.8",
-    "prompts": "^2.4.2",
-    "puppeteer": "^20.7.3",
-    "qrcode": "^1.5.3",
-    "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
     "typescript": ">=5.0.4 <5.1.0"
   },
@@ -58,9 +50,8 @@
     "node": ">=16.3.0"
   },
   "keywords": [
-    "ts-node",
-    "typescript",
     "qq-guild-bot",
+    "alemon-qq",
     "alemon"
   ]
 }
