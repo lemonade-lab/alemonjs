@@ -1,7 +1,5 @@
 node_modules
 dist
-*logs
-*log
 .idea
 *.logs
 *.log
