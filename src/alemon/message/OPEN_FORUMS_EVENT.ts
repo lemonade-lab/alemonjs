@@ -1,8 +1,6 @@
 import { EventEmitter } from 'ws'
-import { EType, typeMessage, EventType } from 'alemon'
-
-/* 非依赖引用 */
-import { AlemonMsgType } from '../types.js'
+import { typeMessage } from 'alemon'
+import { EType, EventType, Messagetype } from 'alemon'
 
 declare global {
   //连接对象
@@ -16,10 +14,10 @@ declare global {
  */
 
 /**
- * *********
- * todo
- * 该事件需要拆分
  * ***********
+ * THREAD  主题 FORUMS_THREAD
+ * POST  帖子 FORUMS_POST
+ * REPLY 评论 FORUMS_REPLY
  */
 
 /**
@@ -31,15 +29,21 @@ declare global {
   
     - OPEN_FORUM_POST_CREATE       // 当用户创建帖子时
     - OPEN_FORUM_POST_DELETE       // 当用户删除帖子时
+    
     - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
     - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
    */
 export const OPEN_FORUMS_EVENT = () => {
-  ws.on('OPEN_FORUMS_EVENT', (e: AlemonMsgType) => {
+  ws.on('OPEN_FORUMS_EVENT', (e: Messagetype) => {
     /* 事件匹配 */
-    e.event = EType.FORUMS
-    //是公域
-    e.isPrivate = false
+
+    if (new RegExp(/^OPEN_FORUM_THREAD/).test(e.eventType)) {
+      e.event = EType.FORUMS_THREAD
+    } else if (new RegExp(/^OPEN_FORUM_POST/).test(e.eventType)) {
+      e.event = EType.FORUMS_POST
+    } else {
+      e.event = EType.FORUMS_REPLY
+    }
 
     if (new RegExp(/CREATE$/).test(e.eventType)) {
       e.eventType = EventType.CREATE
@@ -48,6 +52,9 @@ export const OPEN_FORUMS_EVENT = () => {
     } else {
       e.eventType = EventType.DELETE
     }
+
+    //是公域
+    e.isPrivate = false
 
     //只匹配类型
     typeMessage(e)

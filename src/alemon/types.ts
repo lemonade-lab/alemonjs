@@ -1,15 +1,3 @@
-import { Messagetype } from 'alemon'
-export interface AlemonMsgType extends Messagetype {
-  //公信转私信
-  replyPrivate: (
-    e: Messagetype,
-    msg?: string | object | Array<string>,
-    obj?: object
-  ) => Promise<boolean>
-  //是否是管理类机器人
-  isManageRobot: boolean
-}
-
 /**
  * ********************
  * 会被主人限制的权限

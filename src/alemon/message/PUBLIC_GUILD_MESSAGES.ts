@@ -1,10 +1,9 @@
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { EType, typeMessage, EventType } from 'alemon'
+import { typeMessage } from 'alemon'
+import { EType, EventType, Messagetype } from 'alemon'
 
 /* 非依赖引用 */
-import { AlemonMsgType } from '../types.js'
-
 import { guildMessges } from './GUILD_MESSAGE.js'
 
 declare global {
@@ -18,7 +17,7 @@ declare global {
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
 export const PUBLIC_GUILD_MESSAGES = () => {
-  ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: AlemonMsgType) => {
+  ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, async (e: Messagetype) => {
     /* 是否是私域：公域 */
     e.isPrivate = false
     if (new RegExp(/DELETE$/).test(e.eventType)) {

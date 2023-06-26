@@ -1,9 +1,9 @@
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { EventType, EType, typeMessage } from 'alemon'
+import { typeMessage } from 'alemon'
+import { EventType, EType, Messagetype } from 'alemon'
 
 /* 非依赖引用 */
-import { AlemonMsgType } from '../types'
 
 declare global {
   //连接对象
@@ -11,18 +11,23 @@ declare global {
 }
 
 /**
+ * GUILD 频道
+ * CHANNEL 子频道
+ */
+
+/**
 GUILDS (1 << 0)
-  - 主频道
+
   - GUILD_CREATE           // 当机器人加入新guild时
   - GUILD_UPDATE           // 当guild资料发生变更时
   - GUILD_DELETE           // 当机器人退出guild时
-  - 子频道
+  - 
   - CHANNEL_CREATE         // 当channel被创建时
   - CHANNEL_UPDATE         // 当channel被更新时
   - CHANNEL_DELETE         // 当channel被删除时
  */
 export const GUILDS = () => {
-  ws.on(AvailableIntentsEventsEnum.GUILDS, (e: AlemonMsgType) => {
+  ws.on(AvailableIntentsEventsEnum.GUILDS, (e: Messagetype) => {
     /* 拆分事件 */
     if (new RegExp(/^GUILD.*$/).test(e.event)) {
       e.event = EType.GUILD

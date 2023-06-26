@@ -56,7 +56,7 @@ export const createConversation = () => {
     INTERACTION() //互动事件监听
     MESSAGE_AUDIT() //审核事件监听
     AUDIO_ACTION() //音频事件
-    console.info('[READY]', ` 欢迎回来 ${robot.user.username} ~`)
+    console.info('[READY]', ` 欢迎回来 ${robot.user.username}`)
   })
 
   /** 权限错误 */
@@ -100,7 +100,7 @@ export const createConversation = () => {
   /* WS断连 */
   ws.on(SessionEvents.EVENT_WS, async one => {
     if (one.eventType == 'DISCONNECT') {
-      console.log('[EVENT_WS][DISCONNECT]', one)
+      console.info('[EVENT_WS][DISCONNECT]', one)
     }
   })
 }

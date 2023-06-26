@@ -1,20 +1,11 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { PathLike } from 'fs'
-import {
-  BotType,
-  sendImage,
-  EventType,
-  EType,
-  postImage,
-  InstructionMatching,
-  typeMessage
-} from 'alemon'
+import { sendImage, postImage, InstructionMatching, typeMessage } from 'alemon'
+import { BotType, EventType, EType, Messagetype } from 'alemon'
 
 /* 非依赖引用 */
 import { channewlPermissions } from '../permissions.js'
-import { AlemonMsgType } from '../types.js'
 
 declare global {
   //接口对象
@@ -24,13 +15,14 @@ declare global {
   //机器人信息
   var robot: BotType
 }
+
 /**
 DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_CREATE   // 当收到用户发给机器人的私信消息时
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 export const DIRECT_MESSAGE = () => {
-  ws.on(AvailableIntentsEventsEnum.DIRECT_MESSAGE, async (e: AlemonMsgType) => {
+  ws.on(AvailableIntentsEventsEnum.DIRECT_MESSAGE, async (e: Messagetype) => {
     /* 撤回事件 */
     if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(e.eventType)) {
       e.eventType = EventType.DELETE
@@ -48,10 +40,9 @@ export const DIRECT_MESSAGE = () => {
   })
 }
 
-async function directMessage(e: AlemonMsgType) {
+async function directMessage(e: Messagetype) {
   /* 事件匹配 */
   e.event = EType.MESSAGES
-
   e.eventType = EventType.CREATE
 
   /* 屏蔽测回消息 */
@@ -81,7 +72,7 @@ async function directMessage(e: AlemonMsgType) {
    * @param file_image 消息图片
    * @returns
    */
-  e.sendImage = async (file_image: PathLike, content?: string): Promise<boolean> => {
+  e.sendImage = async (file_image: string | Buffer | URL, content?: string): Promise<boolean> => {
     return await sendImage(
       e.msg.guild_id,
       {
@@ -104,7 +95,7 @@ async function directMessage(e: AlemonMsgType) {
    * @param content 内容,可选
    * @returns
    */
-  e.postImage = async (file_image: PathLike, content?: string): Promise<boolean> => {
+  e.postImage = async (file_image: string | Buffer | URL, content?: string): Promise<boolean> => {
     return await postImage(
       e.msg.guild_id,
       {
@@ -159,7 +150,7 @@ async function directMessage(e: AlemonMsgType) {
    * @param boj 表情对象
    */
   e.deleteEmoji = async (boj: any): Promise<boolean> => {
-    console.info('私信无此功能')
+    console.info('私信无此功能', boj)
     return false
   }
 
@@ -169,7 +160,7 @@ async function directMessage(e: AlemonMsgType) {
    * @returns
    */
   e.postEmoji = async (boj: any): Promise<boolean> => {
-    console.info('私信无此功能')
+    console.info('私信无此功能', boj)
     return false
   }
 

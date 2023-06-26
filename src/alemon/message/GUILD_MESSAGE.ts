@@ -1,20 +1,11 @@
 import { IOpenAPI, IGuild, ReactionObj } from 'qq-guild-bot'
 import { EventEmitter } from 'ws'
-import { PathLike } from 'fs'
-import {
-  BotType,
-  BotConfigType,
-  sendImage,
-  postImage,
-  InstructionMatching,
-  EType,
-  EventType
-} from 'alemon'
+import { sendImage, postImage, InstructionMatching } from 'alemon'
+import { BotType, BotConfigType, EType, EventType, Messagetype } from 'alemon'
 
 /* 非依赖引用 */
 import { channewlPermissions } from '../permissions.js'
-import { replyPrivate } from '../privatechat.js'
-import { AlemonMsgType } from '../types.js'
+import { Private } from '../privatechat.js'
 
 declare global {
   //接口对象
@@ -35,7 +26,7 @@ declare global {
  * @returns
  */
 
-export const guildMessges = async (e: AlemonMsgType) => {
+export const guildMessges = async (e: Messagetype) => {
   /* 事件匹配 */
   e.event = EType.MESSAGES
   /* 类型匹配 */
@@ -106,7 +97,7 @@ export const guildMessges = async (e: AlemonMsgType) => {
    * @param content 内容,可选
    * @returns
    */
-  e.postImage = async (file_image: PathLike, content?: string): Promise<boolean> => {
+  e.postImage = async (file_image: string | Buffer | URL, content?: string): Promise<boolean> => {
     if (e.isGroup) return false
     return await postImage(
       e.msg.channel_id,
@@ -235,17 +226,15 @@ export const guildMessges = async (e: AlemonMsgType) => {
   }
 
   e.replyPrivate = async (
-    msg?: string | object | Array<string>,
-    obj?: object
+    msg?: string | object | Array<string> | Buffer,
+    obj?: object | Buffer
   ): Promise<boolean> => {
-    return await replyPrivate(e.msg, msg, obj)
+    return await Private(e.msg, msg, obj)
       .then(res => {
-        console.log(res)
-        return true
+        return res
       })
       .catch(err => {
-        console.log(err)
-        return false
+        return err
       })
   }
 
@@ -255,8 +244,4 @@ export const guildMessges = async (e: AlemonMsgType) => {
   console.info(
     `\n[${guilddata.name}][${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}`
   )
-}
-
-export const deleteMessage = async (e: AlemonMsgType) => {
-  console.log('撤回消息事件')
 }

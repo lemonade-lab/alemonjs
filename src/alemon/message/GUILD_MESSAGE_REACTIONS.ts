@@ -1,9 +1,7 @@
 import { EventEmitter } from 'ws'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { EType, typeMessage, EventType } from 'alemon'
-
-/* 非依赖引用 */
-import { AlemonMsgType } from '../types.js'
+import { typeMessage } from 'alemon'
+import { EType, EventType, Messagetype } from 'alemon'
 
 declare global {
   //连接对象
@@ -16,7 +14,7 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
   - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
  */
 export const GUILD_MESSAGE_REACTIONS = () => {
-  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, (e: AlemonMsgType) => {
+  ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, (e: Messagetype) => {
     /* 事件匹配 */
     e.event = EType.GUILD_MESSAGE_REACTIONS
     if (new RegExp(/ADD$/).test(e.eventType)) {
