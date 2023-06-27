@@ -28,9 +28,7 @@
   "dependencies": {
     "alemon": "^1.4.0",
     "alemon-qq": "^1.0.1",
-    "alemon-redis": "^1.0.0",
-    "qq-guild-bot": "^2.9.5",
-    "yaml": "^2.3.1"
+    "alemon-redis": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.3.1",
