@@ -6,3 +6,8 @@ dist
 /.cache/
 /config/
 /data/
+/lib/
+/types/
+/default/
+/example/
+/plugins/
