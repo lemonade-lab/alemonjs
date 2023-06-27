@@ -26,7 +26,6 @@
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "alemon": "^1.4.0",
     "alemon-qq": "^1.0.1",
     "alemon-redis": "^1.0.0"
   },
@@ -50,6 +49,7 @@
   "keywords": [
     "qq-guild-bot",
     "alemon-qq",
+    "alemon-redis",
     "alemon"
   ]
 }
