@@ -4,12 +4,8 @@
   "description": "阿柠檬机器人",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
-  "private": true,
-  "workspaces": [
-    "example",
-    "plugins/*"
-  ],
   "type": "module",
+  "private": true,
   "scripts": {
     "app": "ts-node index.ts",
     "login": "ts-node index.ts login",
@@ -26,8 +22,7 @@
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "alemon": "^1.4.0",
-    "alemon-qq": "^1.0.1",
+    "alemon-qq": "^1.0.2",
     "alemon-redis": "^1.0.0"
   },
   "devDependencies": {
@@ -44,6 +39,10 @@
     "ts-node": "^10.9.1",
     "typescript": ">=5.0.4 <5.1.0"
   },
+  "workspaces": [
+    "example",
+    "plugins/*"
+  ],
   "engines": {
     "node": ">=16.3.0"
   },
