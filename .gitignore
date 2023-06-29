@@ -3,6 +3,7 @@ dist
 .idea
 *.logs
 *.log
+/log/
 /.cache/
 /config/
 /data/
@@ -11,3 +12,5 @@ dist
 /default/
 /example/
 /plugins/
+/*-player/
+/*-data/
