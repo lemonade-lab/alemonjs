@@ -4,6 +4,7 @@ dist
 *.logs
 *.log
 /log/
+/logs/
 /.cache/
 /config/
 /data/
@@ -14,3 +15,4 @@ dist
 /plugins/
 /*-player/
 /*-data/
+/data-*/
