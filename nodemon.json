@@ -1,4 +1,14 @@
 {
+  "restartable": "rs",
+  "ignore": [".cache", "node_modules", "dist", "config", "data", "logs", "*-data", "*-player"],
+  "delay": 1000,
   "verbose": true,
-  "ignore": [".cache", "node_modules", "dist", "config", "data", "logs"]
+  "execMap": {
+    "ts": "ts-node"
+  },
+  "watch": ["plugins", "example"],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "ext": "js,ts,json,css,scss,vue"
 }
