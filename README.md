@@ -1,18 +1,18 @@
 ## 一、Alemon-Bot
 
-`alemon-qq` 实例化启动模板 （用户）
+`alemon-qq` 实例启动模板
 
 点击了解 ☞[Alemon 官方文档](http://ningmengchongshui.gitee.io/lemonade)
 
 ## 一、alemon-qq
 
-`alemon-qq` 机器人工程包 （开发者）
+`alemon` 机器人实例
 
 点击了解☞[alemon-qq源码](https://gitee.com/ningmengchongshui/alemon-bot/tree/qq/)
 
 ## 三、almeon
 
-`alemon` 框架核心逻辑块
+`alemon` 框架逻辑块
 
 点击了解☞[alemon源码](https://gitee.com/ningmengchongshui/alemon-bot/tree/core/)
 
