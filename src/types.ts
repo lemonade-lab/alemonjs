@@ -298,9 +298,10 @@ export interface SuperType {
 }
 
 /**
- *
+ * 机器人配置
  */
 export interface BotConfigType extends GetWsParam {
+  isPrivate: boolean;
   masterID?: string;
   secretKey?: string;
 }
