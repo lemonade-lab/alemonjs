@@ -182,14 +182,10 @@ export interface Messagetype {
   atuid: IUser[];
   // 是否艾特
   at: boolean;
-  //是否是机器人主人:该功能暂定
+  //是否是机器人主人
   isMaster: boolean;
-  //用户权限
-  user_permissions: PermissionsType;
-  //机器人权限(如机器人无权限:即非管理员,不可获取用户权限)
-  bot_permissions: PermissionsType;
   //身份(触发该消息的用户的身份)
-  identity: IdentityType;
+  identity: IdentityType; // 可以计算得出
   //去除了艾特后的消息
   cmd_msg: string;
   //消息发送机制
@@ -216,6 +212,66 @@ export interface Messagetype {
     content?: string | object | Array<string> | Buffer,
     obj?: object | Buffer
   ) => Promise<boolean>;
+
+  /**
+   * 其他接口不再主动执行,而是调用后再执行
+   * 反复调用消耗性能,且涉及权限问题
+   */
+
+  /**
+   * 查询机器人权限
+   * @returns
+   */
+  searchBotPermissions: () => void;
+
+  /**
+   * 查询用户权限
+   * @returns
+   */
+  searchUerPermissions: () => void;
+
+  /**
+   * 获取当前用户下的所有频道列表
+   */
+  getGuildList: () => void;
+
+  /**
+   * 获取频道详情
+   * @param guildId
+   * @returns
+   */
+  getGuildMsg: (guildId: string) => void;
+
+  /**
+   * 获取子频道列表
+   * @param guildId
+   * @returns
+   */
+  getChannels: (guildId: string) => void;
+
+  /**
+   * 获取子频道详情
+   * @param channelId
+   * @returns
+   */
+  getChannel: (channelId: string) => void;
+
+  /**
+   * 获取频道下指定成员的信息
+   * @param guildId 频道
+   * @param userId 用户
+   * @returns
+   */
+  getGuildMemberMsg: (guildId: string, userId: string) => void;
+
+  /**
+   * 撤回指定消息
+   * @param channelID 频道编号
+   * @param messageID 消息编号
+   * @param hideTip
+   * @returns
+   */
+  deleteMsg: (channelID: string, messageID: string, hideTip: boolean) => void;
 }
 
 /**
