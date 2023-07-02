@@ -1,17 +1,29 @@
-## 一、Alemon-Bot
+### 必要环境
 
-点击了解 ☞[Alemon 官方文档](http://ningmengchongshui.gitee.io/lemonade)
+> 已安装可忽略此步骤
 
-## 二、友情链接
+#### windows
 
-官方代码包[☞SDK](https://github.com/tencent-connect/bot-node-sdk)
+安装[Node.js](https://nodejs.org)
 
-官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
+安装[Git](ttps://git-scm.com)
 
-## 三、开源协议
+#### Centos
 
-GNU GPL 是使用最广泛的自由软件许可证,并有强烈的版权要求
+`yum install nodejs`
 
-分发衍生作品时,作品的源代码必须在同一许可证下可用
+`yum install git`
 
-GNUGPL 有多种变体,每个变体都有不同的要求
+### 安装
+
+1.部署工具
+
+```
+npm install alemon-cli -g
+```
+
+2.初始化
+
+```
+alemon-cli install
+```
