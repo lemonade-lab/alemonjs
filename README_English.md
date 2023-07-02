@@ -1,4 +1,3 @@
-
 ☞[中文文档](./README.md)
 
 ## 一、Alemon-Bot
@@ -27,8 +26,8 @@ Official development documents [☞API](https://bot.q.qq.com/wiki/develop/nodesd
 
 ## 五、Open source protocol
 
-The GNU GPL is the most widely used free software license and has a strong copyleft requirement. 
+The GNU GPL is the most widely used free software license and has a strong copyleft requirement.
 
-When distributing derived works, the source code of the work must be made available under the same license. 
+When distributing derived works, the source code of the work must be made available under the same license.
 
 There are multiple variants of the GNU GPL, each with different requirements.
