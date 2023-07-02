@@ -1,5 +1,8 @@
 import { createAlemon } from 'alemon-qq'
-createAlemon()
+await createAlemon().catch(err => {
+  console.log('启动失败~', err)
+  return
+})
 
 // 监听退出,防止ts-node 退出报错
 process.on('SIGINT', signals => {
@@ -7,4 +10,5 @@ process.on('SIGINT', signals => {
   if (process.pid) {
     process.exit()
   }
+  return
 })
