@@ -50,7 +50,7 @@ export async function createPicture(
   directory: string,
   PageName: string,
   data: object
-) {
+): Promise<string | boolean | Buffer> {
   /** 创建目录地址 */
   const PathHtml = join(process.cwd(), "data", AppName, "html", directory);
   /* 创建文件地址 */
@@ -63,8 +63,8 @@ export async function createPicture(
     try {
       //如果不存在,则读取模板
       html[tplFile] = readFileSync(tplFile, "utf8");
-    } catch (error) {
-      console.info("[HTML][ERROR]", tplFile);
+    } catch (err) {
+      console.error("[HTML][ERROR]", tplFile, err);
       return false;
     }
     //读取后监听文件
@@ -85,9 +85,10 @@ export async function createPicture(
     console.info("[HTML][CREATE]", AdressHtml);
   }
   /* 截图 */
-  const Buffer = await screenshot(AdressHtml, "body").catch((err: any) =>
-    console.error(err)
-  );
+  const Buffer = await screenshot(AdressHtml, "body").catch((err: any) => {
+    console.error(err);
+    return false;
+  });
   /* 截图 */
   return Buffer;
 }

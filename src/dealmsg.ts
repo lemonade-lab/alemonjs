@@ -38,6 +38,7 @@ async function synthesis(AppsObj: object, appname: string, belong: string) {
       });
     });
   }
+  return;
 }
 
 /**
@@ -58,10 +59,10 @@ async function loadExample(dir: string) {
     }
     const AppName = appname.replace(/\.(ts|js)$/, () => "");
     const apps = {};
-    const Program = await import(`file://${dir}/${appname}`).catch((error) => {
+    const Program = await import(`file://${dir}/${appname}`).catch((err) => {
       console.error(AppName);
-      console.error(error);
-      process.exit();
+      console.error(err);
+      return {};
     });
     for (const item in Program) {
       if (Program[item].prototype) {
@@ -76,6 +77,7 @@ async function loadExample(dir: string) {
     await synthesis(apps, AppName, belong);
     ExampleArr.push(AppName);
   }
+  return;
 }
 
 /**
@@ -92,9 +94,9 @@ async function loadPlugins(dir: string) {
   for await (let appname of flies) {
     // 优先考虑ts
     if (existsSync(`${dir}/${appname}/index.ts`)) {
-      await import(`file://${dir}/${appname}/index.ts`).catch((error) => {
+      await import(`file://${dir}/${appname}/index.ts`).catch((err) => {
         console.error(appname);
-        console.error(error);
+        console.error(err);
         process.exit();
       });
       FliesName.push(appname);
@@ -116,6 +118,7 @@ async function loadPlugins(dir: string) {
     PluginsArr.push(appname);
     delApp(appname);
   }
+  return;
 }
 
 /**
@@ -141,6 +144,7 @@ function dataInit() {
     [EType.message]: [],
     "notice.*.poke": [], // 兼容但不响应
   };
+  return;
 }
 
 /**
@@ -156,6 +160,7 @@ export async function cmdInit() {
   console.log(
     `[LOAD] Plugins*${PluginsArr.length} Example*${ExampleArr.length}`
   );
+  return;
 }
 
 /**
@@ -180,9 +185,9 @@ export async function getLoadMsg(key: AppsType) {
 
 /* 指令匹配 */
 export async function InstructionMatching(e: Messagetype) {
-  if (e.isRecall) return;
+  if (e.isRecall) return true;
   // 匹配不到事件
-  if (!Command[e.event]) return;
+  if (!Command[e.event]) return true;
 
   /* 获取对话状态 */
   const state = await getConversationState(e.msg.author.id);
@@ -191,7 +196,7 @@ export async function InstructionMatching(e: Messagetype) {
   if (handler && state) {
     /* 如果用户处于对话状态，则调用对话处理函数 */
     await handler(e, state);
-    return;
+    return true;
   }
 
   // 消息类型兼容层
@@ -223,6 +228,7 @@ export async function InstructionMatching(e: Messagetype) {
         if (res) break;
       } catch (err) {
         logErr(err, data);
+        return false;
       }
     }
   }
@@ -235,7 +241,7 @@ export async function InstructionMatching(e: Messagetype) {
  * @returns
  */
 export async function typeMessage(e: Messagetype) {
-  if (!Command[e.event]) return;
+  if (!Command[e.event]) return true;
   for (const val of Command[e.event]) {
     const { data } = val;
     if (e.eventType != data.eventType) continue;
@@ -250,7 +256,7 @@ export async function typeMessage(e: Messagetype) {
       if (res) break;
     } catch (err) {
       logErr(err, data);
-      return;
+      return false;
     }
   }
 }
@@ -265,4 +271,5 @@ function logErr(err: any, data: any) {
     `[${data.event}][${data.belong}][${data.AppName}][${data.fncName}]]`
   );
   console.error(err);
+  return;
 }

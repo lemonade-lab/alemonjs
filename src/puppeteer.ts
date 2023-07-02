@@ -114,7 +114,7 @@ export async function startChrom(): Promise<boolean> {
     console.info("[puppeteer]启动成功");
     return true;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     isBrowser = false;
     console.info("[puppeteer]启动失败");
     return false;

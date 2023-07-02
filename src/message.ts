@@ -15,6 +15,7 @@ export function getApp(key: any): object {
  */
 export function setApp(key: any, value: any): void {
   APP[key] = value;
+  return;
 }
 /**
  * 删除应用
@@ -22,6 +23,7 @@ export function setApp(key: any, value: any): void {
  */
 export function delApp(key: any): void {
   delete APP[key];
+  return;
 }
 /** 消息控制 */
 const MSG = {};
@@ -40,6 +42,7 @@ export function getMessage(key: string) {
  */
 export function setMessage(key: string, fnc: Function) {
   MSG[key] = fnc;
+  return;
 }
 /**
  * 删除消息
@@ -47,4 +50,5 @@ export function setMessage(key: string, fnc: Function) {
  */
 export function delMessage(key: string) {
   delete MSG[key];
+  return;
 }

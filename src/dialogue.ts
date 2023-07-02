@@ -19,6 +19,7 @@ const getAsync = async (key: string) => {
  */
 const setAsync = async (key: string, val: any) => {
   Sockes[key] = val;
+  return;
 };
 /**
  *
@@ -26,6 +27,7 @@ const setAsync = async (key: string, val: any) => {
  */
 const delAsync = async (key: string) => {
   delete Sockes[key];
+  return;
 };
 
 /* 注册对话处理器 */
@@ -50,6 +52,7 @@ export const setConversationState = async (
 ): Promise<void> => {
   // await setAsync(`conversation-state:${userId}`, JSON.stringify(state), 'EX', 3600)
   await setAsync(`conversation-state:${userId}`, JSON.stringify(state));
+  return;
 };
 
 /* 删除对话状态 */
@@ -57,4 +60,5 @@ export const deleteConversationState = async (
   userId: string
 ): Promise<void> => {
   await delAsync(`conversation-state:${userId}`);
+  return;
 };

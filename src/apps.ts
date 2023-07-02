@@ -46,7 +46,11 @@ export const createApps = async (
   const arr = getAllJsAndTsFilesSync(filepath);
   for await (let AppDir of arr) {
     //文件对象:对象中有多个class
-    const dirObject = await import(`file://${AppDir}`);
+    const dirObject = await import(`file://${AppDir}`).catch((err) => {
+      console.error(AppName);
+      console.error(err);
+      return {};
+    });
     for (let item in dirObject) {
       //如果该导出是class
       if (dirObject[item].prototype) {
@@ -63,3 +67,58 @@ export const createApps = async (
   setApp(AppName, apps);
   return apps;
 };
+
+// /**
+//  * 测试函数|不可使用
+//  * @param AppName
+//  * @returns
+//  */
+// export function createApp(AppName: string) {
+//   return {
+//     plugins: (app: { AppName: string; apps: object }) => {
+//       setApp(app.AppName, app.apps);
+//     },
+//     mount: async (DirName: string) => {
+//       const filepath = join(
+//         process.cwd(),
+//         "plugins",
+//         AppName,
+//         DirName ? DirName : "apps"
+//       );
+//       const apps: object = {};
+//       mkdirSync(filepath, { recursive: true });
+//       const arr = getAllJsAndTsFilesSync(filepath);
+//       for await (let AppDir of arr) {
+//         //文件对象:对象中有多个class
+//         const dirObject = await import(`file://${AppDir}`).catch((err) => {
+//           console.error(AppName);
+//           console.error(err);
+//           return {};
+//         });
+//         for (let item in dirObject) {
+//           //如果该导出是class
+//           if (dirObject[item].prototype) {
+//             //如果没发现有
+//             if (apps.hasOwnProperty(item)) {
+//               console.error(`[同名class export]  ${AppDir}`);
+//             }
+//             apps[item] = dirObject[item];
+//           } else {
+//             console.error(`[非class export]  ${AppDir}`);
+//           }
+//         }
+//       }
+//       setApp(AppName, apps);
+//       return apps;
+//     },
+//   };
+// }
+
+/**
+ *  const app = reateApp(AppName)
+ *  app.mount('apps')
+ */
+
+// const app = createApp("x");
+
+// app.mount("apps");
