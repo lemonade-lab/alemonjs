@@ -1,6 +1,6 @@
 {
   "name": "alemon",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "阿柠檬框架核心功能处理器",
   "main": "lib/index.js",
   "scripts": {
