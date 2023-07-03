@@ -358,7 +358,12 @@ export interface SuperType {
  * 机器人配置
  */
 export interface BotConfigType extends GetWsParam {
+  // 机器人密钥
+  secret?: string;
+  // 是否是私域
   isPrivate: boolean;
+  // 主人编号
   masterID?: string;
-  secretKey?: string;
+  // 密码
+  password?: string;
 }
