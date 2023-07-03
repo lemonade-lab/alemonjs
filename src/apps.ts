@@ -115,7 +115,7 @@ export function createApp(AppName: string) {
      * 创建应用
      * @param app 应用对象
      */
-    component: (dirObject: object) => {
+    component: (dirObject: object = {}) => {
       try {
         for (let item in dirObject) {
           //如果该导出是class
