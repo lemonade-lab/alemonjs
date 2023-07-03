@@ -68,57 +68,102 @@ export const createApps = async (
   return apps;
 };
 
-// /**
-//  * 测试函数|不可使用
-//  * @param AppName
-//  * @returns
-//  */
-// export function createApp(AppName: string) {
-//   return {
-//     plugins: (app: { AppName: string; apps: object }) => {
-//       setApp(app.AppName, app.apps);
-//     },
-//     mount: async (DirName: string) => {
-//       const filepath = join(
-//         process.cwd(),
-//         "plugins",
-//         AppName,
-//         DirName ? DirName : "apps"
-//       );
-//       const apps: object = {};
-//       mkdirSync(filepath, { recursive: true });
-//       const arr = getAllJsAndTsFilesSync(filepath);
-//       for await (let AppDir of arr) {
-//         //文件对象:对象中有多个class
-//         const dirObject = await import(`file://${AppDir}`).catch((err) => {
-//           console.error(AppName);
-//           console.error(err);
-//           return {};
-//         });
-//         for (let item in dirObject) {
-//           //如果该导出是class
-//           if (dirObject[item].prototype) {
-//             //如果没发现有
-//             if (apps.hasOwnProperty(item)) {
-//               console.error(`[同名class export]  ${AppDir}`);
-//             }
-//             apps[item] = dirObject[item];
-//           } else {
-//             console.error(`[非class export]  ${AppDir}`);
-//           }
-//         }
-//       }
-//       setApp(AppName, apps);
-//       return apps;
-//     },
-//   };
-// }
+/**
+ * 测试函数|不可使用
+ * @param AppName
+ * @returns
+ */
+export function createApp(AppName: string) {
+  /** 根目录锁定 */
+  const RootPath = join(process.cwd(), "plugins", AppName);
+  /**  集成 */
+  let apps: object = {};
+  return {
+    create: async (DirName: string) => {
+      try {
+        const filepath = join(RootPath, DirName);
+        mkdirSync(filepath, { recursive: true });
+        const arr = getAllJsAndTsFilesSync(filepath);
+        for await (let AppDir of arr) {
+          //文件对象:对象中有多个class
+          const dirObject = await import(`file://${AppDir}`).catch((err) => {
+            console.error(AppName);
+            console.error(AppDir);
+            console.error(err);
+            return {};
+          });
+          for (let item in dirObject) {
+            //如果该导出是class
+            if (dirObject[item].prototype) {
+              //如果没发现有
+              if (apps.hasOwnProperty(item)) {
+                console.error(`[同名class export]  ${AppDir}`);
+              }
+              apps[item] = dirObject[item];
+            } else {
+              console.error(`[非class export]  ${AppDir}`);
+            }
+          }
+        }
+        return true;
+      } catch (err) {
+        console.log(err);
+        return false;
+      }
+    },
+    /**
+     * 创建应用
+     * @param app 应用对象
+     */
+    component: (dirObject: object) => {
+      try {
+        for (let item in dirObject) {
+          //如果该导出是class
+          if (dirObject[item].prototype) {
+            //如果没发现有
+            if (apps.hasOwnProperty(item)) {
+              console.error(`[同名class export]  ${item}`);
+            }
+            apps[item] = dirObject[item];
+          } else {
+            console.error(`[非class export]  ${item}`);
+          }
+        }
+        return true;
+      } catch (err) {
+        console.log(err);
+        return false;
+      }
+    },
+    /**
+     * 挂起应用
+     * @returns
+     */
+    mount: async () => {
+      try {
+        setApp(AppName, apps);
+        return true;
+      } catch (err) {
+        console.log(err);
+        return false;
+      }
+    },
+  };
+}
 
 /**
+ *  新写法模拟
+ *
+ *  // 创建应用
+ *
  *  const app = reateApp(AppName)
- *  app.mount('apps')
+ *
+ *  // npm 插件: 比如  import xiuxian from 'alemon-xiuxian'
+ *
+ *  app.component(xiuxian) 载入 xiuxian 应用
+ *
+ *  app.create(kill) // 载入 kill 目录
+ *
+ *  // 挂起放最后
+ *  app.mount()
  */
-
-// const app = createApp("x");
-
-// app.mount("apps");

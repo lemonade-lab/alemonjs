@@ -3,7 +3,7 @@ import { join } from "node:path";
 import lodash from "lodash";
 // 非依赖引用
 import { Messagetype, CmdType, EType } from "./types.js";
-import { getApp, delApp, getMessage } from "./message.js";
+import { getApp, delApp, getMessage, getAppKey } from "./message.js";
 import { conversationHandlers, getConversationState } from "./dialogue.js";
 
 /* 指令合集 */
@@ -89,8 +89,6 @@ async function loadPlugins(dir: string) {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   let flies = readdirSync(dir);
   //识别并执行插件
-  const FliesName = [];
-  //识别并执行插件
   for await (let appname of flies) {
     // 优先考虑ts
     if (existsSync(`${dir}/${appname}/index.ts`)) {
@@ -99,7 +97,6 @@ async function loadPlugins(dir: string) {
         console.error(err);
         process.exit();
       });
-      FliesName.push(appname);
     }
     // 发现是js
     else if (existsSync(`${dir}/${appname}/index.js`)) {
@@ -108,15 +105,15 @@ async function loadPlugins(dir: string) {
         console.error(error);
         process.exit();
       });
-      FliesName.push(appname);
     }
   }
+  const APPARR = getAppKey();
   //获取插件方法
-  for await (let appname of FliesName) {
-    const apps = getApp(appname);
-    await synthesis(apps, appname, belong);
-    PluginsArr.push(appname);
-    delApp(appname);
+  for await (let item of APPARR) {
+    const apps = getApp(item);
+    await synthesis(apps, item, belong);
+    PluginsArr.push(item);
+    delApp(item);
   }
   return;
 }
@@ -221,10 +218,24 @@ export async function InstructionMatching(e: Messagetype) {
         const { fnc, AppName } = data;
         const AppFnc = getMessage(AppName);
         if (typeof AppFnc == "function") e = AppFnc(e);
-        const res = await fnc(e).catch((err: any) => {
-          console.error(err);
-          return false;
-        });
+        const res = await fnc(e)
+          .then((res: boolean) => {
+            console.info(
+              `[${data.event}][${data.belong}][${data.AppName}][${
+                data.fncName
+              }][${true}]`
+            );
+            return res;
+          })
+          .catch((err: any) => {
+            console.error(
+              `[${data.event}][${data.belong}][${data.AppName}][${
+                data.fncName
+              }][${false}]`
+            );
+            console.error(err);
+            return false;
+          });
         if (res) break;
       } catch (err) {
         logErr(err, data);
@@ -249,10 +260,24 @@ export async function typeMessage(e: Messagetype) {
       const { fnc, AppName } = data;
       const AppFnc = getMessage(AppName);
       if (typeof AppFnc == "function") e = AppFnc(e);
-      const res = await fnc(e).catch((err: any) => {
-        console.error(err);
-        return false;
-      });
+      const res = await fnc(e)
+        .then((res: boolean) => {
+          console.info(
+            `[${data.event}][${data.belong}][${data.AppName}][${
+              data.fncName
+            }][${true}]`
+          );
+          return res;
+        })
+        .catch((err: any) => {
+          console.error(
+            `[${data.event}][${data.belong}][${data.AppName}][${
+              data.fncName
+            }][${false}]`
+          );
+          console.error(err);
+          return false;
+        });
       if (res) break;
     } catch (err) {
       logErr(err, data);
@@ -268,7 +293,9 @@ export async function typeMessage(e: Messagetype) {
  */
 function logErr(err: any, data: any) {
   console.error(
-    `[${data.event}][${data.belong}][${data.AppName}][${data.fncName}]]`
+    `[${data.event}][${data.belong}][${data.AppName}][${
+      data.fncName
+    }][${false}]`
   );
   console.error(err);
   return;

@@ -139,3 +139,40 @@ export enum AvailableIntentsEventsEnum {
   //
   INTERACTION = "INTERACTION",
 }
+
+export interface IGuild {
+  id: string;
+  name: string;
+  icon: string;
+  owner_id: string;
+  owner: boolean;
+  member_count: number;
+  max_members: number;
+  description: string;
+  joined_at: number;
+  channels: IChannel[];
+  unionworld_id: string;
+  union_org_id: string;
+}
+
+export interface IChannel extends PostChannelObj {
+  id: string;
+  guild_id: string;
+  owner_id: string;
+  speak_permission?: number;
+  application_id?: string;
+}
+
+interface PostChannelObj {
+  name: string;
+  type: ChannelType;
+  sub_type?: ChannelSubType;
+  position: number;
+  parent_id: string;
+  private_type?: number;
+  private_user_ids?: string[];
+  permissions?: string;
+}
+
+declare type ChannelType = 0 | 1 | 2 | 3 | 4 | 10005;
+declare type ChannelSubType = 0 | 1 | 2 | 3;

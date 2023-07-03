@@ -25,6 +25,13 @@ export function delApp(key: any): void {
   delete APP[key];
   return;
 }
+export function getAppKey() {
+  const arr = [];
+  for (let key in APP) {
+    arr.push(key);
+  }
+  return arr;
+}
 /** 消息控制 */
 const MSG = {};
 /**

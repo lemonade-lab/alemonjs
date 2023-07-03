@@ -1,5 +1,8 @@
-import puppeteer, { Browser, PuppeteerLaunchOptions } from "puppeteer";
-import { ScreenshotType } from "./types.js";
+import puppeteer, {
+  Browser,
+  PuppeteerLaunchOptions,
+  ScreenshotOptions,
+} from "puppeteer";
 
 //截图记录
 let pic: number = 0;
@@ -35,10 +38,9 @@ export function setLanchConfig(val: PuppeteerLaunchOptions) {
  */
 export async function screenshot(
   htmlPath: string | Buffer | URL,
-  tab: string,
-  type?: ScreenshotType,
-  quality?: number,
-  timeout?: number
+  SOptions: ScreenshotOptions,
+  tab: string = "body",
+  timeout: number = 120000
 ): Promise<string | false | Buffer> {
   // 检测是否开启
   if (isBrowser == false) {
@@ -56,25 +58,23 @@ export async function screenshot(
     if (!(await startChrom())) return false;
     pic++;
   }
-  const Bufferdata = await startPage(htmlPath, tab, type, quality, timeout);
+  const Bufferdata = await startPage(htmlPath, SOptions, tab, timeout);
   return Bufferdata;
 }
 
 /**
  *
- * @param htmlPath 绝对路径
- * @param tab 截图元素位
- * @param type 图片类型
- * @param quality 清晰度
- * @param timeout 响应检查
+ * @param htmlPath  绝对路径
+ * @param SOptions  { type 图片类型 , quality 清晰度   }
+ * @param tab  截图元素位
+ * @param timeout  响应检查
  * @returns
  */
 export async function startPage(
   htmlPath: string | Buffer | URL,
+  SOptions: ScreenshotOptions,
   tab: string,
-  type?: ScreenshotType,
-  quality?: number,
-  timeout?: number
+  timeout: number
 ): Promise<string | false | Buffer> {
   try {
     if (!isBrowser) {
@@ -86,15 +86,12 @@ export async function startPage(
     const page = await browser.newPage();
     /* 挂载网页 */
     await page.goto(`file://${htmlPath}`, {
-      timeout: timeout ? timeout : 120000,
+      timeout,
     });
     /* 获取元素 */
     const body = await page.$(tab);
     /* 得到图片 */
-    const Buffer = await body.screenshot({
-      type: type ? type : "jpeg",
-      quality: quality ? quality : 70,
-    });
+    const Buffer = await body.screenshot(SOptions);
     console.info("[puppeteer]截图成功");
     return Buffer;
   } catch (err) {

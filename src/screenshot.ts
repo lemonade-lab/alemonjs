@@ -1,10 +1,11 @@
 import { readFileSync, writeFileSync, watch, mkdirSync } from "node:fs";
+import { join } from "node:path";
+import { ScreenshotOptions } from "puppeteer";
 import template from "art-template";
 import lodash from "lodash";
+
 /* 非依赖引用 */
 import { screenshot } from "./puppeteer.js";
-import { join } from "node:path";
-
 /*模板缓存*/
 let html = {};
 
@@ -37,19 +38,20 @@ let AdressCache = {};
 /**
  * 插件截图
  * @param AppName 插件名
- * @param tplFile  模板地址
+ * @param tplFile 模板地址模板地址
  * @param directory 拼接地址
  * @param PageName 文件名
- * @param data  模板插入的数据
+ * @param data 模板插入的数据
+ * @param SOptions 截图参数
  * @returns
  */
-
 export async function createPicture(
   AppName: string,
   tplFile: string,
   directory: string,
   PageName: string,
-  data: object
+  data: object,
+  SOptions?: ScreenshotOptions
 ): Promise<string | boolean | Buffer> {
   /** 创建目录地址 */
   const PathHtml = join(process.cwd(), "data", AppName, "html", directory);
@@ -85,7 +87,11 @@ export async function createPicture(
     console.info("[HTML][CREATE]", AdressHtml);
   }
   /* 截图 */
-  const Buffer = await screenshot(AdressHtml, "body").catch((err: any) => {
+  const Buffer = await screenshot(AdressHtml, {
+    type: SOptions.type || "jpeg",
+    quality: SOptions.quality || 90,
+    ...SOptions,
+  }).catch((err: any) => {
     console.error(err);
     return false;
   });

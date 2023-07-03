@@ -6,6 +6,7 @@ import {
   IMember,
   ReactionObj,
   GetWsParam,
+  IGuild,
 } from "./qq-types.js";
 /* 对话处理函数类型 */
 export interface SockesType {
@@ -115,7 +116,7 @@ export interface MsgType extends IMessage {
   channel_id: string; //子频道号
   content: string; //消息内容
   guild_name: string; //频道名
-  owner_id: string; //频道主
+  owner_id: string; //频道主 // 删除
   guild_id: string; //频道号
   id: string; //消息id
   member: IMember; //消息用户
@@ -233,7 +234,7 @@ export interface Messagetype {
   /**
    * 获取当前用户下的所有频道列表
    */
-  getGuildList: () => void;
+  getGuildList: () => Promise<boolean | IGuild[]>;
 
   /**
    * 获取频道详情
