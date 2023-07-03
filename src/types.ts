@@ -7,6 +7,7 @@ import {
   ReactionObj,
   GetWsParam,
   IGuild,
+  IChannel,
 } from "./qq-types.js";
 /* 对话处理函数类型 */
 export interface SockesType {
@@ -189,73 +190,121 @@ export interface Messagetype {
   identity: IdentityType; // 可以计算得出
   //去除了艾特后的消息
   cmd_msg: string;
-  //消息发送机制
+  /**
+   * 消息发送机制
+   * @param content 消息 | buffer
+   * @param obj  消息对象 | buffer
+   * @returns
+   */
   reply: (
     content?: string | object | Array<string> | Buffer,
     obj?: object | Buffer
   ) => Promise<boolean>;
-  //发送本地图片
+  /**
+   * 发送本地图片
+   * @param file_image 本地地址
+   * @param content
+   * @returns
+   */
   sendImage: (
     file_image: string | Buffer | URL,
     content?: string
   ) => Promise<boolean>;
-  //发送截图
+  /**
+   * 发送截图
+   * @param file_image buffer
+   * @param content 附带内容
+   * @returns
+   */
   postImage: (
     file_image: string | Buffer | URL,
     content?: string
   ) => Promise<boolean>;
-  //删除表态
+  /**
+   * 删除表态
+   * @param boj 表情对象
+   * @returns
+   */
   deleteEmoji: (boj: ReactionObj) => Promise<boolean>;
-  //发送表态
+  /**
+   * 发送表态
+   * @param boj 表情对象
+   * @returns
+   */
   postEmoji: (boj: ReactionObj) => Promise<boolean>;
-  // 公信转私信
+  /**
+   * 公信转私信
+   * @param content 内容 | buffer
+   * @param obj 消息对象 | buffer
+   * @returns
+   */
   replyPrivate: (
     content?: string | object | Array<string> | Buffer,
     obj?: object | Buffer
   ) => Promise<boolean>;
 
   /**
-   * 其他接口不再主动执行,而是调用后再执行
-   * 反复调用消耗性能,且涉及权限问题
-   */
-
-  /**
    * 查询机器人权限
+   * @param channel_id 子频道编号
+   * @param id  用户编号
    * @returns
    */
-  searchBotPermissions: () => void;
+  searchBotPermissions: (
+    channel_id: any,
+    id: any
+  ) => Promise<{
+    botmiss: any;
+    look: boolean;
+    manage: boolean;
+    speak: boolean;
+    broadcast: boolean;
+    state: boolean;
+  }>;
 
   /**
    * 查询用户权限
+   * @param channel_id 子频道编号
+   * @param id  用户编号
    * @returns
    */
-  searchUerPermissions: () => void;
+  searchUerPermissions: (
+    channel_id: any,
+    id: any
+  ) => Promise<{
+    botmiss: any;
+    look: boolean;
+    manage: boolean;
+    speak: boolean;
+    broadcast: boolean;
+    state: boolean;
+  }>;
 
   /**
    * 获取当前用户下的所有频道列表
+   * @returns
    */
   getGuildList: () => Promise<boolean | IGuild[]>;
 
   /**
    * 获取频道详情
-   * @param guildId
+   * @param guildId 频道编号
    * @returns
    */
-  getGuildMsg: (guildId: string) => void;
+  getGuildMsg: (guildId: string) => Promise<boolean | IGuild>;
 
   /**
    * 获取子频道列表
-   * @param guildId
+   * @param guildId 频道编号
    * @returns
    */
-  getChannels: (guildId: string) => void;
+  getChannels: (guildId: string) => Promise<boolean | IChannel[]>;
 
   /**
    * 获取子频道详情
-   * @param channelId
+   * @param channelId 子频道编号
    * @returns
    */
-  getChannel: (channelId: string) => void;
+  getChannel: (channelId: string) => Promise<boolean | IChannel>;
 
   /**
    * 获取频道下指定成员的信息
@@ -263,16 +312,23 @@ export interface Messagetype {
    * @param userId 用户
    * @returns
    */
-  getGuildMemberMsg: (guildId: string, userId: string) => void;
+  getGuildMemberMsg: (
+    guildId: string,
+    userId: string
+  ) => Promise<boolean | IMember>;
 
   /**
    * 撤回指定消息
    * @param channelID 频道编号
    * @param messageID 消息编号
-   * @param hideTip
+   * @param hideTip 是否隐藏
    * @returns
    */
-  deleteMsg: (channelID: string, messageID: string, hideTip: boolean) => void;
+  deleteMsg: (
+    channelID: string,
+    messageID: string,
+    hideTip: boolean
+  ) => Promise<any>;
 }
 
 /**

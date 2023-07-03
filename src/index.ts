@@ -1,7 +1,6 @@
 export * as segment from "./segment.js";
 export * from "./plugin.js";
 export * from "./apps.js";
-export * from "./api.js";
 export * from "./message.js";
 export * from "./dialogue.js";
 export * from "./qrcode.js";

@@ -174,5 +174,5 @@ interface PostChannelObj {
   permissions?: string;
 }
 
-declare type ChannelType = 0 | 1 | 2 | 3 | 4 | 10005;
-declare type ChannelSubType = 0 | 1 | 2 | 3;
+type ChannelType = 0 | 1 | 2 | 3 | 4 | 10005;
+type ChannelSubType = 0 | 1 | 2 | 3;
