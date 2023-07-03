@@ -9,7 +9,7 @@ import { setApp } from "./message.js";
  * @param dirPath 指定目录下
  * @returns
  */
-function getAllJsAndTsFilesSync(dirPath: string) {
+export function getAllJsAndTsFilesSync(dirPath: string) {
   const files = [];
   const entries = readdirSync(dirPath, { withFileTypes: true });
   for (const entry of entries) {
@@ -26,50 +26,7 @@ function getAllJsAndTsFilesSync(dirPath: string) {
 }
 
 /**
- * 创建插件应用
- * @param AppName  插件名（与插件名相同）
- * @param DirName 应用地址（默认为apps）
- * @returns
- */
-export const createApps = async (
-  AppName: string,
-  DirName?: string
-): Promise<object> => {
-  const filepath = join(
-    process.cwd(),
-    "plugins",
-    AppName,
-    DirName ? DirName : "apps"
-  );
-  const apps: object = {};
-  mkdirSync(filepath, { recursive: true });
-  const arr = getAllJsAndTsFilesSync(filepath);
-  for await (let AppDir of arr) {
-    //文件对象:对象中有多个class
-    const dirObject = await import(`file://${AppDir}`).catch((err) => {
-      console.error(AppName);
-      console.error(err);
-      return {};
-    });
-    for (let item in dirObject) {
-      //如果该导出是class
-      if (dirObject[item].prototype) {
-        //如果没发现有
-        if (apps.hasOwnProperty(item)) {
-          console.error(`[同名class export]  ${AppDir}`);
-        }
-        apps[item] = dirObject[item];
-      } else {
-        console.error(`[非class export]  ${AppDir}`);
-      }
-    }
-  }
-  setApp(AppName, apps);
-  return apps;
-};
-
-/**
- * 测试函数|不可使用
+ * 创建应用对象
  * @param AppName
  * @returns
  */
@@ -152,18 +109,44 @@ export function createApp(AppName: string) {
 }
 
 /**
- *  新写法模拟
- *
- *  // 创建应用
- *
- *  const app = reateApp(AppName)
- *
- *  // npm 插件: 比如  import xiuxian from 'alemon-xiuxian'
- *
- *  app.component(xiuxian) 载入 xiuxian 应用
- *
- *  app.create(kill) // 载入 kill 目录
- *
- *  // 挂起放最后
- *  app.mount()
+ * 创建插件应用
+ * @param AppName  插件名（与插件名相同）
+ * @param DirName 应用地址（默认为apps）
+ * @returns
  */
+export const createApps = async (
+  AppName: string,
+  DirName?: string
+): Promise<object> => {
+  const filepath = join(
+    process.cwd(),
+    "plugins",
+    AppName,
+    DirName ? DirName : "apps"
+  );
+  const apps: object = {};
+  mkdirSync(filepath, { recursive: true });
+  const arr = getAllJsAndTsFilesSync(filepath);
+  for await (let AppDir of arr) {
+    //文件对象:对象中有多个class
+    const dirObject = await import(`file://${AppDir}`).catch((err) => {
+      console.error(AppName);
+      console.error(err);
+      return {};
+    });
+    for (let item in dirObject) {
+      //如果该导出是class
+      if (dirObject[item].prototype) {
+        //如果没发现有
+        if (apps.hasOwnProperty(item)) {
+          console.error(`[同名class export]  ${AppDir}`);
+        }
+        apps[item] = dirObject[item];
+      } else {
+        console.error(`[非class export]  ${AppDir}`);
+      }
+    }
+  }
+  setApp(AppName, apps);
+  return apps;
+};
