@@ -18,11 +18,8 @@
   ],
   "dependencies": {
     "art-template": "^4.13.2",
-    "axios": "^1.4.0",
-    "form-data": "^4.0.0",
     "lodash": "^4.17.21",
     "progress": "^2.0.3",
-    "prompts": "^2.4.2",
     "puppeteer": "^20.7.1",
     "qrcode": "^1.5.3",
     "yaml": "^2.3.1"
@@ -32,14 +29,14 @@
     "@types/lodash": "^4.14.186",
     "@types/progress": "^2.0.5",
     "@types/qrcode": "^1.5.0",
-    "@types/prompts": "^2.4.1",
     "typescript": "^5.0.4",
     "ts-node": "^10.9.1"
   },
   "keywords": [
-    "qq-guild",
     "alemon-core",
     "alemon-cli",
-    "alemon-bot"
+    "alemon-bot",
+    "alemon-redis",
+    "create-alemon"
   ]
 }
