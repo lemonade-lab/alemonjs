@@ -58,8 +58,10 @@ export async function screenshot(
     if (!(await startChrom())) return false;
     pic++;
   }
-  const Bufferdata = await startPage(htmlPath, SOptions, tab, timeout);
-  return Bufferdata;
+  return await startPage(htmlPath, SOptions, tab, timeout).catch((err) => {
+    console.log(err);
+    return false;
+  });
 }
 
 /**
@@ -91,9 +93,11 @@ export async function startPage(
     /* 获取元素 */
     const body = await page.$(tab);
     /* 得到图片 */
-    const Buffer = await body.screenshot(SOptions);
     console.info("[puppeteer]截图成功");
-    return Buffer;
+    return await body.screenshot(SOptions).catch((err) => {
+      console.log(err);
+      return false;
+    });
   } catch (err) {
     console.error(err);
     return false;

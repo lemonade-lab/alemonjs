@@ -52,7 +52,7 @@ export async function createPicture(
   PageName: string,
   data: object,
   SOptions?: ScreenshotOptions
-): Promise<string | boolean | Buffer> {
+): Promise<string | false | Buffer> {
   /** 创建目录地址 */
   const PathHtml = join(process.cwd(), "data", AppName, "html", directory);
   /* 创建文件地址 */
@@ -87,7 +87,7 @@ export async function createPicture(
     console.info("[HTML][CREATE]", AdressHtml);
   }
   /* 截图 */
-  const Buffer = await screenshot(AdressHtml, {
+  return await screenshot(AdressHtml, {
     type: SOptions.type || "jpeg",
     quality: SOptions.quality || 90,
     ...SOptions,
@@ -95,6 +95,4 @@ export async function createPicture(
     console.error(err);
     return false;
   });
-  /* 截图 */
-  return Buffer;
 }
