@@ -50,8 +50,8 @@ export async function createPicture(
   tplFile: string,
   directory: string,
   PageName: string,
-  data: object,
-  SOptions?: ScreenshotOptions
+  data: object = {},
+  SOptions: ScreenshotOptions = { type: "jpeg", quality: 90 }
 ): Promise<string | false | Buffer> {
   /** 创建目录地址 */
   const PathHtml = join(process.cwd(), "data", AppName, "html", directory);
@@ -87,11 +87,7 @@ export async function createPicture(
     console.info("[HTML][CREATE]", AdressHtml);
   }
   /* 截图 */
-  return await screenshot(AdressHtml, {
-    type: SOptions.type || "jpeg",
-    quality: SOptions.quality || 90,
-    ...SOptions,
-  }).catch((err: any) => {
+  return await screenshot(AdressHtml, SOptions).catch((err: any) => {
     console.error(err);
     return false;
   });

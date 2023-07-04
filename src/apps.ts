@@ -2,7 +2,7 @@ import { readdirSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 // 非依赖引用
-import { setApp } from "./message.js";
+import { setApp, setMessage } from "./message.js";
 
 /**
  * 递归得到所有js/ts文件绝对路径
@@ -34,8 +34,22 @@ export function createApp(AppName: string) {
   /** 根目录锁定 */
   const RootPath = join(process.cwd(), "plugins", AppName);
   /**  集成 */
-  let apps: object = {};
+  const apps: object = {};
   return {
+    setMessage: (fnc: Function) => {
+      try {
+        setMessage(AppName, fnc);
+        return true;
+      } catch (err) {
+        console.log(err);
+        return false;
+      }
+    },
+    /**
+     * 加载应用
+     * @param DirName
+     * @returns
+     */
     create: async (DirName: string) => {
       try {
         const filepath = join(RootPath, DirName);
@@ -96,7 +110,7 @@ export function createApp(AppName: string) {
      * 挂起应用
      * @returns
      */
-    mount: async () => {
+    mount: () => {
       try {
         setApp(AppName, apps);
         return true;
@@ -112,7 +126,7 @@ export function createApp(AppName: string) {
  * 创建插件应用
  * @param AppName  插件名（与插件名相同）
  * @param DirName 应用地址（默认为apps）
- * @returns
+ * @returns 已废弃,请使用 createapp()
  */
 export const createApps = async (
   AppName: string,
