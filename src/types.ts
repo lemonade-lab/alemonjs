@@ -159,36 +159,69 @@ export interface IdentityType {
 
 /* 对话状态类型 */
 export type ConversationState = {
-  step: number; //会话次数
-  data: Array<any> | string | number | object; //携带的数据
-  fnc: Function; //携带的方法
+  /**
+   * 会话次数
+   */
+  step: number;
+  /**
+   * 携带的数据
+   */
+  data: Array<any> | string | number | object;
+  /**
+   * 携带的方法
+   */
+  fnc: Function;
 };
 
 /* e消息对象类型 */
 export interface Messagetype {
-  //消息事件
+  /**
+   * 消息事件
+   */
   eventId: string;
-  //事件类型
+  /**
+   * 事件类型
+   */
   event: EType;
-  //消息类型
+  /**
+   * 消息类型
+   */
   eventType: EventType;
-  //消息对象
+  /**
+   * 消息对象
+   */
   msg: MsgType;
-  //是否是私域
+  /**
+   * 是否是私域
+   */
   isPrivate: boolean;
-  //是否是群聊
+  /**
+   *是否是群聊
+   */
   isGroup: boolean;
-  //是否是撤回
+  /**
+   * 是否是撤回
+   */
   isRecall: boolean;
-  // 艾特得到的qq
+  /**
+   * 艾特得到的qq
+   */
   atuid: IUser[];
-  // 是否艾特
+  /**
+   * 是否是艾特
+   */
   at: boolean;
-  //是否是机器人主人
+  /**
+   * 是否是机器人主人
+   */
   isMaster: boolean;
-  //身份(触发该消息的用户的身份)
+  /**
+   * 身份(触发该消息的用户的身份)
+   */
   identity: IdentityType; // 可以计算得出
-  //去除了艾特后的消息
+  /**
+   * 去除了艾特后的消息
+   */
   cmd_msg: string;
   /**
    * 消息发送机制
@@ -332,20 +365,20 @@ export interface Messagetype {
 }
 
 /**
- *
+ * 父类属性
+ * @param name 类名
+ * @param dsc 类说明
+ * @param event 事件响应
+ * @param eventType 事件类型
+ * @param priority 正则指令匹配数组
+ * @param rule 事件类型
  */
 export interface SuperType {
-  //类名
   name?: string;
-  //类说明
   dsc?: string;
-  //事件响应
   event?: EType;
-  //事件类型
   eventType?: EventType;
-  //优先级
   priority?: number;
-  //正则指令匹配数组
   rule?: Array<{
     //正则
     reg?: RegExp | string;
@@ -356,14 +389,14 @@ export interface SuperType {
 
 /**
  * 机器人配置
+ * @param secret 机器人密钥
+ * @param isPrivate 是否是私域
+ * @param masterID 主人编号
+ * @param password 密码
  */
 export interface BotConfigType extends GetWsParam {
-  // 机器人密钥
   secret?: string;
-  // 是否是私域
   isPrivate: boolean;
-  // 主人编号
   masterID?: string;
-  // 密码
   password?: string;
 }
