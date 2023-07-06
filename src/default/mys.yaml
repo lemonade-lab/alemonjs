@@ -1,0 +1,19 @@
+# 响应地址(目前仅能公网服务部署)
+url: '/api/mys/callback'
+# 响应端口
+host: 8080
+# 图床地址
+picturebed: ''
+# 腾讯云对象存储配置
+# 服务地址 https://console.cloud.tencent.com/cos
+# 账号
+SecretId: ''
+# 密钥
+SecretKey: ''
+# 密钥生成 https://console.cloud.tencent.com/cam/capi
+# 存储名
+Bucket: ''
+# 地域
+Region: ''
+# 地域配置地址
+# https://cloud.tencent.com/document/product/436/6224
