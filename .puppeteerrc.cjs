@@ -25,7 +25,6 @@ if (process.platform == 'win32') {
     console.info('[Chromium] start')
   }
 }
-
 /**
  * @type {import("puppeteer").Configuration}
  */
