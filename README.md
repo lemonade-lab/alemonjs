@@ -1,18 +1,31 @@
 ☞[English document](./README_English.md)
 
-## 一、Alemon-Bot
+>米游社特别版,正在努力看文档中
 
-`alemon-qq` 实例启动模板
+`npm i` 安装依赖
 
-点击了解 ☞[Alemon 官网](http://ningmengchongshui.gitee.io/lemonade)
+`npm run app` 正常输入登录（公私/环境随便填）
 
-## 一、alemon-qq
+启动成功后退出
 
-`alemon` 机器人实例
+打开`config/mys.yaml` 按照提示输入对象存储配置
+
+因官网暂未更新处理文件上传流写法
+
+该项目选择对象存储作为替代方案
+
+`src/alemon/alemonapi.ts` 集合了所有api
+
+api不一样写对,在测试中...
+
+
+## 一、alemon-mys
+
+`alemon` 机器人别野实例
 
 点击了解 ☞[alemon-qq 源码](https://gitee.com/ningmengchongshui/alemon-bot/tree/qq/)
 
-## 三、almeon
+## 二、almeon
 
 `alemon` 框架逻辑块
 
@@ -20,9 +33,7 @@
 
 ## 四、友情链接
 
-官方代码包[☞SDK](https://github.com/tencent-connect/bot-node-sdk)
-
-官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
+官方开发文档[☞API](https://webstatic.mihoyo.com/)
 
 ## 五、开源协议
 
