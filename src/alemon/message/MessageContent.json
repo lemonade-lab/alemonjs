@@ -1,0 +1,40 @@
+{
+    "trace": {
+        "visual_room_version": "1",
+        "app_version": "2.53.1",
+        "action_type": 0,
+        "bot_msg_id": "",
+        "client": "android",
+        "env": "production",
+        "rong_sdk_version": "5.4.3.107"
+    },
+    "mentionedInfo": {
+        "mentionedContent": "",
+        "userIdList": [
+            "bot_QIf3gzXzoSXi5Kw48oxD"
+        ],
+        "type": 2
+    },
+    "user": {
+        "portraitUri": "https://img-static.mihoyo.com/communityweb/upload/5a022501d4e34aec571cad65d667b5db.png",
+        "extra": "",
+        "name": "柠檬冲水",
+        "alias": "",
+        "id": "304751611",
+        "portrait": "https://img-static.mihoyo.com/communityweb/upload/5a022501d4e34aec571cad65d667b5db.png"
+    },
+    "content": {
+        "images": [],
+        "entities": [
+            {
+                "offset": 0,
+                "length": 6,
+                "entity": {
+                    "type": "mentioned_robot",
+                    "bot_id": "bot_QIf3gzXzoSXi5Kw48oxD"
+                }
+            }
+        ],
+        "text": "@百里寻晴 /闭关 "
+    }
+}
