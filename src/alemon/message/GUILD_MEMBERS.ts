@@ -2,7 +2,7 @@ import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
 import { sendMessage } from '../alemonapi.js'
 import { BotEvent, MHYType } from '../types.js'
 import { createCOS } from '../cos.js'
-export async function GUILD_MEMBERS(event: BotEvent) {
+export async function GUILD_MEMBERS(event: BotEvent, val: number) {
   console.log('成员进出', event.robot.villa_id)
   console.log('成员进出', event.robot.template)
   console.log('成员进出', event.type)

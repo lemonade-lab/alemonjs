@@ -2,7 +2,7 @@ import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
 import { sendMessage } from '../alemonapi.js'
 import { BotEvent, MessageContentType, MHYType } from '../types.js'
 import { createCOS } from '../cos.js'
-export async function MESSAGES(event: BotEvent) {
+export async function MESSAGES(event: BotEvent, val: number) {
   console.log('消息会话', event.robot.villa_id)
   console.log('消息会话', event.robot.template)
   console.log('消息会话', event.type)

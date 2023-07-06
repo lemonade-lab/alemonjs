@@ -2,13 +2,13 @@ import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
 import { sendMessage } from '../alemonapi.js'
 import { BotEvent, MHYType } from '../types.js'
 import { createCOS } from '../cos.js'
-export async function GUILD_MESSAGE_REACTIONS(event: BotEvent, val: number) {
-  console.log('表情表态', event.robot.villa_id)
-  console.log('表情表态', event.robot.template)
-  console.log('表情表态', event.type)
-  console.log('表情表态', event.created_at)
-  console.log('表情表态', event.id)
-  console.log('表情表态', event.send_at)
+export async function GUILDS(event: BotEvent, val: number) {
+  console.log('机器人进出', event.robot.villa_id)
+  console.log('机器人进出', event.robot.template)
+  console.log('机器人进出', event.type)
+  console.log('机器人进出', event.created_at)
+  console.log('机器人进出', event.id)
+  console.log('机器人进出', event.send_at)
   // 房间号
   const room_id = event.extend_data.EventData.SendMessage.room_id
   // 上传图片
@@ -20,7 +20,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: BotEvent, val: number) {
     /** 事件类型 */
     event: EType.MESSAGES,
     /** 消息类型  */
-    eventType: EventType.CREATE,
+    eventType: val == 3 ? EventType.CREATE : EventType.DELETE,
     /**  消息对象 */
     msg: {
       channel_id: String(room_id), // 房间
@@ -51,7 +51,6 @@ export async function GUILD_MESSAGE_REACTIONS(event: BotEvent, val: number) {
       //  第一参数是buffer
       if (Buffer.isBuffer(msg)) {
         try {
-          // 上传图片
           COS.Upload(msg, 'mys.jpg')
           const url = COS.getUrl('mys.jpg')
           return await sendMessage(event.robot.villa_id, {
