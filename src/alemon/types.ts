@@ -132,3 +132,204 @@ export type BotTemplate = {
     desc: string // 指令说明
   }[]
 }
+
+/**
+ * **********
+ * api
+ * ***********
+ */
+export interface MemberBasic {
+  uid: string //  用户 id
+  nickname: string //  用户昵称
+  introduce: string //  用户简介
+  avatar_url: string // 头像地址
+}
+
+export interface MemberBasicType extends MemberBasic {
+  avatar?: string //  头像 id
+}
+
+export enum RoleEnum {
+  MEMBER_ROLE_TYPE_ALL_MEMBER = 'MEMBER_ROLE_TYPE_ALL_MEMBER',
+  MEMBER_ROLE_TYPE_ADMIN = 'MEMBER_ROLE_TYPE_ADMIN',
+  MEMBER_ROLE_TYPE_OWNER = 'MEMBER_ROLE_TYPE_OWNER',
+  MEMBER_ROLE_TYPE_CUSTOM = 'MEMBER_ROLE_TYPE_CUSTOM',
+  MEMBER_ROLE_TYPE_UNKNOWN = 'MEMBER_ROLE_TYPE_UNKNOWN'
+}
+
+export interface MemberRoleBasic {
+  id: number // 身份组 id
+  name: string // 身份组名称
+  color: string // 身份组颜色
+  // 身份组类型
+  role_type: RoleEnum
+  villa_id: number // 大别野 id
+}
+
+export interface MemberRoleList extends MemberRoleBasic {
+  is_all_room?: boolean
+  room_ids?: string[]
+}
+
+/** 用户成员信息 */
+export interface MemberType {
+  basic: MemberBasicType // 基础
+  role_id_list: string[] // 身分组编号列表
+  joined_at: string // 用户加入大别野时间戳
+  role_list: MemberRoleList[] // 身分组集合
+}
+
+/** 用户别野信息 */
+export interface AccessInfoType {
+  uid: string // 用户编号
+  villa_id: string // 别野编号
+  member_access_token: string // 成员访问权限
+  bot_tpl_id: string //
+}
+
+/** 用户数据 */
+export interface MemberDataType {
+  access_info: AccessInfoType
+  member: MemberType
+}
+
+export interface VillaType {
+  villa_id: string
+  name: string
+  villa_avatar_url: string
+  owner_uid: string
+  is_official: boolean
+  introduce: string
+  category_id: number
+  tags: string[]
+}
+
+export interface MemberListType {
+  list: MemberType[]
+  next_offset?: string // 该字段已废弃
+  next_offset_str?: string
+}
+export interface BotReplyMessageType {
+  bot_msg_id: string
+}
+
+export interface ListRoom {
+  room_id: number // 房间 id
+  room_name: string // 房间名称
+  room_type: string // 房间类型
+  group_id: number // 分组 id
+}
+
+export enum RoomEnum {
+  BOT_PLATFORM_ROOM_TYPE_CHAT_ROOM = 'BOT_PLATFORM_ROOM_TYPE_CHAT_ROOM', // 聊天房间
+  BOT_PLATFORM_ROOM_TYPE_POST_ROOM = 'BOT_PLATFORM_ROOM_TYPE_POST_ROOM', // 帖子房间
+  BOT_PLATFORM_ROOM_TYPE_SCENE_ROOM = 'BOT_PLATFORM_ROOM_TYPE_SCENE_ROOM', // 场景房间
+  BOT_PLATFORM_ROOM_TYPE_INVALID = 'BOT_PLATFORM_ROOM_TYPE_INVALID' // 无效
+}
+
+export enum RoomDefaultNotifyEnum {
+  BOT_PLATFORM_DEFAULT_NOTIFY_TYPE_NOTIFY = 'BOT_PLATFORM_DEFAULT_NOTIFY_TYPE_NOTIFY', // 默认通知
+  BOT_PLATFORM_DEFAULT_NOTIFY_TYPE_IGNORE = 'BOT_PLATFORM_DEFAULT_NOTIFY_TYPE_IGNORE', // 默认免打扰
+  BOT_PLATFORM_DEFAULT_NOTIFY_TYPE_INVALID = 'BOT_PLATFORM_DEFAULT_NOTIFY_TYPE_INVALID' // 无效
+}
+
+export interface Group {
+  group_id: number // 分组 id
+  group_name: string //分组名称
+}
+export interface GroupRoom extends Group {
+  room_list: ListRoom[]
+}
+// 房间消息发送权限范围设置
+export interface SendMsgAuthRange {
+  is_all_send_msg: boolean
+  roles: number[]
+}
+// 房间
+export interface RoomMsg {
+  room_id: number //  房间 id
+  room_name: string // 房间名称
+  // 房间类型
+  room_type: RoomEnum
+  group_id: number // 分组 id
+  // 房间默认通知类型
+  room_default_notify_type: RoomDefaultNotifyEnum
+  send_msg_auth_range: SendMsgAuthRange //房间消息发送权限范围设置
+}
+
+export enum ColorEnum {
+  'a' = '#6173AB',
+  'b' = '#F485D8',
+  'c' = '#F47884',
+  'd' = '#FFA54B',
+  'e' = '#7BC26F',
+  'f' = '#59A1EA',
+  'g' = '#977EE1'
+}
+
+export interface Permission {
+  key: string
+  name: string
+  describe: string
+}
+
+export interface MemberRole extends MemberRoleBasic {
+  is_all_room: boolean
+  room_ids: number[]
+  permissions: string[]
+}
+
+export interface MemberRoleResponse {
+  retcode: number
+  message: string
+  data: {
+    role: MemberRole
+  }
+}
+
+// 身份组类型
+export enum MemberRoleType {
+  MEMBER_ROLE_TYPE_ALL_MEMBER = 'all_member', // 所有人身份组
+  MEMBER_ROLE_TYPE_ADMIN = 'admin', // 管理员身份组
+  MEMBER_ROLE_TYPE_OWNER = 'owner', // 大别野房主身份组
+  MEMBER_ROLE_TYPE_CUSTOM = 'custom', // 其他自定义身份组
+  MEMBER_ROLE_TYPE_UNKNOWN = 'unknown' // 未知
+}
+
+// 身份组可添加权限
+export enum MemberRolePermission {
+  MENTION_ALL = 'mention_all', // @全体全员
+  RECALL_MESSAGE = 'recall_message', // 撤回消息
+  PIN_MESSAGE = 'pin_message', // 置顶消息
+  MANAGE_MEMBER_ROLE = 'manage_member_role', // 身份组管理
+  EDIT_VILLA_INFO = 'edit_villa_info', // 编辑大别野详情
+  MANAGE_GROUP_AND_ROOM = 'manage_group_and_room', // 房间及分组管理
+  VILLA_SILENCE = 'villa_silence', // 禁言
+  BLACK_OUT = 'black_out', // 拉黑
+  HANDLE_APPLY = 'handle_apply', // 加入审核
+  MANAGE_CHAT_ROOM = 'manage_chat_room', // 聊天房间管理
+  VIEW_DATA_BOARD = 'view_data_board', // 查看大别野数据
+  MANAGE_CUSTOM_EVENT = 'manage_custom_event', // 组织活动
+  LIVE_ROOM_ORDER = 'live_room_order', // 点播房间节目
+  MANAGE_SPOTLIGHT_COLLECTION = 'manage_spotlight_collection' // 设置精选消息
+}
+
+export interface MemberRolePermissions {
+  key: MemberRolePermission // 权限 key 字符串
+  name: string // 权限名称
+  describe: string // 权限描述
+}
+
+export interface MemberRoleList extends MemberRoleBasic {
+  member_nums: string // 身份组下的成员数量
+}
+
+export interface MemberRoleListPermissions extends MemberRoleBasic {
+  permissions: MemberRolePermissions[] // 身份组下的成员数量
+}
+
+export interface Emoticon {
+  emoticon_id: number // 表情 id
+  describe_text: string // 描述文本
+  icon: string // 表情图片链接
+}
