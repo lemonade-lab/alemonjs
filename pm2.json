@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "alemon",
+      "name": "al-mys",
       "script": "pm2-run.js",
       "instances": 1,
       "autorestart": true,
