@@ -1,6 +1,4 @@
-☞[English document](./README_English.md)
-
->米游社特别版,正在努力看文档中
+> 米游社特别版,正在努力看文档中
 
 `npm i` 安装依赖
 
@@ -14,10 +12,9 @@
 
 该项目选择对象存储作为替代方案
 
-`src/alemon/alemonapi.ts` 集合了所有api
+`src/alemon/alemonapi.ts` 集合了所有 api
 
-api不一样写对,在测试中...
-
+api 不一样写对,在测试中...
 
 ## 一、alemon-mys
 
