@@ -109,36 +109,12 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     console.log(entities)
   }
   /** 搜索并收集 */
-  const UserArr = []
   const RoomArr = []
-  /* 收集用户 ID 和起始位置 */
-  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
-    UserArr.push({ id, offset })
-    return match
-  })
   /* 收集房间 ID 和起始位置 */
   content.replace(/<#(\d+)>/g, (match, id, offset) => {
     RoomArr.push({ id, offset })
     return match
   })
-  /* 字符替换 */
-  for await (const item of UserArr) {
-    const User = await getMember(villa_id, item.id)
-    if (User) {
-      console.log(User)
-      content = content.replace(new RegExp(`<@!${item.id}>`, 'g'), (match, id) => {
-        entities.push({
-          entity: {
-            type: 'mentioned_user', // 提及成员
-            user_id: item.id // 成员id
-          },
-          length: `@${User.basic.nickname} `.length, // 字符占用长度
-          offset: item.offset // 使用起始位置作为偏移量
-        })
-        return `@${User.basic.nickname} `
-      })
-    }
-  }
   /* 字符替换 */
   for await (const item of RoomArr) {
     const Room = await getRoom(villa_id, item.id)
@@ -159,6 +135,32 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       })
     }
   }
+  /** 搜索并收集 */
+  const UserArr = []
+  /* 收集用户 ID 和起始位置 */
+  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
+    UserArr.push({ id, offset })
+    return match
+  })
+  /* 字符替换 */
+  for await (const item of UserArr) {
+    const User = await getMember(villa_id, item.id)
+    if (User) {
+      console.log(User)
+      content = content.replace(new RegExp(`<@!${item.id}>`, 'g'), (match, id) => {
+        entities.push({
+          entity: {
+            type: 'mentioned_user', // 提及成员
+            user_id: item.id // 成员id
+          },
+          length: `@${User.basic.nickname} `.length, // 字符占用长度
+          offset: item.offset // 使用起始位置作为偏移量
+        })
+        return `@${User.basic.nickname} `
+      })
+    }
+  }
+
   console.log(entities)
   console.log(content)
   return {
