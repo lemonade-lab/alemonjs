@@ -29,6 +29,16 @@ npm run app
 
 `src/alemon/alemonapi.ts` 集合接口
 
+框架机器人无任何服务代码
+
+需要安装插件才可测试并观察数据
+
+机器人目录下执行安装
+
+```
+git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-plugin.git ./plugins/alemon-plugin/
+```
+
 ## alemon-mys
 
 点击了解 ☞[alemon 米游社写法](./doc.md)
