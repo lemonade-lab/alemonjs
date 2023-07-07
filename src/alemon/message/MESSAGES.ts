@@ -235,9 +235,11 @@ export async function MESSAGES(event: BotEvent, val: number) {
             content: {
               // 消息文本   支持  [爱心] 来转换成表情
               text: content,
-              images: {
-                url
-              }
+              images: [
+                {
+                  url
+                }
+              ]
             }
           }) // 要回复的消息
         }).catch(err => {
@@ -270,9 +272,11 @@ export async function MESSAGES(event: BotEvent, val: number) {
               // 消息文本   支持  [爱心] 来转换成表情
               text: content,
               entities,
-              images: {
-                url
-              }
+              images: [
+                {
+                  url
+                }
+              ]
             }
           }) // 要回复的消息
         }).catch(err => {
