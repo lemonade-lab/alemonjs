@@ -219,7 +219,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
           msg_content: JSON.stringify({
             content: {
               // 消息文本   支持  [爱心] 来转换成表情
-              text: content
+              text: content != '' ? content : cmd_msg
             }
           }) // 要回复的消息
         }).catch(err => {
@@ -234,7 +234,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
           msg_content: JSON.stringify({
             content: {
               // 消息文本   支持  [爱心] 来转换成表情
-              text: content,
+              text: content != '' ? content : cmd_msg,
               images: [
                 {
                   url,
@@ -256,7 +256,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
           msg_content: JSON.stringify({
             content: {
               // 消息文本   支持  [爱心] 来转换成表情
-              text: content,
+              text: content != '' ? content : cmd_msg,
               entities
             }
           }) // 要回复的消息
@@ -272,7 +272,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
           msg_content: JSON.stringify({
             content: {
               // 消息文本   支持  [爱心] 来转换成表情
-              text: content,
+              text: content != '' ? content : cmd_msg,
               entities,
               images: [
                 {
