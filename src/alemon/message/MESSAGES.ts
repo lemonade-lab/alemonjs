@@ -213,7 +213,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
             text: content,
             entities,
             images: {
-              url: obj.image ?? ''
+              url: obj?.image ?? ''
             }
             // entities: []  // 消息文本内嵌的实体信息 用来描述text的特殊渲染
             // mentionedInfo: {}  // 定义@
