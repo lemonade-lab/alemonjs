@@ -37,10 +37,10 @@ export async function checkMemberBotAccessToken(villa_id: number, token: string)
     }
   })
     .then(res => {
-      // axios
-      const db = res.data
+      // axiso
+      const re = res.data
       // mys
-      return db.data
+      return re.data
     })
     .catch(err => {
       console.log(err)
@@ -66,7 +66,12 @@ export async function getVilla(villa_id: number) {
     method: 'get',
     url: ApiEnum.getVilla
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -94,7 +99,12 @@ export async function getMember(villa_id: number, uid: string) {
       uid
     }
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -120,7 +130,12 @@ export async function getVillaMembers(villa_id: number, offset_str: string, size
       size
     }
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -234,7 +249,12 @@ export async function sendMessage(
     url: ApiEnum.sendMessage,
     data
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -262,7 +282,12 @@ export async function createGroup(villa_id: number, group_name: string) {
     url: ApiEnum.createGroup,
     data: { group_name }
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -325,7 +350,12 @@ export async function getGroupList(villa_id: number) {
     method: 'get',
     url: ApiEnum.getGroupList
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -396,7 +426,12 @@ export async function getRoom(villa_id: number, room_id: number) {
       room_id
     }
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -415,7 +450,12 @@ export async function getVillaGroupRoomList(villa_id: number) {
     method: 'get',
     url: ApiEnum.getVillaGroupRoomList
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -477,7 +517,12 @@ export async function createMemberRole(
     url: ApiEnum.createMemberRole,
     data
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -554,7 +599,12 @@ export async function getMemberRoleInfo(villa_id: number, role_id: number) {
       role_id
     }
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -574,7 +624,12 @@ export async function getVillaMemberRoles(villa_id: number) {
     method: 'get',
     url: ApiEnum.getVillaMemberRoles
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -599,7 +654,12 @@ export async function getAllEmoticons(villa_id: number) {
     method: 'get',
     url: ApiEnum.getAllEmoticons
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
@@ -632,7 +692,12 @@ export async function audit(
     url: ApiEnum.audit,
     data
   })
-    .then(res => res.data)
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
     .catch(err => {
       console.log(err)
       return false
