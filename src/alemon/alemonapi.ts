@@ -201,6 +201,7 @@ export async function pinMessage(
   return ret
 }
 /**
+ * tudo 官网文档 为 get  实际为  post
  * 撤回消息
  * @param villa_id 别野编号
  * @param data 配置数据
@@ -208,7 +209,7 @@ export async function pinMessage(
  */
 export async function recallMessage(
   villa_id: number,
-  params: {
+  data: {
     msg_uid: string // 消息 id
     room_id: string // 房间 id
     msg_time: number // 发送时间
@@ -216,9 +217,9 @@ export async function recallMessage(
 ) {
   console.log(ApiEnum.recallMessage)
   const ret: boolean = await villaService(villa_id, {
-    method: 'get',
+    method: 'post',
     url: ApiEnum.recallMessage,
-    params
+    data
   })
     .then(() => true)
     .catch(err => {
