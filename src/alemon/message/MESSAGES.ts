@@ -67,49 +67,19 @@ export async function MESSAGES(event: BotEvent, val: number) {
     /* 消息发送 */
     reply: async (msg?: string | object | Array<string> | Buffer, obj?: any | Buffer) => {
       //  第一参数是buffer
+      let url = ''
       if (Buffer.isBuffer(msg)) {
         try {
           // 上传图片
           const randomNum = Math.floor(Math.random() * 31)
           COS.Upload(msg, `${randomNum}.jpg`)
-          const url = COS.getUrl(`${randomNum}.jpg`)
+          url = COS.getUrl(`${randomNum}.jpg`)
           return await sendMessage(villa_id, {
             room_id, //房间号
             object_name: MHYType.Text, // 消息类型
             msg_content: JSON.stringify({
               content: {
                 text: cmd_msg,
-                images: [
-                  {
-                    url, // 图片路径
-                    with: '1080',
-                    height: '2200'
-                  }
-                ]
-              }
-            }) // 要回复的消息
-          }).catch(err => {
-            console.log(err)
-            return false
-          })
-        } catch (err) {
-          console.error(err)
-          return false
-        }
-      }
-      // 第二参考书是 buffer
-      if (Buffer.isBuffer(obj)) {
-        try {
-          // 上传图片
-          const randomNum = Math.floor(Math.random() * 31)
-          COS.Upload(obj, `${randomNum}.jpg`)
-          const url = COS.getUrl(`${randomNum}.jpg`)
-          return await sendMessage(villa_id, {
-            room_id, //房间号
-            object_name: MHYType.Text, // 消息类型
-            msg_content: JSON.stringify({
-              content: {
-                text: msg,
                 images: [
                   {
                     url, // 图片路径
@@ -203,16 +173,74 @@ export async function MESSAGES(event: BotEvent, val: number) {
         }
       }
 
-      const url = obj?.image ?? ''
+      // 第二参考书是 buffer
+      if (Buffer.isBuffer(obj)) {
+        try {
+          // 上传图片
+          const randomNum = Math.floor(Math.random() * 31)
+          COS.Upload(obj, `${randomNum}.jpg`)
+          url = COS.getUrl(`${randomNum}.jpg`)
+          if (entities.length == 0) {
+            return await sendMessage(villa_id, {
+              room_id, //房间号
+              object_name: MHYType.Text, // 消息类型
+              msg_content: JSON.stringify({
+                content: {
+                  text: content != '' ? content : cmd_msg,
+                  images: [
+                    {
+                      url, // 图片路径
+                      with: '1080',
+                      height: '2200'
+                    }
+                  ]
+                }
+              }) // 要回复的消息
+            }).catch(err => {
+              console.log(err)
+              return false
+            })
+          } else {
+            return await sendMessage(villa_id, {
+              room_id, //房间号
+              object_name: MHYType.Text, // 消息类型
+              msg_content: JSON.stringify({
+                content: {
+                  text: content != '' ? content : cmd_msg,
+                  entities,
+                  images: [
+                    {
+                      url, // 图片路径
+                      with: '1080',
+                      height: '2200'
+                    }
+                  ]
+                }
+              }) // 要回复的消息
+            }).catch(err => {
+              console.log(err)
+              return false
+            })
+          }
+        } catch (err) {
+          console.error(err)
+          return false
+        }
+      }
 
-      console.log(url)
+      const options = typeof msg === 'object' && !obj ? content : obj
 
-      console.log(content)
+      url = options?.image
+      if (url == undefined) {
+        url = ''
+      }
+      console.log('url=', url)
 
-      console.log(entities)
+      console.log('content=', content)
+
+      console.log('entities=', entities)
 
       if (entities.length == 0 && url == '') {
-        // 判断msg是否是  obj
         await sendMessage(villa_id, {
           room_id, //房间号
           object_name: MHYType.Text, // 消息类型
@@ -227,7 +255,6 @@ export async function MESSAGES(event: BotEvent, val: number) {
           return false
         })
       } else if (entities.length == 0 && url != '') {
-        // 判断msg是否是  obj
         await sendMessage(villa_id, {
           room_id, //房间号
           object_name: MHYType.Text, // 消息类型
@@ -249,7 +276,6 @@ export async function MESSAGES(event: BotEvent, val: number) {
           return false
         })
       } else if (entities.length != 0 && url == '') {
-        // 判断msg是否是  obj
         await sendMessage(villa_id, {
           room_id, //房间号
           object_name: MHYType.Text, // 消息类型
@@ -265,7 +291,6 @@ export async function MESSAGES(event: BotEvent, val: number) {
           return false
         })
       } else if (entities.length != 0 && url != '') {
-        // 判断msg是否是  obj
         await sendMessage(villa_id, {
           room_id, //房间号
           object_name: MHYType.Text, // 消息类型
