@@ -91,13 +91,14 @@ export async function sendMessageTextEntitiesUrl(villa_id, room_id, text, entiti
 export async function stringParsing(msg: string | object | string[], villa_id: number) {
   /** 增加渲染  */
   const entities = []
+  console.log(msg)
   // 判断 msg 是否是  arr  是就转换
   let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
   // 字符转换并增加渲染
   const everyoneMention = '<@!everyone>'
   const everyoneIndex = content.indexOf(everyoneMention)
   if (everyoneIndex !== -1) {
-    content = content.replace(everyoneMention, '@全体成员')
+    content = content.replace(everyoneMention, '@全体成员 ')
     entities.push({
       entity: {
         type: 'mention_all'
@@ -105,6 +106,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       length: 6,
       offset: everyoneIndex
     })
+    console.log(entities)
   }
   /** 搜索并收集 */
   const UserArr = []
@@ -123,16 +125,17 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   for await (const item of UserArr) {
     const User = await getMember(villa_id, item.id)
     if (User) {
+      console.log(User)
       content = content.replace(new RegExp(`<@!${item.id}>`, 'g'), (match, id) => {
         entities.push({
           entity: {
             type: 'mentioned_user', // 提及成员
             user_id: item.id // 成员id
           },
-          length: `@${User} `.length, // 字符占用长度
+          length: `@${User.basic.nickname} `.length, // 字符占用长度
           offset: item.offset // 使用起始位置作为偏移量
         })
-        return `@${User} `
+        return `@${User.basic.nickname} `
       })
     }
   }
@@ -140,6 +143,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   for await (const item of RoomArr) {
     const Room = await getRoom(villa_id, item.id)
     if (Room) {
+      console.log(Room)
       content = content.replace(new RegExp(`<#${item.id}>`, 'g'), (match, id) => {
         entities.push({
           entity: {
@@ -148,13 +152,15 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             villa_id: villa_id, // 大别野 id
             room_id: item.id // 房间 id
           },
-          length: `#${Room} `.length, // 长度可以算
+          length: `#${Room.room_name} `.length, // 长度可以算
           offset: item.offset // 使用起始位置作为偏移量
         })
-        return `#${Room} `
+        return `#${Room.room_name} `
       })
     }
   }
+  console.log(entities)
+  console.log(content)
   return {
     entities,
     content
