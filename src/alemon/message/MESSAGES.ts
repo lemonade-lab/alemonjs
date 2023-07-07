@@ -122,7 +122,6 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     UserArr.push({ id, offset })
     return match
   })
-  let x = 0
   /* 字符替换 */
   for await (const item of RoomArr) {
     const Room = await getRoom(villa_id, item.id)
@@ -137,9 +136,8 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             room_id: item.id // 房间 id
           },
           length: `#${Room.room_name} `.length, // 长度可以算
-          offset: item.offset + x // 使用起始位置作为偏移量
+          offset: item.offset // 使用起始位置作为偏移量
         })
-        x++
         return `#${Room.room_name} `
       })
     }
@@ -156,9 +154,8 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             user_id: item.id // 成员id
           },
           length: `@${User.basic.nickname} `.length, // 字符占用长度
-          offset: item.offset + x // 使用起始位置作为偏移量
+          offset: item.offset // 使用起始位置作为偏移量
         })
-        x++
         return `@${User.basic.nickname} `
       })
     }
