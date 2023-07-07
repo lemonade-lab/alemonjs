@@ -108,18 +108,23 @@ export type BotEvent = {
     EventData: {
       // 会话消息数据包
       SendMessage: {
-        content: string // 消息
-        from_user_id: number
-        send_at: number
-        object_name: number
-        room_id: number
-        nickname: string
-        msg_uid: string
+        content: string // 字符串消息合集
+        from_user_id: number //
+        send_at: number //
+        object_name: number //
+        room_id: number // 房间号
+        nickname: string //
+        msg_uid: string //
       }
       // 表情表态数据包
       AddQuickEmoticon: object
       // 成员进入数据包
-      JoinVilla: object
+      JoinVilla: {
+        join_uid: number // 用户编号
+        join_user_nickname: string // 用户名称
+        join_at: number //
+        villa_id: number // 别野编号
+      }
       // 机器人退出数据包
       DeleteRobot: object
       // 机器人进入数据包

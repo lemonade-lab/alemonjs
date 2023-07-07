@@ -6,13 +6,9 @@ import { BotEvent } from '../types.js'
  * @param val  类型控制
  */
 export async function GUILD_MESSAGE_REACTIONS(event: BotEvent, val: number) {
-  console.log('表情表态', event.robot.villa_id) // 别野编号
+  console.log('表情表态', event) // 消息类型
   console.log('表情表态', event.robot.template) // 机器人信息
-  console.log('表情表态', event.type) // 消息类型
-  console.log('表情表态', event.created_at)
-  console.log('表情表态', event.id) //
-  console.log('表情表态', event.send_at) //
-  console.log('数据包', event.extend_data.EventData.AddQuickEmoticon) //
+  console.log('数据包', event.extend_data.EventData) //
   /** 制作e消息对象 */
   const e = {
     /** 消息编号 */

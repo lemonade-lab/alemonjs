@@ -8,17 +8,13 @@ import { createCOS } from '../cos.js'
  * @param val  类型控制
  */
 export async function MESSAGES(event: BotEvent, val: number) {
-  console.log('消息会话', event.robot.villa_id)
-  console.log('消息会话', event.robot.template)
-  console.log('消息会话', event.type)
-  console.log('消息会话', event.created_at)
-  console.log('消息会话', event.id)
-  console.log('消息会话', event.send_at)
+  console.log('消息会话', event) // 消息类型
+  console.log('消息会话', event.robot.template) // 机器人信息
+  console.log('数据', event.extend_data.EventData) // 数据监听
   /**  数据包 */
   const MessageContent: MessageContentType = JSON.parse(
     event.extend_data.EventData.SendMessage.content
   )
-  console.log('消息会话', MessageContent)
   // 房间号
   const room_id = event.extend_data.EventData.SendMessage.room_id
   /** 指令消息需要去除 @ 和用户名 */

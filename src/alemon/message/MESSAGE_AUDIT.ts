@@ -13,6 +13,7 @@ export async function MESSAGE_AUDIT(event: BotEvent, val: number) {
   console.log('审核事件', event.id)
   console.log('审核事件', event.send_at)
   console.log('审核事件', event)
+  console.log('数据', event.extend_data.EventData) // 数据监听
   /** 制作e消息对象 */
   const e = {
     /** 消息编号 */
