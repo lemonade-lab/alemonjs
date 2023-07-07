@@ -139,7 +139,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
           length: `#${Room.room_name} `.length, // 长度可以算
           offset: item.offset // 使用起始位置作为偏移量
         })
-        x--
+        x++
         return `#${Room.room_name} `
       })
     }
@@ -158,7 +158,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
           length: `@${User.basic.nickname} `.length, // 字符占用长度
           offset: item.offset + x // 使用起始位置作为偏移量
         })
-        x--
+        x++
         return `@${User.basic.nickname} `
       })
     }
