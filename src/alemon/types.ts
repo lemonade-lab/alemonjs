@@ -106,7 +106,7 @@ export type BotEvent = {
   type: number // 消息类型
   extend_data: {
     EventData: {
-      // 不同类型事件有不同的回调数据
+      // 会话消息数据包
       SendMessage: {
         content: string // 消息
         from_user_id: number
@@ -116,6 +116,14 @@ export type BotEvent = {
         nickname: string
         msg_uid: string
       }
+      // 表情表态数据包
+      AddQuickEmoticon: object
+      // 成员进入数据包
+      JoinVilla: object
+      // 机器人退出数据包
+      DeleteRobot: object
+      // 机器人进入数据包
+      CreateRobot: object
     }
   }
   created_at: number // 事件创建事件

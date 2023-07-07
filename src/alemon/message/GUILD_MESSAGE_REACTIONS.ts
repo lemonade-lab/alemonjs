@@ -12,7 +12,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: BotEvent, val: number) {
   console.log('表情表态', event.created_at)
   console.log('表情表态', event.id) //
   console.log('表情表态', event.send_at) //
-  console.log('表情表态', event) //
+  console.log('数据包', event.extend_data.EventData.AddQuickEmoticon) //
   /** 制作e消息对象 */
   const e = {
     /** 消息编号 */

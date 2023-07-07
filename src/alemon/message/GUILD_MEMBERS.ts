@@ -17,7 +17,7 @@ export async function GUILD_MEMBERS(event: BotEvent, val: number) {
   console.log('成员进出', event.created_at)
   console.log('成员进出', event.id) //
   console.log('成员进出', event.send_at) //
-  console.log('成员进出', event) //
+  console.log('数据包', event.extend_data.EventData.JoinVilla) //
   /** 制作e消息对象 */
   const e = {
     /** 消息编号 */
