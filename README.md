@@ -10,7 +10,7 @@ git clone --depth=1 -b mys https://gitee.com/ningmengchongshui/alemon-bot.git
 
 ```
 cd alemon-bot
-npm intall
+npm install
 ```
 
 正常登录（公私/环境随便填）

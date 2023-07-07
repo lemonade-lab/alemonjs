@@ -29,11 +29,6 @@
     // 类型声明
     "typeRoots": ["node_modules/@types"]
   },
-  // "references": [
-  //   {
-  //     "path": "./tsconfig.node.json"
-  //   }
-  // ],
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
