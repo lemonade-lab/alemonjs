@@ -421,9 +421,9 @@ export async function deleteRoom(villa_id: number, room_id: number) {
 export async function getRoom(villa_id: number, room_id: number) {
   console.log(ApiEnum.getRoom)
   const ret: RoomMsg | false = await villaService(villa_id, {
-    method: 'post',
+    method: 'get',
     url: ApiEnum.getRoom,
-    data: {
+    params: {
       room_id
     }
   })
