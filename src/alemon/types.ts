@@ -102,15 +102,15 @@ export interface MessageContentType {
    */
   content: {
     // 图片描述
-    images: {
+    images?: {
       url: string // 图片路径
       with: string // 图片宽度
       height: string // 图片高度
     }[] // 文本+图片
     // 特效描述
-    entities: {
-      offset: number
-      length: number
+    entities?: {
+      offset: number // 下角标,从0开始
+      length: number //  长度
       entity: {
         type: EmbeddedEntityTypeEnum
         bot_id?: string // 机器人账号    提及机器人
@@ -122,7 +122,7 @@ export interface MessageContentType {
         requires_bot_access_token?: boolean
       }
     }[]
-    text: string // 消息文本
+    text?: string // 消息文本
   }
 }
 

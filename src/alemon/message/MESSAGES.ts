@@ -2,6 +2,12 @@ import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
 import { sendMessage } from '../alemonapi.js'
 import { BotEvent, MessageContentType, MHYType } from '../types.js'
 import { createCOS } from '../cos.js'
+import { getMember, getRoom } from '../alemonapi.js'
+
+/**
+ *
+ */
+
 /**
  * 消息会话
  * @param event 回调数据
@@ -17,6 +23,8 @@ export async function MESSAGES(event: BotEvent, val: number) {
   )
   console.log('MessageContent=', MessageContent) // 数据监听
   console.log('entities=', MessageContent.content.entities) // 数据监听
+  // 别野编号
+  const villa_id = event.robot.villa_id
   // 房间号
   const room_id = event.extend_data.EventData.SendMessage.room_id
   /** 指令消息需要去除 @ 和用户名 */
@@ -57,7 +65,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
     /** 去除了艾特后的消息 */
     cmd_msg: cmd_msg,
     /* 消息发送 */
-    reply: async (msg?: string | object | Array<string> | Buffer, obj?: object | Buffer) => {
+    reply: async (msg?: string | object | Array<string> | Buffer, obj?: any | Buffer) => {
       //  第一参数是buffer
       if (Buffer.isBuffer(msg)) {
         try {
@@ -65,7 +73,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
           const randomNum = Math.floor(Math.random() * 31)
           COS.Upload(msg, `${randomNum}.jpg`)
           const url = COS.getUrl(`${randomNum}.jpg`)
-          return await sendMessage(event.robot.villa_id, {
+          return await sendMessage(villa_id, {
             room_id, //房间号
             object_name: MHYType.Text, // 消息类型
             msg_content: JSON.stringify({
@@ -96,7 +104,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
           const randomNum = Math.floor(Math.random() * 31)
           COS.Upload(obj, `${randomNum}.jpg`)
           const url = COS.getUrl(`${randomNum}.jpg`)
-          return await sendMessage(event.robot.villa_id, {
+          return await sendMessage(villa_id, {
             room_id, //房间号
             object_name: MHYType.Text, // 消息类型
             msg_content: JSON.stringify({
@@ -120,18 +128,93 @@ export async function MESSAGES(event: BotEvent, val: number) {
           return false
         }
       }
+
+      /** 增加渲染  */
+      const entities = []
+
       // 判断 msg 是否是  arr  是就转换
-      const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+      let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+
+      // 字符转换并增加渲染
+      const everyoneMention = '<@!everyone>'
+      const everyoneIndex = content.indexOf(everyoneMention)
+      if (everyoneIndex !== -1) {
+        content = content.replace(everyoneMention, '@全体成员')
+        entities.push({
+          entity: {
+            type: 'mention_all'
+          },
+          length: 6,
+          offset: everyoneIndex
+        })
+      }
+
+      /** 搜索并收集 */
+      const UserArr = []
+      const RoomArr = []
+
+      /* 收集用户 ID 和起始位置 */
+      content.replace(/<@!(\d+)>/g, (match, id, offset) => {
+        UserArr.push({ id, offset })
+        return match
+      })
+
+      /* 收集房间 ID 和起始位置 */
+      content.replace(/<#(\d+)>/g, (match, id, offset) => {
+        RoomArr.push({ id, offset })
+        return match
+      })
+
+      /* 字符替换 */
+      for await (const item of UserArr) {
+        const User = await getMember(villa_id, item.id)
+        if (User) {
+          content = content.replace(new RegExp(`<@!${item.id}>`, 'g'), (match, id) => {
+            entities.push({
+              entity: {
+                type: 'mentioned_user', // 提及成员
+                user_id: item.id // 成员id
+              },
+              length: `@${User} `.length, // 字符占用长度
+              offset: item.offset // 使用起始位置作为偏移量
+            })
+            return `@${User} `
+          })
+        }
+      }
+
+      /* 字符替换 */
+      for await (const item of RoomArr) {
+        const Room = await getRoom(villa_id, item.id)
+        if (Room) {
+          content = content.replace(new RegExp(`<#${item.id}>`, 'g'), (match, id) => {
+            entities.push({
+              entity: {
+                // 房间标签，点击会跳转到指定房间（仅支持跳转本大别野的房间）
+                type: 'villa_room_link',
+                villa_id: villa_id, // 大别野 id
+                room_id: item.id // 房间 id
+              },
+              length: `#${Room} `.length, // 长度可以算
+              offset: item.offset // 使用起始位置作为偏移量
+            })
+            return `#${Room} `
+          })
+        }
+      }
+
       // 判断msg是否是  obj
-      const options = typeof msg === 'object' && !obj ? msg : obj
-      await sendMessage(event.robot.villa_id, {
+      await sendMessage(villa_id, {
         room_id, //房间号
         object_name: MHYType.Text, // 消息类型
         msg_content: JSON.stringify({
           content: {
             // 消息文本   支持  [爱心] 来转换成表情
             text: content,
-            ...options
+            entities,
+            images: {
+              url: obj.image ?? ''
+            }
             // entities: []  // 消息文本内嵌的实体信息 用来描述text的特殊渲染
             // mentionedInfo: {}  // 定义@
             // quote: {}  // 引用消息
