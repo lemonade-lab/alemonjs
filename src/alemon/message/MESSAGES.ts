@@ -237,7 +237,9 @@ export async function MESSAGES(event: BotEvent, val: number) {
               text: content,
               images: [
                 {
-                  url
+                  url,
+                  with: '1080',
+                  height: '2200'
                 }
               ]
             }
@@ -274,7 +276,9 @@ export async function MESSAGES(event: BotEvent, val: number) {
               entities,
               images: [
                 {
-                  url
+                  url,
+                  with: '1080',
+                  height: '2200'
                 }
               ]
             }
