@@ -203,6 +203,14 @@ export async function MESSAGES(event: BotEvent, val: number) {
         }
       }
 
+      const url = obj?.image ?? ''
+
+      console.log(url)
+
+      console.log(content)
+
+      console.log(entities)
+
       // 判断msg是否是  obj
       await sendMessage(villa_id, {
         room_id, //房间号
@@ -213,7 +221,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
             text: content,
             entities,
             images: {
-              url: obj?.image ?? ''
+              url
             }
             // entities: []  // 消息文本内嵌的实体信息 用来描述text的特殊渲染
             // mentionedInfo: {}  // 定义@
