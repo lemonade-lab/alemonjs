@@ -90,7 +90,7 @@ export async function getMember(villa_id: number, uid: string) {
   const ret: MemberType | false = await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getMember,
-    data: {
+    params: {
       uid
     }
   })
@@ -115,7 +115,7 @@ export async function getVillaMembers(villa_id: number, offset_str: string, size
   const ret: MemberListType | false = await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getVillaMembers,
-    data: {
+    params: {
       offset_str,
       size
     }
@@ -193,7 +193,7 @@ export async function pinMessage(
  */
 export async function recallMessage(
   villa_id: number,
-  data: {
+  params: {
     msg_uid: string // 消息 id
     room_id: string // 房间 id
     msg_time: number // 发送时间
@@ -203,7 +203,7 @@ export async function recallMessage(
   const ret: boolean = await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.recallMessage,
-    data
+    params
   })
     .then(() => true)
     .catch(err => {
@@ -550,7 +550,7 @@ export async function getMemberRoleInfo(villa_id: number, role_id: number) {
   const ret: any | false = await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getMemberRoleInfo,
-    data: {
+    params: {
       role_id
     }
   })
