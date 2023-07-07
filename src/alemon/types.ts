@@ -49,34 +49,47 @@ export enum ApiEnum {
   // 审核
   audit = '/vila/api/bot/platform/audit'
 }
+
 /**
  * 消息内容
  */
 export interface MessageContentType {
+  /**
+   * 追踪
+   */
   trace: {
-    visual_room_version: string
-    app_version: string
-    action_type: number
-    bot_msg_id: string
-    client: string
-    env: string
-    rong_sdk_version: string
+    visual_room_version: string //可视化房间版本
+    app_version: string //应用程序版本
+    action_type: number // 操作类型
+    bot_msg_id: string // 机器人消息编号
+    client: string // 客户
+    env: string // 环境
+    rong_sdk_version: string //sdk版本
   }
+  /**
+   * 提及
+   */
   mentionedInfo: {
-    mentionedContent: string
-    userIdList: string[]
-    type: number
+    mentionedContent: string //提到
+    userIdList: string[] //用户ID列表
+    type: number //回调类型--会话消息2
   }
+  /**
+   * 用户
+   */
   user: {
-    portraitUri: string
-    extra: string
-    name: string
-    alias: string
-    id: string
-    portrait: string
+    portraitUri: string // 用户头像
+    extra: string // 额外的  {"member_roles":{},"state":null} 需要转为对象
+    name: string // 用户名称
+    alias: string // 别名
+    id: string // 用户编号
+    portrait: string // 用户头像
   }
+  /**
+   * 内容
+   */
   content: {
-    images: never[]
+    images: never[] // 文本+图片
     entities: {
       offset: number
       length: number
@@ -87,13 +100,6 @@ export interface MessageContentType {
     }[]
     text: string // 消息文本
   }
-}
-
-/** 消息类型 */
-export enum MHYType {
-  Text = 'MHY:Text',
-  Image = 'MHY:Image',
-  Post = 'MHY:Post'
 }
 
 // 机器人模板信息
@@ -118,9 +124,7 @@ export type BotEvent = {
   type: number // 消息类型
   extend_data: {
     EventData: {
-      /**
-       * 会话消息数据包
-       */
+      /** 会话消息数据包  */
       SendMessage: {
         content: string // 字符串消息合集  MessageContentType
         from_user_id: number // 来自用户id
@@ -129,10 +133,9 @@ export type BotEvent = {
         room_id: number // 房间号
         nickname: string // 昵称
         msg_uid: string // 消息ID
+        villa_id: string // 别野编号
       }
-      /**
-       * 表情表态数据包
-       */
+      /**  表情表态数据包 */
       AddQuickEmoticon: {
         villa_id: number // 别野编号
         room_id: number // 房间编号
@@ -142,24 +145,18 @@ export type BotEvent = {
         msg_uid: string // 用户消息编号
         bot_msg_id: string // 机器人消息编号
       }
-      /**
-       * 成员进入数据包
-       */
+      /** 成员进入数据包  */
       JoinVilla: {
         join_uid: number // 用户编号
         join_user_nickname: string // 用户名称
         join_at: number // 进入事件编号
         villa_id: number // 别野编号
       }
-      /**
-       * 机器人退出数据包
-       */
+      /**  机器人退出数据包 */
       DeleteRobot: {
         villa_id: number // 别野编号
       }
-      /**
-       * 机器人进入数据包
-       */
+      /**  机器人进入数据包 */
       CreateRobot: {
         villa_id: number // 别野编号
       }
@@ -184,6 +181,13 @@ export interface MemberBasic {
 
 export interface MemberBasicType extends MemberBasic {
   avatar?: string //  头像 id
+}
+
+/** 消息类型 */
+export enum MHYType {
+  Text = 'MHY:Text',
+  Image = 'MHY:Image',
+  Post = 'MHY:Post'
 }
 
 export enum RoleEnum {

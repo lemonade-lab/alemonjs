@@ -6,14 +6,9 @@ import { BotEvent } from '../types.js'
  * @param val  类型控制
  */
 export async function MESSAGE_AUDIT(event: BotEvent, val: number) {
-  console.log('审核事件', event.robot.villa_id)
-  console.log('审核事件', event.robot.template)
-  console.log('审核事件', event.type)
-  console.log('审核事件', event.created_at)
-  console.log('审核事件', event.id)
-  console.log('审核事件', event.send_at)
-  console.log('审核事件', event)
-  console.log('数据', event.extend_data.EventData) // 数据监听
+  console.log('MESSAGE_AUDIT=', event)
+  console.log('MESSAGE_AUDIT=', event.robot.template)
+  console.log('MESSAGE_AUDIT=data=', event.extend_data.EventData) // 数据监听
   /** 制作e消息对象 */
   const e = {
     /** 消息编号 */
