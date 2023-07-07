@@ -2,6 +2,11 @@ import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
 import { sendMessage } from '../alemonapi.js'
 import { BotEvent, MHYType } from '../types.js'
 import { createCOS } from '../cos.js'
+/**
+ * 机器人进出
+ * @param event 回调数据
+ * @param val  类型控制
+ */
 export async function GUILDS(event: BotEvent, val: number) {
   console.log('机器人进出', event.robot.villa_id)
   console.log('机器人进出', event.robot.template)

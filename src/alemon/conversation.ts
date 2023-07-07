@@ -6,14 +6,16 @@ import { GUILD_MESSAGE_REACTIONS } from './message/GUILD_MESSAGE_REACTIONS.js'
 import { MESSAGE_AUDIT } from './message/MESSAGE_AUDIT.js'
 import { GUILDS } from './message/GUILDS.js'
 
-/** 事件合集 */
+/**
+ * 事件处理集
+ */
 const ConversationMap = {
-  [1]: GUILD_MEMBERS,
-  [2]: MESSAGES,
-  [3]: GUILDS,
-  [4]: GUILDS,
-  [5]: GUILD_MESSAGE_REACTIONS,
-  [6]: MESSAGE_AUDIT
+  [1]: GUILD_MEMBERS, // 房间消息--成员进出
+  [2]: MESSAGES, // 会话消息
+  [3]: GUILDS, // 别野消息--机器人进入
+  [4]: GUILDS, // 别野消息--机器人退出
+  [5]: GUILD_MESSAGE_REACTIONS, // 表情表态
+  [6]: MESSAGE_AUDIT // 审核事件
 }
 
 /**
@@ -21,7 +23,7 @@ const ConversationMap = {
  * @param req
  * @param res
  */
-export async function callback(req: Request, res: Response) {
+export async function callBack(req: Request, res: Response) {
   try {
     // 从请求体中获取事件对象
     const event: BotEvent = req.body.event

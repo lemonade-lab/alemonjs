@@ -2,7 +2,7 @@ import express, { Application } from 'express'
 import bodyParser from 'body-parser'
 import { publicIp } from 'public-ip'
 import { BotConfigType, setLanchConfig, cmdInit } from 'alemon'
-import { callback } from './alemon/conversation.js'
+import { callBack } from './alemon/conversation.js'
 import { checkRobot } from './login.js'
 import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig, MysConfig } from './config/index.js'
 
@@ -53,7 +53,7 @@ export async function createAlemon() {
   // 解析 x-www-form-urlencoded 格式的请求体
   app.use(bodyParser.urlencoded({ extended: false }))
   // 处理事件回调请求
-  app.post(MysConfig.url, callback)
+  app.post(MysConfig.url, callBack)
   // 启动 Express 应用程序
   app.listen(MysConfig.host, () => {
     console.info('[HELLO] 欢迎使用Alemon-Mys')

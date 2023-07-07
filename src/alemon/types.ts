@@ -49,7 +49,9 @@ export enum ApiEnum {
   // 审核
   audit = '/vila/api/bot/platform/audit'
 }
-
+/**
+ * 消息内容
+ */
 export interface MessageContentType {
   trace: {
     visual_room_version: string

@@ -2,6 +2,11 @@ import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
 import { sendMessage } from '../alemonapi.js'
 import { BotEvent, MessageContentType, MHYType } from '../types.js'
 import { createCOS } from '../cos.js'
+/**
+ * 消息会话
+ * @param event 回调数据
+ * @param val  类型控制
+ */
 export async function MESSAGES(event: BotEvent, val: number) {
   console.log('消息会话', event.robot.villa_id)
   console.log('消息会话', event.robot.template)
@@ -59,8 +64,9 @@ export async function MESSAGES(event: BotEvent, val: number) {
       if (Buffer.isBuffer(msg)) {
         try {
           // 上传图片
-          COS.Upload(msg, 'mys.jpg')
-          const url = COS.getUrl('mys.jpg')
+          const randomNum = Math.floor(Math.random() * 31)
+          COS.Upload(msg, `${randomNum}.jpg`)
+          const url = COS.getUrl(`${randomNum}.jpg`)
           return await sendMessage(event.robot.villa_id, {
             room_id, //房间号
             object_name: MHYType.Text, // 消息类型
@@ -89,8 +95,9 @@ export async function MESSAGES(event: BotEvent, val: number) {
       if (Buffer.isBuffer(obj)) {
         try {
           // 上传图片
-          COS.Upload(obj, 'mys.jpg')
-          const url = COS.getUrl('mys.jpg')
+          const randomNum = Math.floor(Math.random() * 31)
+          COS.Upload(obj, `${randomNum}.jpg`)
+          const url = COS.getUrl(`${randomNum}.jpg`)
           return await sendMessage(event.robot.villa_id, {
             room_id, //房间号
             object_name: MHYType.Text, // 消息类型

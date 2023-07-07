@@ -130,8 +130,8 @@ export async function getVillaMembers(villa_id: number, offset_str: string, size
 }
 /**
  * 踢出大别野用户
- * @param villa_id
- * @param uid
+ * @param villa_id 别野编号
+ * @param uid 用户编号
  * @returns
  */
 export async function deleteVillaMember(villa_id: number, uid: string) {
@@ -159,7 +159,7 @@ export async function deleteVillaMember(villa_id: number, uid: string) {
 /**
  * 置顶消息
  * @param villa_id 别野编号
- * @param data
+ * @param data 配置数据
  * @returns
  */
 export async function pinMessage(
@@ -188,7 +188,7 @@ export async function pinMessage(
 /**
  * 撤回消息
  * @param villa_id 别野编号
- * @param data
+ * @param data 配置数据
  * @returns
  */
 export async function recallMessage(
@@ -216,8 +216,8 @@ export async function recallMessage(
 
 /**
  * 发送消息
- * @param villa_id
- * @param data
+ * @param villa_id 别野编号
+ * @param data 配置数据
  * @returns
  */
 export async function sendMessage(
@@ -431,7 +431,7 @@ export async function getVillaGroupRoomList(villa_id: number) {
 /**
  * 向身份组操作用户，包括把用户添加到身份组或者从身份组删除用户
  * @param villa_id 别野编号
- * @param data
+ * @param data 配置数据
  * @returns
  */
 export async function operateMemberToRole(
@@ -460,7 +460,7 @@ export async function operateMemberToRole(
 /**
  * 创建身份组
  * @param villa_id 别野编号
- * @param data
+ * @param data 配置数据
  * @returns
  */
 export async function createMemberRole(
@@ -488,7 +488,7 @@ export async function createMemberRole(
 /**
  * 编辑身份组
  * @param villa_id 别野编号
- * @param data
+ * @param data 配置数据
  * @returns
  */
 export async function editMemberRole(

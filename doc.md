@@ -1,13 +1,15 @@
 # 设计稿
 
-频道/别野 -> guild/
-子频道/房间 -> chanld/room
+频道/别野 -> GUILD/villa
+
+子频道/房间 -> CHANNEL/room
 
 # alemon
 
 写法模板
 
 ```ts
+// example/word.ts
 import { plugin, Messagetype } from 'alemon'
 export class word extends plugin {
   constructor() {
@@ -15,12 +17,12 @@ export class word extends plugin {
       rule: [
         {
           reg: /^\/你好$/,
-          fnc: 'postHello'
+          fnc: 'helloWord'
         }
       ]
     })
   }
-  async postHello(e: Messagetype): Promise<boolean> {
+  async helloWord(e: Messagetype): Promise<boolean> {
     e.reply('你好')
     return false
   }
@@ -90,21 +92,17 @@ export enum EventType {
    */
   isRecall: boolean;
   /**
-   * 艾特得到的qq
-   */
-  atuid: IUser[];
-  /**
    * 是否是艾特
    */
   at: boolean;
   /**
+   * 艾特得到的qq
+   */
+  atuid: IUser[];
+  /**
    * 是否是机器人主人
    */
   isMaster: boolean;
-  /**
-   * 身份(触发该消息的用户的身份)
-   */
-  identity: IdentityType; // 可以计算得出
   /**
    * 去除了艾特后的消息
    */

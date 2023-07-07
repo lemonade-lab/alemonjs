@@ -1,6 +1,6 @@
 > 米游社特别版,正在努力看文档中
 
-拉去代码
+拉取代码
 
 ```
 git clone --depth=1 -b mys https://gitee.com/ningmengchongshui/alemon-bot.git
@@ -13,21 +13,21 @@ cd alemon-bot
 npm intall
 ```
 
-正常输入登录（公私/环境随便填）
+正常登录（公私/环境随便填）
 
 ```
 npm run app
 ```
 
-启动成功后退出
-
-`config/mys.yaml` 打开按照提示输入对象存储配置
+图片发送功能,需要启动成功后退出
 
 因官网暂未更新处理文件上传流写法
 
 该项目选择对象存储作为替代方案
 
-`src/alemon/alemonapi.ts` 集合了所有接口
+打开按照提示输入对象存储配置 `config/mys.yaml`
+
+集合接口 `src/alemon/alemonapi.ts`
 
 ## alemon-mys
 

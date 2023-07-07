@@ -1,12 +1,24 @@
 import COS from 'cos-nodejs-sdk-v5'
 import { Readable } from 'stream'
 import { MysConfig } from '../config/index.js'
+/**
+ * 创建存储对象
+ * @returns
+ */
 export function createCOS() {
+  // 实例化
   const cos = new COS({
     SecretId: MysConfig.SecretId,
     SecretKey: MysConfig.SecretKey
   })
+  // 方法合集
   return {
+    /**
+     * 上传图片
+     * @param data 数据
+     * @param Key 图片名
+     * @returns
+     */
     Upload: (data: Buffer, Key: string) => {
       return cos.putObject(
         {
@@ -24,6 +36,11 @@ export function createCOS() {
         }
       )
     },
+    /**
+     * 得到指定图片
+     * @param Key
+     * @returns
+     */
     getUrl: (Key: string) => {
       return cos.getObjectUrl(
         {
@@ -35,8 +52,7 @@ export function createCOS() {
         function (err, data) {
           if (err) return console.log(err)
           /* url为对象访问 url */
-          const url = data.Url
-          return url
+          return data.Url
         }
       )
     }
