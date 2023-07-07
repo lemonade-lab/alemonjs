@@ -91,7 +91,6 @@ export async function sendMessageTextEntitiesUrl(villa_id, room_id, text, entiti
 export async function stringParsing(msg: string | object | string[], villa_id: number) {
   /** 增加渲染  */
   const entities = []
-  console.log(msg)
   // 判断 msg 是否是  arr  是就转换
   let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
   // 字符转换并增加渲染
@@ -106,7 +105,6 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       length: 6,
       offset: everyoneIndex
     })
-    console.log(entities)
   }
   /** 搜索并收集 */
   const RoomArr = []
@@ -115,19 +113,11 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     RoomArr.push({ id, offset })
     return match
   })
-  /** 搜索并收集 */
-  const UserArr = []
-  /* 收集用户 ID 和起始位置 */
-  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
-    UserArr.push({ id, offset })
-    return match
-  })
   /* 字符替换 */
   for await (const item of RoomArr) {
     const Room = await getRoom(villa_id, item.id)
     if (Room) {
-      console.log(Room)
-      content = content.replace(new RegExp(`<#${item.id}>`, 'g'), (match, id, index) => {
+      content = content.replace(new RegExp(`<#${item.id}>`), (match, id, index) => {
         entities.push({
           entity: {
             // 房间标签，点击会跳转到指定房间（仅支持跳转本大别野的房间）
@@ -142,12 +132,18 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       })
     }
   }
+  /** 搜索并收集 */
+  const UserArr = []
+  /* 收集用户 ID 和起始位置 */
+  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
+    UserArr.push({ id, offset })
+    return match
+  })
   /* 字符替换 */
   for await (const item of UserArr) {
     const User = await getMember(villa_id, item.id)
     if (User) {
-      console.log(User)
-      content = content.replace(new RegExp(`<@!${item.id}>`, 'g'), (match, id, index) => {
+      content = content.replace(new RegExp(`<@!${item.id}>`), (match, id, index) => {
         entities.push({
           entity: {
             type: 'mentioned_user', // 提及成员
@@ -161,8 +157,8 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     }
   }
 
-  console.log(entities)
-  console.log(content)
+  console.log('entities=', entities)
+  console.log('content=', content)
   return {
     entities,
     content
