@@ -211,27 +211,75 @@ export async function MESSAGES(event: BotEvent, val: number) {
 
       console.log(entities)
 
-      // 判断msg是否是  obj
-      await sendMessage(villa_id, {
-        room_id, //房间号
-        object_name: MHYType.Text, // 消息类型
-        msg_content: JSON.stringify({
-          content: {
-            // 消息文本   支持  [爱心] 来转换成表情
-            text: content,
-            entities,
-            images: {
-              url
+      if (entities.length == 0 && url == '') {
+        // 判断msg是否是  obj
+        await sendMessage(villa_id, {
+          room_id, //房间号
+          object_name: MHYType.Text, // 消息类型
+          msg_content: JSON.stringify({
+            content: {
+              // 消息文本   支持  [爱心] 来转换成表情
+              text: content
             }
-            // entities: []  // 消息文本内嵌的实体信息 用来描述text的特殊渲染
-            // mentionedInfo: {}  // 定义@
-            // quote: {}  // 引用消息
-          }
-        }) // 要回复的消息
-      }).catch(err => {
-        console.log(err)
-        return false
-      })
+          }) // 要回复的消息
+        }).catch(err => {
+          console.log(err)
+          return false
+        })
+      } else if (entities.length == 0 && url != '') {
+        // 判断msg是否是  obj
+        await sendMessage(villa_id, {
+          room_id, //房间号
+          object_name: MHYType.Text, // 消息类型
+          msg_content: JSON.stringify({
+            content: {
+              // 消息文本   支持  [爱心] 来转换成表情
+              text: content,
+              images: {
+                url
+              }
+            }
+          }) // 要回复的消息
+        }).catch(err => {
+          console.log(err)
+          return false
+        })
+      } else if (entities.length != 0 && url == '') {
+        // 判断msg是否是  obj
+        await sendMessage(villa_id, {
+          room_id, //房间号
+          object_name: MHYType.Text, // 消息类型
+          msg_content: JSON.stringify({
+            content: {
+              // 消息文本   支持  [爱心] 来转换成表情
+              text: content,
+              entities
+            }
+          }) // 要回复的消息
+        }).catch(err => {
+          console.log(err)
+          return false
+        })
+      } else if (entities.length != 0 && url != '') {
+        // 判断msg是否是  obj
+        await sendMessage(villa_id, {
+          room_id, //房间号
+          object_name: MHYType.Text, // 消息类型
+          msg_content: JSON.stringify({
+            content: {
+              // 消息文本   支持  [爱心] 来转换成表情
+              text: content,
+              entities,
+              images: {
+                url
+              }
+            }
+          }) // 要回复的消息
+        }).catch(err => {
+          console.log(err)
+          return false
+        })
+      }
       return true
     }
   }
