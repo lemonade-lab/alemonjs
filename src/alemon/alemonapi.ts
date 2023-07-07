@@ -431,7 +431,7 @@ export async function getRoom(villa_id: number, room_id: number) {
       // axiso
       const re = res.data
       // mys
-      return re.data
+      return re.data.room
     })
     .catch(err => {
       console.log(err)
