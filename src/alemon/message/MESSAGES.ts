@@ -149,7 +149,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
           entity: {
             // 房间标签，点击会跳转到指定房间（仅支持跳转本大别野的房间）
             type: 'villa_room_link',
-            villa_id: villa_id, // 大别野 id
+            villa_id: String(villa_id), // 大别野 id
             room_id: item.id // 房间 id
           },
           length: `#${Room.room_name} `.length, // 长度可以算
