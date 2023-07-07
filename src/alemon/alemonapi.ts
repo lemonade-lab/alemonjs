@@ -103,7 +103,7 @@ export async function getMember(villa_id: number, uid: string) {
       // axiso
       const re = res.data
       // mys
-      return re.data
+      return re.data.member
     })
     .catch(err => {
       console.log(err)
