@@ -85,7 +85,7 @@ export interface MessageContentType {
         bot_id: string
       }
     }[]
-    text: string
+    text: string // 消息文本
   }
 }
 
@@ -94,46 +94,6 @@ export enum MHYType {
   Text = 'MHY:Text',
   Image = 'MHY:Image',
   Post = 'MHY:Post'
-}
-
-/** 机器人接收类型 */
-export type BotEvent = {
-  // 机器人相关信息
-  robot: {
-    template: BotTemplate
-    villa_id: number // 事件所属的大别野 id
-  }
-  type: number // 消息类型
-  extend_data: {
-    EventData: {
-      // 会话消息数据包
-      SendMessage: {
-        content: string // 字符串消息合集
-        from_user_id: number //
-        send_at: number //
-        object_name: number //
-        room_id: number // 房间号
-        nickname: string //
-        msg_uid: string //
-      }
-      // 表情表态数据包
-      AddQuickEmoticon: object
-      // 成员进入数据包
-      JoinVilla: {
-        join_uid: number // 用户编号
-        join_user_nickname: string // 用户名称
-        join_at: number //
-        villa_id: number // 别野编号
-      }
-      // 机器人退出数据包
-      DeleteRobot: object
-      // 机器人进入数据包
-      CreateRobot: object
-    }
-  }
-  created_at: number // 事件创建事件
-  id: string // 消息编号
-  send_at: number // 回调事件
 }
 
 // 机器人模板信息
@@ -146,6 +106,68 @@ export type BotTemplate = {
     name: string // 指令
     desc: string // 指令说明
   }[]
+}
+
+/** 机器人接收类型 */
+export type BotEvent = {
+  // 机器人相关信息
+  robot: {
+    template: BotTemplate
+    villa_id: number // 事件所属的大别野 id
+  }
+  type: number // 消息类型
+  extend_data: {
+    EventData: {
+      /**
+       * 会话消息数据包
+       */
+      SendMessage: {
+        content: string // 字符串消息合集  MessageContentType
+        from_user_id: number // 来自用户id
+        send_at: number // 发送事件编号
+        object_name: number // 对象名称
+        room_id: number // 房间号
+        nickname: string // 昵称
+        msg_uid: string // 消息ID
+      }
+      /**
+       * 表情表态数据包
+       */
+      AddQuickEmoticon: {
+        villa_id: number // 别野编号
+        room_id: number // 房间编号
+        uid: number // 用户编号
+        emoticon_id: number // 表情编号
+        emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
+        msg_uid: string // 用户消息编号
+        bot_msg_id: string // 机器人消息编号
+      }
+      /**
+       * 成员进入数据包
+       */
+      JoinVilla: {
+        join_uid: number // 用户编号
+        join_user_nickname: string // 用户名称
+        join_at: number // 进入事件编号
+        villa_id: number // 别野编号
+      }
+      /**
+       * 机器人退出数据包
+       */
+      DeleteRobot: {
+        villa_id: number // 别野编号
+      }
+      /**
+       * 机器人进入数据包
+       */
+      CreateRobot: {
+        villa_id: number // 别野编号
+      }
+    }
+  }
+  created_at: number // 创建事件编号
+  id: string // 消息编号
+  send_at: number // 发送事件编号
 }
 
 /**

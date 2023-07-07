@@ -15,6 +15,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
   const MessageContent: MessageContentType = JSON.parse(
     event.extend_data.EventData.SendMessage.content
   )
+  console.log('消息内容字符转换', MessageContent) // 数据监听
   // 房间号
   const room_id = event.extend_data.EventData.SendMessage.room_id
   /** 指令消息需要去除 @ 和用户名 */
