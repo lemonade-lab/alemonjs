@@ -228,9 +228,20 @@ export async function MESSAGES(event: BotEvent, val: number) {
         }
       }
 
-      const options = typeof msg === 'object' && !obj ? content : obj
+      /**
+       * msg是对象,同时obj不存在 ? msg
+       */
 
-      url = options?.image
+      if (!obj && typeof msg === 'object') {
+        const options: any = msg
+        url = options?.image
+        if (url == undefined) {
+          // 啥也不是,错误对象,直接不处理
+          return false
+        }
+      }
+
+      url = obj?.image
       if (url == undefined) {
         url = ''
       }
