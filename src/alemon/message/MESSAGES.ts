@@ -187,7 +187,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
   // 房间号
   const room_id = event.extend_data.EventData.SendMessage.room_id
   /** 指令消息需要去除 @ 和用户名 */
-  const cmd_msg = MessageContent.content.text.replace(/(@[^\s]+\s*|\s+$)/g, '')
+  const cmd_msg = MessageContent.content.text.replace(/(@[^\s]+\s)(?!<)/g, '').trim()
   // 上传图片
   const COS = createCOS()
   /** 制作e消息对象 */
