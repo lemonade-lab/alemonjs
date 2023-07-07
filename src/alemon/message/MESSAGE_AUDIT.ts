@@ -1,7 +1,5 @@
-import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
-import { sendMessage } from '../alemonapi.js'
-import { BotEvent, MHYType } from '../types.js'
-import { createCOS } from '../cos.js'
+import { Messagetype, EventType, EType, typeMessage } from 'alemon'
+import { BotEvent } from '../types.js'
 /**
  * 审核事件
  * @param event 回调数据
@@ -49,16 +47,15 @@ export async function MESSAGE_AUDIT(event: BotEvent, val: number) {
     /** 去除了艾特后的消息 */
     cmd_msg: ''
   }
-
-  // 业务处理
-  await InstructionMatching(e as Messagetype) // 转义
+  //只匹配类型
+  await typeMessage(e as Messagetype)
     .then(() => {
-      console.info(`\n[${e.msg.channel_id}] [${e.msg.author.username}]${true}`)
+      console.info(`\n[${e.event}] [${e.eventType}]\n${true}`)
       return true
     })
-    .catch((err: any) => {
-      console.error(err)
-      console.info(`\n[${e.msg.channel_id}] [${e.msg.author.username}]${false}`)
+    .catch(err => {
+      console.log(err)
+      console.info(`\n[${e.event}] [${e.eventType}]\n${false}`)
       return false
     })
 }
