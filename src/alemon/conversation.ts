@@ -31,7 +31,7 @@ export async function callBack(req: Request, res: Response) {
     if (!event || !event.robot) {
       console.log('错误调用~')
       // 处理完毕后返回响应
-      res.status(200).json({ message: '', retcode: 0 })
+      res.status(200).json({ message: '错误调用', retcode: 0 })
       return
     }
     /** 根据不同的消息类型分不同的执行模块 */
@@ -39,10 +39,10 @@ export async function callBack(req: Request, res: Response) {
   } catch (err) {
     console.log(err)
     // 处理完毕后返回响应
-    res.status(200).json({ message: '', retcode: 0 })
+    res.status(200).json({ message: '执行错误', retcode: 0 })
     return
   }
   // 处理完毕后返回响应
-  res.status(200).json({ message: '', retcode: 0 })
+  res.status(200).json({ message: '处理完成', retcode: 0 })
   return
 }
