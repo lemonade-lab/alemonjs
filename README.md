@@ -19,15 +19,15 @@ npm install
 npm run app
 ```
 
-图片发送功能,需要启动成功后退出
+配置对象存储、回调地址、回调端口
+
+`config/mys.yaml` 按提示修改即可
 
 因官网暂未更新处理文件上传流写法
 
 该项目选择对象存储作为替代方案
 
-打开按照提示输入对象存储配置 `config/mys.yaml`
-
-集合接口 `src/alemon/alemonapi.ts`
+`src/alemon/alemonapi.ts` 集合接口
 
 ## alemon-mys
 

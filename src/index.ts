@@ -25,21 +25,6 @@ export async function createAlemon() {
     process.exit()
   })
 
-  // 公网
-  await publicIp({
-    onlyHttps: true,
-    timeout: 10000
-  })
-    .then((ip: any) => {
-      console.info('[OPEN]', 'Callback')
-      console.info(`http://${ip}:${MysConfig.host}${MysConfig.url}`)
-    })
-    .catch(err => {
-      console.log(err)
-      console.log('公网IP识别失败~暂无法支持运行')
-      process.exit()
-    })
-
   // 加载插件
   await cmdInit().catch(err => {
     console.log(err)
@@ -55,13 +40,31 @@ export async function createAlemon() {
   // 处理事件回调请求
   app.post(MysConfig.url, callBack)
   // 启动 Express 应用程序
-  app.listen(MysConfig.host, () => {
+  app.listen(MysConfig.host, async () => {
     console.info('[HELLO] 欢迎使用Alemon-Mys')
     console.info('[DOCS] http://ningmengchongshui.gitee.io/lemonade')
-    console.info('[GIT] https://github.com/ningmengchongshui/alemon-bot')
+    console.info('[CODE] https://github.com/ningmengchongshui/alemon-bot')
     if (cfg.sandbox) {
       console.info('[DOCS] https://webstatic.mihoyo.com/')
     }
+    // 公网
+    await publicIp({
+      onlyHttps: true,
+      timeout: 10000
+    })
+      .then((ip: any) => {
+        console.info('[OPEN]', 'Callback')
+        if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
+          console.info(`[OPEN] http://${ip}:${MysConfig.host}${MysConfig.url}`)
+        } else {
+          console.info(`[OPEN] IPv4地址错误,无法响应回调`)
+        }
+      })
+      .catch(err => {
+        console.log(err)
+        console.log('公网IP识别失败~暂无法支持运行')
+        process.exit()
+      })
   })
   return true
 }

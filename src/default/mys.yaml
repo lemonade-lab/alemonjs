@@ -8,12 +8,12 @@ picturebed: ''
 # 服务地址 https://console.cloud.tencent.com/cos
 # 账号
 SecretId: ''
+# 密钥生成 https://console.cloud.tencent.com/cam/capi
 # 密钥
 SecretKey: ''
-# 密钥生成 https://console.cloud.tencent.com/cam/capi
+# 存储查看 创建时自行定义的存储名
 # 存储名
 Bucket: ''
+# 地域配置 https://cloud.tencent.com/document/product/436/6224
 # 地域
 Region: ''
-# 地域配置地址
-# https://cloud.tencent.com/document/product/436/6224
