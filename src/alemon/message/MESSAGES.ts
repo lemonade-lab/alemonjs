@@ -133,7 +133,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
       const entities = []
 
       // 判断 msg 是否是  arr  是就转换
-      let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+      let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
 
       // 字符转换并增加渲染
       const everyoneMention = '<@!everyone>'
