@@ -8,12 +8,13 @@ import { createCOS } from '../cos.js'
  * @param val  类型控制
  */
 export async function GUILD_MESSAGE_REACTIONS(event: BotEvent, val: number) {
-  console.log('表情表态', event.robot.villa_id)
-  console.log('表情表态', event.robot.template)
-  console.log('表情表态', event.type)
+  console.log('表情表态', event.robot.villa_id) // 别野编号
+  console.log('表情表态', event.robot.template) // 机器人信息
+  console.log('表情表态', event.type) // 消息类型
   console.log('表情表态', event.created_at)
-  console.log('表情表态', event.id)
-  console.log('表情表态', event.send_at)
+  console.log('表情表态', event.id) //
+  console.log('表情表态', event.send_at) //
+  console.log('表情表态', event) //
   // 房间号
   const room_id = event.extend_data.EventData.SendMessage.room_id
   // 上传图片
