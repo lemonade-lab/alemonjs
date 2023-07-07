@@ -120,7 +120,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     const Room = await getRoom(villa_id, item.id)
     if (Room) {
       console.log(Room)
-      content = content.replace(new RegExp(`<#${item.id}>`, 'g'), (match, id) => {
+      content = content.replace(new RegExp(`<#${item.id}>`, 'g'), (match, id, index) => {
         entities.push({
           entity: {
             // 房间标签，点击会跳转到指定房间（仅支持跳转本大别野的房间）
@@ -129,7 +129,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             room_id: item.id // 房间 id
           },
           length: `#${Room.room_name} `.length, // 长度可以算
-          offset: item.offset // 使用起始位置作为偏移量
+          offset: index // 使用起始位置作为偏移量
         })
         return `#${Room.room_name} `
       })
@@ -147,14 +147,14 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     const User = await getMember(villa_id, item.id)
     if (User) {
       console.log(User)
-      content = content.replace(new RegExp(`<@!${item.id}>`, 'g'), (match, id) => {
+      content = content.replace(new RegExp(`<@!${item.id}>`, 'g'), (match, id, index) => {
         entities.push({
           entity: {
             type: 'mentioned_user', // 提及成员
             user_id: item.id // 成员id
           },
           length: `@${User.basic.nickname} `.length, // 字符占用长度
-          offset: item.offset // 使用起始位置作为偏移量
+          offset: index // 使用起始位置作为偏移量
         })
         return `@${User.basic.nickname} `
       })
