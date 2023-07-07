@@ -110,9 +110,16 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   }
   /** 搜索并收集 */
   const RoomArr = []
+  /** 搜索并收集 */
+  const UserArr = []
   /* 收集房间 ID 和起始位置 */
   content.replace(/<#(\d+)>/g, (match, id, offset) => {
     RoomArr.push({ id, offset })
+    return match
+  })
+  /* 收集用户 ID 和起始位置 */
+  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
+    UserArr.push({ id, offset })
     return match
   })
   /* 字符替换 */
@@ -135,13 +142,6 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       })
     }
   }
-  /** 搜索并收集 */
-  const UserArr = []
-  /* 收集用户 ID 和起始位置 */
-  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
-    UserArr.push({ id, offset })
-    return match
-  })
   /* 字符替换 */
   for await (const item of UserArr) {
     const User = await getMember(villa_id, item.id)
