@@ -51,6 +51,18 @@ export enum ApiEnum {
 }
 
 /**
+ * 目前支持的内嵌实体类型有：
+ */
+
+export enum EmbeddedEntityTypeEnum {
+  mentioned_robot = 'mentioned_robot', // 提及机器人
+  mentioned_user = 'mentioned_user', // @指定用户
+  mentioned_all = 'mentioned_all', // @全体成员
+  villa_room_link = 'villa_room_link', // 跳转大别野内的房间
+  link = 'link' // 跳转到外部链接
+}
+
+/**
  * 消息内容
  */
 export interface MessageContentType {
@@ -89,13 +101,25 @@ export interface MessageContentType {
    * 内容
    */
   content: {
-    images: never[] // 文本+图片
+    // 图片描述
+    images: {
+      url: string // 图片路径
+      with: string // 图片宽度
+      height: string // 图片高度
+    }[] // 文本+图片
+    // 特效描述
     entities: {
       offset: number
       length: number
       entity: {
-        type: string
-        bot_id: string
+        type: EmbeddedEntityTypeEnum
+        bot_id?: string // 机器人账号    提及机器人
+        villa_id?: string // 大别野 id  房间标签
+        room_id?: string // 房间 id    房间标签
+        user_id?: string //  成员id   提及成员
+        url?: string // 链接
+        // 字段为true时，跳转链接会带上含有用户信息的token
+        requires_bot_access_token?: boolean
       }
     }[]
     text: string // 消息文本
