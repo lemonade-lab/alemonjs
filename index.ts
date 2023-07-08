@@ -1,7 +1,7 @@
-import { createClient } from './src/index.js'
+import { createClient, Client } from './src/index.js'
 // 实例化
 import { BotEvent } from './src/types.js'
-const client = createClient(
+createClient(
   {
     bot_id: '', // 账号
     bot_secret: '', // 密码
@@ -16,7 +16,7 @@ const client = createClient(
 async function callBack(event: BotEvent) {
   console.log('数据包', event)
   /** 已测 获取分组列表 */
-  const list = client.getGroupList(event.robot.villa_id)
+  const list = Client.getGroupList(event.robot.villa_id)
   console.log(list)
   return
 }
