@@ -6,8 +6,6 @@ import { getMember, getRoom } from './alemonapi.js'
  * @returns
  */
 export async function stringParsing(msg: string | object | string[], villa_id: number) {
-  /** 增加渲染  */
-  const entities = []
   // 判断 msg 是否是  arr  是就转换
   let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
   // 记录
@@ -68,18 +66,20 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       })
     }
   }
-
+  /** 增加渲染  */
+  const entities = []
   for (const item of num) {
     // 构造正则
-    const match = new RegExp(item.name, 'g').exec(content)
+    const match = new RegExp(item.name).exec(content)
     if (match !== null) {
+      const offset = match.index
       if (item.type === 0) {
         entities.push({
           entity: {
             type: 'mention_all'
           },
           length: 6,
-          offset: match.index
+          offset
         })
       } else if (item.type === 1) {
         entities.push({
@@ -88,7 +88,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             user_id: item.id
           },
           length: item.name.length,
-          offset: match.index
+          offset
         })
       } else if (item.type === 2) {
         entities.push({
@@ -98,12 +98,11 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             room_id: item.id
           },
           length: item.name.length,
-          offset: match.index
+          offset
         })
       }
     }
   }
-
   console.log('entities=', entities)
   console.log('content=', content)
   return {
