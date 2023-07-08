@@ -74,10 +74,6 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     let match
     while ((match = pattern.exec(content)) !== null) {
       const offset = match.index
-      content =
-        content.slice(0, offset) +
-        match[0].replace(/./g, ' ') +
-        content.slice(offset + match[0].length) // 将匹配到的字符串替换成空格，用于后续匹配
       if (item.type === 0) {
         entities.push({
           entity: {
