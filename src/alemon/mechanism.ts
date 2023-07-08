@@ -70,9 +70,9 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   const entities = []
   for (const item of num) {
     // 构造正则
-    const match = new RegExp(item.name).exec(content)
+    let match = new RegExp(item.name).exec(content)
     if (match !== null) {
-      const offset = match.index
+      let offset = match.index
       if (item.type === 0) {
         entities.push({
           entity: {
@@ -104,7 +104,6 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     }
   }
   console.log('entities=', entities)
-  console.log('content=', content)
   return {
     entities,
     content

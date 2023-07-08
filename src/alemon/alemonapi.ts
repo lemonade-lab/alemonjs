@@ -85,13 +85,13 @@ export async function getVilla(villa_id: number) {
  * ******
  */
 /**
+ * 已测
  * 获取用户信息
  * @param villa_id 别野
  * @param uid 用户编号
  * @returns
  */
 export async function getMember(villa_id: number, uid: string) {
-  console.log(ApiEnum.getMember)
   const ret: MemberType | false = await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getMember,
@@ -109,7 +109,6 @@ export async function getMember(villa_id: number, uid: string) {
       console.log(err)
       return false
     })
-  console.log('getMember', ret)
   return ret
 }
 
@@ -231,6 +230,7 @@ export async function recallMessage(
 }
 
 /**
+ * 已测
  * 发送消息
  * @param villa_id 别野编号
  * @param data 配置数据
@@ -413,6 +413,7 @@ export async function deleteRoom(villa_id: number, room_id: number) {
   return ret
 }
 /**
+ * 已测
  * 获取房间信息
  * @param villa_id 别野编号
  * @param room_id 房间编号
