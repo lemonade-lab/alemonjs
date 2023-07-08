@@ -31,7 +31,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   })
   const userKeyVal = {}
   function setUserName(user_id, user_name) {
-    content = content.replace(new RegExp(`<#${user_id}>`), (match, id, index) => {
+    content = content.replace(new RegExp(`<@!${user_id}>`), (match, id, index) => {
       // 记录要渲染的名称和编号
       num.push({
         id: user_id,
