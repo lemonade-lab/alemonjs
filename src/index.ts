@@ -2,7 +2,7 @@ import { BotConfigType, setLanchConfig, cmdInit } from 'alemon'
 import { callBack } from './alemon/conversation.js'
 import { checkRobot } from './login.js'
 import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig, MysConfig } from './config/index.js'
-import { createClient, getIP, getLocalImg } from './sdk/index.js'
+import { createClient, getIP } from './sdk/index.js'
 
 declare global {
   //机器人配置
@@ -31,8 +31,6 @@ export async function createAlemon() {
 
   /* 创建应用程序 */
   const app = createClient(cfg.appID, cfg.token)
-  // 处理图片请求
-  app.get('/api/mys/img/:filename', getLocalImg)
   // 处理事件回调请求
   app.post(MysConfig.url, callBack)
   // 启动监听

@@ -1,12 +1,7 @@
 import axios from 'axios'
 import express, { Application } from 'express'
 import bodyParser from 'body-parser'
-// 创建响应
-const app: Application = express()
-// 处理 POST 请求体中的 JSON 数据
-app.use(express.json())
-// 解析 x-www-form-urlencoded 格式的请求体
-app.use(bodyParser.urlencoded({ extended: false }))
+import { getLocalImg } from './localimage.js'
 const spiCfg: {
   bot_id: string
   bot_secret: string
@@ -14,6 +9,14 @@ const spiCfg: {
   bot_id: '',
   bot_secret: ''
 }
+// 创建响应
+const app: Application = express()
+// 处理 POST 请求体中的 JSON 数据
+app.use(express.json())
+// 解析 x-www-form-urlencoded 格式的请求体
+app.use(bodyParser.urlencoded({ extended: false }))
+// 处理图片请求
+app.get('/api/mys/img/:filename', getLocalImg)
 /**
  * 别野服务
  * @param villa_id 别野编号
