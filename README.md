@@ -11,22 +11,23 @@ npm install
 创建 index.js
 
 ```js
-// index.js
 import { createClient } from 'mys-villa'
 // 实例化
 const client = createClient(
   {
     bot_id: '', // 账号
     bot_secret: '', // 密码
-    callback_url: '', // 回调地址
-    callback_host: 8080 // 端口
+    callback_url: '' // 回调地址
+    // 比如 /api/mys/callback  即 http://ip:/api/mys/callback
   },
-  callBack // 回调接收函数
+  callBack, // 回调接收函数
+  async () => {
+    console.log('欢迎使用~')
+  }
 )
-/** 数据处理 */
-async function callBack(event) {
+async function callBack(event: BotEvent) {
   console.log('数据包', event)
-  /** 获取分组列表 */
+  /** 已测 获取分组列表 */
   const list = client.getGroupList(event.robot.villa_id)
   console.log(list)
   return

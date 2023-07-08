@@ -1,4 +1,5 @@
 import { createClient } from './src/index.js'
+// 实例化
 import { BotEvent } from './src/types.js'
 const client = createClient(
   {
