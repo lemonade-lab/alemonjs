@@ -14,7 +14,7 @@ import {
   MemberRolePermission,
   Emoticon,
   MemberRoleList
-} from './types.js'
+} from '../alemon/types.js'
 
 /**
  * ******

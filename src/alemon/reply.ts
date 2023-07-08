@@ -1,4 +1,4 @@
-import { sendMessage } from './alemonapi.js'
+import { sendMessage } from '../sdk/api.js'
 import { MHYType } from './types.js'
 /**
  * 消息发送

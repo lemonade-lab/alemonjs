@@ -1,4 +1,4 @@
-import { getMember, getRoom } from './alemonapi.js'
+import { getMember, getRoom } from './api.js'
 /**
  * 字符串解析器
  * @param msg 消息
