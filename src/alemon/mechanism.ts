@@ -36,10 +36,10 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       num.push({
         id: user_id,
         type: 1,
-        name: `#${user_name} `
+        name: `@${user_name} `
       })
       userKeyVal[user_id] = user_name
-      return `#${user_name} `
+      return `@${user_name} `
     })
   }
   for (const item of userArr) {

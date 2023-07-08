@@ -143,6 +143,7 @@ export async function getVillaMembers(villa_id: number, offset_str: string, size
   return ret
 }
 /**
+ * ??
  * 踢出大别野用户
  * @param villa_id 别野编号
  * @param uid 用户编号
@@ -171,6 +172,7 @@ export async function deleteVillaMember(villa_id: number, uid: string) {
  * *******
  */
 /**
+ * ??
  * 置顶消息
  * @param villa_id 别野编号
  * @param data 配置数据
@@ -297,6 +299,7 @@ export async function createGroup(villa_id: number, group_name: string) {
   return ret
 }
 /**
+ * ？？
  * 编辑分组
  * @param villa_id 别野编号
  * @param group_id 分组编号
@@ -319,6 +322,7 @@ export async function editGroup(villa_id: number, group_id: number, group_name: 
   return ret
 }
 /**
+ * ？？
  * 删除分组
  * @param villa_id 别野编号
  * @param group_id 分组编号
@@ -341,6 +345,7 @@ export async function deleteGroup(villa_id: number, group_id: number) {
 }
 
 /**
+ *
  * 获取分组列表
  * @param villa_id 别野编号
  * @returns
@@ -365,6 +370,7 @@ export async function getGroupList(villa_id: number) {
   return ret
 }
 /**
+ * ??
  * 编辑房间
  * @param villa_id 别野编号
  * @param room_id 房间编号
@@ -390,6 +396,7 @@ export async function editRoom(villa_id: number, room_id: number, room_name: obj
   return ret
 }
 /**
+ * ??
  * 删除房间
  * @param villa_id 别野编号
  * @param room_id 房间编号
@@ -471,6 +478,7 @@ export async function getVillaGroupRoomList(villa_id: number) {
  * ******
  */
 /**
+ * ??
  * 向身份组操作用户，包括把用户添加到身份组或者从身份组删除用户
  * @param villa_id 别野编号
  * @param data 配置数据
@@ -479,9 +487,9 @@ export async function getVillaGroupRoomList(villa_id: number) {
 export async function operateMemberToRole(
   villa_id: number,
   data: {
-    role_id: string
-    uid: string
-    is_add: boolean
+    role_id: string //
+    uid: string //
+    is_add: boolean //
   }
 ) {
   console.log(ApiEnum.operateMemberToRole)
@@ -533,6 +541,7 @@ export async function createMemberRole(
   return ret
 }
 /**
+ * ??
  * 编辑身份组
  * @param villa_id 别野编号
  * @param data 配置数据
@@ -563,6 +572,7 @@ export async function editMemberRole(
 }
 
 /**
+ * ??
  * 删除身份组
  * @param villa_id 别野编号
  * @param id 身份组编号
@@ -583,6 +593,31 @@ export async function deleteMemberRole(villa_id: number, id: number) {
       return false
     })
   console.log('deleteMemberRole', ret)
+  return ret
+}
+
+/**
+ * 获取大别野下所有身份组
+ * @param villa_id 别野编号
+ * @returns
+ */
+export async function getVillaMemberRoles(villa_id: number) {
+  console.log(ApiEnum.getVillaMemberRoles)
+  const ret: MemberRoleList[] | false = await villaService(villa_id, {
+    method: 'get',
+    url: ApiEnum.getVillaMemberRoles
+  })
+    .then(res => {
+      // axiso
+      const re = res.data
+      // mys
+      return re.data
+    })
+    .catch(err => {
+      console.log(err)
+      return false
+    })
+  console.log('getVillaMemberRoles', ret)
   return ret
 }
 
@@ -616,37 +651,13 @@ export async function getMemberRoleInfo(villa_id: number, role_id: number) {
 }
 
 /**
- * 获取大别野下所有身份组
- * @param villa_id 别野编号
- * @returns
- */
-export async function getVillaMemberRoles(villa_id: number) {
-  console.log(ApiEnum.getVillaMemberRoles)
-  const ret: MemberRoleList[] | false = await villaService(villa_id, {
-    method: 'get',
-    url: ApiEnum.getVillaMemberRoles
-  })
-    .then(res => {
-      // axiso
-      const re = res.data
-      // mys
-      return re.data
-    })
-    .catch(err => {
-      console.log(err)
-      return false
-    })
-  console.log('getVillaMemberRoles', ret)
-  return ret
-}
-/**
  * ******
  * 表态api
  * ******
  */
 
 /**
- * 获取全量表情
+ * 获取获取指定消息的全量表情
  * @param villa_id 别野编号
  * @returns
  */

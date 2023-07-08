@@ -49,7 +49,8 @@ export async function MESSAGES(event: BotEvent, val: number) {
         bot: false, // 是否是bot
         avatar: MessageContent.user.portrait // 头像
       },
-      content: MessageContent.content.text // 指令消息
+      // content: MessageContent.content.text // 指令消息
+      content: String(villa_id)
     },
     /** 是否是私域 */
     isPrivate: false,
@@ -136,12 +137,16 @@ export async function MESSAGES(event: BotEvent, val: number) {
   // 业务处理
   await InstructionMatching(e as Messagetype) // 转义
     .then(() => {
-      console.info(`\n[${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}${true}`)
+      console.info(
+        `\n[${e.msg.channel_id}] [${e.msg.author.username}]\n${MessageContent.content.text}${true}`
+      )
       return true
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(`\n[${e.msg.channel_id}] [${e.msg.author.username}]\n${e.msg.content}${false}`)
+      console.info(
+        `\n[${e.msg.channel_id}] [${e.msg.author.username}]\n${MessageContent.content.text}${false}`
+      )
       return false
     })
   return false
