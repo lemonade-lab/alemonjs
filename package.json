@@ -1,6 +1,6 @@
 {
   "name": "mys-villa",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "米游社别野SDK",
   "main": "lib/index.js",
   "scripts": {
