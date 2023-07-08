@@ -35,7 +35,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       // 记录要渲染的名称和编号
       num.push({
         id: user_id,
-        type: 2,
+        type: 1,
         name: `#${user_name} `
       })
       userKeyVal[user_id] = user_name
