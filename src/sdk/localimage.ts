@@ -36,7 +36,7 @@ export function getLocalImg(req: Request, res: Response) {
  * 存储图片
  * @param Buffer 元素
  */
-export function setLocalImg(img: Buffer) {
+export async function setLocalImg(img: Buffer) {
   // 检查参数是否有效
   if (!img) {
     return false
@@ -49,7 +49,7 @@ export function setLocalImg(img: Buffer) {
   // 将图片保存到文件系统中
   writeFileSync(imagePath, img)
   // 返回保存的图片 URL
-  const ip = getIP()
+  const ip = await getIP()
   const url = `http://${ip}:${MysConfig.host}/api/mys/img/${filename}`
   console.log(url)
   return url

@@ -71,7 +71,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
       let url = ''
       if (Buffer.isBuffer(msg)) {
         // 挂载图片
-        const uul = setLocalImg(msg)
+        const uul = await setLocalImg(msg)
         if (!uul) {
           return false
         }
@@ -89,7 +89,7 @@ export async function MESSAGES(event: BotEvent, val: number) {
       // 第二参考书是 buffer
       if (Buffer.isBuffer(obj)) {
         // 挂载图片
-        const uul = setLocalImg(obj)
+        const uul = await setLocalImg(obj)
         if (!uul) {
           return false
         }
