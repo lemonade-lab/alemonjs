@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "dev": "ts-node index.ts",
-    "app": "node lib/index.js",
+    "app": "node index.js",
     "tsc": "npx tsc"
   },
   "author": "ningmengchongshui",
