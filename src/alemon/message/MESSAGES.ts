@@ -7,7 +7,7 @@ import {
   sendMessageText,
   sendMessageTextEntities,
   sendMessageTextEntitiesUrl
-} from '../reply.js'
+} from '../../sdk/reply.js'
 
 /**
  * 消息会话

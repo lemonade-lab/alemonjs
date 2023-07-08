@@ -1,8 +1,13 @@
 import axios from 'axios'
-import { BotConfigType } from 'alemon'
-declare global {
-  //机器人配置
-  var cfg: BotConfigType
+import * as api from './api.js'
+import * as mechanism from './mechanism.js'
+import * as reply from './reply.js'
+const spiCfg: {
+  bot_id: string
+  bot_secret: string
+} = {
+  bot_id: '',
+  bot_secret: ''
 }
 /**
  * 别野服务
@@ -17,10 +22,20 @@ export function villaService(villa_id: number, config: object) {
     baseURL: 'https://bbs-api.miyoushe.com', // 地址
     timeout: 20000, // 响应
     headers: {
-      'x-rpc-bot_id': cfg.appID, // 账号
-      'x-rpc-bot_secret': cfg.token, // 密码
+      'x-rpc-bot_id': spiCfg.bot_id, // 账号
+      'x-rpc-bot_secret': spiCfg.bot_secret, // 密码
       'x-rpc-bot_villa_id': villa_id // 别墅编号
     }
   })
   return service(config)
+}
+/**
+ * 创建请求程序
+ * @param bot_id
+ * @param bot_secret
+ */
+export function createClient(bot_id, bot_secret) {
+  spiCfg.bot_id = bot_id
+  spiCfg.bot_secret = bot_secret
+  return { ...api, ...mechanism, ...reply }
 }

@@ -6,10 +6,12 @@ import { callBack } from './alemon/conversation.js'
 import { getLocalImg } from './alemon/localimage.js'
 import { checkRobot } from './login.js'
 import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig, MysConfig } from './config/index.js'
+import { createClient } from './sdk/axois.js'
 
 declare global {
   //机器人配置
   var cfg: BotConfigType
+  var client: any
 }
 
 export async function createAlemon() {
@@ -25,6 +27,9 @@ export async function createAlemon() {
     console.log(err)
     process.exit()
   })
+
+  /* 创建请求工具包 */
+  global.client = createClient(cfg.appID, cfg.token)
 
   // 加载插件
   await cmdInit().catch(err => {
