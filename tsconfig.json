@@ -34,7 +34,7 @@
     "experimentalSpecifierResolution": "node"
   },
   // 要编译的路径列表（用于指定那些ts文件需要被编译），
-  "include": ["src"],
+  "include": ["src", "index.ts"],
   // 要排除的、不编译的文件，它也可以指定一个列表，
   "exclude": [".cache", "node_modules", "config_default", "dist", "config", "data", "logs"]
 }

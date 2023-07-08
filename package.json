@@ -1,70 +1,40 @@
 {
-  "name": "alemon-mys",
+  "name": "mys-villa",
   "version": "1.0.0",
-  "description": "阿柠檬机器人",
+  "description": "米游社别野SDK",
+  "main": "lib/index.js",
+  "scripts": {
+    "dev": "ts-node index.ts",
+    "app": "node lib/index.js",
+    "tsc": "npx tsc"
+  },
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
+  "types": "types",
   "type": "module",
-  "private": true,
-  "scripts": {
-    "app": "ts-node index.ts",
-    "login": "ts-node index.ts login",
-    "start": "pm2 startOrRestart pm2.json",
-    "linux:pull": "find . -type d -name '.git' -execdir git pull --all \\;",
-    "win:pull": "git pull && cd plugins && for /d %i in (*) do (echo Updating %i && cd %i && git pull && cd ..)",
-    "stop": "pm2 stop pm2.json",
-    "delete": "pm2 delete pm2.json",
-    "logs": "pm2 logs al-mys",
-    "monit": "pm2 monit",
-    "kill": "pm2 kill",
-    "update": "pm2 update",
-    "dev": "nodemon  index.ts",
-    "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
-  },
+  "files": [
+    "lib",
+    "types"
+  ],
   "dependencies": {
-    "alemon": "^1.4.6",
-    "alemon-redis": "^1.0.0",
-    "axios": "^1.4.0",
-    "body-parser": "^1.20.2",
-    "cos-nodejs-sdk-v5": "^2.12.1",
-    "express": "^4.18.2",
-    "form-data": "^4.0.0",
-    "prompts": "^2.4.2",
-    "public-ip": "^6.0.1",
+    "art-template": "^4.13.2",
+    "lodash": "^4.17.21",
+    "puppeteer": "^20.7.1",
+    "qrcode": "^1.5.3",
     "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^20.3.1",
-    "@types/ws": "^8.5.5",
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.60.0",
-    "@types/progress": "^2.0.5",
-    "eslint": "^8.43.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "nodemon": "^2.0.22",
-    "pm2": "^5.3.0",
-    "pre-commit": "^1.2.2",
-    "prettier": "^2.8.8",
-    "ts-node": "^10.9.1",
-    "typescript": ">=5.0.4 <5.1.0"
-  },
-  "pre-commit": [
-    "lint",
-    "format"
-  ],
-  "workspaces": [
-    "example",
-    "plugins/*"
-  ],
-  "engines": {
-    "node": ">=16.3.0"
+    "@types/node": "^20.2.4",
+    "@types/lodash": "^4.14.186",
+    "@types/qrcode": "^1.5.0",
+    "typescript": "^5.0.4",
+    "ts-node": "^10.9.1"
   },
   "keywords": [
-    "alemon-mys",
+    "alemon-core",
+    "alemon-cli",
+    "alemon-bot",
     "alemon-redis",
-    "alemon"
+    "create-alemon"
   ]
 }

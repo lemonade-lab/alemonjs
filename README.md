@@ -1,55 +1,47 @@
-> 米游社特别版
-
-拉取代码
+> MYS-VILLA-SKD
 
 ```
-git clone --depth=1 -b mys https://gitee.com/ningmengchongshui/alemon-bot.git
-```
-
-安装依赖
-
-```
-cd alemon-bot
+npm init -y
+npm mys-villa
 npm install
 ```
 
-正常登录（公私/环境随便填）
+## 启动方法
 
+创建 index.js
+
+```js
+// index.js
+import { createClient } from 'mys-villa'
+// 实例化
+const client = createClient(
+  {
+    bot_id: '', // 账号
+    bot_secret: '', // 密码
+    callback_url: '', // 回调地址
+    callback_host: 8080 // 端口
+  },
+  callBack // 回调接收函数
+)
+/** 数据处理 */
+async function callBack(event) {
+  console.log('数据包', event)
+  /** 获取分组列表 */
+  const list = client.getGroupList(event.robot.villa_id)
+  console.log(list)
+  return
+}
 ```
-npm run app
+
+启动 index.js
+
+```shell
+node index.js
 ```
-
-配置回调地址、回调端口
-
-`config/mys.yaml` 按提示修改即可
-
-`src/alemon/alemonapi.ts` 集合接口
-
-官网图片 url 调用有些问题,正在测试中...
-
-框架无任何服务代码
-
-根目录下执行安装测试工程插件
-
-```
-git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-plugin.git ./plugins/alemon-plugin/
-```
-
-## alemon-mys
-
-点击了解 ☞[alemon 米游社写法](./doc.md)
 
 ## 友情链接
 
-官方开发文档[☞API](https://webstatic.mihoyo.com/)
-
-## almeon
-
-`alemon` 框架逻辑块
-
-点击了解 ☞[alemon 开发文档](http://ningmengchongshui.gitee.io/lemonade)
-
-点击了解 ☞[alemon 核心源码](https://gitee.com/ningmengchongshui/alemon-bot/tree/core/)
+官方接口文档[☞API](https://webstatic.mihoyo.com/)
 
 ## 开源协议
 

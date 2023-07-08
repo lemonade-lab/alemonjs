@@ -1,26 +1,18 @@
 import { Request, Response } from 'express'
-import { MysConfig } from '../config/index.js'
-import { getIP } from './ip.js'
 import { createReadStream, writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
-/** 本地图片地址 */
-const IMAGE_DIR = 'data/mys/img'
-try {
-  // 确保目录存在
-  mkdirSync(IMAGE_DIR, { recursive: true })
-} catch (err) {
-  console.error(`Error creating directory: ${IMAGE_DIR}`, err)
-}
+import { getClientConfig } from './config.js'
 /**
  * 处理图片请求
  * @param req
  * @param res
  */
 export function getLocalImg(req: Request, res: Response) {
+  const cfg = getClientConfig()
   // 得到参数
   const filename = req.params.filename
   // 读取图片
-  const imagePath = join(IMAGE_DIR, filename)
+  const imagePath = join(cfg.IMAGE_DIR, filename)
   // 文件流
   const stream = createReadStream(imagePath)
   stream.on('open', () => {
@@ -41,16 +33,19 @@ export async function setLocalImg(img: Buffer) {
   if (!img) {
     return false
   }
+  // 得到配置
+  const cfg = getClientConfig()
+  // 确保目录存在
+  mkdirSync(cfg.IMAGE_DIR, { recursive: true })
+  // 随机图片
   const randomNum = Math.floor(Math.random() * 31)
   // 生成文件名
   const filename = `${randomNum}.jpg`
   // 文件路径
-  const imagePath = join(IMAGE_DIR, filename)
+  const imagePath = join(cfg.IMAGE_DIR, filename)
   // 将图片保存到文件系统中
   writeFileSync(imagePath, img)
-  // 返回保存的图片 URL
-  const ip = await getIP()
-  const url = `http://${ip}:${MysConfig.host}/api/mys/img/${filename}`
+  const url = `${cfg.img_rul}/${filename}`
   console.log(url)
   return url
 }

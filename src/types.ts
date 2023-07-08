@@ -1,12 +1,11 @@
-/**
- * 客户端配置
- */
+/**  客户端配置 */
 export interface ClientConfig {
   bot_id: string
   bot_secret: string
   callback_url: string
   callback_host?: number
   img_rul?: string
+  IMAGE_DIR?: string
 }
 /** api路径地址 */
 export enum ApiEnum {

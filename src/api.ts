@@ -1,4 +1,4 @@
-import { villaService } from './client.js'
+import { villaService } from './index.js'
 import {
   ApiEnum,
   MHYType,
