@@ -47,7 +47,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   }
   // 房间
   const roomArr = []
-  content.replace(/<#(\d+)>/, (match, id, offset) => {
+  content.replace(/<#(\d+)>/g, (match, id, offset) => {
     roomArr.push({
       id,
       offset
