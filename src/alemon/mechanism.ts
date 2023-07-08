@@ -29,18 +29,27 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     })
     return match
   })
+  const userKeyVal = {}
+  function setUserName(user_id, user_name) {
+    content = content.replace(new RegExp(`<#${user_id}>`), (match, id, index) => {
+      // 记录要渲染的名称和编号
+      num.push({
+        id: user_id,
+        type: 2,
+        name: `#${user_name} `
+      })
+      userKeyVal[user_id] = user_name
+      return `#${user_name} `
+    })
+  }
   for (const item of userArr) {
+    if (userKeyVal[item.id]) {
+      setUserName(item.id, userKeyVal[item.id])
+      continue
+    }
     const User = await getMember(villa_id, String(item.id))
     if (User) {
-      content = content.replace(new RegExp(`<@!${item.id}>`), (match, id, index) => {
-        // 记录要渲染的名称和编号
-        num.push({
-          id: item.id,
-          type: 1,
-          name: `@${User.basic.nickname} `
-        })
-        return `@${User.basic.nickname} `
-      })
+      setUserName(item.id, User.basic.nickname)
     }
   }
   // 房间
@@ -52,54 +61,71 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
     })
     return match
   })
+  const roomKeyVal = {}
+  function setRoomName(room_id, room_name) {
+    content = content.replace(new RegExp(`<#${room_id}>`), (match, id, index) => {
+      // 记录要渲染的名称和编号
+      num.push({
+        id: room_id,
+        type: 2,
+        name: `#${room_name} `
+      })
+      roomKeyVal[room_id] = room_name
+      return `#${room_name} `
+    })
+  }
   for (const item of roomArr) {
+    // 存在的key
+    if (roomKeyVal[item.id]) {
+      setRoomName(item.id, roomKeyVal[item.id])
+      continue
+    }
     const Room = await getRoom(villa_id, item.id)
     if (Room) {
-      content = content.replace(new RegExp(`<#${item.id}>`), (match, id, index) => {
-        // 记录要渲染的名称和编号
-        num.push({
-          id: item.id,
-          type: 2,
-          name: `#${Room.room_name} `
-        })
-        return `#${Room.room_name} `
-      })
+      setRoomName(item.id, Room.room_name)
+      continue
     }
   }
   /** 增加渲染  */
   const entities = []
   for (const item of num) {
     // 构造正则
-    let match = new RegExp(item.name).exec(content)
+    const match = new RegExp(item.name).exec(content)
     if (match !== null) {
-      let offset = match.index
-      if (item.type === 0) {
-        entities.push({
-          entity: {
-            type: 'mention_all'
-          },
-          length: 6,
-          offset
-        })
-      } else if (item.type === 1) {
-        entities.push({
-          entity: {
-            type: 'mentioned_user',
-            user_id: item.id
-          },
-          length: item.name.length,
-          offset
-        })
-      } else if (item.type === 2) {
-        entities.push({
-          entity: {
-            type: 'villa_room_link',
-            villa_id: String(villa_id),
-            room_id: item.id
-          },
-          length: item.name.length,
-          offset
-        })
+      const offset = match.index
+      switch (item.type) {
+        case 0: {
+          entities.push({
+            entity: {
+              type: 'mention_all'
+            },
+            length: 6,
+            offset
+          })
+          break
+        }
+        case 1: {
+          entities.push({
+            entity: {
+              type: 'mentioned_user',
+              user_id: item.id
+            },
+            length: item.name.length,
+            offset
+          })
+          break
+        }
+        case 2: {
+          entities.push({
+            entity: {
+              type: 'villa_room_link',
+              villa_id: String(villa_id),
+              room_id: item.id
+            },
+            length: item.name.length,
+            offset
+          })
+        }
       }
     }
   }
