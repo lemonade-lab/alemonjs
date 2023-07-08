@@ -3,6 +3,7 @@ import express, { Application } from 'express'
 import bodyParser from 'body-parser'
 import { getLocalImg } from './localimage.js'
 import { ClientConfig } from './types.js'
+import * as client from './index.js'
 const spiCfg: {
   bot_id: string
   bot_secret: string
@@ -37,13 +38,20 @@ export function villaService(villa_id: number, config: object) {
   return service(config)
 }
 /**
- * 创建请求程序
+ * 窗口客户端
  * @param bot_id
  * @param bot_secret
  */
 export function createClient(
-  { bot_id, bot_secret, callback_url, img_rul = '/api/mys/img/:filename' }: ClientConfig,
-  callBack: (req: express.Request, res: express.Response) => void
+  {
+    bot_id,
+    bot_secret,
+    callback_url,
+    callback_host = 8080,
+    img_rul = '/api/mys/img/:filename'
+  }: ClientConfig,
+  callBack: (req: express.Request, res: express.Response) => void,
+  logFnc?: () => Promise<void>
 ) {
   spiCfg.bot_id = bot_id
   spiCfg.bot_secret = bot_secret
@@ -51,5 +59,6 @@ export function createClient(
   app.get(img_rul, getLocalImg)
   // 处理事件回调请求
   app.post(callback_url, callBack)
-  return app
+  app.listen(callback_host, logFnc)
+  return client
 }

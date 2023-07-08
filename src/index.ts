@@ -9,20 +9,7 @@ declare global {
   var cfg: BotConfigType
 }
 
-async function logFnc() {
-  console.info('[HELLO] 欢迎使用Alemon-Mys')
-  console.info('[DOCS] http://ningmengchongshui.gitee.io/lemonade')
-  console.info('[CODE] https://github.com/ningmengchongshui/alemon-bot')
-  if (cfg.sandbox) {
-    console.info('[DOCS] https://webstatic.mihoyo.com/')
-  }
-  const ip = await getIP()
-  if (ip) {
-    console.info(`[OPEN] http://${ip}:${MysConfig.host}${MysConfig.url}`)
-  } else {
-    console.log('公网IP识别失败~暂无法支持运行')
-  }
-}
+async function logFnc() {}
 
 export async function createAlemon() {
   // 设置浏览器配置
@@ -45,15 +32,28 @@ export async function createAlemon() {
   })
 
   /* 创建应用程序 */
-  const app = createClient(
+  createClient(
     {
       bot_id: cfg.appID,
       bot_secret: cfg.token,
-      callback_url: MysConfig.url
+      callback_url: MysConfig.url,
+      callback_host: MysConfig.host
     },
-    callBack
+    callBack,
+    async () => {
+      console.info('[HELLO] 欢迎使用Alemon-Mys')
+      console.info('[DOCS] http://ningmengchongshui.gitee.io/lemonade')
+      console.info('[CODE] https://github.com/ningmengchongshui/alemon-bot')
+      if (cfg.sandbox) {
+        console.info('[DOCS] https://webstatic.mihoyo.com/')
+      }
+      const ip = await getIP()
+      if (ip) {
+        console.info(`[OPEN] http://${ip}:${MysConfig.host}${MysConfig.url}`)
+      } else {
+        console.log('公网IP识别失败~暂无法支持运行')
+      }
+    }
   )
-  // 启动监听
-  app.listen(MysConfig.host, logFnc)
   return true
 }
