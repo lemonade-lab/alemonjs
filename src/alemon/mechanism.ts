@@ -88,10 +88,17 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   }
   /** 增加渲染  */
   const entities = []
+  const matchedNames = {}
   for (const item of num) {
+    // 如果该名称已经匹配过，则跳过
+    if (matchedNames[item.name]) {
+      continue
+    }
+    matchedNames[item.name] = true
     // 构造正则
-    const match = new RegExp(item.name).exec(content)
-    if (match !== null) {
+    const regex = new RegExp(item.name, 'g')
+    let match
+    while ((match = regex.exec(content)) !== null) {
       const offset = match.index
       switch (item.type) {
         case 0: {
