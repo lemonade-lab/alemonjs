@@ -30,9 +30,14 @@ export async function createAlemon() {
   })
 
   /* 创建应用程序 */
-  const app = createClient(cfg.appID, cfg.token)
-  // 处理事件回调请求
-  app.post(MysConfig.url, callBack)
+  const app = createClient(
+    {
+      bot_id: cfg.appID,
+      bot_secret: cfg.token,
+      callback_url: MysConfig.url
+    },
+    callBack
+  )
   // 启动监听
   app.listen(MysConfig.host, async () => {
     console.info('[HELLO] 欢迎使用Alemon-Mys')

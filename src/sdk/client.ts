@@ -2,6 +2,7 @@ import axios from 'axios'
 import express, { Application } from 'express'
 import bodyParser from 'body-parser'
 import { getLocalImg } from './localimage.js'
+import { ClientConfig } from './types.js'
 const spiCfg: {
   bot_id: string
   bot_secret: string
@@ -15,8 +16,6 @@ const app: Application = express()
 app.use(express.json())
 // 解析 x-www-form-urlencoded 格式的请求体
 app.use(bodyParser.urlencoded({ extended: false }))
-// 处理图片请求
-app.get('/api/mys/img/:filename', getLocalImg)
 /**
  * 别野服务
  * @param villa_id 别野编号
@@ -42,8 +41,15 @@ export function villaService(villa_id: number, config: object) {
  * @param bot_id
  * @param bot_secret
  */
-export function createClient(bot_id, bot_secret) {
+export function createClient(
+  { bot_id, bot_secret, callback_url, img_rul = '/api/mys/img/:filename' }: ClientConfig,
+  callBack: (req: express.Request, res: express.Response) => void
+) {
   spiCfg.bot_id = bot_id
   spiCfg.bot_secret = bot_secret
+  // 处理图片请求
+  app.get(img_rul, getLocalImg)
+  // 处理事件回调请求
+  app.post(callback_url, callBack)
   return app
 }

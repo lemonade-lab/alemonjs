@@ -1,3 +1,12 @@
+/**
+ * 客户端配置
+ */
+export interface ClientConfig {
+  bot_id: string
+  bot_secret: string
+  callback_url: string
+  img_rul?: string
+}
 /** api路径地址 */
 export enum ApiEnum {
   // 校验用户机器人访问凭证
