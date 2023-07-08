@@ -89,5 +89,5 @@ export function createClient(
   app.listen(callback_host, logFnc)
   return Client
 }
-
+export { Client }
 export * from './types.js'
