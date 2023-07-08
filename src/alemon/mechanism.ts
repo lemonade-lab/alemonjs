@@ -70,41 +70,43 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   }
 
   for (const item of num) {
-    content.replace(new RegExp(item.name), (match, name, offset) => {
-      // 匹配成功
-      if (item.type == 0) {
-        // 是艾特全体的
+    const pattern = new RegExp(item.name, 'g')
+    let match
+    while ((match = pattern.exec(content)) !== null) {
+      const offset = match.index
+      content =
+        content.slice(0, offset) +
+        match[0].replace(/./g, ' ') +
+        content.slice(offset + match[0].length) // 将匹配到的字符串替换成空格，用于后续匹配
+      if (item.type === 0) {
         entities.push({
           entity: {
-            type: 'mention_all' // 提及全员
+            type: 'mention_all'
           },
           length: 6,
           offset: offset
         })
-      } else if (item.type == 1) {
-        // 是艾特用户的
+      } else if (item.type === 1) {
         entities.push({
           entity: {
-            type: 'mentioned_user', // 提及成员
-            user_id: item.id // 成员id
+            type: 'mentioned_user',
+            user_id: item.id
           },
           length: item.name.length,
           offset: offset
         })
-      } else if (item.type == 2) {
-        // 是艾特房间的
+      } else if (item.type === 2) {
         entities.push({
           entity: {
             type: 'villa_room_link',
-            villa_id: String(villa_id), // 大别野 id
-            room_id: item.id // 房间 id
+            villa_id: String(villa_id),
+            room_id: item.id
           },
-          length: item.name.length, // 长度可以算
+          length: item.name.length,
           offset: offset
         })
       }
-      return match
-    })
+    }
   }
 
   console.log('entities=', entities)
