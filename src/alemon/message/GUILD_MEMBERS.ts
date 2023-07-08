@@ -1,5 +1,5 @@
 import { Messagetype, EventType, EType, typeMessage } from 'alemon'
-import { BotEvent } from '../types.js'
+import { BotEvent } from '../../sdk/types.js'
 /**
  * 成员进出
  * @param event 回调数据

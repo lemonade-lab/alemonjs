@@ -1,5 +1,5 @@
 import { sendMessage } from '../sdk/api.js'
-import { MHYType } from './types.js'
+import { MHYType } from '../sdk/types.js'
 /**
  * 消息发送
  * @param villa_id 别野

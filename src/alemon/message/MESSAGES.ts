@@ -1,5 +1,5 @@
 import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
-import { BotEvent, MessageContentType } from '../types.js'
+import { BotEvent, MessageContentType } from '../../sdk/types.js'
 import { setLocalImg } from '../localimage.js'
 import { stringParsing } from '../../sdk/mechanism.js'
 import {

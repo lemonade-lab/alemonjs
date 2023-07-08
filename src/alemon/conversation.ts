@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BotEvent } from './types.js'
+import { BotEvent } from '../sdk/types.js'
 import { MESSAGES } from './message/MESSAGES.js'
 import { GUILD_MEMBERS } from './message/GUILD_MEMBERS.js'
 import { GUILD_MESSAGE_REACTIONS } from './message/GUILD_MESSAGE_REACTIONS.js'
