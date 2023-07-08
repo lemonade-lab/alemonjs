@@ -1,4 +1,4 @@
-> 米游社特别版,正在努力看文档中
+> 米游社特别版
 
 拉取代码
 
@@ -19,21 +19,17 @@ npm install
 npm run app
 ```
 
-配置对象存储、回调地址、回调端口
+配置回调地址、回调端口
 
 `config/mys.yaml` 按提示修改即可
 
-因官网暂未更新处理文件上传流写法
-
-该项目选择对象存储作为替代方案
-
 `src/alemon/alemonapi.ts` 集合接口
 
-框架机器人无任何服务代码
+官网图片 url 调用有些问题,正在测试中...
 
-需要安装插件才可测试并观察数据
+框架无任何服务代码
 
-机器人目录下执行安装
+根目录下执行安装测试工程插件
 
 ```
 git clone --depth=1 https://gitee.com/ningmengchongshui/alemon-plugin.git ./plugins/alemon-plugin/
