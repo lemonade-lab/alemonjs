@@ -43,7 +43,7 @@ export function createClient(
     bot_secret,
     callback_url,
     callback_host = 8080,
-    img_rul = '/api/mys/img/:filename',
+    img_rul = '/api/mys/img',
     IMAGE_DIR = 'data/mys/img'
   }: ClientConfig,
   callBack: (event: BotEvent) => Promise<void>,
@@ -59,7 +59,7 @@ export function createClient(
     IMAGE_DIR
   })
   // 处理图片请求
-  app.get(img_rul, getLocalImg)
+  app.get(`${img_rul}/:filename`, getLocalImg)
   // 处理事件回调请求
   app.post(callback_url, async (req: Request, res: Response) => {
     try {
