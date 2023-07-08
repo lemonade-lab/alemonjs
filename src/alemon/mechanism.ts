@@ -70,17 +70,16 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   }
 
   for (const item of num) {
-    const pattern = new RegExp(item.name, 'g')
-    let match
-    while ((match = pattern.exec(content)) !== null) {
-      const offset = match.index
+    // 构造正则
+    const match = new RegExp(item.name, 'g').exec(content)
+    if (match !== null) {
       if (item.type === 0) {
         entities.push({
           entity: {
             type: 'mention_all'
           },
           length: 6,
-          offset: offset
+          offset: match.index
         })
       } else if (item.type === 1) {
         entities.push({
@@ -89,7 +88,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             user_id: item.id
           },
           length: item.name.length,
-          offset: offset
+          offset: match.index
         })
       } else if (item.type === 2) {
         entities.push({
@@ -99,7 +98,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             room_id: item.id
           },
           length: item.name.length,
-          offset: offset
+          offset: match.index
         })
       }
     }
