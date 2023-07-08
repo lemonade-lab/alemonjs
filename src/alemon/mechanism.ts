@@ -10,19 +10,21 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   const entities = []
   // 判断 msg 是否是  arr  是就转换
   let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
+
   // 字符转换并增加渲染
-  const everyoneMention = '<@!everyone>'
-  const everyoneIndex = content.indexOf(everyoneMention)
-  if (everyoneIndex !== -1) {
-    content = content.replace(everyoneMention, '@全体成员 ')
+
+  /* 全体成员 */
+  content = content.replace(/(<@!everyone>)/g, (match, id, offset) => {
     entities.push({
       entity: {
         type: 'mention_all'
       },
       length: 6,
-      offset: everyoneIndex
+      offset: offset
     })
-  }
+    return '@全体成员 '
+  })
+
   /** 搜索并收集 */
   const RoomArr = []
   /* 收集房间 ID 和起始位置 */
