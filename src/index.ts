@@ -9,8 +9,6 @@ declare global {
   var cfg: BotConfigType
 }
 
-async function logFnc() {}
-
 export async function createAlemon() {
   // 设置浏览器配置
   setLanchConfig(PuppeteerConfig)

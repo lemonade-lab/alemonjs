@@ -1,8 +1,8 @@
-import axios from 'axios'
-import express, { Application } from 'express'
+import express, { Application, Request, Response } from 'express'
 import bodyParser from 'body-parser'
+import axios from 'axios'
 import { getLocalImg } from './localimage.js'
-import { ClientConfig } from './types.js'
+import { ClientConfig, BotEvent } from './types.js'
 import * as client from './index.js'
 const spiCfg: {
   bot_id: string
@@ -50,7 +50,7 @@ export function createClient(
     callback_host = 8080,
     img_rul = '/api/mys/img/:filename'
   }: ClientConfig,
-  callBack: (req: express.Request, res: express.Response) => void,
+  callBack: (event: BotEvent) => Promise<void>,
   logFnc?: () => Promise<void>
 ) {
   spiCfg.bot_id = bot_id
@@ -58,7 +58,31 @@ export function createClient(
   // 处理图片请求
   app.get(img_rul, getLocalImg)
   // 处理事件回调请求
-  app.post(callback_url, callBack)
+  app.post(callback_url, async (req: Request, res: Response) => {
+    try {
+      // 从请求体中获取事件对象
+      const event: BotEvent = req.body.event
+      /** 错误调用  */
+      if (!event || !event.robot) {
+        console.log('错误调用~')
+        // 处理完毕后返回响应
+        res.status(200).json({ message: '错误调用', retcode: 0 })
+        return
+      }
+      await callBack(event).catch(err => {
+        console.log(err)
+        return
+      })
+    } catch (err) {
+      console.log(err)
+      // 处理完毕后返回响应
+      res.status(200).json({ message: '执行错误', retcode: 0 })
+      return
+    }
+    // 处理完毕后返回响应
+    res.status(200).json({ message: '处理完成', retcode: 0 })
+    return
+  })
   app.listen(callback_host, logFnc)
   return client
 }
