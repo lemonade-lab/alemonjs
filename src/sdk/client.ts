@@ -1,4 +1,12 @@
 import axios from 'axios'
+import express, { Application } from 'express'
+import bodyParser from 'body-parser'
+// 创建响应
+const app: Application = express()
+// 处理 POST 请求体中的 JSON 数据
+app.use(express.json())
+// 解析 x-www-form-urlencoded 格式的请求体
+app.use(bodyParser.urlencoded({ extended: false }))
 const spiCfg: {
   bot_id: string
   bot_secret: string
@@ -34,4 +42,5 @@ export function villaService(villa_id: number, config: object) {
 export function createClient(bot_id, bot_secret) {
   spiCfg.bot_id = bot_id
   spiCfg.bot_secret = bot_secret
+  return app
 }

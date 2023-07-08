@@ -1,10 +1,12 @@
 import { Request, Response } from 'express'
-import { BotEvent } from '../sdk/index.js'
 import { MESSAGES } from './message/MESSAGES.js'
 import { GUILD_MEMBERS } from './message/GUILD_MEMBERS.js'
 import { GUILD_MESSAGE_REACTIONS } from './message/GUILD_MESSAGE_REACTIONS.js'
 import { MESSAGE_AUDIT } from './message/MESSAGE_AUDIT.js'
 import { GUILDS } from './message/GUILDS.js'
+
+/** sdk */
+import { BotEvent } from '../sdk/index.js'
 
 /**
  * 事件处理集

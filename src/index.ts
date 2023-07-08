@@ -1,5 +1,3 @@
-import express, { Application } from 'express'
-import bodyParser from 'body-parser'
 import { BotConfigType, setLanchConfig, cmdInit } from 'alemon'
 import { callBack } from './alemon/conversation.js'
 import { checkRobot } from './login.js'
@@ -31,20 +29,13 @@ export async function createAlemon() {
     return
   })
 
-  /* 创建请求工具包 */
-  createClient(cfg.appID, cfg.token)
-
-  // 创建响应
-  const app: Application = express()
-  // 处理 POST 请求体中的 JSON 数据
-  app.use(express.json())
-  // 解析 x-www-form-urlencoded 格式的请求体
-  app.use(bodyParser.urlencoded({ extended: false }))
+  /* 创建应用程序 */
+  const app = createClient(cfg.appID, cfg.token)
   // 处理图片请求
   app.get('/api/mys/img/:filename', getLocalImg)
   // 处理事件回调请求
   app.post(MysConfig.url, callBack)
-  // 启动 Express 应用程序
+  // 启动监听
   app.listen(MysConfig.host, async () => {
     console.info('[HELLO] 欢迎使用Alemon-Mys')
     console.info('[DOCS] http://ningmengchongshui.gitee.io/lemonade')

@@ -1,4 +1,5 @@
 import { Messagetype, EventType, EType, typeMessage } from 'alemon'
+/** sdk */
 import { BotEvent } from '../../sdk/index.js'
 /**
  * 审核事件
