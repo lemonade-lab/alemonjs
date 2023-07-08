@@ -5,7 +5,7 @@ import { getMember, getRoom } from './api.js'
  * @param villa_id 别墅
  * @returns
  */
-export async function stringParsing(msg: string | object | string[], villa_id: number) {
+export async function stringParsing(msg: string | string[], villa_id: number) {
   // 判断 msg 是否是  arr  是就转换
   let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
   // 记录
@@ -136,7 +136,6 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
       }
     }
   }
-  console.log('entities=', entities)
   return {
     entities,
     content

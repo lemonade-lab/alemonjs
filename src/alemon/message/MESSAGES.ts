@@ -84,6 +84,19 @@ export async function MESSAGES(event: BotEvent, val: number) {
         })
       }
 
+      if (typeof msg === 'object') {
+        const options: any = msg
+        if (options?.image) {
+          /** 图片对象  */
+          return await sendMessageTextUrl(villa_id, room_id, cmd_msg, options.image).catch(err => {
+            console.log(err)
+            return false
+          })
+        }
+        // msg 是对象,当没解析出什么
+        return false
+      }
+
       /* 字符解析器 */
       const { entities, content } = await stringParsing(msg, villa_id)
 
@@ -108,19 +121,6 @@ export async function MESSAGES(event: BotEvent, val: number) {
             }
           )
         }
-      }
-
-      if (!obj && typeof msg === 'object') {
-        const options: any = msg
-        if (options?.image) {
-          /** 图片对象  */
-          return await sendMessageTextUrl(villa_id, room_id, cmd_msg, options.image).catch(err => {
-            console.log(err)
-            return false
-          })
-        }
-        // msg 是对象,当没解析出什么
-        return false
       }
 
       if (entities.length == 0 && content != '') {

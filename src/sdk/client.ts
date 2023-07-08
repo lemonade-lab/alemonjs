@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
  */
 export function villaService(villa_id: number, config: object) {
   // 打印方便查看发送的参数
-  console.log(config)
+  console.log('config=', config)
   const service = axios.create({
     baseURL: 'https://bbs-api.miyoushe.com', // 地址
     timeout: 20000, // 响应
