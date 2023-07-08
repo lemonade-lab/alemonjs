@@ -70,7 +70,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   }
 
   for (const item of num) {
-    content.replace(new RegExp(item.name), (match, name, index) => {
+    content.replace(new RegExp(item.name), (match, name, offset) => {
       // 匹配成功
       if (item.type == 0) {
         // 是艾特全体的
@@ -79,7 +79,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             type: 'mention_all' // 提及全员
           },
           length: 6,
-          offset: index
+          offset: offset
         })
       } else if (item.type == 1) {
         // 是艾特用户的
@@ -89,7 +89,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             user_id: item.id // 成员id
           },
           length: item.name.length,
-          offset: index
+          offset: offset
         })
       } else if (item.type == 2) {
         // 是艾特房间的
@@ -100,7 +100,7 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
             room_id: item.id // 房间 id
           },
           length: item.name.length, // 长度可以算
-          offset: index // 使用起始位置作为偏移量
+          offset: offset
         })
       }
       return match
