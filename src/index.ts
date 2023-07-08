@@ -1,8 +1,9 @@
 import express, { Application } from 'express'
 import bodyParser from 'body-parser'
-import { publicIp } from 'public-ip'
+import { ip } from './alemon/ip.js'
 import { BotConfigType, setLanchConfig, cmdInit } from 'alemon'
 import { callBack } from './alemon/conversation.js'
+import { getLocalImg } from './alemon/localimage.js'
 import { checkRobot } from './login.js'
 import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig, MysConfig } from './config/index.js'
 
@@ -37,6 +38,8 @@ export async function createAlemon() {
   app.use(express.json())
   // 解析 x-www-form-urlencoded 格式的请求体
   app.use(bodyParser.urlencoded({ extended: false }))
+  // 处理图片请求
+  app.get('/api/mys/img/:filename', getLocalImg)
   // 处理事件回调请求
   app.post(MysConfig.url, callBack)
   // 启动 Express 应用程序
@@ -47,24 +50,11 @@ export async function createAlemon() {
     if (cfg.sandbox) {
       console.info('[DOCS] https://webstatic.mihoyo.com/')
     }
-    // 公网
-    await publicIp({
-      onlyHttps: true,
-      timeout: 10000
-    })
-      .then((ip: any) => {
-        console.info('[OPEN]', 'Callback')
-        if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
-          console.info(`[OPEN] http://${ip}:${MysConfig.host}${MysConfig.url}`)
-        } else {
-          console.info(`[OPEN] IPv4地址错误,无法响应回调`)
-        }
-      })
-      .catch(err => {
-        console.log(err)
-        console.log('公网IP识别失败~暂无法支持运行')
-        process.exit()
-      })
+    if (ip) {
+      console.info(`[OPEN] http://${ip}:${MysConfig.host}${MysConfig.url}`)
+    } else {
+      console.log('公网IP识别失败~暂无法支持运行')
+    }
   })
   return true
 }

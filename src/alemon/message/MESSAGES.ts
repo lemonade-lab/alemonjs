@@ -1,6 +1,6 @@
 import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
 import { BotEvent, MessageContentType } from '../types.js'
-import { createCOS } from '../cos.js'
+import { setLocalImg } from '../localimage.js'
 import { stringParsing } from '../mechanism.js'
 import {
   sendMessageTextUrl,
@@ -30,8 +30,6 @@ export async function MESSAGES(event: BotEvent, val: number) {
   const room_id = event.extend_data.EventData.SendMessage.room_id
   /** 指令消息需要去除 @ 和用户名 */
   const cmd_msg = MessageContent.content.text.replace(/(@[^\s]+\s)(?!<)/g, '').trim()
-  // 上传图片
-  const COS = createCOS()
   /** 制作e消息对象 */
   const e = {
     /** 消息编号 */
@@ -71,10 +69,12 @@ export async function MESSAGES(event: BotEvent, val: number) {
       //  第一参数是buffer
       let url = ''
       if (Buffer.isBuffer(msg)) {
-        // 上传图片
-        const randomNum = Math.floor(Math.random() * 31)
-        COS.Upload(msg, `${randomNum}.jpg`)
-        url = COS.getUrl(`${randomNum}.jpg`)
+        // 挂载图片
+        const uul = setLocalImg(msg)
+        if (!uul) {
+          return false
+        }
+        url = uul
         /** 直接发送图片 */
         return await sendMessageTextUrl(villa_id, room_id, cmd_msg, url).catch(err => {
           console.log(err)
@@ -87,10 +87,12 @@ export async function MESSAGES(event: BotEvent, val: number) {
 
       // 第二参考书是 buffer
       if (Buffer.isBuffer(obj)) {
-        // 上传图片
-        const randomNum = Math.floor(Math.random() * 31)
-        COS.Upload(obj, `${randomNum}.jpg`)
-        url = COS.getUrl(`${randomNum}.jpg`)
+        // 挂载图片
+        const uul = setLocalImg(obj)
+        if (!uul) {
+          return false
+        }
+        url = uul
         if (entities.length == 0) {
           return await sendMessageTextUrl(villa_id, room_id, content, url).catch(err => {
             console.log(err)
