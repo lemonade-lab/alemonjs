@@ -10,97 +10,101 @@ export async function stringParsing(msg: string | object | string[], villa_id: n
   const entities = []
   // 判断 msg 是否是  arr  是就转换
   let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
-
-  // 字符转换并增加渲染
-
-  // 记录个数
-  let oneSize = 0
-  content.replace(/(<@!everyone>)/g, (match, id, offset) => {
-    // 记录匹配个数
-    oneSize++
+  // 记录
+  const num = []
+  // 替换全体
+  content = content.replace(/<@!(everyone)>/g, (match, id, offset) => {
+    // 记录要渲染的名称和编号
+    num.push({
+      id,
+      type: 0,
+      name: '@全体成员 '
+    })
+    return '@全体成员 '
+  })
+  // 用户
+  const userArr = []
+  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
+    userArr.push({
+      id,
+      offset
+    })
     return match
   })
-  for (let i = 0; i < oneSize; i++) {
-    // 一次就更改一次,并重新匹配
-    content = content.replace(/(<@!everyone>)/, (match, id, offset) => {
-      entities.push({
-        entity: {
-          type: 'mention_all'
-        },
-        length: 6,
-        offset: offset
-      })
-      return '@全体成员 '
-    })
-  }
-
-  // 记录个数
-  let RoomSize = 0
-  content.replace(/<#(\d+)>/g, (match, id, offset) => {
-    // 记录匹配个数
-    RoomSize++
-    return match
-  })
-  for (let i = 0; i < RoomSize; i++) {
-    // 一次就更改一次,并重新匹配
-    const obj = { id: 0, offset: 0 }
-    content.replace(/<#(\d+)>/, (match, id, offset) => {
-      obj.id = id
-      obj.offset = offset
-      return match
-    })
-    const Room = await getRoom(villa_id, obj.id)
-    if (Room) {
-      content = content.replace(new RegExp(`<#${obj.id}>`), (match, id, index) => {
-        entities.push({
-          entity: {
-            type: 'villa_room_link',
-            villa_id: String(villa_id), // 大别野 id
-            room_id: obj.id // 房间 id
-          },
-          length: `#${Room.room_name} `.length, // 长度可以算
-          offset: obj.offset // 使用起始位置作为偏移量
-        })
-        return `#${Room.room_name} `
-      })
-    } else {
-      // 发现错误的房间,后续不再进行
-      break
-    }
-  }
-
-  let UserSize = 0
-  content.replace(/<#(\d+)>/g, (match, id, offset) => {
-    // 记录匹配个数
-    UserSize++
-    return match
-  })
-  for (let i = 0; i < UserSize; i++) {
-    // 一次就更改一次,并重新匹配
-    const obj = { id: '', offset: 0 }
-    content.replace(/<#(\d+)>/, (match, id, offset) => {
-      obj.id = id
-      obj.offset = offset
-      return match
-    })
-    const User = await getMember(villa_id, obj.id)
+  for (const item of userArr) {
+    const User = await getMember(villa_id, String(item.id))
     if (User) {
-      content = content.replace(new RegExp(`<#${obj.id}>`), (match, id, index) => {
-        entities.push({
-          entity: {
-            type: 'villa_room_link',
-            villa_id: String(villa_id), // 大别野 id
-            room_id: obj.id // 房间 id
-          },
-          length: `@${User.basic.nickname} `.length, // 字符占用长度
-          offset: obj.offset // 使用起始位置作为偏移量
+      content = content.replace(new RegExp(`<@!${item.id}>`), (match, id, index) => {
+        // 记录要渲染的名称和编号
+        num.push({
+          id: item.id,
+          type: 1,
+          name: `@${User.basic.nickname} `
         })
         return `@${User.basic.nickname} `
       })
-    } else {
-      // 发现错误的房间,后续不再进行
-      break
     }
+  }
+  // 房间
+  const roomArr = []
+  content.replace(/<#(\d+)>/, (match, id, offset) => {
+    roomArr.push({
+      id,
+      offset
+    })
+    return match
+  })
+  for (const item of roomArr) {
+    const Room = await getRoom(villa_id, item.id)
+    if (Room) {
+      content = content.replace(new RegExp(`<#${item.id}>`), (match, id, index) => {
+        // 记录要渲染的名称和编号
+        num.push({
+          id: item.id,
+          type: 2,
+          name: `#${Room.room_name} `
+        })
+        return `#${Room.room_name} `
+      })
+    }
+  }
+
+  for (const item of num) {
+    content.replace(new RegExp(item.name), (match, name, index) => {
+      // 匹配成功
+      if (item.type == 0) {
+        // 是艾特全体的
+        entities.push({
+          entity: {
+            type: 'mention_all' // 提及全员
+          },
+          length: 6,
+          offset: index
+        })
+      } else if (item.type == 1) {
+        // 是艾特用户的
+        entities.push({
+          entity: {
+            type: 'mentioned_user', // 提及成员
+            user_id: item.id // 成员id
+          },
+          length: item.name.length,
+          offset: index
+        })
+      } else if (item.type == 2) {
+        // 是艾特房间的
+        entities.push({
+          entity: {
+            type: 'villa_room_link',
+            villa_id: String(villa_id), // 大别野 id
+            room_id: item.id // 房间 id
+          },
+          length: item.name.length, // 长度可以算
+          offset: index // 使用起始位置作为偏移量
+        })
+      }
+      return match
+    })
   }
 
   console.log('entities=', entities)
