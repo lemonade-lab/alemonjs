@@ -2,7 +2,7 @@
 
 ```
 npm init -y
-npm mys-villa
+npm i mys-villa
 npm install
 ```
 
@@ -25,7 +25,7 @@ const client = createClient(
     console.log('欢迎使用~')
   }
 )
-async function callBack(event: BotEvent) {
+async function callBack(event) {
   console.log('数据包', event)
   /** 已测 获取分组列表 */
   const list = client.getGroupList(event.robot.villa_id)
