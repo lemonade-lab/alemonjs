@@ -1,13 +1,14 @@
 import { Messagetype, EventType, EType, InstructionMatching } from 'alemon'
-import { BotEvent, MessageContentType } from '../../sdk/types.js'
-import { setLocalImg } from '../localimage.js'
-import { stringParsing } from '../../sdk/mechanism.js'
 import {
+  BotEvent,
+  MessageContentType,
+  setLocalImg,
+  stringParsing,
   sendMessageTextUrl,
   sendMessageText,
   sendMessageTextEntities,
   sendMessageTextEntitiesUrl
-} from '../../sdk/reply.js'
+} from '../../sdk/index.js'
 
 /**
  * 消息会话

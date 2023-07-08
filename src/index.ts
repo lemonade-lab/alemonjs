@@ -1,17 +1,14 @@
 import express, { Application } from 'express'
 import bodyParser from 'body-parser'
-import { ip } from './alemon/ip.js'
 import { BotConfigType, setLanchConfig, cmdInit } from 'alemon'
 import { callBack } from './alemon/conversation.js'
-import { getLocalImg } from './alemon/localimage.js'
 import { checkRobot } from './login.js'
 import { DefaultConfigLogin, ConfigLogin, PuppeteerConfig, MysConfig } from './config/index.js'
-import { createClient } from './sdk/axois.js'
+import { createClient, getIP, getLocalImg } from './sdk/index.js'
 
 declare global {
   //机器人配置
   var cfg: BotConfigType
-  var client: any
 }
 
 export async function createAlemon() {
@@ -28,14 +25,14 @@ export async function createAlemon() {
     process.exit()
   })
 
-  /* 创建请求工具包 */
-  global.client = createClient(cfg.appID, cfg.token)
-
   // 加载插件
   await cmdInit().catch(err => {
     console.log(err)
     return
   })
+
+  /* 创建请求工具包 */
+  createClient(cfg.appID, cfg.token)
 
   // 创建响应
   const app: Application = express()
@@ -55,6 +52,7 @@ export async function createAlemon() {
     if (cfg.sandbox) {
       console.info('[DOCS] https://webstatic.mihoyo.com/')
     }
+    const ip = await getIP()
     if (ip) {
       console.info(`[OPEN] http://${ip}:${MysConfig.host}${MysConfig.url}`)
     } else {

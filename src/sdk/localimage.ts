@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { MysConfig } from '../config/index.js'
-import { ip } from './ip.js'
+import { getIP } from './ip.js'
 import { createReadStream, writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 /** 本地图片地址 */
@@ -49,6 +49,7 @@ export function setLocalImg(img: Buffer) {
   // 将图片保存到文件系统中
   writeFileSync(imagePath, img)
   // 返回保存的图片 URL
+  const ip = getIP()
   const url = `http://${ip}:${MysConfig.host}/api/mys/img/${filename}`
   console.log(url)
   return url

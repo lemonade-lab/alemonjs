@@ -1,7 +1,4 @@
 import axios from 'axios'
-import * as api from './api.js'
-import * as mechanism from './mechanism.js'
-import * as reply from './reply.js'
 const spiCfg: {
   bot_id: string
   bot_secret: string
@@ -37,5 +34,4 @@ export function villaService(villa_id: number, config: object) {
 export function createClient(bot_id, bot_secret) {
   spiCfg.bot_id = bot_id
   spiCfg.bot_secret = bot_secret
-  return { ...api, ...mechanism, ...reply }
 }
