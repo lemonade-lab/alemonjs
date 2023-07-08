@@ -49,5 +49,7 @@ export function setLocalImg(img: Buffer) {
   // 将图片保存到文件系统中
   writeFileSync(imagePath, img)
   // 返回保存的图片 URL
-  return `http://${ip}:${MysConfig.host}/api/mys/img/${filename}`
+  const url = `http://${ip}:${MysConfig.host}/api/mys/img/${filename}`
+  console.log(url)
+  return url
 }
