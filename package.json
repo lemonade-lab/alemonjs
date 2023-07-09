@@ -1,61 +1,37 @@
 {
-  "name": "alemon-bot",
-  "version": "1.0.0",
-  "description": "阿柠檬机器人",
+  "name": "alemon-cli",
+  "version": "1.0.4",
+  "description": "alemon脚手架",
+  "main": "bin/cli.js",
+  "scripts": {
+    "dev": "node bin/cli.js",
+    "format": "npx prettier --write ."
+  },
+  "files": [
+    "bin/cli.js",
+    "commands/install.js",
+    "package.json",
+    "README.md"
+  ],
+  "type": "module",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "app": "ts-node index.ts",
-    "login": "ts-node index.ts login",
-    "start": "pm2 startOrRestart pm2.json",
-    "linux:pull": "find . -type d -name '.git' -execdir git pull --all \\;",
-    "win:pull": "git pull && cd plugins && for /d %i in (*) do (echo Updating %i && cd %i && git pull && cd ..)",
-    "stop": "pm2 stop pm2.json",
-    "delete": "pm2 delete pm2.json",
-    "logs": "pm2 logs alemon",
-    "monit": "pm2 monit",
-    "kill": "pm2 kill",
-    "update": "pm2 update",
-    "dev": "nodemon  index.ts",
-    "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
-  },
   "dependencies": {
-    "alemon-qq": "^1.1.0",
-    "alemon-redis": "^1.0.0"
+    "commander": "^10.0.1",
+    "prompts": "^2.4.2"
+  },
+  "bin": {
+    "alemon-cli": "bin/cli.js"
   },
   "devDependencies": {
-    "@types/node": "^20.3.1",
-    "@types/ws": "^8.5.5",
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.60.0",
-    "eslint": "^8.43.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "nodemon": "^2.0.22",
-    "pm2": "^5.3.0",
-    "pre-commit": "^1.2.2",
-    "prettier": "^2.8.8",
-    "ts-node": "^10.9.1",
-    "typescript": ">=5.0.4 <5.1.0"
-  },
-  "pre-commit": [
-    "lint",
-    "format"
-  ],
-  "workspaces": [
-    "example",
-    "plugins/*"
-  ],
-  "engines": {
-    "node": ">=16.3.0"
+    "@types/prompts": "^2.4.4",
+    "@types/node": "^20.2.5",
+    "prettier": "^2.8.8"
   },
   "keywords": [
-    "qq-guild-bot",
+    "alemon",
     "alemon-qq",
-    "alemon-redis",
-    "alemon"
+    "alemon-mys",
+    "alemon-redis"
   ]
 }
