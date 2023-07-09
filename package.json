@@ -1,37 +1,36 @@
 {
-  "name": "alemon-cli",
-  "version": "1.0.4",
-  "description": "alemon脚手架",
-  "main": "bin/cli.js",
-  "scripts": {
-    "dev": "node bin/cli.js",
-    "format": "npx prettier --write ."
-  },
+  "name": "alemon-redis",
+  "version": "1.0.0",
+  "description": "阿柠檬REDIS连接",
+  "main": "lib/index.js",
   "files": [
-    "bin/cli.js",
-    "commands/install.js",
-    "package.json",
-    "README.md"
+    "lib",
+    "types"
   ],
   "type": "module",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "app": "node lib/index.js",
+    "tsc": "npx tsc"
+  },
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
+  "types": "types",
   "dependencies": {
-    "commander": "^10.0.1",
-    "prompts": "^2.4.2"
-  },
-  "bin": {
-    "alemon-cli": "bin/cli.js"
+    "ioredis": "^5.3.2",
+    "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "@types/prompts": "^2.4.4",
-    "@types/node": "^20.2.5",
-    "prettier": "^2.8.8"
+    "@types/node": "^20.2.4",
+    "@types/progress": "^2.0.5",
+    "typescript": "^5.0.4",
+    "ts-node": "^10.9.1"
   },
   "keywords": [
-    "alemon",
-    "alemon-qq",
-    "alemon-mys",
+    "qq-guild",
+    "alemon-core",
+    "alemon-cli",
+    "alemon-bot",
     "alemon-redis"
   ]
 }

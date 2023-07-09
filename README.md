@@ -1,8 +1,5 @@
-# alemon 脚手架
+# redis链接
 
 ```
-npm install alemon-cli -g
-```
-```
-alemon-install
+npm install alemon-redis
 ```

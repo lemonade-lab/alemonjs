@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "target": "ES2022",
-    "module": "ES2022",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "ignoreDeprecations": "5.0",
     "esModuleInterop": true,
     "preserveConstEnums": true,
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["src/types", "node_modules/@types"],
+    "declaration": true,
+    "declarationDir": "types",
+    "outDir": "lib"
   },
-  "include": ["bin"],
-  "exclude": ["node_modules", "yunzai"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
