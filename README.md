@@ -11,7 +11,7 @@ npm install alemon-redis
 ```ts
 import { createRedis } from "alemon-redis";
 // 不传入配置地址,默认读取config/redis.yaml
-const redisA = reateReids();
+const redisA = createRedis();
 // 传入配置地址
 const redisB = createRedis("config/my/redis.yaml");
 // 传入参数
