@@ -17,27 +17,34 @@ let PluginsArr = [];
 /**
  * 应用挂载
  * @param AppsObj
- * @param appname
+ * @param AppName
  * @param belong
  */
-async function synthesis(AppsObj: object, appname: string, belong: string) {
+async function synthesis(AppsObj: object, AppName: string) {
   for (const item in AppsObj) {
-    let keys = new AppsObj[item]();
-    if (!keys["event"] || !keys["rule"]) continue;
+    const keys = new AppsObj[item]();
+    // 归属和指令数组都不在,是错误类
+    if (!keys["belong"] || !keys["rule"]) continue;
+    // 指令数组
     keys["rule"].forEach((key: any) => {
-      Command[keys["event"]].push({
+      // 收集指令
+      Command[keys["belong"]].push({
+        // 指令
         reg: key["reg"],
+        // 优先级
         priority: keys["priority"],
-        data: {
-          event: keys["event"],
-          eventType: keys["eventType"],
-          belong,
-          AppName: appname,
-          name: item,
-          dsc: keys["dsc"],
-          fncName: key["fnc"],
-          fnc: keys[key["fnc"]],
-        },
+        // 说明
+        dsc: keys["dsc"],
+        // 归属
+        belong: keys["belong"],
+        // 类型
+        type: keys["type"],
+        // 插件名
+        AppName,
+        // 方法名
+        fncName: key["fnc"],
+        // 函数
+        fnc: keys[key["fnc"]],
       });
     });
   }
@@ -49,7 +56,6 @@ async function synthesis(AppsObj: object, appname: string, belong: string) {
  * @param dir
  */
 async function loadExample(dir: string) {
-  const belong = "example";
   /* 初始化 */
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   /* 读取文件 */
@@ -77,7 +83,7 @@ async function loadExample(dir: string) {
         console.error(`[非class export]  ${item}`);
       }
     }
-    await synthesis(apps, AppName, belong);
+    await synthesis(apps, AppName);
     ExampleArr.push(AppName);
   }
   return;
@@ -88,7 +94,6 @@ async function loadExample(dir: string) {
  * @param dir
  */
 async function loadPlugins(dir: string) {
-  const belong = "plugins";
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   let flies = readdirSync(dir);
   //识别并执行插件
@@ -114,7 +119,7 @@ async function loadPlugins(dir: string) {
   //获取插件方法
   for await (let item of APPARR) {
     const apps = getApp(item);
-    await synthesis(apps, item, belong);
+    await synthesis(apps, item);
     PluginsArr.push(item);
     delApp(item);
   }
@@ -200,7 +205,7 @@ export async function getLoadMsg(key: AppsType) {
 export async function InstructionMatching(e: Message) {
   // 是撤回,直接返回
   if (e.message.recall) return true;
-  // 匹配不到事件
+  // 找不到归属
   if (!Command[e.event.belong]) return true;
   /* 获取对话状态 */
   const state = await getConversationState(e.user.id);
@@ -211,13 +216,11 @@ export async function InstructionMatching(e: Message) {
     await handler(e, state);
     return true;
   }
-
   // 消息类型兼容层
   const msgarr = ["MESSAGES"];
   if (e.event.belong == "MESSAGES") {
     msgarr.push("message");
   }
-
   for await (let item of msgarr) {
     // 发现有message  eventType需要变为undefined
     if (item == "message") {
@@ -226,35 +229,32 @@ export async function InstructionMatching(e: Message) {
     }
     /* 循环所有指令 */
     for await (let val of Command[e.event.belong]) {
-      const { reg, data } = val;
+      const { reg, belong, type, AppName, fncName, fnc } = val;
       if (reg === undefined) continue;
       if (!new RegExp(reg).test(e.message.text)) continue;
-      if (e.event.type != data.eventType) continue;
+      // 类型不同
+      if (e.event.type != type) continue;
       try {
-        const { fnc, AppName } = data;
         const AppFnc = getMessage(AppName);
         if (typeof AppFnc == "function") e = AppFnc(e);
         const res = await fnc(e)
           .then((res: boolean) => {
             console.info(
-              `[${data.event}][${data.belong}][${data.AppName}][${
-                data.fncName
-              }][${true}]`
+              `[${belong}][${type}][${AppName}][${fncName}][${true}]`
             );
             return res;
           })
           .catch((err: any) => {
             console.error(
-              `[${data.event}][${data.belong}][${data.AppName}][${
-                data.fncName
-              }][${false}]`
+              `[${belong}][${type}][${AppName}][${fncName}][${false}]`
             );
             console.error(err);
             return false;
           });
         if (res) break;
       } catch (err) {
-        logErr(err, data);
+        console.error(`[${belong}][${type}][${AppName}][${fncName}][${false}]`);
+        console.error(err);
         return false;
       }
     }
@@ -268,51 +268,32 @@ export async function InstructionMatching(e: Message) {
  * @returns
  */
 export async function typeMessage(e: Message) {
+  // 找不到归属
   if (!Command[e.event.belong]) return true;
   for (const val of Command[e.event.belong]) {
-    const { data } = val;
-    if (e.event.type != data.eventType) continue;
+    const { belong, type, AppName, fncName, fnc } = val;
+    // 类型不同
+    if (e.event.type != type) continue;
     try {
-      const { fnc, AppName } = data;
       const AppFnc = getMessage(AppName);
       if (typeof AppFnc == "function") e = AppFnc(e);
       const res = await fnc(e)
         .then((res: boolean) => {
-          console.info(
-            `[${data.event}][${data.belong}][${data.AppName}][${
-              data.fncName
-            }][${true}]`
-          );
+          console.info(`[${belong}][${type}][${AppName}][${fncName}][${true}]`);
           return res;
         })
         .catch((err: any) => {
           console.error(
-            `[${data.event}][${data.belong}][${data.AppName}][${
-              data.fncName
-            }][${false}]`
+            `[${belong}][${type}][${AppName}][${fncName}][${false}]`
           );
           console.error(err);
           return false;
         });
       if (res) break;
     } catch (err) {
-      logErr(err, data);
+      console.error(`[${belong}][${type}][${AppName}][${fncName}][${false}]`);
+      console.error(err);
       return false;
     }
   }
-}
-
-/**
- * 错误信息反馈
- * @param err
- * @param data
- */
-function logErr(err: any, data: any) {
-  console.error(
-    `[${data.event}][${data.belong}][${data.AppName}][${
-      data.fncName
-    }][${false}]`
-  );
-  console.error(err);
-  return;
 }
