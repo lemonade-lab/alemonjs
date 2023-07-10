@@ -1,10 +1,32 @@
-import { SuperType, EventTypeEnum } from "./types.js";
+import { EventTypeEnum } from "./types.js";
 import { EventEnum } from "./typings.js";
+/**
+ * 父类属性
+ * @param name 类名
+ * @param dsc 类说明
+ * @param belong 事件响应
+ * @param type 事件类型
+ * @param priority 正则指令匹配数组
+ * @param rule 事件类型
+ */
+export interface SuperType {
+  name?: string;
+  dsc?: string;
+  belong?: EventEnum;
+  type?: EventTypeEnum;
+  priority?: number;
+  rule?: Array<{
+    //正则
+    reg?: RegExp | string;
+    //方法(函数)
+    fnc: string;
+  }>;
+}
 class plugin {
   name?: string;
   dsc?: string;
-  event?: EventEnum;
-  eventType?: EventTypeEnum;
+  belong?: EventEnum;
+  type?: EventTypeEnum;
   priority?: number;
   rule?: Array<{
     //正则
@@ -24,15 +46,15 @@ class plugin {
   constructor({
     name = "your-name",
     dsc = "dsc",
-    event = EventEnum.MESSAGES,
-    eventType = EventTypeEnum.CREATE,
+    belong = EventEnum.MESSAGES,
+    type = EventTypeEnum.CREATE,
     priority = 5000,
     rule = [],
   }: SuperType) {
     this.name = name;
     this.dsc = dsc;
-    this.event = event;
-    this.eventType = eventType;
+    this.belong = belong;
+    this.type = type;
     this.priority = priority;
     this.rule = rule;
   }

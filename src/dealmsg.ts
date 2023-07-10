@@ -2,11 +2,13 @@ import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import lodash from "lodash";
 // 非依赖引用
-import { Messagetype, CmdType } from "./types.js";
 import { getApp, delApp, getMessage, getAppKey } from "./message.js";
 import { conversationHandlers, getConversationState } from "./dialogue.js";
 import { EventEnum, Message } from "./typings.js";
-
+// 指令类型
+export interface CmdType {
+  [key: string]: Array<any>;
+}
 /* 指令合集 */
 let Command: CmdType;
 let ExampleArr = [];
@@ -200,7 +202,6 @@ export async function InstructionMatching(e: Message) {
   if (e.message.recall) return true;
   // 匹配不到事件
   if (!Command[e.event.belong]) return true;
-
   /* 获取对话状态 */
   const state = await getConversationState(e.user.id);
   /* 获取对话处理函数 */
