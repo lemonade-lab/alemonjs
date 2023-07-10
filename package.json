@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "alemon-qq": "^1.1.0",
-    "alemon-redis": "^1.0.0"
+    "alemon-redis": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.3.1",
