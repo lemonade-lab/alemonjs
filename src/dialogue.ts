@@ -1,11 +1,27 @@
 // 非依赖引用
-import { ConversationState, ConversationHandler, SockesType } from "./types.js";
-/**
- *
- */
+import { Message } from "./typings.js";
+// 对话处理函数类型
+export interface SockesType {
+  [key: string]: any;
+}
+// 对话机
+export type ConversationHandler = (
+  e: Message,
+  state: ConversationState
+) => Promise<void>;
+// 对话状态类型
+export type ConversationState = {
+  // 会话次数
+  step: number;
+  // 携带的数据
+  data: Array<any> | string | number | object;
+  // 携带的方法
+  fnc: Function;
+};
+// 存储
 const Sockes: SockesType = {};
 /**
- *
+ * 获取
  * @param key
  * @returns
  */
@@ -13,7 +29,7 @@ const getAsync = async (key: string) => {
   return Sockes[key];
 };
 /**
- *
+ * 设置
  * @param key
  * @param val
  */
@@ -22,7 +38,7 @@ const setAsync = async (key: string, val: any) => {
   return;
 };
 /**
- *
+ * 删除
  * @param key
  */
 const delAsync = async (key: string) => {

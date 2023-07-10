@@ -37,7 +37,12 @@ export enum EventEnum {
   /* 麦克风事件 */
   AUDIO_MICROPHONE = "AUDIO_MICROPHONE",
 }
-
+// 事件类型
+export enum EventTypeEnum {
+  CREATE = "CREATE",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE",
+}
 export interface Message
   extends ReactionController,
     MuteController,

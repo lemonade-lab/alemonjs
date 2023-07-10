@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { ScreenshotOptions } from "puppeteer";
 import template from "art-template";
 import lodash from "lodash";
-
 /* 非依赖引用 */
 import { screenshot } from "./puppeteer.js";
 /*模板缓存*/

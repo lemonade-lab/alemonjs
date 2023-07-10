@@ -3,6 +3,8 @@ import puppeteer, {
   PuppeteerLaunchOptions,
   ScreenshotOptions,
 } from "puppeteer";
+// 导出集成模块
+export * from "puppeteer";
 
 //截图记录
 let pic: number = 0;

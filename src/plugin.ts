@@ -1,5 +1,4 @@
-import { EventTypeEnum } from "./types.js";
-import { EventEnum } from "./typings.js";
+import { EventEnum, EventTypeEnum } from "./typings.js";
 /**
  * 父类属性
  * @param name 类名

@@ -1,5 +1,7 @@
 import { toDataURL } from "qrcode";
 import { writeFile, readFile } from "node:fs";
+// 导出集成截图
+export * from "qrcode";
 
 /**
  * 链接转化为二维码
