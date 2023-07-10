@@ -23,7 +23,7 @@
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "alemon-qq": "^1.1.0",
+    "alemon-qq": "1.1.0",
     "alemon-redis": "^1.0.1"
   },
   "devDependencies": {
