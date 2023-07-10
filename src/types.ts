@@ -73,8 +73,9 @@ export enum EType {
   /* 麦克风事件 */
   AUDIO_MICROPHONE = "AUDIO_MICROPHONE",
 }
+
 /**
- * 消息判断
+ * 事件类型
  */
 export enum EventType {
   CREATE = "CREATE",
