@@ -2,7 +2,7 @@ import redisClient from "ioredis";
 import { join } from "path";
 import { getYaml } from "./config.js";
 export * from "ioredis";
-export function reateReids(cfg = "config/redis.yaml") {
+export function createRedis(cfg = "config/redis.yaml") {
   try {
     if (typeof cfg === "string") {
       const redis_config = getYaml(join(process.cwd(), cfg));
