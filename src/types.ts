@@ -173,6 +173,100 @@ export type ConversationState = {
   fnc: Function;
 };
 
+// 事件匹配
+export interface EventObjType {
+  // 频道
+  guild?: {
+    id: string; // 频道编号
+    name: string; // 频道名
+  };
+  // 子频道
+  channel?: {
+    id: string; // 子频道编号
+    name: string; // 子频道名
+  };
+  // 机器人
+  robot?: {
+    id: string; // 机器人编号
+    name: string; // 机器人名
+    // 机器人身份
+    identity?: {
+      // 超级管理员
+      super: boolean;
+      //管理员
+      admins: boolean;
+      //子频道管理员
+      wardens: boolean;
+      //成员
+      member: boolean;
+      //等级
+      grade: string;
+    };
+  };
+  // 用户
+  user?: {
+    id: string; // 用户编号
+    name: string; // 用户名
+    master: boolean; // 该用户是否是主人
+    // 用户身份
+    identity?: {
+      //频道主
+      master: boolean;
+      // 超级管理员
+      super: boolean;
+      //管理员
+      admins: boolean;
+      //子频道管理员
+      wardens: boolean;
+      //成员
+      member: boolean;
+      //等级
+      grade: string;
+    };
+  };
+  // 消息
+  message?: {
+    id: string;
+    isPrivate: boolean;
+    type: EventType;
+    isGroup: boolean; //是否是群聊
+    isRecall: boolean; //是否是撤回
+    atuid: IUser[]; // 艾特得到的qq
+    at: boolean; // 是否是艾特
+    text: string; // 消息文本
+    content: string; // 消息原文
+  };
+  // 消息回复方法
+  /**
+   * 发送消息
+   * @param msg 消息|图片
+   * @param img 图片
+   * @returns
+   */
+  reply: (
+    msg?: string | Array<string> | Buffer,
+    img?: Buffer
+  ) => Promise<boolean>;
+  /**
+   * 发送卡片
+   * @param img
+   * @returns
+   */
+  replyCard: (img: object) => Promise<boolean>;
+  // 动态数据方法
+  /**
+   * 获得频道列表
+   * @returns
+   */
+  getGuilList: () => void;
+  // 权限数据方法
+  /**
+   * 获得频道信息
+   * @returns
+   */
+  getGuildMsg: () => void;
+}
+
 /* e消息对象类型 */
 export interface Messagetype {
   /**
