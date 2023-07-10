@@ -1,13 +1,3 @@
-// 登录配置
-export interface LoginConfig {
-  id: string; // 机器人账号
-  key: string; // 机器人钥匙
-  authority: Array<string>; // 权限
-  secret?: string; // 机器人密钥
-  account?: string; // 主人账号
-  password?: string; // 主人密码
-  sendbox?: boolean; // 是沙盒？
-}
 // 事件枚举
 export enum EventEnum {
   /* 频道|别野消息 */
