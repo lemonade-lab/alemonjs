@@ -1,3 +1,13 @@
+// 登录配置
+export interface LoginConfig {
+  id: string; // 机器人账号
+  key: string; // 机器人钥匙
+  authority: Array<string>; // 权限
+  secret?: string; // 机器人密钥
+  account?: string; // 主人账号
+  password?: string; // 主人密码
+  sendbox?: boolean; // 是沙盒？
+}
 // 事件枚举
 export enum EventEnum {
   /* 频道|别野消息 */
@@ -27,6 +37,71 @@ export enum EventEnum {
   /* 麦克风事件 */
   AUDIO_MICROPHONE = "AUDIO_MICROPHONE",
 }
+
+export interface Message
+  extends ReactionController,
+    MuteController,
+    UserController,
+    IdentityGroupController,
+    ChannelController,
+    GuildController,
+    ReplyController,
+    WithdrawController {
+  guild: GuildBasice;
+  channel: ChannelBasice;
+  user: UserBasice;
+  robot: RobotBasice;
+  message: MessageBasice;
+  event: EventBasice;
+}
+// 子频道基础信息
+export interface ChannelBasice {
+  id: string; // 子频道编号
+  name: string; // 子频道名
+  type: string; // 子频道类ing
+}
+
+// 频道基础信息
+export interface GuildBasice {
+  id: string; // 频道编号
+  name: string; // 频道名
+  icon: string; // 频道头像
+}
+
+// 用户基础信息
+export interface UserBasice {
+  id: string; // 编号
+  name: string; // 昵称
+  avatar: string; // 头像地址
+  robot: true; // 是机器人？
+  master: false; // 主人？
+}
+// 机器人基础信息
+export interface RobotBasice {
+  id: string; // 编号
+  name: string; // 昵称
+  avatar: string; // 头像地址
+  robot: true; // 是机器人？
+}
+// 消息基础信息
+export interface MessageBasice {
+  id: string; // 编号
+  groupChat: true; // 是群聊(房间/子频道)
+  publickSphere: true; // 公域
+  at: false; // 是艾特？  注：机器人@不算@
+  text: string; // 消息文本，
+  atid: Array<string>; // @得到的UID集
+  recall: false; // 是撤回？
+  time: string; // 发送时间
+}
+
+// 事件基础信息
+export interface EventBasice {
+  id: string; // 事件编号
+  belong: EventEnum; // 创建/更新/删除
+  type: string; // 事件类型类型
+}
+
 // 回复控制器
 export interface ReplyController {
   /**
@@ -107,53 +182,6 @@ export interface ReplyController {
 export interface WithdrawController {
   withdraw: () => void;
   withdrawReation: () => void;
-}
-
-// 用户基础细腻些
-export interface UserBasice {
-  id: number; // 编号
-  name: string; // 昵称
-  avatar: string; // 头像地址
-  robot: true; // 是机器人？
-  master: false; // 主人？
-}
-// 机器人基础信息
-export interface RobotBasice {
-  id: number; // 编号
-  name: string; // 昵称
-  avatar: string; // 头像地址
-  robot: true; // 是机器人？
-}
-// 消息基础信息
-export interface MessageBasice {
-  id: number; // 编号
-  groupChat: true; // 是群聊(房间/子频道)
-  publickSphere: true; // 公域
-  at: false; // 是艾特？  注：机器人@不算@
-  text: string; // 消息文本，
-  atid: Array<string>; // @得到的UID集
-  recall: false; // 是撤回？
-  time: string; // 发送时间
-}
-
-// 事件基础信息
-export interface EventBasice {
-  id: string; // 事件编号
-  belong: EventEnum; // 创建/更新/删除
-  type: string; // 事件类型类型
-}
-// 子频道基础信息
-export interface ChannelBasice {
-  id: number; // 子频道编号
-  name: string; // 子频道名
-  type: string; // 子频道类ing
-}
-
-// 频道基础信息
-export interface GuildBasice {
-  id: number; // 频道编号
-  name: string; // 频道名
-  icon: string; // 频道头像
 }
 
 // 频道控制器

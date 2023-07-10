@@ -1,14 +1,4 @@
-/** alemon-bot */
-import {
-  IMessage,
-  MessageReference,
-  IUser,
-  IMember,
-  ReactionObj,
-  GetWsParam,
-  IGuild,
-  IChannel,
-} from "./qq-types.js";
+import { EventEnum, Message } from "./typings.js";
 /* 对话处理函数类型 */
 export interface SockesType {
   [key: string]: any;
@@ -17,7 +7,7 @@ export interface SockesType {
  *
  */
 export type ConversationHandler = (
-  e: Messagetype,
+  e: Message,
   state: ConversationState
 ) => Promise<void>;
 /**
@@ -77,7 +67,7 @@ export enum EType {
 /**
  * 事件类型
  */
-export enum EventType {
+export enum EventTypeEnum {
   CREATE = "CREATE",
   UPDATE = "UPDATE",
   DELETE = "DELETE",
@@ -105,15 +95,15 @@ export interface BotType {
 }
 
 /** 消息类型  */
-export interface MsgType extends IMessage {
+export interface MsgType {
   /* 机器人 */
   version: number;
   session_id: string;
   user: UserType; //机器人信息
   shard: Array<number>; //分发建议
   /* 用户 */
-  message_reference: MessageReference; //引用消息
-  author: IUser; //消息作者
+  message_reference: any; //引用消息
+  author: any; //消息作者
   channel_name: string; //子频道名称
   channel_id: string; //子频道号
   content: string; //消息内容
@@ -121,8 +111,8 @@ export interface MsgType extends IMessage {
   owner_id: string; //频道主 // 删除
   guild_id: string; //频道号
   id: string; //消息id
-  member: IMember; //消息用户
-  mentions: Array<IUser>; //ai消息对象数组
+  member: any; //消息用户
+  mentions: Array<any>; //ai消息对象数组
   seq: number; //消息间的排序,已废弃
   seq_in_channel: string; //消息间的排序,仅限于子频道
   timestamp: string; //消息时间
@@ -229,10 +219,10 @@ export interface EventObjType {
   message?: {
     id: string;
     isPrivate: boolean;
-    type: EventType;
+    type: EventTypeEnum;
     isGroup: boolean; //是否是群聊
     isRecall: boolean; //是否是撤回
-    atuid: IUser[]; // 艾特得到的qq
+    atuid: any; // 艾特得到的qq
     at: boolean; // 是否是艾特
     text: string; // 消息文本
     content: string; // 消息原文
@@ -277,11 +267,11 @@ export interface Messagetype {
   /**
    * 事件类型
    */
-  event: EType;
+  event: EventEnum;
   /**
    * 消息类型
    */
-  eventType: EventType;
+  eventType: EventTypeEnum;
   /**
    * 消息对象
    */
@@ -301,7 +291,7 @@ export interface Messagetype {
   /**
    * 艾特得到的qq
    */
-  atuid: IUser[];
+  atuid: any;
   /**
    * 是否是艾特
    */
@@ -353,13 +343,13 @@ export interface Messagetype {
    * @param boj 表情对象
    * @returns
    */
-  deleteEmoji: (boj: ReactionObj) => Promise<boolean>;
+  deleteEmoji: (boj: any) => Promise<boolean>;
   /**
    * 发送表态
    * @param boj 表情对象
    * @returns
    */
-  postEmoji: (boj: ReactionObj) => Promise<boolean>;
+  postEmoji: (boj: any) => Promise<boolean>;
   /**
    * 公信转私信
    * @param content 内容 | buffer
@@ -411,28 +401,28 @@ export interface Messagetype {
    * 获取当前用户下的所有频道列表
    * @returns
    */
-  getGuildList: () => Promise<boolean | IGuild[]>;
+  getGuildList: () => Promise<boolean | any[]>;
 
   /**
    * 获取频道详情
    * @param guildId 频道编号
    * @returns
    */
-  getGuildMsg: (guildId: string) => Promise<boolean | IGuild>;
+  getGuildMsg: (guildId: string) => Promise<boolean | any>;
 
   /**
    * 获取子频道列表
    * @param guildId 频道编号
    * @returns
    */
-  getChannels: (guildId: string) => Promise<boolean | IChannel[]>;
+  getChannels: (guildId: string) => Promise<boolean | any[]>;
 
   /**
    * 获取子频道详情
    * @param channelId 子频道编号
    * @returns
    */
-  getChannel: (channelId: string) => Promise<boolean | IChannel>;
+  getChannel: (channelId: string) => Promise<boolean | any>;
 
   /**
    * 获取频道下指定成员的信息
@@ -443,7 +433,7 @@ export interface Messagetype {
   getGuildMemberMsg: (
     guildId: string,
     userId: string
-  ) => Promise<boolean | IMember>;
+  ) => Promise<boolean | any>;
 
   /**
    * 撤回指定消息
@@ -471,8 +461,8 @@ export interface Messagetype {
 export interface SuperType {
   name?: string;
   dsc?: string;
-  event?: EType;
-  eventType?: EventType;
+  event?: EventEnum;
+  eventType?: EventTypeEnum;
   priority?: number;
   rule?: Array<{
     //正则
@@ -489,7 +479,7 @@ export interface SuperType {
  * @param masterID 主人编号
  * @param password 密码
  */
-export interface BotConfigType extends GetWsParam {
+export interface BotConfigType {
   secret?: string;
   isPrivate: boolean;
   masterID?: string;

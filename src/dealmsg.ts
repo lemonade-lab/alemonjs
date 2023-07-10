@@ -2,9 +2,10 @@ import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import lodash from "lodash";
 // 非依赖引用
-import { Messagetype, CmdType, EType } from "./types.js";
+import { Messagetype, CmdType } from "./types.js";
 import { getApp, delApp, getMessage, getAppKey } from "./message.js";
 import { conversationHandlers, getConversationState } from "./dialogue.js";
+import { EventEnum, Message } from "./typings.js";
 
 /* 指令合集 */
 let Command: CmdType;
@@ -125,21 +126,34 @@ function dataInit() {
   ExampleArr = [];
   PluginsArr = [];
   Command = {
-    [EType.AUDIO_FREQUENCY]: [],
-    [EType.AUDIO_MICROPHONE]: [],
-    [EType.CHANNEL]: [],
-    [EType.DIRECT_MESSAGE]: [],
-    [EType.FORUMS_THREAD]: [],
-    [EType.FORUMS_POST]: [],
-    [EType.FORUMS_REPLY]: [],
-    [EType.GUILD]: [],
-    [EType.GUILD_MEMBERS]: [],
-    [EType.MESSAGES]: [],
-    [EType.MESSAGE_AUDIT]: [],
-    [EType.INTERACTION]: [],
-    [EType.GUILD_MESSAGE_REACTIONS]: [],
-    [EType.message]: [],
-    "notice.*.poke": [], // 兼容但不响应
+    /* 频道|别野消息 */
+    [EventEnum.GUILD_MESSAGE]: [],
+    /* 子频道|房间消息 */
+    [EventEnum.CHANNEL_MESSAGE]: [],
+    /* 成员进出消息 */
+    [EventEnum.MEMBER_MESSAGE]: [],
+    /* 审核消息 */
+    [EventEnum.AUDIT_MESSAGE]: [],
+    /* 会话消息 */
+    [EventEnum.MESSAGES]: [],
+    /* 会话消息 */
+    [EventEnum.message]: [],
+    /* 私聊会话消息 */
+    [EventEnum.PRIVATE_MESSAGE]: [],
+    /* 论坛主题 */
+    [EventEnum.FORUMS_THREAD]: [],
+    /* 论坛POST */
+    [EventEnum.FORUMS_POST]: [],
+    /* 论坛评论 */
+    [EventEnum.FORUMS_REPLY]: [],
+    /* 表态消息 */
+    [EventEnum.REACTIONS_MESSAGE]: [],
+    /* 音频事件 */
+    [EventEnum.AUDIO_FREQUENCY]: [],
+    /* 麦克风事件 */
+    [EventEnum.AUDIO_MICROPHONE]: [],
+    // 兼容但不响应
+    "notice.*.poke": [],
   };
   return;
 }
@@ -181,15 +195,16 @@ export async function getLoadMsg(key: AppsType) {
 }
 
 /* 指令匹配 */
-export async function InstructionMatching(e: Messagetype) {
-  if (e.isRecall) return true;
+export async function InstructionMatching(e: Message) {
+  // 是撤回,直接返回
+  if (e.message.recall) return true;
   // 匹配不到事件
-  if (!Command[e.event]) return true;
+  if (!Command[e.event.belong]) return true;
 
   /* 获取对话状态 */
-  const state = await getConversationState(e.msg.author.id);
+  const state = await getConversationState(e.user.id);
   /* 获取对话处理函数 */
-  const handler = conversationHandlers.get(e.msg.author.id);
+  const handler = conversationHandlers.get(e.user.id);
   if (handler && state) {
     /* 如果用户处于对话状态，则调用对话处理函数 */
     await handler(e, state);
@@ -198,22 +213,22 @@ export async function InstructionMatching(e: Messagetype) {
 
   // 消息类型兼容层
   const msgarr = ["MESSAGES"];
-  if (e.event == "MESSAGES") {
+  if (e.event.belong == "MESSAGES") {
     msgarr.push("message");
   }
 
   for await (let item of msgarr) {
     // 发现有message  eventType需要变为undefined
     if (item == "message") {
-      e.event = EType.message;
-      e.eventType = undefined;
+      e.event.belong = EventEnum.message;
+      e.event.type = undefined;
     }
     /* 循环所有指令 */
-    for await (let val of Command[e.event]) {
+    for await (let val of Command[e.event.belong]) {
       const { reg, data } = val;
       if (reg === undefined) continue;
-      if (!new RegExp(reg).test(e.cmd_msg)) continue;
-      if (e.eventType != data.eventType) continue;
+      if (!new RegExp(reg).test(e.message.text)) continue;
+      if (e.event.type != data.eventType) continue;
       try {
         const { fnc, AppName } = data;
         const AppFnc = getMessage(AppName);
@@ -251,11 +266,11 @@ export async function InstructionMatching(e: Messagetype) {
  * @param e
  * @returns
  */
-export async function typeMessage(e: Messagetype) {
-  if (!Command[e.event]) return true;
-  for (const val of Command[e.event]) {
+export async function typeMessage(e: Message) {
+  if (!Command[e.event.belong]) return true;
+  for (const val of Command[e.event.belong]) {
     const { data } = val;
-    if (e.eventType != data.eventType) continue;
+    if (e.event.type != data.eventType) continue;
     try {
       const { fnc, AppName } = data;
       const AppFnc = getMessage(AppName);

@@ -1,9 +1,10 @@
-import { EType, SuperType, EventType } from "./types.js";
+import { SuperType, EventTypeEnum } from "./types.js";
+import { EventEnum } from "./typings.js";
 class plugin {
   name?: string;
   dsc?: string;
-  event?: EType;
-  eventType?: EventType;
+  event?: EventEnum;
+  eventType?: EventTypeEnum;
   priority?: number;
   rule?: Array<{
     //正则
@@ -23,8 +24,8 @@ class plugin {
   constructor({
     name = "your-name",
     dsc = "dsc",
-    event = EType.MESSAGES,
-    eventType = EventType.CREATE,
+    event = EventEnum.MESSAGES,
+    eventType = EventTypeEnum.CREATE,
     priority = 5000,
     rule = [],
   }: SuperType) {
