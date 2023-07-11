@@ -207,15 +207,24 @@ export async function InstructionMatching(e: Message) {
   if (e.message.recall) return true;
   // 找不到归属
   if (!Command[e.event.belong]) return true;
-  /* 获取对话状态 */
-  const state = await getConversationState(e.user.id);
-  /* 获取对话处理函数 */
-  const handler = conversationHandlers.get(e.user.id);
-  if (handler && state) {
-    /* 如果用户处于对话状态，则调用对话处理函数 */
-    await handler(e, state);
+
+  // 子频道对话机
+  const stateChannel = await getConversationState(e.channel.id);
+  const handlerChannel = conversationHandlers.get(e.channel.id);
+  if (handlerChannel && stateChannel) {
+    await handlerChannel(e, stateChannel);
     return true;
+  } else {
+    // 没有子频道对话机的时候,单用户对话机才能生效
+    // 单用户对话机
+    const stateUser = await getConversationState(e.user.id);
+    const handlerUser = conversationHandlers.get(e.user.id);
+    if (handlerUser && stateUser) {
+      await handlerUser(e, stateUser);
+      return true;
+    }
   }
+
   // 消息类型兼容层
   const msgarr = ["MESSAGES"];
   if (e.event.belong == "MESSAGES") {
