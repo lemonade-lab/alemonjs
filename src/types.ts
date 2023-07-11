@@ -1,8 +1,16 @@
+/**
+ * *************
+ * 涉及权限的api
+ * *************
+ * 需要更改为?
+ * *************
+ */
+
 // 登录配置
 export interface LoginConfig {
   id: string; // 机器人账号
-  key: string; // 机器人钥匙
-  authority: Array<string>; // 权限
+  key: string; // 机器人密码
+  private: false; // 默认公域
   secret?: string; // 机器人密钥
   account?: string; // 主人账号
   password?: string; // 主人密码

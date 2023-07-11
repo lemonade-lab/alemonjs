@@ -1,4 +1,3 @@
-import { EventType } from "puppeteer";
 // 消息对象
 export interface Message
   extends ReactionController,
@@ -90,7 +89,7 @@ export interface MessageBasice {
 export interface EventBasice {
   id: string; // 事件编号
   belong: EventEnum; // 事件归属
-  type: EventType | undefined; // 创建/更新/删除
+  type: EventTypeEnum | undefined; // 创建/更新/删除
 }
 
 // 回复控制器
