@@ -1,33 +1,51 @@
-☞[English document](./README_English.md)
+### 必要环境
 
-## 一、Alemon-Bot
+`alemon` 核心处理工程包
 
-`alemon-qq` 实例启动模板
+### 编译堆栈不足
 
-点击了解 ☞[Alemon 官网](http://ningmengchongshui.gitee.io/lemonade)
+```
+set NODE_OPTIONS=--max-old-space-size=4096 && tsc
+```
 
-## 一、alemon-qq
+### 计划安排
 
-`alemon` 机器人实例
+框架设计 => alemon => 模板插件写法 + 算法 + 快捷转换
 
-点击了解 ☞[alemon-qq 源码](https://gitee.com/ningmengchongshui/alemon-bot/tree/qq/)
+模板控制 => segment => 判断环境而后转换调用
 
-## 三、almeon
+### qq
 
-`alemon` 框架逻辑块
+接口控制 => alemon-qq => 环境控制 + qq-sdk
 
-点击了解 ☞[alemon 源码](https://gitee.com/ningmengchongshui/alemon-bot/tree/core/)
+### mys
 
-## 四、友情链接
+接口控制 => alemon-mys => 环境控制 + mys-sdk
 
-官方代码包[☞SDK](https://github.com/tencent-connect/bot-node-sdk)
+> mys 暂无 sdk 自定义字段更加容易处理
 
-官方开发文档[☞API](https://bot.q.qq.com/wiki/develop/nodesdk/guild/guilds.html)
+### 数据流
 
-## 五、开源协议
+--> 请求而来的数据
 
-GNU GPL 是使用最广泛的自由软件许可证,并有强烈的版权要求
+--> 不同的机器人实例转换并处理成 alemon 统一的数据字段
 
-分发衍生作品时,作品的源代码必须在同一许可证下可用
+--> 统一的数据字段丢给插件
 
-GNUGPL 有多种变体,每个变体都有不同的要求
+--> 插件开发者对该字段进行业务处理达到兼容效果
+
+### 接口细节
+
+1.基础字段
+
+2.请求字段 -> 无权限要求 --> 基础字段
+
+3.请求字段 -> 有权限要求 --> 通用方法
+
+3.动态字段 -> 通用方法
+
+> 不同的平台会对部分字段造成影响
+
+> 不同的平台功能进度不一,功能缺失造成部分字段失效
+
+> 所有受影响字段应该更改为{ p ? : types}

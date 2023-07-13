@@ -1,45 +1,21 @@
 {
   "compilerOptions": {
-    // 标准代码
+    "baseUrl": "./",
     "target": "ESNext",
-    // 模块系统
     "module": "ESNext",
-    // 不允许隐式的 any 类型
-    "noImplicitAny": false,
-    // 实现CommonJS和ES模块之间的互操作性
-    "esModuleInterop": true,
-    // 可隐藏文件类型
     "moduleResolution": "node",
-    // 不生成编译后文件
-    "noEmit": false,
-    // 出类型文件
-    "declaration": true,
-    // 编译后目录
-    "outDir": "dist",
-    // 清除注释
-    "removeComments": true,
-    // 保留 const 和 enum 声明
-    "preserveConstEnums": true, //保留
-    // 版本控制
     "ignoreDeprecations": "5.0",
-    // 是否对 js 文件进行编译，默认是false
-    "allowJs": false, //编译js
-    // 是否抑制隐式any索引的错误，默认：false
-    "suppressImplicitAnyIndexErrors": true, //抑制
-    // 类型声明
-    "typeRoots": ["node_modules/@types"]
+    "esModuleInterop": true,
+    "preserveConstEnums": true,
+    "typeRoots": ["src/types", "node_modules/@types"],
+    "declaration": true,
+    "declarationDir": "types",
+    "outDir": "lib"
   },
-  // "references": [
-  //   {
-  //     "path": "./tsconfig.node.json"
-  //   }
-  // ],
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
   },
-  // 要编译的路径列表（用于指定那些ts文件需要被编译），
-  "include": ["example", "plugins", "src", "index.ts"],
-  // 要排除的、不编译的文件，它也可以指定一个列表，
-  "exclude": [".cache", "node_modules", "config_default", "dist", "config", "data", "logs"]
+  "include": ["src"],
+  "exclude": ["node_modules", "lib", "types"]
 }
