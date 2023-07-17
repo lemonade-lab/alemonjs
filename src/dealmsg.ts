@@ -4,7 +4,7 @@ import lodash from "lodash";
 // 非依赖引用
 import { getApp, delApp, getMessage, getAppKey } from "./message.js";
 import { conversationHandlers, getConversationState } from "./dialogue.js";
-import { EventEnum, Message } from "./typings.js";
+import { EventEnum, MessageEvent } from "./typings.js";
 // 指令类型
 export interface CmdType {
   [key: string]: Array<any>;
@@ -202,7 +202,7 @@ export async function getLoadMsg(key: AppsType) {
 }
 
 /* 指令匹配 */
-export async function InstructionMatching(e: Message) {
+export async function InstructionMatching(e: MessageEvent) {
   // 是撤回,直接返回
   if (e.message.recall) return true;
   // 找不到归属
@@ -276,7 +276,7 @@ export async function InstructionMatching(e: Message) {
  * @param e
  * @returns
  */
-export async function typeMessage(e: Message) {
+export async function typeMessage(e: MessageEvent) {
   // 找不到归属
   if (!Command[e.event.belong]) return true;
   for (const val of Command[e.event.belong]) {

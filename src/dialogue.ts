@@ -1,12 +1,12 @@
 // 非依赖引用
-import { Message } from "./typings.js";
+import { MessageEvent } from "./typings.js";
 // 对话处理函数类型
 export interface SockesType {
   [key: string]: any;
 }
 // 对话机
 export type ConversationHandler = (
-  e: Message,
+  e: MessageEvent,
   state: ConversationState
 ) => Promise<void>;
 // 对话状态类型
