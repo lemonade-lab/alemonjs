@@ -13,6 +13,7 @@ export interface LoginConfig {
   private: false; // 默认公域
   secret?: string; // 机器人密钥
   account?: string; // 主人账号
+  master?: string; // 主人编号
   password?: string; // 主人密码
   sendbox?: boolean; // 是沙盒？
 }
