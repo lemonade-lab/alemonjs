@@ -10,7 +10,7 @@
 export interface LoginConfig {
   id: string; // 机器人账号
   key: string; // 机器人密码
-  private: false; // 默认公域
+  private: boolean; // 属性?
   secret?: string; // 机器人密钥
   account?: string; // 主人账号
   master?: string; // 主人编号

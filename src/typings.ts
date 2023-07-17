@@ -72,14 +72,14 @@ export interface RobotBasice {
 // 消息基础信息
 export interface MessageBasice {
   id: string; // 编号
-  groupChat: true; // 是群聊(房间/子频道)
+  time: string; // 发送时间
   publickSphere: true; // 公域
   privateSphere: false; // 私域
-  at: false; // 是艾特？  注：机器人@不算@
-  atuid: Array<string>; // @得到的UID集
-  recall: false; // 是撤回？
-  time: string; // 发送时间
-  centent: string; // 被处理后的消息内容
+  groupChat: true; // 是群聊(房间/子频道)
+  at?: false; // 是艾特？  注：机器人@不算@
+  atuid?: Array<string>; // @得到的UID集
+  recall?: false; // 是撤回？
+  centent?: string; // 被处理后的消息内容
   text?: string; // 消息原文本
 }
 
