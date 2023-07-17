@@ -1,15 +1,31 @@
 ☞[中文文档](./README.md)
 
-## Almeon
+## Almon Cross Platform Development Framework
 
-`alemon` Framework logic block
+[☞Alemon official website](http://ningmengchongshui.gitee.io/alemon)
 
-Click to learn more ☞[Alemon official website](http://ningmengchongshui.github.io/alemon)
+[☞Click on the link to join the QQ channel](https://pd.qq.com/s/h1o84u58q)
 
-## Open source protocol
+[☞Click on the link to join Discord](https://discord.gg/8dHrVvp3Ad)
 
-The GNU GPL is the most widely used free software license and has a strong copyleft requirement.
+[☞Click on the link to join the Mi You Club](https://dby.miyoushe.com/chat/2142/33641)
 
-When distributing derived works, the source code of the work must be made available under the same license.
+| 分支  | 类型  | 说明  |
+|---|---|---|
+| main  | core  | almeon code  |
+| qq  | bot  | alemon-qq source code  |
+| mys  | bot  | alemon-mys source code  |
+| dc  | bot  | alemon-dc  source code |
+| plugin  | plugin  | Test plugin source code  |
+| redis| npm  | Special connection independent dependency package  |
+| cli | cli  | Installation of control robots  |
+| web | web  | Shared platform plugin contribution address  |
+
+
+## 开源协议
+
+The GNU GPL is the most widely used free software license and has a strong copyleft requirement. 
+
+When distributing derived works, the source code of the work must be made available under the same license. 
 
 There are multiple variants of the GNU GPL, each with different requirements.
