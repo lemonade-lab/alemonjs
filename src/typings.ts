@@ -79,7 +79,7 @@ export interface MessageBasice {
   at?: false; // 是艾特？  注：机器人@不算@
   atuid?: Array<string>; // @得到的UID集
   recall?: false; // 是撤回？
-  centent?: string; // 被处理后的消息内容
+  content?: string; // 被处理后的消息内容
   text?: string; // 消息原文本
 }
 
