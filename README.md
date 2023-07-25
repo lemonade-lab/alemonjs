@@ -26,13 +26,13 @@
 
 > 仓库只做资源收集,对齐安全性不做任何检查,请谨慎选择
 
-查看 ☞[贡献资源](https://gitee.com/ningmengchongshui/alemon/edit/web/docs/root/examples/about/plugins.md)
+查看 ☞[贡献资源](https://gitee.com/ningmengchongshui/alemon/tree/web/docs/root/examples/about/plugins.md)
 
 ### 平台推送
 
 > 仅限签署开源协议的仓库、不开源将不做考虑范围内
 
-请参考 ☞[贡献指南](https://gitee.com/ningmengchongshui/alemon/edit/web/PullRequest.md)向此仓库发起 pull request
+请参考 ☞[贡献指南](https://gitee.com/ningmengchongshui/alemon/tree/web/PullRequest.md)向此仓库发起 pull request
 
 ## 开源协议
 
