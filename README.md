@@ -32,8 +32,6 @@
 
 > 仅限签署开源协议的仓库、不开源将不做考虑范围内
 
-请参考 ☞[贡献指南](https://gitee.com/ningmengchongshui/alemon/tree/web/PullRequest.md)向此仓库发起 pull request
-
 ## 开源协议
 
 GNU GPL 是使用最广泛的自由软件许可证,并有强烈的版权要求
