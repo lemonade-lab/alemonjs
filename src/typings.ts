@@ -19,75 +19,120 @@ export interface MessageEvent
 
 // 事件枚举
 export enum EventEnum {
-  GUILD_MESSAGE = "GUILD_MESSAGE", // 频道|别野消息
-  CHANNEL_MESSAGE = "CHANNEL_MESSAGE", // 子频道|房间消息
-  MEMBER_MESSAGE = "MEMBER_MESSAGE", // 成员进出消息
-  AUDIT_MESSAGE = "AUDIT_MESSAGE", // 审核消息
-  MESSAGES = "MESSAGES", // 会话消息
-  message = "message", // 会话消息
-  PRIVATE_MESSAGE = "PRIVATE_MESSAGE", // 私聊会话消息
-  FORUMS_THREAD = "FORUMS_THREAD", // 论坛主题
-  FORUMS_POST = "FORUMS_POST", // 论坛推送
-  FORUMS_REPLY = "FORUMS_REPLY", // 论坛评论
-  REACTIONS_MESSAGE = "REACTIONS_MESSAGE", // 表态消息
-  AUDIO_FREQUENCY = "AUDIO_FREQUENCY", // 音频事件
-  AUDIO_MICROPHONE = "AUDIO_MICROPHONE", // 麦克风事件
+  // 频道|别野消息
+  GUILD_MESSAGE = "GUILD_MESSAGE",
+  // 子频道|房间消息
+  CHANNEL_MESSAGE = "CHANNEL_MESSAGE",
+  // 成员进出消息
+  MEMBER_MESSAGE = "MEMBER_MESSAGE",
+  // 审核消息
+  AUDIT_MESSAGE = "AUDIT_MESSAGE",
+  // 会话消息
+  MESSAGES = "MESSAGES",
+  // 会话消息
+  message = "message",
+  // 私聊会话消息
+  PRIVATE_MESSAGE = "PRIVATE_MESSAGE",
+  // 论坛主题
+  FORUMS_THREAD = "FORUMS_THREAD",
+  // 论坛推送
+  FORUMS_POST = "FORUMS_POST",
+  // 论坛评论
+  FORUMS_REPLY = "FORUMS_REPLY",
+  // 表态消息
+  REACTIONS_MESSAGE = "REACTIONS_MESSAGE",
+  // 音频事件
+  AUDIO_FREQUENCY = "AUDIO_FREQUENCY",
+  // 麦克风事件
+  AUDIO_MICROPHONE = "AUDIO_MICROPHONE",
 }
+
 // 事件类型
 export enum EventTypeEnum {
-  CREATE = "CREATE", // 创建|增加| 推送
-  UPDATE = "UPDATE", // 更新|变更
-  DELETE = "DELETE", // 删除|移除
+  // 创建|增加| 推送
+  CREATE = "CREATE",
+  // 更新|变更
+  UPDATE = "UPDATE",
+  // 删除|移除
+  DELETE = "DELETE",
 }
 
 // 子频道基础信息
 export interface ChannelBasice {
-  id: string; // 子频道编号
-  name: string; // 子频道名
-  type: string; // 子频道类ing
+  // 子频道编号
+  id: string;
+  // 子频道名
+  name: string;
+  // 子频道类ing
+  type: string;
 }
 
 // 频道基础信息
 export interface GuildBasice {
-  id: string; // 频道编号
-  name: string; // 频道名
-  icon: string; // 频道头像
+  // 频道编号
+  id: string;
+  // 频道名
+  name: string;
+  // 频道头像
+  icon: string;
 }
 
 // 用户基础信息
 export interface UserBasice {
-  id: string; // 编号
-  name: string; // 昵称
-  bot: true; // 是机器人？
-  avatar: string; // 头像地址
-  master: false; // 主人？
+  // 编号
+  id: string;
+  // 昵称
+  name: string;
+  // 是机器人？
+  bot: boolean;
+  // 头像地址
+  avatar: string;
+  // 主人？
+  master: false;
 }
 // 机器人基础信息
 export interface RobotBasice {
-  id: string; // 编号
-  name: string; // 昵称
-  bot: true; // 是机器人？
-  avatar?: string; // 头像地址
+  // 编号
+  id: string;
+  // 昵称
+  name: string;
+  // 是机器人？
+  bot: true;
+  // 头像地址
+  avatar?: string;
 }
 // 消息基础信息
 export interface MessageBasice {
-  id: string; // 编号
-  time: string; // 发送时间
-  publickSphere: true; // 公域
-  privateSphere: false; // 私域
-  groupChat: true; // 是群聊(房间/子频道)
-  at?: false; // 是艾特？  注：机器人@不算@
-  atuid?: Array<string>; // @得到的UID集
-  recall?: false; // 是撤回？
-  content?: string; // 被处理后的消息内容
-  text?: string; // 消息原文本
+  // 编号
+  id: string;
+  // 发送时间
+  time: string;
+  // 公域
+  publickSphere: boolean;
+  // 私域
+  privateSphere: boolean;
+  // 是群聊(房间/子频道)
+  groupChat: boolean;
+  // 是艾特？  注：机器人@不算@
+  at?: boolean;
+  // @得到的UID集
+  atuid?: Array<string>;
+  // 是撤回？
+  recall?: boolean;
+  // 被处理后的消息内容
+  content?: string;
+  // 消息原文本
+  text?: string;
 }
 
 // 事件基础信息
 export interface EventBasice {
-  id: string; // 事件编号
-  belong: EventEnum; // 事件归属
-  type: EventTypeEnum | undefined; // 创建/更新/删除
+  // 事件编号
+  id: string;
+  // 事件归属
+  belong: EventEnum;
+  // 创建/更新/删除
+  type: EventTypeEnum | undefined;
 }
 
 // 回复控制器
@@ -98,7 +143,7 @@ export interface ReplyController {
    * @param img 图片元素
    * @returns
    */
-  reply: (msg: string | Buffer, img: Buffer) => Promise<string | false>;
+  reply: (msg: string | Buffer, img: Buffer) => Promise<string | boolean>;
   /**
    * 图片消息
    * @param msg
@@ -106,71 +151,74 @@ export interface ReplyController {
    * @returns
    */
   replyImage: (
+    // 消息文本
     msg:
-      | string // 消息文本
+      | string
       | {
-          image: string; // url地址
+          // url地址
+          image: string;
         },
     obj: {
-      image: string; // url 地址
+      // url 地址
+      image: string;
     }
-  ) => Promise<string | false>;
+  ) => Promise<string | boolean>;
   /**
    * 卡片消息
    * @param obj
    * @returns
    */
-  replyCard: (obj: object) => Promise<string | false>;
+  replyCard: (obj: object) => Promise<string | boolean>;
   /**
    * 链接消息
    * @param obj
    * @returns
    */
-  replyLink: (obj: object) => Promise<string | false>;
+  replyLink: (obj: object) => Promise<string | boolean>;
   /**
    * 标题消息
    * @param obj
    * @returns
    */
-  replyTitle: (obj: object) => Promise<string | false>;
+  replyTitle: (obj: object) => Promise<string | boolean>;
   /**
    * 转发消息
    * @param obj
    * @returns
    */
-  replyForward: (obj: object) => Promise<string | false>;
+  replyForward: (obj: object) => Promise<string | boolean>;
   /**
    * 通知消息
    * @param obj
    * @returns
    */
-  replyNotice: (obj: object) => Promise<string | false>;
+  replyNotice: (obj: object) => Promise<string | boolean>;
   /**
    * 按钮消息
    * @param obj
    * @returns
    */
-  replyButtom: (obj: object) => Promise<string | false>;
+  replyButtom: (obj: object) => Promise<string | boolean>;
   /**
    * 引用消息
    * @param obj
    * @returns
    */
-  replyQuote: (obj: object) => Promise<string | false>;
+  replyQuote: (obj: object) => Promise<string | boolean>;
   /**
    * 表态消息
    * @param mid 消息编号
    * @param obj 表情对象
    * @returns
    */
-  replyReaction: (mid: string, obj: object) => Promise<string | false>;
+  replyReaction: (mid: string, obj: object) => Promise<string | boolean>;
   /**
    * 回复消息
    * @param mid  消息编号
    * @param msg 消息内容
    * @returns
    */
-  replyMsg: (mid: string, msg: string) => Promise<string | false>;
+  replyMsg: (mid: string, msg: string) => Promise<string | boolean>;
 }
 
 // 特殊消息交互控制器

@@ -1,10 +1,12 @@
 import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import lodash from "lodash";
+
 // 非依赖引用
 import { getApp, delApp, getMessage, getAppKey } from "./message.js";
 import { conversationHandlers, getConversationState } from "./dialogue.js";
 import { EventEnum, MessageEvent } from "./typings.js";
+
 // 指令类型
 export interface CmdType {
   [key: string]: Array<any>;
@@ -181,8 +183,10 @@ export async function cmdInit() {
 
 // 插件类型
 export enum AppsType {
-  example = "example", // 简单插件
-  plugins = "plugins", //  应用插件
+  // 简单插件
+  example = "example",
+  //  应用插件
+  plugins = "plugins",
 }
 
 /**

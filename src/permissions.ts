@@ -21,6 +21,7 @@ export interface PermissionsType {
   botmiss: number;
 }
 
+// 权限默认值
 export const permissions = {
   look: 1,
   manage: 2,
@@ -28,7 +29,7 @@ export const permissions = {
   broadcast: 8,
 };
 
-/** 权限模板  */
+// 权限模板
 export const not_permissions: PermissionsType = {
   state: false,
   look: false,
@@ -37,6 +38,7 @@ export const not_permissions: PermissionsType = {
   broadcast: false,
   botmiss: 0,
 };
+
 /**
  * 得到权限对象
  * @param value 权值

@@ -8,6 +8,5 @@ export * from "./permissions.js";
 export * from "./dealmsg.js";
 export * from "./puppeteer.js";
 export * from "./screenshot.js";
-export * from "./config.js";
 export * from "./types.js";
 export * from "./typings.js";

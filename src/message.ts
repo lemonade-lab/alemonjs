@@ -1,5 +1,7 @@
-/** 插件控制 */
+// 插件控制
 const APP = {};
+// 消息控制
+const MSG = {};
 /**
  * 得到应用
  * @param key 插件名
@@ -32,8 +34,6 @@ export function getAppKey() {
   }
   return arr;
 }
-/** 消息控制 */
-const MSG = {};
 /**
  * 得到消息
  * @param key 插件名

@@ -101,15 +101,15 @@ export async function startPage(
       if (!(await startChrom())) return false;
     }
     console.log("[puppeteer]开始截图");
-    /* 实例化 */
+    // 实例化
     const page = await browser.newPage();
-    /* 挂载网页 */
+    /// 挂载网页
     await page.goto(`file://${htmlPath}`, {
       timeout,
     });
-    /* 获取元素 */
+    // 获取元素
     const body = await page.$(tab);
-    /* 得到图片 */
+    // 得到图片
     console.info("[puppeteer]截图成功");
     return await body.screenshot(SOptions).catch((err) => {
       console.log(err);

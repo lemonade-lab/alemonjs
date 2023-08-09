@@ -36,14 +36,3 @@ export function buffer(path: string) {
   const BufferImage = Buffer.from(image);
   return BufferImage;
 }
-
-/**
- * 加载url图片
- * @param url
- * @returns
- */
-export function image(url: string) {
-  return {
-    image: url,
-  };
-}

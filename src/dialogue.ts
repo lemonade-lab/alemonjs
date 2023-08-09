@@ -1,9 +1,13 @@
 // 非依赖引用
 import { MessageEvent } from "./typings.js";
+
 // 对话处理函数类型
 export interface SockesType {
   [key: string]: any;
 }
+// 存储
+const Sockes: SockesType = {};
+
 // 对话机
 export type ConversationHandler = (
   e: MessageEvent,
@@ -18,8 +22,6 @@ export type ConversationState = {
   // 携带的方法
   fnc: Function;
 };
-// 存储
-const Sockes: SockesType = {};
 /**
  * 获取
  * @param key
@@ -46,7 +48,7 @@ const delAsync = async (key: string) => {
   return;
 };
 
-/* 注册对话处理器 */
+// 注册对话处理器
 export const conversationHandlers: Map<string, ConversationHandler> = new Map();
 
 /**
@@ -61,7 +63,12 @@ export const getConversationState = async (
   return state ? JSON.parse(state) : null;
 };
 
-/* 保存对话状态 */
+/**
+ * 保存对话状态
+ * @param userId
+ * @param state
+ * @returns
+ */
 export const setConversationState = async (
   userId: string,
   state: ConversationState
@@ -71,7 +78,11 @@ export const setConversationState = async (
   return;
 };
 
-/* 删除对话状态 */
+/**
+ * 删除对话状态
+ * @param userId
+ * @returns
+ */
 export const deleteConversationState = async (
   userId: string
 ): Promise<void> => {
