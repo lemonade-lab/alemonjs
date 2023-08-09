@@ -90,6 +90,7 @@ export interface UserBasice {
   // 主人？
   master: false;
 }
+
 // 机器人基础信息
 export interface RobotBasice {
   // 编号
@@ -101,6 +102,7 @@ export interface RobotBasice {
   // 头像地址
   avatar?: string;
 }
+
 // 消息基础信息
 export interface MessageBasice {
   // 编号
@@ -228,9 +230,9 @@ export interface InteractiveController {
   // 艾特全体
   interactiveAtAll: () => string;
   // 引用频道
-  interactiveChannel: () => string;
+  interactiveChannel: (nid: string) => string;
   // 系统表情
-  interactiveFace: () => string;
+  interactiveFace: (obj: object) => string;
 }
 
 // 撤回控制器
@@ -277,11 +279,11 @@ export interface ChannelController {
   createChannelAnnounce: Function;
   // 创建子频道精华
   deleteChannelAnnounce: Function;
-  // 删除子频道
+  // 创建
   createChannelEssence: Function;
-  //
-  getChannelEssenc: Function;
-  //
+  // 得到
+  getChannelEssence: Function;
+  // 删除
   deleteChannelEssence: Function;
 }
 
