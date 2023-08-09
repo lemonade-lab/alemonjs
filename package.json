@@ -2,6 +2,7 @@
   "name": "alemonjs",
   "version": "1.0.0",
   "description": "阿柠檬框架处理器",
+  "private": true,
   "main": "lib/index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
