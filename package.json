@@ -1,7 +1,7 @@
 {
-  "name": "alemon",
-  "version": "1.4.6",
-  "description": "阿柠檬框架核心功能处理器",
+  "name": "alemonjs",
+  "version": "1.0.0",
+  "description": "阿柠檬框架处理器",
   "main": "lib/index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
@@ -32,10 +32,7 @@
     "ts-node": "^10.9.1"
   },
   "keywords": [
-    "alemon-core",
     "alemon-cli",
-    "alemon-bot",
-    "alemon-redis",
-    "create-alemon"
+    "alemon-redis"
   ]
 }
