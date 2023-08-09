@@ -73,7 +73,6 @@ export const setConversationState = async (
   userId: string,
   state: ConversationState
 ): Promise<void> => {
-  // await setAsync(`conversation-state:${userId}`, JSON.stringify(state), 'EX', 3600)
   await setAsync(`conversation-state:${userId}`, JSON.stringify(state));
   return;
 };

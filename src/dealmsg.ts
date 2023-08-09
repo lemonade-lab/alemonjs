@@ -60,11 +60,11 @@ async function synthesis(AppsObj: object, AppName: string) {
  * @param dir
  */
 async function loadExample(dir: string) {
-  /* 初始化 */
+  // 初始化
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  /* 读取文件 */
+  // 读取文件
   const readDir = readdirSync(dir);
-  /* 正则匹配ts文件并返回 */
+  // 正则匹配ts文件并返回
   const flies = readDir.filter((item) => /.(ts|js)$/.test(item));
   for (let appname of flies) {
     if (!existsSync(`${dir}/${appname}`)) {
@@ -100,7 +100,7 @@ async function loadExample(dir: string) {
 async function loadPlugins(dir: string) {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   let flies = readdirSync(dir);
-  //识别并执行插件
+  // 识别并执行插件
   for await (let appname of flies) {
     // 优先考虑ts
     if (existsSync(`${dir}/${appname}/index.ts`)) {
@@ -120,7 +120,7 @@ async function loadPlugins(dir: string) {
     }
   }
   const APPARR = getAppKey();
-  //获取插件方法
+  // 获取插件方法
   for await (let item of APPARR) {
     const apps = getApp(item);
     await synthesis(apps, item);
@@ -135,31 +135,31 @@ function dataInit() {
   ExampleArr = [];
   PluginsArr = [];
   Command = {
-    /* 频道|别野消息 */
+    // 频道|别野消息
     [EventEnum.GUILD_MESSAGE]: [],
-    /* 子频道|房间消息 */
+    // 子频道|房间消息
     [EventEnum.CHANNEL_MESSAGE]: [],
-    /* 成员进出消息 */
+    // 成员进出消息
     [EventEnum.MEMBER_MESSAGE]: [],
-    /* 审核消息 */
+    // 审核消息
     [EventEnum.AUDIT_MESSAGE]: [],
-    /* 会话消息 */
+    // 会话消息
     [EventEnum.MESSAGES]: [],
-    /* 会话消息 */
+    // 会话消息
     [EventEnum.message]: [],
-    /* 私聊会话消息 */
+    // 私聊会话消息
     [EventEnum.PRIVATE_MESSAGE]: [],
-    /* 论坛主题 */
+    // 论坛主题
     [EventEnum.FORUMS_THREAD]: [],
-    /* 论坛POST */
+    // 论坛POST
     [EventEnum.FORUMS_POST]: [],
-    /* 论坛评论 */
+    // 论坛评论
     [EventEnum.FORUMS_REPLY]: [],
-    /* 表态消息 */
+    // 表态消息
     [EventEnum.REACTIONS_MESSAGE]: [],
-    /* 音频事件 */
+    // 音频事件
     [EventEnum.AUDIO_FREQUENCY]: [],
-    /* 麦克风事件 */
+    // 麦克风事件
     [EventEnum.AUDIO_MICROPHONE]: [],
     // 兼容但不响应
     "notice.*.poke": [],
@@ -185,7 +185,7 @@ export async function cmdInit() {
 export enum AppsType {
   // 简单插件
   example = "example",
-  //  应用插件
+  // 应用插件
   plugins = "plugins",
 }
 
@@ -236,7 +236,7 @@ export async function InstructionMatching(e: MessageEvent) {
       e.event.belong = EventEnum.message;
       e.event.type = undefined;
     }
-    /* 循环所有指令 */
+    // 循环所有指令
     for await (let val of Command[e.event.belong]) {
       const { reg, belong, type, AppName, fncName, fnc } = val;
       if (reg === undefined) continue;
