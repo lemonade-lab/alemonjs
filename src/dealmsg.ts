@@ -9,8 +9,10 @@ import { EventEnum, MessageEvent } from "./typings.js";
 export interface CmdType {
   [key: string]: Array<any>;
 }
-/* 指令合集 */
+
+// 指令合集
 let Command: CmdType;
+// 插件名集合
 let ExampleArr = [];
 let PluginsArr = [];
 
@@ -126,9 +128,7 @@ async function loadPlugins(dir: string) {
   return;
 }
 
-/**
- * 初始化应用
- */
+// 初始化应用
 function dataInit() {
   ExampleArr = [];
   PluginsArr = [];
@@ -165,9 +165,7 @@ function dataInit() {
   return;
 }
 
-/**
- * 启动加载
- */
+// 启动加载
 export async function cmdInit() {
   dataInit();
   await loadPlugins(join(process.cwd(), "/plugins"));
@@ -181,9 +179,7 @@ export async function cmdInit() {
   return;
 }
 
-/**
- * 插件类型
- */
+// 插件类型
 export enum AppsType {
   example = "example", // 简单插件
   plugins = "plugins", //  应用插件
@@ -201,7 +197,7 @@ export async function getLoadMsg(key: AppsType) {
   }[key];
 }
 
-/* 指令匹配 */
+// 指令匹配
 export async function InstructionMatching(e: MessageEvent) {
   // 是撤回,直接返回
   if (e.message.recall) return true;

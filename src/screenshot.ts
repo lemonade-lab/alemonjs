@@ -6,10 +6,10 @@ import lodash from "lodash";
 /* 非依赖引用 */
 import { screenshot } from "./puppeteer.js";
 /*模板缓存*/
-let html = {};
+const html = {};
 
 /*监听器*/
-let watcher = {};
+const watcher = {};
 
 /**
  * 缓存监听

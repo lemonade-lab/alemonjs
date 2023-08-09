@@ -1,11 +1,3 @@
-/**
- * *************
- * 涉及权限的api
- * *************
- * 需要更改为?
- * *************
- */
-
 // 登录配置
 export interface LoginConfig {
   id: string; // 机器人账号
@@ -16,27 +8,6 @@ export interface LoginConfig {
   master?: string; // 主人编号
   password?: string; // 主人密码
   sendbox?: boolean; // 是沙盒？
-}
-
-// 应用类型
-export interface AppType {
-  [key: string]: object;
-}
-
-// 权限类型
-export interface PermissionsType {
-  //子频道权限
-  state: boolean;
-  //可查看
-  look: boolean;
-  //可管理
-  manage: boolean;
-  //可发言
-  speak: boolean;
-  //可直播
-  broadcast: boolean;
-  //权限权重
-  botmiss: number;
 }
 
 // 身份类型

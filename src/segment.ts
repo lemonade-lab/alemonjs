@@ -1,4 +1,3 @@
-import { EmojiMap } from "./emoji.js";
 import { readFileSync } from "node:fs";
 import http from "http";
 import https from "https";
@@ -36,16 +35,6 @@ export function buffer(path: string) {
   // 将图片转换为 Buffer 对象
   const BufferImage = Buffer.from(image);
   return BufferImage;
-}
-
-/**
- * 字符串通用表情
- * @param type
- * @param id
- * @returns
- */
-export function expression(type: number, id: number) {
-  return EmojiMap[type][id];
 }
 
 /**

@@ -4,6 +4,23 @@
  * 可发言子频道	0x0000000004(1 << 2)	支持指定成员发言类型，支持身份组发言类型
  * 可直播子频道	0x0000000008 (1 << 3)	支持指定成员发起直播，支持身份组发起直播；仅可在直播子频道中设置
  */
+
+// 权限类型
+export interface PermissionsType {
+  //子频道权限
+  state: boolean;
+  //可查看
+  look: boolean;
+  //可管理
+  manage: boolean;
+  //可发言
+  speak: boolean;
+  //可直播
+  broadcast: boolean;
+  //权限权重
+  botmiss: number;
+}
+
 export const permissions = {
   look: 1,
   manage: 2,
@@ -12,7 +29,7 @@ export const permissions = {
 };
 
 /** 权限模板  */
-export const not_permissions = {
+export const not_permissions: PermissionsType = {
   state: false,
   look: false,
   manage: false,

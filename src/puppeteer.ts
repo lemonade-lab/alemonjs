@@ -19,14 +19,29 @@ let browser: Browser;
 let isBrowser: boolean = false;
 
 //实例配置
-let LaunchCfg: PuppeteerLaunchOptions;
+let LaunchCfg: PuppeteerLaunchOptions = {
+  headless: "new",
+  timeout: 30000,
+  args: [
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--disable-setuid-sandbox",
+    "--no-first-run",
+    "--no-sandbox",
+    "--no-zygote",
+    "--single-process",
+  ],
+};
 
 /**
  * 配置浏览器参数
  * @param val
  */
 export function setLanchConfig(val: PuppeteerLaunchOptions) {
-  LaunchCfg = val;
+  LaunchCfg = {
+    ...LaunchCfg,
+    ...val,
+  };
 }
 
 /**

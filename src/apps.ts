@@ -124,9 +124,10 @@ export function createApp(AppName: string) {
 
 /**
  * 创建插件应用
+ * @deprecated 该方法已经废弃,请使用createApp()
  * @param AppName  插件名（与插件名相同）
  * @param DirName 应用地址（默认为apps）
- * @returns 已废弃,请使用 createapp()
+ * @returns
  */
 export const createApps = async (
   AppName: string,
