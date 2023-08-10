@@ -2,7 +2,7 @@
 
 ## Almon Cross Platform Development Framework
 
-[☞Alemon official website](http://ningmengchongshui.gitee.io/alemon)
+[☞Alemon official website](https://www.alemonjs.com/alemon)
 
 [☞Click on the link to join the QQ channel](https://pd.qq.com/s/h1o84u58q)
 
@@ -16,7 +16,6 @@
 | qq  | bot  | alemon-qq source code  |
 | mys  | bot  | alemon-mys source code  |
 | dc  | bot  | alemon-dc  source code |
-| plugin  | plugin  | Test plugin source code  |
 | redis| npm  | Special connection independent dependency package  |
 | cli | cli  | Installation of control robots  |
 | web | web  | Shared platform plugin contribution address  |

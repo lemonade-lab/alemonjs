@@ -2,7 +2,7 @@
 
 ## Almeon 阿柠檬跨平台开发框架
 
-[☞Alemon 官网](http://ningmengchongshui.gitee.io/alemon)
+[☞Alemon 官网](https://www.alemonjs.com/alemon)
 
 [☞点击链接加入QQ频道](https://pd.qq.com/s/h1o84u58q)
 
@@ -11,15 +11,14 @@
 [☞点击链接加入米游社别野](https://dby.miyoushe.com/chat/2142/33641)
 
 | 分支  | 类型  | 说明  |
-|---|---|---|
-| main  | 核心  | almeon核心处理块  |
-| qq  | 机器人  | alemon-qq源码  |
-| mys  | 机器人  | alemon-mys源码人  |
-| dc  | 机器人  | alemon-dc源码  |
-| plugin  | 插件  | 测试插件源码  |
+| ---- | ---- | ---- |
+| main | 核心  | almeon核心处理块   |
+| qq   | 机器人| alemon-qq源码      |
+| mys  | 机器人| alemon-mys源码人   |
+| dc   | 机器人| alemon-dc源码      |
 | redis| 依赖  | 特殊连接独立依赖包  |
-| cli | 脚手架  | 控制机器人的安装  |
-| web | 网站  | 共享平台插件贡献地址  |
+| cli  | 脚手架| 控制机器人的安装    |
+| web  | 网站  | 共享平台插件贡献地址|
 
 
 ### 共享平台
