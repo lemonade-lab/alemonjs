@@ -13,11 +13,11 @@
 | 分支  | 类型  | 说明  |
 | ---- | ---- | ---- |
 | main | 核心  | almeon核心处理块   |
-| qq   | 机器人| alemon-qq源码      |
-| mys  | 机器人| alemon-mys源码人   |
-| dc   | 机器人| alemon-dc源码      |
-| redis| 依赖  | 特殊连接独立依赖包  |
-| cli  | 脚手架| 控制机器人的安装    |
+| qq   | 机器人| alemon-qq机器人实例      |
+| mys  | 机器人| alemon-mys机器人实例   |
+| dc   | 机器人| alemon-dc机器人实例      |
+| redis| 依赖  | 特殊连接独立  |
+| cli  | 脚手架| 开发模板脚手架    |
 | web  | 网站  | 共享平台插件贡献地址|
 
 
