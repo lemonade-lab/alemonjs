@@ -1,11 +1,26 @@
 import redisClient from "ioredis";
 import { join } from "path";
 import { getYaml } from "./config.js";
-export * from "ioredis";
-export function createRedis(cfg = "config/redis.yaml") {
+import { ioRedisConfigType } from "./types.js";
+
+export const ioRedisConfig: ioRedisConfigType = {
+  host: "127.0.0.1",
+  port: 6379,
+  password: "",
+  db: 1,
+};
+
+export function createRedis(
+  cfg: string | ioRedisConfigType = "config/redis.yaml"
+) {
   try {
     if (typeof cfg === "string") {
-      const redis_config = getYaml(join(process.cwd(), cfg));
+      let redis_config;
+      try {
+        redis_config = getYaml(join(process.cwd(), cfg));
+      } catch (error) {
+        redis_config = ioRedisConfig;
+      }
       const ALRedis = new redisClient(redis_config);
       ALRedis.on("error", (error) => {
         console.error("\n[REDIS]", error);
@@ -13,6 +28,7 @@ export function createRedis(cfg = "config/redis.yaml") {
       });
       return ALRedis;
     } else {
+      // 如果配置cfg中没有 host  port 和 password  字段则使用
       const ALRedis = new redisClient(cfg);
       ALRedis.on("error", (error) => {
         console.error("\n[REDIS]", error);
@@ -24,3 +40,5 @@ export function createRedis(cfg = "config/redis.yaml") {
     console.log(err);
   }
 }
+
+export * from "ioredis";
