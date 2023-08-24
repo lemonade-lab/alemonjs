@@ -121,3 +121,45 @@ export function createApp(AppName: string) {
     },
   };
 }
+
+/**
+ * 集成工程
+ * @param AppName
+ * @param DirName
+ * @returns
+ */
+export async function integration(AppName: string, DirName = "apps") {
+  /** 根目录锁定 */
+  const RootPath = join(process.cwd(), "plugins", AppName);
+  /**  集成 */
+  const apps = {};
+  try {
+    const filepath = join(RootPath, DirName);
+    mkdirSync(filepath, { recursive: true });
+    const arr = getAllJsAndTsFilesSync(filepath);
+    for await (const AppDir of arr) {
+      //文件对象:对象中有多个class
+      const dirObject = await import(`file://${AppDir}`).catch((err) => {
+        console.error(AppName);
+        console.error(AppDir);
+        console.error(err);
+        return {};
+      });
+      for (const item in dirObject) {
+        //如果该导出是class
+        if (dirObject[item].prototype) {
+          //如果没发现有
+          if (Object.prototype.hasOwnProperty.call(apps, item)) {
+            console.error(`[同名class export]  ${AppDir}`);
+          }
+          apps[item] = dirObject[item];
+        } else {
+          console.error(`[非class export]  ${AppDir}`);
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+  return apps;
+}
