@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync, watch, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, writeFileSync, watch, mkdirSync } from "fs";
+import { join } from "path";
 import { ScreenshotOptions } from "puppeteer";
 import template from "art-template";
 import lodash from "lodash";

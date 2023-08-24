@@ -1,5 +1,5 @@
-import { readdirSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, mkdirSync } from "fs";
+import { join } from "path";
 
 // 非依赖引用
 import { setApp, setMessage } from "./message.js";

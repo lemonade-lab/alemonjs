@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readdirSync } from "fs";
+import { join } from "path";
 import lodash from "lodash";
 
 // 非依赖引用

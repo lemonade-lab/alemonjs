@@ -1,5 +1,5 @@
 import { toDataURL } from "qrcode";
-import { writeFile, readFile } from "node:fs";
+import { writeFile, readFile } from "fs";
 // 导出集成截图
 export * from "qrcode";
 
