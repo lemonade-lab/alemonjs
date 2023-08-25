@@ -21,13 +21,17 @@ export function createRedis(
       } catch (error) {
         redis_config = ioRedisConfig;
       }
+      if (!redis_config) {
+        redis_config = ioRedisConfig;
+      }
       const ALRedis = new redisClient(redis_config);
       ALRedis.on("error", (error) => {
         console.error("\n[REDIS]", error);
         console.error("\n[REDIS]", "请检查app配置~");
       });
       return ALRedis;
-    } else {
+    }
+    if (typeof cfg === "object" && cfg !== null) {
       // 如果配置cfg中没有 host  port 和 password  字段则使用
       const ALRedis = new redisClient(cfg);
       ALRedis.on("error", (error) => {
@@ -35,6 +39,8 @@ export function createRedis(
         console.error("\n[REDIS]", "请检查app配置~");
       });
       return ALRedis;
+    } else {
+      console.error("\n[REDIS]", "请检查app配置~");
     }
   } catch (err) {
     console.log(err);
