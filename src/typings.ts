@@ -110,7 +110,7 @@ export interface MessageBasice {
   // 发送时间
   time: string
   // 公域
-  publickSphere: boolean
+  publicSphere: boolean
   // 私域
   privateSphere: boolean
   // 是群聊(房间/子频道)
@@ -200,7 +200,7 @@ export interface ReplyController {
    * @param obj
    * @returns
    */
-  replyButtom: (obj: object) => Promise<string | boolean>
+  replyButton: (obj: object) => Promise<string | boolean>
   /**
    * 引用消息
    * @param obj
@@ -240,7 +240,7 @@ export interface WithdrawController {
   // 撤回消息
   withdraw: Function
   // 撤回表态
-  withdrawReation: Function
+  withdrawReaction: Function
 }
 
 // 频道控制器
@@ -252,7 +252,7 @@ export interface GuildController {
   // 得到指定频道用户
   getGuildUsers: Function
   // 删除指定频道用户
-  deteteGuildUser: Function
+  deleteGuildUser: Function
   // 创建频道公告
   createGuildAnnounce: Function
   // 删除频道公告
@@ -274,7 +274,7 @@ export interface ChannelController {
   // 得到子频道权限
   getChannelPermissions: Function
   // 更新子频道权限
-  updataChannelPermissions: Function
+  updateChannelPermissions: Function
   // 创建子频道精华
   createChannelAnnounce: Function
   // 创建子频道精华
@@ -296,13 +296,13 @@ export interface IdentityGroupController {
   // 创建身分组
   createIdentityGroup: Function
   // 更新身分组
-  updataIdentityGroup: Function
+  updateIdentityGroup: Function
   // 删除身分组
   deleteIdentityGroup: Function
   // 得到身分组权限
   getIdentityGroupPermissions: Function
   // 更新身份组权限
-  updataIdentityGroupPermissions: Function
+  updateIdentityGroupPermissions: Function
 }
 
 // 用户控制器

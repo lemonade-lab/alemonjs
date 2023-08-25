@@ -15,7 +15,7 @@ export interface LoginConfig {
   // 主人密码
   password?: string;
   // 是沙盒？
-  sendbox?: boolean;
+  sandbox?: boolean;
 }
 
 // 身份类型
