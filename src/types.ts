@@ -3,7 +3,7 @@ export interface LoginConfig {
   // 机器人账号
   id: string;
   // 机器人密码
-  key: string;
+  token: string;
   // 是私域？
   private: boolean;
   // 机器人密钥
