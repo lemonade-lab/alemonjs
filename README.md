@@ -10,6 +10,8 @@
 
 [☞点击链接加入米游社别野](https://dby.miyoushe.com/chat/2142/33641)
 
+[☞点击链接加入KOOK开黑吧](https://kook.top/Rq90xA)
+
 | 分支  | 类型  | 说明  |
 | ---- | ---- | ---- |
 | main | 核心  | almeon核心处理块   |

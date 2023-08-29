@@ -10,6 +10,8 @@
 
 [☞Click on the link to join the Mi You Club](https://dby.miyoushe.com/chat/2142/33641)
 
+[☞Click on the link to join KOOK](https://kook.top/Rq90xA)
+
 | 分支  | 类型  | 说明  |
 |---|---|---|
 | main  | core  | almeon code  |
