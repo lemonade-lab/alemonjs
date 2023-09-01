@@ -15,10 +15,7 @@
 | 分支  | 类型  | 说明  |
 |---|---|---|
 | main  | core  | almeon code  |
-| qq  | bot  | alemon-qq source code  |
-| mys  | bot  | alemon-mys source code  |
-| dc  | bot  | alemon-dc  source code |
-| kook  | bot  | alemon-kook  source code |
+| bot  | bot  | alemon-bot source code  |
 | redis| npm  | Special connection independent dependency package  |
 | cli | cli  | Installation of control robots  |
 | web | web  | Shared platform plugin contribution address  |
