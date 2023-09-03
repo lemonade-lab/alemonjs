@@ -38,7 +38,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
    * 艾特类型所得到的
    * 包括机器人在内
    */
-  const mention_role_part = interaction.extra.kmarkdown.mention_role_part
+  const mention_role_part = interaction.extra.kmarkdown?.mention_role_part ?? []
 
   /**
    *
@@ -57,7 +57,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
   /**
    * 艾特用户所得到的
    */
-  const mention_part = interaction.extra.kmarkdown.mention_part
+  const mention_part = interaction.extra.kmarkdown?.mention_part ?? []
   for await (const item of mention_part) {
     at = true
     at_users.push({

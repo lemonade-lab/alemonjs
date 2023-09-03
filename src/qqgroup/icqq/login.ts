@@ -8,6 +8,16 @@ import {
 } from 'icqq'
 import axios from 'axios'
 import prompts from 'prompts'
+import { setBotMsgByQQGroup } from '../alemon/bot.js'
+import { getBotConfigQQGroup } from '../config.js'
+
+/**
+ * 休眠函数
+ * @param ms 毫秒
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 /**
  * 登录
@@ -35,20 +45,16 @@ export function createLogin(account: number, password: string, platform = 1, cal
     const urlRes = await axios
       .post(urlReq, { url })
       .then(res => res.data)
-      .catch()
+      .catch(err => {
+        console.log(err)
+      })
     if (urlRes.message != 'OK') {
       return
     }
     console.log(urlReq)
     console.log('请60s内打开链接以完成验证...')
     console.log('完成后将自动进行登录...')
-    /**
-     * 休眠函数
-     * @param ms 毫秒
-     */
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms))
-    }
+
     for (let i = 0; i < 20; i++) {
       await sleep(3000)
       const res: any = await axios
@@ -153,11 +159,28 @@ export function createLogin(account: number, password: string, platform = 1, cal
   /**
    * 监听扫码
    */
-  client.on('system.login.qrcode', e => {
-    console.log('扫码完成后回车继续...')
-    process.stdin.once('data', () => {
-      client.login()
-    })
+  client.on('system.login.qrcode', async e => {
+    let T = false
+    setTimeout(() => {
+      // 没成功,结束进程
+      if (!T) throw '等待扫码超时，已停止运行'
+    }, 60000)
+    async function get() {
+      for (let i = 0; i < 20; i++) {
+        await sleep(3000)
+        if (!T) {
+          const res: any = await client.queryQrcodeResult()
+          if (res.retcode === 0) {
+            // 二维码登录
+            client.qrcodeLogin()
+            T = true
+            return
+          }
+        }
+      }
+    }
+    get()
+    return
   })
 
   /**
@@ -173,7 +196,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
           { title: '短信验证', value: 1 },
           { title: '扫码验证', value: 2 }
         ],
-        initial: 0 // 默认安卓
+        initial: 0
       }
     ]).catch((err: any) => {
       console.log(err)
@@ -208,11 +231,11 @@ export function createLogin(account: number, password: string, platform = 1, cal
    * 上线监听
    */
   client.on('system.online', () => {
-    /**
-     * 你的账号已上线
-     * 你可以做任何事
-     */
-    console.log(`欢迎回来 ~ ${this.nickname}(${this.uin} ${this.fl.size}个好友 ${this.gl.size}个群`)
+    setBotMsgByQQGroup({
+      id: String(client.uin),
+      name: client.nickname,
+      avatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${client.uin}`
+    })
   })
 
   /**
@@ -224,39 +247,46 @@ export function createLogin(account: number, password: string, platform = 1, cal
    * 撤回和发送群消息
    */
   client.on('message.group', (event: GroupMessageEvent) => {
-    if (event.raw_message === 'dice') {
-      /**
-       * 撤回这条消息
-       */
-      event.recall()
-      /**
-       * 发送一个骰子
-       */
-      event.group.sendMsg(segment.dice())
-      /**
-       * 发送一个戳一戳
-       */
-      event.member.poke()
-    }
+    // if (event.raw_message === 'dice') {
+    //   /**
+    //    * 撤回这条消息
+    //    */
+    //   event.recall()
+    //   /**
+    //    * 发送一个骰子
+    //    */
+    //   event.group.sendMsg(segment.dice())
+    //   /**
+    //    * 发送一个戳一戳
+    //    */
+    //   event.member.poke()
+    // }
   })
 
   /**
    * 同意好友申请
    */
   client.on('request.friend', (event: FriendRequestEvent) => {
-    event.approve()
+    const cfg = getBotConfigQQGroup()
+    event.approve(cfg.friendApplication)
   })
 
   /**
    * 同意群邀请
    */
-  client.on('request.group.invite', (event: GroupInviteEvent) => event.approve())
+  client.on('request.group.invite', (event: GroupInviteEvent) => {
+    const cfg = getBotConfigQQGroup()
+    event.approve(cfg.groupInvitation)
+  })
 
   /**
    * 同意加群申请
    * 拒绝`event.approve(false)`
    */
-  client.on('request.group.add', (event: GroupRequestEvent) => event.approve())
+  client.on('request.group.add', (event: GroupRequestEvent) => {
+    const cfg = getBotConfigQQGroup()
+    event.approve(cfg.addGroupApplication)
+  })
 
   /**
    * 登录

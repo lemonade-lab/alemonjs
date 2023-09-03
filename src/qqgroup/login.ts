@@ -28,18 +28,24 @@ export async function checkRobot(Bcf: string) {
     throw '超过1分钟未完成登录'
   }, 60000)
 
-  const { account, password, device } = await prompts([
+  const { account, password, masterID, device } = await prompts([
     {
       type: 'password',
       name: 'account',
-      message: 'account: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 账户: ')
+      message: '机器账号: ',
+      validate: value => (value !== '' && typeof value === 'string' ? true : '机器账号: ')
     },
     {
       type: 'password',
       name: 'password',
-      message: 'password: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 密码: ')
+      message: '机器密码: ',
+      validate: value => (value !== '' && typeof value === 'string' ? true : '机器密码: ')
+    },
+    {
+      type: 'password',
+      name: 'masterID',
+      message: '主人账号: ',
+      validate: value => (value !== '' && typeof value === 'string' ? true : '主人账号: ')
     },
     {
       type: 'select',
@@ -51,7 +57,7 @@ export async function checkRobot(Bcf: string) {
         { title: '安卓手表', value: 3 },
         { title: 'MacOS', value: 4 },
         { title: 'iPad', value: 5 },
-        { title: 'old_Android', value: 6 }
+        { title: 'Tim', value: 6 }
       ],
       initial: 0 // 默认安卓
     }
@@ -60,7 +66,7 @@ export async function checkRobot(Bcf: string) {
     process.exit()
   })
 
-  if (!account || !password || !device) {
+  if (!account || !password || !masterID || !device) {
     return false
   }
 
@@ -78,6 +84,7 @@ addGroupApplication: false # 加群申请`
   str = str
     .replace(/account: ''/g, `account: ${account}`)
     .replace(/password: ''/g, `password: '${password}'`)
+    .replace(/masterID: ''/g, `masterID: '${masterID}'`)
     .replace(/device: ''/g, `device: ${device}`)
 
   /**
