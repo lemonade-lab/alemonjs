@@ -10,19 +10,20 @@ export async function createAlemonQQByQQGroup() {
   /**
    * 登录
    */
-  await checkRobot(login_qqgroup).catch(err => {
-    console.error(err)
-  })
-
-  /**
-   * 创建配置
-   */
-  const cfg = getBotConfigQQGroup()
-
-  /**
-   * 创建登录
-   */
-  createLogin(cfg.account, cfg.password, cfg.device, callBack)
-
-  return true
+  if (
+    await checkRobot(login_qqgroup).catch(err => {
+      console.error(err)
+    })
+  ) {
+    /**
+     * 创建配置
+     */
+    const cfg = getBotConfigQQGroup()
+    /**
+     * 创建登录
+     */
+    createLogin(cfg.account, cfg.password, cfg.device, callBack)
+    return true
+  }
+  return false
 }

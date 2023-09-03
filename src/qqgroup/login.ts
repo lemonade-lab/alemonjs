@@ -13,18 +13,20 @@ import { watchLogin } from '../watch.js'
  * @param val
  * @returns
  */
-export async function checkRobot(Bcf: string): Promise<void> {
+export async function checkRobot(Bcf: string) {
   if (!process.argv.includes('login')) {
     const config: LoginConfigByQQRroup = getYaml(join(process.cwd(), Bcf))
     if ((config ?? '') !== '' && (config.account ?? '') !== '' && (config.password ?? '') !== '') {
       setBotConfigQQGroup(config)
-      return
+      return true
     }
   }
 
   console.info('[LOGIN]', '-----------------------')
 
-  let T = false
+  const timeoutId = setTimeout(() => {
+    throw '超过1分钟未完成登录'
+  }, 60000)
 
   const { account, password, device } = await prompts([
     {
@@ -52,21 +54,17 @@ export async function checkRobot(Bcf: string): Promise<void> {
         { title: 'old_Android', value: 6 }
       ],
       initial: 0 // 默认安卓
-    },
-    setTimeout(() => {
-      if (!T) {
-        console.log('超过五分钟未完成登录')
-        process.exit()
-      }
-    }, 30000)
+    }
   ]).catch((err: any) => {
     console.log(err)
     process.exit()
   })
 
-  if (!account || !password || !device) process.exit()
+  if (!account || !password || !device) {
+    return false
+  }
 
-  T = true
+  clearTimeout(timeoutId)
 
   let str = `account: '' # 机器人 账户
 password: '' # 机器人 密码
@@ -101,5 +99,5 @@ addGroupApplication: false # 加群申请`
     password,
     device
   })
-  return
+  return true
 }

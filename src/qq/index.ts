@@ -10,24 +10,29 @@ export async function createAlemonByQQ() {
   /**
    * 登录
    */
-  await checkRobotByQQ(Login_qq).catch(err => {
-    console.error(err)
-    process.exit()
-  })
-  /**
-   * 读取配置
-   */
-  const cfg = getBotConfigByQQ()
-  /**
-   * 创建 clientApiByQQ
-   */
-  global.clientApiByQQ = createOpenAPI(cfg)
-  /**
-   * 创建 websocket
-   */
-  const WebsocketClient = createWebsocket(cfg)
-  /**
-   * 创建 conversation
-   */
-  createConversationByQQ(WebsocketClient)
+  if (
+    await checkRobotByQQ(Login_qq).catch(err => {
+      console.error(err)
+      process.exit()
+    })
+  ) {
+    /**
+     * 读取配置
+     */
+    const cfg = getBotConfigByQQ()
+    /**
+     * 创建 clientApiByQQ
+     */
+    global.clientApiByQQ = createOpenAPI(cfg)
+    /**
+     * 创建 websocket
+     */
+    const WebsocketClient = createWebsocket(cfg)
+    /**
+     * 创建 conversation
+     */
+    createConversationByQQ(WebsocketClient)
+    return true
+  }
+  return false
 }

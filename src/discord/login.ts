@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import prompts, { PromptObject } from 'prompts'
+import prompts from 'prompts'
 import { GatewayIntentBits } from 'discord.js'
 import { getBotConfigByDiscord, setBotConfigByDiscord } from './config.js'
 import { LoginConfigByDiscord } from './types.js'
@@ -69,24 +69,24 @@ export async function checkRobotByDiscord(Bcf: string) {
 
   console.info('[LOGIN]', '-----------------------')
 
-  let T = false
+  const timeoutId = setTimeout(() => {
+    throw '超过1分钟未完成登录'
+  }, 60000)
+
   const { token } = await prompts([
     {
       type: 'password',
       name: 'token',
       message: 'BotToken: ',
       validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 token: ')
-    },
-    setTimeout(() => {
-      if (!T) {
-        console.log('超过五分钟未完成登录')
-        process.exit()
-      }
-    }, 30000)
+    }
   ])
-  if (!token) process.exit()
-  T = true
 
+  if (!token) {
+    return false
+  }
+
+  clearTimeout(timeoutId)
   /**
    * 默认公域机器人
    */

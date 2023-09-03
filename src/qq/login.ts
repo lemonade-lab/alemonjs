@@ -12,7 +12,7 @@ import { watchLogin } from '../watch.js'
  * @param Bcf
  * @returns
  */
-export async function checkRobotByQQ(Bcf: string): Promise<void> {
+export async function checkRobotByQQ(Bcf: string) {
   if (process.argv.indexOf('login') == -1) {
     const config: LoginConfigByQQ = getYaml(join(process.cwd(), Bcf))
     if ((config ?? '') !== '' && (config.appID ?? '') !== '' && (config.token ?? '') !== '') {
@@ -25,7 +25,7 @@ export async function checkRobotByQQ(Bcf: string): Promise<void> {
         ]
       }
       setBotConfigbyQQ(config)
-      return
+      return true
     }
   }
 
@@ -38,7 +38,9 @@ export async function checkRobotByQQ(Bcf: string): Promise<void> {
   console.info('[LOGIN]', '更改登录？执行', 'npm run login')
   console.info('[LOGIN]', '-----------------------')
 
-  let T = false
+  const timeoutId = setTimeout(() => {
+    throw '超过1分钟未完成登录'
+  }, 60000)
 
   const { appID, token, inputBot, imputDev } = await prompts([
     {
@@ -78,22 +80,17 @@ export async function checkRobotByQQ(Bcf: string): Promise<void> {
        * 默认部署
        */
       initial: 0
-    },
-    setTimeout(() => {
-      if (!T) {
-        console.log('超过五分钟未完成登录')
-        process.exit()
-      }
-    }, 30000)
+    }
   ]).catch((err: any) => {
     console.error(err)
     process.exit()
   })
 
-  if (!appID || !token || !inputBot || !imputDev) process.exit()
+  if (!appID || !token || !inputBot || !imputDev) {
+    return false
+  }
 
-  T = true
-
+  clearTimeout(timeoutId)
   /**
    * 默认公域机器人
    */
@@ -194,5 +191,5 @@ sandbox: false`
     masterID: '',
     password: ''
   })
-  return
+  return true
 }

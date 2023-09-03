@@ -12,7 +12,7 @@ import { watchLogin } from '../watch.js'
  * @param val
  * @returns
  */
-export async function checkRobotByKOOK(Bcf: string): Promise<void> {
+export async function checkRobotByKOOK(Bcf: string) {
   /**
    * 读取配置
    */
@@ -20,34 +20,31 @@ export async function checkRobotByKOOK(Bcf: string): Promise<void> {
     const config: LoginConfigByKOOK = getYaml(join(process.cwd(), Bcf))
     if ((config ?? '') !== '' && (config.token ?? '') !== '') {
       setBotConfigByKOOK(config)
-      return
+      return true
     }
   }
 
   console.info('[LOGIN]', '-----------------------')
 
-  let T = false
+  const timeoutId = setTimeout(() => {
+    throw '超过1分钟未完成登录'
+  }, 60000)
   const { token } = await prompts([
     {
       type: 'password',
       name: 'token',
       message: 'BotToken: ',
       validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 token: ')
-    },
-    setTimeout(() => {
-      if (!T) {
-        console.log('超过五分钟未完成登录')
-        process.exit()
-      }
-    }, 30000)
+    }
   ]).catch((err: any) => {
     console.log(err)
     process.exit()
   })
 
-  if (!token) process.exit()
-
-  T = true
+  if (!token) {
+    return false
+  }
+  clearTimeout(timeoutId)
 
   let str = `token: '' # 机器人令牌 BotToken
 masterID: '' # 主人编号 masterId
@@ -77,5 +74,5 @@ password: '' # 主人密码 mastetPassword`
     masterID: '',
     password: ''
   })
-  return
+  return true
 }
