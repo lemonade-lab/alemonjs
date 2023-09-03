@@ -6,13 +6,13 @@
 
 [☞Click on the link to join Discord](https://discord.gg/8dHrVvp3Ad)
 
-| 分支  | 类型  | 说明  |
-|---|---|---|
-| main  | core  | almeon code  |
-| bot  | bot  | alemon-bot source code  |
-| redis| npm  | Special connection independent dependency package  |
-| cli | cli  | Installation of control robots  |
-| web | web  | Shared platform plugin contribution address  |
+|Branch | Type | Description|
+|---- | ---- | ----|
+|Main | robot | robot instance|
+|Almeo | Core | Logical Block|
+|Redis | Database | Special Connection Independence|
+|Cli | scaffolding | development template scaffolding|
+|Web | Website | Shared Platform Plugin Contribution Address|
 
 ## 开源协议
 
