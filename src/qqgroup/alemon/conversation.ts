@@ -165,7 +165,7 @@ export async function callBack(event: GroupEventType) {
     /**
      * 消息事件
      */
-    event: EventEnum.message, // message
+    event: EventEnum.MESSAGES, // message
     eventType: EventType.CREATE,
     msg_txt: msg, // icqq做了处理 无法重新扁平化
     msg_id: event.message_id,
