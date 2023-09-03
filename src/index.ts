@@ -55,5 +55,5 @@ export const createAlemon = {
       return false
     })
   },
-  alemon: cmdInit()
+  alemon: cmdInit
 }
