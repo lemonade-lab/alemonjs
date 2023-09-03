@@ -1,4 +1,10 @@
 node_modules
 lib
 types
-*.log
+/config/
+/plugins/
+/example/
+/data/
+/index.js/
+/index.ts/
+/deploy.sh

@@ -6,8 +6,6 @@
 
 [☞点击链接加入QQ频道](https://pd.qq.com/s/h1o84u58q)
 
-[☞点击链接加入Discord](https://discord.gg/8dHrVvp3Ad)
-
 [☞点击链接加入米游社别野](https://dby.miyoushe.com/chat/2142/33641)
 
 [☞点击链接加入KOOK开黑吧](https://kook.top/Rq90xA)
@@ -20,6 +18,19 @@
 | cli   | 脚手架| 开发模板脚手架      |
 | web   | 网站  | 共享平台插件贡献地址|
 
+## 快速开始
+
+```shell
+npm init almeon@latest -y #安装
+```
+
+```shell
+cd alemon-bot #进入
+```
+
+```shell
+npm run app qq #启动
+```
 
 ### 共享平台
 

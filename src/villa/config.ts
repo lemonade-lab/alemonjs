@@ -1,0 +1,33 @@
+import { LoginByVillaConfig } from './types.js'
+export const Login_villa = 'config/login-villa.yaml'
+/**
+ * 机器人基础配置
+ */
+let cfg: LoginByVillaConfig = {
+  bot_id: '',
+  secret: '',
+  masterID: '',
+  password: '',
+  port: 8080,
+  url: '/api/mys/callback',
+  img_url: '/api/mys/img',
+  IMAGE_DIR: 'data/mys/img',
+  size: 999999
+}
+
+/**
+ * 读取login配置
+ * @returns
+ */
+export function getBotConfigByVilla() {
+  return cfg
+}
+/**
+ * 设置login配置
+ * @param val
+ * @returns
+ */
+export function setBotConfigByVilla(val: LoginByVillaConfig) {
+  cfg = val
+  return
+}

@@ -4,13 +4,7 @@
 
 [☞Alemon official website](https://www.alemonjs.com/alemon)
 
-[☞Click on the link to join the QQ channel](https://pd.qq.com/s/h1o84u58q)
-
 [☞Click on the link to join Discord](https://discord.gg/8dHrVvp3Ad)
-
-[☞Click on the link to join the Mi You Club](https://dby.miyoushe.com/chat/2142/33641)
-
-[☞Click on the link to join KOOK](https://kook.top/Rq90xA)
 
 | 分支  | 类型  | 说明  |
 |---|---|---|
@@ -19,7 +13,6 @@
 | redis| npm  | Special connection independent dependency package  |
 | cli | cli  | Installation of control robots  |
 | web | web  | Shared platform plugin contribution address  |
-
 
 ## 开源协议
 

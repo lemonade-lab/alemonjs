@@ -3,7 +3,7 @@
     "baseUrl": "./",
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "ignoreDeprecations": "5.0",
     "esModuleInterop": true,
     "preserveConstEnums": true,
