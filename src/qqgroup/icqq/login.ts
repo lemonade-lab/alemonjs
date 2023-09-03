@@ -1,6 +1,5 @@
 import {
   createClient,
-  segment,
   FriendRequestEvent,
   GroupInviteEvent,
   GroupRequestEvent,

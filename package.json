@@ -1,6 +1,6 @@
 {
   "name": "alemon-bot",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "阿柠檬机器人",
   "author": "ningmengchongshui",
   "main": "lib/index.js",

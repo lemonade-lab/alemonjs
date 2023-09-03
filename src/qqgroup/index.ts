@@ -1,7 +1,7 @@
 import { checkRobot } from './login.js'
 import { login_qqgroup, getBotConfigQQGroup } from './config.js'
 import { createLogin } from './icqq/login.js'
-import { callBack } from './alemon/conversation.js'
+import { PUBLIC_MESSAGESByQQGroup } from './alemon/message/PUBLIC_MESSAGES.js'
 /**
  * 创建实例
  * @returns
@@ -22,7 +22,7 @@ export async function createAlemonQQByQQGroup() {
     /**
      * 创建登录
      */
-    createLogin(cfg.account, cfg.password, cfg.device, callBack)
+    createLogin(cfg.account, cfg.password, cfg.device, PUBLIC_MESSAGESByQQGroup)
     return true
   }
   return false
