@@ -4,7 +4,7 @@
 
 > support QQ、QQ channel、Discord、Mi You She Big Villa、KOOK
 
-[☞Alemon official website](https://alemonjs.com)
+[☞Alemon official website](http://ningmengchongshui.github.io/alemon)
 
 | Branch | Type        | Description                                 |
 | ------ | ----------- | ------------------------------------------- |
