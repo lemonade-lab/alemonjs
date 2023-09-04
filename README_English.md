@@ -2,9 +2,9 @@
 
 ## Almon Cross Platform Development Framework
 
-[☞Alemon official website](https://alemonjs.com)
+> support QQ、QQ channel、Discord、Mi You She Big Villa、KOOK
 
-[☞Click on the link to join Discord](https://discord.gg/8dHrVvp3Ad)
+[☞Alemon official website](https://alemonjs.com)
 
 | Branch | Type        | Description                                 |
 | ------ | ----------- | ------------------------------------------- |

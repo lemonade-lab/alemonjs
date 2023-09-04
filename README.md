@@ -1,14 +1,10 @@
 ☞[English document](./README_English.md)
 
-## Almeon 阿柠檬跨平台开发框架
+## Almeon 阿柠檬跨平台开发框架机器人
 
-[☞Alemon 官网](https://alemonjs.com)
+> 支持 QQ、QQ 频道、Discord、米游社大别野、KOOK
 
-[☞ 点击链接加入 QQ 频道](https://pd.qq.com/s/h1o84u58q)
-
-[☞ 点击链接加入米游社别野](https://dby.miyoushe.com/chat/2142/33641)
-
-[☞ 点击链接加入 KOOK 开黑吧](https://kook.top/Rq90xA)
+[☞Alemon 文档](https://alemonjs.com)
 
 | 分支  | 类型   | 说明                 |
 | ----- | ------ | -------------------- |
