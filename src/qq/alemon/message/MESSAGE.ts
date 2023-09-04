@@ -1,5 +1,5 @@
 import { IOpenAPI, Embed, Ark } from 'qq-guild-bot'
-import { InstructionMatching } from 'alemon'
+import { CacrdEnum, CardType, InstructionMatching } from 'alemon'
 import { EventEnum, EventType, AMessage, PlatformEnum } from 'alemon'
 import { postImage } from '../alemonapi.js'
 import { Private } from '../privatechat.js'
@@ -114,7 +114,11 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
    * @param img
    * @returns
    */
-  e.reply = async (msg?: string | string[] | Buffer, img?: Buffer): Promise<boolean> => {
+  e.reply = async (
+    msg?: string | string[] | Buffer,
+    img?: Buffer | string,
+    name?: string
+  ): Promise<boolean> => {
     /**
      * 是buffer
      */
@@ -166,31 +170,28 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
       })
   }
 
-  e.replyCard = async (obj: { type: 'embed' | 'ark'; card: { embed: Embed } | { ark: Ark } }) => {
-    /**
-     * 发送卡片需要识别卡片类型
-     */
-    const { type, card } = obj
-    if (type == 'embed' || type == 'ark') {
-      /**
-       * 频道
-       */
-      return await clientApiByQQ.messageApi
-        .postMessage(data.msg.channel_id, {
-          msg_id: data.msg.id,
-          ...card
-        })
-        .then(() => true)
-        .catch((err: any) => {
-          console.error(err)
+  e.replyCard = async (arr: CardType[]) => {
+    for (const item of arr) {
+      try {
+        if (item.type == 'qq_ark' || item.type == 'qq_embed') {
+          await clientApiByQQ.messageApi
+            .postMessage(data.msg.channel_id, {
+              msg_id: data.msg.id,
+              ...item.card
+            })
+            .then(() => true)
+            .catch((err: any) => {
+              console.error(err)
+              return false
+            })
+        } else {
           return false
-        })
-    } else {
-      /**
-       * 其他类型的卡片
-       */
-      return false
+        }
+      } catch {
+        return false
+      }
     }
+    return true
   }
 
   /**
@@ -360,7 +361,11 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
    * @param img
    * @returns
    */
-  e.replyPrivate = async (msg?: string | string[] | Buffer, img?: Buffer): Promise<boolean> => {
+  e.replyPrivate = async (
+    msg?: string | string[] | Buffer,
+    img?: Buffer | string,
+    name?: string
+  ): Promise<boolean> => {
     return await Private(data.msg, msg, img)
       .then(res => {
         return res

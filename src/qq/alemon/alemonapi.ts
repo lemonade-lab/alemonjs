@@ -40,6 +40,7 @@ export async function postImage(message: {
   image: Buffer
   isGroup: boolean
   content?: string
+  name?: string
 }): Promise<any> {
   const cfg = getBotConfigByQQ()
   const appID = cfg.appID
@@ -66,10 +67,7 @@ export async function postImage(message: {
    * 为上传的图片指定文件名
    * 指定上传的图片类型
    */
-  formdata.append('file_image', picData, {
-    filename: 'image.jpg',
-    contentType: 'image/jpeg'
-  })
+  formdata.append('file_image', picData, message.name ?? 'image.jpg')
 
   let url = ''
   if (!message.isGroup) {

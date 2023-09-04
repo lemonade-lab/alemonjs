@@ -130,7 +130,11 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
      * @param content 消息内容
      * @param img 额外消息 可选
      */
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer): Promise<boolean> => {
+    reply: async (
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
           const attach = new AttachmentBuilder(msg, { name: 'result.jpeg' })

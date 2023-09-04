@@ -232,7 +232,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
      * @param img
      * @returns
      */
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer) => {
+    reply: async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
       /**
        * url获取
        */
@@ -346,12 +346,12 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       return false
     },
     ...now_e
-  }
+  } as AMessage
 
   /**
    * 业务处理
    */
-  await InstructionMatching(e as AMessage)
+  await InstructionMatching(e)
     .then(() => {
       console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${MessageContent.content.text}`)
       return true

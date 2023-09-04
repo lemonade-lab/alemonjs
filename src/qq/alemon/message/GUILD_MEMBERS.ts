@@ -1,5 +1,5 @@
-import { IOpenAPI, Embed, Ark } from 'qq-guild-bot'
-import { typeMessage, AMessage } from 'alemon'
+import { IOpenAPI } from 'qq-guild-bot'
+import { typeMessage, AMessage, CardType } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
@@ -98,7 +98,11 @@ export const GUILD_MEMBERS = async (data: any) => {
      * @param img
      * @returns
      */
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer): Promise<boolean> => {
+    reply: async (
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ): Promise<boolean> => {
       /**
        * 是图片
        */
@@ -148,16 +152,28 @@ export const GUILD_MEMBERS = async (data: any) => {
           return false
         })
     },
-    replyCard: async (obj: { embed: Embed } | { ark: Ark }) => {
-      return await clientApiByQQ.messageApi
-        .postMessage(ChannelData.id, {
-          ...obj
-        })
-        .then(() => true)
-        .catch((err: any) => {
-          console.error(err)
+    replyCard: async (arr: CardType[]) => {
+      for (const item of arr) {
+        try {
+          if (item.type == 'qq_ark' || item.type == 'qq_embed') {
+            await clientApiByQQ.messageApi
+              .postMessage(data.msg.channel_id, {
+                msg_id: data.msg.id,
+                ...item.card
+              })
+              .then(() => true)
+              .catch((err: any) => {
+                console.error(err)
+                return false
+              })
+          } else {
+            return false
+          }
+        } catch {
           return false
-        })
+        }
+      }
+      return true
     }
   } as AMessage
 

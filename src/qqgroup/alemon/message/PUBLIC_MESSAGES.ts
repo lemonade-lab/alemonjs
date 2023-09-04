@@ -1,4 +1,4 @@
-import { AMessage, UserType, InstructionMatching } from 'alemon'
+import { AMessage, UserType, InstructionMatching, CardType } from 'alemon'
 import { getBotConfigQQGroup, setup_qqgroup } from '../../config.js'
 import { GroupEventType } from '../types.js'
 import { segmentQQGroup } from '../segment.js'
@@ -121,8 +121,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
   }
 
   let group_id = 0
+  let guild_name = ''
   if (event.message_type == 'group') {
-    // console.log(event.group_name)
+    guild_name = event.group_name
     group_id = event.group_id
   }
 
@@ -139,7 +140,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
      * 频道
      */
     guild_id: String(group_id),
+    guild_name: guild_name,
     channel_id: String(group_id),
+    channel_name: guild_name,
     isPrivate: true,
     isRecall: false,
     isMaster: isMaster,
@@ -174,7 +177,11 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
      * @param content 消息内容
      * @param img 额外消息 可选
      */
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer): Promise<boolean> => {
+    reply: async (
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
           event.reply(segmentIcqq.image(msg))
@@ -201,7 +208,12 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         return false
       }
     },
-    replyByMid: async (mid: string, msg?: string | string[] | Buffer, img?: Buffer) => {
+    replyByMid: async (
+      mid: string,
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ) => {
       try {
         if (Buffer.isBuffer(msg)) {
           try {
@@ -236,8 +248,41 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         return false
       }
     },
-    replyCard: (obj: any) => {
-      event.reply(segmentIcqq.json(obj))
+    replyCard: async (arr: CardType[]) => {
+      const cardArr: any = []
+      const map = {
+        qqgroup_image: card => cardArr.push(segmentIcqq.image(card)),
+        qqgroup_json: card => cardArr.push(segmentIcqq.json(card)),
+        qqgroup_xml: card => cardArr.push(segmentIcqq.xml(card)),
+        qqgroup_face: card => cardArr.push(segmentIcqq.face(card)),
+        qqgroup_at: card => cardArr.push(segmentIcqq.at(card)),
+        qqgroup_bface: item => cardArr.push(segmentIcqq.bface(item.card.file, item.card.text)),
+        qqgroup_dice: card => cardArr.push(segmentIcqq.dice(card)),
+        qqgroup_fake: card => cardArr.push(segmentIcqq.face(card)),
+        qqgroup_flash: card => cardArr.push(segmentIcqq.flash(card)),
+        qqgroup_fromCqcode: card => cardArr.push(segmentIcqq.fromCqcode(card)),
+        qqgroup_location: card =>
+          cardArr.push(segmentIcqq.location(card.lat, card.lng, card.address, card.id)),
+        qqgroup_mirai: card => cardArr.push(segmentIcqq.mirai(card)),
+        qqgroup_music: card => cardArr.push(segmentIcqq.music(card)),
+        qqgroup_poke: card => cardArr.push(segmentIcqq.poke(card)),
+        qqgroup_share: card => cardArr.push(segmentIcqq.sface(card)),
+        qqgroup_video: card => cardArr.push(segmentIcqq.video(card)),
+        qqgroup_record: card => cardArr.push(segmentIcqq.record(card)),
+        qqgroup_rps: card => cardArr.push(segmentIcqq.rps(card)),
+        qqgroup_text: card => cardArr.push(segmentIcqq.text(card))
+      }
+      for (const item of arr) {
+        if (map[item.type]) {
+          map[item.type](item.card)
+        }
+      }
+      try {
+        event.reply(cardArr)
+        return true
+      } catch {
+        return false
+      }
     }
   } as AMessage
 

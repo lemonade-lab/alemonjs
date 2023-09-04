@@ -18,7 +18,8 @@ declare global {
 export const Private = async (
   EMessage: QQEMessage,
   msg?: string | string[] | Buffer,
-  img?: Buffer
+  img?: Buffer | string,
+  name?: string
 ): Promise<boolean> => {
   const postSessionRes: any = await clientApiByQQ.directMessageApi
     .createDirectMessage({

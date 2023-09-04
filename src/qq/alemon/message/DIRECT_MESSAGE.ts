@@ -1,5 +1,5 @@
-import { IOpenAPI, Embed, Ark } from 'qq-guild-bot'
-import { typeMessage, AMessage, InstructionMatching } from 'alemon'
+import { IOpenAPI } from 'qq-guild-bot'
+import { typeMessage, AMessage, InstructionMatching, CardType } from 'alemon'
 import { postImage } from '../alemonapi.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
@@ -100,7 +100,7 @@ async function directMessage(e: AMessage, data) {
   }
 
   /* 消息发送机制 */
-  e.reply = async (msg?: string | string[] | Buffer, img?: Buffer) => {
+  e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
     if (Buffer.isBuffer(msg)) {
       try {
         return await ePostImage(msg).catch(err => {
@@ -135,32 +135,28 @@ async function directMessage(e: AMessage, data) {
         return false
       })
   }
-
-  e.replyCard = async (obj: { type: 'embed' | 'ark'; card: { embed: Embed } | { ark: Ark } }) => {
-    /**
-     * 发送卡片需要识别卡片类型
-     */
-    const { type, card } = obj
-    if (type == 'embed' || type == 'ark') {
-      /**
-       * 频道
-       */
-      return await clientApiByQQ.messageApi
-        .postMessage(data.msg.channel_id, {
-          msg_id: data.msg.id,
-          ...card
-        })
-        .then(() => true)
-        .catch((err: any) => {
-          console.error(err)
+  e.replyCard = async (arr: CardType[]) => {
+    for (const item of arr) {
+      try {
+        if (item.type == 'qq_ark' || item.type == 'qq_embed') {
+          await clientApiByQQ.messageApi
+            .postMessage(data.msg.channel_id, {
+              msg_id: data.msg.id,
+              ...item.card
+            })
+            .then(() => true)
+            .catch((err: any) => {
+              console.error(err)
+              return false
+            })
+        } else {
           return false
-        })
-    } else {
-      /**
-       * 其他类型的卡片
-       */
-      return false
+        }
+      } catch {
+        return false
+      }
     }
+    return true
   }
 
   /**

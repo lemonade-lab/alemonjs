@@ -10,6 +10,9 @@ import { getBotMsgByKOOK } from '../bot.js'
  * @returns
  */
 export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
+  // console.log('interaction', interaction)
+
+  // return
   /**
    * 忽视机器人
    */
@@ -137,9 +140,9 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
      */
     isMaster: isMaster,
     /**
-     * 是群聊
+     * 是群聊 PERSON | GROUP
      */
-    isGroup: true,
+    isGroup: interaction.channel_type == 'GROUP' ? true : false,
     /**
      * 艾特
      */
@@ -197,17 +200,30 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
      * @param content 消息内容
      * @param obj 额外消息 可选
      */
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer): Promise<boolean> => {
+    reply: async (
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ): Promise<boolean> => {
       /**
        * buffer
        */
       if (Buffer.isBuffer(msg)) {
         try {
-          const url = await KOOKApiClient.postImage(msg)
+          const url = await KOOKApiClient.postImage(msg, typeof img == 'string' ? img : 'img.png')
           if (url) {
-            await KOOKApiClient.createMessage({
+            if (interaction.channel_type == 'GROUP') {
+              await KOOKApiClient.createMessage({
+                type: 2,
+                target_id: interaction.target_id,
+                content: url
+              })
+              return true
+            }
+            await KOOKApiClient.createDirectMessage({
               type: 2,
               target_id: interaction.target_id,
+              chat_code: interaction.extra.code,
               content: url
             })
             return true
@@ -218,20 +234,38 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
           return false
         }
       }
-
       const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
-
       /**
        * buffer
        */
       if (Buffer.isBuffer(img)) {
         try {
-          const url = await KOOKApiClient.postImage(img)
+          const url = await KOOKApiClient.postImage(img, name ?? 'img.png')
           if (url) {
-            await KOOKApiClient.createMessage({
+            if (interaction.channel_type == 'GROUP') {
+              await KOOKApiClient.createMessage({
+                type: 9,
+                target_id: interaction.target_id,
+                content: content
+              })
+              await KOOKApiClient.createMessage({
+                type: 2,
+                target_id: interaction.target_id,
+                content: url
+              })
+              return true
+            }
+            await KOOKApiClient.createDirectMessage({
+              type: 9,
+              target_id: interaction.target_id,
+              chat_code: interaction.extra.code,
+              content: content
+            })
+            await KOOKApiClient.createDirectMessage({
               type: 2,
               target_id: interaction.target_id,
-              content: `${content} ${url}`
+              chat_code: interaction.extra.code,
+              content: url
             })
             return true
           }
@@ -241,11 +275,23 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
           return false
         }
       }
-
+      if (interaction.channel_type == 'GROUP') {
+        try {
+          await KOOKApiClient.createMessage({
+            type: 9,
+            target_id: interaction.target_id,
+            content
+          })
+          return true
+        } catch {
+          return false
+        }
+      }
       try {
-        await KOOKApiClient.createMessage({
+        await KOOKApiClient.createDirectMessage({
           type: 9,
           target_id: interaction.target_id,
+          chat_code: interaction.extra.code,
           content
         })
         return true

@@ -1,5 +1,3 @@
-import {} from 'alemon'
-
 interface Member {
   joined_at: string
   nick: string

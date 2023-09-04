@@ -106,7 +106,7 @@ export async function GUILDS_VILLA(event: BotEvent) {
      */
     user_avatar: '',
     ...now_e,
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer) => {
+    reply: async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
       return false
     }
   } as AMessage
