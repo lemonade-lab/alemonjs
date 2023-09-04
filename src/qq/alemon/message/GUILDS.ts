@@ -1,5 +1,4 @@
-import { typeMessage } from 'alemon'
-import { EventType, EventEnum, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -24,31 +23,32 @@ GUILDS (1 << 0)
  */
 export const GUILDS = async (data: any) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.GUILD,
-    eventType: EventType.CREATE,
-    /**
-     * 不是私域
-     */
+    event: 'GUILD',
+    eventType: 'CREATE',
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
+    isRecall: false,
+    isGroup: false
   } as AMessage
 
+  /**
+   * 事件匹配
+   */
   if (new RegExp(/^GUILD.*$/).test(data.event)) {
-    e.event = EventEnum.GUILD
+    e.event = 'GUILD'
   } else {
-    e.event = EventEnum.CHANNEL
+    e.event = 'CHANNEL'
   }
+  /**
+   * 类型匹配
+   */
   if (new RegExp(/CREATE$/).test(data.eventType)) {
-    e.eventType = EventType.CREATE
+    e.eventType = 'CREATE'
   } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
-    e.eventType = EventType.UPDATE
+    e.eventType = 'UPDATE'
   } else {
-    e.eventType = EventType.DELETE
+    e.eventType = 'DELETE'
   }
 
   /**

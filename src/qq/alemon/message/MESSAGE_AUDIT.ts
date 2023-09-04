@@ -1,5 +1,4 @@
-import { typeMessage } from 'alemon'
-import { EventEnum, EventType, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -13,26 +12,21 @@ MESSAGE_AUDIT (1 << 27)
  */
 export const MESSAGE_AUDIT = async (data: any) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.MESSAGE_AUDIT,
-    eventType: EventType.CREATE,
-    /**
-     * 不是私域
-     */
+    event: 'MESSAGE_AUDIT',
+    eventType: 'CREATE',
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
+    isRecall: false,
+    isGroup: false
   } as AMessage
 
   /**
    * 事件匹配
    */
-  e.event = EventEnum.MESSAGE_AUDIT
+  e.event = 'MESSAGE_AUDIT'
   if (new RegExp(/REJECT$/).test(data.eventType)) {
-    e.eventType = EventType.DELETE
+    e.eventType = 'DELETE'
   }
 
   /**

@@ -1,5 +1,4 @@
-import { typeMessage } from 'alemon'
-import { EventEnum, EventType, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -12,30 +11,22 @@ INTERACTION (1 << 26)
  */
 export const INTERACTION = async data => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.INTERACTION,
-    eventType: EventType.CREATE,
-    /**
-     * 不是私域
-     */
+    event: 'INTERACTION',
+    eventType: 'CREATE',
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
+    isRecall: false,
+    isGroup: false
   } as AMessage
 
   /**
    * 事件匹配
    */
   if (!new RegExp(/CREATE$/).test(data.eventType)) {
-    e.eventType = EventType.DELETE
+    e.eventType = 'DELETE'
   }
 
-  /**
-   * 只匹配类型
-   */
   await typeMessage(e)
     .then(() => {
       console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)

@@ -1,5 +1,4 @@
-import { typeMessage, PlatformEnum } from 'alemon'
-import { EventEnum, EventType, AMessage } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 /**
  * AUDIO_MICROPHONE 音频
@@ -19,24 +18,13 @@ AUDIO_ACTION (1 << 29)
  */
 export const AUDIO_ACTION = async (data: any) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    /**
-     * 麦克风事件
-     */
-    event: EventEnum.AUDIO_MICROPHONE,
-    /**
-     * 上麦
-     */
-    eventType: EventType.CREATE,
-    /**
-     * 不是私域
-     */
+    event: 'AUDIO_MICROPHONE',
+    eventType: 'CREATE',
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
+    isRecall: false,
+    isGroup: false
   } as AMessage
 
   if (new RegExp(/MIC$/).test(data.eventType)) {
@@ -44,24 +32,21 @@ export const AUDIO_ACTION = async (data: any) => {
       /**
        * 下麦
        */
-      e.eventType = EventType.DELETE
+      e.eventType = 'DELETE'
     }
   } else {
     /**
      * 音频事件
      */
-    e.event = EventEnum.AUDIO_FREQUENCY
+    e.event = 'AUDIO_FREQUENCY'
     if (!new RegExp(/^AUDIO_START$/).test(data.eventType)) {
       /**
        * 音频播放结束时
        */
-      e.eventType = EventType.DELETE
+      e.eventType = 'DELETE'
     }
   }
 
-  /**
-   * 只匹配类型
-   */
   await typeMessage(e)
     .then(() => {
       console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)

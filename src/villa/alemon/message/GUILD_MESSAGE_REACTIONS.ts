@@ -1,4 +1,4 @@
-import { AMessage, EventType, EventEnum, typeMessage, PlatformEnum } from 'alemon'
+import { AMessage, typeMessage } from 'alemon'
 import { BotEvent } from 'mys-villa'
 import { segmentVilla } from '../segment.js'
 import { now_e } from './e.js'
@@ -20,7 +20,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
    * 制作e消息对象
    */
   const e = {
-    platform: PlatformEnum.villa,
+    platform: 'villa',
     /**
      * 机器人信息
      */
@@ -32,13 +32,11 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
     /**
      * 事件类型
      */
-    event: EventEnum.GUILD_MESSAGE_REACTIONS,
+    event: 'GUILD_MESSAGE_REACTIONS',
     /**
      * 消息类型 ： 存在则为撤回
      */
-    eventType: event.extend_data.EventData.AddQuickEmoticon.is_cancel
-      ? EventType.DELETE
-      : EventType.CREATE,
+    eventType: event.extend_data.EventData.AddQuickEmoticon.is_cancel ? 'DELETE' : 'CREATE',
     /**
      * 是否是私域
      */

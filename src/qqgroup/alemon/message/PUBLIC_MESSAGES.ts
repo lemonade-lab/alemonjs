@@ -1,5 +1,5 @@
-import { AMessage, UserType, EventEnum, EventType, PlatformEnum, InstructionMatching } from 'alemon'
-import { getBotConfigQQGroup } from '../../config.js'
+import { AMessage, UserType, InstructionMatching } from 'alemon'
+import { getBotConfigQQGroup, setup_qqgroup } from '../../config.js'
 import { GroupEventType } from '../types.js'
 import { segmentQQGroup } from '../segment.js'
 import { getBotMsgByQQGroup } from '../bot.js'
@@ -7,18 +7,7 @@ import { getBotMsgByQQGroup } from '../bot.js'
 import { segmentIcqq } from '../../icqq/segment.js'
 import { getUserAvatar } from '../../icqq/user.js'
 import { parseMsg } from '../msg.js'
-
-/**
- * 为了能够让插件拿到实际的数据包，而为almeon
- *
- * 需要增加字段eventData ?
- */
-
-/**
- * 回复和撤回分两种
- *
- * 一种是直接撤回 一种是指定撤回
- */
+import { getYaml } from '../../../config.js'
 
 /**
  * 响应普通消息
@@ -28,10 +17,24 @@ import { parseMsg } from '../msg.js'
 export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
   // 消息监听
   // console.log('message=', event)
+
+  /**
+   * 不处理bot消息
+   */
+  const setupConfig = getYaml(setup_qqgroup)
+  const allBot = setupConfig.botQQ ?? []
+  for (const item of allBot) {
+    if (event.sender.user_id == item) {
+      // 直接返回
+      return
+    }
+  }
+
   /**
    * 重点关注字段
    * atall
    */
+
   const bot = getBotMsgByQQGroup()
   /**
    * 艾特消息处理
@@ -53,14 +56,20 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
       msg = item.text
     }
     if (item.type == 'image') {
-      // 把图片地址当成消息
+      /**
+       * 把图片地址当成消息
+       */
       msg = item.url
     }
     if (item.type == 'json') {
       msg = item.data
     }
     if (item.type == 'at') {
-      // 如果存在 atme 而且 id与qq相等 自己就是bot
+      /**
+       * 如果存在 atme
+       * 而且 id与qq相等
+       * 自己就是bot
+       */
       let isBot = false
       if (item.qq == bot.id && event.message_type == 'group' && event.atme) {
         isBot = true
@@ -69,14 +78,21 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         id: String(item.qq),
         name: msg.replace('@', '').trim(),
         avatar: getUserAvatar(item.qq),
-        // qq 如何判断是否是 bot 只能靠主人主动收集,就把对方视为bot
-        // 或者说,主人用指令添加bot标记
+        /**
+         * qq 如何判断是否是 bot
+         * 只能靠主人主动收集
+         * 就把对方视为bot
+         * 主人用指令添加bot标记
+         * 因此需要添加一个是否是bot的收集json
+         * 同时该json文件非监听类型
+         */
         bot: isBot
       })
     }
   }
 
   let at_user: UserType | undefined = undefined
+
   if (at_users.some(item => item.bot != true)) {
     at = true
   }
@@ -114,9 +130,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
    * 构造e对象
    */
   const e = {
-    platform: PlatformEnum.qqgroup,
+    platform: 'qqgroup',
     /**
-     * 机器人信息  tudo
+     * 机器人信息
      */
     bot,
     /**
@@ -131,8 +147,8 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
     /**
      * 消息事件
      */
-    event: EventEnum.MESSAGES, // message
-    eventType: EventType.CREATE,
+    event: 'MESSAGES', // message
+    eventType: 'CREATE',
     msg_txt: msg, // icqq做了处理 无法重新扁平化
     msg_id: event.message_id,
     msg: msg,
@@ -223,12 +239,12 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
     replyCard: (obj: any) => {
       event.reply(segmentIcqq.json(obj))
     }
-  }
+  } as AMessage
 
   /**
    * 消息处理
    */
-  await InstructionMatching(e as AMessage)
+  await InstructionMatching(e)
     .then(() => {
       console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`)
       return true

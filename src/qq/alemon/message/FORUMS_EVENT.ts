@@ -1,5 +1,4 @@
-import { EventType, typeMessage } from 'alemon'
-import { EventEnum, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -30,36 +29,32 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
  */
 export const FORUMS_EVENT = async (data: any) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    // 麦克风事件
-    event: EventEnum.FORUMS_THREAD,
-    // 上麦
-    eventType: EventType.CREATE,
-    // 是私域
+    event: 'FORUMS_THREAD',
+    eventType: 'CREATE',
     isPrivate: false,
-    // 不是撤回
-    isRecall: false
+    isRecall: false,
+    isGroup: false
   } as AMessage
 
   /* 事件匹配 */
   if (new RegExp(/^FORUM_THREAD/).test(data.eventType)) {
-    e.event = EventEnum.FORUMS_THREAD
+    e.event = 'FORUMS_THREAD'
   } else if (new RegExp(/^FORUM_POST/).test(data.eventType)) {
-    e.event = EventEnum.FORUMS_POST
+    e.event = 'FORUMS_POST'
   } else {
-    e.event = EventEnum.FORUMS_REPLY
+    e.event = 'FORUMS_REPLY'
   }
 
   if (new RegExp(/CREATE$/).test(data.eventType)) {
-    e.eventType = EventType.CREATE
+    e.eventType = 'CREATE'
   } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
-    e.eventType = EventType.UPDATE
+    e.eventType = 'UPDATE'
   } else {
-    e.eventType = EventType.DELETE
+    e.eventType = 'DELETE'
   }
 
-  //只匹配类型
   await typeMessage(e)
     .then(() => {
       console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)

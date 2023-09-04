@@ -1,4 +1,4 @@
-import { AMessage, EventType, EventEnum, typeMessage, PlatformEnum } from 'alemon'
+import { AMessage, typeMessage } from 'alemon'
 import { BotEvent } from 'mys-villa'
 import { segmentVilla } from '../segment.js'
 import { now_e } from './e.js'
@@ -25,7 +25,7 @@ export async function MESSAGE_AUDIT_VILLA(event: BotEvent) {
    * 制作e消息对象
    */
   const e = {
-    platform: PlatformEnum.villa,
+    platform: 'villa',
     /**
      * 机器人信息
      */
@@ -37,11 +37,11 @@ export async function MESSAGE_AUDIT_VILLA(event: BotEvent) {
     /**
      * 事件类型
      */
-    event: EventEnum.MESSAGE_AUDIT,
+    event: 'MESSAGE_AUDIT',
     /**
      * 消息类型
      */
-    eventType: EventType.CREATE,
+    eventType: 'CREATE',
     /**
      * 是否是私域
      */

@@ -1,5 +1,6 @@
 import { LoginConfigByQQRroup } from './types.js'
 export const login_qqgroup = 'config/login-qqgroup.yaml'
+export const setup_qqgroup = 'config/setup_qqgroup.yaml'
 let cfg: LoginConfigByQQRroup = {
   account: 0,
   password: '',

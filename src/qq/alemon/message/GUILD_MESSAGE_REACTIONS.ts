@@ -1,5 +1,4 @@
-import { typeMessage } from 'alemon'
-import { EventEnum, EventType, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -13,22 +12,17 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
  */
 export const GUILD_MESSAGE_REACTIONS = async (data: any) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.GUILD_MESSAGE_REACTIONS,
-    eventType: EventType.CREATE,
-    /**
-     * 不是私域
-     */
+    event: 'GUILD_MESSAGE_REACTIONS',
+    eventType: 'CREATE',
     isPrivate: true,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
+    isRecall: false,
+    isGroup: false
   } as AMessage
 
   if (new RegExp(/REMOVE$/).test(data.eventType)) {
-    e.eventType = EventType.DELETE
+    e.eventType = 'DELETE'
   }
 
   /**

@@ -1,4 +1,4 @@
-import { AMessage, EventType, EventEnum, typeMessage, PlatformEnum } from 'alemon'
+import { AMessage, typeMessage } from 'alemon'
 import { BotEvent } from 'mys-villa'
 import { segmentVilla } from '../segment.js'
 import { now_e } from './e.js'
@@ -20,7 +20,7 @@ export async function GUILDS_VILLA(event: BotEvent) {
    * 制作e消息对象
    */
   const e = {
-    platform: PlatformEnum.villa,
+    platform: 'villa',
     /**
      * 机器人信息
      */
@@ -32,11 +32,11 @@ export async function GUILDS_VILLA(event: BotEvent) {
     /**
      * 事件类型
      */
-    event: EventEnum.GUILD,
+    event: 'GUILD',
     /**
      * 消息类型
      */
-    eventType: event.type == 3 ? EventType.CREATE : EventType.DELETE,
+    eventType: event.type == 3 ? 'CREATE' : 'DELETE',
     /**
      * 是否是私域
      */
@@ -114,7 +114,7 @@ export async function GUILDS_VILLA(event: BotEvent) {
   /**
    * 只匹配类型
    */
-  await typeMessage(e as AMessage)
+  await typeMessage(e)
     .then(() => {
       console.info(`\n[${e.event}] [${e.eventType}] [${true}] `)
       return true

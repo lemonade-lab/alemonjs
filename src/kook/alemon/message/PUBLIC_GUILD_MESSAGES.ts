@@ -1,7 +1,5 @@
-import { InstructionMatching } from 'alemon'
-import { EventEnum, EventType, AMessage, UserType, PlatformEnum } from 'alemon'
-import { KOOKApiClient } from 'kook-ws'
-import { EventData } from 'kook-ws'
+import { AMessage, UserType, InstructionMatching } from 'alemon'
+import { KOOKApiClient, EventData } from 'kook-ws'
 import { getBotConfigByKOOK } from '../../config.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
@@ -113,7 +111,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
    * 构造e对象
    */
   const e = {
-    platform: PlatformEnum.kook,
+    platform: 'kook',
     /**
      * 机器人信息  tudo
      */
@@ -121,11 +119,11 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
     /**
      *
      */
-    event: EventEnum.MESSAGES,
+    event: 'MESSAGES',
     /**
      *
      */
-    eventType: EventType.CREATE,
+    eventType: 'CREATE',
     /**
      * kook没私域
      */
@@ -255,12 +253,12 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (interaction: EventData) => {
         return false
       }
     }
-  }
+  } as AMessage
 
   /**
    * 消息处理
    */
-  await InstructionMatching(e as AMessage)
+  await InstructionMatching(e)
     .then(() => {
       console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`)
       return true

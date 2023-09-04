@@ -1,5 +1,4 @@
-import { typeMessage } from 'alemon'
-import { EventEnum, EventType, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -34,44 +33,39 @@ import { getBotMsgByQQ } from '../bot.js'
    */
 export const OPEN_FORUMS_EVENT = async (data: any) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.FORUMS_THREAD,
-    eventType: EventType.CREATE,
-    /**
-     * 不是私域
-     */
+    event: 'FORUMS_THREAD',
+    eventType: 'CREATE',
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
-  }
+    isRecall: false,
+    isGroup: false
+  } as AMessage
 
   /**
    * 事件匹配
    */
 
   if (new RegExp(/^OPEN_FORUM_THREAD/).test(data.eventType)) {
-    e.event = EventEnum.FORUMS_THREAD
+    e.event = 'FORUMS_THREAD'
   } else if (new RegExp(/^OPEN_FORUM_POST/).test(data.eventType)) {
-    e.event = EventEnum.FORUMS_POST
+    e.event = 'FORUMS_POST'
   } else {
-    e.event = EventEnum.FORUMS_REPLY
-  }
-
-  if (new RegExp(/CREATE$/).test(data.eventType)) {
-    e.eventType = EventType.CREATE
-  } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
-    e.eventType = EventType.UPDATE
-  } else {
-    e.eventType = EventType.DELETE
+    e.event = 'FORUMS_REPLY'
   }
 
   /**
-   * 只匹配类型
+   * 类型匹配
    */
-  await typeMessage(e as AMessage)
+  if (new RegExp(/CREATE$/).test(data.eventType)) {
+    e.eventType = 'CREATE'
+  } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
+    e.eventType = 'UPDATE'
+  } else {
+    e.eventType = 'DELETE'
+  }
+
+  await typeMessage(e)
     .then(() => {
       console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)
       return true

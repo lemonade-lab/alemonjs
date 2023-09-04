@@ -1,6 +1,5 @@
 import { IOpenAPI, Embed, Ark } from 'qq-guild-bot'
-import { InstructionMatching, typeMessage } from 'alemon'
-import { EventType, EventEnum, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage, InstructionMatching } from 'alemon'
 import { postImage } from '../alemonapi.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
@@ -24,10 +23,10 @@ DIRECT_MESSAGE (1 << 12)
  */
 export const DIRECT_MESSAGE = async (data: directEventData) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.MESSAGES,
-    eventType: EventType.CREATE,
+    event: 'MESSAGES',
+    eventType: 'CREATE',
     /**
      * 不是私域
      */
@@ -46,7 +45,7 @@ export const DIRECT_MESSAGE = async (data: directEventData) => {
    * 撤回事件
    */
   if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(data.eventType)) {
-    e.eventType = EventType.DELETE
+    e.eventType = 'DELETE'
     e.isRecall = true
     /**
      * 只匹配类型

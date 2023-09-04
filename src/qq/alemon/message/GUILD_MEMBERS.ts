@@ -1,6 +1,5 @@
 import { IOpenAPI, Embed, Ark } from 'qq-guild-bot'
-import { typeMessage } from 'alemon'
-import { EventType, EventEnum, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
@@ -18,14 +17,14 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
 export const GUILD_MEMBERS = async (data: any) => {
-  const event = EventEnum.GUILD_MEMBERS
-  let eventType = EventType.CREATE
+  const event = 'GUILD_MEMBERS'
+  let eventType = 'CREATE'
   if (new RegExp(/ADD$/).test(data.eventType)) {
-    eventType = EventType.CREATE
+    eventType = 'CREATE'
   } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
-    eventType = EventType.UPDATE
+    eventType = 'UPDATE'
   } else {
-    eventType = EventType.DELETE
+    eventType = 'DELETE'
   }
 
   /**
@@ -86,24 +85,13 @@ export const GUILD_MEMBERS = async (data: any) => {
   }
 
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    /**
-     * 麦克风事件
-     */
     event: event,
-    /**
-     * 上麦
-     */
     eventType: eventType,
-    /**
-     * 是私域
-     */
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
     isRecall: false,
+    isGroup: true,
     /**
      * 发现消息
      * @param msg
@@ -173,7 +161,6 @@ export const GUILD_MEMBERS = async (data: any) => {
     }
   } as AMessage
 
-  //只匹配类型
   await typeMessage(e)
     .then(() => {
       console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)

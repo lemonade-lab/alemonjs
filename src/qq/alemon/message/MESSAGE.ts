@@ -27,18 +27,18 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
    */
   if (data.msg.author.bot) return
 
-  e.platform = PlatformEnum.qq
+  e.platform = 'qq'
 
   e.bot = getBotMsgByQQ()
 
   /**
    * 事件匹配
    */
-  e.event = EventEnum.MESSAGES
+  e.event = 'MESSAGES'
   /**
    * 类型匹配
    */
-  e.eventType = EventType.CREATE
+  e.eventType = 'CREATE'
 
   /**
    * 得到登录配置

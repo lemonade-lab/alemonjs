@@ -1,5 +1,4 @@
-import { InstructionMatching } from 'alemon'
-import { EventEnum, EventType, AMessage, UserType, PlatformEnum } from 'alemon'
+import { AMessage, UserType, InstructionMatching } from 'alemon'
 import { Message, AttachmentBuilder } from 'discord.js'
 import { getBotConfigByDiscord } from '../../config.js'
 import { segmentDiscord } from '../segment.js'
@@ -83,7 +82,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
    * 构造e对象
    */
   const e = {
-    platform: PlatformEnum.discord,
+    platform: 'discord',
     /**
      * 机器人信息  tudo
      */
@@ -100,8 +99,8 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
     /**
      * 消息事件
      */
-    event: EventEnum.MESSAGES,
-    eventType: EventType.CREATE,
+    event: 'MESSAGES',
+    eventType: 'CREATE',
     msg_txt: interaction.content,
     msg_id: interaction.id,
     msg: msg,
@@ -160,12 +159,12 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
         return false
       }
     }
-  }
+  } as AMessage
 
   /**
    * 消息处理
    */
-  await InstructionMatching(e as AMessage)
+  await InstructionMatching(e)
     .then(() => {
       console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`)
       return true

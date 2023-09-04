@@ -1,5 +1,4 @@
-import { typeMessage } from 'alemon'
-import { EventEnum, EventType, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { mergeMessages } from './MESSAGE.js'
 import { EventData } from '../types.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -17,27 +16,22 @@ import { getBotMsgByQQ } from '../bot.js'
  */
 export const PUBLIC_GUILD_MESSAGES = async (data: EventData) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.MESSAGES,
-    eventType: EventType.CREATE,
-    /**
-     * 不是私域
-     */
+    event: 'MESSAGES',
+    eventType: 'CREATE',
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
-  }
+    isRecall: false,
+    isGroup: true // 群聊
+  } as AMessage
 
+  /**
+   * 消息撤回
+   */
   if (new RegExp(/DELETE$/).test(data.eventType)) {
-    e.eventType = EventType.DELETE
+    e.eventType = 'DELETE'
     e.isRecall = true
-    /**
-     * 只匹配类型
-     */
-    await typeMessage(e as AMessage)
+    await typeMessage(e)
       .then(() => {
         console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)
         return true
@@ -51,7 +45,7 @@ export const PUBLIC_GUILD_MESSAGES = async (data: EventData) => {
   }
 
   /**
-   *
+   * 消息创建
    */
   if (new RegExp(/CREATE$/).test(data.eventType)) {
     mergeMessages(e as AMessage, data).catch((err: any) => {

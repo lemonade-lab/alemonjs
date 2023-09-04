@@ -53,7 +53,6 @@ export function createLogin(account: number, password: string, platform = 1, cal
     console.log(urlReq)
     console.log('请60s内打开链接以完成验证...')
     console.log('完成后将自动进行登录...')
-
     for (let i = 0; i < 20; i++) {
       await sleep(3000)
       const res: any = await axios
@@ -159,9 +158,14 @@ export function createLogin(account: number, password: string, platform = 1, cal
    * 监听扫码
    */
   client.on('system.login.qrcode', async e => {
+    console.log('请60s内扫码以完成验证...')
+    console.log('完成后将自动进行登录...')
+    console.log('刷新二维码需要退出重来...')
     let T = false
     setTimeout(() => {
-      // 没成功,结束进程
+      /**
+       * 结束进程
+       */
       if (!T) throw '等待扫码超时，已停止运行'
     }, 60000)
     async function get() {
@@ -170,7 +174,9 @@ export function createLogin(account: number, password: string, platform = 1, cal
         if (!T) {
           const res: any = await client.queryQrcodeResult()
           if (res.retcode === 0) {
-            // 二维码登录
+            /**
+             * 二维码登录
+             */
             client.qrcodeLogin()
             T = true
             return
@@ -264,6 +270,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
 
   /**
    * 同意好友申请
+   * 拒绝`event.approve(false)`
    */
   client.on('request.friend', (event: FriendRequestEvent) => {
     const cfg = getBotConfigQQGroup()
@@ -272,6 +279,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
 
   /**
    * 同意群邀请
+   * 拒绝`event.approve(false)`
    */
   client.on('request.group.invite', (event: GroupInviteEvent) => {
     const cfg = getBotConfigQQGroup()

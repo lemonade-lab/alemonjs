@@ -1,5 +1,4 @@
-import { typeMessage } from 'alemon'
-import { EventType, EventEnum, AMessage, PlatformEnum } from 'alemon'
+import { typeMessage, AMessage } from 'alemon'
 import { mergeMessages } from './MESSAGE.js'
 import { getBotMsgByQQ } from '../bot.js'
 
@@ -17,10 +16,10 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
  * */
 export const GUILD_MESSAGES = async (data: any) => {
   const e = {
-    platform: PlatformEnum.qq,
+    platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: EventEnum.MESSAGES,
-    eventType: EventType.CREATE,
+    event: 'MESSAGES',
+    eventType: 'CREATE',
     /**
      * 不是私域
      */
@@ -35,14 +34,8 @@ export const GUILD_MESSAGES = async (data: any) => {
    * 撤回消息
    */
   if (new RegExp(/DELETE$/).test(data.eventType)) {
-    e.eventType = EventType.DELETE
-    /**
-     * 是撤回
-     */
+    e.eventType = 'DELETE'
     e.isRecall = true
-    /**
-     * 只匹配类型
-     */
     await typeMessage(e)
       .then(() => {
         console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)

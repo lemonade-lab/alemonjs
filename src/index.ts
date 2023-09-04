@@ -1,11 +1,9 @@
 import { cmdInit, setLanchConfig } from 'alemon'
 import { getConfig } from './config.js'
-
 /**
  * 读取配置
  */
 const { PuppeteerConfig } = getConfig()
-
 /**
  * 设置浏览器配置
  */
