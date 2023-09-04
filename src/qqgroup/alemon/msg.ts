@@ -20,9 +20,15 @@ export function parseMsg(msg) {
     // 提取 <@xxx> 中的 xxx
     const userId = match[1]
 
-    // 根据 userId 调用 segmentIcqq.at() API，生成 @柠檬冲水 表达式，并添加到数组中
-    const segmentAt = segmentIcqq.at(userId)
-    arr.push(segmentAt)
+    if (userId == 'everyone') {
+      // 这是一个at全体
+      arr.push(segmentIcqq.at('all'))
+    } else {
+      // 根据 userId 调用 segmentIcqq.at() API
+      // 生成 @柠檬冲水 表达式，
+      // 并添加到数组中
+      arr.push(segmentIcqq.at(Number(userId)))
+    }
 
     lastIndex = endIndex
   }

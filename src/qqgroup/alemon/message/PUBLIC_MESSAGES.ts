@@ -202,7 +202,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         }
       }
       try {
-        event.reply(parseMsg(content), true)
+        event.reply(parseMsg(content))
         return true
       } catch {
         return false
