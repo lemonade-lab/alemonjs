@@ -184,7 +184,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
     ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
-          event.reply(segmentIcqq.image(msg))
+          event.reply(segmentIcqq.image(msg)).catch(err => {
+            console.log(err)
+          })
           return true
         } catch (err) {
           console.error(err)
@@ -194,7 +196,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
       const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
       if (Buffer.isBuffer(img)) {
         try {
-          event.reply([content, segmentIcqq.image(img)])
+          event.reply([content, segmentIcqq.image(img)]).catch(err => {
+            console.log(err)
+          })
           return true
         } catch (err) {
           console.error(err)
@@ -202,7 +206,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         }
       }
       try {
-        event.reply(parseMsg(content))
+        event.reply(parseMsg(content)).catch(err => {
+          console.log(err)
+        })
         return true
       } catch {
         return false
@@ -217,7 +223,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
       try {
         if (Buffer.isBuffer(msg)) {
           try {
-            event.reply(segmentIcqq.image(msg), true)
+            event.reply(segmentIcqq.image(msg), true).catch(err => {
+              console.log(err)
+            })
             return true
           } catch (err) {
             console.error(err)
@@ -231,7 +239,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
           : undefined
         if (Buffer.isBuffer(img)) {
           try {
-            event.reply([content, segmentIcqq.image(img)], true)
+            event.reply([content, segmentIcqq.image(img)], true).catch(err => {
+              console.log(err)
+            })
             return true
           } catch (err) {
             console.error(err)
@@ -239,7 +249,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
           }
         }
         try {
-          event.reply(parseMsg(content), true)
+          event.reply(parseMsg(content), true).catch(err => {
+            console.log(err)
+          })
           return true
         } catch {
           return false
@@ -278,7 +290,9 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         }
       }
       try {
-        event.reply(cardArr)
+        event.reply(cardArr).catch(err => {
+          console.log(err)
+        })
         return true
       } catch {
         return false
