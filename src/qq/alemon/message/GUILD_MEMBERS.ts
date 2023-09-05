@@ -16,12 +16,12 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_UPDATE    // 当成员资料变更时
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
-export const GUILD_MEMBERS = async (data: any) => {
-  const event = 'GUILD_MEMBERS'
+export const GUILD_MEMBERS = async (event: any) => {
+  const Eevent = 'GUILD_MEMBERS'
   let eventType = 'CREATE'
-  if (new RegExp(/ADD$/).test(data.eventType)) {
+  if (new RegExp(/ADD$/).test(event.eventType)) {
     eventType = 'CREATE'
-  } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
+  } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
     eventType = 'UPDATE'
   } else {
     eventType = 'DELETE'
@@ -31,7 +31,7 @@ export const GUILD_MEMBERS = async (data: any) => {
    * 得到频道列表
    */
   const ChannelsData = await clientApiByQQ.channelApi
-    .channels(data.msg.guild_id)
+    .channels(event.msg.guild_id)
     .then(res => {
       const { data } = res
       return data
@@ -42,7 +42,7 @@ export const GUILD_MEMBERS = async (data: any) => {
     })
 
   if (typeof ChannelsData == 'boolean') {
-    console.info(`\n[${event}] [${eventType}]\n${false}`)
+    console.info(`\n[${Eevent}] [${eventType}]\n${false}`)
     return false
   }
 
@@ -51,7 +51,7 @@ export const GUILD_MEMBERS = async (data: any) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
-    event: event,
+    event: Eevent,
     eventType: eventType,
     isPrivate: false,
     isRecall: false,
@@ -70,8 +70,8 @@ export const GUILD_MEMBERS = async (data: any) => {
       if (Buffer.isBuffer(msg)) {
         try {
           return await postImage({
-            id: data.msg.guild_id,
-            msg_id: data.msg.id, //消息id, 必须
+            id: event.msg.guild_id,
+            msg_id: event.msg.id, //消息id, 必须
             image: msg, //buffer
             name: typeof img == 'string' ? img : 'result.jpg'
           })
@@ -89,8 +89,8 @@ export const GUILD_MEMBERS = async (data: any) => {
       if (Buffer.isBuffer(img)) {
         try {
           return await postImage({
-            id: data.msg.guild_id,
-            msg_id: data.msg.id, //消息id, 必须
+            id: event.msg.guild_id,
+            msg_id: event.msg.id, //消息id, 必须
             image: img, //buffer
             content,
             name: name ?? 'result.jpg'
@@ -123,8 +123,8 @@ export const GUILD_MEMBERS = async (data: any) => {
         try {
           if (item.type == 'qq_ark' || item.type == 'qq_embed') {
             await clientApiByQQ.messageApi
-              .postMessage(data.msg.channel_id, {
-                msg_id: data.msg.id,
+              .postMessage(event.msg.channel_id, {
+                msg_id: event.msg.id,
                 ...item.card
               })
               .then(() => true)

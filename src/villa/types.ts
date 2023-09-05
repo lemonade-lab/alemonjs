@@ -12,6 +12,7 @@ export interface LoginByVillaConfig {
   /**
    * hppts
    */
+  http?: string
   url?: string
   port?: number
   size?: number

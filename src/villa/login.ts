@@ -52,11 +52,12 @@ export async function checkRobotByVilla(Bcf: string) {
 secret: '' # 机器人 密码
 masterID: '' # 主人 账户
 password: '' # 主人 密码
+http: 'http' # 可更改为https
 url: '/api/mys/callback' # 回调地址
 port: 8080 # 回调接口
 size: 999999 # 图片缓存空间
 img_url: '/api/mys/img' # 图片请求路径
-IMAGE_DIR: '/api/mys/img' # 图片缓存路径`
+IMAGE_DIR: '/data/mys/img' # 图片缓存路径`
   /**
    * 替换登录配置
    */
@@ -83,7 +84,13 @@ IMAGE_DIR: '/api/mys/img' # 图片缓存路径`
     bot_id,
     secret,
     masterID: '',
-    password: ''
+    password: '',
+    http: 'http',
+    url: '/api/mys/callback',
+    port: 8080,
+    size: 999999,
+    img_url: '/api/mys/img',
+    IMAGE_DIR: 'data/mys/img'
   })
   return true
 }

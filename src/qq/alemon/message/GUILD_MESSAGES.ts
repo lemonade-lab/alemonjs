@@ -14,7 +14,7 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
   内容与 AT_MESSAGE_CREATE 相同
   - MESSAGE_DELETE         // 删除（撤回）消息事件
  * */
-export const GUILD_MESSAGES = async (data: any) => {
+export const GUILD_MESSAGES = async (event: any) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -33,7 +33,7 @@ export const GUILD_MESSAGES = async (data: any) => {
   /**
    * 撤回消息
    */
-  if (new RegExp(/DELETE$/).test(data.eventType)) {
+  if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
     await typeMessage(e)
@@ -52,7 +52,7 @@ export const GUILD_MESSAGES = async (data: any) => {
   /**
    * 消息方法
    */
-  mergeMessages(e as AMessage, data).catch((err: any) => {
+  mergeMessages(e as AMessage, event).catch((err: any) => {
     console.error(err)
     return false
   })

@@ -10,7 +10,7 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_PASS     // 消息审核通过
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
-export const MESSAGE_AUDIT = async (data: any) => {
+export const MESSAGE_AUDIT = async (event: any) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -25,7 +25,7 @@ export const MESSAGE_AUDIT = async (data: any) => {
    * 事件匹配
    */
   e.event = 'MESSAGE_AUDIT'
-  if (new RegExp(/REJECT$/).test(data.eventType)) {
+  if (new RegExp(/REJECT$/).test(event.eventType)) {
     e.eventType = 'DELETE'
   }
 

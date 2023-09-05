@@ -9,7 +9,7 @@ import { getBotMsgByQQ } from '../bot.js'
 INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
-export const INTERACTION = async data => {
+export const INTERACTION = async event => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -23,7 +23,7 @@ export const INTERACTION = async data => {
   /**
    * 事件匹配
    */
-  if (!new RegExp(/CREATE$/).test(data.eventType)) {
+  if (!new RegExp(/CREATE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
   }
 

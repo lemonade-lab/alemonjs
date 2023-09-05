@@ -9,6 +9,7 @@ let cfg: LoginByVillaConfig = {
   masterID: '',
   password: '',
   port: 8080,
+  http: 'http',
   url: '/api/mys/callback',
   img_url: '/api/mys/img',
   IMAGE_DIR: 'data/mys/img',

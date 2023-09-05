@@ -31,7 +31,7 @@ import { getBotMsgByQQ } from '../bot.js'
     - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
     - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
    */
-export const OPEN_FORUMS_EVENT = async (data: any) => {
+export const OPEN_FORUMS_EVENT = async (event: any) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -46,9 +46,9 @@ export const OPEN_FORUMS_EVENT = async (data: any) => {
    * 事件匹配
    */
 
-  if (new RegExp(/^OPEN_FORUM_THREAD/).test(data.eventType)) {
+  if (new RegExp(/^OPEN_FORUM_THREAD/).test(event.eventType)) {
     e.event = 'FORUMS_THREAD'
-  } else if (new RegExp(/^OPEN_FORUM_POST/).test(data.eventType)) {
+  } else if (new RegExp(/^OPEN_FORUM_POST/).test(event.eventType)) {
     e.event = 'FORUMS_POST'
   } else {
     e.event = 'FORUMS_REPLY'
@@ -57,9 +57,9 @@ export const OPEN_FORUMS_EVENT = async (data: any) => {
   /**
    * 类型匹配
    */
-  if (new RegExp(/CREATE$/).test(data.eventType)) {
+  if (new RegExp(/CREATE$/).test(event.eventType)) {
     e.eventType = 'CREATE'
-  } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
+  } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
     e.eventType = 'UPDATE'
   } else {
     e.eventType = 'DELETE'

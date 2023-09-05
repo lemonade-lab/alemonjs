@@ -77,9 +77,6 @@ password: '' # 机器人 密码
 device: '' # 登录设备 
 masterID: '' # 主人编号 
 masterPW: '' # 主人密码 
-friendApplication: false # 好友申请
-groupInvitation: false # 邀群申请
-addGroupApplication: false # 加群申请
 # 签名API地址(如:http://127.0.0.1:8080/sign?key=12315)
 sign_api_addr: 
 # 传入的QQ版本(如:8.9.63、8.9.68)
@@ -108,6 +105,8 @@ version:  `
   setBotConfigQQGroup({
     account,
     password,
+    masterID,
+    masterPW: '',
     device
   })
   return true

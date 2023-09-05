@@ -21,7 +21,7 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_CREATE   // 当收到用户发给机器人的私信消息时
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
-export const DIRECT_MESSAGE = async (data: directEventData) => {
+export const DIRECT_MESSAGE = async (event: directEventData) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -44,7 +44,7 @@ export const DIRECT_MESSAGE = async (data: directEventData) => {
   /**
    * 撤回事件
    */
-  if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(data.eventType)) {
+  if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
     /**
@@ -66,25 +66,25 @@ export const DIRECT_MESSAGE = async (data: directEventData) => {
   /**
    * 优化接口
    */
-  await directMessage(e, data).catch(err => {
+  await directMessage(e, event).catch(err => {
     console.error(err)
     return
   })
   console.info(
-    `\n[${data.msg.author.username}][${data.msg.author.id}][${e.isGroup}] ${
-      data.msg.content ? data.msg.content : ''
+    `\n[${event.msg.author.username}][${event.msg.author.id}][${e.isGroup}] ${
+      event.msg.content ? event.msg.content : ''
     }`
   )
 }
 
-async function directMessage(e: AMessage, data) {
+async function directMessage(e: AMessage, event: directEventData) {
   /* 消息发送机制 */
   e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
     if (Buffer.isBuffer(msg)) {
       try {
         return await postDirectImage({
-          id: data.msg.guild_id,
-          msg_id: data.msg.id, //消息id, 必须
+          id: event.msg.guild_id,
+          msg_id: event.msg.id, //消息id, 必须
           image: msg, //buffer
           name: typeof img == 'string' ? img : 'result.jpg'
         })
@@ -102,8 +102,8 @@ async function directMessage(e: AMessage, data) {
     if (Buffer.isBuffer(img)) {
       try {
         return await postDirectImage({
-          id: data.msg.guild_id,
-          msg_id: data.msg.id, //消息id, 必须
+          id: event.msg.guild_id,
+          msg_id: event.msg.id, //消息id, 必须
           image: img, //buffer
           content,
           name: name ?? 'result.jpg'
@@ -119,8 +119,8 @@ async function directMessage(e: AMessage, data) {
       }
     }
     return await clientApiByQQ.directMessageApi
-      .postDirectMessage(data.msg.guild_id, {
-        msg_id: data.msg.id,
+      .postDirectMessage(event.msg.guild_id, {
+        msg_id: event.msg.id,
         content
       })
       .then(() => true)
@@ -134,8 +134,8 @@ async function directMessage(e: AMessage, data) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
           await clientApiByQQ.messageApi
-            .postMessage(data.msg.channel_id, {
-              msg_id: data.msg.id,
+            .postMessage(event.msg.channel_id, {
+              msg_id: event.msg.id,
               ...item.card
             })
             .then(() => true)
@@ -181,24 +181,24 @@ async function directMessage(e: AMessage, data) {
     return false
   }
 
-  e.msg_txt = data.msg.content
+  e.msg_txt = event.msg.content
 
-  e.msg = data.msg.content
+  e.msg = event.msg.content
 
   /**
    * 消息编号
    */
-  e.msg_id = data.msg.id
+  e.msg_id = event.msg.id
 
-  e.user_id = data.msg.author.id
+  e.user_id = event.msg.author.id
 
-  e.user_avatar = data.msg.author.avatar
+  e.user_avatar = event.msg.author.avatar
 
-  e.user_name = data.msg.author.username
+  e.user_name = event.msg.author.username
 
-  e.channel_id = data.msg.channel_id
+  e.channel_id = event.msg.channel_id
 
-  e.guild_id = data.msg.guild_id
+  e.guild_id = event.msg.guild_id
 
   e.segment = segmentQQ
 
@@ -230,16 +230,12 @@ async function directMessage(e: AMessage, data) {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(
-        `\n[${data.msg.channel_id}] [${data.msg.author.username}]\n${data.msg.content}${true}`
-      )
+      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`))
       return true
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(
-        `\n[${data.msg.channel_id}] [${data.msg.author.username}]\n${data.msg.content}${false}`
-      )
+      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`))
       return false
     })
 }

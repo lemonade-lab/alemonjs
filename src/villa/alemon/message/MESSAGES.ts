@@ -247,9 +247,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const dimensions = imageSize(msg)
         const uul = await Client.setLocalImg(msg)
         if (!uul) return false
-        const NowObj = await Client.transferImage(villa_id, `http://${ip}:8080${uul}`)
+        const NowObj = await Client.transferImage(villa_id, `${cfg.http}://${ip}:${cfg.port}${uul}`)
         if (!NowObj) {
-          url = `http://${ip}:8080${uul}`
+          url = `${cfg.http}://${ip}:${cfg.port}${uul}`
         } else {
           url = NowObj.new_url
         }
@@ -299,9 +299,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const dimensions = imageSize(img)
         const uul = await Client.setLocalImg(img)
         if (!uul) return false
-        const NowObj = await Client.transferImage(villa_id, `http://${ip}:8080${uul}`)
+        const NowObj = await Client.transferImage(villa_id, `${cfg.http}://${ip}:${cfg.port}${uul}`)
         if (!NowObj) {
-          url = `http://${ip}:8080${uul}`
+          url = `${cfg.http}://${ip}:${cfg.port}${uul}`
         } else {
           url = NowObj.new_url
         }

@@ -20,11 +20,11 @@ declare global {
  * @param data  原数据
  * @returns
  */
-export const mergeMessages = async (e: AMessage, data: EventData) => {
+export const mergeMessages = async (e: AMessage, event: EventData) => {
   /**
    * 屏蔽其他机器人的消息
    */
-  if (data.msg.author.bot) return
+  if (event.msg.author.bot) return
 
   e.platform = 'qq'
 
@@ -58,7 +58,7 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
   /**
    * 检查身份
    */
-  if (data.msg.author.id == masterID) {
+  if (event.msg.author.id == masterID) {
     /**
      * 是主人
      */
@@ -84,8 +84,8 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
     if (Buffer.isBuffer(msg)) {
       try {
         return await postImage({
-          id: data.msg.guild_id,
-          msg_id: data.msg.id, //消息id, 必须
+          id: event.msg.guild_id,
+          msg_id: event.msg.id, //消息id, 必须
           image: msg, //buffer
           name: typeof img == 'string' ? img : 'result.jpg'
         })
@@ -103,8 +103,8 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
     if (Buffer.isBuffer(img)) {
       try {
         return await postImage({
-          id: data.msg.guild_id,
-          msg_id: data.msg.id, //消息id, 必须
+          id: event.msg.guild_id,
+          msg_id: event.msg.id, //消息id, 必须
           image: img, //buffer
           content,
           name: name ?? 'result.jpg'
@@ -123,8 +123,8 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
      * 发送接口
      */
     return await clientApiByQQ.messageApi
-      .postMessage(data.msg.channel_id, {
-        msg_id: data.msg.id,
+      .postMessage(event.msg.channel_id, {
+        msg_id: event.msg.id,
         content
       })
       .then(() => true)
@@ -139,8 +139,8 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
           await clientApiByQQ.messageApi
-            .postMessage(data.msg.channel_id, {
-              msg_id: data.msg.id,
+            .postMessage(event.msg.channel_id, {
+              msg_id: event.msg.id,
               ...item.card
             })
             .then(() => true)
@@ -167,7 +167,7 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
 
   e.replyByMid = async (mid: string, msg: string) => {
     return await clientApiByQQ.messageApi
-      .postMessage(data.msg.channel_id, {
+      .postMessage(event.msg.channel_id, {
         msg_id: mid,
         content: msg,
         message_reference: { message_id: mid }
@@ -190,7 +190,7 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
     return await clientApiByQQ.reactionApi
-      .postReaction(data.msg.channel_id, {
+      .postReaction(event.msg.channel_id, {
         message_id: mid,
         ...boj
       })
@@ -212,7 +212,7 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
     return await clientApiByQQ.reactionApi
-      .deleteReaction(data.msg.channel_id, {
+      .deleteReaction(event.msg.channel_id, {
         message_id: mid,
         ...boj
       })
@@ -226,42 +226,42 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
   /**
    * 消息原文
    */
-  e.msg_txt = data.msg.content
+  e.msg_txt = event.msg.content
 
   /**
    * 消息
    */
-  e.msg = data.msg.content
+  e.msg = event.msg.content
 
   /**
    * 消息编号
    */
-  e.msg_id = data.msg.id
+  e.msg_id = event.msg.id
 
   /**
    * 用户编号
    */
-  e.user_id = data.msg.author.id
+  e.user_id = event.msg.author.id
 
   /**
    * 用户头像
    */
-  e.user_avatar = data.msg.author.avatar
+  e.user_avatar = event.msg.author.avatar
 
   /**
    * 用户名
    */
-  e.user_name = data.msg.author.username
+  e.user_name = event.msg.author.username
 
   /**
    * 子频道编号
    */
-  e.channel_id = data.msg.channel_id
+  e.channel_id = event.msg.channel_id
 
   /**
    * 频道编号
    */
-  e.guild_id = data.msg.guild_id
+  e.guild_id = event.msg.guild_id
 
   /**
    * 模块
@@ -278,11 +278,11 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
    */
   e.at = false
 
-  if (data.msg.mentions) {
+  if (event.msg.mentions) {
     /**
      * 去掉@ 转为纯消息
      */
-    for await (const item of data.msg.mentions) {
+    for await (const item of event.msg.mentions) {
       if (item.bot != true) {
         // 用户艾特才会为真
         e.at = true
@@ -330,7 +330,7 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
     img?: Buffer | string,
     name?: string
   ): Promise<boolean> => {
-    return await Private(data.msg, msg, img)
+    return await Private(event.msg, msg, img)
       .then(res => {
         return res
       })
@@ -344,16 +344,12 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(
-        `\n[${data.msg.channel_id}] [${data.msg.author.username}] [${true}] \n ${data.msg.content}`
-      )
+      console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`)
       return
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(
-        `\n[${data.msg.channel_id}] [${data.msg.author.username}] [${false}] \n ${data.msg.content}`
-      )
+      console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`)
       return
     })
 }

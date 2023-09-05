@@ -27,7 +27,7 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
-export const FORUMS_EVENT = async (data: any) => {
+export const FORUMS_EVENT = async (event: any) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -39,17 +39,17 @@ export const FORUMS_EVENT = async (data: any) => {
   } as AMessage
 
   /* 事件匹配 */
-  if (new RegExp(/^FORUM_THREAD/).test(data.eventType)) {
+  if (new RegExp(/^FORUM_THREAD/).test(event.eventType)) {
     e.event = 'FORUMS_THREAD'
-  } else if (new RegExp(/^FORUM_POST/).test(data.eventType)) {
+  } else if (new RegExp(/^FORUM_POST/).test(event.eventType)) {
     e.event = 'FORUMS_POST'
   } else {
     e.event = 'FORUMS_REPLY'
   }
 
-  if (new RegExp(/CREATE$/).test(data.eventType)) {
+  if (new RegExp(/CREATE$/).test(event.eventType)) {
     e.eventType = 'CREATE'
-  } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
+  } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
     e.eventType = 'UPDATE'
   } else {
     e.eventType = 'DELETE'

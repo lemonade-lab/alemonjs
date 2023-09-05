@@ -8,10 +8,12 @@ const arr: string[] = []
  * 指令合集
  */
 const args = process.argv.slice(2)
+
 /**
  * 推送插件启动到最后
  */
 args.push('alemon')
+
 for await (const item of args) {
   /**
    * 不能启动相同的机器人

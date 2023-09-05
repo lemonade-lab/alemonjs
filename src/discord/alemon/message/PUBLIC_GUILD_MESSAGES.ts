@@ -1,18 +1,18 @@
 import { AMessage, UserType, InstructionMatching } from 'alemon'
-import { Message, AttachmentBuilder } from 'discord.js'
+import { Message as DcMessage, AttachmentBuilder } from 'discord.js'
 import { getBotConfigByDiscord } from '../../config.js'
 import { segmentDiscord } from '../segment.js'
 import { getBotMsgByDiscord } from '../bot.js'
 /**
  * 公共
- * @param interaction
+ * @param event
  * @returns
  */
-export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
+export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
   /**
    * 忽视机器人
    */
-  if (interaction.author.bot) {
+  if (event.author.bot) {
     return
   }
 
@@ -20,7 +20,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
    * 艾特消息处理
    */
   const at_users: UserType[] = []
-  const obj = Object.fromEntries(interaction.mentions.users)
+  const obj = Object.fromEntries(event.mentions.users)
 
   /**
    *
@@ -41,7 +41,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
   /**
    * 清除 @ 相关
    */
-  let msg = interaction.content
+  let msg = event.content
   for await (const item of at_users) {
     msg = msg.replace(`<@${item.id}>`, '').trim()
   }
@@ -71,7 +71,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
   /**
    * 检查身份
    */
-  if (interaction.author.id == cfg.masterID) {
+  if (event.author.id == cfg.masterID) {
     /**
      * 是主人
      */
@@ -90,8 +90,8 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
     /**
      * 频道
      */
-    guild_id: interaction.guildId,
-    channel_id: interaction.channelId,
+    guild_id: event.guildId,
+    channel_id: event.channelId,
     isPrivate: true,
     isRecall: false,
     isMaster: isMaster,
@@ -101,8 +101,8 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
      */
     event: 'MESSAGES',
     eventType: 'CREATE',
-    msg_txt: interaction.content,
-    msg_id: interaction.id,
+    msg_txt: event.content,
+    msg_id: event.id,
     msg: msg,
     /**
      * 艾特消息
@@ -114,9 +114,9 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
     /**
      * 用户
      */
-    user_id: interaction.author.id,
-    user_name: interaction.author.username,
-    user_avatar: interaction.author.avatarURL({
+    user_id: event.author.id,
+    user_name: event.author.username,
+    user_avatar: event.author.avatarURL({
       extension: 'png',
       forceStatic: true,
       size: 1024
@@ -140,7 +140,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
           const attach = new AttachmentBuilder(msg, {
             name: typeof img == 'string' ? img : 'result.jpeg'
           })
-          await interaction.channel.send({ files: [attach] })
+          await event.channel.send({ files: [attach] })
           return true
         } catch (err) {
           console.error(err)
@@ -151,7 +151,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
       if (Buffer.isBuffer(img)) {
         try {
           const attach = new AttachmentBuilder(img, { name: name ?? 'result.jpeg' })
-          await interaction.channel.send({ files: [attach] })
+          await event.channel.send({ files: [attach] })
           return true
         } catch (err) {
           console.error(err)
@@ -159,7 +159,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
         }
       }
       try {
-        await interaction.channel.send(content)
+        await event.channel.send(content)
         return true
       } catch {
         return false

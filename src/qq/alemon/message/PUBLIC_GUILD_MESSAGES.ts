@@ -14,7 +14,7 @@ import { getBotMsgByQQ } from '../bot.js'
  AT_MESSAGE_CREATE       // 当收到@机器人的消息时
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
-export const PUBLIC_GUILD_MESSAGES = async (data: EventData) => {
+export const PUBLIC_GUILD_MESSAGES = async (event: EventData) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -28,7 +28,7 @@ export const PUBLIC_GUILD_MESSAGES = async (data: EventData) => {
   /**
    * 消息撤回
    */
-  if (new RegExp(/DELETE$/).test(data.eventType)) {
+  if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
     await typeMessage(e)
@@ -47,8 +47,8 @@ export const PUBLIC_GUILD_MESSAGES = async (data: EventData) => {
   /**
    * 消息创建
    */
-  if (new RegExp(/CREATE$/).test(data.eventType)) {
-    mergeMessages(e as AMessage, data).catch((err: any) => {
+  if (new RegExp(/CREATE$/).test(event.eventType)) {
+    mergeMessages(e as AMessage, event).catch((err: any) => {
       console.error(err)
       return false
     })

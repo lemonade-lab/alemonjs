@@ -78,7 +78,7 @@ export async function checkRobotByDiscord(Bcf: string) {
       type: 'password',
       name: 'token',
       message: 'BotToken: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 token: ')
+      validate: value => (value !== '' && typeof value === 'string' ? true : 'BotToken: ')
     }
   ])
 

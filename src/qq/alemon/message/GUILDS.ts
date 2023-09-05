@@ -21,7 +21,7 @@ GUILDS (1 << 0)
   - CHANNEL_UPDATE         // 当channel被更新时
   - CHANNEL_DELETE         // 当channel被删除时
  */
-export const GUILDS = async (data: any) => {
+export const GUILDS = async (event: any) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -35,7 +35,7 @@ export const GUILDS = async (data: any) => {
   /**
    * 事件匹配
    */
-  if (new RegExp(/^GUILD.*$/).test(data.event)) {
+  if (new RegExp(/^GUILD.*$/).test(event.event)) {
     e.event = 'GUILD'
   } else {
     e.event = 'CHANNEL'
@@ -43,9 +43,9 @@ export const GUILDS = async (data: any) => {
   /**
    * 类型匹配
    */
-  if (new RegExp(/CREATE$/).test(data.eventType)) {
+  if (new RegExp(/CREATE$/).test(event.eventType)) {
     e.eventType = 'CREATE'
-  } else if (new RegExp(/UPDATE$/).test(data.eventType)) {
+  } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
     e.eventType = 'UPDATE'
   } else {
     e.eventType = 'DELETE'

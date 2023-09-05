@@ -16,7 +16,7 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_ON_MIC            // 上麦时  create
   - AUDIO_OFF_MIC           // 下麦时 delete
  */
-export const AUDIO_ACTION = async (data: any) => {
+export const AUDIO_ACTION = async (event: any) => {
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -27,8 +27,8 @@ export const AUDIO_ACTION = async (data: any) => {
     isGroup: false
   } as AMessage
 
-  if (new RegExp(/MIC$/).test(data.eventType)) {
-    if (!new RegExp(/ON_MIC$/).test(data.eventType)) {
+  if (new RegExp(/MIC$/).test(event.eventType)) {
+    if (!new RegExp(/ON_MIC$/).test(event.eventType)) {
       /**
        * 下麦
        */
@@ -39,7 +39,7 @@ export const AUDIO_ACTION = async (data: any) => {
      * 音频事件
      */
     e.event = 'AUDIO_FREQUENCY'
-    if (!new RegExp(/^AUDIO_START$/).test(data.eventType)) {
+    if (!new RegExp(/^AUDIO_START$/).test(event.eventType)) {
       /**
        * 音频播放结束时
        */
