@@ -6,6 +6,7 @@
     "dist",
     "config",
     "plugins/*/*.json",
+    "plugins/*/apps.js",
     "data",
     "logs"
   ]

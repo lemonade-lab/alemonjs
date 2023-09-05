@@ -16,7 +16,7 @@ export async function createAlemonQQByQQGroup() {
       console.error(err)
     })
   ) {
-    let str = `friendApplication: false # 好友申请
+    const str = `friendApplication: false # 好友申请
 groupInvitation: false # 邀群申请
 addGroupApplication: false # 加群申请
 botQQ: [] # 被视为bot的QQ号,当对方是bot时反馈`
