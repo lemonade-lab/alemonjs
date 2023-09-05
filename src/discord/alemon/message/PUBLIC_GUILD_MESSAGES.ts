@@ -1,8 +1,9 @@
 import { AMessage, UserType, InstructionMatching } from 'alemon'
-import { Message as DcMessage, AttachmentBuilder } from 'discord.js'
+import { Message as DcMessage } from 'discord.js'
 import { getBotConfigByDiscord } from '../../config.js'
 import { segmentDiscord } from '../segment.js'
 import { getBotMsgByDiscord } from '../bot.js'
+import { postImage } from '../api.js'
 /**
  * 公共
  * @param event
@@ -137,11 +138,13 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
     ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
-          const attach = new AttachmentBuilder(msg, {
-            name: typeof img == 'string' ? img : 'result.jpeg'
-          })
-          await event.channel.send({ files: [attach] })
-          return true
+          const attach = await postImage(img)
+          if (attach) {
+            await event.channel.send({ files: [attach] })
+            return true
+          } else {
+            return false
+          }
         } catch (err) {
           console.error(err)
           return false
@@ -150,9 +153,13 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
       const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
       if (Buffer.isBuffer(img)) {
         try {
-          const attach = new AttachmentBuilder(img, { name: name ?? 'result.jpeg' })
-          await event.channel.send({ files: [attach] })
-          return true
+          const attach = await postImage(img)
+          if (attach) {
+            await event.channel.send({ files: [attach] })
+            return true
+          } else {
+            return false
+          }
         } catch (err) {
           console.error(err)
           return false

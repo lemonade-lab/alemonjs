@@ -1,6 +1,6 @@
 import { AMessage, InstructionMatching, UserType } from 'alemon'
 import { BotEvent, MessageContentType, Client } from 'mys-villa'
-import imageSize from 'image-size'
+import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
 import { getBotConfigByVilla } from '../../config.js'
 import { now_e } from './e.js'
@@ -244,7 +244,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         /**
          * 挂载图片
          */
-        const dimensions = imageSize(msg)
+        const dimensions = IMGS.imageSize(msg)
         const uul = await Client.setLocalImg(msg)
         if (!uul) return false
         const NowObj = await Client.transferImage(villa_id, `${cfg.http}://${ip}:${cfg.port}${uul}`)
@@ -296,7 +296,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         /**
          * 挂载图片
          */
-        const dimensions = imageSize(img)
+        const dimensions = IMGS.imageSize(img)
         const uul = await Client.setLocalImg(img)
         if (!uul) return false
         const NowObj = await Client.transferImage(villa_id, `${cfg.http}://${ip}:${cfg.port}${uul}`)

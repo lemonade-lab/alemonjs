@@ -21,5 +21,14 @@ export const segmentVilla = {
    */
   atChannel: function (channel_id: string): string {
     return `<#${channel_id}>`
+  },
+  /**
+   * 蓝链接
+   * @param name
+   * @param url
+   * @returns
+   */
+  link: function (name: string, url: string): string {
+    return `[${name}](${url})`
   }
 }

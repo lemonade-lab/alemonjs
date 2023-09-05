@@ -1,7 +1,6 @@
 import { Readable } from 'stream'
 import FormData from 'form-data'
 import axios from 'axios'
-
 import { getBotConfigByQQ } from '../config.js'
 
 /**
