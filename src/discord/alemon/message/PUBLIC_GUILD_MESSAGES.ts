@@ -138,7 +138,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
     ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
-          const attach = await postImage(img, typeof img == 'string' ? img : undefined)
+          const attach = await postImage(msg, typeof img == 'string' ? img : undefined)
           if (attach) {
             await event.channel.send({ files: [attach] })
             return true
@@ -155,7 +155,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
         try {
           const attach = await postImage(img, name)
           if (attach) {
-            await event.channel.send({ files: [attach] })
+            await event.channel.send({ content,files: [attach] })
             return true
           } else {
             return false
