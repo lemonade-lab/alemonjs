@@ -12,7 +12,7 @@ export const segmentDiscord = {
    * @returns
    */
   atAll: function atAll(): string {
-    return `<@everyone>`
+    return `@everyone`
   },
   /**
    * 子频道引用
