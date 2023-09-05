@@ -87,7 +87,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           id: event.msg.guild_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg, //buffer
-          name: typeof img == 'string' ? img : 'result.jpg'
+          name: typeof img == 'string' ? img : undefined
         })
           .then(() => true)
           .catch((err: any) => {
@@ -107,7 +107,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           msg_id: event.msg.id, //消息id, 必须
           image: img, //buffer
           content,
-          name: name ?? 'result.jpg'
+          name: name
         })
           .then(() => true)
           .catch((err: any) => {
