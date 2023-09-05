@@ -44,7 +44,7 @@ export const Private = async (
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: msg, //buffer
-        name: typeof img == 'string' ? img : 'result.jpg'
+        name: typeof img == 'string' ? img : undefined
       })
         .then(() => true)
         .catch((err: any) => {
@@ -64,7 +64,7 @@ export const Private = async (
         msg_id: EMessage.id, //消息id, 必须
         image: img, //buffer
         content: content,
-        name: name ?? 'result.jpg'
+        name: name
       })
         .then(() => true)
         .catch((err: any) => {
