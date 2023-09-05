@@ -1,6 +1,6 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import { typeMessage, AMessage, InstructionMatching, CardType } from 'alemon'
-import { postImage } from '../alemonapi.js'
+import { postDirectImage } from '../api.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -78,35 +78,21 @@ export const DIRECT_MESSAGE = async (data: directEventData) => {
 }
 
 async function directMessage(e: AMessage, data) {
-  /**
-   * 发送截图
-   * @param file_image
-   * @param content 内容,可选
-   * @returns
-   */
-  const ePostImage = async (image: Buffer, content?: string): Promise<boolean> => {
-    return await postImage({
-      id: data.msg.guild_id,
-      msg_id: data.msg.id, //消息id, 必须
-      image, //buffer
-      content,
-      isGroup: false
-    })
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
-
   /* 消息发送机制 */
   e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
     if (Buffer.isBuffer(msg)) {
       try {
-        return await ePostImage(msg).catch(err => {
-          console.error(err)
-          return false
+        return await postDirectImage({
+          id: data.msg.guild_id,
+          msg_id: data.msg.id, //消息id, 必须
+          image: msg, //buffer
+          name: typeof img == 'string' ? img : 'result.jpg'
         })
+          .then(() => true)
+          .catch((err: any) => {
+            console.error(err)
+            return false
+          })
       } catch (err) {
         console.error(err)
         return false
@@ -115,10 +101,18 @@ async function directMessage(e: AMessage, data) {
     const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
     if (Buffer.isBuffer(img)) {
       try {
-        return await ePostImage(img, content).catch(err => {
-          console.error(err)
-          return false
+        return await postDirectImage({
+          id: data.msg.guild_id,
+          msg_id: data.msg.id, //消息id, 必须
+          image: img, //buffer
+          content,
+          name: name ?? 'result.jpg'
         })
+          .then(() => true)
+          .catch((err: any) => {
+            console.error(err)
+            return false
+          })
       } catch (err) {
         console.error(err)
         return false

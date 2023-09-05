@@ -137,7 +137,9 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
     ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
-          const attach = new AttachmentBuilder(msg, { name: 'result.jpeg' })
+          const attach = new AttachmentBuilder(msg, {
+            name: typeof img == 'string' ? img : 'result.jpeg'
+          })
           await interaction.channel.send({ files: [attach] })
           return true
         } catch (err) {
@@ -148,7 +150,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (interaction: Message) => {
       const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
       if (Buffer.isBuffer(img)) {
         try {
-          const attach = new AttachmentBuilder(img, { name: 'result.jpeg' })
+          const attach = new AttachmentBuilder(img, { name: name ?? 'result.jpeg' })
           await interaction.channel.send({ files: [attach] })
           return true
         } catch (err) {

@@ -1,7 +1,6 @@
-import { IOpenAPI, Embed, Ark } from 'qq-guild-bot'
-import { CacrdEnum, CardType, InstructionMatching } from 'alemon'
-import { EventEnum, EventType, AMessage, PlatformEnum } from 'alemon'
-import { postImage } from '../alemonapi.js'
+import { IOpenAPI } from 'qq-guild-bot'
+import { CardType, InstructionMatching, AMessage } from 'alemon'
+import { postImage } from '../api.js'
 import { Private } from '../privatechat.js'
 import { getBotConfigByQQ } from '../../config.js'
 import { EventData } from '../types.js'
@@ -72,43 +71,6 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
   e.isGroup = true
 
   /**
-   * 封装发送截图
-   * @param file_image
-   * @param content 内容,可选
-   * @returns
-   */
-  const ePostImage = async (image: Buffer, content?: string): Promise<boolean> => {
-    if (!e.isGroup) return false
-    return await postImage({
-      /**
-       * 子频道id
-       */
-      id: data.msg.channel_id,
-      /**
-       * 消息id
-       */
-      msg_id: data.msg.id,
-      /**
-       * buffer
-       */
-      image,
-      /**
-       * 内容
-       */
-      content,
-      /**
-       * 是群聊
-       */
-      isGroup: true
-    })
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
-
-  /**
    * 消息发送机制
    * @param msg 消息
    * @param img
@@ -119,14 +81,16 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
     img?: Buffer | string,
     name?: string
   ): Promise<boolean> => {
-    /**
-     * 是buffer
-     */
     if (Buffer.isBuffer(msg)) {
       try {
-        return await ePostImage(msg)
+        return await postImage({
+          id: data.msg.guild_id,
+          msg_id: data.msg.id, //消息id, 必须
+          image: msg, //buffer
+          name: typeof img == 'string' ? img : 'result.jpg'
+        })
           .then(() => true)
-          .catch(err => {
+          .catch((err: any) => {
             console.error(err)
             return false
           })
@@ -135,18 +99,18 @@ export const mergeMessages = async (e: AMessage, data: EventData) => {
         return false
       }
     }
-    /**
-     * 整个msg
-     */
     const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
-    /**
-     * 是buffer
-     */
     if (Buffer.isBuffer(img)) {
       try {
-        return await ePostImage(img, content)
+        return await postImage({
+          id: data.msg.guild_id,
+          msg_id: data.msg.id, //消息id, 必须
+          image: img, //buffer
+          content,
+          name: name ?? 'result.jpg'
+        })
           .then(() => true)
-          .catch(err => {
+          .catch((err: any) => {
             console.error(err)
             return false
           })

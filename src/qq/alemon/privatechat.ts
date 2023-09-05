@@ -1,7 +1,6 @@
 // 非引用依赖
 import { IOpenAPI } from 'qq-guild-bot'
-import { postImage } from './alemonapi.js'
-
+import { postDirectImage } from './api.js'
 import { QQEMessage } from './types.js'
 
 declare global {
@@ -41,11 +40,11 @@ export const Private = async (
 
   if (Buffer.isBuffer(msg)) {
     try {
-      return await postImage({
+      return await postDirectImage({
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: msg, //buffer
-        isGroup: true
+        name: typeof img == 'string' ? img : 'result.jpg'
       })
         .then(() => true)
         .catch((err: any) => {
@@ -60,12 +59,12 @@ export const Private = async (
   const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
   if (Buffer.isBuffer(img)) {
     try {
-      return await postImage({
+      return await postDirectImage({
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: img, //buffer
         content: content,
-        isGroup: true
+        name: name ?? 'result.jpg'
       })
         .then(() => true)
         .catch((err: any) => {

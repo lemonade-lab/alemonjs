@@ -3,7 +3,7 @@ import { typeMessage, AMessage, CardType } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
-import { postImage } from '../alemonapi.js'
+import { postImage } from '../api.js'
 
 declare global {
   //接口对象
@@ -48,42 +48,6 @@ export const GUILD_MEMBERS = async (data: any) => {
 
   const ChannelData = ChannelsData.find(item => item.type === 0)
 
-  /**
-   * 发送截图
-   * @param file_image
-   * @param content 内容,可选
-   * @returns
-   */
-  const EPostImage = async (image: Buffer, content?: string): Promise<boolean> => {
-    return await postImage({
-      /**
-       * 频道编号
-       */
-      id: data.img.guild_id,
-      /**
-       * 消息编号
-       */
-      msg_id: data.img.id,
-      /**
-       * 图片
-       */
-      image,
-      /**
-       * 内容
-       */
-      content,
-      /**
-       * 是群聊
-       */
-      isGroup: true
-    })
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
-
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
@@ -103,14 +67,16 @@ export const GUILD_MEMBERS = async (data: any) => {
       img?: Buffer | string,
       name?: string
     ): Promise<boolean> => {
-      /**
-       * 是图片
-       */
       if (Buffer.isBuffer(msg)) {
         try {
-          return await EPostImage(msg)
+          return await postImage({
+            id: data.msg.guild_id,
+            msg_id: data.msg.id, //消息id, 必须
+            image: msg, //buffer
+            name: typeof img == 'string' ? img : 'result.jpg'
+          })
             .then(() => true)
-            .catch(err => {
+            .catch((err: any) => {
               console.error(err)
               return false
             })
@@ -119,18 +85,18 @@ export const GUILD_MEMBERS = async (data: any) => {
           return false
         }
       }
-      /**
-       * 折叠文本
-       */
       const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
-      /**
-       * 发送文字+图片
-       */
       if (Buffer.isBuffer(img)) {
         try {
-          return await EPostImage(img, content)
+          return await postImage({
+            id: data.msg.guild_id,
+            msg_id: data.msg.id, //消息id, 必须
+            image: img, //buffer
+            content,
+            name: name ?? 'result.jpg'
+          })
             .then(() => true)
-            .catch(err => {
+            .catch((err: any) => {
               console.error(err)
               return false
             })
