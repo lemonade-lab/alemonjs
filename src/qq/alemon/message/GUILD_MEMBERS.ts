@@ -30,7 +30,7 @@ export const GUILD_MEMBERS = async (event: any) => {
   /**
    * 得到频道列表
    */
-  const ChannelsData = await clientApiByQQ.channelApi
+  const ChannelsData: boolean | any[] = await clientApiByQQ.channelApi
     .channels(event.msg.guild_id)
     .then(res => {
       const { data } = res
@@ -42,6 +42,11 @@ export const GUILD_MEMBERS = async (event: any) => {
     })
 
   if (typeof ChannelsData == 'boolean') {
+    console.info(`\n[${Eevent}] [${eventType}]\n${false}`)
+    return false
+  }
+
+  if (ChannelsData.length == 0) {
     console.info(`\n[${Eevent}] [${eventType}]\n${false}`)
     return false
   }
@@ -70,7 +75,7 @@ export const GUILD_MEMBERS = async (event: any) => {
       if (Buffer.isBuffer(msg)) {
         try {
           return await postImage({
-            id: event.msg.guild_id,
+            id: ChannelData.id,
             msg_id: event.msg.id, //消息id, 必须
             image: msg, //buffer
             name: typeof img == 'string' ? img : undefined
@@ -89,7 +94,7 @@ export const GUILD_MEMBERS = async (event: any) => {
       if (Buffer.isBuffer(img)) {
         try {
           return await postImage({
-            id: event.msg.guild_id,
+            id: ChannelData.id,
             msg_id: event.msg.id, //消息id, 必须
             image: img, //buffer
             content,

@@ -1,31 +1,23 @@
 import { Readable } from 'stream'
 import FormData from 'form-data'
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { getBotConfigByQQ } from '../config.js'
-
 /**
- * 环境配置
- */
-const Acf = {
-  sandbox_api: 'https://sandbox.api.sgroup.qq.com',
-  api: 'https://api.sgroup.qq.com'
-}
-
-/**
- * 得到环境api
+ * 创建axios实例
+ * @param config
  * @returns
  */
-function getUrl(sandbox: boolean): string {
-  /**
-   * 沙箱环境
-   */
-  if (sandbox) return Acf.sandbox_api
-  /**
-   * 正式环境
-   */
-  return Acf.api
+export async function requestService(config: AxiosRequestConfig) {
+  const { appID, token, sandbox } = getBotConfigByQQ()
+  const service = await axios.create({
+    baseURL: sandbox ? 'https://sandbox.api.sgroup.qq.com' : 'https://api.sgroup.qq.com',
+    timeout: 20000,
+    headers: {
+      Authorization: `Bot ${appID}.${token}`
+    }
+  })
+  return service(config)
 }
-
 /**
  * 发送buffer图片
  * @param id 私信传频道id,公信传子频道id
@@ -40,47 +32,16 @@ export async function postImage(message: {
   content?: string
   name?: string
 }): Promise<any> {
-  const cfg = getBotConfigByQQ()
-  const appID = cfg.appID
-  const token = cfg.token
-  const sandbox = cfg.sandbox
-  /**
-   * 得到环境
-   */
-  const urlbase = getUrl(sandbox)
-  /**
-   * 创建可读流对象
-   */
-  const picData = new Readable()
-  picData.push(message.image)
-  picData.push(null)
-
-  /**
-   * 构建请求数据包
-   */
-  const formdata = new FormData()
-  formdata.append('msg_id', message.msg_id)
-  if (typeof message.content === 'string') formdata.append('content', message.content)
-  /**
-   * 为上传的图片指定文件名
-   * 指定上传的图片类型
-   */
-  formdata.append('file_image', picData, message.name ?? 'image.jpg')
-
-  /**
-   * 发送数据
-   */
-  return await axios({
+  const formdata = createFrom(message.image, message.msg_id, message.content, message.name)
+  return requestService({
     method: 'post',
-    url: `${urlbase}/channels/${message.id}/messages`,
+    url: `/channels/${message.id}/messages`,
     headers: {
-      'Content-Type': `multipart/form-data; boundary=${formdata.getBoundary()}`,
-      'Authorization': `Bot ${appID}.${token}`
+      'Content-Type': `multipart/form-data; boundary=${formdata.getBoundary()}`
     },
     data: formdata
-  }).catch(err => console.log(err))
+  })
 }
-
 /**
  * 私聊发送buffer图片
  * @param id 私信传频道id,公信传子频道id
@@ -94,43 +55,42 @@ export async function postDirectImage(message: {
   content?: string
   name?: string
 }): Promise<any> {
-  const cfg = getBotConfigByQQ()
-  const appID = cfg.appID
-  const token = cfg.token
-  const sandbox = cfg.sandbox
-  /**
-   * 得到环境
-   */
-  const urlbase = getUrl(sandbox)
+  const formdata = createFrom(message.image, message.msg_id, message.content, message.name)
+  return requestService({
+    method: 'post',
+    url: `/dms/${message.id}/messages`,
+    headers: {
+      'Content-Type': `multipart/form-data; boundary=${formdata.getBoundary()}`
+    },
+    data: formdata
+  })
+}
+
+/**
+ * 创建form
+ * @param image
+ * @param msg_id
+ * @param content
+ * @param name
+ * @returns
+ */
+function createFrom(image, msg_id, content, name = 'image.jpg') {
   /**
    * 创建可读流对象
    */
   const picData = new Readable()
-  picData.push(message.image)
+  picData.push(image)
   picData.push(null)
-
   /**
    * 构建请求数据包
    */
   const formdata = new FormData()
-  formdata.append('msg_id', message.msg_id)
-  if (typeof message.content === 'string') formdata.append('content', message.content)
+  formdata.append('msg_id', msg_id)
+  if (typeof content === 'string') formdata.append('content', content)
   /**
    * 为上传的图片指定文件名
    * 指定上传的图片类型
    */
-  formdata.append('file_image', picData, message.name ?? 'image.jpg')
-
-  /**
-   * 发送数据
-   */
-  return await axios({
-    method: 'post',
-    url: `${urlbase}/dms/${message.id}/messages`,
-    headers: {
-      'Content-Type': `multipart/form-data; boundary=${formdata.getBoundary()}`,
-      'Authorization': `Bot ${appID}.${token}`
-    },
-    data: formdata
-  }).catch(err => console.log(err))
+  formdata.append('file_image', picData, name)
+  return formdata
 }

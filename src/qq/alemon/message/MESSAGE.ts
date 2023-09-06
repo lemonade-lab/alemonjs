@@ -84,7 +84,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     if (Buffer.isBuffer(msg)) {
       try {
         return await postImage({
-          id: event.msg.guild_id,
+          id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg, //buffer
           name: typeof img == 'string' ? img : undefined
@@ -103,7 +103,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     if (Buffer.isBuffer(img)) {
       try {
         return await postImage({
-          id: event.msg.guild_id,
+          id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: img, //buffer
           content,
