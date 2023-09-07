@@ -49,7 +49,12 @@ if (process.platform == 'linux' || process.platform == 'android') {
     /**
      * search
      */
-    const arr = ['/usr/bin/chromium', '/snap/bin/chromium', '/usr/bin/chromium-browser']
+    const arr = [
+      '/usr/bin/chromium',
+      '/snap/bin/chromium',
+      '/usr/bin/chromium-browser',
+      '/opt/google/chrome/chrome'
+    ]
     for (const item of arr) {
       if (existsSync(item)) {
         skipDownload = true
