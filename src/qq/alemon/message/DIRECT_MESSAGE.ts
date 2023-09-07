@@ -1,6 +1,6 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import { typeMessage, AMessage, InstructionMatching, CardType } from 'alemon'
-import { postDirectImage } from '../api.js'
+import { ClientAPIByQQ as Client } from 'qq-channel'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -82,7 +82,7 @@ async function directMessage(e: AMessage, event: directEventData) {
   e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
     if (Buffer.isBuffer(msg)) {
       try {
-        return await postDirectImage({
+        return await Client.postDirectImage({
           id: event.msg.guild_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg, //buffer
@@ -101,7 +101,7 @@ async function directMessage(e: AMessage, event: directEventData) {
     const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
     if (Buffer.isBuffer(img)) {
       try {
-        return await postDirectImage({
+        return await Client.postDirectImage({
           id: event.msg.guild_id,
           msg_id: event.msg.id, //消息id, 必须
           image: img, //buffer

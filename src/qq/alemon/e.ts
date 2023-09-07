@@ -1,30 +1,5 @@
 export const now_e = {
   /**
-   * 身份
-   */
-  identity: {
-    /**
-     * 频道主人
-     */
-    master: false,
-    /**
-     * 成员
-     */
-    member: false,
-    /**
-     * 等级
-     */
-    grade: '1',
-    /**
-     * 管理员
-     */
-    admins: false,
-    /**
-     * 子频道管理员
-     */
-    wardens: false
-  },
-  /**
    * 卡片
    * @param obj
    * @returns
@@ -68,61 +43,5 @@ export const now_e = {
   ): Promise<boolean> => {
     console.log('待实现')
     return false
-  },
-  /**
-   * 获取当前用户下的所有频道列表
-   * @returns
-   */
-  getGuildList: async (): Promise<boolean | any[]> => {
-    console.log('待实现')
-    return []
-  },
-  /**
-   * 获取频道详情
-   * @param gid 频道编号
-   * @returns
-   */
-  getGuildMsg: async (gid: string): Promise<boolean | any> => {
-    console.log('待实现')
-    return
-  },
-  /**
-   * 获取子频道列表
-   * @param gid 频道编号
-   * @returns
-   */
-  getChannels: async (gid: string): Promise<boolean | any[]> => {
-    console.log('待实现')
-    return []
-  },
-  /**
-   * 获取子频道详情
-   * @param cid 子频道编号
-   * @returns
-   */
-  getChannel: async (cid: string): Promise<boolean | any> => {
-    console.log('待实现')
-    return
-  },
-  /**
-   * 获取频道下指定成员的信息
-   * @param gid 频道
-   * @param uid 用户
-   * @returns
-   */
-  getGuildMemberMsg: async (gid: string, uid: string): Promise<boolean | any> => {
-    console.log('待实现')
-    return
-  },
-  /**
-   * 撤回指定消息
-   * @param cid 频道编号
-   * @param mid 消息编号
-   * @param hideTip 是否隐藏
-   * @returns
-   */
-  deleteMsg: async (cid: string, mid: string, hideTip: boolean): Promise<any> => {
-    console.log('待实现')
-    return
   }
 }

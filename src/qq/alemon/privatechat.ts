@@ -1,6 +1,5 @@
-// 非引用依赖
 import { IOpenAPI } from 'qq-guild-bot'
-import { postDirectImage } from './api.js'
+import { ClientAPIByQQ as Client } from 'qq-channel'
 import { QQEMessage } from './types.js'
 
 declare global {
@@ -40,7 +39,7 @@ export const Private = async (
 
   if (Buffer.isBuffer(msg)) {
     try {
-      return await postDirectImage({
+      return await Client.postDirectImage({
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: msg, //buffer
@@ -59,7 +58,7 @@ export const Private = async (
   const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
   if (Buffer.isBuffer(img)) {
     try {
-      return await postDirectImage({
+      return await Client.postDirectImage({
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: img, //buffer

@@ -3,7 +3,7 @@ import { typeMessage, AMessage, CardType } from 'alemon'
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
-import { postImage } from '../api.js'
+import { ClientAPIByQQ as Client } from 'qq-channel'
 
 declare global {
   //接口对象
@@ -74,7 +74,7 @@ export const GUILD_MEMBERS = async (event: any) => {
     ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
-          return await postImage({
+          return await Client.postImage({
             id: ChannelData.id,
             msg_id: event.msg.id, //消息id, 必须
             image: msg, //buffer
@@ -93,7 +93,7 @@ export const GUILD_MEMBERS = async (event: any) => {
       const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
       if (Buffer.isBuffer(img)) {
         try {
-          return await postImage({
+          return await Client.postImage({
             id: ChannelData.id,
             msg_id: event.msg.id, //消息id, 必须
             image: img, //buffer

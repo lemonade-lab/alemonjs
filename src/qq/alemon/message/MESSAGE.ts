@@ -1,6 +1,6 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import { CardType, InstructionMatching, AMessage } from 'alemon'
-import { postImage } from '../api.js'
+import { ClientAPIByQQ as Client } from 'qq-channel'
 import { Private } from '../privatechat.js'
 import { getBotConfigByQQ } from '../../config.js'
 import { EventData } from '../types.js'
@@ -83,7 +83,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
   ): Promise<boolean> => {
     if (Buffer.isBuffer(msg)) {
       try {
-        return await postImage({
+        return await Client.postImage({
           id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg, //buffer
@@ -102,7 +102,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
     if (Buffer.isBuffer(img)) {
       try {
-        return await postImage({
+        return await Client.postImage({
           id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: img, //buffer
