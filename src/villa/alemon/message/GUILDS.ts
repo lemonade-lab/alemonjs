@@ -3,6 +3,10 @@ import { BotEvent } from 'mys-villa'
 import { segmentVilla } from '../segment.js'
 import { now_e } from './e.js'
 /**
+ * 涉及房间的接口不可用
+ */
+
+/**
  * 机器人进出
  * @param event 回调数据
  * @param val  类型控制
@@ -12,10 +16,6 @@ export async function GUILDS_VILLA(event: BotEvent) {
    * 别野编号
    */
   const villa_id = event.robot.villa_id ?? ''
-  /**
-   * 房间号
-   */
-  const room_id = event.extend_data.EventData.SendMessage.room_id ?? ''
   /**
    * 制作e消息对象
    */
@@ -80,7 +80,7 @@ export async function GUILDS_VILLA(event: BotEvent) {
     /**
      * 房间编号
      */
-    channel_id: String(room_id),
+    channel_id: '',
     /**
      * 消息原文
      */

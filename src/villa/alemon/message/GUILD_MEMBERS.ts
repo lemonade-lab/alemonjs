@@ -9,6 +9,10 @@ import { now_e } from './e.js'
  */
 
 /**
+ * 涉及房间的接口不可用
+ */
+
+/**
  * 成员进出
  * @param event 回调数据
  * @param val  类型控制
@@ -18,10 +22,6 @@ export async function GUILD_MEMBERS_VILLA(event: BotEvent) {
    * 别野编号
    */
   const villa_id = event.robot.villa_id ?? ''
-  /**
-   * 房间号
-   */
-  const room_id = event.extend_data.EventData.SendMessage?.room_id ?? ''
   /**
    * 制作e消息对象
    */
@@ -84,9 +84,9 @@ export async function GUILD_MEMBERS_VILLA(event: BotEvent) {
      */
     guild_id: String(villa_id),
     /**
-     * 房间编号
+     * 房间编号:空
      */
-    channel_id: String(room_id),
+    channel_id: '',
     /**
      * 原文消息
      */
