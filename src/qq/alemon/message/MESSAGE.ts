@@ -5,7 +5,7 @@ import { Private } from '../privatechat.js'
 import { getBotConfigByQQ } from '../../config.js'
 import { EventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
-import { getBotMsgByQQ } from '../bot.js'
+import { setBotMsgByQQ } from '../bot.js'
 
 declare global {
   /**
@@ -25,19 +25,6 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    * 屏蔽其他机器人的消息
    */
   if (event.msg.author.bot) return
-
-  e.platform = 'qq'
-
-  e.bot = getBotMsgByQQ()
-
-  /**
-   * 事件匹配
-   */
-  e.event = 'MESSAGES'
-  /**
-   * 类型匹配
-   */
-  e.eventType = 'CREATE'
 
   /**
    * 得到登录配置
@@ -306,17 +293,21 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    * 存在at
    */
   if (e.at) {
-    // 得到第一个艾特
+    /**
+     * 得到第一个艾特
+     */
     e.at_user = e.at_users.find(item => item.bot != true)
   }
 
-  /**
-   * 机器人信息  tudo
-   */
-  e.bot = {
-    id: '',
-    name: '',
-    avatar: ''
+  if (e.bot.avatar == 'string') {
+    /**
+     * 配置一下机器人头像
+     */
+    const bot = e.at_users.find(item => item.bot == true && item.id == e.bot.id)
+    if (bot) {
+      e.bot.avatar = bot.avatar
+      setBotMsgByQQ(bot)
+    }
   }
 
   /**

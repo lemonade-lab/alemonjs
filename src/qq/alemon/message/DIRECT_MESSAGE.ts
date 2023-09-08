@@ -27,17 +27,8 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     bot: getBotMsgByQQ(),
     event: 'MESSAGES',
     eventType: 'CREATE',
-    /**
-     * 不是私域
-     */
     isPrivate: false,
-    /**
-     * 不是撤回
-     */
     isRecall: false,
-    /**
-     * 不是群聊
-     */
     isGroup: false
   } as AMessage
 

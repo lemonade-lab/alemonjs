@@ -20,14 +20,9 @@ export const GUILD_MESSAGES = async (event: any) => {
     bot: getBotMsgByQQ(),
     event: 'MESSAGES',
     eventType: 'CREATE',
-    /**
-     * 不是私域
-     */
     isPrivate: true,
-    /**
-     * 不是撤回
-     */
-    isRecall: false
+    isRecall: false,
+    isGroup: true
   } as AMessage
 
   /**
