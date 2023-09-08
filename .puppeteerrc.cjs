@@ -1,5 +1,5 @@
 const os = require('os')
-const { existsSync, realpathSync } = require('fs')
+const { existsSync } = require('fs')
 const { execSync } = require('child_process')
 const arch = os.arch()
 /**
@@ -23,7 +23,7 @@ if (process.platform == 'linux' || process.platform == 'android') {
       const chromiumPath = execSync(`whereis ${item}`).toString().split(' ')[1]?.trim()
       if (chromiumPath) {
         skipDownload = true
-        executablePath = realpathSync(chromiumPath)
+        executablePath = chromiumPath
         console.info(`[Chromium] start ${item}`)
         break
       }
