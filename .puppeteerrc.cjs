@@ -11,30 +11,20 @@ let skipDownload = false
  */
 let executablePath
 /**
- * windows path
- */
-const win32Edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
-/**
  * linux | android
  */
 if (process.platform == 'linux' || process.platform == 'android') {
-  const chromium = [
-    'whereis chrome-browser',
-    'whereis chrome',
-    'whereis chromium-browser',
-    'whereis chromium',
-    'whereis firefox'
-  ]
+  const chromium = ['chrome-browser', 'chrome', 'chromium-browser', 'chromium', 'firefox']
   /**
    * get path
    */
   for (const item of chromium) {
     try {
-      const chromiumPath = execSync(item).toString().split(' ')[1]?.trim()
+      const chromiumPath = execSync(`whereis ${item}`).toString().split(' ')[1]?.trim()
       if (chromiumPath) {
         skipDownload = true
         executablePath = realpathSync(chromiumPath)
-        console.info('[Chromium] start')
+        console.info(`[Chromium] start ${item}`)
         break
       }
     } catch (error) {
@@ -71,13 +61,25 @@ if (process.platform == 'linux' || process.platform == 'android') {
     console.info('[arm64/aarch64] system')
     skipDownload = true
   }
-} else if (process.platform == 'win32' && existsSync(win32Edge)) {
+} else if (process.platform == 'win32') {
+  /**
+   * windows path
+   */
+  const win32 = {
+    Chrome: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    Edge: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+  }
   /**
    * win32  Edge
    */
-  skipDownload = true
-  executablePath = win32Edge
-  console.info('[Win32 Edge] start')
+  for (const item in win32) {
+    if (existsSync(win32[item])) {
+      skipDownload = true
+      executablePath = win32[item]
+      console.info(`[Win32] start ${item}`)
+      break
+    }
+  }
 }
 /**
  * @type {import("puppeteer").Configuration}

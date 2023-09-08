@@ -34,7 +34,7 @@ export async function createAlemonByVilla() {
         console.info('[HELLO] 欢迎使用大别野')
       }
     )
-    global.clientApiByVilla = Client
+
     /**
      * 获取ip4
      */
