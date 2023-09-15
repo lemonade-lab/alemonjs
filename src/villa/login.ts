@@ -24,18 +24,24 @@ export async function checkRobotByVilla(Bcf: string) {
   const timeoutId = setTimeout(() => {
     throw '超过1分钟未完成登录'
   }, 60000)
-  const { bot_id, secret } = await prompts([
+  const { bot_id, secret, pub_key } = await prompts([
     {
       type: 'password',
       name: 'bot_id',
       message: 'bot_id: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : 'BotAppID: ')
+      validate: value => (value !== '' && typeof value === 'string' ? true : 'bot_id: ')
     },
     {
       type: 'password',
       name: 'secret',
       message: 'secret: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : 'BotSecret: ')
+      validate: value => (value !== '' && typeof value === 'string' ? true : 'secret: ')
+    },
+    {
+      type: 'password',
+      name: 'pub_key',
+      message: 'pub_key: ',
+      validate: value => (value !== '' && typeof value === 'string' ? true : 'pub_key: ')
     }
   ]).catch((err: any) => {
     console.error(err)
@@ -50,6 +56,7 @@ export async function checkRobotByVilla(Bcf: string) {
    */
   let str = `bot_id: '' # 机器人 账户
 secret: '' # 机器人 密码
+pub_key: '' # 机器人 公钥
 masterID: '' # 主人 账户
 password: '' # 主人 密码
 http: 'http' # 可更改为https
@@ -64,6 +71,7 @@ IMAGE_DIR: '/data/mys/img' # 图片缓存路径`
   str = str
     .replace(/bot_id: ''/g, `bot_id: '${bot_id}'`)
     .replace(/secret: ''/g, `secret: '${secret}'`)
+    .replace(/pub_key: ''/g, `pub_key: '${pub_key}'`)
   /**
    * 确保目录存在
    */
@@ -83,6 +91,7 @@ IMAGE_DIR: '/data/mys/img' # 图片缓存路径`
   setBotConfigByVilla({
     bot_id,
     secret,
+    pub_key,
     masterID: '',
     password: '',
     http: 'http',

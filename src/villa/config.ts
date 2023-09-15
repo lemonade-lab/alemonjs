@@ -6,6 +6,7 @@ export const Login_villa = 'config/login-villa.yaml'
 let cfg: LoginByVillaConfig = {
   bot_id: '',
   secret: '',
+  pub_key: '',
   masterID: '',
   password: '',
   port: 8080,

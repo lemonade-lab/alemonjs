@@ -4,6 +4,7 @@ export interface LoginByVillaConfig {
    */
   bot_id: string
   secret: string
+  pub_key: string
   /**
    * master
    */

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleResolution": "Node16",
     "ignoreDeprecations": "5.0",
     "esModuleInterop": true,
