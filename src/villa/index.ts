@@ -1,6 +1,6 @@
 import { callBackByVilla } from './alemon/conversation.js'
 import { checkRobotByVilla } from './login.js'
-import { Login_villa } from './config.js'
+import { Login_villa, Login_Key } from './config.js'
 import { createClient, Client } from 'mys-villa'
 import { getBotConfigByVilla } from './config.js'
 import { hmacSha256 } from './hs.js'
@@ -9,7 +9,7 @@ export async function createAlemonByVilla() {
    * 登录
    */
   if (
-    await checkRobotByVilla(Login_villa).catch(err => {
+    await checkRobotByVilla(Login_villa, Login_Key).catch(err => {
       console.error(err)
       process.exit()
     })
@@ -21,10 +21,16 @@ export async function createAlemonByVilla() {
     /**
      * 创建应用程序
      */
+    console.log('配置', cfg)
+
+    const bot_secret = hmacSha256(cfg.pub_key, cfg.secret)
+
+    console.log('密钥', bot_secret)
+
     createClient(
       {
         bot_id: cfg.bot_id,
-        bot_secret: hmacSha256(cfg.pub_key, cfg.secret),
+        bot_secret,
         callback_port: cfg.port ?? 8080,
         callback_url: cfg.url ?? '/api/mys/callback',
         img_url: cfg.img_url ?? '/api/mys/img',

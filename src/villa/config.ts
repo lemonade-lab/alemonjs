@@ -1,5 +1,6 @@
 import { LoginByVillaConfig } from './types.js'
 export const Login_villa = 'config/login-villa.yaml'
+export const Login_Key = 'config/pub_key.txt'
 /**
  * 机器人基础配置
  */
