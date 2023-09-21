@@ -157,11 +157,11 @@ sign_api_addr = ''
 # 传入的QQ版本(如:8.9.63、8.9.68)
 version = 0
 # 好友同意
-friendApplication: false
+friendApplication = false
 # 群聊
-groupInvitation: false
+groupInvitation = false
 # 加群同意
-addGroupApplication: false
+addGroupApplication = false
 # 机器人账号集
-botQQ: []
+botQQ = []
 ```
