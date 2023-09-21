@@ -17,7 +17,7 @@ export async function createAlemonByVilla() {
      */
     const cfg = getBotConfigByKey('villa')
 
-    if (cfg.pub_key != '') {
+    if ((cfg.pub_key ?? '') != '') {
       cfg.secret = hmacSha256(cfg.secret, cfg.pub_key)
     }
 
