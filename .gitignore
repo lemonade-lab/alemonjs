@@ -5,9 +5,9 @@ types
 /plugins/
 /example/
 /data/
-/index.js/
-/index.ts/
-/deploy.sh
-/alemon.toml
-/alemon.json
-/example.js
+/help/
+index.js 
+deploy.sh
+alemon.toml
+alemon.json
+example.js

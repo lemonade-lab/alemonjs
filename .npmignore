@@ -5,8 +5,9 @@
 node_modules
 /plugins/
 /data/
+/help/
 /src/
-/alemon.toml
+alemon.toml
 .eslintrc.cjs
 .gitignore
 .npmrc
