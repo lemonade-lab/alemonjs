@@ -1,6 +1,6 @@
 import prompts from 'prompts'
 import { getBotConfigByKey, setBotConfigByKey } from '../login.js'
-import { getToml, writeToml } from 'src/config.js'
+import { getToml, writeToml } from '../config.js'
 
 /**
  * 登录配置

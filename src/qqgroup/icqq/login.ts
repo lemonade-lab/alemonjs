@@ -8,7 +8,7 @@ import {
 import axios from 'axios'
 import prompts from 'prompts'
 import { setBotMsgByQQGroup } from '../alemon/bot.js'
-import { getBotConfigByKey } from 'src/login.js'
+import { getBotConfigByKey } from '../../login.js'
 
 /**
  * 休眠函数
