@@ -1,20 +1,15 @@
-import { writeFileSync, mkdirSync } from 'node:fs'
-import { dirname, join } from 'node:path'
 import prompts from 'prompts'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { getBotConfigByQQ, setBotConfigbyQQ } from './config.js'
-import { LoginConfigByQQ } from './types.js'
-import { getYaml } from '../config.js'
-import { watchLogin } from '../watch.js'
-
+import { setBotConfigByKey, getBotConfigByKey } from '../login.js'
+import { getToml, writeToml } from '../config.js'
 /**
  * 登录配置
  * @param Bcf
  * @returns
  */
-export async function checkRobotByQQ(Bcf: string) {
+export async function checkRobotByQQ() {
   if (process.argv.indexOf('login') == -1) {
-    const config: LoginConfigByQQ = getYaml(join(process.cwd(), Bcf))
+    const config = getBotConfigByKey('qq')
     if ((config ?? '') !== '' && (config.appID ?? '') !== '' && (config.token ?? '') !== '') {
       if (!config.intents) {
         config.intents = [
@@ -24,7 +19,7 @@ export async function checkRobotByQQ(Bcf: string) {
           AvailableIntentsEventsEnum.GUILD_MEMBERS
         ]
       }
-      setBotConfigbyQQ(config)
+      setBotConfigByKey('qq', config)
       return true
     }
   }
@@ -135,61 +130,27 @@ export async function checkRobotByQQ(Bcf: string) {
     isPrivate = true
   }
 
-  /**
-   * 默认部署
-   */
+  // 默认部署
   let sandbox = false
-  if (imputDev == '1') {
-    /**
-     * 开发环境
-     */
-    sandbox = true
-  }
+  // 开发环境
+  if (imputDev == '1') sandbox = true
 
-  let str = `# 机器人应用编号 BotAppID
-appID: '' 
-# 机器人令牌 BotToken
-token: '' 
-# 主人编号 masterId
-masterID: '' 
-# 主人密码 mastetPassword
-password: '' 
-# 监听事件
-intents: [] 
-# 是否是私域  默认公域
-isPrivate: false
-# 是否是沙箱  默认部署
-sandbox: false`
-
-  str = str
-    .replace(/appID: ''/g, `appID: '${appID}'`)
-    .replace(/token: ''/g, `token: '${token}'`)
-    .replace(/intents:\s*\[\s*\]/g, `intents: [${intents}]`)
-    .replace(/isPrivate:\s*false/g, `isPrivate: ${isPrivate}`)
-    .replace(/sandbox:\s*false/g, `sandbox: ${sandbox}`)
-
-  /**
-   * 确保目录存在
-   */
-  mkdirSync(dirname(join(process.cwd(), Bcf)), { recursive: true })
-
-  /**
-   * 写入内容
-   */
-  writeFileSync(join(process.cwd(), Bcf), str)
-
-  console.info('[CTRETE]', join(process.cwd(), Bcf))
-
-  watchLogin(join(process.cwd(), Bcf), getBotConfigByQQ)
-
-  setBotConfigbyQQ({
+  // 得到已变更的配置
+  const db = getBotConfigByKey('qq')
+  // 得到配置
+  const data = getToml()
+  data.qq = {
+    ...db,
+    // 覆盖新配置
     appID,
     token,
     intents,
     isPrivate,
-    sandbox,
-    masterID: '',
-    password: ''
-  })
+    sandbox
+  }
+  // 写入配置
+  writeToml(data)
+  // 设置配置
+  setBotConfigByKey('qq', data.qq)
   return true
 }

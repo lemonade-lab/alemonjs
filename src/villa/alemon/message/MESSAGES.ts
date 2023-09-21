@@ -2,7 +2,7 @@ import { AMessage, InstructionMatching, UserType } from 'alemon'
 import { BotEvent, MessageContentType, Client } from 'mys-villa'
 import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
-import { getBotConfigByVilla } from '../../config.js'
+import { getBotConfigByKey } from '../../../login.js'
 import { now_e } from './e.js'
 
 /**
@@ -99,7 +99,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
    * 得到登录配置
    */
 
-  const cfg = getBotConfigByVilla()
+  const cfg = getBotConfigByKey('villa')
 
   /**
    * 得到主人id

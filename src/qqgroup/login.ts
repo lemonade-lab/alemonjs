@@ -1,11 +1,6 @@
-import { writeFileSync, mkdirSync } from 'fs'
-import { dirname, join } from 'path'
 import prompts from 'prompts'
-import { getYaml } from '../config.js'
-import { setBotConfigQQGroup } from './config.js'
-import { LoginConfigByQQRroup } from './types.js'
-import { getBotConfigQQGroup } from './config.js'
-import { watchLogin } from '../watch.js'
+import { getBotConfigByKey, setBotConfigByKey } from '../login.js'
+import { getToml, writeToml } from 'src/config.js'
 
 /**
  * 登录配置
@@ -13,11 +8,12 @@ import { watchLogin } from '../watch.js'
  * @param val
  * @returns
  */
-export async function checkRobot(Bcf: string) {
+export async function checkRobot() {
   if (!process.argv.includes('login')) {
-    const config: LoginConfigByQQRroup = getYaml(join(process.cwd(), Bcf))
+    // 启动
+    const config = getBotConfigByKey('qqgroup')
     if ((config ?? '') !== '' && (config.account ?? '') !== '' && (config.password ?? '') !== '') {
-      setBotConfigQQGroup(config)
+      setBotConfigByKey('qqgroup', config)
       return true
     }
   }
@@ -72,42 +68,21 @@ export async function checkRobot(Bcf: string) {
 
   clearTimeout(timeoutId)
 
-  let str = `account: '' # 机器人 账户
-password: '' # 机器人 密码
-device: '' # 登录设备 
-masterID: '' # 主人编号 
-masterPW: '' # 主人密码 
-# 签名API地址(如:http://127.0.0.1:8080/sign?key=12315)
-sign_api_addr: 
-# 传入的QQ版本(如:8.9.63、8.9.68)
-version:  `
-
-  str = str
-    .replace(/account: ''/g, `account: ${account}`)
-    .replace(/password: ''/g, `password: '${password}'`)
-    .replace(/masterID: ''/g, `masterID: '${masterID}'`)
-    .replace(/device: ''/g, `device: ${device}`)
-
-  /**
-   * 确保目录存在
-   */
-  mkdirSync(dirname(join(process.cwd(), Bcf)), { recursive: true })
-
-  /**
-   * 写入内容
-   */
-  writeFileSync(join(process.cwd(), Bcf), str)
-
-  console.info('[CTRETE]', join(process.cwd(), Bcf))
-
-  watchLogin(join(process.cwd(), Bcf), getBotConfigQQGroup)
-
-  setBotConfigQQGroup({
+  // 得到已变更的配置
+  const db = getBotConfigByKey('qqgroup')
+  // 得到配置
+  const data = getToml()
+  data.qqgroup = {
+    ...db,
+    // 覆盖新配置
     account,
     password,
     masterID,
-    masterPW: '',
     device
-  })
+  }
+  // 写入配置
+  writeToml(data)
+  // 设置配置
+  setBotConfigByKey('qqgroup', data.qqgroup)
   return true
 }

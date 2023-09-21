@@ -1,9 +1,9 @@
 import { AMessage, UserType, InstructionMatching } from 'alemon'
 import { Message as DcMessage } from 'discord.js'
-import { getBotConfigByDiscord } from '../../config.js'
 import { segmentDiscord } from '../segment.js'
 import { getBotMsgByDiscord } from '../bot.js'
 import { postImage } from '../api.js'
+import { getBotConfigByKey } from '../../../login.js'
 /**
  * 公共
  * @param event
@@ -67,7 +67,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
   /**
    * 得到登录配置
    */
-  const cfg = getBotConfigByDiscord()
+  const cfg = getBotConfigByKey('discord')
 
   /**
    * 检查身份
@@ -155,7 +155,7 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
         try {
           const attach = await postImage(img, name)
           if (attach) {
-            await event.channel.send({ content,files: [attach] })
+            await event.channel.send({ content, files: [attach] })
             return true
           } else {
             return false

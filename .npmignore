@@ -6,6 +6,7 @@ node_modules
 /plugins/
 /data/
 /src/
+/alemon.toml
 .eslintrc.cjs
 .gitignore
 .npmrc

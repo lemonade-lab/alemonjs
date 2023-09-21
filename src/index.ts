@@ -1,10 +1,9 @@
 import { cmdInit, setLanchConfig } from 'alemon'
-import { getConfig } from './config.js'
-// 读取配置
-const { PuppeteerConfig } = getConfig()
-// 设置浏览器配置
-setLanchConfig(PuppeteerConfig)
-// 启动机器人
+import { getBotConfigByKey, setBotConfig } from './login.js'
+import { getToml } from './config.js'
+/**
+ * 启动机器人
+ */
 export const createAlemon = {
   qq: async (): Promise<boolean> => {
     const { createAlemonByQQ: qq } = await import('./qq/index.js')
@@ -48,16 +47,37 @@ export const createAlemon = {
   },
   alemon: cmdInit
 }
+
 /**
  * 启动机器人
- * @param args
+ * @param args 启动指令
+ * @param url 配置地址
  */
-export async function createBot(args: string[]) {
-  // 控制
+export async function createBot(args: string[], url?: string) {
+  /**
+   * 加载配置
+   */
+  await setBotConfig(getToml(url))
+
+  /**
+   * 设置浏览器配置
+   */
+  await setLanchConfig(getBotConfigByKey('puppeteer'))
+
+  /**
+   * 控制
+   */
   const arr: string[] = []
-  // 推送插件启动到最后
-  args.push('alemon')
-  // 开始启动
+
+  /**
+   * 推送插件启动到最后
+   */
+  if (args.indexOf('not') == -1) {
+    args.push('alemon')
+  }
+  /**
+   * 开始启动
+   */
   for await (const item of args) {
     if (arr.indexOf(item) != -1) continue
     if (!createAlemon[item]) continue
@@ -65,3 +85,14 @@ export async function createBot(args: string[]) {
     await createAlemon[item]()
   }
 }
+// 机器人配置
+export { getBotConfigByKey } from './login.js'
+
+// 监听退出
+process.on('SIGINT', signals => {
+  console.log(signals)
+  if (process.pid) {
+    process.exit()
+  }
+  return
+})

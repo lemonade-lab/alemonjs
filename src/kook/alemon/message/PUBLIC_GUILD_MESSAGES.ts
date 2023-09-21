@@ -1,8 +1,8 @@
 import { AMessage, UserType, InstructionMatching } from 'alemon'
 import { KOOKApiClient, EventData } from 'kook-ws'
-import { getBotConfigByKOOK } from '../../config.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
+import { getBotConfigByKey } from '../../../login.js'
 
 /**
  *
@@ -47,7 +47,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     msg = msg.replace(`(met)${item.id}(met)`, '').trim()
   }
   let isMaster = false
-  const cfg = getBotConfigByKOOK()
+  const cfg = getBotConfigByKey('kook')
   const masterID = cfg.masterID
   if (event.msg_id == masterID) {
     isMaster = true

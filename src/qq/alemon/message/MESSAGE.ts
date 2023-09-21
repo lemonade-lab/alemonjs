@@ -2,10 +2,10 @@ import { IOpenAPI } from 'qq-guild-bot'
 import { CardType, InstructionMatching, AMessage } from 'alemon'
 import { ClientAPIByQQ as Client } from 'qq-channel'
 import { Private } from '../privatechat.js'
-import { getBotConfigByQQ } from '../../config.js'
 import { EventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { setBotMsgByQQ } from '../bot.js'
+import { getBotConfigByKey } from '../../../login.js'
 
 declare global {
   /**
@@ -30,7 +30,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    * 得到登录配置
    */
 
-  const cfg = getBotConfigByQQ()
+  const cfg = getBotConfigByKey('qq')
 
   /**
    * 得到主人id

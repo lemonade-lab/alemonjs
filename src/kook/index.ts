@@ -1,8 +1,8 @@
-import { Login_kook, getBotConfigByKOOK } from './config.js'
 import { checkRobotByKOOK } from './login.js'
 import { callBackByKOOK } from './alemon/conversation.js'
 import { createClient, KOOKApiClient } from 'kook-ws'
 import { setBotMsgByKOOK } from './alemon/bot.js'
+import { getBotConfigByKey } from '../login.js'
 /**
  * 创建实例
  * @returns
@@ -12,7 +12,7 @@ export async function createAlemonByKOOK() {
    * 创建登录配置
    */
   if (
-    await checkRobotByKOOK(Login_kook).catch(err => {
+    await checkRobotByKOOK().catch(err => {
       console.error(err)
       process.exit()
     })
@@ -20,7 +20,7 @@ export async function createAlemonByKOOK() {
     /**
      * 读取配置
      */
-    const cfg = await getBotConfigByKOOK()
+    const cfg = await getBotConfigByKey('kook')
 
     /**
      * 创建连接

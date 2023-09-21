@@ -28,6 +28,12 @@ cd alemon-bot #进入
 npm run app qq #启动
 ```
 
+## 配置管理
+
+打开 alemon.toml 文件
+
+参考配置说明进行更改[config](./config.md)
+
 ### 共享平台
 
 > 仓库只做资源收集,对齐安全性不做任何检查,请谨慎选择

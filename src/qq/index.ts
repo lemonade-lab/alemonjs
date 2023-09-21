@@ -3,7 +3,7 @@ import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { setBotConfig } from 'qq-channel'
 import { checkRobotByQQ } from './login.js'
 import { createConversationByQQ } from './alemon/conversation.js'
-import { getBotConfigByQQ, Login_qq } from './config.js'
+import { getBotConfigByKey } from '../login.js'
 declare global {
   var clientApiByQQ: IOpenAPI
 }
@@ -12,7 +12,7 @@ export async function createAlemonByQQ() {
    * 登录
    */
   if (
-    await checkRobotByQQ(Login_qq).catch(err => {
+    await checkRobotByQQ().catch(err => {
       console.error(err)
       process.exit()
     })
@@ -20,7 +20,7 @@ export async function createAlemonByQQ() {
     /**
      * 读取配置
      */
-    const cfg = getBotConfigByQQ()
+    const cfg = getBotConfigByKey('qq')
     /**
      * 创建 clientApiByQQ
      */

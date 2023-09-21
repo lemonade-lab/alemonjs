@@ -10,8 +10,8 @@ import { INTERACTION } from './message/INTERACTION.js'
 import { MESSAGE_AUDIT } from './message/MESSAGE_AUDIT.js'
 import { AUDIO_ACTION } from './message/AUDIO_ACTION.js'
 import { FORUMS_EVENT } from './message/FORUMS_EVENT.js'
-import { getBotConfigByQQ } from '../config.js'
 import { setBotMsgByQQ } from './bot.js'
+import { getBotConfigByKey } from '../../login.js'
 
 interface BotData {
   version: number
@@ -37,7 +37,7 @@ export const createConversationByQQ = ws => {
    * 准备
    */
   ws.on(SessionEvents.READY, async data => {
-    const cfg = getBotConfigByQQ()
+    const cfg = getBotConfigByKey('qq')
     if (cfg.sandbox) console.info('[READY]', data)
     const robot: BotData = data.msg
     const bot = {

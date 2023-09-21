@@ -1,8 +1,7 @@
 import { checkRobot } from './login.js'
-import { login_qqgroup, getBotConfigQQGroup, setup_qqgroup } from './config.js'
 import { createLogin } from './icqq/login.js'
 import { PUBLIC_MESSAGESByQQGroup } from './alemon/message/PUBLIC_MESSAGES.js'
-import { createYaml } from '../config.js'
+import { getBotConfigByKey } from '../login.js'
 /**
  * 创建实例
  * @returns
@@ -12,19 +11,14 @@ export async function createAlemonQQByQQGroup() {
    * 登录
    */
   if (
-    await checkRobot(login_qqgroup).catch(err => {
+    await checkRobot().catch(err => {
       console.error(err)
     })
   ) {
-    const str = `friendApplication: false # 好友申请
-groupInvitation: false # 邀群申请
-addGroupApplication: false # 加群申请
-botQQ: [] # 被视为bot的QQ号,当对方是bot时反馈`
-    createYaml(setup_qqgroup, str)
     /**
      * 创建配置
      */
-    const cfg = getBotConfigQQGroup()
+    const cfg = getBotConfigByKey('qqgroup')
     /**
      * 创建登录
      */

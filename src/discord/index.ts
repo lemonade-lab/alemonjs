@@ -1,14 +1,14 @@
 import { Client } from 'discord.js'
 import { checkRobotByDiscord } from './login.js'
 import { callBackByDisdord } from './alemon/conversation.js'
-import { getBotConfigByDiscord, login_dc } from './config.js'
 import { setBotMsgByDiscord } from './alemon/bot.js'
+import { getBotConfigByKey } from '../login.js'
 export async function createAlemonByDiscord() {
   /**
    * 登录
    */
   if (
-    await checkRobotByDiscord(login_dc).catch(err => {
+    await checkRobotByDiscord().catch(err => {
       console.log(err)
       process.exit()
     })
@@ -16,7 +16,7 @@ export async function createAlemonByDiscord() {
     /**
      * 读取配置
      */
-    const cfg = getBotConfigByDiscord()
+    const cfg = getBotConfigByKey('discord')
     /**
      * 创建程序
      */

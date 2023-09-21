@@ -1,5 +1,4 @@
 import { AMessage, UserType, InstructionMatching, CardType } from 'alemon'
-import { getBotConfigQQGroup, setup_qqgroup } from '../../config.js'
 import { GroupEventType } from '../types.js'
 import { segmentQQGroup } from '../segment.js'
 import { getBotMsgByQQGroup } from '../bot.js'
@@ -7,7 +6,7 @@ import { getBotMsgByQQGroup } from '../bot.js'
 import { segmentIcqq } from '../../icqq/segment.js'
 import { getUserAvatar } from '../../icqq/user.js'
 import { parseMsg } from '../msg.js'
-import { getYaml } from '../../../config.js'
+import { getBotConfigByKey } from '../../../login.js'
 
 /**
  * 响应普通消息
@@ -19,10 +18,11 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
   // console.log('message=', event)
 
   /**
-   * 不处理bot消息
+   * 得到配置
    */
-  const setupConfig = getYaml(setup_qqgroup)
-  const allBot = setupConfig.botQQ ?? []
+  const cfg = getBotConfigByKey('qqgroup')
+
+  const allBot = cfg.botQQ ?? []
   for (const item of allBot) {
     if (event.sender.user_id == item) {
       // 直接返回
@@ -104,11 +104,6 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
    * 主人处理
    */
   let isMaster = false
-
-  /**
-   * 得到登录配置
-   */
-  const cfg = getBotConfigQQGroup()
 
   /**
    * 检查身份

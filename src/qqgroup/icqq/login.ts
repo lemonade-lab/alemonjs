@@ -8,7 +8,7 @@ import {
 import axios from 'axios'
 import prompts from 'prompts'
 import { setBotMsgByQQGroup } from '../alemon/bot.js'
-import { getBotConfigQQGroup } from '../config.js'
+import { getBotConfigByKey } from 'src/login.js'
 
 /**
  * 休眠函数
@@ -274,7 +274,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
    * 拒绝`event.approve(false)`
    */
   client.on('request.friend', (event: FriendRequestEvent) => {
-    const cfg = getBotConfigQQGroup()
+    const cfg = getBotConfigByKey('qqgroup')
     event.approve(cfg.friendApplication)
   })
 
@@ -283,7 +283,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
    * 拒绝`event.approve(false)`
    */
   client.on('request.group.invite', (event: GroupInviteEvent) => {
-    const cfg = getBotConfigQQGroup()
+    const cfg = getBotConfigByKey('qqgroup')
     event.approve(cfg.groupInvitation)
   })
 
@@ -292,7 +292,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
    * 拒绝`event.approve(false)`
    */
   client.on('request.group.add', (event: GroupRequestEvent) => {
-    const cfg = getBotConfigQQGroup()
+    const cfg = getBotConfigByKey('qqgroup')
     event.approve(cfg.addGroupApplication)
   })
 
