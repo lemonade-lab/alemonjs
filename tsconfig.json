@@ -16,6 +16,6 @@
     "esm": true,
     "experimentalSpecifierResolution": "node"
   },
-  "include": ["src"],
+  "include": ["src","plugins", "example"],
   "exclude": ["node_modules", "lib", "types"]
 }

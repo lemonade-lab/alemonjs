@@ -1,6 +1,6 @@
 {
   "name": "alemon-bot",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "description": "阿柠檬机器人",
   "author": "ningmengchongshui",
   "main": "lib/index.js",
@@ -9,7 +9,6 @@
   "scripts": {
     "app": "ts-node index.ts",
     "login": "ts-node index.ts login",
-    "dev": "nodemon --exec ts-node index.ts",
     "tsc": "npx tsc",
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
@@ -19,7 +18,7 @@
     "@discordjs/core": "^0.6.0",
     "@discordjs/rest": "^1.7.1",
     "@iarna/toml": "^2.2.5",
-    "alemon": "^1.5.15",
+    "alemon": "^1.6.2",
     "axios": "^1.4.0",
     "discord.js": "^14.11.0",
     "form-data": "^4.0.0",
@@ -39,7 +38,6 @@
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "nodemon": "^2.0.22",
     "prettier": "^2.8.8",
     "rollup": "^3.28.1",
     "ts-node": "^10.9.1",

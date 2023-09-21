@@ -9,3 +9,5 @@ types
 /index.ts/
 /deploy.sh
 /alemon.toml
+/alemon.json
+/example.js

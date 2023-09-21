@@ -1,6 +1,7 @@
-import { cmdInit, setLanchConfig } from 'alemon'
+import { setLanchConfig } from 'alemon'
 import { getBotConfigByKey, setBotConfig } from './login.js'
 import { getToml } from './config.js'
+import { cmdInit } from 'alemon'
 /**
  * 启动机器人
  */
@@ -44,37 +45,27 @@ export const createAlemon = {
       console.info('QQ群机器人启动失败~')
       return false
     })
-  },
-  alemon: cmdInit
+  }
 }
 
 /**
  * 启动机器人
  * @param args 启动指令
- * @param url 配置地址
+ * @param cfg 配置地址
  */
-export async function createBot(args: string[], url?: string) {
+export async function createBot(args: string[], cfg?: string) {
   /**
    * 加载配置
    */
-  await setBotConfig(getToml(url))
-
+  await setBotConfig(getToml(cfg))
   /**
    * 设置浏览器配置
    */
   await setLanchConfig(getBotConfigByKey('puppeteer'))
-
   /**
    * 控制
    */
   const arr: string[] = []
-
-  /**
-   * 推送插件启动到最后
-   */
-  if (args.indexOf('not') == -1) {
-    args.push('alemon')
-  }
   /**
    * 开始启动
    */
@@ -84,7 +75,9 @@ export async function createBot(args: string[], url?: string) {
     arr.push(item)
     await createAlemon[item]()
   }
+  return cmdInit
 }
+
 // 机器人配置
 export { getBotConfigByKey } from './login.js'
 
