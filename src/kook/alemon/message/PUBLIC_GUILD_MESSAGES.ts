@@ -10,7 +10,7 @@ import { getBotConfigByKey } from '../../../login.js'
  * @returns
  */
 export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
-  // console.log('interaction', interaction)
+  // console.info('interaction', interaction)
   if (event.extra.author.bot) {
     return false
   }

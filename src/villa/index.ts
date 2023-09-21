@@ -28,7 +28,7 @@ export async function createAlemonByVilla() {
         callback_port: cfg.port ?? 8080,
         callback_url: cfg.url ?? '/api/mys/callback',
         img_url: cfg.img_url ?? '/api/mys/img',
-        IMAGE_DIR: cfg.IMAGE_DIR ?? 'data/mys/img'
+        IMAGE_DIR: cfg.IMAGE_DIR ?? '/data/mys/img'
       },
       callBackByVilla,
       async () => {

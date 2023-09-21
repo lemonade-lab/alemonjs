@@ -6,7 +6,7 @@ export const now_e = {
    * @returns
    */
   replyCard: async (arr: CardType[]) => {
-    console.log('待实现')
+    console.info('待实现')
     return false
   },
   /**
@@ -16,7 +16,7 @@ export const now_e = {
    * @returns
    */
   replyByMid: async (mid: string, msg: string | string[] | Buffer) => {
-    console.log('待实现')
+    console.info('待实现')
     return false
   },
   /**
@@ -29,7 +29,7 @@ export const now_e = {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.log('待实现')
+    console.info('待实现')
     return false
   },
   /**
@@ -42,7 +42,7 @@ export const now_e = {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.log('待实现')
+    console.info('待实现')
     return false
   }
 }

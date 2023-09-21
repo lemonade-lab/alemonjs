@@ -9,7 +9,7 @@ export async function createAlemonByDiscord() {
    */
   if (
     await checkRobotByDiscord().catch(err => {
-      console.log(err)
+      console.error(err)
       process.exit()
     })
   ) {
@@ -37,7 +37,7 @@ export async function createAlemonByDiscord() {
             size: 1024
           }) ?? ''
       })
-      console.log(`欢迎回来 ${client.user?.username}`)
+      console.info(`欢迎回来 ${client.user?.username}`)
     })
     /**
      * 监听消息创建

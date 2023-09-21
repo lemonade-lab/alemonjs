@@ -33,7 +33,7 @@ export async function createAlemonByKOOK() {
           name: data.username,
           avatar: data.avatar
         })
-        console.log('[KOOK] 欢迎回来~', data.username)
+        console.info('[KOOK] 欢迎回来~', data.username)
       }
     })
     return true

@@ -34,7 +34,7 @@ export async function checkRobotByKOOK() {
         value !== '' && typeof value === 'string' ? true : '机器人 token: '
     }
   ]).catch((err: any) => {
-    console.log(err)
+    console.error(err)
     process.exit()
   })
 

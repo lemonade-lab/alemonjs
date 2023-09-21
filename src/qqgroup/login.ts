@@ -58,7 +58,7 @@ export async function checkRobot() {
       initial: 0 // 默认安卓
     }
   ]).catch((err: any) => {
-    console.log(err)
+    console.error(err)
     process.exit()
   })
 

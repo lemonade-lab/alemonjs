@@ -15,7 +15,7 @@ import { getBotConfigByKey } from '../../../login.js'
  */
 export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
   // 消息监听
-  // console.log('message=', event)
+  // console.info('message=', event)
 
   /**
    * 得到配置
@@ -180,7 +180,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
       if (Buffer.isBuffer(msg)) {
         try {
           event.reply(segmentIcqq.image(msg)).catch(err => {
-            console.log(err)
+            console.error(err)
           })
           return true
         } catch (err) {
@@ -192,7 +192,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
       if (Buffer.isBuffer(img)) {
         try {
           event.reply([content, segmentIcqq.image(img)]).catch(err => {
-            console.log(err)
+            console.error(err)
           })
           return true
         } catch (err) {
@@ -202,7 +202,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
       }
       try {
         event.reply(parseMsg(content)).catch(err => {
-          console.log(err)
+          console.error(err)
         })
         return true
       } catch {
@@ -219,7 +219,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         if (Buffer.isBuffer(msg)) {
           try {
             event.reply(segmentIcqq.image(msg), true).catch(err => {
-              console.log(err)
+              console.error(err)
             })
             return true
           } catch (err) {
@@ -235,7 +235,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         if (Buffer.isBuffer(img)) {
           try {
             event.reply([content, segmentIcqq.image(img)], true).catch(err => {
-              console.log(err)
+              console.error(err)
             })
             return true
           } catch (err) {
@@ -245,7 +245,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
         }
         try {
           event.reply(parseMsg(content), true).catch(err => {
-            console.log(err)
+            console.error(err)
           })
           return true
         } catch {
@@ -286,7 +286,7 @@ export async function PUBLIC_MESSAGESByQQGroup(event: GroupEventType) {
       }
       try {
         event.reply(cardArr).catch(err => {
-          console.log(err)
+          console.error(err)
         })
         return true
       } catch {

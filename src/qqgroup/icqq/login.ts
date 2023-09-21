@@ -46,14 +46,14 @@ export function createLogin(account: number, password: string, platform = 1, cal
       .post(urlReq, { url })
       .then(res => res.data)
       .catch(err => {
-        console.log(err)
+        console.error(err)
       })
     if (urlRes.message != 'OK') {
       return
     }
-    console.log(urlReq)
-    console.log('请60s内打开链接以完成验证...')
-    console.log('完成后将自动进行登录...')
+    console.info(urlReq)
+    console.info('请60s内打开链接以完成验证...')
+    console.info('完成后将自动进行登录...')
     for (let i = 0; i < 20; i++) {
       await sleep(3000)
       const res: any = await axios
@@ -89,16 +89,16 @@ export function createLogin(account: number, password: string, platform = 1, cal
         initial: 0 // 默认安卓
       }
     ]).catch((err: any) => {
-      console.log(err)
+      console.error(err)
       process.exit()
     })
     if (!select) process.exit()
-    console.log('PC按[CTRA+鼠标左键]以外链方式打开')
+    console.info('PC按[CTRA+鼠标左键]以外链方式打开')
     const map = {
       1: async () => {
         const ticket$0 = await getTicket(e.url)
         if (!ticket$0) {
-          console.log('请求错误,请手动获取\n')
+          console.error('请求错误,请手动获取\n')
           const { ticket } = await prompts([
             {
               type: 'password',
@@ -107,7 +107,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
               validate: value => (value !== '' && typeof value === 'string' ? true : 'ticket: ')
             }
           ]).catch((err: any) => {
-            console.log(err)
+            console.error(err)
             process.exit()
           })
           if (!ticket) process.exit()
@@ -118,7 +118,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
         return
       },
       2: async () => {
-        console.log('滑动验证app下载地址\nhttps://wwp.lanzouy.com/i6w3J08um92h\n密码:3kuu')
+        console.info('滑动验证app下载地址\nhttps://wwp.lanzouy.com/i6w3J08um92h\n密码:3kuu')
         const { ticket } = await prompts([
           {
             type: 'password',
@@ -127,7 +127,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
             validate: value => (value !== '' && typeof value === 'string' ? true : 'ticket: ')
           }
         ]).catch((err: any) => {
-          console.log(err)
+          console.error(err)
           process.exit()
         })
         if (!ticket) process.exit()
@@ -142,7 +142,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
             validate: value => (value !== '' && typeof value === 'string' ? true : 'ticket: ')
           }
         ]).catch((err: any) => {
-          console.log(err)
+          console.error(err)
           process.exit()
         })
         if (!ticket) process.exit()
@@ -159,9 +159,9 @@ export function createLogin(account: number, password: string, platform = 1, cal
    * 监听扫码
    */
   client.on('system.login.qrcode', async e => {
-    console.log('请60s内扫码以完成验证...')
-    console.log('完成后将自动进行登录...')
-    console.log('刷新二维码需要退出重来...')
+    console.info('请60s内扫码以完成验证...')
+    console.info('完成后将自动进行登录...')
+    console.info('刷新二维码需要退出重来...')
     let T = false
     setTimeout(() => {
       /**
@@ -205,7 +205,7 @@ export function createLogin(account: number, password: string, platform = 1, cal
         initial: 0
       }
     ]).catch((err: any) => {
-      console.log(err)
+      console.error(err)
       process.exit()
     })
     if (!select) process.exit()
@@ -219,14 +219,14 @@ export function createLogin(account: number, password: string, platform = 1, cal
           validate: value => (value !== '' && typeof value === 'string' ? true : 'ticket: ')
         }
       ]).catch((err: any) => {
-        console.log(err)
+        console.error(err)
         process.exit()
       })
       if (!code) process.exit()
       client.submitSmsCode(code.trim())
     } else {
-      console.log(e.url)
-      console.log('扫码完成后回车继续...')
+      console.info(e.url)
+      console.info('扫码完成后回车继续...')
       process.stdin.once('data', () => {
         client.login()
       })

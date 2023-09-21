@@ -42,7 +42,7 @@ export async function callBackByVilla(event: BotEvent) {
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     return await ConversationMap[event.type](event)
   } else {
-    console.log('[新事件触发]', event.type)
+    // console.info('[新事件触发]', event.type)
     return
   }
 }

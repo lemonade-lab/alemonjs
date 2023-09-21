@@ -5,7 +5,7 @@ import { createApp, compilationTools } from 'alemon'
 await createBot(process.argv.slice(2))
   .then(alemon => alemon(false))
   .catch(err => {
-    console.log('出错啦', err)
+    console.error('出错啦', err)
   })
 
 // 加载模块
@@ -30,5 +30,5 @@ app.mount('#app')
 // await createBot(process.argv.slice(2))
 //   .then(alemon => alemon())
 //   .catch(err => {
-//     console.log('出错啦', err)
+//     console.error('出错啦', err)
 //   })

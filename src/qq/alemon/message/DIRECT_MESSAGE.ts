@@ -154,21 +154,21 @@ async function directMessage(e: AMessage, event: directEventData) {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.log('不可用')
+    console.info('不可用')
     return false
   }
 
   /**
    * 删除表情表态
    * @param mid
-   * @param boj { emoji_type: number; emoji_id: string }
+   * @param boj
    * @returns
    */
   e.deleteEmoji = async (
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.log('不可用')
+    console.info('不可用')
     return false
   }
 

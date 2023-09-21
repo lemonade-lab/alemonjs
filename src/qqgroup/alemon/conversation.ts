@@ -33,5 +33,5 @@ export async function callBack(
     | GroupInviteEvent
     | FriendRequestEvent
 ) {
-  console.log(event)
+  console.info(event)
 }

@@ -86,7 +86,10 @@ export function setBotConfig(val: ConfigType) {
   // 分布覆盖
   for (const item in val) {
     // 当且仅当存在同key的时候才会覆盖默认配置
-    config[item] = val[item]
+    for (const i in val[item]) {
+      // 当前仅当同属性名的时候才会覆盖默认配置
+      config[item][i] = val[item][i]
+    }
   }
 }
 
@@ -98,6 +101,7 @@ export function setBotConfig(val: ConfigType) {
 export function setBotConfigByKey<T extends keyof ConfigType>(key: T, val: ConfigType[T]): void {
   // 分布覆盖
   for (const item in val) {
+    // 当前仅当同属性名的时候才会覆盖默认配置
     config[key][item] = val[item]
   }
 }

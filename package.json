@@ -1,6 +1,6 @@
 {
   "name": "alemon-bot",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "阿柠檬机器人",
   "author": "ningmengchongshui",
   "main": "lib/index.js",
@@ -25,7 +25,7 @@
     "icqq": "^0.5.2",
     "image-size": "^1.0.2",
     "kook-ws": "^1.0.4",
-    "mys-villa": "^1.1.7",
+    "mys-villa": "^1.1.8",
     "prompts": "^2.4.2",
     "qq-channel": "^1.0.0",
     "qq-guild-bot": "^2.9.5"

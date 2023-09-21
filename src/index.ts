@@ -10,7 +10,7 @@ export const createAlemon = {
     const { createAlemonByQQ: qq } = await import('./qq/index.js')
     return qq().catch(err => {
       console.error(err)
-      console.info('QQ机器人启动失败~')
+      console.error('QQ机器人启动失败~')
       return false
     })
   },
@@ -18,7 +18,7 @@ export const createAlemon = {
     const { createAlemonByVilla: villa } = await import('./villa/index.js')
     return villa().catch(err => {
       console.error(err)
-      console.info('villa机器人启动失败~')
+      console.error('villa机器人启动失败~')
       return false
     })
   },
@@ -26,7 +26,7 @@ export const createAlemon = {
     const { createAlemonByKOOK: kook } = await import('./kook/index.js')
     return kook().catch(err => {
       console.error(err)
-      console.info('KOOK机器人启动失败~')
+      console.error('KOOK机器人启动失败~')
       return false
     })
   },
@@ -34,7 +34,7 @@ export const createAlemon = {
     const { createAlemonByDiscord: dc } = await import('./discord/index.js')
     return dc().catch(err => {
       console.error(err)
-      console.info('discord机器人启动失败~')
+      console.error('discord机器人启动失败~')
       return false
     })
   },
@@ -42,7 +42,7 @@ export const createAlemon = {
     const { createAlemonQQByQQGroup: qqgroup } = await import('./qqgroup/index.js')
     return qqgroup().catch(err => {
       console.error(err)
-      console.info('QQ群机器人启动失败~')
+      console.error('QQ群机器人启动失败~')
       return false
     })
   }
@@ -83,7 +83,7 @@ export { getBotConfigByKey, setBotConfigByKey } from './login.js'
 
 // 监听退出
 process.on('SIGINT', signals => {
-  console.log(signals)
+  console.info(signals)
   if (process.pid) {
     process.exit()
   }
