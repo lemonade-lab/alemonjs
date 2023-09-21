@@ -12,7 +12,7 @@ export interface MysqlConfig {
   port: number
   user: string
   password: string
-  database: number
+  database: string
 }
 
 export interface DiscordConfig {

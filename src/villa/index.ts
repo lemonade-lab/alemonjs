@@ -1,7 +1,6 @@
 import { callBackByVilla } from './alemon/conversation.js'
 import { checkRobotByVilla } from './login.js'
-import { createClient, Client } from 'mys-villa'
-import { hmacSha256 } from './hs.js'
+import { createClient, Client, hmacSha256 } from 'mys-villa'
 import { getBotConfigByKey } from '../login.js'
 export async function createAlemonByVilla() {
   /**
@@ -19,7 +18,7 @@ export async function createAlemonByVilla() {
     const cfg = getBotConfigByKey('villa')
 
     if (cfg.pub_key != '') {
-      cfg.secret = hmacSha256(cfg.pub_key, cfg.secret)
+      cfg.secret = hmacSha256(cfg.secret, cfg.pub_key)
     }
 
     createClient(

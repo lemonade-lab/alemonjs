@@ -79,7 +79,7 @@ export async function createBot(args: string[], cfg?: string) {
 }
 
 // 机器人配置
-export { getBotConfigByKey } from './login.js'
+export { getBotConfigByKey, setBotConfigByKey } from './login.js'
 
 // 监听退出
 process.on('SIGINT', signals => {

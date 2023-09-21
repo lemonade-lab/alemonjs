@@ -11,7 +11,7 @@ const config: ConfigType = {
     port: 3306,
     user: 'root',
     password: '',
-    database: 1
+    database: 'alemon'
   },
   discord: {
     token: '',
