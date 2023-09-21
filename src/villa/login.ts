@@ -26,7 +26,7 @@ export async function checkRobotByVilla(Bcf: string, pub_key_cfg: string) {
       const readKey = readFileSync(join(process.cwd(), pub_key_cfg), 'utf-8')
       const cig = {
         ...config,
-        pub_key: readKey
+        pub_key: readKey.replace(/\r/g, '')
       }
       setBotConfigByVilla(cig)
       return true
