@@ -1,50 +1,71 @@
 import redisClient from "ioredis";
-import { join } from "path";
-import { getYaml } from "./config.js";
-import { ioRedisConfigType } from "./types.js";
+import { ioRedisConfig, getToml } from "./config.js";
 
-export const ioRedisConfig: ioRedisConfigType = {
+export const dcfg: ioRedisConfig = {
   host: "127.0.0.1",
   port: 6379,
   password: "",
   db: 1,
 };
 
+/**
+ * 创建redis应用
+ * @param cfg 
+ * @returns 
+ */
 export function createRedis(
-  cfg: string | ioRedisConfigType = "config/redis.yaml"
+  cfg?: ioRedisConfig | string
 ) {
   try {
-    if (typeof cfg === "string") {
-      let redis_config;
-      try {
-        redis_config = getYaml(join(process.cwd(), cfg));
-      } catch (error) {
-        redis_config = ioRedisConfig;
+    // 存在参数
+    if (cfg) {
+      // 读取默认配置文件
+      let val = dcfg
+      if (typeof cfg == 'string') {
+        // 是字符串
+        const data =  getToml(cfg)
+        // 读取成功
+        if (data && data?.redis) {
+          val = data.redis
+        }
       }
-      if (!redis_config) {
-        redis_config = ioRedisConfig;
-      }
-      const ALRedis = new redisClient(redis_config);
-      ALRedis.on("error", (error) => {
-        console.error("\n[REDIS]", error);
-        console.error("\n[REDIS]", "请检查app配置~");
+      const ALRedis = new redisClient(val);
+      ALRedis.on("error", (err: any) => {
+        console.error("\n[REDIS]", err);
+        console.error("\n[REDIS]", "请检查配置");
       });
-      return ALRedis;
+      return ALRedis
     }
-    if (typeof cfg === "object" && cfg !== null) {
-      // 如果配置cfg中没有 host  port 和 password  字段则使用
-      const ALRedis = new redisClient(cfg);
-      ALRedis.on("error", (error) => {
-        console.error("\n[REDIS]", error);
-        console.error("\n[REDIS]", "请检查app配置~");
+
+    
+
+    // 不存在参数
+    if (!cfg) {
+      // 读取默认配置文件
+      let val = dcfg
+      const data = getToml()
+      // 默认配置文件存在redis
+      if (data && data?.redis) {
+        // 存在redis配置,直接使用
+        val = data.redis
+        // 输入了配置信息
+        const ALRedis = new redisClient(val);
+        ALRedis.on("error", (err: any) => {
+          console.error("\n[REDIS]", err);
+          console.error("\n[REDIS]", "请检查配置");
+        });
+        return ALRedis
+      }
+      // 不存在 redis
+      const ALRedis = new redisClient(dcfg);
+      ALRedis.on("error", (err: any) => {
+        console.error("\n[REDIS]", err);
+        console.error("\n[REDIS]", "请检查配置");
       });
       return ALRedis;
-    } else {
-      console.error("\n[REDIS]", "请检查app配置~");
     }
   } catch (err) {
     console.log(err);
+    console.error("\n[REDIS]", "请检查配置");
   }
 }
-
-export * from "ioredis";
