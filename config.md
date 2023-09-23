@@ -45,7 +45,7 @@ user = "root"
 # 密码
 password = ""
 # 数据库
-database = 1
+database = "alemon"
 ```
 
 ## server
@@ -69,7 +69,7 @@ masterID = ''
 # 主人密码
 password = ''
 # 监听事件
-intents = []
+intents = [8_192, 16_384, 4_096, 1_024, 2_048, 512, 1, 32_768]
 ```
 
 ## kook
@@ -131,7 +131,12 @@ masterID = ''
 # 主人密码
 password = ''
 # 监听事件
-intents = []
+intents = [
+  "GUILDS",
+  "GUILD_MEMBERS",
+  "DIRECT_MESSAGE",
+  "PUBLIC_GUILD_MESSAGES",
+]
 # 是否是私域  默认公域
 isPrivate = false
 # 是否是沙箱  默认部署
