@@ -2,7 +2,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { parse } from "@iarna/toml";
 import { join } from 'path'
 
-export interface ioRedisConfig {
+export interface ioRedisOptions {
   host: string;
   port: number;
   password: string;
@@ -21,6 +21,6 @@ export function getToml(url = urlVal) {
   const u = join(process.cwd(), urlVal)
   if (!existsSync(u)) return {} 
   return parse(readFileSync(u, 'utf8')) as {
-    redis?: ioRedisConfig
+    redis?: ioRedisOptions
   }
 }

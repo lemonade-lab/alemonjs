@@ -1,7 +1,7 @@
-import redisClient from "ioredis";
-import { ioRedisConfig, getToml } from "./config.js";
+import redisClient, { RedisOptions } from "ioredis";
+import { ioRedisOptions, getToml } from "./config.js";
 
-export const dcfg: ioRedisConfig = {
+export const dcfg: ioRedisOptions = {
   host: "127.0.0.1",
   port: 6379,
   password: "",
@@ -13,9 +13,7 @@ export const dcfg: ioRedisConfig = {
  * @param cfg 
  * @returns 
  */
-export function createRedis(
-  cfg?: ioRedisConfig | string
-) {
+export function createRedis(cfg?: RedisOptions | string) {
   try {
     // 存在参数
     if (cfg) {
@@ -23,7 +21,7 @@ export function createRedis(
       let val = dcfg
       if (typeof cfg == 'string') {
         // 是字符串
-        const data =  getToml(cfg)
+        const data = getToml(cfg)
         // 读取成功
         if (data && data?.redis) {
           val = data.redis
@@ -36,9 +34,6 @@ export function createRedis(
       });
       return ALRedis
     }
-
-    
-
     // 不存在参数
     if (!cfg) {
       // 读取默认配置文件
@@ -64,6 +59,36 @@ export function createRedis(
       });
       return ALRedis;
     }
+  } catch (err) {
+    console.log(err);
+    console.error("\n[REDIS]", "请检查配置");
+  }
+}
+
+/**
+ * 创建可配置应用
+ * @param url 文件地址
+ * @param options 附加参数
+ * @returns 
+ */
+export async function createRedisByOptions(
+  url: string,
+  options: RedisOptions = {}) {
+  try {
+    let val = dcfg
+    const data = getToml(url)
+    if (data && data?.redis) {
+      val = data.redis
+    }
+    const ALRedis = new redisClient({
+      ...val,
+      ...options
+    });
+    ALRedis.on("error", (err: any) => {
+      console.error("\n[REDIS]", err);
+      console.error("\n[REDIS]", "请检查配置");
+    });
+    return ALRedis
   } catch (err) {
     console.log(err);
     console.error("\n[REDIS]", "请检查配置");

@@ -1,6 +1,6 @@
 {
   "name": "alemon-redis",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "阿柠檬REDIS连接",
   "main": "lib/index.js",
   "files": [
