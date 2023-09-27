@@ -66,7 +66,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
     img?: Buffer | string,
     name?: string
   ): Promise<boolean> => {
-    console.log('群聊响应', msg)
     if (Buffer.isBuffer(msg)) {
       try {
         let url = ''
@@ -76,7 +75,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
            */
           const uul = await ClinetWeb.setLocalImg(msg)
           url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
-          console.log(url)
           return await Client.postFilesByGroup(event.group_id, url).catch(err => {
             console.error(err)
             return false
@@ -94,7 +92,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
         const dimensions = IMGS.imageSize(img)
         const uul = await ClinetWeb.setLocalImg(img)
         url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
-        console.log(url)
         return await Client.postMessageByGroup(
           event.group_id,
           `${content} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
@@ -122,7 +119,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.log('暂不可用')
+          console.info('暂不可用')
           return false
         } else {
           return false
@@ -142,7 +139,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
    */
 
   e.replyByMid = async (mid: string, msg: string) => {
-    console.log('暂不可用')
+    console.info('暂不可用')
     return false
   }
 
@@ -156,7 +153,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.log('暂不可用')
+    console.info('暂不可用')
     return false
   }
 
@@ -170,7 +167,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.log('暂不可用')
+    console.info('暂不可用')
     return false
   }
 
@@ -197,12 +194,12 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
   /**
    * 用户头像
    */
-  e.user_avatar = ''
+  e.user_avatar = 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638'
 
   /**
    * 用户名
    */
-  e.user_name = ''
+  e.user_name = '柠檬冲水'
 
   /**
    * 子频道编号
@@ -245,8 +242,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
   await InstructionMatching(e)
     .then(() => {
       console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`)
-
-      console.log('情况')
       return
     })
     .catch((err: any) => {

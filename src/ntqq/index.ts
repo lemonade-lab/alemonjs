@@ -47,7 +47,6 @@ export async function createAlemonByNtqq() {
      * 设置定时任务 重复设置配置
      */
     setInterval(async () => {
-      console.log('重新获取token')
       const data: aut = await ClientAPIByQQ.getAuthentication(cfg.appID, cfg.secret).then(
         res => res.data
       )

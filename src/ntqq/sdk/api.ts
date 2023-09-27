@@ -27,7 +27,6 @@ export function getAuthentication(appId: string, clientSecret: string) {
  */
 export async function requestService(config: AxiosRequestConfig) {
   const { token } = getBotConfig()
-  console.log(config)
   const service = await axios.create({
     baseURL: 'https://api.sgroup.qq.com',
     timeout: 20000,

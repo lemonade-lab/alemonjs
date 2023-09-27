@@ -25,7 +25,6 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
 
   /* 消息发送机制 */
   e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
-    console.log('私聊响应', msg)
     if (Buffer.isBuffer(msg)) {
       try {
         let url = ''
@@ -75,7 +74,7 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.log('暂不可用')
+          console.info('暂不可用')
           return false
         } else {
           return false
@@ -126,9 +125,9 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
 
   e.user_id = event.author.id
 
-  e.user_avatar = ''
+  e.user_avatar = 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638'
 
-  e.user_name = ''
+  e.user_name = '柠檬冲水'
 
   e.channel_id = event.group_id
 

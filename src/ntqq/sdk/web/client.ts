@@ -60,11 +60,11 @@ export function createWeb(
    */
   function handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.log(`端口 ${currentPort} 被占用，尝试启动新的端口...`)
+      console.error(`端口 ${currentPort} 被占用，尝试启动新的端口...`)
       currentPort++
       size++
       if (size >= 10) {
-        console.log('寻端失败~')
+        console.error('寻端失败~')
         return
       }
       createApp(currentPort)

@@ -9,10 +9,10 @@ import { ExampleObject } from './types.js'
 export async function callBack(data: ExampleObject) {
   if (data.group_id == '0') {
     // 私聊
-    console.log('私聊data=', data)
+    console.info('私聊data=', data)
     C2C_MESSAGE_CREATE(data)
   } else {
-    console.log('群聊data=', data)
+    console.info('群聊data=', data)
     GROUP_AT_MESSAGE_CREATE(data)
   }
 }

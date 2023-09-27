@@ -14,7 +14,7 @@ export async function getGatewayUrl(): Promise<string | undefined> {
     if (response.url) {
       return response.url
     } else {
-      console.log('[http] err:', null)
+      console.error('[http] err:', null)
     }
   } catch (error) {
     console.error('[token] err:', error.message)
@@ -39,7 +39,7 @@ export async function createClient(call: fnc) {
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
-      console.log('[token] ok')
+      console.info('[token] ok')
     })
     /**
      * 标记是否已连接
@@ -85,7 +85,7 @@ export async function createClient(call: fnc) {
             }, heartbeat_interval)
           } else if (t === 'RESUMED') {
             // Resumed Event，恢复连接成功
-            console.log('恢复连接')
+            console.info('恢复连接')
           } else if (t === 'GROUP_AT_MESSAGE_CREATE') {
             // 处理不同类型的事件内容
             call.callBack(data)
@@ -93,16 +93,16 @@ export async function createClient(call: fnc) {
             // 处理不同类型的事件内容
             call.callBack(data)
           } else {
-            console.log('不知名事件', message)
+            console.info('不知名事件', message)
           }
           break
         }
         case 7: {
-          console.log('重新连接')
+          console.info('重新连接')
           break
         }
         case 9: {
-          console.log('参数有错')
+          console.info('参数有错')
           break
         }
         case 10: {
@@ -131,17 +131,17 @@ export async function createClient(call: fnc) {
         }
         case 11: {
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.log('心跳发送成功~')
+          console.info('心跳发送成功~')
           break
         }
         case 12: {
-          console.log('平台推送的数据', message)
+          console.info('平台推送的数据', message)
         }
       }
     })
 
     ws.on('close', () => {
-      console.log('[ws] close')
+      console.info('[ws] close')
     })
   }
 }
