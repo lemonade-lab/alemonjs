@@ -53,8 +53,6 @@ export interface NtQQConfig {
   masterID: string
   password: string
   intents: NtQQEventsEnum[]
-  isPrivate: boolean
-  sandbox: boolean
 }
 
 export interface QQConfig {
@@ -65,20 +63,6 @@ export interface QQConfig {
   intents: AvailableIntentsEventsEnum[]
   isPrivate: boolean
   sandbox: boolean
-}
-
-export interface QQGroupConfig {
-  account: number
-  password: string
-  device: number
-  masterID: number
-  masterPW: string
-  sign_api_addr: string
-  version: string
-  friendApplication: boolean
-  groupInvitation: boolean
-  addGroupApplication: boolean
-  botQQ: number[]
 }
 
 export interface ServerConfig {
@@ -99,7 +83,6 @@ export interface ConfigType {
   kook?: KookConfig
   villa?: VillaConfig
   qq?: QQConfig
-  qqgroup?: QQGroupConfig
   server?: ServerConfig
   puppeteer?: PuppeteerConfig
   ntqq?: NtQQConfig

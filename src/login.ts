@@ -51,22 +51,7 @@ const config: ConfigType = {
     token: '',
     masterID: '',
     password: '',
-    intents: [],
-    isPrivate: false,
-    sandbox: false
-  },
-  qqgroup: {
-    account: 0,
-    password: '',
-    device: 1,
-    masterID: 0,
-    masterPW: '',
-    sign_api_addr: '',
-    version: '',
-    friendApplication: false,
-    groupInvitation: false,
-    addGroupApplication: false,
-    botQQ: []
+    intents: []
   },
   server: {
     host: '127.0.0.1',

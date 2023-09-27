@@ -143,30 +143,27 @@ isPrivate = false
 sandbox = false
 ```
 
-## qqgroup
+## ntqq
 
 ```toml
-[qqgroup]
-# 机器人账户
-account = ''
-# 机器人密码
-password = ''
-# 登录设备
-device = ''
+[qq]
+# 应用编号
+appID = ''
+# 令牌
+token = ''
 # 主人编号
 masterID = ''
 # 主人密码
-masterPW = ''
-# 签名API地址(如:http://127.0.0.1:8080/sign?key=12315)
-sign_api_addr = ''
-# 传入的QQ版本(如:8.9.63、8.9.68)
-version = 0
-# 好友同意
-friendApplication = false
-# 群聊
-groupInvitation = false
-# 加群同意
-addGroupApplication = false
-# 机器人账号集
-botQQ = []
+password = ''
+# 监听事件
+intents = [
+  "GUILDS",
+  "GUILD_MEMBERS",
+  "DIRECT_MESSAGE",
+  "PUBLIC_GUILD_MESSAGES",
+]
+# 是否是私域  默认公域
+isPrivate = false
+# 是否是沙箱  默认部署
+sandbox = false
 ```

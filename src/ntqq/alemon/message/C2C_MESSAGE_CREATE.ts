@@ -1,5 +1,4 @@
 import { CardType, InstructionMatching, AMessage } from 'alemon'
-import { EventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { setBotMsgByQQ } from '../bot.js'
 import { getBotConfigByKey } from '../../../login.js'
@@ -10,7 +9,7 @@ import { getBotConfigByKey } from '../../../login.js'
  * @param data  原数据
  * @returns
  */
-export const C2C_MESSAGE_CREATE = async (e: AMessage, event: EventData) => {
+export const C2C_MESSAGE_CREATE = async (e: AMessage, event: any) => {
   /**
    * 屏蔽其他机器人的消息
    */

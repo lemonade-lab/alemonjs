@@ -3,7 +3,7 @@ import { checkRobotByQQ } from './login.js'
 import { getBotConfigByKey } from '../login.js'
 import { callback } from './alemon/conversation.js'
 
-export async function createAlemonByQQ() {
+export async function createAlemonByNtqq() {
   /**
    * 登录
    */

@@ -38,11 +38,11 @@ export const createAlemon = {
       return false
     })
   },
-  qqgroup: async (): Promise<boolean> => {
-    const { createAlemonQQByQQGroup: qqgroup } = await import('./qqgroup/index.js')
-    return qqgroup().catch(err => {
+  ntqq: async (): Promise<boolean> => {
+    const { createAlemonByNtqq: ntqq } = await import('./ntqq/index.js')
+    return ntqq().catch(err => {
       console.error(err)
-      console.error('QQ群机器人启动失败~')
+      console.error('discord机器人启动失败~')
       return false
     })
   }
