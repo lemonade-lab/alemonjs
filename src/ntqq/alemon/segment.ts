@@ -5,7 +5,8 @@ export const segmentQQ = {
    * @returns
    */
   at: function (uid: string): string {
-    return `<@!${uid}>`
+    // 暂时用户@
+    return `` // 没有艾特了
   },
   /**
    * 艾特全体
@@ -20,7 +21,7 @@ export const segmentQQ = {
    * @returns
    */
   atChannel: function (channel_id: string): string {
-    return `<#${channel_id}>`
+    return `` // 没有
   },
   link: function (title: string, centent): string {
     return `[🔗${title}](${centent})`

@@ -88,20 +88,39 @@ export async function postFilesByGroup(openid: string, content: string): Promise
  * @param content
  * @returns
  */
-export async function postMessageByUser(openid: string, content: string) {
+export async function postMessageByUser(openid: string, content: string, msg_id) {
   const { appID } = getBotConfig()
-  return requestService({
-    url: `/v2/users/${openid}/messages`,
-    method: 'post',
-    headers: {
-      'X-Union-Appid': appID
-    },
-    data: {
-      content: 'md',
-      markdown: { content },
-      msg_type: 2 //  0 文本  1 图文 2 md 3 ark 4 embed
-    }
-  })
+
+  if (/\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
+    // md
+    return requestService({
+      url: `/v2/users/${openid}/messages`,
+      method: 'post',
+      headers: {
+        'X-Union-Appid': appID
+      },
+      data: {
+        content: 'md',
+        msg_id: msg_id,
+        markdown: { content },
+        msg_type: 2 //  0 文本  1 图文 2 md 3 ark 4 embed
+      }
+    })
+  } else {
+    return requestService({
+      url: `/v2/users/${openid}/messages`,
+      method: 'post',
+      headers: {
+        'X-Union-Appid': appID
+      },
+      data: {
+        content: content,
+        msg_id: msg_id,
+        // markdown: { content },
+        msg_type: 0 //  0 文本  1 图文 2 md 3 ark 4 embed
+      }
+    })
+  }
 }
 
 /**
@@ -110,19 +129,37 @@ export async function postMessageByUser(openid: string, content: string) {
  * @param content
  * @returns
  */
-export async function postMessageByGroup(group_openid: string, content: string) {
+export async function postMessageByGroup(group_openid: string, content: string, msg_id?: string) {
   const { appID } = getBotConfig()
-  return requestService({
-    url: `/v2/groups/${group_openid}/messages`,
-    method: 'post',
-    headers: {
-      'X-Union-Appid': appID
-    },
-    data: {
-      content: 'md',
-      markdown: { content },
-      msg_type: 2, //  0 文本  1 图文 2 md 3 ark 4 embed
-      timestamp: Math.floor(Date.now() / 1000)
-    }
-  })
+  if (/\[[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
+    // md
+    return requestService({
+      url: `/v2/groups/${group_openid}/messages`,
+      method: 'post',
+      headers: {
+        'X-Union-Appid': appID
+      },
+      data: {
+        content: 'md',
+        msg_id: msg_id,
+        markdown: { content },
+        msg_type: 2, //  0 文本  1 图文 2 md 3 ark 4 embed
+        timestamp: Math.floor(Date.now() / 1000)
+      }
+    })
+  } else {
+    return requestService({
+      url: `/v2/groups/${group_openid}/messages`,
+      method: 'post',
+      headers: {
+        'X-Union-Appid': appID
+      },
+      data: {
+        content: content,
+        msg_id: msg_id,
+        msg_type: 0, //  0 文本  1 图文 2 md 3 ark 4 embed
+        timestamp: Math.floor(Date.now() / 1000)
+      }
+    })
+  }
 }

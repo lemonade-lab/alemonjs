@@ -51,7 +51,8 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
         return await Client.postMessageByGroup(
           event.group_id,
-          `${content}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+          `${content}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
+          event.id
         )
           .then(() => true)
           .catch((err: any) => {
@@ -63,7 +64,7 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         return false
       }
     }
-    return await Client.postMessageByUser(event.author.id, content)
+    return await Client.postMessageByUser(event.author.id, content, event.id)
       .then(() => true)
       .catch((err: any) => {
         console.error(err)

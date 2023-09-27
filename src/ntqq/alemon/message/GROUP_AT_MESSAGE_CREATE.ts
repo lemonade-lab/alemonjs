@@ -97,7 +97,8 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
         console.log(url)
         return await Client.postMessageByGroup(
           event.group_id,
-          `${content} ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+          `${content} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
+          event.id
         )
           .then(() => true)
           .catch((err: any) => {
@@ -109,7 +110,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
         return false
       }
     }
-    return await Client.postMessageByGroup(event.group_id, content)
+    return await Client.postMessageByGroup(event.group_id, content, event.id)
       .then(() => true)
       .catch((err: any) => {
         console.error(err)
