@@ -42,6 +42,21 @@ export interface VillaConfig {
   IMAGE_DIR: string
 }
 
+export enum NtQQEventsEnum {
+  GROUP_AT_MESSAGE_CREATE = 'GROUP_AT_MESSAGE_CREATE', // 群艾特消息
+  C2C_MESSAGE_CREATE = 'C2C_MESSAGE_CREATE' // 单聊消息
+}
+
+export interface NtQQConfig {
+  appID: string
+  token: string
+  masterID: string
+  password: string
+  intents: NtQQEventsEnum[]
+  isPrivate: boolean
+  sandbox: boolean
+}
+
 export interface QQConfig {
   appID: string
   token: string
@@ -87,4 +102,5 @@ export interface ConfigType {
   qqgroup?: QQGroupConfig
   server?: ServerConfig
   puppeteer?: PuppeteerConfig
+  ntqq?: NtQQConfig
 }

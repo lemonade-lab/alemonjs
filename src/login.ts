@@ -46,6 +46,15 @@ const config: ConfigType = {
     isPrivate: false,
     sandbox: false
   },
+  ntqq: {
+    appID: '',
+    token: '',
+    masterID: '',
+    password: '',
+    intents: [],
+    isPrivate: false,
+    sandbox: false
+  },
   qqgroup: {
     account: 0,
     password: '',
