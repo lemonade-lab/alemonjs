@@ -16,6 +16,7 @@ export function createWeb(
   {
     callback_port = 9090,
     img_size = 9999999,
+    http = 'http',
     img_url = '/api/mys/img',
     IMAGE_DIR = '/data/mys/img'
   }: WebConfig,
@@ -83,6 +84,7 @@ export function createWeb(
     setWebConfig({
       callback_port: port,
       img_url,
+      http,
       img_size,
       IMAGE_DIR
     })
