@@ -76,6 +76,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
            */
           const uul = await ClinetWeb.setLocalImg(msg)
           url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+          console.log(url)
           return await Client.postFilesByGroup(event.group_id, url).catch(err => {
             console.error(err)
             return false
@@ -93,9 +94,10 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
         const dimensions = IMGS.imageSize(img)
         const uul = await ClinetWeb.setLocalImg(img)
         url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+        console.log(url)
         return await Client.postMessageByGroup(
           event.group_id,
-          `${content}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+          `${content} ![text #${dimensions.width}px #${dimensions.height}px](${url})`
         )
           .then(() => true)
           .catch((err: any) => {
