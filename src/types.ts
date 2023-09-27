@@ -50,6 +50,7 @@ export enum NtQQEventsEnum {
 export interface NtQQConfig {
   appID: string
   token: string
+  secret: string
   masterID: string
   password: string
   intents: NtQQEventsEnum[]

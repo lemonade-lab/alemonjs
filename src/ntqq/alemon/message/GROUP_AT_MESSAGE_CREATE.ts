@@ -1,25 +1,37 @@
 import { CardType, InstructionMatching, AMessage } from 'alemon'
+import { ClientAPIByQQ as Client, ClinetWeb, getWebConfig } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
-import { setBotMsgByQQ } from '../bot.js'
+import { getBotMsgByNtqq } from '../bot.js'
 import { getBotConfigByKey } from '../../../login.js'
+import { ExampleObject } from '../types.js'
+import IMGS from 'image-size'
 
 /**
- * 群聊
+ * 获取ip
+ */
+const ip = await ClinetWeb.getIP()
+
+/**
+ * 公私域合并
  * @param e
  * @param data  原数据
  * @returns
  */
-export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
-  /**
-   * 屏蔽其他机器人的消息
-   */
-  if (event.msg.author.bot) return
+export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
+  const e = {} as AMessage
+  e.platform = 'ntqq'
+  e.bot = getBotMsgByNtqq()
+  e.event = 'MESSAGES'
+  e.eventType = 'CREATE'
+  e.isPrivate = false
+  e.isRecall = false
+  e.isGroup = true
 
   /**
    * 得到登录配置
    */
 
-  const cfg = getBotConfigByKey('qq')
+  const cfg = getBotConfigByKey('ntqq')
 
   /**
    * 得到主人id
@@ -34,17 +46,14 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
   /**
    * 检查身份
    */
-  if (event.msg.author.id == masterID) {
+  if (event.author.id == masterID) {
     /**
      * 是主人
      */
     e.isMaster = true
   }
 
-  /**
-   * 是群聊
-   */
-  e.isGroup = true
+  const webCfg = getWebConfig()
 
   /**
    * 消息发送机制
@@ -57,9 +66,21 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
     img?: Buffer | string,
     name?: string
   ): Promise<boolean> => {
+    console.log('群聊响应', msg)
     if (Buffer.isBuffer(msg)) {
       try {
-        return false
+        let url = ''
+        if (Buffer.isBuffer(msg)) {
+          /**
+           * 挂载图片
+           */
+          const uul = await ClinetWeb.setLocalImg(msg)
+          url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+          return await Client.postFilesByGroup(event.group_id, url).catch(err => {
+            console.error(err)
+            return false
+          })
+        }
       } catch (err) {
         console.error(err)
         return false
@@ -68,22 +89,37 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
     const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
     if (Buffer.isBuffer(img)) {
       try {
-        return false
+        let url = ''
+        const dimensions = IMGS.imageSize(img)
+        const uul = await ClinetWeb.setLocalImg(img)
+        url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+        return await Client.postMessageByGroup(
+          event.group_id,
+          `${content}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+        )
+          .then(() => true)
+          .catch((err: any) => {
+            console.error(err)
+            return false
+          })
       } catch (err) {
         console.error(err)
         return false
       }
     }
-    /**
-     * 发送接口
-     */
-    return false
+    return await Client.postMessageByGroup(event.group_id, content)
+      .then(() => true)
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
   }
 
   e.replyCard = async (arr: CardType[]) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
+          console.log('暂不可用')
           return false
         } else {
           return false
@@ -103,6 +139,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
    */
 
   e.replyByMid = async (mid: string, msg: string) => {
+    console.log('暂不可用')
     return false
   }
 
@@ -116,6 +153,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
+    console.log('暂不可用')
     return false
   }
 
@@ -129,48 +167,49 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
+    console.log('暂不可用')
     return false
   }
 
   /**
    * 消息原文
    */
-  e.msg_txt = event.msg.content
+  e.msg_txt = event.content
 
   /**
    * 消息
    */
-  e.msg = event.msg.content
+  e.msg = event.content.trim()
 
   /**
    * 消息编号
    */
-  e.msg_id = event.msg.id
+  e.msg_id = event.id
 
   /**
    * 用户编号
    */
-  e.user_id = event.msg.author.id
+  e.user_id = event.author.id
 
   /**
    * 用户头像
    */
-  e.user_avatar = event.msg.author.avatar
+  e.user_avatar = ''
 
   /**
    * 用户名
    */
-  e.user_name = event.msg.author.username
+  e.user_name = ''
 
   /**
    * 子频道编号
    */
-  e.channel_id = event.msg.channel_id
+  e.channel_id = event.group_id
 
   /**
    * 频道编号
    */
-  e.guild_id = event.msg.guild_id
+  e.guild_id = event.group_id
 
   /**
    * 模块
@@ -187,30 +226,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
    */
   e.at = false
 
-  if (event.msg.mentions) {
-    /**
-     * 去掉@ 转为纯消息
-     */
-    for await (const item of event.msg.mentions) {
-      if (item.bot != true) {
-        // 用户艾特才会为真
-        e.at = true
-      }
-      e.at_users.push({
-        id: item.id,
-        name: item.username,
-        avatar: item.avatar,
-        bot: item.bot
-      })
-    }
-    /**
-     * 循环删除文本中的at信息并去除前后空格
-     */
-    e.at_users.forEach(item => {
-      e.msg = e.msg.replace(`<@!${item.id}>`, '').trim()
-    })
-  }
-
   /**
    * 存在at
    */
@@ -221,23 +236,14 @@ export const GROUP_AT_MESSAGE_CREATE = async (e: AMessage, event: any) => {
     e.at_user = e.at_users.find(item => item.bot != true)
   }
 
-  if (e.bot.avatar == 'string') {
-    /**
-     * 配置一下机器人头像
-     */
-    const bot = e.at_users.find(item => item.bot == true && item.id == e.bot.id)
-    if (bot) {
-      e.bot.avatar = bot.avatar
-      setBotMsgByQQ(bot)
-    }
-  }
-
   /**
    * 消息处理
    */
   await InstructionMatching(e)
     .then(() => {
       console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`)
+
+      console.log('情况')
       return
     })
     .catch((err: any) => {

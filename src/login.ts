@@ -49,6 +49,7 @@ const config: ConfigType = {
   ntqq: {
     appID: '',
     token: '',
+    secret: '',
     masterID: '',
     password: '',
     intents: []

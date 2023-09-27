@@ -1,65 +1,42 @@
 import { CardType, InstructionMatching, AMessage } from 'alemon'
+import { ClientAPIByQQ as Client, ClinetWeb, getWebConfig } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
-import { setBotMsgByQQ } from '../bot.js'
-import { getBotConfigByKey } from '../../../login.js'
+import { getBotMsgByNtqq } from '../bot.js'
+import { ExampleObject } from '../types.js'
+import IMGS from 'image-size'
 
 /**
- * 单聊
- * @param e
- * @param data  原数据
- * @returns
+ * 获取ip
  */
-export const C2C_MESSAGE_CREATE = async (e: AMessage, event: any) => {
-  /**
-   * 屏蔽其他机器人的消息
-   */
-  if (event.msg.author.bot) return
+const ip = await ClinetWeb.getIP()
 
-  /**
-   * 得到登录配置
-   */
+export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
+  const e = {} as AMessage
 
-  const cfg = getBotConfigByKey('qq')
+  const webCfg = getWebConfig()
 
-  /**
-   * 得到主人id
-   */
-  const masterID = cfg.masterID
+  e.platform = 'ntqq'
+  e.bot = getBotMsgByNtqq()
+  e.event = 'MESSAGES'
+  e.eventType = 'CREATE'
+  e.isPrivate = false
+  e.isRecall = false
+  e.isGroup = false
 
-  /**
-   * 默认不是主人
-   */
-  e.isMaster = false
-
-  /**
-   * 检查身份
-   */
-  if (event.msg.author.id == masterID) {
-    /**
-     * 是主人
-     */
-    e.isMaster = true
-  }
-
-  /**
-   * 是群聊
-   */
-  e.isGroup = true
-
-  /**
-   * 消息发送机制
-   * @param msg 消息
-   * @param img
-   * @returns
-   */
-  e.reply = async (
-    msg?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
-  ): Promise<boolean> => {
+  /* 消息发送机制 */
+  e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
+    console.log('私聊响应', msg)
     if (Buffer.isBuffer(msg)) {
       try {
-        return false
+        let url = ''
+        if (Buffer.isBuffer(msg)) {
+          const uul = await ClinetWeb.setLocalImg(msg)
+          url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+          return await Client.postFilesByGroup(event.group_id, url).catch(err => {
+            console.error(err)
+            return false
+          })
+        }
       } catch (err) {
         console.error(err)
         return false
@@ -68,22 +45,36 @@ export const C2C_MESSAGE_CREATE = async (e: AMessage, event: any) => {
     const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
     if (Buffer.isBuffer(img)) {
       try {
-        return false
+        let url = ''
+        const dimensions = IMGS.imageSize(img)
+        const uul = await ClinetWeb.setLocalImg(img)
+        url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+        return await Client.postMessageByGroup(
+          event.group_id,
+          `${content}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+        )
+          .then(() => true)
+          .catch((err: any) => {
+            console.error(err)
+            return false
+          })
       } catch (err) {
         console.error(err)
         return false
       }
     }
-    /**
-     * 发送接口
-     */
-    return false
+    return await Client.postMessageByUser(event.author.id, content)
+      .then(() => true)
+      .catch((err: any) => {
+        console.error(err)
+        return false
+      })
   }
-
   e.replyCard = async (arr: CardType[]) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
+          console.log('暂不可用')
           return false
         } else {
           return false
@@ -96,17 +87,6 @@ export const C2C_MESSAGE_CREATE = async (e: AMessage, event: any) => {
   }
 
   /**
-   * 引用消息
-   * @param mid
-   * @param boj
-   * @returns
-   */
-
-  e.replyByMid = async (mid: string, msg: string) => {
-    return false
-  }
-
-  /**
    * 发送表情表态
    * @param mid
    * @param boj { emoji_type: number; emoji_id: string }
@@ -116,133 +96,70 @@ export const C2C_MESSAGE_CREATE = async (e: AMessage, event: any) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
+    console.info('不可用')
     return false
   }
 
   /**
    * 删除表情表态
    * @param mid
-   * @param boj { emoji_type: number; emoji_id: string }
+   * @param boj
    * @returns
    */
   e.deleteEmoji = async (
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
+    console.info('不可用')
     return false
   }
 
-  /**
-   * 消息原文
-   */
-  e.msg_txt = event.msg.content
+  e.msg_txt = event.content
 
-  /**
-   * 消息
-   */
-  e.msg = event.msg.content
+  e.msg = event.content
 
   /**
    * 消息编号
    */
-  e.msg_id = event.msg.id
+  e.msg_id = event.id
 
-  /**
-   * 用户编号
-   */
-  e.user_id = event.msg.author.id
+  e.user_id = event.author.id
 
-  /**
-   * 用户头像
-   */
-  e.user_avatar = event.msg.author.avatar
+  e.user_avatar = ''
 
-  /**
-   * 用户名
-   */
-  e.user_name = event.msg.author.username
+  e.user_name = ''
 
-  /**
-   * 子频道编号
-   */
-  e.channel_id = event.msg.channel_id
+  e.channel_id = event.group_id
 
-  /**
-   * 频道编号
-   */
-  e.guild_id = event.msg.guild_id
+  e.guild_id = event.group_id
 
-  /**
-   * 模块
-   */
   e.segment = segmentQQ
 
-  /**
-   * 被艾特的用户
-   */
   e.at_users = []
+
+  e.at_user = {
+    id: '0',
+    avatar: '0',
+    name: '0',
+    bot: false
+  }
 
   /**
    * 艾特消息处理
    */
   e.at = false
 
-  if (event.msg.mentions) {
-    /**
-     * 去掉@ 转为纯消息
-     */
-    for await (const item of event.msg.mentions) {
-      if (item.bot != true) {
-        // 用户艾特才会为真
-        e.at = true
-      }
-      e.at_users.push({
-        id: item.id,
-        name: item.username,
-        avatar: item.avatar,
-        bot: item.bot
-      })
-    }
-    /**
-     * 循环删除文本中的at信息并去除前后空格
-     */
-    e.at_users.forEach(item => {
-      e.msg = e.msg.replace(`<@!${item.id}>`, '').trim()
-    })
-  }
-
-  /**
-   * 存在at
-   */
-  if (e.at) {
-    /**
-     * 得到第一个艾特
-     */
-    e.at_user = e.at_users.find(item => item.bot != true)
-  }
-
-  if (e.bot.avatar == 'string') {
-    /**
-     * 配置一下机器人头像
-     */
-    const bot = e.at_users.find(item => item.bot == true && item.id == e.bot.id)
-    if (bot) {
-      e.bot.avatar = bot.avatar
-      setBotMsgByQQ(bot)
-    }
-  }
-
   /**
    * 消息处理
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`)
-      return
+      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`))
+      return true
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`)
-      return
+      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`))
+      return false
     })
 }

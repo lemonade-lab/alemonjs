@@ -1,6 +1,9 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 import { createBot } from './src/index.js'
 import { createApp, compilationTools } from 'alemon'
+
+// 设置独立鉴权路径tudo
+
 // 创建机器人
 await createBot(process.argv.slice(2))
   .then(alemon => alemon(false))
@@ -21,14 +24,3 @@ const app = createApp('alemon')
 app.component(alemon)
 // 挂载
 app.mount('#app')
-
-// /**
-//  * 插件模式启动
-//  */
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-// import { createBot } from './src/index.js'
-// await createBot(process.argv.slice(2))
-//   .then(alemon => alemon())
-//   .catch(err => {
-//     console.error('出错啦', err)
-//   })

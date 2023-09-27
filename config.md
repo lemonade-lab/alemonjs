@@ -146,24 +146,20 @@ sandbox = false
 ## ntqq
 
 ```toml
-[qq]
+[ntqq]
 # 应用编号
 appID = ''
 # 令牌
 token = ''
+# 密钥
+secret = ''
 # 主人编号
 masterID = ''
 # 主人密码
 password = ''
 # 监听事件
 intents = [
-  "GUILDS",
-  "GUILD_MEMBERS",
-  "DIRECT_MESSAGE",
-  "PUBLIC_GUILD_MESSAGES",
+  "GROUP_AT_MESSAGE_CREATE",
+  "C2C_MESSAGE_CREATE",
 ]
-# 是否是私域  默认公域
-isPrivate = false
-# 是否是沙箱  默认部署
-sandbox = false
 ```

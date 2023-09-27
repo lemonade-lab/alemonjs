@@ -4,10 +4,10 @@ let bot = {
   avatar: 'string'
 }
 
-export function setBotMsgByQQ(val: any) {
+export function setBotMsgByNtqq(val: any) {
   bot = val
 }
 
-export function getBotMsgByQQ() {
+export function getBotMsgByNtqq() {
   return bot
 }

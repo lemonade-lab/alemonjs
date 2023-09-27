@@ -2,6 +2,9 @@ import { setLanchConfig } from 'alemon'
 import { getBotConfigByKey, setBotConfig } from './login.js'
 import { getToml } from './config.js'
 import { cmdInit } from 'alemon'
+import { ClientAPIByQQ } from './ntqq/sdk/index.js'
+// 设置独立鉴权路径
+export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication
 /**
  * 启动机器人
  */

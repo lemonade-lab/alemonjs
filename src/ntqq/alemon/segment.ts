@@ -21,5 +21,8 @@ export const segmentQQ = {
    */
   atChannel: function (channel_id: string): string {
     return `<#${channel_id}>`
+  },
+  link: function (title: string, centent): string {
+    return `[🔗${title}](${centent})`
   }
 }
