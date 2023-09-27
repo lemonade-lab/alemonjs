@@ -1,8 +1,9 @@
 import { checkRobotByQQ } from './login.js'
 import { getBotConfigByKey } from '../login.js'
 import { callBack } from './alemon/conversation.js'
-import { setBotConfig, createClient, ClientAPIByQQ } from './sdk/index.js'
+import { setBotConfig, createClient, ClientAPIByQQ, ClinetWeb, getWebConfig } from './sdk/index.js'
 import { setBotMsgByNtqq } from './alemon/bot.js'
+import { createWeb } from './sdk/web/client.js'
 
 interface aut {
   access_token: string
@@ -39,6 +40,10 @@ export async function createAlemonByNtqq() {
     })
 
     /**
+     * 挂载一下服务
+     */
+
+    /**
      * 设置定时任务 重复设置配置
      */
     setInterval(async () => {
@@ -68,6 +73,28 @@ export async function createAlemonByNtqq() {
       },
       callBack: callBack
     })
+
+    /**
+     * 创建
+     */
+    createWeb({})
+
+    const webCfg = getWebConfig()
+
+    /**
+     * 获取ip4
+     */
+    const ip = await ClinetWeb.getIP()
+    if (ip) {
+      console.info(
+        `[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}/api/mys/callback`
+      )
+      // 启动清除机制
+      ClinetWeb.autoClearImages(600000)
+    } else {
+      console.error('公网IP识别失败~暂无法支持运行')
+      return
+    }
 
     return true
   }

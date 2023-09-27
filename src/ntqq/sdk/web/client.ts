@@ -14,7 +14,7 @@ import { setWebConfig } from '../config.js'
  */
 export function createWeb(
   {
-    callback_port = 8080,
+    callback_port = 9090,
     img_size = 9999999,
     img_url = '/api/mys/img',
     IMAGE_DIR = '/data/mys/img'

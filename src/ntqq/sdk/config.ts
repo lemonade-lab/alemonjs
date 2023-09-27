@@ -27,7 +27,7 @@ import { type WebConfig } from './types.js'
  * 配置
  */
 let ClientCfg: WebConfig = {
-  callback_port: 8080,
+  callback_port: 9090,
   img_size: 9999999,
   http: 'http',
   img_url: '/api/mys/img',
