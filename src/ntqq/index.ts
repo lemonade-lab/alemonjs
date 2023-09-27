@@ -2,6 +2,7 @@ import './alemon/console.js'
 import { checkRobotByQQ } from './login.js'
 import { getBotConfigByKey } from '../login.js'
 import { callback } from './alemon/conversation.js'
+import {} from 'ntqq-sdk'
 
 export async function createAlemonByNtqq() {
   /**
