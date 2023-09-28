@@ -52,7 +52,12 @@ const config: ConfigType = {
     secret: '',
     masterID: '',
     password: '',
-    intents: []
+    intents: [],
+    port: 9090,
+    size: 999999,
+    img_url: '/api/mys/img',
+    IMAGE_DIR: '/data/mys/img',
+    http: 'http'
   },
   server: {
     host: '127.0.0.1',

@@ -31,7 +31,7 @@ interface fnc {
  * @param token
  * @param callBack
  */
-export async function createClient(call: fnc) {
+export async function createClient(call: fnc, shard = [0, 1]) {
   /**
    * 请求url
    */
@@ -118,7 +118,7 @@ export async function createClient(call: fnc) {
               d: {
                 token: `QQBot ${token}`,
                 intents: getIntentsMask(intents),
-                shard: [0, 4],
+                shard,
                 properties: {
                   $os: 'linux',
                   $browser: 'my_library',

@@ -1,7 +1,14 @@
 import { checkRobotByQQ } from './login.js'
 import { getBotConfigByKey } from '../login.js'
 import { callBack } from './alemon/conversation.js'
-import { setBotConfig, createClient, ClientAPIByQQ, ClinetWeb, getWebConfig } from './sdk/index.js'
+import {
+  setBotConfig,
+  createClient,
+  ClientAPIByQQ,
+  ClinetWeb,
+  getWebConfig,
+  BotConfig
+} from './sdk/index.js'
 import { setBotMsgByNtqq } from './alemon/bot.js'
 import { createWeb } from './sdk/web/client.js'
 
@@ -26,37 +33,46 @@ export async function createAlemonByNtqq() {
      */
     const cfg = getBotConfigByKey('ntqq')
 
+    /**
+     * 发送请求
+     */
     const data: aut = await ClientAPIByQQ.getAuthentication(cfg.appID, cfg.secret).then(
       res => res.data
     )
-    /**
-     * 设置配置
-     */
-    setBotConfig({
+
+    const g = {
       appID: cfg.appID,
       token: data.access_token,
       secret: cfg.secret,
       intents: ['C2C_MESSAGE_CREATE', 'GROUP_AT_MESSAGE_CREATE']
-    })
+    } as BotConfig
 
     /**
-     * 挂载一下服务
+     * 设置配置
      */
+    setBotConfig(g)
 
-    /**
-     * 设置定时任务 重复设置配置
-     */
-    setInterval(async () => {
+    const bal = async () => {
+      /**
+       * 发送请求
+       */
       const data: aut = await ClientAPIByQQ.getAuthentication(cfg.appID, cfg.secret).then(
         res => res.data
       )
-      setBotConfig({
-        appID: cfg.appID,
-        token: data.access_token,
-        secret: cfg.secret,
-        intents: ['C2C_MESSAGE_CREATE', 'GROUP_AT_MESSAGE_CREATE']
-      })
-    }, data.expires_in * 1000)
+
+      g.token = data.access_token
+
+      /**
+       * 设置配置
+       */
+      setBotConfig(g)
+
+      console.info('刷新时间:', data.expires_in, '秒')
+
+      setTimeout(bal, data.expires_in * 1000)
+    }
+
+    setTimeout(bal, data.expires_in * 1000)
 
     /**
      * 创建客户端
@@ -74,9 +90,15 @@ export async function createAlemonByNtqq() {
     })
 
     /**
-     * 创建
+     * 创建web端
      */
-    createWeb({})
+    createWeb({
+      callback_port: cfg.port,
+      http: cfg.http,
+      img_url: cfg.img_url,
+      IMAGE_DIR: cfg.IMAGE_DIR,
+      img_size: cfg.size
+    })
 
     const webCfg = getWebConfig()
 
@@ -85,9 +107,7 @@ export async function createAlemonByNtqq() {
      */
     const ip = await ClinetWeb.getIP()
     if (ip) {
-      console.info(
-        `[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}/api/mys/callback`
-      )
+      console.info(`[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}`)
       // 启动清除机制
       ClinetWeb.autoClearImages(600000)
     } else {

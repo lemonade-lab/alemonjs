@@ -54,6 +54,11 @@ export interface NtQQConfig {
   masterID: string
   password: string
   intents: NtQQEventsEnum[]
+  port: number
+  size: number
+  img_url: string
+  IMAGE_DIR: string
+  http: string
 }
 
 export interface QQConfig {

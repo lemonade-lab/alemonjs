@@ -162,4 +162,14 @@ intents = [
   "GROUP_AT_MESSAGE_CREATE",
   "C2C_MESSAGE_CREATE",
 ]
+# 应用端口
+port = 8080
+# 图片缓存空间
+size = 999999
+# 图片请求路径
+img_url = '/api/mys/img'
+# 图片缓存路径
+IMAGE_DIR = '/data/mys/img'
+
+http = 'http'
 ```
