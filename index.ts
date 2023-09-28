@@ -1,4 +1,6 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+if (process.argv.slice(2).includes('discord') && !process.argv.slice(2).includes('not')) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+}
 import { createBot } from './src/index.js'
 import { createApp, compilationTools } from 'alemon'
 
