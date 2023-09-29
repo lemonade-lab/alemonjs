@@ -1,23 +1,24 @@
 import { createBot } from './src/index.js'
-import { createApp, compilationTools } from 'alemon'
+import { createApp } from 'alemon'
 
 // 创建机器人
-await createBot()
-  .then(alemon => alemon(false))
-  .catch(err => {
-    console.error('出错啦', err)
-  })
+const AlemonBot = await createBot()
+
+// 创建插件
+const { compilationTools } = await AlemonBot({
+  mount: true
+})
 
 // 加载模块
-const alemon = await compilationTools({
+const example = await compilationTools({
   input: `example/**/*.ts`,
   file: `example.js`,
   external: ['alemon']
 })
 
 // 创建应用
-const app = createApp('alemon')
+const app = createApp('example')
 // 设置模块
-app.component(alemon)
+app.component(example)
 // 挂载
 app.mount('#app')

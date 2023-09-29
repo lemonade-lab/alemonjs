@@ -57,9 +57,10 @@ export const createAlemon = {
 }
 
 /**
- * 启动机器人
- * @param args 启动指令
- * @param cfg 配置地址
+ * 创建机器人
+ * @param args ['discord','qq','ntqq','kook','villa']
+ * @param cfg '/alemon.toml'
+ * @returns
  */
 export async function createBot(args: string[] = process.argv.slice(2), cfg?: string) {
   /**
