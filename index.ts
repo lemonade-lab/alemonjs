@@ -1,11 +1,8 @@
-if (process.argv.slice(2).includes('discord') && !process.argv.slice(2).includes('not')) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-}
 import { createBot } from './src/index.js'
 import { createApp, compilationTools } from 'alemon'
 
 // 创建机器人
-await createBot(process.argv.slice(2))
+await createBot()
   .then(alemon => alemon(false))
   .catch(err => {
     console.error('出错啦', err)
@@ -15,7 +12,7 @@ await createBot(process.argv.slice(2))
 const alemon = await compilationTools({
   input: `example/**/*.ts`,
   file: `example.js`,
-  external: ['alemon'] // 忽视提示
+  external: ['alemon']
 })
 
 // 创建应用

@@ -26,7 +26,7 @@
     "image-size": "^1.0.2",
     "kook-ws": "^1.0.4",
     "mys-villa": "^1.1.8",
-    "ntqq-sdk": "^0.0.0",
+    "ntqq-sdk": "github:kongxiangyiren/ntqq-sdk",
     "prompts": "^2.4.2",
     "qq-channel": "^1.0.0",
     "qq-guild-bot": "^2.9.5"

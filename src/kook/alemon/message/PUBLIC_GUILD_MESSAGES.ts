@@ -10,7 +10,6 @@ import { getBotConfigByKey } from '../../../login.js'
  * @returns
  */
 export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
-  // console.info('interaction', interaction)
   if (event.extra.author.bot) {
     return false
   }
@@ -58,15 +57,15 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       at_user = at_users[0]
     }
   }
+
+  const avatar = event.extra.author.avatar
+
   const e = {
     platform: 'kook',
     bot: getBotMsgByKOOK(),
     event: 'MESSAGES',
     eventType: 'CREATE',
-    /**
-     * kook没私域
-     */
-    isPrivate: true,
+    isPrivate: true, //  kook没私域
     isRecall: false,
     isMaster: isMaster,
     isGroup: event.channel_type == 'GROUP' ? true : false,
@@ -81,7 +80,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     channel_id: event.extra.guild_id,
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
-    user_avatar: event.extra.author.avatar,
+    user_avatar: avatar.substring(0, avatar.indexOf('?')),
     segment: segmentKOOK,
     /**
      * 消息发送机制

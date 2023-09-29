@@ -7,7 +7,10 @@
     "ignoreDeprecations": "5.0",
     "esModuleInterop": true,
     "preserveConstEnums": true,
-    "typeRoots": ["src/types", "node_modules/@types"],
+    "typeRoots": [
+      "src/types",
+      "node_modules/@types"
+    ],
     "declaration": true,
     "declarationDir": "types",
     "outDir": "lib"
@@ -16,6 +19,13 @@
     "esm": true,
     "experimentalSpecifierResolution": "node"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "lib", "types"]
+  "include": [
+    "src",
+    "plugins"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "types"
+  ]
 }

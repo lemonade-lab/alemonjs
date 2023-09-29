@@ -1,8 +1,13 @@
+if (process.argv.slice(2).includes('discord') && !process.argv.slice(2).includes('not')) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+}
 import { setLanchConfig } from 'alemon'
 import { getBotConfigByKey, setBotConfig } from './login.js'
 import { getToml } from './config.js'
 import { cmdInit } from 'alemon'
 import { ClientAPIByQQ } from './ntqq/sdk/index.js'
+// 机器人配置
+export { getBotConfigByKey, setBotConfigByKey } from './login.js'
 // 设置独立鉴权路径
 export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication
 /**
@@ -21,7 +26,7 @@ export const createAlemon = {
     const { createAlemonByVilla: villa } = await import('./villa/index.js')
     return villa().catch(err => {
       console.error(err)
-      console.error('villa机器人启动失败~')
+      console.error('Villa机器人启动失败~')
       return false
     })
   },
@@ -37,7 +42,7 @@ export const createAlemon = {
     const { createAlemonByDiscord: dc } = await import('./discord/index.js')
     return dc().catch(err => {
       console.error(err)
-      console.error('discord机器人启动失败~')
+      console.error('Discord机器人启动失败~')
       return false
     })
   },
@@ -45,7 +50,7 @@ export const createAlemon = {
     const { createAlemonByNtqq: ntqq } = await import('./ntqq/index.js')
     return ntqq().catch(err => {
       console.error(err)
-      console.error('discord机器人启动失败~')
+      console.error('Ntqq机器人启动失败~')
       return false
     })
   }
@@ -56,7 +61,7 @@ export const createAlemon = {
  * @param args 启动指令
  * @param cfg 配置地址
  */
-export async function createBot(args: string[], cfg?: string) {
+export async function createBot(args: string[] = process.argv.slice(2), cfg?: string) {
   /**
    * 加载配置
    */
@@ -80,9 +85,6 @@ export async function createBot(args: string[], cfg?: string) {
   }
   return cmdInit
 }
-
-// 机器人配置
-export { getBotConfigByKey, setBotConfigByKey } from './login.js'
 
 // 监听退出
 process.on('SIGINT', signals => {
