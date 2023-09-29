@@ -1,5 +1,6 @@
 import { createBot } from './src/index.js'
 import { createApp } from 'alemon'
+import config from './config.js'
 
 // 创建机器人
 const AlemonBot = await createBot()
@@ -10,11 +11,7 @@ const { compilationTools } = await AlemonBot({
 })
 
 // 加载模块
-const example = await compilationTools({
-  input: `example/**/*.ts`,
-  file: `example.js`,
-  external: ['alemon']
-})
+const example = await compilationTools(config)
 
 // 创建应用
 const app = createApp('example')
