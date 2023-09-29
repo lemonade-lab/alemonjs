@@ -1,18 +1,19 @@
 import { GROUP_AT_MESSAGE_CREATE } from './message/GROUP_AT_MESSAGE_CREATE.js'
 import { C2C_MESSAGE_CREATE } from './message/C2C_MESSAGE_CREATE.js'
-import { ExampleObject } from './types.js'
-
+import { setBotMsgByNtqq } from './bot.js'
 /**
- * 会话事件分类
- * @param ws
+ * 回话对象
  */
-export async function callBack(data: ExampleObject) {
-  if (data.group_id == '0') {
-    // 私聊
-    console.info('私聊data=', data)
-    C2C_MESSAGE_CREATE(data)
-  } else {
-    console.info('群聊data=', data)
-    GROUP_AT_MESSAGE_CREATE(data)
-  }
+export const conversation = {
+  READY: async data => {
+    // 设置bot信息
+    setBotMsgByNtqq({
+      id: data.user.id,
+      name: data.user.name,
+      avatar: 'string'
+    })
+  },
+  GROUP_AT_MESSAGE_CREATE: GROUP_AT_MESSAGE_CREATE,
+  C2C_MESSAGE_CREATE: C2C_MESSAGE_CREATE,
+  FRIEND_ADD: async () => {}
 }

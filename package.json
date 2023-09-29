@@ -26,7 +26,6 @@
     "image-size": "^1.0.2",
     "kook-ws": "^1.0.4",
     "mys-villa": "^1.1.8",
-    "ntqq-sdk": "github:kongxiangyiren/ntqq-sdk",
     "prompts": "^2.4.2",
     "qq-channel": "^1.0.0",
     "qq-guild-bot": "^2.9.5"
@@ -36,6 +35,7 @@
     "@types/ws": "^8.5.5",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
+    "ntqq-sdk": "github:kongxiangyiren/ntqq-sdk",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",

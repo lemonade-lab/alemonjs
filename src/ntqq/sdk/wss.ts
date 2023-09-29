@@ -2,6 +2,18 @@ import WebSocket from 'ws'
 import { requestService } from './api.js'
 import { getBotConfig } from './config.js'
 import { getIntentsMask } from './intents.js'
+
+/**
+ *
+ */
+export type OpStart = {
+  READY?: (event: any) => Promise<any>
+  FRIEND_ADD?: (event: any) => Promise<any>
+  GROUP_AT_MESSAGE_CREATE?: (event: any) => Promise<any>
+  C2C_MESSAGE_CREATE?: (event: any) => Promise<any>
+  INTERACTION_CREATE?: (event: any) => Promise<any>
+}
+
 /**
  * @param token  token
  * @returns
@@ -21,21 +33,36 @@ export async function getGatewayUrl(): Promise<string | undefined> {
   }
 }
 
-interface fnc {
-  READY: (event: any) => Promise<any>
-  callBack: (event: any) => Promise<any>
-}
+let reconnectAttempts = 0 // 重新连接计数器
 
 /**
  * 使用获取到的网关连接地址建立 WebSocket 连接
  * @param token
  * @param callBack
  */
-export async function createClient(call: fnc, shard = [0, 1]) {
+export async function createClient(call: OpStart, shard = [0, 1]) {
   /**
    * 请求url
    */
   const gatewayUrl = await getGatewayUrl()
+
+  // 重新连接的逻辑
+  const reconnect = async () => {
+    if (reconnectAttempts >= 5) {
+      console.info('已达到最大重连次数，取消重新连接')
+      return
+    }
+
+    console.info('正在重新连接...')
+    // 延迟一段时间后发起重新连接
+    await new Promise(resolve => setTimeout(resolve, 5000))
+
+    // 调用createClient函数重新建立连接
+    await createClient(call, shard)
+
+    reconnectAttempts++ // 递增重连计数器
+  }
+
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
@@ -49,10 +76,17 @@ export async function createClient(call: fnc, shard = [0, 1]) {
      * 存储最新的消息序号
      */
     let heartbeat_interval = 30000
+
+    /**
+     * 鉴权
+     */
+
+    let power
+
     /**
      * 监听消息
      */
-    ws.on('message', msg => {
+    ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))
       /**
        * opcode
@@ -65,15 +99,18 @@ export async function createClient(call: fnc, shard = [0, 1]) {
        */
       const { op, s, d: data, t } = message
       // 根据 opcode 进行处理
+
       switch (op) {
         case 0: {
+          console.log('[数据接收]', data)
+          // 存在,则执行t对应的函数
+          if (Object.prototype.hasOwnProperty.call(call, t)) {
+            call[t](data)
+          }
+
+          // Ready Event，鉴权成功
           if (t === 'READY') {
-            call.READY(data)
-            // Ready Event，鉴权成功
-            setInterval(() => {
-              /**
-               * 心跳定时发送
-               */
+            power = setInterval(() => {
               if (isConnected) {
                 ws.send(
                   JSON.stringify({
@@ -83,29 +120,38 @@ export async function createClient(call: fnc, shard = [0, 1]) {
                 )
               }
             }, heartbeat_interval)
-          } else if (t === 'RESUMED') {
-            // Resumed Event，恢复连接成功
+          }
+
+          // Resumed Event，恢复连接成功
+          if (t === 'RESUMED') {
             console.info('恢复连接')
-          } else if (t === 'GROUP_AT_MESSAGE_CREATE') {
-            // 处理不同类型的事件内容
-            call.callBack(data)
-          } else if (t === 'C2C_MESSAGE_CREATE') {
-            // 处理不同类型的事件内容
-            call.callBack(data)
-          } else {
-            console.info('不知名事件', message)
+            // 重制次数
+            reconnectAttempts = 0
           }
           break
         }
+        case 6: {
+          console.info('[连接尝试]', message)
+          break
+        }
         case 7: {
-          console.info('重新连接')
+          // 执行重新连接
+          console.info('[重新连接]', message)
+
+          // 取消鉴权发送
+          if (power) {
+            clearInterval(power)
+          }
+
+          await reconnect()
           break
         }
         case 9: {
-          console.info('参数有错')
+          console.info('[参数错误]', message)
           break
         }
         case 10: {
+          // 重制次数
           isConnected = true
           heartbeat_interval = data.heartbeat_interval
           const { token, intents } = getBotConfig()
@@ -127,15 +173,17 @@ export async function createClient(call: fnc, shard = [0, 1]) {
               }
             })
           )
+
+          reconnectAttempts = 0
           break
         }
         case 11: {
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.info('心跳发送成功~')
+          console.info('[心跳发送]', message)
           break
         }
         case 12: {
-          console.info('平台推送的数据', message)
+          console.info('[平台数据]', message)
         }
       }
     })
@@ -148,10 +196,11 @@ export async function createClient(call: fnc, shard = [0, 1]) {
 
 /**
 
-0	Dispatch	Receive	服务端进行消息推送
 1	Heartbeat	Send/Receive	客户端或服务端发送心跳
 2	Identify	Send	客户端发送鉴权
 6	Resume	Send	客户端恢复连接
+
+0	Dispatch	Receive	服务端进行消息推送
 7	Reconnect	Receive	服务端通知客户端重新连接
 9	Invalid Session	Receive	当identify或resume的时候，如果参数有错，服务端会返回该消息
 10	Hello	Receive	当客户端与网关建立ws连接之后，网关下发的第一条消息

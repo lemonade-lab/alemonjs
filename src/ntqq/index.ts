@@ -1,6 +1,6 @@
 import { checkRobotByQQ } from './login.js'
 import { getBotConfigByKey } from '../login.js'
-import { callBack } from './alemon/conversation.js'
+import { conversation } from './alemon/conversation.js'
 import {
   setBotConfig,
   createClient,
@@ -9,7 +9,6 @@ import {
   getWebConfig,
   BotConfig
 } from './sdk/index.js'
-import { setBotMsgByNtqq } from './alemon/bot.js'
 import { createWeb } from './sdk/web/client.js'
 
 interface aut {
@@ -77,17 +76,7 @@ export async function createAlemonByNtqq() {
     /**
      * 创建客户端
      */
-    createClient({
-      READY: async data => {
-        // 设置bot信息
-        setBotMsgByNtqq({
-          id: data.user.id,
-          name: data.user.name,
-          avatar: 'string'
-        })
-      },
-      callBack: callBack
-    })
+    createClient(conversation)
 
     /**
      * 创建web端

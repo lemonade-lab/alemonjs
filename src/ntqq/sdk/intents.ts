@@ -55,6 +55,8 @@ const intentsMap = {
   PUBLIC_MESSAGE_DELETE: 1 << 30,
   GROUP_AT_MESSAGE_CREATE: 1 << 25,
   C2C_MESSAGE_CREATE: 1 << 25
+  // FRIEND_ADD: 1 << 25
+  // GROUP_ADD_ROBOT: 1 << 25
 }
 
 export function getIntentsMask(intents: IntentsEnum[]) {
