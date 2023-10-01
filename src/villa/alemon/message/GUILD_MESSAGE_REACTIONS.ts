@@ -15,7 +15,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
   /**
    * 房间号
    */
-  const room_id = event.extend_data.EventData.SendMessage.room_id ?? ''
+  const room_id = event.extend_data.EventData.SendMessage?.room_id ?? ''
   /**
    * 制作e消息对象
    */
