@@ -33,7 +33,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
   /**
    * 得到特效
    */
-  const entities = MessageContent.content.entities
+  const entities = MessageContent.content?.entities ?? []
   /**
    * 收集uid
    */
