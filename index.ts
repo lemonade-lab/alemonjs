@@ -6,7 +6,7 @@ import config from './config.js'
 const AlemonBot = await createBot()
 
 // 创建插件
-const { compilationTools } = await AlemonBot({
+const compilationTools = await AlemonBot({
   mount: true
 })
 

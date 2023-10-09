@@ -21,6 +21,7 @@
   },
   "include": [
     "src",
+    "plugins"
   ],
   "exclude": [
     "node_modules",

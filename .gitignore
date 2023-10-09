@@ -6,8 +6,9 @@ types
 /example/
 /data/
 /help/
-index.js 
+index.js
 deploy.sh
 alemon.toml
 alemon.json
 example.js
+apps.js

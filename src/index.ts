@@ -4,7 +4,7 @@ if (process.argv.slice(2).includes('discord') && !process.argv.slice(2).includes
 import { setLanchConfig } from 'alemon'
 import { getBotConfigByKey, setBotConfig } from './login.js'
 import { getToml } from './config.js'
-import { cmdInit } from 'alemon'
+import { loadInit } from 'alemon'
 import { ClientAPIByQQ } from './ntqq/sdk/index.js'
 // 机器人配置
 export { getBotConfigByKey, setBotConfigByKey } from './login.js'
@@ -84,7 +84,7 @@ export async function createBot(args: string[] = process.argv.slice(2), cfg?: st
     arr.push(item)
     await createAlemon[item]()
   }
-  return cmdInit
+  return loadInit
 }
 
 // 监听退出

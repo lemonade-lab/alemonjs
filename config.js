@@ -1,5 +1,5 @@
 export default {
   input: `example/**/*.ts`,
-  file: `example.js`,
+  file: `apps.js`,
   external: ['alemon']
 }
