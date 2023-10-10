@@ -42,7 +42,9 @@ export async function createAlemonByVilla() {
     const ip = await Client.getIP()
     if (ip) {
       console.info(
-        `[OPEN] ${cfg.http ?? 'http'}://${ip}:${cfg.port ?? 8080}${cfg.url ?? '/api/mys/callback'}`
+        `[OPEN] ${cfg.http ?? 'http'}://${ip}:${cfg.port ?? 8080}${
+          cfg.url ?? '/api/mys/callback'
+        }`
       )
       // 启动清除机制
       Client.autoClearImages(600000)

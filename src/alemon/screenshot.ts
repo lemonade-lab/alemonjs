@@ -107,7 +107,8 @@ export function createStr(Options: {
    * 模板更改和数据更改都会生成生成html
    */
   if (control) {
-    const reg = /url\(['"](@[^'"]+)['"]\)|href=['"](@[^'"]+)['"]|src=['"](@[^'"]+)['"]/g
+    const reg =
+      /url\(['"](@[^'"]+)['"]\)|href=['"](@[^'"]+)['"]|src=['"](@[^'"]+)['"]/g
     absolutePathTemplateCache[tplFile] = html[tplFile].replace(
       reg,
       (match, urlPath, hrefPath, srcPath) => {
@@ -116,7 +117,10 @@ export function createStr(Options: {
          * 去掉路径开头的 @ 符号
          * 转义\/
          */
-        const absolutePath = join(basePath, relativePath.substr(1)).replace(/\\/g, '/')
+        const absolutePath = join(basePath, relativePath.substr(1)).replace(
+          /\\/g,
+          '/'
+        )
         if (urlPath) return `url('${absolutePath}')`
         if (hrefPath) return `href='${absolutePath}'`
         if (srcPath) return `src='${absolutePath}'`

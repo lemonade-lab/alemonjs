@@ -14,13 +14,22 @@ let executablePath
  * linux | android
  */
 if (process.platform == 'linux' || process.platform == 'android') {
-  const chromium = ['chrome-browser', 'chrome', 'chromium-browser', 'chromium', 'firefox']
+  const chromium = [
+    'chrome-browser',
+    'chrome',
+    'chromium-browser',
+    'chromium',
+    'firefox'
+  ]
   /**
    * get path
    */
   for (const item of chromium) {
     try {
-      const chromiumPath = execSync(`whereis ${item}`).toString().split(' ')[1]?.trim()
+      const chromiumPath = execSync(`whereis ${item}`)
+        .toString()
+        .split(' ')[1]
+        ?.trim()
       if (chromiumPath) {
         skipDownload = true
         executablePath = chromiumPath

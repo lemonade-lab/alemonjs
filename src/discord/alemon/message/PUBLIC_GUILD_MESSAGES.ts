@@ -1,4 +1,8 @@
-import { AMessage, UserType, InstructionMatching } from '../../../alemon/index.js'
+import {
+  AMessage,
+  UserType,
+  InstructionMatching
+} from '../../../alemon/index.js'
 import { Message as DcMessage } from 'discord.js'
 import { segmentDiscord } from '../segment.js'
 import { getBotMsgByDiscord } from '../bot.js'
@@ -138,7 +142,10 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
     ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
-          const attach = await postImage(msg, typeof img == 'string' ? img : undefined)
+          const attach = await postImage(
+            msg,
+            typeof img == 'string' ? img : undefined
+          )
           if (attach) {
             await event.channel.send({ files: [attach] })
             return true
@@ -150,7 +157,11 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
           return false
         }
       }
-      const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+      const content = Array.isArray(msg)
+        ? msg.join('')
+        : typeof msg === 'string'
+        ? msg
+        : undefined
       if (Buffer.isBuffer(img)) {
         try {
           const attach = await postImage(img, name)
@@ -179,12 +190,16 @@ export const PUBLIC_GUILD_MESSAGES_DISCORD = async (event: DcMessage) => {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`
+      )
       return true
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${false}] ${e.msg_txt}`
+      )
       return false
     })
 }

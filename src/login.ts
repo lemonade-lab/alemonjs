@@ -98,7 +98,10 @@ export function setBotConfig(val: ConfigType) {
  * @param key
  * @param val
  */
-export function setBotConfigByKey<T extends keyof ConfigType>(key: T, val: ConfigType[T]): void {
+export function setBotConfigByKey<T extends keyof ConfigType>(
+  key: T,
+  val: ConfigType[T]
+): void {
   // 分布覆盖
   for (const item in val) {
     // 当前仅当同属性名的时候才会覆盖默认配置
@@ -111,6 +114,8 @@ export function setBotConfigByKey<T extends keyof ConfigType>(key: T, val: Confi
  * @param key
  * @returns
  */
-export function getBotConfigByKey<T extends keyof ConfigType>(key: T): ConfigType[T] | undefined {
+export function getBotConfigByKey<T extends keyof ConfigType>(
+  key: T
+): ConfigType[T] | undefined {
   return config[key]
 }

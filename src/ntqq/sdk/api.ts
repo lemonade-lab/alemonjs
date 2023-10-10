@@ -43,7 +43,10 @@ export async function requestService(config: AxiosRequestConfig) {
  * @param content
  * @returns
  */
-export async function postFilesByUsers(openid: string, content: string): Promise<any> {
+export async function postFilesByUsers(
+  openid: string,
+  content: string
+): Promise<any> {
   const { appID } = getBotConfig()
   return requestService({
     url: `/v2/users/${openid}/files`,
@@ -65,7 +68,10 @@ export async function postFilesByUsers(openid: string, content: string): Promise
  * @param content
  * @returns
  */
-export async function postFilesByGroup(openid: string, content: string): Promise<any> {
+export async function postFilesByGroup(
+  openid: string,
+  content: string
+): Promise<any> {
   const { appID } = getBotConfig()
   return requestService({
     url: `/v2/groups/${openid}/files`,
@@ -87,7 +93,11 @@ export async function postFilesByGroup(openid: string, content: string): Promise
  * @param content
  * @returns
  */
-export async function postMessageByUser(openid: string, content: string, msg_id) {
+export async function postMessageByUser(
+  openid: string,
+  content: string,
+  msg_id
+) {
   const { appID } = getBotConfig()
 
   if (/\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
@@ -128,7 +138,11 @@ export async function postMessageByUser(openid: string, content: string, msg_id)
  * @param content
  * @returns
  */
-export async function postMessageByGroup(group_openid: string, content: string, msg_id?: string) {
+export async function postMessageByGroup(
+  group_openid: string,
+  content: string,
+  msg_id?: string
+) {
   const { appID } = getBotConfig()
   if (/\[[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
     // md

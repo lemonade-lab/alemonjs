@@ -7,7 +7,10 @@ import { writeFile, readFile } from 'fs'
  * @param localpath 可选,要保存的路径
  * @returns
  */
-export async function createQrcode(text: string, localpath?: string): Promise<false | Buffer> {
+export async function createQrcode(
+  text: string,
+  localpath?: string
+): Promise<false | Buffer> {
   try {
     const qrDataURL = await new Promise<string>((resolve, reject) => {
       toDataURL(
@@ -44,14 +47,17 @@ export async function createQrcode(text: string, localpath?: string): Promise<fa
  */
 export const getBuffer = (localpath: string): Promise<Buffer> => {
   return new Promise((resolve, reject) => {
-    readFile(localpath, (err: NodeJS.ErrnoException | null, bufferData: Buffer) => {
-      if (err) {
-        reject(err)
-      } else {
-        console.info('[BUFFER][READ]', localpath)
-        resolve(bufferData)
+    readFile(
+      localpath,
+      (err: NodeJS.ErrnoException | null, bufferData: Buffer) => {
+        if (err) {
+          reject(err)
+        } else {
+          console.info('[BUFFER][READ]', localpath)
+          resolve(bufferData)
+        }
       }
-    })
+    )
   })
 }
 

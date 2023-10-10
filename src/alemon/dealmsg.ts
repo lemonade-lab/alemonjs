@@ -104,7 +104,11 @@ function createPluginHelp() {
  * @param appname
  * @param belong
  */
-async function synthesis(AppsObj: object, appname: string, belong: 'plugins' | 'example') {
+async function synthesis(
+  AppsObj: object,
+  appname: string,
+  belong: 'plugins' | 'example'
+) {
   // 没有记载
   if (!plugins[appname]) {
     plugins[appname] = []
@@ -116,14 +120,22 @@ async function synthesis(AppsObj: object, appname: string, belong: 'plugins' | '
     /**
      * 不合法
      */
-    if (!keys['rule'] || !Array.isArray(keys['rule']) || keys['rule'].length == 0) {
+    if (
+      !keys['rule'] ||
+      !Array.isArray(keys['rule']) ||
+      keys['rule'].length == 0
+    ) {
       continue
     }
     /**
      * 指令不存在
      */
     for await (const key of keys['rule']) {
-      if (!key['fnc'] || !key['reg'] || typeof keys[key['fnc']] !== 'function') {
+      if (
+        !key['fnc'] ||
+        !key['reg'] ||
+        typeof keys[key['fnc']] !== 'function'
+      ) {
         /**
          * 函数指定不存在,正则不存在
          * 得到的不是函数
@@ -329,13 +341,13 @@ export async function loadInit(
   val: {
     mount?: boolean
     address?: string
-  } = { mount: false, address: '/plugins' }
+  } = { mount: false, address: '/application' }
 ) {
   const { mount, address } = val
   /**
    * 加载插件
    */
-  await loadPlugins(join(process.cwd(), address ?? '/plugins'))
+  await loadPlugins(join(process.cwd(), address ?? '/application'))
   /**
    * 取消集成
    */
@@ -379,7 +391,11 @@ export async function InstructionMatching(e: AMessage) {
    * 循环所有指令 用 awwat确保指令顺序
    */
   for await (const data of Command[e.event]) {
-    if (e.eventType != data.eventType || data.reg === undefined || !data.reg.test(e.msg)) {
+    if (
+      e.eventType != data.eventType ||
+      data.reg === undefined ||
+      !data.reg.test(e.msg)
+    ) {
       continue
     }
     const AppFnc = getMessage(data.AppName)
@@ -389,7 +405,9 @@ export async function InstructionMatching(e: AMessage) {
         .fnc(e)
         .then((res: boolean) => {
           console.info(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${data.fncName}][${true}]`
+            `\n[${data.event}][${data.belong}][${data.AppName}][${
+              data.fncName
+            }][${true}]`
           )
           return res
         })
@@ -398,7 +416,9 @@ export async function InstructionMatching(e: AMessage) {
             `\n[${data.event}][${data.belong}][${data.AppName}][${data.fncName}][${err}]`
           )
           console.error(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${data.fncName}][${false}]`
+            `\n[${data.event}][${data.belong}][${data.AppName}][${
+              data.fncName
+            }][${false}]`
           )
           return false
         })
@@ -433,14 +453,18 @@ export async function typeMessage(e: AMessage) {
         .fnc(e)
         .then((res: boolean) => {
           console.info(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${data.fncName}][${true}]`
+            `\n[${data.event}][${data.belong}][${data.AppName}][${
+              data.fncName
+            }][${true}]`
           )
           return res
         })
         .catch((err: any) => {
           console.error(err)
           console.error(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${data.fncName}][${false}]`
+            `\n[${data.event}][${data.belong}][${data.AppName}][${
+              data.fncName
+            }][${false}]`
           )
           return false
         })
@@ -462,6 +486,10 @@ export async function typeMessage(e: AMessage) {
  */
 function logErr(err: any, data: CmdItemType) {
   console.error(err)
-  console.error(`\n[${data.event}][${data.belong}][${data.AppName}][${data.fncName}][${false}]`)
+  console.error(
+    `\n[${data.event}][${data.belong}][${data.AppName}][${
+      data.fncName
+    }][${false}]`
+  )
   return
 }

@@ -44,7 +44,8 @@ export async function checkRobotByDiscord() {
       type: 'password',
       name: 'token',
       message: 'BotToken: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : 'BotToken: ')
+      validate: value =>
+        value !== '' && typeof value === 'string' ? true : 'BotToken: '
     }
   ])
 

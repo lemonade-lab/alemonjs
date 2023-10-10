@@ -46,7 +46,9 @@ member_count	number	成员数
 max_members	number	最大成员数
 description	string	描述
  */
-export const getGuildMsg = async (guildId: string): Promise<boolean | IGuild> => {
+export const getGuildMsg = async (
+  guildId: string
+): Promise<boolean | IGuild> => {
   const data = await clientApiByQQ.guildApi
     .guild(guildId)
     .then(res => {
@@ -80,7 +82,9 @@ position	number	排序，非必填
 parent_id	string	分组 ID
 owner_id	string	创建人 ID
  */
-export const getChannels = async (guildId: string): Promise<boolean | IChannel[]> => {
+export const getChannels = async (
+  guildId: string
+): Promise<boolean | IChannel[]> => {
   const data = await clientApiByQQ.channelApi
     .channels(guildId)
     .then(res => {
@@ -106,7 +110,9 @@ position	number	排序，非必填
 parent_id	string	分组 ID
 owner_id	string	创建人 ID
  */
-export const getChannel = async (channelId: string): Promise<boolean | IChannel> => {
+export const getChannel = async (
+  channelId: string
+): Promise<boolean | IChannel> => {
   const data = await clientApiByQQ.channelApi
     .channel(channelId)
     .then(res => {

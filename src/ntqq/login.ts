@@ -11,9 +11,16 @@ import { NtQQEventsEnum } from '../types.js'
 export async function checkRobotByQQ() {
   if (process.argv.indexOf('login') == -1) {
     const config = getBotConfigByKey('ntqq')
-    if ((config ?? '') !== '' && (config.appID ?? '') !== '' && (config.token ?? '') !== '') {
+    if (
+      (config ?? '') !== '' &&
+      (config.appID ?? '') !== '' &&
+      (config.token ?? '') !== ''
+    ) {
       if (!config.intents) {
-        config.intents = [NtQQEventsEnum.GROUP_AT_MESSAGE_CREATE, NtQQEventsEnum.C2C_MESSAGE_CREATE]
+        config.intents = [
+          NtQQEventsEnum.GROUP_AT_MESSAGE_CREATE,
+          NtQQEventsEnum.C2C_MESSAGE_CREATE
+        ]
       }
       setBotConfigByKey('ntqq', config)
       return true
@@ -31,13 +38,15 @@ export async function checkRobotByQQ() {
       type: 'password',
       name: 'appID',
       message: 'BotAppID: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 appID: ')
+      validate: value =>
+        value !== '' && typeof value === 'string' ? true : '机器人 appID: '
     },
     {
       type: 'password',
       name: 'token',
       message: 'BotToken: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 token: ')
+      validate: value =>
+        value !== '' && typeof value === 'string' ? true : '机器人 token: '
     }
   ]).catch((err: any) => {
     console.error(err)
@@ -52,7 +61,10 @@ export async function checkRobotByQQ() {
   /**
    * 默认公域机器人
    */
-  const intents = [NtQQEventsEnum.GROUP_AT_MESSAGE_CREATE, NtQQEventsEnum.C2C_MESSAGE_CREATE]
+  const intents = [
+    NtQQEventsEnum.GROUP_AT_MESSAGE_CREATE,
+    NtQQEventsEnum.C2C_MESSAGE_CREATE
+  ]
 
   // 得到已变更的配置
   const db = getBotConfigByKey('ntqq')

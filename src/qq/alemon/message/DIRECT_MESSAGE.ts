@@ -1,5 +1,10 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { typeMessage, AMessage, InstructionMatching, CardType } from '../../../alemon/index.js'
+import {
+  typeMessage,
+  AMessage,
+  InstructionMatching,
+  CardType
+} from '../../../alemon/index.js'
 import { ClientAPIByQQ as Client } from 'qq-channel'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
@@ -70,7 +75,11 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
 
 async function directMessage(e: AMessage, event: directEventData) {
   /* 消息发送机制 */
-  e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
+  e.reply = async (
+    msg?: string | string[] | Buffer,
+    img?: Buffer | string,
+    name?: string
+  ) => {
     if (Buffer.isBuffer(msg)) {
       try {
         return await Client.postDirectImage({
@@ -89,7 +98,11 @@ async function directMessage(e: AMessage, event: directEventData) {
         return false
       }
     }
-    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+    const content = Array.isArray(msg)
+      ? msg.join('')
+      : typeof msg === 'string'
+      ? msg
+      : undefined
     if (Buffer.isBuffer(img)) {
       try {
         return await Client.postDirectImage({
@@ -221,12 +234,20 @@ async function directMessage(e: AMessage, event: directEventData) {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`))
+      console.info(
+        console.info(
+          `\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`
+        )
+      )
       return true
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`))
+      console.info(
+        console.info(
+          `\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`
+        )
+      )
       return false
     })
 }

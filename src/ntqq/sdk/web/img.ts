@@ -40,7 +40,11 @@ export function autoClearImages(time: number) {
     const files = readdirSync(cfg.IMAGE_DIR as string)
     for (const file of files) {
       const extname = file.split('.').pop()
-      if (['jpg', 'jpeg', 'png', 'gif'].includes((extname as string).toLowerCase())) {
+      if (
+        ['jpg', 'jpeg', 'png', 'gif'].includes(
+          (extname as string).toLowerCase()
+        )
+      ) {
         const filePath = join(cfg.IMAGE_DIR as string, file)
         unlinkSync(filePath)
       }

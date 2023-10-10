@@ -10,7 +10,11 @@ import { getToml, writeToml } from '../config.js'
 export async function checkRobotByQQ() {
   if (process.argv.indexOf('login') == -1) {
     const config = getBotConfigByKey('qq')
-    if ((config ?? '') !== '' && (config.appID ?? '') !== '' && (config.token ?? '') !== '') {
+    if (
+      (config ?? '') !== '' &&
+      (config.appID ?? '') !== '' &&
+      (config.token ?? '') !== ''
+    ) {
       if (!config.intents) {
         config.intents = [
           AvailableIntentsEventsEnum.GUILDS,
@@ -42,13 +46,15 @@ export async function checkRobotByQQ() {
       type: 'password',
       name: 'appID',
       message: 'BotAppID: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 appID: ')
+      validate: value =>
+        value !== '' && typeof value === 'string' ? true : '机器人 appID: '
     },
     {
       type: 'password',
       name: 'token',
       message: 'BotToken: ',
-      validate: value => (value !== '' && typeof value === 'string' ? true : '机器人 token: ')
+      validate: value =>
+        value !== '' && typeof value === 'string' ? true : '机器人 token: '
     },
     {
       type: 'select',

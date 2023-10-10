@@ -1,5 +1,13 @@
-import { CardType, InstructionMatching, AMessage } from '../../../alemon/index.js'
-import { ClientAPIByQQ as Client, ClinetWeb, getWebConfig } from '../../sdk/index.js'
+import {
+  CardType,
+  InstructionMatching,
+  AMessage
+} from '../../../alemon/index.js'
+import {
+  ClientAPIByQQ as Client,
+  ClinetWeb,
+  getWebConfig
+} from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { ExampleObject } from '../types.js'
@@ -24,24 +32,34 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
   e.isGroup = false
 
   /* 消息发送机制 */
-  e.reply = async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
+  e.reply = async (
+    msg?: string | string[] | Buffer,
+    img?: Buffer | string,
+    name?: string
+  ) => {
     if (Buffer.isBuffer(msg)) {
       try {
         let url = ''
         if (Buffer.isBuffer(msg)) {
           const uul = await ClinetWeb.setLocalImg(msg)
           url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
-          return await Client.postFilesByGroup(event.group_id, url).catch(err => {
-            console.error(err)
-            return false
-          })
+          return await Client.postFilesByGroup(event.group_id, url).catch(
+            err => {
+              console.error(err)
+              return false
+            }
+          )
         }
       } catch (err) {
         console.error(err)
         return false
       }
     }
-    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+    const content = Array.isArray(msg)
+      ? msg.join('')
+      : typeof msg === 'string'
+      ? msg
+      : undefined
     if (Buffer.isBuffer(img)) {
       try {
         let url = ''
@@ -154,12 +172,20 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`))
+      console.info(
+        console.info(
+          `\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`
+        )
+      )
       return true
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`))
+      console.info(
+        console.info(
+          `\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`
+        )
+      )
       return false
     })
 }

@@ -1,7 +1,13 @@
 /**
  * 阿柠檬消息类型
  */
-export interface AMessage extends EventBase, UserBase, MsgBase, Serverbase, BotBase, ApiBase {}
+export interface AMessage
+  extends EventBase,
+    UserBase,
+    MsgBase,
+    Serverbase,
+    BotBase,
+    ApiBase {}
 
 /**
  * 事件相关
@@ -440,7 +446,10 @@ interface replyController {
    * @param obj 消息对象 | buffer
    * @returns
    */
-  replyPrivate?(content?: string | string[] | Buffer, obj?: Buffer): Promise<boolean>
+  replyPrivate?(
+    content?: string | string[] | Buffer,
+    obj?: Buffer
+  ): Promise<boolean>
 
   /**
    * 发送表态

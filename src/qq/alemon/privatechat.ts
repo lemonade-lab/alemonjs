@@ -55,7 +55,11 @@ export const Private = async (
       return false
     }
   }
-  const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+  const content = Array.isArray(msg)
+    ? msg.join('')
+    : typeof msg === 'string'
+    ? msg
+    : undefined
   if (Buffer.isBuffer(img)) {
     try {
       return await Client.postDirectImage({

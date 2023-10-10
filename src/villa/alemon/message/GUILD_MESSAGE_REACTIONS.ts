@@ -36,7 +36,9 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
     /**
      * 消息类型 ： 存在则为撤回
      */
-    eventType: event.extend_data.EventData.AddQuickEmoticon.is_cancel ? 'DELETE' : 'CREATE',
+    eventType: event.extend_data.EventData.AddQuickEmoticon.is_cancel
+      ? 'DELETE'
+      : 'CREATE',
     /**
      * 是否是私域
      */
@@ -106,7 +108,11 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
      */
     user_avatar: '',
     ...now_e,
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
+    reply: async (
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ) => {
       return false
     }
   } as AMessage

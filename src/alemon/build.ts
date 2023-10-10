@@ -63,7 +63,9 @@ export async function compilationTools(obj: compilationType) {
       /**
        * 集成
        */
-      const apps = await import(`file://${join(process.cwd(), obj?.file)}`).catch(err => {
+      const apps = await import(
+        `file://${join(process.cwd(), obj?.file)}`
+      ).catch(err => {
         console.error(err)
         return {}
       })

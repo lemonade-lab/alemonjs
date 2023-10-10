@@ -9,7 +9,10 @@ import { AttachmentBuilder } from 'discord.js'
  * @param name
  * @returns
  */
-export async function postImage(file: string | Buffer | Readable, name = 'image.jpg') {
+export async function postImage(
+  file: string | Buffer | Readable,
+  name = 'image.jpg'
+) {
   let picData: Readable | Buffer[]
   if (typeof file === 'string') {
     if (!existsSync(file)) {

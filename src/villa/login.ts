@@ -13,7 +13,11 @@ export async function checkRobotByVilla() {
     // 启动
     const config = getBotConfigByKey('villa')
     // 存在
-    if ((config ?? '') !== '' && (config.bot_id ?? '') !== '' && (config.secret ?? '') !== '') {
+    if (
+      (config ?? '') !== '' &&
+      (config.bot_id ?? '') !== '' &&
+      (config.secret ?? '') !== ''
+    ) {
       setBotConfigByKey('villa', config)
       return true
     }
@@ -27,13 +31,15 @@ export async function checkRobotByVilla() {
       type: 'password',
       name: 'bot_id',
       message: 'bot_id: ',
-      validate: (value: any) => (value !== '' && typeof value === 'string' ? true : 'bot_id: ')
+      validate: (value: any) =>
+        value !== '' && typeof value === 'string' ? true : 'bot_id: '
     },
     {
       type: 'password',
       name: 'secret',
       message: 'secret: ',
-      validate: (value: any) => (value !== '' && typeof value === 'string' ? true : 'secret: ')
+      validate: (value: any) =>
+        value !== '' && typeof value === 'string' ? true : 'secret: '
     }
   ]).catch((err: any) => {
     console.error(err)

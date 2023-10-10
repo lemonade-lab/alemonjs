@@ -28,7 +28,10 @@ export type ConversationState = {
 /**
  * 对话接口
  */
-export type ConversationHandler = (e: AMessage, state: ConversationState) => Promise<void>
+export type ConversationHandler = (
+  e: AMessage,
+  state: ConversationState
+) => Promise<void>
 
 /**
  * 对话集
@@ -78,7 +81,9 @@ export const conversationHandlers: conversationHandlersMap = new Map()
  * @param userId 根据id获取
  * @returns
  */
-export const getConversationState = async (userId: string): Promise<ConversationState | null> => {
+export const getConversationState = async (
+  userId: string
+): Promise<ConversationState | null> => {
   const state = await getAsync(`conversation-state:${userId}`)
   return state ? JSON.parse(state) : null
 }
@@ -102,7 +107,9 @@ export const setConversationState = async (
  * @param userId
  * @returns
  */
-export const deleteConversationState = async (userId: string): Promise<void> => {
+export const deleteConversationState = async (
+  userId: string
+): Promise<void> => {
   await delAsync(`conversation-state:${userId}`)
   return
 }

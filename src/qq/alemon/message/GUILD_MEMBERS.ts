@@ -90,7 +90,11 @@ export const GUILD_MEMBERS = async (event: any) => {
           return false
         }
       }
-      const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+      const content = Array.isArray(msg)
+        ? msg.join('')
+        : typeof msg === 'string'
+        ? msg
+        : undefined
       if (Buffer.isBuffer(img)) {
         try {
           return await Client.postImage({

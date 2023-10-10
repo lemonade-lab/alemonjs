@@ -1,4 +1,8 @@
-import { AMessage, InstructionMatching, UserType } from '../../../alemon/index.js'
+import {
+  AMessage,
+  InstructionMatching,
+  UserType
+} from '../../../alemon/index.js'
 import { BotEvent, MessageContentType, Client } from 'mys-villa'
 import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
@@ -232,7 +236,11 @@ export async function MESSAGES_VILLA(event: BotEvent) {
      * @param img
      * @returns
      */
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
+    reply: async (
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ) => {
       /**
        * url获取
        */
@@ -247,7 +255,10 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const dimensions = IMGS.imageSize(msg)
         const uul = await Client.setLocalImg(msg)
         if (!uul) return false
-        const NowObj = await Client.transferImage(villa_id, `${cfg.http}://${ip}:${cfg.port}${uul}`)
+        const NowObj = await Client.transferImage(
+          villa_id,
+          `${cfg.http}://${ip}:${cfg.port}${uul}`
+        )
         if (!NowObj) {
           url = `${cfg.http}://${ip}:${cfg.port}${uul}`
         } else {
@@ -274,12 +285,15 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           /**
            * 图片对象
            */
-          return await Client.sendMessageTextUrl(villa_id, room_id, msg, options.image).catch(
-            err => {
-              console.error(err)
-              return false
-            }
-          )
+          return await Client.sendMessageTextUrl(
+            villa_id,
+            room_id,
+            msg,
+            options.image
+          ).catch(err => {
+            console.error(err)
+            return false
+          })
         }
         return false
       }
@@ -299,17 +313,26 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const dimensions = IMGS.imageSize(img)
         const uul = await Client.setLocalImg(img)
         if (!uul) return false
-        const NowObj = await Client.transferImage(villa_id, `${cfg.http}://${ip}:${cfg.port}${uul}`)
+        const NowObj = await Client.transferImage(
+          villa_id,
+          `${cfg.http}://${ip}:${cfg.port}${uul}`
+        )
         if (!NowObj) {
           url = `${cfg.http}://${ip}:${cfg.port}${uul}`
         } else {
           url = NowObj.new_url
         }
         if (entities.length == 0) {
-          return await Client.sendMessageTextUrl(villa_id, room_id, content, url, {
-            width: dimensions.width,
-            height: dimensions.height
-          }).catch(err => {
+          return await Client.sendMessageTextUrl(
+            villa_id,
+            room_id,
+            content,
+            url,
+            {
+              width: dimensions.width,
+              height: dimensions.height
+            }
+          ).catch(err => {
             console.error(err)
             return false
           })
@@ -331,17 +354,22 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         }
       }
       if (entities.length == 0 && content != '') {
-        return await Client.sendMessageText(villa_id, room_id, content).catch(err => {
-          console.error(err)
-          return false
-        })
-      } else if (entities.length != 0 && content != '') {
-        return await Client.sendMessageTextEntities(villa_id, room_id, content, entities).catch(
+        return await Client.sendMessageText(villa_id, room_id, content).catch(
           err => {
             console.error(err)
             return false
           }
         )
+      } else if (entities.length != 0 && content != '') {
+        return await Client.sendMessageTextEntities(
+          villa_id,
+          room_id,
+          content,
+          entities
+        ).catch(err => {
+          console.error(err)
+          return false
+        })
       }
       return false
     },
@@ -353,11 +381,19 @@ export async function MESSAGES_VILLA(event: BotEvent) {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${MessageContent.content.text}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${true}] ${
+          MessageContent.content.text
+        }`
+      )
       return true
     })
     .catch((err: any) => {
-      console.error(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${MessageContent.content.text}`)
+      console.error(
+        `\n[${e.channel_id}] [${e.user_name}] [${true}] ${
+          MessageContent.content.text
+        }`
+      )
       console.error(err)
       return false
     })

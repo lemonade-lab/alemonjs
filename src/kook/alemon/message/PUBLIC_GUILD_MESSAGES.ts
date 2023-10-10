@@ -1,4 +1,8 @@
-import { AMessage, UserType, InstructionMatching } from '../../../alemon/index.js'
+import {
+  AMessage,
+  UserType,
+  InstructionMatching
+} from '../../../alemon/index.js'
 import { KOOKApiClient, EventData } from 'kook-ws'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
@@ -94,7 +98,10 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     ): Promise<boolean> => {
       if (Buffer.isBuffer(msg)) {
         try {
-          const url = await KOOKApiClient.postImage(msg, typeof img == 'string' ? img : undefined)
+          const url = await KOOKApiClient.postImage(
+            msg,
+            typeof img == 'string' ? img : undefined
+          )
           if (url) {
             if (event.channel_type == 'GROUP') {
               await KOOKApiClient.createMessage({
@@ -118,7 +125,11 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           return false
         }
       }
-      const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+      const content = Array.isArray(msg)
+        ? msg.join('')
+        : typeof msg === 'string'
+        ? msg
+        : undefined
       if (Buffer.isBuffer(img)) {
         try {
           const url = await KOOKApiClient.postImage(img, name)
@@ -184,12 +195,16 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
 
   await InstructionMatching(e)
     .then(() => {
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`
+      )
       return true
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${false}] ${e.msg_txt}`
+      )
       return false
     })
 }

@@ -111,7 +111,11 @@ export async function MESSAGE_AUDIT_VILLA(event: BotEvent) {
      */
     user_avatar: '',
     ...now_e,
-    reply: async (msg?: string | string[] | Buffer, img?: Buffer | string, name?: string) => {
+    reply: async (
+      msg?: string | string[] | Buffer,
+      img?: Buffer | string,
+      name?: string
+    ) => {
       return false
     }
   } as AMessage

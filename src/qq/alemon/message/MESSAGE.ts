@@ -1,5 +1,9 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { CardType, InstructionMatching, AMessage } from '../../../alemon/index.js'
+import {
+  CardType,
+  InstructionMatching,
+  AMessage
+} from '../../../alemon/index.js'
 import { ClientAPIByQQ as Client } from 'qq-channel'
 import { Private } from '../privatechat.js'
 import { EventData } from '../types.js'
@@ -86,7 +90,11 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
         return false
       }
     }
-    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+    const content = Array.isArray(msg)
+      ? msg.join('')
+      : typeof msg === 'string'
+      ? msg
+      : undefined
     if (Buffer.isBuffer(img)) {
       try {
         return await Client.postImage({
@@ -335,12 +343,16 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`
+      )
       return
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`
+      )
       return
     })
 }

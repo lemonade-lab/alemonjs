@@ -69,7 +69,10 @@ export const createConversationByQQ = ws => {
     /**
      * 频道会话消息（公域）
      */
-    ws.on(AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES, PUBLIC_GUILD_MESSAGES)
+    ws.on(
+      AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
+      PUBLIC_GUILD_MESSAGES
+    )
 
     /**
      * ***
@@ -95,7 +98,10 @@ export const createConversationByQQ = ws => {
     /**
      * 频道表情点击会话消息
      */
-    ws.on(AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, GUILD_MESSAGE_REACTIONS)
+    ws.on(
+      AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS,
+      GUILD_MESSAGE_REACTIONS
+    )
 
     /**
      * 互动事件监听

@@ -1,5 +1,13 @@
-import { CardType, InstructionMatching, AMessage } from '../../../alemon/index.js'
-import { ClientAPIByQQ as Client, ClinetWeb, getWebConfig } from '../../sdk/index.js'
+import {
+  CardType,
+  InstructionMatching,
+  AMessage
+} from '../../../alemon/index.js'
+import {
+  ClientAPIByQQ as Client,
+  ClinetWeb,
+  getWebConfig
+} from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { getBotConfigByKey } from '../../../login.js'
@@ -75,17 +83,23 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
            */
           const uul = await ClinetWeb.setLocalImg(msg)
           url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
-          return await Client.postFilesByGroup(event.group_id, url).catch(err => {
-            console.error(err)
-            return false
-          })
+          return await Client.postFilesByGroup(event.group_id, url).catch(
+            err => {
+              console.error(err)
+              return false
+            }
+          )
         }
       } catch (err) {
         console.error(err)
         return false
       }
     }
-    const content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : undefined
+    const content = Array.isArray(msg)
+      ? msg.join('')
+      : typeof msg === 'string'
+      ? msg
+      : undefined
     if (Buffer.isBuffer(img)) {
       try {
         let url = ''
@@ -241,12 +255,16 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
    */
   await InstructionMatching(e)
     .then(() => {
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`
+      )
       return
     })
     .catch((err: any) => {
       console.error(err)
-      console.info(`\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`)
+      console.info(
+        `\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`
+      )
       return
     })
 }

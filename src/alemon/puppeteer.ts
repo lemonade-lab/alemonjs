@@ -1,4 +1,9 @@
-import puppeteer, { Browser, PuppeteerLaunchOptions, ScreenshotOptions, Page } from 'puppeteer'
+import puppeteer, {
+  Browser,
+  PuppeteerLaunchOptions,
+  ScreenshotOptions,
+  Page
+} from 'puppeteer'
 import queryString from 'querystring'
 /**
  * 截图次数
@@ -134,10 +139,12 @@ export async function screenshotByFile(
      * 得到图片
      */
     console.info('[puppeteer] success')
-    const buff: string | false | Buffer = await body.screenshot(SOptions).catch(err => {
-      console.error(err)
-      return false
-    })
+    const buff: string | false | Buffer = await body
+      .screenshot(SOptions)
+      .catch(err => {
+        console.error(err)
+        return false
+      })
     /**
      * 关闭
      */
@@ -181,7 +188,8 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
   if (!pageCache[url]) {
     pageCache[url] = await browser.newPage()
   }
-  const isurl = params == undefined ? url : `${url}?${queryString.stringify(params ?? {})}`
+  const isurl =
+    params == undefined ? url : `${url}?${queryString.stringify(params ?? {})}`
   /**
    * 启用页面缓存
    */

@@ -35,9 +35,10 @@ export async function createAlemonByNtqq() {
     /**
      * 发送请求
      */
-    const data: aut = await ClientAPIByQQ.getAuthentication(cfg.appID, cfg.secret).then(
-      res => res.data
-    )
+    const data: aut = await ClientAPIByQQ.getAuthentication(
+      cfg.appID,
+      cfg.secret
+    ).then(res => res.data)
 
     const g = {
       appID: cfg.appID,
@@ -55,9 +56,10 @@ export async function createAlemonByNtqq() {
       /**
        * 发送请求
        */
-      const data: aut = await ClientAPIByQQ.getAuthentication(cfg.appID, cfg.secret).then(
-        res => res.data
-      )
+      const data: aut = await ClientAPIByQQ.getAuthentication(
+        cfg.appID,
+        cfg.secret
+      ).then(res => res.data)
 
       g.token = data.access_token
 
@@ -96,7 +98,9 @@ export async function createAlemonByNtqq() {
      */
     const ip = await ClinetWeb.getIP()
     if (ip) {
-      console.info(`[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}`)
+      console.info(
+        `[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}`
+      )
       // 启动清除机制
       ClinetWeb.autoClearImages(600000)
     } else {
