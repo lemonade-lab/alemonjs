@@ -1,4 +1,4 @@
-import { AMessage, UserType, InstructionMatching } from 'alemon'
+import { AMessage, UserType, InstructionMatching } from '../../../alemon/index.js'
 import { Message as DcMessage } from 'discord.js'
 import { segmentDiscord } from '../segment.js'
 import { getBotMsgByDiscord } from '../bot.js'

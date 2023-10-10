@@ -1,4 +1,4 @@
-import { AMessage, typeMessage } from 'alemon'
+import { AMessage, typeMessage } from '../../../alemon/index.js'
 import { BotEvent } from 'mys-villa'
 import { segmentVilla } from '../segment.js'
 import { now_e } from './e.js'

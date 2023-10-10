@@ -1,5 +1,5 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { typeMessage, AMessage, InstructionMatching, CardType } from 'alemon'
+import { typeMessage, AMessage, InstructionMatching, CardType } from '../../../alemon/index.js'
 import { ClientAPIByQQ as Client } from 'qq-channel'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'

@@ -1,4 +1,4 @@
-import { typeMessage, AMessage } from 'alemon'
+import { typeMessage, AMessage } from '../../../alemon/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 /**
  * AUDIO_MICROPHONE 音频

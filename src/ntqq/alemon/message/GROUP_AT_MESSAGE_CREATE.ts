@@ -1,4 +1,4 @@
-import { CardType, InstructionMatching, AMessage } from 'alemon'
+import { CardType, InstructionMatching, AMessage } from '../../../alemon/index.js'
 import { ClientAPIByQQ as Client, ClinetWeb, getWebConfig } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'

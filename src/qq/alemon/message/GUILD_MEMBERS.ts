@@ -1,5 +1,5 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { typeMessage, AMessage, CardType } from 'alemon'
+import { typeMessage, AMessage, CardType } from '../../../alemon/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用

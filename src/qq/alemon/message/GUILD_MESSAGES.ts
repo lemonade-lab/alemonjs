@@ -1,4 +1,4 @@
-import { typeMessage, AMessage } from 'alemon'
+import { typeMessage, AMessage } from '../../../alemon/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { getBotMsgByQQ } from '../bot.js'
 

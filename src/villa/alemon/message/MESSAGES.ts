@@ -1,4 +1,4 @@
-import { AMessage, InstructionMatching, UserType } from 'alemon'
+import { AMessage, InstructionMatching, UserType } from '../../../alemon/index.js'
 import { BotEvent, MessageContentType, Client } from 'mys-villa'
 import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'

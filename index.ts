@@ -1,5 +1,5 @@
 import { createBot } from './src/index.js'
-import { createApp } from 'alemon'
+import { createApp } from '../../../alemon/index.js'
 import config from './config.js'
 
 // 创建机器人
