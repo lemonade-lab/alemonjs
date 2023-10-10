@@ -4,6 +4,7 @@ import { getToml } from './config.js'
 import { loadInit } from './alemon/index.js'
 import { ClientAPIByQQ } from './ntqq/sdk/index.js'
 import { compilationTools } from 'alemon-rollup'
+
 /**
  * 启动机器人
  */

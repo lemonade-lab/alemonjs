@@ -11,4 +11,4 @@ export * from './alemon/index.js'
 /**
  * 编译
  */
-export { compilationTools } from 'alemon-rollup'
+export { compilationTools, integration } from 'alemon-rollup'

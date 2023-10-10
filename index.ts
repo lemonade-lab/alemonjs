@@ -1,5 +1,4 @@
 import { createBot, createApp } from './src/index.js'
-import config from './config.js'
 
 // 创建机器人
 const compilationTools = await createBot({
@@ -7,7 +6,10 @@ const compilationTools = await createBot({
 })
 
 // 加载模块
-const word = await compilationTools(config)
+const word = await compilationTools({
+  aInput: `example/**/*.ts`,
+  aOutput: `apps.js`
+})
 
 // 创建应用
 const app = createApp('bot')
