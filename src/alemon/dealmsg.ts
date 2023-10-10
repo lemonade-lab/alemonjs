@@ -4,7 +4,6 @@ import { existsSync, mkdirSync, readdirSync, readFileSync } from 'fs'
 import lodash from 'lodash'
 import { getMessage } from './message.js'
 import { getApp, delApp, getAppKey } from './app.js'
-import { compilationTools } from './build.js'
 import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 
@@ -324,7 +323,7 @@ export async function appsInit() {
   /**
    * 打印
    */
-  console.info(`[LOAD] Plugins*${PluginsArr.length} `)
+  console.info(`[LOAD] apps*${PluginsArr.length} `)
   return
 }
 
@@ -332,9 +331,15 @@ export function getMergedRegex() {
   return mergedRegex
 }
 
+let appDir = '/application'
+
+export function getAppDir() {
+  return appDir
+}
+
 /**
  *  初始化应用 mount = ture 则直接应用
- * @param param0 { mount = false, address = '/plugins' }
+ * @param param0 { mount = false, address = '/application' }
  * @returns
  */
 export async function loadInit(
@@ -344,6 +349,9 @@ export async function loadInit(
   } = { mount: false, address: '/application' }
 ) {
   const { mount, address } = val
+
+  appDir = address ?? '/application'
+
   /**
    * 加载插件
    */
@@ -351,7 +359,7 @@ export async function loadInit(
   /**
    * 取消集成
    */
-  if (mount) return compilationTools
+  if (mount) return
   /**
    * 开始集成
    */

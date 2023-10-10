@@ -1,6 +1,27 @@
+# 依赖
 node_modules
-/.cache/
+
+# 包
+lib
+types
+
+# 配置
 /config/
+
+# 插件
+/application/
+
+# 缓存
 /data/
-/logs/
-/dist/
+/help/
+
+# 额外生成物
+index.js
+alemon.toml
+alemon.json
+apps.js
+
+# 打印
+logs
+*.logs
+*.los

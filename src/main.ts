@@ -3,7 +3,6 @@ import { getBotConfigByKey, setBotConfig } from './login.js'
 import { getToml } from './config.js'
 import { loadInit } from './alemon/index.js'
 import { ClientAPIByQQ } from './ntqq/sdk/index.js'
-
 /**
  * 启动机器人
  */
@@ -69,15 +68,7 @@ export async function createBot(
     address: '/application'
   }
 ) {
-  /**
-   * {
-  
-  args: string[] =,
-  cfg?: string
-   */
-
   const { args, mount, cfg, address } = val
-
   /**
    * 加载配置
    */
@@ -93,7 +84,7 @@ export async function createBot(
   /**
    * 开始启动
    */
-  for await (const item of args) {
+  for await (const item of args ?? process.argv.slice(2)) {
     if (arr.indexOf(item) != -1) continue
     if (!createAlemon[item]) continue
     arr.push(item)
@@ -103,8 +94,8 @@ export async function createBot(
    * 启动插件加载
    */
   await loadInit({
-    mount,
-    address
+    mount: mount == undefined ? false : mount,
+    address: address == undefined ? '/application' : address
   })
   return
 }

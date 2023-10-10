@@ -1,6 +1,7 @@
 import lodash from 'lodash'
 import { join, basename } from 'path'
 import { readFileSync, watch, mkdirSync } from 'fs'
+import { getAppDir } from './dealmsg.js'
 /**
  * 源码缓存
  */
@@ -45,6 +46,7 @@ function watchCT(tplFile: string) {
       delete watcher[tplFile]
     })
 }
+
 /**
  * 如果control为真则需重新用art渲染
  * @param Options
@@ -65,10 +67,11 @@ export function createStr(Options: {
   data?: any
 }) {
   const { AppName, tplFile, data } = Options
+  const appDir = getAppDir()
   /**
    * 插件路径
    */
-  const basePath = join(process.cwd(), 'plugins', AppName)
+  const basePath = join(process.cwd(), appDir, AppName)
   /**
    * 写入地址
    */

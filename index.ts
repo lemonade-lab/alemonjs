@@ -7,13 +7,13 @@ await createBot({
 })
 
 // 加载模块
-const example = await compilationTools(config)
+const word = await compilationTools(config)
 
 // 创建应用
-const app = createApp('example')
+const app = createApp('bot')
 
 // 设置模块
-app.component(example)
+app.component(word)
 
 // 挂载
 app.mount('#app')

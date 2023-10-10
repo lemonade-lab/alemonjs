@@ -1,4 +1,8 @@
 /**
+ * 编译
+ */
+export { compilationTools } from 'alemon-rollup'
+/**
  * 插件
  */
 export * from './plugin.js'
@@ -38,7 +42,3 @@ export * from './typings.js'
  * 二进制
  */
 export * from './buffer.js'
-/**
- * 编译
- */
-export * from './build.js'
