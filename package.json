@@ -4,7 +4,6 @@
   "description": "阿柠檬框架",
   "author": "ningmengchongshui",
   "main": "lib/index.js",
-  "private": true,
   "license": "GPL-2.0",
   "type": "module",
   "scripts": {
@@ -56,9 +55,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "engines": {
-    "node": ">=16.3.0"
-  },
-  "keywords": [
-    "alemon"
-  ]
+    "node": ">=16.14.0"
+  }
 }
