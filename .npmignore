@@ -1,23 +1,42 @@
-.vscode
-/config/
-/default/
-/example/
+# 依赖
 node_modules
-/plugins/
-/data/
-/help/
-/src/
-alemon.toml
-.eslintrc.cjs
-.gitignore
-.npmrc
+
+# 包
+lib
+types
+
+# 配置
+/config/
+tsconfig.json
+.vscode
 .prettierignore
 .prettierrc.json
 .puppeteerrc.cjs
+.eslintrc.cjs
+.gitignore
+.npmrc
+
+# 插件
+/application/
+/example/
+/src/
+
+# 缓存
+/data/
+/help/
+
+# 额外生成物
+index.js
+alemon.toml
+alemon.json
+apps.js
 index.js
 index.ts
 nodemon.json
 index.js
 index.ts
-tsconfig.json
-apps.js
+
+# 打印
+logs
+*.logs
+*.los
