@@ -1,8 +1,4 @@
 /**
- * 编译
- */
-export { compilationTools } from 'alemon-rollup'
-/**
  * 插件
  */
 export * from './plugin.js'

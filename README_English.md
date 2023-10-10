@@ -2,14 +2,13 @@
 
 ## Almon Cross Platform Development Framework
 
-> support QQ、QQ channel、Discord、Mi You She Big Villa、KOOK
+> support NtQQ、QQ channel、Discord、Mi You She Big Villa、KOOK
 
-[☞Alemon official website](http://ningmengchongshui.github.io/alemon)
+[☞Alemon official website](https://alemonjs.com)
 
 | Branch | Type        | Description                                 |
 | ------ | ----------- | ------------------------------------------- |
-| Main   | robot       | robot instance                              |
-| Almeo  | Core        | Logical Block                               |
+| Main   | core        | bot instance                                |
 | Redis  | Database    | Special Connection Independence             |
 | Cli    | scaffolding | development template scaffolding            |
 | Web    | Website     | Shared Platform Plugin Contribution Address |

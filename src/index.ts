@@ -8,3 +8,7 @@ if (
 export * from './main.js'
 // 导出核心方法
 export * from './alemon/index.js'
+/**
+ * 编译
+ */
+export { compilationTools } from 'alemon-rollup'

@@ -21,12 +21,10 @@
   },
   "include": [
     "src/**/*",
-    "application"
   ],
   "exclude": [
     "node_modules",
     "lib",
-    "src/alemon/build/index.ts",
     "types"
   ]
 }

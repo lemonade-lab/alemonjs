@@ -3,6 +3,7 @@ import { getBotConfigByKey, setBotConfig } from './login.js'
 import { getToml } from './config.js'
 import { loadInit } from './alemon/index.js'
 import { ClientAPIByQQ } from './ntqq/sdk/index.js'
+import { compilationTools } from 'alemon-rollup'
 /**
  * 启动机器人
  */
@@ -97,7 +98,7 @@ export async function createBot(
     mount: mount == undefined ? false : mount,
     address: address == undefined ? '/application' : address
   })
-  return
+  return compilationTools
 }
 
 // 机器人配置

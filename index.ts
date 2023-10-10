@@ -1,8 +1,8 @@
-import { createBot, createApp, compilationTools } from './src/index.js'
+import { createBot, createApp } from './src/index.js'
 import config from './config.js'
 
 // 创建机器人
-await createBot({
+const compilationTools = await createBot({
   mount: true // 独立开发启动
 })
 
