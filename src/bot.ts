@@ -3,51 +3,10 @@ import { getBotConfigByKey, setBotConfig, getToml } from './config/index.js'
 import { loadInit } from './alemon/index.js'
 import { ClientAPIByQQ } from './ntqq/sdk/index.js'
 import { compilationTools } from 'alemon-rollup'
-/**
- * 启动机器人
- */
-const createAlemon = {
-  qq: async (): Promise<boolean> => {
-    const { createAlemonByQQ: qq } = await import('./qq/index.js')
-    return qq().catch(err => {
-      console.error(err)
-      console.error('QQ机器人启动失败~')
-      return false
-    })
-  },
-  villa: async (): Promise<boolean> => {
-    const { createAlemonByVilla: villa } = await import('./villa/index.js')
-    return villa().catch(err => {
-      console.error(err)
-      console.error('Villa机器人启动失败~')
-      return false
-    })
-  },
-  kook: async (): Promise<boolean> => {
-    const { createAlemonByKOOK: kook } = await import('./kook/index.js')
-    return kook().catch(err => {
-      console.error(err)
-      console.error('KOOK机器人启动失败~')
-      return false
-    })
-  },
-  discord: async (): Promise<boolean> => {
-    const { createAlemonByDiscord: dc } = await import('./discord/index.js')
-    return dc().catch(err => {
-      console.error(err)
-      console.error('Discord机器人启动失败~')
-      return false
-    })
-  },
-  ntqq: async (): Promise<boolean> => {
-    const { createAlemonByNtqq: ntqq } = await import('./ntqq/index.js')
-    return ntqq().catch(err => {
-      console.error(err)
-      console.error('Ntqq机器人启动失败~')
-      return false
-    })
-  }
-}
+import { createAlemon } from './map.js'
+
+// 设置独立鉴权路径
+export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication
 
 /**
  * 创建机器人
@@ -97,6 +56,3 @@ export async function createBot(
   })
   return compilationTools
 }
-
-// 设置独立鉴权路径
-export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication
