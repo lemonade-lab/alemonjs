@@ -93,12 +93,19 @@ export function setBotConfig(val: ConfigType) {
   for (const i in val) {
     // 当且仅当存在同key的时候才会覆盖默认配置
     if (Object.prototype.hasOwnProperty.call(config, i)) {
-      for (const j in val[i]) {
-        // 当前仅当同属性名的时候才会覆盖默认配置
-        if (Object.prototype.hasOwnProperty.call(config[i], j)) {
+      if (i == 'puppeteer') {
+        // pup 不用检查 直接覆盖
+        for (const j in val[i]) {
           config[i][j] = val[i][j]
-        } else {
-          console.log('[alemonjs][存在无效参数]', val[i])
+        }
+      } else {
+        for (const j in val[i]) {
+          // 当前仅当同属性名的时候才会覆盖默认配置
+          if (Object.prototype.hasOwnProperty.call(config[i], j)) {
+            config[i][j] = val[i][j]
+          } else {
+            console.log('[alemonjs][存在无效参数]', val[i])
+          }
         }
       }
     } else {
@@ -116,13 +123,19 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
   key: T,
   val: ConfigType[T]
 ): void {
-  // 分布覆盖
-  for (const item in val) {
-    // 当前仅当同属性名的时候才会覆盖默认配置
-    if (Object.prototype.hasOwnProperty.call(config[key], item)) {
+  if (key == 'puppeteer') {
+    // pup 不用检查 直接覆盖
+    for (const item in val) {
       config[key][item] = val[item]
-    } else {
-      console.log('[alemonjs][存在无效参数]', val[item])
+    }
+  } else {
+    for (const item in val) {
+      // 当前仅当同属性名的时候才会覆盖默认配置
+      if (Object.prototype.hasOwnProperty.call(config[key], item)) {
+        config[key][item] = val[item]
+      } else {
+        console.log('[alemonjs][存在无效参数]', val[item])
+      }
     }
   }
 }
