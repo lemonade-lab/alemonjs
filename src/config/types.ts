@@ -2,9 +2,9 @@ import { GatewayIntentBits } from 'discord.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 
 /**
- * ****
+ * ******
  * config
- * /////
+ * ******
  */
 export interface ConfigType {
   redis?: RedisConfig

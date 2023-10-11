@@ -13,25 +13,11 @@
 | cli   | 脚手架 | 开发模板脚手架       |
 | web   | 网站   | 共享平台插件贡献地址 |
 
-## 快速开始
-
-```shell
-npm init almeonjs@latest -y #安装
-```
-
-```shell
-cd alemon-bot #进入
-```
-
-```shell
-npm run app qq #启动
-```
-
 ## 配置管理
 
-打开 alemon.toml 文件
+参考配置说明进行
 
-参考配置说明进行更改[config](./config.md)
+更改[alemon.toml](./alemon.md)
 
 ### 共享平台
 
