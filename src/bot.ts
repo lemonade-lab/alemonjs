@@ -11,7 +11,7 @@ export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication
 let appDir = 'application'
 
 /**
- * 初始模块简化
+ * 应用模块集成
  * @param AppName
  * @param name
  * @returns
