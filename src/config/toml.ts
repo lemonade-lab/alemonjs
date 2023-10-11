@@ -14,7 +14,7 @@ export function getToml(url = urlVal) {
   urlVal = url
   const u = join(process.cwd(), urlVal)
   if (!existsSync(u)) return {} as ConfigType
-  return parse(readFileSync(u, 'utf8')) as ConfigType
+  return parse(readFileSync(u, 'utf8')) as unknown as ConfigType
 }
 
 /**

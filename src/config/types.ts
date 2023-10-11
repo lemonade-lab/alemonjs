@@ -1,5 +1,6 @@
 import { GatewayIntentBits } from 'discord.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
+import { PuppeteerLaunchOptions } from 'puppeteer'
 
 /**
  * ******
@@ -7,15 +8,15 @@ import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
  * ******
  */
 export interface ConfigType {
-  redis?: RedisConfig
-  mysql?: MysqlConfig
-  discord?: DiscordConfig
-  kook?: KookConfig
-  villa?: VillaConfig
-  qq?: QQConfig
-  server?: ServerConfig
-  puppeteer?: PuppeteerConfig
-  ntqq?: NtQQConfig
+  redis: RedisConfig
+  mysql: MysqlConfig
+  discord: DiscordConfig
+  kook: KookConfig
+  villa: VillaConfig
+  qq: QQConfig
+  server: ServerConfig
+  puppeteer: PuppeteerLaunchOptions
+  ntqq: NtQQConfig
 }
 
 /**
@@ -133,15 +134,4 @@ export interface QQConfig {
 export interface ServerConfig {
   host: string
   port: number
-}
-
-/**
- * ********
- * pup
- * *******
- */
-export interface PuppeteerConfig {
-  args: string[]
-  headless: 'new'
-  timeout: number
 }

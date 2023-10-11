@@ -66,6 +66,9 @@ const config: ConfigType = {
     host: '127.0.0.1',
     port: 5000
   },
+  /**
+   * pup的配置的繁多的
+   */
   puppeteer: {
     headless: 'new',
     timeout: 30000,
@@ -87,11 +90,19 @@ const config: ConfigType = {
  */
 export function setBotConfig(val: ConfigType) {
   // 分布覆盖
-  for (const item in val) {
+  for (const i in val) {
     // 当且仅当存在同key的时候才会覆盖默认配置
-    for (const i in val[item]) {
-      // 当前仅当同属性名的时候才会覆盖默认配置
-      config[item][i] = val[item][i]
+    if (Object.prototype.hasOwnProperty.call(config, i)) {
+      for (const j in val[i]) {
+        // 当前仅当同属性名的时候才会覆盖默认配置
+        if (Object.prototype.hasOwnProperty.call(config[i], j)) {
+          config[i][j] = val[i][j]
+        } else {
+          console.log('[alemonjs][存在无效参数]', val[i])
+        }
+      }
+    } else {
+      console.log('[alemonjs][存在无效参数]', val[i])
     }
   }
 }
@@ -108,7 +119,11 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
   // 分布覆盖
   for (const item in val) {
     // 当前仅当同属性名的时候才会覆盖默认配置
-    config[key][item] = val[item]
+    if (Object.prototype.hasOwnProperty.call(config[key], item)) {
+      config[key][item] = val[item]
+    } else {
+      console.log('[alemonjs][存在无效参数]', val[item])
+    }
   }
 }
 
