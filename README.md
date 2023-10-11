@@ -37,9 +37,9 @@ npm run app qq #启动
 
 > 仓库只做资源收集,对齐安全性不做任何检查,请谨慎选择
 
-Gitee ☞[贡献资源](https://gitee.com/ningmengchongshui/alemon/tree/web/docs/root/examples/about/plugins.md)
+[Gitee ☞ 贡献资源](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
 
-Github ☞[贡献资源](https://github.com/ningmengchongshui/alemon/tree/web/docs/root/examples/about/plugins.md)
+[Github ☞ 贡献资源](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
 
 ### 平台推送
 
