@@ -9,7 +9,7 @@ import { Private } from '../privatechat.js'
 import { EventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { setBotMsgByQQ } from '../bot.js'
-import { getBotConfigByKey } from '../../../login.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 
 declare global {
   /**

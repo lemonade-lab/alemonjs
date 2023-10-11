@@ -7,7 +7,7 @@ import { Message as DcMessage } from 'discord.js'
 import { segmentDiscord } from '../segment.js'
 import { getBotMsgByDiscord } from '../bot.js'
 import { postImage } from '../api.js'
-import { getBotConfigByKey } from '../../../login.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 /**
  * 公共
  * @param event

@@ -1,7 +1,11 @@
 import prompts from 'prompts'
-import { setBotConfigByKey, getBotConfigByKey } from '../login.js'
-import { getToml, writeToml } from '../config.js'
-import { NtQQEventsEnum } from '../types.js'
+import {
+  NtQQEventsEnum,
+  setBotConfigByKey,
+  getBotConfigByKey,
+  getToml,
+  writeToml
+} from '../config/index.js'
 
 /**
  * 登录配置

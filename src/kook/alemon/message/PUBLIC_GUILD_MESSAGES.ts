@@ -6,7 +6,7 @@ import {
 import { KOOKApiClient, EventData } from 'kook-ws'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
-import { getBotConfigByKey } from '../../../login.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 
 /**
  *

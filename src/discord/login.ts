@@ -1,7 +1,11 @@
 import prompts from 'prompts'
 import { GatewayIntentBits } from 'discord.js'
-import { setBotConfigByKey, getBotConfigByKey } from '../login.js'
-import { getToml, writeToml } from '../config.js'
+import {
+  setBotConfigByKey,
+  getBotConfigByKey,
+  getToml,
+  writeToml
+} from '../config/index.js'
 
 /**
  * 登录配置

@@ -11,7 +11,7 @@ import { MESSAGE_AUDIT } from './message/MESSAGE_AUDIT.js'
 import { AUDIO_ACTION } from './message/AUDIO_ACTION.js'
 import { FORUMS_EVENT } from './message/FORUMS_EVENT.js'
 import { setBotMsgByQQ } from './bot.js'
-import { getBotConfigByKey } from '../../login.js'
+import { getBotConfigByKey } from '../../config/index.js'
 
 interface BotData {
   version: number

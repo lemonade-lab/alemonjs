@@ -1,6 +1,5 @@
 import { setLanchConfig } from './alemon/index.js'
-import { getBotConfigByKey, setBotConfig } from './login.js'
-import { getToml } from './config.js'
+import { getBotConfigByKey, setBotConfig, getToml } from './config/index.js'
 import { loadInit } from './alemon/index.js'
 import { ClientAPIByQQ } from './ntqq/sdk/index.js'
 import { compilationTools } from 'alemon-rollup'
@@ -50,20 +49,18 @@ const createAlemon = {
   }
 }
 
-interface botOpoint {
-  args?: string[]
-  mount?: boolean
-  address?: string
-  cfg?: string
-}
-
 /**
  * 创建机器人
  * @param val
  * @returns
  */
 export async function createBot(
-  val: botOpoint = {
+  val: {
+    args?: string[]
+    mount?: boolean
+    address?: string
+    cfg?: string
+  } = {
     args: process.argv.slice(2),
     mount: false,
     address: '/application'
@@ -100,9 +97,6 @@ export async function createBot(
   })
   return compilationTools
 }
-
-// 机器人配置
-export { getBotConfigByKey, setBotConfigByKey } from './login.js'
 
 // 设置独立鉴权路径
 export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication

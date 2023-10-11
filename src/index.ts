@@ -11,6 +11,8 @@ export { compilationTools, integration } from 'alemon-rollup'
 export * from './alemon/index.js'
 // 导出机器人
 export * from './bot.js'
+// 机器配置管理
+export * from './config/index.js'
 
 // 监听退出
 process.on('SIGINT', signals => {

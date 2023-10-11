@@ -6,7 +6,7 @@ import {
 import { BotEvent, MessageContentType, Client } from 'mys-villa'
 import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
-import { getBotConfigByKey } from '../../../login.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 import { now_e } from './e.js'
 
 /**

@@ -3,7 +3,7 @@ import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { setBotConfig } from 'qq-channel'
 import { checkRobotByQQ } from './login.js'
 import { createConversationByQQ } from './alemon/conversation.js'
-import { getBotConfigByKey } from '../login.js'
+import { getBotConfigByKey } from '../config/index.js'
 declare global {
   var clientApiByQQ: IOpenAPI
 }

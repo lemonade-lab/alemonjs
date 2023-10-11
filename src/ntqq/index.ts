@@ -1,5 +1,5 @@
 import { checkRobotByQQ } from './login.js'
-import { getBotConfigByKey } from '../login.js'
+import { getBotConfigByKey } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
 import {
   setBotConfig,

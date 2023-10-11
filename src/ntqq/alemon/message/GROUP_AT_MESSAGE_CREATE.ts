@@ -10,7 +10,7 @@ import {
 } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
-import { getBotConfigByKey } from '../../../login.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 import { ExampleObject } from '../types.js'
 import IMGS from 'image-size'
 

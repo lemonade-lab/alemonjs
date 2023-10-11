@@ -2,7 +2,7 @@ import { Client } from 'discord.js'
 import { checkRobotByDiscord } from './login.js'
 import { callBackByDisdord } from './alemon/conversation.js'
 import { setBotMsgByDiscord } from './alemon/bot.js'
-import { getBotConfigByKey } from '../login.js'
+import { getBotConfigByKey } from '../config/index.js'
 export async function createAlemonByDiscord() {
   /**
    * 登录

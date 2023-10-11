@@ -2,7 +2,7 @@ import { checkRobotByKOOK } from './login.js'
 import { callBackByKOOK } from './alemon/conversation.js'
 import { createClient, KOOKApiClient } from 'kook-ws'
 import { setBotMsgByKOOK } from './alemon/bot.js'
-import { getBotConfigByKey } from '../login.js'
+import { getBotConfigByKey } from '../config/index.js'
 /**
  * 创建实例
  * @returns
