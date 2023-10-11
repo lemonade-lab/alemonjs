@@ -46,7 +46,6 @@ function watchCT(tplFile: string) {
       delete watcher[tplFile]
     })
 }
-
 /**
  * 如果control为真则需重新用art渲染
  * @param Options
@@ -73,13 +72,17 @@ export function createStr(Options: {
    */
   const basePath = join(process.cwd(), appDir, AppName)
   /**
+   * 数据路径
+   */
+  const dataPath = join(process.cwd(), '.data', AppName)
+  /**
    * 写入地址
    */
-  const AdressHtml = join(process.cwd(), 'data', AppName, basename(tplFile))
+  const AdressHtml = join(dataPath, basename(tplFile))
   /**
    * 确保写入目录存在
    */
-  mkdirSync(join(process.cwd(), 'data', AppName), { recursive: true })
+  mkdirSync(dataPath, { recursive: true })
   /**
    * 判断初始模板是否改变
    */

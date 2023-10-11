@@ -10,6 +10,7 @@ types
 
 # 插件
 /application/
+/public/
 
 # 缓存
 /data/

@@ -8,7 +8,7 @@ const compilationTools = await createBot({
 // 加载模块
 const word = await compilationTools({
   aInput: `example/**/*.ts`,
-  aOutput: `apps.js`
+  aOutput: `.apps/index.js`
 })
 
 // 创建应用

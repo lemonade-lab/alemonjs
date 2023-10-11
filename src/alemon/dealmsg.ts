@@ -51,7 +51,7 @@ const plugins: object = {}
 /**
  * 默认执行地址
  */
-const route = '/help'
+const route = '/public/defset'
 
 /**
  * 执行文件
@@ -66,7 +66,7 @@ let mergedRegex: RegExp
 
 /**
  * 设置指令json地址
- * @param rt '/help'
+ * @param rt '/public/defset'
  */
 export function setAppsHelp(rt = route) {
   addressMenu = join(process.cwd(), rt)

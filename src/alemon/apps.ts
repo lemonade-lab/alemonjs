@@ -37,7 +37,7 @@ export function createApp(AppName: string) {
   return {
     /**
      * 设置指令json地址
-     * @param rt = '/src'
+     * @param rt = '/public/defset'
      */
     setHelp: setAppsHelp,
     /**

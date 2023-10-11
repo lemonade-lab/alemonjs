@@ -639,6 +639,9 @@ export interface MuteController {
   muteMembers?: (...args: any[]) => any
 }
 
+/**
+ * 卡片枚举
+ */
 export const CacrdEnum = [
   /**
    * qq频道
@@ -654,6 +657,9 @@ export const CacrdEnum = [
   'kook_card'
 ] as const
 
+/**
+ * 卡片类型
+ */
 export interface CardType {
   type: (typeof CacrdEnum)[number]
   card: any

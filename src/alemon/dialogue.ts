@@ -39,7 +39,7 @@ export type ConversationHandler = (
 export type conversationHandlersMap = Map<string, ConversationHandler>
 
 /**
- *
+ *对话缓存
  */
 const Sockes: SockesType = {}
 

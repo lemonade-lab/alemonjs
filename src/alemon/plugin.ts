@@ -1,5 +1,7 @@
 import { EventEnum, EventType } from './typings.js'
-
+/**
+ * 插件类型
+ */
 export interface PluginInitType {
   event?: (typeof EventEnum)[number]
   eventType?: (typeof EventType)[number]
@@ -8,7 +10,9 @@ export interface PluginInitType {
   dsc?: string
   rule?: PluginRuleType[]
 }
-
+/**
+ * 插件类型
+ */
 export interface PluginRuleType {
   /**
    * 正则
@@ -32,6 +36,9 @@ export interface PluginRuleType {
   priority?: number
 }
 
+/**
+ * 插件模板
+ */
 export class plugin {
   /**
    * 模块名

@@ -4,11 +4,9 @@ if (
 ) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 }
-// 导出机器人
-export * from './main.js'
+// 导出编译工具
+export { compilationTools, integration } from 'alemon-rollup'
 // 导出核心方法
 export * from './alemon/index.js'
-/**
- * 编译
- */
-export { compilationTools, integration } from 'alemon-rollup'
+// 导出机器人
+export * from './bot.js'
