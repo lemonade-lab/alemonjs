@@ -106,12 +106,3 @@ export { getBotConfigByKey, setBotConfigByKey } from './login.js'
 
 // 设置独立鉴权路径
 export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication
-
-// 监听退出
-process.on('SIGINT', signals => {
-  console.info(signals)
-  if (process.pid) {
-    process.exit()
-  }
-  return
-})

@@ -15,6 +15,7 @@ tsconfig.json
 .eslintrc.cjs
 .gitignore
 .npmrc
+.apps
 
 # 插件
 /application/

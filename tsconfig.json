@@ -20,7 +20,6 @@
   },
   "include": [
     "src/**/*",
-    "application"
   ],
   "exclude": [
     "node_modules",

@@ -1,4 +1,7 @@
 import { ConfigType } from './types.js'
+/**
+ * bot-config
+ */
 const config: ConfigType = {
   redis: {
     host: '127.0.0.1',

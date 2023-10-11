@@ -1,5 +1,28 @@
 import { GatewayIntentBits } from 'discord.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
+
+/**
+ * ****
+ * config
+ * /////
+ */
+export interface ConfigType {
+  redis?: RedisConfig
+  mysql?: MysqlConfig
+  discord?: DiscordConfig
+  kook?: KookConfig
+  villa?: VillaConfig
+  qq?: QQConfig
+  server?: ServerConfig
+  puppeteer?: PuppeteerConfig
+  ntqq?: NtQQConfig
+}
+
+/**
+ * ****
+ * redis
+ * *****
+ */
 export interface RedisConfig {
   host: string
   port: number
@@ -7,6 +30,11 @@ export interface RedisConfig {
   db: number
 }
 
+/**
+ * ***
+ * mysql
+ * **
+ */
 export interface MysqlConfig {
   host: string
   port: number
@@ -15,6 +43,11 @@ export interface MysqlConfig {
   database: string
 }
 
+/**
+ * **
+ * discord
+ * **
+ */
 export interface DiscordConfig {
   token: string
   masterID: string
@@ -22,12 +55,22 @@ export interface DiscordConfig {
   intents: GatewayIntentBits[]
 }
 
+/**
+ * ****
+ * kook
+ * ***
+ */
 export interface KookConfig {
   token: string
   masterID: string
   password: string
 }
 
+/**
+ * ****
+ * villa
+ * *****
+ */
 export interface VillaConfig {
   bot_id: string
   secret: string
@@ -41,6 +84,12 @@ export interface VillaConfig {
   img_url: string
   IMAGE_DIR: string
 }
+
+/**
+ * *****
+ * ntqq
+ * ****
+ */
 
 export enum NtQQEventsEnum {
   GROUP_AT_MESSAGE_CREATE = 'GROUP_AT_MESSAGE_CREATE', // 群艾特消息
@@ -61,6 +110,11 @@ export interface NtQQConfig {
   http: string
 }
 
+/**
+ * ******
+ * qq
+ * *****
+ */
 export interface QQConfig {
   appID: string
   token: string
@@ -71,25 +125,23 @@ export interface QQConfig {
   sandbox: boolean
 }
 
+/**
+ * ******
+ * server
+ * *****
+ */
 export interface ServerConfig {
   host: string
   port: number
 }
 
+/**
+ * ********
+ * pup
+ * *******
+ */
 export interface PuppeteerConfig {
   args: string[]
   headless: 'new'
   timeout: number
-}
-
-export interface ConfigType {
-  redis?: RedisConfig
-  mysql?: MysqlConfig
-  discord?: DiscordConfig
-  kook?: KookConfig
-  villa?: VillaConfig
-  qq?: QQConfig
-  server?: ServerConfig
-  puppeteer?: PuppeteerConfig
-  ntqq?: NtQQConfig
 }

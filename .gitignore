@@ -11,6 +11,7 @@ types
 # 插件
 /application/
 /public/
+.apps
 
 # 缓存
 /data/
