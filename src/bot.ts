@@ -8,6 +8,21 @@ import { createAlemon } from './map.js'
 // 设置独立鉴权路径
 export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication
 
+let appDir = 'application'
+
+/**
+ * 初始模块简化
+ * @param AppName
+ * @param name
+ * @returns
+ */
+export function ApplicationTools(AppName: string, name = 'apps') {
+  return compilationTools({
+    aInput: `${appDir}/${AppName}/${name}/**/*.ts`,
+    aOutput: `${appDir}/${AppName}/apps.js`
+  })
+}
+
 /**
  * 创建机器人
  * @param val
@@ -22,10 +37,14 @@ export async function createBot(
   } = {
     args: process.argv.slice(2),
     mount: false,
-    address: '/application'
+    address: 'application'
   }
 ) {
   const { args, mount, cfg, address } = val
+
+  // 配置快捷路径
+  appDir = address == undefined ? 'application' : address
+
   /**
    * 加载配置
    */
@@ -52,7 +71,7 @@ export async function createBot(
    */
   await loadInit({
     mount: mount == undefined ? false : mount,
-    address: address == undefined ? '/application' : address
+    address: address == undefined ? '/application' : `/${address}`
   })
   return compilationTools
 }
