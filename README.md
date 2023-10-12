@@ -13,11 +13,11 @@
 | cli   | 脚手架 | 开发模板脚手架       |
 | web   | 网站   | 共享平台插件贡献地址 |
 
-## 配置管理
+配置管理[alemon.toml](./alemon.md)
 
-参考配置说明进行
+开发模板 GITEE[create-alemonjs](https://gitee.com/ningmengchongshui/alemon/tree/cli/bin/template)
 
-更改[alemon.toml](./alemon.md)
+开发模板 GITHUB[create-alemonjs](https://github.com/ningmengchongshui/alemon/tree/cli/bin/template)
 
 ### 共享平台
 
