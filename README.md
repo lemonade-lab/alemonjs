@@ -13,8 +13,6 @@
 
 > 需要配置机器人才可启动
 
-配置管理 OPEN[alemon.toml](./alemon.md)
-
 文档查看 OPEN[alemonjs.com](https://alemonjs.com)
 
 开发模板 GITEE[create-alemonjs](https://gitee.com/ningmengchongshui/alemon/tree/cli/bin/template)

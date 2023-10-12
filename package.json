@@ -5,9 +5,11 @@
   "author": "ningmengchongshui",
   "main": "lib/index.js",
   "license": "GPL-2.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "app": "ts-node index.ts",
+    "app": "alemonjs",
+    "dev": "alemonjs dev",
     "tsc": "npx tsc",
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
@@ -46,9 +48,13 @@
   },
   "types": "types",
   "files": [
+    "bin",
     "lib",
     "types"
   ],
+  "bin": {
+    "alemonjs": "bin/main.js"
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },

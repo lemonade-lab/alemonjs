@@ -10,8 +10,10 @@ export { compilationTools, integration } from 'alemon-rollup'
 
 // 导出核心方法
 export * from './alemon/index.js'
-// 导出机器人
-export * from './bot.js'
+
+// 导出执行
+export * from './define/index.js'
+
 // 机器配置管理
 export * from './config/index.js'
 

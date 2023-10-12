@@ -1,89 +1,27 @@
 import { ConfigType } from './types.js'
+import redis from '../default/redis.js'
+import mysql from '../default/mysql.js'
+import server from '../default/server.js'
+import puppeteer from '../default/pup.js'
+import discord from '../default/login/discord.js'
+import kook from '../default/login/kook.js'
+import villa from '../default/login/villa.js'
+import qq from '../default/login/qq.js'
+import ntqq from '../default/login/ntqq.js'
 /**
  * bot-config
  */
 const config: ConfigType = {
-  redis: {
-    host: '127.0.0.1',
-    port: 6379,
-    password: '',
-    db: 1
-  },
-  mysql: {
-    host: '127.0.0.1',
-    port: 3306,
-    user: 'root',
-    password: '',
-    database: 'alemon'
-  },
-  discord: {
-    token: '',
-    masterID: '',
-    password: '',
-    intents: []
-  },
-  kook: {
-    token: '',
-    masterID: '',
-    password: ''
-  },
-  villa: {
-    bot_id: '',
-    secret: '',
-    pub_key: '',
-    masterID: '',
-    password: '',
-    http: 'http',
-    url: '/api/mys/callback',
-    port: 8080,
-    size: 999999,
-    img_url: '/api/mys/img',
-    IMAGE_DIR: '/data/mys/img'
-  },
-  qq: {
-    appID: '',
-    token: '',
-    masterID: '',
-    password: '',
-    intents: [],
-    isPrivate: false,
-    sandbox: false
-  },
-  ntqq: {
-    appID: '',
-    token: '',
-    secret: '',
-    masterID: '',
-    password: '',
-    intents: [],
-    port: 9090,
-    size: 999999,
-    img_url: '/api/mys/img',
-    IMAGE_DIR: '/data/mys/img',
-    http: 'http'
-  },
-  server: {
-    host: '127.0.0.1',
-    port: 5000
-  },
-  /**
-   * pup的配置的繁多的
-   */
-  puppeteer: {
-    headless: 'new',
-    timeout: 30000,
-    args: [
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-setuid-sandbox',
-      '--no-first-run',
-      '--no-sandbox',
-      '--no-zygote',
-      '--single-process'
-    ]
-  }
+  redis,
+  mysql,
+  discord,
+  kook,
+  villa,
+  qq,
+  ntqq,
+  server,
+  puppeteer
 }
-
 /**
  * 初始化配置
  * @param val
