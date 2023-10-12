@@ -4,7 +4,7 @@
  * ***********
  */
 import { IOpenAPI } from 'qq-guild-bot'
-import { ClientAPIByQQ as ClientByNTQQ } from './ntqq/sdk/index.js'
+import { ClientAPIByQQ as ClientByNTQQ } from '../ntqq/sdk/index.js'
 import { Client as ClientByVILLA } from 'mys-villa'
 import { KOOKApiClient as ClientByKOOK } from 'kook-ws'
 declare global {

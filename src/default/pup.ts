@@ -10,5 +10,7 @@ export default {
     '--no-sandbox',
     '--no-zygote',
     '--single-process'
-  ]
+  ],
+  skipDownload: true,
+  executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 } as PuppeteerLaunchOptions

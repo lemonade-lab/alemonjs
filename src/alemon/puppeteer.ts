@@ -70,8 +70,11 @@ export async function pupStartCheck() {
   /**
    * 检测是否开启
    */
-  if (isBrowser == false) {
-    if (!(await startChrom())) return false
+  if (!isBrowser) {
+    const T = await startChrom()
+    if (!T) {
+      return false
+    }
   }
   if (pic <= RestartControl) {
     /**
@@ -111,16 +114,12 @@ export async function screenshotByFile(
     timeout?: number
   }
 ) {
-  if (!pupStartCheck()) return false
+  const T = await pupStartCheck()
+  if (!T) {
+    return false
+  }
   const { SOptions, tab = 'body', timeout = 120000 } = Options
   try {
-    /**
-     * 开始
-     */
-    if (!isBrowser) {
-      if (!(await startChrom())) return false
-    }
-    console.info('[puppeteer] start')
     /**
      * 实例化
      */
@@ -178,12 +177,10 @@ export interface urlScreenshotOptions {
  * @returns
  */
 export async function screenshotByUrl(val: urlScreenshotOptions) {
-  if (!pupStartCheck()) return false
-  if (!isBrowser) {
-    if (!(await startChrom())) return false
+  const T = await pupStartCheck()
+  if (!T) {
+    return false
   }
-  console.info('[puppeteer] start')
-
   const { url, time, rand, params, tab, cache } = val
   if (!pageCache[url]) {
     pageCache[url] = await browser.newPage()

@@ -1,33 +1,27 @@
 if (
   process.argv.slice(2).includes('discord') &&
-  !process.argv.slice(2).includes('not')
+  !process.argv.slice(2).includes('no')
 ) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 }
 /**
  * *******************
- * 核心处理器&公共方法
+ * 核心处理&公共方法
  * *******************
  */
 export * from './alemon/index.js'
 /**
  * *******************
- * 配置解析器
+ * 初始化
  * *******************
  */
 export * from './define/index.js'
 /**
  * **********
- * 配置管理器
+ * 配置管理
  * **********
  */
 export * from './config/index.js'
-/**
- * **********
- * SDK
- * **********
- */
-export * from './api.js'
 /**
  * *********
  * 监听退出

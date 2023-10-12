@@ -8,21 +8,13 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
  */
 export interface AlemonOptions {
   /**
-   * 可执行的依赖包
-   */
-  component?: any[]
-  /**
-   * 附加运行脚本
-   */
-  scripts?: {
-    ars?: string[]
-    name?: 'ts-node' | 'node'
-    file: string
-  }[]
-  /**
    * 应用名称
    */
   name?: string
+  /**
+   * 可执行的依赖包
+   */
+  component?: any[]
   /**
    * redis配置
    */
@@ -54,6 +46,14 @@ export interface AlemonOptions {
     aInput: string
     aOutput: string
   }
+  /**
+   * 附加运行脚本
+   */
+  scripts?: {
+    ars?: string[]
+    name?: 'ts-node' | 'node'
+    file: string
+  }[]
 }
 
 /**
