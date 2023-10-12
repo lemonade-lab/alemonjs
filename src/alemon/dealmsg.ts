@@ -84,16 +84,31 @@ export function getPluginHelp(AppName: string) {
 
 /**
  * 创建机器人帮助
+ * 存在且得到的app不为[]时才会创建json
  */
 function createPluginHelp() {
-  // 不存在
-  if (!existsSync(addressMenu)) mkdirSync(addressMenu, { recursive: true })
-  // 创建help
-  for (const item in plugins) {
-    const basePath = join(addressMenu, `${item}.json`)
-    const jsonData = JSON.stringify(plugins[item], null, 2)
-    // 异步创建避免阻塞
-    writeFile(basePath, jsonData, 'utf-8')
+  // 存在app才创建
+  if (Object.values(plugins).length != 0) {
+    // 同时key不能是空数组
+    let t = false
+    for (const item in plugins) {
+      if (plugins[item] && plugins[item].length != 0) {
+        t = true
+      }
+    }
+    if (t) {
+      // 不存在
+      if (!existsSync(addressMenu)) mkdirSync(addressMenu, { recursive: true })
+      // 创建help
+      for (const item in plugins) {
+        if (plugins[item] && plugins[item].length != 0) {
+          const basePath = join(addressMenu, `${item}.json`)
+          const jsonData = JSON.stringify(plugins[item], null, 2)
+          // 异步创建避免阻塞
+          writeFile(basePath, jsonData, 'utf-8')
+        }
+      }
+    }
   }
 }
 
@@ -421,12 +436,9 @@ export async function InstructionMatching(e: AMessage) {
         })
         .catch((err: any) => {
           console.error(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${data.fncName}][${err}]`
-          )
-          console.error(
             `\n[${data.event}][${data.belong}][${data.AppName}][${
               data.fncName
-            }][${false}]`
+            }][${false}]\n[${err}]`
           )
           return false
         })
@@ -468,11 +480,10 @@ export async function typeMessage(e: AMessage) {
           return res
         })
         .catch((err: any) => {
-          console.error(err)
           console.error(
             `\n[${data.event}][${data.belong}][${data.AppName}][${
               data.fncName
-            }][${false}]`
+            }][${false}]\n[${err}]`
           )
           return false
         })
@@ -493,11 +504,10 @@ export async function typeMessage(e: AMessage) {
  * @param data
  */
 function logErr(err: any, data: CmdItemType) {
-  console.error(err)
   console.error(
     `\n[${data.event}][${data.belong}][${data.AppName}][${
       data.fncName
-    }][${false}]`
+    }][${false}]\n[${err}]`
   )
   return
 }
