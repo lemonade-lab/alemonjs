@@ -8,7 +8,6 @@
   "type": "module",
   "scripts": {
     "app": "ts-node index.ts",
-    "login": "ts-node index.ts login",
     "tsc": "npx tsc",
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
@@ -25,7 +24,6 @@
     "kook-ws": "^1.0.4",
     "lodash": "^4.17.21",
     "mys-villa": "^1.1.8",
-    "prompts": "^2.4.2",
     "puppeteer": "^20.7.1",
     "qq-channel": "^1.0.0",
     "qq-guild-bot": "^2.9.5",
