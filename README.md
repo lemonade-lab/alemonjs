@@ -23,9 +23,9 @@
 
 > 仓库只做资源收集,对齐安全性不做任何检查,请谨慎选择
 
-[Gitee ☞ 贡献资源](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
+贡献资源 OPEN[Gitee](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
 
-[Github ☞ 贡献资源](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
+贡献资源 OPEN[Github](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
 
 > 仅限签署开源协议的仓库、不开源将不做考虑范围内
 

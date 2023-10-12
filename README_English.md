@@ -4,14 +4,14 @@
 
 > support NtQQ、QQ channel、Discord、Mi You She Big Villa、KOOK
 
-[☞Alemon official website](https://alemonjs.com)
-
 | Branch | Type        | Description                                 |
 | ------ | ----------- | ------------------------------------------- |
 | Main   | core        | bot instance                                |
 | Redis  | Database    | Special Connection Independence             |
 | Cli    | scaffolding | development template scaffolding            |
 | Web    | Website     | Shared Platform Plugin Contribution Address |
+
+official website OPEN[alemonjs.com](https://alemonjs.com)
 
 ## 开源协议
 
