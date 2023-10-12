@@ -1,8 +1,5 @@
-import {
-  NtQQEventsEnum,
-  setBotConfigByKey,
-  getBotConfigByKey
-} from '../config/index.js'
+import { setBotConfigByKey, getBotConfigByKey } from '../config/index.js'
+import { NtQQEventsEnum } from '../default/types.js'
 
 /**
  * 登录配置

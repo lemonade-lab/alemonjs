@@ -4,20 +4,35 @@ if (
 ) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 }
-
-// 导出编译工具
-export { compilationTools, integration } from 'alemon-rollup'
-
-// 导出核心方法
+/**
+ * *******************
+ * 核心处理器&公共方法
+ * *******************
+ */
 export * from './alemon/index.js'
-
-// 导出执行
+/**
+ * *******************
+ * 配置解析器
+ * *******************
+ */
 export * from './define/index.js'
-
-// 机器配置管理
+/**
+ * **********
+ * 配置管理器
+ * **********
+ */
 export * from './config/index.js'
-
-// 监听退出
+/**
+ * **********
+ * SDK
+ * **********
+ */
+export * from './api.js'
+/**
+ * *********
+ * 监听退出
+ * *********
+ */
 process.on('SIGINT', signals => {
   console.info(signals)
   if (process.pid) {

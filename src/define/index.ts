@@ -1,15 +1,15 @@
-import { rebotMap } from './map.js'
+import { compilationTools } from 'alemon-rollup'
+import PupOptions from '../default/pup.js'
 import { AlemonOptions } from '../default/types.js'
+import { rebotMap } from './map.js'
+import { nodeScripts } from './child_process.js'
+import { ClientAPIByQQ } from '../ntqq/sdk/index.js'
 import {
   createApp,
   loadInit,
   setBotConfigByKey,
   setLanchConfig
 } from '../index.js'
-import PupOptions from '../default/pup.js'
-import { compilationTools } from 'alemon-rollup'
-import { nodeScripts } from './child_process.js'
-import { ClientAPIByQQ } from '../ntqq/sdk/index.js'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientAPIByQQ.setAuthentication

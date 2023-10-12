@@ -223,8 +223,18 @@ async function synthesis(
  * @param dir
  */
 async function loadPlugins(dir: string) {
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+  /**
+   * ********************
+   * 没有该文件夹直接返回
+   * *******************
+   */
+  if (!existsSync(dir)) {
+    return
+  }
   const flies = readdirSync(dir)
+  if (flies.length == 0) {
+    return
+  }
   /**
    * 识别并执行插件
    */
@@ -364,9 +374,7 @@ export async function loadInit(
   } = { mount: false, address: '/application' }
 ) {
   const { mount, address } = val
-
   appDir = address ?? '/application'
-
   /**
    * 加载插件
    */

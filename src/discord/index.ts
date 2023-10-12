@@ -47,6 +47,7 @@ export async function createAlemonByDiscord() {
      * 登录
      */
     client.login(cfg.token)
+
     return true
   }
   return false

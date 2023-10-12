@@ -5,10 +5,10 @@ export default {
   masterID: '',
   password: '',
   intents: [
-    'GUILDS',
-    'GUILD_MEMBERS',
-    'DIRECT_MESSAGE',
-    'PUBLIC_GUILD_MESSAGES'
+    AvailableIntentsEventsEnum.GUILDS,
+    AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
+    AvailableIntentsEventsEnum.DIRECT_MESSAGE,
+    AvailableIntentsEventsEnum.GUILD_MEMBERS
   ] as AvailableIntentsEventsEnum[],
   isPrivate: false,
   sandbox: false

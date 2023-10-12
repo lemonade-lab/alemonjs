@@ -24,7 +24,11 @@ export async function createAlemonByQQ() {
     /**
      * 创建 clientApiByQQ
      */
-    global.clientApiByQQ = createOpenAPI(cfg)
+    global.clientApiByQQ = createOpenAPI({
+      appID: cfg.appID,
+      token: cfg.token,
+      sandbox: cfg.sandbox ?? false
+    })
 
     /**
      * 设置 qq-channal 配置
@@ -40,7 +44,14 @@ export async function createAlemonByQQ() {
     /**
      * 创建 websocket
      */
-    const WebsocketClient = createWebsocket(cfg)
+    const WebsocketClient = createWebsocket({
+      appID: cfg.appID,
+      token: cfg.token,
+      sandbox: cfg.sandbox,
+      // shards?:[],
+      intents: cfg.intents
+      // maxRetry:
+    })
     /**
      * 创建 conversation
      */
