@@ -4,8 +4,6 @@
 
 > 支持 NtQQ、QQ 频道、Discord、米游社大别野、KOOK
 
-[☞Alemon 文档](https://alemonjs.com)
-
 | 分支  | 类型   | 说明                 |
 | ----- | ------ | -------------------- |
 | main  | 核心   | 机器实例             |
@@ -13,7 +11,9 @@
 | cli   | 脚手架 | 开发模板脚手架       |
 | web   | 网站   | 共享平台插件贡献地址 |
 
-配置管理[alemon.toml](./alemon.md)
+文档查看 OPEN[alemonjs.com](https://alemonjs.com)
+
+配置管理 OPEN[alemon.toml](./alemon.md)
 
 开发模板 GITEE[create-alemonjs](https://gitee.com/ningmengchongshui/alemon/tree/cli/bin/template)
 
@@ -26,8 +26,6 @@
 [Gitee ☞ 贡献资源](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
 
 [Github ☞ 贡献资源](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
-
-### 平台推送
 
 > 仅限签署开源协议的仓库、不开源将不做考虑范围内
 
