@@ -1,65 +1,29 @@
-import { existsSync, readdirSync, copyFileSync, mkdirSync } from 'fs'
+import { existsSync, readdirSync, cpSync } from 'fs'
 import { getAppRegex } from '../alemon/index.js'
 import { join } from 'path'
-
-/**
- * 遍历复制方法
- */
-const copyFiles = (source, destination) => {
-  if (!existsSync(destination)) {
-    mkdirSync(destination, { recursive: true })
-  }
-  const files = readdirSync(source)
-  for (const file of files) {
-    const sourcePath = join(source, file)
-    const destinationPath = join(destination, file)
-    copyFileSync(sourcePath, destinationPath)
-  }
-}
 
 /**
  * 同步挂载文件
  * @param dir 插件目录
  */
-export function copyAppsFile(dir) {
+export function copyAppsFile(dir: string, control: string[] = []) {
   if (!existsSync(dir)) return
   const flies = readdirSync(dir)
   if (flies.length === 0) return
   const { RegexOpen, RegexClose } = getAppRegex()
-  // 插件名
-  const apps = flies
-    .filter(item => RegexOpen.test(item))
-    .filter(item => {
-      // 关闭符合条件的
-      if (!RegexClose) {
-        return true
-      }
-      if (RegexClose.test(item)) {
-        return false
-      }
-      return true
-    })
-  for (const appname of apps) {
+  for (const appname of flies) {
     const appPath = join(dir, appname)
-    if (existsSync(`${appPath}/assets`)) {
-      const originalAddress = `${appPath}/assets`
-      const destinationAddress = join(process.cwd(), `/assets/.${appname}`)
-      copyFiles(originalAddress, destinationAddress)
-    }
-    if (existsSync(`${appPath}/pages`)) {
-      const originalAddress = `${appPath}/pages`
-      const destinationAddress = join(process.cwd(), `/pages/.${appname}`)
-      copyFiles(originalAddress, destinationAddress)
-    }
-    if (existsSync(`${appPath}/plugins`)) {
-      const originalAddress = `${appPath}/plugins`
-      const destinationAddress = join(process.cwd(), `/plugins/.${appname}`)
-      copyFiles(originalAddress, destinationAddress)
-    }
-    if (existsSync(`${appPath}/server`)) {
-      const originalAddress = `${appPath}/server`
-      const destinationAddress = join(process.cwd(), `/server/.${appname}`)
-      copyFiles(originalAddress, destinationAddress)
+    if (RegexOpen.test(appname) && (!RegexClose || !RegexClose.test(appname))) {
+      for (const name of control) {
+        if (existsSync(`${appPath}/${name}`)) {
+          const originalAddress = `${appPath}/${name}`
+          const destinationAddress = join(
+            process.cwd(),
+            `./${name}/.${appname}`
+          )
+          cpSync(originalAddress, destinationAddress, { recursive: true })
+        }
+      }
     }
   }
 }

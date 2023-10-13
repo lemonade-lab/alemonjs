@@ -64,6 +64,10 @@ export interface AlemonOptions {
    */
   plugin?: {
     /**
+     * 是否加载插件
+     */
+    init?: boolean
+    /**
      * 插件目录
      */
     directory?: string
@@ -71,7 +75,12 @@ export interface AlemonOptions {
      * 挂载文件
      * default true
      */
-    mountFile?: string
+    mountFile?: boolean
+    /**
+     * 选择性挂载
+     * 默认 ['assets', 'pages', 'public', 'plugins', 'server']
+     */
+    monutControl?: string[]
     /**
      * 插件名匹配规则
      */

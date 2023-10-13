@@ -130,7 +130,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       await rebotMap[item]()
     }
   }
-
   /**
    * ********
    * 登录提示
@@ -167,17 +166,28 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ***************
    */
   if (Options?.plugin?.mountFile) {
-    copyAppsFile(join(process.cwd(), `/${address}`))
+    copyAppsFile(
+      join(process.cwd(), `/${address}`).replace(/\\/g, '/'),
+      Options?.plugin?.monutControl ?? [
+        'assets',
+        'pages',
+        'public',
+        'plugins',
+        'server'
+      ]
+    )
   }
   /**
    * ************
    * 扫描插件
    * ************
    */
-  await loadInit({
-    mount: mount,
-    address: address == undefined ? '/application' : `/${address}`
-  })
+  if (Options?.plugin?.init) {
+    await loadInit({
+      mount: mount,
+      address: address == undefined ? '/application' : `/${address}`
+    })
+  }
   /**
    * ************
    * 编译独立插件
