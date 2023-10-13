@@ -43,34 +43,22 @@ export function copyAppsFile(dir) {
     const appPath = join(dir, appname)
     if (existsSync(`${appPath}/assets`)) {
       const originalAddress = `${appPath}/assets`
-      const destinationAddress = join(
-        process.cwd(),
-        `/public/.${appname}/assets`
-      )
+      const destinationAddress = join(process.cwd(), `/assets/.${appname}`)
       copyFiles(originalAddress, destinationAddress)
     }
     if (existsSync(`${appPath}/pages`)) {
       const originalAddress = `${appPath}/pages`
-      const destinationAddress = join(
-        process.cwd(),
-        `/public/.${appname}/pages`
-      )
+      const destinationAddress = join(process.cwd(), `/pages/.${appname}`)
       copyFiles(originalAddress, destinationAddress)
     }
     if (existsSync(`${appPath}/plugins`)) {
       const originalAddress = `${appPath}/plugins`
-      const destinationAddress = join(
-        process.cwd(),
-        `/public/.${appname}/plugins`
-      )
+      const destinationAddress = join(process.cwd(), `/plugins/.${appname}`)
       copyFiles(originalAddress, destinationAddress)
     }
     if (existsSync(`${appPath}/server`)) {
       const originalAddress = `${appPath}/server`
-      const destinationAddress = join(
-        process.cwd(),
-        `/public/.${appname}/server`
-      )
+      const destinationAddress = join(process.cwd(), `/server/.${appname}`)
       copyFiles(originalAddress, destinationAddress)
     }
   }
