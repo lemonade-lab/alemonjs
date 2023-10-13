@@ -1,6 +1,6 @@
 import { compilationTools } from 'alemon-rollup'
 import PupOptions from '../default/pup.js'
-import { AlemonOptions } from '../default/types.js'
+import { AlemonOptions } from './types.js'
 import { rebotMap } from './map.js'
 import { nodeScripts } from './child_process.js'
 import { ClientAPIByQQ as ClientByNTQQ } from '../ntqq/sdk/index.js'
@@ -12,6 +12,7 @@ import {
   getPupPath,
   getBotConfigByKey
 } from '../index.js'
+import { command } from './command.js'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
@@ -36,6 +37,14 @@ export function ApplicationTools(AppName: string, name = 'apps') {
  * @param Options
  */
 export async function defineAlemonConfig(Options: AlemonOptions) {
+  /**
+   * 运行前执行
+   */
+  if (Options?.command) {
+    for await (const item of Options.command) {
+      await command(item)
+    }
+  }
   /**
    * *******
    * pup配置
@@ -121,10 +130,10 @@ export async function defineAlemonConfig(Options: AlemonOptions) {
    * ************
    */
   let mount = false
-  if (Options?.component || Options?.module) {
+  if (Options?.app?.component || Options?.app?.module) {
     mount = true
   }
-  const address = Options?.other?.plugin?.directory ?? 'application'
+  const address = Options?.plugin?.directory ?? 'application'
   appDir = address
   /**
    * ************
@@ -141,13 +150,13 @@ export async function defineAlemonConfig(Options: AlemonOptions) {
    * ************
    */
   if (mount) {
-    const app = createApp(Options?.name ?? 'bot')
-    if (Options?.module) {
-      const word = await compilationTools(Options.module)
+    const app = createApp(Options?.app?.name ?? 'bot')
+    if (Options?.app?.module) {
+      const word = await compilationTools(Options?.app?.module)
       app.component(word)
     }
-    if (Options?.component) {
-      for (const item of Options.component) {
+    if (Options?.app?.component) {
+      for await (const item of Options.app.component) {
         app.component(item)
       }
     }
@@ -165,7 +174,7 @@ export async function defineAlemonConfig(Options: AlemonOptions) {
      * 执行附加脚本
      */
     if (Options?.scripts) {
-      for (const item of Options.scripts) {
+      for await (const item of Options.scripts) {
         const name = item?.name ?? 'node'
         nodeScripts(name, item?.file, item?.ars ?? [])
       }

@@ -19,8 +19,7 @@
     "experimentalSpecifierResolution": "node"
   },
   "include": [
-    "src/**/*",
-    "application"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
