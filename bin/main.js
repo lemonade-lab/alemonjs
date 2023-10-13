@@ -9,7 +9,6 @@ const files = msg.match(/(\S+\.js|\S+\.ts)/g) ?? ['alemon.config.ts']
 const argsWithoutFiles = msg.replace(/(\S+\.js|\S+\.ts)/g, '')
 
 for (const item of files) {
-  // 判断是  js还是ts文件
   const isTypeScript = item.endsWith('.ts')
 
   const command = isTypeScript ? 'npx ts-node' : 'node'
