@@ -113,7 +113,7 @@ export const createConversationByQQ = ws => {
      * 审核事件监听
      */
     ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, AUDIO_ACTION)
-    console.info('[READY]', ` 欢迎回来 ${bot.name}`)
+    console.info('[QQ]', ` 欢迎回来 ${bot.name}`)
   })
 
   /**

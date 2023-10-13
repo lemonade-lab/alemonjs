@@ -37,7 +37,7 @@ export async function createAlemonByDiscord() {
             size: 1024
           }) ?? ''
       })
-      console.info(`欢迎回来 ${client.user?.username}`)
+      console.info(`[DISCORD]欢迎回来 ${client.user?.username}`)
     })
     /**
      * 监听消息创建

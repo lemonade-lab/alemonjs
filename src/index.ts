@@ -23,6 +23,10 @@ export * from './define/index.js'
  */
 export * from './config/index.js'
 /**
+ * 登录加载器
+ */
+export * from './login.js'
+/**
  * *********
  * 监听退出
  * *********
