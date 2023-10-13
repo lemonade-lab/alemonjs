@@ -88,6 +88,17 @@ export function setAppRegex(val: RegexControl) {
 }
 
 /**
+ * 得到插件名匹配模式
+ * @returns
+ */
+export function getAppRegex() {
+  return {
+    RegexOpen: appRegex,
+    RegexClose: appRegexClose
+  }
+}
+
+/**
  * 设置指令json地址
  * @param rt '/public/defset'
  */
@@ -246,23 +257,12 @@ async function synthesis(
  * @param dir
  */
 async function loadPlugins(dir: string) {
-  /**
-   * ********************
-   * 没有该文件夹直接返回
-   * *******************
-   */
-  if (!existsSync(dir)) {
-    return
-  }
+  if (!existsSync(dir)) return
   const flies = readdirSync(dir)
-  if (flies.length == 0) {
-    return
-  }
-
-  const app = flies
+  if (flies.length == 0) return
+  const apps = flies
     .filter(item => appRegex.test(item))
     .filter(item => {
-      // 关闭符合条件的
       if (!appRegexClose) {
         return true
       }
@@ -275,7 +275,7 @@ async function loadPlugins(dir: string) {
   /**
    * 识别并执行插件
    */
-  for await (const appname of app) {
+  for await (const appname of apps) {
     if (existsSync(`${dir}/${appname}/index.ts`)) {
       /**
        * 优先考虑ts

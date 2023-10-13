@@ -14,6 +14,8 @@ import {
   setAppRegex
 } from '../index.js'
 import { command } from './command.js'
+import { copyAppsFile } from './plugin.js'
+import { join } from 'path'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
@@ -129,10 +131,14 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     }
   }
 
+  /**
+   * ********
+   * 登录提示
+   * ********
+   */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
     console.info('[LOGIN] 无登录配置')
   }
-
   /**
    * ************
    * 迟缓插件加载
@@ -154,6 +160,14 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       RegexOpen: Options?.plugin?.RegexOpen,
       RegexClose: Options?.plugin?.RegexClose
     })
+  }
+  /**
+   * ***************
+   * 是否同步文件
+   * ***************
+   */
+  if (Options?.plugin?.mountFile) {
+    copyAppsFile(join(process.cwd(), `/${address}`))
   }
   /**
    * ************
