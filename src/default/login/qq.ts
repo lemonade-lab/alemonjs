@@ -8,8 +8,7 @@ export default {
   intents: [
     AvailableIntentsEventsEnum.GUILDS,
     AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
-    AvailableIntentsEventsEnum.DIRECT_MESSAGE,
-    AvailableIntentsEventsEnum.GUILD_MEMBERS
+    AvailableIntentsEventsEnum.DIRECT_MESSAGE
   ] as AvailableIntentsEventsEnum[],
   isPrivate: false,
   sandbox: false

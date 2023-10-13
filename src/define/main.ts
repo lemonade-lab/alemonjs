@@ -14,6 +14,7 @@ import {
   setAppRegex
 } from '../index.js'
 import { command } from './command.js'
+import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
@@ -97,28 +98,58 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   const arr: string[] = []
   /**
    * *********
-   * 启动机器人
+   * 登录机器人
    * *********
    */
   if (Options?.login) {
-    /**
-     * ********
-     * 配置载入
-     * *******
-     */
     if (Options.login?.discord) {
+      // 自定义覆盖
       setBotConfigByKey('discord', Options.login.discord)
     }
     if (Options.login?.qq) {
+      // 开启私域
+      if (Options.login?.qq?.isPrivate) {
+        setBotConfigByKey('qq', {
+          intents: [
+            // 基础事件
+            AvailableIntentsEventsEnum.GUILDS, //频道进出
+            AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
+            AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
+            // 需申请的
+            AvailableIntentsEventsEnum.AUDIO_ACTION, //音频
+            AvailableIntentsEventsEnum.MESSAGE_AUDIT, //消息审核
+            AvailableIntentsEventsEnum.INTERACTION, //互动事件
+            AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, //表情表态
+            // 私域特有
+            AvailableIntentsEventsEnum.GUILD_MESSAGES, //私域事件
+            AvailableIntentsEventsEnum.FORUMS_EVENT //私域论坛
+          ]
+        })
+      } else {
+        setBotConfigByKey('qq', {
+          intents: [
+            // 基础事件
+            AvailableIntentsEventsEnum.GUILDS, //频道进出
+            AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
+            AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
+            // 公域特有
+            AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES //公域事件
+          ]
+        })
+      }
+      // 自定义覆盖
       setBotConfigByKey('qq', Options.login.qq)
     }
     if (Options.login?.ntqq) {
+      // 自定义覆盖
       setBotConfigByKey('ntqq', Options.login.ntqq)
     }
     if (Options.login?.kook) {
+      // 自定义覆盖
       setBotConfigByKey('kook', Options.login.kook)
     }
     if (Options.login?.villa) {
+      // 自定义覆盖
       setBotConfigByKey('villa', Options.login.villa)
     }
     for (const item in Options.login) {
