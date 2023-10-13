@@ -10,7 +10,8 @@ import {
   setBotConfigByKey,
   setLanchConfig,
   getPupPath,
-  getBotConfigByKey
+  getBotConfigByKey,
+  setAppRegex
 } from '../index.js'
 import { command } from './command.js'
 
@@ -32,13 +33,27 @@ export function ApplicationTools(AppName: string, name = 'apps') {
   })
 }
 
+let OptionsCache: AlemonOptions
+
+/**
+ * 得到载入配置
+ * @returns
+ */
+export function getAlemonConfig() {
+  return OptionsCache
+}
+
 /**
  * 机器人配置
  * @param Options
  */
-export async function defineAlemonConfig(Options: AlemonOptions) {
+export async function defineAlemonConfig(Options?: AlemonOptions) {
+  if (!Options) return
+  OptionsCache = Options
   /**
+   * **********
    * 运行前执行
+   * **********
    */
   if (Options?.command) {
     for await (const item of Options.command) {
@@ -122,7 +137,7 @@ export async function defineAlemonConfig(Options: AlemonOptions) {
       await rebotMap[item]()
     }
   } else {
-    console.log('[LOGIN] 无登录配置')
+    console.info('[LOGIN] 无登录配置')
   }
   /**
    * ************
@@ -135,6 +150,17 @@ export async function defineAlemonConfig(Options: AlemonOptions) {
   }
   const address = Options?.plugin?.directory ?? 'application'
   appDir = address
+  /**
+   * ************
+   * 设置扫描规则
+   * ***********
+   */
+  if (Options?.plugin?.RegexOpen || Options?.plugin?.RegexClose) {
+    setAppRegex({
+      RegexOpen: Options?.plugin?.RegexOpen,
+      RegexClose: Options?.plugin?.RegexClose
+    })
+  }
   /**
    * ************
    * 扫描插件
@@ -151,8 +177,14 @@ export async function defineAlemonConfig(Options: AlemonOptions) {
    */
   if (mount) {
     const app = createApp(Options?.app?.name ?? 'bot')
+    if (Options?.app?.regJSon?.address) {
+      app.setHelp(Options?.app?.regJSon?.address ?? '/public/defset')
+    }
     if (Options?.app?.module) {
-      const word = await compilationTools(Options?.app?.module)
+      const word = await compilationTools({
+        aInput: Options?.app?.module?.input ?? 'src/apps/**/*.ts',
+        aOutput: Options?.app?.module?.input ?? '.apps/index.js'
+      })
       app.component(word)
     }
     if (Options?.app?.component) {

@@ -64,6 +64,29 @@ let addressMenu = join(process.cwd(), route)
 
 let mergedRegex: RegExp
 
+let appRegex = /./
+
+let appRegexClose: RegExp
+
+interface RegexControl {
+  RegexOpen?: RegExp
+  RegexClose?: RegExp
+}
+
+/**
+ * 插件名匹配
+ * @param val
+ */
+export function setAppRegex(val: RegexControl) {
+  const { RegexOpen, RegexClose } = val
+  if (RegexOpen) {
+    appRegex = RegexOpen
+  }
+  if (RegexClose) {
+    appRegexClose = RegexClose
+  }
+}
+
 /**
  * 设置指令json地址
  * @param rt '/public/defset'
@@ -235,10 +258,24 @@ async function loadPlugins(dir: string) {
   if (flies.length == 0) {
     return
   }
+
+  const app = flies
+    .filter(item => appRegex.test(item))
+    .filter(item => {
+      // 关闭符合条件的
+      if (!appRegexClose) {
+        return true
+      }
+      if (appRegexClose.test(item)) {
+        return false
+      }
+      return true
+    })
+
   /**
    * 识别并执行插件
    */
-  for await (const appname of flies) {
+  for await (const appname of app) {
     if (existsSync(`${dir}/${appname}/index.ts`)) {
       /**
        * 优先考虑ts

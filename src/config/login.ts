@@ -42,12 +42,12 @@ export function setBotConfig(val: ConfigType) {
           if (Object.prototype.hasOwnProperty.call(config[i], j)) {
             config[i][j] = val[i][j]
           } else {
-            console.log('[alemonjs][存在无效参数]', val[i])
+            console.info('[alemonjs][存在无效参数]', val[i])
           }
         }
       }
     } else {
-      console.log('[alemonjs][存在无效参数]', val[i])
+      console.info('[alemonjs][存在无效参数]', val[i])
     }
   }
 }
@@ -72,7 +72,7 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
       if (Object.prototype.hasOwnProperty.call(config[key], item)) {
         config[key][item] = val[item]
       } else {
-        console.log('[alemonjs][存在无效参数]', val[item])
+        console.info('[alemonjs][存在无效参数]', val[item])
       }
     }
   }

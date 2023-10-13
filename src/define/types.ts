@@ -21,24 +21,43 @@ export interface AlemonOptions {
      */
     component?: any[]
     /**
-     * 指令预览是否生成
+     * 指令预览
      */
-    regJSon?: boolean
-    /**
-     * 是否不立即解析插件
-     */
-    mount?: boolean
+    regJSon?: {
+      /**
+       * 是否生成
+       * defaukt true
+       */
+      create?: boolean
+      /**
+       * 生成地址
+       * defaukt /publick/defset
+       */
+      address?: string
+    }
     /**
      * 独立模块配置
      */
     module?: {
-      aInput: string
-      aOutput: string
+      /**
+       * 输入规则
+       */
+      input?: string
+      /**
+       * 输出规则
+       */
+      output?: string
     }
     /**
      * 关闭指定应用
      */
     close?: string[]
+    /**
+     * 重定义消息对象
+     * @param args
+     * @returns
+     */
+    redefineMessage?: (...args: any[]) => any
   }
   /**
    * 插件配置
@@ -47,7 +66,20 @@ export interface AlemonOptions {
     /**
      * 插件目录
      */
-    directory: string
+    directory?: string
+    /**
+     * 挂载文件
+     * default true
+     */
+    mountFile?: string
+    /**
+     * 插件名匹配规则
+     */
+    RegexOpen?: RegExp
+    /**
+     * 插件名关闭规则
+     */
+    RegexClose?: RegExp
   }
   /**
    * login配置

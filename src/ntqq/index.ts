@@ -78,7 +78,7 @@ export async function createAlemonByNtqq() {
     /**
      * 创建客户端
      */
-    createClient(conversation)
+    createClient(conversation, cfg?.shard ?? [0, 1])
 
     /**
      * 创建web端

@@ -2,6 +2,7 @@ import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 export default {
   appID: '',
   token: '',
+  secret: '',
   masterID: '',
   password: '',
   intents: [

@@ -7,14 +7,14 @@ export async function command(cmd: string) {
   const dirPath = `./`
   // 没有存在
   mkdirSync(dirPath, { recursive: true })
-  console.log('\n')
+  console.info('\n')
   try {
     // 切换目录
     process.chdir(dirPath)
-    console.log(`[command] ${cmd}`)
+    console.info(`[command] ${cmd}`)
     execSync(cmd, { stdio: 'inherit' })
   } catch (error) {
-    console.log(`${error}`)
+    console.info(`${error}`)
     return
   }
 }

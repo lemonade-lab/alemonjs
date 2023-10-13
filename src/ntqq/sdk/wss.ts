@@ -102,12 +102,10 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
 
       switch (op) {
         case 0: {
-          console.log('[数据接收]', data)
           // 存在,则执行t对应的函数
           if (Object.prototype.hasOwnProperty.call(call, t)) {
             call[t](data)
           }
-
           // Ready Event，鉴权成功
           if (t === 'READY') {
             power = setInterval(() => {
@@ -121,7 +119,6 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
               }
             }, heartbeat_interval)
           }
-
           // Resumed Event，恢复连接成功
           if (t === 'RESUMED') {
             console.info('恢复连接')

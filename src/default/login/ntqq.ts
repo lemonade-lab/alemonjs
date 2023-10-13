@@ -9,6 +9,7 @@ export default {
     'GROUP_AT_MESSAGE_CREATE',
     'C2C_MESSAGE_CREATE'
   ] as NtQQEventsEnum[],
+  shard: [0, 1],
   port: 9090,
   size: 999999,
   img_url: '/api/mys/img',
