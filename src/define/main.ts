@@ -50,16 +50,7 @@ export function getAlemonConfig() {
 export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (!Options) return
   OptionsCache = Options
-  /**
-   * **********
-   * 运行前执行
-   * **********
-   */
-  if (Options?.command) {
-    for await (const item of Options.command) {
-      await command(item)
-    }
-  }
+
   /**
    * *******
    * pup配置
@@ -136,9 +127,12 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       arr.push(item)
       await rebotMap[item]()
     }
-  } else {
+  }
+
+  if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
     console.info('[LOGIN] 无登录配置')
   }
+
   /**
    * ************
    * 迟缓插件加载
@@ -195,21 +189,24 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     app.mount('#app')
   }
   /**
+   * **********
+   * 附加执行
+   * **********
+   */
+  if (Options?.command) {
+    for await (const item of Options.command) {
+      await command(item)
+    }
+  }
+  /**
    * ***************
-   * 如果是开发模式
-   * 不会执行附加脚本
+   * 附加脚本
    * ***************
    */
-  const ars = process.argv.slice(2)
-  if (!ars.includes('off')) {
-    /**
-     * 执行附加脚本
-     */
-    if (Options?.scripts) {
-      for await (const item of Options.scripts) {
-        const name = item?.name ?? 'node'
-        nodeScripts(name, item?.file, item?.ars ?? [])
-      }
+  if (Options?.scripts) {
+    for await (const item of Options.scripts) {
+      const name = item?.name ?? 'node'
+      nodeScripts(name, item?.file, item?.ars ?? [])
     }
   }
   return

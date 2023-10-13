@@ -1,11 +1,10 @@
 {
   "name": "alemonjs",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "阿柠檬框架",
   "author": "ningmengchongshui",
   "main": "lib/index.js",
   "license": "GPL-2.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "app": "alemonjs",
