@@ -72,16 +72,6 @@ export interface AlemonOptions {
      */
     directory?: string
     /**
-     * 挂载文件
-     * default true
-     */
-    mountFile?: boolean
-    /**
-     * 选择性挂载
-     * 默认 ['assets', 'pages', 'public', 'plugins', 'server']
-     */
-    monutControl?: string[]
-    /**
      * 插件名匹配规则
      */
     RegexOpen?: RegExp
