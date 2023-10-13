@@ -1,6 +1,6 @@
 import { mkdirSync } from 'fs'
-import { execSync } from 'child_process'
-export async function command(cmd: string) {
+import { execSync, exec } from 'child_process'
+export async function command(cess: 'execSync' | 'exec', cmd: string) {
   // 错误参数
   if (!cmd) process.exit()
   // 锁定位置
@@ -12,7 +12,11 @@ export async function command(cmd: string) {
     // 切换目录
     process.chdir(dirPath)
     console.info(`[command] ${cmd}`)
-    execSync(cmd, { stdio: 'inherit' })
+    if (cess == 'execSync') {
+      execSync(cmd, { stdio: 'inherit' })
+    } else if (cess == 'exec') {
+      exec(cmd)
+    }
   } catch (error) {
     console.info(`${error}`)
     return

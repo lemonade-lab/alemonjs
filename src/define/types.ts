@@ -85,13 +85,23 @@ export interface AlemonOptions {
    */
   login?: LoginOptions
   /**
+   * 附加运行等待时间
+   */
+  waitingTime?: number
+  /**
    * 附加指令
    */
-  command?: string[]
+  command?: {
+    cess?: 'execSync' | 'exec'
+    cmd: string
+  }[]
   /**
    * 附加运行脚本
    */
   scripts?: {
+    /**
+     * 参数
+     */
     ars?: string[]
     name?: 'ts-node' | 'node'
     file: string

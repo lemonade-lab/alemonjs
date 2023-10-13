@@ -224,26 +224,33 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     }
     app.mount('#app')
   }
-  /**
-   * **********
-   * 附加执行
-   * **********
-   */
-  if (Options?.command) {
-    for await (const item of Options.command) {
-      await command(item)
+
+  setTimeout(async () => {
+    /**
+     * **********
+     * 附加执行
+     * **********
+     */
+    if (Options?.command) {
+      for await (const item of Options.command) {
+        if (item?.cmd) {
+          // 默认同步
+          await command(item?.cess ?? 'execSync', item?.cmd)
+        }
+      }
     }
-  }
-  /**
-   * ***************
-   * 附加脚本
-   * ***************
-   */
-  if (Options?.scripts) {
-    for await (const item of Options.scripts) {
-      const name = item?.name ?? 'node'
-      nodeScripts(name, item?.file, item?.ars ?? [])
+    /**
+     * ***************
+     * 附加脚本
+     * ***************
+     */
+    if (Options?.scripts) {
+      for await (const item of Options.scripts) {
+        const name = item?.name ?? 'node'
+        nodeScripts(name, item?.file, item?.ars ?? [])
+      }
     }
-  }
+  }, Options?.waitingTime ?? 3000)
+
   return
 }
