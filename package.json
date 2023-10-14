@@ -1,17 +1,10 @@
 {
   "name": "alemonjs",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "阿柠檬框架",
   "author": "ningmengchongshui",
-  "main": "lib/index.js",
   "license": "GPL-2.0",
   "type": "module",
-  "exports": {
-    "./run": {
-      "types": "./run.d.ts",
-      "import": "./run.js"
-    }
-  },
   "scripts": {
     "app": "alemonjs",
     "dev": "alemonjs dev",
@@ -24,6 +17,7 @@
     "@discordjs/core": "^0.6.0",
     "@discordjs/rest": "^1.7.1",
     "alemon-rollup": "^1.0.2",
+    "alemonjs": "^1.0.13",
     "axios": "^1.4.0",
     "discord.js": "^14.11.0",
     "image-size": "^1.0.2",
@@ -51,6 +45,7 @@
     "typescript": ">=5.0.4 <5.1.0"
   },
   "types": "types",
+  "main": "lib/index.js",
   "files": [
     "bin",
     "lib",
@@ -58,6 +53,17 @@
     "run.js",
     "run.d.ts"
   ],
+  "exports": {
+    ".": "./lib/index.js",
+    "./run": {
+      "import": "./run.js",
+      "types": "./run.d.ts"
+    },
+    "./core": {
+      "import": "./types/core/index.js",
+      "types": "./lib/core/index.d.ts"
+    }
+  },
   "bin": {
     "alemonjs": "bin/main.js"
   },

@@ -33,8 +33,8 @@ export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
 export function ApplicationTools(AppName: string, name = 'apps') {
   const appDir = getAppDir()
   return compilationTools({
-    aInput: `${appDir}/${AppName}/${name}/**/*.ts`,
-    aOutput: `${appDir}/${AppName}/apps.js`
+    aInput: `${appDir.replace(/^\//, '')}/${AppName}/${name}/**/*.ts`,
+    aOutput: `${appDir.replace(/^\//, '')}/${AppName}/apps.js`
   })
 }
 
@@ -184,8 +184,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     }
     if (Options?.app?.module) {
       const word = await compilationTools({
-        aInput: Options?.app?.module?.input ?? 'apps/**/*.ts',
-        aOutput: Options?.app?.module?.input ?? '.apps/index.js'
+        aInput:
+          Options?.app?.module?.input?.replace(/^\//, '') ?? 'apps/**/*.ts',
+        aOutput:
+          Options?.app?.module?.output.replace(/^\//, '') ?? '.apps/index.js'
       })
       app.component(word)
     }
