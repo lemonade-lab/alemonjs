@@ -1,4 +1,4 @@
-import { CardType } from '../../../alemon/index.js'
+import { CardType } from '../../../core/index.js'
 export const now_e = {
   /**
    * 卡片

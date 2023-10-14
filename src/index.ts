@@ -9,7 +9,7 @@ if (
  * 核心处理&公共方法
  * *******************
  */
-export * from './alemon/index.js'
+export * from './core/index.js'
 /**
  * *******************
  * 初始化

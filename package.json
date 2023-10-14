@@ -6,6 +6,10 @@
   "main": "lib/index.js",
   "license": "GPL-2.0",
   "type": "module",
+  "exports": {
+    "./run": "./src/run.js",
+    "./core": "./src/core/index.js"
+  },
   "scripts": {
     "app": "alemonjs",
     "dev": "alemonjs dev",

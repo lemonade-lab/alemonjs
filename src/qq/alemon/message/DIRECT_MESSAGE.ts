@@ -4,7 +4,7 @@ import {
   AMessage,
   InstructionMatching,
   CardType
-} from '../../../alemon/index.js'
+} from '../../../core/index.js'
 import { ClientAPIByQQ as Client } from 'qq-channel'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'

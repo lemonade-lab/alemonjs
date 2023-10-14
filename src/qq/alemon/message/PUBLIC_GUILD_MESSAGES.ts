@@ -1,4 +1,4 @@
-import { typeMessage, AMessage } from '../../../alemon/index.js'
+import { typeMessage, AMessage } from '../../../core/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { EventData } from '../types.js'
 import { getBotMsgByQQ } from '../bot.js'

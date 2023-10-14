@@ -1,8 +1,4 @@
-import {
-  AMessage,
-  UserType,
-  InstructionMatching
-} from '../../../alemon/index.js'
+import { AMessage, UserType, InstructionMatching } from '../../../core/index.js'
 import { KOOKApiClient, EventData } from 'kook-ws'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'

@@ -14,7 +14,7 @@ import {
   setAppRegex,
   setAppDir,
   getAppDir
-} from '../alemon/index.js'
+} from '../core/index.js'
 import {
   getPupPath,
   setBotConfigByKey,

@@ -1,8 +1,4 @@
-import {
-  CardType,
-  InstructionMatching,
-  AMessage
-} from '../../../alemon/index.js'
+import { CardType, InstructionMatching, AMessage } from '../../../core/index.js'
 import {
   ClientAPIByQQ as Client,
   ClinetWeb,
