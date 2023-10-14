@@ -1,14 +1,16 @@
 {
   "name": "alemonjs",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "阿柠檬框架",
   "author": "ningmengchongshui",
   "main": "lib/index.js",
   "license": "GPL-2.0",
   "type": "module",
   "exports": {
-    "./run": "./src/run.js",
-    "./core": "./src/core/index.js"
+    "./run": {
+      "types": "./run.d.ts",
+      "import": "./run.js"
+    }
   },
   "scripts": {
     "app": "alemonjs",
@@ -52,7 +54,9 @@
   "files": [
     "bin",
     "lib",
-    "types"
+    "types",
+    "run.js",
+    "run.d.ts"
   ],
   "bin": {
     "alemonjs": "bin/main.js"

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { spawn } from 'child_process'
 export function commandRun(ars) {
   const msg = ars.join(' ')
