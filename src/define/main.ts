@@ -3,18 +3,21 @@ import PupOptions from '../default/pup.js'
 import { AlemonOptions } from './types.js'
 import { rebotMap } from './map.js'
 import { nodeScripts } from './child_process.js'
+import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { ClientAPIByQQ as ClientByNTQQ } from '../ntqq/sdk/index.js'
+import { command } from './command.js'
 import {
   createApp,
-  loadInit,
-  setBotConfigByKey,
   setLanchConfig,
-  getPupPath,
-  getBotConfigByKey,
+  loadInit,
+  appsInit,
   setAppRegex
-} from '../index.js'
-import { command } from './command.js'
-import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
+} from '../alemon/index.js'
+import {
+  getPupPath,
+  setBotConfigByKey,
+  getBotConfigByKey
+} from '../config/index.js'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
@@ -51,7 +54,6 @@ export function getAlemonConfig() {
 export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (!Options) return
   OptionsCache = Options
-
   /**
    * *******
    * pup配置
@@ -61,7 +63,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   // 设置旧的值
   setBotConfigByKey('puppeteer', pCig)
   if (Options?.puppeteer) {
-    // 存在 替换新的值
+    // 存在则替换新的值
     setBotConfigByKey('puppeteer', Options?.puppeteer)
   }
   const pData = getBotConfigByKey('puppeteer')
@@ -222,7 +224,8 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
         app.component(item)
       }
     }
-    app.mount('#app')
+    app.mount()
+    await appsInit()
   }
 
   setTimeout(async () => {
@@ -250,7 +253,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
         nodeScripts(name, item?.file, item?.ars ?? [])
       }
     }
-  }, Options?.waitingTime ?? 3000)
+  }, Options?.waitingTime ?? Object.keys(Options?.login ?? {}).length * 1000)
 
   return
 }

@@ -6,46 +6,40 @@ import { getMessage } from './message.js'
 import { getApp, delApp, getAppKey } from './app.js'
 import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
-
 /**
+ * **************
  * 指令可枚举类型
+ * **************
  */
 interface CmdItemType {
   reg: RegExp
   priority: number
   event: (typeof EventEnum)[number]
   eventType: (typeof EventType)[number]
-  belong: 'plugins' | 'example'
   AppName: string
   fncName: string
   fnc: (...args: any[]) => any
 }
 
 /**
- * 指令类型
+ * *******
+ * 指令map
+ * *******
+ * Command message
+ * CommandNotR other message
  */
-type CmdType = {
+type CommandMap = {
   [Event in (typeof EventEnum)[number]]: CmdItemType[]
 }
+const Command: CommandMap = {} as CommandMap
+const CommandNotR: CommandMap = {} as CommandMap
 
 /**
- * 指令合集
- */
-const Command: CmdType = {} as CmdType
-
-/**
- * 指令合集
- */
-const CommandNotR: CmdType = {} as CmdType
-
-/**
- * plugins插件集合
+ * ***********
+ * plugins管理
+ * ***********
  */
 let PluginsArr = []
-
-/**
- * 指令json
- */
 const plugins: object = {}
 
 /**
@@ -58,21 +52,16 @@ const route = '/public/defset'
  */
 let addressMenu = join(process.cwd(), route)
 
-/**
- * 大正则
- */
-
+// 大正则
 let mergedRegex: RegExp
-
+// 插件目录匹配规则
 let appRegex = /./
-
+// 插件目录取消规则
 let appRegexClose: RegExp
-
 interface RegexControl {
   RegexOpen?: RegExp
   RegexClose?: RegExp
 }
-
 /**
  * 插件名匹配
  * @param val
@@ -150,13 +139,8 @@ function createPluginHelp() {
  * 应用挂载
  * @param AppsObj
  * @param appname
- * @param belong
  */
-async function synthesis(
-  AppsObj: object,
-  appname: string,
-  belong: 'plugins' | 'example'
-) {
+async function synthesis(AppsObj: object, appname: string) {
   // 没有记载
   if (!plugins[appname]) {
     plugins[appname] = []
@@ -198,7 +182,6 @@ async function synthesis(
       const fnc = keys[fncName]
       const doc = key['doc'] ?? ''
       const dsc = key['dsc'] ?? ''
-
       // 如果类型正确
       if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
         // 存在正则就必须是MESSAGES
@@ -216,7 +199,6 @@ async function synthesis(
         })
         // 保存
         Command[event].push({
-          belong,
           event: event,
           eventType: eventType,
           reg: new RegExp(reg),
@@ -238,7 +220,6 @@ async function synthesis(
         })
         // 保存
         CommandNotR[event].push({
-          belong,
           event: event,
           eventType: eventType,
           priority,
@@ -337,7 +318,7 @@ export async function appsInit() {
     /**
      * 分析插件集
      */
-    await synthesis(apps, item, 'plugins')
+    await synthesis(apps, item)
     /**
      * 记录该插件
      */
@@ -348,17 +329,22 @@ export async function appsInit() {
     delApp(item)
   }
 
-  /***
-   * 排序之后把所有正则变成一条正则
-   */
-
   /**
    * 排序
    */
   for (const val in Command) {
     Command[val] = lodash.orderBy(Command[val], ['priority'], ['asc'])
   }
+  /**
+   * 排序
+   */
+  for (const val in CommandNotR) {
+    CommandNotR[val] = lodash.orderBy(CommandNotR[val], ['priority'], ['asc'])
+  }
 
+  /***
+   * 排序之后把所有正则变成一条正则
+   */
   const mergedRegexArr = []
   for (const val in Command) {
     for (const data of Command[val]) {
@@ -372,20 +358,14 @@ export async function appsInit() {
   mergedRegex = new RegExp(mergedRegexArr.map(regex => regex.source).join('|'))
 
   /**
-   * 排序
-   */
-  for (const val in CommandNotR) {
-    CommandNotR[val] = lodash.orderBy(CommandNotR[val], ['priority'], ['asc'])
-  }
-
-  /**
    * 生成指令json
    */
   createPluginHelp()
+
   /**
    * 打印
    */
-  console.info(`[LOAD] apps*${PluginsArr.length} `)
+  console.info(`[LOAD] APPS*${PluginsArr.length} `)
   return
 }
 
@@ -441,7 +421,9 @@ export async function InstructionMatching(e: AMessage) {
    * 获取对话处理函数
    */
   const handler = conversationHandlers.get(e.user_id)
-
+  /**
+   * 拦截
+   */
   if (handler && state) {
     /**
      * 如果用户处于对话状态
@@ -454,7 +436,6 @@ export async function InstructionMatching(e: AMessage) {
    *  撤回事件 匹配不到事件 或者 大正则不匹配
    */
   if (e.isRecall || !Command[e.event] || !mergedRegex.test(e.msg)) return true
-
   /**
    * 循环所有指令 用 awwat确保指令顺序
    */
@@ -473,15 +454,13 @@ export async function InstructionMatching(e: AMessage) {
         .fnc(e)
         .then((res: boolean) => {
           console.info(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${
-              data.fncName
-            }][${true}]`
+            `\n[${data.event}][${data.AppName}][${data.fncName}][${true}]`
           )
           return res
         })
         .catch((err: any) => {
           console.error(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${
+            `\n[${data.event}][${data.AppName}][${
               data.fncName
             }][${false}]\n[${err}]`
           )
@@ -518,15 +497,13 @@ export async function typeMessage(e: AMessage) {
         .fnc(e)
         .then((res: boolean) => {
           console.info(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${
-              data.fncName
-            }][${true}]`
+            `\n[${data.event}][${data.AppName}][${data.fncName}][${true}]`
           )
           return res
         })
         .catch((err: any) => {
           console.error(
-            `\n[${data.event}][${data.belong}][${data.AppName}][${
+            `\n[${data.event}][${data.AppName}][${
               data.fncName
             }][${false}]\n[${err}]`
           )
@@ -550,9 +527,7 @@ export async function typeMessage(e: AMessage) {
  */
 function logErr(err: any, data: CmdItemType) {
   console.error(
-    `\n[${data.event}][${data.belong}][${data.AppName}][${
-      data.fncName
-    }][${false}]\n[${err}]`
+    `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]\n[${err}]`
   )
   return
 }

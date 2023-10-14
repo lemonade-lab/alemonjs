@@ -104,14 +104,12 @@ export function createApp(AppName: string) {
      * 挂起应用
      * @returns
      */
-    mount: (instruct?: string) => {
+    mount: () => {
       try {
         setApp(AppName, apps)
       } catch (err) {
         console.error(err)
       }
-      // 存在挂载指令则重新加载
-      if (instruct) appsInit()
     }
   }
 }

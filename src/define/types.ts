@@ -86,6 +86,7 @@ export interface AlemonOptions {
   login?: LoginOptions
   /**
    * 附加运行等待时间
+   * defaukt app*1000
    */
   waitingTime?: number
   /**
