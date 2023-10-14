@@ -58,10 +58,6 @@
     "./run": {
       "import": "./run.js",
       "types": "./run.d.ts"
-    },
-    "./core": {
-      "import": "./types/core/index.js",
-      "types": "./lib/core/index.d.ts"
     }
   },
   "bin": {
