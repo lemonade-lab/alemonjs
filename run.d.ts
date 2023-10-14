@@ -1,1 +1,1 @@
-export declare function commandRun(ars: any): void
+export declare function commandRun(ars: string[]): void
