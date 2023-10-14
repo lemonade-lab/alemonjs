@@ -11,7 +11,18 @@ import {
  * ******
  */
 export interface AlemonOptions {
+  /**
+   * 是否解析应用
+   */
+  mount?: false
+  /**
+   * 个人应用
+   */
   app?: {
+    /**
+     * 是否创建
+     */
+    init?: boolean
     /**
      * 应用名称
      */

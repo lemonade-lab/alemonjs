@@ -2,7 +2,7 @@ import { dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
 import { setMessage } from './message.js'
 import { setApp } from './app.js'
-import { appsInit, setAppsHelp } from './dealmsg.js'
+import { setAppsHelp } from './dealmsg.js'
 /**
  * 得到执行路径
  * @param url

@@ -11,7 +11,9 @@ import {
   setLanchConfig,
   loadInit,
   appsInit,
-  setAppRegex
+  setAppRegex,
+  setAppDir,
+  getAppDir
 } from '../alemon/index.js'
 import {
   getPupPath,
@@ -22,8 +24,6 @@ import {
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
 
-let appDir = 'application'
-
 /**
  * 应用模块集成
  * @param AppName
@@ -31,6 +31,7 @@ let appDir = 'application'
  * @returns
  */
 export function ApplicationTools(AppName: string, name = 'apps') {
+  const appDir = getAppDir()
   return compilationTools({
     aInput: `${appDir}/${AppName}/${name}/**/*.ts`,
     aOutput: `${appDir}/${AppName}/apps.js`
@@ -161,6 +162,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       await rebotMap[item]()
     }
   }
+
   /**
    * ********
    * 登录提示
@@ -169,17 +171,39 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
     console.info('[LOGIN] 无登录配置')
   }
+
   /**
-   * ************
-   * 迟缓插件加载
+   * ***********
+   * 加载应用
    * ************
    */
-  let mount = false
-  if (Options?.app?.component || Options?.app?.module) {
-    mount = true
+  if (Options?.login && Options?.app?.init !== false) {
+    const app = createApp(Options?.app?.name ?? 'bot')
+    if (Options?.app?.regJSon?.address) {
+      app.setHelp(Options?.app?.regJSon?.address ?? '/public/defset')
+    }
+    if (Options?.app?.module) {
+      const word = await compilationTools({
+        aInput: Options?.app?.module?.input ?? 'apps/**/*.ts',
+        aOutput: Options?.app?.module?.input ?? '.apps/index.js'
+      })
+      app.component(word)
+    }
+    if (Options?.app?.component) {
+      for await (const item of Options.app.component) {
+        app.component(item)
+      }
+    }
+    app.mount()
   }
-  const address = Options?.plugin?.directory ?? 'application'
-  appDir = address
+
+  /**
+   * ************
+   * 设置加载目录
+   * ************
+   */
+  setAppDir(Options?.plugin?.directory ?? '/application')
+
   /**
    * ************
    * 设置扫描规则
@@ -191,40 +215,23 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       RegexClose: Options?.plugin?.RegexClose
     })
   }
+
   /**
    * ************
    * 扫描插件
    * ************
    */
   if (Options?.plugin?.init) {
-    await loadInit({
-      mount: mount,
-      address: address == undefined ? '/application' : `/${address}`
-    })
+    // 加载插件
+    await loadInit()
   }
+
   /**
    * ************
-   * 编译独立插件
+   * 开始解析
    * ************
    */
-  if (mount) {
-    const app = createApp(Options?.app?.name ?? 'bot')
-    if (Options?.app?.regJSon?.address) {
-      app.setHelp(Options?.app?.regJSon?.address ?? '/public/defset')
-    }
-    if (Options?.app?.module) {
-      const word = await compilationTools({
-        aInput: Options?.app?.module?.input ?? 'src/apps/**/*.ts',
-        aOutput: Options?.app?.module?.input ?? '.apps/index.js'
-      })
-      app.component(word)
-    }
-    if (Options?.app?.component) {
-      for await (const item of Options.app.component) {
-        app.component(item)
-      }
-    }
-    app.mount()
+  if (Options?.mount) {
     await appsInit()
   }
 
@@ -243,9 +250,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       }
     }
     /**
-     * ***************
+     * **********
      * 附加脚本
-     * ***************
+     * **********
      */
     if (Options?.scripts) {
       for await (const item of Options.scripts) {

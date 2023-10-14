@@ -379,31 +379,17 @@ export function getAppDir() {
   return appDir
 }
 
+export function setAppDir(val: string) {
+  appDir = val
+}
+
 /**
  *  初始化应用 mount = ture 则直接应用
  * @param param0 { mount = false, address = '/application' }
  * @returns
  */
-export async function loadInit(
-  val: {
-    mount?: boolean
-    address?: string
-  } = { mount: false, address: '/application' }
-) {
-  const { mount, address } = val
-  appDir = address ?? '/application'
-  /**
-   * 加载插件
-   */
-  await loadPlugins(join(process.cwd(), address ?? '/application'))
-  /**
-   * 取消集成
-   */
-  if (mount) return
-  /**
-   * 开始集成
-   */
-  await appsInit()
+export async function loadInit() {
+  await loadPlugins(join(process.cwd(), getAppDir()))
   return
 }
 
