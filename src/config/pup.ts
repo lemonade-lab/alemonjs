@@ -12,7 +12,6 @@ if (process.platform == 'win32' && existsSync(win32Edge)) {
   //  win32  Edge
   skipDownload = true
   executablePath = win32Edge
-  console.info('[Win32 Edge] start')
 } else if (platform == 'linux' || platform == 'android') {
   // linux | android
   const chromium = [
@@ -29,11 +28,9 @@ if (process.platform == 'win32' && existsSync(win32Edge)) {
       if (chromiumPath) {
         skipDownload = true
         executablePath = realpathSync(chromiumPath)
-        console.info('[Chromium] start')
         break
       }
     } catch (error) {
-      console.error('Failed to get Chromium path:', error)
       continue
     }
   }
@@ -51,14 +48,12 @@ if (process.platform == 'win32' && existsSync(win32Edge)) {
       if (existsSync(item)) {
         skipDownload = true
         executablePath = item
-        console.info('[Chromium] start')
         break
       }
     }
   }
   //  arm64/arrch64
   if (isArch == 'arm64' || isArch == 'aarch64') {
-    console.info('[arm64/aarch64] system')
     skipDownload = true
   }
 }
