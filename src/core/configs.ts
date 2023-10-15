@@ -3,7 +3,7 @@ interface ApplicationProcessingOpsion {
   main: string
   type: 'ts' | 'js'
   openRegex: RegExp
-  closeRegex: RegExp
+  closeRegex: RegExp | undefined
   route: string
 }
 
@@ -16,7 +16,7 @@ const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   // 打开正则
   openRegex: /./,
   // 屏蔽正则
-  closeRegex: /./,
+  closeRegex: undefined,
   // 指令生成地址
   route: '/public/defset'
 }

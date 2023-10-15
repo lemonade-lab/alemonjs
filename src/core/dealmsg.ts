@@ -182,7 +182,7 @@ async function loadPlugins(dir: string) {
   if (flies.length == 0) return
   // 读取配置
   const open = getAppProCoinfg('openRegex')
-  const close = getAppProCoinfg('closeRegex')
+  const close: undefined | RegExp = getAppProCoinfg('closeRegex')
   // 排除
   const apps = flies
     .filter(item => open.test(item))

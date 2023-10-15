@@ -240,7 +240,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 开始解析
    * ************
    */
-  if (Options?.mount) {
+  if (Options?.mount !== false) {
     await appsInit()
   }
 
