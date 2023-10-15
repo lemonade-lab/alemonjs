@@ -29,7 +29,7 @@ export function setAppProCoinfg<T extends keyof ApplicationProcessingOpsion>(
   if (
     Object.prototype.hasOwnProperty.call(
       ApplicationProcessingConfiguration,
-      val
+      key
     )
   ) {
     ApplicationProcessingConfiguration[key] = val
