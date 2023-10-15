@@ -2,7 +2,6 @@ import { dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
 import { setMessage } from './message.js'
 import { setApp } from './app.js'
-import { setAppsHelp } from './dealmsg.js'
 /**
  * 得到执行路径
  * @param url
@@ -35,11 +34,6 @@ export function createApp(AppName: string) {
    */
   let acount = 0
   return {
-    /**
-     * 设置指令json地址
-     * @param rt = '/public/defset'
-     */
-    setHelp: setAppsHelp,
     /**
      * 重定义消息
      * @param fnc

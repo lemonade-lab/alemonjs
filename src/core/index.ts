@@ -7,6 +7,7 @@
  * *******
  */
 export * from './plugin.js'
+export * from './configs.js'
 export * from './apps.js'
 export * from './message.js'
 export * from './dialogue.js'

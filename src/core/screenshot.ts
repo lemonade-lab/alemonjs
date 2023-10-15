@@ -1,7 +1,7 @@
 import lodash from 'lodash'
 import { join, basename } from 'path'
 import { readFileSync, watch, mkdirSync } from 'fs'
-import { getAppDir } from './dealmsg.js'
+import { getAppProCoinfg } from './configs.js'
 /**
  * 源码缓存
  */
@@ -66,7 +66,7 @@ export function createStr(Options: {
   data?: any
 }) {
   const { AppName, tplFile, data } = Options
-  const appDir = getAppDir()
+  const appDir = getAppProCoinfg('dir')
   /**
    * 插件路径
    */

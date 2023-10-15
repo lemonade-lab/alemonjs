@@ -6,6 +6,7 @@ import { getMessage } from './message.js'
 import { getApp, delApp, getAppKey } from './app.js'
 import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
+import { getAppProCoinfg } from './configs.js'
 /**
  * **************
  * 指令可枚举类型
@@ -20,7 +21,6 @@ interface CmdItemType {
   fncName: string
   fnc: (...args: any[]) => any
 }
-
 /**
  * *******
  * 指令map
@@ -33,67 +33,12 @@ type CommandMap = {
 }
 const Command: CommandMap = {} as CommandMap
 const CommandNotR: CommandMap = {} as CommandMap
-
 /**
- * ***********
- * plugins管理
- * ***********
+ * 机器人统计
  */
-let PluginsArr = []
 const plugins: object = {}
-
-/**
- * 默认执行地址
- */
-const route = '/public/defset'
-
-/**
- * 执行文件
- */
-let addressMenu = join(process.cwd(), route)
-
 // 大正则
 let mergedRegex: RegExp
-// 插件目录匹配规则
-let appRegex = /./
-// 插件目录取消规则
-let appRegexClose: RegExp
-interface RegexControl {
-  RegexOpen?: RegExp
-  RegexClose?: RegExp
-}
-/**
- * 插件名匹配
- * @param val
- */
-export function setAppRegex(val: RegexControl) {
-  const { RegexOpen, RegexClose } = val
-  if (RegexOpen) {
-    appRegex = RegexOpen
-  }
-  if (RegexClose) {
-    appRegexClose = RegexClose
-  }
-}
-
-/**
- * 得到插件名匹配模式
- * @returns
- */
-export function getAppRegex() {
-  return {
-    RegexOpen: appRegex,
-    RegexClose: appRegexClose
-  }
-}
-
-/**
- * 设置指令json地址
- * @param rt '/public/defset'
- */
-export function setAppsHelp(rt = route) {
-  addressMenu = join(process.cwd(), rt)
-}
 
 /**
  * 得到机器人帮助
@@ -101,13 +46,13 @@ export function setAppsHelp(rt = route) {
  * @returns
  */
 export function getPluginHelp(AppName: string) {
-  const basePath = join(addressMenu, `${AppName}.json`)
+  const dir = getAppProCoinfg('route')
+  const basePath = join(process.cwd(), dir, `${AppName}.json`)
   return JSON.parse(readFileSync(basePath, 'utf8'))
 }
 
 /**
  * 创建机器人帮助
- * 存在且得到的app不为[]时才会创建json
  */
 function createPluginHelp() {
   // 存在app才创建
@@ -120,12 +65,13 @@ function createPluginHelp() {
       }
     }
     if (t) {
+      const dir = join(process.cwd(), getAppProCoinfg('route'))
       // 不存在
-      if (!existsSync(addressMenu)) mkdirSync(addressMenu, { recursive: true })
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
       // 创建help
       for (const item in plugins) {
         if (plugins[item] && plugins[item].length != 0) {
-          const basePath = join(addressMenu, `${item}.json`)
+          const basePath = join(dir, `${item}.json`)
           const jsonData = JSON.stringify(plugins[item], null, 2)
           // 异步创建避免阻塞
           writeFile(basePath, jsonData, 'utf-8')
@@ -149,9 +95,7 @@ async function synthesis(AppsObj: object, appname: string) {
     const keys = new AppsObj[item]()
     // 控制类型
     const eventType = keys['eventType'] ?? 'CREATE'
-    /**
-     * 不合法
-     */
+    // 不合法
     if (
       !keys['rule'] ||
       !Array.isArray(keys['rule']) ||
@@ -159,19 +103,14 @@ async function synthesis(AppsObj: object, appname: string) {
     ) {
       continue
     }
-    /**
-     * 指令不存在
-     */
+    // 指令不存在
     for await (const key of keys['rule']) {
       if (
         !key['fnc'] ||
         !key['reg'] ||
         typeof keys[key['fnc']] !== 'function'
       ) {
-        /**
-         * 函数指定不存在,正则不存在
-         * 得到的不是函数
-         */
+        /// 函数指定不存在,正则不存在 得到的不是函数
         continue
       }
       // 先看指令优先级,没有就看类优先级,再没有则默认优先级
@@ -241,38 +180,32 @@ async function loadPlugins(dir: string) {
   if (!existsSync(dir)) return
   const flies = readdirSync(dir)
   if (flies.length == 0) return
+  // 读取配置
+  const open = getAppProCoinfg('openRegex')
+  const close = getAppProCoinfg('closeRegex')
+  // 排除
   const apps = flies
-    .filter(item => appRegex.test(item))
+    .filter(item => open.test(item))
     .filter(item => {
-      if (!appRegexClose) {
+      if (!close) {
         return true
       }
-      if (appRegexClose.test(item)) {
+      if (close.test(item)) {
         return false
       }
       return true
     })
 
   /**
-   * 识别并执行插件
+   * 动态扫描
    */
+  const main = getAppProCoinfg('main')
+  const type = getAppProCoinfg('type')
   for await (const appname of apps) {
-    if (existsSync(`${dir}/${appname}/index.ts`)) {
-      /**
-       * 优先考虑ts
-       */
-      await import(`file://${dir}/${appname}/index.ts`).catch(err => {
-        console.error(`file://${dir}/${appname}/index.ts`)
+    if (existsSync(`${dir}/${appname}${main}.${type}`)) {
+      await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
+        console.error(`file://${dir}/${appname}${main}.${type}`)
         console.error(err)
-        process.exit()
-      })
-    } else if (existsSync(`${dir}/${appname}/index.js`)) {
-      /**
-       * 允许js写法
-       */
-      await import(`file://${dir}/${appname}/index.js`).catch(error => {
-        console.error(`file://${dir}/${appname}/index.js`)
-        console.error(error)
         process.exit()
       })
     }
@@ -284,7 +217,6 @@ async function loadPlugins(dir: string) {
  * 初始化应用
  */
 function dataInit() {
-  PluginsArr = []
   for (const item of EventEnum) {
     if (isNaN(Number(item))) {
       Command[item] = []
@@ -299,97 +231,63 @@ function dataInit() {
  * @returns
  */
 export async function appsInit() {
-  /**
-   * 清空当前的apps
-   */
+  // 清空当前的apps
   dataInit()
-  /**
-   * 得到所有插件名
-   */
+  // 得到所有插件名
   const APPARR = getAppKey()
-  /**
-   * 导出所有插件名
-   */
+  // 导出所有插件名
   for await (const item of APPARR) {
-    /**
-     * 获取插件集
-     */
+    // 获取插件集
     const apps = getApp(item)
-    /**
-     * 分析插件集
-     */
+    // 分析插件集
     await synthesis(apps, item)
-    /**
-     * 记录该插件
-     */
-    PluginsArr.push(item)
-    /**
-     * 删除指集
-     */
+    // 删除指集
     delApp(item)
   }
 
-  /**
-   * 排序
-   */
+  // 排序
   for (const val in Command) {
     Command[val] = lodash.orderBy(Command[val], ['priority'], ['asc'])
   }
-  /**
-   * 排序
-   */
+
+  // 排序
   for (const val in CommandNotR) {
     CommandNotR[val] = lodash.orderBy(CommandNotR[val], ['priority'], ['asc'])
   }
 
-  /***
-   * 排序之后把所有正则变成一条正则
-   */
+  // 排序之后把所有正则变成一条正则
   const mergedRegexArr = []
   for (const val in Command) {
-    for (const data of Command[val]) {
-      if (data.reg !== undefined && data.eventType !== undefined) {
-        mergedRegexArr.push(data.reg)
-      }
+    for await (const { reg } of Command[val]) {
+      mergedRegexArr.push(reg)
     }
   }
 
   // 机器人整体指令正则
   mergedRegex = new RegExp(mergedRegexArr.map(regex => regex.source).join('|'))
 
-  /**
-   * 生成指令json
-   */
+  // 生成指令json
   createPluginHelp()
 
-  /**
-   * 打印
-   */
-  console.info(`[LOAD] APPS*${PluginsArr.length} `)
+  // 打印
+  console.info(`[LOAD] APPS*${Object.keys(plugins).length} `)
   return
 }
 
+/**
+ * 得到大正则
+ * @returns
+ */
 export function getMergedRegex() {
   return mergedRegex
 }
 
-let appDir = '/application'
-
-export function getAppDir() {
-  return appDir
-}
-
-export function setAppDir(val: string) {
-  appDir = val
-}
-
 /**
- *  初始化应用 mount = ture 则直接应用
- * @param param0 { mount = false, address = '/application' }
+ * 初始化应用
  * @returns
  */
 export async function loadInit() {
-  await loadPlugins(join(process.cwd(), getAppDir()))
+  await loadPlugins(join(process.cwd(), getAppProCoinfg('dir')))
   return
 }
 

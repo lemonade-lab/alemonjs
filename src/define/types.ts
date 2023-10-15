@@ -90,6 +90,17 @@ export interface AlemonOptions {
      * 插件名关闭规则
      */
     RegexClose?: RegExp
+    /**
+     * 插件入口
+     * 默认index
+     * type='ts'
+     * 即 index.ts
+     */
+    main?: string
+    /**
+     * 入口文件类型
+     */
+    type?: 'ts' | 'js'
   }
   /**
    * login配置

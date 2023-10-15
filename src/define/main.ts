@@ -11,9 +11,8 @@ import {
   setLanchConfig,
   loadInit,
   appsInit,
-  setAppRegex,
-  setAppDir,
-  getAppDir
+  setAppProCoinfg,
+  getAppProCoinfg
 } from '../core/index.js'
 import {
   getPupPath,
@@ -31,7 +30,7 @@ export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
  * @returns
  */
 export function ApplicationTools(AppName: string, name = 'apps') {
-  const appDir = getAppDir()
+  const appDir = getAppProCoinfg('dir')
   return compilationTools({
     aInput: `${appDir.replace(/^\//, '')}/${AppName}/${name}/**/*.ts`,
     aOutput: `${appDir.replace(/^\//, '')}/${AppName}/apps.js`
@@ -180,7 +179,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.login && Options?.app?.init !== false) {
     const app = createApp(Options?.app?.name ?? 'bot')
     if (Options?.app?.regJSon?.address) {
-      app.setHelp(Options?.app?.regJSon?.address ?? '/public/defset')
+      setAppProCoinfg('route', Options?.app?.regJSon?.address)
     }
     if (Options?.app?.module) {
       const word = await compilationTools({
@@ -204,18 +203,26 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 设置加载目录
    * ************
    */
-  setAppDir(Options?.plugin?.directory ?? '/application')
+  if (Options?.plugin?.directory) {
+    setAppProCoinfg('dir', Options?.plugin?.directory)
+  }
+  if (Options?.plugin?.main) {
+    setAppProCoinfg('main', Options?.plugin?.main)
+  }
+  if (Options?.plugin?.type) {
+    setAppProCoinfg('type', Options?.plugin?.type)
+  }
 
   /**
    * ************
    * 设置扫描规则
    * ***********
    */
-  if (Options?.plugin?.RegexOpen || Options?.plugin?.RegexClose) {
-    setAppRegex({
-      RegexOpen: Options?.plugin?.RegexOpen,
-      RegexClose: Options?.plugin?.RegexClose
-    })
+  if (Options?.plugin?.RegexOpen) {
+    setAppProCoinfg('openRegex', Options?.plugin?.RegexOpen)
+  }
+  if (Options?.plugin?.RegexClose) {
+    setAppProCoinfg('closeRegex', Options?.plugin?.RegexClose)
   }
 
   /**
