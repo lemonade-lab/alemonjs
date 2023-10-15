@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "阿柠檬框架",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
@@ -16,7 +16,7 @@
     "@discordjs/builders": "^1.6.3",
     "@discordjs/core": "^0.6.0",
     "@discordjs/rest": "^1.7.1",
-    "alemon-rollup": "^1.0.2",
+    "alemon-rollup": "^1.0.3",
     "alemonjs": "^1.0.13",
     "axios": "^1.4.0",
     "discord.js": "^14.11.0",
@@ -61,7 +61,10 @@
     }
   },
   "bin": {
-    "alemonjs": "bin/main.js"
+    "alemonjs": "bin/main.js",
+    "alemonjs-start": "bin/start.js",
+    "alemonjs-build": "bin/build.js",
+    "alemonjs-dev": "bin/dev.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

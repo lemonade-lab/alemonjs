@@ -5,16 +5,15 @@ import { existsSync } from 'fs'
 import { join } from 'path'
 const ars = process.argv.slice(2)
 const msg = ars.join(' ')
-const files = msg.match(/(\S+\.js|\S+\.ts)/g) ?? ['alemon.config.ts']
+const files = msg.match(/(\S+\.js|\S+\.ts)/g) ?? ['pm2.config.cjs']
 const argsWithoutFiles = msg.replace(/(\S+\.js|\S+\.ts)/g, '')
 for (const item of files) {
   if (!existsSync(join(process.cwd(), item))) {
     console.log('[NO FILE]', item)
     continue
   }
-  const isTypeScript = item.endsWith('.ts')
-  const command = isTypeScript ? 'npx ts-node' : 'node'
-  const cmd = `${command} ${item} ${argsWithoutFiles}`
+  // pm2 startOrRestart pm2.config.cjs
+  const cmd = `pm2 startOrRestart ${item} ${argsWithoutFiles}`
   console.log('[alemonjs]', cmd)
   const childProcess = spawn(cmd, { shell: true })
   childProcess.stdout.on('data', data => {
