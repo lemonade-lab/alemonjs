@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "阿柠檬框架",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
@@ -53,7 +53,10 @@
     "build.d.ts"
   ],
   "exports": {
-    ".": "./lib/index.js",
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./types/index.d.ts"
+    },
     "./run": {
       "import": "./run.js",
       "types": "./run.d.ts"
@@ -61,10 +64,6 @@
     "./build": {
       "import": "./build.js",
       "types": "./build.d.ts"
-    },
-    "./core": {
-      "import": "./core.js",
-      "types": "./core.d.ts"
     }
   },
   "bin": {
