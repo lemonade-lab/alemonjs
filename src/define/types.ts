@@ -43,23 +43,6 @@ export interface AlemonOptions {
       address?: string
     }
     /**
-     * 独立模块配置
-     */
-    module?: {
-      /**
-       * 输入规则
-       */
-      input?: string
-      /**
-       * 输出规则
-       */
-      output?: string
-    }
-    /**
-     * 关闭指定应用
-     */
-    close?: string[]
-    /**
      * 重定义消息对象
      * @param args
      * @returns
