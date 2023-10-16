@@ -35,7 +35,7 @@ export interface AlemonOptions {
        * 是否生成
        * defaukt true
        */
-      create?: boolean
+      create?: undefined | false
       /**
        * 生成地址
        * defaukt /publick/defset

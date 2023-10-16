@@ -178,6 +178,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    */
   if (Options?.login && Options?.app?.init !== false) {
     const app = createApp(Options?.app?.name ?? 'bot')
+    if (Options?.app?.regJSon?.create === false) {
+      setAppProCoinfg('regex', Options?.app?.regJSon?.create)
+    }
     if (Options?.app?.regJSon?.address) {
       setAppProCoinfg('route', Options?.app?.regJSon?.address)
     }

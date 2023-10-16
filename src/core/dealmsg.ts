@@ -46,6 +46,8 @@ let mergedRegex: RegExp
  * @returns
  */
 export function getPluginHelp(AppName: string) {
+  const c = getAppProCoinfg('regex')
+  if (c === false) return {}
   const dir = getAppProCoinfg('route')
   const basePath = join(process.cwd(), dir, `${AppName}.json`)
   return JSON.parse(readFileSync(basePath, 'utf8'))
@@ -55,6 +57,8 @@ export function getPluginHelp(AppName: string) {
  * 创建机器人帮助
  */
 function createPluginHelp() {
+  const c = getAppProCoinfg('regex')
+  if (c === false) return
   // 存在app才创建
   if (Object.values(plugins).length != 0) {
     // 同时key不能是空数组
