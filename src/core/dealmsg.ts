@@ -9,10 +9,10 @@ import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
 /**
  * **************
- * 指令可枚举类型
+ * CommandType
  * **************
  */
-interface CmdItemType {
+interface CommandType {
   reg: RegExp
   priority: number
   event: (typeof EventEnum)[number]
@@ -23,16 +23,16 @@ interface CmdItemType {
 }
 /**
  * *******
- * 指令map
+ * CommandMap
  * *******
  * Command message
- * CommandNotR other message
+ * CommandNotMessage other message
  */
 type CommandMap = {
-  [Event in (typeof EventEnum)[number]]: CmdItemType[]
+  [Event in (typeof EventEnum)[number]]: CommandType[]
 }
 const Command: CommandMap = {} as CommandMap
-const CommandNotR: CommandMap = {} as CommandMap
+const CommandNotMessage: CommandMap = {} as CommandMap
 /**
  * 机器人统计
  */
@@ -158,7 +158,7 @@ async function synthesis(AppsObj: object, appname: string) {
           priority
         })
         // 保存
-        CommandNotR[event].push({
+        CommandNotMessage[event].push({
           event: event,
           eventType: eventType,
           priority,
@@ -187,13 +187,8 @@ async function loadPlugins(dir: string) {
   const apps = flies
     .filter(item => open.test(item))
     .filter(item => {
-      if (!close) {
-        return true
-      }
-      if (close.test(item)) {
-        return false
-      }
-      return true
+      if (!close) return true
+      return !close.test(item)
     })
 
   /**
@@ -220,7 +215,7 @@ function dataInit() {
   for (const item of EventEnum) {
     if (isNaN(Number(item))) {
       Command[item] = []
-      CommandNotR[item] = []
+      CommandNotMessage[item] = []
     }
   }
   return
@@ -251,8 +246,12 @@ export async function appsInit() {
   }
 
   // 排序
-  for (const val in CommandNotR) {
-    CommandNotR[val] = lodash.orderBy(CommandNotR[val], ['priority'], ['asc'])
+  for (const val in CommandNotMessage) {
+    CommandNotMessage[val] = lodash.orderBy(
+      CommandNotMessage[val],
+      ['priority'],
+      ['asc']
+    )
   }
 
   // 排序之后把所有正则变成一条正则
@@ -370,9 +369,9 @@ export async function InstructionMatching(e: AMessage) {
  * @returns
  */
 export async function typeMessage(e: AMessage) {
-  if (!CommandNotR[e.event]) return true
+  if (!CommandNotMessage[e.event]) return true
   // 循环查找
-  for (const data of CommandNotR[e.event]) {
+  for (const data of CommandNotMessage[e.event]) {
     if (e.eventType != data.eventType) continue
     try {
       const AppFnc = getMessage(data.AppName)
@@ -409,7 +408,7 @@ export async function typeMessage(e: AMessage) {
  * @param err
  * @param data
  */
-function logErr(err: any, data: CmdItemType) {
+function logErr(err: any, data: CommandType) {
   console.error(
     `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]\n[${err}]`
   )

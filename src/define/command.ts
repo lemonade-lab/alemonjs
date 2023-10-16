@@ -1,5 +1,11 @@
 import { mkdirSync } from 'fs'
 import { execSync, exec } from 'child_process'
+/**
+ *
+ * @param cess
+ * @param cmd
+ * @returns
+ */
 export async function command(cess: 'execSync' | 'exec', cmd: string) {
   // 错误参数
   if (!cmd) process.exit()

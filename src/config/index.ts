@@ -1,8 +1,9 @@
 /**
- * 暴露
- * ********
- * 配置管理器
- * ********
+ * *************
+ * public
+ * *************
+ * config system
+ * *************
  */
 export * from './login.js'
 export * from './types.js'

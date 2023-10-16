@@ -9,7 +9,9 @@ import villa from '../default/login/villa.js'
 import qq from '../default/login/qq.js'
 import ntqq from '../default/login/ntqq.js'
 /**
- * bot-config
+ * *************
+ * defset-config
+ * *************
  */
 const config: ConfigType = {
   redis,
@@ -23,7 +25,7 @@ const config: ConfigType = {
   puppeteer
 }
 /**
- * 初始化配置
+ * init config
  * @param val
  */
 export function setBotConfig(val: ConfigType) {
@@ -53,7 +55,7 @@ export function setBotConfig(val: ConfigType) {
 }
 
 /**
- * 设置
+ * set
  * @param key
  * @param val
  */
@@ -79,7 +81,7 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
 }
 
 /**
- * 得到配置
+ * get
  * @param key
  * @returns
  */

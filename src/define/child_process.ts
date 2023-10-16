@@ -1,4 +1,10 @@
 import { spawn } from 'child_process'
+/**
+ *
+ * @param name
+ * @param file
+ * @param ars
+ */
 export function nodeScripts(name = 'node', file = '', ars = []) {
   const command = spawn(`${name} ${file} ${ars.join(' ')}`, { shell: true })
   command.stdout.on('data', data => {

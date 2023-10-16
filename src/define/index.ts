@@ -1,6 +1,8 @@
 /**
+ *
+ * public
  * ********
- * 暴露
+ * define
  * ******
  */
 export * from './api.js'

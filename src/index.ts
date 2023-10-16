@@ -5,31 +5,33 @@ if (
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 }
 /**
- * *******************
- * 核心处理&公共方法
- * *******************
+ * *************
+ * core
+ * *************
  */
 export * from './core/index.js'
 /**
- * *******************
- * 初始化
- * *******************
+ * *************
+ * define
+ * *************
  */
 export * from './define/index.js'
 /**
- * **********
- * 配置管理
- * **********
+ * *************
+ * config system
+ * *************
  */
 export * from './config/index.js'
 /**
- * 登录加载器
+ * *************
+ * login
+ * *************
  */
 export * from './login.js'
 /**
- * *********
- * 监听退出
- * *********
+ * *************
+ * exit
+ * *************
  */
 process.on('SIGINT', signals => {
   console.info(signals)

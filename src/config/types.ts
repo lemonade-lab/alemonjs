@@ -2,13 +2,12 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import {
   DiscordOptions,
   KookOptionsg,
-  MysqlOptions,
   NtQQOptions,
   QqGuildOptions,
-  RedisOptions,
   VillaOptions,
   ServerOptions
 } from '../default/types.js'
+import { MysqlOptions, RedisOptions } from '../default/typings.js'
 
 /**
  * ******

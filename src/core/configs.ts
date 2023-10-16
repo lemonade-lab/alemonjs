@@ -1,24 +1,42 @@
 interface ApplicationProcessingOpsion {
+  /**
+   * 根目录
+   */
   dir: string
+  /**
+   * 主文件
+   */
   main: string
+  /**
+   * 主文件类型
+   */
   type: 'ts' | 'js'
+  /**
+   * 匹配正则
+   */
   openRegex: RegExp
+  /**
+   * 不匹配正则
+   */
   closeRegex: RegExp | undefined
+  /**
+   * 指令json路由
+   */
   route: string
+  /**
+   * 是否生成json
+   */
+  regex: boolean
 }
 
 const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
-  // 根目录
   dir: '/application',
-  // 主函数
   main: '/index',
   type: 'ts',
-  // 打开正则
   openRegex: /./,
-  // 屏蔽正则
   closeRegex: undefined,
-  // 指令生成地址
-  route: '/public/defset'
+  route: '/public/defset',
+  regex: true
 }
 
 export function setAppProCoinfg<T extends keyof ApplicationProcessingOpsion>(

@@ -65,10 +65,10 @@ export class plugin {
    */
   rule?: PluginRuleType[]
   /**
-   * @param name 类名标记
-   * @param event 事件类型
-   * @param eventType 消息类型
-   * @param priority 优先级      数字越小优先级越高
+   * @param name 类名标记        default app-name
+   * @param event 事件类型       default MESSAGES
+   * @param eventType 消息类型   default CREATE
+   * @param priority 优先级      越小优越高 default 9000
    * @param rule.reg 命令正则    RegExp | string
    * @param rule.fnc 命令函数    function
    * @param rule.dsc 指令示范    sdc
@@ -76,7 +76,7 @@ export class plugin {
    * @param rule.priority 优先级    数字越小优先级越高
    */
   constructor({
-    name = 'your-name',
+    name = 'app-name',
     event = 'MESSAGES',
     eventType = 'CREATE',
     priority = 9000,

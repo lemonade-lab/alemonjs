@@ -2,6 +2,7 @@ import { dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
 import { setMessage } from './message.js'
 import { setApp } from './app.js'
+
 /**
  * 得到执行路径
  * @param url
@@ -10,6 +11,7 @@ import { setApp } from './app.js'
 export function getAppPath(url: string | URL) {
   return dirname(fileURLToPath(url)).replace(/\\/g, '/')
 }
+
 /**
  * 得到执行目录
  * @param {} url
@@ -17,6 +19,16 @@ export function getAppPath(url: string | URL) {
  */
 export function getAppName(url: string | URL) {
   return basename(getAppPath(url))
+}
+
+/**
+ * 创建应用对象
+ * @param url import.meta.url
+ * @returns
+ */
+export function createApps(url: string) {
+  const AppName = getAppPath(url)
+  return createApp(AppName)
 }
 
 /**
@@ -52,18 +64,18 @@ export function createApp(AppName: string) {
      * 创建应用
      * @param app 应用对象
      */
-    component: (dirObject: object = {}) => {
+    component: (urlObject: object = {}) => {
       try {
-        for (const item in dirObject) {
+        for (const item in urlObject) {
           /**
            * 如果该导出是class
            */
-          if (dirObject[item].prototype) {
+          if (urlObject[item].prototype) {
             if (!Object.prototype.hasOwnProperty.call(apps, item)) {
               /**
                * 不重名
                */
-              apps[item] = dirObject[item]
+              apps[item] = urlObject[item]
               continue
             }
             const T = true
@@ -73,7 +85,7 @@ export function createApp(AppName: string) {
                 /**
                  * 不重名
                  */
-                apps[keyName] = dirObject[item]
+                apps[keyName] = urlObject[item]
                 /**
                  * 重置为0
                  */

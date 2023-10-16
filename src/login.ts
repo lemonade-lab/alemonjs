@@ -1,6 +1,8 @@
 import { AlemonOptions } from './index.js'
 /**
+ * ***********
  * 登录集成map
+ * **********
  */
 export interface LoginMap {
   [key: string]: AlemonOptions['login']
