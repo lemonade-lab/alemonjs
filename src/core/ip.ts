@@ -1,16 +1,23 @@
 import { publicIp } from 'public-ip'
+
+let myIp
+
 /**
  * 得到ip地址
  * @returns
  */
 export async function getIP() {
-  const ip = await publicIp({
+  if (myIp) {
+    return myIp
+  }
+  myIp = await publicIp({
     onlyHttps: true,
     timeout: 10000
   })
     .then((ip: any) => {
       if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
-        return ip
+        myIp = ip
+        return myIp
       } else {
         return false
       }
@@ -19,5 +26,5 @@ export async function getIP() {
       console.error(err)
       process.exit()
     })
-  return ip
+  return myIp
 }

@@ -1,4 +1,9 @@
-import { CardType, InstructionMatching, AMessage } from '../../../core/index.js'
+import {
+  CardType,
+  InstructionMatching,
+  AMessage,
+  getIP
+} from '../../../core/index.js'
 import {
   ClientAPIByQQ as Client,
   ClinetWeb,
@@ -9,12 +14,12 @@ import { getBotMsgByNtqq } from '../bot.js'
 import { ExampleObject } from '../types.js'
 import IMGS from 'image-size'
 
-/**
- * 获取ip
- */
-const ip = await ClinetWeb.getIP()
-
 export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
+  /**
+   * 获取ip
+   */
+  const ip = await getIP()
+
   const e = {} as AMessage
 
   const webCfg = getWebConfig()

@@ -2,6 +2,7 @@ import { callBackByVilla } from './alemon/conversation.js'
 import { checkRobotByVilla } from './login.js'
 import { createClient, Client, hmacSha256 } from 'mys-villa'
 import { getBotConfigByKey } from '../config/index.js'
+import { getIP } from '../core/index.js'
 export async function createAlemonByVilla() {
   /**
    * 登录
@@ -39,7 +40,7 @@ export async function createAlemonByVilla() {
     /**
      * 获取ip4
      */
-    const ip = await Client.getIP()
+    const ip = await getIP()
     if (ip) {
       console.info(
         `[OPEN] ${cfg.http ?? 'http'}://${ip}:${cfg.port ?? 8080}${

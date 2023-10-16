@@ -1,4 +1,9 @@
-import { AMessage, InstructionMatching, UserType } from '../../../core/index.js'
+import {
+  AMessage,
+  InstructionMatching,
+  UserType,
+  getIP
+} from '../../../core/index.js'
 import { BotEvent, MessageContentType, Client } from 'mys-villa'
 import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
@@ -6,16 +11,15 @@ import { getBotConfigByKey } from '../../../config/index.js'
 import { now_e } from './e.js'
 
 /**
- * 获取ip
- */
-const ip = await Client.getIP()
-
-/**
  * 消息会话
  * @param event 回调数据
  * @param val  类型控制
  */
 export async function MESSAGES_VILLA(event: BotEvent) {
+  /**
+   * 获取ip
+   */
+  const ip = await getIP()
   /**
    * 数据包解析
    */

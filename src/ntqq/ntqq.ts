@@ -1,4 +1,4 @@
-import { NtQQEventsEnum } from '../types.js'
+import { NtQQEventsEnum } from '../default/types.js'
 export default {
   appID: '',
   token: '',

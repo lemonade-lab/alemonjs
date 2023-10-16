@@ -1,4 +1,9 @@
-import { CardType, InstructionMatching, AMessage } from '../../../core/index.js'
+import {
+  CardType,
+  InstructionMatching,
+  AMessage,
+  getIP
+} from '../../../core/index.js'
 import {
   ClientAPIByQQ as Client,
   ClinetWeb,
@@ -11,17 +16,17 @@ import { ExampleObject } from '../types.js'
 import IMGS from 'image-size'
 
 /**
- * 获取ip
- */
-const ip = await ClinetWeb.getIP()
-
-/**
  * 公私域合并
  * @param e
  * @param data  原数据
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
+  /**
+   * 获取ip
+   */
+  const ip = await getIP()
+
   const e = {} as AMessage
   e.platform = 'ntqq'
   e.bot = getBotMsgByNtqq()

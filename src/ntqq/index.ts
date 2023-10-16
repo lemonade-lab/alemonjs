@@ -10,6 +10,7 @@ import {
   BotConfig
 } from './sdk/index.js'
 import { createWeb } from './sdk/web/client.js'
+import { getIP } from '../core/index.js'
 
 interface aut {
   access_token: string
@@ -96,7 +97,7 @@ export async function createAlemonByNtqq() {
     /**
      * 获取ip4
      */
-    const ip = await ClinetWeb.getIP()
+    const ip = await getIP()
     if (ip) {
       console.info(
         `[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}`
