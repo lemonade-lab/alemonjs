@@ -6,8 +6,6 @@
   "license": "GPL-2.0",
   "type": "module",
   "scripts": {
-    "app": "alemonjs",
-    "dev": "alemonjs dev",
     "tsc": "npx tsc",
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
