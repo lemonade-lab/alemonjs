@@ -13,7 +13,7 @@ for (const item of files) {
     continue
   }
   // pm2 startOrRestart pm2.config.cjs
-  const cmd = `pm2 startOrRestart ${item} ${argsWithoutFiles}`
+  const cmd = `npx pm2 startOrRestart ${item} ${argsWithoutFiles}`
   console.log('[alemonjs]', cmd)
   const childProcess = spawn(cmd, { shell: true })
   childProcess.stdout.on('data', data => {

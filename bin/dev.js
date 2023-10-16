@@ -13,7 +13,7 @@ for (const item of files) {
     continue
   }
   // nodemon alemon.config.ts dev
-  const cmd = `nodemon ${item} ${argsWithoutFiles}`
+  const cmd = `npx nodemon ${item} ${argsWithoutFiles}`
   console.log('[alemonjs]', cmd)
   const childProcess = spawn(cmd, { shell: true })
   childProcess.stdout.on('data', data => {
