@@ -1,4 +1,3 @@
-import { compilationTools } from 'alemon-rollup'
 import PupOptions from '../default/pup.js'
 import { AlemonOptions } from './types.js'
 import { rebotMap } from './map.js'
@@ -11,8 +10,7 @@ import {
   setLanchConfig,
   loadInit,
   appsInit,
-  setAppProCoinfg,
-  getAppProCoinfg
+  setAppProCoinfg
 } from '../core/index.js'
 import {
   getPupPath,
@@ -22,20 +20,6 @@ import {
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
-
-/**
- * 应用模块集成
- * @param AppName
- * @param name
- * @returns
- */
-export function ApplicationTools(AppName: string, name = 'apps') {
-  const appDir = getAppProCoinfg('dir')
-  return compilationTools({
-    aInput: `${appDir.replace(/^\//, '')}/${AppName}/${name}/**/*.ts`,
-    aOutput: `${appDir.replace(/^\//, '')}/${AppName}/apps.js`
-  })
-}
 
 let OptionsCache: AlemonOptions
 
@@ -183,15 +167,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     }
     if (Options?.app?.regJSon?.address) {
       setAppProCoinfg('route', Options?.app?.regJSon?.address)
-    }
-    if (Options?.app?.module) {
-      const word = await compilationTools({
-        aInput:
-          Options?.app?.module?.input?.replace(/^\//, '') ?? 'apps/**/*.ts',
-        aOutput:
-          Options?.app?.module?.output.replace(/^\//, '') ?? '.apps/index.js'
-      })
-      app.component(word)
     }
     if (Options?.app?.component) {
       for await (const item of Options.app.component) {
