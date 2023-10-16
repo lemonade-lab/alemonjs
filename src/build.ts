@@ -1,5 +1,5 @@
 import { compilationTools } from 'alemon-rollup'
-;(async function run() {
+export async function commandBuild() {
   const ars = process.argv.slice(2)
   const Options = {
     input: 'apps/**/*.ts',
@@ -17,4 +17,4 @@ import { compilationTools } from 'alemon-rollup'
     aInput: Options.input,
     aOutput: Options.output
   })
-})()
+}
