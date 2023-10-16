@@ -1,9 +1,7 @@
-#!/usr/bin/env node
-
 import { compilationTools } from 'alemon-rollup'
 ;(async function run() {
   const ars = process.argv.slice(2)
-  let Options = {
+  const Options = {
     input: 'apps/**/*.ts',
     output: 'alemon.app.js'
   }

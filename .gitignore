@@ -13,6 +13,12 @@ types
 /public/
 .apps
 
+#脚本类
+run.js
+run.d.ts
+build.js
+build.d.ts
+
 # 缓存
 /data/
 /help/

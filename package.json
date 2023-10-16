@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.0.20",
+  "version": "1.1.0",
   "description": "阿柠檬框架",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
@@ -55,13 +55,14 @@
     "./run": {
       "import": "./run.js",
       "types": "./run.d.ts"
+    },
+    "./build": {
+      "import": "./build.js",
+      "types": "./build.d.ts"
     }
   },
   "bin": {
-    "alemonjs": "bin/main.js",
-    "alemonjs-start": "bin/start.js",
-    "alemonjs-build": "bin/build.js",
-    "alemonjs-dev": "bin/dev.js"
+    "alemonjs": "bin/main.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

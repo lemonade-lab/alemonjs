@@ -27,8 +27,7 @@ export function getAppName(url: string | URL) {
  * @returns
  */
 export function createApps(url: string) {
-  const AppName = getAppPath(url)
-  return createApp(AppName)
+  return createApp(getAppPath(url))
 }
 
 /**

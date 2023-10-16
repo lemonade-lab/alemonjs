@@ -17,6 +17,12 @@ tsconfig.json
 .npmrc
 .apps
 
+#脚本类
+run.js
+run.d.ts
+build.js
+build.d.ts
+
 # 插件
 /application/
 /example/
