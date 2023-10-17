@@ -4,15 +4,12 @@ import {
   AMessage,
   getIP
 } from '../../../core/index.js'
-import {
-  ClientAPIByQQ as Client,
-  ClinetWeb,
-  getWebConfig
-} from '../../sdk/index.js'
+import { ClientAPIByQQ as Client, getWebConfig } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { ExampleObject } from '../types.js'
 import IMGS from 'image-size'
+import { setLocalImg } from '../../../koa/index.js'
 
 export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
   /**
@@ -42,7 +39,7 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       try {
         let url = ''
         if (Buffer.isBuffer(msg)) {
-          const uul = await ClinetWeb.setLocalImg(msg)
+          const uul = await setLocalImg(msg)
           url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
           return await Client.postFilesByGroup(event.group_id, url).catch(
             err => {
@@ -65,7 +62,7 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       try {
         let url = ''
         const dimensions = IMGS.imageSize(img)
-        const uul = await ClinetWeb.setLocalImg(img)
+        const uul = await setLocalImg(img)
         url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
         return await Client.postMessageByGroup(
           event.group_id,

@@ -2,11 +2,10 @@ import { type Context } from 'koa'
 import { createReadStream, writeFileSync, readdirSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import { fileTypeFromBuffer } from 'file-type'
-import { getWebConfig } from '../config.js'
+import { getWebConfig } from '../ntqq/sdk/config.js'
 /**
  * 处理图片请求
- * @param req
- * @param res
+ * @param ctx
  */
 export function getLocalImg(ctx: Context) {
   const cfg = getWebConfig()
@@ -54,7 +53,8 @@ export function autoClearImages(time: number) {
 
 /**
  * 存储图片
- * @param Buffer 元素
+ * @param img buffer
+ * @returns
  */
 export async function setLocalImg(img: Buffer) {
   /**

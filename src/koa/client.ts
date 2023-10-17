@@ -3,8 +3,8 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 import { mkdirSync } from 'fs'
 import { getLocalImg } from './img.js'
-import { type WebConfig } from '../types.js'
-import { setWebConfig } from '../config.js'
+import { type WebConfig } from '../ntqq/sdk/types.js'
+import { setWebConfig } from '../ntqq/sdk/config.js'
 
 /**
  * 创建客户端

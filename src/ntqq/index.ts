@@ -5,11 +5,10 @@ import {
   setBotConfig,
   createClient,
   ClientAPIByQQ,
-  ClinetWeb,
   getWebConfig,
   BotConfig
 } from './sdk/index.js'
-import { createWeb } from './sdk/web/client.js'
+import { createWeb, autoClearImages } from '../koa/index.js'
 import { getIP } from '../core/index.js'
 
 interface aut {
@@ -103,7 +102,7 @@ export async function createAlemonByNtqq() {
         `[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}`
       )
       // 启动清除机制
-      ClinetWeb.autoClearImages(600000)
+      autoClearImages(600000)
     } else {
       console.error('公网IP识别失败~暂无法支持运行')
       return
