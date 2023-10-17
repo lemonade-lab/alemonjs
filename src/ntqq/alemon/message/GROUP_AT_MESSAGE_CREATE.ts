@@ -9,7 +9,7 @@ import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { ExampleObject } from '../types.js'
-import { setLocalImg } from '../../../koa/index.js'
+import { setLocalImg } from '../../sdk/web/index.js'
 import IMGS from 'image-size'
 
 /**

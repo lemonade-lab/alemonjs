@@ -2,7 +2,7 @@ import { type Context } from 'koa'
 import { createReadStream, writeFileSync, readdirSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import { fileTypeFromBuffer } from 'file-type'
-import { getWebConfig } from '../ntqq/sdk/config.js'
+import { getWebConfig } from '../config.js'
 /**
  * 处理图片请求
  * @param ctx

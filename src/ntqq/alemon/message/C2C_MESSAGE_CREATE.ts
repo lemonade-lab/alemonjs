@@ -9,7 +9,7 @@ import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { ExampleObject } from '../types.js'
 import IMGS from 'image-size'
-import { setLocalImg } from '../../../koa/index.js'
+import { setLocalImg } from '../../sdk/web/index.js'
 
 export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
   /**

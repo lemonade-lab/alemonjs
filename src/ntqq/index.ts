@@ -8,7 +8,7 @@ import {
   getWebConfig,
   BotConfig
 } from './sdk/index.js'
-import { createWeb, autoClearImages } from '../koa/index.js'
+import { createWeb, autoClearImages } from './sdk/web/index.js'
 import { getIP } from '../core/index.js'
 
 interface aut {
