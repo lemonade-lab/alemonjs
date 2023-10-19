@@ -54,7 +54,7 @@ export async function compressImage(
   const ctx = canvas.getContext('2d')
   ctx.drawImage(image, 0, 0)
   ctx.canvas.toDataURL('image/jpeg', quality)
-  const buffer = await new Promise<Buffer>((resolve, reject) => {
+  return new Promise<Buffer>((resolve, reject) => {
     canvas.toBuffer((err: any, buf: Buffer) => {
       if (err) {
         reject(err)
@@ -63,5 +63,4 @@ export async function compressImage(
       }
     }, 'image/jpeg')
   })
-  return buffer
 }

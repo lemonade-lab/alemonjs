@@ -26,22 +26,6 @@ let browser: Browser
 let isBrowser = false
 
 /**
- * 对每个页面进行缓存
- */
-const pageCache: {
-  [key: string]: Page
-} = {}
-
-/**
- * 清除缓存
- */
-function delCache() {
-  for (const item in pageCache) {
-    delete pageCache[item]
-  }
-}
-
-/**
  * 实例配置
  */
 let LaunchCfg: PuppeteerLaunchOptions
@@ -87,7 +71,6 @@ export async function pupStartCheck() {
      */
     pic = 0
     console.info('[puppeteer] close')
-    delCache()
     isBrowser = false
     browser.close().catch(err => console.error(err))
     console.info('[puppeteer] reopen')
@@ -182,26 +165,23 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
     return false
   }
   const { url, time, rand, params, tab, cache } = val
-  if (!pageCache[url]) {
-    pageCache[url] = await browser.newPage()
-  }
+  const page = await browser.newPage()
   const isurl =
     params == undefined ? url : `${url}?${queryString.stringify(params ?? {})}`
   /**
    * 启用页面缓存
    */
-  await pageCache[url].setCacheEnabled(cache == undefined ? true : cache)
+  await page.setCacheEnabled(cache == undefined ? true : cache)
   /**
    * 启动网页
    */
-  await pageCache[url].goto(isurl)
+  await page.goto(isurl)
   console.info(`open ${isurl}`)
   /**
    * 找到元素
    */
-  const body = await pageCache[url].$(tab ?? 'body')
+  const body = await page.$(tab ?? 'body')
   if (!body) {
-    delete pageCache[url]
     console.error(`tab err`)
     return false
   }
@@ -228,11 +208,10 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
    * 打印错误
    */
   if (!buff) {
-    // 确保页面已经不再使用后再删除
-    await pageCache[url].close()
-    delete pageCache[url]
     console.error(`buff err:${url}`)
   }
+  // 确保页面已经不再使用后再删除
+  await page.close()
   return buff
 }
 
@@ -244,13 +223,11 @@ export async function startChrom(): Promise<boolean> {
   try {
     browser = await puppeteer.launch(LaunchCfg)
     isBrowser = true
-    delCache()
     console.info('[puppeteer] open success')
     return true
   } catch (err) {
     console.error(err)
     isBrowser = false
-    delCache()
     console.error('[puppeteer] open fail')
     return false
   }

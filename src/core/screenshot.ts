@@ -118,7 +118,6 @@ export function createHtml(AppName: string, tplFile: string) {
     console.info('[HTML][CREATE]', AdressHtml)
   }
   return {
-    control,
     // 模板地址
     AdressHtml,
     // 模板字符
