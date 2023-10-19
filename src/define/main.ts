@@ -87,7 +87,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 登录机器人
    * *********
    */
-  if (Options?.login) {
+  if (
+    Options?.login &&
+    (Options?.plugin?.init !== false || Options?.app?.init !== false)
+  ) {
     if (Options.login?.discord) {
       // 自定义覆盖
       setBotConfigByKey('discord', Options.login.discord)
@@ -208,7 +211,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 扫描插件
    * ************
    */
-  if (Options?.plugin?.init) {
+  if (Options?.login && Options?.plugin?.init !== false) {
     // 加载插件
     await loadInit()
   }

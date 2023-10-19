@@ -18,7 +18,7 @@ export interface AlemonOptions {
     /**
      * 是否创建
      */
-    init?: boolean
+    init?: false
     /**
      * 应用名称
      */
@@ -35,7 +35,7 @@ export interface AlemonOptions {
        * 是否生成
        * defaukt true
        */
-      create?: undefined | false
+      create?: false
       /**
        * 生成地址
        * defaukt /publick/defset
@@ -56,7 +56,7 @@ export interface AlemonOptions {
     /**
      * 是否加载插件
      */
-    init?: boolean
+    init?: false
     /**
      * 插件目录
      */

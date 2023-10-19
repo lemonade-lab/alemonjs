@@ -147,7 +147,7 @@ export async function screenshotByFile(
     /**
      * 关闭
      */
-    page.close().catch((err: any) => console.error(err))
+    await page.close().catch((err: any) => console.error(err))
     /**
      * 空的
      */
@@ -228,6 +228,8 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
    * 打印错误
    */
   if (!buff) {
+    // 确保页面已经不再使用后再删除
+    await pageCache[url].close()
     delete pageCache[url]
     console.error(`buff err:${url}`)
   }
