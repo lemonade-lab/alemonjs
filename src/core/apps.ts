@@ -55,7 +55,7 @@ export function createApp(AppName: string) {
         setMessage(AppName, fnc)
         return true
       } catch (err) {
-        console.error(err)
+        console.error('[AlemonJS]重定义消息', err)
         return false
       }
     },
@@ -101,7 +101,7 @@ export function createApp(AppName: string) {
         }
         return true
       } catch (err) {
-        console.error(err)
+        console.error('[AlemonJS]插件解析', err)
         return false
       }
     },
@@ -113,7 +113,7 @@ export function createApp(AppName: string) {
       try {
         setApp(AppName, apps)
       } catch (err) {
-        console.error(err)
+        console.error('[AlemonJS]应用挂起', err)
       }
     }
   }

@@ -204,7 +204,7 @@ async function loadPlugins(dir: string) {
     if (existsSync(`${dir}/${appname}${main}.${type}`)) {
       await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
         console.error(`file://${dir}/${appname}${main}.${type}`)
-        console.error(err)
+        console.error('[AlemonJS]加载出错', err)
         process.exit()
       })
     }

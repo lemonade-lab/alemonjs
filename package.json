@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "docs https://alemonjs.com/",
   "author": "ningmengchongshui",
   "license": "GPL-2.0",
@@ -15,7 +15,6 @@
     "@discordjs/core": "^0.6.0",
     "@discordjs/rest": "^1.7.1",
     "axios": "^1.4.0",
-    "canvas": "^2.11.2",
     "discord.js": "^14.11.0",
     "image-size": "^1.0.2",
     "kook-ws": "^1.0.4",

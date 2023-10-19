@@ -23,7 +23,7 @@ export async function getIP() {
       }
     })
     .catch(err => {
-      console.error(err)
+      console.error('[AlemonJS]IP获取错误', err)
       process.exit()
     })
   return myIp

@@ -72,7 +72,9 @@ export async function pupStartCheck() {
     pic = 0
     console.info('[puppeteer] close')
     isBrowser = false
-    browser.close().catch(err => console.error(err))
+    browser.close().catch(err => {
+      console.error('[AlemonJS]pup关闭错误', err)
+    })
     console.info('[puppeteer] reopen')
     if (!(await startChrom())) return false
     pic++
@@ -103,41 +105,28 @@ export async function screenshotByFile(
   }
   const { SOptions, tab = 'body', timeout = 120000 } = Options
   try {
-    /**
-     * 实例化
-     */
     const page = await browser.newPage()
-    /**
-     * 挂载网页
-     */
     await page.goto(`file://${htmlPath}`, {
       timeout
     })
-    /**
-     * 获取元素
-     */
     const body = await page.$(tab)
-    /**
-     * 得到图片
-     */
     console.info('[puppeteer] success')
     const buff: string | false | Buffer = await body
       .screenshot(SOptions)
       .catch(err => {
-        console.error(err)
+        console.error('[AlemonJS]pup截图错误', err)
         return false
       })
-    /**
-     * 关闭
-     */
-    await page.close().catch((err: any) => console.error(err))
-    /**
-     * 空的
-     */
-    if (!buff) console.error('[puppeteer]', htmlPath)
+    await page.close().catch((err: any) => {
+      console.error('[AlemonJS]page关闭错误', err)
+    })
+    if (!buff) {
+      console.error('[puppeteer]', htmlPath)
+      return false
+    }
     return buff
   } catch (err) {
-    console.error(err)
+    console.error('[AlemonJS]page实例化错误', err)
     return false
   }
 }
@@ -165,54 +154,42 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
     return false
   }
   const { url, time, rand, params, tab, cache } = val
-  const page = await browser.newPage()
-  const isurl =
-    params == undefined ? url : `${url}?${queryString.stringify(params ?? {})}`
-  /**
-   * 启用页面缓存
-   */
-  await page.setCacheEnabled(cache == undefined ? true : cache)
-  /**
-   * 启动网页
-   */
-  await page.goto(isurl)
-  console.info(`open ${isurl}`)
-  /**
-   * 找到元素
-   */
-  const body = await page.$(tab ?? 'body')
-  if (!body) {
-    console.error(`tab err`)
+  try {
+    const page = await browser.newPage()
+    const query = queryString.stringify(params ?? {})
+    const isurl = params == undefined ? url : `${url}?${query}`
+    await page.setCacheEnabled(cache == undefined ? true : cache)
+    await page.goto(isurl)
+    console.info(`open ${isurl}`)
+    const body = await page.$(tab ?? 'body')
+    if (!body) {
+      await page.close()
+      console.error('[AlemonJS]tab 获取失败')
+      return false
+    }
+    await new Promise(resolve => setTimeout(resolve, time ?? 1000))
+    const buff: string | false | Buffer = await body
+      .screenshot(
+        rand ?? {
+          type: 'jpeg',
+          quality: 90,
+          path: ''
+        }
+      )
+      .catch(err => {
+        console.error('[AlemonJS]page截图错误', err)
+        return false
+      })
+    await page.close()
+    if (!buff) {
+      console.error('[AlemonJS]buff截图错误', url)
+      return false
+    }
+    return buff
+  } catch (err) {
+    console.error('[AlemonJS]page实例化错误', err)
     return false
   }
-  /**
-   * 延迟
-   */
-  await new Promise(resolve => setTimeout(resolve, time ?? 1000))
-  /**
-   * 截图
-   */
-  const buff: string | false | Buffer = await body
-    .screenshot(
-      rand ?? {
-        type: 'jpeg',
-        quality: 90,
-        path: ''
-      }
-    )
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  /**
-   * 打印错误
-   */
-  if (!buff) {
-    console.error(`buff err:${url}`)
-  }
-  // 确保页面已经不再使用后再删除
-  await page.close()
-  return buff
 }
 
 /**
@@ -226,9 +203,8 @@ export async function startChrom(): Promise<boolean> {
     console.info('[puppeteer] open success')
     return true
   } catch (err) {
-    console.error(err)
     isBrowser = false
-    console.error('[puppeteer] open fail')
+    console.error('[puppeteer] 打开错误', err)
     return false
   }
 }
