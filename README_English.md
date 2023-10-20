@@ -2,7 +2,9 @@
 
 ## Almon Cross Platform Development Framework
 
-official website OPEN[https://alemonjs.com](https://alemonjs.com)
+Development documentation OPEN[https://alemonjs.com](https://alemonjs.com)
+
+Type/Interface OPEN[docs](https://ningmengchongshui.github.io/alemon/)
 
 ## 开源协议
 

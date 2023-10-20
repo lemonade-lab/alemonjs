@@ -4,9 +4,9 @@
 
 > 需要配置机器人才可启动
 
-文档查看 OPEN[https://alemonjs.com](https://alemonjs.com)
+开发文档 OPEN[https://alemonjs.com](https://alemonjs.com)
 
-类型声明 OPEN[docs](./docs/index.html)
+类型/接口 OPEN[docs](https://ningmengchongshui.github.io/alemon/)
 
 开发模板 GITEE[create-alemonjs](https://gitee.com/ningmengchongshui/alemon/tree/cli/bin)
 
