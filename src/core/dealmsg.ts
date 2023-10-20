@@ -345,12 +345,15 @@ export async function InstructionMatching(e: AMessage) {
     return true
   }
 
+  let T = false
   for (const item in CommandApp) {
     const { name, Papp } = CommandApp[item]
     const AppFnc = getMessage(name)
     try {
       if (typeof AppFnc == 'function') e = AppFnc(e)
       const app = new Papp(e)
+      // 设置this.e
+      app.e = e
       // 如果存在用户上下文
       if (app.getContext) {
         // 得到缓存
@@ -360,11 +363,14 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            app[fnc](context[fnc])
+            if (app[fnc]) {
+              T = true
+              app[fnc](context[fnc])
+            }
           }
-          return
         }
       }
+      if (T) return
       // 如果存在频道上下文
       if (app.getContextGroup) {
         // 得到缓存
@@ -374,11 +380,14 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            app[fnc](context[fnc])
+            if (app[fnc]) {
+              T = true
+              app[fnc](context[fnc])
+            }
           }
-          return
         }
       }
+      if (T) return
     } catch (err) {
       console.log('[AlemonJS]上下文出错', err)
       return
@@ -405,21 +414,11 @@ export async function InstructionMatching(e: AMessage) {
     try {
       if (typeof AppFnc == 'function') e = AppFnc(e)
       const app = new data.app(e)
-      if (
-        Object.prototype.hasOwnProperty.call(app, data.fncName) &&
-        typeof app[data.fncName] == 'function'
-      ) {
-        app.e = e
-        const res = await app[data.fncName](e)
-          .then(info(data))
-          .catch(logErr(data))
-        if (res) break
-      } else {
-        console.error(
-          `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]`
-        )
-        break
-      }
+      app.e = e
+      const res = await app[data.fncName](e)
+        .then(info(data))
+        .catch(logErr(data))
+      if (res) break
     } catch (err) {
       logErr(data)(err)
       return false
@@ -443,21 +442,11 @@ export async function typeMessage(e: AMessage) {
       const AppFnc = getMessage(data.AppName)
       if (typeof AppFnc == 'function') e = AppFnc(e)
       const app = new data.app(e)
-      if (
-        Object.prototype.hasOwnProperty.call(app, data.fncName) &&
-        typeof app[data.fncName] == 'function'
-      ) {
-        app.e = e
-        const res = await app[data.fncName](e)
-          .then(info(data))
-          .catch(logErr(data))
-        if (res) break
-      } else {
-        console.error(
-          `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]`
-        )
-        break
-      }
+      app.e = e
+      const res = await app[data.fncName](e)
+        .then(info(data))
+        .catch(logErr(data))
+      if (res) break
     } catch (err) {
       logErr(data)(err)
       continue
