@@ -1,4 +1,4 @@
-import { GatewayIntentBits } from 'discord.js'
+import { GatewayIntentBits } from '../default/types.js'
 export default {
   token: '',
   masterID: '',

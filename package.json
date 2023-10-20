@@ -11,11 +11,7 @@
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@discordjs/builders": "^1.6.3",
-    "@discordjs/core": "^0.6.0",
-    "@discordjs/rest": "^1.7.1",
     "axios": "^1.4.0",
-    "discord.js": "^14.11.0",
     "image-size": "^1.0.2",
     "kook-ws": "^1.0.4",
     "lodash": "^4.17.21",

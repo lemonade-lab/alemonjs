@@ -1,4 +1,3 @@
-import { GatewayIntentBits } from 'discord.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 /**
  * *****
@@ -50,6 +49,35 @@ export interface DiscordOptions {
    * 事件订阅
    */
   intents?: GatewayIntentBits[]
+}
+
+/**
+ * https://discord.com/developers/docs/topics/gateway#list-of-intents
+ */
+export declare enum GatewayIntentBits {
+  Guilds = 1,
+  GuildMembers = 2,
+  GuildModeration = 4,
+  /**
+   * @deprecated This is the old name for {@apilink GatewayIntentBits#GuildModeration}
+   */
+  GuildBans = 4,
+  GuildEmojisAndStickers = 8,
+  GuildIntegrations = 16,
+  GuildWebhooks = 32,
+  GuildInvites = 64,
+  GuildVoiceStates = 128,
+  GuildPresences = 256,
+  GuildMessages = 512,
+  GuildMessageReactions = 1024,
+  GuildMessageTyping = 2048,
+  DirectMessages = 4096,
+  DirectMessageReactions = 8192,
+  DirectMessageTyping = 16384,
+  MessageContent = 32768,
+  GuildScheduledEvents = 65536,
+  AutoModerationConfiguration = 1048576,
+  AutoModerationExecution = 2097152
 }
 
 /**
