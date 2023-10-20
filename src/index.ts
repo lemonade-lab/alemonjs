@@ -1,9 +1,3 @@
-if (
-  process.argv.slice(2).includes('discord') &&
-  !process.argv.slice(2).includes('no')
-) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-}
 /**
  * *************
  * core

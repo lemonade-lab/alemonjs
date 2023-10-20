@@ -28,9 +28,6 @@ export const rebotMap = {
       return false
     })
   },
-  discord: async (): Promise<boolean> => {
-    return false
-  },
   ntqq: async (): Promise<boolean> => {
     const { createAlemonByNtqq: ntqq } = await import('../ntqq/index.js')
     return ntqq().catch(err => {

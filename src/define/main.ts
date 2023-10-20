@@ -99,9 +99,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     Options?.login &&
     (Options?.plugin?.init !== false || Options?.app?.init !== false)
   ) {
-    if (Options.login?.discord) {
-      setBotConfigByKey('discord', Options.login.discord)
-    }
     if (Options.login?.qq) {
       // 开启私域
       if (Options.login?.qq?.isPrivate) {

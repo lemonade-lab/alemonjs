@@ -11,10 +11,6 @@ declare global {
   var clientApiByQQ: IOpenAPI
 }
 /**
- * discord客户端
- */
-export const ClientDISCORD = {}
-/**
  * qq客户端
  */
 export const ClientQQ = global.ClientAPIByQQ

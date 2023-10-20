@@ -14,7 +14,7 @@ export interface AMessage
  */
 interface EventBase {
   /**
-   * 平台 qq | kook | discord | villa | ntqq
+   * 平台 qq | kook | villa | ntqq
    */
   platform: (typeof PlatformEnum)[number]
   /**
@@ -33,7 +33,6 @@ interface EventBase {
 export const PlatformEnum = [
   'qq',
   'kook',
-  'discord',
   'villa',
   'ntqq',
   'wechat',

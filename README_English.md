@@ -2,8 +2,6 @@
 
 ## Almon Cross Platform Development Framework
 
-> support NtQQ、QQ channel、Discord、Mi You She Big Villa、KOOK
-
 | Branch | Type        | Description                                 |
 | ------ | ----------- | ------------------------------------------- |
 | Main   | core        | bot instance                                |
@@ -11,7 +9,7 @@
 | Cli    | scaffolding | development template scaffolding            |
 | Web    | Website     | Shared Platform Plugin Contribution Address |
 
-official website OPEN[alemonjs.com](https://alemonjs.com)
+official website OPEN[https://alemonjs.com](https://alemonjs.com)
 
 ## 开源协议
 

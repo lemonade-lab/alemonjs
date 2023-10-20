@@ -2,8 +2,6 @@
 
 ## Almeon 阿柠檬跨平台开发框架机器人
 
-> 支持 NtQQ、QQ 频道、Discord、米游社大别野、KOOK
-
 | 分支  | 类型   | 说明                 |
 | ----- | ------ | -------------------- |
 | main  | 核心   | 机器实例             |
@@ -13,11 +11,11 @@
 
 > 需要配置机器人才可启动
 
-文档查看 OPEN[alemonjs.com](https://alemonjs.com)
+文档查看 OPEN[https://alemonjs.com](https://alemonjs.com)
 
-开发模板 GITEE[create-alemonjs](https://gitee.com/ningmengchongshui/alemon/tree/cli/bin/template)
+开发模板 GITEE[create-alemonjs](https://gitee.com/ningmengchongshui/alemon/tree/cli/bin)
 
-开发模板 GITHUB[create-alemonjs](https://github.com/ningmengchongshui/alemon/tree/cli/bin/template)
+开发模板 GITHUB[create-alemonjs](https://github.com/ningmengchongshui/alemon/tree/cli/bin)
 
 ### 共享平台
 

@@ -3,7 +3,6 @@ import redis from '../default/redis.js'
 import mysql from '../default/mysql.js'
 import server from '../default/server.js'
 import puppeteer from '../default/pup.js'
-import discord from '../discord/discord.js'
 import kook from '../kook/kook.js'
 import villa from '../villa/villa.js'
 import qq from '../qq/qq.js'
@@ -16,7 +15,6 @@ import ntqq from '../ntqq/ntqq.js'
 const config: ConfigType = {
   redis,
   mysql,
-  discord,
   kook,
   villa,
   qq,
