@@ -57,7 +57,8 @@ export interface PluginRuleType {
 }
 
 /**
- * 插件模板
+ * Represents a plugin.
+ * @class
  */
 export class plugin {
   /**

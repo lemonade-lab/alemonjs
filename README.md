@@ -6,6 +6,8 @@
 
 文档查看 OPEN[https://alemonjs.com](https://alemonjs.com)
 
+类型声明 OPEN[docs](./docs/index.html)
+
 开发模板 GITEE[create-alemonjs](https://gitee.com/ningmengchongshui/alemon/tree/cli/bin)
 
 开发模板 GITHUB[create-alemonjs](https://github.com/ningmengchongshui/alemon/tree/cli/bin)

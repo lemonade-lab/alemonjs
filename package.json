@@ -7,6 +7,7 @@
   "type": "module",
   "scripts": {
     "tsc": "npx tsc",
+    "doc": "npx jsdoc -c jsdoc.json",
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },
@@ -35,6 +36,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
+    "typedoc": "^0.25.2",
     "typescript": ">=5.0.4 <5.1.0"
   },
   "types": "types",
