@@ -29,12 +29,7 @@ export const rebotMap = {
     })
   },
   discord: async (): Promise<boolean> => {
-    const { createAlemonByDiscord: dc } = await import('../discord/index.js')
-    return dc().catch(err => {
-      console.error(err)
-      console.error('Discord机器人启动失败~')
-      return false
-    })
+    return false
   },
   ntqq: async (): Promise<boolean> => {
     const { createAlemonByNtqq: ntqq } = await import('../ntqq/index.js')
