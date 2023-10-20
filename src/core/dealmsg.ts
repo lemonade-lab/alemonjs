@@ -24,16 +24,14 @@ interface CommandType {
   priority: number
   event: (typeof EventEnum)[number]
   eventType: (typeof EventType)[number]
-  AppName: string
   fncName: string
-  app: PluginApp
-  fnc: (...args: any[]) => any
+  APP: string
 }
 
 interface PluginAppMap {
   [key: string]: {
     name: string
-    Papp: PluginApp
+    APP: PluginApp
   }
 }
 
@@ -50,10 +48,12 @@ type CommandMap = {
 const Command: CommandMap = {} as CommandMap
 const CommandNotMessage: CommandMap = {} as CommandMap
 const CommandApp: PluginAppMap = {}
+
 /**
  * 机器人统计
  */
 const plugins: object = {}
+
 // 大正则
 let mergedRegex: RegExp
 
@@ -118,7 +118,7 @@ async function synthesis(AppsObj: object, appname: string) {
      */
     CommandApp[item] = {
       name: appname,
-      Papp: AppsObj[item] as PluginApp
+      APP: AppsObj[item] as PluginApp
     }
     /**
      * 解析class
@@ -148,8 +148,6 @@ async function synthesis(AppsObj: object, appname: string) {
       const priority = key['priority'] ?? keys['priority'] ?? 9000
       // 得到函数名
       const fncName = key['fnc']
-      // 得到函数
-      const fnc = keys[fncName]
       const doc = key['doc'] ?? ''
       const dsc = key['dsc'] ?? ''
       // 如果类型正确
@@ -158,6 +156,7 @@ async function synthesis(AppsObj: object, appname: string) {
         const event: PluginInitType['event'] = 'MESSAGES'
         // 得到解析
         const reg = key['reg']
+        if (!reg) continue
         // 推送
         plugins[appname].push({
           event: event,
@@ -174,9 +173,7 @@ async function synthesis(AppsObj: object, appname: string) {
           reg: new RegExp(reg),
           priority,
           fncName,
-          app: AppsObj[item],
-          fnc,
-          AppName: appname
+          APP: item
         })
       } else {
         // 控制消息 -- 类型必须要存在的
@@ -196,9 +193,7 @@ async function synthesis(AppsObj: object, appname: string) {
           priority,
           reg: /./,
           fncName,
-          app: AppsObj[item],
-          fnc,
-          AppName: appname
+          APP: item
         })
       }
     }
@@ -264,10 +259,6 @@ export async function appsInit() {
   dataInit()
   // 得到所有插件名
   const APPARR = getAppKey()
-
-  /**
-   * 把所有的apps 重新合成一个全新的apps 并解决内部 重名问题
-   */
 
   // 导出所有插件名
   for await (const item of APPARR) {
@@ -344,14 +335,15 @@ export async function InstructionMatching(e: AMessage) {
     await handler(e, state)
     return true
   }
-
-  let T = false
+  /**
+   * 上下文
+   */
   for (const item in CommandApp) {
-    const { name, Papp } = CommandApp[item]
+    const { name, APP } = CommandApp[item]
     const AppFnc = getMessage(name)
     try {
       if (typeof AppFnc == 'function') e = AppFnc(e)
-      const app = new Papp(e)
+      const app = new APP(e)
       // 设置this.e
       app.e = e
       // 如果存在用户上下文
@@ -364,13 +356,12 @@ export async function InstructionMatching(e: AMessage) {
           for (const fnc in context) {
             // 丢给自己
             if (app[fnc]) {
-              T = true
               app[fnc](context[fnc])
             }
           }
+          return
         }
       }
-      if (T) return
       // 如果存在频道上下文
       if (app.getContextGroup) {
         // 得到缓存
@@ -381,13 +372,12 @@ export async function InstructionMatching(e: AMessage) {
           for (const fnc in context) {
             // 丢给自己
             if (app[fnc]) {
-              T = true
               app[fnc](context[fnc])
             }
+            return
           }
         }
       }
-      if (T) return
     } catch (err) {
       console.log('[AlemonJS]上下文出错', err)
       return
@@ -410,10 +400,12 @@ export async function InstructionMatching(e: AMessage) {
     ) {
       continue
     }
-    const AppFnc = getMessage(data.AppName)
     try {
+      const { name, APP } = CommandApp[data.APP]
+      const AppFnc = getMessage(name)
       if (typeof AppFnc == 'function') e = AppFnc(e)
-      const app = new data.app(e)
+      // 不能每次都new一个
+      const app = new APP(e)
       app.e = e
       const res = await app[data.fncName](e)
         .then(info(data))
@@ -439,9 +431,10 @@ export async function typeMessage(e: AMessage) {
   for (const data of CommandNotMessage[e.event]) {
     if (e.eventType != data.eventType) continue
     try {
-      const AppFnc = getMessage(data.AppName)
+      const { name, APP } = CommandApp[data.APP]
+      const AppFnc = getMessage(name)
       if (typeof AppFnc == 'function') e = AppFnc(e)
-      const app = new data.app(e)
+      const app = new APP(e)
       app.e = e
       const res = await app[data.fncName](e)
         .then(info(data))
@@ -457,16 +450,14 @@ export async function typeMessage(e: AMessage) {
 
 function logErr(data: CommandType) {
   return (err: any) => {
-    console.error(
-      `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]\n[${err}]`
-    )
+    console.error(`\n[${data.event}][${data.fncName}][${false}]\n[${err}]`)
     return false
   }
 }
 
 function info(data: CommandType) {
   return (res: boolean) => {
-    console.info(`\n[${data.event}][${data.AppName}][${data.fncName}][${true}]`)
+    console.info(`\n[${data.event}][${data.fncName}][${true}]`)
     return res
   }
 }

@@ -141,10 +141,10 @@ export class plugin {
   conKey(isGroup = false) {
     if (isGroup) {
       // 应用名 频道号
-      return `${this.e.guild_id}`
+      return `${JSON.stringify(this.rule)}:${this.name}:${this.e.guild_id}`
     } else {
       // 应用名 用户编号
-      return `${this.e.user_id}`
+      return `${JSON.stringify(this.rule)}:${this.name}:${this.e.user_id}`
     }
   }
 
@@ -160,7 +160,6 @@ export class plugin {
     if (!stateCache[key]) {
       stateCache[key] = {}
     }
-    // 设置当前的e对象
     stateCache[key][type] = this.e
     // 定时
     if (time && typeof time == 'number') {
