@@ -57,9 +57,6 @@
       "types": "./run.d.ts"
     }
   },
-  "bin": {
-    "alemonjs": "bin/main.js"
-  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
