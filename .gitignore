@@ -3,7 +3,7 @@ node_modules
 
 # 包
 lib
-types
+/type*/**
 
 # 配置
 /config/
