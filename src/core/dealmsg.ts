@@ -116,7 +116,19 @@ async function synthesis(AppsObj: object, appname: string) {
     /**
      * 收藏app
      */
-    CommandApp[item] = {
+    let x = 1
+    let itemX = item
+    const T = true
+    while (T) {
+      // 名字不重复
+      if (!Object.prototype.hasOwnProperty.call(CommandApp, itemX)) {
+        break
+      }
+      // 同名了 需要重命名
+      itemX = `${item}${x}`
+      x++
+    }
+    CommandApp[itemX] = {
       name: appname,
       APP: AppsObj[item] as PluginApp
     }
@@ -173,7 +185,7 @@ async function synthesis(AppsObj: object, appname: string) {
           reg: new RegExp(reg),
           priority,
           fncName,
-          APP: item
+          APP: itemX
         })
       } else {
         // 控制消息 -- 类型必须要存在的
@@ -193,7 +205,7 @@ async function synthesis(AppsObj: object, appname: string) {
           priority,
           reg: /./,
           fncName,
-          APP: item
+          APP: itemX
         })
       }
     }
@@ -241,11 +253,16 @@ async function loadPlugins(dir: string) {
  * 初始化应用
  */
 function dataInit() {
+  // 清事件
   for (const item of EventEnum) {
     if (isNaN(Number(item))) {
       Command[item] = []
       CommandNotMessage[item] = []
     }
+  }
+  // 清class
+  for (const item in CommandApp) {
+    delete CommandApp[item]
   }
   return
 }
