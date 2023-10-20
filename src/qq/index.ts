@@ -14,7 +14,7 @@ export async function createAlemonByQQ() {
   if (
     await checkRobotByQQ().catch(err => {
       console.error(err)
-      process.exit()
+      return false
     })
   ) {
     /**

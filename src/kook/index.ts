@@ -14,7 +14,7 @@ export async function createAlemonByKOOK() {
   if (
     await checkRobotByKOOK().catch(err => {
       console.error(err)
-      process.exit()
+      return false
     })
   ) {
     /**

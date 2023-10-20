@@ -10,7 +10,7 @@ export async function createAlemonByVilla() {
   if (
     await checkRobotByVilla().catch(err => {
       console.error(err)
-      process.exit()
+      return false
     })
   ) {
     /**

@@ -17,7 +17,7 @@ export async function checkRobotByVilla() {
     setBotConfigByKey('villa', config)
     return true
   }
-  console.info('[LOGIN]', '-----------------------')
-  console.info('[LOGIN]', 'villa配置加载失败~')
-  process.exit()
+  console.error('[LOGIN]', '-----------------------')
+  console.error('[LOGIN]', 'VILLA配置加载失败~')
+  return false
 }
