@@ -1,6 +1,6 @@
 import { publicIp } from 'public-ip'
 
-let myIp
+let myIp: string | false
 
 /**
  * 得到ip地址
@@ -14,7 +14,7 @@ export async function getIP() {
     onlyHttps: true,
     timeout: 10000
   })
-    .then((ip: any) => {
+    .then(ip => {
       if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
         myIp = ip
         return myIp

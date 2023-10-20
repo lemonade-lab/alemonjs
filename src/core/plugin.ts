@@ -152,7 +152,7 @@ export class plugin {
    * @param time 操作时间，默认120秒
    */
   setContext(type: string, isGroup = false, time = 120) {
-    let key = this.conKey(isGroup)
+    const key = this.conKey(isGroup)
     if (!stateCache[key]) stateCache[key] = {}
     stateCache[key][type] = this.e
     if (time && typeof time == 'number') {
@@ -171,7 +171,7 @@ export class plugin {
    * @returns
    */
   getContext() {
-    let key = this.conKey()
+    const key = this.conKey()
     return stateCache[key]
   }
 
@@ -180,7 +180,7 @@ export class plugin {
    * @returns
    */
   getContextGroup() {
-    let key = this.conKey(true)
+    const key = this.conKey(true)
     return stateCache[key]
   }
 

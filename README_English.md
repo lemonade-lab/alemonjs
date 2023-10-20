@@ -2,13 +2,6 @@
 
 ## Almon Cross Platform Development Framework
 
-| Branch | Type        | Description                                 |
-| ------ | ----------- | ------------------------------------------- |
-| Main   | core        | bot instance                                |
-| Redis  | Database    | Special Connection Independence             |
-| Cli    | scaffolding | development template scaffolding            |
-| Web    | Website     | Shared Platform Plugin Contribution Address |
-
 official website OPEN[https://alemonjs.com](https://alemonjs.com)
 
 ## 开源协议
