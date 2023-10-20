@@ -1,8 +1,7 @@
 import puppeteer, {
   Browser,
   PuppeteerLaunchOptions,
-  ScreenshotOptions,
-  Page
+  ScreenshotOptions
 } from 'puppeteer'
 import queryString from 'querystring'
 /**
@@ -138,7 +137,7 @@ export interface urlScreenshotOptions {
   url: string
   time?: number
   rand?: ScreenshotOptions
-  params?: any
+  params?: queryString.ParsedUrlQueryInput
   tab?: string
   cache?: boolean
 }
@@ -156,7 +155,7 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
   const { url, time, rand, params, tab, cache } = val
   try {
     const page = await browser.newPage()
-    const query = queryString.stringify(params ?? {})
+    const query = params == undefined ? '' : queryString.stringify(params)
     const isurl = params == undefined ? url : `${url}?${query}`
     await page.setCacheEnabled(cache == undefined ? true : cache)
     await page.goto(isurl)

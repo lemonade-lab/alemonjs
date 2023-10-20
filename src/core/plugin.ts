@@ -1,4 +1,10 @@
-import { EventEnum, EventType } from './typings.js'
+import { type AMessage, type EventEnum, type EventType } from './typings.js'
+
+/**
+ * 状态缓存
+ */
+const stateCache = {}
+
 /**
  * 插件类型
  */
@@ -9,6 +15,11 @@ export interface PluginInitType {
   name?: string
   dsc?: string
   rule?: PluginRuleType[]
+  task?: {
+    name: string
+    fnc: string
+    cron: string
+  }
 }
 /**
  * 插件类型
@@ -41,6 +52,10 @@ export interface PluginRuleType {
  */
 export class plugin {
   /**
+   * this.e 方法
+   */
+  e: AMessage
+  /**
    * 模块名
    */
   name?: string
@@ -64,6 +79,13 @@ export class plugin {
    * 匹配集
    */
   rule?: PluginRuleType[]
+
+  task?: {
+    name: string
+    fnc: string
+    cron: string
+  }
+
   /**
    * @param name 类名标记        default app-name
    * @param event 事件类型       default MESSAGES
@@ -80,12 +102,98 @@ export class plugin {
     event = 'MESSAGES',
     eventType = 'CREATE',
     priority = 9000,
-    rule = []
+    rule = [],
+    task
   }: PluginInitType) {
     this.name = name
     this.event = event
     this.eventType = eventType
     this.priority = priority
     this.rule = rule
+    this.task = {
+      name: task?.fnc ?? '',
+      fnc: task?.fnc ?? '',
+      cron: task?.cron ?? ''
+    }
+  }
+
+  /**
+   * @param content 内容
+   * @param img  图片buffer | 指定图片名
+   * @param name 指定图片名
+   * @returns
+   */
+  reply(
+    content?: string | Buffer | string[],
+    img?: string | Buffer,
+    name?: string
+  ) {
+    if (!this.e.reply || !content || content == '') return false
+    this.e.reply(content, img, name)
+    return true
+  }
+
+  /**
+   * 缓存key
+   * @param isGroup
+   * @returns
+   */
+  conKey(isGroup = false) {
+    if (isGroup) {
+      return `${this.name}.${this.e.guild_id}`
+    } else {
+      return `${this.name}.${this.e.user_id}`
+    }
+  }
+
+  /**
+   * @param type 执行方法
+   * @param isGroup 是否群聊
+   * @param time 操作时间，默认120秒
+   */
+  setContext(type: string, isGroup = false, time = 120) {
+    let key = this.conKey(isGroup)
+    if (!stateCache[key]) stateCache[key] = {}
+    stateCache[key][type] = this.e
+    if (time && typeof time == 'number') {
+      /** 操作时间 */
+      setTimeout(() => {
+        if (stateCache[key][type]) {
+          delete stateCache[key][type]
+          this.e.reply('操作超时已取消')
+        }
+      }, time * 1000)
+    }
+  }
+
+  /**
+   *
+   * @returns
+   */
+  getContext() {
+    let key = this.conKey()
+    return stateCache[key]
+  }
+
+  /**
+   *
+   * @returns
+   */
+  getContextGroup() {
+    let key = this.conKey(true)
+    return stateCache[key]
+  }
+
+  /**
+   * @param type 执行方法
+   * @param isGroup 是否公信
+   */
+  finish(type: string, isGroup = false) {
+    if (
+      stateCache[this.conKey(isGroup)] &&
+      stateCache[this.conKey(isGroup)][type]
+    ) {
+      delete stateCache[this.conKey(isGroup)][type]
+    }
   }
 }

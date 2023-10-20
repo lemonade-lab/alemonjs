@@ -7,6 +7,8 @@ import { getApp, delApp, getAppKey } from './app.js'
 import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
+import { PluginInitType, plugin } from './plugin.js'
+
 /**
  * **************
  * CommandType
@@ -19,6 +21,7 @@ interface CommandType {
   eventType: (typeof EventType)[number]
   AppName: string
   fncName: string
+  app: new (config: PluginInitType) => plugin
   fnc: (...args: any[]) => any
 }
 /**
@@ -147,6 +150,7 @@ async function synthesis(AppsObj: object, appname: string) {
           reg: new RegExp(reg),
           priority,
           fncName,
+          app: AppsObj[item],
           fnc,
           AppName: appname
         })
@@ -167,6 +171,7 @@ async function synthesis(AppsObj: object, appname: string) {
           eventType: eventType,
           priority,
           fncName,
+          app: AppsObj[item],
           fnc,
           AppName: appname
         })
@@ -234,6 +239,11 @@ export async function appsInit() {
   dataInit()
   // 得到所有插件名
   const APPARR = getAppKey()
+
+  /**
+   * 把所有的apps 重新合成一个全新的apps 并解决内部 重名问题
+   */
+
   // 导出所有插件名
   for await (const item of APPARR) {
     // 获取插件集
@@ -323,6 +333,7 @@ export async function InstructionMatching(e: AMessage) {
    *  撤回事件 匹配不到事件 或者 大正则不匹配
    */
   if (e.isRecall || !Command[e.event] || !mergedRegex.test(e.msg)) return true
+
   /**
    * 循环所有指令 用 awwat确保指令顺序
    */
@@ -337,28 +348,52 @@ export async function InstructionMatching(e: AMessage) {
     const AppFnc = getMessage(data.AppName)
     try {
       if (typeof AppFnc == 'function') e = AppFnc(e)
-      const res = await data
-        .fnc(e)
-        .then((res: boolean) => {
-          console.info(
-            `\n[${data.event}][${data.AppName}][${data.fncName}][${true}]`
-          )
-          return res
-        })
-        .catch((err: any) => {
-          console.error(
-            `\n[${data.event}][${data.AppName}][${
-              data.fncName
-            }][${false}]\n[${err}]`
-          )
-          return false
-        })
-      // 不是false都直接中断匹配
-      if (res !== false) {
+      const app = new data.app(e)
+
+      /**
+       */
+      const priority = []
+      for (const plugin of priority) {
+        /** 上下文hook */
+        if (plugin.getContext) {
+          const context = plugin.getContext()
+          if (!lodash.isEmpty(context)) {
+            for (const fnc in context) {
+              plugin[fnc](context[fnc])
+            }
+            return
+          }
+        }
+
+        /** 群上下文hook */
+        if (plugin.getContextGroup) {
+          const context = plugin.getContextGroup()
+          if (!lodash.isEmpty(context)) {
+            for (const fnc in context) {
+              plugin[fnc](context[fnc])
+            }
+            return
+          }
+        }
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(app, data.fncName) &&
+        typeof app[data.fncName] == 'function'
+      ) {
+        app.e = e
+        const res = await app[data.fncName](e)
+          .then(info(data))
+          .catch(logErr(data))
+        if (res) break
+      } else {
+        console.error(
+          `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]`
+        )
         break
       }
     } catch (err) {
-      logErr(err, data)
+      logErr(data)(err)
       return false
     }
   }
@@ -380,41 +415,42 @@ export async function typeMessage(e: AMessage) {
     try {
       const AppFnc = getMessage(data.AppName)
       if (typeof AppFnc == 'function') e = AppFnc(e)
-      const res = await data
-        .fnc(e)
-        .then((res: boolean) => {
-          console.info(
-            `\n[${data.event}][${data.AppName}][${data.fncName}][${true}]`
-          )
-          return res
-        })
-        .catch((err: any) => {
-          console.error(
-            `\n[${data.event}][${data.AppName}][${
-              data.fncName
-            }][${false}]\n[${err}]`
-          )
-          return false
-        })
-      if (res) {
+      const app = new data.app(e)
+      if (
+        Object.prototype.hasOwnProperty.call(app, data.fncName) &&
+        typeof app[data.fncName] == 'function'
+      ) {
+        app.e = e
+        const res = await app[data.fncName](e)
+          .then(info(data))
+          .catch(logErr(data))
+        if (res) break
+      } else {
+        console.error(
+          `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]`
+        )
         break
       }
     } catch (err) {
-      logErr(err, data)
+      logErr(data)(err)
       continue
     }
   }
   return true
 }
 
-/**
- * 错误信息反馈
- * @param err
- * @param data
- */
-function logErr(err: any, data: CommandType) {
-  console.error(
-    `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]\n[${err}]`
-  )
-  return
+function logErr(data: CommandType) {
+  return (err: any) => {
+    console.error(
+      `\n[${data.event}][${data.AppName}][${data.fncName}][${false}]\n[${err}]`
+    )
+    return false
+  }
+}
+
+function info(data: CommandType) {
+  return (res: boolean) => {
+    console.info(`\n[${data.event}][${data.AppName}][${data.fncName}][${true}]`)
+    return res
+  }
 }

@@ -1,4 +1,4 @@
-import { AMessage } from './typings.js'
+import { type AMessage } from './typings.js'
 
 /**
  * 对话处理函数类型
