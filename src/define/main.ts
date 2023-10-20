@@ -10,7 +10,8 @@ import {
   setLanchConfig,
   loadInit,
   appsInit,
-  setAppProCoinfg
+  setAppProCoinfg,
+  startChrom
 } from '../core/index.js'
 import {
   getPupPath,
@@ -44,14 +45,21 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * *******
    */
   const pCig = { ...PupOptions, ...getPupPath() }
-  // 设置旧的值
   setBotConfigByKey('puppeteer', pCig)
   if (Options?.puppeteer) {
-    // 存在则替换新的值
     setBotConfigByKey('puppeteer', Options?.puppeteer)
   }
   const pData = getBotConfigByKey('puppeteer')
   await setLanchConfig(pData)
+
+  /**
+   * *********
+   * pup启动
+   * ********
+   */
+  if (Options.pupStart !== false) {
+    await startChrom()
+  }
   /**
    * *********
    * mysql配置
@@ -92,7 +100,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     (Options?.plugin?.init !== false || Options?.app?.init !== false)
   ) {
     if (Options.login?.discord) {
-      // 自定义覆盖
       setBotConfigByKey('discord', Options.login.discord)
     }
     if (Options.login?.qq) {
@@ -224,7 +231,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.mount !== false) {
     await appsInit()
   }
-
+  /**
+   * 延迟执行
+   */
   setTimeout(async () => {
     /**
      * **********
@@ -251,6 +260,5 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       }
     }
   }, Options?.waitingTime ?? Object.keys(Options?.login ?? {}).length * 1000)
-
   return
 }

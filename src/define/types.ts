@@ -117,6 +117,11 @@ export interface AlemonOptions {
    */
   puppeteer?: PuppeteerLaunchOptions
   /**
+   * 是否启动pup
+   * defaut true
+   */
+  pupStart?: false
+  /**
    * redis配置
    */
   redis?: RedisOptions
