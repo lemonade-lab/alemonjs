@@ -7,11 +7,14 @@ interface test {
   name: string
   fnc: any
 }
-export function creatTask(task: test[]) {
+
+const task = []
+
+export function creatTask(taskArr: test[]) {
   // 如果存在test
   if (process.argv[1].includes('test')) return
   // 循环创建
-  task.forEach((val: test) => {
+  taskArr.forEach((val: test) => {
     val.job = schedule.scheduleJob(val.cron, async () => {
       try {
         if (val.log === true) {
@@ -30,17 +33,17 @@ export function creatTask(task: test[]) {
   })
 }
 
-export function collectTask(task) {
-  if (Array.isArray(task)) {
-    task.forEach(val => {
+export function collectTask(taskArr) {
+  if (Array.isArray(taskArr)) {
+    taskArr.forEach(val => {
       if (!val.cron) return
       if (!val.name) throw new Error('插件任务名称错误')
-      this.task.push(val)
+      task.push(val)
     })
   } else {
-    if (task.fnc && task.cron) {
-      if (!task.name) throw new Error('插件任务名称错误')
-      this.task.push(task)
+    if (taskArr.fnc && taskArr.cron) {
+      if (!taskArr.name) throw new Error('插件任务名称错误')
+      task.push(taskArr)
     }
   }
 }

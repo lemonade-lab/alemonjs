@@ -134,15 +134,17 @@ export class plugin {
   }
 
   /**
-   * 缓存key
+   * 得到缓存的key
    * @param isGroup
    * @returns
    */
   conKey(isGroup = false) {
     if (isGroup) {
-      return `${this.name}.${this.e.guild_id}`
+      // 应用名 频道号
+      return `${this.e.guild_id}`
     } else {
-      return `${this.name}.${this.e.user_id}`
+      // 应用名 用户编号
+      return `${this.e.user_id}`
     }
   }
 
@@ -152,36 +154,38 @@ export class plugin {
    * @param time 操作时间，默认120秒
    */
   setContext(type: string, isGroup = false, time = 120) {
+    // 得到缓存key
     const key = this.conKey(isGroup)
-    if (!stateCache[key]) stateCache[key] = {}
+    // 不存在
+    if (!stateCache[key]) {
+      stateCache[key] = {}
+    }
+    // 设置当前的e对象
     stateCache[key][type] = this.e
+    // 定时
     if (time && typeof time == 'number') {
-      /** 操作时间 */
       setTimeout(() => {
-        if (stateCache[key][type]) {
-          delete stateCache[key][type]
-          this.e.reply('操作超时已取消')
-        }
+        this.finish(type, isGroup)
+        this.e.reply('操作超时已取消')
       }, time * 1000)
     }
   }
 
   /**
    *
+   * 得到用户缓存
    * @returns
    */
   getContext() {
-    const key = this.conKey()
-    return stateCache[key]
+    return stateCache[this.conKey()]
   }
 
   /**
-   *
+   * 得到频道缓存
    * @returns
    */
   getContextGroup() {
-    const key = this.conKey(true)
-    return stateCache[key]
+    return stateCache[this.conKey(true)]
   }
 
   /**
@@ -190,9 +194,12 @@ export class plugin {
    */
   finish(type: string, isGroup = false) {
     if (
+      // 检擦key
       stateCache[this.conKey(isGroup)] &&
+      // 检查方法
       stateCache[this.conKey(isGroup)][type]
     ) {
+      // 删除方法
       delete stateCache[this.conKey(isGroup)][type]
     }
   }

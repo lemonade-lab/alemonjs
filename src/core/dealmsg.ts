@@ -8,7 +8,12 @@ import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
 import { PluginInitType, plugin } from './plugin.js'
-
+/**
+ * ************
+ * 插件实例类型
+ * ************
+ */
+type PluginApp = new (config: PluginInitType) => plugin
 /**
  * **************
  * CommandType
@@ -21,9 +26,17 @@ interface CommandType {
   eventType: (typeof EventType)[number]
   AppName: string
   fncName: string
-  app: new (config: PluginInitType) => plugin
+  app: PluginApp
   fnc: (...args: any[]) => any
 }
+
+interface PluginAppMap {
+  [key: string]: {
+    name: string
+    Papp: PluginApp
+  }
+}
+
 /**
  * *******
  * CommandMap
@@ -36,6 +49,7 @@ type CommandMap = {
 }
 const Command: CommandMap = {} as CommandMap
 const CommandNotMessage: CommandMap = {} as CommandMap
+const CommandApp: PluginAppMap = {}
 /**
  * 机器人统计
  */
@@ -99,9 +113,19 @@ async function synthesis(AppsObj: object, appname: string) {
     plugins[appname] = []
   }
   for (const item in AppsObj) {
+    /**
+     * 收藏app
+     */
+    CommandApp[item] = {
+      name: appname,
+      Papp: AppsObj[item] as PluginApp
+    }
+    /**
+     * 解析class
+     */
     const keys = new AppsObj[item]()
     // 控制类型
-    const eventType = keys['eventType'] ?? 'CREATE'
+    const eventType: PluginInitType['eventType'] = keys['eventType'] ?? 'CREATE'
     // 不合法
     if (
       !keys['rule'] ||
@@ -131,7 +155,7 @@ async function synthesis(AppsObj: object, appname: string) {
       // 如果类型正确
       if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
         // 存在正则就必须是MESSAGES
-        const event = 'MESSAGES'
+        const event: PluginInitType['event'] = 'MESSAGES'
         // 得到解析
         const reg = key['reg']
         // 推送
@@ -156,7 +180,7 @@ async function synthesis(AppsObj: object, appname: string) {
         })
       } else {
         // 控制消息 -- 类型必须要存在的
-        const event = keys['event']
+        const event: PluginInitType['event'] = keys['event']
         // 推送
         plugins[appname].push({
           event: event,
@@ -170,6 +194,7 @@ async function synthesis(AppsObj: object, appname: string) {
           event: event,
           eventType: eventType,
           priority,
+          reg: /./,
           fncName,
           app: AppsObj[item],
           fnc,
@@ -311,31 +336,62 @@ export async function loadInit() {
  */
 export async function InstructionMatching(e: AMessage) {
   /**
-   * 获取对话状态
+   * 对话机
    */
   const state = await getConversationState(e.user_id)
-  /**
-   * 获取对话处理函数
-   */
   const handler = conversationHandlers.get(e.user_id)
-  /**
-   * 拦截
-   */
   if (handler && state) {
-    /**
-     * 如果用户处于对话状态
-     * 则调用对话处理函数
-     */
     await handler(e, state)
     return true
   }
+
+  for (const item in CommandApp) {
+    const { name, Papp } = CommandApp[item]
+    const AppFnc = getMessage(name)
+    try {
+      if (typeof AppFnc == 'function') e = AppFnc(e)
+      const app = new Papp(e)
+      // 如果存在用户上下文
+      if (app.getContext) {
+        // 得到缓存
+        const context = app.getContext()
+        // 是否为 null && undefined && '' && [] && {}
+        if (!lodash.isEmpty(context)) {
+          // 得到缓存中的e消息
+          for (const fnc in context) {
+            // 丢给自己
+            app[fnc](context[fnc])
+          }
+          return
+        }
+      }
+      // 如果存在频道上下文
+      if (app.getContextGroup) {
+        // 得到缓存
+        const context = app.getContextGroup()
+        // 是否为 null && undefined && '' && [] && {}
+        if (!lodash.isEmpty(context)) {
+          // 得到缓存中的e消息
+          for (const fnc in context) {
+            // 丢给自己
+            app[fnc](context[fnc])
+          }
+          return
+        }
+      }
+    } catch (err) {
+      console.log('[AlemonJS]上下文出错', err)
+      return
+    }
+  }
+
   /**
-   *  撤回事件 匹配不到事件 或者 大正则不匹配
+   *  撤回事件 || 匹配不到事件 || 大正则不匹配
    */
   if (e.isRecall || !Command[e.event] || !mergedRegex.test(e.msg)) return true
 
   /**
-   * 循环所有指令 用 awwat确保指令顺序
+   * 循环所有指令
    */
   for await (const data of Command[e.event]) {
     if (
@@ -349,34 +405,6 @@ export async function InstructionMatching(e: AMessage) {
     try {
       if (typeof AppFnc == 'function') e = AppFnc(e)
       const app = new data.app(e)
-
-      /**
-       */
-      const priority = []
-      for (const plugin of priority) {
-        /** 上下文hook */
-        if (plugin.getContext) {
-          const context = plugin.getContext()
-          if (!lodash.isEmpty(context)) {
-            for (const fnc in context) {
-              plugin[fnc](context[fnc])
-            }
-            return
-          }
-        }
-
-        /** 群上下文hook */
-        if (plugin.getContextGroup) {
-          const context = plugin.getContextGroup()
-          if (!lodash.isEmpty(context)) {
-            for (const fnc in context) {
-              plugin[fnc](context[fnc])
-            }
-            return
-          }
-        }
-      }
-
       if (
         Object.prototype.hasOwnProperty.call(app, data.fncName) &&
         typeof app[data.fncName] == 'function'
@@ -397,7 +425,6 @@ export async function InstructionMatching(e: AMessage) {
       return false
     }
   }
-
   return true
 }
 
