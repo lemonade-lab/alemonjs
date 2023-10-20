@@ -2,7 +2,7 @@ import { checkRobotByQQ } from './login.js'
 import { getBotConfigByKey } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
 import {
-  setBotConfig,
+  setBotNTQQConfig,
   createClient,
   ClientAPIByQQ,
   getWebConfig,
@@ -50,7 +50,7 @@ export async function createAlemonByNtqq() {
     /**
      * 设置配置
      */
-    setBotConfig(g)
+    setBotNTQQConfig(g)
 
     const bal = async () => {
       /**
@@ -66,7 +66,7 @@ export async function createAlemonByNtqq() {
       /**
        * 设置配置
        */
-      setBotConfig(g)
+      setBotNTQQConfig(g)
 
       console.info('刷新时间:', data.expires_in, '秒')
 

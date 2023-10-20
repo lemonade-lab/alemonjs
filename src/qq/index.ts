@@ -1,6 +1,6 @@
 import './alemon/console.js'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
-import { setBotConfig } from 'qq-channel'
+import { setBotConfig as setBotQQConfig } from './sdk/index.js'
 import { checkRobotByQQ } from './login.js'
 import { createConversationByQQ } from './alemon/conversation.js'
 import { getBotConfigByKey } from '../config/index.js'
@@ -33,7 +33,7 @@ export async function createAlemonByQQ() {
     /**
      * 设置 qq-channal 配置
      */
-    setBotConfig({
+    setBotQQConfig({
       token: cfg.token,
       appID: cfg.appID,
       intents: cfg.intents,

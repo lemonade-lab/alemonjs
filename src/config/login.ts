@@ -22,35 +22,6 @@ const config: ConfigType = {
   server,
   puppeteer
 }
-/**
- * init config
- * @param val
- */
-export function setBotConfig(val: ConfigType) {
-  // 分布覆盖
-  for (const i in val) {
-    // 当且仅当存在同key的时候才会覆盖默认配置
-    if (Object.prototype.hasOwnProperty.call(config, i)) {
-      if (i == 'puppeteer') {
-        // pup 不用检查 直接覆盖
-        for (const j in val[i]) {
-          config[i][j] = val[i][j]
-        }
-      } else {
-        for (const j in val[i]) {
-          // 当前仅当同属性名的时候才会覆盖默认配置
-          if (Object.prototype.hasOwnProperty.call(config[i], j)) {
-            config[i][j] = val[i][j]
-          } else {
-            console.info('[alemonjs][存在无效参数]', val[i])
-          }
-        }
-      }
-    } else {
-      console.info('[alemonjs][存在无效参数]', val[i])
-    }
-  }
-}
 
 /**
  * set
@@ -72,7 +43,13 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
       if (Object.prototype.hasOwnProperty.call(config[key], item)) {
         config[key][item] = val[item]
       } else {
-        console.info('[alemonjs][存在无效参数]', val[item])
+        try {
+          config[key] = {}
+          config[key] = val[item]
+          console.info('[alemonjs][新增KEY成功]')
+        } catch {
+          console.info('[alemonjs][新增KEY失败]')
+        }
       }
     }
   }

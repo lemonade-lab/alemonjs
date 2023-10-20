@@ -3,7 +3,7 @@ import { typeMessage, AMessage, CardType } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
-import { ClientAPIByQQ as Client } from 'qq-channel'
+import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 
 declare global {
   //接口对象

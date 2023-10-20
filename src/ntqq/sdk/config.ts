@@ -17,7 +17,7 @@ export function getBotConfig() {
  * @param val
  * @returns
  */
-export function setBotConfig(val: BotConfig) {
+export function setBotNTQQConfig(val: BotConfig) {
   cfg = val
   return
 }

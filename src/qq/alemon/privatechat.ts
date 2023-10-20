@@ -1,5 +1,5 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { ClientAPIByQQ as Client } from 'qq-channel'
+import { ClientAPIByQQ as Client } from '../sdk/index.js'
 import { QQEMessage } from './types.js'
 
 declare global {

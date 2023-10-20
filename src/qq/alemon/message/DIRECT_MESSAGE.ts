@@ -5,7 +5,7 @@ import {
   InstructionMatching,
   CardType
 } from '../../../core/index.js'
-import { ClientAPIByQQ as Client } from 'qq-channel'
+import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
