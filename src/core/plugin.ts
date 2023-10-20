@@ -6,6 +6,16 @@ import { type AMessage, type EventEnum, type EventType } from './typings.js'
 const stateCache = {}
 
 /**
+ * 定时类型
+ */
+interface TaskType {
+  name?: string
+  fnc?: string
+  cron?: string
+  log?: boolean
+}
+
+/**
  * 插件类型
  */
 export interface PluginInitType {
@@ -15,11 +25,10 @@ export interface PluginInitType {
   name?: string
   dsc?: string
   rule?: PluginRuleType[]
-  task?: {
-    name: string
-    fnc: string
-    cron: string
-  }
+  /**
+   * @deprecated 已废弃,建议使用原生模块 node-schedule
+   */
+  task?: TaskType
 }
 /**
  * 插件类型
@@ -79,12 +88,10 @@ export class plugin {
    * 匹配集
    */
   rule?: PluginRuleType[]
-
-  task?: {
-    name: string
-    fnc: string
-    cron: string
-  }
+  /**
+   * @deprecated 已废弃,建议使用原生模块 node-schedule
+   */
+  task?: TaskType
 
   /**
    * @param name 类名标记        default app-name
@@ -111,9 +118,10 @@ export class plugin {
     this.priority = priority
     this.rule = rule
     this.task = {
-      name: task?.fnc ?? '',
+      name: task?.name ?? '',
       fnc: task?.fnc ?? '',
-      cron: task?.cron ?? ''
+      cron: task?.cron ?? '',
+      log: task?.log ?? false
     }
   }
 
