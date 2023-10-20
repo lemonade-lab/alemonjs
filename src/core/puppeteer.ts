@@ -1,7 +1,8 @@
 import puppeteer, {
   Browser,
   PuppeteerLaunchOptions,
-  ScreenshotOptions
+  ScreenshotOptions,
+  PuppeteerLifeCycleEvent
 } from 'puppeteer'
 import queryString from 'querystring'
 /**
@@ -105,10 +106,7 @@ export async function screenshotByFile(
   const { SOptions, tab = 'body', timeout = 120000 } = Options
   try {
     const page = await browser.newPage()
-    await page.goto(`file://${htmlPath}`, {
-      timeout,
-      waitUntil: 'networkidle2'
-    })
+    await page.goto(`file://${htmlPath}`, { timeout })
     const body = await page.$(tab)
     console.info('[puppeteer] success')
     const buff: string | false | Buffer = await body
@@ -142,6 +140,7 @@ export interface urlScreenshotOptions {
   tab?: string
   timeout?: number
   cache?: boolean
+  waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
 }
 
 /**
@@ -154,7 +153,16 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
   if (!T) {
     return false
   }
-  const { url, time, rand, params, tab, cache, timeout } = val
+  const {
+    url,
+    time,
+    rand,
+    params,
+    tab = 'body',
+    cache,
+    timeout,
+    waitUntil = 'networkidle2'
+  } = val
   try {
     const page = await browser.newPage()
     const query = params == undefined ? '' : queryString.stringify(params)
@@ -163,10 +171,10 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
     // 等待资源加载完成后进行
     await page.goto(isurl, {
       timeout: timeout ?? 120000,
-      waitUntil: 'networkidle2'
+      waitUntil
     })
     console.info(`open ${isurl}`)
-    const body = await page.$(params == undefined ? 'body' : tab)
+    const body = await page.$(tab)
     if (!body) {
       await page.close()
       console.error('[AlemonJS]tab 获取失败')
