@@ -113,6 +113,21 @@ async function synthesis(AppsObj: object, appname: string) {
     plugins[appname] = []
   }
   for (const item in AppsObj) {
+    // 解析class
+    const keys = new AppsObj[item]()
+
+    // 控制类型
+    const eventType: PluginInitType['eventType'] = keys['eventType'] ?? 'CREATE'
+
+    // 不合法
+    if (
+      !keys['rule'] ||
+      !Array.isArray(keys['rule']) ||
+      keys['rule'].length == 0
+    ) {
+      continue
+    }
+
     /**
      * 收藏app
      */
@@ -132,20 +147,7 @@ async function synthesis(AppsObj: object, appname: string) {
       name: appname,
       APP: AppsObj[item] as PluginApp
     }
-    /**
-     * 解析class
-     */
-    const keys = new AppsObj[item]()
-    // 控制类型
-    const eventType: PluginInitType['eventType'] = keys['eventType'] ?? 'CREATE'
-    // 不合法
-    if (
-      !keys['rule'] ||
-      !Array.isArray(keys['rule']) ||
-      keys['rule'].length == 0
-    ) {
-      continue
-    }
+
     // 指令不存在
     for await (const key of keys['rule']) {
       if (
@@ -231,10 +233,7 @@ async function loadPlugins(dir: string) {
       if (!close) return true
       return !close.test(item)
     })
-
-  /**
-   * 动态扫描
-   */
+  //动态扫描
   const main = getAppProCoinfg('main')
   const type = getAppProCoinfg('type')
   for await (const appname of apps) {
@@ -348,6 +347,15 @@ export async function InstructionMatching(e: AMessage) {
     await handler(e, state)
     return true
   }
+
+  /**
+   *
+   */
+
+  const APPCACHE: {
+    [key: string]: plugin
+  } = {}
+
   /**
    * 上下文
    */
@@ -368,9 +376,7 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            if (app[fnc]) {
-              app[fnc](context[fnc])
-            }
+            if (app[fnc]) app[fnc](context[fnc])
           }
           return
         }
@@ -384,13 +390,12 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            if (app[fnc]) {
-              app[fnc](context[fnc])
-            }
+            if (app[fnc]) app[fnc](context[fnc])
             return
           }
         }
       }
+      APPCACHE[item] = app
     } catch (err) {
       console.log('[AlemonJS]上下文出错', err)
       return
@@ -405,7 +410,7 @@ export async function InstructionMatching(e: AMessage) {
   /**
    * 循环所有指令
    */
-  for await (const data of Command[e.event]) {
+  for (const data of Command[e.event]) {
     if (
       e.eventType != data.eventType ||
       data.reg === undefined ||
@@ -414,16 +419,11 @@ export async function InstructionMatching(e: AMessage) {
       continue
     }
     try {
-      const { name, APP } = CommandApp[data.APP]
-      const AppFnc = getMessage(name)
-      if (typeof AppFnc == 'function') e = AppFnc(e)
-      // 不能每次都new一个
-      const app = new APP(e)
-      app.e = e
+      const app = APPCACHE[data.APP]
       const res = await app[data.fncName](e)
         .then(info(data))
         .catch(logErr(data))
-      if (res) break
+      if (res != false) break
     } catch (err) {
       logErr(data)(err)
       return false
@@ -440,19 +440,34 @@ export async function InstructionMatching(e: AMessage) {
  */
 export async function typeMessage(e: AMessage) {
   if (!CommandNotMessage[e.event]) return true
+
+  const APPCACHE: {
+    [key: string]: plugin
+  } = {}
+
+  for (const item in CommandApp) {
+    const { name, APP } = CommandApp[item]
+    const AppFnc = getMessage(name)
+    try {
+      if (typeof AppFnc == 'function') e = AppFnc(e)
+      const app = new APP(e)
+      app.e = e
+      APPCACHE[item] = app
+    } catch (err) {
+      console.log('[AlemonJS]上下文出错', err)
+      return
+    }
+  }
+
   // 循环查找
   for (const data of CommandNotMessage[e.event]) {
     if (e.eventType != data.eventType) continue
     try {
-      const { name, APP } = CommandApp[data.APP]
-      const AppFnc = getMessage(name)
-      if (typeof AppFnc == 'function') e = AppFnc(e)
-      const app = new APP(e)
-      app.e = e
+      const app = APPCACHE[data.APP]
       const res = await app[data.fncName](e)
         .then(info(data))
         .catch(logErr(data))
-      if (res) break
+      if (res != false) break
     } catch (err) {
       logErr(data)(err)
       continue
