@@ -1,9 +1,9 @@
 import { mkdirSync } from 'fs'
 import { execSync, exec } from 'child_process'
 /**
- *
- * @param cess
- * @param cmd
+ * 指定指定可执行指令
+ * @param cess 执行规则 同步 | 异步
+ * @param cmd 指定指令
  * @returns
  */
 export async function command(cess: 'execSync' | 'exec', cmd: string) {

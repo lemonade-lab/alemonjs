@@ -5,7 +5,7 @@ import { writeFile, readFile } from 'fs'
  * 链接转化为二维码
  * @param text 链接
  * @param localpath 可选,要保存的路径
- * @returns
+ * @returns buffer
  */
 export async function createQrcode(
   text: string,
@@ -43,7 +43,7 @@ export async function createQrcode(
 /**
  * 读取buffer文件
  * @param localpath 读取地址
- * @returns
+ * @returns buffer
  */
 export const getBuffer = (localpath: string): Promise<Buffer> => {
   return new Promise((resolve, reject) => {

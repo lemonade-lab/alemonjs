@@ -25,7 +25,7 @@ export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
 let OptionsCache: AlemonOptions
 
 /**
- * 得到载入配置
+ * 得到初始化配置
  * @returns
  */
 export function getAlemonConfig() {
@@ -33,7 +33,7 @@ export function getAlemonConfig() {
 }
 
 /**
- * 机器人配置
+ * 配置机器人启动规则
  * @param Options
  */
 export async function defineAlemonConfig(Options?: AlemonOptions) {

@@ -60,7 +60,7 @@ let mergedRegex: RegExp
 /**
  * 得到机器人帮助
  * @param AppName
- * @returns
+ * @returns 指令对象
  */
 export function getPluginHelp(AppName: string) {
   const c = getAppProCoinfg('regex')
@@ -104,8 +104,8 @@ function createPluginHelp() {
 
 /**
  * 应用挂载
- * @param AppsObj
- * @param appname
+ * @param AppsObj 插件集成对象
+ * @param appname 插件名
  */
 async function synthesis(AppsObj: object, appname: string) {
   // 没有记载
@@ -215,7 +215,7 @@ async function synthesis(AppsObj: object, appname: string) {
 
 /**
  * 加载应用插件
- * @param dir
+ * @param dir 插件路径
  */
 async function loadPlugins(dir: string) {
   if (!existsSync(dir)) return
@@ -268,8 +268,7 @@ function dataInit() {
 }
 
 /**
- * 应用初始化
- * @returns
+ * 插件初始化
  */
 export async function appsInit() {
   // 清空当前的apps
@@ -317,30 +316,27 @@ export async function appsInit() {
 
   // 打印
   console.info(`[LOAD] APPS*${Object.keys(plugins).length} `)
-  return
 }
 
 /**
- * 得到大正则
- * @returns
+ * 得到指令大正则
+ * @returns 正则
  */
 export function getMergedRegex() {
   return mergedRegex
 }
 
 /**
- * 初始化应用
- * @returns
+ * 扫描插件
  */
 export async function loadInit() {
   await loadPlugins(join(process.cwd(), getAppProCoinfg('dir')))
-  return
 }
 
 /**
  * 指令匹配
- * @param e
- * @returns
+ * @param e alemonjs message
+ * @returns 是否处理完成
  */
 export async function InstructionMatching(e: AMessage) {
   /**
@@ -439,8 +435,8 @@ export async function InstructionMatching(e: AMessage) {
 /**
  * 不匹配指令的方法
  * 只用匹配类型函数
- * @param e
- * @returns
+ * @param e alemonjs message
+ * @returns 是否处理完成
  */
 export async function typeMessage(e: AMessage) {
   if (!CommandNotMessage[e.event]) return true

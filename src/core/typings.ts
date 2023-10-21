@@ -397,7 +397,7 @@ interface replyController {
    * 消息发送机制
    * @param content 消息 | buffer
    * @param img  消息 | buffer
-   * @returns
+   * @returns 是否执行完成
    */
   reply(
     content?: string | string[] | Buffer,

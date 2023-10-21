@@ -3,8 +3,8 @@ import { publicIp } from 'public-ip'
 let myIp: string | false
 
 /**
- * 得到ip地址
- * @returns
+ * 得到本机IP地址
+ * @returns ip
  */
 export async function getIP() {
   if (myIp) {

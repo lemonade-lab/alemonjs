@@ -57,8 +57,11 @@ if (process.platform == 'win32' && existsSync(win32Edge)) {
     skipDownload = true
   }
 }
+
 /**
+ * 得到pup可寻地址
  * @type {import("puppeteer").Configuration}
+ * @returns 得到配置对象
  */
 export function getPupPath() {
   return {

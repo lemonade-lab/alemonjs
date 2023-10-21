@@ -4,7 +4,7 @@ const MSG = {}
 /**
  * 得到消息
  * @param key 插件名
- * @returns
+ * @returns 重定义回调函数
  */
 export function getMessage(key: string) {
   return MSG[key]
@@ -16,7 +16,6 @@ export function getMessage(key: string) {
  */
 export function setMessage(key: string, fnc: (...args: any[]) => any) {
   MSG[key] = fnc
-  return
 }
 /**
  * 删除消息
@@ -24,5 +23,4 @@ export function setMessage(key: string, fnc: (...args: any[]) => any) {
  */
 export function delMessage(key: string) {
   delete MSG[key]
-  return
 }

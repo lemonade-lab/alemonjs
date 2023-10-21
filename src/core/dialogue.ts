@@ -1,9 +1,9 @@
 import { type AMessage } from './typings.js'
 
 /**
- * 对话处理函数类型
+ * 对话处理函数集
  */
-export interface SockesType {
+export interface SockesMap {
   [key: string]: any
 }
 
@@ -26,7 +26,7 @@ export type ConversationState = {
 }
 
 /**
- * 对话接口
+ * 对话接口类型
  */
 export type ConversationHandler = (
   e: AMessage,
@@ -41,12 +41,12 @@ export type conversationHandlersMap = Map<string, ConversationHandler>
 /**
  *对话缓存
  */
-const Sockes: SockesType = {}
+const Sockes: SockesMap = {}
 
 /**
  * 得到对话
- * @param key
- * @returns
+ * @param key 对话键
+ * @returns 对话值
  */
 const getAsync = async (key: string) => {
   return Sockes[key]
@@ -54,8 +54,8 @@ const getAsync = async (key: string) => {
 
 /**
  * 设置对话
- * @param key
- * @param val
+ * @param key 对话键
+ * @param val 对话值
  */
 const setAsync = async (key: string, val: any) => {
   Sockes[key] = val
@@ -64,11 +64,10 @@ const setAsync = async (key: string, val: any) => {
 
 /**
  * 删除对话
- * @param key
+ * @param key 对话键
  */
 const delAsync = async (key: string) => {
   delete Sockes[key]
-  return
 }
 
 /**
@@ -78,8 +77,8 @@ export const conversationHandlers: conversationHandlersMap = new Map()
 
 /**
  * 获取对话状态
- * @param userId 根据id获取
- * @returns
+ * @param userId 用户编号
+ * @returns 对话状态值
  */
 export const getConversationState = async (
   userId: string
@@ -89,27 +88,23 @@ export const getConversationState = async (
 }
 
 /**
- * 保存对话状态
- * @param userId
- * @param state
- * @returns
+ * 设置对话状态
+ * @param userId 用户编号
+ * @param state 状态记录
  */
 export const setConversationState = async (
   userId: string,
   state: ConversationState
 ): Promise<void> => {
   await setAsync(`conversation-state:${userId}`, JSON.stringify(state))
-  return
 }
 
 /**
  * 删除对话状态
- * @param userId
- * @returns
+ * @param userId 用户编号
  */
 export const deleteConversationState = async (
   userId: string
 ): Promise<void> => {
   await delAsync(`conversation-state:${userId}`)
-  return
 }

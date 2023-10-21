@@ -57,7 +57,7 @@ export interface PluginRuleType {
 }
 
 /**
- * Represents a plugin.
+ * 插件基础类
  * @class
  */
 export class plugin {
@@ -130,7 +130,7 @@ export class plugin {
    * @param content 内容
    * @param img  图片buffer | 指定图片名
    * @param name 指定图片名
-   * @returns
+   * @returns 是否处理完成
    */
   reply(
     content?: string | Buffer | string[],
@@ -145,7 +145,7 @@ export class plugin {
   /**
    * 得到缓存的key
    * @param isGroup
-   * @returns
+   * @returns key
    */
   conKey(isGroup = false) {
     if (isGroup) {
@@ -158,6 +158,7 @@ export class plugin {
   }
 
   /**
+   * 设置上下文
    * @param type 执行方法
    * @param isGroup 是否群聊
    * @param time 操作时间，默认120秒
@@ -181,22 +182,23 @@ export class plugin {
 
   /**
    *
-   * 得到用户缓存
-   * @returns
+   * 得到用户缓存消息对象
+   * @returns message
    */
   getContext() {
     return stateCache[this.conKey()]
   }
 
   /**
-   * 得到频道缓存
-   * @returns
+   * 得到频道缓存消息对象
+   * @returns message
    */
   getContextGroup() {
     return stateCache[this.conKey(true)]
   }
 
   /**
+   * 完成上下文
    * @param type 执行方法
    * @param isGroup 是否公信
    */

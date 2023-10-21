@@ -5,8 +5,8 @@ import { setApp } from './app.js'
 
 /**
  * 得到执行路径
- * @param url
- * @returns
+ * @param url  import.meta.url
+ * @returns AppName目录名
  */
 export function getAppPath(url: string | URL) {
   return dirname(fileURLToPath(url)).replace(/\\/g, '/')
@@ -14,8 +14,8 @@ export function getAppPath(url: string | URL) {
 
 /**
  * 得到执行目录
- * @param {} url
- * @returns
+ * @param {} url import.meta.url
+ * @returns AppName目录名
  */
 export function getAppName(url: string | URL) {
   return basename(getAppPath(url))
@@ -24,7 +24,7 @@ export function getAppName(url: string | URL) {
 /**
  * 创建应用对象
  * @param url import.meta.url
- * @returns
+ * @returns AppName目录名
  */
 export function createApps(url: string) {
   return createApp(getAppName(url))
@@ -32,8 +32,8 @@ export function createApps(url: string) {
 
 /**
  * 创建应用对象
- * @param AppName
- * @returns
+ * @param AppName 目录名 getAppName(import.meta.url)
+ * @returns 应用app对象
  */
 export function createApp(AppName: string) {
   /**
@@ -47,8 +47,8 @@ export function createApp(AppName: string) {
   return {
     /**
      * 重定义消息
-     * @param fnc
-     * @returns
+     * @param fnc 回调函数
+     * @returns 是否成功定义
      */
     setMessage: (fnc: (...args: any[]) => any) => {
       try {
@@ -107,7 +107,6 @@ export function createApp(AppName: string) {
     },
     /**
      * 挂起应用
-     * @returns
      */
     mount: () => {
       try {

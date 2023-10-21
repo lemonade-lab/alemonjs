@@ -4,7 +4,7 @@ const APP = {}
 /**
  * 得到应用
  * @param key 插件名
- * @returns
+ * @returns 得到应用集
  */
 export function getApp(key: any): object {
   return APP[key]
@@ -31,7 +31,7 @@ export function delApp(key: any): void {
 
 /**
  * 得到应用
- * @returns
+ * @returns 得到指定应用值
  */
 export function getAppKey() {
   const arr = []

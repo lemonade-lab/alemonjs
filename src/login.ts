@@ -9,8 +9,8 @@ export interface LoginMap {
 }
 /**
  * map登录校验
- * @param val
- * @returns
+ * @param val 校验值
+ * @returns 返回校验所得login配置
  */
 export function analysis(val: LoginMap) {
   const ars = process.argv.slice(2)

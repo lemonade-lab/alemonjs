@@ -32,7 +32,7 @@ let LaunchCfg: PuppeteerLaunchOptions
 
 /**
  * 配置浏览器参数
- * @param val
+ * @param val 参数值
  */
 export function setLanchConfig(val: PuppeteerLaunchOptions) {
   LaunchCfg = val
@@ -40,15 +40,15 @@ export function setLanchConfig(val: PuppeteerLaunchOptions) {
 
 /**
  * 得到pup配置
- * @returns
+ * @returns config
  */
 export function getLanchConfig() {
   return LaunchCfg
 }
 
 /**
- * 启动检查
- * @returns
+ * 启动pup检查
+ * @returns 是否启动成功
  */
 export async function pupStartCheck() {
   /**
@@ -89,7 +89,7 @@ export async function pupStartCheck() {
  * @param type 图片类型
  * @param quality 清晰度
  * @param timeout 响应检查
- * @returns
+ * @returns buffer
  */
 export async function screenshotByFile(
   htmlPath: string | Buffer | URL,
@@ -144,9 +144,9 @@ export interface urlScreenshotOptions {
 }
 
 /**
- * 截图
- * @param val
- * @returns
+ * 对url截图进行截图
+ * @param val url地址
+ * @returns buffer
  */
 export async function screenshotByUrl(val: urlScreenshotOptions) {
   const T = await pupStartCheck()
@@ -206,8 +206,8 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
 }
 
 /**
- * 启动浏览器
- * @returns
+ * 启动pup
+ * @returns 是否启动
  */
 export async function startChrom(): Promise<boolean> {
   try {

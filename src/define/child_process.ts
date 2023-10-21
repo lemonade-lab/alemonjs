@@ -1,9 +1,9 @@
 import { spawn } from 'child_process'
 /**
- *
- * @param name
- * @param file
- * @param ars
+ * 执行脚本文件
+ * @param name node | ts-node
+ * @param file 脚本文件
+ * @param ars 执行参数
  */
 export function nodeScripts(name = 'node', file = '', ars = []) {
   const command = spawn(`${name} ${file} ${ars.join(' ')}`, { shell: true })

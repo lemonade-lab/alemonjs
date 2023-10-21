@@ -24,9 +24,9 @@ const config: ConfigType = {
 }
 
 /**
- * set
- * @param key
- * @param val
+ * 设置机器人基础配置
+ * @param key 配置名
+ * @param val 配置值
  */
 export function setBotConfigByKey<T extends keyof ConfigType>(
   key: T,
@@ -56,9 +56,9 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
 }
 
 /**
- * get
- * @param key
- * @returns
+ * g得到机器人基础配置
+ * @param key 配置名
+ * @returns 得到配置值
  */
 export function getBotConfigByKey<T extends keyof ConfigType>(
   key: T

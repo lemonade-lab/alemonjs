@@ -29,6 +29,11 @@ interface ApplicationProcessingOpsion {
   regex: boolean
 }
 
+/**
+ * ***********
+ * 插件解析配置
+ * ***********
+ */
 const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   dir: '/application',
   main: '/index',
@@ -39,6 +44,11 @@ const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   regex: true
 }
 
+/**
+ * 设置插件解析配置
+ * @param key 配置名
+ * @param val 配置值
+ */
 export function setAppProCoinfg<T extends keyof ApplicationProcessingOpsion>(
   key: T,
   val: ApplicationProcessingOpsion[T]
@@ -54,6 +64,11 @@ export function setAppProCoinfg<T extends keyof ApplicationProcessingOpsion>(
   }
 }
 
+/**
+ * 得到插件解析配置
+ * @param key 配置名
+ * @returns 配置值
+ */
 export function getAppProCoinfg<T extends keyof ApplicationProcessingOpsion>(
   key: T
 ) {

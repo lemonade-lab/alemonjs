@@ -5,8 +5,8 @@ import { join } from 'path'
 
 /**
  * 异步请求图片
- * @param url
- * @returns
+ * @param url 网络地址
+ * @returns buffer
  */
 export function getUrlbuffer(url: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -27,8 +27,8 @@ export function getUrlbuffer(url: string): Promise<Buffer> {
 
 /**
  * 读取本地图片
- * @param path 根路径
- * @returns
+ * @param path 本地地址 /public/img/xx.png
+ * @returns buffer
  */
 export function getPathBuffer(path: string): Buffer {
   // 读取本地图片

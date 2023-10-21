@@ -21,7 +21,6 @@ const absolutePathTemplateCache = {}
 /**
  * 缓存监听
  * @param tplFile 模板地址
- * @returns
  */
 function watchCT(tplFile: string) {
   /**
@@ -48,10 +47,10 @@ function watchCT(tplFile: string) {
 }
 
 /**
- * 如果control为真则需重新重新渲染
- * @param AppName
- * @param tplFile
- * @returns
+ * 对指定html进行资源矫正
+ * @param AppName 插件名
+ * @param tplFile 文件地址
+ * @returns 文件地址|模板字符串
  */
 export function createHtml(AppName: string, tplFile: string) {
   const appDir = getAppProCoinfg('dir')

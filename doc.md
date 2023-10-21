@@ -6,7 +6,7 @@ import { createCanvas, loadImage } from 'canvas'
  * 压缩buffer图片
  * @param img
  * @param quality
- * @returns
+ * @returns 返回压缩后的buffer
  */
 export async function compressImage(
   img: Buffer,
