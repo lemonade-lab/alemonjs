@@ -1,6 +1,6 @@
 ☞[English document](./README_English.md)
 
-## Almeon 阿柠檬跨平台开发框架机器人
+## 阿柠檬跨平台开发框架机器人
 
 > 需要配置机器人才可启动
 
@@ -14,13 +14,13 @@
 
 ### 共享平台
 
-> 仓库只做资源收集,对齐安全性不做任何检查,请谨慎选择
-
-> 仅限签署开源协议的仓库、不开源将不做考虑范围内
-
 贡献资源 OPEN[Gitee](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
 
 贡献资源 OPEN[Github](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
+
+- 仓库只做资源收集,对齐安全性不做任何检查,请谨慎选择
+
+- 仅限签署开源协议的仓库、不开源将不做考虑范围内
 
 ## 开源协议
 
