@@ -4,7 +4,7 @@ import {
   UserType,
   getIP
 } from '../../../core/index.js'
-import { BotEvent, MessageContentType, Client } from 'mys-villa'
+import { BotEvent, MessageContentType, Client } from '../../sdk/index.js'
 import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'

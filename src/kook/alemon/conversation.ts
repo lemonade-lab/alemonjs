@@ -1,5 +1,5 @@
 import { PUBLIC_GUILD_MESSAGES_KOOK } from './message/PUBLIC_GUILD_MESSAGES.js'
-import { EventData, SystemData } from 'kook-ws'
+import { EventData, SystemData } from '../sdk/index.js'
 /**
  * 事件处理集
  */

@@ -1,6 +1,6 @@
 import { checkRobotByKOOK } from './login.js'
 import { callBackByKOOK } from './alemon/conversation.js'
-import { createClient, KOOKApiClient } from 'kook-ws'
+import { createClient, KOOKApiClient } from './sdk/index.js'
 import { setBotMsgByKOOK } from './alemon/bot.js'
 import { getBotConfigByKey } from '../config/index.js'
 /**

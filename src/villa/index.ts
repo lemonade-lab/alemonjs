@@ -1,6 +1,6 @@
 import { callBackByVilla } from './alemon/conversation.js'
 import { checkRobotByVilla } from './login.js'
-import { createClient, Client, hmacSha256 } from 'mys-villa'
+import { createClient, Client, hmacSha256 } from './sdk/index.js'
 import { getBotConfigByKey } from '../config/index.js'
 import { getIP } from '../core/index.js'
 export async function createAlemonByVilla() {

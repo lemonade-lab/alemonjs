@@ -1,5 +1,5 @@
 import { AMessage, typeMessage } from '../../../core/index.js'
-import { BotEvent } from 'mys-villa'
+import { BotEvent } from '../../sdk/index.js'
 import { segmentVilla } from '../segment.js'
 import { now_e } from './e.js'
 

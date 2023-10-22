@@ -1,5 +1,5 @@
 import { AMessage, UserType, InstructionMatching } from '../../../core/index.js'
-import { KOOKApiClient, EventData } from 'kook-ws'
+import { KOOKApiClient, EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
