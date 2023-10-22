@@ -133,12 +133,14 @@ export class plugin {
    * @returns 是否处理完成
    */
   reply(
-    content?: string | Buffer | string[],
-    img?: string | Buffer,
-    name?: string
+    content: Buffer | string | (Buffer | string)[],
+    select?: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ) {
     if (!this.e.reply || !content || content == '') return false
-    this.e.reply(content, img, name)
+    this.e.reply(content, select)
     return true
   }
 

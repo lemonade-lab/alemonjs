@@ -68,9 +68,11 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
    * @returns
    */
   e.reply = async (
-    msg?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
+    msg: Buffer | string | (Buffer | string)[],
+    select?: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ): Promise<boolean> => {
     if (Buffer.isBuffer(msg)) {
       try {
@@ -141,18 +143,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
       }
     }
     return true
-  }
-
-  /**
-   * 引用消息
-   * @param mid
-   * @param boj
-   * @returns
-   */
-
-  e.replyByMid = async (mid: string, msg: string) => {
-    console.info('暂不可用')
-    return false
   }
 
   /**

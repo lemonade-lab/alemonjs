@@ -15,9 +15,11 @@ declare global {
  */
 export const Private = async (
   EMessage: QQEMessage,
-  msg?: string | string[] | Buffer,
-  img?: Buffer | string,
-  name?: string
+  msg: Buffer | string | (Buffer | string)[],
+  select?: {
+    quote?: boolean
+    withdraw?: boolean
+  }
 ): Promise<boolean> => {
   const postSessionRes: any = await clientApiByQQ.directMessageApi
     .createDirectMessage({

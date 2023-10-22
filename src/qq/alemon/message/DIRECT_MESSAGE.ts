@@ -76,9 +76,11 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
 async function directMessage(e: AMessage, event: directEventData) {
   /* 消息发送机制 */
   e.reply = async (
-    msg?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
+    msg: Buffer | string | (Buffer | string)[],
+    select?: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ) => {
     if (Buffer.isBuffer(msg)) {
       try {

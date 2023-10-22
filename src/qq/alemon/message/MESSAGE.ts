@@ -64,9 +64,11 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    * @returns
    */
   e.reply = async (
-    msg?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
+    msg: Buffer | string | (Buffer | string)[],
+    select?: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ): Promise<boolean> => {
     if (Buffer.isBuffer(msg)) {
       try {
@@ -156,19 +158,19 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    * @returns
    */
 
-  e.replyByMid = async (mid: string, msg: string) => {
-    return await clientApiByQQ.messageApi
-      .postMessage(event.msg.channel_id, {
-        msg_id: mid,
-        content: msg,
-        message_reference: { message_id: mid }
-      })
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
-  }
+  // e.replyByMid = async (mid: string, msg: string) => {
+  // return await clientApiByQQ.messageApi
+  //   .postMessage(event.msg.channel_id, {
+  //     msg_id: mid,
+  //     content: msg,
+  //     message_reference: { message_id: mid }
+  //   })
+  //   .then(() => true)
+  //   .catch((err: any) => {
+  //     console.error(err)
+  //     return false
+  //   })
+  // }
 
   /**
    * 发送表情表态
@@ -321,11 +323,13 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    * @returns
    */
   e.replyPrivate = async (
-    msg?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
+    msg: Buffer | string | (Buffer | string)[],
+    select?: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ): Promise<boolean> => {
-    return await Private(event.msg, msg, img)
+    return await Private(event.msg, msg)
       .then(res => {
         return res
       })

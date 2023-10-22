@@ -31,10 +31,13 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
 
   /* 消息发送机制 */
   e.reply = async (
-    msg?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
+    msg: Buffer | string | (Buffer | string)[],
+    select?: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ) => {
+    // 看看是否是数组
     if (Buffer.isBuffer(msg)) {
       try {
         let url = ''
