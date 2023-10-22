@@ -235,14 +235,23 @@ async function loadPlugins(dir: string) {
     })
   //动态扫描
   const main = getAppProCoinfg('main')
-  const type = getAppProCoinfg('type')
-  for await (const appname of apps) {
-    if (existsSync(`${dir}/${appname}${main}.${type}`)) {
-      await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
-        console.error(`file://${dir}/${appname}${main}.${type}`)
-        console.error('[AlemonJS]加载出错', err)
-        process.exit()
-      })
+  const typeVal = getAppProCoinfg('type')
+  const types = []
+  if (typeVal != 'stript') {
+    types.push(typeVal)
+  } else {
+    types.push('js')
+    types.push('ts')
+  }
+  for (const type of types) {
+    for await (const appname of apps) {
+      if (existsSync(`${dir}/${appname}${main}.${type}`)) {
+        await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
+          console.error(`file://${dir}/${appname}${main}.${type}`)
+          console.error('[AlemonJS]加载出错', err)
+          process.exit()
+        })
+      }
     }
   }
   return

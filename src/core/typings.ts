@@ -14,7 +14,7 @@ export interface AMessage
  */
 interface EventBase {
   /**
-   * 平台 qq | kook | villa | ntqq
+   * 平台 qq | kook | villa | ntqq | discord
    */
   platform: (typeof PlatformEnum)[number]
   /**
@@ -37,7 +37,8 @@ export const PlatformEnum = [
   'ntqq',
   'wechat',
   'telegram',
-  'dodo'
+  'dodo',
+  'discord'
 ] as const
 
 /**
@@ -395,14 +396,17 @@ interface ApiBase
 interface replyController {
   /**
    * 消息发送机制
-   * @param content 消息 | buffer
-   * @param img  消息 | buffer
-   * @returns 是否执行完成
+   * @param content 消息
+   * @param select.quote 引用消息编号,默认无引用
+   * @param select.withdraw 撤回消息,默认不撤回
+   * 文件名会进行解析后得到正确文件后缀
    */
   reply(
-    content?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
+    content: Buffer | string | (Buffer | string)[],
+    select: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ): Promise<boolean>
 
   /**
@@ -412,42 +416,19 @@ interface replyController {
   replyCard?(arr: CardType[]): Promise<boolean>
 
   /**
-   * 回复消息
-   * @param obj
-   */
-  replyByMid?(
-    mid: string,
-    content?: string | string[] | Buffer,
-    img?: Buffer | string,
-    name?: string
-  ): Promise<boolean>
-
-  /**
-   * 回复卡片
-   * @param mid
-   * @param arr
-   */
-  replyByMidCard?(mid: string, arr: CardType[]): Promise<boolean>
-
-  /**
-   * 撤回指定消息
-   * @param cid 频道编号
-   * @param mid 消息编号
-   * @param hideTip 是否隐藏
-   * @returns
-   */
-  replyDelete?(cid: string, mid: string, hideTip: boolean): Promise<any>
-
-  /**
    * 公信转私信
    * QQ频道使用
-   * @param content 内容 | buffer
-   * @param obj 消息对象 | buffer
+   * @param content 消息
+   * @param select.quote 引用消息编号,默认无引用
+   * @param select.withdraw 撤回消息,默认不撤回
    * @returns
    */
   replyPrivate?(
-    content?: string | string[] | Buffer,
-    obj?: Buffer
+    content: Buffer | string | (Buffer | string)[],
+    select: {
+      quote?: boolean
+      withdraw?: boolean
+    }
   ): Promise<boolean>
 
   /**

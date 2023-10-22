@@ -10,7 +10,7 @@ interface ApplicationProcessingOpsion {
   /**
    * 主文件类型
    */
-  type: 'ts' | 'js'
+  type: 'ts' | 'js' | 'stript'
   /**
    * 匹配正则
    */
@@ -36,7 +36,7 @@ interface ApplicationProcessingOpsion {
  */
 const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   dir: '/application',
-  main: '/index',
+  main: '/main',
   type: 'ts',
   openRegex: /./,
   closeRegex: undefined,

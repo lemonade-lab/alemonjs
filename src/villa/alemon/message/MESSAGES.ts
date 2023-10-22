@@ -260,6 +260,8 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           `${cfg.http}://${ip}:${cfg.port}${uul}`
         )
         if (!NowObj) {
+          console.log('转存失败', NowObj)
+          console.log('公网访问', url)
           url = `${cfg.http}://${ip}:${cfg.port}${uul}`
         } else {
           url = NowObj.new_url
