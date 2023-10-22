@@ -403,7 +403,7 @@ interface replyController {
    */
   reply(
     content: Buffer | string | (Buffer | string)[],
-    select: {
+    select?: {
       quote?: boolean
       withdraw?: boolean
     }
