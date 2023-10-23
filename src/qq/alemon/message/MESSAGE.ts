@@ -71,6 +71,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     }
   ): Promise<boolean> => {
     // isBuffer
+
     if (Buffer.isBuffer(msg)) {
       try {
         return await Client.postImage({
@@ -116,7 +117,10 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     return await clientApiByQQ.messageApi
       .postMessage(event.msg.channel_id, {
         msg_id: event.msg.id,
-        content
+        content,
+        message_reference: select?.quote
+          ? { message_id: select?.quote }
+          : undefined
       })
       .catch(err => {
         console.error(err)
@@ -146,27 +150,6 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     }
     return true
   }
-
-  /**
-   * 引用消息
-   * @param mid
-   * @param boj
-   * @returns
-   */
-
-  // e.replyByMid = async (mid: string, msg: string) => {
-  // return await clientApiByQQ.messageApi
-  //   .postMessage(event.msg.channel_id, {
-  //     msg_id: mid,
-  //     content: msg,
-  //     message_reference: { message_id: mid }
-  //   })
-  //   .then(() => true)
-  //   .catch((err: any) => {
-  //     console.error(err)
-  //     return false
-  //   })
-  // }
 
   /**
    * 发送表情表态
