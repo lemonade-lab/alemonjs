@@ -112,13 +112,12 @@ async function synthesis(AppsObj: object, appname: string) {
   if (!plugins[appname]) {
     plugins[appname] = []
   }
+  const shield = getAppProCoinfg('event')
   for (const item in AppsObj) {
-    // 解析class
     const keys = new AppsObj[item]()
-
+    if (shield.find(item => item == keys['event'])) continue
     // 控制类型
     const eventType: PluginInitType['eventType'] = keys['eventType'] ?? 'CREATE'
-
     // 不合法
     if (
       !keys['rule'] ||
@@ -127,7 +126,6 @@ async function synthesis(AppsObj: object, appname: string) {
     ) {
       continue
     }
-
     /**
      * 收藏app
      */
@@ -148,7 +146,6 @@ async function synthesis(AppsObj: object, appname: string) {
       APP: AppsObj[item] as PluginApp
     }
 
-    // 指令不存在
     for await (const key of keys['rule']) {
       if (
         !key['fnc'] ||
@@ -164,6 +161,7 @@ async function synthesis(AppsObj: object, appname: string) {
       const fncName = key['fnc']
       const doc = key['doc'] ?? ''
       const dsc = key['dsc'] ?? ''
+
       // 如果类型正确
       if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
         // 存在正则就必须是MESSAGES

@@ -27,6 +27,10 @@ interface ApplicationProcessingOpsion {
    * 是否生成json
    */
   regex: boolean
+  /**
+   * 事件屏蔽器
+   */
+  event: string[]
 }
 
 /**
@@ -40,6 +44,7 @@ const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   type: 'stript',
   openRegex: /./,
   closeRegex: undefined,
+  event: [],
   route: '/public/defset',
   regex: true
 }

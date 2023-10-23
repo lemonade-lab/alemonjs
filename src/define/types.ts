@@ -12,6 +12,10 @@ export interface AlemonOptions {
    */
   mount?: false
   /**
+   * 事件屏蔽
+   */
+  shieldEvent?: string[]
+  /**
    * 个人应用
    */
   app?: {

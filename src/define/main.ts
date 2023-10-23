@@ -220,6 +220,15 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     await loadInit()
   }
 
+  const shieldEvent = Options?.shieldEvent ?? []
+  if (
+    shieldEvent &&
+    Array.isArray(Options.shieldEvent) &&
+    shieldEvent.every((item: any) => typeof item === 'string')
+  ) {
+    setAppProCoinfg('event', shieldEvent)
+  }
+
   /**
    * ************
    * 开始解析
