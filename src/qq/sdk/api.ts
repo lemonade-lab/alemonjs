@@ -1,7 +1,11 @@
-import { Readable } from 'stream'
 import FormData from 'form-data'
 import axios, { AxiosRequestConfig } from 'axios'
 import { getBotConfig } from './config.js'
+import { existsSync, createReadStream } from 'fs'
+import { Readable, isReadable } from 'stream'
+import { basename } from 'path'
+import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
+
 /**
  * 创建axios实例
  * @param config
@@ -34,17 +38,18 @@ export async function postImage(message: {
   content?: string
   name?: string
 }): Promise<any> {
-  const formdata = createFrom(
+  const formdata = await createFrom(
     message.image,
     message.msg_id,
     message.content,
     message.name
   )
+  const dary = formdata != false ? formdata.getBoundary() : ''
   return requestService({
     method: 'post',
     url: `/channels/${message.id}/messages`,
     headers: {
-      'Content-Type': `multipart/form-data; boundary=${formdata.getBoundary()}`
+      'Content-Type': `multipart/form-data; boundary=${dary}`
     },
     data: formdata
   })
@@ -62,17 +67,18 @@ export async function postDirectImage(message: {
   content?: string
   name?: string
 }): Promise<any> {
-  const formdata = createFrom(
+  const formdata = await createFrom(
     message.image,
     message.msg_id,
     message.content,
     message.name
   )
+  const dary = formdata != false ? formdata.getBoundary() : ''
   return requestService({
     method: 'post',
     url: `/dms/${message.id}/messages`,
     headers: {
-      'Content-Type': `multipart/form-data; boundary=${formdata.getBoundary()}`
+      'Content-Type': `multipart/form-data; boundary=${dary}`
     },
     data: formdata
   })
@@ -86,23 +92,34 @@ export async function postDirectImage(message: {
  * @param name
  * @returns
  */
-function createFrom(image, msg_id, content, name = 'image.jpg') {
-  /**
-   * 创建可读流对象
-   */
-  const picData = new Readable()
-  picData.push(image)
-  picData.push(null)
-  /**
-   * 构建请求数据包
-   */
+async function createFrom(image, msg_id, content, name = 'image.jpg') {
+  let picData: Readable | Buffer[]
+  if (typeof image === 'string') {
+    if (!existsSync(image)) {
+      return false
+    }
+    if (!name) {
+      name = basename(image)
+    }
+    picData = createReadStream(image)
+  } else if (Buffer.isBuffer(image)) {
+    if (!name) {
+      name = 'file.' + (await fileTypeFromBuffer(image)).ext
+    }
+    picData = new Readable()
+    picData.push(image)
+    picData.push(null)
+  } else if (isReadable(image)) {
+    if (!name) {
+      name = 'file.' + (await fileTypeFromStream(image)).ext
+    }
+    picData = image
+  } else {
+    return false
+  }
   const formdata = new FormData()
   formdata.append('msg_id', msg_id)
   if (typeof content === 'string') formdata.append('content', content)
-  /**
-   * 为上传的图片指定文件名
-   * 指定上传的图片类型
-   */
   formdata.append('file_image', picData, name)
   return formdata
 }
