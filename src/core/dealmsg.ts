@@ -432,6 +432,11 @@ export async function InstructionMatching(e: AMessage) {
       const res = await app[data.fncName](e)
         .then(info(data))
         .catch(logErr(data))
+      if (typeof res != 'boolean') {
+        e.reply(res).catch(err => {
+          console.log('重发错误', err)
+        })
+      }
       if (res != false) break
     } catch (err) {
       logErr(data)(err)
