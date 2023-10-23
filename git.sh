@@ -14,5 +14,3 @@ git add .
 git commit -m "$variable"
 
 git push
-
-cd -

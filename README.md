@@ -12,16 +12,6 @@
 
 开发模板 GITHUB[create-alemonjs](https://github.com/ningmengchongshui/alemon/tree/cli/bin)
 
-### 共享平台
-
-贡献资源 OPEN[Gitee](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
-
-贡献资源 OPEN[Github](https://gitee.com/ningmengchongshui/alemon/blob/web/docs/about/plugins.md)
-
-- 仓库只做资源收集,对齐安全性不做任何检查,请谨慎选择
-
-- 仅限签署开源协议的仓库、不开源将不做考虑范围内
-
 ## 开源协议
 
 GNU GPL 是使用最广泛的自由软件许可证,并有强烈的版权要求
