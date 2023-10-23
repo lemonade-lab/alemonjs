@@ -100,11 +100,7 @@ export const EventEnum = [
   /**
    * 麦克风事件
    */
-  'AUDIO_MICROPHONE',
-  /**
-   * 兼容不响应
-   */
-  'notice.*.poke'
+  'AUDIO_MICROPHONE'
 ] as const
 
 /**
