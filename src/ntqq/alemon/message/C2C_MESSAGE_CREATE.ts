@@ -33,11 +33,11 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
   e.reply = async (
     msg: Buffer | string | (Buffer | string)[],
     select?: {
-      quote?: boolean
+      quote?: string
       withdraw?: boolean
     }
   ) => {
-    // 看看是否是数组
+    // isBuffer
     if (Buffer.isBuffer(msg)) {
       try {
         let url = ''
@@ -56,20 +56,21 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         return false
       }
     }
-    const content = Array.isArray(msg)
-      ? msg.join('')
-      : typeof msg === 'string'
-      ? msg
-      : undefined
-    if (Buffer.isBuffer(img)) {
+    /**
+     * isString arr and find buffer
+     */
+    if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+      const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+      const cont = msg.filter(element => typeof element === 'string').join('')
       try {
         let url = ''
-        const dimensions = IMGS.imageSize(img)
-        const uul = await setLocalImg(img)
+        const dimensions = IMGS.imageSize(msg[isBuffer])
+        const uul = await setLocalImg(msg[isBuffer] as Buffer)
         url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+        console.log('[url]', url)
         return await Client.postMessageByGroup(
           event.group_id,
-          `${content}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
+          `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           event.id
         )
           .then(() => true)
@@ -82,6 +83,11 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         return false
       }
     }
+    const content = Array.isArray(msg)
+      ? msg.join('')
+      : typeof msg === 'string'
+      ? msg
+      : undefined
     return await Client.postMessageByUser(event.author.id, content, event.id)
       .then(() => true)
       .catch((err: any) => {

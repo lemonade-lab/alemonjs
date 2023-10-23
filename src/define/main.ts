@@ -51,7 +51,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   }
   const pData = getBotConfigByKey('puppeteer')
   await setLanchConfig(pData)
-
   /**
    * *********
    * pup启动
@@ -90,6 +89,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * **********
    */
   const arr: string[] = []
+
   /**
    * *********
    * 登录机器人

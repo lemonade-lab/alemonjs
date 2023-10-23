@@ -68,17 +68,40 @@ export const GUILD_MEMBERS = async (event: any) => {
      * @returns
      */
     reply: async (
-      msg?: string | string[] | Buffer,
-      img?: Buffer | string,
-      name?: string
+      msg: Buffer | string | (Buffer | string)[],
+      select?: {
+        quote?: string
+        withdraw?: boolean
+      }
     ): Promise<boolean> => {
+      // is buffer
       if (Buffer.isBuffer(msg)) {
         try {
           return await Client.postImage({
             id: ChannelData.id,
             msg_id: event.msg.id, //消息id, 必须
-            image: msg, //buffer
-            name: typeof img == 'string' ? img : undefined
+            image: msg //buffer
+          })
+            .then(() => true)
+            .catch((err: any) => {
+              console.error(err)
+              return false
+            })
+        } catch (err) {
+          console.error(err)
+          return false
+        }
+      }
+      // arr && find buffer
+      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+        const cont = msg.filter(element => typeof element === 'string').join('')
+        try {
+          return await Client.postImage({
+            id: ChannelData.id,
+            msg_id: event.msg.id, //消息id, 必须
+            image: msg[isBuffer] as Buffer, //buffer
+            content: cont
           })
             .then(() => true)
             .catch((err: any) => {
@@ -95,25 +118,6 @@ export const GUILD_MEMBERS = async (event: any) => {
         : typeof msg === 'string'
         ? msg
         : undefined
-      if (Buffer.isBuffer(img)) {
-        try {
-          return await Client.postImage({
-            id: ChannelData.id,
-            msg_id: event.msg.id, //消息id, 必须
-            image: img, //buffer
-            content,
-            name: name
-          })
-            .then(() => true)
-            .catch((err: any) => {
-              console.error(err)
-              return false
-            })
-        } catch (err) {
-          console.error(err)
-          return false
-        }
-      }
       /**
        * 发送文字
        */

@@ -36,16 +36,34 @@ export const Private = async (
   const {
     data: { guild_id }
   } = postSessionRes
-
   if (!guild_id) return false
-
+  // is Buffer
   if (Buffer.isBuffer(msg)) {
     try {
       return await Client.postDirectImage({
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
-        image: msg, //buffer
-        name: typeof img == 'string' ? img : undefined
+        image: msg //buffer
+      })
+        .then(() => true)
+        .catch((err: any) => {
+          console.error(err)
+          return false
+        })
+    } catch (err) {
+      console.error(err)
+      return false
+    }
+  }
+  if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+    const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+    const cont = msg.filter(element => typeof element === 'string').join('')
+    try {
+      return await Client.postDirectImage({
+        id: EMessage.guild_id,
+        msg_id: EMessage.id, //消息id, 必须
+        image: msg[isBuffer] as Buffer, //buffer
+        content: cont
       })
         .then(() => true)
         .catch((err: any) => {
@@ -62,26 +80,6 @@ export const Private = async (
     : typeof msg === 'string'
     ? msg
     : undefined
-  if (Buffer.isBuffer(img)) {
-    try {
-      return await Client.postDirectImage({
-        id: EMessage.guild_id,
-        msg_id: EMessage.id, //消息id, 必须
-        image: img, //buffer
-        content: content,
-        name: name
-      })
-        .then(() => true)
-        .catch((err: any) => {
-          console.error(err)
-          return false
-        })
-    } catch (err) {
-      console.error(err)
-      return false
-    }
-  }
-
   return await clientApiByQQ.directMessageApi
     .postDirectMessage(guild_id, {
       msg_id: EMessage.id,

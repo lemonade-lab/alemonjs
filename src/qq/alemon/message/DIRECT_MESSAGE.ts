@@ -78,7 +78,7 @@ async function directMessage(e: AMessage, event: directEventData) {
   e.reply = async (
     msg: Buffer | string | (Buffer | string)[],
     select?: {
-      quote?: boolean
+      quote?: string
       withdraw?: boolean
     }
   ) => {
@@ -87,8 +87,28 @@ async function directMessage(e: AMessage, event: directEventData) {
         return await Client.postDirectImage({
           id: event.msg.guild_id,
           msg_id: event.msg.id, //消息id, 必须
-          image: msg, //buffer
-          name: typeof img == 'string' ? img : undefined
+          image: msg //buffer
+        })
+          .then(() => true)
+          .catch((err: any) => {
+            console.error(err)
+            return false
+          })
+      } catch (err) {
+        console.error(err)
+        return false
+      }
+    }
+    // arr && find buffer
+    if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+      const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+      const cont = msg.filter(element => typeof element === 'string').join('')
+      try {
+        return await Client.postDirectImage({
+          id: event.msg.guild_id,
+          msg_id: event.msg.id, //消息id, 必须
+          image: msg[isBuffer] as Buffer, //buffer
+          content: cont
         })
           .then(() => true)
           .catch((err: any) => {
@@ -105,25 +125,6 @@ async function directMessage(e: AMessage, event: directEventData) {
       : typeof msg === 'string'
       ? msg
       : undefined
-    if (Buffer.isBuffer(img)) {
-      try {
-        return await Client.postDirectImage({
-          id: event.msg.guild_id,
-          msg_id: event.msg.id, //消息id, 必须
-          image: img, //buffer
-          content,
-          name: name
-        })
-          .then(() => true)
-          .catch((err: any) => {
-            console.error(err)
-            return false
-          })
-      } catch (err) {
-        console.error(err)
-        return false
-      }
-    }
     return await clientApiByQQ.directMessageApi
       .postDirectMessage(event.msg.guild_id, {
         msg_id: event.msg.id,

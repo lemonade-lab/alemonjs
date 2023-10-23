@@ -88,16 +88,18 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
      * @param obj 额外消息 可选
      */
     reply: async (
-      msg?: string | string[] | Buffer,
-      img?: Buffer | string,
-      name?: string
+      msg: Buffer | string | (Buffer | string)[],
+      select?: {
+        quote?: string
+        withdraw?: boolean
+      }
     ): Promise<boolean> => {
+      /**
+       * isbuffer
+       */
       if (Buffer.isBuffer(msg)) {
         try {
-          const url = await KOOKApiClient.postImage(
-            msg,
-            typeof img == 'string' ? img : undefined
-          )
+          const url = await KOOKApiClient.postImage(msg)
           if (url) {
             if (event.channel_type == 'GROUP') {
               await KOOKApiClient.createMessage({
@@ -121,48 +123,56 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           return false
         }
       }
+      /**
+       * isString arr and find buffer
+       */
+      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+        // 找到其中一个buffer
+        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+        // 删除所有buffer
+        const content = msg
+          .filter(element => typeof element === 'string')
+          .join('')
+        // 转存
+        const url = await KOOKApiClient.postImage(msg[isBuffer])
+        if (url) {
+          // 群
+          if (event.channel_type == 'GROUP') {
+            await KOOKApiClient.createMessage({
+              type: 9,
+              target_id: event.target_id,
+              content: content
+            })
+            await KOOKApiClient.createMessage({
+              type: 2,
+              target_id: event.target_id,
+              content: url
+            })
+            return true
+          }
+          // 私聊
+          await KOOKApiClient.createDirectMessage({
+            type: 9,
+            target_id: event.target_id,
+            chat_code: event.extra.code,
+            content: content
+          })
+          await KOOKApiClient.createDirectMessage({
+            type: 2,
+            target_id: event.target_id,
+            chat_code: event.extra.code,
+            content: url
+          })
+          return true
+        }
+        return false
+      }
+      // string and string[]
       const content = Array.isArray(msg)
         ? msg.join('')
         : typeof msg === 'string'
         ? msg
         : undefined
-      if (Buffer.isBuffer(img)) {
-        try {
-          const url = await KOOKApiClient.postImage(img, name)
-          if (url) {
-            if (event.channel_type == 'GROUP') {
-              await KOOKApiClient.createMessage({
-                type: 9,
-                target_id: event.target_id,
-                content: content
-              })
-              await KOOKApiClient.createMessage({
-                type: 2,
-                target_id: event.target_id,
-                content: url
-              })
-              return true
-            }
-            await KOOKApiClient.createDirectMessage({
-              type: 9,
-              target_id: event.target_id,
-              chat_code: event.extra.code,
-              content: content
-            })
-            await KOOKApiClient.createDirectMessage({
-              type: 2,
-              target_id: event.target_id,
-              chat_code: event.extra.code,
-              content: url
-            })
-            return true
-          }
-          return false
-        } catch (err) {
-          console.error(err)
-          return false
-        }
-      }
       if (event.channel_type == 'GROUP') {
         try {
           await KOOKApiClient.createMessage({

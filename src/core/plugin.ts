@@ -135,7 +135,7 @@ export class plugin {
   reply(
     content: Buffer | string | (Buffer | string)[],
     select?: {
-      quote?: boolean
+      quote?: string
       withdraw?: boolean
     }
   ) {

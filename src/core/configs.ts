@@ -37,7 +37,7 @@ interface ApplicationProcessingOpsion {
 const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   dir: '/application',
   main: '/main',
-  type: 'ts',
+  type: 'stript',
   openRegex: /./,
   closeRegex: undefined,
   route: '/public/defset',

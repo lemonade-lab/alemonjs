@@ -237,16 +237,18 @@ export async function MESSAGES_VILLA(event: BotEvent) {
      * @returns
      */
     reply: async (
-      msg?: string | string[] | Buffer,
-      img?: Buffer | string,
-      name?: string
+      msg: Buffer | string | (Buffer | string)[],
+      select?: {
+        quote?: string
+        withdraw?: boolean
+      }
     ) => {
       /**
        * url获取
        */
       let url = ''
       /**
-       * 第一参数是buffer
+       * isBuffer
        */
       if (Buffer.isBuffer(msg)) {
         /**
@@ -259,10 +261,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           villa_id,
           `${cfg.http}://${ip}:${cfg.port}${uul}`
         )
-        if (!NowObj) {
-          console.log('转存失败', NowObj)
-          console.log('公网访问', url)
+        if (!NowObj?.new_url) {
           url = `${cfg.http}://${ip}:${cfg.port}${uul}`
+          console.log('[转存失败]', url)
         } else {
           url = NowObj.new_url
         }
@@ -277,50 +278,29 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           return false
         })
       }
-
       /**
-       * 第一个参数是对象且不是数组对象
+       * isString arr and find buffer
        */
-      if (typeof msg === 'object' && !Array.isArray(msg)) {
-        const options: any = msg
-        if (options?.image) {
-          /**
-           * 图片对象
-           */
-          return await Client.sendMessageTextUrl(
-            villa_id,
-            room_id,
-            msg,
-            options.image
-          ).catch(err => {
-            console.error(err)
-            return false
-          })
-        }
-        return false
-      }
-
-      /**
-       * 字符解析器
-       */
-      const { entities, content } = await Client.stringParsing(msg, villa_id)
-
-      /**
-       * 第二参是 buffer
-       */
-      if (Buffer.isBuffer(img)) {
+      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+        // 找到其中一个buffer
+        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+        // 删除所有buffer
+        const cont = msg.filter(element => typeof element === 'string').join('')
         /**
-         * 挂载图片
+         * 字符解析器
          */
-        const dimensions = IMGS.imageSize(img)
-        const uul = await Client.setLocalImg(img)
+        const { entities, content } = await Client.stringParsing(cont, villa_id)
+        // 挂载图片
+        const dimensions = IMGS.imageSize(msg[isBuffer])
+        const uul = await Client.setLocalImg(msg[isBuffer] as Buffer)
         if (!uul) return false
         const NowObj = await Client.transferImage(
           villa_id,
           `${cfg.http}://${ip}:${cfg.port}${uul}`
         )
-        if (!NowObj) {
+        if (!NowObj?.new_url) {
           url = `${cfg.http}://${ip}:${cfg.port}${uul}`
+          console.log('[转存失败]', url)
         } else {
           url = NowObj.new_url
         }
@@ -355,6 +335,14 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           })
         }
       }
+      // string and string[]
+      const cont = Array.isArray(msg)
+        ? msg.join('')
+        : typeof msg === 'string'
+        ? msg
+        : undefined
+      // 字符解析器
+      const { entities, content } = await Client.stringParsing(cont, villa_id)
       if (entities.length == 0 && content != '') {
         return await Client.sendMessageText(villa_id, room_id, content).catch(
           err => {
