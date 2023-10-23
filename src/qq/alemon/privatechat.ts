@@ -28,7 +28,7 @@ export const Private = async (
     })
     .catch((err: any) => {
       console.error(err)
-      return false
+      return err
     })
 
   if (!postSessionRes) return false
@@ -44,15 +44,13 @@ export const Private = async (
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: msg //buffer
+      }).catch((err: any) => {
+        console.error(err)
+        return err
       })
-        .then(() => true)
-        .catch((err: any) => {
-          console.error(err)
-          return false
-        })
     } catch (err) {
       console.error(err)
-      return false
+      return err
     }
   }
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -64,15 +62,13 @@ export const Private = async (
         msg_id: EMessage.id, //消息id, 必须
         image: msg[isBuffer] as Buffer, //buffer
         content: cont
+      }).catch((err: any) => {
+        console.error(err)
+        return err
       })
-        .then(() => true)
-        .catch((err: any) => {
-          console.error(err)
-          return false
-        })
     } catch (err) {
       console.error(err)
-      return false
+      return err
     }
   }
   const content = Array.isArray(msg)
@@ -85,9 +81,8 @@ export const Private = async (
       msg_id: EMessage.id,
       content
     })
-    .then(() => true)
     .catch(err => {
       console.error(err)
-      return false
+      return err
     })
 }

@@ -275,7 +275,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           height: dimensions.height
         }).catch(err => {
           console.error(err)
-          return false
+          return err
         })
       }
       /**
@@ -297,7 +297,10 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const NowObj = await Client.transferImage(
           villa_id,
           `${cfg.http}://${ip}:${cfg.port}${uul}`
-        )
+        ).catch(err => {
+          console.error(err)
+          return err
+        })
         if (!NowObj?.new_url) {
           url = `${cfg.http}://${ip}:${cfg.port}${uul}`
           console.log('[转存失败]', url)
@@ -316,7 +319,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
             }
           ).catch(err => {
             console.error(err)
-            return false
+            return err
           })
         } else {
           return await Client.sendMessageTextEntitiesUrl(
@@ -331,7 +334,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
             }
           ).catch(err => {
             console.error(err)
-            return false
+            return err
           })
         }
       }
@@ -347,7 +350,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         return await Client.sendMessageText(villa_id, room_id, content).catch(
           err => {
             console.error(err)
-            return false
+            return err
           }
         )
       } else if (entities.length != 0 && content != '') {
@@ -358,7 +361,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           entities
         ).catch(err => {
           console.error(err)
-          return false
+          return err
         })
       }
       return false

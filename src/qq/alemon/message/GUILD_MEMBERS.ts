@@ -81,15 +81,13 @@ export const GUILD_MEMBERS = async (event: any) => {
             id: ChannelData.id,
             msg_id: event.msg.id, //消息id, 必须
             image: msg //buffer
+          }).catch((err: any) => {
+            console.error(err)
+            return err
           })
-            .then(() => true)
-            .catch((err: any) => {
-              console.error(err)
-              return false
-            })
         } catch (err) {
           console.error(err)
-          return false
+          return err
         }
       }
       // arr && find buffer
@@ -102,15 +100,13 @@ export const GUILD_MEMBERS = async (event: any) => {
             msg_id: event.msg.id, //消息id, 必须
             image: msg[isBuffer] as Buffer, //buffer
             content: cont
+          }).catch((err: any) => {
+            console.error(err)
+            return err
           })
-            .then(() => true)
-            .catch((err: any) => {
-              console.error(err)
-              return false
-            })
         } catch (err) {
           console.error(err)
-          return false
+          return err
         }
       }
       const content = Array.isArray(msg)
@@ -125,10 +121,9 @@ export const GUILD_MEMBERS = async (event: any) => {
         .postMessage(ChannelData.id, {
           content
         })
-        .then(() => true)
         .catch((err: any) => {
           console.error(err)
-          return false
+          return err
         })
     },
     replyCard: async (arr: CardType[]) => {
@@ -140,16 +135,15 @@ export const GUILD_MEMBERS = async (event: any) => {
                 msg_id: event.msg.id,
                 ...item.card
               })
-              .then(() => true)
-              .catch((err: any) => {
+              .catch(err => {
                 console.error(err)
-                return false
+                return err
               })
           } else {
             return false
           }
-        } catch {
-          return false
+        } catch (err) {
+          return err
         }
       }
       return true

@@ -83,15 +83,12 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
           const uul = await setLocalImg(msg)
           url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
           return await Client.postFilesByGroup(event.group_id, url).catch(
-            err => {
-              console.error(err)
-              return false
-            }
+            err => err
           )
         }
       } catch (err) {
         console.error(err)
-        return false
+        return err
       }
     }
     if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -107,15 +104,13 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
           event.group_id,
           `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           event.id
-        )
-          .then(() => true)
-          .catch((err: any) => {
-            console.error(err)
-            return false
-          })
+        ).catch(err => {
+          console.error(err)
+          return err
+        })
       } catch (err) {
         console.error(err)
-        return false
+        return err
       }
     }
     const content = Array.isArray(msg)
@@ -123,12 +118,11 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
       : typeof msg === 'string'
       ? msg
       : undefined
-    return await Client.postMessageByGroup(event.group_id, content, event.id)
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
+    return await Client.postMessageByGroup(
+      event.group_id,
+      content,
+      event.id
+    ).catch(err => err)
   }
 
   e.replyCard = async (arr: CardType[]) => {
@@ -140,8 +134,9 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
         } else {
           return false
         }
-      } catch {
-        return false
+      } catch (err) {
+        console.error(err)
+        return err
       }
     }
     return true

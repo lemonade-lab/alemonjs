@@ -372,7 +372,7 @@ export async function InstructionMatching(e: AMessage) {
     const { name, APP } = CommandApp[item]
     const AppFnc = getMessage(name)
     try {
-      if (typeof AppFnc == 'function') e = AppFnc(e)
+      if (typeof AppFnc == 'function') e = await AppFnc(e)
       const app = new APP(e)
       // 设置this.e
       app.e = e
@@ -458,7 +458,7 @@ export async function typeMessage(e: AMessage) {
     const { name, APP } = CommandApp[item]
     const AppFnc = getMessage(name)
     try {
-      if (typeof AppFnc == 'function') e = AppFnc(e)
+      if (typeof AppFnc == 'function') e = await AppFnc(e)
       const app = new APP(e)
       app.e = e
       APPCACHE[item] = app

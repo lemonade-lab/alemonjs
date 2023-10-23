@@ -47,13 +47,12 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
           return await Client.postFilesByGroup(event.group_id, url).catch(
             err => {
               console.error(err)
-              return false
+              return err
             }
           )
         }
       } catch (err) {
-        console.error(err)
-        return false
+        return err
       }
     }
     /**
@@ -72,15 +71,13 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
           event.group_id,
           `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           event.id
-        )
-          .then(() => true)
-          .catch((err: any) => {
-            console.error(err)
-            return false
-          })
+        ).catch(err => {
+          console.error(err)
+          return err
+        })
       } catch (err) {
         console.error(err)
-        return false
+        return err
       }
     }
     const content = Array.isArray(msg)
@@ -88,12 +85,14 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       : typeof msg === 'string'
       ? msg
       : undefined
-    return await Client.postMessageByUser(event.author.id, content, event.id)
-      .then(() => true)
-      .catch((err: any) => {
-        console.error(err)
-        return false
-      })
+    return await Client.postMessageByUser(
+      event.author.id,
+      content,
+      event.id
+    ).catch(err => {
+      console.error(err)
+      return err
+    })
   }
   e.replyCard = async (arr: CardType[]) => {
     for (const item of arr) {
@@ -104,8 +103,9 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         } else {
           return false
         }
-      } catch {
-        return false
+      } catch (err) {
+        console.error(err)
+        return err
       }
     }
     return true

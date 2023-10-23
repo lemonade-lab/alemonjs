@@ -140,8 +140,7 @@ export class plugin {
     }
   ) {
     if (!this.e.reply || !content || content == '') return false
-    this.e.reply(content, select)
-    return true
+    return this.e.reply(content, select)
   }
 
   /**

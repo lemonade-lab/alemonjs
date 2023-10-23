@@ -77,15 +77,13 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg //buffer
+        }).catch(err => {
+          console.error(err)
+          return err
         })
-          .then(() => true)
-          .catch((err: any) => {
-            console.error(err)
-            return false
-          })
       } catch (err) {
         console.error(err)
-        return false
+        return err
       }
     }
     // arr & find buffer
@@ -98,15 +96,13 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           msg_id: event.msg.id, //消息id, 必须
           image: msg[isBuffer] as Buffer, //buffer
           content: cont
+        }).catch(err => {
+          console.error(err)
+          return err
         })
-          .then(() => true)
-          .catch((err: any) => {
-            console.error(err)
-            return false
-          })
       } catch (err) {
         console.error(err)
-        return false
+        return err
       }
     }
     const content = Array.isArray(msg)
@@ -122,10 +118,9 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
         msg_id: event.msg.id,
         content
       })
-      .then(() => true)
-      .catch((err: any) => {
+      .catch(err => {
         console.error(err)
-        return false
+        return err
       })
   }
 
@@ -133,21 +128,20 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          await clientApiByQQ.messageApi
+          return await clientApiByQQ.messageApi
             .postMessage(event.msg.channel_id, {
               msg_id: event.msg.id,
               ...item.card
             })
-            .then(() => true)
-            .catch((err: any) => {
+            .catch(err => {
               console.error(err)
-              return false
+              return err
             })
         } else {
           return false
         }
-      } catch {
-        return false
+      } catch (err) {
+        return err
       }
     }
     return true
@@ -189,10 +183,9 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
         message_id: mid,
         ...boj
       })
-      .then(() => true)
-      .catch((err: any) => {
+      .catch(err => {
         console.error(err)
-        return false
+        return err
       })
   }
 
@@ -211,10 +204,9 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
         message_id: mid,
         ...boj
       })
-      .then(() => true)
       .catch((err: any) => {
         console.error(err)
-        return false
+        return err
       })
   }
 
@@ -331,13 +323,10 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       withdraw?: boolean
     }
   ): Promise<boolean> => {
-    return await Private(event.msg, msg)
-      .then(res => {
-        return res
-      })
-      .catch(err => {
-        return err
-      })
+    return await Private(event.msg, msg).catch(err => {
+      console.error(err)
+      return err
+    })
   }
 
   /**
