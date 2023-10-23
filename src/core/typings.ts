@@ -407,13 +407,13 @@ interface replyController {
       quote?: string
       withdraw?: boolean
     }
-  ): Promise<boolean>
+  ): Promise<any>
 
   /**
    * 发送卡片
    * @param arr
    */
-  replyCard?(arr: CardType[]): Promise<boolean>
+  replyCard?(arr: CardType[]): Promise<any>
 
   /**
    * 公信转私信
@@ -429,27 +429,27 @@ interface replyController {
       quote?: boolean
       withdraw?: boolean
     }
-  ): Promise<boolean>
+  ): Promise<any>
 
   /**
    * 发送表态
    * @param boj
    */
-  replyEmoji?(mid: string, boj: any): Promise<boolean>
+  replyEmoji?(mid: string, boj: any): Promise<any>
 
   /**
    * 删除表态
    * @param boj 表情对象
    * @returns
    */
-  deleteEmoji?(mid: string, boj: any): Promise<boolean>
+  deleteEmoji?(mid: string, boj: any): Promise<any>
 
   /**
    * 更新表态
    * @param mid
    * @param boj
    */
-  updateEmoji?(mid: string, boj: any): Promise<boolean>
+  updateEmoji?(mid: string, boj: any): Promise<any>
 
   /**
    * 得到指定消息的表态
