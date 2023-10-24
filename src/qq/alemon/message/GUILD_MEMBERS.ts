@@ -118,8 +118,11 @@ export const GUILD_MEMBERS = async (event: any) => {
         ? msg.join('')
         : typeof msg === 'string'
         ? msg
-        : undefined
+        : ''
 
+      if (content == '') {
+        return false
+      }
       /**
        * http
        */

@@ -115,7 +115,11 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       ? msg.join('')
       : typeof msg === 'string'
       ? msg
-      : undefined
+      : ''
+
+    if (content == '') {
+      return false
+    }
 
     /**
      * http

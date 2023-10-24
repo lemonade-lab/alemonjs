@@ -344,7 +344,11 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         ? msg.join('')
         : typeof msg === 'string'
         ? msg
-        : undefined
+        : ''
+
+      if (cont == '') {
+        return false
+      }
 
       const match = cont.match(/<http>(.*?)<\/http>/)
       if (match) {

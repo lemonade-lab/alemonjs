@@ -183,7 +183,12 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         ? msg.join('')
         : typeof msg === 'string'
         ? msg
-        : undefined
+        : ''
+
+      if (content == '') {
+        return false
+      }
+
       const match = content.match(/<http>(.*?)<\/http>/)
       if (match) {
         const getUrl = match[1]

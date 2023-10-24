@@ -117,7 +117,11 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
       ? msg.join('')
       : typeof msg === 'string'
       ? msg
-      : undefined
+      : ''
+
+    if (content == '') {
+      return false
+    }
 
     /**
      * http

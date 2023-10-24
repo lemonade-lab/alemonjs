@@ -121,7 +121,11 @@ async function directMessage(e: AMessage, event: directEventData) {
       ? msg.join('')
       : typeof msg === 'string'
       ? msg
-      : undefined
+      : ''
+
+    if (content == '') {
+      return false
+    }
     /**
      * http
      */
