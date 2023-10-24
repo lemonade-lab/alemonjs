@@ -1,6 +1,6 @@
 import { dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
-import { setMessage } from './message.js'
+import { setMessage, setAppArg } from './message.js'
 import { setApp } from './app.js'
 
 /**
@@ -45,6 +45,10 @@ export function createApp(AppName: string) {
    */
   let acount = 0
   return {
+    /**
+     * 设置扩展参
+     */
+    setArg: setAppArg,
     /**
      * 重定义消息
      * @param fnc 回调函数

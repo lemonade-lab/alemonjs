@@ -2,7 +2,7 @@ import { join } from 'path'
 import { writeFile } from 'fs/promises'
 import { existsSync, mkdirSync, readdirSync, readFileSync } from 'fs'
 import lodash from 'lodash'
-import { getMessage } from './message.js'
+import { getAppArg, getMessage } from './message.js'
 import { getApp, delApp, getAppKey } from './app.js'
 import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
@@ -355,12 +355,12 @@ export async function InstructionMatching(e: AMessage) {
     return true
   }
 
-  /**
-   *
-   */
-
   const APPCACHE: {
     [key: string]: plugin
+  } = {}
+
+  const ARGCACHE: {
+    [key: string]: any[]
   } = {}
 
   /**
@@ -369,8 +369,10 @@ export async function InstructionMatching(e: AMessage) {
   for (const item in CommandApp) {
     const { name, APP } = CommandApp[item]
     const AppFnc = getMessage(name)
+    const AppArg = getAppArg(name)
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
+      if (typeof AppArg == 'function') ARGCACHE[name] = await AppArg()
       const app = new APP(e)
       // 设置this.e
       app.e = e
@@ -426,8 +428,14 @@ export async function InstructionMatching(e: AMessage) {
       continue
     }
     try {
+      const getArg = (e: AMessage) => {
+        if (!ARGCACHE[data.APP]) {
+          return [e]
+        }
+        return [e, ...ARGCACHE[data.APP]]
+      }
       const app = APPCACHE[data.APP]
-      const res = await app[data.fncName](e)
+      const res = await app[data.fncName](...getArg(e))
         .then(info(data))
         .catch(logErr(data))
       if (typeof res != 'boolean') {
@@ -457,11 +465,17 @@ export async function typeMessage(e: AMessage) {
     [key: string]: plugin
   } = {}
 
+  const ARGCACHE: {
+    [key: string]: any[]
+  } = {}
+
   for (const item in CommandApp) {
     const { name, APP } = CommandApp[item]
     const AppFnc = getMessage(name)
+    const AppArg = getAppArg(name)
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
+      if (typeof AppArg == 'function') ARGCACHE[name] = await AppArg()
       const app = new APP(e)
       app.e = e
       APPCACHE[item] = app
@@ -475,10 +489,14 @@ export async function typeMessage(e: AMessage) {
   for (const data of CommandNotMessage[e.event]) {
     if (e.eventType != data.eventType) continue
     try {
+      const getArg = (e: AMessage) => {
+        if (!ARGCACHE[data.APP]) {
+          return [e]
+        }
+        return [e, ...ARGCACHE[data.APP]]
+      }
       const app = APPCACHE[data.APP]
-      const res = await app[data.fncName](e)
-        .then(info(data))
-        .catch(logErr(data))
+      const res = await app[data.fncName](...getArg(e))
       if (typeof res != 'boolean') {
         e.reply(res).catch(err => {
           console.log('重发错误', err)
