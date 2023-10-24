@@ -355,7 +355,6 @@ export interface markdownType {
   link?(txt: string, url: string): string
   /**
    * 标注GET请求
-   * <http>xxxxxx</http>
    * @param rul
    */
   http?(rul: string, body?: any): string
