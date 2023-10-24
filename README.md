@@ -12,6 +12,8 @@
 
 开发模板 GITHUB[create-alemonjs](https://github.com/ningmengchongshui/alemon/tree/cli/bin)
 
+共享平台 OPEN[sharing platform](https://gitee.com/ningmengchongshui/alemon/tree/web/docs/.vitepress/components/data)
+
 ## 开源协议
 
 GNU GPL 是使用最广泛的自由软件许可证,并有强烈的版权要求

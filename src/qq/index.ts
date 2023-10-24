@@ -48,10 +48,9 @@ export async function createAlemonByQQ() {
       appID: cfg.appID,
       token: cfg.token,
       sandbox: cfg.sandbox,
-      // shards?:[],
       intents: cfg.intents
-      // maxRetry:
     })
+
     /**
      * 创建 conversation
      */
