@@ -124,7 +124,7 @@ export const GUILD_MEMBERS = async (event: any) => {
        * http
        */
 
-      const match = content.match(/<http>(.*?)<\/http>/g)
+      const match = content.match(/<http>(.*?)<\/http>/)
       if (match) {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)

@@ -123,7 +123,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
      * http
      */
 
-    const match = content.match(/<http>(.*?)<\/http>/g)
+    const match = content.match(/<http>(.*?)<\/http>/)
     if (match) {
       const getUrl = match[1]
       const msg = await getUrlbuffer(getUrl)

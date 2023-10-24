@@ -184,7 +184,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         : typeof msg === 'string'
         ? msg
         : undefined
-      const match = content.match(/<http>(.*?)<\/http>/g)
+      const match = content.match(/<http>(.*?)<\/http>/)
       if (match) {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)

@@ -80,13 +80,17 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         return err
       }
     }
+
     const content = Array.isArray(msg)
       ? msg.join('')
       : typeof msg === 'string'
       ? msg
       : undefined
 
-    const match = content.match(/<http>(.*?)<\/http>/g)
+    /**
+     * https
+     */
+    const match = content.match(/<http>(.*?)<\/http>/)
     if (match) {
       const getUrl = match[1]
       const msg = await getUrlbuffer(getUrl)

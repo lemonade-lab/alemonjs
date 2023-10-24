@@ -346,7 +346,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         ? msg
         : undefined
 
-      const match = cont.match(/<http>(.*?)<\/http>/g)
+      const match = cont.match(/<http>(.*?)<\/http>/)
       if (match) {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)

@@ -116,11 +116,12 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       : typeof msg === 'string'
       ? msg
       : undefined
-    /**\
+
+    /**
      * http
      */
 
-    const match = content.match(/<http>(.*?)<\/http>/g)
+    const match = content.match(/<http>(.*?)<\/http>/)
     if (match) {
       const getUrl = match[1]
       const msg = await getUrlbuffer(getUrl)
