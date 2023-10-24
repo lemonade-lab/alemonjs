@@ -2,7 +2,8 @@ import {
   CardType,
   InstructionMatching,
   AMessage,
-  getIP
+  getIP,
+  getUrlbuffer
 } from '../../../core/index.js'
 import { ClientAPIByQQ as Client, getWebConfig } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
@@ -37,10 +38,10 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       withdraw?: boolean
     }
   ) => {
+    let url = ''
     // isBuffer
     if (Buffer.isBuffer(msg)) {
       try {
-        let url = ''
         if (Buffer.isBuffer(msg)) {
           const uul = await setLocalImg(msg)
           url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
@@ -62,7 +63,6 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
       const cont = msg.filter(element => typeof element === 'string').join('')
       try {
-        let url = ''
         const dimensions = IMGS.imageSize(msg[isBuffer])
         const uul = await setLocalImg(msg[isBuffer] as Buffer)
         url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
@@ -85,6 +85,20 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       : typeof msg === 'string'
       ? msg
       : undefined
+
+    const match = content.match(/<http>(.*?)<\/http>/g)
+    if (match) {
+      const getUrl = match[1]
+      const msg = await getUrlbuffer(getUrl)
+      if (Buffer.isBuffer(msg)) {
+        const uul = await setLocalImg(msg)
+        url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+        return await Client.postFilesByGroup(event.group_id, url).catch(
+          err => err
+        )
+      }
+    }
+
     return await Client.postMessageByUser(
       event.author.id,
       content,

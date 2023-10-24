@@ -4,22 +4,29 @@ export const segmentKOOK = {
    * @param uid
    * @returns
    */
-  at: function (uid: string): string {
+  at: (uid: string): string => {
     return `(met)${uid}(met)`
   },
   /**
    * 艾特全体
    * @returns
    */
-  atAll: function atAll(): string {
+  atAll: (): string => {
     return `(met)all(met)`
+  },
+  /**
+   * 标注GET请求
+   * @returns
+   */
+  http: (url: string) => {
+    return `<http>${url}</http>`
   },
   /**
    * 子频道引用
    * @param channel_id
    * @returns
    */
-  atChannel: function (channel_id: string): string {
+  atChannel: (channel_id: string): string => {
     return `(chn)${channel_id}(chn)`
   },
   /**
@@ -28,21 +35,21 @@ export const segmentKOOK = {
    * @param url
    * @returns
    */
-  link: function (name: string, url: string): string {
+  link: (name: string, url: string): string => {
     return `[${name}](${url})`
   },
   /**
    *
    * @param role_id 角色
    */
-  role: function (role_id: string): string {
+  role: (role_id: string): string => {
     return `(rol)${role_id}(rol)`
   },
   /**
    *  点击后才显示
    * @param content 内容
    */
-  spoiler: function (content: string): string {
+  spoiler: (content: string): string => {
     return ``
   },
   /**
@@ -50,41 +57,41 @@ export const segmentKOOK = {
    * @param name  服务器表情名
    * @param id   服务器表情id
    */
-  expression: function (name: string, id: string): string {
+  expression: (name: string, id: string): string => {
     return `(emj)${name}(emj)[${id}]`
   },
   /**
    * 加粗
    * @param txt
    */
-  Bold: function (txt: string): string {
+  Bold: (txt: string): string => {
     return `**${txt}**`
   },
   /**
    * 斜体
    * @param txt
    */
-  italic: function (txt: string): string {
+  italic: (txt: string): string => {
     return `*${txt}*`
   },
   /**
    * 加粗斜体
    */
-  boldItalic: function (txt: string): string {
+  boldItalic: (txt: string): string => {
     return `***${txt}***`
   },
   /**
    * 删除线
    * @param txt
    */
-  strikethrough: function (txt: string): string {
+  strikethrough: (txt: string): string => {
     return `~~${txt}~~`
   },
   /**
    * 代码块
    * @param txt
    */
-  block: function (txt: string): string {
+  block: (txt: string): string => {
     return `\`${txt}\``
   }
 }

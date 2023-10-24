@@ -3,7 +3,8 @@ import {
   typeMessage,
   AMessage,
   InstructionMatching,
-  CardType
+  CardType,
+  getUrlbuffer
 } from '../../../core/index.js'
 import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { directEventData } from '../types.js'
@@ -121,6 +122,25 @@ async function directMessage(e: AMessage, event: directEventData) {
       : typeof msg === 'string'
       ? msg
       : undefined
+    /**
+     * http
+     */
+    const match = content.match(/<http>(.*?)<\/http>/g)
+    if (match) {
+      const getUrl = match[1]
+      const msg = await getUrlbuffer(getUrl)
+      if (msg) {
+        return await Client.postImage({
+          id: event.msg.channel_id,
+          msg_id: event.msg.id, //消息id, 必须
+          image: msg //buffer
+        }).catch(err => {
+          console.error(err)
+          return err
+        })
+      }
+    }
+
     return await clientApiByQQ.directMessageApi
       .postDirectMessage(event.msg.guild_id, {
         msg_id: event.msg.id,

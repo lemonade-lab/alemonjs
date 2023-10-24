@@ -1,5 +1,10 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { typeMessage, AMessage, CardType } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  CardType,
+  getUrlbuffer
+} from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
@@ -114,6 +119,27 @@ export const GUILD_MEMBERS = async (event: any) => {
         : typeof msg === 'string'
         ? msg
         : undefined
+
+      /**
+       * http
+       */
+
+      const match = content.match(/<http>(.*?)<\/http>/g)
+      if (match) {
+        const getUrl = match[1]
+        const msg = await getUrlbuffer(getUrl)
+        if (msg) {
+          return await Client.postImage({
+            id: event.msg.channel_id,
+            msg_id: event.msg.id, //消息id, 必须
+            image: msg //buffer
+          }).catch(err => {
+            console.error(err)
+            return err
+          })
+        }
+      }
+
       /**
        * 发送文字
        */

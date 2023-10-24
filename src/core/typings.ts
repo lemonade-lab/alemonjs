@@ -350,9 +350,15 @@ export interface markdownType {
   expression?(name: string, id: string): string
   /**
    * @param txt 链接文字
-   * @param rul 链接地址
+   * @param url 链接地址
    */
-  link?(txt: string, rul: string): string
+  link?(txt: string, url: string): string
+  /**
+   * 标注GET请求
+   * <http>xxxxxx</http>
+   * @param rul
+   */
+  http?(rul: string, body?: any): string
   /**
    * 加粗
    * @param txt

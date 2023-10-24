@@ -1,4 +1,9 @@
-import { AMessage, UserType, InstructionMatching } from '../../../core/index.js'
+import {
+  AMessage,
+  UserType,
+  InstructionMatching,
+  getUrlbuffer
+} from '../../../core/index.js'
 import { KOOKApiClient, EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
@@ -128,7 +133,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         }
       }
       /**
-       * isString arr and find buffer
+       * string[] arr and find buffer
        */
       if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
         // 找到其中一个buffer
@@ -174,12 +179,38 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           return err
         })
       }
-      // string and string[]
       const content = Array.isArray(msg)
         ? msg.join('')
         : typeof msg === 'string'
         ? msg
         : undefined
+      const match = content.match(/<http>(.*?)<\/http>/g)
+      if (match) {
+        const getUrl = match[1]
+        const msg = await getUrlbuffer(getUrl)
+        const url = await KOOKApiClient.postImage(msg)
+        if (msg && url) {
+          if (event.channel_type == 'GROUP') {
+            return await KOOKApiClient.createMessage({
+              type: 2,
+              target_id: event.target_id,
+              content: url
+            }).catch(err => {
+              console.log(err)
+              return err
+            })
+          }
+          return await KOOKApiClient.createDirectMessage({
+            type: 2,
+            target_id: event.target_id,
+            chat_code: event.extra.code,
+            content: url
+          }).catch(err => {
+            console.log(err)
+            return err
+          })
+        }
+      }
       if (event.channel_type == 'GROUP') {
         try {
           return await KOOKApiClient.createMessage({

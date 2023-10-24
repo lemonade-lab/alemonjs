@@ -1,5 +1,10 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { CardType, InstructionMatching, AMessage } from '../../../core/index.js'
+import {
+  CardType,
+  InstructionMatching,
+  AMessage,
+  getUrlbuffer
+} from '../../../core/index.js'
 import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { Private } from '../privatechat.js'
 import { EventData } from '../types.js'
@@ -111,6 +116,26 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       : typeof msg === 'string'
       ? msg
       : undefined
+    /**\
+     * http
+     */
+
+    const match = content.match(/<http>(.*?)<\/http>/g)
+    if (match) {
+      const getUrl = match[1]
+      const msg = await getUrlbuffer(getUrl)
+      if (msg) {
+        return await Client.postImage({
+          id: event.msg.channel_id,
+          msg_id: event.msg.id, //消息id, 必须
+          image: msg //buffer
+        }).catch(err => {
+          console.error(err)
+          return err
+        })
+      }
+    }
+
     /**
      * 发送接口
      */

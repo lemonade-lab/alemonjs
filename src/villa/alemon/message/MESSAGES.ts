@@ -2,7 +2,8 @@ import {
   AMessage,
   InstructionMatching,
   UserType,
-  getIP
+  getIP,
+  getUrlbuffer
 } from '../../../core/index.js'
 import { BotEvent, MessageContentType, Client } from '../../sdk/index.js'
 import IMGS from 'image-size'
@@ -254,7 +255,6 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         /**
          * 挂载图片
          */
-        const dimensions = IMGS.imageSize(msg)
         const uul = await Client.setLocalImg(msg)
         if (!uul) return false
         const NowObj = await Client.transferImage(
@@ -270,6 +270,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         /**
          * 直接发送图片
          */
+        const dimensions = IMGS.imageSize(msg)
         return await Client.sendMessageImage(villa_id, room_id, url, {
           width: dimensions.width,
           height: dimensions.height
@@ -344,6 +345,34 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         : typeof msg === 'string'
         ? msg
         : undefined
+
+      const match = cont.match(/<http>(.*?)<\/http>/g)
+      if (match) {
+        const getUrl = match[1]
+        const msg = await getUrlbuffer(getUrl)
+        if (msg) {
+          const uul = await Client.setLocalImg(msg)
+          if (!uul) return false
+          const NowObj = await Client.transferImage(
+            villa_id,
+            `${cfg.http}://${ip}:${cfg.port}${uul}`
+          )
+          if (!NowObj?.new_url) {
+            url = `${cfg.http}://${ip}:${cfg.port}${uul}`
+            console.log('[转存失败]', url)
+          } else {
+            url = NowObj.new_url
+          }
+          const dimensions = IMGS.imageSize(msg)
+          return await Client.sendMessageImage(villa_id, room_id, url, {
+            width: dimensions.width,
+            height: dimensions.height
+          }).catch(err => {
+            console.error(err)
+            return err
+          })
+        }
+      }
       // 字符解析器
       const { entities, content } = await Client.stringParsing(cont, villa_id)
       if (entities.length == 0 && content != '') {

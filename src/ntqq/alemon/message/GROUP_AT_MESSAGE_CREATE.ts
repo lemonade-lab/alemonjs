@@ -2,7 +2,8 @@ import {
   CardType,
   InstructionMatching,
   AMessage,
-  getIP
+  getIP,
+  getUrlbuffer
 } from '../../../core/index.js'
 import { ClientAPIByQQ as Client, getWebConfig } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
@@ -74,10 +75,10 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
       withdraw?: boolean
     }
   ): Promise<boolean> => {
+    let url = ''
     // is buffer
     if (Buffer.isBuffer(msg)) {
       try {
-        let url = ''
         if (Buffer.isBuffer(msg)) {
           // 挂载图片
           const uul = await setLocalImg(msg)
@@ -95,7 +96,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
       const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
       const cont = msg.filter(element => typeof element === 'string').join('')
       try {
-        let url = ''
         const dimensions = IMGS.imageSize(msg[isBuffer])
         const uul = await setLocalImg(msg[isBuffer] as Buffer)
         url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
@@ -118,6 +118,24 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
       : typeof msg === 'string'
       ? msg
       : undefined
+
+    /**
+     * http
+     */
+
+    const match = content.match(/<http>(.*?)<\/http>/g)
+    if (match) {
+      const getUrl = match[1]
+      const msg = await getUrlbuffer(getUrl)
+      if (Buffer.isBuffer(msg)) {
+        const uul = await setLocalImg(msg)
+        url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+        return await Client.postFilesByGroup(event.group_id, url).catch(
+          err => err
+        )
+      }
+    }
+
     return await Client.postMessageByGroup(
       event.group_id,
       content,

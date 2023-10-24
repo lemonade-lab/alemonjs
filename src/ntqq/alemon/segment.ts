@@ -4,7 +4,7 @@ export const segmentQQ = {
    * @param uid
    * @returns
    */
-  at: function (uid: string): string {
+  at: (uid: string): string => {
     // 暂时用户@
     return `` // 没有艾特了
   },
@@ -12,18 +12,25 @@ export const segmentQQ = {
    * 艾特全体
    * @returns
    */
-  atAll: function atAll(): string {
+  atAll: (): string => {
     return `@everyone`
+  },
+  /**
+   * 标注GET请求
+   * @returns
+   */
+  http: (url: string) => {
+    return `<http>${url}</http>`
   },
   /**
    * 子频道引用
    * @param channel_id
    * @returns
    */
-  atChannel: function (channel_id: string): string {
+  atChannel: (channel_id: string): string => {
     return `` // 没有
   },
-  link: function (title: string, centent): string {
+  link: (title: string, centent): string => {
     return `[🔗${title}](${centent})`
   }
 }

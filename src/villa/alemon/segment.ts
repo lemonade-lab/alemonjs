@@ -4,22 +4,29 @@ export const segmentVilla = {
    * @param uid
    * @returns
    */
-  at: function (uid: string): string {
+  at: (uid: string): string => {
     return `<@!${uid}>`
   },
   /**
    * 艾特全体
    * @returns
    */
-  atAll: function atAll(): string {
+  atAll: (): string => {
     return `<@!everyone>`
+  },
+  /**
+   * 标注GET请求
+   * @returns
+   */
+  http: (url: string) => {
+    return `<http>${url}</http>`
   },
   /**
    * 子频道引用
    * @param channel_id
    * @returns
    */
-  atChannel: function (channel_id: string): string {
+  atChannel: (channel_id: string): string => {
     return `<#${channel_id}>`
   },
   /**
@@ -28,7 +35,7 @@ export const segmentVilla = {
    * @param url
    * @returns
    */
-  link: function (name: string, url: string): string {
+  link: (name: string, url: string): string => {
     return `[${name}](${url})`
   }
 }
