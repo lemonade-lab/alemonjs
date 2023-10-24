@@ -48,7 +48,15 @@ export function createApp(AppName: string) {
     /**
      * 设置扩展参
      */
-    setArg: setAppArg,
+    setArg: (fnc: (...args: any[]) => any[] | Promise<any[]>) => {
+      try {
+        setAppArg(AppName, fnc)
+        return true
+      } catch (err) {
+        console.error('[AlemonJS]扩展参设置成功', err)
+        return false
+      }
+    },
     /**
      * 重定义消息
      * @param fnc 回调函数

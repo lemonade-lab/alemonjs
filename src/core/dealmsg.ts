@@ -372,7 +372,7 @@ export async function InstructionMatching(e: AMessage) {
     const AppArg = getAppArg(name)
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
-      if (typeof AppArg == 'function') ARGCACHE[name] = await AppArg()
+      if (typeof AppArg == 'function') ARGCACHE[item] = await AppArg(e)
       const app = new APP(e)
       // 设置this.e
       app.e = e
@@ -428,14 +428,8 @@ export async function InstructionMatching(e: AMessage) {
       continue
     }
     try {
-      const getArg = (e: AMessage) => {
-        if (!ARGCACHE[data.APP]) {
-          return [e]
-        }
-        return [e, ...ARGCACHE[data.APP]]
-      }
       const app = APPCACHE[data.APP]
-      const res = await app[data.fncName](...getArg(e))
+      const res = await app[data.fncName](...[e, ...(ARGCACHE[data.APP] ?? [])])
         .then(info(data))
         .catch(logErr(data))
       if (typeof res != 'boolean') {
@@ -475,7 +469,7 @@ export async function typeMessage(e: AMessage) {
     const AppArg = getAppArg(name)
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
-      if (typeof AppArg == 'function') ARGCACHE[name] = await AppArg()
+      if (typeof AppArg == 'function') ARGCACHE[item] = await AppArg(e)
       const app = new APP(e)
       app.e = e
       APPCACHE[item] = app
@@ -489,14 +483,8 @@ export async function typeMessage(e: AMessage) {
   for (const data of CommandNotMessage[e.event]) {
     if (e.eventType != data.eventType) continue
     try {
-      const getArg = (e: AMessage) => {
-        if (!ARGCACHE[data.APP]) {
-          return [e]
-        }
-        return [e, ...ARGCACHE[data.APP]]
-      }
       const app = APPCACHE[data.APP]
-      const res = await app[data.fncName](...getArg(e))
+      const res = await app[data.fncName](...[e, ...(ARGCACHE[data.APP] ?? [])])
       if (typeof res != 'boolean') {
         e.reply(res).catch(err => {
           console.log('重发错误', err)
