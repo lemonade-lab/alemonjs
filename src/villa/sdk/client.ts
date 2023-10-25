@@ -1,10 +1,13 @@
 import Koa from 'koa'
 import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
-import { mkdirSync } from 'fs'
-import { getLocalImg } from './img.js'
 import { type ClientConfig, type BotEvent } from './types.js'
 import { setClientConfig } from './config.js'
+
+/**
+ * tudo
+ * 需要验证登录是否成功
+ */
 
 /**
  * 创建客户端
@@ -17,10 +20,7 @@ export function createClient(
     bot_id,
     bot_secret,
     callback_url = '/api/mys/callback',
-    callback_port = 8080,
-    img_size = 9999999,
-    img_url = '/api/mys/img',
-    IMAGE_DIR = '/data/mys/img'
+    callback_port = 8080
   }: ClientConfig,
   callBack: (event: BotEvent) => Promise<void>,
   logFnc?: (port: number) => Promise<void>
@@ -35,17 +35,6 @@ export function createClient(
    * 处理 POST 请求体中的 JSON 数据
    */
   app.use(bodyParser())
-
-  /**
-   * 确保目录存在
-   */
-  mkdirSync(IMAGE_DIR, { recursive: true })
-  mkdirSync(img_url, { recursive: true })
-
-  /**
-   * 处理图片请求
-   */
-  router.get(`${img_url}/:filename`, getLocalImg)
 
   /**
    * 处理事件回调请求
@@ -123,10 +112,7 @@ export function createClient(
       bot_id,
       bot_secret,
       callback_url,
-      callback_port: port,
-      img_url,
-      img_size,
-      IMAGE_DIR
+      callback_port: port
     })
 
     /**

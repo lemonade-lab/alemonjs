@@ -1,21 +1,17 @@
 import { callBackByVilla } from './alemon/conversation.js'
 import { checkRobotByVilla } from './login.js'
-import { createClient, Client, hmacSha256 } from './sdk/index.js'
+import { createClient, hmacSha256 } from './sdk/index.js'
 import { getBotConfigByKey } from '../config/index.js'
 import { getIP } from '../core/index.js'
 export async function createAlemonByVilla() {
-  /**
-   * 登录
-   */
+  // 登录
   if (
     await checkRobotByVilla().catch(err => {
       console.error(err)
       return false
     })
   ) {
-    /**
-     * 读取配置
-     */
+    // 读取配置
     const cfg = getBotConfigByKey('villa')
 
     if ((cfg.pub_key ?? '') != '') {
@@ -37,9 +33,7 @@ export async function createAlemonByVilla() {
       }
     )
 
-    /**
-     * 获取ip4
-     */
+    // 获取ip4
     const ip = await getIP()
     if (ip) {
       console.info(
@@ -47,8 +41,6 @@ export async function createAlemonByVilla() {
           cfg.url ?? '/api/mys/callback'
         }`
       )
-      // 启动清除机制
-      Client.autoClearImages(600000)
     } else {
       console.error('公网IP识别失败~暂无法支持运行')
       return

@@ -18,6 +18,7 @@ import {
   setBotConfigByKey,
   getBotConfigByKey
 } from '../config/index.js'
+import { createWeb } from 'src/koa/client.js'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
@@ -160,6 +161,25 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
     console.info('[LOGIN] 无登录配置')
+  }
+
+  /**
+   * ***********
+   * 挂起web服务
+   * **********
+   */
+
+  if (Options.server) {
+    /**
+     * 创建web端
+     */
+    createWeb({
+      port: Options.server.port,
+      http: Options.server.http,
+      imgRouter: Options.server.imgRouter,
+      imgDir: Options.server.imgDir,
+      imgSize: Options.server.imgSize
+    })
   }
 
   /**

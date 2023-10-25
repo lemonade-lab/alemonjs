@@ -10,6 +10,60 @@ import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { now_e } from './e.js'
+import { AlemonJSError, AlemonJSLog } from 'src/log/index.js'
+import { ClientKOA } from '../../../koa/index.js'
+
+/**
+ * 撤回消息
+ * @param res
+ * @param select
+ * @returns
+ */
+const recallMessage = (
+  res: { bot_msg_id: string },
+  select: {
+    quote?: string
+    withdraw?: number
+  },
+  villa_id: number,
+  room_id: number
+) => {
+  if (res && res.bot_msg_id && select?.withdraw && select?.withdraw > 1000) {
+    setTimeout(() => {
+      Client.recallMessage(villa_id, {
+        room_id: String(room_id),
+        msg_uid: res.bot_msg_id,
+        msg_time: new Date().getTime()
+      })
+    }, select?.withdraw)
+  }
+  return res
+}
+
+/**
+ * 错误打印
+ * @param err
+ * @returns
+ */
+const error = err => {
+  console.log(err)
+  return err
+}
+
+/**
+ * 图片转存
+ * @param villa_id
+ * @param uul
+ * @param cfg
+ * @returns
+ */
+const unloading = async (villa_id: number, uul: string) => {
+  const NowObj = await Client.transferImage(villa_id, uul)
+  if (!NowObj?.new_url) {
+    return uul
+  }
+  return NowObj.new_url
+}
 
 /**
  * 消息会话
@@ -17,10 +71,6 @@ import { now_e } from './e.js'
  * @param val  类型控制
  */
 export async function MESSAGES_VILLA(event: BotEvent) {
-  /**
-   * 获取ip
-   */
-  const ip = await getIP()
   /**
    * 数据包解析
    */
@@ -245,39 +295,22 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       }
     ): Promise<any> => {
       /**
-       * url获取
-       */
-      let url = ''
-      /**
        * isBuffer
        */
       if (Buffer.isBuffer(msg)) {
         /**
          * 挂载图片
          */
-        const uul = await Client.setLocalImg(msg)
+        const uul = await ClientKOA.setLocalImg(msg)
         if (!uul) return false
-        const NowObj = await Client.transferImage(
-          villa_id,
-          `${cfg.http}://${ip}:${cfg.port}${uul}`
-        )
-        if (!NowObj?.new_url) {
-          url = `${cfg.http}://${ip}:${cfg.port}${uul}`
-          console.log('[转存失败]', url)
-        } else {
-          url = NowObj.new_url
-        }
-        /**
-         * 直接发送图片
-         */
+        const url = await unloading(villa_id, uul)
         const dimensions = IMGS.imageSize(msg)
         return await Client.sendMessageImage(villa_id, room_id, url, {
           width: dimensions.width,
           height: dimensions.height
-        }).catch(err => {
-          console.error(err)
-          return err
         })
+          .then(res => recallMessage(res, select, villa_id, room_id))
+          .catch(error)
       }
       /**
        * isString arr and find buffer
@@ -287,27 +320,13 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
         // 删除所有buffer
         const cont = msg.filter(element => typeof element === 'string').join('')
-        /**
-         * 字符解析器
-         */
+        // 字符解析器
         const { entities, content } = await Client.stringParsing(cont, villa_id)
         // 挂载图片
         const dimensions = IMGS.imageSize(msg[isBuffer])
-        const uul = await Client.setLocalImg(msg[isBuffer] as Buffer)
+        const uul = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
         if (!uul) return false
-        const NowObj = await Client.transferImage(
-          villa_id,
-          `${cfg.http}://${ip}:${cfg.port}${uul}`
-        ).catch(err => {
-          console.error(err)
-          return err
-        })
-        if (!NowObj?.new_url) {
-          url = `${cfg.http}://${ip}:${cfg.port}${uul}`
-          console.log('[转存失败]', url)
-        } else {
-          url = NowObj.new_url
-        }
+        const url = await unloading(villa_id, uul)
         if (entities.length == 0) {
           return await Client.sendMessageTextUrl(
             villa_id,
@@ -318,10 +337,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
               width: dimensions.width,
               height: dimensions.height
             }
-          ).catch(err => {
-            console.error(err)
-            return err
-          })
+          )
+            .then(res => recallMessage(res, select, villa_id, room_id))
+            .catch(error)
         } else {
           return await Client.sendMessageTextEntitiesUrl(
             villa_id,
@@ -333,10 +351,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
               width: dimensions.width,
               height: dimensions.height
             }
-          ).catch(err => {
-            console.error(err)
-            return err
-          })
+          )
+            .then(res => recallMessage(res, select, villa_id, room_id))
+            .catch(error)
         }
       }
       // string and string[]
@@ -345,57 +362,46 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         : typeof msg === 'string'
         ? msg
         : ''
+      if (cont == '') return false
 
-      if (cont == '') {
-        return false
-      }
-
+      /**
+       * http
+       */
       const match = cont.match(/<http>(.*?)<\/http>/)
       if (match) {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)
         if (msg) {
-          const uul = await Client.setLocalImg(msg)
+          const uul = await ClientKOA.setLocalImg(msg)
           if (!uul) return false
-          const NowObj = await Client.transferImage(
-            villa_id,
-            `${cfg.http}://${ip}:${cfg.port}${uul}`
-          )
-          if (!NowObj?.new_url) {
-            url = `${cfg.http}://${ip}:${cfg.port}${uul}`
-            console.log('[转存失败]', url)
-          } else {
-            url = NowObj.new_url
-          }
+          const url = await unloading(villa_id, uul)
           const dimensions = IMGS.imageSize(msg)
           return await Client.sendMessageImage(villa_id, room_id, url, {
             width: dimensions.width,
             height: dimensions.height
-          }).catch(err => {
-            console.error(err)
-            return err
           })
+            .then(res => recallMessage(res, select, villa_id, room_id))
+            .catch(error)
         }
       }
-      // 字符解析器
+
+      /**
+       * reply
+       */
       const { entities, content } = await Client.stringParsing(cont, villa_id)
       if (entities.length == 0 && content != '') {
-        return await Client.sendMessageText(villa_id, room_id, content).catch(
-          err => {
-            console.error(err)
-            return err
-          }
-        )
+        return await Client.sendMessageText(villa_id, room_id, content)
+          .then(res => recallMessage(res, select, villa_id, room_id))
+          .catch(error)
       } else if (entities.length != 0 && content != '') {
         return await Client.sendMessageTextEntities(
           villa_id,
           room_id,
           content,
           entities
-        ).catch(err => {
-          console.error(err)
-          return err
-        })
+        )
+          .then(res => recallMessage(res, select, villa_id, room_id))
+          .catch(error)
       }
       return false
     },
@@ -405,23 +411,11 @@ export async function MESSAGES_VILLA(event: BotEvent) {
   /**
    * 业务处理
    */
-  await InstructionMatching(e)
-    .then(() => {
-      console.info(
-        `\n[${e.channel_id}] [${e.user_name}] [${true}] ${
-          MessageContent.content.text
-        }`
-      )
-      return true
-    })
-    .catch((err: any) => {
-      console.error(
-        `\n[${e.channel_id}] [${e.user_name}] [${true}] ${
-          MessageContent.content.text
-        }`
-      )
-      console.error(err)
-      return false
-    })
-  return false
+  return await InstructionMatching(e)
+    .then(() =>
+      AlemonJSLog(e.channel_id, e.user_name, MessageContent.content.text)
+    )
+    .catch(err =>
+      AlemonJSError(err, e.channel_id, e.user_name, MessageContent.content.text)
+    )
 }

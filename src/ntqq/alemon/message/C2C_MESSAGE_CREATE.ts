@@ -10,7 +10,7 @@ import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { ExampleObject } from '../types.js'
 import IMGS from 'image-size'
-import { setLocalImg } from '../../sdk/web/index.js'
+import { ClientKOA } from '../../../koa/index.js'
 
 export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
   /**
@@ -38,13 +38,12 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       withdraw?: number
     }
   ): Promise<any> => {
-    let url = ''
     // isBuffer
     if (Buffer.isBuffer(msg)) {
       try {
         if (Buffer.isBuffer(msg)) {
-          const uul = await setLocalImg(msg)
-          url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+          const url = await ClientKOA.setLocalImg(msg)
+          if (!url) return false
           return await Client.postFilesByGroup(event.group_id, url).catch(
             err => {
               console.error(err)
@@ -64,9 +63,8 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       const cont = msg.filter(element => typeof element === 'string').join('')
       try {
         const dimensions = IMGS.imageSize(msg[isBuffer])
-        const uul = await setLocalImg(msg[isBuffer] as Buffer)
-        url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
-        console.log('[url]', url)
+        const url = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
+        if (!url) return false
         return await Client.postMessageByGroup(
           event.group_id,
           `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
@@ -99,8 +97,8 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       const getUrl = match[1]
       const msg = await getUrlbuffer(getUrl)
       if (Buffer.isBuffer(msg)) {
-        const uul = await setLocalImg(msg)
-        url = `${webCfg.http}://${ip}:${webCfg.callback_port}${uul}`
+        const url = await ClientKOA.setLocalImg(msg)
+        if (!url) return false
         return await Client.postFilesByGroup(event.group_id, url).catch(
           err => err
         )

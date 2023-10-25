@@ -210,19 +210,3 @@ export interface QqGuildOptions {
    */
   sandbox?: boolean
 }
-
-/**
- * ******
- * server
- * *****
- */
-export interface ServerOptions {
-  /**
-   * 地址
-   */
-  host?: string
-  /**
-   * 端口
-   */
-  port?: number
-}

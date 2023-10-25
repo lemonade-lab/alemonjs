@@ -8,7 +8,6 @@ import {
   getWebConfig,
   BotConfig
 } from './sdk/index.js'
-import { createWeb, autoClearImages } from './sdk/web/index.js'
 import { getIP } from '../core/index.js'
 
 interface aut {
@@ -80,17 +79,6 @@ export async function createAlemonByNtqq() {
      */
     createClient(conversation, cfg?.shard ?? [0, 1])
 
-    /**
-     * 创建web端
-     */
-    createWeb({
-      callback_port: cfg.port,
-      http: cfg.http,
-      img_url: cfg.img_url,
-      IMAGE_DIR: cfg.IMAGE_DIR,
-      img_size: cfg.size
-    })
-
     const webCfg = getWebConfig()
 
     /**
@@ -101,8 +89,6 @@ export async function createAlemonByNtqq() {
       console.info(
         `[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}`
       )
-      // 启动清除机制
-      autoClearImages(600000)
     } else {
       console.error('公网IP识别失败~暂无法支持运行')
       return

@@ -1,8 +1,9 @@
 /**
- * 独立的图片挂载服务器
- *
- * 减少多个平台独立挂载
- *
- * villa比较特殊 目前只支持http形式回调
- *
+ * 配置图片挂载服务
+ * 挂载的地址可以配置
+ * 而且是根目录下的地址
  */
+export * from './client.js'
+export * from './config.js'
+export * as ClientKOA from './img.js'
+export * from './types.js'

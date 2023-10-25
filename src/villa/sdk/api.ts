@@ -44,7 +44,10 @@ export async function villaService(villa_id: number, config: object) {
  * @param url
  * @returns
  */
-export async function transferImage(villa_id: number, url: string): Promise<UrlType> {
+export async function transferImage(
+  villa_id: number,
+  url: string
+): Promise<UrlType> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.transferImage,
@@ -121,7 +124,10 @@ export async function getVilla(villa_id: number): Promise<VillaType> {
  * @param uid 用户编号
  * @returns
  */
-export async function getMember(villa_id: number, uid: string): Promise<MemberType> {
+export async function getMember(
+  villa_id: number,
+  uid: string
+): Promise<MemberType> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getMember,
@@ -268,7 +274,10 @@ export async function sendMessage(
  * @param group_name 分组名
  * @returns
  */
-export async function createGroup(villa_id: number, group_name: string): Promise<string> {
+export async function createGroup(
+  villa_id: number,
+  group_name: string
+): Promise<string> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.createGroup,
@@ -288,7 +297,11 @@ export async function createGroup(villa_id: number, group_name: string): Promise
  * @param group_name 分组名称
  * @returns
  */
-export async function editGroup(villa_id: number, group_id: number, group_name: string) {
+export async function editGroup(
+  villa_id: number,
+  group_id: number,
+  group_name: string
+) {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.editGroup,
@@ -335,7 +348,11 @@ export async function getGroupList(villa_id: number): Promise<Group> {
  * @param room_name 房间名
  * @returns
  */
-export async function editRoom(villa_id: number, room_id: number, room_name: object) {
+export async function editRoom(
+  villa_id: number,
+  room_id: number,
+  room_name: object
+) {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.editRoom,
@@ -368,7 +385,10 @@ export async function deleteRoom(villa_id: number, room_id: number) {
  * @param room_id 房间编号
  * @returns
  */
-export async function getRoom(villa_id: number, room_id: number): Promise<RoomMsg> {
+export async function getRoom(
+  villa_id: number,
+  room_id: number
+): Promise<RoomMsg> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getRoom,
@@ -388,7 +408,9 @@ export async function getRoom(villa_id: number, room_id: number): Promise<RoomMs
  * @param villa_id 别野编号
  * @returns
  */
-export async function getVillaGroupRoomList(villa_id: number): Promise<GroupRoom> {
+export async function getVillaGroupRoomList(
+  villa_id: number
+): Promise<GroupRoom> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getVillaGroupRoomList
@@ -498,7 +520,9 @@ export async function deleteMemberRole(villa_id: number, id: number) {
  * @param villa_id 别野编号
  * @returns
  */
-export async function getVillaMemberRoles(villa_id: number): Promise<MemberRoleList[]> {
+export async function getVillaMemberRoles(
+  villa_id: number
+): Promise<MemberRoleList[]> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getVillaMemberRoles

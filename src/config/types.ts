@@ -3,10 +3,10 @@ import {
   KookOptionsg,
   NtQQOptions,
   QqGuildOptions,
-  VillaOptions,
-  ServerOptions
+  VillaOptions
 } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/typings.js'
+import { ServerOptions } from '../koa/types.js'
 
 /**
  * ******

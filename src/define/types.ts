@@ -1,6 +1,7 @@
 import { PuppeteerLaunchOptions } from 'puppeteer'
-import { LoginOptions, ServerOptions } from '../default/types.js'
+import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/typings.js'
+import { ServerOptions } from '../koa/types.js'
 /**
  * ******
  * config

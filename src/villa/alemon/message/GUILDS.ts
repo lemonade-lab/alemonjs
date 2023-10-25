@@ -1,3 +1,4 @@
+import { AlemonJSEventError, AlemonJSEventLog } from 'src/log/event.js'
 import { AMessage, typeMessage } from '../../../core/index.js'
 import { BotEvent } from '../../sdk/index.js'
 import { segmentVilla } from '../segment.js'
@@ -120,14 +121,7 @@ export async function GUILDS_VILLA(event: BotEvent) {
   /**
    * 只匹配类型
    */
-  await typeMessage(e)
-    .then(() => {
-      console.info(`\n[${e.event}] [${e.eventType}] [${true}] `)
-      return true
-    })
-    .catch(err => {
-      console.error(`\n[${e.event}] [${e.eventType}] [${false}] `)
-      console.error(err)
-      return false
-    })
+  return await typeMessage(e)
+    .then(() => AlemonJSEventLog(e.event, e.eventType))
+    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
 }

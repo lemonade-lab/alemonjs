@@ -3,8 +3,8 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 import { mkdirSync } from 'fs'
 import { getLocalImg } from './img.js'
-import { type WebConfig } from '../types.js'
-import { setWebConfig } from '../config.js'
+import { ServerOptions } from './types.js'
+import { getServerConfig, setServerCoinfg } from './config.js'
 
 /**
  * 创建客户端
@@ -13,44 +13,35 @@ import { setWebConfig } from '../config.js'
  * @param logFnc
  */
 export function createWeb(
-  {
-    callback_port = 9090,
-    img_size = 9999999,
-    http = 'http',
-    img_url = '/api/mys/img',
-    IMAGE_DIR = '/data/mys/img'
-  }: WebConfig,
+  val: ServerOptions,
   logFnc?: (port: number) => Promise<void>
 ) {
-  /**
-   * 创建 Koa 应用
-   */
+  for (const item in val) {
+    setServerCoinfg(item as keyof ServerOptions, val[item])
+  }
+  // 创建 Koa 应用
   const app = new Koa()
   const router = new Router()
 
-  /**
-   * 处理 POST 请求体中的 JSON 数据
-   */
+  // 处理 POST 请求体中的 JSON 数据
   app.use(bodyParser())
 
-  /**
-   * 确保目录存在
-   */
-  mkdirSync(IMAGE_DIR, { recursive: true })
-  mkdirSync(img_url, { recursive: true })
+  const imgDir = getServerConfig('imgDir')
+  const imgRouter = getServerConfig('imgRouter')
+  // 确保目录存在
+  mkdirSync(imgDir, { recursive: true })
+  mkdirSync(imgRouter, { recursive: true })
 
-  /**
-   * 处理图片请求
-   */
-  router.get(`${img_url}/:filename`, getLocalImg)
+  // 处理图片请求
+  router.get(`${imgRouter}/:filename`, getLocalImg)
 
-  /**
-   * 将路由注册到应用
-   */
+  const port = getServerConfig('port')
+  // 将路由注册到应用
   app.use(router.routes())
   app.use(router.allowedMethods())
 
-  let currentPort = callback_port
+  // 端口
+  let currentPort = port
   let size = 0
 
   /**
@@ -78,20 +69,9 @@ export function createWeb(
    * @param port
    */
   function createApp(port: number) {
-    /**
-     * 设置配置
-     */
-    setWebConfig({
-      callback_port: port,
-      img_url,
-      http,
-      img_size,
-      IMAGE_DIR
-    })
-
-    /**
-     * 启动应用
-     */
+    // 设置配置
+    setServerCoinfg('port', port)
+    // 启动应用
     app
       .listen(port, async () => {
         if (logFnc) {
@@ -101,8 +81,6 @@ export function createWeb(
       .on('error', handlePortConflict)
   }
 
-  /**
-   * 启动应用
-   */
+  // 启动应用
   createApp(currentPort)
 }
