@@ -181,9 +181,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         ? msg
         : ''
 
-      if (content == '') {
-        return false
-      }
+      if (content == '') return false
 
       const match = content.match(/<http>(.*?)<\/http>/)
       if (match) {

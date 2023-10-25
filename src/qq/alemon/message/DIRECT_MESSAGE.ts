@@ -121,9 +121,7 @@ async function directMessage(e: AMessage, event: directEventData) {
       ? msg
       : ''
 
-    if (content == '') {
-      return false
-    }
+    if (content == '') return false
     /**
      * http
      */

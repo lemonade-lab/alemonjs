@@ -86,9 +86,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       ? msg
       : ''
 
-    if (content == '') {
-      return false
-    }
+    if (content == '') return false
 
     /**
      * https

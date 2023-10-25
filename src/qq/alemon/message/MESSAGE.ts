@@ -122,9 +122,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       ? msg
       : ''
 
-    if (content == '') {
-      return false
-    }
+    if (content == '') return false
 
     /**
      * http

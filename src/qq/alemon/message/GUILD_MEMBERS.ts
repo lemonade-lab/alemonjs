@@ -124,9 +124,7 @@ export const GUILD_MEMBERS = async (event: any) => {
         ? msg
         : ''
 
-      if (content == '') {
-        return false
-      }
+      if (content == '') return false
       /**
        * http
        */
