@@ -42,6 +42,6 @@ export function analysis(val: LoginMap) {
       delete val[ket][item]
     }
   }
-  console.info('[BOT]', ket)
+  console.info('[LOAD BOT]', ket)
   return val[ket] as AlemonOptions['login']
 }

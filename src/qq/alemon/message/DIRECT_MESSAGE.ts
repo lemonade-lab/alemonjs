@@ -10,11 +10,22 @@ import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
-import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
+import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 
 declare global {
   //接口对象
   var clientApiByQQ: IOpenAPI
+}
+
+/**
+ * 错误打印
+ * @param err
+ * @returns
+ */
+const error = err => {
+  console.error(err)
+  return err
 }
 
 /**
@@ -48,26 +59,16 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     /**
      * 只匹配类型
      */
-    await typeMessage(e as AMessage)
-      .then(() => {
-        console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)
-        return true
-      })
-      .catch(err => {
-        console.error(err)
-        console.error(`\n[${e.event}] [${e.eventType}] [${false}]`)
-        return false
-      })
+    return await typeMessage(e)
+      .then(() => AlemonJSEventLog(e.event, e.eventType))
+      .catch(err => AlemonJSEventError(err, e.event, e.eventType))
     return
   }
 
   /**
    * 优化接口
    */
-  await directMessage(e, event).catch(err => {
-    console.error(err)
-    return
-  })
+  await directMessage(e, event).catch(error)
   console.info(
     `\n[${event.msg.author.username}][${event.msg.author.id}][${e.isGroup}] ${
       event.msg.content ? event.msg.content : ''
@@ -90,10 +91,7 @@ async function directMessage(e: AMessage, event: directEventData) {
           id: event.msg.guild_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg //buffer
-        }).catch((err: any) => {
-          console.error(err)
-          return err
-        })
+        }).catch(error)
       } catch (err) {
         console.error(err)
         return err
@@ -109,10 +107,7 @@ async function directMessage(e: AMessage, event: directEventData) {
           msg_id: event.msg.id, //消息id, 必须
           image: msg[isBuffer] as Buffer, //buffer
           content: cont
-        }).catch((err: any) => {
-          console.error(err)
-          return err
-        })
+        }).catch(error)
       } catch (err) {
         console.error(err)
         return err
@@ -139,10 +134,7 @@ async function directMessage(e: AMessage, event: directEventData) {
           id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg //buffer
-        }).catch(err => {
-          console.error(err)
-          return err
-        })
+        }).catch(error)
       }
     }
 
@@ -151,10 +143,7 @@ async function directMessage(e: AMessage, event: directEventData) {
         msg_id: event.msg.id,
         content
       })
-      .catch((err: any) => {
-        console.error(err)
-        return err
-      })
+      .catch(error)
   }
   e.replyCard = async (arr: CardType[]) => {
     for (const item of arr) {
@@ -165,10 +154,7 @@ async function directMessage(e: AMessage, event: directEventData) {
               msg_id: event.msg.id,
               ...item.card
             })
-            .catch((err: any) => {
-              console.error(err)
-              return err
-            })
+            .catch(error)
         } else {
           return false
         }

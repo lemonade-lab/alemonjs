@@ -1,9 +1,15 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import { ClientAPIByQQ as Client } from '../sdk/index.js'
 import { QQEMessage } from './types.js'
+import { getUrlbuffer } from '../../core/index.js'
 
 declare global {
   var clientApiByQQ: IOpenAPI
+}
+
+const error = err => {
+  console.error(err)
+  return false
 }
 
 /**
@@ -26,10 +32,7 @@ export const Private = async (
       source_guild_id: EMessage.guild_id,
       recipient_id: EMessage.author.id
     })
-    .catch((err: any) => {
-      console.error(err)
-      return err
-    })
+    .catch(error)
 
   if (!postSessionRes) return false
 
@@ -44,10 +47,7 @@ export const Private = async (
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: msg //buffer
-      }).catch((err: any) => {
-        console.error(err)
-        return err
-      })
+      }).catch(error)
     } catch (err) {
       console.error(err)
       return err
@@ -62,27 +62,42 @@ export const Private = async (
         msg_id: EMessage.id, //消息id, 必须
         image: msg[isBuffer] as Buffer, //buffer
         content: cont
-      }).catch((err: any) => {
-        console.error(err)
-        return err
-      })
+      }).catch(error)
     } catch (err) {
       console.error(err)
       return err
     }
   }
+
   const content = Array.isArray(msg)
     ? msg.join('')
     : typeof msg === 'string'
     ? msg
-    : undefined
+    : ''
+
+  if (content == '') return false
+
+  /**
+   * http
+   */
+
+  const match = content.match(/<http>(.*?)<\/http>/)
+  if (match) {
+    const getUrl = match[1]
+    const msg = await getUrlbuffer(getUrl)
+    if (msg) {
+      return await Client.postImage({
+        id: EMessage.guild_id,
+        msg_id: EMessage.id, //消息id, 必须
+        image: msg //buffer
+      }).catch(error)
+    }
+  }
+
   return await clientApiByQQ.directMessageApi
     .postDirectMessage(guild_id, {
       msg_id: EMessage.id,
       content
     })
-    .catch(err => {
-      console.error(err)
-      return err
-    })
+    .catch(error)
 }

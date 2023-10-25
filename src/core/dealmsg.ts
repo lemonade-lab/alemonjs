@@ -406,7 +406,7 @@ export async function InstructionMatching(e: AMessage) {
       }
       APPCACHE[item] = app
     } catch (err) {
-      console.log('[AlemonJS]上下文出错', err)
+      console.info('[AlemonJS]上下文出错', err)
       return
     }
   }
@@ -434,7 +434,7 @@ export async function InstructionMatching(e: AMessage) {
         .catch(logErr(data))
       if (typeof res != 'boolean') {
         e.reply(res).catch(err => {
-          console.log('重发错误', err)
+          console.error('重发错误', err)
         })
       }
       if (res != false) break
@@ -474,7 +474,7 @@ export async function typeMessage(e: AMessage) {
       app.e = e
       APPCACHE[item] = app
     } catch (err) {
-      console.log('[AlemonJS]上下文出错', err)
+      console.error('[AlemonJS]上下文出错', err)
       return
     }
   }
@@ -487,7 +487,7 @@ export async function typeMessage(e: AMessage) {
       const res = await app[data.fncName](...[e, ...(ARGCACHE[data.APP] ?? [])])
       if (typeof res != 'boolean') {
         e.reply(res).catch(err => {
-          console.log('重发错误', err)
+          console.error('重发错误', err)
         })
       }
       if (res != false) break

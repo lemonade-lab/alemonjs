@@ -17,6 +17,11 @@ export function getPermissionsFromValue(value: number) {
   return { look, manage, speak, broadcast }
 }
 
+const error = err => {
+  console.error(err)
+  return false
+}
+
 /**
  * 得到权限对象
  * @param channel_id  频道id
@@ -27,10 +32,7 @@ export async function channewlPermissions(channel_id: any, id: any) {
   /* 自身机器人权限检测 */
   const authority: any = await clientApiByQQ.channelPermissionsApi
     .channelPermissions(channel_id, id)
-    .catch(err => {
-      console.error(err)
-      return false
-    })
+    .catch(error)
 
   /* 机器人没有权限 */
   if (!authority) {

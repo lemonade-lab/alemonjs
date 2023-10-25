@@ -8,7 +8,12 @@ import { KOOKApiClient, EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
+
+const error = err => {
+  console.error(err)
+  return err
+}
 
 /**
  *
@@ -112,20 +117,14 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
                 type: 2,
                 target_id: event.target_id,
                 content: url
-              }).catch(err => {
-                console.log(err)
-                return err
-              })
+              }).catch(error)
             }
             return await KOOKApiClient.createDirectMessage({
               type: 2,
               target_id: event.target_id,
               chat_code: event.extra.code,
               content: url
-            }).catch(err => {
-              console.log(err)
-              return err
-            })
+            }).catch(error)
           }
           return false
         } catch (err) {
@@ -157,10 +156,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
               type: 2,
               target_id: event.target_id,
               content: url
-            }).catch(err => {
-              console.log(err)
-              return err
-            })
+            }).catch(error)
           }
         }
         // 私聊
@@ -175,10 +171,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           target_id: event.target_id,
           chat_code: event.extra.code,
           content: String(url)
-        }).catch(err => {
-          console.log(err)
-          return err
-        })
+        }).catch(error)
       }
       const content = Array.isArray(msg)
         ? msg.join('')
@@ -201,20 +194,14 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
               type: 2,
               target_id: event.target_id,
               content: url
-            }).catch(err => {
-              console.log(err)
-              return err
-            })
+            }).catch(error)
           }
           return await KOOKApiClient.createDirectMessage({
             type: 2,
             target_id: event.target_id,
             chat_code: event.extra.code,
             content: url
-          }).catch(err => {
-            console.log(err)
-            return err
-          })
+          }).catch(error)
         }
       }
       if (event.channel_type == 'GROUP') {
@@ -223,12 +210,9 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
             type: 9,
             target_id: event.target_id,
             content
-          }).catch(err => {
-            console.log(err)
-            return err
-          })
+          }).catch(error)
         } catch (err) {
-          console.log(err)
+          console.error(err)
           return err
         }
       }
@@ -238,12 +222,9 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           target_id: event.target_id,
           chat_code: event.extra.code,
           content
-        }).catch(err => {
-          console.log(err)
-          return err
-        })
+        }).catch(error)
       } catch (err) {
-        console.log(err)
+        console.error(err)
         return err
       }
     }

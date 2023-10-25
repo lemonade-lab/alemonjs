@@ -77,7 +77,7 @@ export function createWeb(
     app
       .listen(port, async () => {
         if (logFnc) await logFnc(port)
-        console.log('[AlemonJS]', 'KOA', `http://[::]:${port}`)
+        console.info('[AlemonJS]', 'KOA', `http://[::]:${port}`)
       })
       .on('error', handlePortConflict)
   }

@@ -2,12 +2,23 @@ import { typeMessage, AMessage } from '../../../core/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { EventData } from '../types.js'
 import { getBotMsgByQQ } from '../bot.js'
+import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 
 /**
  * *
  * 公域
  * *
  */
+
+/**
+ * 错误打印
+ * @param err
+ * @returns
+ */
+const error = err => {
+  console.error(err)
+  return err
+}
 
 /**
  PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
@@ -31,16 +42,9 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventData) => {
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
-    await typeMessage(e)
-      .then(() => {
-        console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)
-        return true
-      })
-      .catch(err => {
-        console.error(err)
-        console.error(`\n[${e.event}] [${e.eventType}] [${false}]`)
-        return false
-      })
+    return await typeMessage(e)
+      .then(() => AlemonJSEventLog(e.event, e.eventType))
+      .catch(err => AlemonJSEventError(err, e.event, e.eventType))
     return
   }
 
@@ -48,10 +52,7 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventData) => {
    * 消息创建
    */
   if (new RegExp(/CREATE$/).test(event.eventType)) {
-    mergeMessages(e as AMessage, event).catch((err: any) => {
-      console.error(err)
-      return false
-    })
+    mergeMessages(e as AMessage, event).catch(error)
     return
   }
 }

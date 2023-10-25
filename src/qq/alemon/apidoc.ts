@@ -17,21 +17,24 @@ declare global {
  */
 
 /**
+ * 错误打印
+ * @param err
+ * @returns
+ */
+const error = err => {
+  console.error(err)
+  return err
+}
+
+/**
  * 获取当前用户下的所有频道列表
  * @returns
  */
 export const getGuildList = async (): Promise<boolean | IGuild[]> => {
-  const data = await clientApiByQQ.meApi
-    .meGuilds()
-    .then(res => {
-      const { data } = res
-      return data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return data
+  return await clientApiByQQ.meApi.meGuilds().then(res => {
+    const { data } = res
+    return data
+  })
 }
 
 /**
@@ -49,17 +52,10 @@ description	string	描述
 export const getGuildMsg = async (
   guildId: string
 ): Promise<boolean | IGuild> => {
-  const data = await clientApiByQQ.guildApi
-    .guild(guildId)
-    .then(res => {
-      const { data } = res
-      return data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return data
+  return await clientApiByQQ.guildApi.guild(guildId).then(res => {
+    const { data } = res
+    return data
+  })
 }
 
 /**
@@ -85,17 +81,10 @@ owner_id	string	创建人 ID
 export const getChannels = async (
   guildId: string
 ): Promise<boolean | IChannel[]> => {
-  const data = await clientApiByQQ.channelApi
-    .channels(guildId)
-    .then(res => {
-      const { data } = res
-      return data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return data
+  return await clientApiByQQ.channelApi.channels(guildId).then(res => {
+    const { data } = res
+    return data
+  })
 }
 /**
  * 获取子频道详情
@@ -113,17 +102,10 @@ owner_id	string	创建人 ID
 export const getChannel = async (
   channelId: string
 ): Promise<boolean | IChannel> => {
-  const data = await clientApiByQQ.channelApi
-    .channel(channelId)
-    .then(res => {
-      const { data } = res
-      return data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return data
+  return await clientApiByQQ.channelApi.channel(channelId).then(res => {
+    const { data } = res
+    return data
+  })
 }
 
 /**
@@ -156,17 +138,10 @@ export const getGuildMemberMsg = async (
   guildId: string,
   userId: string
 ): Promise<boolean | IMember> => {
-  const data = await clientApiByQQ.guildApi
-    .guildMember(guildId, userId)
-    .then(res => {
-      const { data } = res
-      return data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return data
+  return await clientApiByQQ.guildApi.guildMember(guildId, userId).then(res => {
+    const { data } = res
+    return data
+  })
 }
 
 /**
@@ -210,17 +185,12 @@ export const deleteMsg = async (
   messageID: string,
   hideTip?: boolean
 ): Promise<any> => {
-  const data = await clientApiByQQ.messageApi
+  return await clientApiByQQ.messageApi
     .deleteMessage(channelID, messageID, hideTip)
     .then(res => {
       const { data } = res
       return data
     })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return data
 }
 
 /**

@@ -5,10 +5,8 @@ import {
   setBotNTQQConfig,
   createClient,
   ClientAPIByQQ,
-  getWebConfig,
   BotConfig
 } from './sdk/index.js'
-import { getIP } from '../core/index.js'
 
 interface aut {
   access_token: string
@@ -78,21 +76,6 @@ export async function createAlemonByNtqq() {
      * 创建客户端
      */
     createClient(conversation, cfg?.shard ?? [0, 1])
-
-    const webCfg = getWebConfig()
-
-    /**
-     * 获取ip4
-     */
-    const ip = await getIP()
-    if (ip) {
-      console.info(
-        `[OPEN] ${webCfg.http ?? 'http'}://${ip}:${webCfg.port ?? 9090}`
-      )
-    } else {
-      console.error('公网IP识别失败~暂无法支持运行')
-      return
-    }
 
     return true
   }

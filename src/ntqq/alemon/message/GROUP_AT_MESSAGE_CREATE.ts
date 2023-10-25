@@ -12,7 +12,17 @@ import { getBotConfigByKey } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
 import { ClientKOA } from '../../../koa/index.js'
 import IMGS from 'image-size'
-import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
+
+/**
+ * 错误打印
+ * @param err
+ * @returns
+ */
+const error = err => {
+  console.error(err)
+  return err
+}
 
 /**
  * 公私域合并
@@ -21,11 +31,6 @@ import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
-  /**
-   * 获取ip
-   */
-  const ip = await getIP()
-
   const e = {} as AMessage
   e.platform = 'ntqq'
   e.bot = getBotMsgByNtqq()
@@ -81,9 +86,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
           // 挂载图片
           const url = await ClientKOA.setLocalImg(msg)
           if (!url) return false
-          return await Client.postFilesByGroup(event.group_id, url).catch(
-            err => err
-          )
+          return await Client.postFilesByGroup(event.group_id, url).catch(error)
         }
       } catch (err) {
         console.error(err)
@@ -101,10 +104,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
           event.group_id,
           `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           event.id
-        ).catch(err => {
-          console.error(err)
-          return err
-        })
+        ).catch(error)
       } catch (err) {
         console.error(err)
         return err
@@ -131,9 +131,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       if (Buffer.isBuffer(msg)) {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByGroup(event.group_id, url).catch(
-          err => err
-        )
+        return await Client.postFilesByGroup(event.group_id, url).catch(error)
       }
     }
 
@@ -141,7 +139,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       event.group_id,
       content,
       event.id
-    ).catch(err => err)
+    ).catch(error)
   }
 
   e.replyCard = async (arr: CardType[]) => {

@@ -10,7 +10,7 @@ import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { now_e } from './e.js'
-import { AlemonJSError, AlemonJSLog } from 'src/log/index.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientKOA } from '../../../koa/index.js'
 
 /**
@@ -46,7 +46,7 @@ const recallMessage = (
  * @returns
  */
 const error = err => {
-  console.log(err)
+  console.error(err)
   return err
 }
 

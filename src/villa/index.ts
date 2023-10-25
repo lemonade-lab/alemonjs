@@ -43,9 +43,10 @@ export async function createAlemonByVilla() {
         }`
       )
     } else {
-      console.error('公网IP识别失败~暂无法支持运行')
+      console.error('[VILLA] 公网IP识别失败,无法支持运行')
       return
     }
+
     return true
   }
   return false

@@ -78,6 +78,6 @@ export async function setLocalImg(img: Buffer) {
   // 将图片保存到文件系统中
   writeFileSync(imagePath, img)
   const url = `${http}://${ip}:${port}${imgRouter}/${filename}`
-  console.log('url', url)
+  console.info('url', url)
   return url
 }

@@ -11,7 +11,17 @@ import { getBotMsgByNtqq } from '../bot.js'
 import { USER_DATA } from '../types.js'
 import IMGS from 'image-size'
 import { ClientKOA } from '../../../koa/index.js'
-import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
+
+/**
+ * 错误打印
+ * @param err
+ * @returns
+ */
+const error = err => {
+  console.error(err)
+  return err
+}
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const e = {} as AMessage
@@ -41,10 +51,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
           return await Client.postFilesByUsers(
             event.author.user_openid,
             url
-          ).catch(err => {
-            console.error(err)
-            return err
-          })
+          ).catch(error)
         }
       } catch (err) {
         return err
@@ -64,10 +71,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
           event.author.user_openid,
           `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           event.id
-        ).catch(err => {
-          console.error(err)
-          return err
-        })
+        ).catch(error)
       } catch (err) {
         console.error(err)
         return err
@@ -97,7 +101,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         return await Client.postFilesByUsers(
           event.author.user_openid,
           url
-        ).catch(err => err)
+        ).catch(error)
       }
     }
 
@@ -105,11 +109,9 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       event.author.user_openid,
       content,
       event.id
-    ).catch(err => {
-      console.error(err)
-      return err
-    })
+    ).catch(error)
   }
+
   e.replyCard = async (arr: CardType[]) => {
     for (const item of arr) {
       try {

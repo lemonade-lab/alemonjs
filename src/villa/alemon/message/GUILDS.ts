@@ -1,4 +1,4 @@
-import { AlemonJSEventError, AlemonJSEventLog } from 'src/log/event.js'
+import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import { AMessage, typeMessage } from '../../../core/index.js'
 import { BotEvent } from '../../sdk/index.js'
 import { segmentVilla } from '../segment.js'

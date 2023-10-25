@@ -1,4 +1,4 @@
-import { AlemonJSEventError, AlemonJSEventLog } from 'src/log/event.js'
+import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import { typeMessage, AMessage } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 

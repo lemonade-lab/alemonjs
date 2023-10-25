@@ -14,7 +14,7 @@ export async function getGatewayUrl(): Promise<string | undefined> {
     if (response.url) {
       return response.url
     } else {
-      console.log('[http] err:', null)
+      console.error('[http] err:', null)
     }
   } catch (error) {
     console.error('[token] err:', error.message)
@@ -33,7 +33,7 @@ export async function createClient(callBack: (...args: any[]) => any) {
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
-      console.log('[token] ok')
+      console.info('[token] ok')
     })
     /**
      * 标记是否已连接
@@ -82,11 +82,11 @@ export async function createClient(callBack: (...args: any[]) => any) {
           break
         }
         case 7: {
-          console.log(message)
+          console.info(message)
           break
         }
         case 9: {
-          console.log(message)
+          console.info(message)
           break
         }
         case 10: {
@@ -116,17 +116,17 @@ export async function createClient(callBack: (...args: any[]) => any) {
         }
         case 11: {
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.log('心跳发送成功~')
+          console.info('心跳发送成功~')
           break
         }
         case 12: {
-          console.log(12, message)
+          console.info(12, message)
         }
       }
     })
 
     ws.on('close', () => {
-      console.log('[ws] close')
+      console.error('[ws] close')
     })
   }
 }
