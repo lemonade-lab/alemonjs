@@ -42,7 +42,9 @@
 <div class="tsd-index-list"><a href="AMessage.html#at" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>at</span></a>
 <a href="AMessage.html#at_user" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>at_<wbr/>user?</span></a>
 <a href="AMessage.html#at_users" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>at_<wbr/>users?</span></a>
+<a href="AMessage.html#attribute" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>attribute</span></a>
 <a href="AMessage.html#bot" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>bot</span></a>
+<a href="AMessage.html#boundaries" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>boundaries</span></a>
 <a href="AMessage.html#channel_id" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>channel_<wbr/>id?</span></a>
 <a href="AMessage.html#channel_name" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>channel_<wbr/>name?</span></a>
 <a href="AMessage.html#createChannel" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>create<wbr/>Channel?</span></a>
@@ -115,7 +117,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.at</p>
 <ul>
-<li>Defined in core/typings.ts:159</li></ul></aside></section>
+<li>Defined in core/typings.ts:167</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="at_user" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>at_<wbr/>user</span><a href="#at_user" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">at_<wbr/>user</span><span class="tsd-signature-symbol">?:</span> <a href="UserType.html" class="tsd-signature-type tsd-kind-interface">UserType</a></div>
@@ -126,7 +128,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.at_user</p>
 <ul>
-<li>Defined in core/typings.ts:165</li></ul></aside></section>
+<li>Defined in core/typings.ts:173</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="at_users" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>at_<wbr/>users</span><a href="#at_users" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">at_<wbr/>users</span><span class="tsd-signature-symbol">?:</span> <a href="UserType.html" class="tsd-signature-type tsd-kind-interface">UserType</a><span class="tsd-signature-symbol">[]</span></div>
@@ -135,7 +137,16 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.at_users</p>
 <ul>
-<li>Defined in core/typings.ts:169</li></ul></aside></section>
+<li>Defined in core/typings.ts:177</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited"><a id="attribute" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>attribute</span><a href="#attribute" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">attribute</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;group&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;single&quot;</span></div>
+<div class="tsd-comment tsd-typography"><p>群聊 | 私聊</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<p>Inherited from Serverbase.attribute</p>
+<ul>
+<li>Defined in core/typings.ts:157</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="bot" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>bot</span><a href="#bot" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">bot</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">avatar</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">id</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
@@ -151,6 +162,15 @@
 <p>Inherited from BotBase.bot</p>
 <ul>
 <li>Defined in core/typings.ts:115</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-inherited"><a id="boundaries" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>boundaries</span><a href="#boundaries" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">boundaries</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;private&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;publick&quot;</span></div>
+<div class="tsd-comment tsd-typography"><p>公域 | 私域</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<p>Inherited from Serverbase.boundaries</p>
+<ul>
+<li>Defined in core/typings.ts:153</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="channel_id" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>channel_<wbr/>id</span><a href="#channel_id" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">channel_<wbr/>id</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -190,7 +210,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.createChannel</p>
 <ul>
-<li>Defined in core/typings.ts:534</li></ul></aside></section>
+<li>Defined in core/typings.ts:542</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="createChannelAnnounce" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>create<wbr/>Channel<wbr/>Announce</span><a href="#createChannelAnnounce" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">create<wbr/>Channel<wbr/>Announce</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -212,7 +232,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.createChannelAnnounce</p>
 <ul>
-<li>Defined in core/typings.ts:554</li></ul></aside></section>
+<li>Defined in core/typings.ts:562</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="createChannelEssence" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>create<wbr/>Channel<wbr/>Essence</span><a href="#createChannelEssence" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">create<wbr/>Channel<wbr/>Essence</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -234,7 +254,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.createChannelEssence</p>
 <ul>
-<li>Defined in core/typings.ts:562</li></ul></aside></section>
+<li>Defined in core/typings.ts:570</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="createGuildAnnounce" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>create<wbr/>Guild<wbr/>Announce</span><a href="#createGuildAnnounce" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">create<wbr/>Guild<wbr/>Announce</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -256,7 +276,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.createGuildAnnounce</p>
 <ul>
-<li>Defined in core/typings.ts:512</li></ul></aside></section>
+<li>Defined in core/typings.ts:520</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="createIdentityGroup" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>create<wbr/>Identity<wbr/>Group</span><a href="#createIdentityGroup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">create<wbr/>Identity<wbr/>Group</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -278,7 +298,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.createIdentityGroup</p>
 <ul>
-<li>Defined in core/typings.ts:588</li></ul></aside></section>
+<li>Defined in core/typings.ts:596</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="deleteChannel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>delete<wbr/>Channel</span><a href="#deleteChannel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">delete<wbr/>Channel</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -300,7 +320,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.deleteChannel</p>
 <ul>
-<li>Defined in core/typings.ts:542</li></ul></aside></section>
+<li>Defined in core/typings.ts:550</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="deleteChannelAnnounce" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>delete<wbr/>Channel<wbr/>Announce</span><a href="#deleteChannelAnnounce" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">delete<wbr/>Channel<wbr/>Announce</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -322,7 +342,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.deleteChannelAnnounce</p>
 <ul>
-<li>Defined in core/typings.ts:558</li></ul></aside></section>
+<li>Defined in core/typings.ts:566</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="deleteChannelEssence" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>delete<wbr/>Channel<wbr/>Essence</span><a href="#deleteChannelEssence" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">delete<wbr/>Channel<wbr/>Essence</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -344,7 +364,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.deleteChannelEssence</p>
 <ul>
-<li>Defined in core/typings.ts:570</li></ul></aside></section>
+<li>Defined in core/typings.ts:578</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="deleteGuildAnnounce" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>delete<wbr/>Guild<wbr/>Announce</span><a href="#deleteGuildAnnounce" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">delete<wbr/>Guild<wbr/>Announce</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -366,7 +386,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.deleteGuildAnnounce</p>
 <ul>
-<li>Defined in core/typings.ts:516</li></ul></aside></section>
+<li>Defined in core/typings.ts:524</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="deleteGuildUser" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>delete<wbr/>Guild<wbr/>User</span><a href="#deleteGuildUser" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">delete<wbr/>Guild<wbr/>User</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -388,7 +408,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.deleteGuildUser</p>
 <ul>
-<li>Defined in core/typings.ts:508</li></ul></aside></section>
+<li>Defined in core/typings.ts:516</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="deleteIdentityGroup" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>delete<wbr/>Identity<wbr/>Group</span><a href="#deleteIdentityGroup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">delete<wbr/>Identity<wbr/>Group</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -410,7 +430,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.deleteIdentityGroup</p>
 <ul>
-<li>Defined in core/typings.ts:596</li></ul></aside></section>
+<li>Defined in core/typings.ts:604</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="event" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>event</span><a href="#event" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">event</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;message&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;GUILD_MEMBERS&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;GUILD_MESSAGE_REACTIONS&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;DIRECT_MESSAGE&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;MESSAGE_AUDIT&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;INTERACTION&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;GUILD&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;CHANNEL&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;FORUMS_THREAD&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;FORUMS_POST&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;FORUMS_REPLY&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;MESSAGES&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;AUDIO_FREQUENCY&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;AUDIO_MICROPHONE&quot;</span></div>
@@ -450,7 +470,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getChannel</p>
 <ul>
-<li>Defined in core/typings.ts:526</li></ul></aside></section>
+<li>Defined in core/typings.ts:534</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getChannelEssence" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Channel<wbr/>Essence</span><a href="#getChannelEssence" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Channel<wbr/>Essence</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -472,7 +492,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getChannelEssence</p>
 <ul>
-<li>Defined in core/typings.ts:566</li></ul></aside></section>
+<li>Defined in core/typings.ts:574</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getChannelMsg" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Channel<wbr/>Msg</span><a href="#getChannelMsg" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Channel<wbr/>Msg</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -494,7 +514,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getChannelMsg</p>
 <ul>
-<li>Defined in core/typings.ts:530</li></ul></aside></section>
+<li>Defined in core/typings.ts:538</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getChannelPermissions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Channel<wbr/>Permissions</span><a href="#getChannelPermissions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Channel<wbr/>Permissions</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -516,7 +536,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getChannelPermissions</p>
 <ul>
-<li>Defined in core/typings.ts:546</li></ul></aside></section>
+<li>Defined in core/typings.ts:554</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getGuild" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Guild</span><a href="#getGuild" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Guild</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -538,7 +558,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getGuild</p>
 <ul>
-<li>Defined in core/typings.ts:496</li></ul></aside></section>
+<li>Defined in core/typings.ts:504</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getGuildMsg" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Guild<wbr/>Msg</span><a href="#getGuildMsg" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Guild<wbr/>Msg</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -560,7 +580,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getGuildMsg</p>
 <ul>
-<li>Defined in core/typings.ts:500</li></ul></aside></section>
+<li>Defined in core/typings.ts:508</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getGuildUsers" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Guild<wbr/>Users</span><a href="#getGuildUsers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Guild<wbr/>Users</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -582,7 +602,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getGuildUsers</p>
 <ul>
-<li>Defined in core/typings.ts:504</li></ul></aside></section>
+<li>Defined in core/typings.ts:512</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getIdentityGroup" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Identity<wbr/>Group</span><a href="#getIdentityGroup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Identity<wbr/>Group</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -604,7 +624,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getIdentityGroup</p>
 <ul>
-<li>Defined in core/typings.ts:580</li></ul></aside></section>
+<li>Defined in core/typings.ts:588</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getIdentityGroupMsg" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Identity<wbr/>Group<wbr/>Msg</span><a href="#getIdentityGroupMsg" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Identity<wbr/>Group<wbr/>Msg</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -626,7 +646,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getIdentityGroupMsg</p>
 <ul>
-<li>Defined in core/typings.ts:584</li></ul></aside></section>
+<li>Defined in core/typings.ts:592</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getIdentityGroupPermissions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Identity<wbr/>Group<wbr/>Permissions</span><a href="#getIdentityGroupPermissions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>Identity<wbr/>Group<wbr/>Permissions</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -648,7 +668,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getIdentityGroupPermissions</p>
 <ul>
-<li>Defined in core/typings.ts:600</li></ul></aside></section>
+<li>Defined in core/typings.ts:608</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getUserMsg" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>User<wbr/>Msg</span><a href="#getUserMsg" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">get<wbr/>User<wbr/>Msg</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -670,7 +690,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getUserMsg</p>
 <ul>
-<li>Defined in core/typings.ts:614</li></ul></aside></section>
+<li>Defined in core/typings.ts:622</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="guild_id" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>guild_<wbr/>id</span><a href="#guild_id" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">guild_<wbr/>id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -706,7 +726,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from UserBase.isMaster</p>
 <ul>
-<li>Defined in core/typings.ts:215</li></ul></aside></section>
+<li>Defined in core/typings.ts:223</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="isPrivate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Private</span><a href="#isPrivate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">is<wbr/>Private</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -724,7 +744,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.isRecall</p>
 <ul>
-<li>Defined in core/typings.ts:193</li></ul></aside></section>
+<li>Defined in core/typings.ts:201</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="msg" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>msg</span><a href="#msg" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">msg</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -733,7 +753,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.msg</p>
 <ul>
-<li>Defined in core/typings.ts:185</li></ul></aside></section>
+<li>Defined in core/typings.ts:193</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="msg_create_time" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>msg_<wbr/>create_<wbr/>time</span><a href="#msg_create_time" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">msg_<wbr/>create_<wbr/>time</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
@@ -742,7 +762,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.msg_create_time</p>
 <ul>
-<li>Defined in core/typings.ts:177</li></ul></aside></section>
+<li>Defined in core/typings.ts:185</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="msg_id" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>msg_<wbr/>id</span><a href="#msg_id" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">msg_<wbr/>id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -751,7 +771,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.msg_id</p>
 <ul>
-<li>Defined in core/typings.ts:173</li></ul></aside></section>
+<li>Defined in core/typings.ts:181</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="msg_txt" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>msg_<wbr/>txt</span><a href="#msg_txt" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">msg_<wbr/>txt</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -760,7 +780,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.msg_txt</p>
 <ul>
-<li>Defined in core/typings.ts:181</li></ul></aside></section>
+<li>Defined in core/typings.ts:189</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="muteAll" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>mute<wbr/>All</span><a href="#muteAll" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">mute<wbr/>All</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -782,7 +802,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.muteAll</p>
 <ul>
-<li>Defined in core/typings.ts:624</li></ul></aside></section>
+<li>Defined in core/typings.ts:632</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="muteMember" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>mute<wbr/>Member</span><a href="#muteMember" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">mute<wbr/>Member</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -804,7 +824,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.muteMember</p>
 <ul>
-<li>Defined in core/typings.ts:628</li></ul></aside></section>
+<li>Defined in core/typings.ts:636</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="muteMembers" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>mute<wbr/>Members</span><a href="#muteMembers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">mute<wbr/>Members</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -826,7 +846,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.muteMembers</p>
 <ul>
-<li>Defined in core/typings.ts:632</li></ul></aside></section>
+<li>Defined in core/typings.ts:640</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="permissions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>permissions</span><a href="#permissions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">permissions</span><span class="tsd-signature-symbol">?:</span> <a href="permissionsType.html" class="tsd-signature-type tsd-kind-interface">permissionsType</a></div>
@@ -835,7 +855,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from UserBase.permissions</p>
 <ul>
-<li>Defined in core/typings.ts:219</li></ul></aside></section>
+<li>Defined in core/typings.ts:227</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="platform" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>platform</span><a href="#platform" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">platform</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;qq&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;kook&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;villa&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ntqq&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;wechat&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;telegram&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;dodo&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;discord&quot;</span></div>
@@ -853,7 +873,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from MsgBase.segment</p>
 <ul>
-<li>Defined in core/typings.ts:189</li></ul></aside></section>
+<li>Defined in core/typings.ts:197</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="updateChannel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>update<wbr/>Channel</span><a href="#updateChannel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">update<wbr/>Channel</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -875,7 +895,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.updateChannel</p>
 <ul>
-<li>Defined in core/typings.ts:538</li></ul></aside></section>
+<li>Defined in core/typings.ts:546</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="updateChannelPermissions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>update<wbr/>Channel<wbr/>Permissions</span><a href="#updateChannelPermissions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">update<wbr/>Channel<wbr/>Permissions</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -897,7 +917,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.updateChannelPermissions</p>
 <ul>
-<li>Defined in core/typings.ts:550</li></ul></aside></section>
+<li>Defined in core/typings.ts:558</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="updateIdentityGroup" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>update<wbr/>Identity<wbr/>Group</span><a href="#updateIdentityGroup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">update<wbr/>Identity<wbr/>Group</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -919,7 +939,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.updateIdentityGroup</p>
 <ul>
-<li>Defined in core/typings.ts:592</li></ul></aside></section>
+<li>Defined in core/typings.ts:600</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="updateIdentityGroupPermissions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>update<wbr/>Identity<wbr/>Group<wbr/>Permissions</span><a href="#updateIdentityGroupPermissions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">update<wbr/>Identity<wbr/>Group<wbr/>Permissions</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -941,7 +961,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.updateIdentityGroupPermissions</p>
 <ul>
-<li>Defined in core/typings.ts:604</li></ul></aside></section>
+<li>Defined in core/typings.ts:612</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="user_avatar" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>user_<wbr/>avatar</span><a href="#user_avatar" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">user_<wbr/>avatar</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -950,7 +970,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from UserBase.user_avatar</p>
 <ul>
-<li>Defined in core/typings.ts:211</li></ul></aside></section>
+<li>Defined in core/typings.ts:219</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="user_id" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>user_<wbr/>id</span><a href="#user_id" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">user_<wbr/>id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -959,7 +979,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from UserBase.user_id</p>
 <ul>
-<li>Defined in core/typings.ts:203</li></ul></aside></section>
+<li>Defined in core/typings.ts:211</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="user_name" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>user_<wbr/>name</span><a href="#user_name" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">user_<wbr/>name</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
@@ -968,7 +988,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from UserBase.user_name</p>
 <ul>
-<li>Defined in core/typings.ts:207</li></ul></aside></section>
+<li>Defined in core/typings.ts:215</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="withdraw" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>withdraw</span><a href="#withdraw" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">withdraw</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -990,7 +1010,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.withdraw</p>
 <ul>
-<li>Defined in core/typings.ts:482</li></ul></aside></section>
+<li>Defined in core/typings.ts:490</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="withdrawReaction" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>withdraw<wbr/>Reaction</span><a href="#withdrawReaction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">withdraw<wbr/>Reaction</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span></div>
@@ -1012,7 +1032,7 @@
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.withdrawReaction</p>
 <ul>
-<li>Defined in core/typings.ts:486</li></ul></aside></section></section>
+<li>Defined in core/typings.ts:494</li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="deleteEmoji" class="tsd-anchor"></a>
@@ -1036,7 +1056,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.deleteEmoji</p>
 <ul>
-<li>Defined in core/typings.ts:458</li></ul></aside></li></ul></section>
+<li>Defined in core/typings.ts:466</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getEmoji" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>get<wbr/>Emoji</span><a href="#getEmoji" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -1054,7 +1074,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.getEmoji</p>
 <ul>
-<li>Defined in core/typings.ts:472</li></ul></aside></li></ul></section>
+<li>Defined in core/typings.ts:480</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="reply" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>reply</span><a href="#reply" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -1090,7 +1110,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.reply</p>
 <ul>
-<li>Defined in core/typings.ts:405</li></ul></aside></li></ul></section>
+<li>Defined in core/typings.ts:413</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="replyCard" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>reply<wbr/>Card</span><a href="#replyCard" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -1108,7 +1128,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.replyCard</p>
 <ul>
-<li>Defined in core/typings.ts:429</li></ul></aside></li></ul></section>
+<li>Defined in core/typings.ts:437</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="replyEmoji" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>reply<wbr/>Emoji</span><a href="#replyEmoji" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -1128,7 +1148,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.replyEmoji</p>
 <ul>
-<li>Defined in core/typings.ts:451</li></ul></aside></li></ul></section>
+<li>Defined in core/typings.ts:459</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="replyPrivate" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>reply<wbr/>Private</span><a href="#replyPrivate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -1162,7 +1182,7 @@ QQ频道使用</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.replyPrivate</p>
 <ul>
-<li>Defined in core/typings.ts:439</li></ul></aside></li></ul></section>
+<li>Defined in core/typings.ts:447</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="updateEmoji" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>update<wbr/>Emoji</span><a href="#updateEmoji" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -1183,7 +1203,7 @@ QQ频道使用</p>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from ApiBase.updateEmoji</p>
 <ul>
-<li>Defined in core/typings.ts:465</li></ul></aside></li></ul></section></section></div>
+<li>Defined in core/typings.ts:473</li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -1206,7 +1226,9 @@ QQ频道使用</p>
 <li><a href="#at" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>at</span></a></li>
 <li><a href="#at_user" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>at_<wbr/>user</span></a></li>
 <li><a href="#at_users" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>at_<wbr/>users</span></a></li>
+<li><a href="#attribute" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>attribute</span></a></li>
 <li><a href="#bot" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>bot</span></a></li>
+<li><a href="#boundaries" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>boundaries</span></a></li>
 <li><a href="#channel_id" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>channel_<wbr/>id</span></a></li>
 <li><a href="#channel_name" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>channel_<wbr/>name</span></a></li>
 <li><a href="#createChannel" class="tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>create<wbr/>Channel</span></a></li>
