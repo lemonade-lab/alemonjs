@@ -13,11 +13,13 @@ import { getServerConfig, setServerCoinfg } from './config.js'
  * @param logFnc
  */
 export function createWeb(
-  val: ServerOptions,
+  val?: ServerOptions,
   logFnc?: (port: number) => Promise<void>
 ) {
-  for (const item in val) {
-    setServerCoinfg(item as keyof ServerOptions, val[item])
+  if (val) {
+    for (const item in val) {
+      setServerCoinfg(item as keyof ServerOptions, val[item])
+    }
   }
   // 创建 Koa 应用
   const app = new Koa()
@@ -74,9 +76,8 @@ export function createWeb(
     // 启动应用
     app
       .listen(port, async () => {
-        if (logFnc) {
-          await logFnc(port)
-        }
+        if (logFnc) await logFnc(port)
+        console.log('[AlemonJS]', 'KOA', `http://[::]:${port}`)
       })
       .on('error', handlePortConflict)
   }

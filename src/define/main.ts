@@ -168,15 +168,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 挂起web服务
    * **********
    */
-  if (Options.server.state != false) {
+  if (Options?.server?.state != false) {
     // 创建server端
-    createWeb({
-      port: Options.server.port,
-      http: Options.server.http,
-      imgRouter: Options.server.imgRouter,
-      imgDir: Options.server.imgDir,
-      imgSize: Options.server.imgSize
-    })
+    createWeb(Options?.server)
   }
 
   /**

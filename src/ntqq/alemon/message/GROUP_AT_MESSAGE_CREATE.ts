@@ -5,11 +5,11 @@ import {
   getIP,
   getUrlbuffer
 } from '../../../core/index.js'
-import { ClientAPIByQQ as Client, getWebConfig } from '../../sdk/index.js'
+import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import { ExampleObject } from '../types.js'
+import { GROUP_DATA } from '../types.js'
 import { ClientKOA } from '../../../koa/index.js'
 import IMGS from 'image-size'
 import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
@@ -20,7 +20,7 @@ import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
  * @param data  原数据
  * @returns
  */
-export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
+export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   /**
    * 获取ip
    */
@@ -60,8 +60,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
      */
     e.isMaster = true
   }
-
-  const webCfg = getWebConfig()
 
   /**
    * 消息发送机制

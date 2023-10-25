@@ -5,23 +5,16 @@ import {
   getIP,
   getUrlbuffer
 } from '../../../core/index.js'
-import { ClientAPIByQQ as Client, getWebConfig } from '../../sdk/index.js'
+import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
-import { ExampleObject } from '../types.js'
+import { USER_DATA } from '../types.js'
 import IMGS from 'image-size'
 import { ClientKOA } from '../../../koa/index.js'
 import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
 
-export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
-  /**
-   * 获取ip
-   */
-  const ip = await getIP()
-
+export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const e = {} as AMessage
-
-  const webCfg = getWebConfig()
 
   e.platform = 'ntqq'
   e.bot = getBotMsgByNtqq()
@@ -45,12 +38,13 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         if (Buffer.isBuffer(msg)) {
           const url = await ClientKOA.setLocalImg(msg)
           if (!url) return false
-          return await Client.postFilesByGroup(event.group_id, url).catch(
-            err => {
-              console.error(err)
-              return err
-            }
-          )
+          return await Client.postFilesByUsers(
+            event.author.user_openid,
+            url
+          ).catch(err => {
+            console.error(err)
+            return err
+          })
         }
       } catch (err) {
         return err
@@ -66,8 +60,8 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
         const dimensions = IMGS.imageSize(msg[isBuffer])
         const url = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
         if (!url) return false
-        return await Client.postMessageByGroup(
-          event.group_id,
+        return await Client.postMessageByUser(
+          event.author.user_openid,
           `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           event.id
         ).catch(err => {
@@ -100,14 +94,15 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
       if (Buffer.isBuffer(msg)) {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByGroup(event.group_id, url).catch(
-          err => err
-        )
+        return await Client.postFilesByUsers(
+          event.author.user_openid,
+          url
+        ).catch(err => err)
       }
     }
 
     return await Client.postMessageByUser(
-      event.author.id,
+      event.author.user_openid,
       content,
       event.id
     ).catch(err => {
@@ -175,9 +170,9 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
 
   e.user_name = '柠檬冲水'
 
-  e.channel_id = event.group_id
+  e.channel_id = event.author.user_openid // 私聊重置为用户open编号
 
-  e.guild_id = event.group_id
+  e.guild_id = event.author.user_openid
 
   e.segment = segmentQQ
 
