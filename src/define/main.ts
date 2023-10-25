@@ -18,7 +18,7 @@ import {
   setBotConfigByKey,
   getBotConfigByKey
 } from '../config/index.js'
-import { createWeb } from 'src/koa/client.js'
+import { createWeb } from '../koa/client.js'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
@@ -168,11 +168,8 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 挂起web服务
    * **********
    */
-
-  if (Options.server) {
-    /**
-     * 创建web端
-     */
+  if (Options.server.state != false) {
+    // 创建server端
     createWeb({
       port: Options.server.port,
       http: Options.server.http,
@@ -257,6 +254,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.mount !== false) {
     await appsInit()
   }
+
   /**
    * 延迟执行
    */
