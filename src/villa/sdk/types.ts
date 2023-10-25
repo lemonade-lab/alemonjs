@@ -6,9 +6,6 @@ export interface ClientConfig {
   bot_secret?: string
   callback_url?: string
   callback_port?: number
-  img_url?: string
-  img_size?: number
-  IMAGE_DIR?: string
 }
 /**
  *  api路径地址

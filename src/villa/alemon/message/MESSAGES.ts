@@ -59,9 +59,7 @@ const error = err => {
  */
 const unloading = async (villa_id: number, uul: string) => {
   const NowObj = await Client.transferImage(villa_id, uul)
-  if (!NowObj?.new_url) {
-    return uul
-  }
+  if (!NowObj?.new_url) return uul
   return NowObj.new_url
 }
 

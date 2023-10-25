@@ -9,6 +9,7 @@ import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
 import { ClientAPIByQQ as Client } from '../../sdk/index.js'
+import { AlemonJSEventError, AlemonJSEventLog } from 'src/log/event.js'
 
 declare global {
   //接口对象
@@ -179,14 +180,7 @@ export const GUILD_MEMBERS = async (event: any) => {
     }
   } as AMessage
 
-  await typeMessage(e)
-    .then(() => {
-      console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)
-      return true
-    })
-    .catch(err => {
-      console.error(err)
-      console.error(`\n[${e.event}] [${e.eventType}] [${false}]`)
-      return false
-    })
+  return await typeMessage(e)
+    .then(() => AlemonJSEventLog(e.event, e.eventType))
+    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
 }

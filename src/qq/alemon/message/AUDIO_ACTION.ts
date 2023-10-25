@@ -1,3 +1,4 @@
+import { AlemonJSEventError, AlemonJSEventLog } from 'src/log/event.js'
 import { typeMessage, AMessage } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 /**
@@ -47,14 +48,7 @@ export const AUDIO_ACTION = async (event: any) => {
     }
   }
 
-  await typeMessage(e)
-    .then(() => {
-      console.info(`\n[${e.event}] [${e.eventType}] [${true}]`)
-      return true
-    })
-    .catch(err => {
-      console.error(err)
-      console.info(`\n[${e.event}] [${e.eventType}]\n${false}`)
-      return false
-    })
+  return await typeMessage(e)
+    .then(() => AlemonJSEventLog(e.event, e.eventType))
+    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
 }

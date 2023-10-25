@@ -44,7 +44,11 @@ export async function sendMessageImage(
  * @param text 文本
  * @returns
  */
-export async function sendMessageText(villa_id: number, room_id: number, text: string) {
+export async function sendMessageText(
+  villa_id: number,
+  room_id: number,
+  text: string
+) {
   return await sendMessage(villa_id, {
     /**
      *  房间号

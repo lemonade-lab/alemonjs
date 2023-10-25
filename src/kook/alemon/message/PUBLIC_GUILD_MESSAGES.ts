@@ -8,6 +8,7 @@ import { KOOKApiClient, EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
+import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
 
 /**
  *
@@ -248,18 +249,10 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     }
   } as AMessage
 
-  await InstructionMatching(e)
-    .then(() => {
-      console.info(
-        `\n[${e.channel_id}] [${e.user_name}] [${true}] ${e.msg_txt}`
-      )
-      return true
-    })
-    .catch((err: any) => {
-      console.error(err)
-      console.info(
-        `\n[${e.channel_id}] [${e.user_name}] [${false}] ${e.msg_txt}`
-      )
-      return false
-    })
+  /**
+   * 业务处理
+   */
+  return await InstructionMatching(e)
+    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
+    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }

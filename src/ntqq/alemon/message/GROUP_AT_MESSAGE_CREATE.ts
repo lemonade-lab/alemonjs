@@ -12,6 +12,7 @@ import { getBotConfigByKey } from '../../../config/index.js'
 import { ExampleObject } from '../types.js'
 import { ClientKOA } from '../../../koa/index.js'
 import IMGS from 'image-size'
+import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
 
 /**
  * 公私域合并
@@ -256,20 +257,9 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
   }
 
   /**
-   * 消息处理
+   * 业务处理
    */
-  await InstructionMatching(e)
-    .then(() => {
-      console.info(
-        `\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`
-      )
-      return
-    })
-    .catch((err: any) => {
-      console.error(err)
-      console.info(
-        `\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`
-      )
-      return
-    })
+  return await InstructionMatching(e)
+    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
+    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }

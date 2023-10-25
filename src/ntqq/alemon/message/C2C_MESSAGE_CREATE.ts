@@ -11,6 +11,7 @@ import { getBotMsgByNtqq } from '../bot.js'
 import { ExampleObject } from '../types.js'
 import IMGS from 'image-size'
 import { ClientKOA } from '../../../koa/index.js'
+import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
 
 export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
   /**
@@ -195,24 +196,9 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
   e.at = false
 
   /**
-   * 消息处理
+   * 业务处理
    */
-  await InstructionMatching(e)
-    .then(() => {
-      console.info(
-        console.info(
-          `\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`
-        )
-      )
-      return true
-    })
-    .catch((err: any) => {
-      console.error(err)
-      console.info(
-        console.info(
-          `\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`
-        )
-      )
-      return false
-    })
+  return await InstructionMatching(e)
+    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
+    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }

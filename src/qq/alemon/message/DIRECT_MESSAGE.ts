@@ -10,6 +10,7 @@ import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
+import { AlemonJSError, AlemonJSLog } from 'src/log/user.js'
 
 declare global {
   //接口对象
@@ -252,24 +253,9 @@ async function directMessage(e: AMessage, event: directEventData) {
   e.at = false
 
   /**
-   * 消息处理
+   * 业务处理
    */
-  await InstructionMatching(e)
-    .then(() => {
-      console.info(
-        console.info(
-          `\n[${e.channel_id}] [${e.user_name}] [${true}] \n ${e.msg_txt}`
-        )
-      )
-      return true
-    })
-    .catch((err: any) => {
-      console.error(err)
-      console.info(
-        console.info(
-          `\n[${e.channel_id}] [${e.user_name}] [${false}] \n ${e.msg_txt}`
-        )
-      )
-      return false
-    })
+  return await InstructionMatching(e)
+    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
+    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }
