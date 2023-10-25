@@ -3,6 +3,7 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 import { type ClientConfig, type BotEvent } from './types.js'
 import { setClientConfig } from './config.js'
+import { getIP } from '../../core/index.js'
 
 /**
  * tudo
@@ -122,6 +123,18 @@ export function createClient(
       .listen(port, async () => {
         if (logFnc) {
           await logFnc(port)
+        }
+
+        // 获取ip4
+        const ip = await getIP()
+        if (ip) {
+          console.info(
+            '[VILLA OPEN]',
+            `http://${ip}:${port ?? 8080}${callback_url ?? '/api/mys/callback'}`
+          )
+        } else {
+          console.error('[VILLA] 公网IP识别失败,无法支持运行')
+          return
         }
       })
       .on('error', handlePortConflict)
