@@ -43,7 +43,10 @@ export async function getGatewayUrl(
  * @param token
  * @param callBack
  */
-export async function createClient(token: string, callBack: Function) {
+export async function createClient(
+  token: string,
+  callBack: (...args: any[]) => any
+) {
   /**
    * 设置token
    */
