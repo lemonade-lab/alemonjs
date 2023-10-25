@@ -72,9 +72,9 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     msg: Buffer | string | (Buffer | string)[],
     select?: {
       quote?: string
-      withdraw?: boolean
+      withdraw?: number
     }
-  ): Promise<boolean> => {
+  ): Promise<any> => {
     // isBuffer
 
     if (Buffer.isBuffer(msg)) {
@@ -332,10 +332,10 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
   e.replyPrivate = async (
     msg: Buffer | string | (Buffer | string)[],
     select?: {
-      quote?: boolean
-      withdraw?: boolean
+      quote?: string
+      withdraw?: number
     }
-  ): Promise<boolean> => {
+  ): Promise<any> => {
     return await Private(event.msg, msg).catch(err => {
       console.error(err)
       return err

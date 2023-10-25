@@ -17,10 +17,10 @@ export const Private = async (
   EMessage: QQEMessage,
   msg: Buffer | string | (Buffer | string)[],
   select?: {
-    quote?: boolean
-    withdraw?: boolean
+    quote?: string
+    withdraw?: number
   }
-): Promise<boolean> => {
+): Promise<any> => {
   const postSessionRes: any = await clientApiByQQ.directMessageApi
     .createDirectMessage({
       source_guild_id: EMessage.guild_id,

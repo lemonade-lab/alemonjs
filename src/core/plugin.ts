@@ -132,15 +132,15 @@ export class plugin {
    * @param name 指定图片名
    * @returns 是否处理完成
    */
-  reply(
+  async reply(
     content: Buffer | string | (Buffer | string)[],
     select?: {
       quote?: string
-      withdraw?: boolean
+      withdraw?: number
     }
   ) {
     if (!this.e.reply || !content || content == '') return false
-    return this.e.reply(content, select)
+    return await this.e.reply(content, select)
   }
 
   /**

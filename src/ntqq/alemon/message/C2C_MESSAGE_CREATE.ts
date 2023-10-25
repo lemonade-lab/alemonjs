@@ -35,9 +35,9 @@ export const C2C_MESSAGE_CREATE = async (event: ExampleObject) => {
     msg: Buffer | string | (Buffer | string)[],
     select?: {
       quote?: string
-      withdraw?: boolean
+      withdraw?: number
     }
-  ) => {
+  ): Promise<any> => {
     let url = ''
     // isBuffer
     if (Buffer.isBuffer(msg)) {

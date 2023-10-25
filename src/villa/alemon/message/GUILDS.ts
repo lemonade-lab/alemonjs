@@ -110,9 +110,9 @@ export async function GUILDS_VILLA(event: BotEvent) {
       msg: Buffer | string | (Buffer | string)[],
       select?: {
         quote?: string
-        withdraw?: boolean
+        withdraw?: number
       }
-    ) => {
+    ): Promise<any> => {
       return false
     }
   } as AMessage

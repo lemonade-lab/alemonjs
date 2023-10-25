@@ -72,9 +72,9 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: ExampleObject) => {
     msg: Buffer | string | (Buffer | string)[],
     select?: {
       quote?: string
-      withdraw?: boolean
+      withdraw?: number
     }
-  ): Promise<boolean> => {
+  ): Promise<any> => {
     let url = ''
     // is buffer
     if (Buffer.isBuffer(msg)) {

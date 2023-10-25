@@ -80,9 +80,9 @@ async function directMessage(e: AMessage, event: directEventData) {
     msg: Buffer | string | (Buffer | string)[],
     select?: {
       quote?: string
-      withdraw?: boolean
+      withdraw?: number
     }
-  ) => {
+  ): Promise<any> => {
     if (Buffer.isBuffer(msg)) {
       try {
         return await Client.postDirectImage({

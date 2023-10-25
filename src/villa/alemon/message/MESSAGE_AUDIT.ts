@@ -115,9 +115,9 @@ export async function MESSAGE_AUDIT_VILLA(event: BotEvent) {
       msg: Buffer | string | (Buffer | string)[],
       select?: {
         quote?: string
-        withdraw?: boolean
+        withdraw?: number
       }
-    ) => {
+    ): Promise<any> => {
       return false
     }
   } as AMessage

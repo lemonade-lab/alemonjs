@@ -96,9 +96,9 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       msg: Buffer | string | (Buffer | string)[],
       select?: {
         quote?: string
-        withdraw?: boolean
+        withdraw?: number
       }
-    ): Promise<boolean> => {
+    ): Promise<any> => {
       /**
        * isbuffer
        */

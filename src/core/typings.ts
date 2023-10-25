@@ -403,10 +403,22 @@ interface replyController {
    * 文件名会进行解析后得到正确文件后缀
    */
   reply(
+    /**
+     * 消息内容
+     */
     content: Buffer | string | (Buffer | string)[],
+    /**
+     * 选择
+     */
     select?: {
+      /**
+       * 引用消息编号,默认不引用
+       */
       quote?: string
-      withdraw?: boolean
+      /**
+       * 撤回毫秒数,默认不撤回
+       */
+      withdraw?: number
     }
   ): Promise<any>
 
@@ -427,8 +439,8 @@ interface replyController {
   replyPrivate?(
     content: Buffer | string | (Buffer | string)[],
     select: {
-      quote?: boolean
-      withdraw?: boolean
+      quote?: string
+      withdraw?: number
     }
   ): Promise<any>
 

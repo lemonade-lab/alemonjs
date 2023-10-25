@@ -76,9 +76,9 @@ export const GUILD_MEMBERS = async (event: any) => {
       msg: Buffer | string | (Buffer | string)[],
       select?: {
         quote?: string
-        withdraw?: boolean
+        withdraw?: number
       }
-    ): Promise<boolean> => {
+    ): Promise<any> => {
       // is buffer
       if (Buffer.isBuffer(msg)) {
         try {

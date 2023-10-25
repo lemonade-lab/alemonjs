@@ -241,9 +241,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       msg: Buffer | string | (Buffer | string)[],
       select?: {
         quote?: string
-        withdraw?: boolean
+        withdraw?: number
       }
-    ) => {
+    ): Promise<any> => {
       /**
        * url获取
        */
