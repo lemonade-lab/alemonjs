@@ -46,9 +46,9 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
         try {
           config[key] = {}
           config[key] = val[item]
-          console.info('[alemonjs][新增KEY成功]')
+          console.info('[AlemonJS]', '[新增KEY成功]')
         } catch {
-          console.info('[alemonjs][新增KEY失败]')
+          console.info('[AlemonJS]', '[新增KEY失败]')
         }
       }
     }

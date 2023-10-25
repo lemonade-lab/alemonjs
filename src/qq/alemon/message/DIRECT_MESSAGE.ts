@@ -47,7 +47,9 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
-    isGroup: false
+    isGroup: false,
+    boundaries: 'publick',
+    attribute: 'single'
   } as AMessage
 
   /**
@@ -176,7 +178,7 @@ async function directMessage(e: AMessage, event: directEventData) {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('不可用')
+    console.info('[AlemonJS]', '不可用')
     return false
   }
 
@@ -190,7 +192,7 @@ async function directMessage(e: AMessage, event: directEventData) {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('不可用')
+    console.info('[AlemonJS]', '不可用')
     return false
   }
 

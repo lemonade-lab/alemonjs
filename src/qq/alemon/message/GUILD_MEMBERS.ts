@@ -55,12 +55,12 @@ export const GUILD_MEMBERS = async (event: any) => {
     .catch(error)
 
   if (typeof ChannelsData == 'boolean') {
-    console.info(`\n[${Eevent}] [${eventType}]\n${false}`)
+    console.info('[AlemonJS]', `[${Eevent}] [${eventType}] ${false}`)
     return false
   }
 
   if (ChannelsData.length == 0) {
-    console.info(`\n[${Eevent}] [${eventType}]\n${false}`)
+    console.info('[AlemonJS]', `[${Eevent}] [${eventType}] ${false}`)
     return false
   }
 
@@ -74,6 +74,8 @@ export const GUILD_MEMBERS = async (event: any) => {
     isPrivate: false,
     isRecall: false,
     isGroup: true,
+    boundaries: 'publick',
+    attribute: 'group',
     /**
      * 发现消息
      * @param msg

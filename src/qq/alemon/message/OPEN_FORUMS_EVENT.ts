@@ -40,7 +40,9 @@ export const OPEN_FORUMS_EVENT = async (event: any) => {
     eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
-    isGroup: false
+    isGroup: false,
+    boundaries: 'publick',
+    attribute: 'group'
   } as AMessage
 
   /**

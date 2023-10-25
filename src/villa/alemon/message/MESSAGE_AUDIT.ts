@@ -27,6 +27,8 @@ export async function MESSAGE_AUDIT_VILLA(event: BotEvent) {
    */
   const e = {
     platform: 'villa',
+    boundaries: 'publick',
+    attribute: 'group',
     /**
      * 机器人信息
      */

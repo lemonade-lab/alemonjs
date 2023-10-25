@@ -147,6 +147,14 @@ interface Serverbase {
    * 是否是群聊
    */
   isGroup: boolean
+  /**
+   * 公域 | 私域
+   */
+  boundaries: 'publick' | 'private'
+  /**
+   * 群聊 | 私聊
+   */
+  attribute: 'group' | 'single'
 }
 
 /**

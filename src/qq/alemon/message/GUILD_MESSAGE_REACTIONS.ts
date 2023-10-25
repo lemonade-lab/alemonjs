@@ -19,7 +19,9 @@ export const GUILD_MESSAGE_REACTIONS = async (event: any) => {
     eventType: 'CREATE',
     isPrivate: true,
     isRecall: false,
-    isGroup: false
+    isGroup: false,
+    boundaries: 'publick',
+    attribute: 'group'
   } as AMessage
 
   if (new RegExp(/REMOVE$/).test(event.eventType)) {

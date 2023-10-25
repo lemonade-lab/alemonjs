@@ -53,7 +53,7 @@ export const getBuffer = (localpath: string): Promise<Buffer> => {
         if (err) {
           reject(err)
         } else {
-          console.info('[BUFFER][READ]', localpath)
+          console.info('[AlemonJS]', '[BUFFER][READ]', localpath)
           resolve(bufferData)
         }
       }
@@ -69,7 +69,7 @@ export const getBuffer = (localpath: string): Promise<Buffer> => {
 export const setBuffer = (localpath: string, bufferData: Buffer) => {
   writeFile(localpath, bufferData, (err: NodeJS.ErrnoException | null) => {
     if (err) throw err
-    console.info('[BUFFER][SET]', localpath)
+    console.info('[AlemonJS]', '[BUFFER][SET]', localpath)
   })
   return
 }

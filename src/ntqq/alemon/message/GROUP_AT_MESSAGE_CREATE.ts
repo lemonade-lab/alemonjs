@@ -2,7 +2,6 @@ import {
   CardType,
   InstructionMatching,
   AMessage,
-  getIP,
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientAPIByQQ as Client } from '../../sdk/index.js'
@@ -31,14 +30,17 @@ const error = err => {
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
-  const e = {} as AMessage
-  e.platform = 'ntqq'
-  e.bot = getBotMsgByNtqq()
-  e.event = 'MESSAGES'
-  e.eventType = 'CREATE'
-  e.isPrivate = false
-  e.isRecall = false
-  e.isGroup = true
+  const e = {
+    platform: 'ntqq',
+    bot: getBotMsgByNtqq(),
+    event: 'MESSAGES',
+    eventType: 'CREATE',
+    isPrivate: false,
+    isRecall: false,
+    isGroup: true,
+    boundaries: 'publick',
+    attribute: 'group'
+  } as AMessage
 
   /**
    * 得到登录配置
@@ -82,17 +84,15 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     // is buffer
     if (Buffer.isBuffer(msg)) {
       try {
-        if (Buffer.isBuffer(msg)) {
-          // 挂载图片
-          const url = await ClientKOA.setLocalImg(msg)
-          if (!url) return false
-          return await Client.postFilesByGroup(event.group_id, url).catch(error)
-        }
+        const url = await ClientKOA.setLocalImg(msg)
+        if (!url) return false
+        return await Client.postFilesByGroup(event.group_id, url).catch(error)
       } catch (err) {
         console.error(err)
         return err
       }
     }
+
     if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
       const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
       const cont = msg.filter(element => typeof element === 'string').join('')
@@ -103,22 +103,21 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
         return await Client.postMessageByGroup(
           event.group_id,
           `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-          event.id
+          select?.quote
         ).catch(error)
       } catch (err) {
         console.error(err)
         return err
       }
     }
+
     const content = Array.isArray(msg)
       ? msg.join('')
       : typeof msg === 'string'
       ? msg
       : ''
 
-    if (content == '') {
-      return false
-    }
+    if (content == '') return false
 
     /**
      * http
@@ -138,7 +137,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     return await Client.postMessageByGroup(
       event.group_id,
       content,
-      event.id
+      select?.quote
     ).catch(error)
   }
 
@@ -146,11 +145,10 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.info('暂不可用')
-          return false
-        } else {
+          console.info('[AlemonJS]', '暂不可用')
           return false
         }
+        return false
       } catch (err) {
         console.error(err)
         return err
@@ -169,7 +167,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('暂不可用')
+    console.info('[AlemonJS]', '暂不可用')
     return false
   }
 
@@ -183,7 +181,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('暂不可用')
+    console.info('[AlemonJS]', '暂不可用')
     return false
   }
 

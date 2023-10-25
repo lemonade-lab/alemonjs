@@ -25,7 +25,9 @@ export const AUDIO_ACTION = async (event: any) => {
     eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
-    isGroup: false
+    isGroup: false,
+    boundaries: 'publick',
+    attribute: 'group'
   } as AMessage
 
   if (new RegExp(/MIC$/).test(event.eventType)) {

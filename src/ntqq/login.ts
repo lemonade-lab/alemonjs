@@ -22,7 +22,7 @@ export async function checkRobotByQQ() {
     setBotConfigByKey('ntqq', config)
     return true
   }
-  console.error('[LOGIN]', '-----------------------')
-  console.error('[LOGIN]', 'ntqq配置加载失败~')
+  console.error('[AlemonJS]', '[LOGIN]', '-----------------------')
+  console.error('[AlemonJS]', '[LOGIN]', 'ntqq配置加载失败~')
   return false
 }

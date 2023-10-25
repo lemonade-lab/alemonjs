@@ -22,6 +22,8 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
    */
   const e = {
     platform: 'villa',
+    boundaries: 'publick',
+    attribute: 'group',
     /**
      * 机器人信息
      */

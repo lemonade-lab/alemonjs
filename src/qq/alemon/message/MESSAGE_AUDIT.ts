@@ -19,7 +19,9 @@ export const MESSAGE_AUDIT = async (event: any) => {
     eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
-    isGroup: false
+    isGroup: false,
+    boundaries: 'publick',
+    attribute: 'group'
   } as AMessage
 
   /**

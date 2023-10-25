@@ -33,7 +33,9 @@ export const GUILD_MESSAGES = async (event: any) => {
     eventType: 'CREATE',
     isPrivate: true,
     isRecall: false,
-    isGroup: true
+    isGroup: true,
+    boundaries: 'publick',
+    attribute: 'group'
   } as AMessage
 
   /**
@@ -42,13 +44,15 @@ export const GUILD_MESSAGES = async (event: any) => {
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
+
+    e.boundaries = 'publick'
+    e.attribute = 'group'
     /**
      * 只匹配类型
      */
     return await typeMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
-    return
   }
 
   /**

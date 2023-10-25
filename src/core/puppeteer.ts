@@ -70,12 +70,12 @@ export async function pupStartCheck() {
      * 重置次数
      */
     pic = 0
-    console.info('[puppeteer] close')
+    console.info('[AlemonJS]', '[puppeteer] close')
     isBrowser = false
     browser.close().catch(err => {
       console.error('[AlemonJS]pup关闭错误', err)
     })
-    console.info('[puppeteer] reopen')
+    console.info('[AlemonJS]', '[puppeteer] reopen')
     if (!(await startChrom())) return false
     pic++
   }
@@ -108,23 +108,23 @@ export async function screenshotByFile(
     const page = await browser.newPage()
     await page.goto(`file://${htmlPath}`, { timeout })
     const body = await page.$(tab)
-    console.info('[puppeteer] success')
+    console.info('[AlemonJS]', '[puppeteer] success')
     const buff: string | false | Buffer = await body
       .screenshot(SOptions)
       .catch(err => {
-        console.error('[AlemonJS]pup截图错误', err)
+        console.error('[AlemonJS]', '[puppeteer]', '截图错误', err)
         return false
       })
     await page.close().catch((err: any) => {
-      console.error('[AlemonJS]page关闭错误', err)
+      console.error('[AlemonJS]', '[puppeteer]', 'page关闭错误', err)
     })
     if (!buff) {
-      console.error('[puppeteer]', htmlPath)
+      console.error('[AlemonJS]', '[puppeteer]', htmlPath)
       return false
     }
     return buff
   } catch (err) {
-    console.error('[AlemonJS]page实例化错误', err)
+    console.error('[AlemonJS]', 'page实例化错误', err)
     return false
   }
 }
@@ -177,7 +177,7 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
     const body = await page.$(tab)
     if (!body) {
       await page.close()
-      console.error('[AlemonJS]tab 获取失败')
+      console.error('[AlemonJS]', 'tab 获取失败')
       return false
     }
     await new Promise(resolve => setTimeout(resolve, time ?? 1000))
@@ -190,17 +190,17 @@ export async function screenshotByUrl(val: urlScreenshotOptions) {
         }
       )
       .catch(err => {
-        console.error('[AlemonJS]page截图错误', err)
+        console.error('[AlemonJS]', 'page截图错误', err)
         return false
       })
     await page.close()
     if (!buff) {
-      console.error('[AlemonJS]buff截图错误', url)
+      console.error('[AlemonJS]', 'buff截图错误', url)
       return false
     }
     return buff
   } catch (err) {
-    console.error('[AlemonJS]page实例化错误', err)
+    console.error('[AlemonJS]', 'page实例化错误', err)
     return false
   }
 }
@@ -213,11 +213,11 @@ export async function startChrom(): Promise<boolean> {
   try {
     browser = await puppeteer.launch(LaunchCfg)
     isBrowser = true
-    console.info('[puppeteer] open success')
+    console.info('[AlemonJS]', '[puppeteer] open success')
     return true
   } catch (err) {
     isBrowser = false
-    console.error('[puppeteer] 打开错误', err)
+    console.error('[AlemonJS]', '[puppeteer] 打开错误', err)
     return false
   }
 }

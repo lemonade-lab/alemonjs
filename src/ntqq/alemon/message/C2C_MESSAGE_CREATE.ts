@@ -2,7 +2,6 @@ import {
   CardType,
   InstructionMatching,
   AMessage,
-  getIP,
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientAPIByQQ as Client } from '../../sdk/index.js'
@@ -24,15 +23,19 @@ const error = err => {
 }
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
-  const e = {} as AMessage
-
-  e.platform = 'ntqq'
-  e.bot = getBotMsgByNtqq()
-  e.event = 'MESSAGES'
-  e.eventType = 'CREATE'
-  e.isPrivate = false
-  e.isRecall = false
-  e.isGroup = false
+  const e = {
+    platform: 'ntqq',
+    bot: getBotMsgByNtqq(),
+    event: 'MESSAGES',
+    eventType: 'CREATE',
+    // 是私
+    isPrivate: false,
+    isRecall: false,
+    isGroup: false,
+    boundaries: 'publick',
+    // 是私聊
+    attribute: 'single'
+  } as AMessage
 
   /* 消息发送机制 */
   e.reply = async (
@@ -45,15 +48,14 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     // isBuffer
     if (Buffer.isBuffer(msg)) {
       try {
-        if (Buffer.isBuffer(msg)) {
-          const url = await ClientKOA.setLocalImg(msg)
-          if (!url) return false
-          return await Client.postFilesByUsers(
-            event.author.user_openid,
-            url
-          ).catch(error)
-        }
+        const url = await ClientKOA.setLocalImg(msg)
+        if (!url) return false
+        return await Client.postFilesByUsers(
+          event.author.user_openid,
+          url
+        ).catch(error)
       } catch (err) {
+        console.error(err)
         return err
       }
     }
@@ -70,7 +72,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         return await Client.postMessageByUser(
           event.author.user_openid,
           `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-          event.id
+          select?.quote
         ).catch(error)
       } catch (err) {
         console.error(err)
@@ -108,7 +110,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     return await Client.postMessageByUser(
       event.author.user_openid,
       content,
-      event.id
+      select?.quote
     ).catch(error)
   }
 
@@ -116,7 +118,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.info('暂不可用')
+          console.info('[AlemonJS]', '暂不可用')
           return false
         } else {
           return false
@@ -139,7 +141,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('不可用')
+    console.info('[AlemonJS]', '不可用')
     return false
   }
 
@@ -153,7 +155,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('不可用')
+    console.info('[AlemonJS]', '不可用')
     return false
   }
 

@@ -17,14 +17,14 @@ export async function command(cess: 'execSync' | 'exec', cmd: string) {
   try {
     // 切换目录
     process.chdir(dirPath)
-    console.info(`[command] ${cmd}`)
+    console.info('[AlemonJS]', `[command] ${cmd}`)
     if (cess == 'execSync') {
       execSync(cmd, { stdio: 'inherit' })
     } else if (cess == 'exec') {
       exec(cmd)
     }
-  } catch (error) {
-    console.info(`${error}`)
+  } catch (err) {
+    console.error(err)
     return
   }
 }

@@ -17,7 +17,7 @@ export async function checkRobotByVilla() {
     setBotConfigByKey('villa', config)
     return true
   }
-  console.error('[LOGIN]', '-----------------------')
-  console.error('[LOGIN]', 'VILLA配置加载失败~')
+  console.error('[AlemonJS]', '[LOGIN]', '-----------------------')
+  console.error('[AlemonJS]', '[LOGIN]', 'VILLA配置加载失败~')
   return false
 }

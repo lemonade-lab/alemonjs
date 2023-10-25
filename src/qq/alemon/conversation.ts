@@ -38,7 +38,7 @@ export const createConversationByQQ = ws => {
    */
   ws.on(SessionEvents.READY, async data => {
     const cfg = getBotConfigByKey('qq')
-    if (cfg.sandbox) console.info('[READY]', data)
+    if (cfg.sandbox) console.info('[AlemonJS]', '[READY]', data)
     const robot: BotData = data.msg
     const bot = {
       id: robot.user.id,
@@ -113,59 +113,59 @@ export const createConversationByQQ = ws => {
      * 审核事件监听
      */
     ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, AUDIO_ACTION)
-    console.info('[QQ]', ` 欢迎回来 ${bot.name}`)
+    console.info('[AlemonJS]', '[QQ]', ` 欢迎回来 ${bot.name}`)
   })
 
   /**
    * 权限错误
    */
   ws.on(SessionEvents.ERROR, (one: any) => {
-    console.error('[ERROR]', one)
+    console.error('[AlemonJS]', '[ERROR]', one)
   })
 
   /**
    * 超长断连
    */
   ws.on(SessionEvents.DEAD, (one: any) => {
-    console.error('DEAD', one)
-    console.error('请确认配置！')
-    console.error('账户密码是否正确？')
-    console.error('域事件是否匹配？')
+    console.error('[AlemonJS]', 'DEAD', one)
+    console.error('[AlemonJS]', '请确认配置！')
+    console.error('[AlemonJS]', '账户密码是否正确？')
+    console.error('[AlemonJS]', '域事件是否匹配？')
   })
 
   /**
    * 关闭
    */
   ws.on(SessionEvents.CLOSED, (one: any) => {
-    console.error('[CLOSED]', one)
+    console.error('[AlemonJS]', '[CLOSED]', one)
   })
 
   /**
    * 断开连接
    */
   ws.on(SessionEvents.DISCONNECT, (one: any) => {
-    console.error('[DISCONNECT]', one)
+    console.error('[AlemonJS]', '[DISCONNECT]', one)
   })
 
   /**
    * 无效会话
    */
   ws.on(SessionEvents.INVALID_SESSION, (one: any) => {
-    console.error('[INVALID_SESSION]', one)
+    console.error('[AlemonJS]', '[INVALID_SESSION]', one)
   })
 
   /**
    * 再连接
    */
   ws.on(SessionEvents.RECONNECT, (one: any) => {
-    console.error('[RECONNECT]', one)
+    console.error('[AlemonJS]', '[RECONNECT]', one)
   })
 
   /**
    * 重新开始
    */
   ws.on(SessionEvents.RESUMED, (one: any) => {
-    console.error('[RESUMED]', one)
+    console.error('[AlemonJS]', '[RESUMED]', one)
   })
 
   /**
@@ -173,7 +173,7 @@ export const createConversationByQQ = ws => {
    */
   ws.on(SessionEvents.EVENT_WS, async one => {
     if (one.eventType == 'DISCONNECT') {
-      console.info('[EVENT_WS][DISCONNECT]', one)
+      console.info('[AlemonJS]', '[EVENT_WS][DISCONNECT]', one)
     }
   })
 }

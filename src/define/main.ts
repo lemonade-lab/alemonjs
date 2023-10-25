@@ -18,7 +18,8 @@ import {
   setBotConfigByKey,
   getBotConfigByKey
 } from '../config/index.js'
-import { createWeb } from '../koa/client.js'
+import { createWeb } from '../koa/index.js'
+import { autoClearImages } from '../koa/img.js'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
@@ -160,7 +161,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ********
    */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
-    console.info('[LOGIN] 无登录配置')
+    console.info('[AlemonJS]', '[LOGIN] 无登录配置')
   }
 
   /**
@@ -171,6 +172,8 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.server?.state != false) {
     // 创建server端
     createWeb(Options?.server)
+    // 定时清除
+    autoClearImages()
   }
 
   /**

@@ -10,10 +10,6 @@ import { now_e } from './e.js'
  */
 
 /**
- * 涉及房间的接口不可用
- */
-
-/**
  * 成员进出
  * @param event 回调数据
  * @param val  类型控制
@@ -28,6 +24,8 @@ export async function GUILD_MEMBERS_VILLA(event: BotEvent) {
    */
   const e = {
     platform: 'villa',
+    boundaries: 'publick',
+    attribute: 'group',
     /**
      * 机器人信息
      */

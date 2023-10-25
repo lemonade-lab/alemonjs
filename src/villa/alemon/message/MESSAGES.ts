@@ -2,7 +2,6 @@ import {
   AMessage,
   InstructionMatching,
   UserType,
-  getIP,
   getUrlbuffer
 } from '../../../core/index.js'
 import { BotEvent, MessageContentType, Client } from '../../sdk/index.js'
@@ -184,6 +183,8 @@ export async function MESSAGES_VILLA(event: BotEvent) {
    */
   const e = {
     platform: 'villa',
+    boundaries: 'publick',
+    attribute: 'group',
     /**
      * 机器人信息
      */

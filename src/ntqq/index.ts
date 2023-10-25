@@ -65,7 +65,7 @@ export async function createAlemonByNtqq() {
        */
       setBotNTQQConfig(g)
 
-      console.info('刷新时间:', data.expires_in, '秒')
+      console.info('[AlemonJS]', '刷新时间:', data.expires_in, '秒')
 
       setTimeout(bal, data.expires_in * 1000)
     }

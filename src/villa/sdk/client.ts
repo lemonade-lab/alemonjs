@@ -57,7 +57,7 @@ export function createClient(
         return
       }
       await callBack(event).catch(err => {
-        console.error('回调出错')
+        console.error('[AlemonJS]', '回调出错')
         console.error(err)
       })
     } catch (err) {
@@ -88,16 +88,19 @@ export function createClient(
    */
   function handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.error(`端口 ${currentPort} 被占用，尝试启动新的端口...`)
+      console.error(
+        '[AlemonJS]',
+        `端口 ${currentPort} 被占用，尝试启动新的端口...`
+      )
       currentPort++
       size++
       if (size >= 10) {
-        console.error('寻端失败~')
+        console.error('[AlemonJS]', '寻端失败~')
         return
       }
       createApp(currentPort)
     } else {
-      console.error('启动应用程序时发生错误：', err)
+      console.error('[AlemonJS]', '启动应用程序时发生错误：', err)
     }
   }
 
@@ -129,11 +132,12 @@ export function createClient(
         const ip = await getIP()
         if (ip) {
           console.info(
+            '[AlemonJS]',
             '[VILLA OPEN]',
             `http://${ip}:${port ?? 8080}${callback_url ?? '/api/mys/callback'}`
           )
         } else {
-          console.error('[VILLA] 公网IP识别失败,无法支持运行')
+          console.error('[AlemonJS]', '[VILLA] 公网IP识别失败,无法支持运行')
           return
         }
       })

@@ -3,9 +3,6 @@ import { AMessage, typeMessage } from '../../../core/index.js'
 import { BotEvent } from '../../sdk/index.js'
 import { segmentVilla } from '../segment.js'
 import { now_e } from './e.js'
-/**
- * 涉及房间的接口不可用
- */
 
 /**
  * 机器人进出
@@ -22,6 +19,8 @@ export async function GUILDS_VILLA(event: BotEvent) {
    */
   const e = {
     platform: 'villa',
+    boundaries: 'publick',
+    attribute: 'group',
     /**
      * 机器人信息
      */

@@ -33,8 +33,6 @@ export * from './api.js'
  */
 process.on('SIGINT', signals => {
   console.info(signals)
-  if (process.pid) {
-    process.exit()
-  }
+  if (process.pid) process.exit()
   return
 })

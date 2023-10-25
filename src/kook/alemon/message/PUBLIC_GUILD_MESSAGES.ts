@@ -80,6 +80,8 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     isRecall: false,
     isMaster: isMaster,
     isGroup: event.channel_type == 'GROUP' ? true : false,
+    boundaries: 'private',
+    attribute: event.channel_type == 'GROUP' ? 'group' : 'single',
     at,
     at_users,
     at_user,

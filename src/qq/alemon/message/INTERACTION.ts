@@ -18,7 +18,9 @@ export const INTERACTION = async event => {
     eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
-    isGroup: false
+    isGroup: false,
+    boundaries: 'publick',
+    attribute: 'group'
   } as AMessage
 
   /**

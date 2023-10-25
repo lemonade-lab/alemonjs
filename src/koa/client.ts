@@ -5,6 +5,7 @@ import { mkdirSync } from 'fs'
 import { getLocalImg } from './img.js'
 import { ServerOptions } from './types.js'
 import { getServerConfig, setServerCoinfg } from './config.js'
+import { join } from 'path'
 
 /**
  * 创建客户端
@@ -28,13 +29,12 @@ export function createWeb(
   // 处理 POST 请求体中的 JSON 数据
   app.use(bodyParser())
 
-  const imgDir = getServerConfig('imgDir')
-  const imgRouter = getServerConfig('imgRouter')
   // 确保目录存在
-  mkdirSync(imgDir, { recursive: true })
-  mkdirSync(imgRouter, { recursive: true })
+  const imgDir = getServerConfig('imgDir')
+  mkdirSync(join(process.cwd(), imgDir), { recursive: true })
 
   // 处理图片请求
+  const imgRouter = getServerConfig('imgRouter')
   router.get(`${imgRouter}/:filename`, getLocalImg)
 
   const port = getServerConfig('port')
@@ -53,16 +53,19 @@ export function createWeb(
    */
   function handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.error(`端口 ${currentPort} 被占用，尝试启动新的端口...`)
+      console.error(
+        '[AlemonJS]',
+        `端口 ${currentPort} 被占用，尝试启动新的端口...`
+      )
       currentPort++
       size++
       if (size >= 10) {
-        console.error('寻端失败~')
+        console.error('[AlemonJS]', '寻端失败~')
         return
       }
       createApp(currentPort)
     } else {
-      console.error('启动应用程序时发生错误：', err)
+      console.error('[AlemonJS]', '启动应用程序时发生错误：', err)
     }
   }
 

@@ -33,7 +33,9 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventData) => {
     eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
-    isGroup: true // 群聊
+    isGroup: true,
+    boundaries: 'publick',
+    attribute: 'group'
   } as AMessage
 
   /**
@@ -45,7 +47,6 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventData) => {
     return await typeMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
-    return
   }
 
   /**

@@ -96,10 +96,10 @@ export async function postFilesByGroup(
 export async function postMessageByUser(
   openid: string,
   content: string,
-  msg_id
+  msg_id?: string
 ) {
   const { appID } = getBotConfig()
-
+  // 判断是否是md
   if (/\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
     // md
     return requestService({
@@ -125,7 +125,6 @@ export async function postMessageByUser(
       data: {
         content: content,
         msg_id: msg_id,
-        // markdown: { content },
         msg_type: 0 //  0 文本  1 图文 2 md 3 ark 4 embed
       }
     })
@@ -144,6 +143,7 @@ export async function postMessageByGroup(
   msg_id?: string
 ) {
   const { appID } = getBotConfig()
+  // 判断是否是md
   if (/\[[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
     // md
     return requestService({
