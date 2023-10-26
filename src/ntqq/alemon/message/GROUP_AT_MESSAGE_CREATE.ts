@@ -145,7 +145,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.info('暂不可用')
+          console.info('temporarily unavailable')
           return false
         }
         return false
@@ -167,7 +167,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('暂不可用')
+    console.info('temporarily unavailable')
     return false
   }
 
@@ -181,7 +181,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('暂不可用')
+    console.info('temporarily unavailable')
     return false
   }
 

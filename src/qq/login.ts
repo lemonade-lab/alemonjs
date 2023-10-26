@@ -23,7 +23,7 @@ export async function checkRobotByQQ() {
     setBotConfigByKey('qq', config)
     return true
   }
-  console.error('[LOGIN]', '-----------------------')
-  console.error('[LOGIN]', 'QQ配置加载失败~')
+  console.error('login', '-----------------------')
+  console.error('login', 'QQ config err')
   return false
 }

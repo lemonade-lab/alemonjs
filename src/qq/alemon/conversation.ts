@@ -38,7 +38,7 @@ export const createConversationByQQ = ws => {
    */
   ws.on(SessionEvents.READY, async data => {
     const cfg = getBotConfigByKey('qq')
-    if (cfg.sandbox) console.info('[READY]', data)
+    if (cfg.sandbox) console.info('ready', data)
     const robot: BotData = data.msg
     const bot = {
       id: robot.user.id,
@@ -113,59 +113,56 @@ export const createConversationByQQ = ws => {
      * 审核事件监听
      */
     ws.on(AvailableIntentsEventsEnum.AUDIO_ACTION, AUDIO_ACTION)
-    console.info('[QQ]', ` 欢迎回来 ${bot.name}`)
+    console.info('qq', 'Welcome back', bot.name)
   })
 
   /**
    * 权限错误
    */
   ws.on(SessionEvents.ERROR, (one: any) => {
-    console.error('[ERROR]', one)
+    console.error('err', one)
   })
 
   /**
    * 超长断连
    */
   ws.on(SessionEvents.DEAD, (one: any) => {
-    console.error('DEAD', one)
-    console.error('请确认配置！')
-    console.error('账户密码是否正确？')
-    console.error('域事件是否匹配？')
+    console.error('dead', one)
   })
 
   /**
    * 关闭
    */
   ws.on(SessionEvents.CLOSED, (one: any) => {
-    console.error('[CLOSED]', one)
+    console.error('close', one)
   })
 
   /**
    * 断开连接
    */
   ws.on(SessionEvents.DISCONNECT, (one: any) => {
-    console.error('[DISCONNECT]', one)
+    console.error('disconnect', one)
   })
 
   /**
    * 无效会话
    */
   ws.on(SessionEvents.INVALID_SESSION, (one: any) => {
-    console.error('[INVALID_SESSION]', one)
+    console.error('invalid session', one)
   })
 
   /**
    * 再连接
    */
   ws.on(SessionEvents.RECONNECT, (one: any) => {
-    console.error('[RECONNECT]', one)
+    console.error('reconnect', one)
   })
 
   /**
    * 重新开始
    */
   ws.on(SessionEvents.RESUMED, (one: any) => {
-    console.error('[RESUMED]', one)
+    console.error('resumed', one)
   })
 
   /**
@@ -173,7 +170,7 @@ export const createConversationByQQ = ws => {
    */
   ws.on(SessionEvents.EVENT_WS, async one => {
     if (one.eventType == 'DISCONNECT') {
-      console.info('[EVENT_WS][DISCONNECT]', one)
+      console.info('ws disconnect', one)
     }
   })
 }

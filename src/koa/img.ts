@@ -73,13 +73,13 @@ export async function setLocalImg(img: Buffer) {
   // 文件路径
   const imagePath = join(process.cwd(), imgDir, filename)
 
-  console.log('[KOA CREATE]', imagePath)
+  console.info('server create', imagePath)
 
   // 将图片保存到文件系统中
   writeFileSync(imagePath, img)
 
   const url = `${http}://${ip}:${port}${imgRouter}/${filename}`
 
-  console.info('[KOA URL]', url)
+  console.info('server url', url)
   return url
 }

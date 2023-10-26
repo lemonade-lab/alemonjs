@@ -27,7 +27,7 @@ export async function createAlemonByVilla() {
       },
       callBackByVilla,
       async () => {
-        console.info('[HELLO] 欢迎使用大别野')
+        console.info('VILLA Welcome back')
       }
     )
     return true

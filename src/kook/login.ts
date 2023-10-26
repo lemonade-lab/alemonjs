@@ -15,7 +15,7 @@ export async function checkRobotByKOOK() {
     setBotConfigByKey('kook', config)
     return true
   }
-  console.error('[LOGIN]', '-----------------------')
-  console.error('[LOGIN]', 'KOOK配置加载失败~')
+  console.error('login', '-----------------------')
+  console.error('login', 'KOOK config err')
   return false
 }

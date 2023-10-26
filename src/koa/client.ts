@@ -53,16 +53,18 @@ export function createWeb(
    */
   function handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.error(`端口 ${currentPort} 被占用，尝试启动新的端口...`)
+      console.error(
+        `port ${currentPort} occupied, attempting to start a new port...`
+      )
       currentPort++
       size++
       if (size >= 10) {
-        console.error('寻端失败~')
+        console.error('find port err')
         return
       }
       createApp(currentPort)
     } else {
-      console.error('启动应用程序时发生错误：', err)
+      console.error('An error occurred while starting the application', err)
     }
   }
 
@@ -77,7 +79,7 @@ export function createWeb(
     app
       .listen(port, async () => {
         if (logFnc) await logFnc(port)
-        console.info('KOA', `http://[::]:${port}`)
+        console.info('server', `http://[::]:${port}`)
       })
       .on('error', handlePortConflict)
   }

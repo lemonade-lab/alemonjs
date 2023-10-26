@@ -5,7 +5,7 @@ export const now_e = {
    * @returns
    */
   replyCard: async (obj: { type: 'embed' | 'ark'; card: any }) => {
-    console.info('待实现')
+    console.info('to be implemented')
     return false
   },
   /**
@@ -15,7 +15,7 @@ export const now_e = {
    * @returns
    */
   replyByMid: async (mid: string, msg: string) => {
-    console.info('待实现')
+    console.info('to be implemented')
     return false
   },
   /**
@@ -28,7 +28,7 @@ export const now_e = {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('待实现')
+    console.info('to be implemented')
     return false
   },
   /**
@@ -41,7 +41,7 @@ export const now_e = {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('待实现')
+    console.info('to be implemented')
     return false
   }
 }

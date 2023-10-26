@@ -53,11 +53,11 @@ export function createClient(
         /**
          * 处理完毕后返回响应
          */
-        ctx.body = { message: '错误回调', retcode: 0 }
+        ctx.body = { message: 'error callback', retcode: 0 }
         return
       }
       await callBack(event).catch(err => {
-        console.error('回调出错')
+        console.error('callback error')
         console.error(err)
       })
     } catch (err) {
@@ -65,11 +65,11 @@ export function createClient(
       /**
        * 处理完毕后返回响应
        */
-      ctx.body = { message: '执行错误', retcode: 0 }
+      ctx.body = { message: 'execution error', retcode: 0 }
       return
     }
     // 处理完毕后返回响应
-    ctx.body = { message: '处理完成', retcode: 0 }
+    ctx.body = { message: 'processing completed', retcode: 0 }
   })
 
   /**
@@ -88,16 +88,18 @@ export function createClient(
    */
   function handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.error(`端口 ${currentPort} 被占用，尝试启动新的端口...`)
+      console.error(
+        `port ${currentPort} occupied, attempting to start a new port...`
+      )
       currentPort++
       size++
       if (size >= 10) {
-        console.error('寻端失败~')
+        console.error('find port err')
         return
       }
       createApp(currentPort)
     } else {
-      console.error('启动应用程序时发生错误：', err)
+      console.error('an error occurred while starting the application', err)
     }
   }
 
@@ -129,11 +131,11 @@ export function createClient(
         const ip = await getIP()
         if (ip) {
           console.info(
-            '[VILLA OPEN]',
+            'villa open',
             `http://${ip}:${port ?? 8080}${callback_url ?? '/api/mys/callback'}`
           )
         } else {
-          console.error('[VILLA] 公网IP识别失败,无法支持运行')
+          console.error('vllia no public ip')
           return
         }
       })

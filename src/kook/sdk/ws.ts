@@ -31,10 +31,10 @@ export async function getGatewayUrl(
     if (response.data.code === 0) {
       return response.data.data.url
     } else {
-      console.error('[http] err:', response.data.message)
+      console.error('http err', response.data.message)
     }
   } catch (error) {
-    console.error('[token] err:', error.message)
+    console.error('token err', error.message)
   }
 }
 
@@ -58,7 +58,7 @@ export async function createClient(
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
-      console.info('[token] ok')
+      console.info('token ok')
     })
 
     /**
@@ -128,11 +128,11 @@ export async function createClient(
          */
         case 1: {
           if (data && data.code === 0) {
-            console.info('[ws] ok')
+            console.info('ws ok')
             sessionID = data.session_id
             isConnected = true
           } else {
-            console.info('[ws] err')
+            console.info('ws err')
           }
           break
         }
@@ -140,7 +140,7 @@ export async function createClient(
          * 心跳，ping
          */
         case 2: {
-          console.info('[ws] ping')
+          console.info('ws ping')
           ws.send(
             JSON.stringify({
               s: 3
@@ -152,21 +152,21 @@ export async function createClient(
          * 心跳，pong
          */
         case 3: {
-          console.info('[ws] pong')
+          console.info('ws pong')
           break
         }
         /**
          * resume, 恢复会话
          */
         case 4: {
-          console.info('[ws] resume')
+          console.info('ws resume')
           break
         }
         /**
          * reconnect, 要求客户端断开当前连接重新连接
          */
         case 5: {
-          console.info('[ws] Connection failed, reconnect')
+          console.info('ws Connection failed, reconnect')
           /**
            * 处理 RECONNECT 信令
            * 断开当前连接并进行重新连接
@@ -185,11 +185,11 @@ export async function createClient(
          * resume ack
          */
         case 6: {
-          console.info('[ws] resume ack')
+          console.info('ws resume ack')
           break
         }
         default: {
-          console.info('[ws] 默认')
+          console.info('ws define')
           break
         }
       }
@@ -210,7 +210,7 @@ export async function createClient(
     }, 30000)
 
     ws.on('close', () => {
-      console.error('[ws] close')
+      console.error('ws close')
     })
   }
 }

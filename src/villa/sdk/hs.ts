@@ -13,7 +13,7 @@ export function hmacSha256(secret: string, pubKey: string): string {
     const rawHmac = mac.digest()
     return Buffer.from(rawHmac).toString('hex')
   } catch (e) {
-    console.error('加密错误')
+    console.error('encryption error')
     throw new Error(e)
   }
 }

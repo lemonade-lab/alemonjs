@@ -246,7 +246,7 @@ async function loadPlugins(dir: string) {
       if (existsSync(`${dir}/${appname}${main}.${type}`)) {
         await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
           console.error(`file://${dir}/${appname}${main}.${type}`)
-          console.error('加载出错', err)
+          console.error('APP load', err)
           process.exit()
         })
       }
@@ -321,7 +321,7 @@ export async function appsInit() {
   createPluginHelp()
 
   // 打印
-  console.info('[LOAD]', `APPS*${Object.keys(plugins).length} `)
+  console.info('[APP INIT]', `APPS*${Object.keys(plugins).length} `)
 }
 
 /**
@@ -406,7 +406,7 @@ export async function InstructionMatching(e: AMessage) {
       }
       APPCACHE[item] = app
     } catch (err) {
-      console.info('上下文出错', err)
+      console.error('APP ERR', err)
       return
     }
   }
@@ -434,7 +434,7 @@ export async function InstructionMatching(e: AMessage) {
         .catch(logErr(data))
       if (typeof res != 'boolean') {
         e.reply(res).catch(err => {
-          console.error('重发错误', err)
+          console.error('APP REPLY', err)
         })
       }
       if (res != false) break
@@ -474,7 +474,7 @@ export async function typeMessage(e: AMessage) {
       app.e = e
       APPCACHE[item] = app
     } catch (err) {
-      console.error('上下文出错', err)
+      console.error('APP', err)
       return
     }
   }
@@ -487,7 +487,7 @@ export async function typeMessage(e: AMessage) {
       const res = await app[data.fncName](...[e, ...(ARGCACHE[data.APP] ?? [])])
       if (typeof res != 'boolean') {
         e.reply(res).catch(err => {
-          console.error('重发错误', err)
+          console.error('APP REPLY', err)
         })
       }
       if (res != false) break

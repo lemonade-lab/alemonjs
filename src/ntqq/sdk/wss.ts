@@ -26,10 +26,10 @@ export async function getGatewayUrl(): Promise<string | undefined> {
     if (response.url) {
       return response.url
     } else {
-      console.error('[http] err:', null)
+      console.error('http err:', null)
     }
   } catch (error) {
-    console.error('[token] err:', error.message)
+    console.error('token err:', error.message)
   }
 }
 
@@ -49,11 +49,13 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
   // 重新连接的逻辑
   const reconnect = async () => {
     if (reconnectAttempts >= 5) {
-      console.info('已达到最大重连次数，取消重新连接')
+      console.info(
+        'The maximum number of reconnections has been reached, cancel reconnection'
+      )
       return
     }
 
-    console.info('正在重新连接...')
+    console.info('reconnecting...')
     // 延迟一段时间后发起重新连接
     await new Promise(resolve => setTimeout(resolve, 5000))
 
@@ -66,7 +68,7 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
-      console.info('[token] ok')
+      console.info('token ok')
     })
     /**
      * 标记是否已连接
@@ -121,19 +123,19 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
           }
           // Resumed Event，恢复连接成功
           if (t === 'RESUMED') {
-            console.info('恢复连接')
+            console.info('restore connection')
             // 重制次数
             reconnectAttempts = 0
           }
           break
         }
         case 6: {
-          console.info('[连接尝试]', message)
+          console.info('connection attempt', message)
           break
         }
         case 7: {
           // 执行重新连接
-          console.info('[重新连接]', message)
+          console.info('reconnect', message)
 
           // 取消鉴权发送
           if (power) {
@@ -144,7 +146,7 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
           break
         }
         case 9: {
-          console.info('[参数错误]', message)
+          console.info('parameter error', message)
           break
         }
         case 10: {
@@ -176,11 +178,11 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
         }
         case 11: {
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.info('[心跳发送]', message)
+          console.info('heartbeat transmission', message)
           break
         }
         case 12: {
-          console.info('[平台数据]', message)
+          console.info('platform data', message)
         }
       }
     })

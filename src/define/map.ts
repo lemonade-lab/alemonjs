@@ -8,7 +8,7 @@ export const rebotMap = {
     const { createAlemonByQQ: qq } = await import('../qq/index.js')
     return qq().catch(err => {
       console.error(err)
-      console.error('QQ机器人启动失败~')
+      console.error('QQ bot open err')
       return false
     })
   },
@@ -16,7 +16,7 @@ export const rebotMap = {
     const { createAlemonByVilla: villa } = await import('../villa/index.js')
     return villa().catch(err => {
       console.error(err)
-      console.error('Villa机器人启动失败~')
+      console.error('VILLA bot open err')
       return false
     })
   },
@@ -24,7 +24,7 @@ export const rebotMap = {
     const { createAlemonByKOOK: kook } = await import('../kook/index.js')
     return kook().catch(err => {
       console.error(err)
-      console.error('KOOK机器人启动失败~')
+      console.error('KOOK bot open err')
       return false
     })
   },
@@ -32,7 +32,7 @@ export const rebotMap = {
     const { createAlemonByNtqq: ntqq } = await import('../ntqq/index.js')
     return ntqq().catch(err => {
       console.error(err)
-      console.error('Ntqq机器人启动失败~')
+      console.error('NTQQ bot open err')
       return false
     })
   }

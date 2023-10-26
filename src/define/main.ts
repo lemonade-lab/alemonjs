@@ -161,7 +161,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ********
    */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
-    console.info('[LOGIN] 无登录配置')
+    console.info('login no bot')
   }
 
   /**

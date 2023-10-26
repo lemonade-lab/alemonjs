@@ -116,7 +116,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.info('暂不可用')
+          console.info('temporarily unavailable')
           return false
         } else {
           return false
@@ -139,7 +139,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('不可用')
+    console.info('temporarily unavailable')
     return false
   }
 
@@ -153,7 +153,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('不可用')
+    console.info('temporarily unavailable')
     return false
   }
 

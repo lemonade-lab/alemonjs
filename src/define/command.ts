@@ -17,7 +17,7 @@ export async function command(cess: 'execSync' | 'exec', cmd: string) {
   try {
     // 切换目录
     process.chdir(dirPath)
-    console.info(`[command] ${cmd}`)
+    console.info(`command ${cmd}`)
     if (cess == 'execSync') {
       execSync(cmd, { stdio: 'inherit' })
     } else if (cess == 'exec') {
