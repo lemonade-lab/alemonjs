@@ -36,7 +36,7 @@ function watchCT(tplFile: string) {
        * 模板改变,删除模板
        */
       delete html[tplFile]
-      console.info('[AlemonJS]', '[HTML][UPDATA]', tplFile)
+      console.info('[HTML][UPDATA]', tplFile)
     })
     .on('close', () => {
       /**
@@ -114,7 +114,7 @@ export function createHtml(AppName: string, tplFile: string) {
     /**
      * 打印反馈生成后的地址
      */
-    console.info('[AlemonJS]', '[HTML][CREATE]', AdressHtml)
+    console.info('[HTML][CREATE]', AdressHtml)
   }
   return {
     // 模板地址
@@ -208,7 +208,7 @@ export function createStr(Options: {
     /**
      * 打印反馈生成后的地址
      */
-    console.info('[AlemonJS]', '[HTML][CREATE]', AdressHtml)
+    console.info('[HTML][CREATE]', AdressHtml)
   }
 
   return {

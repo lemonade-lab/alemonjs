@@ -176,7 +176,7 @@ async function directMessage(e: AMessage, event: directEventData) {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('[AlemonJS]', '不可用')
+    console.info('不可用')
     return false
   }
 
@@ -190,7 +190,7 @@ async function directMessage(e: AMessage, event: directEventData) {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    console.info('[AlemonJS]', '不可用')
+    console.info('不可用')
     return false
   }
 

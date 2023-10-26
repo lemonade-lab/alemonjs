@@ -5,7 +5,7 @@
  * @param text
  */
 export function AlemonJSEventLog(event: string | number, eventType: string) {
-  console.info('[AlemonJS]', `[${event}] [${eventType}] [${true}]`)
+  console.info(`[${event}] [${eventType}] [${true}]`)
 }
 /**
  * 打印用户错误信息
@@ -19,6 +19,6 @@ export function AlemonJSEventError(
   event: string | number,
   eventType: string
 ) {
-  console.info('[AlemonJS]', `[${event}] [${eventType}] [${false}]`)
+  console.info(`[${event}] [${eventType}] [${false}]`)
   console.error(err)
 }

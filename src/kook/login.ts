@@ -15,7 +15,7 @@ export async function checkRobotByKOOK() {
     setBotConfigByKey('kook', config)
     return true
   }
-  console.error('[AlemonJS]', '[LOGIN]', '-----------------------')
-  console.error('[AlemonJS]', '[LOGIN]', 'KOOK配置加载失败~')
+  console.error('[LOGIN]', '-----------------------')
+  console.error('[LOGIN]', 'KOOK配置加载失败~')
   return false
 }

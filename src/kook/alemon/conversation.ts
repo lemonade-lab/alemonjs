@@ -37,7 +37,7 @@ const ConversationMap = {
    * @param event
    */
   [255]: (event: SystemData) => {
-    console.info('[AlemonJS]', '系统消息', new Date(event.msg_timestamp))
+    console.info('系统消息', new Date(event.msg_timestamp))
     // console.info('event', event)
   }
 }

@@ -55,12 +55,12 @@ export const GUILD_MEMBERS = async (event: any) => {
     .catch(error)
 
   if (typeof ChannelsData == 'boolean') {
-    console.info('[AlemonJS]', `[${Eevent}] [${eventType}] ${false}`)
+    console.info(`[${Eevent}] [${eventType}] ${false}`)
     return false
   }
 
   if (ChannelsData.length == 0) {
-    console.info('[AlemonJS]', `[${Eevent}] [${eventType}] ${false}`)
+    console.info(`[${Eevent}] [${eventType}] ${false}`)
     return false
   }
 

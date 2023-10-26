@@ -9,7 +9,7 @@ export function AlemonJSLog(
   user_name: string,
   text: any
 ) {
-  console.info('[AlemonJS]', `[${channel_id}] [${user_name}] [${true}] ${text}`)
+  console.info(`[${channel_id}] [${user_name}] [${true}] ${text}`)
 }
 /**
  * 打印用户错误信息
@@ -24,9 +24,6 @@ export function AlemonJSError(
   user_name: string,
   text: any
 ) {
-  console.info(
-    '[AlemonJS]',
-    `[${channel_id}] [${user_name}] [${false}] ${text}`
-  )
+  console.info(`[${channel_id}] [${user_name}] [${false}] ${text}`)
   console.error(err)
 }

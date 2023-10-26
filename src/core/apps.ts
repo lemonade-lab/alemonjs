@@ -53,7 +53,7 @@ export function createApp(AppName: string) {
         setAppArg(AppName, fnc)
         return true
       } catch (err) {
-        console.error('[AlemonJS]', '扩展参设置成功', err)
+        console.error('扩展参设置成功', err)
         return false
       }
     },
@@ -67,7 +67,7 @@ export function createApp(AppName: string) {
         setMessage(AppName, fnc)
         return true
       } catch (err) {
-        console.error('[AlemonJS]', '重定义消息', err)
+        console.error('重定义消息', err)
         return false
       }
     },
@@ -113,7 +113,7 @@ export function createApp(AppName: string) {
         }
         return true
       } catch (err) {
-        console.error('[AlemonJS]', '插件解析', err)
+        console.error('插件解析', err)
         return false
       }
     },
@@ -124,7 +124,7 @@ export function createApp(AppName: string) {
       try {
         setApp(AppName, apps)
       } catch (err) {
-        console.error('[AlemonJS]', '应用挂起', err)
+        console.error('应用挂起', err)
       }
     }
   }

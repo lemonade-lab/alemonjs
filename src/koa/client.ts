@@ -53,19 +53,16 @@ export function createWeb(
    */
   function handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.error(
-        '[AlemonJS]',
-        `端口 ${currentPort} 被占用，尝试启动新的端口...`
-      )
+      console.error(`端口 ${currentPort} 被占用，尝试启动新的端口...`)
       currentPort++
       size++
       if (size >= 10) {
-        console.error('[AlemonJS]', '寻端失败~')
+        console.error('寻端失败~')
         return
       }
       createApp(currentPort)
     } else {
-      console.error('[AlemonJS]', '启动应用程序时发生错误：', err)
+      console.error('启动应用程序时发生错误：', err)
     }
   }
 
@@ -80,7 +77,7 @@ export function createWeb(
     app
       .listen(port, async () => {
         if (logFnc) await logFnc(port)
-        console.info('[AlemonJS]', 'KOA', `http://[::]:${port}`)
+        console.info('KOA', `http://[::]:${port}`)
       })
       .on('error', handlePortConflict)
   }

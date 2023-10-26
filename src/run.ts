@@ -11,13 +11,13 @@ export function commandRun(ars: string[]) {
   const argsWithoutFiles = msg.replace(/(\S+\.js|\S+\.ts)/g, '')
   for (const item of files) {
     if (!existsSync(join(process.cwd(), item))) {
-      console.info('[AlemonJS]', '[NO FILE]', item)
+      console.info('[NO FILE]', item)
       continue
     }
     const isTypeScript = item.endsWith('.ts')
     const command = isTypeScript ? 'npx ts-node' : 'node'
     const cmd = `${command} ${item} ${argsWithoutFiles}`
-    console.info('[AlemonJS]', cmd)
+    console.info(cmd)
     const childProcess = spawn(cmd, { shell: true })
     childProcess.stdout.on('data', data => {
       process.stdout.write(data.toString())

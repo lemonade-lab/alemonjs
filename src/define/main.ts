@@ -161,7 +161,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ********
    */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
-    console.info('[AlemonJS]', '[LOGIN] 无登录配置')
+    console.info('[LOGIN] 无登录配置')
   }
 
   /**
@@ -249,6 +249,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ************
    */
   if (Options?.mount !== false) {
+    if (Options?.regex) {
+      setAppProCoinfg('regex', Options?.regex)
+    }
     await appsInit()
   }
 

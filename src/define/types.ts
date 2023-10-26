@@ -17,6 +17,10 @@ export interface AlemonOptions {
    */
   shieldEvent?: string[]
   /**
+   * 是否生成json
+   */
+  regex?: boolean
+  /**
    * 个人应用
    */
   app?: {
@@ -29,7 +33,7 @@ export interface AlemonOptions {
      */
     name?: string
     /**
-     * 可执行的依赖包
+     * 可执行的包
      */
     component?: any[]
     /**
@@ -84,7 +88,7 @@ export interface AlemonOptions {
     /**
      * 入口文件类型
      */
-    type?: 'ts' | 'js'
+    type?: 'ts' | 'js' | 'stript'
   }
   /**
    * login配置

@@ -73,13 +73,13 @@ export async function setLocalImg(img: Buffer) {
   // 文件路径
   const imagePath = join(process.cwd(), imgDir, filename)
 
-  console.log('[AlemonJS]', '[KOA CREATE]', imagePath)
+  console.log('[KOA CREATE]', imagePath)
 
   // 将图片保存到文件系统中
   writeFileSync(imagePath, img)
 
   const url = `${http}://${ip}:${port}${imgRouter}/${filename}`
 
-  console.info('[AlemonJS]', '[KOA URL]', url)
+  console.info('[KOA URL]', url)
   return url
 }
