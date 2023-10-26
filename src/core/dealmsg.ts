@@ -501,14 +501,19 @@ export async function typeMessage(e: AMessage) {
 
 function logErr(data: CommandType) {
   return (err: any) => {
-    console.error(`[${data.event}][${data.fncName}][${false}]\n[${err}]`)
+    console.error(
+      `[${data.event}]`,
+      `[${data.fncName}]`,
+      `[${false}]\n`,
+      `[${err}]`
+    )
     return false
   }
 }
 
 function info(data: CommandType) {
   return (res: boolean) => {
-    console.info(`[${data.event}][${data.fncName}][${true}]`)
+    console.info(`[${data.event}]`, `[${data.fncName}]`, `[${true}]`)
     return res
   }
 }

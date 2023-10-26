@@ -1,5 +1,5 @@
 import { setBotConfigByKey, getBotConfigByKey } from '../config/index.js'
-import { NtQQEventsEnum } from '../default/types.js'
+import { NTQQEventsEnum } from './ntqq.js'
 
 /**
  * 登录配置
@@ -15,8 +15,8 @@ export async function checkRobotByQQ() {
   ) {
     if (!config.intents) {
       config.intents = [
-        NtQQEventsEnum.GROUP_AT_MESSAGE_CREATE,
-        NtQQEventsEnum.C2C_MESSAGE_CREATE
+        NTQQEventsEnum.GROUP_AT_MESSAGE_CREATE,
+        NTQQEventsEnum.C2C_MESSAGE_CREATE
       ]
     }
     setBotConfigByKey('ntqq', config)
