@@ -1,4 +1,3 @@
-import './alemon/console.js'
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { setBotConfig as setBotQQConfig } from './sdk/index.js'
 import { checkRobotByQQ } from './login.js'
