@@ -11,7 +11,7 @@ export function commandRun(ars: string[]) {
   const argsWithoutFiles = msg.replace(/(\S+\.js|\S+\.ts)/g, '')
   for (const item of files) {
     if (!existsSync(join(process.cwd(), item))) {
-      console.info('NO FILE', item)
+      console.info('no file', item)
       continue
     }
     const isTypeScript = item.endsWith('.ts')
