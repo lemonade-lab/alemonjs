@@ -1,6 +1,5 @@
-import { readFileSync } from 'fs'
-import http from 'http'
-import https from 'https'
+import { existsSync, readFileSync } from 'fs'
+import axios from 'axios'
 import { join } from 'path'
 
 /**
@@ -8,32 +7,31 @@ import { join } from 'path'
  * @param url 网络地址
  * @returns buffer
  */
-export function getUrlbuffer(url: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https') ? https : http
-    protocol
-      .get(url, response => {
-        if (response.statusCode !== 200) {
-          reject(new Error(`Failed to fetch image: ${response.statusCode}`))
-        } else {
-          const chunks: Buffer[] = []
-          response.on('data', chunk => chunks.push(chunk))
-          response.on('end', () => resolve(Buffer.concat(chunks)))
-        }
-      })
-      .on('error', reject)
-  })
+export async function getUrlbuffer(url: string) {
+  return await axios
+    .get(url, {
+      responseType: 'arraybuffer'
+    })
+    .then(res => {
+      if (res.data) return Buffer.from(res.data, 'binary')
+      return false
+    })
 }
 
 /**
  * 读取本地图片
- * @param path 本地地址 /public/img/xx.png
- * @returns buffer
+ * @param val
+ * @returns
  */
-export function getPathBuffer(path: string): Buffer {
-  // 读取本地图片
-  const image = readFileSync(join(process.cwd(), path))
-  // 将图片转换为 Buffer 对象
-  const BufferImage = Buffer.from(image)
-  return BufferImage
+export function getPathBuffer(val: string) {
+  const add = join(process.cwd(), val)
+  try {
+    // 绝对路径
+    if (existsSync(add)) return Buffer.from(readFileSync(add))
+    // 相对路径
+    if (existsSync(val)) return Buffer.from(readFileSync(val))
+  } catch (err) {
+    console.info(err)
+  }
+  return false
 }
