@@ -7,7 +7,6 @@ let myIp: string | false
 export async function getIP() {
   if (myIp) return myIp
   return await publicIp({
-    onlyHttps: true,
     timeout: 10000
   }).then(ip => {
     if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
