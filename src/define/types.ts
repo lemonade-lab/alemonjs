@@ -21,6 +21,10 @@ export interface AlemonOptions {
    */
   regex?: boolean
   /**
+   * 自定义起始符规则
+   */
+  character?: RegExp
+  /**
    * 个人应用
    */
   app?: {

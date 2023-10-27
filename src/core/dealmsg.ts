@@ -365,34 +365,6 @@ function getStartSymbol(reg: RegExp): string {
  */
 export async function InstructionMatching(e: AMessage) {
   /**
-   * 增加起始符概念
-   *
-   *
-   *  不能直接切换 而是先判断是否匹配
-   * 默认 /^(#|\/)/  是自定义 则调用起始符转换规则  查看插件特征
-   *
-   * e.msg = e.msg.replre(/^(#|\/)/,'/')
-   *
-   * 更改 /^喵喵/ 是自定义 调用转转  查看插件特性
-   *
-   * e.msg = e.msg.replre(/^喵喵/,'/')
-   *
-   * 》特征必须是/ 或者 # ?
-   *
-   * 不匹配 不是匹配规则 不准换
-   *
-   * 如果是 undefind的 不会转转？
-   *
-   *
-   *
-   *
-   */
-
-  // 当且仅当
-
-  // e.msg = e.msg.replace(character, )
-
-  /**
    * 对话机
    */
   const state = await getConversationState(e.user_id)
