@@ -25,7 +25,7 @@ export interface PluginInitType {
   name?: string
   dsc?: string
   rule?: PluginRuleType[]
-  character?: '/' | '#'
+  startCharacter?: '/' | '#'
   /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
@@ -94,7 +94,7 @@ export class plugin {
   /**
    * 起始符特性
    */
-  character?: '/' | '#'
+  startCharacter?: '/' | '#'
   /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
@@ -115,7 +115,7 @@ export class plugin {
     event = 'MESSAGES',
     eventType = 'CREATE',
     priority = 9000,
-    character = '/',
+    startCharacter = '/',
     rule = [],
     task
   }: PluginInitType) {
@@ -124,7 +124,7 @@ export class plugin {
     this.eventType = eventType
     this.priority = priority
     this.rule = rule
-    this.character = character
+    this.startCharacter = startCharacter
     this.task = {
       name: task?.name ?? '',
       fnc: task?.fnc ?? '',

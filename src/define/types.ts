@@ -27,7 +27,7 @@ export interface AlemonOptions {
   /**
    * 默认特征
    */
-  defaultCharacter: '/' | '#'
+  defaultCharacter?: '/' | '#'
   /**
    * 个人应用
    */

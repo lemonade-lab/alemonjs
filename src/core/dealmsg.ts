@@ -145,8 +145,7 @@ async function synthesis(AppsObj: object, appname: string) {
     }
     CommandApp[itemX] = {
       name: appname,
-      // 默认起始符是谁？要
-      character: keys['character'] ?? defaultCharacter,
+      character: keys?.startCharacter ?? defaultCharacter,
       APP: AppsObj[item] as PluginApp
     }
 
@@ -342,22 +341,6 @@ export function getMergedRegex() {
  */
 export async function loadInit() {
   await loadPlugins(join(process.cwd(), getAppProCoinfg('dir')))
-}
-
-/**
- * 起始符转换器
- * @param reg
- * @returns
- */
-function getStartSymbol(reg: RegExp): string {
-  const source = reg.source
-  let startSymbol = ''
-  if (source.startsWith('#')) {
-    startSymbol = '#'
-  } else if (source.startsWith('/')) {
-    startSymbol = '/'
-  }
-  return startSymbol
 }
 
 /**
