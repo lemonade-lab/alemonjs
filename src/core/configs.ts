@@ -55,7 +55,7 @@ const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   event: [],
   route: '/public/defset',
   regex: true,
-  character: /^(#\/)/,
+  character: /^(#|\/)/,
   defaultCharacter: '/'
 }
 
