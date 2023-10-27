@@ -43,23 +43,21 @@ export async function villaService(villa_id: number, config: object) {
  * @param villa_id
  * @param url
  * @returns
+ * type = villa
  */
 export async function transferImage(
   villa_id: number,
   url: string
-): Promise<UrlType> {
+): Promise<{
+  data: UrlType
+}> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.transferImage,
     data: {
       url
     }
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data
-  })
+  }).then(res => res.data)
 }
 
 /**
@@ -72,23 +70,21 @@ export async function transferImage(
  * @param villa_id 别野
  * @param token 令牌
  * @returns
+ * type = villa
  */
 export async function checkMemberBotAccessToken(
   villa_id: number,
   token: string
-): Promise<MemberDataType> {
+): Promise<{
+  data: MemberDataType
+}> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.checkMemberBotAccessToken,
     data: {
       token
     }
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data
-  })
+  }).then(res => res.data)
 }
 /**
  * ******
@@ -100,18 +96,47 @@ export async function checkMemberBotAccessToken(
  * 获取大别野信息
  * @param villa_id  别野编号
  * @returns
+ * type = villa
  */
-export async function getVilla(villa_id: number): Promise<VillaType> {
+export async function getVilla(villa_id: number): Promise<{
+  data: {
+    villa: VillaType
+  }
+}> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getVilla
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.villa
-  })
+  }).then(res => res.data)
 }
+
+/**
+ * 已测
+ * 获取大别野成员列表
+ * @param villa_id  别野编号
+ * @param offset_str  起始位置偏移量
+ * @param size 分页大小
+ * @returns
+ * type = villa_id
+ */
+export async function getVillaMembers(
+  villa_id: number,
+  offset_str: string,
+  size: number
+): Promise<{
+  data: {
+    list: MemberListType
+  }
+}> {
+  return await villaService(villa_id, {
+    method: 'get',
+    url: ApiEnum.getVillaMembers,
+    params: {
+      offset_str,
+      size
+    }
+  }).then(res => res.data)
+}
+
 /**
  * ******
  * 用户api
@@ -123,58 +148,32 @@ export async function getVilla(villa_id: number): Promise<VillaType> {
  * @param villa_id 别野
  * @param uid 用户编号
  * @returns
+ * type = user
  */
 export async function getMember(
   villa_id: number,
   uid: string
-): Promise<MemberType> {
+): Promise<{
+  data: {
+    menber: MemberType
+  }
+}> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getMember,
     params: {
       uid
     }
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.member
-  })
+  }).then(res => res.data)
 }
 
-/**
- * 已测
- * 获取大别野成员列表
- * @param villa_id  别野编号
- * @param offset_str  起始位置偏移量
- * @param size 分页大小
- * @returns
- */
-export async function getVillaMembers(
-  villa_id: number,
-  offset_str: string,
-  size: number
-): Promise<MemberListType> {
-  return await villaService(villa_id, {
-    method: 'get',
-    url: ApiEnum.getVillaMembers,
-    params: {
-      offset_str,
-      size
-    }
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.list
-  })
-}
 /**
  * ??
  * 踢出大别野用户
  * @param villa_id 别野编号
  * @param uid 用户编号
  * @returns
+ * type = user
  */
 export async function deleteVillaMember(villa_id: number, uid: string) {
   return await villaService(villa_id, {
@@ -183,7 +182,7 @@ export async function deleteVillaMember(villa_id: number, uid: string) {
     data: {
       uid
     }
-  }).then(() => true)
+  }).then(res => res.data)
 }
 /**
  * *******
@@ -196,6 +195,7 @@ export async function deleteVillaMember(villa_id: number, uid: string) {
  * @param villa_id 别野编号
  * @param data 配置数据
  * @returns
+ * type = message
  */
 export async function pinMessage(
   villa_id: number,
@@ -210,7 +210,7 @@ export async function pinMessage(
     method: 'post',
     url: ApiEnum.pinMessage,
     data
-  }).then(() => true)
+  }).then(res => res.data)
 }
 /**
  * tudo 官网文档 为 get  实际为  post
@@ -218,6 +218,7 @@ export async function pinMessage(
  * @param villa_id 别野编号
  * @param data 配置数据
  * @returns
+ * type = message
  */
 export async function recallMessage(
   villa_id: number,
@@ -231,7 +232,7 @@ export async function recallMessage(
     method: 'post',
     url: ApiEnum.recallMessage,
     data
-  }).then(() => true)
+  }).then(res => res.data)
 }
 
 /**
@@ -240,6 +241,7 @@ export async function recallMessage(
  * @param villa_id 别野编号
  * @param data 配置数据
  * @returns
+ * type = room_id
  */
 export async function sendMessage(
   villa_id: number,
@@ -248,17 +250,14 @@ export async function sendMessage(
     object_name: (typeof MHYEnum)[number]
     msg_content: string
   }
-): Promise<BotReplyMessageType> {
+): Promise<{
+  data: BotReplyMessageType
+}> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.sendMessage,
     data
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data
-  })
+  }).then(res => res.data)
 }
 
 /**
@@ -273,22 +272,23 @@ export async function sendMessage(
  * @param villa_id 别野编号
  * @param group_name 分组名
  * @returns
+ * type = group_id
  */
 export async function createGroup(
   villa_id: number,
   group_name: string
-): Promise<string> {
+): Promise<{
+  data: {
+    group_id: string
+  }
+}> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.createGroup,
     data: { group_name }
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.group_id // 分组编号
-  })
+  }).then(res => res.data)
 }
+
 /**
  * ？？
  * 编辑分组
@@ -296,6 +296,7 @@ export async function createGroup(
  * @param group_id 分组编号
  * @param group_name 分组名称
  * @returns
+ * type = group_id
  */
 export async function editGroup(
   villa_id: number,
@@ -306,7 +307,7 @@ export async function editGroup(
     method: 'post',
     url: ApiEnum.editGroup,
     data: { group_id, group_name }
-  }).then(() => true)
+  }).then(res => res.data)
 }
 /**
  * ？？
@@ -314,13 +315,14 @@ export async function editGroup(
  * @param villa_id 别野编号
  * @param group_id 分组编号
  * @returns
+ * type = group_id
  */
 export async function deleteGroup(villa_id: number, group_id: number) {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.deleteGroup,
     data: { group_id }
-  }).then(() => true)
+  }).then(res => res.data)
 }
 
 /**
@@ -328,17 +330,17 @@ export async function deleteGroup(villa_id: number, group_id: number) {
  * 获取分组列表
  * @param villa_id 别野编号
  * @returns
+ * type = villa
  */
-export async function getGroupList(villa_id: number): Promise<Group> {
+export async function getGroupList(villa_id: number): Promise<{
+  data: {
+    list: Group
+  }
+}> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getGroupList
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.list
-  })
+  }).then(res => res.data)
 }
 /**
  * ??
@@ -347,6 +349,7 @@ export async function getGroupList(villa_id: number): Promise<Group> {
  * @param room_id 房间编号
  * @param room_name 房间名
  * @returns
+ * type = room_id
  */
 export async function editRoom(
   villa_id: number,
@@ -360,7 +363,7 @@ export async function editRoom(
       room_id,
       room_name
     }
-  }).then(() => true)
+  }).then(res => res.data)
 }
 /**
  * ??
@@ -368,6 +371,7 @@ export async function editRoom(
  * @param villa_id 别野编号
  * @param room_id 房间编号
  * @returns
+ * type = room_id
  */
 export async function deleteRoom(villa_id: number, room_id: number) {
   return await villaService(villa_id, {
@@ -376,7 +380,7 @@ export async function deleteRoom(villa_id: number, room_id: number) {
     data: {
       room_id
     }
-  }).then(() => true)
+  }).then(res => res.data)
 }
 /**
  * 已测
@@ -384,42 +388,40 @@ export async function deleteRoom(villa_id: number, room_id: number) {
  * @param villa_id 别野编号
  * @param room_id 房间编号
  * @returns
+ * type = room_id
  */
 export async function getRoom(
   villa_id: number,
   room_id: number
-): Promise<RoomMsg> {
+): Promise<{
+  data: {
+    room: RoomMsg
+  }
+}> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getRoom,
     params: {
       room_id
     }
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.room
-  })
+  }).then(res => res.data)
 }
 /**
  * 已测
  * 获取房间列表信息
  * @param villa_id 别野编号
  * @returns
+ * type = villa_id
  */
-export async function getVillaGroupRoomList(
-  villa_id: number
-): Promise<GroupRoom> {
+export async function getVillaGroupRoomList(villa_id: number): Promise<{
+  data: {
+    list: GroupRoom
+  }
+}> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getVillaGroupRoomList
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.list
-  })
+  }).then(res => res.data)
 }
 /**
  * ******
@@ -432,6 +434,7 @@ export async function getVillaGroupRoomList(
  * @param villa_id 别野编号
  * @param data 配置数据
  * @returns
+ * type = role_id
  */
 export async function operateMemberToRole(
   villa_id: number,
@@ -445,7 +448,7 @@ export async function operateMemberToRole(
     method: 'post',
     url: ApiEnum.operateMemberToRole,
     data
-  }).then(() => true)
+  }).then(res => res.data)
 }
 
 /**
@@ -454,6 +457,7 @@ export async function operateMemberToRole(
  * @param villa_id 别野编号
  * @param data 配置数据
  * @returns
+ * type = villa_id
  */
 export async function createMemberRole(
   villa_id: number,
@@ -462,17 +466,16 @@ export async function createMemberRole(
     color: Array<typeof ColorEnum>
     permissions: Array<typeof MemberRolePermissionEnum>
   }
-): Promise<string> {
+): Promise<{
+  data: {
+    id: string
+  }
+}> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.createMemberRole,
     data
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.id // 身分组编号
-  })
+  }).then(res => res.data)
 }
 /**
  * ??
@@ -480,6 +483,7 @@ export async function createMemberRole(
  * @param villa_id 别野编号
  * @param data 配置数据
  * @returns
+ * type = villa_id
  */
 export async function editMemberRole(
   villa_id: number,
@@ -494,7 +498,7 @@ export async function editMemberRole(
     method: 'post',
     url: ApiEnum.editMemberRole,
     data
-  }).then(() => true)
+  }).then(res => res.data)
 }
 
 /**
@@ -503,6 +507,7 @@ export async function editMemberRole(
  * @param villa_id 别野编号
  * @param id 身份组编号
  * @returns
+ * type = id
  */
 export async function deleteMemberRole(villa_id: number, id: number) {
   return await villaService(villa_id, {
@@ -511,7 +516,7 @@ export async function deleteMemberRole(villa_id: number, id: number) {
     data: {
       id
     }
-  }).then(() => true)
+  }).then(res => res.data)
 }
 
 /**
@@ -519,19 +524,17 @@ export async function deleteMemberRole(villa_id: number, id: number) {
  * 获取大别野下所有身份组
  * @param villa_id 别野编号
  * @returns
+ * type = villa_id
  */
-export async function getVillaMemberRoles(
-  villa_id: number
-): Promise<MemberRoleList[]> {
+export async function getVillaMemberRoles(villa_id: number): Promise<{
+  data: {
+    list: MemberRoleList[]
+  }
+}> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getVillaMemberRoles
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data.list
-  })
+  }).then(res => res.data)
 }
 
 /**
@@ -539,6 +542,7 @@ export async function getVillaMemberRoles(
  * @param villa_id 别野编号
  * @param role_id 身份组编号
  * @returns
+ * type = role_id
  */
 export async function getMemberRoleInfo(villa_id: number, role_id: number) {
   return await villaService(villa_id, {
@@ -547,12 +551,7 @@ export async function getMemberRoleInfo(villa_id: number, role_id: number) {
     params: {
       role_id
     }
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data
-  })
+  }).then(res => res.data)
 }
 
 /**
@@ -565,27 +564,28 @@ export async function getMemberRoleInfo(villa_id: number, role_id: number) {
  * 获取获取指定消息的全量表情
  * @param villa_id 别野编号
  * @returns
+ * type = villa_id
  */
-export async function getAllEmoticons(villa_id: number): Promise<Emoticon[]> {
+export async function getAllEmoticons(villa_id: number): Promise<{
+  data: Emoticon[]
+}> {
   return await villaService(villa_id, {
     method: 'get',
     url: ApiEnum.getAllEmoticons
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data
-  })
+  }).then(res => res.data)
 }
+
 /**
  * ******
  * 审核api
  * ******
  */
+
 /**
  * 审核
  * @param villa_id 别野编号
  * @returns
+ * type = user
  */
 export async function audit(
   villa_id: number,
@@ -595,15 +595,12 @@ export async function audit(
     room_id?: number // 房间 id，选填
     uid: number // 用户 id, 必填
   }
-): Promise<{ audit_id: string }> {
+): Promise<{
+  data: { audit_id: string }
+}> {
   return await villaService(villa_id, {
     method: 'post',
     url: ApiEnum.audit,
     data
-  }).then(res => {
-    // axiso
-    const re = res.data
-    // mys
-    return re.data
-  })
+  }).then(res => res.data)
 }

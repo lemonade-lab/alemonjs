@@ -108,20 +108,20 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
        */
       if (Buffer.isBuffer(msg)) {
         try {
-          const url = await KOOKApiClient.postImage(msg)
-          if (url) {
+          const ret = await KOOKApiClient.postImage(msg)
+          if (ret && ret.data) {
             if (event.channel_type == 'GROUP') {
               return await KOOKApiClient.createMessage({
                 type: 2,
                 target_id: event.target_id,
-                content: url
+                content: ret.data.url
               }).catch(error)
             }
             return await KOOKApiClient.createDirectMessage({
               type: 2,
               target_id: event.target_id,
               chat_code: event.extra.code,
-              content: url
+              content: ret.data.url
             }).catch(error)
           }
           return false
@@ -145,8 +145,9 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           .filter(element => typeof element === 'string')
           .join('')
         // 转存
-        const url = await KOOKApiClient.postImage(msg[isBuffer] as Buffer)
-        if (url) {
+        const ret = await KOOKApiClient.postImage(msg[isBuffer] as Buffer)
+        if (!ret) return false
+        if (ret?.data) {
           // 群
           if (event.channel_type == 'GROUP') {
             await KOOKApiClient.createMessage({
@@ -157,7 +158,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
             return await KOOKApiClient.createMessage({
               type: 2,
               target_id: event.target_id,
-              content: url
+              content: ret.data.url
             }).catch(error)
           }
         }
@@ -172,7 +173,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           type: 2,
           target_id: event.target_id,
           chat_code: event.extra.code,
-          content: String(url)
+          content: String(ret.data.url)
         }).catch(error)
       }
       const content = Array.isArray(msg)
@@ -189,20 +190,22 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       if (match) {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)
-        const url = await KOOKApiClient.postImage(msg)
-        if (msg && url) {
+        if (!msg) return false
+        const ret = await KOOKApiClient.postImage(msg)
+        if (!ret) return false
+        if (msg && ret) {
           if (event.channel_type == 'GROUP') {
             return await KOOKApiClient.createMessage({
               type: 2,
               target_id: event.target_id,
-              content: url
+              content: ret.data.url
             }).catch(error)
           }
           return await KOOKApiClient.createDirectMessage({
             type: 2,
             target_id: event.target_id,
             chat_code: event.extra.code,
-            content: url
+            content: ret.data.url
           }).catch(error)
         }
       }

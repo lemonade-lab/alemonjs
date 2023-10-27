@@ -38,7 +38,6 @@ const ConversationMap = {
    */
   [255]: (event: SystemData) => {
     console.info('system message', new Date(event.msg_timestamp))
-    // console.info('event', event)
   }
 }
 /**
@@ -49,8 +48,6 @@ const ConversationMap = {
 export async function callBackByKOOK(event: EventData | SystemData) {
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     return await ConversationMap[event.type](event)
-  } else {
-    // console.info('kook new message', event.type)
-    return false
   }
+  return false
 }

@@ -10,7 +10,11 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
   /**
    * 把string[]更改为string
    */
-  let content = Array.isArray(msg) ? msg.join('') : typeof msg === 'string' ? msg : ''
+  let content = Array.isArray(msg)
+    ? msg.join('')
+    : typeof msg === 'string'
+    ? msg
+    : ''
   /**
    * 记录所有要渲染的
    */
@@ -18,7 +22,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
   /**
    * 开始识别 @ 全体 并替换
    */
-  content = content.replace(/<@!(everyone)>/g, (match, id, offset) => {
+  content = content.replace(/<@(everyone)>/g, (match, id, offset) => {
     /**
      * 记录要渲染的名称和编号
      */
@@ -57,7 +61,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
   /**
    * 知道艾特的位置
    */
-  content.replace(/<@!(\d+)>/g, (match, id, offset) => {
+  content.replace(/<@(\d+)>/g, (match, id, offset) => {
     userArr.push({
       id,
       offset
@@ -77,24 +81,27 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
     /**
      * 替换字
      */
-    content = content.replace(new RegExp(`<@!${user_id}>`), (match, id, index) => {
-      /**
-       * 记录要渲染的名称和编号
-       */
-      num.push({
-        id: user_id,
-        type: 1,
-        name: `@${user_name} `
-      })
-      /**
-       * 记录
-       */
-      userKeyVal[user_id] = user_name
-      /**
-       * 替换为名字
-       */
-      return `@${user_name} `
-    })
+    content = content.replace(
+      new RegExp(`<@${user_id}>`),
+      (match, id, index) => {
+        /**
+         * 记录要渲染的名称和编号
+         */
+        num.push({
+          id: user_id,
+          type: 1,
+          name: `@${user_name} `
+        })
+        /**
+         * 记录
+         */
+        userKeyVal[user_id] = user_name
+        /**
+         * 替换为名字
+         */
+        return `@${user_name} `
+      }
+    )
   }
   /**
    *
@@ -112,7 +119,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
      */
     const User = await getMember(villa_id, String(item.id))
     if (User) {
-      setUserName(item.id, User.basic.nickname)
+      setUserName(item.id, User?.data?.menber?.basic?.nickname)
     }
   }
   /**
@@ -142,18 +149,21 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
    * @param room_name
    */
   function setRoomName(room_id, room_name) {
-    content = content.replace(new RegExp(`<#${room_id}>`), (match, id, index) => {
-      /**
-       * 记录要渲染的名称和编号
-       */
-      num.push({
-        id: room_id,
-        type: 2,
-        name: `#${room_name} `
-      })
-      roomKeyVal[room_id] = room_name
-      return `#${room_name} `
-    })
+    content = content.replace(
+      new RegExp(`<#${room_id}>`),
+      (match, id, index) => {
+        /**
+         * 记录要渲染的名称和编号
+         */
+        num.push({
+          id: room_id,
+          type: 2,
+          name: `#${room_name} `
+        })
+        roomKeyVal[room_id] = room_name
+        return `#${room_name} `
+      }
+    )
   }
   /**
    *
@@ -171,7 +181,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
      */
     const Room = await getRoom(villa_id, item.id)
     if (Room) {
-      setRoomName(item.id, Room.room_name)
+      setRoomName(item.id, Room.data.room.room_name)
       continue
     }
   }

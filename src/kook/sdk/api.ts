@@ -4,7 +4,12 @@ import { existsSync, createReadStream } from 'fs'
 import { Readable, isReadable } from 'stream'
 import { basename } from 'path'
 import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
-import { ApiEnum, SendMessageParams, BotInformation, SendDirectMessageParams } from './typings.js'
+import {
+  ApiEnum,
+  SendMessageParams,
+  BotInformation,
+  SendDirectMessageParams
+} from './typings.js'
 import { getKookToken } from './config.js'
 
 /**
@@ -36,7 +41,10 @@ export function kookService(config: object) {
  * @param message {消息编号,图片,内容}
  * @returns
  */
-export async function postImage(file: string | Buffer | Readable, name = 'image.jpg') {
+export async function postImage(
+  file: string | Buffer | Readable,
+  name = 'image.jpg'
+) {
   let picData: Readable | Buffer[]
   if (typeof file === 'string') {
     if (!existsSync(file)) {
@@ -73,25 +81,15 @@ export async function postImage(file: string | Buffer | Readable, name = 'image.
  * @param formdata
  * @returns
  */
-export async function createUrl(formdata) {
-  const ret: { url: string } | false = await kookService({
+export async function createUrl(formdata): Promise<{
+  data: { url: string }
+}> {
+  return await kookService({
     method: 'post',
     url: ApiEnum.AssetCreate,
     data: formdata,
     headers: formdata.getHeaders()
-  })
-    .then(res => {
-      const re = res.data
-      return re.data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  if (!ret) {
-    return false
-  }
-  return ret.url
+  }).then(res => res.data)
 }
 
 /**
@@ -100,21 +98,13 @@ export async function createUrl(formdata) {
  * **********
  */
 
-export async function getBotInformation() {
-  const ret: BotInformation | false = await kookService({
+export async function getBotInformation(): Promise<{
+  data: BotInformation
+}> {
+  return await kookService({
     method: 'post',
     url: ApiEnum.UserMe
-  })
-    .then(res => {
-      const re = res.data
-      return re.data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-
-  return ret
+  }).then(res => res.data)
 }
 
 /**
@@ -128,25 +118,18 @@ export async function getBotInformation() {
  * @param data
  * @returns
  */
-export async function createMessage(data: SendMessageParams) {
-  const ret: {
+export async function createMessage(data: SendMessageParams): Promise<{
+  data: {
     msg_id: string
     msg_timestamp: number
     nonce: string
-  } = await kookService({
+  }
+}> {
+  return await kookService({
     method: 'post',
     url: ApiEnum.MessageCreate,
     data
-  })
-    .then(res => {
-      const re = res.data
-      return re.data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return ret
+  }).then(res => res.data)
 }
 
 /**
@@ -158,23 +141,18 @@ export async function createMessage(data: SendMessageParams) {
  * @param data
  * @returns
  */
-export async function createDirectMessage(data: SendDirectMessageParams) {
-  const ret: {
+export async function createDirectMessage(
+  data: SendDirectMessageParams
+): Promise<{
+  data: {
     msg_id: string
     msg_timestamp: number
     nonce: string
-  } = await kookService({
+  }
+}> {
+  return kookService({
     method: 'post',
     url: ApiEnum.DirectMessageCreate,
     data
-  })
-    .then(res => {
-      const re = res.data
-      return re.data
-    })
-    .catch(err => {
-      console.error(err)
-      return false
-    })
-  return ret
+  }).then(res => res.data)
 }

@@ -41,8 +41,5 @@ const ConversationMap = {
 export async function callBackByVilla(event: BotEvent) {
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     return await ConversationMap[event.type](event)
-  } else {
-    // console.info('[new event triggering]', event.type)
-    return
   }
 }

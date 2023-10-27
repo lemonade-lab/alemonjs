@@ -5,14 +5,14 @@ export const segmentVilla = {
    * @returns
    */
   at: (uid: string): string => {
-    return `<@!${uid}>`
+    return `<@${uid}>`
   },
   /**
    * 艾特全体
    * @returns
    */
   atAll: (): string => {
-    return `<@!everyone>`
+    return `<@everyone>`
   },
   /**
    * 标注GET请求

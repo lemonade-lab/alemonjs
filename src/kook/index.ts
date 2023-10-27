@@ -26,14 +26,14 @@ export async function createAlemonByKOOK() {
      * 创建连接
      */
     await createClient(cfg.token, callBackByKOOK).then(async res => {
-      const data = await KOOKApiClient.getBotInformation()
-      if (data) {
+      const ret = await KOOKApiClient.getBotInformation()
+      if (ret?.data) {
         setBotMsgByKOOK({
-          id: data.id,
-          name: data.username,
-          avatar: data.avatar
+          id: ret.data.id,
+          name: ret.data.username,
+          avatar: ret.data.avatar
         })
-        console.info('KOOK Welcome back', data.username)
+        console.info('KOOK Welcome back', ret.data.username)
       }
     })
     return true

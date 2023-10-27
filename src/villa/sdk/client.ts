@@ -127,19 +127,14 @@ export function createClient(
         if (logFnc) {
           await logFnc(port)
         }
-
         // 获取ip4
         let ip = await getIP()
         const ipp = getServerConfig('ip')
         if (ipp != 'localhost') {
           ip = ipp
         }
-        if (ip) {
-          console.info(
-            'villa open',
-            `http://${ip}:${port ?? 8080}${callback_url ?? '/api/mys/callback'}`
-          )
-        } else {
+        console.info('villa open', `http://${ip}:${port}${callback_url}`)
+        if (!ip) {
           console.error('vllia no public ip')
           return
         }

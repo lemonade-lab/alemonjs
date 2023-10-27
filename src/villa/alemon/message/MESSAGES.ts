@@ -58,8 +58,8 @@ const error = err => {
  */
 const unloading = async (villa_id: number, uul: string) => {
   const NowObj = await Client.transferImage(villa_id, uul)
-  if (!NowObj?.new_url) return uul
-  return NowObj.new_url
+  if (!NowObj?.data?.new_url) return uul
+  return NowObj?.data?.new_url
 }
 
 /**
@@ -293,7 +293,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           width: dimensions.width,
           height: dimensions.height
         })
-          .then(res => recallMessage(res, select, villa_id, room_id))
+          .then(res => recallMessage(res?.data, select, villa_id, room_id))
           .catch(error)
       }
       /**
@@ -328,7 +328,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
               height: dimensions.height
             }
           )
-            .then(res => recallMessage(res, select, villa_id, room_id))
+            .then(res => recallMessage(res?.data, select, villa_id, room_id))
             .catch(error)
         } else {
           return await Client.sendMessageTextEntitiesUrl(
@@ -342,7 +342,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
               height: dimensions.height
             }
           )
-            .then(res => recallMessage(res, select, villa_id, room_id))
+            .then(res => recallMessage(res?.data, select, villa_id, room_id))
             .catch(error)
         }
       }
@@ -372,7 +372,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
             width: dimensions.width,
             height: dimensions.height
           })
-            .then(res => recallMessage(res, select, villa_id, room_id))
+            .then(res => recallMessage(res?.data, select, villa_id, room_id))
             .catch(error)
         }
       }
@@ -383,7 +383,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       const { entities, content } = await Client.stringParsing(cont, villa_id)
       if (entities.length == 0 && content != '') {
         return await Client.sendMessageText(villa_id, room_id, content)
-          .then(res => recallMessage(res, select, villa_id, room_id))
+          .then(res => recallMessage(res?.data, select, villa_id, room_id))
           .catch(error)
       } else if (entities.length != 0 && content != '') {
         return await Client.sendMessageTextEntities(
@@ -392,7 +392,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           content,
           entities
         )
-          .then(res => recallMessage(res, select, villa_id, room_id))
+          .then(res => recallMessage(res?.data, select, villa_id, room_id))
           .catch(error)
       }
       return false
