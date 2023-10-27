@@ -35,6 +35,10 @@ interface ApplicationProcessingOpsion {
    * 起始符特性
    */
   character: RegExp
+  /**
+   * 默认特征
+   */
+  defaultCharacter: '/' | '#'
 }
 
 /**
@@ -51,7 +55,8 @@ const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   event: [],
   route: '/public/defset',
   regex: true,
-  character: /^(#\/)/
+  character: /^(#\/)/,
+  defaultCharacter: '/'
 }
 
 /**

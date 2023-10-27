@@ -114,6 +114,7 @@ async function synthesis(AppsObj: object, appname: string) {
     plugins[appname] = []
   }
   const shield = getAppProCoinfg('event')
+  const defaultCharacter = getAppProCoinfg('defaultCharacter')
   for (const item in AppsObj) {
     const keys: plugin = new AppsObj[item]()
     if (shield.find(item => item == keys['event'])) continue
@@ -144,7 +145,8 @@ async function synthesis(AppsObj: object, appname: string) {
     }
     CommandApp[itemX] = {
       name: appname,
-      character: keys['character'] ?? '/',
+      // 默认起始符是谁？要
+      character: keys['character'] ?? defaultCharacter,
       APP: AppsObj[item] as PluginApp
     }
 

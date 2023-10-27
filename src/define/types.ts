@@ -25,6 +25,10 @@ export interface AlemonOptions {
    */
   character?: RegExp
   /**
+   * 默认特征
+   */
+  defaultCharacter: '/' | '#'
+  /**
    * 个人应用
    */
   app?: {

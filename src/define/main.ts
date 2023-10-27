@@ -232,6 +232,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.character) {
     setAppProCoinfg('character', Options?.character)
   }
+  if (Options?.defaultCharacter) {
+    setAppProCoinfg('defaultCharacter', Options?.defaultCharacter)
+  }
 
   /**
    * ************
