@@ -7,6 +7,10 @@ export interface ServerOptions {
    */
   http?: string
   /**
+   * 地址
+   */
+  ip?: string
+  /**
    * 端口
    */
   port?: number

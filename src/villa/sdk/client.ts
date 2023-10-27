@@ -4,6 +4,7 @@ import bodyParser from 'koa-bodyparser'
 import { type ClientConfig, type BotEvent } from './types.js'
 import { setClientConfig } from './config.js'
 import { getIP } from '../../core/index.js'
+import { getServerConfig } from '../../koa/config.js'
 
 /**
  * tudo
@@ -128,7 +129,11 @@ export function createClient(
         }
 
         // 获取ip4
-        const ip = await getIP()
+        let ip = await getIP()
+        const ipp = getServerConfig('ip')
+        if (ipp != 'localhost') {
+          ip = ipp
+        }
         if (ip) {
           console.info(
             'villa open',

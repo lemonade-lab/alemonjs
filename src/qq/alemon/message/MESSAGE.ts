@@ -80,7 +80,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
    * @returns
    */
   e.reply = async (
-    msg: Buffer | string | (Buffer | string)[],
+    msg: Buffer | string | number | (Buffer | number | string)[],
     select?: {
       quote?: string
       withdraw?: number
@@ -103,7 +103,13 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     // arr & find buffer
     if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
       const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
-      const cont = msg.filter(element => typeof element === 'string').join('')
+      const cont = msg
+        .map(item => {
+          if (typeof item === 'number') return String(item)
+          return item
+        })
+        .filter(element => typeof element === 'string')
+        .join('')
       try {
         return await Client.postImage({
           id: event.msg.channel_id,
@@ -120,6 +126,8 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       ? msg.join('')
       : typeof msg === 'string'
       ? msg
+      : typeof msg === 'number'
+      ? `${msg}`
       : ''
 
     if (content == '') return false

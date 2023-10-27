@@ -101,7 +101,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
      * @param obj 额外消息 可选
      */
     reply: async (
-      msg: Buffer | string | (Buffer | string)[],
+      msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {
         quote?: string
         withdraw?: number
@@ -142,10 +142,14 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
         // 删除所有buffer
         const content = msg
+          .map(item => {
+            if (typeof item === 'number') return String(item)
+            return item
+          })
           .filter(element => typeof element === 'string')
           .join('')
         // 转存
-        const url = await KOOKApiClient.postImage(msg[isBuffer])
+        const url = await KOOKApiClient.postImage(msg[isBuffer] as Buffer)
         if (url) {
           // 群
           if (event.channel_type == 'GROUP') {
@@ -179,6 +183,8 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         ? msg.join('')
         : typeof msg === 'string'
         ? msg
+        : typeof msg === 'number'
+        ? `${msg}`
         : ''
 
       if (content == '') return false

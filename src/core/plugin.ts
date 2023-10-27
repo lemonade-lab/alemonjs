@@ -25,11 +25,13 @@ export interface PluginInitType {
   name?: string
   dsc?: string
   rule?: PluginRuleType[]
+  character?: '/' | '#'
   /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
   task?: TaskType
 }
+
 /**
  * 插件类型
  */
@@ -90,10 +92,13 @@ export class plugin {
    */
   rule?: PluginRuleType[]
   /**
+   * 起始符特性
+   */
+  character?: '/' | '#'
+  /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
   task?: TaskType
-
   /**
    * @param name 类名标记        default app-name
    * @param event 事件类型       default MESSAGES
@@ -110,6 +115,7 @@ export class plugin {
     event = 'MESSAGES',
     eventType = 'CREATE',
     priority = 9000,
+    character = '/',
     rule = [],
     task
   }: PluginInitType) {
@@ -118,6 +124,7 @@ export class plugin {
     this.eventType = eventType
     this.priority = priority
     this.rule = rule
+    this.character = character
     this.task = {
       name: task?.name ?? '',
       fnc: task?.fnc ?? '',
@@ -133,7 +140,7 @@ export class plugin {
    * @returns 是否处理完成
    */
   async reply(
-    content: Buffer | string | (Buffer | string)[],
+    content: Buffer | string | number | (Buffer | number | string)[],
     select?: {
       quote?: string
       withdraw?: number

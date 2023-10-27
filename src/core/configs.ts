@@ -31,6 +31,10 @@ interface ApplicationProcessingOpsion {
    * 事件屏蔽器
    */
   event: string[]
+  /**
+   * 起始符特性
+   */
+  character: RegExp
 }
 
 /**
@@ -46,7 +50,8 @@ const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
   closeRegex: undefined,
   event: [],
   route: '/public/defset',
-  regex: true
+  regex: true,
+  character: /^(#\/)/
 }
 
 /**

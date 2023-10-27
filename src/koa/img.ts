@@ -63,7 +63,11 @@ export async function setLocalImg(img: Buffer) {
   const imgSize = getServerConfig('imgSize')
   const port = getServerConfig('port')
   const http = getServerConfig('http')
-  const ip = await getIP()
+  let ip = await getIP()
+  const ipp = getServerConfig('ip')
+  if (ipp != 'localhost') {
+    ip = ipp
+  }
 
   // 生成文件名
   const filename = `${Math.floor(Math.random() * imgSize)}.${

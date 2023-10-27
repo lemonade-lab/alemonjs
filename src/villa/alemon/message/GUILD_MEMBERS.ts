@@ -112,7 +112,7 @@ export async function GUILD_MEMBERS_VILLA(event: BotEvent) {
     user_avatar: '',
     ...now_e,
     reply: async (
-      msg: Buffer | string | (Buffer | string)[],
+      msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {
         quote?: string
         withdraw?: number

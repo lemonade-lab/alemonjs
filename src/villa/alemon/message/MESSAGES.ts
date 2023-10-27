@@ -287,7 +287,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | (Buffer | string)[],
+      msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {
         quote?: string
         withdraw?: number
@@ -318,11 +318,17 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         // 找到其中一个buffer
         const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
         // 删除所有buffer
-        const cont = msg.filter(element => typeof element === 'string').join('')
+        const cont = msg
+          .map(item => {
+            if (typeof item === 'number') return String(item)
+            return item
+          })
+          .filter(element => typeof element === 'string')
+          .join('')
         // 字符解析器
         const { entities, content } = await Client.stringParsing(cont, villa_id)
         // 挂载图片
-        const dimensions = IMGS.imageSize(msg[isBuffer])
+        const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
         const uul = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
         if (!uul) return false
         const url = await unloading(villa_id, uul)
@@ -360,6 +366,8 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         ? msg.join('')
         : typeof msg === 'string'
         ? msg
+        : typeof msg === 'number'
+        ? `${msg}`
         : ''
       if (cont == '') return false
 

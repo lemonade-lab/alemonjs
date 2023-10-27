@@ -55,7 +55,13 @@ export const Private = async (
   }
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
     const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
-    const cont = msg.filter(element => typeof element === 'string').join('')
+    const cont = msg
+      .map(item => {
+        if (typeof item === 'number') return String(item)
+        return item
+      })
+      .filter(element => typeof element === 'string')
+      .join('')
     try {
       return await Client.postDirectImage({
         id: EMessage.guild_id,
@@ -73,6 +79,8 @@ export const Private = async (
     ? msg.join('')
     : typeof msg === 'string'
     ? msg
+    : typeof msg === 'number'
+    ? `${msg}`
     : ''
 
   if (content == '') return false

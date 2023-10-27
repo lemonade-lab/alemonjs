@@ -414,7 +414,7 @@ interface replyController {
     /**
      * 消息内容
      */
-    content: Buffer | string | (Buffer | string)[],
+    content: Buffer | string | number | (Buffer | number | string)[],
     /**
      * 选择
      */
@@ -445,7 +445,7 @@ interface replyController {
    * @returns
    */
   replyPrivate?(
-    content: Buffer | string | (Buffer | string)[],
+    content: Buffer | string | number | (Buffer | number | string)[],
     select: {
       quote?: string
       withdraw?: number

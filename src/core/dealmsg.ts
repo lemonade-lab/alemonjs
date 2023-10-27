@@ -31,6 +31,7 @@ interface CommandType {
 interface PluginAppMap {
   [key: string]: {
     name: string
+    character: '/' | '#'
     APP: PluginApp
   }
 }
@@ -114,7 +115,7 @@ async function synthesis(AppsObj: object, appname: string) {
   }
   const shield = getAppProCoinfg('event')
   for (const item in AppsObj) {
-    const keys = new AppsObj[item]()
+    const keys: plugin = new AppsObj[item]()
     if (shield.find(item => item == keys['event'])) continue
     // 控制类型
     const eventType: PluginInitType['eventType'] = keys['eventType'] ?? 'CREATE'
@@ -143,6 +144,7 @@ async function synthesis(AppsObj: object, appname: string) {
     }
     CommandApp[itemX] = {
       name: appname,
+      character: keys['character'] ?? '/',
       APP: AppsObj[item] as PluginApp
     }
 
@@ -167,6 +169,7 @@ async function synthesis(AppsObj: object, appname: string) {
         // 存在正则就必须是MESSAGES
         const event: PluginInitType['event'] = 'MESSAGES'
         // 得到解析
+
         const reg = key['reg']
         if (!reg) continue
         // 推送
@@ -340,11 +343,55 @@ export async function loadInit() {
 }
 
 /**
+ * 起始符转换器
+ * @param reg
+ * @returns
+ */
+function getStartSymbol(reg: RegExp): string {
+  const source = reg.source
+  let startSymbol = ''
+  if (source.startsWith('#')) {
+    startSymbol = '#'
+  } else if (source.startsWith('/')) {
+    startSymbol = '/'
+  }
+  return startSymbol
+}
+
+/**
  * 指令匹配
  * @param e alemonjs message
  * @returns 是否处理完成
  */
 export async function InstructionMatching(e: AMessage) {
+  /**
+   * 增加起始符概念
+   *
+   *
+   *  不能直接切换 而是先判断是否匹配
+   * 默认 /^(#|\/)/  是自定义 则调用起始符转换规则  查看插件特征
+   *
+   * e.msg = e.msg.replre(/^(#|\/)/,'/')
+   *
+   * 更改 /^喵喵/ 是自定义 调用转转  查看插件特性
+   *
+   * e.msg = e.msg.replre(/^喵喵/,'/')
+   *
+   * 》特征必须是/ 或者 # ?
+   *
+   * 不匹配 不是匹配规则 不准换
+   *
+   * 如果是 undefind的 不会转转？
+   *
+   *
+   *
+   *
+   */
+
+  // 当且仅当
+
+  // e.msg = e.msg.replace(character, )
+
   /**
    * 对话机
    */
@@ -367,9 +414,13 @@ export async function InstructionMatching(e: AMessage) {
    * 上下文
    */
   for (const item in CommandApp) {
-    const { name, APP } = CommandApp[item]
+    const { name, APP, character } = CommandApp[item]
     const AppFnc = getMessage(name)
     const AppArg = getAppArg(name)
+    const _character = getAppProCoinfg('character')
+    if (_character.test(e.msg)) {
+      e.msg = e.msg.replace(_character, character)
+    }
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
       if (typeof AppArg == 'function') ARGCACHE[item] = await AppArg(e)

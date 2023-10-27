@@ -12,6 +12,10 @@ const ServerCfg: ServerOptions = {
    */
   port: 6060,
   /**
+   * 地址
+   */
+  ip: 'localhost',
+  /**
    * 图片随机度
    */
   imgSize: 9999999,
