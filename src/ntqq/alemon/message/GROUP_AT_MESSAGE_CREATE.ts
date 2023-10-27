@@ -30,9 +30,12 @@ const error = err => {
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
+  const cfg = getBotConfigByKey('ntqq')
+  const masterID = cfg.masterID
   const e = {
     platform: 'ntqq',
     bot: getBotMsgByNtqq(),
+    isMaster: event.author.id == masterID ? true : false,
     event: 'MESSAGES',
     eventType: 'CREATE',
     isPrivate: false,
@@ -41,32 +44,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     boundaries: 'publick',
     attribute: 'group'
   } as AMessage
-
-  /**
-   * 得到登录配置
-   */
-
-  const cfg = getBotConfigByKey('ntqq')
-
-  /**
-   * 得到主人id
-   */
-  const masterID = cfg.masterID
-
-  /**
-   * 默认不是主人
-   */
-  e.isMaster = false
-
-  /**
-   * 检查身份
-   */
-  if (event.author.id == masterID) {
-    /**
-     * 是主人
-     */
-    e.isMaster = true
-  }
 
   /**
    * 消息发送机制

@@ -56,12 +56,8 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     })
     msg = msg.replace(`(met)${item.id}(met)`, '').trim()
   }
-  let isMaster = false
   const cfg = getBotConfigByKey('kook')
   const masterID = cfg.masterID
-  if (event.msg_id == masterID) {
-    isMaster = true
-  }
   let at_user
   if (at) {
     if (at_users[0] && at_users[0].bot != true) {
@@ -78,7 +74,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     eventType: 'CREATE',
     isPrivate: true, //  kook没私域
     isRecall: false,
-    isMaster: isMaster,
+    isMaster: event.msg_id == masterID ? true : false,
     isGroup: event.channel_type == 'GROUP' ? true : false,
     boundaries: 'private',
     attribute: event.channel_type == 'GROUP' ? 'group' : 'single',

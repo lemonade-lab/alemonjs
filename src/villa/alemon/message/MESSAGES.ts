@@ -159,21 +159,6 @@ export async function MESSAGES_VILLA(event: BotEvent) {
   const masterID = cfg.masterID
 
   /**
-   * 默认不是主人
-   */
-  let isMaster = false
-
-  /**
-   * 检查身份
-   */
-  if (MessageContent.user.id == masterID) {
-    /**
-     * 是主人
-     */
-    isMaster = true
-  }
-
-  /**
    * 清除 @ 后的消息
    */
   const msg = txt.replace(/(@[^\s]+\s)(?!<)/g, '').trim()
@@ -232,7 +217,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
     /**
      * 是否是机器人主人
      */
-    isMaster: isMaster,
+    isMaster: MessageContent.user.id == masterID ? true : false,
     /*
      * 消息编号 这个消息是可以触发回复api的消息id
      */

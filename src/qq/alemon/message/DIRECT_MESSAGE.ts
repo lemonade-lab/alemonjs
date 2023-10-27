@@ -12,6 +12,7 @@ import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 
 declare global {
   //接口对象
@@ -40,9 +41,12 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 export const DIRECT_MESSAGE = async (event: directEventData) => {
+  const cfg = getBotConfigByKey('qq')
+  const masterID = cfg.masterID
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),
+    isMaster: event.msg.author.id == masterID ? true : false,
     event: 'MESSAGES',
     eventType: 'CREATE',
     isPrivate: false,

@@ -11,6 +11,7 @@ import { USER_DATA } from '../types.js'
 import IMGS from 'image-size'
 import { ClientKOA } from '../../../koa/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 
 /**
  * 错误打印
@@ -23,9 +24,12 @@ const error = err => {
 }
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
+  const cfg = getBotConfigByKey('ntqq')
+  const masterID = cfg.masterID
   const e = {
     platform: 'ntqq',
     bot: getBotMsgByNtqq(),
+    isMaster: event.author.id == masterID ? true : false,
     event: 'MESSAGES',
     eventType: 'CREATE',
     // 是私
