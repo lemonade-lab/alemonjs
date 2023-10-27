@@ -130,14 +130,9 @@ export function createClient(
         // 获取ip4
         let ip = await getIP()
         const ipp = getServerConfig('ip')
-        if (ipp != 'localhost') {
-          ip = ipp
-        }
+        if (ipp != 'localhost') ip = ipp
         console.info('villa open', `http://${ip}:${port}${callback_url}`)
-        if (!ip) {
-          console.error('vllia no public ip')
-          return
-        }
+        if (!ip) console.error('vllia no public ip')
       })
       .on('error', handlePortConflict)
   }

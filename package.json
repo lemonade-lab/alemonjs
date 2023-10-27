@@ -50,7 +50,9 @@
     "lib",
     "types",
     "run.js",
-    "run.d.ts"
+    "run.d.ts",
+    "logs.js",
+    "logs.d.ts"
   ],
   "exports": {
     ".": {
@@ -60,6 +62,10 @@
     "./run": {
       "import": "./run.js",
       "types": "./run.d.ts"
+    },
+    "./logs": {
+      "import": "./logs.js",
+      "types": "./logs.d.ts"
     }
   },
   "publishConfig": {

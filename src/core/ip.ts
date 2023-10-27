@@ -9,10 +9,7 @@ export async function getIP() {
   return await publicIp({
     timeout: 10000
   }).then(ip => {
-    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
-      myIp = ip
-      return myIp
-    }
-    return false
+    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) myIp = ip
+    return myIp ?? false
   })
 }
