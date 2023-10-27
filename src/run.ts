@@ -15,7 +15,7 @@ export function commandRun(ars: string[]) {
       continue
     }
     const isTypeScript = item.endsWith('.ts')
-    const command = isTypeScript ? 'npx ts-node' : 'node'
+    const command = isTypeScript ? 'ts-node' : 'node'
     const cmd = `${command} ${item} ${argsWithoutFiles}`
     console.info(cmd)
     const childProcess = spawn(cmd, { shell: true })
