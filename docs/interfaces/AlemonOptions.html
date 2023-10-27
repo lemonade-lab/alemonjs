@@ -35,7 +35,9 @@
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
 <div class="tsd-index-list"><a href="AlemonOptions.html#app" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>app?</span></a>
+<a href="AlemonOptions.html#character" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>character?</span></a>
 <a href="AlemonOptions.html#command" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>command?</span></a>
+<a href="AlemonOptions.html#defaultCharacter" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>default<wbr/>Character?</span></a>
 <a href="AlemonOptions.html#login" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>login?</span></a>
 <a href="AlemonOptions.html#mount" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>mount?</span></a>
 <a href="AlemonOptions.html#mysql" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>mysql?</span></a>
@@ -43,6 +45,7 @@
 <a href="AlemonOptions.html#pupStart" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>pup<wbr/>Start?</span></a>
 <a href="AlemonOptions.html#puppeteer" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>puppeteer?</span></a>
 <a href="AlemonOptions.html#redis" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>redis?</span></a>
+<a href="AlemonOptions.html#regex" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>regex?</span></a>
 <a href="AlemonOptions.html#scripts" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>scripts?</span></a>
 <a href="AlemonOptions.html#server" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>server?</span></a>
 <a href="AlemonOptions.html#shieldEvent" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>shield<wbr/>Event?</span></a>
@@ -60,7 +63,7 @@
 <ul class="tsd-parameters">
 <li class="tsd-parameter">
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">component</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
-<div class="tsd-comment tsd-typography"><p>可执行的依赖包</p>
+<div class="tsd-comment tsd-typography"><p>可执行的包</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
@@ -110,7 +113,15 @@ defaukt true</p>
 <div class="tsd-comment tsd-typography"></div></li></ul></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:22</li></ul></aside></section>
+<li>Defined in define/types.ts:34</li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="character" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>character</span><a href="#character" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">character</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">RegExp</span></div>
+<div class="tsd-comment tsd-typography"><p>自定义起始符规则</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in define/types.ts:26</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="command" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>command</span><a href="#command" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">command</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">cess</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;execSync&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;exec&quot;</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">cmd</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">[]</span></div>
@@ -125,7 +136,15 @@ defaukt true</p>
 <h5><span class="tsd-kind-property">cmd</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:101</li></ul></aside></section>
+<li>Defined in define/types.ts:113</li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="defaultCharacter" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>default<wbr/>Character</span><a href="#defaultCharacter" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">default<wbr/>Character</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">&quot;/&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;#&quot;</span></div>
+<div class="tsd-comment tsd-typography"><p>默认特征</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in define/types.ts:30</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="login" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>login</span><a href="#login" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">login</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">LoginOptions</span></div>
@@ -133,7 +152,7 @@ defaukt true</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:92</li></ul></aside></section>
+<li>Defined in define/types.ts:104</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="mount" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>mount</span><a href="#mount" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">mount</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">false</span></div>
@@ -149,10 +168,10 @@ defaukt true</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:136</li></ul></aside></section>
+<li>Defined in define/types.ts:148</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="plugin" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>plugin</span><a href="#plugin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">plugin</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">RegexClose</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type ">RegExp</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">RegexOpen</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type ">RegExp</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">directory</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">init</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">main</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">type</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;ts&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;js&quot;</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
+<div class="tsd-signature"><span class="tsd-kind-property">plugin</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">RegexClose</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type ">RegExp</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">RegexOpen</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type ">RegExp</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">directory</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">init</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">main</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">type</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;ts&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;js&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;stript&quot;</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
 <div class="tsd-comment tsd-typography"><p>插件配置</p>
 </div>
 <div class="tsd-type-declaration">
@@ -187,13 +206,13 @@ type=&#39;ts&#39;
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li class="tsd-parameter">
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">type</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;ts&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;js&quot;</span></h5>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">type</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;ts&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;js&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;stript&quot;</span></h5>
 <div class="tsd-comment tsd-typography"><p>入口文件类型</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:60</li></ul></aside></section>
+<li>Defined in define/types.ts:72</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="pupStart" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>pup<wbr/>Start</span><a href="#pupStart" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">pup<wbr/>Start</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">false</span></div>
@@ -202,7 +221,7 @@ defaut true</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:128</li></ul></aside></section>
+<li>Defined in define/types.ts:140</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="puppeteer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>puppeteer</span><a href="#puppeteer" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">puppeteer</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">PuppeteerLaunchOptions</span></div>
@@ -210,7 +229,7 @@ defaut true</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:123</li></ul></aside></section>
+<li>Defined in define/types.ts:135</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="redis" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>redis</span><a href="#redis" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">redis</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">RedisOptions</span></div>
@@ -218,7 +237,15 @@ defaut true</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:132</li></ul></aside></section>
+<li>Defined in define/types.ts:144</li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="regex" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>regex</span><a href="#regex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">regex</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>是否生成json</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in define/types.ts:22</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="scripts" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>scripts</span><a href="#scripts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">scripts</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">ars</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">file</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;node&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ts-node&quot;</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">[]</span></div>
@@ -238,7 +265,7 @@ defaut true</p>
 <h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-property">name</span><span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;node&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ts-node&quot;</span></h5></li></ul></div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:108</li></ul></aside></section>
+<li>Defined in define/types.ts:120</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="server" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>server</span><a href="#server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">server</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type ">ServerOptions</span></div>
@@ -246,7 +273,7 @@ defaut true</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:119</li></ul></aside></section>
+<li>Defined in define/types.ts:131</li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="shieldEvent" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>shield<wbr/>Event</span><a href="#shieldEvent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">shield<wbr/>Event</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
@@ -263,7 +290,7 @@ defaukt app*1000</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in define/types.ts:97</li></ul></aside></section></section></div>
+<li>Defined in define/types.ts:109</li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -284,7 +311,9 @@ defaukt app*1000</p>
 <div class="tsd-accordion-details">
 <ul>
 <li><a href="#app" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>app</span></a></li>
+<li><a href="#character" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>character</span></a></li>
 <li><a href="#command" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>command</span></a></li>
+<li><a href="#defaultCharacter" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>default<wbr/>Character</span></a></li>
 <li><a href="#login" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>login</span></a></li>
 <li><a href="#mount" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>mount</span></a></li>
 <li><a href="#mysql" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>mysql</span></a></li>
@@ -292,6 +321,7 @@ defaukt app*1000</p>
 <li><a href="#pupStart" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>pup<wbr/>Start</span></a></li>
 <li><a href="#puppeteer" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>puppeteer</span></a></li>
 <li><a href="#redis" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>redis</span></a></li>
+<li><a href="#regex" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>regex</span></a></li>
 <li><a href="#scripts" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>scripts</span></a></li>
 <li><a href="#server" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>server</span></a></li>
 <li><a href="#shieldEvent" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>shield<wbr/>Event</span></a></li>
