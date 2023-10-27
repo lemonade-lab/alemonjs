@@ -11,17 +11,11 @@ import { getBotConfigByKey } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
 import { ClientKOA } from '../../../koa/index.js'
 import IMGS from 'image-size'
-import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
-
-/**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
-}
+import {
+  AlemonJSError,
+  AlemonJSLog,
+  everyoneError
+} from '../../../log/index.js'
 
 /**
  * 公私域合并
@@ -63,7 +57,9 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       try {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByGroup(event.group_id, url).catch(error)
+        return await Client.postFilesByGroup(event.group_id, url).catch(
+          everyoneError
+        )
       } catch (err) {
         console.error(err)
         return err
@@ -87,7 +83,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
           event.group_id,
           `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           select?.quote
-        ).catch(error)
+        ).catch(everyoneError)
       } catch (err) {
         console.error(err)
         return err
@@ -115,7 +111,9 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       if (Buffer.isBuffer(msg)) {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByGroup(event.group_id, url).catch(error)
+        return await Client.postFilesByGroup(event.group_id, url).catch(
+          everyoneError
+        )
       }
     }
 
@@ -123,7 +121,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       event.group_id,
       content,
       select?.quote
-    ).catch(error)
+    ).catch(everyoneError)
   }
 
   e.replyCard = async (arr: CardType[]) => {

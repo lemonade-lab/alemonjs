@@ -17,16 +17,6 @@ declare global {
  */
 
 /**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
-}
-
-/**
  * 获取当前用户下的所有频道列表
  * @returns
  */

@@ -2,23 +2,17 @@ import { typeMessage, AMessage } from '../../../core/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { EventData } from '../types.js'
 import { getBotMsgByQQ } from '../bot.js'
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+import {
+  AlemonJSEventError,
+  AlemonJSEventLog,
+  everyoneError
+} from '../../../log/index.js'
 
 /**
  * *
  * 公域
  * *
  */
-
-/**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
-}
 
 /**
  PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
@@ -53,7 +47,7 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventData) => {
    * 消息创建
    */
   if (new RegExp(/CREATE$/).test(event.eventType)) {
-    mergeMessages(e as AMessage, event).catch(error)
+    mergeMessages(e as AMessage, event).catch(everyoneError)
     return
   }
 }

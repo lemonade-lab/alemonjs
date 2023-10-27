@@ -9,7 +9,11 @@ import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { now_e } from './e.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
+import {
+  AlemonJSError,
+  AlemonJSLog,
+  everyoneError
+} from '../../../log/index.js'
 import { ClientKOA } from '../../../koa/index.js'
 
 /**
@@ -37,16 +41,6 @@ const recallMessage = (
     }, select?.withdraw)
   }
   return res
-}
-
-/**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
 }
 
 /**
@@ -294,7 +288,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           height: dimensions.height
         })
           .then(res => recallMessage(res?.data, select, villa_id, room_id))
-          .catch(error)
+          .catch(everyoneError)
       }
       /**
        * isString arr and find buffer
@@ -329,7 +323,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
             }
           )
             .then(res => recallMessage(res?.data, select, villa_id, room_id))
-            .catch(error)
+            .catch(everyoneError)
         } else {
           return await Client.sendMessageTextEntitiesUrl(
             villa_id,
@@ -343,7 +337,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
             }
           )
             .then(res => recallMessage(res?.data, select, villa_id, room_id))
-            .catch(error)
+            .catch(everyoneError)
         }
       }
       // string and string[]
@@ -373,7 +367,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
             height: dimensions.height
           })
             .then(res => recallMessage(res?.data, select, villa_id, room_id))
-            .catch(error)
+            .catch(everyoneError)
         }
       }
 
@@ -384,7 +378,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       if (entities.length == 0 && content != '') {
         return await Client.sendMessageText(villa_id, room_id, content)
           .then(res => recallMessage(res?.data, select, villa_id, room_id))
-          .catch(error)
+          .catch(everyoneError)
       } else if (entities.length != 0 && content != '') {
         return await Client.sendMessageTextEntities(
           villa_id,
@@ -393,7 +387,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           entities
         )
           .then(res => recallMessage(res?.data, select, villa_id, room_id))
-          .catch(error)
+          .catch(everyoneError)
       }
       return false
     },

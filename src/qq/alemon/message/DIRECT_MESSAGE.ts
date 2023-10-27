@@ -10,23 +10,18 @@ import { ClientAPIByQQ as Client } from '../../sdk/index.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+import {
+  AlemonJSError,
+  AlemonJSLog,
+  AlemonJSEventError,
+  AlemonJSEventLog,
+  everyoneError
+} from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 
 declare global {
   //接口对象
   var clientApiByQQ: IOpenAPI
-}
-
-/**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
 }
 
 /**
@@ -74,7 +69,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
   /**
    * 优化接口
    */
-  await directMessage(e, event).catch(error)
+  await directMessage(e, event).catch(everyoneError)
   console.info(
     `\n[${event.msg.author.username}][${event.msg.author.id}][${e.isGroup}] ${
       event.msg.content ? event.msg.content : ''
@@ -97,7 +92,7 @@ async function directMessage(e: AMessage, event: directEventData) {
           id: event.msg.guild_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg //buffer
-        }).catch(error)
+        }).catch(everyoneError)
       } catch (err) {
         console.error(err)
         return err
@@ -119,7 +114,7 @@ async function directMessage(e: AMessage, event: directEventData) {
           msg_id: event.msg.id, //消息id, 必须
           image: msg[isBuffer] as Buffer, //buffer
           content: cont
-        }).catch(error)
+        }).catch(everyoneError)
       } catch (err) {
         console.error(err)
         return err
@@ -145,7 +140,7 @@ async function directMessage(e: AMessage, event: directEventData) {
           id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg //buffer
-        }).catch(error)
+        }).catch(everyoneError)
       }
     }
 
@@ -154,7 +149,7 @@ async function directMessage(e: AMessage, event: directEventData) {
         msg_id: event.msg.id,
         content
       })
-      .catch(error)
+      .catch(everyoneError)
   }
   e.replyCard = async (arr: CardType[]) => {
     for (const item of arr) {
@@ -165,7 +160,7 @@ async function directMessage(e: AMessage, event: directEventData) {
               msg_id: event.msg.id,
               ...item.card
             })
-            .catch(error)
+            .catch(everyoneError)
         } else {
           return false
         }

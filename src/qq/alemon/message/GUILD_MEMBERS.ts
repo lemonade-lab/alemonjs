@@ -9,21 +9,16 @@ import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
 import { ClientAPIByQQ as Client } from '../../sdk/index.js'
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+
+import {
+  AlemonJSEventError,
+  AlemonJSEventLog,
+  everyoneError
+} from '../../../log/index.js'
 
 declare global {
   //接口对象
   var clientApiByQQ: IOpenAPI
-}
-
-/**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
 }
 
 /**
@@ -52,7 +47,7 @@ export const GUILD_MEMBERS = async (event: any) => {
       const { data } = res
       return data
     })
-    .catch(error)
+    .catch(everyoneError)
 
   if (typeof ChannelsData == 'boolean') {
     console.info(`[${Eevent}] [${eventType}] ${false}`)
@@ -96,7 +91,7 @@ export const GUILD_MEMBERS = async (event: any) => {
             id: ChannelData.id,
             msg_id: event.msg.id, //消息id, 必须
             image: msg //buffer
-          }).catch(error)
+          }).catch(everyoneError)
         } catch (err) {
           console.error(err)
           return err
@@ -118,7 +113,7 @@ export const GUILD_MEMBERS = async (event: any) => {
             msg_id: event.msg.id, //消息id, 必须
             image: msg[isBuffer] as Buffer, //buffer
             content: cont
-          }).catch(error)
+          }).catch(everyoneError)
         } catch (err) {
           console.error(err)
           return err
@@ -145,7 +140,7 @@ export const GUILD_MEMBERS = async (event: any) => {
             id: event.msg.channel_id,
             msg_id: event.msg.id, //消息id, 必须
             image: msg //buffer
-          }).catch(error)
+          }).catch(everyoneError)
         }
       }
 
@@ -156,7 +151,7 @@ export const GUILD_MEMBERS = async (event: any) => {
         .postMessage(ChannelData.id, {
           content
         })
-        .catch(error)
+        .catch(everyoneError)
     },
     replyCard: async (arr: CardType[]) => {
       for (const item of arr) {
@@ -167,7 +162,7 @@ export const GUILD_MEMBERS = async (event: any) => {
                 msg_id: event.msg.id,
                 ...item.card
               })
-              .catch(error)
+              .catch(everyoneError)
           } else {
             return false
           }

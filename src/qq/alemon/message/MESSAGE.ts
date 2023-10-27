@@ -11,23 +11,17 @@ import { EventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { setBotMsgByQQ } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/user.js'
+import {
+  AlemonJSError,
+  AlemonJSLog,
+  everyoneError
+} from '../../../log/index.js'
 
 declare global {
   /**
    * 接口对象
    */
   var clientApiByQQ: IOpenAPI
-}
-
-/**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
 }
 
 /**
@@ -94,7 +88,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg //buffer
-        }).catch(error)
+        }).catch(everyoneError)
       } catch (err) {
         console.error(err)
         return err
@@ -116,7 +110,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           msg_id: event.msg.id, //消息id, 必须
           image: msg[isBuffer] as Buffer, //buffer
           content: cont
-        }).catch(error)
+        }).catch(everyoneError)
       } catch (err) {
         console.error(err)
         return err
@@ -145,7 +139,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           id: event.msg.channel_id,
           msg_id: event.msg.id, //消息id, 必须
           image: msg //buffer
-        }).catch(error)
+        }).catch(everyoneError)
       }
     }
 
@@ -160,7 +154,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
           ? { message_id: select?.quote }
           : undefined
       })
-      .catch(error)
+      .catch(everyoneError)
   }
 
   e.replyCard = async (arr: CardType[]) => {
@@ -172,7 +166,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
               msg_id: event.msg.id,
               ...item.card
             })
-            .catch(error)
+            .catch(everyoneError)
         } else {
           return false
         }
@@ -198,7 +192,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
         message_id: mid,
         ...boj
       })
-      .catch(error)
+      .catch(everyoneError)
   }
 
   /**
@@ -216,7 +210,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
         message_id: mid,
         ...boj
       })
-      .catch(error)
+      .catch(everyoneError)
   }
 
   /**
@@ -332,7 +326,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       withdraw?: number
     }
   ): Promise<any> => {
-    return await Private(event.msg, msg).catch(error)
+    return await Private(event.msg, msg).catch(everyoneError)
   }
 
   /**

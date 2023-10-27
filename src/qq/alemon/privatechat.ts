@@ -2,14 +2,10 @@ import { IOpenAPI } from 'qq-guild-bot'
 import { ClientAPIByQQ as Client } from '../sdk/index.js'
 import { QQEMessage } from './types.js'
 import { getUrlbuffer } from '../../core/index.js'
+import { everyoneError } from '../../log/index.js'
 
 declare global {
   var clientApiByQQ: IOpenAPI
-}
-
-const error = err => {
-  console.error(err)
-  return false
 }
 
 /**
@@ -32,7 +28,7 @@ export const Private = async (
       source_guild_id: EMessage.guild_id,
       recipient_id: EMessage.author.id
     })
-    .catch(error)
+    .catch(everyoneError)
 
   if (!postSessionRes) return false
 
@@ -47,7 +43,7 @@ export const Private = async (
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: msg //buffer
-      }).catch(error)
+      }).catch(everyoneError)
     } catch (err) {
       console.error(err)
       return err
@@ -68,7 +64,7 @@ export const Private = async (
         msg_id: EMessage.id, //消息id, 必须
         image: msg[isBuffer] as Buffer, //buffer
         content: cont
-      }).catch(error)
+      }).catch(everyoneError)
     } catch (err) {
       console.error(err)
       return err
@@ -98,7 +94,7 @@ export const Private = async (
         id: EMessage.guild_id,
         msg_id: EMessage.id, //消息id, 必须
         image: msg //buffer
-      }).catch(error)
+      }).catch(everyoneError)
     }
   }
 
@@ -107,5 +103,5 @@ export const Private = async (
       msg_id: EMessage.id,
       content
     })
-    .catch(error)
+    .catch(everyoneError)
 }

@@ -1,21 +1,15 @@
 import { typeMessage, AMessage } from '../../../core/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { getBotMsgByQQ } from '../bot.js'
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+import {
+  everyoneError,
+  AlemonJSEventError,
+  AlemonJSEventLog
+} from '../../../log/index.js'
 
 /**
  * *私域*
  */
-
-/**
- * 错误打印
- * @param err
- * @returns
- */
-const error = err => {
-  console.error(err)
-  return err
-}
 
 /** 
 GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置此 intents。
@@ -58,5 +52,5 @@ export const GUILD_MESSAGES = async (event: any) => {
   /**
    * 消息方法
    */
-  mergeMessages(e as AMessage, event).catch(error)
+  mergeMessages(e as AMessage, event).catch(everyoneError)
 }
