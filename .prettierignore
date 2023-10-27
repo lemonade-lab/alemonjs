@@ -8,6 +8,8 @@ types
 # 配置
 /config/
 
+docs
+
 # 插件
 /application/
 /public/

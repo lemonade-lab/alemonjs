@@ -17,6 +17,8 @@ tsconfig.json
 .npmrc
 .apps
 
+docs
+
 # 插件
 /application/
 /example/
