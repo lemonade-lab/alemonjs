@@ -4,7 +4,7 @@ import {
   InstructionMatching,
   getUrlbuffer
 } from '../../../core/index.js'
-import { KOOKApiClient, EventData } from '../../sdk/index.js'
+import { ClientKOOK, EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -107,16 +107,16 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
        */
       if (Buffer.isBuffer(msg)) {
         try {
-          const ret = await KOOKApiClient.postImage(msg)
+          const ret = await ClientKOOK.postImage(msg)
           if (ret && ret.data) {
             if (event.channel_type == 'GROUP') {
-              return await KOOKApiClient.createMessage({
+              return await ClientKOOK.createMessage({
                 type: 2,
                 target_id: event.target_id,
                 content: ret.data.url
               }).catch(everyoneError)
             }
-            return await KOOKApiClient.createDirectMessage({
+            return await ClientKOOK.createDirectMessage({
               type: 2,
               target_id: event.target_id,
               chat_code: event.extra.code,
@@ -144,17 +144,17 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           .filter(element => typeof element === 'string')
           .join('')
         // 转存
-        const ret = await KOOKApiClient.postImage(msg[isBuffer] as Buffer)
+        const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer)
         if (!ret) return false
         if (ret?.data) {
           // 群
           if (event.channel_type == 'GROUP') {
-            await KOOKApiClient.createMessage({
+            await ClientKOOK.createMessage({
               type: 9,
               target_id: event.target_id,
               content: content
             }).catch(err => err)
-            return await KOOKApiClient.createMessage({
+            return await ClientKOOK.createMessage({
               type: 2,
               target_id: event.target_id,
               content: ret.data.url
@@ -162,13 +162,13 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
           }
         }
         // 私聊
-        await KOOKApiClient.createDirectMessage({
+        await ClientKOOK.createDirectMessage({
           type: 9,
           target_id: event.target_id,
           chat_code: event.extra.code,
           content: content
         })
-        return await KOOKApiClient.createDirectMessage({
+        return await ClientKOOK.createDirectMessage({
           type: 2,
           target_id: event.target_id,
           chat_code: event.extra.code,
@@ -190,17 +190,17 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)
         if (!msg) return false
-        const ret = await KOOKApiClient.postImage(msg)
+        const ret = await ClientKOOK.postImage(msg)
         if (!ret) return false
         if (msg && ret) {
           if (event.channel_type == 'GROUP') {
-            return await KOOKApiClient.createMessage({
+            return await ClientKOOK.createMessage({
               type: 2,
               target_id: event.target_id,
               content: ret.data.url
             }).catch(everyoneError)
           }
-          return await KOOKApiClient.createDirectMessage({
+          return await ClientKOOK.createDirectMessage({
             type: 2,
             target_id: event.target_id,
             chat_code: event.extra.code,
@@ -210,7 +210,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       }
       if (event.channel_type == 'GROUP') {
         try {
-          return await KOOKApiClient.createMessage({
+          return await ClientKOOK.createMessage({
             type: 9,
             target_id: event.target_id,
             content
@@ -221,7 +221,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         }
       }
       try {
-        return await KOOKApiClient.createDirectMessage({
+        return await ClientKOOK.createDirectMessage({
           type: 9,
           target_id: event.target_id,
           chat_code: event.extra.code,

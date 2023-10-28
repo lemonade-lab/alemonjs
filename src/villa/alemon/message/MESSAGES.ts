@@ -4,7 +4,7 @@ import {
   UserType,
   getUrlbuffer
 } from '../../../core/index.js'
-import { BotEvent, MessageContentType, Client } from '../../sdk/index.js'
+import { BotEvent, MessageContentType, ClientVILLA } from '../../sdk/index.js'
 import IMGS from 'image-size'
 import { segmentVilla } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -33,7 +33,7 @@ const recallMessage = (
 ) => {
   if (res && res.bot_msg_id && select?.withdraw && select?.withdraw > 1000) {
     setTimeout(() => {
-      Client.recallMessage(villa_id, {
+      ClientVILLA.recallMessage(villa_id, {
         room_id: String(room_id),
         msg_uid: res.bot_msg_id,
         msg_time: new Date().getTime()
@@ -51,7 +51,7 @@ const recallMessage = (
  * @returns
  */
 const unloading = async (villa_id: number, uul: string) => {
-  const NowObj = await Client.transferImage(villa_id, uul)
+  const NowObj = await ClientVILLA.transferImage(villa_id, uul)
   if (!NowObj?.data?.new_url) return uul
   return NowObj?.data?.new_url
 }
@@ -283,7 +283,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         if (!uul) return false
         const url = await unloading(villa_id, uul)
         const dimensions = IMGS.imageSize(msg)
-        return await Client.sendMessageImage(villa_id, room_id, url, {
+        return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
           width: dimensions.width,
           height: dimensions.height
         })
@@ -305,14 +305,17 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           .filter(element => typeof element === 'string')
           .join('')
         // 字符解析器
-        const { entities, content } = await Client.stringParsing(cont, villa_id)
+        const { entities, content } = await ClientVILLA.stringParsing(
+          cont,
+          villa_id
+        )
         // 挂载图片
         const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
         const uul = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
         if (!uul) return false
         const url = await unloading(villa_id, uul)
         if (entities.length == 0) {
-          return await Client.sendMessageTextUrl(
+          return await ClientVILLA.sendMessageTextUrl(
             villa_id,
             room_id,
             content,
@@ -325,7 +328,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
             .then(res => recallMessage(res?.data, select, villa_id, room_id))
             .catch(everyoneError)
         } else {
-          return await Client.sendMessageTextEntitiesUrl(
+          return await ClientVILLA.sendMessageTextEntitiesUrl(
             villa_id,
             room_id,
             content,
@@ -362,7 +365,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           if (!uul) return false
           const url = await unloading(villa_id, uul)
           const dimensions = IMGS.imageSize(msg)
-          return await Client.sendMessageImage(villa_id, room_id, url, {
+          return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
             width: dimensions.width,
             height: dimensions.height
           })
@@ -374,13 +377,16 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       /**
        * reply
        */
-      const { entities, content } = await Client.stringParsing(cont, villa_id)
+      const { entities, content } = await ClientVILLA.stringParsing(
+        cont,
+        villa_id
+      )
       if (entities.length == 0 && content != '') {
-        return await Client.sendMessageText(villa_id, room_id, content)
+        return await ClientVILLA.sendMessageText(villa_id, room_id, content)
           .then(res => recallMessage(res?.data, select, villa_id, room_id))
           .catch(everyoneError)
       } else if (entities.length != 0 && content != '') {
-        return await Client.sendMessageTextEntities(
+        return await ClientVILLA.sendMessageTextEntities(
           villa_id,
           room_id,
           content,

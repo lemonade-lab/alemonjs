@@ -1,4 +1,4 @@
-export * as KOOKApiClient from './api.js'
+export * as ClientKOOK from './api.js'
 export * from './config.js'
 export * from './typings.js'
 export * from './ws.js'

@@ -1,11 +1,11 @@
 import { IOpenAPI } from 'qq-guild-bot'
-import { ClientAPIByQQ as Client } from '../sdk/index.js'
+import { ClientQQ as Client } from '../sdk/index.js'
 import { QQEMessage } from './types.js'
 import { getUrlbuffer } from '../../core/index.js'
 import { everyoneError } from '../../log/index.js'
 
 declare global {
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 
 /**
@@ -23,7 +23,7 @@ export const Private = async (
     withdraw?: number
   }
 ): Promise<any> => {
-  const postSessionRes: any = await clientApiByQQ.directMessageApi
+  const postSessionRes: any = await ClientQQ.directMessageApi
     .createDirectMessage({
       source_guild_id: EMessage.guild_id,
       recipient_id: EMessage.author.id
@@ -98,7 +98,7 @@ export const Private = async (
     }
   }
 
-  return await clientApiByQQ.directMessageApi
+  return await ClientQQ.directMessageApi
     .postDirectMessage(guild_id, {
       msg_id: EMessage.id,
       content

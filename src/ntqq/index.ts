@@ -4,7 +4,7 @@ import { conversation } from './alemon/conversation.js'
 import {
   setBotNTQQConfig,
   createClient,
-  ClientAPIByQQ,
+  ClientNTQQ,
   BotConfig
 } from './sdk/index.js'
 
@@ -32,7 +32,7 @@ export async function createAlemonByNtqq() {
     /**
      * 发送请求
      */
-    const data: aut = await ClientAPIByQQ.getAuthentication(
+    const data: aut = await ClientNTQQ.getAuthentication(
       cfg.appID,
       cfg.secret
     ).then(res => res.data)
@@ -53,7 +53,7 @@ export async function createAlemonByNtqq() {
       /**
        * 发送请求
        */
-      const data: aut = await ClientAPIByQQ.getAuthentication(
+      const data: aut = await ClientNTQQ.getAuthentication(
         cfg.appID,
         cfg.secret
       ).then(res => res.data)

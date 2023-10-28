@@ -4,7 +4,7 @@ import {
   AMessage,
   getUrlbuffer
 } from '../../../core/index.js'
-import { ClientAPIByQQ as Client } from '../../sdk/index.js'
+import { ClientNTQQ } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -57,7 +57,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       try {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByGroup(event.group_id, url).catch(
+        return await ClientNTQQ.postFilesByGroup(event.group_id, url).catch(
           everyoneError
         )
       } catch (err) {
@@ -79,7 +79,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
         const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
         const url = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
         if (!url) return false
-        return await Client.postMessageByGroup(
+        return await ClientNTQQ.postMessageByGroup(
           event.group_id,
           `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           select?.quote
@@ -111,13 +111,13 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       if (Buffer.isBuffer(msg)) {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByGroup(event.group_id, url).catch(
+        return await ClientNTQQ.postFilesByGroup(event.group_id, url).catch(
           everyoneError
         )
       }
     }
 
-    return await Client.postMessageByGroup(
+    return await ClientNTQQ.postMessageByGroup(
       event.group_id,
       content,
       select?.quote

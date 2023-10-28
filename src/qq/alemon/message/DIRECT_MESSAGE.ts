@@ -6,7 +6,7 @@ import {
   CardType,
   getUrlbuffer
 } from '../../../core/index.js'
-import { ClientAPIByQQ as Client } from '../../sdk/index.js'
+import { ClientQQ as Client } from '../../sdk/index.js'
 import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -21,7 +21,7 @@ import { getBotConfigByKey } from '../../../config/index.js'
 
 declare global {
   //接口对象
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 
 /**
@@ -144,7 +144,7 @@ async function directMessage(e: AMessage, event: directEventData) {
       }
     }
 
-    return await clientApiByQQ.directMessageApi
+    return await ClientQQ.directMessageApi
       .postDirectMessage(event.msg.guild_id, {
         msg_id: event.msg.id,
         content
@@ -155,7 +155,7 @@ async function directMessage(e: AMessage, event: directEventData) {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          await clientApiByQQ.messageApi
+          await ClientQQ.messageApi
             .postMessage(event.msg.channel_id, {
               msg_id: event.msg.id,
               ...item.card

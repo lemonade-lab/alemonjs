@@ -4,7 +4,7 @@ import { checkRobotByQQ } from './login.js'
 import { createConversationByQQ } from './alemon/conversation.js'
 import { getBotConfigByKey } from '../config/index.js'
 declare global {
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 export async function createAlemonByQQ() {
   /**
@@ -21,9 +21,9 @@ export async function createAlemonByQQ() {
      */
     const cfg = getBotConfigByKey('qq')
     /**
-     * 创建 clientApiByQQ
+     * 创建 ClientQQ
      */
-    global.clientApiByQQ = createOpenAPI({
+    global.ClientQQ = createOpenAPI({
       appID: cfg.appID,
       token: cfg.token,
       sandbox: cfg.sandbox ?? false

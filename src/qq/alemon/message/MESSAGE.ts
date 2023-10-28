@@ -5,7 +5,7 @@ import {
   AMessage,
   getUrlbuffer
 } from '../../../core/index.js'
-import { ClientAPIByQQ as Client } from '../../sdk/index.js'
+import { ClientQQ as Client } from '../../sdk/index.js'
 import { Private } from '../privatechat.js'
 import { EventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
@@ -21,7 +21,7 @@ declare global {
   /**
    * 接口对象
    */
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 
 /**
@@ -146,7 +146,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     /**
      * 发送接口
      */
-    return await clientApiByQQ.messageApi
+    return await ClientQQ.messageApi
       .postMessage(event.msg.channel_id, {
         msg_id: event.msg.id,
         content,
@@ -161,7 +161,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     for (const item of arr) {
       try {
         if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          return await clientApiByQQ.messageApi
+          return await ClientQQ.messageApi
             .postMessage(event.msg.channel_id, {
               msg_id: event.msg.id,
               ...item.card
@@ -187,7 +187,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    return await clientApiByQQ.reactionApi
+    return await ClientQQ.reactionApi
       .postReaction(event.msg.channel_id, {
         message_id: mid,
         ...boj
@@ -205,7 +205,7 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
     mid: string,
     boj: { emoji_type: number; emoji_id: string }
   ): Promise<boolean> => {
-    return await clientApiByQQ.reactionApi
+    return await ClientQQ.reactionApi
       .deleteReaction(event.msg.channel_id, {
         message_id: mid,
         ...boj

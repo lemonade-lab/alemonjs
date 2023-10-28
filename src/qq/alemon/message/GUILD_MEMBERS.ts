@@ -8,7 +8,7 @@ import {
 import { getBotMsgByQQ } from '../bot.js'
 
 // 非依赖引用
-import { ClientAPIByQQ as Client } from '../../sdk/index.js'
+import { ClientQQ as Client } from '../../sdk/index.js'
 
 import {
   AlemonJSEventError,
@@ -18,7 +18,7 @@ import {
 
 declare global {
   //接口对象
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 
 /**
@@ -41,7 +41,7 @@ export const GUILD_MEMBERS = async (event: any) => {
   /**
    * 得到频道列表
    */
-  const ChannelsData: boolean | any[] = await clientApiByQQ.channelApi
+  const ChannelsData: boolean | any[] = await ClientQQ.channelApi
     .channels(event.msg.guild_id)
     .then(res => {
       const { data } = res
@@ -147,7 +147,7 @@ export const GUILD_MEMBERS = async (event: any) => {
       /**
        * 发送文字
        */
-      return await clientApiByQQ.messageApi
+      return await ClientQQ.messageApi
         .postMessage(ChannelData.id, {
           content
         })
@@ -157,7 +157,7 @@ export const GUILD_MEMBERS = async (event: any) => {
       for (const item of arr) {
         try {
           if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-            await clientApiByQQ.messageApi
+            await ClientQQ.messageApi
               .postMessage(event.msg.channel_id, {
                 msg_id: event.msg.id,
                 ...item.card

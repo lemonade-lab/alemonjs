@@ -2,6 +2,7 @@ import WebSocket from 'ws'
 import { requestService } from './api.js'
 import { getBotConfig } from './config.js'
 import { getIntentsMask } from './intents.js'
+
 /**
  * @param token  token
  * @returns
@@ -20,12 +21,16 @@ export async function getGatewayUrl(): Promise<string | undefined> {
     console.error('token err:', error.message)
   }
 }
+
 /**
  * 使用获取到的网关连接地址建立 WebSocket 连接
  * @param token
  * @param callBack
  */
-export async function createClient(callBack: (...args: any[]) => any) {
+export async function createClient(
+  callBack: (...args: any[]) => any,
+  shard = [0, 4]
+) {
   /**
    * 请求url
    */
@@ -103,7 +108,7 @@ export async function createClient(callBack: (...args: any[]) => any) {
               d: {
                 token: `Bot ${appID}.${token}`,
                 intents: getIntentsMask(intents),
-                shard: [0, 4],
+                shard,
                 properties: {
                   $os: 'linux',
                   $browser: 'my_library',

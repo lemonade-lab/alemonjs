@@ -4,30 +4,26 @@
  * ***********
  */
 import { IOpenAPI } from 'qq-guild-bot'
-import { ClientAPIByQQ as ClientByNTQQ } from './ntqq/sdk/index.js'
-import { Client as ClientByVILLA } from './villa/sdk/index.js'
-import { KOOKApiClient as ClientByKOOK } from './kook/sdk/index.js'
-import { ClientKOA as ClientByKOA } from './koa/index.js'
 declare global {
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 /**
  * qq客户端
  */
-export const ClientQQ = global.ClientAPIByQQ
-/**
- * kook客户端
- */
-export const ClientKOOK = ClientByKOOK
-/**
- * ntqq客户端
- */
-export const ClientNTQQ = ClientByNTQQ
+export const ClientQQ = global.ClientQQ
 /**
  * villa客户端
  */
-export const ClientVILLA = ClientByVILLA
+export { ClientVILLA } from './villa/sdk/index.js'
+/**
+ * ntqq客户端
+ */
+export { ClientNTQQ } from './ntqq/sdk/index.js'
 /**
  * server客户端
  */
-export const ClientKOA = ClientByKOA
+export { ClientKOA } from './koa/index.js'
+/**
+ * kook客户端
+ */
+export { ClientKOOK } from './kook/sdk/index.js'

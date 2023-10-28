@@ -7,7 +7,7 @@
 import { IGuild, IChannel, IMember, IOpenAPI } from 'qq-guild-bot'
 
 declare global {
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 
 /**
@@ -21,7 +21,7 @@ declare global {
  * @returns
  */
 export const getGuildList = async (): Promise<boolean | IGuild[]> => {
-  return await clientApiByQQ.meApi.meGuilds().then(res => {
+  return await ClientQQ.meApi.meGuilds().then(res => {
     const { data } = res
     return data
   })
@@ -42,7 +42,7 @@ description	string	描述
 export const getGuildMsg = async (
   guildId: string
 ): Promise<boolean | IGuild> => {
-  return await clientApiByQQ.guildApi.guild(guildId).then(res => {
+  return await ClientQQ.guildApi.guild(guildId).then(res => {
     const { data } = res
     return data
   })
@@ -71,7 +71,7 @@ owner_id	string	创建人 ID
 export const getChannels = async (
   guildId: string
 ): Promise<boolean | IChannel[]> => {
-  return await clientApiByQQ.channelApi.channels(guildId).then(res => {
+  return await ClientQQ.channelApi.channels(guildId).then(res => {
     const { data } = res
     return data
   })
@@ -92,7 +92,7 @@ owner_id	string	创建人 ID
 export const getChannel = async (
   channelId: string
 ): Promise<boolean | IChannel> => {
-  return await clientApiByQQ.channelApi.channel(channelId).then(res => {
+  return await ClientQQ.channelApi.channel(channelId).then(res => {
     const { data } = res
     return data
   })
@@ -128,7 +128,7 @@ export const getGuildMemberMsg = async (
   guildId: string,
   userId: string
 ): Promise<boolean | IMember> => {
-  return await clientApiByQQ.guildApi.guildMember(guildId, userId).then(res => {
+  return await ClientQQ.guildApi.guildMember(guildId, userId).then(res => {
     const { data } = res
     return data
   })
@@ -175,7 +175,7 @@ export const deleteMsg = async (
   messageID: string,
   hideTip?: boolean
 ): Promise<any> => {
-  return await clientApiByQQ.messageApi
+  return await ClientQQ.messageApi
     .deleteMessage(channelID, messageID, hideTip)
     .then(res => {
       const { data } = res

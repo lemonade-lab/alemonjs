@@ -2,7 +2,7 @@ import { IOpenAPI } from 'qq-guild-bot'
 import { not_permissions, permissions } from './types.js'
 import { everyoneError } from '../../log/index.js'
 declare global {
-  var clientApiByQQ: IOpenAPI
+  var ClientQQ: IOpenAPI
 }
 
 /**
@@ -26,7 +26,7 @@ export function getPermissionsFromValue(value: number) {
  */
 export async function channewlPermissions(channel_id: any, id: any) {
   /* 自身机器人权限检测 */
-  const authority: any = await clientApiByQQ.channelPermissionsApi
+  const authority: any = await ClientQQ.channelPermissionsApi
     .channelPermissions(channel_id, id)
     .catch(everyoneError)
 

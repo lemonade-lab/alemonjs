@@ -4,7 +4,7 @@ import {
   AMessage,
   getUrlbuffer
 } from '../../../core/index.js'
-import { ClientAPIByQQ as Client } from '../../sdk/index.js'
+import { ClientNTQQ } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { USER_DATA } from '../types.js'
@@ -48,7 +48,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       try {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByUsers(
+        return await ClientNTQQ.postFilesByUsers(
           event.author.user_openid,
           url
         ).catch(everyoneError)
@@ -73,7 +73,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
         const url = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
         if (!url) return false
-        return await Client.postMessageByUser(
+        return await ClientNTQQ.postMessageByUser(
           event.author.user_openid,
           `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
           select?.quote
@@ -104,14 +104,14 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       if (Buffer.isBuffer(msg)) {
         const url = await ClientKOA.setLocalImg(msg)
         if (!url) return false
-        return await Client.postFilesByUsers(
+        return await ClientNTQQ.postFilesByUsers(
           event.author.user_openid,
           url
         ).catch(everyoneError)
       }
     }
 
-    return await Client.postMessageByUser(
+    return await ClientNTQQ.postMessageByUser(
       event.author.user_openid,
       content,
       select?.quote

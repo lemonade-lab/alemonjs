@@ -3,7 +3,7 @@ import { AlemonOptions } from './types.js'
 import { rebotMap } from './map.js'
 import { nodeScripts } from './child_process.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { ClientAPIByQQ as ClientByNTQQ } from '../ntqq/sdk/index.js'
+import { ClientNTQQ } from '../ntqq/sdk/index.js'
 import { command } from './command.js'
 import {
   createApp,
@@ -22,7 +22,7 @@ import { createWeb } from '../koa/index.js'
 import { autoClearImages } from '../koa/img.js'
 
 // 设置ntqq独立鉴权路径
-export const setAuthenticationByNtqq = ClientByNTQQ.setAuthentication
+export const setAuthenticationByNtqq = ClientNTQQ.setAuthentication
 
 let OptionsCache: AlemonOptions
 

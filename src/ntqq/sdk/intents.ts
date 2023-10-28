@@ -1,4 +1,7 @@
 import { IntentsEnum } from './typings.js'
+/**
+ * 订阅事件集合
+ */
 const intentsMap = {
   GUILDS: 1 << 0,
   GUILD_CREATE: 1 << 0,
@@ -54,9 +57,9 @@ const intentsMap = {
   AT_MESSAGE_CREATE: 1 << 30,
   PUBLIC_MESSAGE_DELETE: 1 << 30,
   GROUP_AT_MESSAGE_CREATE: 1 << 25,
-  C2C_MESSAGE_CREATE: 1 << 25
-  // FRIEND_ADD: 1 << 25
-  // GROUP_ADD_ROBOT: 1 << 25
+  C2C_MESSAGE_CREATE: 1 << 25,
+  FRIEND_ADD: 1 << 25,
+  GROUP_ADD_ROBOT: 1 << 25
 }
 
 export function getIntentsMask(intents: IntentsEnum[]) {
