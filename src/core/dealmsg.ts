@@ -2,7 +2,13 @@ import { join } from 'path'
 import { writeFile } from 'fs/promises'
 import { existsSync, mkdirSync, readdirSync, readFileSync } from 'fs'
 import lodash from 'lodash'
-import { getAppArg, getMessage } from './message.js'
+import {
+  getAppArg,
+  getAppEvent,
+  getAppCharacter,
+  getAppMessage,
+  getAppPriority
+} from './cache.js'
 import { getApp, delApp, getAppKey } from './app.js'
 import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
@@ -27,11 +33,14 @@ interface CommandType {
   fncName: string
   APP: string
 }
-
+/**
+ * **********
+ * AppMap
+ * ***********
+ */
 interface PluginAppMap {
   [key: string]: {
     name: string
-    character: '/' | '#'
     APP: PluginApp
   }
 }
@@ -105,16 +114,15 @@ function createPluginHelp() {
 
 /**
  * 应用挂载
+ * @param AppName 插件名
  * @param AppsObj 插件集成对象
- * @param appname 插件名
  */
-async function synthesis(AppsObj: object, appname: string) {
+async function synthesis(AppName: string, AppsObj: object) {
   // 没有记载
-  if (!plugins[appname]) {
-    plugins[appname] = []
+  if (!plugins[AppName]) {
+    plugins[AppName] = []
   }
   const shield = getAppProCoinfg('event')
-  const defaultCharacter = getAppProCoinfg('defaultCharacter')
   for (const item in AppsObj) {
     const keys: plugin = new AppsObj[item]()
     if (shield.find(item => item == keys['event'])) continue
@@ -144,8 +152,7 @@ async function synthesis(AppsObj: object, appname: string) {
       x++
     }
     CommandApp[itemX] = {
-      name: appname,
-      character: keys?.startCharacter ?? defaultCharacter,
+      name: AppName,
       APP: AppsObj[item] as PluginApp
     }
 
@@ -164,23 +171,27 @@ async function synthesis(AppsObj: object, appname: string) {
       const fncName = key['fnc']
       const doc = key['doc'] ?? ''
       const dsc = key['dsc'] ?? ''
-
+      /**
+       * 对比优先级,比设置的低
+       */
+      const AppPriority = getAppPriority(AppName)
       // 如果类型正确
       if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
         // 存在正则就必须是MESSAGES
-        const event: PluginInitType['event'] = 'MESSAGES'
+        const event: PluginInitType['event'] =
+          getAppEvent(AppName) ?? 'MESSAGES'
         // 得到解析
-
         const reg = key['reg']
         if (!reg) continue
         // 推送
-        plugins[appname].push({
+        plugins[AppName].push({
           event: event,
           eventType: eventType,
           reg: String(reg),
           dsc,
           doc,
-          priority
+          priority:
+            AppPriority && AppPriority < priority ? AppPriority : priority
         })
         // 保存
         Command[event].push({
@@ -195,7 +206,7 @@ async function synthesis(AppsObj: object, appname: string) {
         // 控制消息 -- 类型必须要存在的
         const event: PluginInitType['event'] = keys['event']
         // 推送
-        plugins[appname].push({
+        plugins[AppName].push({
           event: event,
           eventType: eventType,
           dsc,
@@ -206,7 +217,8 @@ async function synthesis(AppsObj: object, appname: string) {
         CommandNotMessage[event].push({
           event: event,
           eventType: eventType,
-          priority,
+          priority:
+            AppPriority && AppPriority < priority ? AppPriority : priority,
           reg: /./,
           fncName,
           APP: itemX
@@ -287,13 +299,13 @@ export async function appsInit() {
   const APPARR = getAppKey()
 
   // 导出所有插件名
-  for await (const item of APPARR) {
+  for await (const AppName of APPARR) {
     // 获取插件集
-    const apps = getApp(item)
+    const apps = getApp(AppName)
     // 分析插件集
-    await synthesis(apps, item)
+    await synthesis(AppName, apps)
     // 删除指集
-    delApp(item)
+    delApp(AppName)
   }
 
   // 排序
@@ -371,11 +383,12 @@ export async function InstructionMatching(e: AMessage) {
    * 上下文
    */
   for (const item in CommandApp) {
-    const { name, APP, character } = CommandApp[item]
-    const AppFnc = getMessage(name)
+    const { name, APP } = CommandApp[item]
+    const AppFnc = getAppMessage(name)
     const AppArg = getAppArg(name)
     const _character = getAppProCoinfg('character')
     if (_character.test(e.msg)) {
+      const character = getAppCharacter(name)
       e.msg = e.msg.replace(_character, character)
     }
     try {
@@ -473,7 +486,7 @@ export async function typeMessage(e: AMessage) {
 
   for (const item in CommandApp) {
     const { name, APP } = CommandApp[item]
-    const AppFnc = getMessage(name)
+    const AppFnc = getAppMessage(name)
     const AppArg = getAppArg(name)
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)

@@ -1,6 +1,12 @@
 import { dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
-import { setMessage, setAppArg } from './message.js'
+import {
+  setAppMessage,
+  setAppArg,
+  setAppCharacter,
+  setAppEvent,
+  setAppPriority
+} from './cache.js'
 import { setApp } from './app.js'
 
 /**
@@ -44,7 +50,54 @@ export function createApp(AppName: string) {
    * 重名控制器
    */
   let acount = 0
+  /**
+   * 设置默认指令规则
+   */
+  setAppCharacter(AppName, '/')
   return {
+    /**
+     * 设置正则最低优先级
+     * 当设置了500，而所有优先级为5000时
+     * 则全部默认为500,但有优先级为300的子应用
+     * 则仅限当前子应用优先级为300
+     * @param val
+     * @returns
+     */
+    setPriority: (val: number) => {
+      try {
+        setAppPriority(AppName, val)
+        return true
+      } catch (err) {
+        console.error('APP setEvent', err)
+        return false
+      }
+    },
+    /**
+     * 设置正则默认消息
+     * @param val
+     * @returns
+     */
+    setEvent: (val: 'MESSAGES' | 'message') => {
+      try {
+        setAppEvent(AppName, val)
+        return true
+      } catch (err) {
+        console.error('APP setEvent', err)
+        return false
+      }
+    },
+    /**
+     * 设置指令规则
+     */
+    setCharacter: (val: '#' | '/') => {
+      try {
+        setAppCharacter(AppName, val)
+        return true
+      } catch (err) {
+        console.error('APP setCharacter', err)
+        return false
+      }
+    },
     /**
      * 设置扩展参
      */
@@ -64,7 +117,7 @@ export function createApp(AppName: string) {
      */
     setMessage: (fnc: (...args: any[]) => any) => {
       try {
-        setMessage(AppName, fnc)
+        setAppMessage(AppName, fnc)
         return true
       } catch (err) {
         console.error('APP setMessage', err)

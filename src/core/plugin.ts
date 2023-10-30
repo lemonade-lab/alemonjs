@@ -6,6 +6,11 @@ import { type AMessage, type EventEnum, type EventType } from './typings.js'
 const stateCache = {}
 
 /**
+ * 定时器记录
+ */
+const timeoutCache = {}
+
+/**
  * 定时类型
  */
 interface TaskType {
@@ -25,7 +30,6 @@ export interface PluginInitType {
   name?: string
   dsc?: string
   rule?: PluginRuleType[]
-  startCharacter?: '/' | '#'
   /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
@@ -92,10 +96,6 @@ export class plugin {
    */
   rule?: PluginRuleType[]
   /**
-   * 起始符特性
-   */
-  startCharacter?: '/' | '#'
-  /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
   task?: TaskType
@@ -115,7 +115,6 @@ export class plugin {
     event = 'MESSAGES',
     eventType = 'CREATE',
     priority = 9000,
-    startCharacter = '/',
     rule = [],
     task
   }: PluginInitType) {
@@ -124,7 +123,6 @@ export class plugin {
     this.eventType = eventType
     this.priority = priority
     this.rule = rule
-    this.startCharacter = startCharacter
     this.task = {
       name: task?.name ?? '',
       fnc: task?.fnc ?? '',
@@ -175,17 +173,17 @@ export class plugin {
     // 得到缓存key
     const key = this.conKey(isGroup)
     // 不存在
-    if (!stateCache[key]) {
-      stateCache[key] = {}
-    }
+    if (!stateCache[key]) stateCache[key] = {}
     stateCache[key][type] = this.e
     // 定时
-    if (time && typeof time == 'number') {
-      setTimeout(() => {
-        this.finish(type, isGroup)
-        this.e.reply('操作超时已取消')
-      }, time * 1000)
-    }
+    if (!(time && typeof time == 'number')) return
+    //
+    if (!timeoutCache[key]) timeoutCache[key] = {}
+    //
+    timeoutCache[key][type] = setTimeout(() => {
+      this.finish(type, isGroup)
+      this.e.reply('操作超时已取消')
+    }, time * 1000)
   }
 
   /**
@@ -211,6 +209,7 @@ export class plugin {
    * @param isGroup 是否公信
    */
   finish(type: string, isGroup = false) {
+    if (!this.conKey(isGroup)) return
     if (
       // 检擦key
       stateCache[this.conKey(isGroup)] &&
@@ -219,6 +218,17 @@ export class plugin {
     ) {
       // 删除方法
       delete stateCache[this.conKey(isGroup)][type]
+    }
+    if (
+      // 检擦key
+      timeoutCache[this.conKey(isGroup)] &&
+      // 检查方法
+      timeoutCache[this.conKey(isGroup)][type]
+    ) {
+      /**
+       * 删除定时任务
+       */
+      clearTimeout(timeoutCache[this.conKey(isGroup)][type])
     }
   }
 }
