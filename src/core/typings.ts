@@ -194,7 +194,7 @@ interface MsgBase {
   /**
    * 快捷接口
    */
-  segment: markdownType
+  segment: SegmentType
   /**
    * 是否是撤回
    */
@@ -325,7 +325,7 @@ export interface permissionsType {
 /**
  * segment
  */
-export interface markdownType {
+export interface SegmentType {
   /**
    * 艾特用户
    * @param uid
@@ -340,6 +340,10 @@ export interface markdownType {
    * @param channel_id
    */
   atChannel?(channel_id: string): string
+  /**
+   * @param dir 本地图片地址
+   */
+  img(dir: string): Buffer
   /**
    *
    * @param role_id 角色

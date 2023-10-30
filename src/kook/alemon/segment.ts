@@ -1,3 +1,4 @@
+import { getPathBuffer } from '../../core/buffer.js'
 export const segmentKOOK = {
   /**
    * 艾特某人
@@ -14,6 +15,7 @@ export const segmentKOOK = {
   atAll: (): string => {
     return `(met)all(met)`
   },
+  img: getPathBuffer,
   /**
    * 标注GET请求
    * @returns

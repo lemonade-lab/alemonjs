@@ -1,3 +1,4 @@
+import { getPathBuffer } from '../../core/buffer.js'
 export const segmentVilla = {
   /**
    * 艾特某人
@@ -14,6 +15,7 @@ export const segmentVilla = {
   atAll: (): string => {
     return `<@everyone>`
   },
+  img: getPathBuffer,
   /**
    * 标注GET请求
    * @returns

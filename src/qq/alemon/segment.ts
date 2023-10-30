@@ -1,3 +1,4 @@
+import { getPathBuffer } from '../../core/buffer.js'
 export const segmentQQ = {
   /**
    * 艾特某人
@@ -14,6 +15,7 @@ export const segmentQQ = {
   atAll: (): string => {
     return `@everyone`
   },
+  img: getPathBuffer,
   /**
    * 标注GET请求
    * @returns
