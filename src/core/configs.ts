@@ -47,7 +47,7 @@ interface ApplicationProcessingOpsion {
  * ***********
  */
 const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
-  dir: '/application',
+  dir: '/plugins',
   main: '/main',
   type: 'stript',
   openRegex: /./,
