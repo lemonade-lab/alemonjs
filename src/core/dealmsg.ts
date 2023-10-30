@@ -13,13 +13,13 @@ import { getApp, delApp, getAppKey } from './app.js'
 import { AMessage, EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
-import { PluginInitType, plugin } from './plugin.js'
+import { PluginInitType, APlugin } from './plugin.js'
 /**
  * ************
  * 插件实例类型
  * ************
  */
-type PluginApp = new (config: PluginInitType) => plugin
+type PluginApp = new (config: PluginInitType) => APlugin
 /**
  * **************
  * CommandType
@@ -124,7 +124,7 @@ async function synthesis(AppName: string, AppsObj: object) {
   }
   const shield = getAppProCoinfg('event')
   for (const item in AppsObj) {
-    const keys: plugin = new AppsObj[item]()
+    const keys: APlugin = new AppsObj[item]()
     if (shield.find(item => item == keys['event'])) continue
     // 控制类型
     const eventType: PluginInitType['eventType'] = keys['eventType'] ?? 'CREATE'
@@ -372,7 +372,7 @@ export async function InstructionMatching(e: AMessage) {
   }
 
   const APPCACHE: {
-    [key: string]: plugin
+    [key: string]: APlugin
   } = {}
 
   const ARGCACHE: {
@@ -389,7 +389,8 @@ export async function InstructionMatching(e: AMessage) {
     const _character = getAppProCoinfg('character')
     if (_character.test(e.msg)) {
       const character = getAppCharacter(name)
-      e.msg = e.msg.replace(_character, character)
+      const __character = getAppProCoinfg('defaultCharacter')
+      e.msg = e.msg.replace(_character, character ?? __character)
     }
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
@@ -477,7 +478,7 @@ export async function typeMessage(e: AMessage) {
   if (!CommandNotMessage[e.event]) return true
 
   const APPCACHE: {
-    [key: string]: plugin
+    [key: string]: APlugin
   } = {}
 
   const ARGCACHE: {
