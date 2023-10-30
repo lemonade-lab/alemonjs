@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>delMessage | alemonjs</title><meta name="description" content="Documentation for alemonjs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>createDirectMessage | alemonjs</title><meta name="description" content="Documentation for alemonjs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -13,26 +13,25 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../modules.html">alemonjs</a></li>
-<li><a href="delMessage.html">delMessage</a></li></ul>
-<h1>Function delMessage</h1></div>
+<li><a href="../modules/ClientKOOK.html">ClientKOOK</a></li>
+<li><a href="ClientKOOK.createDirectMessage.html">createDirectMessage</a></li></ul>
+<h1>Function createDirectMessage</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="delMessage"><span class="tsd-kind-call-signature">del<wbr/>Message</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">key</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#delMessage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="createDirectMessage"><span class="tsd-kind-call-signature">create<wbr/>Direct<wbr/>Message</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">data</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>        </span><span class="tsd-kind-property">msg_id</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>        </span><span class="tsd-kind-property">msg_timestamp</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>        </span><span class="tsd-kind-property">nonce</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><a href="#createDirectMessage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>删除消息</p>
+<div class="tsd-comment tsd-typography"><p>创建消息</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><span class="tsd-kind-parameter">key</span>: <span class="tsd-signature-type">string</span></h5>
-<div class="tsd-comment tsd-typography"><p>插件名</p>
-</div>
+<h5><span class="tsd-kind-parameter">data</span>: <span class="tsd-signature-type ">SendDirectMessageParams</span></h5>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span><span class="tsd-kind-property">data</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>        </span><span class="tsd-kind-property">msg_id</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>        </span><span class="tsd-kind-property">msg_timestamp</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>        </span><span class="tsd-kind-property">nonce</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in core/message.ts:36</li></ul></aside></li></ul></section></div>
+<li>Defined in kook/sdk/api.ts:144</li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -51,6 +50,10 @@
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>alemonjs</span></a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="..">
+<li><a href="../modules/ClientKOA.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg>ClientKOA</a></li>
+<li><a href="../modules/ClientKOOK.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg>ClientKOOK</a></li>
+<li><a href="../modules/ClientNTQQ.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg>ClientNTQQ</a></li>
+<li><a href="../modules/ClientVILLA.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg>ClientVILLA</a></li>
 <li><a href="../classes/plugin.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg>plugin</a></li>
 <li><a href="../interfaces/AMessage.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>AMessage</a></li>
 <li><a href="../interfaces/AlemonOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>AlemonOptions</a></li>
@@ -68,10 +71,6 @@
 <li><a href="../interfaces/UserType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>UserType</a></li>
 <li><a href="../interfaces/WithdrawController.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>WithdrawController</a></li>
 <li><a href="../interfaces/markdownType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>markdownType</a></li>
-<li><a href="../interfaces/permissionsType.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>permissionsType</a></li>
-<li><a href="../interfaces/urlScreenshotOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg>urlScreenshotOptions</a></li>
-<li><a href="../types/ConversationHandler.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2097152"></use></svg>ConversationHandler</a></li>
-<li><a href="../types/ConversationState.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2097152"></use></svg>ConversationState</a></li>
 <li>Loading...</li></ul></nav></div></div></div>
 <div class="tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" rel="noopener" target="_blank">TypeDoc</a></p></div>
