@@ -5,6 +5,9 @@ node_modules
 lib
 /type*/**
 
+.data
+plugins
+
 # 配置
 /config/
 

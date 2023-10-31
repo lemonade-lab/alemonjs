@@ -1,5 +1,5 @@
 import { getPathBuffer } from '../../core/buffer.js'
-export const segmentQQ = {
+export const segmentNTQQ = {
   /**
    * 艾特某人
    * @param uid

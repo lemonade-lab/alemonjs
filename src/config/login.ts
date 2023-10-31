@@ -7,6 +7,8 @@ import { defineKOOK as kook } from '../kook/kook.js'
 import { defineVILLA as villa } from '../villa/villa.js'
 import { defineQQ as qq } from '../qq/qq.js'
 import { defineNtqq as ntqq } from '../ntqq/ntqq.js'
+import { defineOne as one } from '../one/one.js'
+
 /**
  * *************
  * defset-config
@@ -20,7 +22,8 @@ const config: ConfigType = {
   qq,
   ntqq,
   server,
-  puppeteer
+  puppeteer,
+  one
 }
 
 /**

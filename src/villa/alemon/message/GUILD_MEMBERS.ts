@@ -1,7 +1,7 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import { AMessage, typeMessage } from '../../../core/index.js'
 import { BotEvent } from '../../sdk/index.js'
-import { segmentVilla } from '../segment.js'
+import { segmentVILLA } from '../segment.js'
 import { now_e } from './e.js'
 
 /**
@@ -105,7 +105,7 @@ export async function GUILD_MEMBERS_VILLA(event: BotEvent) {
     /**
      * 模板方法
      */
-    segment: segmentVilla,
+    segment: segmentVILLA,
     /**
      * 用户头像
      */

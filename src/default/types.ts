@@ -2,6 +2,7 @@ import { VILLAOptions } from '../villa/villa.js'
 import { KOOKOptions } from '../kook/kook.js'
 import { QQOptions } from '../qq/qq.js'
 import { NTQQOptions } from '../ntqq/ntqq.js'
+import { OneOptions } from '../one/one.js'
 /**
  * *****
  * login
@@ -24,6 +25,10 @@ export interface LoginOptions {
    * ntqq配置
    */
   ntqq?: NTQQOptions
+  /**
+   * qq配置
+   */
+  one?: OneOptions
 }
 
 /**

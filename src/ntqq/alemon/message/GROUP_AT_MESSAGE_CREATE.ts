@@ -5,7 +5,7 @@ import {
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
-import { segmentQQ } from '../segment.js'
+import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
@@ -211,7 +211,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   /**
    * 模块
    */
-  e.segment = segmentQQ
+  e.segment = segmentNTQQ
 
   /**
    * 被艾特的用户

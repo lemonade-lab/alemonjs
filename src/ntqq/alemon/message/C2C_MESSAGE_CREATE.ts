@@ -5,7 +5,7 @@ import {
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
-import { segmentQQ } from '../segment.js'
+import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { USER_DATA } from '../types.js'
 import IMGS from 'image-size'
@@ -182,7 +182,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
 
   e.guild_id = event.author.user_openid
 
-  e.segment = segmentQQ
+  e.segment = segmentNTQQ
 
   e.at_users = []
 

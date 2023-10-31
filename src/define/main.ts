@@ -147,6 +147,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       // 自定义覆盖
       setBotConfigByKey('villa', Options.login.villa)
     }
+    if (Options.login?.one) {
+      // 自定义覆盖
+      setBotConfigByKey('one', Options.login.one)
+    }
     for (const item in Options.login) {
       if (arr.indexOf(item) != -1) continue
       if (!rebotMap[item]) continue

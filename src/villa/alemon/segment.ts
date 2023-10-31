@@ -1,5 +1,5 @@
 import { getPathBuffer } from '../../core/buffer.js'
-export const segmentVilla = {
+export const segmentVILLA = {
   /**
    * 艾特某人
    * @param uid

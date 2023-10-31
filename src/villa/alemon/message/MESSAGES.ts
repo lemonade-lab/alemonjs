@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 import { BotEvent, MessageContentType, ClientVILLA } from '../../sdk/index.js'
 import IMGS from 'image-size'
-import { segmentVilla } from '../segment.js'
+import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { now_e } from './e.js'
 import {
@@ -257,7 +257,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
     /**
      * 模板接口
      */
-    segment: segmentVilla,
+    segment: segmentVILLA,
 
     /**
      *消息发送

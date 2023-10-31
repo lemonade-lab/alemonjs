@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "command": "npx ts-node alemon.config.ts kook",
+      "name": "AlemonJS kook Debug",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npx ts-node alemon.config.ts qq",
+      "name": "AlemonJS qq Debug",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npx ts-node alemon.config.ts villa",
+      "name": "AlemonJS villa Debug",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npx ts-node alemon.config.ts ntqq",
+      "name": "AlemonJS ntqq Debug",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npx ts-node alemon.config.ts one",
+      "name": "AlemonJS one Debug",
+      "request": "launch",
+      "type": "node-terminal"
+    }
+  ]
+}

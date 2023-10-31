@@ -14,7 +14,7 @@ export interface AMessage
  */
 interface EventBase {
   /**
-   * 平台 qq | kook | villa | ntqq | discord
+   * 平台 qq | kook | villa | ntqq | discord | one
    */
   platform: (typeof PlatformEnum)[number]
   /**
@@ -38,7 +38,8 @@ export const PlatformEnum = [
   'wechat',
   'telegram',
   'dodo',
-  'discord'
+  'discord',
+  'one'
 ] as const
 
 /**
@@ -266,7 +267,7 @@ export interface SegmentType {
   /**
    * @param dir 本地图片地址
    */
-  img(dir: string): Buffer
+  img(dir: string): Buffer | false
   /**
    *
    * @param role_id 角色

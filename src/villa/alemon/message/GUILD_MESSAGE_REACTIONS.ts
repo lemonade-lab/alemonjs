@@ -1,7 +1,7 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import { AMessage, typeMessage } from '../../../core/index.js'
 import { BotEvent } from '../../sdk/index.js'
-import { segmentVilla } from '../segment.js'
+import { segmentVILLA } from '../segment.js'
 import { now_e } from './e.js'
 /**
  * 表情表态
@@ -105,7 +105,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
     /**
      * 模板函数
      */
-    segment: segmentVilla,
+    segment: segmentVILLA,
     /**
      * 用户头像
      */
