@@ -11,7 +11,8 @@ import {
   loadInit,
   appsInit,
   setAppProCoinfg,
-  startChrom
+  startChrom,
+  getIP
 } from '../core/index.js'
 import {
   getPupPath,
@@ -176,8 +177,12 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.server?.state != false) {
     // 创建server端
     createWeb(Options?.server)
-    // 定时清除
-    autoClearImages()
+    if (Options?.server?.clear != false) {
+      // 定时清除
+      autoClearImages()
+    }
+    // 缓存ip
+    getIP()
   }
 
   /**

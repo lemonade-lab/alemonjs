@@ -76,7 +76,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         return await ClientNTQQ.postMessageByUser(
           event.author.user_openid,
           `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-          select?.quote
+          event.id
         ).catch(everyoneError)
       } catch (err) {
         console.error(err)
@@ -114,7 +114,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     return await ClientNTQQ.postMessageByUser(
       event.author.user_openid,
       content,
-      select?.quote
+      event.id
     ).catch(everyoneError)
   }
 

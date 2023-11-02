@@ -82,7 +82,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
         return await ClientNTQQ.postMessageByGroup(
           event.group_id,
           `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-          select?.quote
+          event.id
         ).catch(everyoneError)
       } catch (err) {
         console.error(err)
@@ -120,7 +120,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     return await ClientNTQQ.postMessageByGroup(
       event.group_id,
       content,
-      select?.quote
+      event.id
     ).catch(everyoneError)
   }
 

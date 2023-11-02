@@ -30,4 +30,9 @@ export interface ServerOptions {
    * 当前服务状态
    */
   state?: boolean
+  /**
+   * 定时清除是否开启
+   * 默认关闭
+   */
+  clear?: boolean
 }

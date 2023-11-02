@@ -128,9 +128,11 @@ export function createClient(
           await logFnc(port)
         }
         // 获取ip4
-        let ip = await getIP()
-        const ipp = getServerConfig('ip')
-        if (ipp != 'localhost') ip = ipp
+        let ip = getServerConfig('ip')
+        if (ip == 'localhost') {
+          const ipp = await getIP()
+          if (ipp) ip = ipp
+        }
         console.info('villa open', `http://${ip}:${port}${callback_url}`)
         if (!ip) console.error('vllia no public ip')
       })
