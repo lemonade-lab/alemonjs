@@ -155,7 +155,7 @@ export async function getMember(
   uid: string
 ): Promise<{
   data: {
-    menber: MemberType
+    member: MemberType
   }
 }> {
   return await villaService(villa_id, {

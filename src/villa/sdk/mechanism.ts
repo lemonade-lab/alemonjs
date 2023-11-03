@@ -77,7 +77,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
    * @param user_id
    * @param user_name
    */
-  function setUserName(user_id, user_name) {
+  function setUserName(user_id: string, user_name: string) {
     /**
      * 替换字
      */
@@ -119,7 +119,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
      */
     const User = await getMember(villa_id, String(item.id))
     if (User) {
-      setUserName(item.id, User?.data?.menber?.basic?.nickname)
+      setUserName(item.id, User?.data?.member?.basic?.nickname)
     }
   }
   /**
@@ -148,7 +148,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
    * @param room_id
    * @param room_name
    */
-  function setRoomName(room_id, room_name) {
+  function setRoomName(room_id: number, room_name: string) {
     content = content.replace(
       new RegExp(`<#${room_id}>`),
       (match, id, index) => {
