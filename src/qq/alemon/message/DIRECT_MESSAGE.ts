@@ -7,7 +7,6 @@ import {
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientQQ as Client } from '../../sdk/index.js'
-import { directEventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 import {
@@ -22,6 +21,38 @@ import { getBotConfigByKey } from '../../../config/index.js'
 declare global {
   //接口对象
   var ClientQQ: IOpenAPI
+}
+
+interface directEventData {
+  eventType: 'AT_MESSAGE_CREATE'
+  eventId: string
+  msg: {
+    attachments?: {
+      content_type: string
+      filename: string
+      height: number
+      id: string
+      size: number
+      url: string
+      width: number
+    }[]
+    author: {
+      avatar: string
+      bot: boolean
+      id: string
+      username: string
+    }
+    channel_id: string
+    content: string
+    direct_message: boolean
+    guild_id: string
+    id: string
+    member: { joined_at: string }
+    seq: number
+    seq_in_channel: string
+    src_guild_id: string
+    timestamp: string
+  }
 }
 
 /**
@@ -49,7 +80,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     isGroup: false,
     boundaries: 'publick',
     attribute: 'single',
-    attachments: []
+    attachments: event?.msg?.attachments ?? []
   } as AMessage
 
   /**
@@ -152,6 +183,7 @@ async function directMessage(e: AMessage, event: directEventData) {
       })
       .catch(everyoneError)
   }
+
   e.replyCard = async (arr: CardType[]) => {
     for (const item of arr) {
       try {
@@ -171,34 +203,6 @@ async function directMessage(e: AMessage, event: directEventData) {
       }
     }
     return true
-  }
-
-  /**
-   * 发送表情表态
-   * @param mid
-   * @param boj { emoji_type: number; emoji_id: string }
-   * @returns
-   */
-  e.replyEmoji = async (
-    mid: string,
-    boj: { emoji_type: number; emoji_id: string }
-  ): Promise<boolean> => {
-    console.info('temporarily unavailable')
-    return false
-  }
-
-  /**
-   * 删除表情表态
-   * @param mid
-   * @param boj
-   * @returns
-   */
-  e.deleteEmoji = async (
-    mid: string,
-    boj: { emoji_type: number; emoji_id: string }
-  ): Promise<boolean> => {
-    console.info('temporarily unavailable')
-    return false
   }
 
   e.msg_txt = event.msg.content
@@ -229,15 +233,6 @@ async function directMessage(e: AMessage, event: directEventData) {
     avatar: '0',
     name: '0',
     bot: false
-  }
-
-  /**
-   * 机器人信息  tudo
-   */
-  e.bot = {
-    id: '',
-    name: '',
-    avatar: ''
   }
 
   /**

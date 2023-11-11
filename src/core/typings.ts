@@ -133,6 +133,10 @@ interface Serverbase {
    */
   guild_name?: string
   /**
+   * 频道头像
+   */
+  guild_avatar?: string
+  /**
    * 子频道名 | 房间名 | 群名
    */
   channel_name?: string
@@ -140,6 +144,10 @@ interface Serverbase {
    * 子频道编号 | 房间编号 | 群号
    */
   channel_id?: string
+  /**
+   * 子频道头像
+   */
+  channel_avatar?: string
   /**
    * 是否是私域
    */
@@ -171,7 +179,7 @@ interface MsgBase {
    * 第一个非机器人用户信息
    * 不管是公域或私域
    */
-  at_user?: UserType | undefined
+  at_user?: UserType
   /**
    * 艾特得到的uid即可
    */
@@ -264,14 +272,14 @@ export interface SegmentType {
    */
   atAll(): string
   /**
+   * @param dir 本地图片地址
+   */
+  img(dir: string): Buffer | false
+  /**
    * 艾特频道
    * @param channel_id
    */
   atChannel?(channel_id: string): string
-  /**
-   * @param dir 本地图片地址
-   */
-  img(dir: string): Buffer | false
   /**
    *
    * @param role_id 角色
@@ -357,22 +365,6 @@ interface replyController {
    * @param arr
    */
   replyCard?(arr: CardType[]): Promise<any>
-
-  /**
-   * 公信转私信
-   * QQ频道使用
-   * @param content 消息
-   * @param select.quote 引用消息编号,默认无引用
-   * @param select.withdraw 撤回消息,默认不撤回
-   * @returns
-   */
-  replyPrivate?(
-    content: Buffer | string | number | (Buffer | number | string)[],
-    select: {
-      quote?: string
-      withdraw?: number
-    }
-  ): Promise<any>
 
   /**
    * 发送表态

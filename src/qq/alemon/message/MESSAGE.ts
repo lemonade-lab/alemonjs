@@ -6,8 +6,6 @@ import {
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientQQ as Client } from '../../sdk/index.js'
-import { Private } from '../privatechat.js'
-import { EventData } from '../types.js'
 import { segmentQQ } from '../segment.js'
 import { setBotMsgByQQ } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -24,13 +22,56 @@ declare global {
   var ClientQQ: IOpenAPI
 }
 
+interface EventPublicDuildType {
+  eventType: 'AT_MESSAGE_CREATE'
+  eventId: string
+  msg: {
+    attachments?: {
+      content_type: string
+      filename: string
+      height: number
+      id: string
+      size: number
+      url: string
+      width: number
+    }[]
+    author: {
+      avatar: string
+      bot: boolean
+      id: string
+      username: string
+    }
+    channel_id: string
+    content: string
+    guild_id: string
+    id: string
+    member: {
+      joined_at: string
+      nick: string
+      roles: string[]
+    }
+    mentions: {
+      avatar: string
+      bot: boolean
+      id: string
+      username: string
+    }[]
+    seq: number
+    seq_in_channel: string
+    timestamp: string
+  }
+}
+
 /**
  * 公私域合并
  * @param e
  * @param data  原数据
  * @returns
  */
-export const mergeMessages = async (e: AMessage, event: EventData) => {
+export const mergeMessages = async (
+  e: AMessage,
+  event: EventPublicDuildType
+) => {
   /**
    * 屏蔽其他机器人的消息
    */
@@ -311,22 +352,6 @@ export const mergeMessages = async (e: AMessage, event: EventData) => {
       e.bot.avatar = bot.avatar
       setBotMsgByQQ(bot)
     }
-  }
-
-  /**
-   * 公信专私信
-   * @param msg
-   * @param img
-   * @returns
-   */
-  e.replyPrivate = async (
-    msg: Buffer | string | (Buffer | string)[],
-    select?: {
-      quote?: string
-      withdraw?: number
-    }
-  ): Promise<any> => {
-    return await Private(event.msg, msg).catch(everyoneError)
   }
 
   /**

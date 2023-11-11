@@ -40,137 +40,92 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     /**
      * 特殊消息
      */
-    attachments: []
-  } as AMessage
-
-  /**
-   * 消息发送机制
-   * @param msg 消息
-   * @param img
-   * @returns
-   */
-  e.reply = async (
-    msg: Buffer | string | number | (Buffer | number | string)[],
-    select?: {
-      quote?: string
-      withdraw?: number
-    }
-  ): Promise<any> => {
-    // is buffer
-    if (Buffer.isBuffer(msg)) {
-      try {
-        const url = await ClientKOA.setLocalImg(msg)
-        if (!url) return false
-        return await ClientNTQQ.postFilesByGroup(event.group_id, url).catch(
-          everyoneError
-        )
-      } catch (err) {
-        console.error(err)
-        return err
-      }
-    }
-
-    if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
-      const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
-      const cont = msg
-        .map(item => {
-          if (typeof item === 'number') return String(item)
-          return item
-        })
-        .filter(element => typeof element === 'string')
-        .join('')
-      try {
-        const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
-        const url = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
-        if (!url) return false
-        return await ClientNTQQ.postMessageByGroup(
-          event.group_id,
-          `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-          event.id
-        ).catch(everyoneError)
-      } catch (err) {
-        console.error(err)
-        return err
-      }
-    }
-
-    const content = Array.isArray(msg)
-      ? msg.join('')
-      : typeof msg === 'string'
-      ? msg
-      : typeof msg === 'number'
-      ? `${msg}`
-      : ''
-
-    if (content == '') return false
-
+    attachments: [],
     /**
-     * http
+     * 消息发送机制
+     * @param msg 消息
+     * @param img
+     * @returns
      */
-
-    const match = content.match(/<http>(.*?)<\/http>/)
-    if (match) {
-      const getUrl = match[1]
-      const msg = await getUrlbuffer(getUrl)
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: {
+        quote?: string
+        withdraw?: number
+      }
+    ): Promise<any> => {
+      // is buffer
       if (Buffer.isBuffer(msg)) {
-        const url = await ClientKOA.setLocalImg(msg)
-        if (!url) return false
-        return await ClientNTQQ.postFilesByGroup(event.group_id, url).catch(
-          everyoneError
-        )
-      }
-    }
-
-    return await ClientNTQQ.postMessageByGroup(
-      event.group_id,
-      content,
-      event.id
-    ).catch(everyoneError)
-  }
-
-  e.replyCard = async (arr: CardType[]) => {
-    for (const item of arr) {
-      try {
-        if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.info('temporarily unavailable')
-          return false
+        try {
+          const url = await ClientKOA.setLocalImg(msg)
+          if (!url) return false
+          return await ClientNTQQ.postFilesByGroup(event.group_id, url).catch(
+            everyoneError
+          )
+        } catch (err) {
+          console.error(err)
+          return err
         }
-        return false
-      } catch (err) {
-        console.error(err)
-        return err
       }
+
+      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+        const cont = msg
+          .map(item => {
+            if (typeof item === 'number') return String(item)
+            return item
+          })
+          .filter(element => typeof element === 'string')
+          .join('')
+        try {
+          const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
+          const url = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
+          if (!url) return false
+          return await ClientNTQQ.postMessageByGroup(
+            event.group_id,
+            `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
+            event.id
+          ).catch(everyoneError)
+        } catch (err) {
+          console.error(err)
+          return err
+        }
+      }
+
+      const content = Array.isArray(msg)
+        ? msg.join('')
+        : typeof msg === 'string'
+        ? msg
+        : typeof msg === 'number'
+        ? `${msg}`
+        : ''
+
+      if (content == '') return false
+
+      /**
+       * http
+       */
+
+      const match = content.match(/<http>(.*?)<\/http>/)
+      if (match) {
+        const getUrl = match[1]
+        const msg = await getUrlbuffer(getUrl)
+        if (Buffer.isBuffer(msg)) {
+          const url = await ClientKOA.setLocalImg(msg)
+          if (!url) return false
+          return await ClientNTQQ.postFilesByGroup(event.group_id, url).catch(
+            everyoneError
+          )
+        }
+      }
+
+      return await ClientNTQQ.postMessageByGroup(
+        event.group_id,
+        content,
+        event.id
+      ).catch(everyoneError)
     }
-    return true
-  }
-
-  /**
-   * 发送表情表态
-   * @param mid
-   * @param boj { emoji_type: number; emoji_id: string }
-   * @returns
-   */
-  e.replyEmoji = async (
-    mid: string,
-    boj: { emoji_type: number; emoji_id: string }
-  ): Promise<boolean> => {
-    console.info('temporarily unavailable')
-    return false
-  }
-
-  /**
-   * 删除表情表态
-   * @param mid
-   * @param boj { emoji_type: number; emoji_id: string }
-   * @returns
-   */
-  e.deleteEmoji = async (
-    mid: string,
-    boj: { emoji_type: number; emoji_id: string }
-  ): Promise<boolean> => {
-    console.info('temporarily unavailable')
-    return false
-  }
+  } as AMessage
 
   /**
    * 消息原文

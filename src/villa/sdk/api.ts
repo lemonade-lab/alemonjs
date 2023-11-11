@@ -1,6 +1,10 @@
 import axios from 'axios'
 import { getClientConfig } from './config.js'
-import { readFileSync } from 'fs'
+import FormData from 'form-data'
+import { existsSync, createReadStream } from 'fs'
+import { Readable, isReadable } from 'stream'
+import { basename } from 'path'
+import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
 import {
   ApiEnum,
   type MHYEnum,
@@ -69,14 +73,55 @@ export async function getImageReq() {
 }
 
 /**
+ * 创建form
+ * @param image
+ * @param name
+ * @returns
+ */
+async function createFrom(image, name = 'image.jpg') {
+  let picData: Readable | Buffer[]
+  // 是 string
+  if (typeof image === 'string') {
+    if (!existsSync(image)) {
+      return false
+    }
+    if (!name) {
+      name = basename(image)
+    }
+    picData = createReadStream(image)
+
+    // 是 buffer
+  } else if (Buffer.isBuffer(image)) {
+    if (!name) {
+      name = 'file.' + (await fileTypeFromBuffer(image)).ext
+    }
+    picData = new Readable()
+    picData.push(image)
+    picData.push(null)
+
+    // 是 文件流
+  } else if (isReadable(image)) {
+    if (!name) {
+      name = 'file.' + (await fileTypeFromStream(image)).ext
+    }
+    picData = image
+  } else {
+    return false
+  }
+  return { picData, name }
+}
+
+/**
  * 上传图片
  * @param img
  * @param name
  * @returns
  */
-export async function uploadImage(img: Buffer, name: string) {
+export async function uploadImage(img, ImgName = 'image.jpg') {
   const uploadParams = await getImageReq()
-  // 创建 FormData 对象，并设置参数
+
+  console.log('uploadParams', uploadParams)
+
   const formData = new FormData()
   formData.append('x:extra', uploadParams.params.callback_var.x_extra)
   formData.append('OSSAccessKeyId', uploadParams.params.accessid)
@@ -90,13 +135,21 @@ export async function uploadImage(img: Buffer, name: string) {
   formData.append('x-oss-content-type', uploadParams.params.x_oss_content_type)
   formData.append('key', uploadParams.params.key)
   formData.append('policy', uploadParams.params.policy)
-  formData.append('file', img, name)
-  return axios
-    .post(uploadParams.params.host, formData, {
-      headers: formData.getHeaders()
-    })
-    .then(res => res.data)
+
+  // 识别文件
+  const from = await createFrom(img, ImgName)
+  if (!from) return false
+  const { picData, name } = from
+
+  formData.append('file', picData, name)
+
+  return axios({
+    url: uploadParams.params.host,
+    method: 'post',
+    data: formData
+  }).then(res => res.data)
 }
+
 /**
  * ******
  * 鉴权api

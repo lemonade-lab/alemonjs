@@ -15,6 +15,9 @@ export const segmentKOOK = {
   atAll: (): string => {
     return `(met)all(met)`
   },
+  /**
+   * 本地图片
+   */
   img: getPathBuffer,
   /**
    * 标注GET请求

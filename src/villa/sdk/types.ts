@@ -295,7 +295,7 @@ export interface MemberRoleBasic {
 }
 
 /**
- * tudo
+ *
  */
 export interface MemberRoleList extends MemberRoleBasic {
   // 身份组下的成员数量

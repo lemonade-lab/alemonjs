@@ -1,9 +1,12 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { AMessage, typeMessage } from '../../../core/index.js'
+import {
+  EventEnum,
+  EventType,
+  PlatformEnum,
+  typeMessage
+} from '../../../core/index.js'
 import { BotEvent } from '../../sdk/index.js'
 import { segmentVILLA } from '../segment.js'
-import { now_e } from './e.js'
-
 /**
  * 机器人进出
  * @param event 回调数据
@@ -18,9 +21,9 @@ export async function GUILDS_VILLA(event: BotEvent) {
    * 制作e消息对象
    */
   const e = {
-    platform: 'villa',
-    boundaries: 'publick',
-    attribute: 'group',
+    platform: 'villa' as (typeof PlatformEnum)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     /**
      * 机器人信息
      */
@@ -32,11 +35,12 @@ export async function GUILDS_VILLA(event: BotEvent) {
     /**
      * 事件类型
      */
-    event: 'GUILD',
+    event: 'GUILD' as (typeof EventEnum)[number],
     /**
      * 消息类型
      */
-    eventType: event.type == 3 ? 'CREATE' : 'DELETE',
+    eventType:
+      event.type == 3 ? 'CREATE' : ('DELETE' as (typeof EventType)[number]),
     /**
      * 是否是私域
      */
@@ -109,7 +113,12 @@ export async function GUILDS_VILLA(event: BotEvent) {
      * 用户头像
      */
     user_avatar: '',
-    ...now_e,
+    /**
+     * 消息回复
+     * @param msg
+     * @param select
+     * @returns
+     */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {
@@ -119,7 +128,7 @@ export async function GUILDS_VILLA(event: BotEvent) {
     ): Promise<any> => {
       return false
     }
-  } as AMessage
+  }
 
   /**
    * 只匹配类型

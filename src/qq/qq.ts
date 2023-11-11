@@ -1,18 +1,5 @@
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
-export const defineQQ = {
-  appID: '',
-  token: '',
-  secret: '',
-  masterID: '',
-  password: '',
-  intents: [
-    AvailableIntentsEventsEnum.GUILDS,
-    AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
-    AvailableIntentsEventsEnum.DIRECT_MESSAGE
-  ] as AvailableIntentsEventsEnum[],
-  isPrivate: false,
-  sandbox: false
-}
+
 /**
  * ******
  * qq
@@ -55,4 +42,19 @@ export interface QQOptions {
    * 是否是沙盒环境
    */
   sandbox?: boolean
+}
+
+export const defineQQ = {
+  appID: '',
+  token: '',
+  secret: '',
+  masterID: '',
+  password: '',
+  intents: [
+    AvailableIntentsEventsEnum.GUILDS,
+    AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
+    AvailableIntentsEventsEnum.DIRECT_MESSAGE
+  ] as AvailableIntentsEventsEnum[],
+  isPrivate: false,
+  sandbox: false
 }

@@ -1,8 +1,10 @@
 import {
-  AMessage,
   UserType,
   InstructionMatching,
-  getUrlbuffer
+  getUrlbuffer,
+  PlatformEnum,
+  EventEnum,
+  EventType
 } from '../../../core/index.js'
 import { ClientKOOK, EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
@@ -67,16 +69,25 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
   const avatar = event.extra.author.avatar
 
   const e = {
-    platform: 'kook',
+    /**
+     * 基础声明
+     */
+    platform: 'kook' as (typeof PlatformEnum)[number],
+    boundaries: 'private' as 'publick' | 'private',
+    attribute:
+      event.channel_type == 'GROUP'
+        ? 'group'
+        : ('single' as 'group' | 'single'),
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
     bot: getBotMsgByKOOK(),
-    event: 'MESSAGES',
-    eventType: 'CREATE',
+    /**
+     *
+     */
     isPrivate: true, //  kook没私域
     isRecall: false,
     isMaster: event.msg_id == masterID ? true : false,
     isGroup: event.channel_type == 'GROUP' ? true : false,
-    boundaries: 'private',
-    attribute: event.channel_type == 'GROUP' ? 'group' : 'single',
     at,
     at_users,
     at_user,
@@ -236,7 +247,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         return err
       }
     }
-  } as AMessage
+  }
 
   /**
    * 业务处理

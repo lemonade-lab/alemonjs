@@ -14,24 +14,6 @@ export enum NTQQEventsEnum {
   C2C_MESSAGE_CREATE = 'C2C_MESSAGE_CREATE'
 }
 
-export const defineNtqq = {
-  appID: '',
-  token: '',
-  secret: '',
-  masterID: '',
-  password: '',
-  intents: [
-    'GROUP_AT_MESSAGE_CREATE',
-    'C2C_MESSAGE_CREATE'
-  ] as NTQQEventsEnum[],
-  shard: [0, 1],
-  port: 9090,
-  size: 999999,
-  img_url: '/api/mys/img',
-  IMAGE_DIR: '/data/mys/img',
-  http: 'http'
-}
-
 /**
  * *****
  * ntqq
@@ -63,6 +45,10 @@ export interface NTQQOptions {
    */
   intents?: NTQQEventsEnum[]
   /**
+   * 模式
+   */
+  mode?: 'ntqq' | 'qq' | 'whole'
+  /**
    * 分片
    */
   shard?: number[]
@@ -86,4 +72,22 @@ export interface NTQQOptions {
    * 头模式
    */
   http?: string
+}
+
+export const defineNtqq = {
+  appID: '',
+  token: '',
+  secret: '',
+  masterID: '',
+  password: '',
+  intents: [
+    'GROUP_AT_MESSAGE_CREATE',
+    'C2C_MESSAGE_CREATE'
+  ] as NTQQEventsEnum[],
+  shard: [0, 1],
+  port: 9090,
+  size: 999999,
+  img_url: '/api/mys/img',
+  IMAGE_DIR: '/data/mys/img',
+  http: 'http'
 }

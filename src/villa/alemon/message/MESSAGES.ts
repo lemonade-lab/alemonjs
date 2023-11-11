@@ -1,6 +1,8 @@
 import {
-  AMessage,
+  EventEnum,
+  EventType,
   InstructionMatching,
+  PlatformEnum,
   UserType,
   getUrlbuffer
 } from '../../../core/index.js'
@@ -8,13 +10,11 @@ import { BotEvent, MessageContentType, ClientVILLA } from '../../sdk/index.js'
 import IMGS from 'image-size'
 import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import { now_e } from './e.js'
 import {
   AlemonJSError,
   AlemonJSLog,
   everyoneError
 } from '../../../log/index.js'
-import { ClientKOA } from '../../../koa/index.js'
 
 /**
  * 撤回消息
@@ -41,19 +41,6 @@ const recallMessage = (
     }, select?.withdraw)
   }
   return res
-}
-
-/**
- * 图片转存
- * @param villa_id
- * @param uul
- * @param cfg
- * @returns
- */
-const unloading = async (uul: string) => {
-  const NowObj = await ClientVILLA.transferImage(uul)
-  if (!NowObj?.data?.new_url) return uul
-  return NowObj?.data?.new_url
 }
 
 /**
@@ -98,7 +85,6 @@ export async function MESSAGES_VILLA(event: BotEvent) {
    * 消息原文
    */
   const txt = MessageContent.content.text
-
   /**
    * 解析
    */
@@ -130,7 +116,6 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       continue
     }
   }
-
   /**
    * 存在at
    */
@@ -140,7 +125,6 @@ export async function MESSAGES_VILLA(event: BotEvent) {
      */
     at_user = at_users.find(item => item.bot != true)
   }
-
   /**
    * 得到登录配置
    */
@@ -161,9 +145,17 @@ export async function MESSAGES_VILLA(event: BotEvent) {
    * 制作e消息对象
    */
   const e = {
-    platform: 'villa',
-    boundaries: 'publick',
-    attribute: 'group',
+    platform: 'villa' as (typeof PlatformEnum)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
+    /**
+     * 事件类型
+     */
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    /**
+     *  消息类型
+     * */
+    eventType: 'CREATE' as (typeof EventType)[number],
     /**
      * 机器人信息
      */
@@ -172,17 +164,6 @@ export async function MESSAGES_VILLA(event: BotEvent) {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    /**
-     * 消息编号
-     */
-    /**
-     * 事件类型
-     */
-    event: 'MESSAGES',
-    /**
-     *  消息类型
-     * */
-    eventType: 'CREATE',
     /**
      *  是否是私域
      *
@@ -281,11 +262,10 @@ export async function MESSAGES_VILLA(event: BotEvent) {
        */
       if (Buffer.isBuffer(msg)) {
         /**
-         * 挂载图片
+         * 上传图片
          */
-        const uul = await ClientKOA.setLocalImg(msg)
-        if (!uul) return false
-        const url = await unloading(uul)
+        const url = await ClientVILLA.uploadImage(msg)
+        if (!url) return false
         const dimensions = IMGS.imageSize(msg)
         return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
           width: dimensions.width,
@@ -313,11 +293,13 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           cont,
           villa_id
         )
-        // 挂载图片
+        /**
+         * 上传图片
+         */
+        const url = await ClientVILLA.uploadImage(msg[isBuffer] as Buffer)
+        if (!url) return false
+        // 识别大小
         const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
-        const uul = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
-        if (!uul) return false
-        const url = await unloading(uul)
         if (entities.length == 0) {
           return await ClientVILLA.sendMessageTextUrl(
             villa_id,
@@ -365,9 +347,11 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)
         if (msg) {
-          const uul = await ClientKOA.setLocalImg(msg)
-          if (!uul) return false
-          const url = await unloading(uul)
+          /**
+           * 上传图片
+           */
+          const url = await ClientVILLA.uploadImage(msg)
+          if (!url) return false
           const dimensions = IMGS.imageSize(msg)
           return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
             width: dimensions.width,
@@ -400,9 +384,8 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           .catch(everyoneError)
       }
       return false
-    },
-    ...now_e
-  } as AMessage
+    }
+  }
 
   /**
    * 业务处理

@@ -253,50 +253,6 @@ export async function MESSAGES(socket: WebSocket, event: EventGroup) {
     return true
   }
 
-  e.replyCard = async (arr: CardType[]) => {
-    for (const item of arr) {
-      try {
-        if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          console.info('temporarily unavailable')
-          return false
-        }
-        return false
-      } catch (err) {
-        console.error(err)
-        return err
-      }
-    }
-    return true
-  }
-
-  /**
-   * 发送表情表态
-   * @param mid
-   * @param boj { emoji_type: number; emoji_id: string }
-   * @returns
-   */
-  e.replyEmoji = async (
-    mid: string,
-    boj: { emoji_type: number; emoji_id: string }
-  ): Promise<boolean> => {
-    console.info('temporarily unavailable')
-    return false
-  }
-
-  /**
-   * 删除表情表态
-   * @param mid
-   * @param boj { emoji_type: number; emoji_id: string }
-   * @returns
-   */
-  e.deleteEmoji = async (
-    mid: string,
-    boj: { emoji_type: number; emoji_id: string }
-  ): Promise<boolean> => {
-    console.info('temporarily unavailable')
-    return false
-  }
-
   /**
    * 消息原文
    */

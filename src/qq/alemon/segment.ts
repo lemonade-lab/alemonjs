@@ -15,6 +15,9 @@ export const segmentQQ = {
   atAll: (): string => {
     return `@everyone`
   },
+  /**
+   * 本地图片
+   */
   img: getPathBuffer,
   /**
    * 标注GET请求

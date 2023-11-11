@@ -7,7 +7,7 @@ export const segmentNTQQ = {
    */
   at: (uid: string): string => {
     // 暂时用户@
-    return '' // 没有艾特了
+    return `<@${uid}>`
   },
   /**
    * 艾特全体
@@ -16,6 +16,9 @@ export const segmentNTQQ = {
   atAll: (): string => {
     return '@everyone'
   },
+  /**
+   * 本地图片
+   */
   img: getPathBuffer,
   /**
    * 标注GET请求
@@ -36,3 +39,12 @@ export const segmentNTQQ = {
     return `[🔗${title}](${centent})`
   }
 }
+
+// 标题
+//  加粗
+// 下划线加粗
+//  斜体
+// 星号斜体
+// 加粗斜体
+// 删除线
+// 块引用
