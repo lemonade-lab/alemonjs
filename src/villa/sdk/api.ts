@@ -1,11 +1,7 @@
 import axios from 'axios'
 import { getClientConfig } from './config.js'
 import FormData from 'form-data'
-import { existsSync, createReadStream } from 'fs'
-import { Readable, isReadable } from 'stream'
-import { basename } from 'path'
 import { createHash } from 'crypto'
-import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
 import {
   ApiEnum,
   type MHYEnum,
@@ -23,6 +19,8 @@ import {
   type MemberRoleList,
   type UrlType
 } from './types.js'
+import { createPicFrom } from '../../core/index.js'
+import { Readable } from 'stream'
 
 /**
  * 别野服务
@@ -78,53 +76,17 @@ export async function getImageReq(md5: string, ext: string) {
 }
 
 /**
- * 创建form
- * @param image
- * @param name
- * @returns
- */
-async function createFrom(image: any, name = 'image.jpg') {
-  let picData: Readable | Buffer[]
-  // 是 string
-  if (typeof image === 'string') {
-    if (!existsSync(image)) {
-      return false
-    }
-    if (!name) {
-      name = basename(image)
-    }
-    picData = createReadStream(image)
-
-    // 是 buffer
-  } else if (Buffer.isBuffer(image)) {
-    if (!name) {
-      name = 'file.' + (await fileTypeFromBuffer(image)).ext
-    }
-    picData = new Readable()
-    picData.push(image)
-    picData.push(null)
-
-    // 是 文件流
-  } else if (isReadable(image)) {
-    if (!name) {
-      name = 'file.' + (await fileTypeFromStream(image)).ext
-    }
-    picData = image
-  } else {
-    return false
-  }
-  return { picData, image, name }
-}
-
-/**
  * 上传图片
  * @param img
  * @param name
  * @returns
  */
-export async function uploadImage(img: any, ImgName = 'image.jpg') {
+export async function uploadImage(
+  img: string | Buffer | Readable,
+  ImgName = 'image.jpg'
+) {
   // 识别文件
-  const from = await createFrom(img, ImgName)
+  const from = await createPicFrom(img, ImgName)
   if (!from) return { data: null, message: '文件创建失败' }
   console.log('from', from)
   const { picData, image, name } = from

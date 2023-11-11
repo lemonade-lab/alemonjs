@@ -1,9 +1,6 @@
 import axios from 'axios'
 import FormData from 'form-data'
-import { existsSync, createReadStream } from 'fs'
-import { Readable, isReadable } from 'stream'
-import { basename } from 'path'
-import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
+import { Readable } from 'stream'
 import {
   ApiEnum,
   SendMessageParams,
@@ -11,6 +8,7 @@ import {
   SendDirectMessageParams
 } from './typings.js'
 import { getKookToken } from './config.js'
+import { createPicFrom } from '../../core/index.js'
 
 /**
  * KOOK服务
@@ -43,32 +41,11 @@ export function kookService(config: object) {
  */
 export async function postImage(
   file: string | Buffer | Readable,
-  name = 'image.jpg'
+  Name = 'image.jpg'
 ) {
-  let picData: Readable | Buffer[]
-  if (typeof file === 'string') {
-    if (!existsSync(file)) {
-      return false
-    }
-    if (!name) {
-      name = basename(file)
-    }
-    picData = createReadStream(file)
-  } else if (Buffer.isBuffer(file)) {
-    if (!name) {
-      name = 'file.' + (await fileTypeFromBuffer(file)).ext
-    }
-    picData = new Readable()
-    picData.push(file)
-    picData.push(null)
-  } else if (isReadable(file)) {
-    if (!name) {
-      name = 'file.' + (await fileTypeFromStream(file)).ext
-    }
-    picData = file
-  } else {
-    return false
-  }
+  const from = await createPicFrom(file, Name)
+  if (!from) return false
+  const { picData, name } = from
   const formdata = new FormData()
   formdata.append('file', picData, name)
   const url = await createUrl(formdata)
