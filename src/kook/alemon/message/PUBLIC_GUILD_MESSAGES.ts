@@ -82,6 +82,10 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     at_user,
     msg,
     msg_id: event.msg_id,
+    /**
+     * 特殊消息
+     */
+    attachments: [],
     msg_txt: event.content,
     msg_create_time: event.msg_timestamp,
     guild_id: event.target_id,

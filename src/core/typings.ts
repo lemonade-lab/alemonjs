@@ -189,6 +189,10 @@ interface MsgBase {
    */
   msg_txt: string
   /**
+   * 特殊消息
+   */
+  attachments: any[]
+  /**
    * 纯消息
    */
   msg: string

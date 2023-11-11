@@ -75,6 +75,10 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
      */
     msg_id: event.id,
     /**
+     * 特殊消息
+     */
+    attachments: [],
+    /**
      * 艾特用户
      */
     at_user: undefined,

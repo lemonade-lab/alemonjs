@@ -40,3 +40,7 @@ export async function createAlemonByKOOK() {
   }
   return false
 }
+/**
+ * 客户端
+ */
+export { ClientKOOK } from './sdk/index.js'

@@ -34,3 +34,4 @@ export async function createAlemonByVilla() {
   }
   return false
 }
+export { ClientVILLA } from './sdk/index.js'

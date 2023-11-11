@@ -71,6 +71,7 @@ export const GUILD_MEMBERS = async (event: any) => {
     isGroup: true,
     boundaries: 'publick',
     attribute: 'group',
+    attachments: [],
     /**
      * 发现消息
      * @param msg

@@ -11,6 +11,8 @@ export interface ClientConfig {
  *  api路径地址
  */
 export enum ApiEnum {
+  // 本地图片上传
+  localImage = '/vila/api/bot/platform/getUploadImageParams',
   // 公网图转存接口
   transferImage = '/vila/api/bot/platform/transferImage',
   // 校验用户机器人访问凭证

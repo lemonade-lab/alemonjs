@@ -81,3 +81,7 @@ export async function createAlemonByNtqq() {
   }
   return false
 }
+/**
+ * 客户端
+ */
+export { ClientNTQQ } from './sdk/index.js'

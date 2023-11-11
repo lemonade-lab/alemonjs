@@ -32,7 +32,11 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     isGroup: false,
     boundaries: 'publick',
     // 是私聊
-    attribute: 'single'
+    attribute: 'single',
+    /**
+     * 特殊消息
+     */
+    attachments: []
   } as AMessage
 
   /* 消息发送机制 */

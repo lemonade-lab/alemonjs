@@ -32,7 +32,8 @@ export const GUILDS = async (event: any) => {
     isRecall: false,
     isGroup: false,
     boundaries: 'publick',
-    attribute: 'group'
+    attribute: 'group',
+    attachments: []
   } as AMessage
 
   /**

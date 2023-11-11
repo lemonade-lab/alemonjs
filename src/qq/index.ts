@@ -58,3 +58,7 @@ export async function createAlemonByQQ() {
   }
   return false
 }
+/**
+ * qq客户端
+ */
+export const ClientQQ = global.ClientQQ

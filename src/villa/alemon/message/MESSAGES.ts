@@ -50,8 +50,8 @@ const recallMessage = (
  * @param cfg
  * @returns
  */
-const unloading = async (villa_id: number, uul: string) => {
-  const NowObj = await ClientVILLA.transferImage(villa_id, uul)
+const unloading = async (uul: string) => {
+  const NowObj = await ClientVILLA.transferImage(uul)
   if (!NowObj?.data?.new_url) return uul
   return NowObj?.data?.new_url
 }
@@ -225,6 +225,10 @@ export async function MESSAGES_VILLA(event: BotEvent) {
      */
     msg_txt: txt,
     /**
+     * 特殊消息
+     */
+    attachments: [],
+    /**
      * 房间编号
      */
     guild_id: String(villa_id),
@@ -281,7 +285,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
          */
         const uul = await ClientKOA.setLocalImg(msg)
         if (!uul) return false
-        const url = await unloading(villa_id, uul)
+        const url = await unloading(uul)
         const dimensions = IMGS.imageSize(msg)
         return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
           width: dimensions.width,
@@ -313,7 +317,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
         const uul = await ClientKOA.setLocalImg(msg[isBuffer] as Buffer)
         if (!uul) return false
-        const url = await unloading(villa_id, uul)
+        const url = await unloading(uul)
         if (entities.length == 0) {
           return await ClientVILLA.sendMessageTextUrl(
             villa_id,
@@ -363,7 +367,7 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         if (msg) {
           const uul = await ClientKOA.setLocalImg(msg)
           if (!uul) return false
-          const url = await unloading(villa_id, uul)
+          const url = await unloading(uul)
           const dimensions = IMGS.imageSize(msg)
           return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
             width: dimensions.width,

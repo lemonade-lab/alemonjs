@@ -48,7 +48,8 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     isRecall: false,
     isGroup: false,
     boundaries: 'publick',
-    attribute: 'single'
+    attribute: 'single',
+    attachments: []
   } as AMessage
 
   /**

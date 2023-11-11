@@ -29,7 +29,8 @@ export const GUILD_MESSAGES = async (event: any) => {
     isRecall: false,
     isGroup: true,
     boundaries: 'publick',
-    attribute: 'group'
+    attribute: 'group',
+    attachments: event?.msg?.attachments ?? []
   } as AMessage
 
   /**

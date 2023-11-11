@@ -70,6 +70,10 @@ export async function GUILDS_VILLA(event: BotEvent) {
      */
     msg_id: event.id,
     /**
+     * 特殊消息
+     */
+    attachments: [],
+    /**
      *
      */
     at_user: undefined,

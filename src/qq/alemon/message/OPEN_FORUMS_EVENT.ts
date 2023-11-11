@@ -42,7 +42,8 @@ export const OPEN_FORUMS_EVENT = async (event: any) => {
     isRecall: false,
     isGroup: false,
     boundaries: 'publick',
-    attribute: 'group'
+    attribute: 'group',
+    attachments: []
   } as AMessage
 
   /**

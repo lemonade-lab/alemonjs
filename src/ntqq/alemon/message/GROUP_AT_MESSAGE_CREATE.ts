@@ -36,7 +36,11 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     isRecall: false,
     isGroup: true,
     boundaries: 'publick',
-    attribute: 'group'
+    attribute: 'group',
+    /**
+     * 特殊消息
+     */
+    attachments: []
   } as AMessage
 
   /**

@@ -6,12 +6,6 @@
 export * from './core/index.js'
 /**
  * *************
- * define
- * *************
- */
-export * from './define/index.js'
-/**
- * *************
  * config system
  * *************
  */
@@ -22,6 +16,12 @@ export * from './config/index.js'
  * *************
  */
 export * from './login.js'
+/**
+ * *************
+ * define
+ * *************
+ */
+export * from './define/index.js'
 /**
  * api
  */

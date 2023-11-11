@@ -78,6 +78,10 @@ export async function MESSAGE_AUDIT_VILLA(event: BotEvent) {
      */
     msg_id: event.id,
     /**
+     * 特殊消息
+     */
+    attachments: [],
+    /**
      * 艾特用户
      */
     at_user: undefined,

@@ -20,6 +20,7 @@ import {
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
 export const PUBLIC_GUILD_MESSAGES = async (event: EventData) => {
+  console.log('pubclik event', event)
   const e = {
     platform: 'qq',
     bot: getBotMsgByQQ(),

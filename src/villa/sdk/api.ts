@@ -24,15 +24,14 @@ import {
  * @param config 配置
  * @returns
  */
-export async function villaService(villa_id: number, config: object) {
+export async function villaService(config: object) {
   const ClientCfg = getClientConfig()
   const service = axios.create({
     baseURL: 'https://bbs-api.miyoushe.com', // 地址
     timeout: 30000, // 响应
     headers: {
       'x-rpc-bot_id': ClientCfg.bot_id, // 账号
-      'x-rpc-bot_secret': ClientCfg.bot_secret, // 密码
-      'x-rpc-bot_villa_id': villa_id // 别墅编号
+      'x-rpc-bot_secret': ClientCfg.bot_secret // 密码
     }
   })
   return await service(config)
@@ -45,18 +44,47 @@ export async function villaService(villa_id: number, config: object) {
  * @returns
  * type = villa
  */
-export async function transferImage(
-  villa_id: number,
-  url: string
-): Promise<{
+export async function transferImage(url: string): Promise<{
   data: UrlType
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.transferImage,
     data: {
       url
     }
+  }).then(res => res.data)
+}
+
+/**
+ * 得到请求url
+ * @param img
+ * @returns
+ */
+export async function getImageReq(img: Buffer) {
+  // 请求  接口得到参数
+
+  // post  阿里云 oss 上传图片 并得到 url
+
+  // 最终返回url
+
+  return await villaService({
+    method: 'get',
+    url: ApiEnum.localImage
+  }).then(res => res.data)
+}
+
+/**
+ * 上传图片
+ * @param img
+ * @returns
+ */
+export async function postImage(img: Buffer) {
+  // post  阿里云 oss 上传图片 并得到 url
+  // 最终返回url
+  return await villaService({
+    method: 'get',
+    url: ApiEnum.localImage
   }).then(res => res.data)
 }
 
@@ -72,13 +100,10 @@ export async function transferImage(
  * @returns
  * type = villa
  */
-export async function checkMemberBotAccessToken(
-  villa_id: number,
-  token: string
-): Promise<{
+export async function checkMemberBotAccessToken(token: string): Promise<{
   data: MemberDataType
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.checkMemberBotAccessToken,
     data: {
@@ -103,8 +128,11 @@ export async function getVilla(villa_id: number): Promise<{
     villa: VillaType
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     url: ApiEnum.getVilla
   }).then(res => res.data)
 }
@@ -127,9 +155,12 @@ export async function getVillaMembers(
     list: MemberListType
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
     url: ApiEnum.getVillaMembers,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     params: {
       offset_str,
       size
@@ -158,9 +189,12 @@ export async function getMember(
     member: MemberType
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
     url: ApiEnum.getMember,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     params: {
       uid
     }
@@ -176,9 +210,12 @@ export async function getMember(
  * type = user
  */
 export async function deleteVillaMember(villa_id: number, uid: string) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.deleteVillaMember,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data: {
       uid
     }
@@ -206,9 +243,12 @@ export async function pinMessage(
     send_at: number // 发送时间
   }
 ) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.pinMessage,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data
   }).then(res => res.data)
 }
@@ -228,9 +268,12 @@ export async function recallMessage(
     msg_time: number // 发送时间
   }
 ) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.recallMessage,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data
   }).then(res => res.data)
 }
@@ -253,9 +296,12 @@ export async function sendMessage(
 ): Promise<{
   data: BotReplyMessageType
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.sendMessage,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data
   }).then(res => res.data)
 }
@@ -282,9 +328,12 @@ export async function createGroup(
     group_id: string
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.createGroup,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data: { group_name }
   }).then(res => res.data)
 }
@@ -303,9 +352,12 @@ export async function editGroup(
   group_id: number,
   group_name: string
 ) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.editGroup,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data: { group_id, group_name }
   }).then(res => res.data)
 }
@@ -318,9 +370,12 @@ export async function editGroup(
  * type = group_id
  */
 export async function deleteGroup(villa_id: number, group_id: number) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.deleteGroup,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data: { group_id }
   }).then(res => res.data)
 }
@@ -337,8 +392,11 @@ export async function getGroupList(villa_id: number): Promise<{
     list: Group
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     url: ApiEnum.getGroupList
   }).then(res => res.data)
 }
@@ -356,9 +414,12 @@ export async function editRoom(
   room_id: number,
   room_name: object
 ) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.editRoom,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data: {
       room_id,
       room_name
@@ -374,9 +435,12 @@ export async function editRoom(
  * type = room_id
  */
 export async function deleteRoom(villa_id: number, room_id: number) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.deleteRoom,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data: {
       room_id
     }
@@ -398,9 +462,12 @@ export async function getRoom(
     room: RoomMsg
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
     url: ApiEnum.getRoom,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     params: {
       room_id
     }
@@ -418,9 +485,12 @@ export async function getVillaGroupRoomList(villa_id: number): Promise<{
     list: GroupRoom
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
-    url: ApiEnum.getVillaGroupRoomList
+    url: ApiEnum.getVillaGroupRoomList,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    }
   }).then(res => res.data)
 }
 /**
@@ -444,8 +514,11 @@ export async function operateMemberToRole(
     is_add: boolean //
   }
 ) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     url: ApiEnum.operateMemberToRole,
     data
   }).then(res => res.data)
@@ -471,8 +544,11 @@ export async function createMemberRole(
     id: string
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     url: ApiEnum.createMemberRole,
     data
   }).then(res => res.data)
@@ -494,9 +570,12 @@ export async function editMemberRole(
     permissions: Array<typeof MemberRolePermissionEnum>
   }
 ) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.editMemberRole,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data
   }).then(res => res.data)
 }
@@ -510,9 +589,12 @@ export async function editMemberRole(
  * type = id
  */
 export async function deleteMemberRole(villa_id: number, id: number) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
     url: ApiEnum.deleteMemberRole,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     data: {
       id
     }
@@ -531,8 +613,11 @@ export async function getVillaMemberRoles(villa_id: number): Promise<{
     list: MemberRoleList[]
   }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     url: ApiEnum.getVillaMemberRoles
   }).then(res => res.data)
 }
@@ -545,9 +630,12 @@ export async function getVillaMemberRoles(villa_id: number): Promise<{
  * type = role_id
  */
 export async function getMemberRoleInfo(villa_id: number, role_id: number) {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
     url: ApiEnum.getMemberRoleInfo,
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     params: {
       role_id
     }
@@ -569,8 +657,11 @@ export async function getMemberRoleInfo(villa_id: number, role_id: number) {
 export async function getAllEmoticons(villa_id: number): Promise<{
   data: Emoticon[]
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'get',
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     url: ApiEnum.getAllEmoticons
   }).then(res => res.data)
 }
@@ -598,8 +689,11 @@ export async function audit(
 ): Promise<{
   data: { audit_id: string }
 }> {
-  return await villaService(villa_id, {
+  return await villaService({
     method: 'post',
+    headers: {
+      'x-rpc-bot_villa_id': villa_id // 别墅编号
+    },
     url: ApiEnum.audit,
     data
   }).then(res => res.data)
