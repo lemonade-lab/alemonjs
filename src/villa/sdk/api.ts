@@ -4,6 +4,7 @@ import FormData from 'form-data'
 import { existsSync, createReadStream } from 'fs'
 import { Readable, isReadable } from 'stream'
 import { basename } from 'path'
+import { createHash } from 'crypto'
 import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
 import {
   ApiEnum,
@@ -65,9 +66,13 @@ export async function transferImage(url: string): Promise<{
  * 得到请参数
  * @returns
  */
-export async function getImageReq() {
+export async function getImageReq(md5: string, ext: string) {
   return await villaService({
     method: 'get',
+    params: {
+      md5: md5,
+      ext: ext
+    },
     url: ApiEnum.localImage
   }).then(res => res.data)
 }
@@ -78,7 +83,7 @@ export async function getImageReq() {
  * @param name
  * @returns
  */
-async function createFrom(image, name = 'image.jpg') {
+async function createFrom(image: any, name = 'image.jpg') {
   let picData: Readable | Buffer[]
   // 是 string
   if (typeof image === 'string') {
@@ -108,7 +113,7 @@ async function createFrom(image, name = 'image.jpg') {
   } else {
     return false
   }
-  return { picData, name }
+  return { picData, image, name }
 }
 
 /**
@@ -117,10 +122,21 @@ async function createFrom(image, name = 'image.jpg') {
  * @param name
  * @returns
  */
-export async function uploadImage(img, ImgName = 'image.jpg') {
-  const uploadParams = await getImageReq()
-
+export async function uploadImage(img: any, ImgName = 'image.jpg') {
+  // 识别文件
+  const from = await createFrom(img, ImgName)
+  if (!from) return { data: null, message: '文件创建失败' }
+  console.log('from', from)
+  const { picData, image, name } = from
+  const typing = name.split('.')[1] ?? 'jpg'
+  const md5Hash = createHash('md5').update(image).digest('hex')
+  console.log('typing', typing)
+  console.log('md5Hash', md5Hash)
+  const uploadParams = await getImageReq(md5Hash, typing)
   console.log('uploadParams', uploadParams)
+  if (!uploadParams.data) {
+    return uploadParams
+  }
 
   const formData = new FormData()
   formData.append('x:extra', uploadParams.params.callback_var.x_extra)
@@ -135,11 +151,6 @@ export async function uploadImage(img, ImgName = 'image.jpg') {
   formData.append('x-oss-content-type', uploadParams.params.x_oss_content_type)
   formData.append('key', uploadParams.params.key)
   formData.append('policy', uploadParams.params.policy)
-
-  // 识别文件
-  const from = await createFrom(img, ImgName)
-  if (!from) return false
-  const { picData, name } = from
 
   formData.append('file', picData, name)
 
