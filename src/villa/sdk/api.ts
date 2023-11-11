@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { getClientConfig } from './config.js'
+import { readFileSync } from 'fs'
 import {
   ApiEnum,
   type MHYEnum,
@@ -57,17 +58,10 @@ export async function transferImage(url: string): Promise<{
 }
 
 /**
- * 得到请求url
- * @param img
+ * 得到请参数
  * @returns
  */
-export async function getImageReq(img: Buffer) {
-  // 请求  接口得到参数
-
-  // post  阿里云 oss 上传图片 并得到 url
-
-  // 最终返回url
-
+export async function getImageReq() {
   return await villaService({
     method: 'get',
     url: ApiEnum.localImage
@@ -77,17 +71,32 @@ export async function getImageReq(img: Buffer) {
 /**
  * 上传图片
  * @param img
+ * @param name
  * @returns
  */
-export async function postImage(img: Buffer) {
-  // post  阿里云 oss 上传图片 并得到 url
-  // 最终返回url
-  return await villaService({
-    method: 'get',
-    url: ApiEnum.localImage
-  }).then(res => res.data)
+export async function uploadImage(img: Buffer, name: string) {
+  const uploadParams = await getImageReq()
+  // 创建 FormData 对象，并设置参数
+  const formData = new FormData()
+  formData.append('x:extra', uploadParams.params.callback_var.x_extra)
+  formData.append('OSSAccessKeyId', uploadParams.params.accessid)
+  formData.append('signature', uploadParams.params.signature)
+  formData.append(
+    'success_action_status',
+    uploadParams.params.success_action_status
+  )
+  formData.append('name', uploadParams.params.name)
+  formData.append('callback', uploadParams.params.callback)
+  formData.append('x-oss-content-type', uploadParams.params.x_oss_content_type)
+  formData.append('key', uploadParams.params.key)
+  formData.append('policy', uploadParams.params.policy)
+  formData.append('file', img, name)
+  return axios
+    .post(uploadParams.params.host, formData, {
+      headers: formData.getHeaders()
+    })
+    .then(res => res.data)
 }
-
 /**
  * ******
  * 鉴权api
