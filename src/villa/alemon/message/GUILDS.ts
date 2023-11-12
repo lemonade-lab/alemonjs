@@ -40,7 +40,7 @@ export async function GUILDS_VILLA(event: {
   /**
    * 别野编号
    */
-  const villa_id = event.robot.villa_id ?? ''
+  const villa_id = event.robot.villa_id
   /**
    * 制作e消息对象
    */
@@ -128,7 +128,7 @@ export async function GUILDS_VILLA(event: {
     /**
      * 消息触发时间
      */
-    msg_create_time: new Date().getTime(),
+    msg_create_time: event.send_at,
     /**
      * 模板函数
      */

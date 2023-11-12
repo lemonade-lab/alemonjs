@@ -8,8 +8,7 @@ import {
 import { segmentVILLA } from '../segment.js'
 
 /**
- * todo
- * 未判断成员退出别野
+ * 没有成员退出回调
  */
 
 /**
@@ -49,7 +48,7 @@ export async function GUILD_MEMBERS_VILLA(event: {
   /**
    * 别野编号
    */
-  const villa_id = event.robot.villa_id ?? ''
+  const villa_id = event.extend_data.EventData.JoinVilla.villa_id
   /**
    * 制作e消息对象
    */
@@ -128,15 +127,15 @@ export async function GUILD_MEMBERS_VILLA(event: {
     /**
      * 用户编号
      */
-    user_id: '',
+    user_id: String(event.extend_data.EventData.JoinVilla.join_uid),
     /**
      * 用户名
      */
-    user_name: '',
+    user_name: event.extend_data.EventData.JoinVilla.join_user_nickname,
     /**
      * 消息触发时间
      */
-    msg_create_time: new Date().getTime(),
+    msg_create_time: event.send_at,
     /**
      * 模板方法
      */

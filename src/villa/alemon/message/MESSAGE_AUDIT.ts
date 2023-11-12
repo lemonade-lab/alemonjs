@@ -9,7 +9,7 @@ import { segmentVILLA } from '../segment.js'
 
 /**
  * tudo
- * 如何判断审核事件成功与否？
+ * 判断审核事件?
  */
 
 /**
@@ -47,7 +47,7 @@ export async function MESSAGE_AUDIT_VILLA(event: {
   /**
    * 房间号
    */
-  const room_id = event.extend_data.EventData.SendMessage?.room_id ?? ''
+  const room_id = ''
   /**
    * 制作e消息对象
    */
@@ -134,7 +134,7 @@ export async function MESSAGE_AUDIT_VILLA(event: {
     /**
      * 消息创建时间
      */
-    msg_create_time: new Date().getTime(),
+    msg_create_time: event.send_at,
     /**
      * 模板函数
      */

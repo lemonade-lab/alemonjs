@@ -48,11 +48,11 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
   /**
    * 别野编号
    */
-  const villa_id = event.robot.villa_id ?? ''
+  const villa_id = event.extend_data.EventData.AddQuickEmoticon.villa_id
   /**
    * 房间号
    */
-  const room_id = ''
+  const room_id = event.extend_data.EventData.AddQuickEmoticon.room_id
   /**
    * 制作e消息对象
    */
@@ -133,7 +133,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
     /**
      * 用户编号
      */
-    user_id: '',
+    user_id: String(event.extend_data.EventData.AddQuickEmoticon.uid),
     /**
      * 用户名
      */
@@ -141,7 +141,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
     /**
      * 消息创建时间
      */
-    msg_create_time: new Date().getTime(),
+    msg_create_time: event.send_at,
     /**
      * 模板函数
      */

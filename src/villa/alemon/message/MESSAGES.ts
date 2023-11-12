@@ -17,33 +17,6 @@ import {
 } from '../../../log/index.js'
 
 /**
- * 撤回消息
- * @param res
- * @param select
- * @returns
- */
-const recallMessage = (
-  res: { bot_msg_id: string },
-  select: {
-    quote?: string
-    withdraw?: number
-  },
-  villa_id: number | string,
-  room_id: number | string
-) => {
-  if (res && res.bot_msg_id && select?.withdraw && select?.withdraw > 1000) {
-    setTimeout(() => {
-      ClientVILLA.recallMessage(villa_id, {
-        room_id: String(room_id),
-        msg_uid: res.bot_msg_id,
-        msg_time: new Date().getTime()
-      })
-    }, select?.withdraw)
-  }
-  return res
-}
-
-/**
  * 消息会话
  * @param event 回调数据
  * @param val  类型控制
@@ -269,7 +242,7 @@ export async function MESSAGES_VILLA(event: {
     /**
      * 创建消息事件
      */
-    msg_create_time: new Date().getTime(),
+    msg_create_time: event.send_at,
 
     /**
      * 模板接口
@@ -304,9 +277,7 @@ export async function MESSAGES_VILLA(event: {
         return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
           width: dimensions.width,
           height: dimensions.height
-        })
-          .then(res => recallMessage(res?.data, select, villa_id, room_id))
-          .catch(everyoneError)
+        }).catch(everyoneError)
       }
       /**
        * isString arr and find buffer
@@ -347,9 +318,7 @@ export async function MESSAGES_VILLA(event: {
               width: dimensions.width,
               height: dimensions.height
             }
-          )
-            .then(res => recallMessage(res?.data, select, villa_id, room_id))
-            .catch(everyoneError)
+          ).catch(everyoneError)
         } else {
           return await ClientVILLA.sendMessageTextEntitiesUrl(
             villa_id,
@@ -361,9 +330,7 @@ export async function MESSAGES_VILLA(event: {
               width: dimensions.width,
               height: dimensions.height
             }
-          )
-            .then(res => recallMessage(res?.data, select, villa_id, room_id))
-            .catch(everyoneError)
+          ).catch(everyoneError)
         }
       }
       // string and string[]
@@ -395,9 +362,7 @@ export async function MESSAGES_VILLA(event: {
           return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
             width: dimensions.width,
             height: dimensions.height
-          })
-            .then(res => recallMessage(res?.data, select, villa_id, room_id))
-            .catch(everyoneError)
+          }).catch(everyoneError)
         }
       }
 
@@ -409,18 +374,18 @@ export async function MESSAGES_VILLA(event: {
         villa_id
       )
       if (entities.length == 0 && content != '') {
-        return await ClientVILLA.sendMessageText(villa_id, room_id, content)
-          .then(res => recallMessage(res?.data, select, villa_id, room_id))
-          .catch(everyoneError)
+        return await ClientVILLA.sendMessageText(
+          villa_id,
+          room_id,
+          content
+        ).catch(everyoneError)
       } else if (entities.length != 0 && content != '') {
         return await ClientVILLA.sendMessageTextEntities(
           villa_id,
           room_id,
           content,
           entities
-        )
-          .then(res => recallMessage(res?.data, select, villa_id, room_id))
-          .catch(everyoneError)
+        ).catch(everyoneError)
       }
       return false
     }
