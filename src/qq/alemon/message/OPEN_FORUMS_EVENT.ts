@@ -1,5 +1,11 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { typeMessage, AMessage, PlatformEnum } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  PlatformEnum,
+  EventEnum,
+  EventType
+} from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 
@@ -67,10 +73,10 @@ interface content {
 export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
-    event: 'FORUMS_THREAD',
-    eventType: 'CREATE',
-    boundaries: 'publick',
-    attribute: 'group',
+    event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
@@ -127,7 +133,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     e.eventType = 'DELETE'
   }
 
-  return await typeMessage(e as any)
+  return await typeMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.eventType))
     .catch(err => AlemonJSEventError(err, e.event, e.eventType))
 }

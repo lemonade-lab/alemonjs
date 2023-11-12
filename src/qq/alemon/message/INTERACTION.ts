@@ -1,10 +1,16 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { typeMessage, AMessage, PlatformEnum } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  PlatformEnum,
+  EventEnum,
+  EventType
+} from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 
 /**
- * DO
+ * TUDO
  */
 
 /**
@@ -14,10 +20,10 @@ INTERACTION (1 << 26)
 export const INTERACTION = async event => {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
-    event: 'INTERACTION',
-    eventType: 'CREATE',
-    boundaries: 'publick',
-    attribute: 'group',
+    event: 'INTERACTION' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
@@ -61,7 +67,7 @@ export const INTERACTION = async event => {
     e.eventType = 'DELETE'
   }
 
-  return await typeMessage(e as any)
+  return await typeMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.eventType))
     .catch(err => AlemonJSEventError(err, e.event, e.eventType))
 }

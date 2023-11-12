@@ -1,4 +1,10 @@
-import { typeMessage, AMessage, PlatformEnum } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  PlatformEnum,
+  EventEnum,
+  EventType
+} from '../../../core/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { getBotMsgByQQ } from '../bot.js'
 import {
@@ -62,10 +68,10 @@ interface EventPublicDuildType {
 export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
-    event: 'MESSAGES',
-    eventType: 'CREATE',
-    boundaries: 'publick',
-    attribute: 'group',
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
@@ -108,7 +114,7 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
-    return await typeMessage(e as any)
+    return await typeMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
   }

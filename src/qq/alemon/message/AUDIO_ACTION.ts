@@ -8,13 +8,14 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-/**
- * AUDIO_MICROPHONE 音频
- * AUDIO_FREQUENCY 麦克风
- */
 
 /**
  * TUDO
+ */
+
+/**
+ * AUDIO_MICROPHONE 音频
+ * AUDIO_FREQUENCY 麦克风
  */
 
 /**

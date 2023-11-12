@@ -1,10 +1,15 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { typeMessage, AMessage, PlatformEnum } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  PlatformEnum,
+  EventEnum,
+  EventType
+} from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-
 /**
- * DO
+ * TUDO
  */
 
 /**
@@ -15,10 +20,10 @@ MESSAGE_AUDIT (1 << 27)
 export const MESSAGE_AUDIT = async (event: any) => {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
-    event: 'MESSAGE_AUDIT',
-    eventType: 'CREATE',
-    boundaries: 'publick',
-    attribute: 'group',
+    event: 'MESSAGE_AUDIT' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
@@ -66,7 +71,7 @@ export const MESSAGE_AUDIT = async (event: any) => {
   /**
    * 只匹配类型
    */
-  return await typeMessage(e as any)
+  return await typeMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.eventType))
     .catch(err => AlemonJSEventError(err, e.event, e.eventType))
 }

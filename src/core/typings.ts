@@ -47,61 +47,46 @@ export const PlatformEnum = [
  */
 export const EventEnum = [
   /**
-   * 频道消息
+   * **********
+   * 频道
+   * **********
    */
-  'GUILD',
+  'GUILD', // 机器人进出+频道事件
+  'CHANNEL', // 子频道事件
+  'GUILD_MEMBERS', // 成员进出
   /**
-   * 子频道消息
+   * ***********
+   * 论坛
+   * *********
    */
-  'CHANNEL',
+  'FORUMS_THREAD', // 论坛主题
+  'FORUMS_POST', // 论坛POST
+  'FORUMS_REPLY', // 论坛评论
   /**
-   * 成员频道进出变动消息
-   */
-  'GUILD_MEMBERS',
-  /**
-   * 审核消息
-   */
-  'MESSAGE_AUDIT',
-  /**
-   * 私聊会话消息
-   */
-  'DIRECT_MESSAGE',
-  /**
-   * 论坛主题
-   */
-  'FORUMS_THREAD',
-  /**
-   * 论坛POST
-   */
-  'FORUMS_POST',
-  /**
-   * 论坛评论
-   */
-  'FORUMS_REPLY',
-  /**
-   * 会话消息:公私合并
+   * *********
+   * 会话消息
+   * ********
+   * MESSAGES=message
+   * =MESSAGE+DIRECT+PUBLIC
    */
   'MESSAGES',
-  /**
-   * 小写兼容层
-   */
   'message',
-  /**
-   * 频道表情点击会话消息
-   */
   'GUILD_MESSAGE_REACTIONS',
   /**
    * 互动事件监听
    */
   'INTERACTION',
   /**
+   * ***********
    * 音频事件
+   * ***********
    */
-  'AUDIO_FREQUENCY',
+  'AUDIO_FREQUENCY', // 视频
+  'AUDIO_MICROPHONE', // 麦克风
   /**
-   * 麦克风事件
+   * 审核消息
    */
-  'AUDIO_MICROPHONE'
+  'MESSAGE_AUDIT'
 ] as const
 
 /**
