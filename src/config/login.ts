@@ -46,9 +46,10 @@ export function setBotConfigByKey<T extends keyof ConfigType>(
       if (Object.prototype.hasOwnProperty.call(config[key], item)) {
         config[key][item] = val[item]
       } else {
+        // 不属于默认
         try {
-          config[key] = {}
-          config[key] = val[item]
+          config[key] = {} as any
+          config[key] = val[item] as any
           console.info('KEY secess')
         } catch {
           console.info('KEY err')

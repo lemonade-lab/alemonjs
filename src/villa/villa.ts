@@ -7,15 +7,15 @@ export interface VILLAOptions {
   /**
    * 机器人编号
    */
-  bot_id?: string
+  bot_id: string
   /**
    * 密钥
    */
-  secret?: string
+  secret: string
   /**
    * 公匙
    */
-  pub_key?: string
+  pub_key: string
   /**
    * 主人编号
    */

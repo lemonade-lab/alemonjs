@@ -9,11 +9,11 @@ export interface QQOptions {
   /**
    * 应用编号
    */
-  appID?: string
+  appID: string
   /**
    * 钥匙
    */
-  token?: string
+  token: string
   /**
    * 密钥
    */

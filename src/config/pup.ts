@@ -1,6 +1,7 @@
 import { arch } from 'os'
 import { existsSync, realpathSync } from 'fs'
 import { execSync } from 'child_process'
+import { Configuration } from 'puppeteer'
 const isArch = arch()
 const platform = process.platform
 const win32Edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
@@ -57,13 +58,11 @@ if (process.platform == 'win32' && existsSync(win32Edge)) {
     skipDownload = true
   }
 }
-
 /**
- * 得到pup可寻地址
- * @type {import("puppeteer").Configuration}
- * @returns 得到配置对象
+ * 得到可寻地址
+ * @returns 配置对象
  */
-export function getPupPath() {
+export function getPupPath(): Configuration {
   return {
     skipDownload,
     executablePath

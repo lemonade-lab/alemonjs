@@ -14,7 +14,7 @@ export interface OneOptions {
   /**
    * 地址
    */
-  url?: string
+  url: string
   /**
    * 钥匙
    */

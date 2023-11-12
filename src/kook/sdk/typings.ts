@@ -7,7 +7,6 @@ export enum ApiEnum {
    * 频道相关
    * ********
    */
-
   GuildList = '/api/v3/guild/list',
   GuildView = '/api/v3/guild/view',
   GuildUserList = '/api/v3/guild/user-list',
@@ -24,7 +23,6 @@ export enum ApiEnum {
    * 子频道接口
    * ******
    */
-
   ChannelMessage = '/api/v3/channel/message',
   ChannelList = '/api/v3/channel/list',
   ChannelView = '/api/v3/channel/view',
@@ -52,6 +50,7 @@ export enum ApiEnum {
   MessageReactionList = '/api/v3/message/reaction-list',
   MessageAddReaction = '/api/v3/message/add-reaction',
   MessageDeleteReaction = '/api/v3/message/delete-reaction',
+
   /**
    * *******
    * 频道用户
@@ -75,7 +74,6 @@ export enum ApiEnum {
    * 用户私聊
    * *******
    */
-
   DirectMessageList = '/api/v3/direct-message/list',
   DirectMessageView = '/api/v3/direct-message/view',
   DirectMessageCreate = '/api/v3/direct-message/create',
@@ -99,7 +97,6 @@ export enum ApiEnum {
    * 媒体接口
    * *******
    */
-
   AssetCreate = '/api/v3/asset/create',
 
   /**
@@ -107,7 +104,6 @@ export enum ApiEnum {
    * 服务器角色权限相关接口列表
    * *******
    */
-
   GuildRoleList = '/api/v3/guild-role/list',
   GuildRoleCreate = '/api/v3/guild-role/create',
   GuildRoleUpdate = '/api/v3/guild-role/update',
@@ -120,7 +116,6 @@ export enum ApiEnum {
    * 亲密度相关接口列表
    * *******
    */
-
   IntimacyIndex = '/api/v3/intimacy/index',
   IntimacyUpdate = '/api/v3/intimacy/update',
 
@@ -129,7 +124,6 @@ export enum ApiEnum {
    * 服务器表情相关接口
    * *******
    */
-
   GuildEmojiList = '/api/v3/guild-emoji/list',
   GuildEmojiCreate = '/api/v3/guild-emoji/create',
   GuildEmojiUpdate = '/api/v3/guild-emoji/update',
@@ -140,7 +134,6 @@ export enum ApiEnum {
    * 邀请相关接口
    * *******
    */
-
   InviteList = '/api/v3/invite/list',
   InviteCreate = '/api/v3/invite/create',
   InviteDelete = '/api/v3/invite/delete',
@@ -150,7 +143,6 @@ export enum ApiEnum {
    * 黑名单相关接口
    * *******
    */
-
   BlacklistList = '/api/v3/blacklist/list',
   BlacklistCreate = '/api/v3/blacklist/create',
   BlacklistDelete = '/api/v3/blacklist/delete',
@@ -160,7 +152,6 @@ export enum ApiEnum {
    * Badge 相关文档
    * *******
    */
-
   BadgeGuild = '/api/v3/badge/guild',
 
   /**
@@ -180,7 +171,6 @@ export enum ApiEnum {
    * Gateway
    * *******
    */
-
   OAuth2Token = '/api/oauth2/token',
 
   /**
@@ -188,7 +178,6 @@ export enum ApiEnum {
    * OAuth2.0相关接口
    * *******
    */
-
   GatewayIndex = '/api/v3/gateway/index'
 }
 

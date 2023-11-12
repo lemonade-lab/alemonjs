@@ -12,7 +12,14 @@ import { getIP } from '../core/index.js'
 export function getLocalImg(ctx: Context) {
   const imgDir = getServerConfig('imgDir')
   const filename = ctx.params.filename
+
   const imagePath = join(process.cwd(), imgDir, filename)
+
+  /**
+   * 图片应该是压缩的图片
+   * 已减少内存地址
+   */
+
   try {
     // 读取图片
     const stream = createReadStream(imagePath)

@@ -7,7 +7,7 @@ export interface KOOKOptions {
   /**
    * 钥匙
    */
-  token?: string
+  token: string
   /**
    * 主人编号
    */
