@@ -8,7 +8,7 @@ import { GUILDS_VILLA } from './message/GUILDS.js'
  */
 const ConversationMap = {
   /**
-   * 房间消息--成员进出
+   * 房间消息--成员进入
    */
   [1]: GUILD_MEMBERS_VILLA,
   /**

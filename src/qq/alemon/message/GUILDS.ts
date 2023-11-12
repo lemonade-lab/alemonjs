@@ -75,17 +75,21 @@ export const GUILDS = async Event => {
   if (new RegExp(/^GUILD.*$/).test(Event.eventType)) {
     const event: EventGuildType = Event
     const e = {
-      bot: getBotMsgByQQ(),
+      platform: 'qq' as (typeof PlatformEnum)[number],
       event: 'GUILD' as (typeof EventEnum)[number],
       eventType: 'CREATE' as (typeof EventType)[number],
+      boundaries: 'publick' as 'publick' | 'private',
+      attribute: 'group' as 'group' | 'single',
+      bot: getBotMsgByQQ(),
       isPrivate: false,
       isRecall: false,
       isGroup: false,
       attachments: [],
+      /**
+       * 特殊消息
+       */
+      specials: [],
       msg_create_time: new Date().getTime(),
-      platform: 'qq' as (typeof PlatformEnum)[number],
-      boundaries: 'publick' as 'publick' | 'private',
-      attribute: 'group' as 'group' | 'single',
       user_id: '',
       user_name: '',
       isMaster: false,
@@ -149,6 +153,10 @@ export const GUILDS = async Event => {
     isRecall: false,
     isGroup: false,
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [],
     msg_create_time: new Date().getTime(),
     platform: 'qq' as (typeof PlatformEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',

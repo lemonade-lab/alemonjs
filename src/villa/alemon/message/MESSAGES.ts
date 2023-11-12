@@ -211,9 +211,13 @@ export async function MESSAGES_VILLA(event: {
      */
     msg_txt: txt,
     /**
-     * 特殊消息
+     * 附件消息
      */
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [],
     /**
      * 房间编号
      */

@@ -36,7 +36,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
         emoticon_id: number // 表情编号
         emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
         is_cancel?: boolean // 是撤回为  ture
-        msg_uid: string // 用户消息编号
+        msg_uid: string // 消息是谁的
         bot_msg_id: string // 机器人消息编号
       }
     }
@@ -111,9 +111,22 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
      */
     msg_id: event.id,
     /**
-     * 特殊消息
+     * 附件消息
      */
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [
+      {
+        emoticon_id: event.extend_data.EventData.AddQuickEmoticon.emoticon_id,
+        emoticon_type: 0,
+        emoticon: event.extend_data.EventData.AddQuickEmoticon.emoticon,
+        is_cancel:
+          event.extend_data.EventData.AddQuickEmoticon?.is_cancel ?? false,
+        msg_uid: event.extend_data.EventData.AddQuickEmoticon.msg_uid
+      }
+    ],
     /**
      * 艾特用户
      */

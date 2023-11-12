@@ -68,7 +68,6 @@ export async function setLocalImg(img: Buffer) {
     const ipp = await getIP()
     if (ipp) ip = ipp
   }
-  console.log('测试1')
 
   // 生成文件名
   const filename = `${Math.floor(Math.random() * imgSize)}.${

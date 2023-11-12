@@ -98,9 +98,13 @@ export async function GUILDS_VILLA(event: {
      */
     msg_id: event.id,
     /**
-     * 特殊消息
+     * 附件消息
      */
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [],
     /**
      *
      */

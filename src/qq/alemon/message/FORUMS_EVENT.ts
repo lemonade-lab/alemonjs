@@ -1,5 +1,11 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { typeMessage, AMessage } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  PlatformEnum,
+  EventEnum,
+  EventType
+} from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -9,10 +15,39 @@ import { getBotMsgByQQ } from '../bot.js'
  * REPLY  评论  FORUMS_REPLY
  */
 
-/**
- * DO
- */
+interface ForumsEventType {
+  eventType:
+    | 'FORUM_THREAD_CREATE'
+    | 'FORUM_THREAD_UPDATE'
+    | 'FORUM_THREAD_DELETE'
+    | 'FORUM_POST_CREATE'
+    | 'FORUM_POST_DELETE'
+    | 'FORUM_REPLY_CREATE'
+    | 'FORUM_REPLY_DELETE'
+    | 'FORUM_PUBLISH_AUDIT_RESULT'
+  eventId: string
+  msg: {
+    author_id: string
+    channel_id: string
+    guild_id: string
+    thread_info: {
+      content: string // content
+      date_time: string
+      thread_id: string
+      title: string
+    }
+  }
+}
 
+interface content {
+  paragraphs: {
+    elems: {
+      text: { text: string }
+      type: number
+    }[]
+    props: any
+  }[]
+}
 /**
 FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 intents。
 
@@ -28,18 +63,19 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
-export const FORUMS_EVENT = async (event: any) => {
+export const FORUMS_EVENT = async (event: ForumsEventType) => {
   const e = {
-    platform: 'qq',
+    platform: 'qq' as (typeof PlatformEnum)[number],
+    event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    event: 'FORUMS_THREAD',
-    eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    boundaries: 'publick',
-    attribute: 'group',
-    attachments: []
+    attachments: [],
+    specials: [JSON.parse(event.msg.thread_info.content)]
   } as AMessage
 
   /* 事件匹配 */

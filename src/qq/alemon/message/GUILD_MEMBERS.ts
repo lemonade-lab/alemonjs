@@ -10,7 +10,7 @@ import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 
 interface EventGuildMembersType {
-  eventType: string
+  eventType: 'GUILD_MEMBER_ADD' | 'GUILD_MEMBER_UPDATE' | 'GUILD_MEMBER_REMOVE'
   eventId: string
   msg: {
     guild_id: string
@@ -35,8 +35,8 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
 export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
-  const Eevent: (typeof EventEnum)[number] = 'GUILD_MEMBERS'
-  let eventType: (typeof EventType)[number] = 'CREATE'
+  const Eevent = 'GUILD_MEMBERS'
+  let eventType = 'CREATE'
 
   if (new RegExp(/ADD$/).test(event.eventType)) {
     eventType = 'CREATE'
@@ -48,15 +48,19 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
 
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
+    event: Eevent as (typeof EventEnum)[number],
+    eventType: eventType as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    event: Eevent,
-    eventType: eventType,
     isPrivate: false,
     isRecall: false,
     isGroup: true,
-    boundaries: 'publick' as 'publick' | 'private',
-    attribute: 'group' as 'group' | 'single',
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [],
     user_id: event.msg.user.id,
     user_name: event.msg.user.username,
     isMaster: false,

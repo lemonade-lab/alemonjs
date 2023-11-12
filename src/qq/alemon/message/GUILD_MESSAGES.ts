@@ -1,4 +1,10 @@
-import { typeMessage, AMessage } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  PlatformEnum,
+  EventEnum,
+  EventType
+} from '../../../core/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { getBotMsgByQQ } from '../bot.js'
 import {
@@ -21,16 +27,20 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
  * */
 export const GUILD_MESSAGES = async (event: any) => {
   const e = {
-    platform: 'qq',
+    platform: 'qq' as (typeof PlatformEnum)[number],
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    event: 'MESSAGES',
-    eventType: 'CREATE',
     isPrivate: true,
     isRecall: false,
     isGroup: true,
-    boundaries: 'publick',
-    attribute: 'group',
-    attachments: event?.msg?.attachments ?? []
+    attachments: event?.msg?.attachments ?? [],
+    /**
+     * 特殊消息
+     */
+    specials: []
   } as AMessage
 
   /**

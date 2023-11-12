@@ -1,5 +1,11 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { typeMessage, AMessage } from '../../../core/index.js'
+import {
+  typeMessage,
+  AMessage,
+  PlatformEnum,
+  EventEnum,
+  EventType
+} from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 /**
  * AUDIO_MICROPHONE 音频
@@ -7,7 +13,7 @@ import { getBotMsgByQQ } from '../bot.js'
  */
 
 /**
- * DO
+ * TUDO
  */
 
 /**
@@ -19,16 +25,23 @@ AUDIO_ACTION (1 << 29)
  */
 export const AUDIO_ACTION = async (event: any) => {
   const e = {
-    platform: 'qq',
+    platform: 'qq' as (typeof PlatformEnum)[number],
+    event: 'AUDIO_MICROPHONE' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    event: 'AUDIO_MICROPHONE',
-    eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    boundaries: 'publick',
-    attribute: 'group',
-    attachments: []
+    /**
+     * 附件消息
+     */
+    attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: []
   } as AMessage
 
   if (new RegExp(/MIC$/).test(event.eventType)) {

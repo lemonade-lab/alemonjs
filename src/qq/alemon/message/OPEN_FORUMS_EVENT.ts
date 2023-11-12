@@ -1,5 +1,5 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { typeMessage, AMessage } from '../../../core/index.js'
+import { typeMessage, AMessage, PlatformEnum } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -9,9 +9,39 @@ import { getBotMsgByQQ } from '../bot.js'
  * 或权限需要申请
  */
 
-/**
- * DO
- */
+interface ForumsEventType {
+  eventType:
+    | 'FORUM_THREAD_CREATE'
+    | 'FORUM_THREAD_UPDATE'
+    | 'FORUM_THREAD_DELETE'
+    | 'FORUM_POST_CREATE'
+    | 'FORUM_POST_DELETE'
+    | 'FORUM_REPLY_CREATE'
+    | 'FORUM_REPLY_DELETE'
+    | 'FORUM_PUBLISH_AUDIT_RESULT'
+  eventId: string
+  msg: {
+    author_id: string
+    channel_id: string
+    guild_id: string
+    thread_info: {
+      content: string // content
+      date_time: string
+      thread_id: string
+      title: string
+    }
+  }
+}
+
+interface content {
+  paragraphs: {
+    elems: {
+      text: { text: string }
+      type: number
+    }[]
+    props: any
+  }[]
+}
 
 /**
  * ***********
@@ -33,18 +63,19 @@ import { getBotMsgByQQ } from '../bot.js'
     - OPEN_FORUM_REPLY_CREATE      // 当用户回复评论时
     - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
    */
-export const OPEN_FORUMS_EVENT = async (event: any) => {
+export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
   const e = {
-    platform: 'qq',
-    bot: getBotMsgByQQ(),
+    platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'FORUMS_THREAD',
     eventType: 'CREATE',
+    boundaries: 'publick',
+    attribute: 'group',
+    bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    boundaries: 'publick',
-    attribute: 'group',
-    attachments: []
+    attachments: [],
+    specials: [JSON.parse(event.msg.thread_info.content)]
   } as AMessage
 
   /**

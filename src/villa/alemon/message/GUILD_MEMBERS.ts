@@ -8,11 +8,7 @@ import {
 import { segmentVILLA } from '../segment.js'
 
 /**
- * 没有成员退出回调
- */
-
-/**
- * 成员进出
+ * 成员进入
  * @param event 回调数据
  * @param val  类型控制
  */
@@ -105,9 +101,13 @@ export async function GUILD_MEMBERS_VILLA(event: {
      */
     msg_id: event.id,
     /**
-     * 特殊消息
+     * 附件消息
      */
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [],
     /**
      *
      */

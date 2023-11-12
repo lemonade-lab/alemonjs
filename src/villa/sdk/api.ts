@@ -310,7 +310,6 @@ export async function pinMessage(
   }).then(res => res.data)
 }
 /**
- * tudo 官网文档 为 get  实际为  post
  * 撤回消息
  * @param villa_id 别野编号
  * @param data 配置数据

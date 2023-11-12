@@ -7,7 +7,7 @@ import { getIP } from '../../core/index.js'
 import { getServerConfig } from '../../koa/config.js'
 
 /**
- * tudo
+ * TUDP
  * 需要验证登录是否成功
  */
 

@@ -8,7 +8,7 @@ import {
 import { segmentVILLA } from '../segment.js'
 
 /**
- * tudo
+ * TUDO
  * 判断审核事件?
  */
 
@@ -104,9 +104,13 @@ export async function MESSAGE_AUDIT_VILLA(event: {
      */
     msg_id: event.id,
     /**
-     * 特殊消息
+     * 附件消息
      */
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [],
     /**
      * 艾特用户
      */

@@ -4,7 +4,10 @@ import {
   AMessage,
   InstructionMatching,
   CardType,
-  getUrlbuffer
+  getUrlbuffer,
+  EventEnum,
+  PlatformEnum,
+  EventType
 } from '../../../core/index.js'
 import { ClientQQ as Client } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
@@ -70,18 +73,38 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
   const cfg = getBotConfigByKey('qq')
   const masterID = cfg.masterID
   const e = {
-    platform: 'qq',
+    platform: 'qq' as (typeof PlatformEnum)[number],
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isMaster: event.msg.author.id == masterID ? true : false,
-    event: 'MESSAGES',
-    eventType: 'CREATE',
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    boundaries: 'publick',
-    attribute: 'single',
-    attachments: event?.msg?.attachments ?? []
-  } as AMessage
+    attachments: event?.msg?.attachments ?? [],
+    specials: [],
+    user_id: '',
+    user_name: '',
+    user_avatar: '',
+    at: false,
+    msg_id: '',
+    msg_create_time: 0,
+    msg_txt: '',
+    msg: '',
+    segment: segmentQQ,
+    guild_id: '',
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: {
+        quote?: string
+        withdraw?: number
+      }
+    ): Promise<any> => {
+      return false
+    }
+  }
 
   /**
    * 撤回事件
@@ -95,7 +118,6 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     return await typeMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
-    return
   }
 
   /**

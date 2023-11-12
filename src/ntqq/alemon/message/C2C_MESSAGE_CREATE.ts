@@ -37,6 +37,10 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
      * 特殊消息
      */
     attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: [],
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {

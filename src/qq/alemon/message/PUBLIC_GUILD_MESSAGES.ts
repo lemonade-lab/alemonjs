@@ -1,4 +1,4 @@
-import { typeMessage, AMessage } from '../../../core/index.js'
+import { typeMessage, AMessage, PlatformEnum } from '../../../core/index.js'
 import { mergeMessages } from './MESSAGE.js'
 import { getBotMsgByQQ } from '../bot.js'
 import {
@@ -59,21 +59,21 @@ interface EventPublicDuildType {
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
 export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
-  console.log('pubclik event', event)
-  console.log('pubclik attachments', event.msg.attachments)
-  console.log('pubclik mentions', event.msg.mentions)
   const e = {
-    platform: 'qq',
-    bot: getBotMsgByQQ(),
+    platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES',
     eventType: 'CREATE',
+    boundaries: 'publick',
+    attribute: 'group',
+    bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
     isGroup: true,
-    boundaries: 'publick',
-    attribute: 'group',
-    //   `${url}?${filename}`
-    attachments: event?.msg?.attachments ?? []
+    attachments: event?.msg?.attachments ?? [],
+    /**
+     * 特殊消息
+     */
+    specials: []
   } as AMessage
 
   /**

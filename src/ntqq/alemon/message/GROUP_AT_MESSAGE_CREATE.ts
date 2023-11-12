@@ -42,6 +42,10 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
      */
     attachments: [],
     /**
+     * 特殊消息
+     */
+    specials: [],
+    /**
      * 消息发送机制
      * @param msg 消息
      * @param img

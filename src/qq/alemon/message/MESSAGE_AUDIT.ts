@@ -1,5 +1,5 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
-import { typeMessage, AMessage } from '../../../core/index.js'
+import { typeMessage, AMessage, PlatformEnum } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 
 /**
@@ -13,16 +13,20 @@ MESSAGE_AUDIT (1 << 27)
  */
 export const MESSAGE_AUDIT = async (event: any) => {
   const e = {
-    platform: 'qq',
-    bot: getBotMsgByQQ(),
+    platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'MESSAGE_AUDIT',
     eventType: 'CREATE',
+    boundaries: 'publick',
+    attribute: 'group',
+    bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    boundaries: 'publick',
-    attribute: 'group',
-    attachments: []
+    attachments: [],
+    /**
+     * 特殊消息
+     */
+    specials: []
   } as AMessage
 
   /**
