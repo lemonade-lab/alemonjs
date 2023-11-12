@@ -1,4 +1,3 @@
-import { BotEvent } from '../sdk/index.js'
 import { MESSAGES_VILLA } from './message/MESSAGES.js'
 import { GUILD_MEMBERS_VILLA } from './message/GUILD_MEMBERS.js'
 import { GUILD_MESSAGE_REACTIONS_VILLA } from './message/GUILD_MESSAGE_REACTIONS.js'
@@ -38,7 +37,7 @@ const ConversationMap = {
  * @param req
  * @param res
  */
-export async function callBackByVilla(event: BotEvent) {
+export async function callBackByVilla(event) {
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     return await ConversationMap[event.type](event)
   }

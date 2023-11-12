@@ -35,7 +35,7 @@ export interface AlemonOptions {
     /**
      * 是否创建
      */
-    init?: false
+    init?: boolean
     /**
      * 应用名称
      */

@@ -5,7 +5,6 @@ import {
   PlatformEnum,
   typeMessage
 } from '../../../core/index.js'
-import { BotEvent } from '../../sdk/index.js'
 import { segmentVILLA } from '../segment.js'
 
 /**
@@ -18,7 +17,35 @@ import { segmentVILLA } from '../segment.js'
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function GUILD_MEMBERS_VILLA(event: BotEvent) {
+export async function GUILD_MEMBERS_VILLA(event: {
+  robot: {
+    template: {
+      id: string
+      name: string
+      desc: string
+      icon: string
+      commands: Array<{
+        name: string // 指令
+        desc: string // 指令说明
+      }>
+    }
+    villa_id: number
+  }
+  type: number
+  extend_data: {
+    EventData: {
+      JoinVilla: {
+        join_uid: number // 用户编号
+        join_user_nickname: string // 用户名称
+        join_at: number // 进入事件编号
+        villa_id: number // 别野编号
+      }
+    }
+  }
+  created_at: number
+  id: string
+  send_at: number
+}) {
   /**
    * 别野编号
    */

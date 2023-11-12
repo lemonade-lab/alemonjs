@@ -1,7 +1,7 @@
 import Koa from 'koa'
 import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
-import { type ClientConfig, type BotEvent } from './types.js'
+import { type ClientConfig } from './types.js'
 import { setClientConfig } from './config.js'
 import { getIP } from '../../core/index.js'
 import { getServerConfig } from '../../koa/config.js'
@@ -24,7 +24,7 @@ export function createClient(
     callback_url = '/api/mys/callback',
     callback_port = 8080
   }: ClientConfig,
-  callBack: (event: BotEvent) => Promise<void>,
+  callBack: (event) => Promise<void>,
   logFnc?: (port: number) => Promise<void>
 ) {
   /**
@@ -46,11 +46,11 @@ export function createClient(
       /**
        * 从请求体中获取事件对象
        */
-      const event: BotEvent = ctx.request.body.event
+      const event = ctx.request.body?.event
       /**
        * 错误调用
        */
-      if (!event?.robot) {
+      if (!event || !event?.robot) {
         /**
          * 处理完毕后返回响应
          */

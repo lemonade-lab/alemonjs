@@ -6,7 +6,10 @@ import { type EntitiesType } from './types.js'
  * @param villa_id 别墅
  * @returns
  */
-export async function stringParsing(msg: string | string[], villa_id: number) {
+export async function stringParsing(
+  msg: string | string[],
+  villa_id: number | string
+) {
   /**
    * 把string[]更改为string
    */
@@ -117,7 +120,7 @@ export async function stringParsing(msg: string | string[], villa_id: number) {
     /**
      * 得到用户名
      */
-    const User = await getMember(villa_id, String(item.id))
+    const User = await getMember(villa_id, item.id)
     if (User) {
       setUserName(item.id, User?.data?.member?.basic?.nickname)
     }

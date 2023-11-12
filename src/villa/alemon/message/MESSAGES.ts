@@ -6,7 +6,7 @@ import {
   UserType,
   getUrlbuffer
 } from '../../../core/index.js'
-import { BotEvent, MessageContentType, ClientVILLA } from '../../sdk/index.js'
+import { MessageContentType, ClientVILLA } from '../../sdk/index.js'
 import IMGS from 'image-size'
 import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -28,8 +28,8 @@ const recallMessage = (
     quote?: string
     withdraw?: number
   },
-  villa_id: number,
-  room_id: number
+  villa_id: number | string,
+  room_id: number | string
 ) => {
   if (res && res.bot_msg_id && select?.withdraw && select?.withdraw > 1000) {
     setTimeout(() => {
@@ -48,7 +48,39 @@ const recallMessage = (
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function MESSAGES_VILLA(event: BotEvent) {
+export async function MESSAGES_VILLA(event: {
+  robot: {
+    template: {
+      id: string
+      name: string
+      desc: string
+      icon: string
+      commands: Array<{
+        name: string // 指令
+        desc: string // 指令说明
+      }>
+    }
+    villa_id: number
+  }
+  type: number
+  extend_data: {
+    EventData: {
+      SendMessage: {
+        content: string // 字符串消息合集  MessageContentType
+        from_user_id: number // 来自用户id
+        send_at: number // 发送事件编号
+        object_name: number // 对象名称
+        room_id: number // 房间号
+        nickname: string // 昵称
+        msg_uid: string // 消息ID
+        villa_id: string // 别野编号
+      }
+    }
+  }
+  created_at: number
+  id: string
+  send_at: number
+}) {
   /**
    * 数据包解析
    */
@@ -264,7 +296,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         /**
          * 上传图片
          */
-        const url = await ClientVILLA.uploadImage(msg)
+        const url = await ClientVILLA.uploadImage(villa_id, msg).then(
+          res => res?.data?.url
+        )
         if (!url) return false
         const dimensions = IMGS.imageSize(msg)
         return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
@@ -296,7 +330,10 @@ export async function MESSAGES_VILLA(event: BotEvent) {
         /**
          * 上传图片
          */
-        const url = await ClientVILLA.uploadImage(msg[isBuffer] as Buffer)
+        const url = await ClientVILLA.uploadImage(
+          villa_id,
+          msg[isBuffer] as Buffer
+        ).then(res => res?.data?.url)
         if (!url) return false
         // 识别大小
         const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
@@ -350,7 +387,9 @@ export async function MESSAGES_VILLA(event: BotEvent) {
           /**
            * 上传图片
            */
-          const url = await ClientVILLA.uploadImage(msg)
+          const url = await ClientVILLA.uploadImage(villa_id, msg).then(
+            res => res?.data?.url
+          )
           if (!url) return false
           const dimensions = IMGS.imageSize(msg)
           return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {

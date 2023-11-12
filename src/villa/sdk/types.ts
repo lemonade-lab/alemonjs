@@ -86,6 +86,9 @@ export interface EntitiesType {
   offset: number
   // 长度
   length: number
+  /**
+   * 描述
+   */
   entity: {
     type: (typeof EmbeddedEntityTypeEnum)[number]
     // 机器人账号    提及机器人
@@ -172,82 +175,6 @@ export interface MessageContentType {
     // 消息文本
     text?: string
   }
-}
-
-/**
- * 机器人模板信息
- */
-export interface BotTemplate {
-  id: string // 机器人编号
-  name: string // 机器人名称
-  desc: string // 机器人说明
-  icon: string // 机器人头像
-  commands: Array<{
-    name: string // 指令
-    desc: string // 指令说明
-  }>
-}
-
-export interface SendMessageType {
-  content: string // 字符串消息合集  MessageContentType
-  from_user_id: number // 来自用户id
-  send_at: number // 发送事件编号
-  object_name: number // 对象名称
-  room_id: number // 房间号
-  nickname: string // 昵称
-  msg_uid: string // 消息ID
-  villa_id: string // 别野编号
-}
-
-export interface AddQuickEmoticonType {
-  villa_id: number // 别野编号
-  room_id: number // 房间编号
-  uid: number // 用户编号
-  emoticon_id: number // 表情编号
-  emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
-  is_cancel?: boolean // 是撤回为  ture
-  msg_uid: string // 用户消息编号
-  bot_msg_id: string // 机器人消息编号
-}
-
-export interface JoinVillaType {
-  join_uid: number // 用户编号
-  join_user_nickname: string // 用户名称
-  join_at: number // 进入事件编号
-  villa_id: number // 别野编号
-}
-
-/**
- * 机器人接收类型
- */
-export interface BotEvent {
-  // 机器人相关信息
-  robot: {
-    template: BotTemplate // 机器人模板信息
-    villa_id: number // 事件所属的大别野 id
-  }
-  type: number // 消息类型
-  extend_data: {
-    EventData: {
-      // 会话消息数据包
-      SendMessage: SendMessageType
-      // 表情表态数据包
-      AddQuickEmoticon: AddQuickEmoticonType
-      // 成员进入数据包
-      JoinVilla: JoinVillaType
-      // 机器人退出数据包
-      DeleteRobot: {
-        villa_id: number // 别野编号
-      }
-      // 机器人进入数据包
-      CreateRobot: {
-        villa_id: number // 别野编号
-      }
-    }
-  }
-  created_at: number // 创建事件编号
-  id: string // 消息编号
-  send_at: number // 发送事件编号
 }
 
 /**

@@ -5,14 +5,46 @@ import {
   PlatformEnum,
   typeMessage
 } from '../../../core/index.js'
-import { BotEvent } from '../../sdk/index.js'
 import { segmentVILLA } from '../segment.js'
 /**
  * 表情表态
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
+export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
+  robot: {
+    template: {
+      id: string
+      name: string
+      desc: string
+      icon: string
+      commands: Array<{
+        name: string // 指令
+        desc: string // 指令说明
+      }>
+    }
+    villa_id: number
+  }
+  type: number
+  extend_data: {
+    EventData: {
+      // 增加和删除都是一个数据位
+      AddQuickEmoticon: {
+        villa_id: number // 别野编号
+        room_id: number // 房间编号
+        uid: number // 用户编号
+        emoticon_id: number // 表情编号
+        emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
+        is_cancel?: boolean // 是撤回为  ture
+        msg_uid: string // 用户消息编号
+        bot_msg_id: string // 机器人消息编号
+      }
+    }
+  }
+  created_at: number
+  id: string
+  send_at: number
+}) {
   /**
    * 别野编号
    */
@@ -20,7 +52,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: BotEvent) {
   /**
    * 房间号
    */
-  const room_id = event.extend_data.EventData.SendMessage?.room_id ?? ''
+  const room_id = ''
   /**
    * 制作e消息对象
    */

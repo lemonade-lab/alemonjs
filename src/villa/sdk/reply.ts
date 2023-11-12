@@ -10,8 +10,8 @@ import { type EntitiesType, type ImageSizeType } from './types.js'
  * @returns
  */
 export async function sendMessageImage(
-  villa_id: number,
-  room_id: number,
+  villa_id: number | string,
+  room_id: number | string,
   url: string,
   size?: ImageSizeType
 ) {
@@ -45,8 +45,8 @@ export async function sendMessageImage(
  * @returns
  */
 export async function sendMessageText(
-  villa_id: number,
-  room_id: number,
+  villa_id: number | string,
+  room_id: number | string,
   text: string
 ) {
   return await sendMessage(villa_id, {
@@ -71,8 +71,8 @@ export async function sendMessageText(
  * @returns
  */
 export async function sendMessageTextEntities(
-  villa_id: number,
-  room_id: number,
+  villa_id: number | string,
+  room_id: number | string,
   text: string,
   entities: EntitiesType[]
 ) {
@@ -97,8 +97,8 @@ export async function sendMessageTextEntities(
  * @returns
  */
 export async function sendMessageTextUrl(
-  villa_id: number,
-  room_id: number,
+  villa_id: number | string,
+  room_id: number | string,
   text: string,
   url: string,
   size?: ImageSizeType
@@ -130,8 +130,8 @@ export async function sendMessageTextUrl(
  * @returns
  */
 export async function sendMessageTextImages(
-  villa_id: number,
-  room_id: number,
+  villa_id: number | string,
+  room_id: number | string,
   text: string,
   images: any
 ) {
@@ -158,8 +158,8 @@ export async function sendMessageTextImages(
  * @returns
  */
 export async function sendMessageTextEntitiesUrl(
-  villa_id: number,
-  room_id: number,
+  villa_id: number | string,
+  room_id: number | string,
   text: string,
   entities: EntitiesType[],
   url: string,

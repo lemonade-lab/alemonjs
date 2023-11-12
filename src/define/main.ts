@@ -174,7 +174,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 挂起web服务
    * **********
    */
-  if (Options?.server?.state != false) {
+  if (Options?.server?.state) {
     // 创建server端
     createWeb(Options?.server)
     if (Options?.server?.clear != false) {

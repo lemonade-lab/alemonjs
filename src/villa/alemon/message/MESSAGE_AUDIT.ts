@@ -5,7 +5,6 @@ import {
   PlatformEnum,
   typeMessage
 } from '../../../core/index.js'
-import { BotEvent } from '../../sdk/index.js'
 import { segmentVILLA } from '../segment.js'
 
 /**
@@ -18,7 +17,29 @@ import { segmentVILLA } from '../segment.js'
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function MESSAGE_AUDIT_VILLA(event: BotEvent) {
+export async function MESSAGE_AUDIT_VILLA(event: {
+  // 机器人相关信息
+  robot: {
+    template: {
+      id: string
+      name: string
+      desc: string
+      icon: string
+      commands: Array<{
+        name: string // 指令
+        desc: string // 指令说明
+      }>
+    }
+    villa_id: number // 事件所属的大别野 id
+  }
+  type: number // 消息类型
+  extend_data: {
+    EventData: any
+  }
+  created_at: number // 创建事件编号
+  id: string // 消息编号
+  send_at: number // 发送事件编号
+}) {
   /**
    * 别野编号
    */
