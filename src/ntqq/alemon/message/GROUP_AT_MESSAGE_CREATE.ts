@@ -28,22 +28,16 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   const masterID = cfg.masterID
   const e = {
     platform: 'ntqq',
-    bot: getBotMsgByNtqq(),
-    isMaster: event.author.id == masterID ? true : false,
     event: 'MESSAGES',
     eventType: 'CREATE',
+    boundaries: 'publick',
+    attribute: 'group',
+    bot: getBotMsgByNtqq(),
+    isMaster: event.author.id == masterID ? true : false,
     isPrivate: false,
     isRecall: false,
     isGroup: true,
-    boundaries: 'publick',
-    attribute: 'group',
-    /**
-     * 特殊消息
-     */
     attachments: [],
-    /**
-     * 特殊消息
-     */
     specials: [],
     /**
      * 消息发送机制

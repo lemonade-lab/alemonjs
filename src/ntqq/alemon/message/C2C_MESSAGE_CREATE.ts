@@ -22,24 +22,16 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const masterID = cfg.masterID
   const e = {
     platform: 'ntqq',
-    bot: getBotMsgByNtqq(),
-    isMaster: event.author.id == masterID ? true : false,
     event: 'MESSAGES',
     eventType: 'CREATE',
-    // 是私
+    boundaries: 'publick',
+    attribute: 'single',
+    bot: getBotMsgByNtqq(),
+    isMaster: event.author.id == masterID ? true : false,
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    boundaries: 'publick',
-    // 是私聊
-    attribute: 'single',
-    /**
-     * 特殊消息
-     */
     attachments: [],
-    /**
-     * 特殊消息
-     */
     specials: [],
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],

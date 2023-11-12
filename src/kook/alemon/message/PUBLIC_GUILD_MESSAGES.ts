@@ -69,17 +69,14 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
   const avatar = event.extra.author.avatar
 
   const e = {
-    /**
-     * 基础声明
-     */
     platform: 'kook' as (typeof PlatformEnum)[number],
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
     boundaries: 'private' as 'publick' | 'private',
     attribute:
       event.channel_type == 'GROUP'
         ? 'group'
         : ('single' as 'group' | 'single'),
-    event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
     bot: getBotMsgByKOOK(),
     /**
      *
