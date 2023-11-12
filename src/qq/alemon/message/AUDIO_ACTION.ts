@@ -7,6 +7,7 @@ import {
   EventType
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
+import { segmentQQ } from '../segment.js'
 /**
  * AUDIO_MICROPHONE 音频
  * AUDIO_FREQUENCY 麦克风
@@ -41,8 +42,33 @@ export const AUDIO_ACTION = async (event: any) => {
     /**
      * 特殊消息
      */
-    specials: []
-  } as AMessage
+    specials: [],
+    user_id: '',
+    user_name: '',
+    isMaster: false,
+    msg_create_time: new Date().getTime(),
+    user_avatar: '',
+    at: false,
+    msg_id: '',
+    msg_txt: '',
+    segment: segmentQQ,
+    msg: '',
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    /**
+     * 发现消息
+     * @param msg
+     * @param img
+     * @returns
+     */
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: {
+        quote?: string
+        withdraw?: number
+      }
+    ): Promise<any> => {}
+  }
 
   if (new RegExp(/MIC$/).test(event.eventType)) {
     if (!new RegExp(/ON_MIC$/).test(event.eventType)) {

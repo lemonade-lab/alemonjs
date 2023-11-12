@@ -6,7 +6,6 @@ import {
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientQQ as Client } from '../../sdk/index.js'
-import { segmentQQ } from '../segment.js'
 import { setBotMsgByQQ } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import {
@@ -293,11 +292,6 @@ export const mergeMessages = async (
    * 频道编号
    */
   e.guild_id = event.msg.guild_id
-
-  /**
-   * 模块
-   */
-  e.segment = segmentQQ
 
   /**
    * 被艾特的用户

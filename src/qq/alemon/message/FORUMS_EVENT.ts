@@ -7,6 +7,7 @@ import {
   EventType
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
+import { segmentQQ } from '../segment.js'
 
 /**
  * ***********
@@ -75,8 +76,33 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     isRecall: false,
     isGroup: false,
     attachments: [],
-    specials: [JSON.parse(event.msg.thread_info.content)]
-  } as AMessage
+    specials: [JSON.parse(event.msg.thread_info.content)],
+    user_id: '',
+    user_name: '',
+    isMaster: false,
+    msg_create_time: new Date().getTime(),
+    user_avatar: '',
+    at: false,
+    msg_id: '',
+    msg_txt: '',
+    segment: segmentQQ,
+    msg: '',
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    /**
+     * 发现消息
+     * @param msg
+     * @param img
+     * @returns
+     */
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: {
+        quote?: string
+        withdraw?: number
+      }
+    ): Promise<any> => {}
+  }
 
   /* 事件匹配 */
   if (new RegExp(/^FORUM_THREAD/).test(event.eventType)) {

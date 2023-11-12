@@ -21,18 +21,15 @@ export async function DIRECT_MESSAGE(socket: WebSocket, event: Event) {
   const masterID = cfg.masterID
   const e = {
     platform: 'one',
-    bot: getBotMsgByONE(),
-    isMaster: event.user_id == masterID ? true : false,
     event: 'MESSAGES',
     eventType: 'CREATE',
-    // 撤回
-    isRecall: false,
     boundaries: 'publick',
+    attribute: event.detail_type == 'private' ? 'single' : 'group',
+    bot: getBotMsgByONE(),
+    isMaster: event.user_id == masterID ? true : false,
+    isRecall: false,
     isGroup: event.detail_type == 'private' ? true : false,
-    // 是私
-    isPrivate: event.detail_type == 'private' ? true : false,
-    // 是私聊
-    attribute: event.detail_type == 'private' ? 'single' : 'group'
+    isPrivate: event.detail_type == 'private' ? true : false
   } as AMessage
 
   /**

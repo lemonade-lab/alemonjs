@@ -12,6 +12,7 @@ import {
   AlemonJSEventError,
   AlemonJSEventLog
 } from '../../../log/index.js'
+import { segmentQQ } from '../segment.js'
 
 /**
  * *私域*
@@ -40,8 +41,33 @@ export const GUILD_MESSAGES = async (event: any) => {
     /**
      * 特殊消息
      */
-    specials: []
-  } as AMessage
+    specials: [],
+    user_id: '',
+    user_name: '',
+    isMaster: false,
+    msg_create_time: new Date().getTime(),
+    user_avatar: '',
+    at: false,
+    msg_id: '',
+    msg_txt: '',
+    segment: segmentQQ,
+    msg: '',
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    /**
+     * 发现消息
+     * @param msg
+     * @param img
+     * @returns
+     */
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: {
+        quote?: string
+        withdraw?: number
+      }
+    ): Promise<any> => {}
+  }
 
   /**
    * 撤回消息

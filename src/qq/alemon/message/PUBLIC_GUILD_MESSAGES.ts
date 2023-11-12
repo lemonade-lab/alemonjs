@@ -6,6 +6,7 @@ import {
   AlemonJSEventLog,
   everyoneError
 } from '../../../log/index.js'
+import { segmentQQ } from '../segment.js'
 
 interface EventPublicDuildType {
   eventType: 'AT_MESSAGE_CREATE'
@@ -73,8 +74,33 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
     /**
      * 特殊消息
      */
-    specials: []
-  } as AMessage
+    specials: [],
+    user_id: '',
+    user_name: '',
+    isMaster: false,
+    msg_create_time: new Date().getTime(),
+    user_avatar: '',
+    at: false,
+    msg_id: '',
+    msg_txt: '',
+    segment: segmentQQ,
+    msg: '',
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    /**
+     * 发现消息
+     * @param msg
+     * @param img
+     * @returns
+     */
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: {
+        quote?: string
+        withdraw?: number
+      }
+    ): Promise<any> => {}
+  }
 
   /**
    * 消息撤回
@@ -82,7 +108,7 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
-    return await typeMessage(e)
+    return await typeMessage(e as any)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
   }
