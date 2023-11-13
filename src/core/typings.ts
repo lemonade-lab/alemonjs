@@ -265,6 +265,11 @@ export interface SegmentType {
    */
   img(dir: string): Buffer | false
   /**
+   * 标注GET请求
+   * @param rul
+   */
+  http(rul: string, body?: any): string
+  /**
    * 艾特频道
    * @param channel_id
    */
@@ -290,11 +295,6 @@ export interface SegmentType {
    * @param url 链接地址
    */
   link?(txt: string, url: string): string
-  /**
-   * 标注GET请求
-   * @param rul
-   */
-  http?(rul: string, body?: any): string
   /**
    * 加粗
    * @param txt
