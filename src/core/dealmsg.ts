@@ -382,6 +382,9 @@ export async function loadInit() {
  * @returns 是否处理完成
  */
 export async function InstructionMatching(e: AMessage) {
+  // 标记当前函数平台
+  global.APlatform = e.platform
+
   /**
    * 对话机
    */

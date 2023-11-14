@@ -4,14 +4,15 @@ import {
   EventEnum,
   EventType
 } from '../../../core/index.js'
-import { mergeMessages } from './MESSAGE.js'
 import { getBotMsgByQQ } from '../bot.js'
-import {
-  AlemonJSEventError,
-  AlemonJSEventLog,
-  everyoneError
-} from '../../../log/index.js'
+import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
+import { InstructionMatching } from '../../../core/index.js'
+import { setBotMsgByQQ } from '../bot.js'
+import { getBotConfigByKey } from '../../../config/index.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
+import { replyController } from '../reply.js'
+import { ClientController } from '../controller.js'
 
 interface EventPublicDuildType {
   eventType: 'AT_MESSAGE_CREATE'
@@ -65,6 +66,13 @@ interface EventPublicDuildType {
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
 export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    msg_id: event.msg.id,
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -77,16 +85,16 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
     isGroup: true,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
-    user_id: '',
-    user_name: '',
+    user_id: event.msg.author.id,
+    user_name: event.msg.author.username,
     isMaster: false,
     send_at: new Date().getTime(),
-    user_avatar: '',
+    user_avatar: event.msg.author.avatar,
     at: false,
-    msg_id: '',
-    msg_txt: '',
+    msg_id: event.msg.id,
+    msg_txt: event.msg?.content ?? '',
+    msg: event.msg?.content ?? '',
     segment: segmentQQ,
-    msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     at_user: undefined,
@@ -105,17 +113,12 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
         guild_id?: string
         channel_id?: string
       }
-    ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    ): Promise<any> => {
+      const channel_id = select?.channel_id ?? event.msg.channel_id
+      const msg_id = select?.channel_id ?? event.msg.channel_id
+      return await replyController(msg, channel_id, msg_id)
+    },
+    controller
   }
 
   /**
@@ -129,11 +132,67 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
   }
 
+  // 屏蔽其他机器人的消息
+  if (event.msg.author.bot) return
+  const cfg = getBotConfigByKey('qq')
+  const masterID = cfg.masterID
+
   /**
-   * 消息创建
+   * 检查身份
    */
-  if (new RegExp(/CREATE$/).test(event.eventType)) {
-    mergeMessages(e, event).catch(everyoneError)
-    return
+  if (event.msg.author.id == masterID) {
+    e.isMaster = true
   }
+
+  if (event.msg.mentions) {
+    /**
+     * 去掉@ 转为纯消息
+     */
+    for await (const item of event.msg.mentions) {
+      if (item.bot != true) {
+        // 用户艾特才会为真
+        e.at = true
+      }
+      e.at_users.push({
+        id: item.id,
+        name: item.username,
+        avatar: item.avatar,
+        bot: item.bot
+      })
+    }
+    /**
+     * 循环删除文本中的at信息并去除前后空格
+     */
+    e.at_users.forEach(item => {
+      e.msg = e.msg.replace(`<@!${item.id}>`, '').trim()
+    })
+  }
+
+  /**
+   * 存在at
+   */
+  if (e.at) {
+    /**
+     * 得到第一个艾特
+     */
+    e.at_user = e.at_users.find(item => item.bot != true)
+  }
+
+  if (e.bot.avatar == 'string') {
+    /**
+     * 配置一下机器人头像
+     */
+    const bot = e.at_users.find(item => item.bot == true && item.id == e.bot.id)
+    if (bot) {
+      e.bot.avatar = bot.avatar
+      setBotMsgByQQ(bot)
+    }
+  }
+
+  /**
+   * 业务处理
+   */
+  return await InstructionMatching(e)
+    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
+    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }

@@ -17,10 +17,19 @@ import {
   everyoneError
 } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
+import { ClientController } from '../controller.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
+
+  const controller = ClientController({
+    guild_id: event.author.user_openid,
+    channel_id: event.author.user_openid,
+    msg_id: event.id,
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'ntqq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -130,16 +139,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         event.id
       ).catch(everyoneError)
     },
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /**

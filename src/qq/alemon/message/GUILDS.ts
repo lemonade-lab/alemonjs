@@ -7,6 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
+import { ClientController } from '../controller.js'
 
 /**
  * GUILD 频道
@@ -69,6 +70,13 @@ GUILDS (1 << 0)
   - CHANNEL_DELETE         // 当channel被删除时
  */
 export const GUILDS = async Event => {
+  const controller = ClientController({
+    guild_id: Event.msg.guild_id,
+    channel_id: '0',
+    msg_id: '0',
+    send_at: new Date().getTime()
+  })
+
   /**
    * 事件匹配
    */
@@ -98,6 +106,7 @@ export const GUILDS = async Event => {
       at_user: undefined,
       msg: '',
       guild_id: event.msg.id, // ?
+      channel_id: '',
       at_users: [],
       /**
        * 发现消息
@@ -114,16 +123,7 @@ export const GUILDS = async Event => {
           channel_id?: string
         }
       ): Promise<any> => {},
-      controller: async (select?: {
-        msg_id?: string
-        send_at?: number
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-        pinning?: boolean
-        forward?: boolean
-        horn?: boolean
-      }) => {}
+      controller
     }
 
     /**
@@ -183,6 +183,7 @@ export const GUILDS = async Event => {
     at_user: undefined,
     msg: '',
     guild_id: event.msg.guild_id, // ?
+    channel_id: '',
     at_users: [],
     /**
      * 发现消息
@@ -197,16 +198,7 @@ export const GUILDS = async Event => {
         withdraw?: number
       }
     ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /**

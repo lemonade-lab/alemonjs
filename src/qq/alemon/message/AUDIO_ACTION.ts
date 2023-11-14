@@ -7,6 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
+import { ClientController } from '../controller.js'
 
 /**
  * TUDO
@@ -25,6 +26,13 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_OFF_MIC           // 下麦时 delete
  */
 export const AUDIO_ACTION = async (event: any) => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    msg_id: '0',
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'AUDIO_MICROPHONE' as (typeof EventEnum)[number],
@@ -66,16 +74,7 @@ export const AUDIO_ACTION = async (event: any) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   if (new RegExp(/MIC$/).test(event.eventType)) {

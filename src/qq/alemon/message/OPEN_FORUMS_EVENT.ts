@@ -1,13 +1,13 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
   typeMessage,
-  AMessage,
   PlatformEnum,
   EventEnum,
   EventType
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
+import { ClientController } from '../controller.js'
 
 /**
  * ***********
@@ -71,6 +71,13 @@ interface content {
     - OPEN_FORUM_REPLY_DELETE      // 当用户删除评论时
    */
 export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    msg_id: '0',
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
@@ -112,16 +119,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /**

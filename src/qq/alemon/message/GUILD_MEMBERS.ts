@@ -8,6 +8,7 @@ import {
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
+import { ClientController } from '../controller.js'
 
 interface EventGuildMembersType {
   eventType: 'GUILD_MEMBER_ADD' | 'GUILD_MEMBER_UPDATE' | 'GUILD_MEMBER_REMOVE'
@@ -35,6 +36,13 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
 export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: '',
+    msg_id: '0',
+    send_at: new Date().getTime()
+  })
+
   const Eevent = 'GUILD_MEMBERS'
   let eventType = 'CREATE'
 
@@ -70,6 +78,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     segment: segmentQQ,
     msg: '',
     guild_id: event.msg.guild_id,
+    channel_id: '',
     at_users: [],
     /**
      * 发现消息
@@ -86,16 +95,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   return await typeMessage(e)

@@ -20,6 +20,7 @@ import {
   everyoneError
 } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
+import { ClientController } from '../controller.js'
 
 declare global {
   //接口对象
@@ -70,6 +71,13 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 export const DIRECT_MESSAGE = async (event: directEventData) => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    msg_id: event.msg.id,
+    send_at: new Date().getTime()
+  })
+
   const cfg = getBotConfigByKey('qq')
   const masterID = cfg.masterID
   const e = {
@@ -89,7 +97,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     user_name: '',
     user_avatar: '',
     at: false,
-    msg_id: '',
+    msg_id: event.msg.id,
     at_users: [],
     at_user: undefined,
     send_at: 0,
@@ -97,6 +105,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     msg: '',
     segment: segmentQQ,
     guild_id: '',
+    channel_id: '',
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {
@@ -108,16 +117,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     ): Promise<any> => {
       return false
     },
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /**
@@ -133,19 +133,6 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
   }
-
-  /**
-   * 优化接口
-   */
-  await directMessage(e, event).catch(everyoneError)
-  console.info(
-    `\n[${event.msg.author.username}][${event.msg.author.id}][${e.isGroup}] ${
-      event.msg.content ? event.msg.content : ''
-    }`
-  )
-}
-
-async function directMessage(e: AMessage, event: directEventData) {
   /* 消息发送机制 */
   e.reply = async (
     msg: Buffer | string | number | (Buffer | number | string)[],
@@ -220,26 +207,26 @@ async function directMessage(e: AMessage, event: directEventData) {
       .catch(everyoneError)
   }
 
-  e.replyCard = async (arr: CardType[]) => {
-    for (const item of arr) {
-      try {
-        if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-          await ClientQQ.messageApi
-            .postMessage(event.msg.channel_id, {
-              msg_id: event.msg.id,
-              ...item.card
-            })
-            .catch(everyoneError)
-        } else {
-          return false
-        }
-      } catch (err) {
-        console.error(err)
-        return err
-      }
-    }
-    return true
-  }
+  // e.replyCard = async (arr: CardType[]) => {
+  //   for (const item of arr) {
+  //     try {
+  //       if (item.type == 'qq_ark' || item.type == 'qq_embed') {
+  //         await ClientQQ.messageApi
+  //           .postMessage(event.msg.channel_id, {
+  //             msg_id: event.msg.id,
+  //             ...item.card
+  //           })
+  //           .catch(everyoneError)
+  //       } else {
+  //         return false
+  //       }
+  //     } catch (err) {
+  //       console.error(err)
+  //       return err
+  //     }
+  //   }
+  //   return true
+  // }
 
   e.msg_txt = event.msg.content
 

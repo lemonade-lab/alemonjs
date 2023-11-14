@@ -17,6 +17,7 @@ import {
   AlemonJSLog,
   everyoneError
 } from '../../../log/index.js'
+import { ClientController } from '../controller.js'
 
 /**
  * 公私域合并
@@ -27,6 +28,14 @@ import {
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
+
+  const controller = ClientController({
+    guild_id: event.group_id,
+    channel_id: '0',
+    msg_id: event.id,
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'ntqq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -40,6 +49,20 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     isGroup: true,
     attachments: [],
     specials: [],
+    msg_txt: event.content,
+    msg: event.content.trim(),
+    msg_id: event.id,
+    user_id: event.author.id,
+    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
+    user_name: '柠檬冲水',
+    guild_id: event.group_id,
+    channel_id: event.group_id,
+    segment: segmentNTQQ,
+    at_users: [],
+    at: false,
+    at_user: undefined,
+    send_at: new Date().getTime(),
+    controller,
     /**
      * 消息发送机制
      * @param msg 消息
@@ -125,30 +148,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
         content,
         event.id
       ).catch(everyoneError)
-    },
-    msg_txt: event.content,
-    msg: event.content.trim(),
-    msg_id: event.id,
-    user_id: event.author.id,
-    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
-    user_name: '柠檬冲水',
-    channel_id: event.group_id,
-    guild_id: event.group_id,
-    segment: segmentNTQQ,
-    at_users: [],
-    at: false,
-    at_user: undefined,
-    send_at: new Date().getTime(),
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    }
   }
 
   /**

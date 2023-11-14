@@ -15,6 +15,7 @@ import {
   AlemonJSLog,
   everyoneError
 } from '../../../log/index.js'
+import { ClientController } from '../controller.js'
 
 /**
  *
@@ -67,6 +68,13 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
   }
 
   const avatar = event.extra.author.avatar
+
+  const controller = ClientController({
+    guild_id: event.target_id,
+    channel_id: event.extra.guild_id,
+    msg_id: event.msg_id,
+    send_at: new Date().getTime()
+  })
 
   const e = {
     platform: 'kook' as (typeof PlatformEnum)[number],
@@ -241,16 +249,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         return err
       }
     },
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /**

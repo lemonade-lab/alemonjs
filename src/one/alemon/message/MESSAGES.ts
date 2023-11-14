@@ -11,6 +11,7 @@ import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientONE } from '../../sdk/wss.js'
+import { ClientController } from '../controller.js'
 /**
  * 公信事件
  * @param socket
@@ -20,6 +21,14 @@ import { ClientONE } from '../../sdk/wss.js'
 export async function MESSAGES(event: EventGroup) {
   const cfg = getBotConfigByKey('one')
   const masterID = cfg.masterID
+
+  const controller = ClientController({
+    guild_id: event.group_id,
+    channel_id: '0',
+    msg_id: event.message_id,
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'one' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -34,7 +43,26 @@ export async function MESSAGES(event: EventGroup) {
     isRecall: false,
     isGroup: event.detail_type == 'private' ? true : false,
     isPrivate: event.detail_type == 'private' ? true : false,
-
+    msg_txt: event.raw_message,
+    user_id: event.user_id,
+    user_avatar:
+      event.platform == 'qq'
+        ? `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`
+        : 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
+    user_name: event.sender.nickname,
+    guild_id: event.group_id,
+    guild_name: event.group_name,
+    channel_id: event.group_id,
+    segment: segmentONE,
+    at_users: [],
+    msg: event.raw_message.trim(),
+    msg_id: event.message_id,
+    at: false,
+    send_at: new Date().getTime(),
+    attachments: [],
+    specials: [],
+    at_user: undefined,
+    controller,
     /**
      * 消息发送机制
      * @param msg 消息
@@ -225,36 +253,7 @@ export async function MESSAGES(event: EventGroup) {
         })
       )
       return true
-    },
-    msg_txt: event.raw_message,
-    user_id: event.user_id,
-    user_avatar:
-      event.platform == 'qq'
-        ? `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`
-        : 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
-    user_name: event.sender.nickname,
-    guild_id: event.group_id,
-    guild_name: event.group_name,
-    channel_id: event.group_id,
-    segment: segmentONE,
-    at_users: [],
-    msg: event.raw_message.trim(),
-    msg_id: event.message_id,
-    at: false,
-    send_at: new Date().getTime(),
-    attachments: [],
-    specials: [],
-    at_user: undefined,
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    }
   }
 
   const arr: {

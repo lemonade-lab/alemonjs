@@ -7,7 +7,7 @@ export interface AMessage
     MsgBase,
     Serverbase,
     BotBase,
-    replyController {}
+    ReplyBase {}
 
 /**
  * 事件相关
@@ -129,7 +129,7 @@ interface Serverbase {
   /**
    * 子频道编号 | 房间编号 | 群号
    */
-  channel_id?: string
+  channel_id: string
   /**
    * 子频道头像
    */
@@ -322,7 +322,7 @@ export interface SegmentType {
   block?(txt: string): string
 }
 
-interface replyController {
+interface ReplyBase {
   /**
    * 消息发送机制
    * @param content 消息
@@ -355,58 +355,18 @@ interface replyController {
        * 子频道号
        */
       channel_id?: string
+      /**
+       *
+       */
+      msg_id?: string
     }
   ): Promise<any>
 
   /**
-   * 发送卡片
-   * @param arr
-   */
-  replyCard?(arr: CardType[]): Promise<any>
-
-  /**
-   * 发送表态
-   * @param boj
-   */
-  replyEmoji?(mid: string, boj: any): Promise<any>
-
-  /**
-   * 删除表态
-   * @param boj 表情对象
-   * @returns
-   */
-  deleteEmoji?(mid: string, boj: any): Promise<any>
-
-  /**
-   * 更新表态
-   * @param mid
-   * @param boj
-   */
-  updateEmoji?(mid: string, boj: any): Promise<any>
-
-  /**
-   * 得到指定消息的表态
-   * @param mid
-   * @param boj
-   */
-  getEmoji?(mid: string): Promise<any[]>
-
-  /**
    * 控制器
+   * @param select 选择绑定
    */
   controller(select?: {
-    /**
-     * 消息编号
-     */
-    msg_id?: string
-    /**
-     * 消息创建时间
-     */
-    send_at?: number
-    /**
-     * 撤回毫秒数,默认不撤回
-     */
-    withdraw?: number
     /**
      * 频道号
      */
@@ -416,22 +376,51 @@ interface replyController {
      */
     channel_id?: string
     /**
-     * 钉选---别野顶置--频道精华
+     * 消息编号
      */
-    pinning?: boolean
+    msg_id?: string
+    /**
+     * 消息创建时间
+     */
+    send_at?: number
+  }): {
+    /**
+     * 内容并发送内容
+     * @param content
+     */
+    quote(
+      content: Buffer | string | number | (Buffer | number | string)[]
+    ): Promise<any>
+    /**
+     * 撤回
+     * @param time 撤回时间
+     */
+    withdraw(): Promise<any>
+    /**
+     * 钉选---别野顶置--频道精华
+     * @param cancel 取消
+     */
+    pinning(cancel?: boolean): Promise<any>
+    /**
+     * 喇叭--别野-精选--频道全局公告
+     * @param cancel 取消
+     */
+    horn(cancel?: boolean): Promise<any>
     /**
      * 转发
      */
-    forward?: boolean
+    forward(): Promise<any>
     /**
-     * 喇叭--别野-精选--频道全局公告
+     * 表态
+     * @param msg 表情
+     * @param cancel 取消
      */
-    horn?: boolean
+    emoji(msg: any[], cancel?: boolean): Promise<any>
     /**
-     * 取消
+     * 卡片
      */
-    cancel?: boolean
-  }): Promise<any>
+    card(msg: CardType[]): Promise<any>
+  }
 }
 
 /**

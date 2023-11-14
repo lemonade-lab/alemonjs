@@ -7,6 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
+import { ClientController } from '../controller.js'
 
 /**
  * TUDO
@@ -17,6 +18,13 @@ INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
 export const INTERACTION = async event => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    msg_id: '0',
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'INTERACTION' as (typeof EventEnum)[number],
@@ -58,16 +66,7 @@ export const INTERACTION = async event => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /**

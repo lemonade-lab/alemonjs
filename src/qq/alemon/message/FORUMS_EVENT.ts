@@ -7,6 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
+import { ClientController } from '../controller.js'
 
 /**
  * ***********
@@ -64,6 +65,13 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
 export const FORUMS_EVENT = async (event: ForumsEventType) => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    msg_id: '0',
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
@@ -105,16 +113,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /* 事件匹配 */

@@ -7,6 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
+import { ClientController } from '../controller.js'
 
 interface GUILD_MESSAGE_REACTIONS {
   eventType: 'MESSAGE_REACTION_ADD' | 'MESSAGE_REACTION_REMOVE'
@@ -31,6 +32,13 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
 export const GUILD_MESSAGE_REACTIONS = async (
   event: GUILD_MESSAGE_REACTIONS
 ) => {
+  const controller = ClientController({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    msg_id: '0',
+    send_at: new Date().getTime()
+  })
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
@@ -82,16 +90,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller: async (select?: {
-      msg_id?: string
-      send_at?: number
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      pinning?: boolean
-      forward?: boolean
-      horn?: boolean
-    }) => {}
+    controller
   }
 
   /**
