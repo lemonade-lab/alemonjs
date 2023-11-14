@@ -35,14 +35,25 @@ export async function MESSAGE_AUDIT_VILLA(event: {
   }
   type: number // 消息类型
   extend_data: {
-    EventData: any
+    EventData: {
+      AuditCallback: {
+        audit_id: string // 审核事件 id
+        bot_tpl_id: string // 机器人 id
+        villa_id: number // 大别野 id
+        room_id: number // 房间 id（和审核接口调用方传入的值一致）
+        user_id: number // 用户 id（和审核接口调用方传入的值一致）
+        pass_through: string // 透传数据（和审核接口调用方传入的值一致）
+        audit_result: number // 审核结果，0作兼容，1审核通过，2审核驳回
+      }
+    }
   }
   created_at: number // 创建事件编号
   id: string // 消息编号
   send_at: number // 发送事件编号
 }) {
-  const villa_id = event.robot.villa_id ?? ''
-
+  const AuditCallback = event.extend_data.EventData.AuditCallback
+  const cfg = getBotConfigByKey('villa')
+  const masterID = cfg.masterID
   /**
    * 制作e消息对象
    */
@@ -62,16 +73,16 @@ export async function MESSAGE_AUDIT_VILLA(event: {
     isRecall: false,
     at_users: [],
     at: false,
-    isMaster: false,
+    isMaster: masterID == String(AuditCallback.user_id),
     msg: '',
-    msg_id: event.id,
+    msg_id: AuditCallback.audit_id,
     attachments: [],
     specials: [],
     at_user: undefined,
-    guild_id: String(villa_id),
-    channel_id: '',
+    guild_id: String(AuditCallback.villa_id),
+    channel_id: String(AuditCallback.room_id),
     msg_txt: '',
-    user_id: '',
+    user_id: String(AuditCallback.user_id),
     user_name: '',
     msg_create_time: event.send_at,
     segment: segmentVILLA,

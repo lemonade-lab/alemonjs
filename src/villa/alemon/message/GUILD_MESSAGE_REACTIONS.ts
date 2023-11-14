@@ -74,7 +74,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
     at: false,
     isMaster: masterID == String(AddQuickEmoticon.uid),
     msg: '',
-    msg_id: event.id,
+    msg_id: AddQuickEmoticon.msg_uid,
     attachments: [],
     specials: [
       {
