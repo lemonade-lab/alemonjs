@@ -231,23 +231,6 @@ export async function GUILD_BOT(event: {
       }
       return false
     },
-    withdraw: async (select?: {
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-      send_at?: number
-    }) => {
-      const villa_id = select?.guild_id ?? DeleteRobot.villa_id
-      const room_id = select?.channel_id ?? false
-      const msg_uid = select?.msg_id ?? false
-      const send_at = select?.send_at ?? false
-      if (!msg_uid || !room_id || !send_at) return false
-      return ClientVILLA.recallMessage(villa_id, {
-        room_id: room_id,
-        msg_uid: msg_uid,
-        send_at: send_at
-      })
-    },
     controller: async (select?: {
       msg_id?: string
       send_at?: number
@@ -257,7 +240,33 @@ export async function GUILD_BOT(event: {
       pinning?: boolean
       forward?: boolean
       horn?: boolean
-    }) => {}
+      cancel?: boolean
+    }) => {
+      const villa_id = select?.guild_id ?? DeleteRobot.villa_id
+      const room_id = select?.channel_id ?? false
+      const msg_uid = select?.msg_id ?? false
+      const send_at = select?.send_at ?? false
+      // 撤回
+      if (select?.withdraw) {
+        if (!msg_uid || !room_id || !send_at) return false
+        return ClientVILLA.recallMessage(villa_id, {
+          room_id: room_id,
+          msg_uid: msg_uid,
+          send_at: send_at
+        })
+      }
+      // 钉选
+      if (select?.pinning) {
+        if (!msg_uid || !room_id || !send_at) return false
+        return ClientVILLA.pinMessage(villa_id, {
+          msg_uid,
+          is_cancel: select?.cancel == true ? true : false,
+          room_id,
+          send_at
+        })
+      }
+      return false
+    }
   }
 
   /**

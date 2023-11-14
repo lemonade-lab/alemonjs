@@ -320,22 +320,6 @@ export async function MESSAGES(event: {
       }
       return false
     },
-    withdraw: async (select?: {
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-      send_at?: number
-    }) => {
-      const villa_id = select?.guild_id ?? SendMessage.villa_id
-      const room_id = select?.channel_id ?? SendMessage.room_id
-      const msg_uid = select?.msg_id ?? SendMessage.msg_uid
-      const send_at = select?.send_at ?? SendMessage.send_at
-      return ClientVILLA.recallMessage(villa_id, {
-        room_id: room_id,
-        msg_uid: msg_uid,
-        send_at: send_at
-      })
-    },
     controller: async (select?: {
       msg_id?: string
       send_at?: number
@@ -345,7 +329,29 @@ export async function MESSAGES(event: {
       pinning?: boolean
       forward?: boolean
       horn?: boolean
-    }) => {}
+      cancel?: boolean
+    }) => {
+      const villa_id = select?.guild_id ?? SendMessage.villa_id
+      const room_id = select?.channel_id ?? SendMessage.room_id
+      const msg_uid = select?.msg_id ?? SendMessage.msg_uid
+      const send_at = select?.send_at ?? SendMessage.send_at
+      if (select?.withdraw) {
+        return ClientVILLA.recallMessage(villa_id, {
+          room_id: room_id,
+          msg_uid: msg_uid,
+          send_at: send_at
+        })
+      }
+      if (select?.pinning) {
+        return ClientVILLA.pinMessage(villa_id, {
+          msg_uid,
+          is_cancel: select?.cancel == true ? true : false,
+          room_id,
+          send_at
+        })
+      }
+      return false
+    }
   }
 
   /**

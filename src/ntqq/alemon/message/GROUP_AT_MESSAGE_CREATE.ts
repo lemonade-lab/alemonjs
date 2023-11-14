@@ -139,12 +139,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     at: false,
     at_user: undefined,
     send_at: new Date().getTime(),
-    withdraw: async (select?: {
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-      send_at?: number
-    }) => {},
     controller: async (select?: {
       msg_id?: string
       send_at?: number

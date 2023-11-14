@@ -392,16 +392,6 @@ interface replyController {
   getEmoji?(mid: string): Promise<any[]>
 
   /**
-   * 立即撤回
-   */
-  withdraw(select?: {
-    guild_id?: string
-    channel_id?: string
-    msg_id?: string
-    send_at?: number
-  }): Promise<any>
-
-  /**
    * 控制器
    */
   controller(select?: {
@@ -437,6 +427,10 @@ interface replyController {
      * 喇叭--别野-精选--频道全局公告
      */
     horn?: boolean
+    /**
+     * 取消
+     */
+    cancel?: boolean
   }): Promise<any>
 }
 

@@ -106,12 +106,6 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    withdraw: async (select?: {
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-      send_at?: number
-    }) => {},
     controller: async (select?: {
       msg_id?: string
       send_at?: number

@@ -130,12 +130,6 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         event.id
       ).catch(everyoneError)
     },
-    withdraw: async (select?: {
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-      send_at?: number
-    }) => {},
     controller: async (select?: {
       msg_id?: string
       send_at?: number

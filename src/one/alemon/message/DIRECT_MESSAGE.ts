@@ -240,12 +240,6 @@ export async function DIRECT_MESSAGE(event: Event) {
     send_at: new Date().getTime(),
     at: false,
     at_user: undefined,
-    withdraw: async (select?: {
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-      send_at?: number
-    }) => {},
     controller: async (select?: {
       msg_id?: string
       send_at?: number

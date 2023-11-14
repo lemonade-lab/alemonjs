@@ -108,12 +108,6 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     ): Promise<any> => {
       return false
     },
-    withdraw: async (select?: {
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-      send_at?: number
-    }) => {},
     controller: async (select?: {
       msg_id?: string
       send_at?: number
