@@ -65,6 +65,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at_users: [],
     /**
      * 发现消息
      * @param msg

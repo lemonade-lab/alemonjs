@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
   typeMessage,
-  AMessage,
   PlatformEnum,
   EventEnum,
   EventType
@@ -36,13 +35,7 @@ export const AUDIO_ACTION = async (event: any) => {
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    /**
-     * 附件消息
-     */
     attachments: [],
-    /**
-     * 特殊消息
-     */
     specials: [],
     user_id: '',
     user_name: '',
@@ -56,6 +49,7 @@ export const AUDIO_ACTION = async (event: any) => {
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at_users: [],
     /**
      * 发现消息
      * @param msg

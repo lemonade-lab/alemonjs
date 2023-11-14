@@ -1,8 +1,9 @@
 import {
-  CardType,
   InstructionMatching,
-  AMessage,
-  getUrlbuffer
+  getUrlbuffer,
+  PlatformEnum,
+  EventEnum,
+  EventType
 } from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
 import { segmentNTQQ } from '../segment.js'
@@ -27,11 +28,11 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
   const e = {
-    platform: 'ntqq',
-    event: 'MESSAGES',
-    eventType: 'CREATE',
-    boundaries: 'publick',
-    attribute: 'group',
+    platform: 'ntqq' as (typeof PlatformEnum)[number],
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByNtqq(),
     isMaster: event.author.id == masterID ? true : false,
     isPrivate: false,
@@ -122,63 +123,21 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
         content,
         event.id
       ).catch(everyoneError)
-    }
-  } as AMessage
-
-  /**
-   * 消息原文
-   */
-  e.msg_txt = event.content
-
-  /**
-   * 消息
-   */
-  e.msg = event.content.trim()
-
-  /**
-   * 消息编号
-   */
-  e.msg_id = event.id
-
-  /**
-   * 用户编号
-   */
-  e.user_id = event.author.id
-
-  /**
-   * 用户头像
-   */
-  e.user_avatar = 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638'
-
-  /**
-   * 用户名
-   */
-  e.user_name = '柠檬冲水'
-
-  /**
-   * 子频道编号
-   */
-  e.channel_id = event.group_id
-
-  /**
-   * 频道编号
-   */
-  e.guild_id = event.group_id
-
-  /**
-   * 模块
-   */
-  e.segment = segmentNTQQ
-
-  /**
-   * 被艾特的用户
-   */
-  e.at_users = []
-
-  /**
-   * 艾特消息处理
-   */
-  e.at = false
+    },
+    msg_txt: event.content,
+    msg: event.content.trim(),
+    msg_id: event.id,
+    user_id: event.author.id,
+    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
+    user_name: '柠檬冲水',
+    channel_id: event.group_id,
+    guild_id: event.group_id,
+    segment: segmentNTQQ,
+    at_users: [],
+    at: false,
+    at_user: undefined,
+    msg_create_time: new Date().getTime()
+  }
 
   /**
    * 存在at

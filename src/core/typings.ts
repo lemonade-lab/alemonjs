@@ -51,7 +51,8 @@ export const EventEnum = [
    * 频道
    * **********
    */
-  'GUILD', // 机器人进出+频道事件
+  'GUILD', // 频道事件
+  'GUILD_BOT', // 机器人进出事件
   'CHANNEL', // 子频道事件
   'GUILD_MEMBERS', // 成员进出
   /**
@@ -168,7 +169,7 @@ interface MsgBase {
   /**
    * 艾特得到的uid即可
    */
-  at_users?: UserType[]
+  at_users: UserType[]
   /**
    * 消息编号
    */

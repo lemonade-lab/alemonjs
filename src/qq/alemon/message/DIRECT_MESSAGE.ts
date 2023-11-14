@@ -103,7 +103,8 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
       }
     ): Promise<any> => {
       return false
-    }
+    },
+    at_users: []
   }
 
   /**
@@ -249,13 +250,6 @@ async function directMessage(e: AMessage, event: directEventData) {
   e.segment = segmentQQ
 
   e.at_users = []
-
-  e.at_user = {
-    id: '0',
-    avatar: '0',
-    name: '0',
-    bot: false
-  }
 
   /**
    * 艾特消息处理

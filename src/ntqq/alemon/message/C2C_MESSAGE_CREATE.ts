@@ -1,8 +1,9 @@
 import {
-  CardType,
   InstructionMatching,
-  AMessage,
-  getUrlbuffer
+  getUrlbuffer,
+  PlatformEnum,
+  EventEnum,
+  EventType
 } from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
 import { segmentNTQQ } from '../segment.js'
@@ -21,11 +22,11 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
   const e = {
-    platform: 'ntqq',
-    event: 'MESSAGES',
-    eventType: 'CREATE',
-    boundaries: 'publick',
-    attribute: 'single',
+    platform: 'ntqq' as (typeof PlatformEnum)[number],
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByNtqq(),
     isMaster: event.author.id == masterID ? true : false,
     isPrivate: false,
@@ -33,6 +34,19 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     isGroup: false,
     attachments: [],
     specials: [],
+    msg_txt: event.content,
+    msg: event.content,
+    msg_id: event.id,
+    user_id: event.author.id,
+    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
+    user_name: '柠檬冲水',
+    channel_id: event.author.user_openid, // 私聊重置为用户open编号
+    guild_id: event.author.user_openid,
+    segment: segmentNTQQ,
+    at_users: [],
+    at_user: undefined,
+    at: false,
+    msg_create_time: new Date().getTime(),
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {
@@ -114,42 +128,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         event.id
       ).catch(everyoneError)
     }
-  } as AMessage
-
-  e.msg_txt = event.content
-
-  e.msg = event.content
-
-  /**
-   * 消息编号
-   */
-  e.msg_id = event.id
-
-  e.user_id = event.author.id
-
-  e.user_avatar = 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638'
-
-  e.user_name = '柠檬冲水'
-
-  e.channel_id = event.author.user_openid // 私聊重置为用户open编号
-
-  e.guild_id = event.author.user_openid
-
-  e.segment = segmentNTQQ
-
-  e.at_users = []
-
-  e.at_user = {
-    id: '0',
-    avatar: '0',
-    name: '0',
-    bot: false
   }
-
-  /**
-   * 艾特消息处理
-   */
-  e.at = false
 
   /**
    * 业务处理

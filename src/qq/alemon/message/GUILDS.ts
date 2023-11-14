@@ -85,9 +85,6 @@ export const GUILDS = async Event => {
       isRecall: false,
       isGroup: false,
       attachments: [],
-      /**
-       * 特殊消息
-       */
       specials: [],
       msg_create_time: new Date().getTime(),
       user_id: '',
@@ -100,6 +97,7 @@ export const GUILDS = async Event => {
       segment: segmentQQ,
       msg: '',
       guild_id: event.msg.id, // ?
+      at_users: [],
       /**
        * 发现消息
        * @param msg
@@ -171,6 +169,7 @@ export const GUILDS = async Event => {
     segment: segmentQQ,
     msg: '',
     guild_id: event.msg.guild_id, // ?
+    at_users: [],
     /**
      * 发现消息
      * @param msg

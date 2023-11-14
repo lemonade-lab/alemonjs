@@ -95,6 +95,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at_users: [],
     /**
      * 发现消息
      * @param msg

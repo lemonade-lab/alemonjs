@@ -1,6 +1,5 @@
 import {
   typeMessage,
-  AMessage,
   PlatformEnum,
   EventEnum,
   EventType
@@ -77,9 +76,6 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
     isRecall: false,
     isGroup: true,
     attachments: event?.msg?.attachments ?? [],
-    /**
-     * 特殊消息
-     */
     specials: [],
     user_id: '',
     user_name: '',
@@ -93,6 +89,7 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at_users: [],
     /**
      * 发现消息
      * @param msg
@@ -123,7 +120,7 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
    * 消息创建
    */
   if (new RegExp(/CREATE$/).test(event.eventType)) {
-    mergeMessages(e as AMessage, event).catch(everyoneError)
+    mergeMessages(e, event).catch(everyoneError)
     return
   }
 }

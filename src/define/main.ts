@@ -104,37 +104,40 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   ) {
     if (Options.login?.qq) {
       // 开启私域
-      if (Options.login?.qq?.isPrivate) {
-        setBotConfigByKey('qq', {
-          intents: [
-            // 基础事件
-            AvailableIntentsEventsEnum.GUILDS, //频道进出
-            AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
-            AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
-            // 需申请的
-            AvailableIntentsEventsEnum.AUDIO_ACTION, //音频
-            AvailableIntentsEventsEnum.MESSAGE_AUDIT, //消息审核
-            AvailableIntentsEventsEnum.INTERACTION, //互动事件
-            AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, //表情表态
-            // 私域特有
-            AvailableIntentsEventsEnum.GUILD_MESSAGES, //私域事件
-            AvailableIntentsEventsEnum.FORUMS_EVENT //私域论坛
-          ]
-        })
-      } else {
-        setBotConfigByKey('qq', {
-          intents: [
-            // 基础事件
-            AvailableIntentsEventsEnum.GUILDS, //频道进出
-            AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
-            AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
-            // 公域特有
-            AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES //公域事件
-          ]
-        })
+      if (Options.login?.qq) {
+        // 开启私域
+        if (Options.login?.qq?.isPrivate) {
+          setBotConfigByKey('qq', {
+            intents: [
+              // 基础事件
+              AvailableIntentsEventsEnum.GUILDS, //频道进出
+              AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
+              AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
+              // 需申请的
+              AvailableIntentsEventsEnum.AUDIO_ACTION, //音频
+              AvailableIntentsEventsEnum.MESSAGE_AUDIT, //消息审核
+              AvailableIntentsEventsEnum.INTERACTION, //互动事件
+              AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, //表情表态
+              // 私域特有
+              AvailableIntentsEventsEnum.GUILD_MESSAGES, //私域事件
+              AvailableIntentsEventsEnum.FORUMS_EVENT //私域论坛
+            ],
+            ...Options.login.qq
+          })
+        } else {
+          setBotConfigByKey('qq', {
+            intents: [
+              // 基础事件
+              AvailableIntentsEventsEnum.GUILDS, //频道进出
+              AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
+              AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
+              // 公域特有
+              AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES //公域事件
+            ],
+            ...Options.login.qq
+          })
+        }
       }
-      // 自定义覆盖
-      setBotConfigByKey('qq', Options.login.qq)
     }
     if (Options.login?.ntqq) {
       // 自定义覆盖

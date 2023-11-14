@@ -38,9 +38,6 @@ export const GUILD_MESSAGES = async (event: any) => {
     isRecall: false,
     isGroup: true,
     attachments: event?.msg?.attachments ?? [],
-    /**
-     * 特殊消息
-     */
     specials: [],
     user_id: '',
     user_name: '',
@@ -54,6 +51,7 @@ export const GUILD_MESSAGES = async (event: any) => {
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at_users: [],
     /**
      * 发现消息
      * @param msg

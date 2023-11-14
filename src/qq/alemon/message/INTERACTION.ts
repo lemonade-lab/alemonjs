@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
   typeMessage,
-  AMessage,
   PlatformEnum,
   EventEnum,
   EventType
@@ -29,9 +28,6 @@ export const INTERACTION = async event => {
     isRecall: false,
     isGroup: false,
     attachments: [],
-    /**
-     * 特殊消息
-     */
     specials: [],
     user_id: '',
     user_name: '',
@@ -45,6 +41,7 @@ export const INTERACTION = async event => {
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at_users: [],
     /**
      * 发现消息
      * @param msg
