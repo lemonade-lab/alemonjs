@@ -235,7 +235,7 @@ export async function DIRECT_MESSAGE(event: Event) {
     at_users: [],
     attachments: [],
     specials: [],
-    msg_create_time: new Date().getTime(),
+    send_at: new Date().getTime(),
     at: false,
     at_user: undefined
   }

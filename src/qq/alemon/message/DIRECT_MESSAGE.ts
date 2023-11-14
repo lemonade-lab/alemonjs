@@ -90,7 +90,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     user_avatar: '',
     at: false,
     msg_id: '',
-    msg_create_time: 0,
+    send_at: 0,
     msg_txt: '',
     msg: '',
     segment: segmentQQ,

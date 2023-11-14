@@ -77,7 +77,7 @@ export async function GUILD_MEMBERS_VILLA(event: {
     user_avatar: '',
     user_id: String(event.extend_data.EventData.JoinVilla.join_uid),
     user_name: event.extend_data.EventData.JoinVilla.join_user_nickname,
-    msg_create_time: JoinVilla.join_at,
+    send_at: JoinVilla.join_at,
     segment: segmentVILLA,
     at_user: undefined,
     /**

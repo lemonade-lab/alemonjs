@@ -46,7 +46,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     at_users: [],
     at_user: undefined,
     at: false,
-    msg_create_time: new Date().getTime(),
+    send_at: new Date().getTime(),
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {

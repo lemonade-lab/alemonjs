@@ -136,7 +136,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     at_users: [],
     at: false,
     at_user: undefined,
-    msg_create_time: new Date().getTime()
+    send_at: new Date().getTime()
   }
 
   /**

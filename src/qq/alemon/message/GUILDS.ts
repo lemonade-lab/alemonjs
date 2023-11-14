@@ -86,7 +86,7 @@ export const GUILDS = async Event => {
       isGroup: false,
       attachments: [],
       specials: [],
-      msg_create_time: new Date().getTime(),
+      send_at: new Date().getTime(),
       user_id: '',
       user_name: '',
       isMaster: false,
@@ -155,7 +155,7 @@ export const GUILDS = async Event => {
      * 特殊消息
      */
     specials: [],
-    msg_create_time: new Date().getTime(),
+    send_at: new Date().getTime(),
     platform: 'qq' as (typeof PlatformEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

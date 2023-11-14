@@ -239,7 +239,7 @@ export async function MESSAGES(event: EventGroup) {
     msg: event.raw_message.trim(),
     msg_id: event.message_id,
     at: false,
-    msg_create_time: new Date().getTime(),
+    send_at: new Date().getTime(),
     attachments: [],
     specials: [],
     at_user: undefined

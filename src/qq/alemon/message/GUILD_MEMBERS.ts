@@ -61,7 +61,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     user_id: event.msg.user.id,
     user_name: event.msg.user.username,
     isMaster: false,
-    msg_create_time: new Date(event.msg.joined_at).getTime(),
+    send_at: new Date(event.msg.joined_at).getTime(),
     user_avatar: event.msg.user.avatar,
     at: false,
     msg_id: '',

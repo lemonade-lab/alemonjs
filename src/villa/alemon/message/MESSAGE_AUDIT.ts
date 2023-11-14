@@ -79,7 +79,7 @@ export async function MESSAGE_AUDIT_VILLA(event: {
     msg_txt: '',
     user_id: String(AuditCallback.user_id),
     user_name: '',
-    msg_create_time: event.send_at,
+    send_at: event.send_at,
     segment: segmentVILLA,
     user_avatar: '',
     /**

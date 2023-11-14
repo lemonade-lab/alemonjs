@@ -56,7 +56,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
     user_id: event.msg.user_id,
     user_name: '',
     isMaster: false,
-    msg_create_time: new Date().getTime(),
+    send_at: new Date().getTime(),
     user_avatar: '',
     at: false,
     msg_id: event.msg.target.id,

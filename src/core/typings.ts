@@ -177,7 +177,7 @@ interface MsgBase {
   /**
    * 消息创建时间
    */
-  msg_create_time: number
+  send_at: number
   /**
    * 原始消息内容
    */

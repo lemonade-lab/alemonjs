@@ -79,7 +79,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     user_id: '',
     user_name: '',
     isMaster: false,
-    msg_create_time: new Date().getTime(),
+    send_at: new Date().getTime(),
     user_avatar: '',
     at: false,
     msg_id: '',

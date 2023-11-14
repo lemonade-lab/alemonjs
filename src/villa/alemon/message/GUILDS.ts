@@ -73,7 +73,7 @@ export async function GUILDS_VILLA(event: {
     msg_txt: '',
     user_id: '',
     user_name: '',
-    msg_create_time: event.send_at,
+    send_at: event.send_at,
     segment: segmentVILLA,
     at_user: undefined,
     user_avatar: '',

@@ -90,7 +90,7 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
     msg_txt: '',
     user_id: String(AddQuickEmoticon.uid),
     user_name: '',
-    msg_create_time: event.send_at,
+    send_at: event.send_at,
     segment: segmentVILLA,
     at_user: undefined,
     user_avatar: '',

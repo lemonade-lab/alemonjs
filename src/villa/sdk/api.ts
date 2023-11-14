@@ -321,7 +321,7 @@ export async function recallMessage(
   data: {
     msg_uid: string | number // 消息 id
     room_id: string | number // 房间 id
-    msg_time: number | string // 发送时间
+    send_at: number | string // 发送时间
   }
 ) {
   return await villaService({
@@ -334,7 +334,7 @@ export async function recallMessage(
     params: {
       msg_uid: String(data.msg_uid), // 消息 id
       room_id: Number(data.room_id), // 房间 id
-      msg_time: Number(data.msg_time) // 发送时间
+      msg_time: Number(data.send_at) // 发送时间
     }
   }).then(res => res.data)
 }
