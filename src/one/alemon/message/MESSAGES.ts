@@ -46,6 +46,8 @@ export async function MESSAGES(event: EventGroup) {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
     ): Promise<any> => {
       // is buffer
@@ -242,7 +244,13 @@ export async function MESSAGES(event: EventGroup) {
     send_at: new Date().getTime(),
     attachments: [],
     specials: [],
-    at_user: undefined
+    at_user: undefined,
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   const arr: {

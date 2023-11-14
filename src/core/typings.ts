@@ -165,7 +165,7 @@ interface MsgBase {
    * 第一个非机器人用户信息
    * 不管是公域或私域
    */
-  at_user?: UserType
+  at_user: UserType | undefined
   /**
    * 艾特得到的uid即可
    */
@@ -347,6 +347,14 @@ interface replyController {
        * 撤回毫秒数,默认不撤回
        */
       withdraw?: number
+      /**
+       * 频道号
+       */
+      guild_id?: string
+      /**
+       * 子频道号
+       */
+      channel_id?: string
     }
   ): Promise<any>
 
@@ -382,6 +390,16 @@ interface replyController {
    * @param boj
    */
   getEmoji?(mid: string): Promise<any[]>
+
+  /**
+   * 立即撤回
+   */
+  withdraw(select?: {
+    guild_id?: string
+    channel_id?: string
+    msg_id?: string
+    send_at?: number
+  }): Promise<any>
 }
 
 /**

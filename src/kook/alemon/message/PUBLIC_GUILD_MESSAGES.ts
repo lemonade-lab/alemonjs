@@ -107,6 +107,8 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
     ): Promise<any> => {
       /**
@@ -238,7 +240,13 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         console.error(err)
         return err
       }
-    }
+    },
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

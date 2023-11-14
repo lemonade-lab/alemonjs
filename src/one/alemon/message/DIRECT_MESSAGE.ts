@@ -45,6 +45,8 @@ export async function DIRECT_MESSAGE(event: Event) {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
     ): Promise<any> => {
       // is buffer
@@ -237,7 +239,13 @@ export async function DIRECT_MESSAGE(event: Event) {
     specials: [],
     send_at: new Date().getTime(),
     at: false,
-    at_user: undefined
+    at_user: undefined,
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

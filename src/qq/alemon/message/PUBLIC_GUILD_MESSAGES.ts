@@ -89,9 +89,10 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at_user: undefined,
     at_users: [],
     /**
-     * 发现消息
+     * 发送消息
      * @param msg
      * @param img
      * @returns
@@ -101,8 +102,16 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
-    ): Promise<any> => {}
+    ): Promise<any> => {},
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

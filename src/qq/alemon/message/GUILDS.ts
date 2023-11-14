@@ -95,6 +95,7 @@ export const GUILDS = async Event => {
       msg_id: '',
       msg_txt: '',
       segment: segmentQQ,
+      at_user: undefined,
       msg: '',
       guild_id: event.msg.id, // ?
       at_users: [],
@@ -109,8 +110,16 @@ export const GUILDS = async Event => {
         select?: {
           quote?: string
           withdraw?: number
+          guild_id?: string
+          channel_id?: string
         }
-      ): Promise<any> => {}
+      ): Promise<any> => {},
+      withdraw: async (select?: {
+        guild_id?: string
+        channel_id?: string
+        msg_id?: string
+        send_at?: number
+      }) => {}
     }
 
     /**
@@ -167,6 +176,7 @@ export const GUILDS = async Event => {
     msg_id: '',
     msg_txt: '',
     segment: segmentQQ,
+    at_user: undefined,
     msg: '',
     guild_id: event.msg.guild_id, // ?
     at_users: [],
@@ -182,7 +192,8 @@ export const GUILDS = async Event => {
         quote?: string
         withdraw?: number
       }
-    ): Promise<any> => {}
+    ): Promise<any> => {},
+    withdraw: async () => {}
   }
 
   /**

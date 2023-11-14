@@ -51,6 +51,8 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
     ): Promise<any> => {
       // is buffer
@@ -136,7 +138,13 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     at_users: [],
     at: false,
     at_user: undefined,
-    send_at: new Date().getTime()
+    send_at: new Date().getTime(),
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

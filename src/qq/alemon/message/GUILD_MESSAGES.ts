@@ -49,6 +49,7 @@ export const GUILD_MESSAGES = async (event: any) => {
     msg_txt: '',
     segment: segmentQQ,
     msg: '',
+    at_user: undefined,
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     at_users: [],
@@ -63,8 +64,16 @@ export const GUILD_MESSAGES = async (event: any) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
-    ): Promise<any> => {}
+    ): Promise<any> => {},
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

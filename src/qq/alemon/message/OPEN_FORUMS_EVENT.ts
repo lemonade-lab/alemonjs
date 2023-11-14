@@ -87,6 +87,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     user_name: '',
     isMaster: false,
     send_at: new Date().getTime(),
+    at_user: undefined,
     user_avatar: '',
     at: false,
     msg_id: '',
@@ -107,8 +108,16 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
-    ): Promise<any> => {}
+    ): Promise<any> => {},
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

@@ -38,6 +38,7 @@ export const INTERACTION = async event => {
     msg_id: '',
     msg_txt: '',
     segment: segmentQQ,
+    at_user: undefined,
     msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
@@ -53,8 +54,16 @@ export const INTERACTION = async event => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
-    ): Promise<any> => {}
+    ): Promise<any> => {},
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

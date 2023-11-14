@@ -90,6 +90,8 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     user_avatar: '',
     at: false,
     msg_id: '',
+    at_users: [],
+    at_user: undefined,
     send_at: 0,
     msg_txt: '',
     msg: '',
@@ -100,11 +102,18 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
     ): Promise<any> => {
       return false
     },
-    at_users: []
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

@@ -43,6 +43,7 @@ export const AUDIO_ACTION = async (event: any) => {
     send_at: new Date().getTime(),
     user_avatar: '',
     at: false,
+    at_user: undefined,
     msg_id: '',
     msg_txt: '',
     segment: segmentQQ,
@@ -61,8 +62,16 @@ export const AUDIO_ACTION = async (event: any) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
-    ): Promise<any> => {}
+    ): Promise<any> => {},
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   if (new RegExp(/MIC$/).test(event.eventType)) {

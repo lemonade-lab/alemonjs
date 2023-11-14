@@ -84,6 +84,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     at: false,
     msg_id: '',
     msg_txt: '',
+    at_user: undefined,
     segment: segmentQQ,
     msg: '',
     guild_id: event.msg.guild_id,
@@ -100,8 +101,16 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
-    ): Promise<any> => {}
+    ): Promise<any> => {},
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /* 事件匹配 */

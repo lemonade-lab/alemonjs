@@ -52,6 +52,8 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
     ): Promise<any> => {
       // isBuffer
@@ -127,7 +129,13 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         content,
         event.id
       ).catch(everyoneError)
-    }
+    },
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {}
   }
 
   /**

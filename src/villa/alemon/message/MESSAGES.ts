@@ -185,8 +185,12 @@ export async function MESSAGES_VILLA(event: {
       select?: {
         quote?: string
         withdraw?: number
+        guild_id?: string
+        channel_id?: string
       }
     ): Promise<any> => {
+      const villa_id = select?.guild_id ?? SendMessage.villa_id
+      const room_id = select?.channel_id ?? SendMessage.room_id
       /**
        * isBuffer
        */
@@ -194,21 +198,15 @@ export async function MESSAGES_VILLA(event: {
         /**
          * 上传图片
          */
-        const url = await ClientVILLA.uploadImage(
-          SendMessage.villa_id,
-          msg
-        ).then(res => res?.data?.url)
+        const url = await ClientVILLA.uploadImage(villa_id, msg).then(
+          res => res?.data?.url
+        )
         if (!url) return false
         const dimensions = IMGS.imageSize(msg)
-        return await ClientVILLA.sendMessageImage(
-          SendMessage.villa_id,
-          SendMessage.room_id,
-          url,
-          {
-            width: dimensions.width,
-            height: dimensions.height
-          }
-        ).catch(everyoneError)
+        return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
+          width: dimensions.width,
+          height: dimensions.height
+        }).catch(everyoneError)
       }
       /**
        * isString arr and find buffer
@@ -227,13 +225,13 @@ export async function MESSAGES_VILLA(event: {
         // 字符解析器
         const { entities, content } = await ClientVILLA.stringParsing(
           cont,
-          SendMessage.villa_id
+          villa_id
         )
         /**
          * 上传图片
          */
         const url = await ClientVILLA.uploadImage(
-          SendMessage.villa_id,
+          villa_id,
           msg[isBuffer] as Buffer
         ).then(res => res?.data?.url)
         if (!url) return false
@@ -241,8 +239,8 @@ export async function MESSAGES_VILLA(event: {
         const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
         if (entities.length == 0) {
           return await ClientVILLA.sendMessageTextUrl(
-            SendMessage.villa_id,
-            SendMessage.room_id,
+            villa_id,
+            room_id,
             content,
             url,
             {
@@ -252,8 +250,8 @@ export async function MESSAGES_VILLA(event: {
           ).catch(everyoneError)
         } else {
           return await ClientVILLA.sendMessageTextEntitiesUrl(
-            SendMessage.villa_id,
-            SendMessage.room_id,
+            villa_id,
+            room_id,
             content,
             entities,
             url,
@@ -285,46 +283,55 @@ export async function MESSAGES_VILLA(event: {
           /**
            * 上传图片
            */
-          const url = await ClientVILLA.uploadImage(
-            SendMessage.villa_id,
-            msg
-          ).then(res => res?.data?.url)
+          const url = await ClientVILLA.uploadImage(villa_id, msg).then(
+            res => res?.data?.url
+          )
           if (!url) return false
           const dimensions = IMGS.imageSize(msg)
-          return await ClientVILLA.sendMessageImage(
-            SendMessage.villa_id,
-            SendMessage.room_id,
-            url,
-            {
-              width: dimensions.width,
-              height: dimensions.height
-            }
-          ).catch(everyoneError)
+          return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
+            width: dimensions.width,
+            height: dimensions.height
+          }).catch(everyoneError)
         }
       }
-
       /**
        * reply
        */
       const { entities, content } = await ClientVILLA.stringParsing(
         cont,
-        SendMessage.villa_id
+        villa_id
       )
       if (entities.length == 0 && content != '') {
         return await ClientVILLA.sendMessageText(
-          SendMessage.villa_id,
-          SendMessage.room_id,
+          villa_id,
+          room_id,
           content
         ).catch(everyoneError)
       } else if (entities.length != 0 && content != '') {
         return await ClientVILLA.sendMessageTextEntities(
-          SendMessage.villa_id,
-          SendMessage.room_id,
+          villa_id,
+          room_id,
           content,
           entities
         ).catch(everyoneError)
       }
       return false
+    },
+    withdraw: async (select?: {
+      guild_id?: string
+      channel_id?: string
+      msg_id?: string
+      send_at?: number
+    }) => {
+      const villa_id = select?.guild_id ?? SendMessage.villa_id
+      const room_id = select?.channel_id ?? SendMessage.room_id
+      const msg_uid = select?.msg_id ?? SendMessage.msg_uid
+      const send_at = select?.send_at ?? SendMessage.send_at
+      return ClientVILLA.recallMessage(villa_id, {
+        room_id: room_id,
+        msg_uid: msg_uid,
+        send_at: send_at
+      })
     }
   }
 
