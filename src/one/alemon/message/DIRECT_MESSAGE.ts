@@ -39,28 +39,34 @@ export async function DIRECT_MESSAGE(event: Event) {
         ? 'single'
         : ('group' as 'group' | 'single'),
     bot: getBotMsgByONE(),
-    isMaster: event.user_id == masterID ? true : false,
+    isMaster: event.user_id == masterID,
     isRecall: false,
     isGroup: event.detail_type == 'private' ? true : false,
     isPrivate: event.detail_type == 'private' ? true : false,
+    guild_id: '',
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
+    channel_id: '',
+    attachments: [],
+    specials: [],
+    //
+    at: false,
+    at_user: undefined,
+    at_users: [],
     msg_txt: event.raw_message,
     msg: event.raw_message.trim(),
     msg_id: event.message_id,
+    open_id: '',
+    //
     user_id: event.user_id,
     user_avatar:
       event.platform == 'qq'
         ? `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`
         : 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
     user_name: event.sender.nickname,
-    channel_id: '',
-    guild_id: '',
-    segment: segmentONE,
-    at_users: [],
-    attachments: [],
-    specials: [],
     send_at: new Date().getTime(),
-    at: false,
-    at_user: undefined,
+    segment: segmentONE,
     controller,
     /**
      * 消息发送机制

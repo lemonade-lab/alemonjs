@@ -92,6 +92,9 @@ export const PUBLIC_GUILD_MESSAGES = async (
     attachments: event?.msg?.attachments ?? [],
     specials: [],
     guild_id: event.msg.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: event.msg.channel_id,
     //
     at: false,
@@ -100,6 +103,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     msg_id: event.msg.id,
     msg_txt: event.msg?.content ?? '',
     msg: event.msg?.content ?? '',
+    open_id: '',
     //
     user_id: event.msg.author.id,
     user_name: event.msg.author.username,

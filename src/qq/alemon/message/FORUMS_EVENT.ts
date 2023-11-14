@@ -94,6 +94,9 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     isMaster: false,
     isGroup: false,
     guild_id: event.msg.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: event.msg.channel_id,
     attachments: [],
     specials: [content],
@@ -104,6 +107,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    open_id: '',
     //
     user_id: '',
     user_name: '',

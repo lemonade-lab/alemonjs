@@ -39,6 +39,9 @@ export const INTERACTION = async event => {
     attachments: [],
     specials: [],
     guild_id: event.msg.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: event.msg.channel_id,
     //
     at: false,
@@ -47,6 +50,7 @@ export const INTERACTION = async event => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    open_id: '',
     //
     user_id: '',
     user_name: '',

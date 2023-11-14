@@ -45,6 +45,9 @@ export const AUDIO_ACTION = async (event: any) => {
     isGroup: false,
     isMaster: false,
     guild_id: event.msg.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: event.msg.channel_id,
     attachments: [],
     specials: [],
@@ -55,6 +58,7 @@ export const AUDIO_ACTION = async (event: any) => {
     at: false,
     at_user: undefined,
     at_users: [],
+    open_id: '',
     //
     user_id: '',
     user_avatar: '',

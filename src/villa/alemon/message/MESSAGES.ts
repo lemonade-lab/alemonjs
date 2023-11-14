@@ -166,6 +166,9 @@ export async function MESSAGES(event: {
     isRecall: false,
     isMaster: MessageContent.user.id == masterID,
     guild_id: String(SendMessage.villa_id),
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: String(SendMessage.room_id),
     attachments: [],
     specials: [],
@@ -176,6 +179,7 @@ export async function MESSAGES(event: {
     msg_id: SendMessage.msg_uid,
     msg: msg,
     msg_txt: txt,
+    open_id: '',
     //
     user_id: MessageContent.user.id,
     user_name: MessageContent.user.name,

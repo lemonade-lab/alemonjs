@@ -24,6 +24,9 @@ export const ClientController = (data: {
     const msg_uid = select?.msg_id ?? data.msg_id
     const send_at = select?.send_at ?? data.send_at
     return {
+      reply: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {},
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {},

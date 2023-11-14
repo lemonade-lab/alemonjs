@@ -117,23 +117,19 @@ interface Serverbase {
   /**
    *  频道名 |  服务器名 | 群号
    */
-  guild_name?: string
+  guild_name: string
   /**
    * 频道头像
    */
-  guild_avatar?: string
+  guild_avatar: string
   /**
    * 子频道名 | 房间名 | 群名
    */
-  channel_name?: string
+  channel_name: string
   /**
    * 子频道编号 | 房间编号 | 群号
    */
   channel_id: string
-  /**
-   * 子频道头像
-   */
-  channel_avatar?: string
   /**
    * 是否是私域
    */
@@ -174,6 +170,10 @@ interface MsgBase {
    * 消息编号
    */
   msg_id: string
+  /**
+   * 对话编号
+   */
+  open_id: string
   /**
    * 消息创建时间
    */
@@ -385,7 +385,14 @@ interface ReplyBase {
     send_at?: number
   }): {
     /**
-     * 内容并发送内容
+     * 回复消息
+     * @param content
+     */
+    reply(
+      content: Buffer | string | number | (Buffer | number | string)[]
+    ): Promise<any>
+    /**
+     * 引用消息
      * @param content
      */
     quote(

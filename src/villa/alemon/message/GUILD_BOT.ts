@@ -72,6 +72,9 @@ export async function GUILD_BOT(event: {
     isRecall: false,
     isMaster: false,
     guild_id: String(DeleteRobot.villa_id),
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: '',
     attachments: [],
     specials: [],
@@ -82,6 +85,7 @@ export async function GUILD_BOT(event: {
     msg: '',
     msg_id: event.id,
     msg_txt: '',
+    open_id: '',
     //
     user_id: '',
     user_name: '',

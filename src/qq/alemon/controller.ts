@@ -1,6 +1,4 @@
-import { everyoneError } from '../../log/index.js'
-import IMGS from 'image-size'
-import { getUrlbuffer } from '../../core/index.js'
+import { replyController } from './reply.js'
 
 /**
  * 客户端控制器
@@ -24,9 +22,18 @@ export const ClientController = (data: {
     const msg_id = select?.msg_id ?? data.msg_id
     const send_at = select?.send_at ?? data.send_at
     return {
+      reply: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return await replyController(content, channel_id, msg_id)
+      },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {},
+      ) => {
+        return await replyController(content, channel_id, msg_id, {
+          quote: msg_id
+        })
+      },
       withdraw: async () => {},
       pinning: async (cancel?: boolean) => {},
       forward: async () => {},

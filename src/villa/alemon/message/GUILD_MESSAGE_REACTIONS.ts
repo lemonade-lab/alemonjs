@@ -82,6 +82,9 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     isRecall: false,
     isMaster: masterID == String(AddQuickEmoticon.uid),
     guild_id: String(AddQuickEmoticon.villa_id),
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: String(AddQuickEmoticon.room_id),
     attachments: [],
     specials: [
@@ -100,6 +103,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     msg: '',
     msg_id: AddQuickEmoticon.msg_uid,
     msg_txt: '',
+    open_id: '',
     //
     user_id: String(AddQuickEmoticon.uid),
     user_name: '', // dodo 可权限获得

@@ -88,23 +88,29 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     bot: getBotMsgByKOOK(),
     isPrivate: true, //  kook没私域
     isRecall: false,
-    isMaster: event.msg_id == masterID ? true : false,
     isGroup: event.channel_type == 'GROUP' ? true : false,
+    isMaster: event.msg_id == masterID ? true : false,
+    guild_id: event.target_id, // 频道
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
+    channel_id: event.extra.code, // 子频道
+    attachments: [],
+    specials: [],
+    //
     at,
     at_users,
     at_user,
     msg,
-    msg_id: event.msg_id,
-    attachments: [],
-    specials: [],
     msg_txt: event.content,
-    send_at: event.msg_timestamp,
-    guild_id: event.target_id, // 频道
-    channel_id: event.extra.code, // 子频道
+    msg_id: event.msg_id,
+    open_id: '',
+    //
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
     user_avatar: avatar.substring(0, avatar.indexOf('?')),
     segment: segmentKOOK,
+    send_at: event.msg_timestamp,
     /**
      * 消息发送机制
      * @param content 消息内容

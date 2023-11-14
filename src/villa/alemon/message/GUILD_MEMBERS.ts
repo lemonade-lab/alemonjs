@@ -75,6 +75,9 @@ export async function GUILD_MEMBERS(event: {
     isRecall: false,
     isMaster: masterID == String(JoinVilla.join_uid),
     guild_id: String(JoinVilla.villa_id),
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: '',
     //
     attachments: [],
@@ -85,6 +88,7 @@ export async function GUILD_MEMBERS(event: {
     msg: '',
     msg_id: event.id,
     msg_txt: '',
+    open_id: '',
     //
     user_avatar: '', // dodo 可以通过 请求权限获得
     user_id: String(event.extend_data.EventData.JoinVilla.join_uid),

@@ -78,6 +78,9 @@ export async function MESSAGE_AUDIT(event: {
     isRecall: false,
     isMaster: masterID == String(AuditCallback.user_id),
     guild_id: String(AuditCallback.villa_id),
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: String(AuditCallback.room_id),
     attachments: [],
     specials: [],
@@ -88,6 +91,7 @@ export async function MESSAGE_AUDIT(event: {
     msg: '',
     msg_id: AuditCallback.audit_id,
     msg_txt: '',
+    open_id: '',
     //
     user_id: String(AuditCallback.user_id),
     user_name: '', // dodo 可权限获得

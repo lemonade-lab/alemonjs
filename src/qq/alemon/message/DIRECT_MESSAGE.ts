@@ -92,6 +92,9 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     isGroup: false,
     isMaster: event.msg.author.id == masterID ? true : false,
     guild_id: event.msg.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: event.msg.channel_id,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
@@ -102,6 +105,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     msg: event.msg?.content ?? '',
     msg_txt: event.msg?.content ?? '',
     msg_id: event.msg.id,
+    open_id: '',
     //
     user_id: event.msg.author.id,
     user_name: event.msg.author.username,

@@ -74,6 +74,9 @@ export const CHANNEL = async (event: EventChannelType) => {
     attachments: [],
     specials: [],
     guild_id: event.msg?.guild_id, // ?
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: '',
     //
     at: false,
@@ -82,6 +85,7 @@ export const CHANNEL = async (event: EventChannelType) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    open_id: '',
     //
     user_id: '',
     user_name: '',

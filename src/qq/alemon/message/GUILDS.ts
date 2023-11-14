@@ -77,6 +77,9 @@ export const GUILD = async (event: EventGuildType) => {
     attachments: [],
     specials: [],
     guild_id: event.msg.id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: '',
     //
     at: false,
@@ -85,6 +88,7 @@ export const GUILD = async (event: EventGuildType) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    open_id: '',
     //
     user_id: '',
     user_name: '',

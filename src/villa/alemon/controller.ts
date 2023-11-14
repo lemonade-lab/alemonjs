@@ -23,6 +23,12 @@ export const ClientController = (data?: {
     const msg_uid = select?.msg_id ?? data.msg_id
     const send_at = select?.send_at ?? data.send_at
     return {
+      reply: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        // villa未有回复api
+        return await replyController(villa_id, room_id, content)
+      },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {

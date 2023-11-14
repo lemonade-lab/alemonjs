@@ -92,6 +92,9 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     attachments: [],
     specials: [JSON.parse(event.msg.thread_info.content)],
     guild_id: event.msg.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
     channel_id: event.msg.channel_id,
     //
     at: false,
@@ -100,6 +103,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     msg_id: '',
     msg_txt: '',
     msg: '',
+    open_id: '',
     //
     user_id: '',
     user_name: '',
