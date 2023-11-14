@@ -328,13 +328,13 @@ export async function recallMessage(
     method: 'post',
     url: ApiEnum.recallMessage,
     headers: {
+      'Content-Type': 'application/json',
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
-
-    data: {
+    params: {
       msg_uid: String(data.msg_uid), // 消息 id
-      room_id: String(data.room_id), // 房间 id
-      send_at: Number(data.msg_time) // 发送时间
+      room_id: Number(data.room_id), // 房间 id
+      msg_time: Number(data.msg_time) // 发送时间
     }
   }).then(res => res.data)
 }
