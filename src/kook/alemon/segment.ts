@@ -51,13 +51,6 @@ export const segmentKOOK = {
     return `(rol)${role_id}(rol)`
   },
   /**
-   *  点击后才显示
-   * @param content 内容
-   */
-  spoiler: (content: string): string => {
-    return ``
-  },
-  /**
    *
    * @param name  服务器表情名
    * @param id   服务器表情id

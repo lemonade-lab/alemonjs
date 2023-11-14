@@ -27,14 +27,6 @@ export const segmentNTQQ = {
   http: (url: string) => {
     return `<http>${url}</http>`
   },
-  /**
-   * 子频道引用
-   * @param channel_id
-   * @returns
-   */
-  atChannel: (channel_id: string): string => {
-    return '' // 没有
-  },
   link: (title: string, centent): string => {
     return `[🔗${title}](${centent})`
   }
