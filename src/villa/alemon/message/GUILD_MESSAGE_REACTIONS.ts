@@ -1,23 +1,26 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+import {
+  AlemonJSEventError,
+  AlemonJSEventLog,
+  everyoneError
+} from '../../../log/index.js'
 import {
   EventEnum,
   EventType,
   PlatformEnum,
-  typeMessage
+  typeMessage,
+  getUrlbuffer
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { ClientVILLA } from '../../sdk/index.js'
-import { getUrlbuffer } from '../../../core/index.js'
 import IMGS from 'image-size'
-import { everyoneError } from '../../../log/index.js'
 
 /**
  * 表情表态
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
+export async function GUILD_MESSAGE_REACTIONS(event: {
   robot: {
     template: {
       id: string
@@ -75,11 +78,9 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
     isPrivate: false,
     isGroup: true,
     isRecall: false,
-    at_users: [],
-    at: false,
     isMaster: masterID == String(AddQuickEmoticon.uid),
-    msg: '',
-    msg_id: AddQuickEmoticon.msg_uid,
+    guild_id: String(AddQuickEmoticon.villa_id),
+    channel_id: String(AddQuickEmoticon.room_id),
     attachments: [],
     specials: [
       {
@@ -90,15 +91,19 @@ export async function GUILD_MESSAGE_REACTIONS_VILLA(event: {
         msg_uid: AddQuickEmoticon.msg_uid
       }
     ],
-    guild_id: String(AddQuickEmoticon.villa_id),
-    channel_id: String(AddQuickEmoticon.room_id),
+    //
+    at: false,
+    at_user: undefined,
+    at_users: [],
+    msg: '',
+    msg_id: AddQuickEmoticon.msg_uid,
     msg_txt: '',
+    //
     user_id: String(AddQuickEmoticon.uid),
-    user_name: '',
+    user_name: '', // dodo 可权限获得
+    user_avatar: '', // dodo 可权限获得
     send_at: event.send_at,
     segment: segmentVILLA,
-    at_user: undefined,
-    user_avatar: '',
     /**
      * 消息回复
      * @param msg

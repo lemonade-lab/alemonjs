@@ -1,23 +1,26 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+import {
+  AlemonJSEventError,
+  AlemonJSEventLog,
+  everyoneError
+} from '../../../log/index.js'
 import {
   EventEnum,
   EventType,
   PlatformEnum,
-  typeMessage
+  typeMessage,
+  getUrlbuffer
 } from '../../../core/index.js'
-import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { ClientVILLA } from '../../sdk/index.js'
-import { getUrlbuffer } from '../../../core/index.js'
+import { segmentVILLA } from '../segment.js'
 import IMGS from 'image-size'
-import { everyoneError } from '../../../log/index.js'
 
 /**
  * 成员进入
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function GUILD_MEMBERS_VILLA(event: {
+export async function GUILD_MEMBERS(event: {
   robot: {
     template: {
       id: string
@@ -68,22 +71,24 @@ export async function GUILD_MEMBERS_VILLA(event: {
     isPrivate: false,
     isGroup: true,
     isRecall: false,
-    at_users: [],
-    at: false,
     isMaster: masterID == String(JoinVilla.join_uid),
-    msg: '',
-    msg_id: event.id,
-    attachments: [],
-    specials: [],
     guild_id: String(JoinVilla.villa_id),
     channel_id: '',
+    //
+    attachments: [],
+    specials: [],
+    at: false,
+    at_user: undefined,
+    at_users: [],
+    msg: '',
+    msg_id: event.id,
     msg_txt: '',
-    user_avatar: '',
+    //
+    user_avatar: '', // dodo 可以通过 请求权限获得
     user_id: String(event.extend_data.EventData.JoinVilla.join_uid),
     user_name: event.extend_data.EventData.JoinVilla.join_user_nickname,
     send_at: JoinVilla.join_at,
     segment: segmentVILLA,
-    at_user: undefined,
     /**
      * 消息回复
      * @param msg

@@ -1,23 +1,26 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../..//log/event.js'
+import {
+  AlemonJSEventError,
+  AlemonJSEventLog,
+  everyoneError
+} from '../../..//log/index.js'
 import {
   EventEnum,
   EventType,
   PlatformEnum,
-  typeMessage
+  typeMessage,
+  getUrlbuffer
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { ClientVILLA } from '../../sdk/index.js'
-import { getUrlbuffer } from '../../../core/index.js'
 import IMGS from 'image-size'
-import { everyoneError } from '../../../log/index.js'
 
 /**
  * 审核事件
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function MESSAGE_AUDIT_VILLA(event: {
+export async function MESSAGE_AUDIT(event: {
   // 机器人相关信息
   robot: {
     template: {
@@ -70,22 +73,25 @@ export async function MESSAGE_AUDIT_VILLA(event: {
     isPrivate: false,
     isGroup: true,
     isRecall: false,
-    at_users: [],
-    at: false,
     isMaster: masterID == String(AuditCallback.user_id),
-    msg: '',
-    msg_id: AuditCallback.audit_id,
-    attachments: [],
-    specials: [],
-    at_user: undefined,
     guild_id: String(AuditCallback.villa_id),
     channel_id: String(AuditCallback.room_id),
+    attachments: [],
+    specials: [],
+    //
+    at: false,
+    at_user: undefined,
+    at_users: [],
+    msg: '',
+    msg_id: AuditCallback.audit_id,
     msg_txt: '',
+    //
     user_id: String(AuditCallback.user_id),
-    user_name: '',
+    user_name: '', // dodo 可权限获得
+    user_avatar: '', // dodo 可权限获得
+    //
     send_at: event.send_at,
     segment: segmentVILLA,
-    user_avatar: '',
     /**
      * 消息回复
      * @param msg

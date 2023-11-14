@@ -1,22 +1,25 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
+import {
+  AlemonJSEventError,
+  AlemonJSEventLog,
+  everyoneError
+} from '../../../log/index.js'
 import {
   EventEnum,
   EventType,
   PlatformEnum,
-  typeMessage
+  typeMessage,
+  getUrlbuffer
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
 import { ClientVILLA } from '../../sdk/index.js'
-import { getUrlbuffer } from '../../../core/index.js'
 import IMGS from 'image-size'
-import { everyoneError } from '../../../log/index.js'
 
 /**
  * 机器人进出
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function GUILDS_VILLA(event: {
+export async function GUILD_BOT(event: {
   robot: {
     template: {
       id: string
@@ -46,7 +49,6 @@ export async function GUILDS_VILLA(event: {
    * 别野编号
    */
   const DeleteRobot = event.extend_data.EventData.DeleteRobot
-
   /**
    * 制作e消息对象
    */
@@ -54,7 +56,7 @@ export async function GUILDS_VILLA(event: {
     platform: 'villa' as (typeof PlatformEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
-    event: 'GUILD' as (typeof EventEnum)[number],
+    event: 'GUILD_BOT' as (typeof EventEnum)[number],
     eventType:
       event.type == 3 ? 'CREATE' : ('DELETE' as (typeof EventType)[number]),
     bot: {
@@ -65,22 +67,25 @@ export async function GUILDS_VILLA(event: {
     isPrivate: false,
     isGroup: true,
     isRecall: false,
-    at_users: [],
-    at: false,
     isMaster: false,
-    msg: '',
-    msg_id: event.id,
-    attachments: [],
-    specials: [],
     guild_id: String(DeleteRobot.villa_id),
     channel_id: '',
+    attachments: [],
+    specials: [],
+    //
+    at: false,
+    at_user: undefined,
+    at_users: [],
+    msg: '',
+    msg_id: event.id,
     msg_txt: '',
+    //
     user_id: '',
     user_name: '',
+    user_avatar: '',
+    //
     send_at: event.send_at,
     segment: segmentVILLA,
-    at_user: undefined,
-    user_avatar: '',
     /**
      * 消息回复
      * @param msg

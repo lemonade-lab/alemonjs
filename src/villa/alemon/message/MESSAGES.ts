@@ -1,4 +1,9 @@
 import {
+  AlemonJSError,
+  AlemonJSLog,
+  everyoneError
+} from '../../../log/index.js'
+import {
   EventEnum,
   EventType,
   InstructionMatching,
@@ -7,21 +12,16 @@ import {
   getUrlbuffer
 } from '../../../core/index.js'
 import { MessageContentType, ClientVILLA } from '../../sdk/index.js'
-import IMGS from 'image-size'
-import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import {
-  AlemonJSError,
-  AlemonJSLog,
-  everyoneError
-} from '../../../log/index.js'
+import { segmentVILLA } from '../segment.js'
+import IMGS from 'image-size'
 
 /**
  * 消息会话
  * @param event 回调数据
  * @param val  类型控制
  */
-export async function MESSAGES_VILLA(event: {
+export async function MESSAGES(event: {
   robot: {
     template: {
       id: string
@@ -158,20 +158,23 @@ export async function MESSAGES_VILLA(event: {
     isPrivate: false,
     isGroup: true,
     isRecall: false,
+    isMaster: MessageContent.user.id == masterID,
+    guild_id: String(SendMessage.villa_id),
+    channel_id: String(SendMessage.room_id),
+    attachments: [],
+    specials: [],
+    //
     at,
     at_users: at_users,
     at_user,
-    isMaster: MessageContent.user.id == masterID,
     msg_id: SendMessage.msg_uid,
     msg: msg,
     msg_txt: txt,
-    attachments: [],
-    specials: [],
-    guild_id: String(SendMessage.villa_id),
-    channel_id: String(SendMessage.room_id),
+    //
     user_id: MessageContent.user.id,
     user_name: MessageContent.user.name,
     user_avatar: MessageContent.user.portrait,
+    //
     send_at: SendMessage.send_at,
     segment: segmentVILLA,
     /**

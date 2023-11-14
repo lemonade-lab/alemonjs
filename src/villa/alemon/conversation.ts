@@ -1,8 +1,8 @@
-import { MESSAGES_VILLA } from './message/MESSAGES.js'
-import { GUILD_MEMBERS_VILLA } from './message/GUILD_MEMBERS.js'
-import { GUILD_MESSAGE_REACTIONS_VILLA } from './message/GUILD_MESSAGE_REACTIONS.js'
-import { MESSAGE_AUDIT_VILLA } from './message/MESSAGE_AUDIT.js'
-import { GUILDS_VILLA } from './message/GUILDS.js'
+import { MESSAGES } from './message/MESSAGES.js'
+import { GUILD_MEMBERS } from './message/GUILD_MEMBERS.js'
+import { GUILD_MESSAGE_REACTIONS } from './message/GUILD_MESSAGE_REACTIONS.js'
+import { MESSAGE_AUDIT } from './message/MESSAGE_AUDIT.js'
+import { GUILD_BOT } from './message/GUILD_BOT.js'
 /**
  * 事件处理集
  */
@@ -10,27 +10,27 @@ const ConversationMap = {
   /**
    * 房间消息--成员进入
    */
-  [1]: GUILD_MEMBERS_VILLA,
+  [1]: GUILD_MEMBERS,
   /**
    * 会话消息
    */
-  [2]: MESSAGES_VILLA,
+  [2]: MESSAGES,
   /**
    * 别野消息--机器人进入
    */
-  [3]: GUILDS_VILLA,
+  [3]: GUILD_BOT,
   /**
    * 别野消息--机器人退出
    */
-  [4]: GUILDS_VILLA,
+  [4]: GUILD_BOT,
   /**
    *  表情表态
    */
-  [5]: GUILD_MESSAGE_REACTIONS_VILLA,
+  [5]: GUILD_MESSAGE_REACTIONS,
   /**
    *  审核事件
    */
-  [6]: MESSAGE_AUDIT_VILLA
+  [6]: MESSAGE_AUDIT
 }
 /**
  * 消息接收入口
