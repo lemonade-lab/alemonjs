@@ -8,6 +8,7 @@ import {
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { ClientController } from '../controller.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 
 interface GUILD_MESSAGE_REACTIONS {
   eventType: 'MESSAGE_REACTION_ADD' | 'MESSAGE_REACTION_REMOVE'
@@ -39,6 +40,9 @@ export const GUILD_MESSAGE_REACTIONS = async (
     send_at: new Date().getTime()
   })
 
+  const cfg = getBotConfigByKey('qq')
+  const masterID = cfg.masterID
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
@@ -51,6 +55,9 @@ export const GUILD_MESSAGE_REACTIONS = async (
     isPrivate: true,
     isRecall: false,
     isGroup: false,
+    isMaster: event.msg.user_id == masterID,
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
     attachments: [],
     specials: [
       {
@@ -61,20 +68,19 @@ export const GUILD_MESSAGE_REACTIONS = async (
         msg_uid: ''
       }
     ],
-    user_id: event.msg.user_id,
-    user_name: '',
-    isMaster: false,
-    send_at: new Date().getTime(),
-    user_avatar: '',
+    //
     at: false,
+    at_user: undefined,
+    at_users: [],
+    msg: '',
     msg_id: event.msg.target.id,
     msg_txt: '',
-    at_user: undefined,
+    //
+    user_id: event.msg.user_id,
+    user_name: '',
+    user_avatar: '',
     segment: segmentQQ,
-    msg: '',
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    at_users: [],
+    send_at: new Date().getTime(),
     /**
      * 发现消息
      * @param msg

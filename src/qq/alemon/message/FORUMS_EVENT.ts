@@ -40,7 +40,7 @@ interface ForumsEventType {
   }
 }
 
-interface content {
+interface ContentType {
   paragraphs: {
     elems: {
       text: { text: string }
@@ -72,32 +72,44 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     send_at: new Date().getTime()
   })
 
+  const content: ContentType = JSON.parse(event.msg.thread_info.content)
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
-    event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    event: new RegExp(/^FORUM_THREAD/).test(event.eventType)
+      ? 'FORUMS_THREAD'
+      : new RegExp(/^FORUM_POST/).test(event.eventType)
+      ? 'FORUMS_POST'
+      : ('FORUMS_REPLY' as (typeof EventEnum)[number]),
+    eventType: new RegExp(/CREATE$/).test(event.eventType)
+      ? 'CREATE'
+      : new RegExp(/UPDATE$/).test(event.eventType)
+      ? 'UPDATE'
+      : ('DELETE' as (typeof EventType)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
-    isGroup: false,
-    attachments: [],
-    specials: [JSON.parse(event.msg.thread_info.content)],
-    user_id: '',
-    user_name: '',
     isMaster: false,
-    send_at: new Date().getTime(),
-    user_avatar: '',
-    at: false,
-    msg_id: '',
-    msg_txt: '',
-    at_user: undefined,
-    segment: segmentQQ,
-    msg: '',
+    isGroup: false,
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    attachments: [],
+    specials: [content],
+    //
+    at: false,
+    at_user: undefined,
     at_users: [],
+    msg: '',
+    msg_id: '',
+    msg_txt: '',
+    //
+    user_id: '',
+    user_name: '',
+    user_avatar: '',
+    segment: segmentQQ,
+    send_at: new Date().getTime(),
     /**
      * 发现消息
      * @param msg
@@ -114,23 +126,6 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
       }
     ): Promise<any> => {},
     controller
-  }
-
-  /* 事件匹配 */
-  if (new RegExp(/^FORUM_THREAD/).test(event.eventType)) {
-    e.event = 'FORUMS_THREAD'
-  } else if (new RegExp(/^FORUM_POST/).test(event.eventType)) {
-    e.event = 'FORUMS_POST'
-  } else {
-    e.event = 'FORUMS_REPLY'
-  }
-
-  if (new RegExp(/CREATE$/).test(event.eventType)) {
-    e.eventType = 'CREATE'
-  } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
-    e.eventType = 'UPDATE'
-  } else {
-    e.eventType = 'DELETE'
   }
 
   return await typeMessage(e)

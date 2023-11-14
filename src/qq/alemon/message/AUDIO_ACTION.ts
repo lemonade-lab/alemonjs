@@ -43,22 +43,24 @@ export const AUDIO_ACTION = async (event: any) => {
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    attachments: [],
-    specials: [],
-    user_id: '',
-    user_name: '',
     isMaster: false,
-    send_at: new Date().getTime(),
-    user_avatar: '',
-    at: false,
-    at_user: undefined,
-    msg_id: '',
-    msg_txt: '',
-    segment: segmentQQ,
-    msg: '',
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    attachments: [],
+    specials: [],
+    //
+    msg_id: '',
+    msg_txt: '',
+    msg: '',
+    at: false,
+    at_user: undefined,
     at_users: [],
+    //
+    user_id: '',
+    user_avatar: '',
+    user_name: '',
+    segment: segmentQQ,
+    send_at: new Date().getTime(),
     /**
      * 发现消息
      * @param msg
@@ -79,20 +81,14 @@ export const AUDIO_ACTION = async (event: any) => {
 
   if (new RegExp(/MIC$/).test(event.eventType)) {
     if (!new RegExp(/ON_MIC$/).test(event.eventType)) {
-      /**
-       * 下麦
-       */
+      // 下麦
       e.eventType = 'DELETE'
     }
   } else {
-    /**
-     * 音频事件
-     */
+    // 音频事件
     e.event = 'AUDIO_FREQUENCY'
     if (!new RegExp(/^AUDIO_START$/).test(event.eventType)) {
-      /**
-       * 音频播放结束时
-       */
+      // 音频播放结束时
       e.eventType = 'DELETE'
     }
   }

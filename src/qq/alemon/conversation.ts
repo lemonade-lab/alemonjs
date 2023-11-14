@@ -1,5 +1,6 @@
 import { SessionEvents, AvailableIntentsEventsEnum } from 'qq-guild-bot'
-import { GUILDS } from './message/GUILDS.js'
+import { GUILD } from './message/GUILDS.js'
+import { CHANNEL } from './message/CHANNEL.js'
 import { GUILD_MEMBERS } from './message/GUILD_MEMBERS.js'
 import { DIRECT_MESSAGE } from './message/DIRECT_MESSAGE.js'
 import { PUBLIC_GUILD_MESSAGES } from './message/PUBLIC_GUILD_MESSAGES.js'
@@ -54,7 +55,13 @@ export const createConversationByQQ = ws => {
     /**
      * 机器人进出频道消息
      */
-    ws.on(AvailableIntentsEventsEnum.GUILDS, GUILDS)
+    ws.on(AvailableIntentsEventsEnum.GUILDS, event => {
+      if (new RegExp(/^GUILD.*$/).test(event.eventType)) {
+        GUILD(event)
+      } else {
+        CHANNEL(event)
+      }
+    })
 
     /**
      * 成员频道进出变动消息

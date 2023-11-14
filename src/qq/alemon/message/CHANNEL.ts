@@ -8,49 +8,86 @@ import {
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { ClientController } from '../controller.js'
-/**
- * TUDO
- */
 
 /**
-MESSAGE_AUDIT (1 << 27)
-- MESSAGE_AUDIT_PASS     // 消息审核通过
-- MESSAGE_AUDIT_REJECT   // 消息审核不通过
+ * GUILD 频道
+ * CHANNEL 子频道
  */
-export const MESSAGE_AUDIT = async (event: any) => {
+
+interface EventChannelType {
+  eventType: string
+  eventId: string
+  msg: {
+    application_id?: string // 创建时
+    guild_id: string // 频道id
+    id: string
+    name: string // 频道name
+    op_user_id: string
+    owner_id: string
+    parent_id?: string // 创建时
+    permissions?: string // 创建时
+    position?: number // 创建时
+    private_type: number
+    speak_permission: number
+    sub_type: number
+    type: number
+  }
+}
+
+/**
+GUILDS (1 << 0)
+
+  - GUILD_CREATE           // 当机器人加入新guild时
+  - GUILD_UPDATE           // 当guild资料发生变更时
+  - GUILD_DELETE           // 当机器人退出guild时
+  - 
+  - CHANNEL_CREATE         // 当channel被创建时
+  - CHANNEL_UPDATE         // 当channel被更新时
+  - CHANNEL_DELETE         // 当channel被删除时
+ */
+
+export const CHANNEL = async (event: EventChannelType) => {
   const controller = ClientController({
     guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
+    channel_id: '0',
     msg_id: '0',
     send_at: new Date().getTime()
   })
 
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
-    event: 'MESSAGE_AUDIT' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    event: new RegExp(/^GUILD.*$/).test(event.eventType)
+      ? 'GUILD'
+      : ('CHANNEL' as (typeof EventEnum)[number]),
+    eventType: new RegExp(/CREATE$/).test(event.eventType)
+      ? 'CREATE'
+      : new RegExp(/UPDATE$/).test(event.eventType)
+      ? 'UPDATE'
+      : ('DELETE' as (typeof EventType)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
-    isMaster: false,
     isGroup: false,
+    isMaster: false,
     attachments: [],
     specials: [],
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
+    guild_id: event.msg?.guild_id, // ?
+    channel_id: '',
+    //
     at: false,
     at_user: undefined,
     at_users: [],
     msg: '',
     msg_id: '',
     msg_txt: '',
+    //
     user_id: '',
     user_name: '',
     user_avatar: '',
-    send_at: new Date().getTime(),
     segment: segmentQQ,
+    send_at: new Date().getTime(),
     /**
      * 发现消息
      * @param msg
@@ -62,19 +99,9 @@ export const MESSAGE_AUDIT = async (event: any) => {
       select?: {
         quote?: string
         withdraw?: number
-        guild_id?: string
-        channel_id?: string
       }
     ): Promise<any> => {},
     controller
-  }
-
-  /**
-   * 事件匹配
-   */
-  e.event = 'MESSAGE_AUDIT'
-  if (new RegExp(/REJECT$/).test(event.eventType)) {
-    e.eventType = 'DELETE'
   }
 
   /**

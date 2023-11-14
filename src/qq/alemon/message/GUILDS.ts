@@ -38,26 +38,6 @@ interface EventGuildType {
   }
 }
 
-interface EventChannelType {
-  eventType: string
-  eventId: string
-  msg: {
-    application_id?: string // 创建时
-    guild_id: string // 频道id
-    id: string
-    name: string // 频道name
-    op_user_id: string
-    owner_id: string
-    parent_id?: string // 创建时
-    permissions?: string // 创建时
-    position?: number // 创建时
-    private_type: number
-    speak_permission: number
-    sub_type: number
-    type: number
-  }
-}
-
 /**
 GUILDS (1 << 0)
 
@@ -69,122 +49,48 @@ GUILDS (1 << 0)
   - CHANNEL_UPDATE         // 当channel被更新时
   - CHANNEL_DELETE         // 当channel被删除时
  */
-export const GUILDS = async Event => {
+export const GUILD = async (event: EventGuildType) => {
   const controller = ClientController({
-    guild_id: Event.msg.guild_id,
+    guild_id: event.msg.id,
     channel_id: '0',
     msg_id: '0',
     send_at: new Date().getTime()
   })
 
-  /**
-   * 事件匹配
-   */
-  if (new RegExp(/^GUILD.*$/).test(Event.eventType)) {
-    const event: EventGuildType = Event
-    const e = {
-      platform: 'qq' as (typeof PlatformEnum)[number],
-      event: 'GUILD' as (typeof EventEnum)[number],
-      eventType: 'CREATE' as (typeof EventType)[number],
-      boundaries: 'publick' as 'publick' | 'private',
-      attribute: 'group' as 'group' | 'single',
-      bot: getBotMsgByQQ(),
-      isPrivate: false,
-      isRecall: false,
-      isGroup: false,
-      attachments: [],
-      specials: [],
-      send_at: new Date().getTime(),
-      user_id: '',
-      user_name: '',
-      isMaster: false,
-      user_avatar: '',
-      at: false,
-      msg_id: '',
-      msg_txt: '',
-      segment: segmentQQ,
-      at_user: undefined,
-      msg: '',
-      guild_id: event.msg.id, // ?
-      channel_id: '',
-      at_users: [],
-      /**
-       * 发现消息
-       * @param msg
-       * @param img
-       * @returns
-       */
-      reply: async (
-        msg: Buffer | string | number | (Buffer | number | string)[],
-        select?: {
-          quote?: string
-          withdraw?: number
-          guild_id?: string
-          channel_id?: string
-        }
-      ): Promise<any> => {},
-      controller
-    }
-
-    /**
-     * 类型匹配
-     */
-    if (new RegExp(/CREATE$/).test(event.eventType)) {
-      e.eventType = 'CREATE'
-    } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
-      e.eventType = 'UPDATE'
-    } else {
-      e.eventType = 'DELETE'
-    }
-
-    /**
-     * 事件匹配
-     */
-    if (new RegExp(/^GUILD.*$/).test(event.eventType)) {
-      e.event = 'GUILD'
-    } else {
-      e.event = 'CHANNEL'
-    }
-
-    /**
-     * 只匹配类型
-     */
-    return await typeMessage(e)
-      .then(() => AlemonJSEventLog(e.event, e.eventType))
-      .catch(err => AlemonJSEventError(err, e.event, e.eventType))
-  }
-
-  const event: EventChannelType = Event
-
   const e = {
+    platform: 'qq' as (typeof PlatformEnum)[number],
+    event: new RegExp(/^GUILD.*$/).test(event.eventType)
+      ? 'GUILD'
+      : ('CHANNEL' as (typeof EventEnum)[number]),
+    eventType: new RegExp(/CREATE$/).test(event.eventType)
+      ? 'CREATE'
+      : new RegExp(/UPDATE$/).test(event.eventType)
+      ? 'UPDATE'
+      : ('DELETE' as (typeof EventType)[number]),
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    event: 'CHANNEL' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
     isPrivate: false,
     isRecall: false,
     isGroup: false,
-    attachments: [],
-    /**
-     * 特殊消息
-     */
-    specials: [],
-    send_at: new Date().getTime(),
-    platform: 'qq' as (typeof PlatformEnum)[number],
-    boundaries: 'publick' as 'publick' | 'private',
-    attribute: 'group' as 'group' | 'single',
-    user_id: '',
-    user_name: '',
     isMaster: false,
-    user_avatar: '',
+    attachments: [],
+    specials: [],
+    guild_id: event.msg.id,
+    channel_id: '',
+    //
     at: false,
+    at_user: undefined,
+    at_users: [],
+    msg: '',
     msg_id: '',
     msg_txt: '',
+    //
+    user_id: '',
+    user_name: '',
+    user_avatar: '',
     segment: segmentQQ,
-    at_user: undefined,
-    msg: '',
-    guild_id: event.msg.guild_id, // ?
-    channel_id: '',
-    at_users: [],
+    send_at: new Date().getTime(),
     /**
      * 发现消息
      * @param msg
@@ -199,17 +105,6 @@ export const GUILDS = async Event => {
       }
     ): Promise<any> => {},
     controller
-  }
-
-  /**
-   * 类型匹配
-   */
-  if (new RegExp(/CREATE$/).test(event.eventType)) {
-    e.eventType = 'CREATE'
-  } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
-    e.eventType = 'UPDATE'
-  } else {
-    e.eventType = 'DELETE'
   }
 
   /**

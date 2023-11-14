@@ -99,8 +99,8 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     specials: [],
     msg_txt: event.content,
     send_at: event.msg_timestamp,
-    guild_id: event.target_id,
-    channel_id: event.extra.guild_id,
+    guild_id: event.target_id, // 频道
+    channel_id: event.extra.code, // 子频道
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
     user_avatar: avatar.substring(0, avatar.indexOf('?')),

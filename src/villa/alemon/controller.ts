@@ -59,3 +59,44 @@ export const ClientController = (data?: {
     }
   }
 }
+
+/**
+ * 客户端控制器
+ * @param select
+ * @returns
+ */
+export const ClientControllerOnMember = (data?: {
+  guild_id: string | number
+  uid: string | number
+}) => {
+  return (select?: { guild_id?: string; uid?: string }) => {
+    const villa_id = select?.guild_id ?? data.guild_id
+    const uid = select?.guild_id ?? data.uid
+    return {
+      /**
+       * 查看信息
+       * @returns
+       */
+      message: async () => {
+        // 对进行进行过滤,并以固定格式返回
+        const data = await ClientVILLA.getMember(villa_id, uid).then(
+          res => res.data
+        )
+        if (!data) return false
+        return {
+          id: data.member.basic.uid,
+          name: data.member.basic.nickname,
+          avatar: data.member.basic.avatar
+        }
+      },
+      /**
+       * 禁言
+       */
+      mute: async () => {},
+      /**
+       * 踢出
+       */
+      remove: async () => {}
+    }
+  }
+}

@@ -14,7 +14,7 @@ import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { replyController } from '../reply.js'
 import { ClientController } from '../controller.js'
 
-interface EventPublicDuildType {
+interface PUBLIC_GUILD_MESSAGES_TYPE {
   eventType: 'AT_MESSAGE_CREATE'
   eventId: string
   msg: {
@@ -65,13 +65,18 @@ interface EventPublicDuildType {
  AT_MESSAGE_CREATE       // 当收到@机器人的消息时
  PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
  */
-export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
+export const PUBLIC_GUILD_MESSAGES = async (
+  event: PUBLIC_GUILD_MESSAGES_TYPE
+) => {
   const controller = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: event.msg.id,
     send_at: new Date().getTime()
   })
+
+  const cfg = getBotConfigByKey('qq')
+  const masterID = cfg.masterID
 
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
@@ -83,22 +88,24 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
     isPrivate: false,
     isRecall: false,
     isGroup: true,
+    isMaster: event.msg.author.id == masterID,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
-    user_id: event.msg.author.id,
-    user_name: event.msg.author.username,
-    isMaster: false,
-    send_at: new Date().getTime(),
-    user_avatar: event.msg.author.avatar,
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    //
     at: false,
+    at_user: undefined,
+    at_users: [],
     msg_id: event.msg.id,
     msg_txt: event.msg?.content ?? '',
     msg: event.msg?.content ?? '',
+    //
+    user_id: event.msg.author.id,
+    user_name: event.msg.author.username,
+    user_avatar: event.msg.author.avatar,
     segment: segmentQQ,
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    at_user: undefined,
-    at_users: [],
+    send_at: new Date().getTime(),
     /**
      * 发送消息
      * @param msg
@@ -112,11 +119,12 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
         withdraw?: number
         guild_id?: string
         channel_id?: string
+        msg_id?: string
       }
     ): Promise<any> => {
       const channel_id = select?.channel_id ?? event.msg.channel_id
-      const msg_id = select?.channel_id ?? event.msg.channel_id
-      return await replyController(msg, channel_id, msg_id)
+      const msg_id = select?.msg_id ?? event.msg.id
+      return await replyController(msg, channel_id, msg_id, select)
     },
     controller
   }
@@ -134,15 +142,6 @@ export const PUBLIC_GUILD_MESSAGES = async (event: EventPublicDuildType) => {
 
   // 屏蔽其他机器人的消息
   if (event.msg.author.bot) return
-  const cfg = getBotConfigByKey('qq')
-  const masterID = cfg.masterID
-
-  /**
-   * 检查身份
-   */
-  if (event.msg.author.id == masterID) {
-    e.isMaster = true
-  }
 
   if (event.msg.mentions) {
     /**

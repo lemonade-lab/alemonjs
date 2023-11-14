@@ -34,32 +34,35 @@ export const GUILD_MESSAGES = async (event: any) => {
     send_at: new Date().getTime()
   })
 
+  const cfg = getBotConfigByKey('qq')
+  const masterID = cfg.masterID
+
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
     eventType: 'CREATE' as (typeof EventType)[number],
-    boundaries: 'publick' as 'publick' | 'private',
+    boundaries: 'private' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: true,
     isRecall: false,
     isGroup: true,
+    isMaster: event.msg?.author?.id == masterID,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
-    user_id: '',
-    user_name: '',
-    isMaster: false,
-    send_at: new Date().getTime(),
-    user_avatar: '',
-    at: false,
-    msg_id: '',
-    msg_txt: '',
-    segment: segmentQQ,
-    msg: '',
-    at_user: undefined,
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
+    at: false,
+    at_user: undefined,
     at_users: [],
+    msg_id: event.msg?.id ?? '',
+    msg_txt: event.msg?.content ?? '',
+    msg: event.msg?.content ?? '',
+    user_id: event.msg?.author?.id ?? '',
+    user_name: event.msg.author?.username ?? '',
+    user_avatar: event.msg?.author?.avatar ?? '',
+    segment: segmentQQ,
+    send_at: new Date().getTime(),
     /**
      * 发现消息
      * @param msg
@@ -88,12 +91,6 @@ export const GUILD_MESSAGES = async (event: any) => {
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
     e.isRecall = true
-
-    e.boundaries = 'publick'
-    e.attribute = 'group'
-    /**
-     * 只匹配类型
-     */
     return await typeMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
@@ -101,41 +98,6 @@ export const GUILD_MESSAGES = async (event: any) => {
 
   // 屏蔽其他机器人的消息
   if (event.msg.author.bot) return
-  const cfg = getBotConfigByKey('qq')
-  const masterID = cfg.masterID
-
-  /**
-   * 检查身份
-   */
-  if (event.msg.author.id == masterID) {
-    e.isMaster = true
-  }
-
-  /**
-   * 是群聊
-   */
-  e.isGroup = true
-
-  /**
-   * 消息发送机制
-   * @param msg 消息
-   * @param img
-   * @returns
-   */
-  e.reply = async (
-    msg: Buffer | string | number | (Buffer | number | string)[],
-    select?: {
-      quote?: string
-      withdraw?: number
-      guild_id?: string
-      channel_id?: string
-      msg_id?: string
-    }
-  ): Promise<any> => {
-    const channel_id = select?.channel_id ?? event.msg.channel_id
-    const msg_id = select?.channel_id ?? event.msg.channel_id
-    return await replyController(msg, channel_id, msg_id)
-  }
 
   // e.replyCard = async (arr: CardType[]) => {
   //   for (const item of arr) {
@@ -192,56 +154,6 @@ export const GUILD_MESSAGES = async (event: any) => {
   //     })
   //     .catch(everyoneError)
   // }
-
-  /**
-   * 消息原文
-   */
-  e.msg_txt = event.msg.content
-
-  /**
-   * 消息
-   */
-  e.msg = event.msg.content
-
-  /**
-   * 消息编号
-   */
-  e.msg_id = event.msg.id
-
-  /**
-   * 用户编号
-   */
-  e.user_id = event.msg.author.id
-
-  /**
-   * 用户头像
-   */
-  e.user_avatar = event.msg.author.avatar
-
-  /**
-   * 用户名
-   */
-  e.user_name = event.msg.author.username
-
-  /**
-   * 子频道编号
-   */
-  e.channel_id = event.msg.channel_id
-
-  /**
-   * 频道编号
-   */
-  e.guild_id = event.msg.guild_id
-
-  /**
-   * 被艾特的用户
-   */
-  e.at_users = []
-
-  /**
-   * 艾特消息处理
-   */
-  e.at = false
 
   if (event.msg.mentions) {
     /**

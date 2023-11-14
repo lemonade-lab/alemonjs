@@ -9,6 +9,7 @@ import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { ClientController } from '../controller.js'
+import { getBotConfigByKey } from '../../../config/index.js'
 
 interface EventGuildMembersType {
   eventType: 'GUILD_MEMBER_ADD' | 'GUILD_MEMBER_UPDATE' | 'GUILD_MEMBER_REMOVE'
@@ -43,43 +44,41 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     send_at: new Date().getTime()
   })
 
-  const Eevent = 'GUILD_MEMBERS'
-  let eventType = 'CREATE'
-
-  if (new RegExp(/ADD$/).test(event.eventType)) {
-    eventType = 'CREATE'
-  } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
-    eventType = 'UPDATE'
-  } else {
-    eventType = 'DELETE'
-  }
+  const cfg = getBotConfigByKey('qq')
+  const masterID = cfg.masterID
 
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
-    event: Eevent as (typeof EventEnum)[number],
-    eventType: eventType as (typeof EventType)[number],
+    event: 'GUILD_MEMBERS' as (typeof EventEnum)[number],
+    eventType: new RegExp(/ADD$/).test(event.eventType)
+      ? 'CREATE'
+      : new RegExp(/UPDATE$/).test(event.eventType)
+      ? 'UPDATE'
+      : ('DELETE' as (typeof EventType)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
     isPrivate: false,
     isRecall: false,
     isGroup: true,
+    isMaster: masterID == event.msg.user.id,
     attachments: [],
     specials: [],
-    user_id: event.msg.user.id,
-    user_name: event.msg.user.username,
-    isMaster: false,
-    send_at: new Date(event.msg.joined_at).getTime(),
-    user_avatar: event.msg.user.avatar,
-    at: false,
-    msg_id: '',
-    msg_txt: '',
-    at_user: undefined,
-    segment: segmentQQ,
-    msg: '',
     guild_id: event.msg.guild_id,
     channel_id: '',
+    //
+    at: false,
+    at_user: undefined,
     at_users: [],
+    msg: '',
+    msg_id: '',
+    msg_txt: '',
+    //
+    user_id: event.msg.user.id,
+    user_name: event.msg.user.username,
+    user_avatar: event.msg.user.avatar,
+    segment: segmentQQ,
+    send_at: new Date(event.msg.joined_at).getTime(),
     /**
      * 发现消息
      * @param msg

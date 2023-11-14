@@ -72,9 +72,9 @@ DIRECT_MESSAGE (1 << 12)
  */
 export const DIRECT_MESSAGE = async (event: directEventData) => {
   const controller = ClientController({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    msg_id: event.msg.id,
+    guild_id: event.msg?.guild_id ?? '',
+    channel_id: event.msg?.channel_id ?? '',
+    msg_id: event.msg?.id ?? '',
     send_at: new Date().getTime()
   })
 
@@ -87,25 +87,27 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isMaster: event.msg.author.id == masterID ? true : false,
     isPrivate: false,
     isRecall: false,
     isGroup: false,
+    isMaster: event.msg.author.id == masterID ? true : false,
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
-    user_id: '',
-    user_name: '',
-    user_avatar: '',
+    //
     at: false,
-    msg_id: event.msg.id,
     at_users: [],
     at_user: undefined,
-    send_at: 0,
-    msg_txt: '',
-    msg: '',
+    msg: event.msg?.content ?? '',
+    msg_txt: event.msg?.content ?? '',
+    msg_id: event.msg.id,
+    //
+    user_id: event.msg.author.id,
+    user_name: event.msg.author.username,
+    user_avatar: event.msg.author.avatar,
     segment: segmentQQ,
-    guild_id: '',
-    channel_id: '',
+    send_at: new Date().getTime(),
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {
@@ -113,9 +115,76 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
         withdraw?: number
         guild_id?: string
         channel_id?: string
+        msg_id?: string
       }
     ): Promise<any> => {
-      return false
+      const guild_id = select?.channel_id ?? event.msg.guild_id
+      const channel_id = select?.channel_id ?? event.msg.channel_id
+      const msg_id = select?.msg_id ?? event.msg.id
+      if (Buffer.isBuffer(msg)) {
+        try {
+          return await Client.postDirectImage({
+            id: guild_id,
+            msg_id: msg_id, //消息id, 必须
+            image: msg //buffer
+          }).catch(everyoneError)
+        } catch (err) {
+          console.error(err)
+          return err
+        }
+      }
+      // arr && find buffer
+      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
+        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
+        const cont = msg
+          .map(item => {
+            if (typeof item === 'number') return String(item)
+            return item
+          })
+          .filter(element => typeof element === 'string')
+          .join('')
+        try {
+          return await Client.postDirectImage({
+            id: guild_id,
+            msg_id: msg_id, //消息id, 必须
+            image: msg[isBuffer] as Buffer, //buffer
+            content: cont
+          }).catch(everyoneError)
+        } catch (err) {
+          console.error(err)
+          return err
+        }
+      }
+      const content = Array.isArray(msg)
+        ? msg.join('')
+        : typeof msg === 'string'
+        ? msg
+        : typeof msg === 'number'
+        ? `${msg}`
+        : ''
+      if (content == '') return false
+      /**
+       * http
+       */
+      const match = content.match(/<http>(.*?)<\/http>/)
+      if (match) {
+        const getUrl = match[1]
+        const msg = await getUrlbuffer(getUrl)
+        if (msg) {
+          return await Client.postImage({
+            id: guild_id,
+            msg_id: msg_id, //消息id, 必须
+            image: msg //buffer
+          }).catch(everyoneError)
+        }
+      }
+
+      return await ClientQQ.directMessageApi
+        .postDirectMessage(guild_id, {
+          msg_id: msg_id,
+          content
+        })
+        .catch(everyoneError)
     },
     controller
   }
@@ -133,128 +202,6 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))
   }
-  /* 消息发送机制 */
-  e.reply = async (
-    msg: Buffer | string | number | (Buffer | number | string)[],
-    select?: {
-      quote?: string
-      withdraw?: number
-    }
-  ): Promise<any> => {
-    if (Buffer.isBuffer(msg)) {
-      try {
-        return await Client.postDirectImage({
-          id: event.msg.guild_id,
-          msg_id: event.msg.id, //消息id, 必须
-          image: msg //buffer
-        }).catch(everyoneError)
-      } catch (err) {
-        console.error(err)
-        return err
-      }
-    }
-    // arr && find buffer
-    if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
-      const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
-      const cont = msg
-        .map(item => {
-          if (typeof item === 'number') return String(item)
-          return item
-        })
-        .filter(element => typeof element === 'string')
-        .join('')
-      try {
-        return await Client.postDirectImage({
-          id: event.msg.guild_id,
-          msg_id: event.msg.id, //消息id, 必须
-          image: msg[isBuffer] as Buffer, //buffer
-          content: cont
-        }).catch(everyoneError)
-      } catch (err) {
-        console.error(err)
-        return err
-      }
-    }
-    const content = Array.isArray(msg)
-      ? msg.join('')
-      : typeof msg === 'string'
-      ? msg
-      : typeof msg === 'number'
-      ? `${msg}`
-      : ''
-    if (content == '') return false
-    /**
-     * http
-     */
-    const match = content.match(/<http>(.*?)<\/http>/)
-    if (match) {
-      const getUrl = match[1]
-      const msg = await getUrlbuffer(getUrl)
-      if (msg) {
-        return await Client.postImage({
-          id: event.msg.channel_id,
-          msg_id: event.msg.id, //消息id, 必须
-          image: msg //buffer
-        }).catch(everyoneError)
-      }
-    }
-
-    return await ClientQQ.directMessageApi
-      .postDirectMessage(event.msg.guild_id, {
-        msg_id: event.msg.id,
-        content
-      })
-      .catch(everyoneError)
-  }
-
-  // e.replyCard = async (arr: CardType[]) => {
-  //   for (const item of arr) {
-  //     try {
-  //       if (item.type == 'qq_ark' || item.type == 'qq_embed') {
-  //         await ClientQQ.messageApi
-  //           .postMessage(event.msg.channel_id, {
-  //             msg_id: event.msg.id,
-  //             ...item.card
-  //           })
-  //           .catch(everyoneError)
-  //       } else {
-  //         return false
-  //       }
-  //     } catch (err) {
-  //       console.error(err)
-  //       return err
-  //     }
-  //   }
-  //   return true
-  // }
-
-  e.msg_txt = event.msg.content
-
-  e.msg = event.msg.content
-
-  /**
-   * 消息编号
-   */
-  e.msg_id = event.msg.id
-
-  e.user_id = event.msg.author.id
-
-  e.user_avatar = event.msg.author.avatar
-
-  e.user_name = event.msg.author.username
-
-  e.channel_id = event.msg.channel_id
-
-  e.guild_id = event.msg.guild_id
-
-  e.segment = segmentQQ
-
-  e.at_users = []
-
-  /**
-   * 艾特消息处理
-   */
-  e.at = false
 
   /**
    * 业务处理

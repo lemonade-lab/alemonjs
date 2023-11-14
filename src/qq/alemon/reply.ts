@@ -24,7 +24,7 @@ export async function replyController(
     try {
       return await Client.postImage({
         id: channel_id,
-        msg_id: msg_id, //消息id, 必须
+        msg_id: msg_id, //消息id, 必须,不然就是主动消息了
         image: msg //buffer
       }).catch(everyoneError)
     } catch (err) {
