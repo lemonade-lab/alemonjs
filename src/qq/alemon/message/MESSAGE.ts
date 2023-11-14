@@ -71,34 +71,15 @@ export const mergeMessages = async (
   e: AMessage,
   event: EventPublicDuildType
 ) => {
-  /**
-   * 屏蔽其他机器人的消息
-   */
+  // 屏蔽其他机器人的消息
   if (event.msg.author.bot) return
-
-  /**
-   * 得到登录配置
-   */
-
   const cfg = getBotConfigByKey('qq')
-
-  /**
-   * 得到主人id
-   */
   const masterID = cfg.masterID
-
-  /**
-   * 默认不是主人
-   */
-  e.isMaster = false
 
   /**
    * 检查身份
    */
   if (event.msg.author.id == masterID) {
-    /**
-     * 是主人
-     */
     e.isMaster = true
   }
 

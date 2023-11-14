@@ -245,6 +245,16 @@ export async function DIRECT_MESSAGE(event: Event) {
       channel_id?: string
       msg_id?: string
       send_at?: number
+    }) => {},
+    controller: async (select?: {
+      msg_id?: string
+      send_at?: number
+      withdraw?: number
+      guild_id?: string
+      channel_id?: string
+      pinning?: boolean
+      forward?: boolean
+      horn?: boolean
     }) => {}
   }
 

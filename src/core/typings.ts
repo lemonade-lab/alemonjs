@@ -400,6 +400,44 @@ interface replyController {
     msg_id?: string
     send_at?: number
   }): Promise<any>
+
+  /**
+   * 控制器
+   */
+  controller(select?: {
+    /**
+     * 消息编号
+     */
+    msg_id?: string
+    /**
+     * 消息创建时间
+     */
+    send_at?: number
+    /**
+     * 撤回毫秒数,默认不撤回
+     */
+    withdraw?: number
+    /**
+     * 频道号
+     */
+    guild_id?: string
+    /**
+     * 子频道号
+     */
+    channel_id?: string
+    /**
+     * 钉选---别野顶置--频道精华
+     */
+    pinning?: boolean
+    /**
+     * 转发
+     */
+    forward?: boolean
+    /**
+     * 喇叭--别野-精选--频道全局公告
+     */
+    horn?: boolean
+  }): Promise<any>
 }
 
 /**

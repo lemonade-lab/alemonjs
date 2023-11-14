@@ -263,7 +263,17 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
         msg_uid: msg_uid,
         send_at: send_at
       })
-    }
+    },
+    controller: async (select?: {
+      msg_id?: string
+      send_at?: number
+      withdraw?: number
+      guild_id?: string
+      channel_id?: string
+      pinning?: boolean
+      forward?: boolean
+      horn?: boolean
+    }) => {}
   }
 
   /**
