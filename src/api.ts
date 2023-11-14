@@ -20,3 +20,7 @@ export { ClientKOA } from './koa/index.js'
  * kook客户端
  */
 export { ClientKOOK } from './kook/index.js'
+/**
+ * one客户端
+ */
+export { ClientONE } from './one/index.js'

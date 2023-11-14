@@ -1,6 +1,5 @@
 import { setBotMsgByONE } from './bot.js'
 import { EventGroup, Heartbeat } from '../sdk/types.js'
-import { WebSocket } from 'ws'
 import { Event } from '../sdk/types.js'
 import { DIRECT_MESSAGE } from './message/DIRECT_MESSAGE.js'
 import { MESSAGES } from './message/MESSAGES.js'
@@ -8,7 +7,7 @@ import { MESSAGES } from './message/MESSAGES.js'
  * 会话控制
  */
 export const conversation = {
-  meta: async (socket: WebSocket, event: Heartbeat) => {
+  meta: async (event: Heartbeat) => {
     if (event.status && event.status.bots) {
       const bot = event.status.bots[0]
       setBotMsgByONE({
@@ -18,11 +17,11 @@ export const conversation = {
       })
     }
   },
-  message: async (socket: WebSocket, event: Event | EventGroup) => {
+  message: async (event: Event | EventGroup) => {
     if (event.detail_type == 'private') {
-      DIRECT_MESSAGE(socket, event as Event)
+      DIRECT_MESSAGE(event as Event)
     } else {
-      MESSAGES(socket, event as EventGroup)
+      MESSAGES(event as EventGroup)
     }
   }
 }

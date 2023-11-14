@@ -1,4 +1,3 @@
-import { WebSocket } from 'ws'
 import { Event } from '../../sdk/types.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import {
@@ -10,13 +9,14 @@ import {
 import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
+import { ClientONE } from '../../sdk/wss.js'
 /**
  * 公信事件
  * @param socket
  * @param event
  * @returns
  */
-export async function DIRECT_MESSAGE(socket: WebSocket, event: Event) {
+export async function DIRECT_MESSAGE(event: Event) {
   const cfg = getBotConfigByKey('one')
   const masterID = cfg.masterID
   const e = {
@@ -48,7 +48,7 @@ export async function DIRECT_MESSAGE(socket: WebSocket, event: Event) {
     // is buffer
     if (Buffer.isBuffer(msg)) {
       try {
-        socket.send(
+        ClientONE.send(
           JSON.stringify({
             // 行为 发送消息
             action: 'send_message',
@@ -88,7 +88,7 @@ export async function DIRECT_MESSAGE(socket: WebSocket, event: Event) {
         .join('')
       try {
         const buff = msg[isBuffer] as Buffer
-        socket.send(
+        ClientONE.send(
           JSON.stringify({
             // 行为 发送消息
             action: 'send_message',
@@ -143,7 +143,7 @@ export async function DIRECT_MESSAGE(socket: WebSocket, event: Event) {
       const msg = await getUrlbuffer(getUrl)
       if (Buffer.isBuffer(msg)) {
         if (event.detail_type == 'private') {
-          socket.send(
+          ClientONE.send(
             JSON.stringify({
               // 行为 发送消息  send_group_msg
               action: 'send_message',
@@ -167,7 +167,7 @@ export async function DIRECT_MESSAGE(socket: WebSocket, event: Event) {
           )
         } else {
           // 群聊
-          socket.send(
+          ClientONE.send(
             JSON.stringify({
               action: 'send_group_msg',
               params: {
@@ -194,7 +194,7 @@ export async function DIRECT_MESSAGE(socket: WebSocket, event: Event) {
      * <@xxxx>  <@everyone>
      */
 
-    socket.send(
+    ClientONE.send(
       JSON.stringify({
         // 行为 发送消息
         action: 'send_message',

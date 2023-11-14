@@ -25,3 +25,4 @@ export async function createAlemonByONE() {
   }
   return false
 }
+export { ClientONE } from './sdk/wss.js'

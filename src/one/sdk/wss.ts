@@ -1,4 +1,7 @@
-import WebSocket from 'ws'
+import ws, { WebSocket } from 'ws'
+
+let socket: WebSocket
+
 /**
  * 创建连接
  * @param options
@@ -12,7 +15,7 @@ export function createWsHandler(
   fun: any
 ) {
   const { url, access_token } = options
-  const socket = new WebSocket(
+  socket = new ws(
     url,
     access_token == '' || access_token == undefined
       ? {}
@@ -29,7 +32,7 @@ export function createWsHandler(
     const event = JSON.parse(data.toString())
     if (event) {
       if (fun[event.type]) {
-        fun[event.type](socket, event)
+        fun[event.type](event)
       } else {
         if (event?.status != 'ok') {
           console.log('[ONE]', event)
@@ -42,3 +45,5 @@ export function createWsHandler(
     console.debug(`code:${code},reason:${reason.toString('utf8')}`)
   })
 }
+
+export const ClientONE = socket

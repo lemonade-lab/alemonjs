@@ -1,22 +1,21 @@
-import { WebSocket } from 'ws'
 import { EventGroup } from '../../sdk/types.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import {
   AMessage,
-  CardType,
   InstructionMatching,
   getUrlbuffer
 } from '../../../core/index.js'
 import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
+import { ClientONE } from '../../sdk/wss.js'
 /**
  * 公信事件
  * @param socket
  * @param event
  * @returns
  */
-export async function MESSAGES(socket: WebSocket, event: EventGroup) {
+export async function MESSAGES(event: EventGroup) {
   const cfg = getBotConfigByKey('one')
   const masterID = cfg.masterID
   const e = {
@@ -48,7 +47,7 @@ export async function MESSAGES(socket: WebSocket, event: EventGroup) {
     // is buffer
     if (Buffer.isBuffer(msg)) {
       try {
-        socket.send(
+        ClientONE.send(
           JSON.stringify({
             // 行为 发送消息
             action: 'send_group_msg',
@@ -85,7 +84,7 @@ export async function MESSAGES(socket: WebSocket, event: EventGroup) {
         .join('')
       try {
         const buff = msg[isBuffer] as Buffer
-        socket.send(
+        ClientONE.send(
           JSON.stringify({
             // 行为 发送消息
             action: 'send_group_msg',
@@ -137,7 +136,7 @@ export async function MESSAGES(socket: WebSocket, event: EventGroup) {
       const msg = await getUrlbuffer(getUrl)
       if (Buffer.isBuffer(msg)) {
         // 群聊
-        socket.send(
+        ClientONE.send(
           JSON.stringify({
             action: 'send_group_msg',
             params: {
@@ -237,7 +236,7 @@ export async function MESSAGES(socket: WebSocket, event: EventGroup) {
       })
     }
 
-    socket.send(
+    ClientONE.send(
       JSON.stringify({
         action: 'send_group_msg',
         params: {

@@ -22,7 +22,7 @@ export async function checkRobotByQQ() {
     setBotConfigByKey('ntqq', config)
     return true
   }
-  console.error('login', '-----------------------')
-  console.error('login', 'NTQQ config err')
+  console.error('[LOGIN]', '-----------------------')
+  console.error('[LOGIN]', 'NTQQ ERR')
   return false
 }

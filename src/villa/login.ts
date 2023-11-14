@@ -17,7 +17,7 @@ export async function checkRobotByVilla() {
     setBotConfigByKey('villa', config)
     return true
   }
-  console.error('login', '-----------------------')
-  console.error('login', 'VILLA config err')
+  console.error('[LOGIN]', '-----------------------')
+  console.error('[LOGIN]', 'VILLA ERR')
   return false
 }

@@ -15,7 +15,7 @@ export async function checkRobotByOne() {
     setBotConfigByKey('one', config)
     return true
   }
-  console.error('login', '-----------------------')
-  console.error('login', 'ONE config err')
+  console.error('[LOGIN]', '-----------------------')
+  console.error('[LOGIN]', 'ONE ERR')
   return false
 }
