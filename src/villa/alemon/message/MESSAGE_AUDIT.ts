@@ -9,11 +9,6 @@ import {
 import { segmentVILLA } from '../segment.js'
 
 /**
- * TUDO
- * 判断审核事件?
- */
-
-/**
  * 审核事件
  * @param event 回调数据
  * @param val  类型控制

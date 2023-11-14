@@ -154,7 +154,6 @@ export async function postMessageByGroup(
         'X-Union-Appid': appID
       },
       data: {
-        content: 'md',
         msg_id: msg_id,
         markdown: { content },
         msg_type: 2, //  0 文本  1 图文 2 md 3 ark 4 embed
