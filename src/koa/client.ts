@@ -1,6 +1,7 @@
 import Koa from 'koa'
 import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
+import cors from 'koa2-cors'
 import { mkdirSync } from 'fs'
 import { getLocalImg } from './img.js'
 import { ServerOptions } from './types.js'
@@ -25,6 +26,9 @@ export function createWeb(
   // 创建 Koa 应用
   const app = new Koa()
   const router = new Router()
+
+  // 允许跨域请求
+  app.use(cors())
 
   // 处理 POST 请求体中的 JSON 数据
   app.use(bodyParser())

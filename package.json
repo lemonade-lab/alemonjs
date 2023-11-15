@@ -28,6 +28,10 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
+    "@types/koa": "^2.13.11",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-router": "^7.4.7",
+    "@types/koa2-cors": "^2.0.5",
     "@types/lodash": "^4.14.186",
     "@types/node": "^20.2.4",
     "@types/node-schedule": "^2.1.2",
@@ -41,6 +45,7 @@
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "koa2-cors": "^2.0.6",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
     "typedoc": "^0.25.2",
