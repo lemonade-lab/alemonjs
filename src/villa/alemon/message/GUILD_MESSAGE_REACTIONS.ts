@@ -8,7 +8,7 @@ import {
 import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import { ClientController } from '../controller.js'
+import { ClientControllerOnMessage } from '../controller.js'
 
 /**
  * 表情表态
@@ -54,7 +54,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const controller = ClientController({
+  const Message = ClientControllerOnMessage({
     guild_id: AddQuickEmoticon.villa_id,
     channel_id: AddQuickEmoticon.room_id,
     msg_id: '0',
@@ -129,7 +129,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
       const room_id = select?.channel_id ?? AddQuickEmoticon.room_id
       return await replyController(villa_id, room_id, msg)
     },
-    controller
+    Message
   }
 
   /**

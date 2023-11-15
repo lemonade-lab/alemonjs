@@ -26,7 +26,7 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_OFF_MIC           // 下麦时 delete
  */
 export const AUDIO_ACTION = async (event: any) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: '0',
@@ -80,7 +80,7 @@ export const AUDIO_ACTION = async (event: any) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller
+    Message
   }
 
   if (new RegExp(/MIC$/).test(event.eventType)) {

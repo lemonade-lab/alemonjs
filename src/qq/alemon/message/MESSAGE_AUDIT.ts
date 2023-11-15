@@ -18,7 +18,7 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
 export const MESSAGE_AUDIT = async (event: any) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: '0',
@@ -70,7 +70,7 @@ export const MESSAGE_AUDIT = async (event: any) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller
+    Message
   }
 
   /**

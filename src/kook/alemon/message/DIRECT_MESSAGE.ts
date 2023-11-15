@@ -11,14 +11,14 @@ import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientController } from '../controller.js'
-import { replyController } from '../reply.js'
+import { directController } from '../direct.js'
 
 /**
  *
  * @param event
  * @returns
  */
-export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
+export const DIRECT_MESSAGE = async (event: EventData) => {
   if (event.extra.author.bot) {
     return false
   }
@@ -121,8 +121,8 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         channel_id?: string
       }
     ): Promise<any> => {
-      // 公的
-      return await replyController(msg, event.target_id)
+      // 私的
+      return await directController(msg, event.author_id, event.extra.code)
     },
     Message
   }

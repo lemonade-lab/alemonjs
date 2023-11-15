@@ -37,7 +37,7 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
 export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: '',
     msg_id: '0',
@@ -98,7 +98,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller
+    Message
   }
 
   return await typeMessage(e)

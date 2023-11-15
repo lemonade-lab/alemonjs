@@ -50,7 +50,7 @@ GUILDS (1 << 0)
   - CHANNEL_DELETE         // 当channel被删除时
  */
 export const GUILD = async (event: EventGuildType) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.id,
     channel_id: '0',
     msg_id: '0',
@@ -108,7 +108,7 @@ export const GUILD = async (event: EventGuildType) => {
         withdraw?: number
       }
     ): Promise<any> => {},
-    controller
+    Message
   }
 
   /**

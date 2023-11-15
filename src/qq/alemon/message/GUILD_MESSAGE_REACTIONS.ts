@@ -33,7 +33,7 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
 export const GUILD_MESSAGE_REACTIONS = async (
   event: GUILD_MESSAGE_REACTIONS
 ) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: '0',
@@ -100,7 +100,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller
+    Message
   }
 
   /**

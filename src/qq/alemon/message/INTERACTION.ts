@@ -18,7 +18,7 @@ INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
 export const INTERACTION = async event => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: '0',
@@ -72,7 +72,7 @@ export const INTERACTION = async event => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    controller
+    Message
   }
 
   /**

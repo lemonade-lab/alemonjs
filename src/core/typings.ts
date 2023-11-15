@@ -366,7 +366,7 @@ interface ReplyBase {
    * 控制器
    * @param select 选择绑定
    */
-  controller(select?: {
+  Message(select?: {
     /**
      * 频道号
      */
@@ -402,7 +402,7 @@ interface ReplyBase {
      * 撤回
      * @param time 撤回时间
      */
-    withdraw(): Promise<any>
+    withdraw(hideTip?: boolean): Promise<any>
     /**
      * 钉选---别野顶置--频道精华
      * @param cancel 取消
@@ -424,9 +424,18 @@ interface ReplyBase {
      */
     emoji(msg: any[], cancel?: boolean): Promise<any>
     /**
-     * 卡片
+     * 发送卡片
      */
     card(msg: CardType[]): Promise<any>
+    /**
+     * 该消息所有表态
+     */
+    allEmoji(): Promise<any>
+    /**
+     * 得到指定消息的 指定 表情 下的 所有用户
+     * @param msg
+     */
+    byEmoji?(msg: any, options: any): Promise<any>
   }
 }
 

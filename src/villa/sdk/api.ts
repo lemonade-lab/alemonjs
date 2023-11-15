@@ -727,13 +727,19 @@ export async function getMemberRoleInfo(
  * @returns
  * type = villa_id
  */
-export async function getAllEmoticons(villa_id: number | string): Promise<{
+export async function getAllEmoticons(
+  villa_id: number | string,
+  msg_uid: string
+): Promise<{
   data: Emoticon[]
 }> {
   return await villaService({
     method: 'get',
     headers: {
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
+    },
+    params: {
+      msg_uid
     },
     url: ApiEnum.getAllEmoticons
   }).then(res => res.data)

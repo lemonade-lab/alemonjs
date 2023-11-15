@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import { ClientController } from '../controller.js'
+import { ClientControllerOnMessage } from '../controller.js'
 
 /**
  * 机器人进出
@@ -45,7 +45,7 @@ export async function GUILD_BOT(event: {
    */
   const DeleteRobot = event.extend_data.EventData.DeleteRobot
 
-  const controller = ClientController({
+  const Message = ClientControllerOnMessage({
     guild_id: DeleteRobot.villa_id,
     channel_id: 0,
     msg_id: '0',
@@ -113,7 +113,7 @@ export async function GUILD_BOT(event: {
       if (!room_id) return false
       return await replyController(villa_id, room_id, msg)
     },
-    controller
+    Message
   }
 
   /**

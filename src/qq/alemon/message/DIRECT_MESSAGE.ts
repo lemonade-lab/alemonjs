@@ -1,26 +1,21 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import {
   typeMessage,
-  AMessage,
   InstructionMatching,
-  CardType,
-  getUrlbuffer,
   EventEnum,
   PlatformEnum,
   EventType
 } from '../../../core/index.js'
-import { ClientQQ as Client } from '../../sdk/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 import {
   AlemonJSError,
   AlemonJSLog,
   AlemonJSEventError,
-  AlemonJSEventLog,
-  everyoneError
+  AlemonJSEventLog
 } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import { ClientController } from '../controller.js'
+import { ClientDirectController, directController } from '../direct.js'
 
 declare global {
   //接口对象
@@ -71,7 +66,7 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 export const DIRECT_MESSAGE = async (event: directEventData) => {
-  const controller = ClientController({
+  const Message = ClientDirectController({
     guild_id: event.msg?.guild_id ?? '',
     channel_id: event.msg?.channel_id ?? '',
     msg_id: event.msg?.id ?? '',
@@ -125,72 +120,12 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
       const guild_id = select?.channel_id ?? event.msg.guild_id
       const channel_id = select?.channel_id ?? event.msg.channel_id
       const msg_id = select?.msg_id ?? event.msg.id
-      if (Buffer.isBuffer(msg)) {
-        try {
-          return await Client.postDirectImage({
-            id: guild_id,
-            msg_id: msg_id, //消息id, 必须
-            image: msg //buffer
-          }).catch(everyoneError)
-        } catch (err) {
-          console.error(err)
-          return err
-        }
-      }
-      // arr && find buffer
-      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
-        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
-        const cont = msg
-          .map(item => {
-            if (typeof item === 'number') return String(item)
-            return item
-          })
-          .filter(element => typeof element === 'string')
-          .join('')
-        try {
-          return await Client.postDirectImage({
-            id: guild_id,
-            msg_id: msg_id, //消息id, 必须
-            image: msg[isBuffer] as Buffer, //buffer
-            content: cont
-          }).catch(everyoneError)
-        } catch (err) {
-          console.error(err)
-          return err
-        }
-      }
-      const content = Array.isArray(msg)
-        ? msg.join('')
-        : typeof msg === 'string'
-        ? msg
-        : typeof msg === 'number'
-        ? `${msg}`
-        : ''
-      if (content == '') return false
-      /**
-       * http
-       */
-      const match = content.match(/<http>(.*?)<\/http>/)
-      if (match) {
-        const getUrl = match[1]
-        const msg = await getUrlbuffer(getUrl)
-        if (msg) {
-          return await Client.postImage({
-            id: guild_id,
-            msg_id: msg_id, //消息id, 必须
-            image: msg //buffer
-          }).catch(everyoneError)
-        }
-      }
-
-      return await ClientQQ.directMessageApi
-        .postDirectMessage(guild_id, {
-          msg_id: msg_id,
-          content
-        })
-        .catch(everyoneError)
+      const withdraw = select?.withdraw ?? 0
+      return await directController(msg, guild_id, msg_id, {
+        withdraw
+      })
     },
-    controller
+    Message
   }
 
   /**

@@ -10,8 +10,8 @@ import {
 import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientONE } from '../../sdk/wss.js'
 import { ClientController } from '../controller.js'
+import { replyController } from '../reply.js'
 /**
  * 公信事件
  * @param socket
@@ -22,7 +22,7 @@ export async function MESSAGES(event: EventGroup) {
   const cfg = getBotConfigByKey('one')
   const masterID = cfg.masterID
 
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.group_id,
     channel_id: '0',
     msg_id: event.message_id,
@@ -64,7 +64,7 @@ export async function MESSAGES(event: EventGroup) {
     msg_id: event.message_id,
     open_id: '',
     segment: segmentONE,
-    controller,
+    Message,
     send_at: new Date().getTime(),
     /**
      * 消息发送机制
@@ -81,181 +81,8 @@ export async function MESSAGES(event: EventGroup) {
         channel_id?: string
       }
     ): Promise<any> => {
-      // is buffer
-      if (Buffer.isBuffer(msg)) {
-        try {
-          ClientONE.send(
-            JSON.stringify({
-              // 行为 发送消息
-              action: 'send_group_msg',
-              params: {
-                group_id: event.group_id,
-                // 消息体
-                message: [
-                  {
-                    type: 'image',
-                    data: {
-                      file_id: `base64://${msg.toString('base64')}`
-                    }
-                  }
-                ]
-              },
-              echo: '1234'
-            })
-          )
-          return false
-        } catch (err) {
-          console.error(err)
-          return err
-        }
-      }
-
-      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
-        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
-        const cont = msg
-          .map(item => {
-            if (typeof item === 'number') return String(item)
-            return item
-          })
-          .filter(element => typeof element === 'string')
-          .join('')
-        try {
-          const buff = msg[isBuffer] as Buffer
-          ClientONE.send(
-            JSON.stringify({
-              // 行为 发送消息
-              action: 'send_group_msg',
-              params: {
-                group_id: event.group_id,
-                // 消息体
-                message: [
-                  {
-                    type: 'text',
-                    data: {
-                      text: cont
-                    }
-                  },
-                  {
-                    type: 'image',
-                    data: {
-                      file_id: `base64://${buff.toString('base64')}`
-                    }
-                  }
-                ]
-              },
-              echo: '1234'
-            })
-          )
-          return false
-        } catch (err) {
-          console.error(err)
-          return err
-        }
-      }
-
-      const content = Array.isArray(msg)
-        ? msg.join('')
-        : typeof msg === 'string'
-        ? msg
-        : typeof msg === 'number'
-        ? `${msg}`
-        : ''
-
-      if (content == '') return false
-
-      /**
-       * http
-       */
-
-      const match = content.match(/<http>(.*?)<\/http>/)
-      if (match) {
-        const getUrl = match[1]
-        const msg = await getUrlbuffer(getUrl)
-        if (Buffer.isBuffer(msg)) {
-          // 群聊
-          ClientONE.send(
-            JSON.stringify({
-              action: 'send_group_msg',
-              params: {
-                group_id: event.group_id,
-                // 消息体
-                message: [
-                  {
-                    type: 'image',
-                    data: {
-                      file_id: `base64://${msg.toString('base64')}`
-                    }
-                  }
-                ]
-              },
-              echo: '1234'
-            })
-          )
-        }
-      }
-      const message = []
-
-      const mentionRegex = /<@(\w+)>/g
-      const mentionAllRegex = /<@everyone>/g
-
-      let matchCentnt
-
-      let lastIndex = 0
-
-      while ((matchCentnt = mentionRegex.exec(content)) !== null) {
-        const user_id = matchCentnt[1]
-        const textBeforeMention = content.substring(
-          lastIndex,
-          matchCentnt.index
-        )
-        if (textBeforeMention) {
-          message.push({
-            type: 'text',
-            data: {
-              text: textBeforeMention
-            }
-          })
-        }
-        if (user_id != 'everyone') {
-          message.push({
-            type: 'mention',
-            data: {
-              user_id
-            }
-          })
-        }
-        lastIndex = mentionRegex.lastIndex
-      }
-
-      const remainingText = content.substring(lastIndex)
-
-      if (remainingText) {
-        message.push({
-          type: 'text',
-          data: {
-            text: remainingText
-          }
-        })
-      }
-
-      if (mentionAllRegex.test(content)) {
-        message.push({
-          type: 'mention_all',
-          data: {}
-        })
-      }
-
-      ClientONE.send(
-        JSON.stringify({
-          action: 'send_group_msg',
-          params: {
-            group_id: event.group_id,
-            message: message
-          },
-          echo: '1234'
-        })
-      )
-      return true
+      const guild_id = select.guild_id ?? event.group_id
+      return await replyController(msg, guild_id)
     }
   }
 

@@ -9,9 +9,10 @@ import { everyoneError } from '../../log/index.js'
  * @param room_id
  * @returns
  */
-export async function replyController(
+export async function directController(
   msg: Buffer | string | number | (Buffer | number | string)[],
-  msg_id: string
+  msg_id: string,
+  code: string
 ) {
   /**
    * isbuffer
@@ -20,9 +21,10 @@ export async function replyController(
     try {
       const ret = await ClientKOOK.postImage(msg)
       if (ret && ret.data) {
-        return await ClientKOOK.createMessage({
+        return await ClientKOOK.createDirectMessage({
           type: 2,
           target_id: msg_id,
+          chat_code: code,
           content: ret.data.url
         }).catch(everyoneError)
       }
@@ -49,18 +51,19 @@ export async function replyController(
     // 转存
     const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer)
     if (!ret) return false
-    if (ret?.data) {
-      await ClientKOOK.createMessage({
-        type: 9,
-        target_id: msg_id,
-        content: content
-      }).catch(err => err)
-      return await ClientKOOK.createMessage({
-        type: 2,
-        target_id: msg_id,
-        content: ret.data.url
-      }).catch(everyoneError)
-    }
+    // 私聊
+    await ClientKOOK.createDirectMessage({
+      type: 9,
+      target_id: msg_id,
+      chat_code: code,
+      content: content
+    })
+    return await ClientKOOK.createDirectMessage({
+      type: 2,
+      target_id: msg_id,
+      chat_code: code,
+      content: String(ret.data.url)
+    }).catch(everyoneError)
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -80,16 +83,18 @@ export async function replyController(
     const ret = await ClientKOOK.postImage(msg)
     if (!ret) return false
     if (msg && ret) {
-      return await ClientKOOK.createMessage({
+      return await ClientKOOK.createDirectMessage({
         type: 2,
         target_id: msg_id,
+        chat_code: code,
         content: ret.data.url
       }).catch(everyoneError)
     }
   }
-  return await ClientKOOK.createMessage({
+  return await ClientKOOK.createDirectMessage({
     type: 9,
     target_id: msg_id,
+    chat_code: code,
     content
   }).catch(everyoneError)
 }

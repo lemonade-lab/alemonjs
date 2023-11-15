@@ -47,7 +47,7 @@ GUILDS (1 << 0)
  */
 
 export const CHANNEL = async (event: EventChannelType) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: '0',
     msg_id: '0',
@@ -105,7 +105,7 @@ export const CHANNEL = async (event: EventChannelType) => {
         withdraw?: number
       }
     ): Promise<any> => {},
-    controller
+    Message
   }
 
   /**

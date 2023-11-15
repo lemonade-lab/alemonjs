@@ -34,12 +34,78 @@ export const ClientController = (data: {
           quote: msg_id
         })
       },
-      withdraw: async () => {},
-      pinning: async (cancel?: boolean) => {},
-      forward: async () => {},
-      horn: async (cancel?: boolean) => {},
-      emoji: async (msg: any[], cancel?: boolean) => {},
-      card: async (msg: any[]) => {}
+      withdraw: async (hideTip = true) => {
+        return await ClientQQ.messageApi.deleteMessage(
+          channel_id,
+          msg_id,
+          hideTip
+        )
+      },
+      pinning: async (cancel?: boolean) => {
+        if (cancel) {
+          return await ClientQQ.pinsMessageApi.deletePinsMessage(
+            channel_id,
+            msg_id
+          )
+        }
+        return await ClientQQ.pinsMessageApi.putPinsMessage(channel_id, msg_id)
+      },
+      forward: async () => {
+        return false
+      },
+      horn: async (cancel?: boolean) => {
+        if (cancel) {
+          return await ClientQQ.announceApi.deleteGuildAnnounce(
+            guild_id,
+            msg_id
+          )
+        }
+        return await ClientQQ.announceApi.postGuildAnnounce(
+          guild_id,
+          channel_id,
+          msg_id
+        )
+      },
+      emoji: async (msg: any[], cancel?: boolean) => {
+        // 不同的场景下 api不同  私聊是不具有这么多功能的
+        if (cancel) {
+          // 是数组形式的表态
+          const arr: any[] = []
+          for (const item of msg) {
+            arr.push(
+              await ClientQQ.reactionApi.deleteReaction(channel_id, item)
+            )
+          }
+          return arr
+        }
+        // 是数组形式的表态
+        const arr: any[] = []
+        for (const item of msg) {
+          arr.push(await ClientQQ.reactionApi.postReaction(channel_id, item))
+        }
+        return arr
+      },
+      card: async (msg: any[]) => {
+        // 卡片消息
+        return []
+      },
+      allEmoji: async () => {
+        //
+        return false
+      },
+      byEmoji: async (
+        reactionObj: any,
+        options = {
+          cookie: '',
+          limit: 20
+        }
+      ) => {
+        return await ClientQQ.reactionApi.getReactionUserList(
+          channel_id,
+          reactionObj,
+          options
+        )
+      }
     }
   }
 }

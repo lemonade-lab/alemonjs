@@ -23,7 +23,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
 
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.author.user_openid,
     channel_id: event.author.user_openid,
     msg_id: event.id,
@@ -58,9 +58,9 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     open_id: '',
     //
     user_id: event.author.id,
+    user_name: '柠檬冲水',
     user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
     segment: segmentNTQQ,
-    user_name: '柠檬冲水',
     send_at: new Date().getTime(),
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
@@ -145,7 +145,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         event.id
       ).catch(everyoneError)
     },
-    controller
+    Message
   }
 
   /**

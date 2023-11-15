@@ -1,5 +1,6 @@
 import { ClientONE } from '../sdk/wss.js'
 import { getUrlbuffer } from '../../core/index.js'
+
 /**
  * 回复控制器
  * @param msg
@@ -7,9 +8,10 @@ import { getUrlbuffer } from '../../core/index.js'
  * @param room_id
  * @returns
  */
-export async function replyController(
+export async function directController(
   msg: Buffer | string | number | (Buffer | number | string)[],
-  guild_id: string
+  detail_type: string,
+  user_id: string
 ) {
   // is buffer
   if (Buffer.isBuffer(msg)) {
@@ -17,9 +19,12 @@ export async function replyController(
       ClientONE.send(
         JSON.stringify({
           // 行为 发送消息
-          action: 'send_group_msg',
+          action: 'send_message',
           params: {
-            group_id: guild_id,
+            // 私聊回复
+            detail_type: detail_type,
+            // 用户
+            user_id: user_id,
             // 消息体
             message: [
               {
@@ -54,9 +59,12 @@ export async function replyController(
       ClientONE.send(
         JSON.stringify({
           // 行为 发送消息
-          action: 'send_group_msg',
+          action: 'send_message',
           params: {
-            group_id: guild_id,
+            // 私聊回复
+            detail_type: detail_type,
+            // 用户
+            user_id: user_id,
             // 消息体
             message: [
               {
@@ -102,82 +110,76 @@ export async function replyController(
     const getUrl = match[1]
     const msg = await getUrlbuffer(getUrl)
     if (Buffer.isBuffer(msg)) {
-      // 群聊
-      ClientONE.send(
-        JSON.stringify({
-          action: 'send_group_msg',
-          params: {
-            group_id: guild_id,
-            // 消息体
-            message: [
-              {
-                type: 'image',
-                data: {
-                  file_id: `base64://${msg.toString('base64')}`
+      if (detail_type == 'private') {
+        ClientONE.send(
+          JSON.stringify({
+            // 行为 发送消息  send_group_msg
+            action: 'send_message',
+            params: {
+              // 私聊回复
+              detail_type: detail_type,
+              // 用户
+              user_id: user_id,
+              // 消息体
+              message: [
+                {
+                  type: 'image',
+                  data: {
+                    file_id: `base64://${msg.toString('base64')}`
+                  }
                 }
-              }
-            ]
-          },
-          echo: '1234'
-        })
-      )
-    }
-  }
-  const message = []
-
-  const mentionRegex = /<@(\w+)>/g
-  const mentionAllRegex = /<@everyone>/g
-
-  let matchCentnt
-
-  let lastIndex = 0
-
-  while ((matchCentnt = mentionRegex.exec(content)) !== null) {
-    const user_id = matchCentnt[1]
-    const textBeforeMention = content.substring(lastIndex, matchCentnt.index)
-    if (textBeforeMention) {
-      message.push({
-        type: 'text',
-        data: {
-          text: textBeforeMention
-        }
-      })
-    }
-    if (user_id != 'everyone') {
-      message.push({
-        type: 'mention',
-        data: {
-          user_id
-        }
-      })
-    }
-    lastIndex = mentionRegex.lastIndex
-  }
-
-  const remainingText = content.substring(lastIndex)
-
-  if (remainingText) {
-    message.push({
-      type: 'text',
-      data: {
-        text: remainingText
+              ]
+            },
+            echo: '1234'
+          })
+        )
+      } else {
+        // 群聊
+        ClientONE.send(
+          JSON.stringify({
+            action: 'send_group_msg',
+            params: {
+              group_id: '',
+              // 消息体
+              message: [
+                {
+                  type: 'image',
+                  data: {
+                    file_id: `base64://${msg.toString('base64')}`
+                  }
+                }
+              ]
+            },
+            echo: '1234'
+          })
+        )
       }
-    })
+    }
   }
 
-  if (mentionAllRegex.test(content)) {
-    message.push({
-      type: 'mention_all',
-      data: {}
-    })
-  }
+  /**
+   * 需要增加解析器
+   * <@xxxx>  <@everyone>
+   */
 
   ClientONE.send(
     JSON.stringify({
-      action: 'send_group_msg',
+      // 行为 发送消息
+      action: 'send_message',
       params: {
-        group_id: guild_id,
-        message: message
+        // 私聊回复
+        detail_type: detail_type,
+        // 用户
+        user_id: user_id,
+        // 消息体
+        message: [
+          {
+            type: 'text',
+            data: {
+              text: content
+            }
+          }
+        ]
       },
       echo: '1234'
     })

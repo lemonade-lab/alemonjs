@@ -8,7 +8,7 @@ import {
 import { getBotConfigByKey } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import { ClientController } from '../controller.js'
+import { ClientControllerOnMessage } from '../controller.js'
 
 /**
  * 成员进入
@@ -49,7 +49,7 @@ export async function GUILD_MEMBERS(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const controller = ClientController({
+  const Message = ClientControllerOnMessage({
     guild_id: JoinVilla.villa_id,
     channel_id: 0,
     msg_id: '0',
@@ -121,7 +121,7 @@ export async function GUILD_MEMBERS(event: {
       if (!room_id) return false
       return await replyController(villa_id, room_id, msg)
     },
-    controller
+    Message
   }
 
   /**

@@ -30,12 +30,13 @@ export const ClientController = (data: {
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {},
-      withdraw: async () => {},
+      withdraw: async (hideTip: boolean) => {},
       pinning: async (cancel?: boolean) => {},
       forward: async () => {},
       horn: async (cancel?: boolean) => {},
       emoji: async (msg: any[], cancel?: boolean) => {},
-      card: async (msg: any[]) => {}
+      card: async (msg: any[]) => {},
+      allEmoji: async () => {}
     }
   }
 }

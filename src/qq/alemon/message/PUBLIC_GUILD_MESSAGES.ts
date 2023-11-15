@@ -68,7 +68,7 @@ interface PUBLIC_GUILD_MESSAGES_TYPE {
 export const PUBLIC_GUILD_MESSAGES = async (
   event: PUBLIC_GUILD_MESSAGES_TYPE
 ) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: event.msg.id,
@@ -128,9 +128,14 @@ export const PUBLIC_GUILD_MESSAGES = async (
     ): Promise<any> => {
       const channel_id = select?.channel_id ?? event.msg.channel_id
       const msg_id = select?.msg_id ?? event.msg.id
-      return await replyController(msg, channel_id, msg_id, select)
+      const quote = select?.quote ?? event.msg.id
+      const withdraw = select?.withdraw ?? 0
+      return await replyController(msg, channel_id, msg_id, {
+        quote,
+        withdraw
+      })
     },
-    controller
+    Message
   }
 
   /**

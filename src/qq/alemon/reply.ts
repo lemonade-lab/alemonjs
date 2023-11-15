@@ -20,6 +20,8 @@ export async function replyController(
 ) {
   // isBuffer
 
+  // if withdraw == 0 ， false 不撤回
+
   if (Buffer.isBuffer(msg)) {
     try {
       return await Client.postImage({

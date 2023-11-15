@@ -27,7 +27,7 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
   - MESSAGE_DELETE         // 删除（撤回）消息事件
  * */
 export const GUILD_MESSAGES = async (event: any) => {
-  const controller = ClientController({
+  const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: event.msg.id,
@@ -84,9 +84,14 @@ export const GUILD_MESSAGES = async (event: any) => {
     ): Promise<any> => {
       const channel_id = select?.channel_id ?? event.msg.channel_id
       const msg_id = select?.channel_id ?? event.msg.channel_id
-      return await replyController(msg, channel_id, msg_id)
+      const quote = select?.quote ?? event.msg.id
+      const withdraw = select?.withdraw ?? 0
+      return await replyController(msg, channel_id, msg_id, {
+        quote,
+        withdraw
+      })
     },
-    controller
+    Message
   }
 
   /**
