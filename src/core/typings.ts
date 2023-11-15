@@ -322,7 +322,7 @@ export interface SegmentType {
   block?(txt: string): string
 }
 
-interface ReplyBase {
+export interface ReplyBase {
   /**
    * 消息发送机制
    * @param content 消息
@@ -383,60 +383,62 @@ interface ReplyBase {
      * 消息创建时间
      */
     send_at?: number
-  }): {
-    /**
-     * 回复消息
-     * @param content
-     */
-    reply(
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ): Promise<any>
-    /**
-     * 引用消息
-     * @param content
-     */
-    quote(
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ): Promise<any>
-    /**
-     * 撤回
-     * @param time 撤回时间
-     */
-    withdraw(hideTip?: boolean): Promise<any>
-    /**
-     * 钉选---别野顶置--频道精华
-     * @param cancel 取消
-     */
-    pinning(cancel?: boolean): Promise<any>
-    /**
-     * 喇叭--别野-精选--频道全局公告
-     * @param cancel 取消
-     */
-    horn(cancel?: boolean): Promise<any>
-    /**
-     * 转发
-     */
-    forward(): Promise<any>
-    /**
-     * 表态
-     * @param msg 表情
-     * @param cancel 取消
-     */
-    emoji(msg: any[], cancel?: boolean): Promise<any>
-    /**
-     * 发送卡片
-     */
-    card(msg: CardType[]): Promise<any>
-    /**
-     * 该消息所有表态
-     */
-    allEmoji(): Promise<any>
-    /**
-     * 得到指定消息的 指定 表情 下的 所有用户
-     * @param msg
-     */
-    byEmoji?(msg: any, options: any): Promise<any>
-  }
+  }): MessageControllerType
+}
+
+export interface MessageControllerType {
+  /**
+   * 回复消息
+   * @param content
+   */
+  reply(
+    content: Buffer | string | number | (Buffer | number | string)[]
+  ): Promise<any>
+  /**
+   * 引用消息
+   * @param content
+   */
+  quote(
+    content: Buffer | string | number | (Buffer | number | string)[]
+  ): Promise<any>
+  /**
+   * 撤回
+   * @param time 撤回时间
+   */
+  withdraw(hideTip?: boolean): Promise<any>
+  /**
+   * 钉选---别野顶置--频道精华
+   * @param cancel 取消
+   */
+  pinning(cancel?: boolean): Promise<any>
+  /**
+   * 喇叭--别野-精选--频道全局公告
+   * @param cancel 取消
+   */
+  horn(cancel?: boolean): Promise<any>
+  /**
+   * 转发
+   */
+  forward(): Promise<any>
+  /**
+   * 表态
+   * @param msg 表情
+   * @param cancel 取消
+   */
+  emoji(msg: any[], cancel?: boolean): Promise<any>
+  /**
+   * 发送卡片
+   */
+  card(msg: CardType[]): Promise<any>
+  /**
+   * 该消息所有表态
+   */
+  allEmoji(): Promise<any>
+  /**
+   * 得到指定消息的 指定 表情 下的 所有用户
+   * @param msg
+   */
+  byEmoji?(msg: any, options: any): Promise<any>
 }
 
 /**

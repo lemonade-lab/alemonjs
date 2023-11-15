@@ -1,5 +1,29 @@
 import { replyController } from './reply.js'
 
+export const Controller = {
+  Message: ({ guild_id, msg_id }) => {
+    return {
+      reply: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return await replyController(content, guild_id, msg_id)
+      },
+      quote: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return await replyController(content, guild_id, msg_id)
+      },
+      withdraw: async (hideTip: boolean) => {},
+      pinning: async (cancel?: boolean) => {},
+      forward: async () => {},
+      horn: async (cancel?: boolean) => {},
+      emoji: async (msg: any[], cancel?: boolean) => {},
+      card: async (msg: any[]) => {},
+      allEmoji: async () => {}
+    }
+  }
+}
+
 /**
  * 客户端控制器
  * @param select
@@ -21,24 +45,6 @@ export const ClientController = (data: {
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
     const send_at = select?.send_at ?? data.send_at
-    return {
-      reply: async (
-        content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {
-        return await replyController(content, guild_id, msg_id)
-      },
-      quote: async (
-        content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {
-        return await replyController(content, guild_id, msg_id)
-      },
-      withdraw: async (hideTip: boolean) => {},
-      pinning: async (cancel?: boolean) => {},
-      forward: async () => {},
-      horn: async (cancel?: boolean) => {},
-      emoji: async (msg: any[], cancel?: boolean) => {},
-      card: async (msg: any[]) => {},
-      allEmoji: async () => {}
-    }
+    return Controller.Message({ guild_id, msg_id })
   }
 }
