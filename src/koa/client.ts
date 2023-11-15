@@ -77,12 +77,11 @@ export function createWeb(
    * @param port
    */
   function createApp(port: number) {
-    // 设置配置
-    setServerCoinfg('port', port)
     // 启动应用
     app
       .listen(port, async () => {
         if (logFnc) await logFnc(port)
+        setServerCoinfg('port', port)
         console.info('server', `http://[::]:${port}`)
       })
       .on('error', handlePortConflict)
