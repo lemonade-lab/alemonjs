@@ -1,5 +1,5 @@
 export const Controller = {
-  Mumber: ({ guild_id, uid }) => {
+  Mumber: ({ guild_id, user_id }) => {
     return {
       /**
        * 查看信息

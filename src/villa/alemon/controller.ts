@@ -2,7 +2,7 @@ import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
 
 export const Controller = {
-  Mumber: ({ guild_id, uid }) => {
+  Mumber: ({ guild_id, user_id }) => {
     return {
       /**
        * 查看信息
@@ -10,7 +10,7 @@ export const Controller = {
        */
       information: async () => {
         // 对进行进行过滤,并以固定格式返回
-        const data = await ClientVILLA.getMember(guild_id, uid).then(
+        const data = await ClientVILLA.getMember(guild_id, user_id).then(
           res => res.data
         )
         if (!data) return false
@@ -42,7 +42,7 @@ export const Controller = {
        * 踢出
        */
       remove: async () => {
-        return await ClientVILLA.deleteVillaMember(guild_id, uid)
+        return await ClientVILLA.deleteVillaMember(guild_id, user_id)
       },
       /**
        * 身分组
@@ -53,7 +53,7 @@ export const Controller = {
       operate: async (role_id: string, add = true) => {
         return await ClientVILLA.operateMemberToRole(guild_id, {
           role_id,
-          uid,
+          uid: user_id,
           is_add: add
         })
       }
@@ -183,12 +183,12 @@ export const ClientControllerOnMessage = (data?: {
  */
 export const ClientControllerOnMember = (data?: {
   guild_id: string | number
-  uid: string
+  user_id: string
 }) => {
-  return (select?: { guild_id?: string; uid?: string }) => {
+  return (select?: { guild_id?: string; user_id?: string }) => {
     const guild_id = select?.guild_id ?? data.guild_id
-    const uid = select?.guild_id ?? data.uid
-    return Controller.Mumber({ guild_id, uid })
+    const user_id = select?.guild_id ?? data.user_id
+    return Controller.Mumber({ guild_id, user_id })
   }
 }
 
