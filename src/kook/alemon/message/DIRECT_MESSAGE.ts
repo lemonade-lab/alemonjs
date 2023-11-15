@@ -42,10 +42,10 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
         : ('single' as 'group' | 'single'),
     bot: getBotMsgByKOOK(),
     isMaster: event.msg_id == masterID,
-    guild_id: event.target_id, // 频道
+    guild_id: event.target_id, // 频道号
     guild_name: '',
     guild_avatar: '',
-    channel_name: '',
+    channel_name: event.extra.channel_name,
     channel_id: event.extra.code, // 子频道
     attachments: [],
     specials: [],

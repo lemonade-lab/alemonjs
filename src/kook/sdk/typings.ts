@@ -221,6 +221,9 @@ export interface SendMessageParams {
    * 消息内容
    */
   content: string
+  /**
+   * 引用--消息id
+   */
   quote?: string
   nonce?: string
   temp_target_id?: string

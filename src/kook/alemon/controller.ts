@@ -1,4 +1,5 @@
 import { ClientKOOK } from '../sdk/index.js'
+import { replyController } from './reply.js'
 
 interface UserInformationType {
   id: string
@@ -61,10 +62,14 @@ export const Controller = {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {},
+      ) => {
+        return await replyController(content, msg_id)
+      },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {},
+      ) => {
+        return await replyController(content, msg_id)
+      },
       /**
        * 更新信息
        * @param content
