@@ -1,6 +1,38 @@
 import { replyController } from './reply.js'
 
 export const Controller = {
+  Mumber: ({ guild_id, uid }) => {
+    return {
+      /**
+       * 查看信息
+       * @returns
+       */
+      information: async () => {
+        return false
+      },
+      /**
+       * 禁言
+       */
+      mute: async () => {
+        return false
+      },
+      /**
+       * 踢出
+       */
+      remove: async () => {
+        return false
+      },
+      /**
+       * 身分组
+       * @param role_id 身分组编号
+       * @param is_add 默认添加行为
+       * @returns
+       */
+      operate: async (role_id: string, add = true) => {
+        return false
+      }
+    }
+  },
   Message: ({ guild_id, channel_id, msg_id }) => {
     return {
       reply: async (
