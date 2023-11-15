@@ -40,9 +40,6 @@ export const AUDIO_ACTION = async (event: any) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: false,
-    isRecall: false,
-    isGroup: false,
     isMaster: false,
     guild_id: event.msg.guild_id,
     guild_name: '',
@@ -58,7 +55,6 @@ export const AUDIO_ACTION = async (event: any) => {
     at: false,
     at_user: undefined,
     at_users: [],
-    open_id: '',
     //
     user_id: '',
     user_avatar: '',

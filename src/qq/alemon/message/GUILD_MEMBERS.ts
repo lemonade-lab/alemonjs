@@ -58,9 +58,6 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: false,
-    isRecall: false,
-    isGroup: true,
     isMaster: masterID == event.msg.user.id,
     attachments: [],
     specials: [],
@@ -76,7 +73,6 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     msg: '',
     msg_txt: '',
     msg_id: '',
-    open_id: '',
     //
     user_id: event.msg.user.id,
     user_name: event.msg.user.username,

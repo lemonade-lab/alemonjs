@@ -85,9 +85,6 @@ export const PUBLIC_GUILD_MESSAGES = async (
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: false,
-    isRecall: false,
-    isGroup: true,
     isMaster: event.msg.author.id == masterID,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
@@ -103,7 +100,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     msg_id: event.msg.id,
     msg_txt: event.msg?.content ?? '',
     msg: event.msg?.content ?? '',
-    open_id: '',
+
     //
     user_id: event.msg.author.id,
     user_name: event.msg.author.username,
@@ -143,7 +140,6 @@ export const PUBLIC_GUILD_MESSAGES = async (
    */
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
-    e.isRecall = true
     return await typeMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))

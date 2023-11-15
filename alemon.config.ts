@@ -8,9 +8,4 @@ defineAlemonConfig({
       masterID: '13348342918169126729'
     }
   }
-  // ,
-  // server: {
-  //   state: true,
-  //   port: 6060
-  // }
 })

@@ -161,9 +161,6 @@ export async function MESSAGES(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isPrivate: false,
-    isGroup: true,
-    isRecall: false,
     isMaster: MessageContent.user.id == masterID,
     guild_id: String(SendMessage.villa_id),
     guild_name: '',
@@ -179,7 +176,7 @@ export async function MESSAGES(event: {
     msg_id: SendMessage.msg_uid,
     msg: msg,
     msg_txt: txt,
-    open_id: '',
+
     //
     user_id: MessageContent.user.id,
     user_name: MessageContent.user.name,

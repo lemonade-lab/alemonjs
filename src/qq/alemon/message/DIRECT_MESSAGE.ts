@@ -82,9 +82,6 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: false,
-    isRecall: false,
-    isGroup: false,
     isMaster: event.msg.author.id == masterID ? true : false,
     guild_id: event.msg.guild_id,
     guild_name: '',
@@ -100,7 +97,6 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     msg: event.msg?.content ?? '',
     msg_txt: event.msg?.content ?? '',
     msg_id: event.msg.id,
-    open_id: '',
     //
     user_id: event.msg.author.id,
     user_name: event.msg.author.username,
@@ -133,7 +129,6 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
    */
   if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
-    e.isRecall = true
     /**
      * 只匹配类型
      */

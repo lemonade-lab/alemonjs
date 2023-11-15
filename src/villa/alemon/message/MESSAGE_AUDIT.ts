@@ -64,18 +64,15 @@ export async function MESSAGE_AUDIT(event: {
    */
   const e = {
     platform: 'villa' as (typeof PlatformEnum)[number],
-    boundaries: 'publick' as 'publick' | 'private',
-    attribute: 'group' as 'group' | 'single',
     event: 'MESSAGE_AUDIT' as (typeof EventEnum)[number],
     eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: {
       id: event.robot.template.id,
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isPrivate: false,
-    isGroup: true,
-    isRecall: false,
     isMaster: masterID == String(AuditCallback.user_id),
     guild_id: String(AuditCallback.villa_id),
     guild_name: '',
@@ -91,7 +88,7 @@ export async function MESSAGE_AUDIT(event: {
     msg: '',
     msg_id: AuditCallback.audit_id,
     msg_txt: '',
-    open_id: '',
+
     //
     user_id: String(AuditCallback.user_id),
     user_name: '', // dodo 可权限获得

@@ -38,9 +38,6 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByNtqq(),
     isMaster: event.author.id == masterID ? true : false,
-    isPrivate: false,
-    isRecall: false,
-    isGroup: false,
     channel_id: event.author.user_openid, // 私聊重置为用户open编号
     guild_name: '',
     guild_avatar: '',
@@ -55,7 +52,6 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     msg_txt: event.content,
     msg: event.content,
     msg_id: event.id,
-    open_id: '',
     //
     user_id: event.author.id,
     user_name: '柠檬冲水',

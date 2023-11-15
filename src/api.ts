@@ -38,38 +38,59 @@ import { type MessageControllerType } from './core/index.js'
 // 当前可用平台
 const PlatformEnum = ['villa', 'qq', 'kook', 'ntqq', 'one'] as const
 
+interface OptionType {
+  /**
+   * 频道号
+   */
+  guild_id?: string
+  /**
+   * 子频道号
+   */
+  channel_id?: string
+  /**
+   * 消息编号
+   */
+  msg_id?: string
+  /**
+   * 消息创建时间
+   */
+  send_at?: number
+}
+
 /**
  * 控制器
- * @param options
+ * @param platform
  * @returns
  */
-export const Controller = (options: {
-  platform: (typeof PlatformEnum)[number]
-  guild_id?: string
-  channel_id?: string
-  msg_id?: string
-  send_at?: number
-}) => {
-  const map: {
-    [Event in (typeof PlatformEnum)[number]]: {
-      Message: MessageControllerType
+export const Controller = (platform: (typeof PlatformEnum)[number]) => {
+  /**
+   * 选择器
+   * @param options
+   * @returns
+   */
+  const fnc = (
+    options: OptionType
+  ): {
+    Message: MessageControllerType
+  } => {
+    const map = {
+      villa: {
+        Message: villaController.Message(options as any)
+      },
+      qq: {
+        Message: qqController.Message(options as any)
+      },
+      ntqq: {
+        Message: ntqqController.Message(options as any)
+      },
+      kook: {
+        Message: kookController.Message(options as any)
+      },
+      one: {
+        Message: oneController.Message(options as any)
+      }
     }
-  } = {
-    villa: {
-      Message: villaController.Message(options as any)
-    },
-    qq: {
-      Message: qqController.Message(options as any)
-    },
-    ntqq: {
-      Message: ntqqController.Message(options as any)
-    },
-    kook: {
-      Message: kookController.Message(options as any)
-    },
-    one: {
-      Message: oneController.Message(options as any)
-    }
+    return map[platform]
   }
-  return map[options.platform]
+  return fnc
 }

@@ -40,9 +40,6 @@ export async function MESSAGES(event: EventGroup) {
         : ('group' as 'group' | 'single'),
     bot: getBotMsgByONE(),
     isMaster: event.user_id == masterID ? true : false,
-    isRecall: false,
-    isGroup: event.detail_type == 'private' ? true : false,
-    isPrivate: event.detail_type == 'private' ? true : false,
     msg_txt: event.raw_message,
     user_id: event.user_id,
     user_avatar:
@@ -62,7 +59,6 @@ export async function MESSAGES(event: EventGroup) {
     specials: [],
     msg: event.raw_message.trim(),
     msg_id: event.message_id,
-    open_id: '',
     segment: segmentONE,
     Message,
     send_at: new Date().getTime(),

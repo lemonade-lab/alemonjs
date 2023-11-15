@@ -460,7 +460,7 @@ export async function InstructionMatching(e: AMessage) {
   /**
    *  撤回事件 || 匹配不到事件 || 大正则不匹配
    */
-  if (e.isRecall || !Command[e.event] || !mergedRegex.test(e.msg)) return true
+  if (!Command[e.event] || !mergedRegex.test(e.msg)) return true
 
   /**
    * 循环所有指令

@@ -66,20 +66,17 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
    */
   const e = {
     platform: 'villa' as (typeof PlatformEnum)[number],
-    boundaries: 'publick' as 'publick' | 'private',
-    attribute: 'group' as 'group' | 'single',
     event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
     eventType: event.extend_data.EventData.AddQuickEmoticon.is_cancel
       ? 'DELETE'
       : ('CREATE' as (typeof EventType)[number]),
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: {
       id: event.robot.template.id,
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isPrivate: false,
-    isGroup: true,
-    isRecall: false,
     isMaster: masterID == String(AddQuickEmoticon.uid),
     guild_id: String(AddQuickEmoticon.villa_id),
     guild_name: '',
@@ -103,7 +100,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     msg: '',
     msg_id: AddQuickEmoticon.msg_uid,
     msg_txt: '',
-    open_id: '',
+
     //
     user_id: String(AddQuickEmoticon.uid),
     user_name: '', // dodo 可权限获得

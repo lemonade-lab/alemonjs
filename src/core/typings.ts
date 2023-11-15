@@ -131,14 +131,6 @@ interface Serverbase {
    */
   channel_id: string
   /**
-   * 是否是私域
-   */
-  isPrivate: boolean
-  /**
-   * 是否是群聊
-   */
-  isGroup: boolean
-  /**
    * 公域 | 私域
    */
   boundaries: 'publick' | 'private'
@@ -171,10 +163,6 @@ interface MsgBase {
    */
   msg_id: string
   /**
-   * 对话编号
-   */
-  open_id: string
-  /**
    * 消息创建时间
    */
   send_at: number
@@ -198,10 +186,6 @@ interface MsgBase {
    * 快捷接口
    */
   segment: SegmentType
-  /**
-   * 是否是撤回
-   */
-  isRecall: boolean
 }
 
 /**

@@ -32,9 +32,6 @@ export const INTERACTION = async event => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: false,
-    isRecall: false,
-    isGroup: false,
     isMaster: false,
     attachments: [],
     specials: [],
@@ -50,7 +47,7 @@ export const INTERACTION = async event => {
     msg: '',
     msg_id: '',
     msg_txt: '',
-    open_id: '',
+
     //
     user_id: '',
     user_name: '',

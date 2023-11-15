@@ -52,9 +52,6 @@ export const GUILD_MESSAGE_REACTIONS = async (
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: true,
-    isRecall: false,
-    isGroup: false,
     isMaster: event.msg.user_id == masterID,
     guild_id: event.msg.guild_id,
     guild_name: '',
@@ -78,7 +75,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
     msg: '',
     msg_id: event.msg.target.id,
     msg_txt: '',
-    open_id: '',
+
     //
     user_id: event.msg.user_id,
     user_name: '',

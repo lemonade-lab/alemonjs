@@ -82,9 +82,6 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: getBotMsgByKOOK(),
-    isPrivate: true, //  kook没私域
-    isRecall: false,
-    isGroup: event.channel_type == 'GROUP' ? true : false,
     isMaster: event.msg_id == masterID ? true : false,
     guild_id: event.target_id, // 频道
     guild_name: '',
@@ -100,7 +97,6 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     msg,
     msg_txt: event.content,
     msg_id: event.msg_id,
-    open_id: '',
     //
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,

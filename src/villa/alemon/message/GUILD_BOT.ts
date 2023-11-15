@@ -57,19 +57,16 @@ export async function GUILD_BOT(event: {
    */
   const e = {
     platform: 'villa' as (typeof PlatformEnum)[number],
-    boundaries: 'publick' as 'publick' | 'private',
-    attribute: 'group' as 'group' | 'single',
     event: 'GUILD_BOT' as (typeof EventEnum)[number],
     eventType:
       event.type == 3 ? 'CREATE' : ('DELETE' as (typeof EventType)[number]),
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
     bot: {
       id: event.robot.template.id,
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isPrivate: false,
-    isGroup: true,
-    isRecall: false,
     isMaster: false,
     guild_id: String(DeleteRobot.villa_id),
     guild_name: '',
@@ -85,7 +82,7 @@ export async function GUILD_BOT(event: {
     msg: '',
     msg_id: event.id,
     msg_txt: '',
-    open_id: '',
+
     //
     user_id: '',
     user_name: '',

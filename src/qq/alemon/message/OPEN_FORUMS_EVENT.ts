@@ -85,9 +85,6 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: false,
-    isRecall: false,
-    isGroup: false,
     isMaster: false,
     attachments: [],
     specials: [JSON.parse(event.msg.thread_info.content)],
@@ -103,7 +100,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     msg_id: '',
     msg_txt: '',
     msg: '',
-    open_id: '',
+
     //
     user_id: '',
     user_name: '',

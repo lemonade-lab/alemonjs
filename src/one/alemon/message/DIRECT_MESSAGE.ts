@@ -39,9 +39,6 @@ export async function DIRECT_MESSAGE(event: Event) {
         : ('group' as 'group' | 'single'),
     bot: getBotMsgByONE(),
     isMaster: event.user_id == masterID,
-    isRecall: false,
-    isGroup: event.detail_type == 'private' ? true : false,
-    isPrivate: event.detail_type == 'private' ? true : false,
     guild_id: '',
     guild_name: '',
     guild_avatar: '',
@@ -56,7 +53,6 @@ export async function DIRECT_MESSAGE(event: Event) {
     msg_txt: event.raw_message,
     msg: event.raw_message.trim(),
     msg_id: event.message_id,
-    open_id: '',
     //
     user_id: event.user_id,
     user_avatar:

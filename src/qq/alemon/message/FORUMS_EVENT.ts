@@ -89,10 +89,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isPrivate: false,
-    isRecall: false,
     isMaster: false,
-    isGroup: false,
     guild_id: event.msg.guild_id,
     guild_name: '',
     guild_avatar: '',
@@ -107,7 +104,6 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
-    open_id: '',
     //
     user_id: '',
     user_name: '',
