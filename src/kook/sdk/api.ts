@@ -217,3 +217,30 @@ export async function guildKickout(
     }
   }).then(res => res.data)
 }
+
+/**
+ * 创建角色
+ * @param channel_id
+ * @param type
+ * @param value
+ * @returns
+ */
+export async function channelRoleCreate(
+  channel_id: string,
+  type: string,
+  value: string
+): Promise<{
+  code: number
+  message: string
+  data: any
+}> {
+  return kookService({
+    method: 'post',
+    url: ApiEnum.ChannelRoleCreate,
+    data: {
+      channel_id,
+      type,
+      value
+    }
+  }).then(res => res.data)
+}

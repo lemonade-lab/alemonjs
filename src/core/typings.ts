@@ -368,6 +368,36 @@ export interface ReplyBase {
      */
     send_at?: number
   }): MessageControllerType
+
+  /**
+   * 控制器
+   * @param select 选择绑定
+   */
+  Member(select?: {
+    /**
+     * 频道号
+     */
+    guild_id?: string
+    /**
+     * 子频道号
+     */
+    channel_id?: string
+    /**
+     * 消息编号
+     */
+    msg_id?: string
+    /**
+     * 消息创建时间
+     */
+    send_at?: number
+  }): MemberControllerType
+}
+
+export interface MemberControllerType {
+  information: () => Promise<any>
+  mute: (select: { time?: number; is?: boolean }) => Promise<any>
+  remove: () => Promise<any>
+  operate: (role_id: string, add?: boolean) => Promise<any>
 }
 
 export interface MessageControllerType {

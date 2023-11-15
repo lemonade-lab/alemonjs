@@ -33,7 +33,10 @@ import { Controller as qqController } from './qq/alemon/controller.js'
 import { Controller as ntqqController } from './ntqq/alemon/controller.js'
 import { Controller as kookController } from './kook/alemon/controller.js'
 import { Controller as oneController } from './one/alemon/controller.js'
-import { type MessageControllerType } from './core/index.js'
+import {
+  type MessageControllerType,
+  type MemberControllerType
+} from './core/index.js'
 
 // 当前可用平台
 const PlatformEnum = ['villa', 'qq', 'kook', 'ntqq', 'one'] as const
@@ -72,33 +75,28 @@ export const Controller = (platform: (typeof PlatformEnum)[number]) => {
     options: OptionType
   ): {
     Message: MessageControllerType
-    Mumber: {
-      information: () => Promise<any>
-      mute: (select: { time?: number; is?: boolean }) => Promise<any>
-      remove: () => Promise<any>
-      operate: (role_id: string, add?: boolean) => Promise<any>
-    }
+    Member: MemberControllerType
   } => {
     const map = {
       villa: {
         Message: villaController.Message(options as any),
-        Mumber: villaController.Mumber(options as any)
+        Member: villaController.Member(options as any)
       },
       qq: {
         Message: qqController.Message(options as any),
-        Mumber: qqController.Mumber(options as any)
+        Member: qqController.Member(options as any)
       },
       ntqq: {
         Message: ntqqController.Message(options as any),
-        Mumber: ntqqController.Mumber(options as any)
+        Member: ntqqController.Member(options as any)
       },
       kook: {
         Message: kookController.Message(options as any),
-        Mumber: kookController.Mumber(options as any)
+        Member: kookController.Member(options as any)
       },
       one: {
         Message: oneController.Message(options as any),
-        Mumber: oneController.Mumber(options as any)
+        Member: oneController.Member(options as any)
       }
     }
     return map[platform]

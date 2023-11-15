@@ -12,7 +12,7 @@ interface UserInformationType {
 }
 
 export const Controller = {
-  Mumber: ({ guild_id, user_id }) => {
+  Member: ({ guild_id, user_id }) => {
     return {
       /**
        * 查看信息
@@ -213,7 +213,7 @@ export const ClientControllerOnMember = (data?: {
   return (select?: { guild_id?: string; user_id?: string }) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const user_id = select?.guild_id ?? data.user_id
-    return Controller.Mumber({ guild_id, user_id })
+    return Controller.Member({ guild_id, user_id })
   }
 }
 
