@@ -46,7 +46,7 @@ export function createClient(
       /**
        * 从请求体中获取事件对象
        */
-      const event = ctx.request.body?.event
+      const { event } = ctx.request.body as any
       /**
        * 错误调用
        */
