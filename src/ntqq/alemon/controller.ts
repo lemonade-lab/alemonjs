@@ -1,5 +1,15 @@
 import { replyController } from './reply.js'
 
+interface UserInformationType {
+  id: string
+  name: string
+  introduce: string
+  bot: boolean
+  avatar: string
+  joined_at: number
+  role: any[]
+}
+
 export const Controller = {
   Mumber: ({ guild_id, user_id }) => {
     return {
@@ -45,13 +55,40 @@ export const Controller = {
       ) => {
         return await replyController(content, guild_id, msg_id)
       },
-      withdraw: async (hideTip: boolean) => {},
-      pinning: async (cancel?: boolean) => {},
-      forward: async () => {},
-      horn: async (cancel?: boolean) => {},
-      emoji: async (msg: any[], cancel?: boolean) => {},
-      card: async (msg: any[]) => {},
-      allEmoji: async () => {}
+      /**
+       * 更新信息
+       * @param content
+       * @returns
+       */
+      update: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return false
+      },
+      delete: async () => {
+        return false
+      },
+      withdraw: async (hideTip: boolean) => {
+        return false
+      },
+      pinning: async (cancel?: boolean) => {
+        return false
+      },
+      forward: async () => {
+        return false
+      },
+      horn: async (cancel?: boolean) => {
+        return false
+      },
+      emoji: async (msg: any[], cancel?: boolean) => {
+        return []
+      },
+      card: async (msg: any[]) => {
+        return []
+      },
+      allEmoji: async () => {
+        return false
+      }
     }
   }
 }

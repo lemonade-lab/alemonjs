@@ -386,6 +386,16 @@ export interface MessageControllerType {
     content: Buffer | string | number | (Buffer | number | string)[]
   ): Promise<any>
   /**
+   * 更新信息
+   */
+  update(
+    content: Buffer | string | number | (Buffer | number | string)[]
+  ): Promise<any>
+  /**
+   * 删除信息
+   */
+  delete(): Promise<any>
+  /**
    * 撤回
    * @param time 撤回时间
    */
@@ -409,11 +419,11 @@ export interface MessageControllerType {
    * @param msg 表情
    * @param cancel 取消
    */
-  emoji(msg: any[], cancel?: boolean): Promise<any>
+  emoji(msg: any[], cancel?: boolean): Promise<any[]>
   /**
    * 发送卡片
    */
-  card(msg: CardType[]): Promise<any>
+  card(msg: CardType[]): Promise<any[]>
   /**
    * 该消息所有表态
    */

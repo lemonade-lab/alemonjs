@@ -1,6 +1,14 @@
-import { everyoneError } from '../../log/index.js'
-import IMGS from 'image-size'
-import { getUrlbuffer } from '../../core/index.js'
+import { ClientKOOK } from '../sdk/index.js'
+
+interface UserInformationType {
+  id: string
+  name: string
+  introduce: string
+  bot: boolean
+  avatar: string
+  joined_at: number
+  role: any[]
+}
 
 export const Controller = {
   Mumber: ({ guild_id, user_id }) => {
@@ -9,7 +17,21 @@ export const Controller = {
        * 查看信息
        * @returns
        */
-      information: async () => {
+      information: async (): Promise<UserInformationType | false> => {
+        const data = await ClientKOOK.userView(guild_id, user_id).then(
+          res => res.data
+        )
+        if (data) {
+          return {
+            id: data.id,
+            name: data.username,
+            introduce: '',
+            bot: data.bot,
+            avatar: data.avatar,
+            joined_at: data.joined_at,
+            role: data.roles
+          }
+        }
         return false
       },
       /**
@@ -22,7 +44,7 @@ export const Controller = {
        * 踢出
        */
       remove: async () => {
-        return false
+        return await ClientKOOK.guildKickout(guild_id, user_id)
       },
       /**
        * 身分组
@@ -43,13 +65,40 @@ export const Controller = {
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {},
-      withdraw: async (hideTip: boolean) => {},
-      pinning: async (cancel?: boolean) => {},
-      forward: async () => {},
-      horn: async (cancel?: boolean) => {},
-      emoji: async (msg: any[], cancel?: boolean) => {},
-      card: async (msg: any[]) => {},
-      allEmoji: async () => {}
+      /**
+       * 更新信息
+       * @param content
+       * @returns
+       */
+      update: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return false
+      },
+      delete: async () => {
+        return false
+      },
+      withdraw: async (hideTip: boolean) => {
+        return false
+      },
+      pinning: async (cancel?: boolean) => {
+        return false
+      },
+      forward: async () => {
+        return false
+      },
+      horn: async (cancel?: boolean) => {
+        return false
+      },
+      emoji: async (msg: any[], cancel?: boolean) => {
+        return []
+      },
+      card: async (msg: any[]) => {
+        return []
+      },
+      allEmoji: async () => {
+        return false
+      }
     }
   }
 }

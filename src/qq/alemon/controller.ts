@@ -1,26 +1,62 @@
+import { IMember } from 'qq-guild-bot'
 import { replyController } from './reply.js'
 
+interface UserInformationType {
+  id: string
+  name: string
+  introduce: string
+  bot: boolean
+  avatar: string
+  joined_at: number
+  role: any[]
+}
+
 export const Controller = {
-  Mumber: ({ guild_id, user_id }) => {
+  Mumber: ({ guild_id, user_id, channel_id }) => {
     return {
       /**
        * 查看信息
        * @returns
        */
-      information: async () => {
+      information: async (): Promise<UserInformationType | false> => {
+        const data: IMember = await ClientQQ.guildApi
+          .guildMember(guild_id, user_id)
+          .then(res => res.data)
+
+        if (data) {
+          return {
+            id: data.user.id,
+            name: data.user.username,
+            avatar: data.user.avatar,
+            introduce: '',
+            joined_at: new Date(data.joined_at).getTime(),
+            bot: data.user.bot,
+            role: data.roles
+          }
+        }
         return false
       },
       /**
        * 禁言
+       * @param param0
+       * @returns
        */
-      mute: async () => {
-        return false
+      mute: async ({ time = 60000, is = true }) => {
+        if (is) {
+          return await ClientQQ.muteApi.muteMember(guild_id, user_id, {
+            seconds: String(time / 1000)
+          })
+        } else {
+          return await ClientQQ.muteApi.muteMember(guild_id, user_id, {
+            seconds: '0'
+          })
+        }
       },
       /**
        * 踢出
        */
       remove: async () => {
-        return false
+        return await ClientQQ.guildApi.deleteGuildMember(guild_id, user_id)
       },
       /**
        * 身分组
@@ -29,7 +65,21 @@ export const Controller = {
        * @returns
        */
       operate: async (role_id: string, add = true) => {
-        return false
+        if (add) {
+          return await ClientQQ.memberApi.memberAddRole(
+            guild_id,
+            role_id,
+            user_id,
+            channel_id
+          )
+        } else {
+          return await ClientQQ.memberApi.memberDeleteRole(
+            guild_id,
+            role_id,
+            user_id,
+            channel_id
+          )
+        }
       }
     }
   },
@@ -46,6 +96,19 @@ export const Controller = {
         return await replyController(content, channel_id, msg_id, {
           quote: msg_id
         })
+      },
+      /**
+       * 更新信息
+       * @param content
+       * @returns
+       */
+      update: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return false
+      },
+      delete: async () => {
+        return false
       },
       withdraw: async (hideTip = true) => {
         return await ClientQQ.messageApi.deleteMessage(
@@ -81,29 +144,42 @@ export const Controller = {
       },
       emoji: async (msg: any[], cancel?: boolean) => {
         // 不同的场景下 api不同  私聊是不具有这么多功能的
+        const arr: any[] = []
         if (cancel) {
-          // 是数组形式的表态
-          const arr: any[] = []
           for (const item of msg) {
             arr.push(
-              await ClientQQ.reactionApi.deleteReaction(channel_id, item)
+              await ClientQQ.reactionApi.deleteReaction(channel_id, {
+                message_id: msg_id,
+                ...item
+              })
             )
           }
           return arr
         }
-        // 是数组形式的表态
-        const arr: any[] = []
         for (const item of msg) {
-          arr.push(await ClientQQ.reactionApi.postReaction(channel_id, item))
+          arr.push(
+            await ClientQQ.reactionApi.postReaction(channel_id, {
+              message_id: msg_id,
+              ...item
+            })
+          )
         }
         return arr
       },
       card: async (msg: any[]) => {
         // 卡片消息
-        return []
+        const arr: any[] = []
+        for (const item of msg) {
+          arr.push(
+            await ClientQQ.messageApi.postMessage(channel_id, {
+              msg_id: msg_id,
+              ...item
+            })
+          )
+        }
+        return arr
       },
       allEmoji: async () => {
-        //
         return false
       },
       byEmoji: async (

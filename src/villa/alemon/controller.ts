@@ -1,6 +1,16 @@
 import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
 
+interface UserInformationType {
+  id: string
+  name: string
+  introduce: string
+  avatar: string
+  bot: boolean
+  joined_at: number
+  role: any[]
+}
+
 export const Controller = {
   Mumber: ({ guild_id, user_id }) => {
     return {
@@ -8,7 +18,7 @@ export const Controller = {
        * 查看信息
        * @returns
        */
-      information: async () => {
+      information: async (): Promise<UserInformationType | false> => {
         // 对进行进行过滤,并以固定格式返回
         const data = await ClientVILLA.getMember(guild_id, user_id).then(
           res => res.data
@@ -29,13 +39,15 @@ export const Controller = {
           name: data.member.basic.nickname,
           introduce: '',
           avatar: data.member.basic.avatar,
+          joined_at: 0,
+          bot: false,
           role: []
         }
       },
       /**
        * 禁言
        */
-      mute: async () => {
+      mute: async ({ time = 60000, is = true }) => {
         //
       },
       /**
@@ -82,6 +94,19 @@ export const Controller = {
       ) => {
         // villa未有回复api
         return await replyController(guild_id, channel_id, content)
+      },
+      /**
+       * 更新信息
+       * @param content
+       * @returns
+       */
+      update: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return false
+      },
+      delete: async () => {
+        return false
       },
       /**
        * 撤回

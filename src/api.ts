@@ -74,7 +74,7 @@ export const Controller = (platform: (typeof PlatformEnum)[number]) => {
     Message: MessageControllerType
     Mumber: {
       information: () => Promise<any>
-      mute: () => Promise<any>
+      mute: (select: { time?: number; is?: boolean }) => Promise<any>
       remove: () => Promise<any>
       operate: (role_id: string, add?: boolean) => Promise<any>
     }

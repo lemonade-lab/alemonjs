@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
 import { Readable } from 'stream'
 import {
@@ -15,7 +15,7 @@ import { createPicFrom } from '../../core/index.js'
  * @param config
  * @returns
  */
-export function kookService(config: object) {
+export function kookService(config: AxiosRequestConfig) {
   const token = getKookToken()
   const service = axios.create({
     baseURL: 'https://www.kookapp.cn',
@@ -71,21 +71,6 @@ export async function createUrl(formdata): Promise<{
 
 /**
  * *********
- * 用户api
- * **********
- */
-
-export async function getBotInformation(): Promise<{
-  data: BotInformation
-}> {
-  return await kookService({
-    method: 'post',
-    url: ApiEnum.UserMe
-  }).then(res => res.data)
-}
-
-/**
- * *********
  * 消息api
  * *********
  */
@@ -131,5 +116,104 @@ export async function createDirectMessage(
     method: 'post',
     url: ApiEnum.DirectMessageCreate,
     data
+  }).then(res => res.data)
+}
+
+/**
+ * **********
+ * user
+ * *********
+ */
+
+/**
+ * 得到当前信息
+ * @param guild_id
+ * @param user_id
+ * @returns
+ */
+export async function userMe(): Promise<{
+  code: number
+  message: string
+  data: {
+    id: string
+    username: string
+    identify_num: string
+    online: false
+    os: string
+    status: number
+    avatar: string
+    banner: string
+    bot: true
+    mobile_verified: true
+    client_id: string
+    mobile_prefix: string
+    mobile: string
+    invited_count: number
+  }
+}> {
+  return kookService({
+    method: 'get',
+    url: ApiEnum.UserMe
+  }).then(res => res.data)
+}
+
+/**
+ * 得到用户信息
+ * @param guild_id
+ * @param user_id
+ * @returns
+ */
+export async function userView(
+  guild_id: string,
+  user_id: string
+): Promise<{
+  code: number
+  message: string
+  data: {
+    id: string
+    username: string
+    identify_num: string
+    online: false
+    status: 0
+    bot: true
+    avatar: string
+    vip_avatar: string
+    mobile_verified: true
+    roles: number[]
+    joined_at: number
+    active_time: number
+  }
+}> {
+  return kookService({
+    method: 'get',
+    url: ApiEnum.UserView,
+    params: {
+      guild_id,
+      user_id
+    }
+  }).then(res => res.data)
+}
+
+/**
+ * 踢出
+ * @param guild_id
+ * @param user_id
+ * @returns
+ */
+export async function guildKickout(
+  guild_id: string,
+  user_id: string
+): Promise<{
+  code: number
+  message: string
+  data: any
+}> {
+  return kookService({
+    method: 'post',
+    url: ApiEnum.GuildKickout,
+    data: {
+      guild_id,
+      target_id: user_id
+    }
   }).then(res => res.data)
 }

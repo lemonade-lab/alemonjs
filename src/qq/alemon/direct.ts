@@ -34,6 +34,19 @@ export const ClientDirectController = (data: {
       ) => {
         return await directController(content, guild_id, msg_id)
       },
+      /**
+       * 更新信息
+       * @param content
+       * @returns
+       */
+      update: async (
+        content: Buffer | string | number | (Buffer | number | string)[]
+      ) => {
+        return false
+      },
+      delete: async () => {
+        return false
+      },
       withdraw: async (hideTip = true) => {
         return false
       },
