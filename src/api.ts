@@ -72,22 +72,33 @@ export const Controller = (platform: (typeof PlatformEnum)[number]) => {
     options: OptionType
   ): {
     Message: MessageControllerType
+    Mumber: {
+      information: () => Promise<any>
+      mute: () => Promise<any>
+      remove: () => Promise<any>
+      operate: (role_id: string, add?: boolean) => Promise<any>
+    }
   } => {
     const map = {
       villa: {
-        Message: villaController.Message(options as any)
+        Message: villaController.Message(options as any),
+        Mumber: villaController.Mumber(options as any)
       },
       qq: {
-        Message: qqController.Message(options as any)
+        Message: qqController.Message(options as any),
+        Mumber: qqController.Mumber(options as any)
       },
       ntqq: {
-        Message: ntqqController.Message(options as any)
+        Message: ntqqController.Message(options as any),
+        Mumber: ntqqController.Mumber(options as any)
       },
       kook: {
-        Message: kookController.Message(options as any)
+        Message: kookController.Message(options as any),
+        Mumber: kookController.Mumber(options as any)
       },
       one: {
-        Message: oneController.Message(options as any)
+        Message: oneController.Message(options as any),
+        Mumber: oneController.Mumber(options as any)
       }
     }
     return map[platform]
