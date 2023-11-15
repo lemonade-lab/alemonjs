@@ -1,5 +1,4 @@
 import {
-  UserType,
   InstructionMatching,
   PlatformEnum,
   EventEnum,
@@ -14,54 +13,14 @@ import { ClientController } from '../controller.js'
 import { directController } from '../direct.js'
 
 /**
- *
  * @param event
  * @returns
  */
 export const DIRECT_MESSAGE = async (event: EventData) => {
-  if (event.extra.author.bot) {
-    return false
-  }
-  let at = false
-  const at_users: UserType[] = []
-  let msg = event.content
-  /**
-   * 艾特类型所得到的
-   * 包括机器人在内
-   */
-  const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? []
-  for await (const item of mention_role_part) {
-    at = true
-    at_users.push({
-      id: item.role_id,
-      name: item.name,
-      avatar: 'string',
-      bot: true
-    })
-    msg = msg.replace(`(rol)${item.role_id}(rol)`, '').trim()
-  }
-  /**
-   * 艾特用户所得到的
-   */
-  const mention_part = event.extra.kmarkdown?.mention_part ?? []
-  for await (const item of mention_part) {
-    at = true
-    at_users.push({
-      id: item.id,
-      name: item.username,
-      avatar: item.avatar,
-      bot: false
-    })
-    msg = msg.replace(`(met)${item.id}(met)`, '').trim()
-  }
+  if (event.extra.author.bot) return false
+  //
   const cfg = getBotConfigByKey('kook')
   const masterID = cfg.masterID
-  let at_user = undefined
-  if (at) {
-    if (at_users[0] && at_users[0].bot != true) {
-      at_user = at_users[0]
-    }
-  }
 
   const avatar = event.extra.author.avatar
 
@@ -82,10 +41,10 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: getBotMsgByKOOK(),
-    isPrivate: true, //  kook没私域
+    isPrivate: true,
     isRecall: false,
-    isGroup: event.channel_type == 'GROUP' ? true : false,
-    isMaster: event.msg_id == masterID ? true : false,
+    isGroup: event.channel_type == 'GROUP',
+    isMaster: event.msg_id == masterID,
     guild_id: event.target_id, // 频道
     guild_name: '',
     guild_avatar: '',
@@ -94,10 +53,10 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     attachments: [],
     specials: [],
     //
-    at,
-    at_users,
-    at_user,
-    msg,
+    at: false,
+    at_users: [],
+    at_user: undefined,
+    msg: event.content,
     msg_txt: event.content,
     msg_id: event.msg_id,
     open_id: '',

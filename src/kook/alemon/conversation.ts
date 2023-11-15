@@ -71,10 +71,8 @@ const ConversationMap = {
 export async function callBackByKOOK(event: EventData | SystemData) {
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     if (event.channel_type == 'GROUP') {
-      // 公的
       return await ConversationMap[event.type]['public'](event)
     } else {
-      // 私的
       return await ConversationMap[event.type]['direct'](event)
     }
   }
