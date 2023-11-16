@@ -85,9 +85,6 @@ export const Controller = {
       card: async (msg: any[]) => {
         return []
       },
-      allEmoji: async () => {
-        return false
-      },
       allUsers: async (
         obj: any,
         options = {

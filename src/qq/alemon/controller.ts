@@ -185,9 +185,6 @@ export const Controller = {
         }
         return arr
       },
-      allEmoji: async () => {
-        return false
-      },
       allUsers: async (
         reactionObj: any,
         options = {

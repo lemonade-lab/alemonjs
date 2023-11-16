@@ -167,15 +167,6 @@ export const Controller = {
       card: async (msg: any[]) => {
         return []
       },
-      /**
-       * 所有表态
-       * @returns
-       */
-      allEmoji: async () => {
-        return await ClientVILLA.getAllEmoticons(guild_id, msg_id).then(
-          res => res.data?.list
-        )
-      },
       allUsers: async (
         reactionObj: any,
         options = {

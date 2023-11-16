@@ -94,9 +94,6 @@ const Controller = {
         // 卡片消息
         return []
       },
-      allEmoji: async () => {
-        return false
-      },
       allUsers: async (
         reactionObj: any,
         options = {

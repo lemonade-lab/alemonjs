@@ -132,10 +132,6 @@ export const Controller = {
           })
         ]
       },
-      allEmoji: async () => {
-        // 该消息的所有emoji
-        return false
-      },
       allUsers: async (
         emoji?: any,
         options = {

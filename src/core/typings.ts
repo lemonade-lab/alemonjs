@@ -491,10 +491,6 @@ export interface MessageControllerType {
    */
   card(msg: any[]): Promise<any[]>
   /**
-   * 该消息所有表态
-   */
-  allEmoji(): Promise<any>
-  /**
    * 得到指定消息的 指定 表情 下的 所有用户
    * @param msg
    */

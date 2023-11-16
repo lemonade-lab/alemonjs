@@ -722,15 +722,11 @@ export async function getMemberRoleInfo(
  */
 
 /**
- * 获取获取指定消息的全量表情
+ * 获得平台所有表态表情列表
  * @param villa_id 别野编号
  * @returns
- * type = villa_id
  */
-export async function getAllEmoticons(
-  villa_id: number | string,
-  msg_uid: string
-): Promise<{
+export async function getAllEmoticons(villa_id: number | string): Promise<{
   data: {
     list: Emoticon[]
   }
@@ -739,9 +735,6 @@ export async function getAllEmoticons(
     method: 'get',
     headers: {
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
-    },
-    params: {
-      msg_uid
     },
     url: ApiEnum.getAllEmoticons
   }).then(res => res.data)
