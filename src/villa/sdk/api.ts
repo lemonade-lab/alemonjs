@@ -723,6 +723,8 @@ export async function getMemberRoleInfo(
 
 /**
  * 获得平台所有表态表情列表
+ * 表情在平台中从左到右排序
+ * id从1开始
  * @param villa_id 别野编号
  * @returns
  */

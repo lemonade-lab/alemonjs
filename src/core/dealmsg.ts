@@ -157,12 +157,8 @@ async function synthesis(AppName: string, AppsObj: object) {
     }
 
     for await (const key of keys['rule']) {
-      if (
-        !key['fnc'] ||
-        !key['reg'] ||
-        typeof keys[key['fnc']] !== 'function'
-      ) {
-        /// 函数指定不存在,正则不存在 得到的不是函数
+      if (!key['fnc'] || typeof keys[key['fnc']] !== 'function') {
+        /// 函数指定不存在 得到的不是函数
         continue
       }
       // 先看指令优先级,没有就看类优先级,再没有则默认优先级
