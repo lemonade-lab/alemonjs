@@ -125,7 +125,7 @@ export async function GUILD_MEMBERS(event: {
       const room_id = select?.channel_id ?? false
       if (!room_id) return false
       return await replyController(villa_id, room_id, msg, {
-        quote: select.quote
+        quote: select?.quote
       })
     },
     Message,

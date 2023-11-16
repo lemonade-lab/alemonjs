@@ -133,7 +133,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
       const villa_id = select?.guild_id ?? AddQuickEmoticon.villa_id
       const room_id = select?.channel_id ?? AddQuickEmoticon.room_id
       return await replyController(villa_id, room_id, msg, {
-        quote: select.quote
+        quote: select?.quote
       })
     },
     Message,

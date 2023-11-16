@@ -122,7 +122,7 @@ export async function MESSAGE_AUDIT(event: {
       const villa_id = select?.guild_id ?? AuditCallback.villa_id
       const room_id = select?.channel_id ?? AuditCallback.room_id
       return await replyController(villa_id, room_id, msg, {
-        quote: select.quote
+        quote: select?.quote
       })
     },
     Message,
