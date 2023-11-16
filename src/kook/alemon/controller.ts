@@ -1,15 +1,6 @@
 import { ClientKOOK } from '../sdk/index.js'
 import { replyController } from './reply.js'
-
-interface UserInformationType {
-  id: string
-  name: string
-  introduce: string
-  bot: boolean
-  avatar: string
-  joined_at: number
-  role: any[]
-}
+import { ControllerOption, UserInformationType } from '../../core/index.js'
 
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
@@ -58,7 +49,7 @@ export const Controller = {
       }
     }
   },
-  Message: ({ guild_id, channel_id, msg_id }) => {
+  Message: ({ guild_id, channel_id, msg_id, user_id }) => {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -78,10 +69,10 @@ export const Controller = {
       update: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return false
+        return await ClientKOOK.messageUpdate({ msg_id, content })
       },
       withdraw: async (hideTip: boolean) => {
-        return false
+        return await ClientKOOK.messageDelete(msg_id)
       },
       pinning: async (cancel?: boolean) => {
         return false
@@ -93,13 +84,41 @@ export const Controller = {
         return false
       },
       emoji: async (msg: any[], cancel?: boolean) => {
-        return []
+        const arr: any[] = []
+        if (cancel) {
+          for (const item of msg) {
+            arr.push(
+              await ClientKOOK.messageDeleteReaction({
+                msg_id,
+                emoji: item,
+                user_id
+              })
+            )
+          }
+          return arr
+        }
+        for (const item of msg) {
+          arr.push(await ClientKOOK.messageAddReaction({ msg_id, emoji: item }))
+        }
+        return arr
       },
       card: async (msg: any[]) => {
+        // 卡片
         return []
       },
       allEmoji: async () => {
+        // 该消息的所有emoji
         return false
+      },
+      allUsers: async (
+        emoji?: any,
+        options = {
+          cookie: '',
+          limit: 20
+        }
+      ) => {
+        // 该消息下 指定emoji的所有用户
+        return await ClientKOOK.messageReactionList({ msg_id, emoji })
       }
     }
   }
@@ -115,17 +134,14 @@ export const ClientController = (data: {
   channel_id: string
   msg_id: string
   send_at: number
+  user_id: string
 }) => {
-  return (select?: {
-    guild_id?: string
-    channel_id?: string
-    msg_id?: string
-    send_at?: number
-  }) => {
+  return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
     const send_at = select?.send_at ?? data.send_at
-    return Controller.Message({ guild_id, channel_id, msg_id })
+    const user_id = select?.user_id ?? data.user_id
+    return Controller.Message({ guild_id, channel_id, msg_id, user_id })
   }
 }

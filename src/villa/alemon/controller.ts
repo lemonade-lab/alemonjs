@@ -1,15 +1,6 @@
 import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
-
-interface UserInformationType {
-  id: string
-  name: string
-  introduce: string
-  avatar: string
-  bot: boolean
-  joined_at: number
-  role: any[]
-}
+import { ControllerOption, UserInformationType } from '../../core/index.js'
 
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
@@ -168,6 +159,15 @@ export const Controller = {
        */
       allEmoji: async () => {
         return await ClientVILLA.getAllEmoticons(guild_id, msg_id)
+      },
+      allUsers: async (
+        reactionObj: any,
+        options = {
+          cookie: '',
+          limit: 20
+        }
+      ) => {
+        return false
       }
     }
   }
@@ -184,12 +184,7 @@ export const ClientControllerOnMessage = (data?: {
   msg_id: string
   send_at: number
 }) => {
-  return (select?: {
-    guild_id?: string
-    channel_id?: string
-    msg_id?: string
-    send_at?: number
-  }) => {
+  return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
@@ -207,7 +202,7 @@ export const ClientControllerOnMember = (data?: {
   guild_id: string | number
   user_id: string
 }) => {
-  return (select?: { guild_id?: string; user_id?: string }) => {
+  return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const user_id = select?.guild_id ?? data.user_id
     return Controller.Member({ guild_id, user_id })

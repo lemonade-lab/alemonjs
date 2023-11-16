@@ -35,30 +35,12 @@ import { Controller as kookController } from './kook/alemon/controller.js'
 import { Controller as oneController } from './one/alemon/controller.js'
 import {
   type MessageControllerType,
-  type MemberControllerType
+  type MemberControllerType,
+  type ControllerOption
 } from './core/index.js'
 
 // 当前可用平台
 const PlatformEnum = ['villa', 'qq', 'kook', 'ntqq', 'one'] as const
-
-interface OptionType {
-  /**
-   * 频道号
-   */
-  guild_id?: string
-  /**
-   * 子频道号
-   */
-  channel_id?: string
-  /**
-   * 消息编号
-   */
-  msg_id?: string
-  /**
-   * 消息创建时间
-   */
-  send_at?: number
-}
 
 /**
  * 控制器
@@ -72,7 +54,7 @@ export const Controller = (platform: (typeof PlatformEnum)[number]) => {
    * @returns
    */
   const fnc = (
-    options: OptionType
+    options: ControllerOption
   ): {
     Message: MessageControllerType
     Member: MemberControllerType

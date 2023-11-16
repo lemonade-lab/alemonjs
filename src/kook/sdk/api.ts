@@ -120,6 +120,126 @@ export async function createDirectMessage(
 }
 
 /**
+ * 删除指定消息
+ * @param msg_id
+ * @returns
+ */
+export async function messageDelete(msg_id: string): Promise<{
+  data: {
+    code: number
+    message: string
+    data: any[]
+  }
+}> {
+  return kookService({
+    method: 'post',
+    url: ApiEnum.MessageDelete,
+    data: {
+      msg_id
+    }
+  }).then(res => res.data)
+}
+
+/**
+ * 重编辑指定消息
+ * @param data
+ * @returns
+ */
+export async function messageUpdate(data: {
+  msg_id: string
+  content: any
+  quote?: string
+  temp_target_id?: string
+}): Promise<{
+  data: {
+    code: number
+    message: string
+    data: any[]
+  }
+}> {
+  return kookService({
+    method: 'post',
+    url: ApiEnum.MessageUpdate,
+    data
+  }).then(res => res.data)
+}
+
+/**
+ * 删回应
+ * @param data
+ * @returns
+ */
+export async function messageDeleteReaction(data: {
+  msg_id: string
+  emoji: string
+  user_id: string
+}): Promise<{
+  code: number
+  message: string
+  data: any[]
+}> {
+  return kookService({
+    method: 'post',
+    url: ApiEnum.MessageDeleteReaction,
+    data
+  }).then(res => res.data)
+}
+
+/**
+ * 发回应
+ * @param data
+ * @returns
+ */
+export async function messageAddReaction(data: {
+  msg_id: string
+  emoji: string
+}): Promise<{
+  code: number
+  message: string
+  data: any[]
+}> {
+  return kookService({
+    method: 'post',
+    url: ApiEnum.MessageAddReaction,
+    data
+  }).then(res => res.data)
+}
+
+/**
+ * 某个回应的所有用户
+ * @param data
+ * @returns
+ */
+export async function messageReactionList(params: {
+  msg_id: string
+  emoji: string
+}): Promise<{
+  code: number
+  message: string
+  data: {
+    id: string
+    username: string
+    identify_num: string
+    online: boolean
+    status: number
+    avatar: string
+    bot: boolean
+    tag_info: {
+      color: string
+      text: string
+    }
+    nickname: string
+    reaction_time: number
+  }
+}> {
+  return kookService({
+    method: 'get',
+    url: ApiEnum.MessageReactionList,
+    params
+  }).then(res => res.data)
+}
+
+/**
  * **********
  * user
  * *********

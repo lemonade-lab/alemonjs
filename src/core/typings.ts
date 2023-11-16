@@ -349,29 +349,38 @@ export interface ReplyBase {
   ): Promise<any>
 }
 
+/**
+ * 控制器可选参
+ */
+export interface ControllerOption {
+  /**
+   * 频道号
+   */
+  guild_id?: string
+  /**
+   * 子频道号
+   */
+  channel_id?: string
+  /**
+   * 消息编号
+   */
+  msg_id?: string
+  /**
+   * 消息创建时间
+   */
+  send_at?: number
+  /**
+   * 用户编号
+   */
+  user_id?: string
+}
+
 interface MemberControllerBase {
   /**
    * 控制器
    * @param select 选择绑定
    */
-  Member(select?: {
-    /**
-     * 频道号
-     */
-    guild_id?: string
-    /**
-     * 子频道号
-     */
-    channel_id?: string
-    /**
-     * 消息编号
-     */
-    msg_id?: string
-    /**
-     * 消息创建时间
-     */
-    send_at?: number
-  }): MemberControllerType
+  Member(select?: ControllerOption): MemberControllerType
 }
 
 interface MessageControllerBase {
@@ -379,31 +388,43 @@ interface MessageControllerBase {
    * 控制器
    * @param select 选择绑定
    */
-  Message(select?: {
-    /**
-     * 频道号
-     */
-    guild_id?: string
-    /**
-     * 子频道号
-     */
-    channel_id?: string
-    /**
-     * 消息编号
-     */
-    msg_id?: string
-    /**
-     * 消息创建时间
-     */
-    send_at?: number
-  }): MessageControllerType
+  Message(select?: ControllerOption): MessageControllerType
 }
 
 export interface MemberControllerType {
-  information: () => Promise<any>
+  /**
+   * 详细信息
+   * @returns
+   */
+  information: () => Promise<UserInformationType | false>
+  /**
+   * 禁言
+   * @param select 禁言参
+   * @returns
+   */
   mute: (select: { time?: number; is?: boolean }) => Promise<any>
+  /**
+   * 移出频道
+   * @returns
+   */
   remove: () => Promise<any>
+  /**
+   * 身份/角色控制
+   * @param role_id
+   * @param add
+   * @returns
+   */
   operate: (role_id: string, add?: boolean) => Promise<any>
+}
+
+export interface UserInformationType {
+  id: string
+  name: string
+  introduce: string
+  avatar: string
+  bot: boolean
+  joined_at: number
+  role: any[]
 }
 
 export interface MessageControllerType {
@@ -427,10 +448,6 @@ export interface MessageControllerType {
   update(
     content: Buffer | string | number | (Buffer | number | string)[]
   ): Promise<any>
-  /**
-   * 删除信息
-   */
-  delete(): Promise<any>
   /**
    * 撤回
    * @param time 撤回时间
@@ -468,5 +485,5 @@ export interface MessageControllerType {
    * 得到指定消息的 指定 表情 下的 所有用户
    * @param msg
    */
-  byEmoji?(msg: any, options: any): Promise<any>
+  allUsers(msg: any, options: any): Promise<any>
 }

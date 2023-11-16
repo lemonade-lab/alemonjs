@@ -1,14 +1,5 @@
 import { replyController } from './reply.js'
-
-interface UserInformationType {
-  id: string
-  name: string
-  introduce: string
-  bot: boolean
-  avatar: string
-  joined_at: number
-  role: any[]
-}
+import { ControllerOption, UserInformationType } from '../../core/index.js'
 
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
@@ -17,7 +8,7 @@ export const Controller = {
        * 查看信息
        * @returns
        */
-      information: async () => {
+      information: async (): Promise<UserInformationType | false> => {
         return false
       },
       /**
@@ -85,6 +76,15 @@ export const Controller = {
       },
       allEmoji: async () => {
         return false
+      },
+      allUsers: async (
+        reactionObj: any,
+        options = {
+          cookie: '',
+          limit: 20
+        }
+      ) => {
+        return false
       }
     }
   }
@@ -101,12 +101,7 @@ export const ClientController = (data: {
   msg_id: string
   send_at: number
 }) => {
-  return (select?: {
-    guild_id?: string
-    channel_id?: string
-    msg_id?: string
-    send_at?: number
-  }) => {
+  return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id

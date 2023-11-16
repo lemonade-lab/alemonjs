@@ -1,15 +1,6 @@
 import { IMember } from 'qq-guild-bot'
 import { replyController } from './reply.js'
-
-interface UserInformationType {
-  id: string
-  name: string
-  introduce: string
-  bot: boolean
-  avatar: string
-  joined_at: number
-  role: any[]
-}
+import { ControllerOption, UserInformationType } from '../../core/index.js'
 
 export const Controller = {
   Member: ({ guild_id, user_id, channel_id }) => {
@@ -140,7 +131,6 @@ export const Controller = {
         )
       },
       emoji: async (msg: any[], cancel?: boolean) => {
-        // 不同的场景下 api不同  私聊是不具有这么多功能的
         const arr: any[] = []
         if (cancel) {
           for (const item of msg) {
@@ -179,7 +169,7 @@ export const Controller = {
       allEmoji: async () => {
         return false
       },
-      byEmoji: async (
+      allUsers: async (
         reactionObj: any,
         options = {
           cookie: '',
@@ -207,16 +197,10 @@ export const ClientController = (data: {
   msg_id: string
   send_at: number
 }) => {
-  return (select?: {
-    guild_id?: string
-    channel_id?: string
-    msg_id?: string
-    send_at?: number
-  }) => {
+  return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
-    const send_at = select?.send_at ?? data.send_at
     return Controller.Message({ guild_id, channel_id, msg_id })
   }
 }
