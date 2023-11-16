@@ -18,15 +18,19 @@ const ServerCfg: ServerOptions = {
   /**
    * 图片随机度
    */
-  imgSize: 9999999,
+  fileSize: 9999999,
   /**
    * 挂载路由
    */
-  imgRouter: '/api/alemonjs/img',
+  fileRouter: '/api/alemonjs/file',
+  /**
+   *
+   */
+  addressRouter: '/api/alemonjs/local',
   /**
    * 本地缓存地址
    */
-  imgDir: '/data/alemonjs/img'
+  fileDir: '/data/alemonjs/img'
 }
 
 /**

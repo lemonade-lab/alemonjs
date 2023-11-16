@@ -20,7 +20,7 @@ import {
   getBotConfigByKey
 } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
-import { autoClearImages } from '../koa/img.js'
+import { autoClearFiles } from '../koa/file.js'
 
 // 设置ntqq独立鉴权路径
 export const setAuthenticationByNtqq = ClientNTQQ.setAuthentication
@@ -182,7 +182,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     createWeb(Options?.server)
     if (Options?.server?.clear != false) {
       // 定时清除
-      autoClearImages()
+      autoClearFiles()
     }
     // 缓存ip
     getIP()

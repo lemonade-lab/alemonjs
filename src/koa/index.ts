@@ -5,5 +5,5 @@
  */
 export * from './client.js'
 export * from './config.js'
-export * as ClientKOA from './img.js'
+export * as ClientKOA from './file.js'
 export * from './types.js'

@@ -15,17 +15,21 @@ export interface ServerOptions {
    */
   port?: number
   /**
+   *
+   */
+  addressRouter?: string
+  /**
    * 图片随机度
    */
-  imgSize?: number
+  fileSize?: number
   /**
    * 挂载路由
    */
-  imgRouter?: string
+  fileRouter?: string
   /**
    * 本地缓存地址
    */
-  imgDir?: string
+  fileDir?: string
   /**
    * 当前服务状态
    */

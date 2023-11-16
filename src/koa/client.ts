@@ -3,7 +3,7 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 import cors from 'koa2-cors'
 import { mkdirSync } from 'fs'
-import { getLocalImg } from './img.js'
+import { getLocalFile } from './file.js'
 import { ServerOptions } from './types.js'
 import { getServerConfig, setServerCoinfg } from './config.js'
 import { join } from 'path'
@@ -34,12 +34,12 @@ export function createWeb(
   app.use(bodyParser())
 
   // 确保目录存在
-  const imgDir = getServerConfig('imgDir')
-  mkdirSync(join(process.cwd(), imgDir), { recursive: true })
+  const fileDir = getServerConfig('fileDir')
+  mkdirSync(join(process.cwd(), fileDir), { recursive: true })
 
   // 处理图片请求
-  const imgRouter = getServerConfig('imgRouter')
-  router.get(`${imgRouter}/:filename`, getLocalImg)
+  const imgRouter = getServerConfig('fileRouter')
+  router.get(`${imgRouter}/:filename`, getLocalFile)
 
   const port = getServerConfig('port')
   // 将路由注册到应用
