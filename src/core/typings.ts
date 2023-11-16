@@ -476,16 +476,20 @@ export interface MessageControllerType {
   emoji(msg: any[], cancel?: boolean): Promise<any[]>
   /**
    * 音频
+   * 传入string视为url地址
+   * 传入buffer视为二进制文件流发送
    * @param file
    * @param name
    */
-  audio(file: Buffer, name: string): Promise<any>
+  audio(file: Buffer | string, name?: string): Promise<any>
   /**
    * 视频
+   * 传入string视为url地址
+   * 传入buffer视为二进制文件流发送
    * @param file
    * @param name
    */
-  video(file: Buffer, name: string): Promise<any>
+  video(file: Buffer | string, name?: string): Promise<any>
   /**
    * 发送卡片
    */

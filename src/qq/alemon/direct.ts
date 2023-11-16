@@ -79,7 +79,7 @@ const Controller = {
        * @param file
        * @param name
        */
-      audio: async (file: Buffer, name: string) => {
+      audio: async (file: Buffer | string, name?: string) => {
         return false
       },
       /**
@@ -87,7 +87,7 @@ const Controller = {
        * @param file
        * @param name
        */
-      video: async (file: Buffer, name: string) => {
+      video: async (file: Buffer | string, name?: string) => {
         return false
       },
       card: async (msg: any[]) => {

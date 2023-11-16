@@ -74,7 +74,10 @@ export const Controller = {
        * @param file
        * @param name
        */
-      audio: async (file: Buffer, name: string) => {
+      audio: async (file: Buffer | string, name?: string) => {
+        if (typeof file == 'string') {
+          return await ClientNTQQ.postRichMediaByGroup(guild_id, file, 3)
+        }
         return false
       },
       /**
@@ -82,7 +85,10 @@ export const Controller = {
        * @param file
        * @param name
        */
-      video: async (file: Buffer, name: string) => {
+      video: async (file: Buffer | string, name?: string) => {
+        if (typeof file == 'string') {
+          return await ClientNTQQ.postRichMediaByGroup(guild_id, file, 2)
+        }
         return false
       },
       emoji: async (msg: any[], cancel?: boolean) => {

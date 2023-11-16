@@ -54,6 +54,20 @@ export async function postImage(
 }
 
 /**
+ * 发送buffer资源
+ * @param id 私信传频道id,公信传子频道id
+ * @param message {消息编号,图片,内容}
+ * @returns
+ */
+export async function postFile(file: Buffer, Name = 'image.jpg') {
+  const formdata = new FormData()
+  formdata.append('file', [file], Name)
+  const url = await createUrl(formdata)
+  if (url) return url
+  return false
+}
+
+/**
  * 转存
  * @param formdata
  * @returns

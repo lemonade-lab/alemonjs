@@ -206,7 +206,7 @@ export async function postMessageByGroup(
 }
 
 /**
- * 发送私聊富媒体消息
+ * 发送私聊富媒体文件
  * @param openid
  * @param content
  * @param file_type
@@ -235,7 +235,7 @@ export async function postRichMediaByUsers(
 }
 
 /**
- * 发送群聊图片
+ * 发送群里文件
  * @param openid
  * @param content
  * @param file_type

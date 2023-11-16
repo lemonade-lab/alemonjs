@@ -110,18 +110,42 @@ export const Controller = {
        * @param file
        * @param name
        */
-      audio: async (file: Buffer, name: string) => {
-        // 转存后  执行 发送
-        return false
+      audio: async (file: Buffer | string, name?: string) => {
+        if (typeof file == 'string') {
+          return await ClientKOOK.createMessage({
+            type: 3,
+            target_id: msg_id,
+            content: file
+          })
+        }
+        const ret = await ClientKOOK.postFile(file, name)
+        if (!ret) return false
+        return await ClientKOOK.createMessage({
+          type: 3,
+          target_id: msg_id,
+          content: ret.data.url
+        })
       },
       /**
        * 视频
        * @param file
        * @param name
        */
-      video: async (file: Buffer, name: string) => {
-        // 转存后  执行 发送
-        return false
+      video: async (file: Buffer | string, name?: string) => {
+        if (typeof file == 'string') {
+          return await ClientKOOK.createMessage({
+            type: 3,
+            target_id: msg_id,
+            content: file
+          })
+        }
+        const ret = await ClientKOOK.postFile(file, name)
+        if (!ret) return false
+        return await ClientKOOK.createMessage({
+          type: 3,
+          target_id: msg_id,
+          content: ret.data.url
+        })
       },
       card: async (msg: any[]) => {
         return [
