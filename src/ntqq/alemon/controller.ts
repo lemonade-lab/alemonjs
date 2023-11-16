@@ -1,6 +1,7 @@
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
 import { getBotConfigByKey } from '../../config/index.js'
+import { ClientNTQQ } from '../sdk/index.js'
 export const Controller = {
   Member: () => {
     return {
@@ -88,7 +89,11 @@ export const Controller = {
         return []
       },
       card: async (msg: any[]) => {
-        return []
+        const arr = []
+        for (const item of msg) {
+          arr.push(ClientNTQQ.postMessageByGroupMD(guild_id, item, msg_id))
+        }
+        return arr
       },
       allUsers: async (
         reactionObj: any,

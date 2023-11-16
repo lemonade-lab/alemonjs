@@ -132,6 +132,34 @@ export async function postMessageByUser(
 }
 
 /**
+ * 发送群聊md消息
+ * @param group_openid
+ * @param content
+ * @param msg_id
+ * @returns
+ */
+export async function postMessageByGroupMD(
+  group_openid: string,
+  data: any,
+  msg_id?: string
+): Promise<{ id: string; timestamp: number }> {
+  const { appID } = getBotConfig()
+  // md
+  return requestService({
+    url: `/v2/groups/${group_openid}/messages`,
+    method: 'post',
+    headers: {
+      'X-Union-Appid': appID
+    },
+    data: {
+      msg_id: msg_id,
+      timestamp: Math.floor(Date.now() / 1000),
+      ...data
+    }
+  }).then(res => res.data)
+}
+
+/**
  * 发送群聊消息
  * @param group_openid
  * @param content
