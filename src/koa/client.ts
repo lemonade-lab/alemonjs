@@ -41,6 +41,9 @@ export function createWeb(
   const imgRouter = getServerConfig('fileRouter')
   router.get(`${imgRouter}/:filename`, getLocalFile)
 
+  const addressRouter = getServerConfig('addressRouter')
+  router.get(`${addressRouter}`, getLocalFile)
+
   const port = getServerConfig('port')
   // 将路由注册到应用
   app.use(router.routes())

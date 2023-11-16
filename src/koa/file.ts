@@ -42,6 +42,8 @@ export async function getLocalFileByAddress(address: string) {
 export async function getFileByAddress(ctx: Context) {
   const address = ctx.query.address // 从请求中获取 address 参数
 
+  console.log('address', address)
+
   if (!address) {
     ctx.status = 400
     ctx.body = 'No dir parameter provided'
