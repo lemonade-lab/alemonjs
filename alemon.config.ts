@@ -1,14 +1,5 @@
-import { defineAlemonConfig } from './src/index.js'
+import { defineAlemonConfig, analysis } from 'alemonjs'
+import { login } from './a.login.config.js'
 defineAlemonConfig({
-  login: {
-    // qq: {
-    //   appID: '102040992',
-    //   token: 'u0uLJaDSA1knHQx6Y1iY7M5LafDjwmik',
-    //   isPrivate: false,
-    //   masterID: '13348342918169126729'
-    // }
-    kook: {
-      token: '1/MjMwOTg=/tNn1nx5brmGbmacCwYsUCw=='
-    }
-  }
+  login: analysis(login)
 })
