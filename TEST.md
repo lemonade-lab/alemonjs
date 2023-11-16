@@ -32,6 +32,12 @@ npm link
 npm link alemonjs
 ```
 
+> 删除 alemonjs 内依赖
+
+```sh
+rm -rf node_modules/alemonjs/node_modules/
+```
+
 > 更改 ts 配置 tsconfig.json
 
 > 增加翻译 plugins 目录
