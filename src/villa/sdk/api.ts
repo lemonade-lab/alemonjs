@@ -319,11 +319,12 @@ export async function sendMessage(
  */
 export async function createComponentTemplate(
   villa_id: string | number,
+  room_id: string | number,
   panel: any
 ) {
-  return await villaService({
+  const { data } = await villaService({
     method: 'post',
-    url: ApiEnum.recallMessage,
+    url: ApiEnum.createComponentTemplate,
     headers: {
       'Content-Type': 'application/json',
       'x-rpc-bot_ts': `${new Date().getTime()}`,
@@ -334,6 +335,18 @@ export async function createComponentTemplate(
       panel: JSON.stringify(panel)
     }
   }).then(res => res.data)
+  if (!data) return data
+  console.log('data', data)
+  const { template_id } = data
+  return await sendMessage(villa_id, {
+    room_id,
+    object_name: 'MHY:Text',
+    msg_content: JSON.stringify({
+      panel: {
+        template_id: template_id
+      }
+    })
+  })
 }
 
 /**
