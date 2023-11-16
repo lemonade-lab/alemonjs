@@ -1,7 +1,7 @@
 import { IMember } from 'qq-guild-bot'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
-
+import { getBotConfigByKey } from '../../config/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id, channel_id }) => {
     return {
@@ -15,6 +15,8 @@ export const Controller = {
           .then(res => res.data)
 
         if (data) {
+          const cfg = getBotConfigByKey('qq')
+          const masterID = cfg.masterID
           return {
             id: data.user.id,
             name: data.user.username,
@@ -22,6 +24,7 @@ export const Controller = {
             introduce: '',
             joined_at: new Date(data.joined_at).getTime(),
             bot: data.user.bot,
+            isMaster: masterID == data.user.id,
             role: data.roles
           }
         }

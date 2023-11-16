@@ -124,15 +124,8 @@ export async function MESSAGES(event: {
      */
     at_user = at_users.find(item => item.bot != true)
   }
-  /**
-   * 得到登录配置
-   */
 
   const cfg = getBotConfigByKey('villa')
-
-  /**
-   * 得到主人id
-   */
   const masterID = cfg.masterID
 
   /**

@@ -1,7 +1,7 @@
 import { ClientKOOK } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
-
+import { getBotConfigByKey } from '../../config/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
     return {
@@ -14,12 +14,15 @@ export const Controller = {
           res => res.data
         )
         if (data) {
+          const cfg = getBotConfigByKey('qq')
+          const masterID = cfg.masterID
           return {
             id: data.id,
             name: data.username,
             introduce: '',
             bot: data.bot,
             avatar: data.avatar,
+            isMaster: masterID == data.id,
             joined_at: data.joined_at,
             role: data.roles
           }

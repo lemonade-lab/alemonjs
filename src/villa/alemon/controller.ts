@@ -1,6 +1,7 @@
 import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
+import { getBotConfigByKey } from '../../config/index.js'
 
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
@@ -17,22 +18,19 @@ export const Controller = {
         if (!data) return false
         // 信息也包含了 权限 and 所在身份
         console.log('data.member', data.member)
-        /**
-         * {
-         *     id: 组编号
-         *     name:组名,
-         *     join_at: 加入时间,
-         *     typing: 类型  频道主9、超级管理员8、管理员7、自定义6、普通0
-         *  }
-         */
+
+        const cfg = getBotConfigByKey('villa')
+        const masterID = cfg.masterID
+
         return {
           id: data.member.basic.uid,
           name: data.member.basic.nickname,
-          introduce: '',
-          avatar: data.member.basic.avatar,
-          joined_at: 0,
+          introduce: data.member.basic.introduce,
+          avatar: data.member.basic.avatar_url,
+          joined_at: Number(data.member.joined_at),
           bot: false,
-          role: []
+          isMaster: masterID == data.member.basic.uid,
+          role: data.member.role_list
         }
       },
       /**

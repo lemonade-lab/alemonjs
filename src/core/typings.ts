@@ -425,6 +425,7 @@ export interface UserInformationType {
   bot: boolean
   joined_at: number
   role: any[]
+  isMaster: boolean
 }
 
 export interface MessageControllerType {
