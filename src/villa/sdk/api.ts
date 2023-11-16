@@ -320,18 +320,12 @@ export async function sendMessage(
 export async function sendComponentTemplate(
   villa_id: string | number,
   room_id: string | number,
-  text: string,
-  panel: any
+  content: any
 ) {
   return await sendMessage(villa_id, {
     room_id,
     object_name: 'MHY:Text',
-    msg_content: JSON.stringify({
-      content: {
-        text
-      },
-      panel
-    })
+    msg_content: JSON.stringify(content)
   })
 }
 

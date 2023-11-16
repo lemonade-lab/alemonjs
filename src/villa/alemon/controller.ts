@@ -167,12 +167,7 @@ export const Controller = {
         const arr: any[] = []
         for (const item of msg) {
           arr.push(
-            await ClientVILLA.sendComponentTemplate(
-              guild_id,
-              channel_id,
-              item.title,
-              item.panel
-            )
+            await ClientVILLA.sendComponentTemplate(guild_id, channel_id, item)
           )
         }
         return []
