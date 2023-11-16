@@ -71,7 +71,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       // isBuffer
       if (Buffer.isBuffer(msg)) {
         try {
-          const url = await ClientKOA.setLocalFile(msg)
+          const url = await ClientKOA.getFileUrl(msg)
           if (!url) return false
           return await ClientNTQQ.postFilesByUsers(
             event.author.user_openid,
@@ -96,7 +96,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
           .join('')
         try {
           const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
-          const url = await ClientKOA.setLocalFile(msg[isBuffer] as Buffer)
+          const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
           if (!url) return false
           return await ClientNTQQ.postMessageByUser(
             event.author.user_openid,
@@ -127,7 +127,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         const getUrl = match[1]
         const msg = await getUrlbuffer(getUrl)
         if (Buffer.isBuffer(msg)) {
-          const url = await ClientKOA.setLocalFile(msg)
+          const url = await ClientKOA.getFileUrl(msg)
           if (!url) return false
           return await ClientNTQQ.postFilesByUsers(
             event.author.user_openid,

@@ -12,7 +12,7 @@ import {
   appsInit,
   setAppProCoinfg,
   startChrom,
-  getIP
+  getPublicIP
 } from '../core/index.js'
 import {
   getPupPath,
@@ -185,7 +185,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       autoClearFiles()
     }
     // 缓存ip
-    getIP()
+    getPublicIP()
   }
 
   /**

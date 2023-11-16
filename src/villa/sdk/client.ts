@@ -3,7 +3,7 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 import { type ClientConfig } from './types.js'
 import { setClientConfig } from './config.js'
-import { getIP } from '../../core/index.js'
+import { getPublicIP } from '../../core/index.js'
 import { getServerConfig } from '../../koa/config.js'
 
 /**
@@ -130,7 +130,7 @@ export function createClient(
         // 获取ip4
         let ip = getServerConfig('ip')
         if (ip == 'localhost') {
-          const ipp = await getIP()
+          const ipp = await getPublicIP()
           if (ipp) ip = ipp
         }
         console.info('villa open', `http://${ip}:${port}${callback_url}`)

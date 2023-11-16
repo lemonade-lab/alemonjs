@@ -18,7 +18,7 @@ export async function replyController(
   // is buffer
   if (Buffer.isBuffer(msg)) {
     try {
-      const url = await ClientKOA.setLocalFile(msg)
+      const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
       return await ClientNTQQ.postFilesByGroup(guild_id, url).catch(
         everyoneError
@@ -40,7 +40,7 @@ export async function replyController(
       .join('')
     try {
       const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
-      const url = await ClientKOA.setLocalFile(msg[isBuffer] as Buffer)
+      const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
       if (!url) return false
       return await ClientNTQQ.postMessageByGroup(
         guild_id,
@@ -72,7 +72,7 @@ export async function replyController(
     const getUrl = match[1]
     const msg = await getUrlbuffer(getUrl)
     if (Buffer.isBuffer(msg)) {
-      const url = await ClientKOA.setLocalFile(msg)
+      const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
       return await ClientNTQQ.postFilesByGroup(guild_id, url).catch(
         everyoneError
