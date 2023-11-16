@@ -82,7 +82,9 @@ export const Controller = {
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
         // villa未有回复api
-        return await replyController(guild_id, channel_id, content)
+        return await replyController(guild_id, channel_id, content, {
+          quote: msg_id
+        })
       },
       /**
        * 更新信息
@@ -170,7 +172,7 @@ export const Controller = {
             await ClientVILLA.sendComponentTemplate(guild_id, channel_id, item)
           )
         }
-        return []
+        return arr
       },
       allUsers: async (
         reactionObj: any,
