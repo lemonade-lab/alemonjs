@@ -121,9 +121,9 @@ export async function MESSAGE_AUDIT(event: {
     ): Promise<any> => {
       const villa_id = select?.guild_id ?? AuditCallback.villa_id
       const room_id = select?.channel_id ?? AuditCallback.room_id
-      const quote =
-        select?.quote ?? `${AuditCallback.audit_id}.${event.send_at}`
-      return await replyController(villa_id, room_id, msg, { quote })
+      return await replyController(villa_id, room_id, msg, {
+        quote: select.quote
+      })
     },
     Message,
     Member

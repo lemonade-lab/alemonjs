@@ -202,10 +202,8 @@ export async function MESSAGES(event: {
     ): Promise<any> => {
       const villa_id = select?.guild_id ?? SendMessage.villa_id
       const room_id = select?.channel_id ?? SendMessage.room_id
-      const quote =
-        select?.quote ?? `${SendMessage.msg_uid}.${SendMessage.send_at}`
       return await replyController(villa_id, room_id, msg, {
-        quote
+        quote: select.quote
       })
     },
     Message,

@@ -317,12 +317,35 @@ export async function sendMessage(
  * @param panel  消息组件面板json序列化后得到的字符串
  * @returns
  */
-export async function createComponentTemplate(
+export async function sendComponentTemplate(
   villa_id: string | number,
   room_id: string | number,
+  text: string,
   panel: any
 ) {
-  const { data } = await villaService({
+  return await sendMessage(villa_id, {
+    room_id,
+    object_name: 'MHY:Text',
+    msg_content: JSON.stringify({
+      content: {
+        text
+      },
+      panel
+    })
+  })
+}
+
+/**
+ * 模板消息
+ * @param villa_id
+ * @param panel  消息组件面板json序列化后得到的字符串
+ * @returns
+ */
+export async function createComponentTemplate(
+  villa_id: string | number,
+  panel: any
+) {
+  return await villaService({
     method: 'post',
     url: ApiEnum.createComponentTemplate,
     headers: {
@@ -335,18 +358,6 @@ export async function createComponentTemplate(
       panel: JSON.stringify(panel)
     }
   }).then(res => res.data)
-  if (!data) return data
-  console.log('data', data)
-  const { template_id } = data
-  return await sendMessage(villa_id, {
-    room_id,
-    object_name: 'MHY:Text',
-    msg_content: JSON.stringify({
-      panel: {
-        template_id: template_id
-      }
-    })
-  })
 }
 
 /**

@@ -121,8 +121,9 @@ export async function GUILD_BOT(event: {
       const villa_id = select?.guild_id ?? guild_id
       const room_id = select?.channel_id ?? false
       if (!room_id) return false
-      const quote = select?.quote ?? `${event.id}.${event.send_at}`
-      return await replyController(villa_id, room_id, msg, { quote })
+      return await replyController(villa_id, room_id, msg, {
+        quote: select.quote
+      })
     },
     Message,
     Member

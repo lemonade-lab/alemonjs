@@ -14,8 +14,33 @@ export async function sendMessageImage(
   room_id: number | string,
   url: string,
   size: ImageSizeType,
-  user_id?: string
+  msg_id?: string
 ) {
+  let data = {
+    /**
+     * 消息文本   支持  [爱心] 来转换成表情
+     */
+    content: {
+      url,
+      size
+    }
+  }
+
+  if (msg_id) {
+    const [id, at] = String(msg_id).split('.')
+    data = {
+      ...data,
+      ...{
+        quote: {
+          original_message_id: id,
+          original_message_send_time: Number(at),
+          quoted_message_id: id,
+          quoted_message_send_time: Number(at)
+        }
+      }
+    }
+  }
+
   return await sendMessage(villa_id, {
     /**
      * 房间号
@@ -27,15 +52,7 @@ export async function sendMessageImage(
     /**
      *
      */
-    msg_content: JSON.stringify({
-      /**
-       * 消息文本   支持  [爱心] 来转换成表情
-       */
-      content: {
-        url,
-        size
-      }
-    })
+    msg_content: JSON.stringify(data)
   })
 }
 /**
@@ -49,19 +66,35 @@ export async function sendMessageText(
   villa_id: number | string,
   room_id: number | string,
   text: string,
-  user_id?: string
+  msg_id?: string
 ) {
+  let data = {
+    content: {
+      text
+    }
+  }
+  if (msg_id) {
+    const [id, at] = String(msg_id).split('.')
+    data = {
+      ...data,
+      ...{
+        quote: {
+          original_message_id: id,
+          original_message_send_time: Number(at),
+          quoted_message_id: id,
+          quoted_message_send_time: Number(at)
+        }
+      }
+    }
+  }
+
   return await sendMessage(villa_id, {
     /**
      *  房间号
      */
     room_id,
     object_name: 'MHY:Text',
-    msg_content: JSON.stringify({
-      content: {
-        text
-      }
-    })
+    msg_content: JSON.stringify(data)
   })
 }
 /**
@@ -93,9 +126,9 @@ export async function sendMessageTextEntities(
       ...{
         quote: {
           original_message_id: id,
-          original_message_send_time: at,
+          original_message_send_time: Number(at),
           quoted_message_id: id,
-          quoted_message_send_time: at
+          quoted_message_send_time: Number(at)
         }
       }
     }
@@ -143,9 +176,9 @@ export async function sendMessageTextUrl(
       ...{
         quote: {
           original_message_id: id,
-          original_message_send_time: at,
+          original_message_send_time: Number(at),
           quoted_message_id: id,
-          quoted_message_send_time: at
+          quoted_message_send_time: Number(at)
         }
       }
     }
@@ -187,9 +220,9 @@ export async function sendMessageTextImages(
       ...{
         quote: {
           original_message_id: id,
-          original_message_send_time: at,
+          original_message_send_time: Number(at),
           quoted_message_id: id,
-          quoted_message_send_time: at
+          quoted_message_send_time: Number(at)
         }
       }
     }
@@ -241,9 +274,9 @@ export async function sendMessageTextEntitiesUrl(
       ...{
         quote: {
           original_message_id: id,
-          original_message_send_time: at,
+          original_message_send_time: Number(at),
           quoted_message_id: id,
-          quoted_message_send_time: at
+          quoted_message_send_time: Number(at)
         }
       }
     }
