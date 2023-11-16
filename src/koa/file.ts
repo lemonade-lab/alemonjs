@@ -46,13 +46,13 @@ export async function getFileByAddress(ctx: Context) {
 
   if (!address) {
     ctx.status = 400
-    ctx.body = 'No dir parameter provided'
+    ctx.body = 'No address parameter provided'
     return
   }
 
   if (typeof address != 'string') {
     ctx.status = 400
-    ctx.body = 'No dir parameter provided'
+    ctx.body = 'No address parameter provided'
     return
   }
 

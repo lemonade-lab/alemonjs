@@ -3,7 +3,7 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 import cors from 'koa2-cors'
 import { mkdirSync } from 'fs'
-import { getLocalFile } from './file.js'
+import { getFileByAddress, getLocalFile } from './file.js'
 import { ServerOptions } from './types.js'
 import { getServerConfig, setServerCoinfg } from './config.js'
 import { join } from 'path'
@@ -42,7 +42,7 @@ export function createWeb(
   router.get(`${imgRouter}/:filename`, getLocalFile)
 
   const addressRouter = getServerConfig('addressRouter')
-  router.get(`${addressRouter}`, getLocalFile)
+  router.get(`${addressRouter}`, getFileByAddress)
 
   const port = getServerConfig('port')
   // 将路由注册到应用
