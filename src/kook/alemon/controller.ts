@@ -108,6 +108,7 @@ export const Controller = {
        * @param name
        */
       audio: async (file: Buffer, name: string) => {
+        // 转存后  执行 发送
         return false
       },
       /**
@@ -116,11 +117,17 @@ export const Controller = {
        * @param name
        */
       video: async (file: Buffer, name: string) => {
+        // 转存后  执行 发送
         return false
       },
       card: async (msg: any[]) => {
-        // 卡片
-        return []
+        return [
+          await ClientKOOK.createMessage({
+            type: 10,
+            target_id: msg_id,
+            content: JSON.stringify(msg)
+          })
+        ]
       },
       allEmoji: async () => {
         // 该消息的所有emoji
