@@ -402,7 +402,7 @@ export interface MemberControllerType {
    * @param select 禁言参
    * @returns
    */
-  mute: (select: { time?: number; is?: boolean }) => Promise<any>
+  mute: (option?: { time?: number; cancel?: boolean }) => Promise<any>
   /**
    * 移出频道
    * @returns

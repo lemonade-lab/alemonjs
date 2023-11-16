@@ -13,7 +13,7 @@ export const Controller = {
       /**
        * 禁言
        */
-      mute: async () => {
+      mute: async (option?: { time?: number; cancel?: boolean }) => {
         return false
       },
       /**

@@ -32,10 +32,10 @@ export const Controller = {
        * @param param0
        * @returns
        */
-      mute: async ({ time = 60000, is = true }) => {
-        if (is) {
+      mute: async (option?: { time?: number; cancel?: boolean }) => {
+        if (option.cancel) {
           return await ClientQQ.muteApi.muteMember(guild_id, user_id, {
-            seconds: String(time / 1000)
+            seconds: String(option.time ?? 60000 / 1000)
           })
         } else {
           return await ClientQQ.muteApi.muteMember(guild_id, user_id, {

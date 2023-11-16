@@ -38,7 +38,7 @@ export const Controller = {
       /**
        * 禁言
        */
-      mute: async ({ time = 60000, is = true }) => {
+      mute: async (option?: { time?: number; cancel?: boolean }) => {
         //
       },
       /**
