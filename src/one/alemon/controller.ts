@@ -66,6 +66,22 @@ export const Controller = {
       emoji: async (msg: any[], cancel?: boolean) => {
         return []
       },
+      /**
+       * 音频
+       * @param file
+       * @param name
+       */
+      audio: async (file: Buffer, name: string) => {
+        return false
+      },
+      /**
+       * 视频
+       * @param file
+       * @param name
+       */
+      video: async (file: Buffer, name: string) => {
+        return false
+      },
       card: async (msg: any[]) => {
         return []
       },

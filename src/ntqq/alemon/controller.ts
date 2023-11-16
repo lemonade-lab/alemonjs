@@ -68,6 +68,22 @@ export const Controller = {
       horn: async (cancel?: boolean) => {
         return false
       },
+      /**
+       * 音频
+       * @param file
+       * @param name
+       */
+      audio: async (file: Buffer, name: string) => {
+        return false
+      },
+      /**
+       * 视频
+       * @param file
+       * @param name
+       */
+      video: async (file: Buffer, name: string) => {
+        return false
+      },
       emoji: async (msg: any[], cancel?: boolean) => {
         return []
       },

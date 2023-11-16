@@ -102,6 +102,22 @@ export const Controller = {
         }
         return arr
       },
+      /**
+       * 音频
+       * @param file
+       * @param name
+       */
+      audio: async (file: Buffer, name: string) => {
+        return false
+      },
+      /**
+       * 视频
+       * @param file
+       * @param name
+       */
+      video: async (file: Buffer, name: string) => {
+        return false
+      },
       card: async (msg: any[]) => {
         // 卡片
         return []

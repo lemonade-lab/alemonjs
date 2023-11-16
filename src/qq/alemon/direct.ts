@@ -54,6 +54,22 @@ export const ClientDirectController = (data: {
         // 不同的场景下 api不同  私聊是不具有这么多功能的
         return []
       },
+      /**
+       * 音频
+       * @param file
+       * @param name
+       */
+      audio: async (file: Buffer, name: string) => {
+        return false
+      },
+      /**
+       * 视频
+       * @param file
+       * @param name
+       */
+      video: async (file: Buffer, name: string) => {
+        return false
+      },
       card: async (msg: any[]) => {
         // 卡片消息
         return []

@@ -474,6 +474,18 @@ export interface MessageControllerType {
    */
   emoji(msg: any[], cancel?: boolean): Promise<any[]>
   /**
+   * 音频
+   * @param file
+   * @param name
+   */
+  audio(file: Buffer, name: string): Promise<any>
+  /**
+   * 视频
+   * @param file
+   * @param name
+   */
+  video(file: Buffer, name: string): Promise<any>
+  /**
    * 发送卡片
    */
   card(msg: any[]): Promise<any[]>
