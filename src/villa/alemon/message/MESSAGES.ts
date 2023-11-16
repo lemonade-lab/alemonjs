@@ -18,7 +18,6 @@ import {
 /**
  * 消息会话
  * @param event 回调数据
- * @param val  类型控制
  */
 export async function MESSAGES(event: {
   robot: {

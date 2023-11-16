@@ -15,7 +15,6 @@ import {
 /**
  * 机器人进出
  * @param event 回调数据
- * @param val  类型控制
  */
 export async function GUILD_BOT(event: {
   robot: {

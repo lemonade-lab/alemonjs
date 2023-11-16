@@ -16,7 +16,6 @@ import {
 /**
  * 成员进入
  * @param event 回调数据
- * @param val  类型控制
  */
 export async function GUILD_MEMBERS(event: {
   robot: {

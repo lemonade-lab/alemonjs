@@ -72,9 +72,11 @@ export const EventEnum = [
    * MESSAGES=message
    * =MESSAGE+DIRECT+PUBLIC
    */
-  'MESSAGES',
-  'message',
-  'GUILD_MESSAGE_REACTIONS',
+  'MESSAGES', // 消息
+  'message', // 消息
+  'GUILD_MESSAGE_REACTIONS', // 表态
+  'MESSAGE_BUTTON', // 按钮回调
+
   /**
    * 互动事件监听
    */

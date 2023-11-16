@@ -16,7 +16,6 @@ import {
 /**
  * 审核事件
  * @param event 回调数据
- * @param val  类型控制
  */
 export async function MESSAGE_AUDIT(event: {
   // 机器人相关信息

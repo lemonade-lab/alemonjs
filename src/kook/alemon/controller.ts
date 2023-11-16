@@ -5,10 +5,6 @@ import { getBotConfigByKey } from '../../config/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
     return {
-      /**
-       * 查看信息
-       * @returns
-       */
       information: async (): Promise<UserInformationType | false> => {
         const data = await ClientKOOK.userView(guild_id, user_id).then(
           res => res.data
@@ -29,24 +25,12 @@ export const Controller = {
         }
         return false
       },
-      /**
-       * 禁言
-       */
       mute: async (option?: { time?: number; cancel?: boolean }) => {
         return false
       },
-      /**
-       * 踢出
-       */
       remove: async () => {
         return await ClientKOOK.guildKickout(guild_id, user_id)
       },
-      /**
-       * 身分组
-       * @param role_id 身分组编号
-       * @param is_add 默认添加行为
-       * @returns
-       */
       operate: async (role_id: string, add = true) => {
         return false
       }
@@ -64,11 +48,6 @@ export const Controller = {
       ) => {
         return await replyController(content, msg_id)
       },
-      /**
-       * 更新信息
-       * @param content
-       * @returns
-       */
       update: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
@@ -105,11 +84,6 @@ export const Controller = {
         }
         return arr
       },
-      /**
-       * 音频
-       * @param file
-       * @param name
-       */
       audio: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
           return await ClientKOOK.createMessage({
@@ -126,11 +100,6 @@ export const Controller = {
           content: ret.data.url
         })
       },
-      /**
-       * 视频
-       * @param file
-       * @param name
-       */
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
           return await ClientKOOK.createMessage({

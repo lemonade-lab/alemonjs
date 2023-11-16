@@ -16,7 +16,6 @@ import {
 /**
  * 表情表态
  * @param event 回调数据
- * @param val  类型控制
  */
 export async function GUILD_MESSAGE_REACTIONS(event: {
   robot: {

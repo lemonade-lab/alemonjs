@@ -3,6 +3,8 @@ import { GUILD_MEMBERS } from './message/GUILD_MEMBERS.js'
 import { GUILD_MESSAGE_REACTIONS } from './message/GUILD_MESSAGE_REACTIONS.js'
 import { MESSAGE_AUDIT } from './message/MESSAGE_AUDIT.js'
 import { GUILD_BOT } from './message/GUILD_BOT.js'
+import { MESSAGE_BUTTON } from './message/MESSAGE_BUTTON.js'
+
 /**
  * 事件处理集
  */
@@ -30,14 +32,19 @@ const ConversationMap = {
   /**
    *  审核事件
    */
-  [6]: MESSAGE_AUDIT
+  [6]: MESSAGE_AUDIT,
+  /**
+   * 按钮回调
+   */
+  [7]: MESSAGE_BUTTON
 }
 /**
  * 消息接收入口
  * @param req
  * @param res
  */
-export async function callBackByVilla(event) {
+export async function callBackByVilla(event: any) {
+  console.log('event.type', event.type)
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     return await ConversationMap[event.type](event)
   }

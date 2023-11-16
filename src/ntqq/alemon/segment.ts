@@ -1,29 +1,12 @@
 import { getPathBuffer } from '../../core/buffer.js'
 export const segmentNTQQ = {
-  /**
-   * 艾特某人
-   * @param uid
-   * @returns
-   */
   at: (uid: string): string => {
-    // 暂时用户@
     return `<@${uid}>`
   },
-  /**
-   * 艾特全体
-   * @returns
-   */
   atAll: (): string => {
     return '@everyone'
   },
-  /**
-   * 本地图片
-   */
   img: getPathBuffer,
-  /**
-   * 标注GET请求
-   * @returns
-   */
   http: (url: string) => {
     return `<http>${url}</http>`
   },
