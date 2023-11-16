@@ -80,9 +80,6 @@ export const Controller = {
       ) => {
         return false
       },
-      delete: async () => {
-        return false
-      },
       withdraw: async (hideTip: boolean) => {
         return false
       },

@@ -105,9 +105,6 @@ export const Controller = {
       ) => {
         return false
       },
-      delete: async () => {
-        return false
-      },
       /**
        * 撤回
        * @returns

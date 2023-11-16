@@ -107,9 +107,6 @@ export const Controller = {
       ) => {
         return false
       },
-      delete: async () => {
-        return false
-      },
       withdraw: async (hideTip = true) => {
         return await ClientQQ.messageApi.deleteMessage(
           channel_id,

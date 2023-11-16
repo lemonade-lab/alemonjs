@@ -44,9 +44,6 @@ export const ClientDirectController = (data: {
       ) => {
         return false
       },
-      delete: async () => {
-        return false
-      },
       withdraw: async (hideTip = true) => {
         return false
       },

@@ -7,7 +7,9 @@ export interface AMessage
     MsgBase,
     Serverbase,
     BotBase,
-    ReplyBase {}
+    ReplyBase,
+    MemberControllerBase,
+    MessageControllerBase {}
 
 /**
  * 事件相关
@@ -345,30 +347,9 @@ export interface ReplyBase {
       msg_id?: string
     }
   ): Promise<any>
+}
 
-  /**
-   * 控制器
-   * @param select 选择绑定
-   */
-  Message(select?: {
-    /**
-     * 频道号
-     */
-    guild_id?: string
-    /**
-     * 子频道号
-     */
-    channel_id?: string
-    /**
-     * 消息编号
-     */
-    msg_id?: string
-    /**
-     * 消息创建时间
-     */
-    send_at?: number
-  }): MessageControllerType
-
+interface MemberControllerBase {
   /**
    * 控制器
    * @param select 选择绑定
@@ -391,6 +372,31 @@ export interface ReplyBase {
      */
     send_at?: number
   }): MemberControllerType
+}
+
+interface MessageControllerBase {
+  /**
+   * 控制器
+   * @param select 选择绑定
+   */
+  Message(select?: {
+    /**
+     * 频道号
+     */
+    guild_id?: string
+    /**
+     * 子频道号
+     */
+    channel_id?: string
+    /**
+     * 消息编号
+     */
+    msg_id?: string
+    /**
+     * 消息创建时间
+     */
+    send_at?: number
+  }): MessageControllerType
 }
 
 export interface MemberControllerType {
@@ -453,7 +459,7 @@ export interface MessageControllerType {
   /**
    * 发送卡片
    */
-  card(msg: CardType[]): Promise<any[]>
+  card(msg: any[]): Promise<any[]>
   /**
    * 该消息所有表态
    */
@@ -463,30 +469,4 @@ export interface MessageControllerType {
    * @param msg
    */
   byEmoji?(msg: any, options: any): Promise<any>
-}
-
-/**
- * 卡片枚举
- */
-export const CacrdEnum = [
-  /**
-   * qq频道
-   */
-  'qq_embed',
-  /**
-   * QQ频道
-   */
-  'qq_ark',
-  /**
-   * kook
-   */
-  'kook_card'
-] as const
-
-/**
- * 卡片类型
- */
-export interface CardType {
-  type: (typeof CacrdEnum)[number]
-  card: any
 }
