@@ -37,23 +37,31 @@ export async function GUILD_BOT(event: {
       DeleteRobot: {
         villa_id: number // 别野编号
       }
+      CreateRobot: {
+        villa_id: number // 别野编号
+      }
     }
   }
   created_at: number
   id: string
   send_at: number
 }) {
-  const DeleteRobot = event.extend_data.EventData.DeleteRobot
+  const EventData = event.extend_data.EventData
+
+  const guild_id =
+    event.type == 3
+      ? EventData.CreateRobot.villa_id
+      : EventData.DeleteRobot.villa_id
 
   const Message = ClientControllerOnMessage({
-    guild_id: DeleteRobot.villa_id,
+    guild_id: guild_id,
     channel_id: 0,
     msg_id: '0',
     send_at: 0
   })
 
   const Member = ClientControllerOnMember({
-    guild_id: DeleteRobot.villa_id,
+    guild_id: guild_id,
     user_id: event.robot.template.id
   })
 
@@ -73,7 +81,7 @@ export async function GUILD_BOT(event: {
       avatar: event.robot.template.icon
     },
     isMaster: false,
-    guild_id: String(DeleteRobot.villa_id),
+    guild_id: String(guild_id),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
@@ -110,7 +118,7 @@ export async function GUILD_BOT(event: {
         channel_id?: string
       }
     ): Promise<any> => {
-      const villa_id = select?.guild_id ?? DeleteRobot.villa_id
+      const villa_id = select?.guild_id ?? guild_id
       const room_id = select?.channel_id ?? false
       if (!room_id) return false
       return await replyController(villa_id, room_id, msg)
