@@ -19,7 +19,6 @@
     "experimentalSpecifierResolution": "node"
   },
   "include": [
-    "plugins",
     "src/**/*"
   ],
   "exclude": [
