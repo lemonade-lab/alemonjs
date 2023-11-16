@@ -1,5 +1,13 @@
 # 测试
 
+> 拉取仓库
+
+```sh
+git clone --depth=1 -b main https://gitee.com/ningmengchongshui/alemon.git
+
+cd alemon
+```
+
 > 安装依赖
 
 ```sh
