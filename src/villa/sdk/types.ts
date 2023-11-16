@@ -31,6 +31,8 @@ export enum ApiEnum {
   recallMessage = '/vila/api/bot/platform/recallMessage',
   // 发送消息
   sendMessage = '/vila/api/bot/platform/sendMessage',
+  // 发送模板
+  createComponentTemplate = '/vila/api/bot/platform/createComponentTemplate',
   // 创建分组
   createGroup = '/vila/api/bot/platform/createGroup',
   // 编辑分组
@@ -62,7 +64,10 @@ export enum ApiEnum {
   // 获取全量表情
   getAllEmoticons = '/vila/api/bot/platform/getAllEmoticons',
   // 审核
-  audit = '/vila/api/bot/platform/audit'
+  audit = '/vila/api/bot/platform/audit',
+
+  // ws
+  getWebsocketInfo = '/vila/api/bot/platform/getWebsocketInfo'
 }
 
 /**

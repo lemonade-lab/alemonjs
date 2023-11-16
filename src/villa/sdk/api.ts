@@ -372,6 +372,31 @@ export async function sendMessage(
 }
 
 /**
+ * 模板消息
+ * @param villa_id
+ * @param panel  消息组件面板json序列化后得到的字符串
+ * @returns
+ */
+export async function createComponentTemplate(
+  villa_id: string | number,
+  panel: any
+) {
+  return await villaService({
+    method: 'post',
+    url: ApiEnum.recallMessage,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-rpc-bot_ts': `${new Date().getTime()}`,
+      'x-rpc-bot_nonce': '34719f00-2f13-364c-f7a7-44ca30b4f20e',
+      'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
+    },
+    data: {
+      panel: JSON.stringify(panel)
+    }
+  }).then(res => res.data)
+}
+
+/**
  * ******
  * 房间api
  * ******
@@ -773,5 +798,32 @@ export async function audit(
     },
     url: ApiEnum.audit,
     data
+  }).then(res => res.data)
+}
+
+/**
+ * 得到ws初始化
+ * @returns
+ */
+export async function getWebsocketInfo(): Promise<{
+  data: {
+    // 接入地址
+    websocket_url: string
+    // 连接使用的 uid 参数
+    websocket_conn_uid: string
+    // 接入使用的 app_id 参数
+    app_id: string
+    // 接入使用的 platform 参数
+    platform: string
+    // 接入使用的 device_id 参数
+    device_id: string
+  }
+}> {
+  return await villaService({
+    method: 'get',
+    url: ApiEnum.getWebsocketInfo,
+    headers: {
+      'Content-Type': 'application/json'
+    }
   }).then(res => res.data)
 }
