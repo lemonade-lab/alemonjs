@@ -174,7 +174,7 @@ export async function MESSAGES(event: {
     at,
     at_users: at_users,
     at_user,
-    msg_id: SendMessage.msg_uid,
+    msg_id: `${SendMessage.msg_uid}.${SendMessage.send_at}`,
     msg: msg,
     msg_txt: txt,
 
@@ -202,7 +202,11 @@ export async function MESSAGES(event: {
     ): Promise<any> => {
       const villa_id = select?.guild_id ?? SendMessage.villa_id
       const room_id = select?.channel_id ?? SendMessage.room_id
-      return await replyController(villa_id, room_id, msg)
+      const quote =
+        select?.quote ?? `${SendMessage.msg_uid}.${SendMessage.send_at}`
+      return await replyController(villa_id, room_id, msg, {
+        quote
+      })
     },
     Message,
     Member

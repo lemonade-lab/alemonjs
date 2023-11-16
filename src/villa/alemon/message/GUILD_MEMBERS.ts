@@ -91,7 +91,7 @@ export async function GUILD_MEMBERS(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: event.id,
+    msg_id: `${event.id}.${JoinVilla.join_at}`,
     msg_txt: '',
 
     //
@@ -124,7 +124,8 @@ export async function GUILD_MEMBERS(event: {
       const villa_id = select?.guild_id ?? JoinVilla.villa_id
       const room_id = select?.channel_id ?? false
       if (!room_id) return false
-      return await replyController(villa_id, room_id, msg)
+      const quote = select?.quote ?? `${event.id}.${JoinVilla.join_at}`
+      return await replyController(villa_id, room_id, msg, { quote })
     },
     Message,
     Member

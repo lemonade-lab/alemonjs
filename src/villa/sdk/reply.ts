@@ -13,7 +13,8 @@ export async function sendMessageImage(
   villa_id: number | string,
   room_id: number | string,
   url: string,
-  size?: ImageSizeType
+  size: ImageSizeType,
+  user_id?: string
 ) {
   return await sendMessage(villa_id, {
     /**
@@ -47,7 +48,8 @@ export async function sendMessageImage(
 export async function sendMessageText(
   villa_id: number | string,
   room_id: number | string,
-  text: string
+  text: string,
+  user_id?: string
 ) {
   return await sendMessage(villa_id, {
     /**
@@ -74,17 +76,35 @@ export async function sendMessageTextEntities(
   villa_id: number | string,
   room_id: number | string,
   text: string,
-  entities: EntitiesType[]
+  entities: EntitiesType[],
+  msg_id?: string
 ) {
+  let data = {
+    content: {
+      text,
+      entities
+    }
+  }
+
+  if (msg_id) {
+    const [id, at] = String(msg_id).split('.')
+    data = {
+      ...data,
+      ...{
+        quote: {
+          original_message_id: id,
+          original_message_send_time: at,
+          quoted_message_id: id,
+          quoted_message_send_time: at
+        }
+      }
+    }
+  }
+
   return await sendMessage(villa_id, {
     room_id,
     object_name: 'MHY:Text',
-    msg_content: JSON.stringify({
-      content: {
-        text,
-        entities
-      }
-    })
+    msg_content: JSON.stringify(data)
   })
 }
 /**
@@ -101,23 +121,40 @@ export async function sendMessageTextUrl(
   room_id: number | string,
   text: string,
   url: string,
-  size?: ImageSizeType
+  size: ImageSizeType,
+  msg_id?: string
 ) {
-  const si = size ?? {}
+  let data = {
+    content: {
+      text,
+      images: [
+        {
+          url,
+          ...size
+        }
+      ]
+    }
+  }
+
+  if (msg_id) {
+    const [id, at] = String(msg_id).split('.')
+    data = {
+      ...data,
+      ...{
+        quote: {
+          original_message_id: id,
+          original_message_send_time: at,
+          quoted_message_id: id,
+          quoted_message_send_time: at
+        }
+      }
+    }
+  }
+
   return await sendMessage(villa_id, {
     room_id,
     object_name: 'MHY:Text',
-    msg_content: JSON.stringify({
-      content: {
-        text,
-        images: [
-          {
-            url,
-            ...si
-          }
-        ]
-      }
-    })
+    msg_content: JSON.stringify(data)
   })
 }
 
@@ -133,17 +170,35 @@ export async function sendMessageTextImages(
   villa_id: number | string,
   room_id: number | string,
   text: string,
-  images: any
+  images: any,
+  msg_id?: string
 ) {
+  let data = {
+    content: {
+      text,
+      images
+    }
+  }
+
+  if (msg_id) {
+    const [id, at] = String(msg_id).split('.')
+    data = {
+      ...data,
+      ...{
+        quote: {
+          original_message_id: id,
+          original_message_send_time: at,
+          quoted_message_id: id,
+          quoted_message_send_time: at
+        }
+      }
+    }
+  }
+
   return await sendMessage(villa_id, {
     room_id,
     object_name: 'MHY:Text',
-    msg_content: JSON.stringify({
-      content: {
-        text,
-        images
-      }
-    })
+    msg_content: JSON.stringify(data)
   })
 }
 
@@ -163,23 +218,40 @@ export async function sendMessageTextEntitiesUrl(
   text: string,
   entities: EntitiesType[],
   url: string,
-  size?: ImageSizeType
+  size: ImageSizeType,
+  msg_id?: string
 ) {
-  const si = size ?? {}
+  let data = {
+    content: {
+      text,
+      entities,
+      images: [
+        {
+          url,
+          ...size
+        }
+      ]
+    }
+  }
+
+  if (msg_id) {
+    const [id, at] = String(msg_id).split('.')
+    data = {
+      ...data,
+      ...{
+        quote: {
+          original_message_id: id,
+          original_message_send_time: at,
+          quoted_message_id: id,
+          quoted_message_send_time: at
+        }
+      }
+    }
+  }
+
   return await sendMessage(villa_id, {
     room_id,
     object_name: 'MHY:Text',
-    msg_content: JSON.stringify({
-      content: {
-        text,
-        entities,
-        images: [
-          {
-            url,
-            ...si
-          }
-        ]
-      }
-    })
+    msg_content: JSON.stringify(data)
   })
 }

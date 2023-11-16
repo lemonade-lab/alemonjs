@@ -93,7 +93,7 @@ export async function GUILD_BOT(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: event.id,
+    msg_id: `${event.id}.${event.send_at}`,
     msg_txt: '',
 
     //
@@ -121,7 +121,8 @@ export async function GUILD_BOT(event: {
       const villa_id = select?.guild_id ?? guild_id
       const room_id = select?.channel_id ?? false
       if (!room_id) return false
-      return await replyController(villa_id, room_id, msg)
+      const quote = select?.quote ?? `${event.id}.${event.send_at}`
+      return await replyController(villa_id, room_id, msg, { quote })
     },
     Message,
     Member

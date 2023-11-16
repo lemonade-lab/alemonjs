@@ -13,7 +13,11 @@ import { getUrlbuffer } from '../../core/index.js'
 export async function replyController(
   villa_id: string | number,
   room_id: string | number,
-  msg: Buffer | string | number | (Buffer | number | string)[]
+  msg: Buffer | string | number | (Buffer | number | string)[],
+  select?: {
+    quote?: string
+    withdraw?: number
+  }
 ) {
   /**
    * isBuffer
@@ -27,10 +31,16 @@ export async function replyController(
     )
     if (!url) return false
     const dimensions = IMGS.imageSize(msg)
-    return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
-      width: dimensions.width,
-      height: dimensions.height
-    }).catch(everyoneError)
+    return await ClientVILLA.sendMessageImage(
+      villa_id,
+      room_id,
+      url,
+      {
+        width: dimensions.width,
+        height: dimensions.height
+      },
+      select?.quote
+    ).catch(everyoneError)
   }
   /**
    * isString arr and find buffer
@@ -70,7 +80,8 @@ export async function replyController(
         {
           width: dimensions.width,
           height: dimensions.height
-        }
+        },
+        select?.quote
       ).catch(everyoneError)
     } else {
       return await ClientVILLA.sendMessageTextEntitiesUrl(
@@ -82,7 +93,8 @@ export async function replyController(
         {
           width: dimensions.width,
           height: dimensions.height
-        }
+        },
+        select?.quote
       ).catch(everyoneError)
     }
   }
@@ -112,10 +124,16 @@ export async function replyController(
       )
       if (!url) return false
       const dimensions = IMGS.imageSize(msg)
-      return await ClientVILLA.sendMessageImage(villa_id, room_id, url, {
-        width: dimensions.width,
-        height: dimensions.height
-      }).catch(everyoneError)
+      return await ClientVILLA.sendMessageImage(
+        villa_id,
+        room_id,
+        url,
+        {
+          width: dimensions.width,
+          height: dimensions.height
+        },
+        select?.quote
+      ).catch(everyoneError)
     }
   }
   /**
@@ -123,15 +141,19 @@ export async function replyController(
    */
   const { entities, content } = await ClientVILLA.stringParsing(cont, villa_id)
   if (entities.length == 0 && content != '') {
-    return await ClientVILLA.sendMessageText(villa_id, room_id, content).catch(
-      everyoneError
-    )
+    return await ClientVILLA.sendMessageText(
+      villa_id,
+      room_id,
+      content,
+      select?.quote
+    ).catch(everyoneError)
   } else if (entities.length != 0 && content != '') {
     return await ClientVILLA.sendMessageTextEntities(
       villa_id,
       room_id,
       content,
-      entities
+      entities,
+      select?.quote
     ).catch(everyoneError)
   }
 }

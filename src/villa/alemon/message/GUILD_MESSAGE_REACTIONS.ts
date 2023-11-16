@@ -106,7 +106,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: AddQuickEmoticon.msg_uid,
+    msg_id: `${AddQuickEmoticon.msg_uid}.${event.send_at}`,
     msg_txt: '',
 
     //
@@ -132,7 +132,9 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     ): Promise<any> => {
       const villa_id = select?.guild_id ?? AddQuickEmoticon.villa_id
       const room_id = select?.channel_id ?? AddQuickEmoticon.room_id
-      return await replyController(villa_id, room_id, msg)
+      const quote =
+        select?.quote ?? `${AddQuickEmoticon.msg_uid}.${event.send_at}`
+      return await replyController(villa_id, room_id, msg, { quote })
     },
     Message,
     Member

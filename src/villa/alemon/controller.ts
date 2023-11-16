@@ -101,8 +101,7 @@ export const Controller = {
       withdraw: async (hideTip: boolean) => {
         return await ClientVILLA.recallMessage(guild_id, {
           room_id: channel_id,
-          msg_uid: msg_id,
-          send_at: send_at
+          msg_uid: msg_id
         })
       },
       /**

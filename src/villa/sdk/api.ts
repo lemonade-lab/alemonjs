@@ -278,66 +278,6 @@ export async function deleteVillaMember(
  * 消息api
  * *******
  */
-/**
- * ??
- * 置顶消息
- * @param villa_id 别野编号
- * @param data 配置数据
- * @returns
- * type = message
- */
-export async function pinMessage(
-  villa_id: number | string,
-  data: {
-    msg_uid: string | number // 消息 id
-    is_cancel: boolean // 是否取消置顶
-    room_id: string | number // 房间 id
-    send_at: number | string // 发送时间
-  }
-) {
-  return await villaService({
-    method: 'post',
-    url: ApiEnum.pinMessage,
-    headers: {
-      'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
-    },
-    data: {
-      msg_uid: String(data.msg_uid), // 消息 id
-      is_cancel: data.is_cancel, // 是否取消置顶
-      room_id: String(data.room_id), // 房间 id
-      send_at: Number(data.send_at) // 发送时间
-    }
-  }).then(res => res.data)
-}
-/**
- * 撤回消息
- * @param villa_id 别野编号
- * @param data 配置数据
- * @returns
- * type = message
- */
-export async function recallMessage(
-  villa_id: number | string,
-  data: {
-    msg_uid: string | number // 消息 id
-    room_id: string | number // 房间 id
-    send_at: number | string // 发送时间
-  }
-) {
-  return await villaService({
-    method: 'post',
-    url: ApiEnum.recallMessage,
-    headers: {
-      'Content-Type': 'application/json',
-      'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
-    },
-    params: {
-      msg_uid: String(data.msg_uid), // 消息 id
-      room_id: Number(data.room_id), // 房间 id
-      msg_time: Number(data.send_at) // 发送时间
-    }
-  }).then(res => res.data)
-}
 
 /**
  * 已测
@@ -392,6 +332,68 @@ export async function createComponentTemplate(
     },
     data: {
       panel: JSON.stringify(panel)
+    }
+  }).then(res => res.data)
+}
+
+/**
+ * ??
+ * 置顶消息
+ * @param villa_id 别野编号
+ * @param data 配置数据
+ * @returns
+ * type = message
+ */
+export async function pinMessage(
+  villa_id: number | string,
+  data: {
+    msg_uid: string | number // 消息 id
+    is_cancel: boolean // 是否取消置顶
+    room_id: string | number // 房间 id
+    send_at: number | string // 发送时间
+  }
+) {
+  return await villaService({
+    method: 'post',
+    url: ApiEnum.pinMessage,
+    headers: {
+      'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
+    },
+    data: {
+      msg_uid: String(data.msg_uid), // 消息 id
+      is_cancel: data.is_cancel, // 是否取消置顶
+      room_id: String(data.room_id), // 房间 id
+      send_at: Number(data.send_at) // 发送时间
+    }
+  }).then(res => res.data)
+}
+
+/**
+ * 撤回消息
+ * @param villa_id 别野编号
+ * @param data 配置数据
+ * @returns
+ * type = message
+ */
+export async function recallMessage(
+  villa_id: number | string,
+  data: {
+    msg_uid: string | number // 消息 id
+    room_id: string | number // 房间 id
+  }
+) {
+  const [msg_uid, send_at] = String(data.msg_uid).split('.')
+  return await villaService({
+    method: 'post',
+    url: ApiEnum.recallMessage,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
+    },
+    params: {
+      room_id: Number(data.room_id), // 房间 id
+      msg_uid: String(msg_uid), // 消息 id
+      msg_time: Number(send_at) // 发送时间
     }
   }).then(res => res.data)
 }

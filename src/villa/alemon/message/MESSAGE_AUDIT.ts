@@ -94,7 +94,7 @@ export async function MESSAGE_AUDIT(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: AuditCallback.audit_id,
+    msg_id: `${AuditCallback.audit_id}.${event.send_at}`,
     msg_txt: '',
 
     //
@@ -121,7 +121,9 @@ export async function MESSAGE_AUDIT(event: {
     ): Promise<any> => {
       const villa_id = select?.guild_id ?? AuditCallback.villa_id
       const room_id = select?.channel_id ?? AuditCallback.room_id
-      return await replyController(villa_id, room_id, msg)
+      const quote =
+        select?.quote ?? `${AuditCallback.audit_id}.${event.send_at}`
+      return await replyController(villa_id, room_id, msg, { quote })
     },
     Message,
     Member
