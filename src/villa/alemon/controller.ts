@@ -172,7 +172,9 @@ export const Controller = {
        * @returns
        */
       allEmoji: async () => {
-        return await ClientVILLA.getAllEmoticons(guild_id, msg_id)
+        return await ClientVILLA.getAllEmoticons(guild_id, msg_id).then(
+          res => res.data?.list
+        )
       },
       allUsers: async (
         reactionObj: any,

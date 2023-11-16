@@ -731,7 +731,9 @@ export async function getAllEmoticons(
   villa_id: number | string,
   msg_uid: string
 ): Promise<{
-  data: Emoticon[]
+  data: {
+    list: Emoticon[]
+  }
 }> {
   return await villaService({
     method: 'get',
