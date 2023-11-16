@@ -9,7 +9,7 @@ import {
 import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { directController } from '../direct.js'
 /**
  * 私信事件
@@ -21,12 +21,8 @@ export async function DIRECT_MESSAGE(event: Event) {
   const cfg = getBotConfigByKey('one')
   const masterID = cfg.masterID
 
-  const Message = ClientController({
-    guild_id: '0',
-    channel_id: '0',
-    msg_id: event.message_id,
-    send_at: new Date().getTime()
-  })
+  const Message = ClientController()
+  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'one' as (typeof PlatformEnum)[number],
@@ -79,7 +75,8 @@ export async function DIRECT_MESSAGE(event: Event) {
       }
     ): Promise<any> => {
       return await directController(msg, event.detail_type, event.user_id)
-    }
+    },
+    Member
   }
 
   /**

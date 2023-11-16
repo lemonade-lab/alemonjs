@@ -12,7 +12,7 @@ import { setBotMsgByQQ } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { replyController } from '../reply.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 
 interface PUBLIC_GUILD_MESSAGES_TYPE {
   eventType: 'AT_MESSAGE_CREATE'
@@ -71,8 +71,13 @@ export const PUBLIC_GUILD_MESSAGES = async (
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
-    msg_id: event.msg.id,
-    send_at: new Date().getTime()
+    msg_id: event.msg.id
+  })
+
+  const Member = ClientControllerOnMember({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    user_id: event.msg.author.id
   })
 
   const cfg = getBotConfigByKey('qq')
@@ -107,6 +112,8 @@ export const PUBLIC_GUILD_MESSAGES = async (
     user_avatar: event.msg.author.avatar,
     segment: segmentQQ,
     send_at: new Date().getTime(),
+    Message,
+    Member,
     /**
      * 发送消息
      * @param msg
@@ -131,8 +138,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
         quote,
         withdraw
       })
-    },
-    Message
+    }
   }
 
   /**

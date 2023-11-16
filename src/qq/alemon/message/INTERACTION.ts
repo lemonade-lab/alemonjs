@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 
 /**
  * TUDO
@@ -21,8 +21,13 @@ export const INTERACTION = async event => {
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
-    msg_id: '0',
-    send_at: new Date().getTime()
+    msg_id: '0'
+  })
+
+  const Member = ClientControllerOnMember({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    user_id: ''
   })
 
   const e = {
@@ -69,7 +74,8 @@ export const INTERACTION = async event => {
         channel_id?: string
       }
     ): Promise<any> => {},
-    Message
+    Message,
+    Member
   }
 
   /**

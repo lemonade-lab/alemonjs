@@ -9,7 +9,7 @@ import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { directController } from '../direct.js'
 
 /**
@@ -25,10 +25,13 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
   const avatar = event.extra.author.avatar
 
   const Message = ClientController({
-    guild_id: event.target_id,
-    channel_id: event.extra.guild_id,
-    msg_id: event.msg_id,
-    send_at: new Date().getTime()
+    msg_id: event?.msg_id,
+    user_id: event.extra.author?.id
+  })
+
+  const Member = ClientControllerOnMember({
+    guild_id: event?.target_id, // 频道
+    user_id: event.extra?.author?.id
   })
 
   const e = {
@@ -62,6 +65,8 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     user_avatar: avatar.substring(0, avatar.indexOf('?')),
     segment: segmentKOOK,
     send_at: event.msg_timestamp,
+    Message,
+    Member,
     /**
      * 消息发送机制
      * @param content 消息内容
@@ -78,8 +83,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     ): Promise<any> => {
       // 私的
       return await directController(msg, event.author_id, event.extra.code)
-    },
-    Message
+    }
   }
 
   /**

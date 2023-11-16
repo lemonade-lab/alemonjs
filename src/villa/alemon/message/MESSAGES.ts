@@ -10,7 +10,10 @@ import { MessageContentType } from '../../sdk/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import { ClientControllerOnMessage } from '../controller.js'
+import {
+  ClientControllerOnMessage,
+  ClientControllerOnMember
+} from '../controller.js'
 
 /**
  * 消息会话
@@ -147,6 +150,11 @@ export async function MESSAGES(event: {
     send_at: SendMessage.send_at
   })
 
+  const Member = ClientControllerOnMember({
+    guild_id: SendMessage.villa_id,
+    user_id: MessageContent.user.id
+  })
+
   /**
    * 制作e消息对象
    */
@@ -203,7 +211,8 @@ export async function MESSAGES(event: {
       const room_id = select?.channel_id ?? SendMessage.room_id
       return await replyController(villa_id, room_id, msg)
     },
-    Message
+    Message,
+    Member
   }
 
   /**

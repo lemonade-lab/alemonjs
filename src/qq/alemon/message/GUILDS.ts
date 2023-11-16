@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 
 /**
  * GUILD 频道
@@ -52,9 +52,14 @@ GUILDS (1 << 0)
 export const GUILD = async (event: EventGuildType) => {
   const Message = ClientController({
     guild_id: event.msg.id,
-    channel_id: '0',
-    msg_id: '0',
-    send_at: new Date().getTime()
+    channel_id: '',
+    msg_id: ''
+  })
+
+  const Member = ClientControllerOnMember({
+    guild_id: event.msg.id,
+    channel_id: '',
+    user_id: ''
   })
 
   const e = {
@@ -105,7 +110,8 @@ export const GUILD = async (event: EventGuildType) => {
         withdraw?: number
       }
     ): Promise<any> => {},
-    Message
+    Message,
+    Member
   }
 
   /**

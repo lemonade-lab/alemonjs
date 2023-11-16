@@ -70,15 +70,15 @@ export const Controller = (platform: (typeof PlatformEnum)[number]) => {
       },
       ntqq: {
         Message: ntqqController.Message(options as any),
-        Member: ntqqController.Member(options as any)
+        Member: ntqqController.Member()
       },
       kook: {
         Message: kookController.Message(options as any),
         Member: kookController.Member(options as any)
       },
       one: {
-        Message: oneController.Message(options as any),
-        Member: oneController.Member(options as any)
+        Message: oneController.Message(),
+        Member: oneController.Member()
       }
     }
     return map[platform]

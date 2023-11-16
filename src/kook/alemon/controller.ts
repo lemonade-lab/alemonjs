@@ -49,7 +49,7 @@ export const Controller = {
       }
     }
   },
-  Message: ({ guild_id, channel_id, msg_id, user_id }) => {
+  Message: ({ msg_id, user_id }) => {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -152,19 +152,26 @@ export const Controller = {
  * @param select
  * @returns
  */
-export const ClientController = (data: {
-  guild_id: string
-  channel_id: string
-  msg_id: string
-  send_at: number
+export const ClientController = (data: { msg_id: string; user_id: string }) => {
+  return (select?: ControllerOption) => {
+    const msg_id = select?.msg_id ?? data.msg_id
+    const user_id = select?.user_id ?? data.user_id
+    return Controller.Message({ msg_id, user_id })
+  }
+}
+
+/**
+ * 成员控制器
+ * @param select
+ * @returns
+ */
+export const ClientControllerOnMember = (data?: {
+  guild_id: string | number
   user_id: string
 }) => {
   return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
-    const channel_id = select?.channel_id ?? data.channel_id
-    const msg_id = select?.msg_id ?? data.msg_id
-    const send_at = select?.send_at ?? data.send_at
-    const user_id = select?.user_id ?? data.user_id
-    return Controller.Message({ guild_id, channel_id, msg_id, user_id })
+    const user_id = select?.guild_id ?? data.user_id
+    return Controller.Member({ guild_id, user_id })
   }
 }

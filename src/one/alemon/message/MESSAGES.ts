@@ -10,7 +10,7 @@ import {
 import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
 /**
  * 公信事件
@@ -22,12 +22,8 @@ export async function MESSAGES(event: EventGroup) {
   const cfg = getBotConfigByKey('one')
   const masterID = cfg.masterID
 
-  const Message = ClientController({
-    guild_id: event.group_id,
-    channel_id: '0',
-    msg_id: event.message_id,
-    send_at: new Date().getTime()
-  })
+  const Message = ClientController()
+  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'one' as (typeof PlatformEnum)[number],
@@ -60,8 +56,9 @@ export async function MESSAGES(event: EventGroup) {
     msg: event.raw_message.trim(),
     msg_id: event.message_id,
     segment: segmentONE,
-    Message,
     send_at: new Date().getTime(),
+    Message,
+    Member,
     /**
      * 消息发送机制
      * @param msg 消息

@@ -8,7 +8,10 @@ import {
 import { segmentVILLA } from '../segment.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import { ClientControllerOnMessage } from '../controller.js'
+import {
+  ClientControllerOnMember,
+  ClientControllerOnMessage
+} from '../controller.js'
 
 /**
  * 审核事件
@@ -57,6 +60,11 @@ export async function MESSAGE_AUDIT(event: {
     channel_id: AuditCallback.room_id,
     msg_id: '0',
     send_at: 0
+  })
+
+  const Member = ClientControllerOnMember({
+    guild_id: AuditCallback.villa_id,
+    user_id: String(AuditCallback.user_id)
   })
 
   /**
@@ -115,7 +123,8 @@ export async function MESSAGE_AUDIT(event: {
       const room_id = select?.channel_id ?? AuditCallback.room_id
       return await replyController(villa_id, room_id, msg)
     },
-    Message
+    Message,
+    Member
   }
   /**
    * 只匹配类型

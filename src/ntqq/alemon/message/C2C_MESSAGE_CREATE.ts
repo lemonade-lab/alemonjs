@@ -17,7 +17,7 @@ import {
   everyoneError
 } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
@@ -25,10 +25,10 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
 
   const Message = ClientController({
     guild_id: event.author.user_openid,
-    channel_id: event.author.user_openid,
-    msg_id: event.id,
-    send_at: new Date().getTime()
+    msg_id: event.id
   })
+
+  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'ntqq' as (typeof PlatformEnum)[number],
@@ -58,6 +58,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
     segment: segmentNTQQ,
     send_at: new Date().getTime(),
+    Member,
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: {

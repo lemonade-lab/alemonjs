@@ -3,20 +3,40 @@ import { ClientQQ as Client } from '../sdk/index.js'
 import { everyoneError } from '../../log/index.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
 
-/**
- * 客户端控制器
- * @param select
- * @returns
- */
-export const ClientDirectController = (data: {
-  guild_id: string
-  channel_id: string
-  msg_id: string
-  send_at: number
-}) => {
-  return (select?: ControllerOption) => {
-    const guild_id = select?.guild_id ?? data.guild_id
-    const msg_id = select?.msg_id ?? data.msg_id
+const Controller = {
+  Member: () => {
+    return {
+      /**
+       * 查看信息
+       * @returns
+       */
+      information: async (): Promise<UserInformationType | false> => {
+        return false
+      },
+      /**
+       * 禁言
+       */
+      mute: async () => {
+        return false
+      },
+      /**
+       * 踢出
+       */
+      remove: async () => {
+        return false
+      },
+      /**
+       * 身分组
+       * @param role_id 身分组编号
+       * @param is_add 默认添加行为
+       * @returns
+       */
+      operate: async (role_id: string, add = true) => {
+        return false
+      }
+    }
+  },
+  Message: ({ guild_id, msg_id }) => {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -87,6 +107,33 @@ export const ClientDirectController = (data: {
         return false
       }
     }
+  }
+}
+
+/**
+ * 客户端控制器
+ * @param select
+ * @returns
+ */
+export const ClientDirectController = (data: {
+  guild_id: string
+  msg_id: string
+}) => {
+  return (select?: ControllerOption) => {
+    const guild_id = select?.guild_id ?? data.guild_id
+    const msg_id = select?.msg_id ?? data.msg_id
+    return Controller.Message({ guild_id, msg_id })
+  }
+}
+
+/**
+ * 成员控制器
+ * @param select
+ * @returns
+ */
+export const ClientControllerOnMember = () => {
+  return (select?: ControllerOption) => {
+    return Controller.Member()
   }
 }
 

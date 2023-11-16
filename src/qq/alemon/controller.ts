@@ -211,12 +211,29 @@ export const ClientController = (data: {
   guild_id: string
   channel_id: string
   msg_id: string
-  send_at: number
 }) => {
   return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
     return Controller.Message({ guild_id, channel_id, msg_id })
+  }
+}
+
+/**
+ * 成员控制器
+ * @param select
+ * @returns
+ */
+export const ClientControllerOnMember = (data?: {
+  guild_id: string | number
+  user_id: string
+  channel_id: string
+}) => {
+  return (select?: ControllerOption) => {
+    const guild_id = select?.guild_id ?? data.guild_id
+    const user_id = select?.guild_id ?? data.user_id
+    const channel_id = select?.channel_id ?? data.channel_id
+    return Controller.Member({ guild_id, user_id, channel_id })
   }
 }

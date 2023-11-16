@@ -15,7 +15,11 @@ import {
   AlemonJSEventLog
 } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
-import { ClientDirectController, directController } from '../direct.js'
+import {
+  ClientDirectController,
+  directController,
+  ClientControllerOnMember
+} from '../direct.js'
 
 declare global {
   //接口对象
@@ -68,10 +72,10 @@ DIRECT_MESSAGE (1 << 12)
 export const DIRECT_MESSAGE = async (event: directEventData) => {
   const Message = ClientDirectController({
     guild_id: event.msg?.guild_id ?? '',
-    channel_id: event.msg?.channel_id ?? '',
-    msg_id: event.msg?.id ?? '',
-    send_at: new Date().getTime()
+    msg_id: event.msg?.id ?? ''
   })
+
+  const Member = ClientControllerOnMember()
 
   const cfg = getBotConfigByKey('qq')
   const masterID = cfg.masterID
@@ -121,7 +125,8 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
         withdraw
       })
     },
-    Message
+    Message,
+    Member
   }
 
   /**

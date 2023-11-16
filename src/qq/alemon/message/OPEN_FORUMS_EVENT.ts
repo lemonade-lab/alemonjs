@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 
 /**
  * ***********
@@ -74,8 +74,13 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
-    msg_id: '0',
-    send_at: new Date().getTime()
+    msg_id: '0'
+  })
+
+  const Member = ClientControllerOnMember({
+    guild_id: event.msg.guild_id,
+    channel_id: event.msg.channel_id,
+    user_id: ''
   })
 
   const e = {
@@ -107,6 +112,8 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     user_avatar: '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
+    Message,
+    Member,
     /**
      * 发现消息
      * @param msg
@@ -121,8 +128,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
         guild_id?: string
         channel_id?: string
       }
-    ): Promise<any> => {},
-    Message
+    ): Promise<any> => {}
   }
 
   /**

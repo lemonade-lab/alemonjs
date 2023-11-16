@@ -9,7 +9,7 @@ import { getBotMsgByNtqq } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientController } from '../controller.js'
+import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
 
 /**
@@ -24,10 +24,10 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
 
   const Message = ClientController({
     guild_id: event.group_id,
-    channel_id: '0',
-    msg_id: event.id,
-    send_at: new Date().getTime()
+    msg_id: event.id
   })
+
+  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'ntqq' as (typeof PlatformEnum)[number],
@@ -56,6 +56,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     at_user: undefined,
     send_at: new Date().getTime(),
     Message,
+    Member,
     /**
      * 消息发送机制
      * @param msg 消息
