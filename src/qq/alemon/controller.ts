@@ -197,6 +197,9 @@ export const Controller = {
           reactionObj,
           options
         )
+      },
+      article: async (msg: any) => {
+        return false
       }
     }
   }

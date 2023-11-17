@@ -494,11 +494,26 @@ export interface MessageControllerType {
   video(file: Buffer | string, name?: string): Promise<any>
   /**
    * 发送卡片
+   * 调用对应平台的卡片接口
+   * 每个平台数据包格式都不同
+   * 使用前请使用平台判断
+   * 并制作出对应平台的数据包
+   * 否非则将无法使用
+   * 当前支持card数据的平台有
+   * ntqq/villa/kook/qq
+   *
+   * @param msg
    */
   card(msg: any[]): Promise<any[]>
   /**
    * 得到指定消息的 指定 表情 下的 所有用户
    * @param msg
+   * @param options
    */
   allUsers(msg: any, options: any): Promise<any>
+  /**
+   * 文章
+   * @param msg
+   */
+  article(msg: any): Promise<any>
 }

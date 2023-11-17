@@ -134,6 +134,9 @@ export const Controller = {
       ) => {
         // 该消息下 指定emoji的所有用户
         return await ClientKOOK.messageReactionList({ msg_id, emoji })
+      },
+      article: async (msg: any) => {
+        return false
       }
     }
   }

@@ -102,6 +102,9 @@ const Controller = {
         }
       ) => {
         return false
+      },
+      article: async (msg: any) => {
+        return false
       }
     }
   }
