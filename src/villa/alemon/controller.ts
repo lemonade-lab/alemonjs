@@ -16,12 +16,8 @@ export const Controller = {
           res => res.data
         )
         if (!data) return false
-        // 信息也包含了 权限 and 所在身份
-        console.log('data.member', data.member)
-
         const cfg = getBotConfigByKey('villa')
         const masterID = cfg.masterID
-
         return {
           id: data.member.basic.uid,
           name: data.member.basic.nickname,

@@ -48,7 +48,7 @@ export async function createClientWS() {
       })
     )
     wsConn.on('message', data => {
-      console.log('data', data)
+      console.info('data', data)
     })
   })
   wsConn.on('error', error => {
