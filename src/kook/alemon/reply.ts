@@ -11,7 +11,7 @@ import { everyoneError } from '../../log/index.js'
  */
 export async function replyController(
   msg: Buffer | string | number | (Buffer | number | string)[],
-  msg_id: string
+  channel_id: string
 ) {
   /**
    * isbuffer
@@ -22,7 +22,7 @@ export async function replyController(
       if (ret && ret.data) {
         return await ClientKOOK.createMessage({
           type: 2,
-          target_id: msg_id,
+          target_id: channel_id,
           content: ret.data.url
         }).catch(everyoneError)
       }
@@ -52,12 +52,12 @@ export async function replyController(
     if (ret?.data) {
       await ClientKOOK.createMessage({
         type: 9,
-        target_id: msg_id,
+        target_id: channel_id,
         content: content
       }).catch(err => err)
       return await ClientKOOK.createMessage({
         type: 2,
-        target_id: msg_id,
+        target_id: channel_id,
         content: ret.data.url
       }).catch(everyoneError)
     }
@@ -82,14 +82,14 @@ export async function replyController(
     if (msg && ret) {
       return await ClientKOOK.createMessage({
         type: 2,
-        target_id: msg_id,
+        target_id: channel_id,
         content: ret.data.url
       }).catch(everyoneError)
     }
   }
   return await ClientKOOK.createMessage({
     type: 9,
-    target_id: msg_id,
+    target_id: channel_id,
     content
   }).catch(everyoneError)
 }

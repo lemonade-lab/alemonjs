@@ -46,17 +46,17 @@ const Controller = {
       }
     }
   },
-  Message: ({ open_id, msg_id }) => {
+  Message: ({ open_id, channel_id }) => {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, msg_id, open_id)
+        return await directController(content, channel_id, open_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, msg_id, open_id)
+        return await directController(content, channel_id, open_id)
       },
       /**
        * 更新信息
@@ -126,13 +126,13 @@ const Controller = {
  * @returns
  */
 export const ClientDirectController = (data: {
-  msg_id: string
+  channel_id: string
   open_id: string
 }) => {
   return (select?: ControllerOption) => {
-    const msg_id = select?.msg_id ?? data.msg_id
+    const channel_id = select?.channel_id ?? data.channel_id
     const open_id = select?.open_id ?? data.open_id
-    return Controller.Message({ msg_id, open_id })
+    return Controller.Message({ channel_id, open_id })
   }
 }
 
@@ -156,7 +156,7 @@ export const ClientControllerOnMember = () => {
  */
 export async function directController(
   msg: Buffer | string | number | (Buffer | number | string)[],
-  msg_id: string,
+  channel_id: string,
   open_id: string
 ) {
   /**
@@ -168,7 +168,7 @@ export async function directController(
       if (ret && ret.data) {
         return await ClientKOOK.createDirectMessage({
           type: 2,
-          target_id: msg_id,
+          target_id: channel_id,
           chat_code: open_id,
           content: ret.data.url
         }).catch(everyoneError)
@@ -199,13 +199,13 @@ export async function directController(
     // 私聊
     await ClientKOOK.createDirectMessage({
       type: 9,
-      target_id: msg_id,
+      target_id: channel_id,
       chat_code: open_id,
       content: content
     })
     return await ClientKOOK.createDirectMessage({
       type: 2,
-      target_id: msg_id,
+      target_id: channel_id,
       chat_code: open_id,
       content: String(ret.data.url)
     }).catch(everyoneError)
@@ -230,7 +230,7 @@ export async function directController(
     if (msg && ret) {
       return await ClientKOOK.createDirectMessage({
         type: 2,
-        target_id: msg_id,
+        target_id: channel_id,
         chat_code: open_id,
         content: ret.data.url
       }).catch(everyoneError)
@@ -238,7 +238,7 @@ export async function directController(
   }
   return await ClientKOOK.createDirectMessage({
     type: 9,
-    target_id: msg_id,
+    target_id: channel_id,
     chat_code: open_id,
     content
   }).catch(everyoneError)

@@ -13,6 +13,7 @@ import { getBotConfigByKey } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
+import { directController } from '../direct.js'
 
 /**
  *
@@ -67,6 +68,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
   const avatar = event.extra.author.avatar
 
   const Message = ClientController({
+    channel_id: event.target_id, // 子频道
     msg_id: event.msg_id,
     user_id: event.extra.author.id
   })
@@ -86,12 +88,12 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: getBotMsgByKOOK(),
-    isMaster: event.msg_id == masterID ? true : false,
-    guild_id: event.target_id, // 频道
+    isMaster: event.extra.author.id == masterID ? true : false,
+    guild_id: event.extra.guild_id, // 频道
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: event.extra.code, // 子频道
+    channel_id: event.target_id, // 子频道
     attachments: [],
     specials: [],
     //
@@ -101,7 +103,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     msg,
     msg_txt: event.content,
     msg_id: event.msg_id,
-    open_id: event.extra.code, // 子频道
+    open_id: event.extra.code, // 私聊标记
     //
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
@@ -119,11 +121,12 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
+      const channel_id = select.channel_id ?? event.target_id // 子频道
       if (select?.open_id) {
-        console.error('VILLA 无私信')
+        directController(msg, channel_id, select?.open_id)
         return false
       }
-      return await replyController(msg, event.target_id)
+      return await replyController(msg, channel_id)
     }
   }
 

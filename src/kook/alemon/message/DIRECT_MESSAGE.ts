@@ -32,7 +32,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
 
   // 私聊中 控制器并非私聊接口
   const Message = ClientDirectController({
-    msg_id: event?.msg_id,
+    channel_id: event.target_id, // 频道号
     open_id: open_id
   })
 
@@ -48,12 +48,12 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: getBotMsgByKOOK(),
-    isMaster: event.msg_id == masterID,
-    guild_id: event.target_id, // 频道号
+    isMaster: event.extra.author.id == masterID,
+    guild_id: '', // 频道号
     guild_name: '',
     guild_avatar: '',
     channel_name: event.extra.channel_name,
-    channel_id: '', // 子频道
+    channel_id: event.target_id, // 子频道
     attachments: [],
     specials: [],
     //
@@ -63,7 +63,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     msg: event.content,
     msg_txt: event.content,
     msg_id: event.msg_id,
-    open_id: event.extra.code,
+    open_id: open_id,
     //
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
@@ -81,9 +81,8 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      const open_id = select?.open_id ?? event.extra.code
-      const msg_id = select?.msg_id ?? event.msg_id
-      return await directController(msg, msg_id, open_id)
+      const channel_id = select?.channel_id ?? event.target_id
+      return await directController(msg, channel_id, select?.open_id ?? open_id)
     }
   }
 

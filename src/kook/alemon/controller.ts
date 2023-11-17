@@ -36,17 +36,17 @@ export const Controller = {
       }
     }
   },
-  Message: ({ msg_id, user_id }) => {
+  Message: ({ channel_id, user_id, msg_id }) => {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, msg_id)
+        return await replyController(content, channel_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, msg_id)
+        return await replyController(content, channel_id)
       },
       update: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -88,7 +88,7 @@ export const Controller = {
         if (typeof file == 'string') {
           return await ClientKOOK.createMessage({
             type: 3,
-            target_id: msg_id,
+            target_id: channel_id,
             content: file
           })
         }
@@ -96,7 +96,7 @@ export const Controller = {
         if (!ret) return false
         return await ClientKOOK.createMessage({
           type: 3,
-          target_id: msg_id,
+          target_id: channel_id,
           content: ret.data.url
         })
       },
@@ -104,7 +104,7 @@ export const Controller = {
         if (typeof file == 'string') {
           return await ClientKOOK.createMessage({
             type: 3,
-            target_id: msg_id,
+            target_id: channel_id,
             content: file
           })
         }
@@ -112,7 +112,7 @@ export const Controller = {
         if (!ret) return false
         return await ClientKOOK.createMessage({
           type: 3,
-          target_id: msg_id,
+          target_id: channel_id,
           content: ret.data.url
         })
       },
@@ -120,7 +120,7 @@ export const Controller = {
         return [
           await ClientKOOK.createMessage({
             type: 10,
-            target_id: msg_id,
+            target_id: channel_id,
             content: JSON.stringify(msg)
           })
         ]
@@ -147,11 +147,16 @@ export const Controller = {
  * @param select
  * @returns
  */
-export const ClientController = (data: { msg_id: string; user_id: string }) => {
+export const ClientController = (data: {
+  msg_id: string
+  channel_id: string
+  user_id: string
+}) => {
   return (select?: ControllerOption) => {
     const msg_id = select?.msg_id ?? data.msg_id
     const user_id = select?.user_id ?? data.user_id
-    return Controller.Message({ msg_id, user_id })
+    const channel_id = select?.channel_id ?? data.channel_id
+    return Controller.Message({ msg_id, user_id, channel_id })
   }
 }
 

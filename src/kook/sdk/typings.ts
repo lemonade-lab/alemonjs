@@ -195,7 +195,7 @@ export type MessageChannelType = 'GROUP' | 'PERSON' | 'BROADCAST'
 export interface EventData {
   channel_type: MessageChannelType
   type: MessageType
-  target_id: string
+  target_id: string // 频道id
   author_id: string
   content: string
   extra: Extra
@@ -349,7 +349,7 @@ export interface SendDirectMessageParams {
 }
 
 interface overheadData {
-  channel_id: string
+  channel_id: string // 子频道
   operator_id: string
   msg_id: string
 }
@@ -384,7 +384,7 @@ interface ChannelData {
 }
 
 interface StatementData {
-  channel_id: string
+  channel_id: string // 子频道
   emoji: {
     // 根据实际情况提供Emoji对象的属性和类型
     [key: string]: any
@@ -395,7 +395,7 @@ interface StatementData {
 
 interface EditingData {
   version_id: string
-  channel_id: string
+  channel_id: string // 子频道
   content: string
   mention: string[]
   mention_all: boolean

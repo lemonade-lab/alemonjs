@@ -71,7 +71,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     ): Promise<any> => {
       // 如果存在 open_id 表示 转为私聊
       if (select?.open_id) {
-        console.error('VILLA 无私信')
+        console.error('NTQQ  无主动私信')
         return false
       }
       const group_id = select?.guild_id ?? event.group_id
