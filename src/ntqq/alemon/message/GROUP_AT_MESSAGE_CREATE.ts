@@ -12,6 +12,7 @@ import { GROUP_DATA } from '../types.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
+import { directController } from '../direct.js'
 
 /**
  * 公私域合并
@@ -69,13 +70,12 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      // 如果存在 open_id 表示 转为私聊
+      const msg_id = select?.msg_id ?? event.id
       if (select?.open_id && select?.open_id != '') {
-        console.error('NTQQ  无主动私信')
-        return false
+        return await directController(msg, select?.open_id, msg_id)
       }
       const group_id = select?.guild_id ?? event.group_id
-      return await replyController(msg, group_id, event.id)
+      return await replyController(msg, group_id, msg_id)
     }
   }
 

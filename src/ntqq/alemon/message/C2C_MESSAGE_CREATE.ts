@@ -19,6 +19,7 @@ import {
 } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { directController } from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
@@ -67,77 +68,8 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      // isBuffer
-      if (Buffer.isBuffer(msg)) {
-        try {
-          const url = await ClientKOA.getFileUrl(msg)
-          if (!url) return false
-          return await ClientNTQQ.postFilesByUsers(open_id, url).catch(
-            everyoneError
-          )
-        } catch (err) {
-          console.error(err)
-          return err
-        }
-      }
-      /**
-       * isString arr and find buffer
-       */
-      if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
-        const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
-        const cont = msg
-          .map(item => {
-            if (typeof item === 'number') return String(item)
-            return item
-          })
-          .filter(element => typeof element === 'string')
-          .join('')
-        try {
-          const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
-          const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
-          if (!url) return false
-          return await ClientNTQQ.postMessageByUser(
-            open_id,
-            `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-            event.id
-          ).catch(everyoneError)
-        } catch (err) {
-          console.error(err)
-          return err
-        }
-      }
-
-      const content = Array.isArray(msg)
-        ? msg.join('')
-        : typeof msg === 'string'
-        ? msg
-        : typeof msg === 'number'
-        ? `${msg}`
-        : ''
-
-      if (content == '') return false
-
-      /**
-       * https
-       */
-      const match = content.match(/<http>(.*?)<\/http>/)
-      if (match) {
-        const getUrl = match[1]
-        const msg = await getUrlbuffer(getUrl)
-        if (Buffer.isBuffer(msg)) {
-          const url = await ClientKOA.getFileUrl(msg)
-          if (!url) return false
-          return await ClientNTQQ.postFilesByUsers(open_id, url).catch(
-            everyoneError
-          )
-        }
-      }
-
-      return await ClientNTQQ.postMessageByUser(
-        open_id,
-        content,
-        event.id
-      ).catch(everyoneError)
+      const msg_id = select?.msg_id ?? event.id
+      return await directController(msg, open_id, msg_id)
     },
     Message
   }
