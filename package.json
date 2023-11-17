@@ -7,8 +7,7 @@
   "type": "module",
   "scripts": {
     "app": "ts-node alemon.config.ts",
-    "publish": "npm run build && npm run doc && npm publish",
-    "build": "npm run format && npm run tsc && npm run tsc:logs && npm run tsc:run ",
+    "build": "npm run tsc && npm run tsc:logs && npm run tsc:run ",
     "tsc": "tsc",
     "tsc:logs": "tsc --module NodeNext --declaration ./logs.ts",
     "tsc:run": "tsc --module NodeNext --declaration ./run.ts",
