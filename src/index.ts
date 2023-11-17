@@ -29,7 +29,7 @@ export * from './api.js'
 /**
  * 平台特殊函数
  */
-export * from './pf.js'
+export * from './utils.js'
 /**
  * *************
  * exit
