@@ -24,7 +24,8 @@ export const MESSAGE_AUDIT = async (event: any) => {
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
-    msg_id: '0'
+    msg_id: '',
+    user_id: ''
   })
 
   const Member = ClientControllerOnMember({
@@ -73,9 +74,11 @@ export const MESSAGE_AUDIT = async (event: any) => {
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? event.msg.id
       const withdraw = select?.withdraw ?? 0
-      if (select?.open_id && select?.open_id != '') {
+      if (select?.open_id && select?.user_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
-          withdraw
+          withdraw,
+          open_id: select?.open_id,
+          user_id: select?.user_id
         })
       }
       const channel_id = select?.channel_id ?? event.msg.channel_id

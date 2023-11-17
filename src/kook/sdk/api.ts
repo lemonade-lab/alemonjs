@@ -114,6 +114,37 @@ export async function createMessage(data: SendMessageParams): Promise<{
 
 /**
  * 创建消息
+ * @param target_id
+ * @returns
+ */
+export async function userChatCreate(target_id: string): Promise<{
+  data: {
+    code: string
+    last_read_time: number
+    latest_msg_time: number
+    unread_count: number
+    is_friend: boolean
+    is_blocked: boolean
+    is_target_blocked: boolean
+    target_info: {
+      id: string
+      username: string
+      online: boolean
+      avatar: string
+    }
+  }
+}> {
+  return kookService({
+    method: 'post',
+    url: ApiEnum.UserChatCreate,
+    data: {
+      target_id
+    }
+  }).then(res => res.data)
+}
+
+/**
+ * 创建消息
  * @param data
  * @returns
  */

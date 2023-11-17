@@ -150,10 +150,21 @@ export async function directController(
   msg_id: string,
   select?: {
     withdraw?: number
+    open_id?: string
+    user_id?: string
   }
 ) {
+  if (select?.open_id && select?.user_id) {
+    const {
+      data: { guild_id }
+    }: any = await ClientQQ.directMessageApi.createDirectMessage({
+      source_guild_id: select?.open_id,
+      recipient_id: select?.user_id
+    })
+    if (!guild_id) return false
+    open_id = guild_id
+  }
   // isBuffer
-
   // if withdraw == 0 ， false 不撤回
   if (Buffer.isBuffer(msg)) {
     try {

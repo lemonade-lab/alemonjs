@@ -5,7 +5,7 @@ import {
   EventType,
   MessageBingdingOption
 } from '../../../core/index.js'
-import { StatementData, SystemData } from '../../sdk/index.js'
+import { ClientKOOK, StatementData, SystemData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -36,6 +36,10 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
     user_id: body.user_id
   })
 
+  const data = await ClientKOOK.userChatCreate(body.user_id).then(
+    res => res?.data
+  )
+
   const e = {
     platform: 'kook' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -61,7 +65,7 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
     msg: '',
     msg_txt: event.content,
     msg_id: event.msg_id,
-    open_id: '', // 私聊标记 空的 需要创建私聊 每次请求都自动创建
+    open_id: data?.code ?? '', // 私聊标记 空的 需要创建私聊 每次请求都自动创建
     //
     user_id: body.user_id,
     user_name: '',

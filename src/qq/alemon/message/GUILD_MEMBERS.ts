@@ -43,7 +43,8 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: '',
-    msg_id: '0'
+    msg_id: '',
+    user_id: event.msg.user.id
   })
 
   const Member = ClientControllerOnMember({
@@ -104,7 +105,9 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
       if (!msg_id) return false
       if (select?.open_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
-          withdraw
+          withdraw,
+          open_id: select?.open_id,
+          user_id: event.msg.user.id
         })
       }
       const channel_id = select?.channel_id ?? false

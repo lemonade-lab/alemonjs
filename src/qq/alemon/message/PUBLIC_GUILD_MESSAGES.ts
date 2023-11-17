@@ -73,7 +73,8 @@ export const PUBLIC_GUILD_MESSAGES = async (
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
-    msg_id: event.msg.id
+    msg_id: event.msg.id,
+    user_id: event.msg.author.id
   })
 
   const Member = ClientControllerOnMember({
@@ -131,7 +132,9 @@ export const PUBLIC_GUILD_MESSAGES = async (
       const withdraw = select?.withdraw ?? 0
       if (select?.open_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
-          withdraw
+          withdraw,
+          open_id: select?.open_id,
+          user_id: event.msg.author.id
         })
       }
       const channel_id = select?.channel_id ?? event.msg.channel_id

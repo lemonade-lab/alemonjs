@@ -398,6 +398,10 @@ export interface MessageBingdingOption {
    * 私聊会话标记
    */
   open_id?: string
+  /**
+   * 目标用户
+   */
+  user_id?: string
 }
 /**
  * 控制器可选参

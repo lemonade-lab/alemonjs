@@ -2,6 +2,7 @@ import { IMember } from 'qq-guild-bot'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
 import { getBotConfigByKey } from '../../config/index.js'
+import { directController } from './direct.js'
 export const Controller = {
   Member: ({ guild_id, user_id, channel_id }) => {
     return {
@@ -77,11 +78,17 @@ export const Controller = {
       }
     }
   },
-  Message: ({ guild_id, channel_id, msg_id }) => {
+  Message: ({ guild_id, channel_id, msg_id, open_id, user_id }) => {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
+        if (open_id && open_id != '' && user_id) {
+          return await directController(content, open_id, msg_id, {
+            open_id: open_id,
+            user_id: user_id
+          })
+        }
         return await replyController(content, channel_id, msg_id)
       },
       quote: async (
@@ -214,12 +221,21 @@ export const ClientController = (data: {
   guild_id: string
   channel_id: string
   msg_id: string
+  user_id: string
 }) => {
   return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
-    return Controller.Message({ guild_id, channel_id, msg_id })
+    const user_id = select?.user_id ?? data.user_id
+    const open_id = select?.open_id
+    return Controller.Message({
+      guild_id,
+      channel_id,
+      user_id,
+      msg_id,
+      open_id
+    })
   }
 }
 

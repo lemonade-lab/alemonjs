@@ -6,7 +6,7 @@ import {
   EventType,
   MessageBingdingOption
 } from '../../../core/index.js'
-import { EventData } from '../../sdk/index.js'
+import { ClientKOOK, EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -78,6 +78,10 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     user_id: event.extra.author.id
   })
 
+  const data = await ClientKOOK.userChatCreate(event.extra.author.id).then(
+    res => res?.data
+  )
+
   const e = {
     platform: 'kook' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -103,7 +107,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     msg,
     msg_txt: event.content,
     msg_id: event.msg_id,
-    open_id: event.extra.code, // 私聊标记 空的 需要创建私聊 每次请求都自动创建
+    open_id: data?.code ?? '', // 私聊标记 空的 需要创建私聊 每次请求都自动创建
     //
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
