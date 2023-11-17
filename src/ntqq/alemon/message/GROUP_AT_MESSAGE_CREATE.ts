@@ -70,7 +70,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       select?: MessageBingdingOption
     ): Promise<any> => {
       // 如果存在 open_id 表示 转为私聊
-      if (select?.open_id) {
+      if (select?.open_id && select?.open_id != '') {
         console.error('NTQQ  无主动私信')
         return false
       }

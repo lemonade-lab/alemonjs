@@ -131,7 +131,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
       const msg_id = select?.msg_id ?? false
       if (!msg_id) return false
       const withdraw = select?.withdraw ?? 0
-      if (select?.open_id) {
+      if (select?.open_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
           withdraw
         })

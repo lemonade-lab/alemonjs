@@ -118,7 +118,7 @@ export async function GUILD_MEMBERS(event: {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      if (select?.open_id) {
+      if (select?.open_id && select?.open_id != '') {
         console.error('VILLA 无私信')
         return false
       }

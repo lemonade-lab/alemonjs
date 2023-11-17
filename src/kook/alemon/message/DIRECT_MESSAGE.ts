@@ -21,7 +21,7 @@ import {
  * @returns
  */
 export const DIRECT_MESSAGE = async (event: EventData) => {
-  if (event.extra.author.bot) return false
+  if (event.extra?.author?.bot) return false
 
   const open_id = event.extra.code
 

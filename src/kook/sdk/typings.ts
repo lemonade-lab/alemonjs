@@ -304,6 +304,17 @@ export interface Extra {
   last_msg_content: string
   send_msg_device: number
 }
+/**
+ * 私聊消息
+ */
+export interface SendDirectMessageParams {
+  type?: MessageType
+  target_id?: string
+  chat_code?: string
+  content: string
+  quote?: string
+  nonce?: string
+}
 
 /**
  * 系统数据
@@ -315,6 +326,7 @@ export interface SystemData {
   target_id: string
   author_id: string
   content: string
+  // 不同的都不同
   extra: {
     // 退频道、进频道
     // 用户进出频道事件
@@ -336,30 +348,18 @@ export interface SystemData {
   from_type: number
 }
 
-/**
- * 私聊消息
- */
-export interface SendDirectMessageParams {
-  type?: MessageType
-  target_id?: string
-  chat_code?: string
-  content: string
-  quote?: string
-  nonce?: string
-}
-
-interface overheadData {
+export interface overheadData {
   channel_id: string // 子频道
   operator_id: string
   msg_id: string
 }
 
-interface memberData {
+export interface memberData {
   user_id: string
   exited_at: number
 }
 
-interface ChannelData {
+export interface ChannelData {
   id: string
   name: string
   user_id: string
@@ -383,7 +383,7 @@ interface ChannelData {
   region: string
 }
 
-interface StatementData {
+export interface StatementData {
   channel_id: string // 子频道
   emoji: {
     // 根据实际情况提供Emoji对象的属性和类型
@@ -393,7 +393,7 @@ interface StatementData {
   msg_id: string
 }
 
-interface EditingData {
+export interface EditingData {
   version_id: string
   channel_id: string // 子频道
   content: string

@@ -113,7 +113,7 @@ export const GUILD = async (event: EventGuildType) => {
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? event.msg.id
       const withdraw = select?.withdraw ?? 0
-      if (select?.open_id) {
+      if (select?.open_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
           withdraw
         })

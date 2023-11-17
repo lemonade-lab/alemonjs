@@ -1,5 +1,5 @@
 /**
- * 阿柠檬消息类型
+ * AlemonjsMessageData
  */
 export interface AMessage
   extends EventBase,
@@ -53,18 +53,39 @@ export const EventEnum = [
    * 频道
    * **********
    */
-  'GUILD', // 频道事件
-  'GUILD_BOT', // 机器人进出事件
-  'CHANNEL', // 子频道事件
-  'GUILD_MEMBERS', // 成员进出
+  /**
+   * 频道事件
+   */
+  'GUILD',
+  /**
+   * 机器人进出事件
+   */
+  'GUILD_BOT',
+  /**
+   * 子频道事件
+   */
+  'CHANNEL',
+  /**
+   * 成员进出
+   */
+  'GUILD_MEMBERS',
   /**
    * ***********
    * 论坛
    * *********
    */
-  'FORUMS_THREAD', // 论坛主题
-  'FORUMS_POST', // 论坛POST
-  'FORUMS_REPLY', // 论坛评论
+  /**
+   * 论坛主题
+   */
+  'FORUMS_THREAD',
+  /**
+   * 论坛POST
+   */
+  'FORUMS_POST',
+  /**
+   * 论坛评论
+   */
+  'FORUMS_REPLY',
   /**
    * *********
    * 会话消息
@@ -72,11 +93,22 @@ export const EventEnum = [
    * MESSAGES=message
    * =MESSAGE+DIRECT+PUBLIC
    */
-  'MESSAGES', // 消息
-  'message', // 消息
-  'GUILD_MESSAGE_REACTIONS', // 表态
-  'MESSAGE_BUTTON', // 按钮回调
-
+  /**
+   * 消息
+   */
+  'MESSAGES',
+  /**
+   * 消息
+   */
+  'message',
+  /**
+   * 表态
+   */
+  'GUILD_MESSAGE_REACTIONS',
+  /**
+   * 按钮回调
+   */
+  'MESSAGE_BUTTON',
   /**
    * 互动事件监听
    */
@@ -86,8 +118,14 @@ export const EventEnum = [
    * 音频事件
    * ***********
    */
-  'AUDIO_FREQUENCY', // 视频
-  'AUDIO_MICROPHONE', // 麦克风
+  /**
+   * 视频
+   */
+  'AUDIO_FREQUENCY',
+  /**
+   * 麦克风
+   */
+  'AUDIO_MICROPHONE',
   /**
    * 审核消息
    */
@@ -167,10 +205,8 @@ interface MsgBase {
    */
   msg_id: string
   /**
-   *  会话编号
-   *  用于确保私聊正常对话的过渡id
-   *  在私聊中,想要进行其他其他频道操作
-   *  必须传入open_id来确保各平台字段不会冲突
+   *  私聊会话
+   *  存在即允许私聊
    */
   open_id: string
   /**
@@ -262,9 +298,9 @@ export interface SegmentType {
   img(dir: string): Buffer | false
   /**
    * 标注GET请求
-   * @param rul
+   * @param url
    */
-  http(rul: string, body?: any): string
+  http(url: string): string
   /**
    * 艾特频道
    * @param channel_id
@@ -413,7 +449,7 @@ export interface MemberControllerType {
   information: () => Promise<UserInformationType | false>
   /**
    * 禁言
-   * @param select 禁言参
+   * @param select { time?: number; cancel?: boolean }
    * @returns
    */
   mute: (option?: { time?: number; cancel?: boolean }) => Promise<any>
@@ -424,8 +460,8 @@ export interface MemberControllerType {
   remove: () => Promise<any>
   /**
    * 身份/角色控制
-   * @param role_id
-   * @param add
+   * @param role_id 角色id
+   * @param add 是否添加 ture
    * @returns
    */
   operate: (role_id: string, add?: boolean) => Promise<any>
@@ -506,14 +542,6 @@ export interface MessageControllerType {
   video(file: Buffer | string, name?: string): Promise<any>
   /**
    * 发送卡片
-   * 调用对应平台的卡片接口
-   * 每个平台数据包格式都不同
-   * 使用前请使用平台判断
-   * 并制作出对应平台的数据包
-   * 否非则将无法使用
-   * 当前支持card数据的平台有
-   * ntqq/villa/kook/qq
-   *
    * @param msg
    */
   card(msg: any[]): Promise<any[]>
