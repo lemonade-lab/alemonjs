@@ -56,10 +56,12 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
+  const msg_id = `${AddQuickEmoticon.msg_uid}.${event.send_at}`
+
   const Message = ClientControllerOnMessage({
     guild_id: AddQuickEmoticon.villa_id,
     channel_id: AddQuickEmoticon.room_id,
-    msg_id: '0'
+    msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
@@ -104,7 +106,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: `${AddQuickEmoticon.msg_uid}.${event.send_at}`,
+    msg_id: msg_id,
     msg_txt: '',
 
     //

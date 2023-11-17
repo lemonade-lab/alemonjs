@@ -52,13 +52,15 @@ export async function MESSAGE_BUTTON(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
+  const msg_id = `${ClickMsgComponent.msg_uid}.0`
+
   /**
    * 制作控制器
    */
   const Message = ClientControllerOnMessage({
     guild_id: ClickMsgComponent.villa_id,
     channel_id: ClickMsgComponent.room_id,
-    msg_id: ClickMsgComponent.msg_uid
+    msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
@@ -92,7 +94,7 @@ export async function MESSAGE_BUTTON(event: {
     at: false,
     at_users: [],
     at_user: undefined,
-    msg_id: `${ClickMsgComponent.msg_uid}.`,
+    msg_id: msg_id,
     msg: '',
     msg_txt: '',
 

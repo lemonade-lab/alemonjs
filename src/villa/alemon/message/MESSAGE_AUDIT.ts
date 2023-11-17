@@ -54,10 +54,12 @@ export async function MESSAGE_AUDIT(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
+  const msg_id = `${AuditCallback.audit_id}.${event.send_at}`
+
   const Message = ClientControllerOnMessage({
     guild_id: AuditCallback.villa_id,
     channel_id: AuditCallback.room_id,
-    msg_id: '0'
+    msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
@@ -92,7 +94,7 @@ export async function MESSAGE_AUDIT(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: `${AuditCallback.audit_id}.${event.send_at}`,
+    msg_id: msg_id,
     msg_txt: '',
 
     //

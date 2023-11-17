@@ -124,13 +124,15 @@ export async function MESSAGES(event: {
     at_user = at_users.find(item => item.bot != true)
   }
 
-  const cfg = getBotConfigByKey('villa')
-  const masterID = cfg.masterID
-
   /**
    * 清除 @ 后的消息
    */
   const msg = txt.replace(/(@[^\s]+\s)(?!<)/g, '').trim()
+
+  const cfg = getBotConfigByKey('villa')
+  const masterID = cfg.masterID
+
+  const msg_id = `${SendMessage.msg_uid}.${SendMessage.send_at}`
 
   /**
    * 制作控制器
@@ -138,7 +140,7 @@ export async function MESSAGES(event: {
   const Message = ClientControllerOnMessage({
     guild_id: SendMessage.villa_id,
     channel_id: SendMessage.room_id,
-    msg_id: `${SendMessage.msg_uid}.${SendMessage.send_at}`
+    msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
@@ -172,7 +174,7 @@ export async function MESSAGES(event: {
     at,
     at_users: at_users,
     at_user,
-    msg_id: `${SendMessage.msg_uid}.${SendMessage.send_at}`,
+    msg_id: msg_id,
     msg: msg,
     msg_txt: txt,
 

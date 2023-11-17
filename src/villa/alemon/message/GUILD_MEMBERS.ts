@@ -51,10 +51,12 @@ export async function GUILD_MEMBERS(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
+  const msg_id = `${event.id}.${JoinVilla.join_at}`
+
   const Message = ClientControllerOnMessage({
     guild_id: JoinVilla.villa_id,
     channel_id: 0,
-    msg_id: '0'
+    msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
@@ -89,7 +91,7 @@ export async function GUILD_MEMBERS(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: `${event.id}.${JoinVilla.join_at}`,
+    msg_id: msg_id,
     msg_txt: '',
 
     //
