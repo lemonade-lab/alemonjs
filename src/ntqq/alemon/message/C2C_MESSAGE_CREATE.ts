@@ -1,22 +1,14 @@
 import {
   InstructionMatching,
-  getUrlbuffer,
   PlatformEnum,
   EventEnum,
   EventType,
   MessageBingdingOption
 } from '../../../core/index.js'
-import { ClientNTQQ } from '../../sdk/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { USER_DATA } from '../types.js'
-import IMGS from 'image-size'
-import { ClientKOA } from '../../../koa/index.js'
-import {
-  AlemonJSError,
-  AlemonJSLog,
-  everyoneError
-} from '../../../log/index.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { directController } from '../direct.js'
