@@ -74,7 +74,7 @@ export async function MESSAGES(event: EventGroup) {
       if (select?.open_id) {
         return await directController(msg, select.open_id)
       }
-      const guild_id = select.guild_id ?? event.group_id
+      const guild_id = select?.guild_id ?? event.group_id
       return await replyController(msg, guild_id)
     }
   }

@@ -121,7 +121,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      const channel_id = select.channel_id ?? event.target_id // 子频道
+      const channel_id = select?.channel_id ?? event.target_id // 子频道
       if (select?.open_id) {
         directController(msg, channel_id, select?.open_id)
         return false
