@@ -55,8 +55,7 @@ export async function GUILD_BOT(event: {
   const Message = ClientControllerOnMessage({
     guild_id: guild_id,
     channel_id: 0,
-    msg_id: '0',
-    send_at: 0
+    msg_id: '0'
   })
 
   const Member = ClientControllerOnMember({

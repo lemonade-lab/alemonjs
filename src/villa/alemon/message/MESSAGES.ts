@@ -138,8 +138,7 @@ export async function MESSAGES(event: {
   const Message = ClientControllerOnMessage({
     guild_id: SendMessage.villa_id,
     channel_id: SendMessage.room_id,
-    msg_id: SendMessage.msg_uid,
-    send_at: SendMessage.send_at
+    msg_id: `${SendMessage.msg_uid}.${SendMessage.send_at}`
   })
 
   const Member = ClientControllerOnMember({

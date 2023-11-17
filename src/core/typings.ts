@@ -368,10 +368,6 @@ export interface ControllerOption {
    */
   msg_id?: string
   /**
-   * 消息创建时间
-   */
-  send_at?: number
-  /**
    * 用户编号
    */
   user_id?: string

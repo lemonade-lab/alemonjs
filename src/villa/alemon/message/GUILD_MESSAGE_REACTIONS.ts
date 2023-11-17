@@ -59,8 +59,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
   const Message = ClientControllerOnMessage({
     guild_id: AddQuickEmoticon.villa_id,
     channel_id: AddQuickEmoticon.room_id,
-    msg_id: '0',
-    send_at: 0
+    msg_id: '0'
   })
 
   const Member = ClientControllerOnMember({

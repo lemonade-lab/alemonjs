@@ -368,9 +368,9 @@ export async function pinMessage(
     msg_uid: string | number // 消息 id
     is_cancel: boolean // 是否取消置顶
     room_id: string | number // 房间 id
-    send_at: number | string // 发送时间
   }
 ) {
+  const [msg_uid, send_at] = String(data.msg_uid).split('.')
   return await villaService({
     method: 'post',
     url: ApiEnum.pinMessage,
@@ -378,10 +378,10 @@ export async function pinMessage(
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     data: {
-      msg_uid: String(data.msg_uid), // 消息 id
+      msg_uid: String(msg_uid), // 消息 id
       is_cancel: data.is_cancel, // 是否取消置顶
       room_id: String(data.room_id), // 房间 id
-      send_at: Number(data.send_at) // 发送时间
+      send_at: Number(send_at) // 发送时间
     }
   }).then(res => res.data)
 }

@@ -60,7 +60,7 @@ export const Controller = {
       }
     }
   },
-  Message: ({ guild_id, channel_id, msg_id, send_at }) => {
+  Message: ({ guild_id, channel_id, msg_id }) => {
     return {
       /**
        * 回复
@@ -115,8 +115,7 @@ export const Controller = {
         return await ClientVILLA.pinMessage(guild_id, {
           room_id: channel_id,
           is_cancel: cancel,
-          msg_uid: msg_id,
-          send_at: send_at
+          msg_uid: msg_id
         })
       },
       /**
@@ -199,14 +198,12 @@ export const ClientControllerOnMessage = (data?: {
   guild_id: string | number
   channel_id: string | number
   msg_id: string
-  send_at: number
 }) => {
   return (select?: ControllerOption) => {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
-    const send_at = select?.send_at ?? data.send_at
-    return Controller.Message({ guild_id, channel_id, msg_id, send_at })
+    return Controller.Message({ guild_id, channel_id, msg_id })
   }
 }
 

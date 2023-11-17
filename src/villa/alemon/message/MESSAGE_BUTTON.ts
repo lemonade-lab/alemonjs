@@ -58,8 +58,7 @@ export async function MESSAGE_BUTTON(event: {
   const Message = ClientControllerOnMessage({
     guild_id: ClickMsgComponent.villa_id,
     channel_id: ClickMsgComponent.room_id,
-    msg_id: ClickMsgComponent.msg_uid,
-    send_at: 0
+    msg_id: ClickMsgComponent.msg_uid
   })
 
   const Member = ClientControllerOnMember({

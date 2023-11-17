@@ -57,8 +57,7 @@ export async function MESSAGE_AUDIT(event: {
   const Message = ClientControllerOnMessage({
     guild_id: AuditCallback.villa_id,
     channel_id: AuditCallback.room_id,
-    msg_id: '0',
-    send_at: 0
+    msg_id: '0'
   })
 
   const Member = ClientControllerOnMember({

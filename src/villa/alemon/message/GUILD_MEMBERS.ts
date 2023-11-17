@@ -54,8 +54,7 @@ export async function GUILD_MEMBERS(event: {
   const Message = ClientControllerOnMessage({
     guild_id: JoinVilla.villa_id,
     channel_id: 0,
-    msg_id: '0',
-    send_at: 0
+    msg_id: '0'
   })
 
   const Member = ClientControllerOnMember({
