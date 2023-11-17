@@ -210,7 +210,7 @@ export const ClientControllerOnMessage = (data?: {
       guild_id,
       channel_id,
       msg_id,
-      open_id: select.open_id
+      open_id: select?.open_id
     })
   }
 }

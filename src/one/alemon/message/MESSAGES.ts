@@ -72,7 +72,7 @@ export async function MESSAGES(event: EventGroup) {
       select?: MessageBingdingOption
     ): Promise<any> => {
       if (select?.open_id && select?.open_id != '') {
-        return await directController(msg, select.open_id)
+        return await directController(msg, select?.open_id)
       }
       const guild_id = select?.guild_id ?? event.group_id
       return await replyController(msg, guild_id)
