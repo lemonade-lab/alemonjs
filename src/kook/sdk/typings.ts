@@ -341,11 +341,19 @@ export interface SystemData {
       | StatementData
       // 消息编辑
       | EditingData
+      // 用户上线
+      | OnLineData
   }
   msg_id: string
   msg_timestamp: number
   nonce: string
   from_type: number
+}
+
+export interface OnLineData {
+  user_id: string
+  event_time: number
+  guilds: any[]
 }
 
 export interface overheadData {

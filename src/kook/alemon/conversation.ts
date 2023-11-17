@@ -61,7 +61,7 @@ const ConversationMap = {
    */
   [255]: {
     public: async (event: SystemData) => {
-      // overheadData | memberData | ChannelData |  | EditingData
+      // overheadData | memberData | ChannelData |EditingData
       console.log(event.extra.body)
       if (
         event.extra.type == 'added_reaction' ||
@@ -70,31 +70,48 @@ const ConversationMap = {
         //StatementData
         return await GUILD_MESSAGE_REACTIONS(event)
       } else if (event.extra.type == 'joined_channel') {
+        //
         console.log('joined_channel')
+        return
+      } else if (event.extra.type == 'exited_channel') {
+        //
+        console.log('exited_channel')
         return
       } else if (event.extra.type == 'updated_channel') {
         // ChannelData
         console.log('updated_channel')
         return
-      } else if (event.extra.type == 'exited_channel') {
-        console.log('exited_channel')
-        return
+        /**
+         * ***********
+         * 频道进出
+         * *******
+         */
       } else if (event.extra.type == 'joined_guild') {
         console.log('joined_guild')
         return
       } else if (event.extra.type == 'exited_guild') {
         console.log('exited_guild')
         return
+        /**
+         * **********
+         * 消息变动
+         * ********
+         */
       } else if (event.extra.type == 'updated_message') {
         // 消息更新
+        // EditingData
         console.log('updated_message')
         return
       } else if (event.extra.type == 'pinned_message') {
         // 顶置消息
+        // overheadData
         console.log('pinned_message')
         return
-      } else if (event.extra.type == 'guild_member_online') {
-        // 成员上线
+      }
+    },
+    direct: async (event: SystemData) => {
+      if (event.extra.type == 'guild_member_online') {
+        //OnLineData
         console.log('exited_guild')
         return
       }
