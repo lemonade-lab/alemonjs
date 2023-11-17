@@ -2,6 +2,7 @@ import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import {
   EventEnum,
   EventType,
+  MessageBingdingOption,
   PlatformEnum,
   typeMessage
 } from '../../../core/index.js'
@@ -108,6 +109,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     msg: '',
     msg_id: msg_id,
     msg_txt: '',
+    open_id: '',
 
     //
     user_id: String(AddQuickEmoticon.uid),
@@ -123,13 +125,12 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
+      if (select?.open_id) {
+        console.error('VILLA 无私信')
+        return false
+      }
       const villa_id = select?.guild_id ?? AddQuickEmoticon.villa_id
       const room_id = select?.channel_id ?? AddQuickEmoticon.room_id
       return await replyController(villa_id, room_id, msg, {

@@ -4,14 +4,15 @@ import {
   EventEnum,
   EventType,
   InstructionMatching,
-  PlatformEnum,
-  getUrlbuffer
+  MessageBingdingOption,
+  PlatformEnum
 } from '../../../core/index.js'
 import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
+import { directController } from '../direct.js'
 /**
  * 公信事件
  * @param socket
@@ -36,25 +37,26 @@ export async function MESSAGES(event: EventGroup) {
         : ('group' as 'group' | 'single'),
     bot: getBotMsgByONE(),
     isMaster: event.user_id == masterID ? true : false,
+    guild_id: event.group_id,
+    guild_avatar: '',
+    guild_name: event.group_name,
+    channel_name: '',
+    channel_id: event.group_id,
+    attachments: [],
+    specials: [],
+    at: false,
+    at_user: undefined,
+    at_users: [],
     msg_txt: event.raw_message,
+    msg: event.raw_message.trim(),
+    msg_id: event.message_id,
+    open_id: event.user_id,
     user_id: event.user_id,
     user_avatar:
       event.platform == 'qq'
         ? `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`
         : 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
     user_name: event.sender.nickname,
-    guild_id: event.group_id,
-    guild_name: event.group_name,
-    guild_avatar: '',
-    channel_name: '',
-    channel_id: event.group_id,
-    at: false,
-    at_user: undefined,
-    at_users: [],
-    attachments: [],
-    specials: [],
-    msg: event.raw_message.trim(),
-    msg_id: event.message_id,
     segment: segmentONE,
     send_at: new Date().getTime(),
     Message,
@@ -67,13 +69,11 @@ export async function MESSAGES(event: EventGroup) {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
+      if (select?.open_id) {
+        return await directController(msg, select.open_id)
+      }
       const guild_id = select.guild_id ?? event.group_id
       return await replyController(msg, guild_id)
     }

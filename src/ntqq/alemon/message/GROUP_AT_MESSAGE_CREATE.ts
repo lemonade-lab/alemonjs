@@ -2,7 +2,8 @@ import {
   InstructionMatching,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
@@ -47,6 +48,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     msg_txt: event.content,
     msg: event.content.trim(),
     msg_id: event.id,
+    open_id: '',
     user_id: event.author.id,
     user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
     user_name: '柠檬冲水',
@@ -65,13 +67,13 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
+      // 如果存在 open_id 表示 转为私聊
+      if (select?.open_id) {
+        console.error('VILLA 无私信')
+        return false
+      }
       const group_id = select?.guild_id ?? event.group_id
       return await replyController(msg, group_id, event.id)
     }

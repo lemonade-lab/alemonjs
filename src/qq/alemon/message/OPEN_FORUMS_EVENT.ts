@@ -3,11 +3,14 @@ import {
   typeMessage,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { directController } from '../direct.js'
+import { replyController } from '../reply.js'
 
 /**
  * ***********
@@ -105,6 +108,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     msg_id: '',
     msg_txt: '',
     msg: '',
+    open_id: event.msg.guild_id,
 
     //
     user_id: '',
@@ -122,13 +126,22 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
+      select?: MessageBingdingOption
+    ): Promise<any> => {
+      const msg_id = select?.msg_id ?? false
+      if (!msg_id) return false
+      const withdraw = select?.withdraw ?? 0
+      if (select?.open_id) {
+        return await directController(msg, select?.open_id, msg_id, {
+          withdraw
+        })
       }
-    ): Promise<any> => {}
+      const channel_id = select?.channel_id ?? event.msg.channel_id
+      return await replyController(msg, channel_id, msg_id, {
+        quote: select?.quote,
+        withdraw
+      })
+    }
   }
 
   /**

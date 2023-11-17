@@ -10,7 +10,6 @@ import { getUrlbuffer } from '../../core/index.js'
  */
 export async function directController(
   msg: Buffer | string | number | (Buffer | number | string)[],
-  detail_type: string,
   user_id: string
 ) {
   // is buffer
@@ -22,7 +21,7 @@ export async function directController(
           action: 'send_message',
           params: {
             // 私聊回复
-            detail_type: detail_type,
+            detail_type: 'private',
             // 用户
             user_id: user_id,
             // 消息体
@@ -62,7 +61,7 @@ export async function directController(
           action: 'send_message',
           params: {
             // 私聊回复
-            detail_type: detail_type,
+            detail_type: 'private',
             // 用户
             user_id: user_id,
             // 消息体
@@ -110,50 +109,28 @@ export async function directController(
     const getUrl = match[1]
     const msg = await getUrlbuffer(getUrl)
     if (Buffer.isBuffer(msg)) {
-      if (detail_type == 'private') {
-        ClientONE.send(
-          JSON.stringify({
-            // 行为 发送消息  send_group_msg
-            action: 'send_message',
-            params: {
-              // 私聊回复
-              detail_type: detail_type,
-              // 用户
-              user_id: user_id,
-              // 消息体
-              message: [
-                {
-                  type: 'image',
-                  data: {
-                    file_id: `base64://${msg.toString('base64')}`
-                  }
+      ClientONE.send(
+        JSON.stringify({
+          // 行为 发送消息  send_group_msg
+          action: 'send_message',
+          params: {
+            // 私聊回复
+            detail_type: 'private',
+            // 用户
+            user_id: user_id,
+            // 消息体
+            message: [
+              {
+                type: 'image',
+                data: {
+                  file_id: `base64://${msg.toString('base64')}`
                 }
-              ]
-            },
-            echo: '1234'
-          })
-        )
-      } else {
-        // 群聊
-        ClientONE.send(
-          JSON.stringify({
-            action: 'send_group_msg',
-            params: {
-              group_id: '',
-              // 消息体
-              message: [
-                {
-                  type: 'image',
-                  data: {
-                    file_id: `base64://${msg.toString('base64')}`
-                  }
-                }
-              ]
-            },
-            echo: '1234'
-          })
-        )
-      }
+              }
+            ]
+          },
+          echo: '1234'
+        })
+      )
     }
   }
 
@@ -168,7 +145,7 @@ export async function directController(
       action: 'send_message',
       params: {
         // 私聊回复
-        detail_type: detail_type,
+        detail_type: 'private',
         // 用户
         user_id: user_id,
         // 消息体

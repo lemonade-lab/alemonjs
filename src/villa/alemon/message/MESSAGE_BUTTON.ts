@@ -3,6 +3,7 @@ import {
   EventEnum,
   EventType,
   InstructionMatching,
+  MessageBingdingOption,
   PlatformEnum
 } from '../../../core/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
@@ -97,6 +98,7 @@ export async function MESSAGE_BUTTON(event: {
     msg_id: msg_id,
     msg: '',
     msg_txt: '',
+    open_id: '',
 
     //
     user_id: String(ClickMsgComponent.uid),
@@ -113,13 +115,12 @@ export async function MESSAGE_BUTTON(event: {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
+      if (select?.open_id) {
+        console.error('VILLA 无私信')
+        return false
+      }
       const villa_id = select?.guild_id ?? ClickMsgComponent.villa_id
       const room_id = select?.channel_id ?? ClickMsgComponent.room_id
       return await replyController(villa_id, room_id, msg, {

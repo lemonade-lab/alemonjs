@@ -167,6 +167,13 @@ interface MsgBase {
    */
   msg_id: string
   /**
+   *  会话编号
+   *  用于确保私聊正常对话的过渡id
+   *  在私聊中,想要进行其他其他频道操作
+   *  必须传入open_id来确保各平台字段不会冲突
+   */
+  open_id: string
+  /**
    * 消息创建时间
    */
   send_at: number
@@ -326,31 +333,36 @@ export interface ReplyBase {
     /**
      * 选择
      */
-    select?: {
-      /**
-       * 引用消息编号,默认不引用
-       */
-      quote?: string
-      /**
-       * 撤回毫秒数,默认不撤回
-       */
-      withdraw?: number
-      /**
-       * 频道号
-       */
-      guild_id?: string
-      /**
-       * 子频道号
-       */
-      channel_id?: string
-      /**
-       *
-       */
-      msg_id?: string
-    }
+    select?: MessageBingdingOption
   ): Promise<any>
 }
 
+export interface MessageBingdingOption {
+  /**
+   * 引用消息编号,默认不引用
+   */
+  quote?: string
+  /**
+   * 撤回毫秒数,默认不撤回
+   */
+  withdraw?: number
+  /**
+   * 频道号
+   */
+  guild_id?: string
+  /**
+   * 子频道号
+   */
+  channel_id?: string
+  /**
+   * 消息编号
+   */
+  msg_id?: string
+  /**
+   * 私聊会话标记
+   */
+  open_id: string
+}
 /**
  * 控制器可选参
  */
@@ -371,6 +383,10 @@ export interface ControllerOption {
    * 用户编号
    */
   user_id?: string
+  /**
+   * 私聊会话识别
+   */
+  open_id?: string
 }
 
 interface MemberControllerBase {

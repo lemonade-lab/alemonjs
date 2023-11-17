@@ -2,7 +2,8 @@ import {
   typeMessage,
   PlatformEnum,
   EventType,
-  EventEnum
+  EventEnum,
+  MessageBingdingOption
 } from '../../../core/index.js'
 
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
@@ -10,6 +11,8 @@ import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { getBotConfigByKey } from '../../../config/index.js'
+import { directController } from '../direct.js'
+import { replyController } from '../reply.js'
 
 interface EventGuildMembersType {
   eventType: 'GUILD_MEMBER_ADD' | 'GUILD_MEMBER_UPDATE' | 'GUILD_MEMBER_REMOVE'
@@ -71,13 +74,14 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     guild_avatar: '',
     channel_name: '',
     channel_id: '',
+    open_id: '',
     //
     at: false,
     at_user: undefined,
     at_users: [],
     msg: '',
     msg_txt: '',
-    msg_id: '',
+    msg_id: event.msg.guild_id,
     //
     user_id: event.msg.user.id,
     user_name: event.msg.user.username,
@@ -93,13 +97,23 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
+      select?: MessageBingdingOption
+    ): Promise<any> => {
+      const msg_id = select?.msg_id ?? false
+      const withdraw = select?.withdraw ?? 0
+      if (!msg_id) return false
+      if (select?.open_id) {
+        return await directController(msg, select?.open_id, msg_id, {
+          withdraw
+        })
       }
-    ): Promise<any> => {},
+      const channel_id = select?.channel_id ?? false
+      if (!channel_id) return false
+      return await replyController(msg, channel_id, msg_id, {
+        quote: select?.quote,
+        withdraw
+      })
+    },
     Message
   }
 

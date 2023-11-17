@@ -36,17 +36,17 @@ const Controller = {
       }
     }
   },
-  Message: ({ guild_id, msg_id }) => {
+  Message: ({ open_id, msg_id }) => {
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, guild_id, msg_id)
+        return await directController(content, open_id, msg_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, guild_id, msg_id)
+        return await directController(content, open_id, msg_id)
       },
       /**
        * 更新信息
@@ -116,13 +116,13 @@ const Controller = {
  * @returns
  */
 export const ClientDirectController = (data: {
-  guild_id: string
+  open_id: string
   msg_id: string
 }) => {
   return (select?: ControllerOption) => {
-    const guild_id = select?.guild_id ?? data.guild_id
+    const open_id = select?.open_id ?? data.open_id
     const msg_id = select?.msg_id ?? data.msg_id
-    return Controller.Message({ guild_id, msg_id })
+    return Controller.Message({ open_id, msg_id })
   }
 }
 
@@ -146,7 +146,7 @@ export const ClientControllerOnMember = () => {
  */
 export async function directController(
   msg: Buffer | string | number | (Buffer | number | string)[],
-  guild_id: string,
+  open_id: string,
   msg_id: string,
   select?: {
     withdraw?: number
@@ -158,7 +158,7 @@ export async function directController(
   if (Buffer.isBuffer(msg)) {
     try {
       return await Client.postDirectImage({
-        id: guild_id,
+        id: open_id,
         msg_id: msg_id, //消息id, 必须
         image: msg //buffer
       }).catch(everyoneError)
@@ -179,7 +179,7 @@ export async function directController(
       .join('')
     try {
       return await Client.postDirectImage({
-        id: guild_id,
+        id: open_id,
         msg_id: msg_id, //消息id, 必须
         image: msg[isBuffer] as Buffer, //buffer
         content: cont
@@ -206,7 +206,7 @@ export async function directController(
     const msg = await getUrlbuffer(getUrl)
     if (msg) {
       return await Client.postImage({
-        id: guild_id,
+        id: open_id,
         msg_id: msg_id, //消息id, 必须
         image: msg //buffer
       }).catch(everyoneError)
@@ -214,7 +214,7 @@ export async function directController(
   }
 
   return await ClientQQ.directMessageApi
-    .postDirectMessage(guild_id, {
+    .postDirectMessage(open_id, {
       msg_id: msg_id,
       content
     })

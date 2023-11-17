@@ -4,6 +4,7 @@ import {
   EventEnum,
   EventType,
   InstructionMatching,
+  MessageBingdingOption,
   PlatformEnum
 } from '../../../core/index.js'
 import { getBotMsgByONE } from '../bot.js'
@@ -49,6 +50,7 @@ export async function DIRECT_MESSAGE(event: Event) {
     msg_txt: event.raw_message,
     msg: event.raw_message.trim(),
     msg_id: event.message_id,
+    open_id: event.user_id,
     //
     user_id: event.user_id,
     user_avatar:
@@ -67,14 +69,9 @@ export async function DIRECT_MESSAGE(event: Event) {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
-      return await directController(msg, event.detail_type, event.user_id)
+      return await directController(msg, event.user_id)
     },
     Member
   }

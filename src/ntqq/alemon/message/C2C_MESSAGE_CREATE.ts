@@ -3,7 +3,8 @@ import {
   getUrlbuffer,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
 import { segmentNTQQ } from '../segment.js'
@@ -23,6 +24,8 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
 
+  const open_id = event.author.user_openid
+
   const Message = ClientController({
     guild_id: event.author.user_openid,
     msg_id: event.id
@@ -38,7 +41,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByNtqq(),
     isMaster: event.author.id == masterID ? true : false,
-    channel_id: event.author.user_openid, // 私聊重置为用户open编号
+    channel_id: event.author.user_openid,
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
@@ -52,6 +55,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     msg_txt: event.content,
     msg: event.content,
     msg_id: event.id,
+    open_id: open_id,
     //
     user_id: event.author.id,
     user_name: '柠檬冲水',
@@ -61,22 +65,16 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     Member,
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
       // isBuffer
       if (Buffer.isBuffer(msg)) {
         try {
           const url = await ClientKOA.getFileUrl(msg)
           if (!url) return false
-          return await ClientNTQQ.postFilesByUsers(
-            event.author.user_openid,
-            url
-          ).catch(everyoneError)
+          return await ClientNTQQ.postFilesByUsers(open_id, url).catch(
+            everyoneError
+          )
         } catch (err) {
           console.error(err)
           return err
@@ -99,7 +97,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
           const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
           if (!url) return false
           return await ClientNTQQ.postMessageByUser(
-            event.author.user_openid,
+            open_id,
             `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
             event.id
           ).catch(everyoneError)
@@ -129,15 +127,14 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
         if (Buffer.isBuffer(msg)) {
           const url = await ClientKOA.getFileUrl(msg)
           if (!url) return false
-          return await ClientNTQQ.postFilesByUsers(
-            event.author.user_openid,
-            url
-          ).catch(everyoneError)
+          return await ClientNTQQ.postFilesByUsers(open_id, url).catch(
+            everyoneError
+          )
         }
       }
 
       return await ClientNTQQ.postMessageByUser(
-        event.author.user_openid,
+        open_id,
         content,
         event.id
       ).catch(everyoneError)

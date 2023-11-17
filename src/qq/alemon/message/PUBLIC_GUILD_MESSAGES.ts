@@ -2,7 +2,8 @@ import {
   typeMessage,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
@@ -13,6 +14,7 @@ import { getBotConfigByKey } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { replyController } from '../reply.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { directController } from '../direct.js'
 
 interface PUBLIC_GUILD_MESSAGES_TYPE {
   eventType: 'AT_MESSAGE_CREATE'
@@ -105,6 +107,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     msg_id: event.msg.id,
     msg_txt: event.msg?.content ?? '',
     msg: event.msg?.content ?? '',
+    open_id: event.msg.guild_id,
 
     //
     user_id: event.msg.author.id,
@@ -122,20 +125,18 @@ export const PUBLIC_GUILD_MESSAGES = async (
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-        msg_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
-      const channel_id = select?.channel_id ?? event.msg.channel_id
       const msg_id = select?.msg_id ?? event.msg.id
-      const quote = select?.quote ?? event.msg.id
       const withdraw = select?.withdraw ?? 0
+      if (select?.open_id) {
+        return await directController(msg, select?.open_id, msg_id, {
+          withdraw
+        })
+      }
+      const channel_id = select?.channel_id ?? event.msg.channel_id
       return await replyController(msg, channel_id, msg_id, {
-        quote,
+        quote: select?.quote,
         withdraw
       })
     }

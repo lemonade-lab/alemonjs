@@ -56,7 +56,7 @@ export const Controller = {
       }
     }
   },
-  Message: ({ guild_id, channel_id, msg_id }) => {
+  Message: ({ guild_id, channel_id, msg_id, open_id }) => {
     return {
       /**
        * 回复
@@ -67,6 +67,10 @@ export const Controller = {
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
         // villa未有回复api
+        if (open_id) {
+          console.error('VILLA 无私信')
+          return false
+        }
         return await replyController(guild_id, channel_id, content)
       },
       /**
@@ -77,7 +81,10 @@ export const Controller = {
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        // villa未有回复api
+        if (open_id) {
+          console.error('VILLA 无私信')
+          return false
+        }
         return await replyController(guild_id, channel_id, content, {
           quote: msg_id
         })
@@ -199,7 +206,12 @@ export const ClientControllerOnMessage = (data?: {
     const guild_id = select?.guild_id ?? data.guild_id
     const channel_id = select?.channel_id ?? data.channel_id
     const msg_id = select?.msg_id ?? data.msg_id
-    return Controller.Message({ guild_id, channel_id, msg_id })
+    return Controller.Message({
+      guild_id,
+      channel_id,
+      msg_id,
+      open_id: select.open_id
+    })
   }
 }
 

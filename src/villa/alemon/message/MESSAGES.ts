@@ -3,6 +3,7 @@ import {
   EventEnum,
   EventType,
   InstructionMatching,
+  MessageBingdingOption,
   PlatformEnum,
   UserType
 } from '../../../core/index.js'
@@ -177,6 +178,7 @@ export async function MESSAGES(event: {
     msg_id: msg_id,
     msg: msg,
     msg_txt: txt,
+    open_id: '',
 
     //
     user_id: MessageContent.user.id,
@@ -193,13 +195,12 @@ export async function MESSAGES(event: {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
+      if (select?.open_id) {
+        console.error('VILLA 无私信')
+        return false
+      }
       const villa_id = select?.guild_id ?? SendMessage.villa_id
       const room_id = select?.channel_id ?? SendMessage.room_id
       return await replyController(villa_id, room_id, msg, {

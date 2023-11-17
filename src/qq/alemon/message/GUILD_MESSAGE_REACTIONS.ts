@@ -3,12 +3,15 @@ import {
   typeMessage,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { getBotConfigByKey } from '../../../config/index.js'
+import { directController } from '../direct.js'
+import { replyController } from '../reply.js'
 
 interface GUILD_MESSAGE_REACTIONS {
   eventType: 'MESSAGE_REACTION_ADD' | 'MESSAGE_REACTION_REMOVE'
@@ -80,6 +83,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
     msg: '',
     msg_id: event.msg.target.id,
     msg_txt: '',
+    open_id: event.msg.guild_id,
 
     //
     user_id: event.msg.user_id,
@@ -95,13 +99,21 @@ export const GUILD_MESSAGE_REACTIONS = async (
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
+      select?: MessageBingdingOption
+    ): Promise<any> => {
+      const msg_id = select?.msg_id ?? event.msg.target.id
+      const withdraw = select?.withdraw ?? 0
+      if (select?.open_id) {
+        return await directController(msg, select?.open_id, msg_id, {
+          withdraw
+        })
       }
-    ): Promise<any> => {},
+      const channel_id = select?.channel_id ?? event.msg.channel_id
+      return await replyController(msg, channel_id, msg_id, {
+        quote: select?.quote,
+        withdraw
+      })
+    },
     Message,
     Member
   }

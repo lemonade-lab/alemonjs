@@ -62,16 +62,17 @@ export async function getFileUrl(file: Buffer, name?: string) {
 }
 
 /**
+ *
  * 自动清除机制
  * 清除挂载下的所有文件
- * @param time
+ * @param options
  */
-export function autoClearFiles(time = 300000) {
-  const fileDir = getServerConfig('fileDir')
+export function autoClearFiles(options?: { time?: number; dir?: string }) {
+  const fileDir = options?.dir ?? getServerConfig('fileDir')
   setInterval(() => {
     const files = readdirSync(join(process.cwd(), fileDir))
     for (const file of files) {
       unlinkSync(join(process.cwd(), fileDir, file))
     }
-  }, time)
+  }, options?.time ?? 300000)
 }

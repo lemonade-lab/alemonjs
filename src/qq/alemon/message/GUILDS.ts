@@ -3,11 +3,14 @@ import {
   typeMessage,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { directController } from '../direct.js'
+import { replyController } from '../reply.js'
 
 /**
  * GUILD 频道
@@ -90,6 +93,7 @@ export const GUILD = async (event: EventGuildType) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    open_id: event.msg.id,
 
     //
     user_id: '',
@@ -105,11 +109,22 @@ export const GUILD = async (event: EventGuildType) => {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
+      select?: MessageBingdingOption
+    ): Promise<any> => {
+      const msg_id = select?.msg_id ?? event.msg.id
+      const withdraw = select?.withdraw ?? 0
+      if (select?.open_id) {
+        return await directController(msg, select?.open_id, msg_id, {
+          withdraw
+        })
       }
-    ): Promise<any> => {},
+      const channel_id = select?.channel_id ?? false
+      if (!channel_id) return false
+      return await replyController(msg, channel_id, msg_id, {
+        quote: select?.quote,
+        withdraw
+      })
+    },
     Message,
     Member
   }

@@ -3,7 +3,8 @@ import {
   InstructionMatching,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
@@ -100,6 +101,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     msg,
     msg_txt: event.content,
     msg_id: event.msg_id,
+    open_id: event.extra.code, // 子频道
     //
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
@@ -115,14 +117,12 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
-      // 公的
+      if (select?.open_id) {
+        console.error('VILLA 无私信')
+        return false
+      }
       return await replyController(msg, event.target_id)
     }
   }

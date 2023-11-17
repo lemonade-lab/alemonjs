@@ -4,7 +4,8 @@ import {
   InstructionMatching,
   EventEnum,
   PlatformEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -20,6 +21,7 @@ import {
   directController,
   ClientControllerOnMember
 } from '../direct.js'
+import { replyController } from '../reply.js'
 
 declare global {
   //接口对象
@@ -70,8 +72,10 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 export const DIRECT_MESSAGE = async (event: directEventData) => {
+  const open_id = event.msg?.guild_id
+
   const Message = ClientDirectController({
-    guild_id: event.msg?.guild_id ?? '',
+    open_id: open_id ?? '',
     msg_id: event.msg?.id ?? ''
   })
 
@@ -101,6 +105,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     msg: event.msg?.content ?? '',
     msg_txt: event.msg?.content ?? '',
     msg_id: event.msg.id,
+    open_id: open_id,
     //
     user_id: event.msg.author.id,
     user_name: event.msg.author.username,
@@ -109,19 +114,12 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     send_at: new Date().getTime(),
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-        msg_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
-      const guild_id = select?.channel_id ?? event.msg.guild_id
-      const channel_id = select?.channel_id ?? event.msg.channel_id
+      const open_id = select?.open_id ?? event.msg.guild_id
       const msg_id = select?.msg_id ?? event.msg.id
       const withdraw = select?.withdraw ?? 0
-      return await directController(msg, guild_id, msg_id, {
+      return await directController(msg, open_id, msg_id, {
         withdraw
       })
     },

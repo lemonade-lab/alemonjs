@@ -2,15 +2,19 @@ import {
   InstructionMatching,
   PlatformEnum,
   EventEnum,
-  EventType
+  EventType,
+  MessageBingdingOption
 } from '../../../core/index.js'
 import { EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
-import { directController } from '../direct.js'
+import {
+  ClientDirectController,
+  ClientControllerOnMember,
+  directController
+} from '../direct.js'
 
 /**
  * @param event
@@ -18,21 +22,21 @@ import { directController } from '../direct.js'
  */
 export const DIRECT_MESSAGE = async (event: EventData) => {
   if (event.extra.author.bot) return false
-  //
+
+  const open_id = event.extra.code
+
   const cfg = getBotConfigByKey('kook')
   const masterID = cfg.masterID
 
   const avatar = event.extra.author.avatar
 
-  const Message = ClientController({
+  // 私聊中 控制器并非私聊接口
+  const Message = ClientDirectController({
     msg_id: event?.msg_id,
-    user_id: event.extra.author?.id
+    open_id: open_id
   })
 
-  const Member = ClientControllerOnMember({
-    guild_id: event?.target_id, // 频道
-    user_id: event.extra?.author?.id
-  })
+  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'kook' as (typeof PlatformEnum)[number],
@@ -49,7 +53,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     guild_name: '',
     guild_avatar: '',
     channel_name: event.extra.channel_name,
-    channel_id: event.extra.code, // 子频道
+    channel_id: '', // 子频道
     attachments: [],
     specials: [],
     //
@@ -59,6 +63,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     msg: event.content,
     msg_txt: event.content,
     msg_id: event.msg_id,
+    open_id: event.extra.code,
     //
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
@@ -74,15 +79,11 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
      */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: {
-        quote?: string
-        withdraw?: number
-        guild_id?: string
-        channel_id?: string
-      }
+      select?: MessageBingdingOption
     ): Promise<any> => {
-      // 私的
-      return await directController(msg, event.author_id, event.extra.code)
+      const open_id = select?.open_id ?? event.extra.code
+      const msg_id = select?.msg_id ?? event.msg_id
+      return await directController(msg, msg_id, open_id)
     }
   }
 
