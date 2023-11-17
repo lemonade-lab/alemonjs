@@ -35,6 +35,7 @@ export function buttonAutomaticArrangement(
   }
 
   // 应该先按照数字大小分 三个类  再进行 分类中的小分区
+
   const small_component_group_list = []
   const mid_component_group_list = []
   const big_component_group_list = []
@@ -49,6 +50,11 @@ export function buttonAutomaticArrangement(
       small_component_group_list.push(slist)
       slist = []
     }
+  }
+
+  if (slist.length == 3) {
+    small_component_group_list.push(slist)
+    slist = []
   }
 
   // 如果   slist是 1 slist是  2 就留到下一批
@@ -66,8 +72,17 @@ export function buttonAutomaticArrangement(
     }
   }
 
+  if (mlist.length == 2) {
+    mid_component_group_list.push(mlist)
+    mlist = []
+  }
+
   for (const item of mlist) {
-    big_component_group_list.push(item)
+    big_component_group_list.push([item])
+  }
+
+  for (const item of big) {
+    big_component_group_list.push([item])
   }
 
   return {
