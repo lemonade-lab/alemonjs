@@ -8,6 +8,7 @@ import { defineVILLA as villa } from '../villa/villa.js'
 import { defineQQ as qq } from '../qq/qq.js'
 import { defineNtqq as ntqq } from '../ntqq/ntqq.js'
 import { defineOne as one } from '../one/one.js'
+import { defineDISCORD as discord } from '../discord/discord.js'
 
 /**
  * *************
@@ -23,7 +24,8 @@ const config: ConfigType = {
   ntqq,
   server,
   puppeteer,
-  one
+  one,
+  discord
 }
 
 /**

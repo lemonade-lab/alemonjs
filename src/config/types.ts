@@ -1,11 +1,12 @@
-import { PuppeteerLaunchOptions } from 'puppeteer'
-import { MysqlOptions, RedisOptions } from '../default/types.js'
-import { ServerOptions } from '../koa/types.js'
-import { KOOKOptions } from '../kook/kook.js'
-import { VILLAOptions } from '../villa/villa.js'
-import { QQOptions } from '../qq/qq.js'
-import { NTQQOptions } from '../ntqq/ntqq.js'
-import { OneOptions } from '../one/one.js'
+import { type PuppeteerLaunchOptions } from 'puppeteer'
+import { type MysqlOptions, type RedisOptions } from '../default/types.js'
+import { type ServerOptions } from '../koa/types.js'
+import { type KOOKOptions } from '../kook/kook.js'
+import { type VILLAOptions } from '../villa/villa.js'
+import { type QQOptions } from '../qq/qq.js'
+import { type NTQQOptions } from '../ntqq/ntqq.js'
+import { type OneOptions } from '../one/one.js'
+import { type DISOCRDOptions } from '../discord/discord.js'
 /**
  * ******
  * config
@@ -21,4 +22,5 @@ export interface ConfigType {
   puppeteer: PuppeteerLaunchOptions
   ntqq: NTQQOptions
   one: OneOptions
+  discord: DISOCRDOptions
 }

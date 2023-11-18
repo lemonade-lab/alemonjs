@@ -155,6 +155,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       // 自定义覆盖
       setBotConfigByKey('one', Options.login.one)
     }
+    if (Options.login?.discord) {
+      // 自定义覆盖
+      setBotConfigByKey('discord', Options.login.discord)
+    }
     for (const item in Options.login) {
       if (arr.indexOf(item) != -1) continue
       if (!rebotMap[item]) continue

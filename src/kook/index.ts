@@ -20,7 +20,7 @@ export async function createAlemonByKOOK() {
     /**
      * 读取配置
      */
-    const cfg = await getBotConfigByKey('kook')
+    const cfg = getBotConfigByKey('kook')
 
     /**
      * 创建连接

@@ -43,5 +43,15 @@ export const rebotMap = {
       console.error('ONE BOT open err')
       return false
     })
+  },
+  discord: async (): Promise<boolean> => {
+    const { createAlemonByDISCORD: discord } = await import(
+      '../discord/index.js'
+    )
+    return discord().catch(err => {
+      console.error(err)
+      console.error('DISCORD BOT open err')
+      return false
+    })
   }
 }

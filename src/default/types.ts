@@ -3,6 +3,7 @@ import { KOOKOptions } from '../kook/kook.js'
 import { QQOptions } from '../qq/qq.js'
 import { NTQQOptions } from '../ntqq/ntqq.js'
 import { OneOptions } from '../one/one.js'
+import { DISOCRDOptions } from '../discord/discord.js'
 /**
  * *****
  * login
@@ -29,6 +30,11 @@ export interface LoginOptions {
    * qq配置
    */
   one?: OneOptions
+  /**
+   * discord配置
+   */
+
+  discord?: DISOCRDOptions
 }
 
 /**

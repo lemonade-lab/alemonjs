@@ -61,7 +61,7 @@ const ConversationMap = {
    */
   [255]: {
     public: async (event: SystemData) => {
-      // overheadData | memberData | ChannelData |EditingData
+      // overheadData | memberData
       console.log(event.extra.body)
       if (
         event.extra.type == 'added_reaction' ||
