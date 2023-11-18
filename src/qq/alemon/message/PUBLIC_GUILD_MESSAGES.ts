@@ -74,13 +74,13 @@ export const PUBLIC_GUILD_MESSAGES = async (
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: event.msg.id,
-    user_id: event.msg.author.id
+    user_id: event.msg?.author?.id ?? ''
   })
 
   const Member = ClientControllerOnMember({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
-    user_id: event.msg.author.id
+    user_id: event.msg?.author?.id ?? ''
   })
 
   const cfg = getBotConfigByKey('qq')
@@ -93,7 +93,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
-    isMaster: event.msg.author.id == masterID,
+    isMaster: event.msg?.author?.id == masterID,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
     guild_id: event.msg.guild_id,
@@ -111,9 +111,9 @@ export const PUBLIC_GUILD_MESSAGES = async (
     open_id: event.msg.guild_id,
 
     //
-    user_id: event.msg.author.id,
-    user_name: event.msg.author.username,
-    user_avatar: event.msg.author.avatar,
+    user_id: event.msg?.author?.id ?? '',
+    user_name: event.msg?.author?.username ?? '',
+    user_avatar: event.msg?.author?.avatar ?? '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
     Message,
@@ -134,7 +134,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
         return await directController(msg, select?.open_id, msg_id, {
           withdraw,
           open_id: select?.open_id,
-          user_id: event.msg.author.id
+          user_id: event.msg?.author?.id ?? ''
         })
       }
       const channel_id = select?.channel_id ?? event.msg.channel_id

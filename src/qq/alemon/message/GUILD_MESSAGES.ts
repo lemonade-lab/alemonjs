@@ -69,7 +69,7 @@ export const GUILD_MESSAGES = async (event: any) => {
     open_id: event.msg.guild_id,
 
     user_id: event.msg?.author?.id ?? '',
-    user_name: event.msg.author?.username ?? '',
+    user_name: event.msg?.author?.username ?? '',
     user_avatar: event.msg?.author?.avatar ?? '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
@@ -89,7 +89,7 @@ export const GUILD_MESSAGES = async (event: any) => {
         return await directController(msg, select?.open_id, msg_id, {
           withdraw,
           open_id: select?.open_id,
-          user_id: event.msg.author.id
+          user_id: event.msg?.author?.id ?? ''
         })
       }
       const channel_id = select?.channel_id ?? event.msg.channel_id
