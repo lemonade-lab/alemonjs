@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { getKookToken } from './config.js'
+import { getDISCORD } from './config.js'
 
 /**
  * KOOK服务
@@ -7,7 +7,7 @@ import { getKookToken } from './config.js'
  * @returns
  */
 export function Service(config: AxiosRequestConfig) {
-  const token = getKookToken()
+  const { token } = getDISCORD()
   const service = axios.create({
     baseURL: 'https://discord.com/api/v10',
     timeout: 6000,

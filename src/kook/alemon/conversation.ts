@@ -62,7 +62,7 @@ const ConversationMap = {
   [255]: {
     public: async (event: SystemData) => {
       // overheadData | memberData
-      console.log(event.extra.body)
+      console.info(event.extra.body)
       if (
         event.extra.type == 'added_reaction' ||
         event.extra.type == 'deleted_reaction'
@@ -71,15 +71,15 @@ const ConversationMap = {
         return await GUILD_MESSAGE_REACTIONS(event)
       } else if (event.extra.type == 'joined_channel') {
         //
-        console.log('joined_channel')
+        console.info('joined_channel')
         return
       } else if (event.extra.type == 'exited_channel') {
         //
-        console.log('exited_channel')
+        console.info('exited_channel')
         return
       } else if (event.extra.type == 'updated_channel') {
         // ChannelData
-        console.log('updated_channel')
+        console.info('updated_channel')
         return
         /**
          * ***********
@@ -87,10 +87,10 @@ const ConversationMap = {
          * *******
          */
       } else if (event.extra.type == 'joined_guild') {
-        console.log('joined_guild')
+        console.info('joined_guild')
         return
       } else if (event.extra.type == 'exited_guild') {
-        console.log('exited_guild')
+        console.info('exited_guild')
         return
         /**
          * **********
@@ -100,19 +100,19 @@ const ConversationMap = {
       } else if (event.extra.type == 'updated_message') {
         // 消息更新
         // EditingData
-        console.log('updated_message')
+        console.info('updated_message')
         return
       } else if (event.extra.type == 'pinned_message') {
         // 顶置消息
         // overheadData
-        console.log('pinned_message')
+        console.info('pinned_message')
         return
       }
     },
     direct: async (event: SystemData) => {
       if (event.extra.type == 'guild_member_online') {
         //OnLineData
-        console.log('exited_guild')
+        console.info('exited_guild')
         return
       }
     }

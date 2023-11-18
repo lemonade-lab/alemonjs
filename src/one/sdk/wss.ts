@@ -35,7 +35,7 @@ export function createWsHandler(
         fun[event.type](event)
       } else {
         if (event?.status != 'ok') {
-          console.log('[ONE]', event)
+          console.info('[ONE]', event)
         }
       }
     }

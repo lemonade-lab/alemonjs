@@ -1,4 +1,7 @@
 import { defineAlemonConfig } from './src/index.js'
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
 export default defineAlemonConfig({
   login: {
     // villa: {
@@ -9,7 +12,7 @@ export default defineAlemonConfig({
     // },
     // discord: {
     //   token:
-    //     'MTExNDAxOTc0MDUyMDgxMjY1NQ.GP0ZrB.gLEkXVvMiDDpcsSkVgbkOfjiX7hKGt1OVBz56U'
+    //     'MTE1NzE1MjE5OTgyMzA2OTIxNQ.GvQPhi.UwXc8sieZ8q3xCQmcOyL36d6fZGAmIyfvoo5tU'
     // }
   },
   app: {

@@ -1,3 +1,4 @@
+import { IntentsEnum } from './sdk/index.js'
 /**
  * ****
  * discord
@@ -8,6 +9,10 @@ export interface DISOCRDOptions {
    * 钥匙
    */
   token: string
+  /**
+   *
+   */
+  intent?: IntentsEnum[]
   /**
    * 主人编号
    */
@@ -20,8 +25,17 @@ export interface DISOCRDOptions {
 /**
  *
  */
-export const defineDISCORD = {
+export const defineDISCORD: DISOCRDOptions = {
   token: '',
+  intent: [
+    IntentsEnum.DIRECT_MESSAGES,
+    IntentsEnum.DIRECT_MESSAGE_TYPING,
+    IntentsEnum.DIRECT_MESSAGE_REACTIONS,
+    IntentsEnum.GUILD_MESSAGE_TYPING,
+    IntentsEnum.GUILD_MESSAGE_REACTIONS,
+    IntentsEnum.GUILD_MESSAGES,
+    IntentsEnum.GUILDS
+  ],
   masterID: '',
   password: ''
 }

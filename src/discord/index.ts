@@ -1,5 +1,5 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-import { createClient } from './sdk/wss.js'
+import { getIntents, setDISOCRD, createClient } from './sdk/index.js'
+import { conversation } from './alemon/conversation.js'
 import { checkRobotByDISCORD } from './login.js'
 import { getBotConfigByKey } from '../config/index.js'
 /**
@@ -21,9 +21,20 @@ export async function createAlemonByDISCORD() {
      */
     const cfg = getBotConfigByKey('discord')
 
-    createClient()
+    const size = getIntents(cfg.intent)
 
+    /**
+     * 设置配置
+     */
+    setDISOCRD(cfg.token, size)
+    /**
+     * 启动监听
+     */
+    createClient(conversation)
     return true
   }
   return false
 }
+
+// 客户端
+export { ClientDISOCRD } from './sdk/index.js'

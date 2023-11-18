@@ -1,17 +1,23 @@
 let token = ''
 
+let intent = 0
+
 /**
  *
  * @param val
  */
-export function setKookToken(val: string) {
+export function setDISOCRD(val: string, i: number) {
   token = val
+  intent = i
 }
 
 /**
  *
  * @returns
  */
-export function getKookToken() {
-  return token
+export function getDISCORD() {
+  return {
+    token,
+    intent
+  }
 }

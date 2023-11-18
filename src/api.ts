@@ -24,6 +24,10 @@ export { ClientKOOK } from './kook/index.js'
  * one客户端
  */
 export { ClientONE } from './one/index.js'
+/**
+ * discord
+ */
+export { ClientDISOCRD } from './discord/index.js'
 
 /**
  * 控制器
