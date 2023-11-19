@@ -1,9 +1,4 @@
-import {
-  getIntents,
-  setDISOCRD,
-  createClient,
-  ClientDISOCRD
-} from './sdk/index.js'
+import { getIntents, setDISOCRD, createClient } from './sdk/index.js'
 import { conversation } from './alemon/conversation.js'
 import { checkRobotByDISCORD } from './login.js'
 import { getBotConfigByKey } from '../config/index.js'

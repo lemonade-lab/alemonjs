@@ -16,8 +16,6 @@ export function applicationsMe() {
   }).then(res => res.data)
 }
 
-//
-
 /**
  *
  * @param user_id
