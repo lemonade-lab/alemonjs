@@ -16,8 +16,7 @@ import {
   type ColorEnum,
   type MemberRolePermissionEnum,
   type Emoticon,
-  type MemberRoleList,
-  type UrlType
+  type MemberRoleList
 } from './types.js'
 import { createPicFrom } from '../../core/index.js'
 import { getClientConfig } from './config.js'
@@ -52,7 +51,9 @@ export async function transferImage(
   villa_id: number | string,
   url: string
 ): Promise<{
-  data: UrlType
+  data: {
+    new_url: string
+  }
 }> {
   return await villaService({
     method: 'post',

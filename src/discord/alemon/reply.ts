@@ -1,8 +1,7 @@
 import { getUrlbuffer } from '../../core/index.js'
-import { ClientNTQQ } from '../sdk/index.js'
-import { ClientKOA } from '../../koa/index.js'
-import IMGS from 'image-size'
+import { ClientDISOCRD as Client } from '../sdk/index.js'
 import { everyoneError } from '../../log/index.js'
+
 /**
  * 回复控制器
  * @param msg
@@ -12,23 +11,26 @@ import { everyoneError } from '../../log/index.js'
  */
 export async function replyController(
   msg: Buffer | string | number | (Buffer | number | string)[],
-  guild_id: string,
-  msg_id: string
+  channel_id: string,
+  msg_id: string,
+  select?: {
+    quote?: string
+    withdraw?: number
+  }
 ) {
-  // is buffer
+  // isBuffer
+
+  // if withdraw == 0 ， false 不撤回
+
   if (Buffer.isBuffer(msg)) {
     try {
-      const url = await ClientKOA.getFileUrl(msg)
-      if (!url) return false
-      return await ClientNTQQ.postFilesByGroup(guild_id, url).catch(
-        everyoneError
-      )
+      return false
     } catch (err) {
       console.error(err)
       return err
     }
   }
-
+  // arr & find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
     const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
     const cont = msg
@@ -39,20 +41,12 @@ export async function replyController(
       .filter(element => typeof element === 'string')
       .join('')
     try {
-      const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
-      const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
-      if (!url) return false
-      return await ClientNTQQ.postMessageByGroup(
-        guild_id,
-        `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-        msg_id
-      ).catch(everyoneError)
+      return false
     } catch (err) {
       console.error(err)
       return err
     }
   }
-
   const content = Array.isArray(msg)
     ? msg.join('')
     : typeof msg === 'string'
@@ -66,15 +60,15 @@ export async function replyController(
   /**
    * http
    */
+
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    return await ClientNTQQ.postFilesByGroup(guild_id, getUrl).catch(
-      everyoneError
-    )
+    const msg = await getUrlbuffer(getUrl)
+    if (msg) {
+      return false
+    }
   }
 
-  return await ClientNTQQ.postMessageByGroup(guild_id, content, msg_id).catch(
-    everyoneError
-  )
+  return false
 }

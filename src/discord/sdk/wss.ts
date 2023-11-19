@@ -5,9 +5,12 @@ import { getDISCORD } from './config.js'
  * 创建ws监听
  */
 export async function createClient(conversation: (...args: any[]) => any) {
-  const data = await gateway()
-  const websocketUrl = data.url
-  const wsConn = new WebSocket(`${websocketUrl}?v=10&encoding=json`)
+  const { url } = await gateway()
+  if (!url) {
+    console.error('TOKEN 错误')
+    return
+  }
+  const wsConn = new WebSocket(`${url}?v=10&encoding=json`)
 
   let heartbeat_interval = 0
 
@@ -119,6 +122,7 @@ export async function createClient(conversation: (...args: any[]) => any) {
   // 关闭
   wsConn.on('close', () => {
     console.error('ws close')
+    console.error('登录失败,TOKEN存在风险')
   })
 
   // 出错

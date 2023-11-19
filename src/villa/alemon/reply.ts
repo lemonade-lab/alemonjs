@@ -98,6 +98,7 @@ export async function replyController(
       ).catch(everyoneError)
     }
   }
+
   // string and string[]
   const cont = Array.isArray(msg)
     ? msg.join('')
@@ -114,28 +115,27 @@ export async function replyController(
   const match = cont.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
+    // url 形式的直接转存
+    const url = await ClientVILLA.transferImage(villa_id, getUrl).then(
+      res => res?.data?.new_url
+    )
+    if (!url) return false
     const msg = await getUrlbuffer(getUrl)
-    if (msg) {
-      /**
-       * 上传图片
-       */
-      const url = await ClientVILLA.uploadImage(villa_id, msg).then(
-        res => res?.data?.url
-      )
-      if (!url) return false
-      const dimensions = IMGS.imageSize(msg)
-      return await ClientVILLA.sendMessageImage(
-        villa_id,
-        room_id,
-        url,
-        {
-          width: dimensions.width,
-          height: dimensions.height
-        },
-        select?.quote
-      ).catch(everyoneError)
-    }
+    if (!msg) return false
+    // 如果是直接的url,应该直接使用转存
+    const dimensions = IMGS.imageSize(msg)
+    return await ClientVILLA.sendMessageImage(
+      villa_id,
+      room_id,
+      url,
+      {
+        width: dimensions.width,
+        height: dimensions.height
+      },
+      select?.quote
+    ).catch(everyoneError)
   }
+
   /**
    * reply
    */

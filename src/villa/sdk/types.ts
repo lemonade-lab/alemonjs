@@ -446,11 +446,6 @@ export interface Emoticon {
   icon: string
 }
 
-// 转存返回类型
-export interface UrlType {
-  new_url: string
-}
-
 // 图片参数
 export interface ImageSizeType {
   width: number
