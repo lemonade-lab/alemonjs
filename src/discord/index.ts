@@ -20,18 +20,14 @@ export async function createAlemonByDISCORD() {
      * 读取配置
      */
     const cfg = getBotConfigByKey('discord')
-
-    const size = getIntents(cfg.intent)
-
     /**
      * 设置配置
      */
-    setDISOCRD(cfg.token, size)
+    setDISOCRD(cfg.token, getIntents(cfg.intent))
     /**
      * 启动监听
      */
-    createClient(conversation)
-
+    createClient(conversation, cfg?.shard)
     return true
   }
   return false

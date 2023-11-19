@@ -4,7 +4,10 @@ import { getDISCORD } from './config.js'
 /**
  * 创建ws监听
  */
-export async function createClient(conversation: (...args: any[]) => any) {
+export async function createClient(
+  conversation: (...args: any[]) => any,
+  shard = [0, 1]
+) {
   const { url } = await gateway()
   if (!url) {
     console.error('TOKEN 错误')
@@ -82,7 +85,7 @@ export async function createClient(conversation: (...args: any[]) => any) {
       const data = {
         op: 2,
         d: {
-          shard: [0, 1],
+          shard: shard,
           token: `Bot ${token}`,
           intents: intent,
           properties: {
