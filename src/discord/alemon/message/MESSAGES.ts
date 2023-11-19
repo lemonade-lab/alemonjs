@@ -4,20 +4,15 @@ import {
   InstructionMatching,
   MessageBingdingOption,
   PlatformEnum,
-  UserType,
-  typeMessage
+  UserType
 } from '../../../core/index.js'
-import {
-  AlemonJSError,
-  AlemonJSLog,
-  AlemonJSEventError,
-  AlemonJSEventLog
-} from '../../../log/index.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
-import { getBotMsgByDISCORD, setBotMsgByDISOCRD } from '../bot.js'
+import { getBotMsgByDISCORD } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'
 import { replyController } from '../reply.js'
+import { ClientDISOCRD } from '../../sdk/index.js'
 
 interface MESSAGES_TYPE {
   type: number
@@ -69,7 +64,7 @@ interface MESSAGES_TYPE {
 export async function MESSAGES(event: MESSAGES_TYPE) {
   if (event.author?.bot) return
 
-  console.log('MESSAGES', event)
+  // console.log('MESSAGES', event)
 
   const Message = ClientController({
     guild_id: event.guild_id,
@@ -86,61 +81,6 @@ export async function MESSAGES(event: MESSAGES_TYPE) {
 
   const cfg = getBotConfigByKey('discord')
   const masterID = cfg.masterID
-
-  const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
-    event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
-    boundaries: 'publick' as 'publick' | 'private',
-    attribute: 'group' as 'group' | 'single',
-    bot: getBotMsgByDISCORD(),
-    isMaster: event.author?.id == masterID,
-    attachments: event?.attachments ?? [],
-    specials: [],
-    guild_id: event.guild_id,
-    guild_name: '',
-    guild_avatar: '',
-    channel_name: '',
-    channel_id: event.channel_id,
-    //
-    at: false,
-    at_user: undefined,
-    at_users: [],
-    msg_id: event.id,
-    msg_txt: event.content ?? '',
-    msg: event.content ?? '',
-    open_id: '',
-
-    //
-    user_id: event.author?.id ?? '',
-    user_name: event.author?.username ?? '',
-    user_avatar: event.author?.avatar ?? '',
-    segment: segmentDISCORD,
-    send_at: new Date(event.timestamp).getTime(),
-    Message,
-    Member,
-    /**
-     * 发送消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.id
-      const withdraw = select?.withdraw ?? 0
-      if (select?.open_id && select?.open_id != '') {
-        return false
-      }
-      const channel_id = select?.channel_id ?? event.channel_id
-      return await replyController(msg, channel_id, msg_id, {
-        quote: select?.quote,
-        withdraw
-      })
-    }
-  }
 
   /**
    * 艾特消息处理
@@ -183,6 +123,64 @@ export async function MESSAGES(event: MESSAGES_TYPE) {
   }
   if (at) {
     at_user = at_users.find(item => item.bot != true)
+  }
+
+  const e = {
+    platform: 'qq' as (typeof PlatformEnum)[number],
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    eventType: 'CREATE' as (typeof EventType)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
+    bot: getBotMsgByDISCORD(),
+    isMaster: event.author?.id == masterID,
+    attachments: event?.attachments ?? [],
+    specials: [],
+    guild_id: event.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
+    channel_id: event.channel_id,
+    //
+    at: at,
+    at_user: at_user,
+    at_users: at_users,
+    msg_id: event.id,
+    msg_txt: event.content ?? '',
+    msg: msg,
+    open_id: '',
+
+    //
+    user_id: event.author?.id ?? '',
+    user_name: event.author?.username ?? '',
+    user_avatar: ClientDISOCRD.UserAvatar(
+      event.author?.id,
+      event.author?.avatar
+    ),
+    segment: segmentDISCORD,
+    send_at: new Date(event.timestamp).getTime(),
+    Message,
+    Member,
+    /**
+     * 发送消息
+     * @param msg
+     * @param img
+     * @returns
+     */
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: MessageBingdingOption
+    ): Promise<any> => {
+      const msg_id = select?.msg_id ?? event.id
+      const withdraw = select?.withdraw ?? 0
+      if (select?.open_id && select?.open_id != '') {
+        return false
+      }
+      const channel_id = select?.channel_id ?? event.channel_id
+      return await replyController(msg, channel_id, msg_id, {
+        quote: select?.quote,
+        withdraw
+      })
+    }
   }
 
   /**

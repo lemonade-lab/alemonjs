@@ -18,18 +18,15 @@ export async function replyController(
     withdraw?: number
   }
 ) {
-  // isBuffer
-
-  // if withdraw == 0 ， false 不撤回
-
   if (Buffer.isBuffer(msg)) {
     try {
-      return false
+      return await Client.channelsMessagesImage(channel_id, msg)
     } catch (err) {
       console.error(err)
       return err
     }
   }
+
   // arr & find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
     const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))
@@ -41,7 +38,7 @@ export async function replyController(
       .filter(element => typeof element === 'string')
       .join('')
     try {
-      return false
+      return await Client.channelsMessagesImage(channel_id, msg[isBuffer], cont)
     } catch (err) {
       console.error(err)
       return err
@@ -57,18 +54,16 @@ export async function replyController(
 
   if (content == '') return false
 
-  /**
-   * http
-   */
-
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
     const msg = await getUrlbuffer(getUrl)
     if (msg) {
-      return false
+      return await Client.channelsMessagesImage(channel_id, msg)
     }
   }
 
-  return false
+  return Client.channelsMessages(channel_id, {
+    content: content
+  }).catch(everyoneError)
 }

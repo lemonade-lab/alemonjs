@@ -1,7 +1,4 @@
-import { IMember } from 'qq-guild-bot'
-import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
-import { getBotConfigByKey } from '../../config/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id, channel_id }) => {
     return {

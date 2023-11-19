@@ -1,4 +1,3 @@
-import { getUrlbuffer } from '../../core/index.js'
 import { ClientNTQQ } from '../sdk/index.js'
 import { ClientKOA } from '../../koa/index.js'
 import IMGS from 'image-size'
