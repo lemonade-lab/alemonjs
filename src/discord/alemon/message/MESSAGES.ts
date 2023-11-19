@@ -21,7 +21,17 @@ interface MESSAGES_TYPE {
   referenced_message: null
   pinned: boolean
   nonce: string
-  mentions: any[]
+  mentions: {
+    username: string
+    public_flags: number
+    member: any
+    id: string
+    global_name: null
+    discriminator: string
+    bot: boolean
+    avatar_decoration_data: null
+    avatar: string
+  }[]
   mention_roles: any[]
   mention_everyone: boolean
   member: {
@@ -86,22 +96,16 @@ export async function MESSAGES(event: MESSAGES_TYPE) {
    * 艾特消息处理
    */
   const at_users: UserType[] = []
-  const obj = {} // Object.fromEntries(event.mentions.users)
 
   /**
-   *
+   * 切割
    */
-  for (const item in obj) {
+  for (const item of event.mentions) {
     at_users.push({
-      id: obj[item].id,
-      name: obj[item].username,
-      avatar:
-        obj[item].avatarURL({
-          extension: 'png',
-          forceStatic: true,
-          size: 1024
-        }) ?? '',
-      bot: obj[item].bot
+      id: item.id,
+      name: item.username,
+      avatar: ClientDISOCRD.UserAvatar(item.id, item.avatar),
+      bot: item.bot
     })
   }
 
@@ -145,7 +149,7 @@ export async function MESSAGES(event: MESSAGES_TYPE) {
     at_user: at_user,
     at_users: at_users,
     msg_id: event.id,
-    msg_txt: event.content ?? '',
+    msg_txt: event.content,
     msg: msg,
     open_id: '',
 
