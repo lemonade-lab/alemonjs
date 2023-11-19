@@ -15,13 +15,9 @@ export interface ServerOptions {
    */
   port?: number
   /**
-   *
+   * 地址路由
    */
   addressRouter?: string
-  /**
-   * 图片随机度
-   */
-  fileSize?: number
   /**
    * 挂载路由
    */

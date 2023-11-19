@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { writeFile } from 'fs/promises'
-import { existsSync, mkdirSync, readdirSync, readFileSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync } from 'fs'
 import lodash from 'lodash'
 import {
   getAppArg,
@@ -66,19 +66,6 @@ const plugins: object = {}
 
 // 大正则
 let mergedRegex: RegExp
-
-/**
- * 得到机器人帮助
- * @param AppName
- * @returns 指令对象
- */
-export function getPluginHelp(AppName: string) {
-  const c = getAppProCoinfg('regex')
-  if (c === false) return {}
-  const dir = getAppProCoinfg('route')
-  const basePath = join(process.cwd(), dir, `${AppName}.json`)
-  return JSON.parse(readFileSync(basePath, 'utf8'))
-}
 
 /**
  * 创建机器人帮助

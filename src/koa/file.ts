@@ -3,6 +3,7 @@ import { writeFileSync, readdirSync, unlinkSync, existsSync } from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
 import { getServerConfig } from './config.js'
 import { getPublicIP } from '../core/index.js'
+import { createHash } from 'crypto'
 
 /**
  * 得到本地文件请求地址
@@ -41,7 +42,6 @@ export async function getFileUrl(file: Buffer, name?: string) {
   if (!Buffer.isBuffer(file)) return false
   const fileDir = getServerConfig('fileDir')
   const fileRouter = getServerConfig('fileRouter')
-  const fileSize = getServerConfig('fileSize')
   const port = getServerConfig('port')
   const http = getServerConfig('http')
   let ip = getServerConfig('ip')
@@ -51,7 +51,8 @@ export async function getFileUrl(file: Buffer, name?: string) {
   }
   // 使用 'bin' 作为默认扩展名
   const extension = (await fileTypeFromBuffer(file))?.ext ?? name ?? 'bin'
-  const filename = `${Math.floor(Math.random() * fileSize)}.${extension}`
+  const md5Hash = createHash('md5').update(file).digest('hex')
+  const filename = `${md5Hash}.${extension}`
   const filePath = join(process.cwd(), fileDir, filename)
   console.info('server create', filePath)
   // 保存文件到文件系统

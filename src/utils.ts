@@ -20,6 +20,9 @@ export function buttonAutomaticArrangement(
   const mid = []
   const big = []
   for (const item of arr) {
+    if (!item.text?.length && item.text.length == 0) {
+      continue
+    }
     if (item.text.length <= 2) {
       small.push(item)
       continue

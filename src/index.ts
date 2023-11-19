@@ -1,9 +1,9 @@
 /**
  * *************
- * core
+ * core-main
  * *************
  */
-export * from './core/index.js'
+export * from './core/main.js'
 /**
  * *************
  * config system

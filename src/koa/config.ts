@@ -16,10 +16,6 @@ const ServerCfg: ServerOptions = {
    */
   ip: 'localhost',
   /**
-   * 图片随机度
-   */
-  fileSize: 9999999,
-  /**
    * 挂载路由
    */
   fileRouter: '/api/alemonjs/file',
