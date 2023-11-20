@@ -12,7 +12,6 @@ import { everyoneError } from '../../log/index.js'
 export async function replyController(
   msg: Buffer | string | number | (Buffer | number | string)[],
   channel_id: string,
-  msg_id: string,
   select?: {
     quote?: string
     withdraw?: number

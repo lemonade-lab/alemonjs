@@ -1,4 +1,5 @@
 import { ControllerOption, UserInformationType } from '../../core/index.js'
+import { replyController } from './reply.js'
 export const Controller = {
   Member: ({ guild_id, user_id, channel_id }) => {
     return {
@@ -39,7 +40,7 @@ export const Controller = {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return false
+        return await replyController(content, channel_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]

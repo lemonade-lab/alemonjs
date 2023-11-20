@@ -71,10 +71,10 @@ interface MESSAGES_TYPE {
  * 基础消息
  * @param event
  */
-export async function MESSAGES(event: MESSAGES_TYPE) {
+export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
   if (event.author?.bot) return
 
-  // console.log('MESSAGES', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.log('MESSAGES_TYPE', event)
 
   const Message = ClientController({
     guild_id: event.guild_id,

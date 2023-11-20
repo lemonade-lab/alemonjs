@@ -9,6 +9,7 @@ let bot: BotMessage = {
   name: '',
   avatar: 'string'
 }
+
 export function setBotMsgByDISOCRD(val: BotMessage) {
   bot = val
 }

@@ -365,9 +365,7 @@ export async function loadInit() {
  * @returns 是否处理完成
  */
 export async function InstructionMatching(e: AMessage) {
-  // 标记当前函数平台
-  global.APlatform = e.platform
-
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.log(e)
   /**
    * 对话机
    */
@@ -482,6 +480,8 @@ export async function InstructionMatching(e: AMessage) {
  * @returns 是否处理完成
  */
 export async function typeMessage(e: AMessage) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.log(e)
+
   if (!CommandNotMessage[e.event]) return true
 
   const APPCACHE: {
