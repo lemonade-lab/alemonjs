@@ -1,8 +1,7 @@
 export const defineOne = {
   url: '',
   access_token: '',
-  masterID: '',
-  password: ''
+  masterID: ''
 }
 
 /**
@@ -23,8 +22,4 @@ export interface OneOptions {
    * 主人编号
    */
   masterID?: string
-  /**
-   * 主人密码
-   */
-  password?: string
 }

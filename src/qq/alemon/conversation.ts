@@ -39,7 +39,9 @@ export const createConversationByQQ = ws => {
    */
   ws.on(SessionEvents.READY, async data => {
     const cfg = getBotConfigByKey('qq')
-    if (cfg.sandbox) console.info('ready', data)
+    if (cfg.sandbox) {
+      console.info('ready', data)
+    }
     const robot: BotData = data.msg
     const bot = {
       id: robot.user.id,

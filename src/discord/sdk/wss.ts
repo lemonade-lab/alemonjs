@@ -60,9 +60,9 @@ export async function createClient(
         })
       )
     },
-    9: () => {
+    9: message => {
       //  6 或 2 失败
-      console.info('无效会话')
+      console.info('parameter error', message)
     },
     /**
      * 打招呼
@@ -104,7 +104,7 @@ export async function createClient(
       wsConn.send(JSON.stringify(data))
     },
     11: ({ d }) => {
-      console.info('心跳确认')
+      console.info('heartbeat transmission')
     }
   }
 

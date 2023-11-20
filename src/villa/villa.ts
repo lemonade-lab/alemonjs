@@ -21,10 +21,6 @@ export interface VILLAOptions {
    */
   masterID?: string
   /**
-   * 主人密码
-   */
-  password?: string
-  /**
    * 回调地址
    */
   url?: string
@@ -55,7 +51,6 @@ export const defineVILLA = {
   secret: '',
   pub_key: '',
   masterID: '',
-  password: '',
   http: 'http',
   url: '/api/mys/callback',
   port: 8080,

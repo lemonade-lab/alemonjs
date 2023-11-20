@@ -27,10 +27,6 @@ export interface QQOptions {
    */
   masterID?: string
   /**
-   * 主人密码
-   */
-  password?: string
-  /**
    * 事件订阅
    */
   intents?: AvailableIntentsEventsEnum[]
@@ -49,12 +45,12 @@ export const defineQQ = {
   token: '',
   secret: '',
   masterID: '',
-  password: '',
   intents: [
     AvailableIntentsEventsEnum.GUILDS,
     AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
     AvailableIntentsEventsEnum.DIRECT_MESSAGE
   ] as AvailableIntentsEventsEnum[],
   isPrivate: false,
-  sandbox: false
+  sandbox: false,
+  shard: [0, 1]
 }

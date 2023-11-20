@@ -21,10 +21,6 @@ export interface DISOCRDOptions {
    * 主人编号
    */
   masterID?: string
-  /**
-   * 主人密码
-   */
-  password?: string
 }
 /**
  *
@@ -53,6 +49,5 @@ export const defineDISCORD: DISOCRDOptions = {
     IntentsEnum.GUILD_PRESENCES
   ],
   shard: [0, 1],
-  masterID: '',
-  password: ''
+  masterID: ''
 }

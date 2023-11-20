@@ -178,7 +178,7 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
         }
         case 11: {
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.info('heartbeat transmission', message)
+          console.info('heartbeat transmission')
           break
         }
         case 12: {

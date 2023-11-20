@@ -21,6 +21,10 @@ import { directController } from '../direct.js'
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') {
+    console.log('GROUP_AT_MESSAGE_CREATE', event)
+  }
+
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
 
