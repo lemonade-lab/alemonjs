@@ -6,6 +6,16 @@ import { MESSAGE_UPDATE } from './message/MESSAGE_UPDATE.js'
 import { TYPING_START } from './message/TYPING_START.js'
 import { MESSAGE_REACTION_ADD } from './message/MESSAGE_REACTION_ADD.js'
 import { VOICE_STATE_UPDATE } from './message/VOICE_STATE_UPDATE.js'
+import { GUILD_MEMBER_UPDATE } from './message/GUILD_MEMBER_UPDATE.js'
+import { GUILD_MEMBER_ADD } from './message/GUILD_MEMBER_ADD.js'
+import { CHANNEL_TOPIC_UPDATE } from './message/CHANNEL_TOPIC_UPDATE.js'
+import { VOICE_CHANNEL_STATUS_UPDATE } from './message/VOICE_CHANNEL_STATUS_UPDATE.js'
+
+/**
+ *
+ * @param t
+ * @param d
+ */
 export function conversation(t: string, d: any) {
   console.log(t)
   if (t == 'READY') {
@@ -36,6 +46,18 @@ export function conversation(t: string, d: any) {
   } else if (t == 'VOICE_STATE_UPDATE') {
     //
     VOICE_STATE_UPDATE(d)
+  } else if (t == 'GUILD_MEMBER_UPDATE') {
+    //
+    GUILD_MEMBER_UPDATE(d)
+  } else if (t == 'GUILD_MEMBER_ADD') {
+    //
+    GUILD_MEMBER_ADD(d)
+  } else if (t == 'CHANNEL_TOPIC_UPDATE') {
+    //
+    CHANNEL_TOPIC_UPDATE(d)
+  } else if (t == 'VOICE_CHANNEL_STATUS_UPDATE') {
+    //
+    VOICE_CHANNEL_STATUS_UPDATE(d)
   } else {
     if (process.env?.ALEMONJS_EVENT == 'dev') console.log('数据', d)
   }

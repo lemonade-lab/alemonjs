@@ -54,9 +54,12 @@ export async function getFileUrl(file: Buffer, name?: string) {
   const md5Hash = createHash('md5').update(file).digest('hex')
   const filename = `${md5Hash}.${extension}`
   const filePath = join(process.cwd(), fileDir, filename)
-  console.info('server create', filePath)
-  // 保存文件到文件系统
-  writeFileSync(filePath, file)
+  if (!existsSync(filePath)) {
+    // 保存文件到文件系统
+    // 仅有该文件不存在的时候才写入
+    console.info('server create', filePath)
+    writeFileSync(filePath, file)
+  }
   const url = `${http}://${ip}:${port}${fileRouter}/${filename}`
   console.info('setLocalFile url', url)
   return url

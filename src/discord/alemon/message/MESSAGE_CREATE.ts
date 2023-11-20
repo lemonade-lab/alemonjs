@@ -180,7 +180,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
         return false
       }
       const channel_id = select?.channel_id ?? event.channel_id
-      return await replyController(msg, channel_id, msg_id, {
+      return await replyController(msg, channel_id, {
         quote: select?.quote,
         withdraw
       })
