@@ -10,6 +10,7 @@ import { GUILD_MEMBER_UPDATE } from './message/GUILD_MEMBER_UPDATE.js'
 import { GUILD_MEMBER_ADD } from './message/GUILD_MEMBER_ADD.js'
 import { CHANNEL_TOPIC_UPDATE } from './message/CHANNEL_TOPIC_UPDATE.js'
 import { VOICE_CHANNEL_STATUS_UPDATE } from './message/VOICE_CHANNEL_STATUS_UPDATE.js'
+import { MESSAGE_DELETE } from './message/MESSAGE_DELETE.js'
 
 /**
  *
@@ -58,6 +59,9 @@ export function conversation(t: string, d: any) {
   } else if (t == 'VOICE_CHANNEL_STATUS_UPDATE') {
     //
     VOICE_CHANNEL_STATUS_UPDATE(d)
+  } else if (t == 'MESSAGE_DELETE') {
+    //
+    MESSAGE_DELETE(d)
   } else {
     if (process.env?.ALEMONJS_EVENT == 'dev') console.log('数据', d)
   }

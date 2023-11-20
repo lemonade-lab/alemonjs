@@ -62,7 +62,8 @@ const ConversationMap = {
   [255]: {
     public: async (event: SystemData) => {
       // overheadData | memberData
-      console.info(event.extra.body)
+      if (process.env?.ALEMONJS_EVENT == 'dev') console.info(event.extra.body)
+
       if (
         event.extra.type == 'added_reaction' ||
         event.extra.type == 'deleted_reaction'

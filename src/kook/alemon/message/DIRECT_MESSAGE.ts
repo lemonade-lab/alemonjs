@@ -23,6 +23,8 @@ import {
 export const DIRECT_MESSAGE = async (event: EventData) => {
   if (event.extra?.author?.bot) return false
 
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info(event)
+
   const open_id = event.extra.code
 
   const cfg = getBotConfigByKey('kook')
