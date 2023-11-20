@@ -11,14 +11,14 @@ import { GUILD_MEMBER_ADD } from './message/GUILD_MEMBER_ADD.js'
 import { CHANNEL_TOPIC_UPDATE } from './message/CHANNEL_TOPIC_UPDATE.js'
 import { VOICE_CHANNEL_STATUS_UPDATE } from './message/VOICE_CHANNEL_STATUS_UPDATE.js'
 import { MESSAGE_DELETE } from './message/MESSAGE_DELETE.js'
-
+import { CHANNEL_UPDATE } from './message/CHANNEL_UPDATE.js'
+import { GUILD_MEMBER_REMOVE } from './message/GUILD_MEMBER_REMOVE.js'
 /**
  *
  * @param t
  * @param d
  */
 export function conversation(t: string, d: any) {
-  console.log(t)
   if (t == 'READY') {
     // 上线
     setBotMsgByDISOCRD({
@@ -62,7 +62,16 @@ export function conversation(t: string, d: any) {
   } else if (t == 'MESSAGE_DELETE') {
     //
     MESSAGE_DELETE(d)
+  } else if (t == 'CHANNEL_UPDATE') {
+    //
+    CHANNEL_UPDATE(d)
+  } else if (t == 'GUILD_MEMBER_REMOVE') {
+    //
+    GUILD_MEMBER_REMOVE(d)
   } else {
-    if (process.env?.ALEMONJS_EVENT == 'dev') console.log('数据', d)
+    if (process.env?.ALEMONJS_EVENT == 'dev') {
+      console.log(t)
+      console.log('数据', d)
+    }
   }
 }
