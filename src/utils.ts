@@ -52,6 +52,7 @@ export function buttonAutomaticArrangement(
       // 第三个进去
       small_component_group_list.push(slist)
       slist = []
+      slist.push(item)
     }
   }
 
@@ -74,6 +75,7 @@ export function buttonAutomaticArrangement(
       // 第二个进去
       mid_component_group_list.push(mlist)
       mlist = []
+      mlist.push(item)
     }
   }
 
