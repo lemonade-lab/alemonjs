@@ -2,17 +2,21 @@ import { GROUP_AT_MESSAGE_CREATE } from './message/GROUP_AT_MESSAGE_CREATE.js'
 import { C2C_MESSAGE_CREATE } from './message/C2C_MESSAGE_CREATE.js'
 import { setBotMsgByNtqq } from './bot.js'
 /**
- * 回话对象
+ *
+ * @param t
+ * @param d
  */
-export const conversation = {
-  READY: async data => {
+export function conversation(t: string, d: any) {
+  if (t == 'READY') {
     // 设置bot信息
     setBotMsgByNtqq({
-      id: data.user.id,
-      name: data.user.name,
+      id: d.user.id,
+      name: d.user.name,
       avatar: 'string'
     })
-  },
-  GROUP_AT_MESSAGE_CREATE: GROUP_AT_MESSAGE_CREATE,
-  C2C_MESSAGE_CREATE: C2C_MESSAGE_CREATE
+  } else if (t == 'GROUP_AT_MESSAGE_CREATE') {
+    C2C_MESSAGE_CREATE(d)
+  } else if (t == 'C2C_MESSAGE_CREATE') {
+    GROUP_AT_MESSAGE_CREATE(d)
+  }
 }

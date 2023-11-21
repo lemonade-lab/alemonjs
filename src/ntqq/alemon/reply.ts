@@ -19,7 +19,7 @@ export async function replyController(
     try {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
-      return await ClientNTQQ.postFilesByGroup(guild_id, url).catch(
+      return await ClientNTQQ.groupsOpenFiles(guild_id, url).catch(
         everyoneError
       )
     } catch (err) {
@@ -41,7 +41,7 @@ export async function replyController(
       const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
       const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
       if (!url) return false
-      return await ClientNTQQ.postMessageByGroup(
+      return await ClientNTQQ.groupOpenMessages(
         guild_id,
         `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
         msg_id
@@ -68,12 +68,12 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    return await ClientNTQQ.postFilesByGroup(guild_id, getUrl).catch(
+    return await ClientNTQQ.groupsOpenFiles(guild_id, getUrl).catch(
       everyoneError
     )
   }
 
-  return await ClientNTQQ.postMessageByGroup(guild_id, content, msg_id).catch(
+  return await ClientNTQQ.groupOpenMessages(guild_id, content, msg_id).catch(
     everyoneError
   )
 }

@@ -159,9 +159,7 @@ export async function directController(
     try {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
-      return await ClientNTQQ.postFilesByUsers(open_id, url).catch(
-        everyoneError
-      )
+      return await ClientNTQQ.usersOpenFiles(open_id, url).catch(everyoneError)
     } catch (err) {
       console.error(err)
       return err
@@ -183,7 +181,7 @@ export async function directController(
       const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
       const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
       if (!url) return false
-      return await ClientNTQQ.postMessageByUser(
+      return await ClientNTQQ.usersOpenMessages(
         open_id,
         `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
         msg_id
@@ -214,13 +212,11 @@ export async function directController(
     if (Buffer.isBuffer(msg)) {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
-      return await ClientNTQQ.postFilesByUsers(open_id, url).catch(
-        everyoneError
-      )
+      return await ClientNTQQ.usersOpenFiles(open_id, url).catch(everyoneError)
     }
   }
 
-  return await ClientNTQQ.postMessageByUser(open_id, content, msg_id).catch(
+  return await ClientNTQQ.usersOpenMessages(open_id, content, msg_id).catch(
     everyoneError
   )
 }

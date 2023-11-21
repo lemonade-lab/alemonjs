@@ -12,14 +12,6 @@ export async function checkRobotByQQ() {
     (config.appID ?? '') !== '' &&
     (config.token ?? '') !== ''
   ) {
-    if (!config.intents) {
-      config.intents = [
-        AvailableIntentsEventsEnum.GUILDS,
-        AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
-        AvailableIntentsEventsEnum.DIRECT_MESSAGE,
-        AvailableIntentsEventsEnum.GUILD_MEMBERS
-      ]
-    }
     setBotConfigByKey('qq', config)
     return true
   }

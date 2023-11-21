@@ -1,18 +1,7 @@
 import { checkRobotByQQ } from './login.js'
 import { getBotConfigByKey } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
-import {
-  setBotNTQQConfig,
-  createClient,
-  ClientNTQQ,
-  BotConfig
-} from './sdk/index.js'
-
-interface aut {
-  access_token: string
-  expires_in: number
-  cache: boolean
-}
+import { createClient, setTimeoutBotConfig } from './sdk/index.js'
 
 export async function createAlemonByNtqq() {
   /**
@@ -30,47 +19,18 @@ export async function createAlemonByNtqq() {
     const cfg = getBotConfigByKey('ntqq')
 
     /**
-     * 发送请求
+     * token
+     * group是刷新的
+     * qq的是固定的
      */
-    const data: aut = await ClientNTQQ.getAuthentication(
-      cfg.appID,
-      cfg.secret
-    ).then(res => res.data)
-
-    const g = {
-      appID: cfg.appID,
-      token: data.access_token,
-      secret: cfg.secret,
-      intents: ['C2C_MESSAGE_CREATE', 'GROUP_AT_MESSAGE_CREATE']
-    } as BotConfig
 
     /**
-     * 设置配置
+     * 鉴权刷新
      */
-    setBotNTQQConfig(g)
-
-    const bal = async () => {
-      /**
-       * 发送请求
-       */
-      const data: aut = await ClientNTQQ.getAuthentication(
-        cfg.appID,
-        cfg.secret
-      ).then(res => res.data)
-
-      g.token = data.access_token
-
-      /**
-       * 设置配置
-       */
-      setBotNTQQConfig(g)
-
-      console.info('refresh', data.expires_in, 's')
-
-      setTimeout(bal, data.expires_in * 1000)
-    }
-
-    setTimeout(bal, data.expires_in * 1000)
+    setTimeoutBotConfig({
+      appID: cfg.appID,
+      secret: cfg.secret
+    })
 
     /**
      * 创建客户端

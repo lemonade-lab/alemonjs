@@ -1,36 +1,28 @@
 import WebSocket from 'ws'
-import { requestService } from './api.js'
+import { Service } from './server.js'
 import { getBotConfig } from './config.js'
 import { getIntentsMask } from './intents.js'
-
-/**
- *
- */
-export type OpStart = {
-  READY?: (event: any) => Promise<any>
-  FRIEND_ADD?: (event: any) => Promise<any>
-  GROUP_AT_MESSAGE_CREATE?: (event: any) => Promise<any>
-  C2C_MESSAGE_CREATE?: (event: any) => Promise<any>
-  INTERACTION_CREATE?: (event: any) => Promise<any>
-}
 
 /**
  * @param token  token
  * @returns
  */
-export async function getGatewayUrl(): Promise<string | undefined> {
-  try {
-    const response = await requestService({
-      url: '/gateway'
-    }).then(res => res.data)
-    if (response.url) {
-      return response.url
-    } else {
-      console.error('http err:', null)
-    }
-  } catch (error) {
-    console.error('token err:', error.message)
-  }
+export function getGatewayUrl(): Promise<string | undefined> {
+  return Service({
+    url: '/gateway'
+  })
+    .then(res => res.data)
+    .then(data => {
+      const { url } = data
+      if (url) {
+        return url
+      } else {
+        console.error('http err:', null)
+      }
+    })
+    .catch(error => {
+      console.error('token err:', error.message)
+    })
 }
 
 let reconnectAttempts = 0 // 重新连接计数器
@@ -40,7 +32,10 @@ let reconnectAttempts = 0 // 重新连接计数器
  * @param token
  * @param callBack
  */
-export async function createClient(call: OpStart, shard = [0, 1]) {
+export async function createClient(
+  conversation: (...args: any[]) => any,
+  shard = [0, 1]
+) {
   /**
    * 请求url
    */
@@ -60,7 +55,7 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
     await new Promise(resolve => setTimeout(resolve, 5000))
 
     // 调用createClient函数重新建立连接
-    await createClient(call, shard)
+    await createClient(conversation, shard)
 
     reconnectAttempts++ // 递增重连计数器
   }
@@ -68,7 +63,7 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
-      console.info('token ok')
+      console.info('TOKEN ok')
     })
     /**
      * 标记是否已连接
@@ -78,115 +73,94 @@ export async function createClient(call: OpStart, shard = [0, 1]) {
      * 存储最新的消息序号
      */
     let heartbeat_interval = 30000
-
     /**
      * 鉴权
      */
-
     let power
+
+    const map = {
+      0: ({ t, d }) => {
+        // 存在,则执行t对应的函数
+        conversation(t, d)
+        // Ready Event，鉴权成功
+        if (t === 'READY') {
+          power = setInterval(() => {
+            if (isConnected) {
+              ws.send(
+                JSON.stringify({
+                  op: 1, //  op = 1
+                  d: null // 如果是第一次连接，传null
+                })
+              )
+            }
+          }, heartbeat_interval)
+        }
+        // Resumed Event，恢复连接成功
+        if (t === 'RESUMED') {
+          console.info('restore connection')
+          // 重制次数
+          reconnectAttempts = 0
+        }
+      },
+      6: message => {
+        console.info('connection attempt', message)
+      },
+      7: async message => {
+        // 执行重新连接
+        console.info('reconnect', message)
+        // 取消鉴权发送
+        if (power) clearInterval(power)
+        await reconnect()
+      },
+      9: message => {
+        console.info('parameter error', message)
+      },
+      10: ({ d }) => {
+        // 重制次数
+        isConnected = true
+        //
+        heartbeat_interval = d.heartbeat_interval
+        const { token, intents } = getBotConfig()
+        /**
+         * 发送鉴权
+         */
+        ws.send(
+          JSON.stringify({
+            op: 2, // op = 2
+            d: {
+              token: `QQBot ${token}`,
+              intents: getIntentsMask(intents),
+              shard,
+              properties: {
+                $os: process.platform,
+                $browser: 'alemonjs',
+                $device: 'alemonjs'
+              }
+            }
+          })
+        )
+        reconnectAttempts = 0
+      },
+      11: () => {
+        // OpCode 11 Heartbeat ACK 消息，心跳发送成功
+        console.info('heartbeat transmission')
+      },
+      12: message => {
+        console.info('platform data', message)
+      }
+    }
 
     /**
      * 监听消息
      */
     ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))
-      /**
-       * opcode
-       *
-       * s 标识消息的唯一性
-       *
-       * t 代表事件类型
-       *
-       * d 代表事件内容
-       */
-      const { op, s, d: data, t } = message
+      const { op, s, d, t } = message
       // 根据 opcode 进行处理
-
-      switch (op) {
-        case 0: {
-          // 存在,则执行t对应的函数
-          if (Object.prototype.hasOwnProperty.call(call, t)) {
-            call[t](data)
-          }
-          // Ready Event，鉴权成功
-          if (t === 'READY') {
-            power = setInterval(() => {
-              if (isConnected) {
-                ws.send(
-                  JSON.stringify({
-                    op: 1, //  op = 1
-                    d: null // 如果是第一次连接，传null
-                  })
-                )
-              }
-            }, heartbeat_interval)
-          }
-          // Resumed Event，恢复连接成功
-          if (t === 'RESUMED') {
-            console.info('restore connection')
-            // 重制次数
-            reconnectAttempts = 0
-          }
-          break
-        }
-        case 6: {
-          console.info('connection attempt', message)
-          break
-        }
-        case 7: {
-          // 执行重新连接
-          console.info('reconnect', message)
-
-          // 取消鉴权发送
-          if (power) {
-            clearInterval(power)
-          }
-
-          await reconnect()
-          break
-        }
-        case 9: {
-          console.info('parameter error', message)
-          break
-        }
-        case 10: {
-          // 重制次数
-          isConnected = true
-          heartbeat_interval = data.heartbeat_interval
-          const { token, intents } = getBotConfig()
-          /**
-           * 发送鉴权
-           */
-          ws.send(
-            JSON.stringify({
-              op: 2, // op = 2
-              d: {
-                token: `QQBot ${token}`,
-                intents: getIntentsMask(intents),
-                shard,
-                properties: {
-                  $os: 'linux',
-                  $browser: 'my_library',
-                  $device: 'my_library'
-                }
-              }
-            })
-          )
-
-          reconnectAttempts = 0
-          break
-        }
-        case 11: {
-          // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.info('heartbeat transmission')
-          break
-        }
-        case 12: {
-          console.info('platform data', message)
-        }
+      if (Object.prototype.hasOwnProperty.call(map, op)) {
+        map[op]({ d, t })
       }
     })
-
     ws.on('close', () => {
       console.info('[ws] close')
     })

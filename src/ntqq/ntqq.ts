@@ -1,18 +1,4 @@
-/**
- * *****
- * ntqq订阅
- * ****
- */
-export enum NTQQEventsEnum {
-  /**
-   * 群聊消息
-   */
-  GROUP_AT_MESSAGE_CREATE = 'GROUP_AT_MESSAGE_CREATE',
-  /**
-   * 单聊消息
-   */
-  C2C_MESSAGE_CREATE = 'C2C_MESSAGE_CREATE'
-}
+import { IntentsEnum } from './sdk/typings.js'
 
 /**
  * *****
@@ -31,7 +17,7 @@ export interface NTQQOptions {
   /**
    * 密钥
    */
-  secret: string
+  secret?: string
   /**
    * 主人编号
    */
@@ -39,11 +25,15 @@ export interface NTQQOptions {
   /**
    * 事件订阅
    */
-  intents?: NTQQEventsEnum[]
+  intents?: IntentsEnum[]
   /***
    * 分片
    */
   shard?: number[]
+  /**
+   * 订阅模式
+   */
+  mode?: 'qq-guild' | 'qq-group' | 'qq'
 }
 
 export const defineNtqq = {
@@ -51,9 +41,7 @@ export const defineNtqq = {
   token: '',
   secret: '',
   masterID: '',
-  intents: [
-    'GROUP_AT_MESSAGE_CREATE',
-    'C2C_MESSAGE_CREATE'
-  ] as NTQQEventsEnum[],
-  shard: [0, 1]
+  intents: ['GROUP_AT_MESSAGE_CREATE', 'C2C_MESSAGE_CREATE'] as IntentsEnum[],
+  shard: [0, 1],
+  mode: 'qq-group' as 'qq-guild' | 'qq-group' | 'qq'
 }

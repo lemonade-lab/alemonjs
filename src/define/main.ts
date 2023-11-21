@@ -22,9 +22,6 @@ import {
 import { createWeb } from '../koa/index.js'
 import { autoClearFiles } from '../koa/file.js'
 
-// 设置ntqq独立鉴权路径
-export const setAuthenticationByNtqq = ClientNTQQ.setAuthentication
-
 let OptionsCache: AlemonOptions
 
 /**

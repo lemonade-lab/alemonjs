@@ -66,7 +66,7 @@ export const Controller = {
       card: async (msg: any[]) => {
         const arr = []
         for (const item of msg) {
-          arr.push(ClientNTQQ.postMessageByGroupMD(guild_id, item, msg_id))
+          arr.push(ClientNTQQ.groupOpenMessagesMarkdown(guild_id, item, msg_id))
         }
         return arr
       },
