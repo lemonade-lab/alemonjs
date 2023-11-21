@@ -35,8 +35,11 @@ export async function createAlemonByNtqq() {
        */
       setTimeoutBotConfig({
         appID: cfg.appID,
+        token: cfg.token,
         secret: cfg.secret,
-        intents: getIntentsMask(cfg.intents)
+        intents: getIntentsMask(cfg.intents),
+        isPrivate: cfg.isPrivate,
+        sandbox: cfg.sandbox
       })
     }
 

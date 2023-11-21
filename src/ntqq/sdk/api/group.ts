@@ -1,5 +1,22 @@
 import { getBotConfig } from '../config.js'
-import { Service } from './server.js'
+import axios, { AxiosRequestConfig } from 'axios'
+
+/**
+ * 创建axios实例
+ * @param config
+ * @returns
+ */
+export async function GroupService(config: AxiosRequestConfig) {
+  const { token } = getBotConfig()
+  const service = await axios.create({
+    baseURL: 'https://api.sgroup.qq.com',
+    timeout: 20000,
+    headers: {
+      Authorization: `QQBot ${token}`
+    }
+  })
+  return service(config)
+}
 
 /**
  * 发送私聊图片
@@ -12,7 +29,7 @@ export async function usersOpenFiles(
   content: string
 ): Promise<{ id: string; timestamp: number }> {
   const { appID } = getBotConfig()
-  return Service({
+  return GroupService({
     url: `/v2/users/${openid}/files`,
     method: 'post',
     headers: {
@@ -37,7 +54,7 @@ export async function groupsOpenFiles(
   content: string
 ): Promise<{ id: string; timestamp: number }> {
   const { appID } = getBotConfig()
-  return Service({
+  return GroupService({
     url: `/v2/groups/${openid}/files`,
     method: 'post',
     headers: {
@@ -67,7 +84,7 @@ export async function usersOpenMessages(
   // 判断是否是md
   if (/\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
     // md
-    return Service({
+    return GroupService({
       url: `/v2/users/${openid}/messages`,
       method: 'post',
       headers: {
@@ -80,7 +97,7 @@ export async function usersOpenMessages(
       }
     }).then(res => res.data)
   } else {
-    return Service({
+    return GroupService({
       url: `/v2/users/${openid}/messages`,
       method: 'post',
       headers: {
@@ -109,7 +126,7 @@ export async function groupsOpenMessages(
 ): Promise<{ id: string; timestamp: number }> {
   const { appID } = getBotConfig()
   // md
-  return Service({
+  return GroupService({
     url: `/v2/groups/${group_openid}/messages`,
     method: 'post',
     headers: {
@@ -139,7 +156,7 @@ export async function groupOpenMessages(
   // 判断是否是md
   if (/\[[^\]]+\]\([^)]+\)|@everyone/.test(content)) {
     // md
-    return Service({
+    return GroupService({
       url: `/v2/groups/${group_openid}/messages`,
       method: 'post',
       headers: {
@@ -153,7 +170,7 @@ export async function groupOpenMessages(
       }
     }).then(res => res.data)
   } else {
-    return Service({
+    return GroupService({
       url: `/v2/groups/${group_openid}/messages`,
       method: 'post',
       headers: {
@@ -183,7 +200,7 @@ export async function groupOpenMessagesMarkdown(
 ): Promise<{ id: string; timestamp: number }> {
   const { appID } = getBotConfig()
   // md
-  return Service({
+  return GroupService({
     url: `/v2/groups/${group_openid}/messages`,
     method: 'post',
     headers: {
@@ -213,7 +230,7 @@ export async function postRichMediaByUsers(
   file_type: 1 | 2 | 3 | 4
 ): Promise<{ id: string; timestamp: number }> {
   const { appID } = getBotConfig()
-  return Service({
+  return GroupService({
     url: `/v2/users/${openid}/files`,
     method: 'post',
     headers: {
@@ -242,7 +259,7 @@ export async function postRichMediaByGroup(
   file_type: 1 | 2 | 3 | 4
 ): Promise<{ id: string; timestamp: number }> {
   const { appID } = getBotConfig()
-  return Service({
+  return GroupService({
     url: `/v2/groups/${openid}/files`,
     method: 'post',
     headers: {

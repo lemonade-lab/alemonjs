@@ -1,29 +1,6 @@
 import WebSocket from 'ws'
-import { Service } from './api/server.js'
+import { gateway } from './api/index.js'
 import { getBotConfig } from './config.js'
-import { getIntentsMask } from './intents.js'
-
-/**
- * @param token  token
- * @returns
- */
-export function getGatewayUrl(): Promise<string | undefined> {
-  return Service({
-    url: '/gateway'
-  })
-    .then(res => res.data)
-    .then(data => {
-      const { url } = data
-      if (url) {
-        return url
-      } else {
-        console.error('http err:', null)
-      }
-    })
-    .catch(error => {
-      console.error('token err:', error.message)
-    })
-}
 
 let reconnectAttempts = 0 // 重新连接计数器
 
@@ -39,7 +16,7 @@ export async function createClient(
   /**
    * 请求url
    */
-  const gatewayUrl = await getGatewayUrl()
+  const gatewayUrl = await gateway()
 
   // 重新连接的逻辑
   const reconnect = async () => {

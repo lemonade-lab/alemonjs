@@ -1,17 +1,24 @@
-import { getAuthentication } from './api/server.js'
-/**
- * 机器人缓存配置
- */
-let cfg: {
+import { getAuthentication } from './api/auth.js'
+
+interface BotCaCheType {
   appID: string
   token: string
   secret: string
   intents: number
-} = {
+  isPrivate?: boolean
+  sandbox?: boolean
+}
+
+/**
+ * 机器人缓存配置
+ */
+let cfg: BotCaCheType = {
   appID: '',
   token: '',
   secret: '',
-  intents: 0
+  intents: 0,
+  isPrivate: false,
+  sandbox: false
 }
 /**
  * 得到机器人配置
@@ -44,11 +51,7 @@ interface aut {
 /**
  * 定时鉴权
  */
-export async function setTimeoutBotConfig(cfg: {
-  appID: string
-  secret: string
-  intents: number
-}) {
+export async function setTimeoutBotConfig(cfg: BotCaCheType) {
   /**
    * 发送请求
    */
@@ -56,11 +59,13 @@ export async function setTimeoutBotConfig(cfg: {
     res => res.data
   )
 
-  const g = {
+  const g: BotCaCheType = {
     appID: cfg.appID,
     token: data.access_token,
     secret: cfg.secret,
-    intents: cfg.intents
+    intents: cfg.intents,
+    isPrivate: cfg.isPrivate,
+    sandbox: cfg.sandbox
   }
 
   /**
