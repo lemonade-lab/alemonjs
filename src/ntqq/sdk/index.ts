@@ -1,4 +1,5 @@
-export * as ClientNTQQ from './api.js'
+export * as ClientNTQQ from './api/index.js'
 export * from './typings.js'
 export * from './config.js'
 export * from './wss.js'
+export * from './intents.js'

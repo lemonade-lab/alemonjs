@@ -1,4 +1,4 @@
-import { getBotConfig } from './config.js'
+import { getBotConfig } from '../config.js'
 import { Service } from './server.js'
 
 /**

@@ -1,13 +1,17 @@
-import { getAuthentication } from './server.js'
-import { type BotConfig } from './typings.js'
+import { getAuthentication } from './api/server.js'
 /**
  * 机器人缓存配置
  */
-let cfg: BotConfig = {
+let cfg: {
+  appID: string
+  token: string
+  secret: string
+  intents: number
+} = {
   appID: '',
   token: '',
   secret: '',
-  intents: []
+  intents: 0
 }
 /**
  * 得到机器人配置
@@ -21,7 +25,12 @@ export function getBotConfig() {
  * @param val
  * @returns
  */
-export function setBotNTQQConfig(val: BotConfig) {
+export function setBotNTQQConfig(val: {
+  appID: string
+  token: string
+  secret: string
+  intents: number
+}) {
   cfg = val
   return
 }
@@ -38,6 +47,7 @@ interface aut {
 export async function setTimeoutBotConfig(cfg: {
   appID: string
   secret: string
+  intents: number
 }) {
   /**
    * 发送请求
@@ -50,8 +60,8 @@ export async function setTimeoutBotConfig(cfg: {
     appID: cfg.appID,
     token: data.access_token,
     secret: cfg.secret,
-    intents: ['C2C_MESSAGE_CREATE', 'GROUP_AT_MESSAGE_CREATE']
-  } as BotConfig
+    intents: cfg.intents
+  }
 
   /**
    * 设置配置

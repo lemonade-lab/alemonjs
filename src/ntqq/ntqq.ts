@@ -1,4 +1,4 @@
-import { IntentsEnum } from './sdk/typings.js'
+import { IntentsEnum } from './sdk/index.js'
 
 /**
  * *****
@@ -34,6 +34,14 @@ export interface NTQQOptions {
    * 订阅模式
    */
   mode?: 'qq-guild' | 'qq-group' | 'qq'
+  /**
+   * 是否是私域
+   */
+  isPrivate?: boolean
+  /**
+   * 是否是沙盒环境
+   */
+  sandbox?: boolean
 }
 
 export const defineNtqq = {
@@ -43,5 +51,7 @@ export const defineNtqq = {
   masterID: '',
   intents: ['GROUP_AT_MESSAGE_CREATE', 'C2C_MESSAGE_CREATE'] as IntentsEnum[],
   shard: [0, 1],
-  mode: 'qq-group' as 'qq-guild' | 'qq-group' | 'qq'
+  mode: 'qq-group' as 'qq-guild' | 'qq-group' | 'qq',
+  isPrivate: false,
+  sandbox: false
 }

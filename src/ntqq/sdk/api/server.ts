@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { getBotConfig } from './config.js'
+import { getBotConfig } from '../config.js'
 
 /**
  * 得到鉴权

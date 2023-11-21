@@ -1,5 +1,4 @@
 import { setBotConfigByKey, getBotConfigByKey } from '../config/index.js'
-
 /**
  * 登录配置
  * @param Bcf

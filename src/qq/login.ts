@@ -1,4 +1,3 @@
-import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { setBotConfigByKey, getBotConfigByKey } from '../config/index.js'
 /**
  * 登录配置

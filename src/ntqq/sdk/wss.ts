@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { Service } from './server.js'
+import { Service } from './api/server.js'
 import { getBotConfig } from './config.js'
 import { getIntentsMask } from './intents.js'
 
@@ -129,7 +129,7 @@ export async function createClient(
             op: 2, // op = 2
             d: {
               token: `QQBot ${token}`,
-              intents: getIntentsMask(intents),
+              intents: intents,
               shard,
               properties: {
                 $os: process.platform,
