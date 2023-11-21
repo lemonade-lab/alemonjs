@@ -2,11 +2,11 @@ import {
   ControllerOption,
   UserInformationType,
   getUrlbuffer
-} from '../../core/index.js'
-import { ClientNTQQ } from '../sdk/index.js'
+} from '../../../core/index.js'
+import { ClientNTQQ } from '../../sdk/index.js'
 import IMGS from 'image-size'
-import { ClientKOA } from '../../koa/index.js'
-import { everyoneError } from '../../log/index.js'
+import { ClientKOA } from '../../../koa/index.js'
+import { everyoneError } from '../../../log/index.js'
 
 const Controller = {
   Member: () => {

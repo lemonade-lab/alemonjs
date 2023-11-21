@@ -4,7 +4,8 @@ import { conversation } from './alemon/conversation.js'
 import {
   createClient,
   setTimeoutBotConfig,
-  getIntentsMask
+  getIntentsMask,
+  setBotConfig
 } from './sdk/index.js'
 export async function createAlemonByNtqq() {
   /**
@@ -21,23 +22,26 @@ export async function createAlemonByNtqq() {
      */
     const cfg = getBotConfigByKey('ntqq')
 
-    if (cfg.mode == 'qq-guild') {
-      //
-    } else {
-      /**
-       * token
-       * group是刷新的
-       * qq的是固定的
-       */
+    console.log('cfg', cfg)
+    const intents = getIntentsMask(cfg.intents)
 
-      /**
-       * 鉴权刷新
-       */
-      setTimeoutBotConfig({
+    console.log('intents', intents)
+
+    if (cfg.mode == 'qq-guild') {
+      setBotConfig({
         appID: cfg.appID,
         token: cfg.token,
         secret: cfg.secret,
-        intents: getIntentsMask(cfg.intents),
+        intents: intents,
+        isPrivate: cfg.isPrivate,
+        sandbox: cfg.sandbox
+      })
+    } else {
+      await setTimeoutBotConfig({
+        appID: cfg.appID,
+        token: cfg.token,
+        secret: cfg.secret,
+        intents: intents,
         isPrivate: cfg.isPrivate,
         sandbox: cfg.sandbox
       })
@@ -47,7 +51,6 @@ export async function createAlemonByNtqq() {
      * 创建客户端
      */
     createClient(conversation, cfg?.shard ?? [0, 1])
-
     return true
   }
   return false

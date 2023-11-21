@@ -9,7 +9,8 @@ export async function checkRobotByQQ() {
   if (
     (config ?? '') !== '' &&
     (config.appID ?? '') !== '' &&
-    (config.token ?? '') !== ''
+    (config.token ?? '') !== '' &&
+    (config.secret ?? '') !== ''
   ) {
     setBotConfigByKey('ntqq', config)
     return true

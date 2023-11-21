@@ -119,6 +119,8 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
         } else {
           intents.push('PUBLIC_GUILD_MESSAGES')
         }
+        intents.push('GROUP_AT_MESSAGE_CREATE') //频道进出
+        intents.push('C2C_MESSAGE_CREATE') //成员资料
       } else if (Options.login.ntqq.mode == 'qq-group') {
         intents.push('GROUP_AT_MESSAGE_CREATE') //频道进出
         intents.push('C2C_MESSAGE_CREATE') //成员资料

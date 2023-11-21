@@ -1,7 +1,7 @@
 import { replyController } from './reply.js'
-import { ControllerOption, UserInformationType } from '../../core/index.js'
-import { getBotConfigByKey } from '../../config/index.js'
-import { ClientNTQQ } from '../sdk/index.js'
+import { ControllerOption, UserInformationType } from '../../../core/index.js'
+import { getBotConfigByKey } from '../../../config/index.js'
+import { ClientNTQQ } from '../../sdk/index.js'
 export const Controller = {
   Member: () => {
     return {

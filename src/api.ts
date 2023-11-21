@@ -34,7 +34,7 @@ export { ClientDISOCRD } from './discord/index.js'
  */
 import { Controller as villaController } from './villa/alemon/controller.js'
 import { Controller as qqController } from './qq/alemon/controller.js'
-import { Controller as ntqqController } from './ntqq/alemon/controller.js'
+import { Controller as ntqqController } from './ntqq/alemon/group/controller.js'
 import { Controller as kookController } from './kook/alemon/controller.js'
 import { Controller as oneController } from './one/alemon/controller.js'
 import {

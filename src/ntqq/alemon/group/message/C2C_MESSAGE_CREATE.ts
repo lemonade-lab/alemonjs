@@ -4,32 +4,27 @@ import {
   EventEnum,
   EventType,
   MessageBingdingOption
-} from '../../../core/index.js'
+} from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
-import { getBotConfigByKey } from '../../../config/index.js'
-import { GROUP_DATA } from '../types.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
+import { USER_DATA } from '../types.js'
+import { AlemonJSError, AlemonJSLog } from '../../../../log/index.js'
+import { getBotConfigByKey } from '../../../../config/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
-import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
 
-/**
- * 公私域合并
- * @param e
- * @param data  原数据
- * @returns
- */
-export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
+export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') {
-    console.log('GROUP_AT_MESSAGE_CREATE', event)
+    console.log('C2C_MESSAGE_CREATE', event)
   }
 
   const cfg = getBotConfigByKey('ntqq')
   const masterID = cfg.masterID
 
+  const open_id = event.author.user_openid
+
   const Message = ClientController({
-    guild_id: event.group_id,
+    guild_id: event.author.user_openid,
     msg_id: event.id
   })
 
@@ -40,57 +35,39 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     event: 'MESSAGES' as (typeof EventEnum)[number],
     eventType: 'CREATE' as (typeof EventType)[number],
     boundaries: 'publick' as 'publick' | 'private',
-    attribute: 'group' as 'group' | 'single',
+    attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByNtqq(),
     isMaster: event.author.id == masterID ? true : false,
-    guild_id: event.group_id,
+    channel_id: event.author.user_openid,
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: event.group_id,
+    guild_id: event.author.user_openid,
     attachments: [],
     specials: [],
-    msg_txt: event.content,
-    msg: event.content.trim(),
-    msg_id: event.id,
-    open_id: '',
-    user_id: event.author.id,
-    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
-    user_name: '柠檬冲水',
-    segment: segmentNTQQ,
+    //
     at_users: [],
-    at: false,
     at_user: undefined,
+    at: false,
+    msg_txt: event.content,
+    msg: event.content,
+    msg_id: event.id,
+    open_id: open_id,
+    //
+    user_id: event.author.id,
+    user_name: '柠檬冲水',
+    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
+    segment: segmentNTQQ,
     send_at: new Date().getTime(),
-    Message,
     Member,
-    /**
-     * 消息发送机制
-     * @param msg 消息
-     * @param img
-     * @returns
-     */
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? event.id
-      if (select?.open_id && select?.open_id != '') {
-        return await directController(msg, select?.open_id, msg_id)
-      }
-      const group_id = select?.guild_id ?? event.group_id
-      return await replyController(msg, group_id, msg_id)
-    }
-  }
-
-  /**
-   * 存在at
-   */
-  if (e.at) {
-    /**
-     * 得到第一个艾特
-     */
-    e.at_user = e.at_users.find(item => item.bot != true)
+      return await directController(msg, open_id, msg_id)
+    },
+    Message
   }
 
   /**

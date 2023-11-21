@@ -2,6 +2,7 @@ import FormData from 'form-data'
 import axios, { AxiosRequestConfig } from 'axios'
 import { getBotConfig } from '../config.js'
 import { createPicFrom } from '../../../core/index.js'
+import { API_SGROUP_SANDBOX, API_SGROUP } from './config.js'
 
 /**
  * 创建axios实例
@@ -11,37 +12,13 @@ import { createPicFrom } from '../../../core/index.js'
 export async function GuildServer(config: AxiosRequestConfig) {
   const { appID, token, sandbox } = getBotConfig()
   const service = await axios.create({
-    baseURL: sandbox
-      ? 'https://sandbox.api.sgroup.qq.com'
-      : 'https://api.sgroup.qq.com',
+    baseURL: sandbox ? API_SGROUP_SANDBOX : API_SGROUP,
     timeout: 20000,
     headers: {
       Authorization: `Bot ${appID}.${token}`
     }
   })
   return service(config)
-}
-
-/**
- * 得到鉴权
- * @returns
- */
-export async function gateway() {
-  return GuildServer({
-    url: '/gateway'
-  })
-    .then(res => res.data)
-    .then(data => {
-      const { url } = data
-      if (url) {
-        return url
-      } else {
-        console.error('http err:', null)
-      }
-    })
-    .catch(error => {
-      console.error('token err:', error.message)
-    })
 }
 
 /**

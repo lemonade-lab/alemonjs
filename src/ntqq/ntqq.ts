@@ -17,7 +17,7 @@ export interface NTQQOptions {
   /**
    * 密钥
    */
-  secret?: string
+  secret: string
   /**
    * 主人编号
    */

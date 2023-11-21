@@ -1,5 +1,6 @@
 import { getBotConfig } from '../config.js'
 import axios, { AxiosRequestConfig } from 'axios'
+import { API_SGROUP } from './config.js'
 
 /**
  * 创建axios实例
@@ -8,14 +9,38 @@ import axios, { AxiosRequestConfig } from 'axios'
  */
 export async function GroupService(config: AxiosRequestConfig) {
   const { token } = getBotConfig()
+  console.log('token', token)
   const service = await axios.create({
-    baseURL: 'https://api.sgroup.qq.com',
+    baseURL: API_SGROUP,
     timeout: 20000,
     headers: {
       Authorization: `QQBot ${token}`
     }
   })
   return service(config)
+}
+
+/**
+ * 得到鉴权
+ * @returns
+ */
+export async function gateway() {
+  return GroupService({
+    url: '/gateway'
+  })
+    .then(res => res.data)
+    .then(data => {
+      console.log('data', data)
+      const { url } = data
+      if (url) {
+        return url
+      } else {
+        console.error('http err:', null)
+      }
+    })
+    .catch(error => {
+      console.error('token err:', error.message)
+    })
 }
 
 /**

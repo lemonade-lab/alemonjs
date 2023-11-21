@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { API_BOTS } from './config.js'
 
 /**
  * 得到鉴权
@@ -8,7 +9,7 @@ import axios from 'axios'
  * @returns
  */
 export function getAuthentication(appId: string, clientSecret: string) {
-  return axios.post('https://bots.qq.com/app/getAppAccessToken', {
+  return axios.post(`${API_BOTS}/app/getAppAccessToken`, {
     appId: appId,
     clientSecret: clientSecret
   })

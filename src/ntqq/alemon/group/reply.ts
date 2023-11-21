@@ -1,7 +1,7 @@
-import { ClientNTQQ } from '../sdk/index.js'
-import { ClientKOA } from '../../koa/index.js'
+import { ClientNTQQ } from '../../sdk/index.js'
+import { ClientKOA } from '../../../koa/index.js'
 import IMGS from 'image-size'
-import { everyoneError } from '../../log/index.js'
+import { everyoneError } from '../../../log/index.js'
 /**
  * 回复控制器
  * @param msg

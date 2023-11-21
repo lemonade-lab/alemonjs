@@ -32,12 +32,7 @@ export function getBotConfig() {
  * @param val
  * @returns
  */
-export function setBotNTQQConfig(val: {
-  appID: string
-  token: string
-  secret: string
-  intents: number
-}) {
+export function setBotConfig(val: BotCaCheType) {
   cfg = val
   return
 }
@@ -59,6 +54,8 @@ export async function setTimeoutBotConfig(cfg: BotCaCheType) {
     res => res.data
   )
 
+  console.log('data.access_token', data.access_token)
+
   const g: BotCaCheType = {
     appID: cfg.appID,
     token: data.access_token,
@@ -71,7 +68,7 @@ export async function setTimeoutBotConfig(cfg: BotCaCheType) {
   /**
    * 设置配置
    */
-  setBotNTQQConfig(g)
+  setBotConfig(g)
 
   const bal = async () => {
     /**
@@ -81,12 +78,14 @@ export async function setTimeoutBotConfig(cfg: BotCaCheType) {
       res => res.data
     )
 
+    console.log('data.access_token', data.access_token)
+
     g.token = data.access_token
 
     /**
      * 设置配置
      */
-    setBotNTQQConfig(g)
+    setBotConfig(g)
 
     console.info('refresh', data.expires_in, 's')
 
