@@ -67,7 +67,6 @@ export async function usersOpenMessages(
     event_id?: any
     msg_id?: string
     msg_seq?: number
-    input_notify?: any
   },
   msg_id?: string
 ): Promise<{ id: string; timestamp: number }> {
@@ -101,7 +100,6 @@ export async function groupOpenMessages(
     event_id?: any
     msg_id?: string
     msg_seq?: number
-    timestamp: number
   }
 ): Promise<{ id: string; timestamp: number }> {
   return GroupService({
