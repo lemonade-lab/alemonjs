@@ -51,7 +51,7 @@ export const Controller = {
       audio: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
           return await ClientNTQQ.postRichMediaByGroup(guild_id, {
-            srv_send_msg: true,
+            srv_send_msg: false,
             url: file,
             file_type: 3
           })
@@ -61,7 +61,7 @@ export const Controller = {
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
           return await ClientNTQQ.postRichMediaByGroup(guild_id, {
-            srv_send_msg: true,
+            srv_send_msg: false,
             url: file,
             file_type: 2
           })

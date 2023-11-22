@@ -129,7 +129,7 @@ export async function postRichMediaByUsers(
     url: string
     file_data?: any
   }
-): Promise<{ id: string; timestamp: number }> {
+): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
   return GroupService({
     url: `/v2/users/${openid}/files`,
     method: 'post',
@@ -154,7 +154,7 @@ export async function postRichMediaByGroup(
     url: string
     file_data?: any
   }
-): Promise<{ id: string; timestamp: number }> {
+): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
   return GroupService({
     url: `/v2/groups/${openid}/files`,
     method: 'post',

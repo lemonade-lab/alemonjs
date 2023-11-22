@@ -1,6 +1,5 @@
 import { ClientNTQQ } from '../../sdk/index.js'
 import { ClientKOA } from '../../../koa/index.js'
-import IMGS from 'image-size'
 import { everyoneError } from '../../../log/index.js'
 /**
  * 回复控制器
@@ -19,10 +18,17 @@ export async function replyController(
     try {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
-      return await ClientNTQQ.postRichMediaByGroup(guild_id, {
-        url,
-        srv_send_msg: true,
-        file_type: 1
+      return await ClientNTQQ.groupOpenMessages(guild_id, {
+        content: '',
+        media: {
+          file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
+            srv_send_msg: false,
+            file_type: 1,
+            url
+          }).then(res => res.file_info)
+        },
+        msg_id,
+        msg_type: 7
       }).catch(everyoneError)
     } catch (err) {
       console.error(err)
@@ -40,15 +46,19 @@ export async function replyController(
       .filter(element => typeof element === 'string')
       .join('')
     try {
-      const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
       const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
       if (!url) return false
       return await ClientNTQQ.groupOpenMessages(guild_id, {
-        markdown: {
-          content: `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+        content: cont,
+        media: {
+          file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
+            srv_send_msg: false,
+            file_type: 1,
+            url
+          }).then(res => res.file_info)
         },
         msg_id,
-        msg_type: 2 //md
+        msg_type: 7
       }).catch(everyoneError)
     } catch (err) {
       console.error(err)
@@ -69,10 +79,17 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    return await ClientNTQQ.postRichMediaByGroup(guild_id, {
-      url: getUrl,
-      srv_send_msg: true,
-      file_type: 1
+    return await ClientNTQQ.groupOpenMessages(guild_id, {
+      content: '',
+      media: {
+        file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
+          srv_send_msg: false,
+          file_type: 1,
+          url: getUrl
+        }).then(res => res.file_info)
+      },
+      msg_id,
+      msg_type: 7
     }).catch(everyoneError)
   }
 
