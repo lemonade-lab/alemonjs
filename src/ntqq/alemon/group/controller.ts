@@ -50,13 +50,21 @@ export const Controller = {
       },
       audio: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
-          return await ClientNTQQ.postRichMediaByGroup(guild_id, file, 3)
+          return await ClientNTQQ.postRichMediaByGroup(guild_id, {
+            srv_send_msg: true,
+            url: file,
+            file_type: 3
+          })
         }
         return false
       },
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
-          return await ClientNTQQ.postRichMediaByGroup(guild_id, file, 2)
+          return await ClientNTQQ.postRichMediaByGroup(guild_id, {
+            srv_send_msg: true,
+            url: file,
+            file_type: 2
+          })
         }
         return false
       },
@@ -66,7 +74,12 @@ export const Controller = {
       card: async (msg: any[]) => {
         const arr = []
         for (const item of msg) {
-          arr.push(ClientNTQQ.groupOpenMessagesMarkdown(guild_id, item, msg_id))
+          arr.push(
+            ClientNTQQ.groupOpenMessages(guild_id, {
+              msg_id,
+              ...item
+            })
+          )
         }
         return arr
       },

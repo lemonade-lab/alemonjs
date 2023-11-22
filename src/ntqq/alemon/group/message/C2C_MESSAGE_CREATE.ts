@@ -10,8 +10,11 @@ import { getBotMsgByNtqq } from '../bot.js'
 import { USER_DATA } from '../types.js'
 import { AlemonJSError, AlemonJSLog } from '../../../../log/index.js'
 import { getBotConfigByKey } from '../../../../config/index.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
-import { directController } from '../direct.js'
+import {
+  directController,
+  ClientDirectController,
+  ClientControllerOnMember
+} from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') {
@@ -23,8 +26,8 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
 
   const open_id = event.author.user_openid
 
-  const Message = ClientController({
-    guild_id: event.author.user_openid,
+  const Message = ClientDirectController({
+    open_id: open_id,
     msg_id: event.id
   })
 

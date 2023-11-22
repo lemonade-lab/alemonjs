@@ -85,6 +85,13 @@ const Controller = {
        * @param name
        */
       audio: async (file: Buffer | string, name?: string) => {
+        if (typeof file == 'string') {
+          return await ClientNTQQ.postRichMediaByGroup(open_id, {
+            srv_send_msg: true,
+            url: file,
+            file_type: 3
+          })
+        }
         return false
       },
       /**
@@ -93,11 +100,25 @@ const Controller = {
        * @param name
        */
       video: async (file: Buffer | string, name?: string) => {
-        return false
+        if (typeof file == 'string') {
+          return await ClientNTQQ.postRichMediaByGroup(open_id, {
+            srv_send_msg: true,
+            url: file,
+            file_type: 2
+          })
+        }
       },
       card: async (msg: any[]) => {
-        // 卡片消息
-        return []
+        const arr = []
+        for (const item of msg) {
+          arr.push(
+            ClientNTQQ.usersOpenMessages(open_id, {
+              msg_id,
+              ...item
+            })
+          )
+        }
+        return arr
       },
       allUsers: async (
         reactionObj: any,
@@ -159,7 +180,11 @@ export async function directController(
     try {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
-      return await ClientNTQQ.usersOpenFiles(open_id, url).catch(everyoneError)
+      return await ClientNTQQ.postRichMediaByUsers(open_id, {
+        srv_send_msg: true,
+        file_type: 1,
+        url
+      }).catch(everyoneError)
     } catch (err) {
       console.error(err)
       return err
@@ -181,11 +206,14 @@ export async function directController(
       const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
       const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
       if (!url) return false
-      return await ClientNTQQ.usersOpenMessages(
-        open_id,
-        `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-        msg_id
-      ).catch(everyoneError)
+      return await ClientNTQQ.usersOpenMessages(open_id, {
+        markdown: {
+          content: `${cont}  ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+        },
+        msg_id,
+        msg_type: 2 //md
+        // timestamp: Math.floor(Date.now() / 1000)
+      }).catch(everyoneError)
     } catch (err) {
       console.error(err)
       return err
@@ -212,11 +240,17 @@ export async function directController(
     if (Buffer.isBuffer(msg)) {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
-      return await ClientNTQQ.usersOpenFiles(open_id, url).catch(everyoneError)
+      return await ClientNTQQ.postRichMediaByUsers(open_id, {
+        srv_send_msg: true,
+        file_type: 1,
+        url
+      }).catch(everyoneError)
     }
   }
 
-  return await ClientNTQQ.usersOpenMessages(open_id, content, msg_id).catch(
-    everyoneError
-  )
+  return await ClientNTQQ.usersOpenMessages(open_id, {
+    content,
+    msg_id,
+    msg_type: 0
+  }).catch(everyoneError)
 }

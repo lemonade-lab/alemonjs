@@ -19,9 +19,11 @@ export async function replyController(
     try {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
-      return await ClientNTQQ.groupsOpenFiles(guild_id, url).catch(
-        everyoneError
-      )
+      return await ClientNTQQ.postRichMediaByGroup(guild_id, {
+        url,
+        srv_send_msg: true,
+        file_type: 1
+      }).catch(everyoneError)
     } catch (err) {
       console.error(err)
       return err
@@ -41,11 +43,14 @@ export async function replyController(
       const dimensions = IMGS.imageSize(msg[isBuffer] as Buffer)
       const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
       if (!url) return false
-      return await ClientNTQQ.groupOpenMessages(
-        guild_id,
-        `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`,
-        msg_id
-      ).catch(everyoneError)
+      return await ClientNTQQ.groupOpenMessages(guild_id, {
+        markdown: {
+          content: `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`
+        },
+        msg_id,
+        msg_type: 2 //md
+        // timestamp: Math.floor(Date.now() / 1000)
+      }).catch(everyoneError)
     } catch (err) {
       console.error(err)
       return err
@@ -62,18 +67,19 @@ export async function replyController(
 
   if (content == '') return false
 
-  /**
-   * http
-   */
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    return await ClientNTQQ.groupsOpenFiles(guild_id, getUrl).catch(
-      everyoneError
-    )
+    return await ClientNTQQ.postRichMediaByGroup(guild_id, {
+      url: getUrl,
+      srv_send_msg: true,
+      file_type: 1
+    }).catch(everyoneError)
   }
 
-  return await ClientNTQQ.groupOpenMessages(guild_id, content, msg_id).catch(
-    everyoneError
-  )
+  return await ClientNTQQ.groupOpenMessages(guild_id, {
+    content,
+    msg_id,
+    msg_type: 0
+  }).catch(everyoneError)
 }
