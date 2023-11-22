@@ -104,6 +104,12 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
        */
       const intents: IntentsEnum[] = []
 
+      const c = getBotConfigByKey('ntqq')
+
+      if (!Options.login.ntqq.mode) {
+        Options.login.ntqq.mode = c.mode
+      }
+
       if (Options.login.ntqq.mode == 'qq') {
         // 全部都要推
         intents.push('GUILDS') //频道进出
@@ -124,7 +130,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       } else if (Options.login.ntqq.mode == 'qq-group') {
         intents.push('GROUP_AT_MESSAGE_CREATE') //频道进出
         intents.push('C2C_MESSAGE_CREATE') //成员资料
-      } else {
+      } else if (Options.login.ntqq.mode == 'qq-guild') {
         // 默认是 qq-guild
         intents.push('GUILDS') //频道进出
         intents.push('GUILD_MEMBERS') //成员资料
