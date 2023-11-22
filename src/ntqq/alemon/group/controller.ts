@@ -50,20 +50,34 @@ export const Controller = {
       },
       audio: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
-          return await ClientNTQQ.postRichMediaByGroup(guild_id, {
-            srv_send_msg: false,
-            url: file,
-            file_type: 3
+          return await ClientNTQQ.groupOpenMessages(guild_id, {
+            content: '',
+            media: {
+              file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
+                srv_send_msg: false,
+                file_type: 3,
+                url: file
+              }).then(res => res.file_info)
+            },
+            msg_id,
+            msg_type: 7
           })
         }
         return false
       },
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
-          return await ClientNTQQ.postRichMediaByGroup(guild_id, {
-            srv_send_msg: false,
-            url: file,
-            file_type: 2
+          return await ClientNTQQ.groupOpenMessages(guild_id, {
+            content: '',
+            media: {
+              file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
+                srv_send_msg: false,
+                file_type: 2,
+                url: file
+              }).then(res => res.file_info)
+            },
+            msg_id,
+            msg_type: 7
           })
         }
         return false

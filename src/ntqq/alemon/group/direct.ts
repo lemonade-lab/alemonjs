@@ -85,11 +85,18 @@ const Controller = {
        */
       audio: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
-          return await ClientNTQQ.postRichMediaByGroup(open_id, {
-            srv_send_msg: false,
-            url: file,
-            file_type: 3
-          })
+          await ClientNTQQ.usersOpenMessages(open_id, {
+            content: '',
+            media: {
+              file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
+                srv_send_msg: false,
+                file_type: 3,
+                url: file
+              }).then(res => res.file_info)
+            },
+            msg_id,
+            msg_type: 7
+          }).catch(everyoneError)
         }
         return false
       },
@@ -100,12 +107,20 @@ const Controller = {
        */
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
-          return await ClientNTQQ.postRichMediaByGroup(open_id, {
-            srv_send_msg: false,
-            url: file,
-            file_type: 2
-          })
+          await ClientNTQQ.usersOpenMessages(open_id, {
+            content: '',
+            media: {
+              file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
+                srv_send_msg: false,
+                file_type: 2,
+                url: file
+              }).then(res => res.file_info)
+            },
+            msg_id,
+            msg_type: 7
+          }).catch(everyoneError)
         }
+        return
       },
       card: async (msg: any[]) => {
         const arr = []
