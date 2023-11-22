@@ -60,6 +60,7 @@ export async function usersOpenMessages(
     msg_type: MsgType
     markdown?: any
     keyboard?: any
+    media?: any
     ark?: any
     image?: any
     message_reference?: any
@@ -93,13 +94,14 @@ export async function groupOpenMessages(
     msg_type: MsgType
     markdown?: any
     keyboard?: any
+    media?: any
     ark?: any
     image?: any
     message_reference?: any
     event_id?: any
     msg_id?: string
     msg_seq?: number
-    input_notify?: any
+    timestamp: number
   }
 ): Promise<{ id: string; timestamp: number }> {
   return GroupService({
@@ -110,7 +112,7 @@ export async function groupOpenMessages(
 }
 
 // markdown = {content}
-// Math.floor(Date.now() / 1000)
+//
 
 /**
  * 发送私聊富媒体文件

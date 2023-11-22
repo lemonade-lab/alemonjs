@@ -48,8 +48,8 @@ export async function replyController(
           content: `${cont} ![text #${dimensions.width}px #${dimensions.height}px](${url})`
         },
         msg_id,
-        msg_type: 2 //md
-        // timestamp: Math.floor(Date.now() / 1000)
+        msg_type: 2, //md
+        timestamp: Math.floor(Date.now() / 1000)
       }).catch(everyoneError)
     } catch (err) {
       console.error(err)
@@ -80,6 +80,7 @@ export async function replyController(
   return await ClientNTQQ.groupOpenMessages(guild_id, {
     content,
     msg_id,
-    msg_type: 0
+    msg_type: 0,
+    timestamp: Math.floor(Date.now() / 1000)
   }).catch(everyoneError)
 }

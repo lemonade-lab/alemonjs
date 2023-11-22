@@ -53,7 +53,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     msg_txt: event.content,
     msg: event.content.trim(),
     msg_id: event.id,
-    open_id: '',
+    open_id: event.author.user_openid,
     user_id: event.author.id,
     user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
     user_name: '柠檬冲水',
