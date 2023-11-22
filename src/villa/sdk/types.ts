@@ -451,3 +451,16 @@ export interface ImageSizeType {
   width: number
   height: number
 }
+
+//
+export interface ButtonType {
+  id: string
+  text: string
+  type?: number
+  c_type?: number
+  link?: string
+  input?: string
+  need_callback?: boolean
+  need_token?: boolean
+  extra?: string
+}

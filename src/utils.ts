@@ -1,21 +1,10 @@
+import { ButtonType } from './villa/sdk/index.js'
 /**
  * Villa按钮自动排咧
  * @param arr
  * @returns
  */
-export function buttonAutomaticArrangement(
-  arr: {
-    id: string
-    text: string
-    type?: number
-    c_type?: number
-    link?: string
-    input?: string
-    need_callback?: boolean
-    need_token?: boolean
-    extra?: string
-  }[] = []
-) {
+export function buttonAutomaticArrangement(arr: ButtonType[] = []) {
   const small = []
   const mid = []
   const big = []
