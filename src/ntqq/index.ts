@@ -22,10 +22,7 @@ export async function createAlemonByNtqq() {
      */
     const cfg = getBotConfigByKey('ntqq')
 
-    console.log('cfg', cfg)
     const intents = getIntentsMask(cfg.intents)
-
-    console.log('intents', intents)
 
     if (cfg.mode == 'qq-guild') {
       setBotConfig({

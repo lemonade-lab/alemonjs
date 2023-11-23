@@ -10,7 +10,6 @@ import { FileType, MsgType } from '../typings.js'
  */
 export async function GroupService(config: AxiosRequestConfig) {
   const { token, appID } = getBotConfig()
-  console.log('token', token)
   const service = await axios.create({
     baseURL: API_SGROUP,
     timeout: 20000,
@@ -32,7 +31,6 @@ export async function gateway() {
   })
     .then(res => res.data)
     .then(data => {
-      console.log('data', data)
       const { url } = data
       if (url) {
         return url

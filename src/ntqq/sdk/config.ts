@@ -54,8 +54,6 @@ export async function setTimeoutBotConfig(cfg: BotCaCheType) {
     res => res.data
   )
 
-  console.log('data.access_token', data.access_token)
-
   const g: BotCaCheType = {
     appID: cfg.appID,
     token: data.access_token,
@@ -77,8 +75,6 @@ export async function setTimeoutBotConfig(cfg: BotCaCheType) {
     const data: aut = await getAuthentication(cfg.appID, cfg.secret).then(
       res => res.data
     )
-
-    console.log('data.access_token', data.access_token)
 
     g.token = data.access_token
 
