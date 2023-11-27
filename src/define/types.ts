@@ -33,21 +33,13 @@ export interface AlemonOptions {
    */
   app?: {
     /**
-     * 是否创建
+     * 是否执行
      */
     init?: boolean
     /**
-     * 应用名称
-     */
-    name?: string
-    /**
-     * 可执行的包
-     */
-    component?: any[]
-    /**
      * 指令预览
      */
-    regJSon?: {
+    regJSON?: {
       /**
        * 是否生成
        * defaukt true
@@ -59,12 +51,7 @@ export interface AlemonOptions {
        */
       address?: string
     }
-    /**
-     * 重定义消息对象
-     * @param args
-     * @returns
-     */
-    redefineMessage?: (...args: any[]) => any
+    scripts?: string
   }
   /**
    * 插件配置

@@ -252,7 +252,7 @@ async function loadPlugins(dir: string) {
           if (match && match[1]) {
             const packageName = match[1]
             console.error(`[APP] [${appname}] 缺失 ${packageName} 包`)
-            // 发生消息
+            // 发送消息
             process.send?.({
               type: 'lack-of-package',
               message: {

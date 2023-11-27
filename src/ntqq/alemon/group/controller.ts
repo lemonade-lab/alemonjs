@@ -60,7 +60,8 @@ export const Controller = {
               }).then(res => res.file_info)
             },
             msg_id,
-            msg_type: 7
+            msg_type: 7,
+            msg_seq: ClientNTQQ.getMsgSeq(msg_id)
           })
         }
         return false
@@ -77,7 +78,8 @@ export const Controller = {
               }).then(res => res.file_info)
             },
             msg_id,
-            msg_type: 7
+            msg_type: 7,
+            msg_seq: ClientNTQQ.getMsgSeq(msg_id)
           })
         }
         return false
@@ -91,7 +93,8 @@ export const Controller = {
           arr.push(
             ClientNTQQ.groupOpenMessages(guild_id, {
               msg_id,
-              ...item
+              ...item,
+              msg_seq: ClientNTQQ.getMsgSeq(msg_id)
             })
           )
         }

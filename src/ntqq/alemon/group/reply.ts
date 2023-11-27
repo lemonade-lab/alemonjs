@@ -28,7 +28,8 @@ export async function replyController(
           }).then(res => res.file_info)
         },
         msg_id,
-        msg_type: 7
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       }).catch(everyoneError)
     } catch (err) {
       console.error(err)
@@ -58,7 +59,8 @@ export async function replyController(
           }).then(res => res.file_info)
         },
         msg_id,
-        msg_type: 7
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       }).catch(everyoneError)
     } catch (err) {
       console.error(err)
@@ -89,13 +91,15 @@ export async function replyController(
         }).then(res => res.file_info)
       },
       msg_id,
-      msg_type: 7
+      msg_type: 7,
+      msg_seq: ClientNTQQ.getMsgSeq(msg_id)
     }).catch(everyoneError)
   }
 
   return await ClientNTQQ.groupOpenMessages(guild_id, {
     content,
     msg_id,
-    msg_type: 0
+    msg_type: 0,
+    msg_seq: ClientNTQQ.getMsgSeq(msg_id)
   }).catch(everyoneError)
 }

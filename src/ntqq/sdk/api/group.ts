@@ -77,6 +77,22 @@ export async function usersOpenMessages(
 
 // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
 
+// map会越来越大,应该自动delte第一个key
+const map = {}
+export function getMsgSeq(MsgId: string) {
+  if (Object.prototype.hasOwnProperty.call(map, MsgId)) {
+    map[MsgId] = map[MsgId] + 1
+  } else {
+    map[MsgId] = 1
+  }
+  const arr = Object.keys(map)
+  if (arr.length > 15) {
+    const firstKey = arr[0]
+    delete map[firstKey]
+  }
+  return map[MsgId]
+}
+
 /**
  * 发送群聊消息
  * @param group_openid

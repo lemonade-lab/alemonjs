@@ -28,22 +28,6 @@ export interface VILLAOptions {
    * 端口
    */
   port?: number
-  /**
-   * 随机数大小
-   */
-  size?: number
-  /**
-   * 图片路由
-   */
-  img_url?: string
-  /**
-   * 本地缓存图地址
-   */
-  IMAGE_DIR?: string
-  /**
-   * 头模式
-   */
-  http?: string
 }
 
 export const defineVILLA = {
@@ -51,10 +35,6 @@ export const defineVILLA = {
   secret: '',
   pub_key: '',
   masterID: '',
-  http: 'http',
   url: '/api/mys/callback',
-  port: 8080,
-  size: 999999,
-  img_url: '/api/mys/img',
-  IMAGE_DIR: '/data/mys/img'
+  port: 8080
 }

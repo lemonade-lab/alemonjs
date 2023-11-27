@@ -17,14 +17,6 @@ plugins
 /public/
 .apps
 
-#脚本类
-logs.js
-logs.d.ts
-run.js
-run.d.ts
-build.js
-build.d.ts
-
 # 缓存
 /data/
 /help/

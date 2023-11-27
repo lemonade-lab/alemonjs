@@ -4,8 +4,8 @@ import { rebotMap } from './map.js'
 import { nodeScripts } from './child_process.js'
 import { IntentsEnum } from '../ntqq/sdk/index.js'
 import { command } from './command.js'
+import { AppNameError } from '../log/index.js'
 import {
-  createApp,
   setLanchConfig,
   loadInit,
   appsInit,
@@ -21,6 +21,7 @@ import {
 import { createWeb } from '../koa/index.js'
 import { autoClearFiles } from '../koa/file.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
+import { join } from 'path'
 
 let OptionsCache: AlemonOptions
 
@@ -250,19 +251,20 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ************
    */
   if (Options?.login && Options?.app?.init !== false) {
-    const app = createApp(Options?.app?.name ?? 'bot')
-    if (Options?.app?.regJSon?.create === false) {
-      setAppProCoinfg('regex', Options?.app?.regJSon?.create)
+    if (Options?.app?.regJSON?.create === false) {
+      setAppProCoinfg('regex', Options?.app?.regJSON?.create)
     }
-    if (Options?.app?.regJSon?.address) {
-      setAppProCoinfg('route', Options?.app?.regJSon?.address)
+    if (Options?.app?.regJSON?.address) {
+      setAppProCoinfg('route', Options?.app?.regJSON?.address)
     }
-    if (Options?.app?.component) {
-      for await (const item of Options.app.component) {
-        app.component(item)
-      }
+
+    if (Options?.app?.scripts && typeof Options?.app?.scripts == 'string') {
+      const dir = join(process.cwd(), Options?.app?.scripts)
+      await import(`file://${dir}`).catch(err => {
+        console.error(`file://${dir}`)
+        AppNameError('local dev', err)
+      })
     }
-    app.mount()
   }
 
   /**

@@ -1,0 +1,56 @@
+{
+  "Plugin TypeScript": {
+    "scope": "typescript",
+    "prefix": "plugin",
+    "body": [
+      "import { APlugin , AMessage } from 'alemonjs'",
+      "\nexport class ${1:PluginName} extends APlugin {",
+      "  constructor() {",
+      "    super({",
+      "      dsc: '${2:插件描述}',",
+      "      rule: [",
+      "        {",
+      "          reg: ${3:/正则表达式/},",
+      "          fnc: '${4:方法名}',",
+      "          dsc: '/正则',",
+      "          doc: '这条正则的意思'",
+      "        }",
+      "      ]",
+      "    })",
+      "  }",
+      "  async ${4:方法名}(e: AMessage) {",
+      "    e.reply('${5:回复内容}')",
+      "    return",
+      "  }",
+      "}\n"
+    ],
+    "description": "plugin文件模板"
+  },
+  "Plugin Javascript": {
+    "scope": "javascript",
+    "prefix": "plugin",
+    "body": [
+      "import { APlugin } from 'alemonjs'",
+      "\nexport class ${1:PluginName} extends APlugin {",
+      "  constructor() {",
+      "    super({",
+      "      dsc: '${2:插件描述}',",
+      "      rule: [",
+      "        {",
+      "          reg: ${3:/正则表达式/},",
+      "          fnc: '${4:方法名}',",
+      "          dsc: '/正则',",
+      "          doc: '这条正则的意思'",
+      "        }",
+      "      ]",
+      "    })",
+      "  }",
+      "  async ${4:方法名}(e){",
+      "    e.reply('${5:回复内容}')",
+      "    return",
+      "  }",
+      "}\n"
+    ],
+    "description": "plugin文件模板"
+  }
+}

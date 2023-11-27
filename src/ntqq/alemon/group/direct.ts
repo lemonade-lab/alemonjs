@@ -95,7 +95,8 @@ const Controller = {
               }).then(res => res.file_info)
             },
             msg_id,
-            msg_type: 7
+            msg_type: 7,
+            msg_seq: ClientNTQQ.getMsgSeq(msg_id)
           }).catch(everyoneError)
         }
         return false
@@ -117,7 +118,8 @@ const Controller = {
               }).then(res => res.file_info)
             },
             msg_id,
-            msg_type: 7
+            msg_type: 7,
+            msg_seq: ClientNTQQ.getMsgSeq(msg_id)
           }).catch(everyoneError)
         }
         return
@@ -128,6 +130,7 @@ const Controller = {
           arr.push(
             ClientNTQQ.usersOpenMessages(open_id, {
               msg_id,
+              msg_seq: ClientNTQQ.getMsgSeq(msg_id),
               ...item
             })
           )
@@ -204,7 +207,8 @@ export async function directController(
           }).then(res => res.file_info)
         },
         msg_id,
-        msg_type: 7
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       }).catch(everyoneError)
     } catch (err) {
       console.error(err)
@@ -236,7 +240,8 @@ export async function directController(
           }).then(res => res.file_info)
         },
         msg_id,
-        msg_type: 7
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       }).catch(everyoneError)
     } catch (err) {
       console.error(err)
@@ -274,7 +279,8 @@ export async function directController(
           }).then(res => res.file_info)
         },
         msg_id,
-        msg_type: 7
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       }).catch(everyoneError)
     }
   }
@@ -282,6 +288,7 @@ export async function directController(
   return await ClientNTQQ.usersOpenMessages(open_id, {
     content,
     msg_id,
-    msg_type: 0
+    msg_type: 0,
+    msg_seq: ClientNTQQ.getMsgSeq(msg_id)
   }).catch(everyoneError)
 }
