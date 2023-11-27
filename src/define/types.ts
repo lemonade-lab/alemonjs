@@ -17,10 +17,6 @@ export interface AlemonOptions {
    */
   shieldEvent?: string[]
   /**
-   * 是否生成json
-   */
-  regex?: boolean
-  /**
    * 自定义起始符规则
    */
   character?: RegExp

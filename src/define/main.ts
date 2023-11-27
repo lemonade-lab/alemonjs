@@ -257,7 +257,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     if (Options?.app?.regJSON?.address) {
       setAppProCoinfg('route', Options?.app?.regJSON?.address)
     }
-
     if (Options?.app?.scripts && typeof Options?.app?.scripts == 'string') {
       const dir = join(process.cwd(), Options?.app?.scripts)
       await import(`file://${dir}`).catch(err => {
@@ -331,9 +330,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ************
    */
   if (Options?.mount !== false) {
-    if (Options?.regex) {
-      setAppProCoinfg('regex', Options?.regex)
-    }
     await appsInit()
   }
 
