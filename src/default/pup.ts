@@ -1,7 +1,7 @@
 import { PuppeteerLaunchOptions } from 'puppeteer'
 export default {
-  headless: 'new',
-  timeout: 30000,
+  headless: process.env?.ALEMONJS_PUPPERTEER_HEADLESS ?? 'new',
+  timeout: Number(process.env?.ALEMONJS_PUPPERTEER_TIMEOUT ?? 30000),
   args: [
     '--disable-gpu',
     '--disable-dev-shm-usage',

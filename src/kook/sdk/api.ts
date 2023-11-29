@@ -1,14 +1,24 @@
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import FormData from 'form-data'
 import { Readable } from 'stream'
 import {
   ApiEnum,
   SendMessageParams,
-  BotInformation,
   SendDirectMessageParams
 } from './typings.js'
 import { getKookToken } from './config.js'
 import { createPicFrom } from '../../core/index.js'
+
+export function ApiLog(res: AxiosResponse) {
+  if (process.env?.KOOK_API_REQUEST == 'dev')
+    console.log('api-config', res?.request)
+  if (process.env?.KOOK_API_HEADERS == 'dev')
+    console.log('api-config', res?.headers)
+  if (process.env?.KOOK_API_CONFIG == 'dev')
+    console.log('api-config', res?.config)
+  if (process.env?.KOOK_API_DATA == 'dev') console.log('api-data', res?.data)
+  return res?.data
+}
 
 /**
  * KOOK服务
@@ -80,7 +90,7 @@ export async function createUrl(formdata): Promise<{
     url: ApiEnum.AssetCreate,
     data: formdata,
     headers: formdata.getHeaders()
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -105,7 +115,7 @@ export async function createMessage(data: SendMessageParams): Promise<{
     method: 'post',
     url: ApiEnum.MessageCreate,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -140,7 +150,7 @@ export async function userChatCreate(target_id: string): Promise<{
     data: {
       target_id
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -161,7 +171,7 @@ export async function createDirectMessage(
     method: 'post',
     url: ApiEnum.DirectMessageCreate,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -182,7 +192,7 @@ export async function messageDelete(msg_id: string): Promise<{
     data: {
       msg_id
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -206,7 +216,7 @@ export async function messageUpdate(data: {
     method: 'post',
     url: ApiEnum.MessageUpdate,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -227,7 +237,7 @@ export async function messageDeleteReaction(data: {
     method: 'post',
     url: ApiEnum.MessageDeleteReaction,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -247,7 +257,7 @@ export async function messageAddReaction(data: {
     method: 'post',
     url: ApiEnum.MessageAddReaction,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -281,7 +291,7 @@ export async function messageReactionList(params: {
     method: 'get',
     url: ApiEnum.MessageReactionList,
     params
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -319,7 +329,7 @@ export async function userMe(): Promise<{
   return kookService({
     method: 'get',
     url: ApiEnum.UserMe
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -356,7 +366,7 @@ export async function userView(
       guild_id,
       user_id
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -380,7 +390,7 @@ export async function guildKickout(
       guild_id,
       target_id: user_id
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -407,5 +417,5 @@ export async function channelRoleCreate(
       type,
       value
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }

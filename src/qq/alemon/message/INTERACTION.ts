@@ -21,6 +21,8 @@ INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
  */
 export const INTERACTION = async event => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,

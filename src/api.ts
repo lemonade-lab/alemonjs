@@ -28,7 +28,6 @@ export { ClientONE } from './one/index.js'
  * discord
  */
 export { ClientDISOCRD } from './discord/index.js'
-
 /**
  * 控制器
  */

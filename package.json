@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "app": "ts-node alemon.config.ts",
@@ -44,6 +44,8 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4",
     "typedoc": "^0.25.2"
   },
   "author": "ningmengchongshui",

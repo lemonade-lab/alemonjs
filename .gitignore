@@ -17,6 +17,11 @@ plugins
 /public/
 .apps
 
+# test
+alemon.config.ts
+apps.ts
+main.ts
+
 # 缓存
 /data/
 /help/

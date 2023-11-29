@@ -19,6 +19,8 @@ import { directController } from '../direct.js'
  * @returns
  */
 export async function DIRECT_MESSAGE(event: Event) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const cfg = getBotConfigByKey('one')
   const masterID = cfg.masterID
 

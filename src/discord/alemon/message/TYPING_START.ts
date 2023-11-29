@@ -49,6 +49,5 @@ interface TYPING_START_TYPE {
  * @param event
  */
 export async function TYPING_START(event: TYPING_START_TYPE) {
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('TYPING_START_TYPE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

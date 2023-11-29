@@ -47,7 +47,5 @@ interface GUILD_MEMBER_UPDATE_TYPE {
  * @param event
  */
 export async function GUILD_MEMBER_UPDATE(event: GUILD_MEMBER_UPDATE_TYPE) {
-  //
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('GUILD_MEMBER_UPDATE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

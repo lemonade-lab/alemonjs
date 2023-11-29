@@ -23,7 +23,7 @@ import {
 export const DIRECT_MESSAGE = async (event: EventData) => {
   if (event.extra?.author?.bot) return false
 
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info(event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const open_id = event.extra.code
 

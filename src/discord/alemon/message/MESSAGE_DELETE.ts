@@ -25,5 +25,5 @@ interface MESSAGE_DELETE_TYPE {
  * @param event
  */
 export async function MESSAGE_DELETE(event: MESSAGE_DELETE_TYPE) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.log('MESSAGE_DELETE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

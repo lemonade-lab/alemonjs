@@ -1,7 +1,8 @@
-import { AxiosRequestConfig } from 'axios'
+import { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { Service } from './base.js'
 import FormData from 'form-data'
 import { createPicFrom } from '../../core/index.js'
+import { ApiLog } from './log.js'
 export * from './cdn.js'
 export * from './base.js'
 
@@ -13,7 +14,7 @@ export function applicationsMe() {
   return Service({
     method: 'get',
     url: '/applications/@me'
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -40,7 +41,7 @@ export function channelsMessages(
     method: 'post',
     headers: headers,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**

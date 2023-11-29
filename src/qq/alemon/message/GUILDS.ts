@@ -53,6 +53,8 @@ GUILDS (1 << 0)
   - CHANNEL_DELETE         // 当channel被删除时
  */
 export const GUILD = async (event: EventGuildType) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.id,
     channel_id: '',

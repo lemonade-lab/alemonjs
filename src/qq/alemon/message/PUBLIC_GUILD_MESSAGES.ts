@@ -70,6 +70,8 @@ interface PUBLIC_GUILD_MESSAGES_TYPE {
 export const PUBLIC_GUILD_MESSAGES = async (
   event: PUBLIC_GUILD_MESSAGES_TYPE
 ) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
@@ -150,6 +152,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
    */
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.eventType = 'DELETE'
+
     return await typeMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.eventType))
       .catch(err => AlemonJSEventError(err, e.event, e.eventType))

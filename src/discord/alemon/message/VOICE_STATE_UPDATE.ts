@@ -56,6 +56,5 @@ interface VOICE_STATE_UPDATE_TYPE {
  * @param event
  */
 export async function VOICE_STATE_UPDATE(event: VOICE_STATE_UPDATE_TYPE) {
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('VOICE_STATE_UPDATE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

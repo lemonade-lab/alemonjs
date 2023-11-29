@@ -29,6 +29,8 @@ AUDIO_ACTION (1 << 29)
   - AUDIO_OFF_MIC           // 下麦时 delete
  */
 export const AUDIO_ACTION = async (event: any) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,

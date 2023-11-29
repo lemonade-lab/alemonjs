@@ -365,7 +365,7 @@ export async function loadInit() {
  * @returns 是否处理完成
  */
 export async function InstructionMatching(e: AMessage) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.log(e)
+  if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
   /**
    * 对话机
    */
@@ -480,7 +480,7 @@ export async function InstructionMatching(e: AMessage) {
  * @returns 是否处理完成
  */
 export async function typeMessage(e: AMessage) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.log(e)
+  if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
 
   if (!CommandNotMessage[e.event]) return true
 

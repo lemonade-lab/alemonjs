@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import { getDISCORD } from './config.js'
+import { ApiLog } from './log.js'
 const BaseUrl = 'https://cdn.discordapp.com'
 export function ServiceApp(config: AxiosRequestConfig) {
   const { token } = getDISCORD()
@@ -35,5 +36,5 @@ export function getUserUrl(user_id: string, avatar_hash: string) {
   return ServiceApp({
     url: url,
     method: 'get'
-  }).then(res => res.data)
+  }).then(ApiLog)
 }

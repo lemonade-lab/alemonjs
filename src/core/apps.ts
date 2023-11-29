@@ -10,6 +10,20 @@ import {
 import { setApp } from './app.js'
 
 /**
+ * 引用路径
+ * @param url
+ * @returns
+ */
+export function importPath(url: string | URL) {
+  const DirPath = getAppPath(url)
+  const AppName = basename(DirPath)
+  return {
+    cwd: () => DirPath,
+    name: AppName
+  }
+}
+
+/**
  * 得到执行路径
  * @param url  import.meta.url
  * @returns AppName目录名

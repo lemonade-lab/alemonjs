@@ -53,6 +53,5 @@ interface MESSAGE_REACTION_ADD_TYPE {
  * @param event
  */
 export async function MESSAGE_REACTION_ADD(event: MESSAGE_REACTION_ADD_TYPE) {
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('MESSAGE_REACTION_ADD', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

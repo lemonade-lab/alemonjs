@@ -29,6 +29,8 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
   - MESSAGE_DELETE         // 删除（撤回）消息事件
  * */
 export const GUILD_MESSAGES = async (event: any) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,

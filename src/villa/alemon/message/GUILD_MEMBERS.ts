@@ -47,6 +47,8 @@ export async function GUILD_MEMBERS(event: {
   id: string
   send_at: number
 }) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const JoinVilla = event.extend_data.EventData.JoinVilla
 
   const cfg = getBotConfigByKey('villa')

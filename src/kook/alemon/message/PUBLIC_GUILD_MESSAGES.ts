@@ -23,7 +23,7 @@ import { directController } from '../direct.js'
 export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
   if (event.extra?.author?.bot) return false
 
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info(event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   let at = false
   const at_users: UserType[] = []

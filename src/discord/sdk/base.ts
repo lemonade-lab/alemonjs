@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import { getDISCORD } from './config.js'
+import { ApiLog } from './log.js'
 
 /**
  * KOOK服务
@@ -29,5 +30,5 @@ export function gateway(): Promise<{
   return Service({
     method: 'get',
     url: '/gateway'
-  }).then(res => res.data)
+  }).then(ApiLog)
 }

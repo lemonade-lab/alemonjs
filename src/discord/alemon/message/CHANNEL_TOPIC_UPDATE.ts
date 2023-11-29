@@ -25,7 +25,5 @@ interface CHANNEL_TOPIC_UPDATE_TYPE {
  * @param event
  */
 export async function CHANNEL_TOPIC_UPDATE(event: CHANNEL_TOPIC_UPDATE_TYPE) {
-  //
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('CHANNEL_TOPIC_UPDATE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

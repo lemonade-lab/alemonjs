@@ -50,6 +50,8 @@ GUILDS (1 << 0)
  */
 
 export const CHANNEL = async (event: EventChannelType) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: '',

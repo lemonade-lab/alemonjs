@@ -1,7 +1,8 @@
 import { getBotConfig } from '../config.js'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import { API_SGROUP } from './config.js'
 import { FileType, MsgType } from '../typings.js'
+import { ApiLog } from '../log.js'
 
 /**
  * 创建axios实例
@@ -72,7 +73,7 @@ export async function usersOpenMessages(
     url: `/v2/users/${openid}/messages`,
     method: 'post',
     data: data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
@@ -120,7 +121,7 @@ export async function groupOpenMessages(
     url: `/v2/groups/${group_openid}/messages`,
     method: 'post',
     data: data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 // markdown = {content}
@@ -148,7 +149,7 @@ export async function postRichMediaByUsers(
     url: `/v2/users/${openid}/files`,
     method: 'post',
     data: data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -173,5 +174,5 @@ export async function postRichMediaByGroup(
     url: `/v2/groups/${openid}/files`,
     method: 'post',
     data: data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }

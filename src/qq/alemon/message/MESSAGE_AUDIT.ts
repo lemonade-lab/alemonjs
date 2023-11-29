@@ -21,6 +21,8 @@ MESSAGE_AUDIT (1 << 27)
 - MESSAGE_AUDIT_REJECT   // 消息审核不通过
  */
 export const MESSAGE_AUDIT = async (event: any) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,

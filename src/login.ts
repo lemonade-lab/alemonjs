@@ -13,7 +13,8 @@ export interface LoginMap {
  * @returns 返回校验所得login配置
  */
 export function analysis(val: LoginMap) {
-  const ars = process.argv.slice(2)
+  const argv = [...process.argv]
+  const ars = argv.slice(2)
   // 缓存key
   let ket = ''
   for (const item in val) {

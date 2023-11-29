@@ -27,10 +27,6 @@ export * from './define/index.js'
  */
 export * from './api.js'
 /**
- * 平台特殊函数
- */
-export * from './utils.js'
-/**
  * *************
  * exit
  * *************

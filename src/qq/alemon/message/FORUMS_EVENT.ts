@@ -68,6 +68,8 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
   - FORUM_PUBLISH_AUDIT_RESULT      // 当用户发表审核通过时
  */
 export const FORUMS_EVENT = async (event: ForumsEventType) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,

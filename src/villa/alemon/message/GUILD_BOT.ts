@@ -46,6 +46,8 @@ export async function GUILD_BOT(event: {
   id: string
   send_at: number
 }) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const EventData = event.extend_data.EventData
 
   const guild_id =

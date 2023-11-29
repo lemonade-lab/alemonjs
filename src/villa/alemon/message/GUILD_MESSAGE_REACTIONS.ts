@@ -52,6 +52,8 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
   id: string
   send_at: number
 }) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const AddQuickEmoticon = event.extend_data.EventData.AddQuickEmoticon
 
   const cfg = getBotConfigByKey('villa')

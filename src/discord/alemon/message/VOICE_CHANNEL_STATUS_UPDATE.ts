@@ -27,7 +27,5 @@ interface VOICE_CHANNEL_STATUS_UPDATE_TYPE {
 export async function VOICE_CHANNEL_STATUS_UPDATE(
   event: VOICE_CHANNEL_STATUS_UPDATE_TYPE
 ) {
-  //
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('VOICE_CHANNEL_STATUS_UPDATE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

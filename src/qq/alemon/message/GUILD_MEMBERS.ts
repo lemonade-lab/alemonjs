@@ -40,6 +40,8 @@ GUILD_MEMBERS (1 << 1)
   - GUILD_MEMBER_REMOVE    // 当成员被移除时
  */
 export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: '',

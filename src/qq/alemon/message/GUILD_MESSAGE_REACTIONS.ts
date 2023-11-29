@@ -36,6 +36,8 @@ GUILD_MESSAGE_REACTIONS (1 << 10)
 export const GUILD_MESSAGE_REACTIONS = async (
   event: GUILD_MESSAGE_REACTIONS
 ) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const Message = ClientController({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,

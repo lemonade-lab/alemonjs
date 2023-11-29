@@ -72,6 +72,8 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
  */
 export const DIRECT_MESSAGE = async (event: directEventData) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+
   const open_id = event.msg?.guild_id
 
   const Message = ClientDirectController({

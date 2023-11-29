@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import FormData from 'form-data'
 import { createHash } from 'crypto'
 import { Readable } from 'stream'
@@ -20,6 +20,7 @@ import {
 } from './types.js'
 import { createPicFrom } from '../../core/index.js'
 import { getClientConfig } from './config.js'
+import { ApiLog } from './log.js'
 
 /**
  * 别野服务
@@ -64,7 +65,7 @@ export async function transferImage(
     data: {
       url
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -89,7 +90,7 @@ export async function getImageReq(
       ext: ext
     },
     url: ApiEnum.localImage
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -128,7 +129,7 @@ export async function uploadImage(
     url: data.params.host,
     method: 'post',
     data: formData
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -158,7 +159,7 @@ export async function checkMemberBotAccessToken(
     data: {
       token
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -184,7 +185,7 @@ export async function getVilla(villa_id: number | string): Promise<{
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     url: ApiEnum.getVilla
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -215,7 +216,7 @@ export async function getVillaMembers(
       offset_str,
       size
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -248,7 +249,7 @@ export async function getMember(
     params: {
       uid: String(uid)
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -272,7 +273,7 @@ export async function deleteVillaMember(
     data: {
       uid: String(uid)
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * *******
@@ -309,7 +310,7 @@ export async function sendMessage(
       object_name: data.object_name,
       msg_content: data.msg_content
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -352,7 +353,7 @@ export async function createComponentTemplate(
     data: {
       panel: JSON.stringify(panel)
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -384,7 +385,7 @@ export async function pinMessage(
       room_id: String(data.room_id), // 房间 id
       send_at: Number(send_at) // 发送时间
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -414,7 +415,7 @@ export async function recallMessage(
       msg_uid: String(msg_uid), // 消息 id
       msg_time: Number(send_at) // 发送时间
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -446,7 +447,7 @@ export async function createGroup(
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     data: { group_name }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -470,7 +471,7 @@ export async function editGroup(
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     data: { group_id, group_name }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * ？？
@@ -488,7 +489,7 @@ export async function deleteGroup(villa_id: number | string, group_id: number) {
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     data: { group_id }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -509,7 +510,7 @@ export async function getGroupList(villa_id: number | string): Promise<{
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     url: ApiEnum.getGroupList
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * ??
@@ -535,7 +536,7 @@ export async function editRoom(
       room_id: Number(room_id),
       room_name: String(room_name)
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * ??
@@ -558,7 +559,7 @@ export async function deleteRoom(
     data: {
       room_id: String(room_id)
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * 已测
@@ -585,7 +586,7 @@ export async function getRoom(
     params: {
       room_id: Number(room_id)
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * 已测
@@ -607,7 +608,7 @@ export async function getVillaGroupRoomList(
     headers: {
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * ******
@@ -637,7 +638,7 @@ export async function operateMemberToRole(
     },
     url: ApiEnum.operateMemberToRole,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -667,7 +668,7 @@ export async function createMemberRole(
     },
     url: ApiEnum.createMemberRole,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  * ??
@@ -693,7 +694,7 @@ export async function editMemberRole(
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -714,7 +715,7 @@ export async function deleteMemberRole(villa_id: number | string, id: number) {
     data: {
       id
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -735,7 +736,7 @@ export async function getVillaMemberRoles(villa_id: number | string): Promise<{
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     url: ApiEnum.getVillaMemberRoles
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -758,7 +759,7 @@ export async function getMemberRoleInfo(
     params: {
       role_id
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -785,7 +786,7 @@ export async function getAllEmoticons(villa_id: number | string): Promise<{
       'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
     },
     url: ApiEnum.getAllEmoticons
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -819,7 +820,7 @@ export async function audit(
     },
     url: ApiEnum.audit,
     data
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 
 /**
@@ -846,5 +847,5 @@ export async function getWebsocketInfo(): Promise<{
     headers: {
       'Content-Type': 'application/json'
     }
-  }).then(res => res.data)
+  }).then(ApiLog)
 }

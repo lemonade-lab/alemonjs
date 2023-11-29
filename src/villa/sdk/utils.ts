@@ -1,4 +1,4 @@
-import { ButtonType } from './villa/sdk/index.js'
+import { ButtonType } from './types.js'
 /**
  * Villa按钮自动排咧
  * @param arr

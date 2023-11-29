@@ -74,7 +74,7 @@ interface MESSAGES_TYPE {
 export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
   if (event.author?.bot) return
 
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.log('MESSAGES_TYPE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const Message = ClientController({
     guild_id: event.guild_id,

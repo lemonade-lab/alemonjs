@@ -32,7 +32,5 @@ interface GUILD_MEMBER_REMOVE_TYPE {
  * @param event
  */
 export async function GUILD_MEMBER_REMOVE(event: GUILD_MEMBER_REMOVE_TYPE) {
-  //
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('GUILD_MEMBER_REMOVE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }

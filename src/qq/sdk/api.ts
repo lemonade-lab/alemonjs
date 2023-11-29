@@ -1,5 +1,5 @@
 import FormData from 'form-data'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import { getBotConfig } from './config.js'
 import { createPicFrom } from '../../core/index.js'
 

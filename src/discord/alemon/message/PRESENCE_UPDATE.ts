@@ -81,7 +81,5 @@ interface MESSAGE_CREATE_TYPE {
  * @param event
  */
 export async function PRESENCE_UPDATE(event: MESSAGE_CREATE_TYPE) {
-  //
-  if (process.env?.ALEMONJS_EVENT == 'dev')
-    console.log('MESSAGE_CREATE_TYPE', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 }
