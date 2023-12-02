@@ -1,4 +1,10 @@
 import protobuf from 'protobufjs'
+import { dirname, join, resolve } from 'path'
+import { fileURLToPath } from 'url'
+
+const currentFilePath = fileURLToPath(import.meta.url)
+const currentDirPath = dirname(currentFilePath)
+const sdkPath = resolve(currentDirPath)
 
 export const commandEnum = [
   'PLogin',
@@ -17,7 +23,7 @@ export const command: {
 } = {} as any
 
 //  .proto 文件中的消息类型
-protobuf.load('proto/command.proto', function (err, root) {
+protobuf.load(join(sdkPath, 'proto/command.proto'), function (err, root) {
   if (err) throw err
   command['PLogin'] = root.lookupType('vila_bot.PLogin')
   command['PLoginReply'] = root.lookupType('vila_bot.PLoginReply')
@@ -42,7 +48,7 @@ export const model: {
 } = {} as any
 
 //  .proto 文件中的消息类型
-protobuf.load('proto/model.proto', function (err, root) {
+protobuf.load(join(sdkPath, 'proto/model.proto'), function (err, root) {
   if (err) throw err
   model['RobotTemplate'] = root.lookupType('vila_bot.RobotTemplate')
   model['Robot'] = root.lookupType('vila_bot.Robot')
@@ -51,10 +57,12 @@ protobuf.load('proto/model.proto', function (err, root) {
 })
 
 //  .proto 文件中的消息类型
-protobuf.load('proto/robot_event_message.proto', function (err, root) {
-  if (err) throw err
-  //
-})
+protobuf.load(
+  join(sdkPath, 'proto/robot_event_message.proto'),
+  function (err, root) {
+    if (err) throw err
+  }
+)
 
 /**
  * 控制器

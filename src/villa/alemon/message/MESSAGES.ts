@@ -27,7 +27,7 @@ export async function MESSAGES(event: {
       name: string
       desc: string
       icon: string
-      customSettings: any
+      customSettings: any[]
       commands: Array<{
         name: string // 指令
         desc: string // 指令说明
@@ -44,7 +44,7 @@ export async function MESSAGES(event: {
       objectName: number // 对象名称
       roomId: number // 房间号
       nickname: string // 昵称
-      msg_uid: string // 消息ID
+      msgUid: string // 消息ID
       villaId: string // 别野编号
     }
   }
@@ -134,7 +134,7 @@ export async function MESSAGES(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const msg_id = `${SendMessage.msg_uid}.${SendMessage.sendAt}`
+  const msg_id = `${SendMessage.msgUid}.${SendMessage.sendAt}`
 
   /**
    * 制作控制器

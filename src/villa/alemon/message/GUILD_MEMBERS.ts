@@ -25,6 +25,7 @@ export async function GUILD_MEMBERS(event: {
       name: string
       desc: string
       icon: string
+      customSettings: any[]
       commands: Array<{
         name: string // 指令
         desc: string // 指令说明

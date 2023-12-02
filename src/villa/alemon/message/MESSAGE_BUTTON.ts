@@ -24,6 +24,7 @@ export async function MESSAGE_BUTTON(event: {
       name: string
       desc: string
       icon: string
+      customSettings: any[]
       commands: Array<{
         name: string // 指令
         desc: string // 指令说明
