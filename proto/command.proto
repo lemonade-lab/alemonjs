@@ -110,8 +110,3 @@ message PKickOff{
     // 状态码对应的文案
     string reason = 2;
 }
-
-message BaseReply {
-    // 错误码 非0表示失败
-    int32  code = 1;
-}

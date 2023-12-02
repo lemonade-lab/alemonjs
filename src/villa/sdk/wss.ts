@@ -49,7 +49,6 @@ export async function createClientWS() {
   const ws = new WebSocket(data.websocket_url)
   ws.on('open', async () => {
     console.log('open')
-
     // login
     ws.send(
       createMessage({
@@ -59,7 +58,7 @@ export async function createClientWS() {
         AppId: data.app_id,
         BodyData: ProtoCommand('PLogin').encode({
           uid: data.uid,
-          token: `${ClientCfg.villa_id}.${ClientCfg.bot_secret}.${ClientCfg.bot_id}`,
+          token: ClientCfg.token,
           platform: data.platform,
           appId: data.app_id,
           deviceId: data.device_id,
@@ -95,10 +94,13 @@ export async function createClientWS() {
           const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
           console.log('PLoginReply:', LongToNumber(reply))
         } else if (obj.bizType == 6) {
+          // 心跳
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
           console.log('PHeartBeatReply:', LongToNumber(reply))
         } else if (obj.bizType == 8) {
           // 退出登录
+          const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)
+          console.log('PLogoutReply:', LongToNumber(reply))
         } else if (obj.bizType == 53) {
           // 强制下线
         } else if (obj.bizType == 52) {
@@ -108,11 +110,10 @@ export async function createClientWS() {
           const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
           console.log('RobotEvent:', LongToNumber(reply))
         } else {
-          console.log('obj', obj)
-          // ProtoModel
+          console.log('未知数据')
         }
       } catch {
-        console.log('错误数据')
+        console.log('代码错误')
       }
     }
   })

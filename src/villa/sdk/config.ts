@@ -7,7 +7,8 @@ let ClientCfg: ClientConfig = {
   bot_secret: '',
   callback_url: '/api/mys/callback',
   callback_port: 8080,
-  villa_id: 0
+  villa_id: 0,
+  token: ''
 }
 /**
  * 设置配置

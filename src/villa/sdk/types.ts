@@ -7,6 +7,7 @@ export interface ClientConfig {
   callback_url?: string
   callback_port?: number
   villa_id?: number
+  token?: string
 }
 /**
  *  api路径地址

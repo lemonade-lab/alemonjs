@@ -4,12 +4,12 @@ export const commandEnum = [
   'PLogin',
   'PLoginReply',
   'PLogout',
+  'PLogoutReply',
   'CommonReply',
   'PKickOff',
   'PHeartBeatReply',
   'PHeartBeatType',
-  'PHeartBeat',
-  'BaseReply'
+  'PHeartBeat'
 ] as const
 
 export const command: {
@@ -22,12 +22,12 @@ protobuf.load('proto/command.proto', function (err, root) {
   command['PLogin'] = root.lookupType('vila_bot.PLogin')
   command['PLoginReply'] = root.lookupType('vila_bot.PLoginReply')
   command['PLogout'] = root.lookupType('vila_bot.PLogout')
+  command['PLogoutReply'] = root.lookupType('vila_bot.PLogoutReply')
   command['CommonReply'] = root.lookupType('vila_bot.CommonReply')
   command['PKickOff'] = root.lookupType('vila_bot.PKickOff')
   command['PHeartBeatReply'] = root.lookupType('vila_bot.PHeartBeatReply')
   command['PHeartBeatType'] = root.lookupType('vila_bot.PHeartBeat')
   command['PHeartBeat'] = root.lookupType('vila_bot.PHeartBeat')
-  command['BaseReply'] = root.lookupType('vila_bot.BaseReply')
 })
 
 export const modelEnum = [
