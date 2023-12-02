@@ -1,57 +1,130 @@
 import WebSocket from 'ws'
+import axios, { AxiosRequestConfig } from 'axios'
+import { getClientConfig } from './config.js'
+import { Counter } from './counter.js'
+import { createMessage, parseMessage } from './data.js'
+import { ProtoCommand, ProtoModel } from './proto.js'
+
+const counter = new Counter(1) // 初始值为1
+
+/**
+ * 别野服务
+ * @param villa_id 别野编号
+ * @param config 配置
+ * @returns
+ */
+async function wsService(config: AxiosRequestConfig) {
+  const ClientCfg = getClientConfig()
+  const service = axios.create({
+    baseURL: 'https://bbs-api.miyoushe.com', // 地址
+    timeout: 6000, // 响应
+    headers: {
+      'x-rpc-bot_id': ClientCfg.bot_id, // 账号
+      'x-rpc-bot_secret': ClientCfg.bot_secret // 密码
+    }
+  })
+  return await service(config)
+}
 
 async function getWebsocketInfo(): Promise<{
-  websocket_url: string
-  websocket_conn_uid: number
-  app_id: number
-  platform: number
-  device_id: number
+  data: {
+    uid: number
+    websocket_url: string
+    websocket_conn_uid: number
+    app_id: number
+    platform: number
+    device_id: string
+  }
 }> {
-  const data = await fetch(
-    'http://devapi-takumi.mihoyo.com/vila/api/bot/platform/getWebsocketInfo',
-    {
-      headers: {
-        'x-rpc-bot_id': 'bot_xxxxxxx',
-        'x-rpc-bot_secret': 'xxxxxxxxxxxxxxx',
-        'x-rpc-bot_villa_id': '2715',
-        'x-rpc-bot_ts': '1697522400',
-        'x-rpc-bot_nonce': '34719f00-2f13-364c-f7a7-44ca30b4f20e',
-        'Content-Type': 'application/json'
-      }
-    }
-  )
-    .then(res => res.json())
-    .then(res => res.data)
-  return data
+  return await wsService({
+    url: '/vila/api/bot/platform/getWebsocketInfo',
+    method: 'get'
+  }).then(res => res.data)
 }
 
 export async function createClientWS() {
-  const data = await getWebsocketInfo()
-  const websocketUrl = data.websocket_url
-  const wsConn = new WebSocket(websocketUrl)
-  wsConn.on('open', async () => {
-    const platform = data.platform // Replace with the actual platform
-    const deviceId = data.device_id // Replace with the actual device ID
-    const uid = data.app_id // Replace with the actual UID
-    const appId = data.app_id // Replace with the actual app ID
-    const region = '' // Replace with the actual region
-    const token = '0.xxxxx.bot_xxxx' // Replace with the actual token
-    // 发送登录
-    wsConn.send(
-      JSON.stringify({
-        uid,
-        token,
-        platform,
-        app_id: appId,
-        device_id: deviceId,
-        region
+  const data = await getWebsocketInfo().then(res => res.data)
+  const ClientCfg = getClientConfig()
+  if (!data?.websocket_url) return
+  const ws = new WebSocket(data.websocket_url)
+  ws.on('open', async () => {
+    console.log('open')
+
+    // login
+    ws.send(
+      createMessage({
+        ID: counter.getNextID(),
+        Flag: 1, // 发送
+        BizType: 7,
+        AppId: data.app_id,
+        BodyData: ProtoCommand('PLogin').encode({
+          uid: data.uid,
+          token: `8488.${ClientCfg.bot_secret}.${ClientCfg.bot_id}`,
+          platform: data.platform,
+          appId: data.app_id,
+          deviceId: data.device_id,
+          region: '',
+          meta: null
+        })
       })
     )
-    wsConn.on('message', data => {
-      console.info('data', data)
-    })
+
+    // 6s 心跳
+    setInterval(() => {
+      ws.send(
+        createMessage({
+          ID: counter.getNextID(),
+          Flag: 1, // 发送
+          BizType: 6,
+          AppId: data.app_id,
+          BodyData: ProtoCommand('PHeartBeat').encode({
+            clientTimestamp: `${new Date().getTime()}`
+          })
+        })
+      )
+    }, 20 * 1000)
   })
-  wsConn.on('error', error => {
+
+  ws.on('message', message => {
+    if (Buffer.isBuffer(message)) {
+      try {
+        const obj = parseMessage(new Uint8Array(message))
+        if (!obj) return
+        if (obj.bizType == 7) {
+          // 登录
+          const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
+          console.log('PLoginReply:', {
+            code: reply.code,
+            serverTimestamp: reply?.serverTimestamp?.toNumber(),
+            connId: reply?.connId?.toNumber()
+          })
+        } else if (obj.bizType == 6) {
+          const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
+          console.log('PHeartBeatReply:', {
+            code: reply.code,
+            serverTimestamp: reply?.serverTimestamp?.toNumber()
+          })
+        } else if (obj.bizType == 8) {
+          // 退出登录
+        } else if (obj.bizType == 53) {
+          // 强制下线
+        } else if (obj.bizType == 52) {
+          // 服务器关机
+        } else if (obj.bizType == 30001) {
+          // 回调数据包
+          const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
+          console.log('RobotEvent:', reply)
+        } else {
+          console.log('obj', obj)
+          // ProtoModel
+        }
+      } catch {
+        console.log('错误数据')
+      }
+    }
+  })
+
+  ws.on('error', error => {
     console.error('WebSocket error:', error)
   })
 }
