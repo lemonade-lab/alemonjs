@@ -93,17 +93,10 @@ export async function createClientWS() {
         if (obj.bizType == 7) {
           // 登录
           const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
-          console.log('PLoginReply:', {
-            code: reply.code,
-            serverTimestamp: reply?.serverTimestamp?.toNumber(),
-            connId: reply?.connId?.toNumber()
-          })
+          console.log('PLoginReply:', LongToNumber(reply))
         } else if (obj.bizType == 6) {
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
-          console.log('PHeartBeatReply:', {
-            code: reply.code,
-            serverTimestamp: reply?.serverTimestamp?.toNumber()
-          })
+          console.log('PHeartBeatReply:', LongToNumber(reply))
         } else if (obj.bizType == 8) {
           // 退出登录
         } else if (obj.bizType == 53) {
@@ -113,7 +106,7 @@ export async function createClientWS() {
         } else if (obj.bizType == 30001) {
           // 回调数据包
           const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
-          console.log('RobotEvent:', reply)
+          console.log('RobotEvent:', LongToNumber(reply))
         } else {
           console.log('obj', obj)
           // ProtoModel
@@ -127,4 +120,32 @@ export async function createClientWS() {
   ws.on('error', error => {
     console.error('WebSocket error:', error)
   })
+}
+
+/**
+ * long数据转为number
+ * @param obj
+ * @returns
+ */
+function LongToNumber(obj: any) {
+  if (obj !== null) {
+    if (typeof obj == 'string') return obj
+    if (typeof obj?.low == 'number') {
+      return Number(obj)
+    } else if (Array.isArray(obj)) {
+      // 递归处理数组中的每个元素
+      return obj.map(item => LongToNumber(item))
+    } else {
+      const result: any = {}
+      for (const key in obj) {
+        // 递归处理对象的每个属性
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          result[key] = LongToNumber(obj[key])
+        }
+      }
+      return result
+    }
+  } else {
+    return obj
+  }
 }
