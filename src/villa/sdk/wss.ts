@@ -4,9 +4,7 @@ import { getClientConfig } from './config.js'
 import { Counter } from './counter.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
-
 const counter = new Counter(1) // 初始值为1
-
 /**
  * 别野服务
  * @param villa_id 别野编号
@@ -42,10 +40,13 @@ async function getWebsocketInfo(): Promise<{
   }).then(res => res.data)
 }
 
-export async function createClientWS() {
+export async function createClientWS(callBackByVilla: any) {
   const data = await getWebsocketInfo().then(res => res.data)
+  if (!data?.websocket_url) {
+    console.log('鉴权失败')
+    return
+  }
   const ClientCfg = getClientConfig()
-  if (!data?.websocket_url) return
   const ws = new WebSocket(data.websocket_url)
   ws.on('open', async () => {
     console.log('open')
@@ -92,11 +93,11 @@ export async function createClientWS() {
         if (obj.bizType == 7) {
           // 登录
           const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
-          console.log('PLoginReply:', LongToNumber(reply))
+          if (reply.code) console.log('登录失败')
         } else if (obj.bizType == 6) {
           // 心跳
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
-          console.log('PHeartBeatReply:', LongToNumber(reply))
+          if (reply.code) console.log('心跳错误')
         } else if (obj.bizType == 8) {
           // 退出登录
           const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)
@@ -108,13 +109,17 @@ export async function createClientWS() {
         } else if (obj.bizType == 30001) {
           // 回调数据包
           const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
-          console.log('RobotEvent:', LongToNumber(reply))
+          const data = LongToNumber(reply)
+          console.log('data', data)
+          callBackByVilla(data)
         } else {
           console.log('未知数据')
         }
       } catch {
         console.log('代码错误')
       }
+    } else {
+      console.log('未知数据')
     }
   })
 

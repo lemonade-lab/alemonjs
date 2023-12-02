@@ -27,41 +27,40 @@ export async function MESSAGES(event: {
       name: string
       desc: string
       icon: string
+      customSettings: any
       commands: Array<{
         name: string // 指令
         desc: string // 指令说明
       }>
     }
-    villa_id: number
+    villaId: number
   }
   type: number
-  extend_data: {
-    EventData: {
-      SendMessage: {
-        content: string // 字符串消息合集  MessageContentType
-        from_user_id: number // 来自用户id
-        send_at: number // 发送事件编号
-        object_name: number // 对象名称
-        room_id: number // 房间号
-        nickname: string // 昵称
-        msg_uid: string // 消息ID
-        villa_id: string // 别野编号
-      }
+  extendData: {
+    sendMessage: {
+      content: string // 字符串消息合集  MessageContentType
+      fromUserId: number // 来自用户id
+      sendAt: number // 发送事件编号
+      objectName: number // 对象名称
+      roomId: number // 房间号
+      nickname: string // 昵称
+      msg_uid: string // 消息ID
+      villaId: string // 别野编号
     }
   }
-  created_at: number
+  createdAt: number
   id: string
-  send_at: number
+  sendAt: number
 }) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const SendMessage = event.extend_data.EventData.SendMessage
+  const SendMessage = event.extendData.sendMessage
 
   /**
    * 数据包解析
    */
   const MessageContent: MessageContentType = JSON.parse(
-    event.extend_data.EventData.SendMessage.content
+    event.extendData.sendMessage.content
   )
 
   /**
@@ -135,19 +134,19 @@ export async function MESSAGES(event: {
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const msg_id = `${SendMessage.msg_uid}.${SendMessage.send_at}`
+  const msg_id = `${SendMessage.msg_uid}.${SendMessage.sendAt}`
 
   /**
    * 制作控制器
    */
   const Message = ClientControllerOnMessage({
-    guild_id: SendMessage.villa_id,
-    channel_id: SendMessage.room_id,
+    guild_id: SendMessage.villaId,
+    channel_id: SendMessage.roomId,
     msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
-    guild_id: SendMessage.villa_id,
+    guild_id: SendMessage.villaId,
     user_id: MessageContent.user.id
   })
 
@@ -166,11 +165,11 @@ export async function MESSAGES(event: {
       avatar: event.robot.template.icon
     },
     isMaster: MessageContent.user.id == masterID,
-    guild_id: String(SendMessage.villa_id),
+    guild_id: String(SendMessage.villaId),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: String(SendMessage.room_id),
+    channel_id: String(SendMessage.roomId),
     attachments: [],
     specials: [],
     //
@@ -187,7 +186,7 @@ export async function MESSAGES(event: {
     user_name: MessageContent.user.name,
     user_avatar: MessageContent.user.portrait,
     //
-    send_at: SendMessage.send_at,
+    send_at: SendMessage.sendAt,
     segment: segmentVILLA,
     /**
      *消息发送
@@ -203,9 +202,9 @@ export async function MESSAGES(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villa_id = select?.guild_id ?? SendMessage.villa_id
-      const room_id = select?.channel_id ?? SendMessage.room_id
-      return await replyController(villa_id, room_id, msg, {
+      const villaId = select?.guild_id ?? SendMessage.villaId
+      const roomId = select?.channel_id ?? SendMessage.roomId
+      return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },

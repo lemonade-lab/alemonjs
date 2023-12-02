@@ -3,6 +3,7 @@ import { hmacSha256 } from './sdk/index.js'
 import { getBotConfigByKey } from '../config/index.js'
 import { createClientWS } from './sdk/wss.js'
 import { setClientConfig } from './sdk/config.js'
+import { callBackByVilla } from './alemon/conversation.js'
 
 export async function createAlemonByVilla() {
   // 登录
@@ -25,7 +26,7 @@ export async function createAlemonByVilla() {
       villa_id: cfg.villa_id,
       token: `${cfg.villa_id}.${cfg.secret}.${cfg.bot_id}`
     })
-    createClientWS()
+    createClientWS(callBackByVilla)
     return true
   }
   return false

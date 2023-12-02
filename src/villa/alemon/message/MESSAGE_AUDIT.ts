@@ -31,43 +31,41 @@ export async function MESSAGE_AUDIT(event: {
         desc: string // 指令说明
       }>
     }
-    villa_id: number // 事件所属的大别野 id
+    villaId: number // 事件所属的大别野 id
   }
   type: number // 消息类型
-  extend_data: {
-    EventData: {
-      AuditCallback: {
-        audit_id: string // 审核事件 id
-        bot_tpl_id: string // 机器人 id
-        villa_id: number // 大别野 id
-        room_id: number // 房间 id（和审核接口调用方传入的值一致）
-        user_id: number // 用户 id（和审核接口调用方传入的值一致）
-        pass_through: string // 透传数据（和审核接口调用方传入的值一致）
-        audit_result: number // 审核结果，0作兼容，1审核通过，2审核驳回
-      }
+  extendData: {
+    auditCallback: {
+      auditId: string // 审核事件 id
+      botTplId: string // 机器人 id
+      villaId: number // 大别野 id
+      roomId: number // 房间 id（和审核接口调用方传入的值一致）
+      userId: number // 用户 id（和审核接口调用方传入的值一致）
+      passThrough: string // 透传数据（和审核接口调用方传入的值一致）
+      auditResult: number // 审核结果，0作兼容，1审核通过，2审核驳回
     }
   }
-  created_at: number // 创建事件编号
+  createdAt: number // 创建事件编号
   id: string // 消息编号
-  send_at: number // 发送事件编号
+  sendAt: number // 发送事件编号
 }) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const AuditCallback = event.extend_data.EventData.AuditCallback
+  const AuditCallback = event.extendData.auditCallback
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const msg_id = `${AuditCallback.audit_id}.${event.send_at}`
+  const msg_id = `${AuditCallback.auditId}.${event.sendAt}`
 
   const Message = ClientControllerOnMessage({
-    guild_id: AuditCallback.villa_id,
-    channel_id: AuditCallback.room_id,
+    guild_id: AuditCallback.villaId,
+    channel_id: AuditCallback.roomId,
     msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
-    guild_id: AuditCallback.villa_id,
-    user_id: String(AuditCallback.user_id)
+    guild_id: AuditCallback.villaId,
+    user_id: String(AuditCallback.userId)
   })
 
   /**
@@ -84,12 +82,12 @@ export async function MESSAGE_AUDIT(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: masterID == String(AuditCallback.user_id),
-    guild_id: String(AuditCallback.villa_id),
+    isMaster: masterID == String(AuditCallback.userId),
+    guild_id: String(AuditCallback.villaId),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: String(AuditCallback.room_id),
+    channel_id: String(AuditCallback.roomId),
     attachments: [],
     specials: [],
     //
@@ -102,11 +100,11 @@ export async function MESSAGE_AUDIT(event: {
     open_id: '',
 
     //
-    user_id: String(AuditCallback.user_id),
+    user_id: String(AuditCallback.userId),
     user_name: '', // dodo 可权限获得
     user_avatar: '', // dodo 可权限获得
     //
-    send_at: event.send_at,
+    send_at: event.sendAt,
     segment: segmentVILLA,
     /**
      * 消息回复
@@ -122,9 +120,9 @@ export async function MESSAGE_AUDIT(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villa_id = select?.guild_id ?? AuditCallback.villa_id
-      const room_id = select?.channel_id ?? AuditCallback.room_id
-      return await replyController(villa_id, room_id, msg, {
+      const villaId = select?.guild_id ?? AuditCallback.villaId
+      const roomId = select?.channel_id ?? AuditCallback.roomId
+      return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },

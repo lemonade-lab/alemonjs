@@ -29,31 +29,29 @@ export async function GUILD_BOT(event: {
         desc: string // 指令说明
       }>
     }
-    villa_id: number
+    villaId: number
   }
   type: number
-  extend_data: {
-    EventData: {
-      DeleteRobot: {
-        villa_id: number // 别野编号
-      }
-      CreateRobot: {
-        villa_id: number // 别野编号
-      }
+  extendData: {
+    deleteRobot: {
+      villaId: number // 别野编号
+    }
+    createRobot: {
+      villaId: number // 别野编号
     }
   }
-  created_at: number
+  createdAt: number
   id: string
-  send_at: number
+  sendAt: number
 }) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const EventData = event.extend_data.EventData
+  const extendData = event.extendData
 
   const guild_id =
     event.type == 3
-      ? EventData.CreateRobot.villa_id
-      : EventData.DeleteRobot.villa_id
+      ? extendData.createRobot.villaId
+      : extendData.deleteRobot.villaId
 
   const Message = ClientControllerOnMessage({
     guild_id: guild_id,
@@ -94,7 +92,7 @@ export async function GUILD_BOT(event: {
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: `${event.id}.${event.send_at}`,
+    msg_id: `${event.id}.${event.sendAt}`,
     msg_txt: '',
     open_id: '',
 
@@ -103,7 +101,7 @@ export async function GUILD_BOT(event: {
     user_name: '',
     user_avatar: '',
     //
-    send_at: event.send_at,
+    send_at: event.sendAt,
     segment: segmentVILLA,
     /**
      * 消息回复
@@ -119,10 +117,10 @@ export async function GUILD_BOT(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villa_id = select?.guild_id ?? guild_id
-      const room_id = select?.channel_id ?? false
-      if (!room_id) return false
-      return await replyController(villa_id, room_id, msg, {
+      const villaId = select?.guild_id ?? guild_id
+      const roomId = select?.channel_id ?? false
+      if (!roomId) return false
+      return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },

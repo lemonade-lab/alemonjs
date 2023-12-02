@@ -30,45 +30,43 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
         desc: string // 指令说明
       }>
     }
-    villa_id: number
+    villaId: number
   }
   type: number
-  extend_data: {
-    EventData: {
-      // 增加和删除都是一个数据位
-      AddQuickEmoticon: {
-        villa_id: number // 别野编号
-        room_id: number // 房间编号
-        uid: number // 用户编号
-        emoticon_id: number // 表情编号
-        emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
-        is_cancel?: boolean // 是撤回为  ture
-        msg_uid: string // 消息是谁的
-        bot_msg_id: string // 机器人消息编号
-      }
+  extendData: {
+    // 增加和删除都是一个数据位
+    addQuickEmoticon: {
+      villaId: number // 别野编号
+      roomId: number // 房间编号
+      uid: number // 用户编号
+      emoticonId: number // 表情编号
+      emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
+      isCancel?: boolean // 是撤回为  ture
+      msgUid: string // 消息是谁的
+      botMsgId: string // 机器人消息编号
     }
   }
-  created_at: number
+  createdAt: number
   id: string
-  send_at: number
+  sendAt: number
 }) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const AddQuickEmoticon = event.extend_data.EventData.AddQuickEmoticon
+  const AddQuickEmoticon = event.extendData.addQuickEmoticon
 
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const msg_id = `${AddQuickEmoticon.msg_uid}.${event.send_at}`
+  const msg_id = `${AddQuickEmoticon.msgUid}.${event.sendAt}`
 
   const Message = ClientControllerOnMessage({
-    guild_id: AddQuickEmoticon.villa_id,
-    channel_id: AddQuickEmoticon.room_id,
+    guild_id: AddQuickEmoticon.villaId,
+    channel_id: AddQuickEmoticon.roomId,
     msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
-    guild_id: AddQuickEmoticon.villa_id,
+    guild_id: AddQuickEmoticon.villaId,
     user_id: String(AddQuickEmoticon.uid)
   })
 
@@ -78,7 +76,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
   const e = {
     platform: 'villa' as (typeof PlatformEnum)[number],
     event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
-    eventType: event.extend_data.EventData.AddQuickEmoticon.is_cancel
+    eventType: event.extendData.addQuickEmoticon.isCancel
       ? 'DELETE'
       : ('CREATE' as (typeof EventType)[number]),
     boundaries: 'publick' as 'publick' | 'private',
@@ -89,19 +87,19 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
       avatar: event.robot.template.icon
     },
     isMaster: masterID == String(AddQuickEmoticon.uid),
-    guild_id: String(AddQuickEmoticon.villa_id),
+    guild_id: String(AddQuickEmoticon.villaId),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: String(AddQuickEmoticon.room_id),
+    channel_id: String(AddQuickEmoticon.roomId),
     attachments: [],
     specials: [
       {
-        emoticon_id: AddQuickEmoticon.emoticon_id,
+        emoticon_id: AddQuickEmoticon.emoticonId,
         emoticon_type: 0,
         emoticon: AddQuickEmoticon.emoticon,
-        is_cancel: AddQuickEmoticon?.is_cancel ?? false,
-        msg_uid: AddQuickEmoticon.msg_uid
+        is_cancel: AddQuickEmoticon?.isCancel ?? false,
+        msg_uid: AddQuickEmoticon.msgUid
       }
     ],
     //
@@ -117,7 +115,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
     user_id: String(AddQuickEmoticon.uid),
     user_name: '', // dodo 可权限获得
     user_avatar: '', // dodo 可权限获得
-    send_at: event.send_at,
+    send_at: event.sendAt,
     segment: segmentVILLA,
     /**
      * 消息回复
@@ -133,9 +131,9 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villa_id = select?.guild_id ?? AddQuickEmoticon.villa_id
-      const room_id = select?.channel_id ?? AddQuickEmoticon.room_id
-      return await replyController(villa_id, room_id, msg, {
+      const villaId = select?.guild_id ?? AddQuickEmoticon.villaId
+      const roomId = select?.channel_id ?? AddQuickEmoticon.roomId
+      return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },

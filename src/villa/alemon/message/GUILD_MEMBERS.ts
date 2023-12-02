@@ -30,41 +30,39 @@ export async function GUILD_MEMBERS(event: {
         desc: string // 指令说明
       }>
     }
-    villa_id: number
+    villaId: number
   }
   type: number
-  extend_data: {
-    EventData: {
-      JoinVilla: {
-        join_uid: number // 用户编号
-        join_user_nickname: string // 用户名称
-        join_at: number // 进入事件编号
-        villa_id: number // 别野编号
-      }
+  extendData: {
+    joinVilla: {
+      joinUid: number // 用户编号
+      joinUserNickname: string // 用户名称
+      joinAt: number // 进入事件编号
+      villaId: number // 别野编号
     }
   }
-  created_at: number
+  createdAt: number
   id: string
-  send_at: number
+  sendAt: number
 }) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const JoinVilla = event.extend_data.EventData.JoinVilla
+  const JoinVilla = event.extendData.joinVilla
 
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const msg_id = `${event.id}.${JoinVilla.join_at}`
+  const msg_id = `${event.id}.${JoinVilla.joinAt}`
 
   const Message = ClientControllerOnMessage({
-    guild_id: JoinVilla.villa_id,
+    guild_id: JoinVilla.villaId,
     channel_id: 0,
     msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
-    guild_id: JoinVilla.villa_id,
-    user_id: String(event.extend_data.EventData.JoinVilla.join_uid)
+    guild_id: JoinVilla.villaId,
+    user_id: String(event.extendData.joinVilla.joinUid)
   })
 
   /**
@@ -81,8 +79,8 @@ export async function GUILD_MEMBERS(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: masterID == String(JoinVilla.join_uid),
-    guild_id: String(JoinVilla.villa_id),
+    isMaster: masterID == String(JoinVilla.joinUid),
+    guild_id: String(JoinVilla.villaId),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
@@ -100,9 +98,9 @@ export async function GUILD_MEMBERS(event: {
 
     //
     user_avatar: '', // dodo 可以通过 请求权限获得
-    user_id: String(event.extend_data.EventData.JoinVilla.join_uid),
-    user_name: event.extend_data.EventData.JoinVilla.join_user_nickname,
-    send_at: JoinVilla.join_at,
+    user_id: String(event.extendData.joinVilla.joinUid),
+    user_name: event.extendData.joinVilla.joinUserNickname,
+    send_at: JoinVilla.joinAt,
     segment: segmentVILLA,
     /**
      * 消息回复
@@ -124,10 +122,10 @@ export async function GUILD_MEMBERS(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villa_id = select?.guild_id ?? JoinVilla.villa_id
-      const room_id = select?.channel_id ?? false
-      if (!room_id) return false
-      return await replyController(villa_id, room_id, msg, {
+      const villaId = select?.guild_id ?? JoinVilla.villaId
+      const roomId = select?.channel_id ?? false
+      if (!roomId) return false
+      return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },

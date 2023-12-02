@@ -15,7 +15,7 @@ import {
 } from '../controller.js'
 
 /**
- * @param event 回调数据
+ * @param event 按钮数据
  */
 export async function MESSAGE_BUTTON(event: {
   robot: {
@@ -29,45 +29,43 @@ export async function MESSAGE_BUTTON(event: {
         desc: string // 指令说明
       }>
     }
-    villa_id: number
+    villaId: number
   }
   type: number
-  extend_data: {
-    EventData: {
-      ClickMsgComponent: {
-        villa_id: number
-        room_id: number
-        component_id: string
-        msg_uid: string
-        uid: number
-        bot_msg_id: string
-      }
+  extendData: {
+    clickMsgComponent: {
+      villaId: number
+      roomId: number
+      componentId: string
+      msgUid: string
+      uid: number
+      botMsgId: string
     }
   }
-  created_at: number
+  createdAt: number
   id: string
-  send_at: number
+  sendAt: number
 }) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const ClickMsgComponent = event.extend_data.EventData.ClickMsgComponent
+  const ClickMsgComponent = event.extendData.clickMsgComponent
 
   const cfg = getBotConfigByKey('villa')
   const masterID = cfg.masterID
 
-  const msg_id = `${ClickMsgComponent.msg_uid}.0`
+  const msg_id = `${ClickMsgComponent.msgUid}.0`
 
   /**
    * 制作控制器
    */
   const Message = ClientControllerOnMessage({
-    guild_id: ClickMsgComponent.villa_id,
-    channel_id: ClickMsgComponent.room_id,
+    guild_id: ClickMsgComponent.villaId,
+    channel_id: ClickMsgComponent.roomId,
     msg_id: msg_id
   })
 
   const Member = ClientControllerOnMember({
-    guild_id: ClickMsgComponent.villa_id,
+    guild_id: ClickMsgComponent.villaId,
     user_id: String(ClickMsgComponent.uid)
   })
 
@@ -86,11 +84,11 @@ export async function MESSAGE_BUTTON(event: {
       avatar: event.robot.template.icon
     },
     isMaster: String(ClickMsgComponent.uid) == masterID,
-    guild_id: String(ClickMsgComponent.villa_id),
+    guild_id: String(ClickMsgComponent.villaId),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: String(ClickMsgComponent.room_id),
+    channel_id: String(ClickMsgComponent.roomId),
     attachments: [],
     specials: [],
     //
@@ -123,9 +121,9 @@ export async function MESSAGE_BUTTON(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villa_id = select?.guild_id ?? ClickMsgComponent.villa_id
-      const room_id = select?.channel_id ?? ClickMsgComponent.room_id
-      return await replyController(villa_id, room_id, msg, {
+      const villaId = select?.guild_id ?? ClickMsgComponent.villaId
+      const roomId = select?.channel_id ?? ClickMsgComponent.roomId
+      return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },
