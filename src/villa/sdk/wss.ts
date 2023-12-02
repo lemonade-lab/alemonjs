@@ -69,7 +69,7 @@ export async function createClientWS(callBackByVilla: any) {
       })
     )
 
-    // 6s 心跳
+    // 20s 心跳
     setInterval(() => {
       ws.send(
         createMessage({
@@ -93,15 +93,20 @@ export async function createClientWS(callBackByVilla: any) {
         if (obj.bizType == 7) {
           // 登录
           const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
+          if (process.env?.VILLA_WS == 'dev')
+            console.log('PLoginReply:', LongToNumber(reply))
           if (reply.code) console.log('登录失败')
         } else if (obj.bizType == 6) {
           // 心跳
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
+          if (process.env?.VILLA_WS == 'dev')
+            console.log('PHeartBeatReply:', LongToNumber(reply))
           if (reply.code) console.log('心跳错误')
         } else if (obj.bizType == 8) {
           // 退出登录
           const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)
-          console.log('PLogoutReply:', LongToNumber(reply))
+          if (process.env?.VILLA_WS == 'dev')
+            console.log('PLogoutReply:', LongToNumber(reply))
         } else if (obj.bizType == 53) {
           // 强制下线
         } else if (obj.bizType == 52) {
@@ -110,16 +115,16 @@ export async function createClientWS(callBackByVilla: any) {
           // 回调数据包
           const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
           const data = LongToNumber(reply)
-          console.log('data', data)
+          if (process.env?.VILLA_WS == 'dev') console.log('data', data)
           callBackByVilla(data)
         } else {
-          console.log('未知数据')
+          if (process.env?.VILLA_WS == 'dev') console.log('未知数据')
         }
       } catch {
-        console.log('代码错误')
+        if (process.env?.VILLA_WS == 'dev') console.log('代码错误')
       }
     } else {
-      console.log('未知数据')
+      if (process.env?.VILLA_WS == 'dev') console.log('未知数据')
     }
   })
 

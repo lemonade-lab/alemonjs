@@ -28,7 +28,6 @@ export function conversation(t: string, d: any) {
     })
   } else if (t == 'GUILD_CREATE') {
     // 频道信息创建
-    // console.log(d)
   } else if (t == 'MESSAGE_CREATE') {
     // 消息创建
     MESSAGE_CREATE(d)
