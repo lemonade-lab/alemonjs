@@ -1,14 +1,18 @@
 import { ClientKOOK } from '../sdk/index.js'
 import { replyController } from './reply.js'
-import { ControllerOption, UserInformationType } from '../../core/index.js'
+import {
+  type ControllerOption,
+  type UserInformationType
+} from '../../core/index.js'
 import { getBotConfigByKey } from '../../config/index.js'
+import { everyoneError } from '../../log/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
     return {
       information: async (): Promise<UserInformationType | false> => {
-        const data = await ClientKOOK.userView(guild_id, user_id).then(
-          res => res.data
-        )
+        const data = await ClientKOOK.userView(guild_id, user_id)
+          .then(res => res.data)
+          .catch(everyoneError)
         if (data) {
           const cfg = getBotConfigByKey('qq')
           const masterID = cfg.masterID
@@ -90,7 +94,7 @@ export const Controller = {
             type: 3,
             target_id: channel_id,
             content: file
-          })
+          }).catch(everyoneError)
         }
         const ret = await ClientKOOK.postFile(file, name)
         if (!ret) return false
@@ -98,7 +102,7 @@ export const Controller = {
           type: 3,
           target_id: channel_id,
           content: ret.data.url
-        })
+        }).catch(everyoneError)
       },
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
@@ -106,7 +110,7 @@ export const Controller = {
             type: 3,
             target_id: channel_id,
             content: file
-          })
+          }).catch(everyoneError)
         }
         const ret = await ClientKOOK.postFile(file, name)
         if (!ret) return false
@@ -114,7 +118,7 @@ export const Controller = {
           type: 3,
           target_id: channel_id,
           content: ret.data.url
-        })
+        }).catch(everyoneError)
       },
       card: async (msg: any[]) => {
         return [
@@ -133,7 +137,9 @@ export const Controller = {
         }
       ) => {
         // 该消息下 指定emoji的所有用户
-        return await ClientKOOK.messageReactionList({ msg_id, emoji })
+        return await ClientKOOK.messageReactionList({ msg_id, emoji }).catch(
+          everyoneError
+        )
       },
       article: async (msg: any) => {
         return false

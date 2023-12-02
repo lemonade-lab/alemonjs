@@ -1,11 +1,11 @@
-import { EventGroup } from '../../sdk/types.js'
+import { type EventGroup } from '../../sdk/types.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import {
-  EventEnum,
-  EventType,
+  type EventEnum,
+  type EventType,
   InstructionMatching,
-  MessageBingdingOption,
-  PlatformEnum
+  type MessageBingdingOption,
+  type PlatformEnum
 } from '../../../core/index.js'
 import { getBotMsgByONE } from '../bot.js'
 import { segmentONE } from '../segment.js'

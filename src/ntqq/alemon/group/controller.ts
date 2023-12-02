@@ -1,7 +1,10 @@
 import { replyController } from './reply.js'
-import { ControllerOption, UserInformationType } from '../../../core/index.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import {
+  type ControllerOption,
+  type UserInformationType
+} from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
+import { everyoneError } from '../../../log/index.js'
 export const Controller = {
   Member: () => {
     return {
@@ -62,7 +65,7 @@ export const Controller = {
             msg_id,
             msg_type: 7,
             msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          })
+          }).catch(everyoneError)
         }
         return false
       },
@@ -80,7 +83,7 @@ export const Controller = {
             msg_id,
             msg_type: 7,
             msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          })
+          }).catch(everyoneError)
         }
         return false
       },
@@ -95,7 +98,7 @@ export const Controller = {
               msg_id,
               ...item,
               msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-            })
+            }).catch(everyoneError)
           )
         }
         return arr

@@ -1,6 +1,6 @@
 import {
-  ControllerOption,
-  UserInformationType,
+  type ControllerOption,
+  type UserInformationType,
   getUrlbuffer
 } from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
@@ -227,26 +227,23 @@ export async function directController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    try {
-      const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
-      if (!url) return false
-      return await ClientNTQQ.usersOpenMessages(open_id, {
-        content: '',
-        media: {
-          file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
-            srv_send_msg: false,
-            file_type: 1,
-            url: url
-          }).then(res => res.file_info)
-        },
-        msg_id,
-        msg_type: 7,
-        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-      }).catch(everyoneError)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
+    if (!url) return false
+    return await ClientNTQQ.usersOpenMessages(open_id, {
+      content: cont,
+      media: {
+        file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
+          srv_send_msg: false,
+          file_type: 1,
+          url: url
+        })
+          .then(res => res.file_info)
+          .catch(everyoneError)
+      },
+      msg_id,
+      msg_type: 7,
+      msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+    }).catch(everyoneError)
   }
 
   const content = Array.isArray(msg)

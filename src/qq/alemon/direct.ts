@@ -1,7 +1,7 @@
 import { getUrlbuffer } from '../../core/index.js'
 import { ClientQQ as Client } from '../sdk/index.js'
 import { everyoneError } from '../../log/index.js'
-import { ControllerOption, UserInformationType } from '../../core/index.js'
+import { ControllerOption, type UserInformationType } from '../../core/index.js'
 
 const Controller = {
   Member: () => {
@@ -41,12 +41,16 @@ const Controller = {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id)
+        return await directController(content, open_id, msg_id).catch(
+          everyoneError
+        )
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id)
+        return await directController(content, open_id, msg_id).catch(
+          everyoneError
+        )
       },
       /**
        * 更新信息
@@ -157,26 +161,23 @@ export async function directController(
   if (select?.open_id && select?.user_id) {
     const {
       data: { guild_id }
-    }: any = await ClientQQ.directMessageApi.createDirectMessage({
-      source_guild_id: select?.open_id,
-      recipient_id: select?.user_id
-    })
+    }: any = await ClientQQ.directMessageApi
+      .createDirectMessage({
+        source_guild_id: select?.open_id,
+        recipient_id: select?.user_id
+      })
+      .catch(everyoneError)
     if (!guild_id) return false
     open_id = guild_id
   }
   // isBuffer
   // if withdraw == 0 ， false 不撤回
   if (Buffer.isBuffer(msg)) {
-    try {
-      return await Client.postDirectImage({
-        id: open_id,
-        msg_id: msg_id, //消息id, 必须
-        image: msg //buffer
-      }).catch(everyoneError)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    return await Client.postDirectImage({
+      id: open_id,
+      msg_id: msg_id, //消息id, 必须
+      image: msg //buffer
+    }).catch(everyoneError)
   }
   // arr && find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -188,17 +189,12 @@ export async function directController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    try {
-      return await Client.postDirectImage({
-        id: open_id,
-        msg_id: msg_id, //消息id, 必须
-        image: msg[isBuffer] as Buffer, //buffer
-        content: cont
-      }).catch(everyoneError)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    return await Client.postDirectImage({
+      id: open_id,
+      msg_id: msg_id, //消息id, 必须
+      image: msg[isBuffer] as Buffer, //buffer
+      content: cont
+    }).catch(everyoneError)
   }
   const content = Array.isArray(msg)
     ? msg.join('')

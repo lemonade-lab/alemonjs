@@ -1,9 +1,9 @@
 import {
   InstructionMatching,
-  PlatformEnum,
-  EventEnum,
-  EventType,
-  MessageBingdingOption
+  type PlatformEnum,
+  type EventEnum,
+  type EventType,
+  type MessageBingdingOption
 } from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'

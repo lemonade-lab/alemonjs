@@ -1,6 +1,6 @@
 import {
-  ControllerOption,
-  UserInformationType,
+  type ControllerOption,
+  type UserInformationType,
   getUrlbuffer
 } from '../../core/index.js'
 import { ClientKOOK } from '../sdk/index.js'
@@ -163,21 +163,16 @@ export async function directController(
    * isbuffer
    */
   if (Buffer.isBuffer(msg)) {
-    try {
-      const ret = await ClientKOOK.postImage(msg)
-      if (ret && ret.data) {
-        return await ClientKOOK.createDirectMessage({
-          type: 2,
-          target_id: channel_id,
-          chat_code: open_id,
-          content: ret.data.url
-        }).catch(everyoneError)
-      }
-      return false
-    } catch (err) {
-      console.error(err)
-      return err
+    const ret = await ClientKOOK.postImage(msg)
+    if (ret && ret.data) {
+      return await ClientKOOK.createDirectMessage({
+        type: 2,
+        target_id: channel_id,
+        chat_code: open_id,
+        content: ret.data.url
+      }).catch(everyoneError)
     }
+    return false
   }
   /**
    * string[] arr and find buffer
@@ -194,7 +189,9 @@ export async function directController(
       .filter(element => typeof element === 'string')
       .join('')
     // 转存
-    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer)
+    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer).catch(
+      everyoneError
+    )
     if (!ret) return false
     // 私聊
     await ClientKOOK.createDirectMessage({
@@ -202,7 +199,7 @@ export async function directController(
       target_id: channel_id,
       chat_code: open_id,
       content: content
-    })
+    }).catch(everyoneError)
     return await ClientKOOK.createDirectMessage({
       type: 2,
       target_id: channel_id,

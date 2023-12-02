@@ -1,8 +1,9 @@
-import { IMember } from 'qq-guild-bot'
+import { type IMember } from 'qq-guild-bot'
 import { replyController } from './reply.js'
-import { ControllerOption, UserInformationType } from '../../core/index.js'
+import { ControllerOption, type UserInformationType } from '../../core/index.js'
 import { getBotConfigByKey } from '../../config/index.js'
 import { directController } from './direct.js'
+import { everyoneError } from '../../log/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id, channel_id }) => {
     return {
@@ -14,6 +15,7 @@ export const Controller = {
         const data: IMember = await ClientQQ.guildApi
           .guildMember(guild_id, user_id)
           .then(res => res.data)
+          .catch(everyoneError)
 
         if (data) {
           const cfg = getBotConfigByKey('qq')
@@ -38,20 +40,26 @@ export const Controller = {
        */
       mute: async (option?: { time?: number; cancel?: boolean }) => {
         if (option.cancel) {
-          return await ClientQQ.muteApi.muteMember(guild_id, user_id, {
-            seconds: String(option.time ?? 60000 / 1000)
-          })
+          return await ClientQQ.muteApi
+            .muteMember(guild_id, user_id, {
+              seconds: String(option.time ?? 60000 / 1000)
+            })
+            .catch(everyoneError)
         } else {
-          return await ClientQQ.muteApi.muteMember(guild_id, user_id, {
-            seconds: '0'
-          })
+          return await ClientQQ.muteApi
+            .muteMember(guild_id, user_id, {
+              seconds: '0'
+            })
+            .catch(everyoneError)
         }
       },
       /**
        * 踢出
        */
       remove: async () => {
-        return await ClientQQ.guildApi.deleteGuildMember(guild_id, user_id)
+        return await ClientQQ.guildApi
+          .deleteGuildMember(guild_id, user_id)
+          .catch(everyoneError)
       },
       /**
        * 身分组
@@ -61,19 +69,13 @@ export const Controller = {
        */
       operate: async (role_id: string, add = true) => {
         if (add) {
-          return await ClientQQ.memberApi.memberAddRole(
-            guild_id,
-            role_id,
-            user_id,
-            channel_id
-          )
+          return await ClientQQ.memberApi
+            .memberAddRole(guild_id, role_id, user_id, channel_id)
+            .catch(everyoneError)
         } else {
-          return await ClientQQ.memberApi.memberDeleteRole(
-            guild_id,
-            role_id,
-            user_id,
-            channel_id
-          )
+          return await ClientQQ.memberApi
+            .memberDeleteRole(guild_id, role_id, user_id, channel_id)
+            .catch(everyoneError)
         }
       }
     }
@@ -87,16 +89,18 @@ export const Controller = {
           return await directController(content, open_id, msg_id, {
             open_id: open_id,
             user_id: user_id
-          })
+          }).catch(everyoneError)
         }
-        return await replyController(content, channel_id, msg_id)
+        return await replyController(content, channel_id, msg_id).catch(
+          everyoneError
+        )
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
         return await replyController(content, channel_id, msg_id, {
           quote: msg_id
-        })
+        }).catch(everyoneError)
       },
       /**
        * 更新信息
@@ -109,56 +113,56 @@ export const Controller = {
         return false
       },
       withdraw: async (hideTip = true) => {
-        return await ClientQQ.messageApi.deleteMessage(
-          channel_id,
-          msg_id,
-          hideTip
-        )
+        return await ClientQQ.messageApi
+          .deleteMessage(channel_id, msg_id, hideTip)
+          .catch(everyoneError)
       },
       pinning: async (cancel?: boolean) => {
         if (cancel) {
-          return await ClientQQ.pinsMessageApi.deletePinsMessage(
-            channel_id,
-            msg_id
-          )
+          return await ClientQQ.pinsMessageApi
+            .deletePinsMessage(channel_id, msg_id)
+            .catch(everyoneError)
         }
-        return await ClientQQ.pinsMessageApi.putPinsMessage(channel_id, msg_id)
+        return await ClientQQ.pinsMessageApi
+          .putPinsMessage(channel_id, msg_id)
+          .catch(everyoneError)
       },
       forward: async () => {
         return false
       },
       horn: async (cancel?: boolean) => {
         if (cancel) {
-          return await ClientQQ.announceApi.deleteGuildAnnounce(
-            guild_id,
-            msg_id
-          )
+          return await ClientQQ.announceApi
+            .deleteGuildAnnounce(guild_id, msg_id)
+            .catch(everyoneError)
         }
-        return await ClientQQ.announceApi.postGuildAnnounce(
-          guild_id,
-          channel_id,
-          msg_id
-        )
+        return await ClientQQ.announceApi
+          .postGuildAnnounce(guild_id, channel_id, msg_id)
+          .catch(everyoneError)
       },
       emoji: async (msg: any[], cancel?: boolean) => {
         const arr: any[] = []
         if (cancel) {
           for (const item of msg) {
             arr.push(
-              await ClientQQ.reactionApi.deleteReaction(channel_id, {
-                message_id: msg_id,
-                ...item
-              })
+              await ClientQQ.reactionApi
+                .deleteReaction(channel_id, {
+                  message_id: msg_id,
+                  ...item
+                })
+                .catch(everyoneError)
             )
           }
           return arr
         }
         for (const item of msg) {
           arr.push(
-            await ClientQQ.reactionApi.postReaction(channel_id, {
-              message_id: msg_id,
-              ...item
-            })
+            await ClientQQ.reactionApi
+              .postReaction(channel_id, {
+                message_id: msg_id,
+                ...item
+              })
+              .catch(everyoneError)
           )
         }
         return arr
@@ -184,10 +188,12 @@ export const Controller = {
         const arr: any[] = []
         for (const item of msg) {
           arr.push(
-            await ClientQQ.messageApi.postMessage(channel_id, {
-              msg_id: msg_id,
-              ...item
-            })
+            await ClientQQ.messageApi
+              .postMessage(channel_id, {
+                msg_id: msg_id,
+                ...item
+              })
+              .catch(everyoneError)
           )
         }
         return arr
@@ -199,11 +205,9 @@ export const Controller = {
           limit: 20
         }
       ) => {
-        return await ClientQQ.reactionApi.getReactionUserList(
-          channel_id,
-          reactionObj,
-          options
-        )
+        return await ClientQQ.reactionApi
+          .getReactionUserList(channel_id, reactionObj, options)
+          .catch(everyoneError)
       },
       article: async (msg: any) => {
         return false

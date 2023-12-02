@@ -10,10 +10,10 @@ import {
   getAppPriority
 } from './cache.js'
 import { getApp, delApp, getAppKey } from './app.js'
-import { AMessage, EventType, EventEnum } from './typings.js'
+import { type AMessage, type EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
-import { PluginInitType, APlugin } from './plugin.js'
+import { type PluginInitType, APlugin } from './plugin.js'
 /**
  * ************
  * 插件实例类型

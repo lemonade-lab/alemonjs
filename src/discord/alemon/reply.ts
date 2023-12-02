@@ -18,12 +18,9 @@ export async function replyController(
   }
 ) {
   if (Buffer.isBuffer(msg)) {
-    try {
-      return await Client.channelsMessagesImage(channel_id, msg)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    return await Client.channelsMessagesImage(channel_id, msg).catch(
+      everyoneError
+    )
   }
 
   // arr & find buffer
@@ -36,12 +33,11 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    try {
-      return await Client.channelsMessagesImage(channel_id, msg[isBuffer], cont)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    return await Client.channelsMessagesImage(
+      channel_id,
+      msg[isBuffer],
+      cont
+    ).catch(everyoneError)
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -58,7 +54,9 @@ export async function replyController(
     const getUrl = match[1]
     const msg = await getUrlbuffer(getUrl)
     if (msg) {
-      return await Client.channelsMessagesImage(channel_id, msg)
+      return await Client.channelsMessagesImage(channel_id, msg).catch(
+        everyoneError
+      )
     }
   }
 

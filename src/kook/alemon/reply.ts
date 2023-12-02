@@ -17,20 +17,15 @@ export async function replyController(
    * isbuffer
    */
   if (Buffer.isBuffer(msg)) {
-    try {
-      const ret = await ClientKOOK.postImage(msg)
-      if (ret && ret.data) {
-        return await ClientKOOK.createMessage({
-          type: 2,
-          target_id: channel_id,
-          content: ret.data.url
-        }).catch(everyoneError)
-      }
-      return false
-    } catch (err) {
-      console.error(err)
-      return err
+    const ret = await ClientKOOK.postImage(msg)
+    if (ret && ret.data) {
+      return await ClientKOOK.createMessage({
+        type: 2,
+        target_id: channel_id,
+        content: ret.data.url
+      }).catch(everyoneError)
     }
+    return false
   }
   /**
    * string[] arr and find buffer
@@ -47,14 +42,16 @@ export async function replyController(
       .filter(element => typeof element === 'string')
       .join('')
     // 转存
-    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer)
+    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer).catch(
+      everyoneError
+    )
     if (!ret) return false
     if (ret?.data) {
       await ClientKOOK.createMessage({
         type: 9,
         target_id: channel_id,
         content: content
-      }).catch(err => err)
+      }).catch(everyoneError)
       return await ClientKOOK.createMessage({
         type: 2,
         target_id: channel_id,
@@ -77,7 +74,7 @@ export async function replyController(
     const getUrl = match[1]
     const msg = await getUrlbuffer(getUrl)
     if (!msg) return false
-    const ret = await ClientKOOK.postImage(msg)
+    const ret = await ClientKOOK.postImage(msg).catch(everyoneError)
     if (!ret) return false
     if (msg && ret) {
       return await ClientKOOK.createMessage({

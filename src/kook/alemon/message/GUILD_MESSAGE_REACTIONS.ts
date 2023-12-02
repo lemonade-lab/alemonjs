@@ -1,11 +1,15 @@
 import {
   InstructionMatching,
-  PlatformEnum,
-  EventEnum,
-  EventType,
-  MessageBingdingOption
+  type PlatformEnum,
+  type EventEnum,
+  type EventType,
+  type MessageBingdingOption
 } from '../../../core/index.js'
-import { ClientKOOK, StatementData, SystemData } from '../../sdk/index.js'
+import {
+  ClientKOOK,
+  type StatementData,
+  type SystemData
+} from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'

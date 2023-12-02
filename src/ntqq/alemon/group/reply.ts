@@ -15,26 +15,23 @@ export async function replyController(
 ) {
   // is buffer
   if (Buffer.isBuffer(msg)) {
-    try {
-      const url = await ClientKOA.getFileUrl(msg)
-      if (!url) return false
-      return await ClientNTQQ.groupOpenMessages(guild_id, {
-        content: '',
-        media: {
-          file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
-            srv_send_msg: false,
-            file_type: 1,
-            url
-          }).then(res => res.file_info)
-        },
-        msg_id,
-        msg_type: 7,
-        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-      }).catch(everyoneError)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    const url = await ClientKOA.getFileUrl(msg)
+    if (!url) return false
+    return await ClientNTQQ.groupOpenMessages(guild_id, {
+      content: '',
+      media: {
+        file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
+          srv_send_msg: false,
+          file_type: 1,
+          url
+        })
+          .then(res => res.file_info)
+          .catch(everyoneError)
+      },
+      msg_id,
+      msg_type: 7,
+      msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+    }).catch(everyoneError)
   }
 
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -46,26 +43,23 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    try {
-      const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
-      if (!url) return false
-      return await ClientNTQQ.groupOpenMessages(guild_id, {
-        content: cont,
-        media: {
-          file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
-            srv_send_msg: false,
-            file_type: 1,
-            url
-          }).then(res => res.file_info)
-        },
-        msg_id,
-        msg_type: 7,
-        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-      }).catch(everyoneError)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
+    if (!url) return false
+    return await ClientNTQQ.groupOpenMessages(guild_id, {
+      content: cont,
+      media: {
+        file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
+          srv_send_msg: false,
+          file_type: 1,
+          url
+        })
+          .then(res => res.file_info)
+          .catch(everyoneError)
+      },
+      msg_id,
+      msg_type: 7,
+      msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+    }).catch(everyoneError)
   }
 
   const content = Array.isArray(msg)
@@ -88,7 +82,9 @@ export async function replyController(
           srv_send_msg: false,
           file_type: 1,
           url: getUrl
-        }).then(res => res.file_info)
+        })
+          .then(res => res.file_info)
+          .catch(everyoneError)
       },
       msg_id,
       msg_type: 7,

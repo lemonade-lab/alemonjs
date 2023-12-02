@@ -1,11 +1,11 @@
 import {
   InstructionMatching,
-  PlatformEnum,
-  EventEnum,
-  EventType,
-  MessageBingdingOption
+  type PlatformEnum,
+  type EventEnum,
+  type EventType,
+  type MessageBingdingOption
 } from '../../../core/index.js'
-import { EventData } from '../../sdk/index.js'
+import { type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { getBotConfigByKey } from '../../../config/index.js'

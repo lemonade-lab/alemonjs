@@ -1,4 +1,7 @@
-import { ControllerOption, UserInformationType } from '../../core/index.js'
+import {
+  type ControllerOption,
+  type UserInformationType
+} from '../../core/index.js'
 import { replyController } from './reply.js'
 export const Controller = {
   Member: ({ guild_id, user_id, channel_id }) => {

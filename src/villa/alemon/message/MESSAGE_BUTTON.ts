@@ -1,10 +1,10 @@
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import {
-  EventEnum,
-  EventType,
   InstructionMatching,
-  MessageBingdingOption,
-  PlatformEnum
+  type EventEnum,
+  type EventType,
+  type MessageBingdingOption,
+  type PlatformEnum
 } from '../../../core/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'

@@ -23,16 +23,11 @@ export async function replyController(
   // if withdraw == 0 ， false 不撤回
 
   if (Buffer.isBuffer(msg)) {
-    try {
-      return await Client.postImage({
-        id: channel_id,
-        msg_id: msg_id, //消息id, 必须,不然就是主动消息了
-        image: msg //buffer
-      }).catch(everyoneError)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    return await Client.postImage({
+      id: channel_id,
+      msg_id: msg_id, //消息id, 必须,不然就是主动消息了
+      image: msg //buffer
+    }).catch(everyoneError)
   }
   // arr & find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -44,17 +39,12 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    try {
-      return await Client.postImage({
-        id: channel_id,
-        msg_id: msg_id, //消息id, 必须
-        image: msg[isBuffer] as Buffer, //buffer
-        content: cont
-      }).catch(everyoneError)
-    } catch (err) {
-      console.error(err)
-      return err
-    }
+    return await Client.postImage({
+      id: channel_id,
+      msg_id: msg_id, //消息id, 必须
+      image: msg[isBuffer] as Buffer, //buffer
+      content: cont
+    }).catch(everyoneError)
   }
   const content = Array.isArray(msg)
     ? msg.join('')

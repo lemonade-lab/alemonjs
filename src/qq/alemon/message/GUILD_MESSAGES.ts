@@ -1,9 +1,9 @@
 import {
   typeMessage,
-  PlatformEnum,
-  EventEnum,
-  EventType,
-  MessageBingdingOption
+  type PlatformEnum,
+  type EventEnum,
+  type EventType,
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'

@@ -112,15 +112,6 @@ export interface EntitiesType {
   }
 }
 
-export interface ImagesType {
-  // 图片路径
-  url: string
-  // 图片宽度
-  with: string
-  // 图片高度
-  height: string
-}
-
 export interface UserType {
   // 用户头像
   portraitUri: string
@@ -175,7 +166,14 @@ export interface MessageContentType {
   // 内容
   content: {
     // 图片描述
-    images?: ImagesType[]
+    images?: {
+      // 图片路径
+      url: string
+      // 图片宽度
+      with?: string
+      // 图片高度
+      height?: string
+    }[]
     // 特效描述
     entities?: EntitiesType[]
     // 消息文本
@@ -447,12 +445,6 @@ export interface Emoticon {
   icon: string
 }
 
-// 图片参数
-export interface ImageSizeType {
-  width: number
-  height: number
-}
-
 //
 export interface ButtonType {
   id: string
@@ -464,4 +456,49 @@ export interface ButtonType {
   need_callback?: boolean
   need_token?: boolean
   extra?: string
+}
+
+export interface QuoteType {
+  original_message_id: string
+  original_message_send_time: number
+  quoted_message_id: string
+  quoted_message_send_time: number
+}
+
+export interface PanelType {
+  template_id?: number
+  small_component_group_list?: ButtonType[][]
+  mid_component_group_list?: ButtonType[][]
+  big_component_group_list?: ButtonType[][]
+}
+
+export interface StringifyType {
+  content: {
+    // 消息文本
+    text?: string
+    // 特效描述
+    entities?: EntitiesType[]
+    // 图片描述
+    images?: {
+      // 图片路径
+      url: string
+      // 图片宽度
+      with?: number
+      // 图片高度
+      height?: number
+    }[]
+    // 图片地址
+    url?: string
+    // 图片参数
+    size?: {
+      width: number
+      height: number
+    }
+  }
+  mentionedInfo?: {
+    type: number
+    userIdList: string[]
+  }
+  quote?: QuoteType
+  panel?: PanelType
 }

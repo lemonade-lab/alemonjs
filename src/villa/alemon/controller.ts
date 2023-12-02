@@ -2,6 +2,7 @@ import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
 import { getBotConfigByKey } from '../../config/index.js'
+import { everyoneError } from '../../log/index.js'
 
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
@@ -12,9 +13,9 @@ export const Controller = {
        */
       information: async (): Promise<UserInformationType | false> => {
         // 对进行进行过滤,并以固定格式返回
-        const data = await ClientVILLA.getMember(guild_id, user_id).then(
-          res => res.data
-        )
+        const data = await ClientVILLA.getMember(guild_id, user_id)
+          .then(res => res.data)
+          .catch(everyoneError)
         if (!data) return false
         const cfg = getBotConfigByKey('villa')
         const masterID = cfg.masterID
@@ -39,7 +40,9 @@ export const Controller = {
        * 踢出
        */
       remove: async () => {
-        return await ClientVILLA.deleteVillaMember(guild_id, user_id)
+        return await ClientVILLA.deleteVillaMember(guild_id, user_id).catch(
+          everyoneError
+        )
       },
       /**
        * 身分组
@@ -52,7 +55,7 @@ export const Controller = {
           role_id,
           uid: user_id,
           is_add: add
-        })
+        }).catch(everyoneError)
       }
     }
   },
@@ -71,7 +74,9 @@ export const Controller = {
           console.error('VILLA 无私信')
           return false
         }
-        return await replyController(guild_id, channel_id, content)
+        return await replyController(guild_id, channel_id, content).catch(
+          everyoneError
+        )
       },
       /**
        * 引用
@@ -87,7 +92,7 @@ export const Controller = {
         }
         return await replyController(guild_id, channel_id, content, {
           quote: msg_id
-        })
+        }).catch(everyoneError)
       },
       /**
        * 更新信息
@@ -107,7 +112,7 @@ export const Controller = {
         return await ClientVILLA.recallMessage(guild_id, {
           room_id: channel_id,
           msg_uid: msg_id
-        })
+        }).catch(everyoneError)
       },
       /**
        *  钉选
@@ -119,7 +124,7 @@ export const Controller = {
           room_id: channel_id,
           is_cancel: cancel,
           msg_uid: msg_id
-        })
+        }).catch(everyoneError)
       },
       /**
        *  喇叭
@@ -170,9 +175,7 @@ export const Controller = {
       card: async (msg: any[]) => {
         const arr: any[] = []
         for (const item of msg) {
-          arr.push(
-            await ClientVILLA.sendComponentTemplate(guild_id, channel_id, item)
-          )
+          arr.push(await ClientVILLA.sendCard(guild_id, channel_id, item))
         }
         return arr
       },

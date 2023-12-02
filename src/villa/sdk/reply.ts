@@ -1,290 +1,78 @@
 import { sendMessage } from './api.js'
-import { type EntitiesType, type ImageSizeType } from './types.js'
+import { stringParsing } from './mechanism.js'
+import { type MHYEnum, type StringifyType, type PanelType } from './types.js'
 
 /**
- * 图片发送
- * @param villa_id 别野
- * @param room_id 房间
- * @param url 图片地址
- * @param size 图片配置
+ * 数据序列化
+ * @param data
  * @returns
  */
-export async function sendMessageImage(
-  villa_id: number | string,
-  room_id: number | string,
-  url: string,
-  size: ImageSizeType,
-  msg_id?: string
-) {
-  let data = {
-    /**
-     * 消息文本   支持  [爱心] 来转换成表情
-     */
-    content: {
-      url,
-      size
-    }
-  }
-
-  if (msg_id) {
-    const [id, at] = String(msg_id).split('.')
-    data = {
-      ...data,
-      ...{
-        quote: {
-          original_message_id: id,
-          original_message_send_time: Number(at),
-          quoted_message_id: id,
-          quoted_message_send_time: Number(at)
-        }
-      }
-    }
-  }
-
-  return await sendMessage(villa_id, {
-    /**
-     * 房间号
-     */
-    room_id,
-    /**
-     * 消息类型 */
-    object_name: 'MHY:Image',
-    /**
-     *
-     */
-    msg_content: JSON.stringify(data)
-  })
-}
-/**
- * 消息发送
- * @param villa_id 别野
- * @param room_id 房间
- * @param text 文本
- * @returns
- */
-export async function sendMessageText(
-  villa_id: number | string,
-  room_id: number | string,
-  text: string,
-  msg_id?: string
-) {
-  let data = {
-    content: {
-      text
-    }
-  }
-  if (msg_id) {
-    const [id, at] = String(msg_id).split('.')
-    data = {
-      ...data,
-      ...{
-        quote: {
-          original_message_id: id,
-          original_message_send_time: Number(at),
-          quoted_message_id: id,
-          quoted_message_send_time: Number(at)
-        }
-      }
-    }
-  }
-
-  return await sendMessage(villa_id, {
-    /**
-     *  房间号
-     */
-    room_id,
-    object_name: 'MHY:Text',
-    msg_content: JSON.stringify(data)
-  })
-}
-/**
- * 消息发送
- * @param villa_id 别野
- * @param room_id 房间
- * @param text 文本
- * @param entities 渲染
- * @returns
- */
-export async function sendMessageTextEntities(
-  villa_id: number | string,
-  room_id: number | string,
-  text: string,
-  entities: EntitiesType[],
-  msg_id?: string
-) {
-  let data = {
-    content: {
-      text,
-      entities
-    }
-  }
-
-  if (msg_id) {
-    const [id, at] = String(msg_id).split('.')
-    data = {
-      ...data,
-      ...{
-        quote: {
-          original_message_id: id,
-          original_message_send_time: Number(at),
-          quoted_message_id: id,
-          quoted_message_send_time: Number(at)
-        }
-      }
-    }
-  }
-
-  return await sendMessage(villa_id, {
-    room_id,
-    object_name: 'MHY:Text',
-    msg_content: JSON.stringify(data)
-  })
-}
-/**
- * 消息发送
- * @param villa_id 别野
- * @param room_id 房间
- * @param text 文本
- * @param url 图片
- * @param size 图片配置
- * @returns
- */
-export async function sendMessageTextUrl(
-  villa_id: number | string,
-  room_id: number | string,
-  text: string,
-  url: string,
-  size: ImageSizeType,
-  msg_id?: string
-) {
-  let data = {
-    content: {
-      text,
-      images: [
-        {
-          url,
-          ...size
-        }
-      ]
-    }
-  }
-
-  if (msg_id) {
-    const [id, at] = String(msg_id).split('.')
-    data = {
-      ...data,
-      ...{
-        quote: {
-          original_message_id: id,
-          original_message_send_time: Number(at),
-          quoted_message_id: id,
-          quoted_message_send_time: Number(at)
-        }
-      }
-    }
-  }
-
-  return await sendMessage(villa_id, {
-    room_id,
-    object_name: 'MHY:Text',
-    msg_content: JSON.stringify(data)
-  })
+export function stringify(data: StringifyType) {
+  return JSON.stringify(data)
 }
 
 /**
  * 消息发送
  * @param villa_id 别野
  * @param room_id 房间
- * @param text 文本
- * @param images 图片集
+ * @param m {msg:文本 images:{ url size }}
+ * @param msg_id 消息编号
  * @returns
  */
-export async function sendMessageTextImages(
+export async function replyMessage(
   villa_id: number | string,
   room_id: number | string,
-  text: string,
-  images: any,
+  m: {
+    msg?: string
+    images?: {
+      url: string
+      width?: number
+      height?: number
+    }[]
+    panel?: PanelType
+  },
   msg_id?: string
 ) {
-  let data = {
-    content: {
-      text,
-      images
-    }
+  const data = {
+    content: undefined,
+    panel: m?.panel,
+    quote: undefined
   }
-
-  if (msg_id) {
-    const [id, at] = String(msg_id).split('.')
-    data = {
-      ...data,
-      ...{
-        quote: {
-          original_message_id: id,
-          original_message_send_time: Number(at),
-          quoted_message_id: id,
-          quoted_message_send_time: Number(at)
-        }
-      }
-    }
-  }
-
-  return await sendMessage(villa_id, {
-    room_id,
-    object_name: 'MHY:Text',
-    msg_content: JSON.stringify(data)
-  })
-}
-
-/**
- * 消息发送
- * @param villa_id 别野
- * @param room_id 房间
- * @param text 文本
- * @param entities 渲染
- * @param url 图片
- * @param size 图片配置
- * @returns
- */
-export async function sendMessageTextEntitiesUrl(
-  villa_id: number | string,
-  room_id: number | string,
-  text: string,
-  entities: EntitiesType[],
-  url: string,
-  size: ImageSizeType,
-  msg_id?: string
-) {
-  let data = {
-    content: {
-      text,
+  let object_name: (typeof MHYEnum)[number] = 'MHY:Text'
+  if (m?.msg || m?.images?.length > 1) {
+    // 文字模式
+    const { entities, content } = await stringParsing(m.msg, villa_id)
+    data.content = {
+      text: content,
       entities,
-      images: [
-        {
-          url,
-          ...size
-        }
-      ]
+      images: m?.images ?? []
     }
+  } else {
+    // 图片模式
+    data.content = {
+      url: m.images[0].url,
+      size:
+        m.images[0]?.width && m.images[0]?.height
+          ? {
+              width: m.images[0]?.width,
+              height: m.images[0]?.height
+            }
+          : undefined
+    }
+    object_name = 'MHY:Image'
   }
-
   if (msg_id) {
     const [id, at] = String(msg_id).split('.')
-    data = {
-      ...data,
-      ...{
-        quote: {
-          original_message_id: id,
-          original_message_send_time: Number(at),
-          quoted_message_id: id,
-          quoted_message_send_time: Number(at)
-        }
-      }
+    data.quote = {
+      original_message_id: id,
+      original_message_send_time: Number(at),
+      quoted_message_id: id,
+      quoted_message_send_time: Number(at)
     }
   }
-
   return await sendMessage(villa_id, {
     room_id,
-    object_name: 'MHY:Text',
-    msg_content: JSON.stringify(data)
+    object_name: object_name,
+    msg_content: stringify(data)
   })
 }

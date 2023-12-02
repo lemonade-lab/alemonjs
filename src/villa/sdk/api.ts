@@ -16,7 +16,8 @@ import {
   type ColorEnum,
   type MemberRolePermissionEnum,
   type Emoticon,
-  type MemberRoleList
+  type MemberRoleList,
+  StringifyType
 } from './types.js'
 import { createPicFrom } from '../../core/index.js'
 import { getClientConfig } from './config.js'
@@ -319,10 +320,10 @@ export async function sendMessage(
  * @param panel  消息组件面板json序列化后得到的字符串
  * @returns
  */
-export async function sendComponentTemplate(
+export async function sendCard(
   villa_id: string | number,
   room_id: string | number,
-  content: any
+  content: StringifyType
 ) {
   return await sendMessage(villa_id, {
     room_id,

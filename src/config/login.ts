@@ -1,4 +1,4 @@
-import { ConfigType } from './types.js'
+import { type ConfigType } from './types.js'
 import redis from '../default/redis.js'
 import mysql from '../default/mysql.js'
 import server from '../default/server.js'

@@ -1,19 +1,3 @@
-import {
-  EventEnum,
-  EventType,
-  InstructionMatching,
-  MessageBingdingOption,
-  PlatformEnum,
-  UserType
-} from '../../../core/index.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { getBotConfigByKey } from '../../../config/index.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
-import { getBotMsgByDISCORD } from '../bot.js'
-import { segmentDISCORD } from '../segment.js'
-import { replyController } from '../reply.js'
-import { ClientDISOCRD } from '../../sdk/index.js'
-
 interface VOICE_STATE_UPDATE_TYPE {
   member: {
     user: {

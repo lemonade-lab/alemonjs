@@ -1,10 +1,10 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
   typeMessage,
-  PlatformEnum,
-  EventEnum,
-  EventType,
-  MessageBingdingOption
+  type PlatformEnum,
+  type EventEnum,
+  type EventType,
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'

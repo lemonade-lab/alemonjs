@@ -1,10 +1,10 @@
 import {
-  EventEnum,
-  EventType,
+  type EventEnum,
+  type EventType,
   InstructionMatching,
-  MessageBingdingOption,
-  PlatformEnum,
-  UserType
+  type MessageBingdingOption,
+  type PlatformEnum,
+  type UserType
 } from '../../../core/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'

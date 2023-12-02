@@ -2,10 +2,10 @@ import { IOpenAPI } from 'qq-guild-bot'
 import {
   typeMessage,
   InstructionMatching,
-  EventEnum,
-  PlatformEnum,
-  EventType,
-  MessageBingdingOption
+  type EventEnum,
+  type PlatformEnum,
+  type EventType,
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -21,7 +21,6 @@ import {
   directController,
   ClientControllerOnMember
 } from '../direct.js'
-import { replyController } from '../reply.js'
 
 declare global {
   //接口对象

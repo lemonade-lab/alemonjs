@@ -1,9 +1,9 @@
 import {
   typeMessage,
-  PlatformEnum,
-  EventType,
-  EventEnum,
-  MessageBingdingOption
+  type PlatformEnum,
+  type EventType,
+  type EventEnum,
+  type MessageBingdingOption
 } from '../../../core/index.js'
 
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
