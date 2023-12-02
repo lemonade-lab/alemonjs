@@ -128,13 +128,14 @@ export async function createClientWS() {
  * @returns
  */
 function LongToNumber(obj: any) {
-  if (obj !== null) {
-    if (typeof obj == 'string') return obj
-    if (typeof obj?.low == 'number') {
-      return Number(obj)
-    } else if (Array.isArray(obj)) {
+  if (typeof obj == 'string') return obj
+  if (typeof obj == 'number') return obj
+  if (obj !== null && typeof obj == 'object') {
+    if (Array.isArray(obj)) {
       // 递归处理数组中的每个元素
       return obj.map(item => LongToNumber(item))
+    } else if (typeof obj?.low == 'number') {
+      return Number(obj)
     } else {
       const result: any = {}
       for (const key in obj) {
