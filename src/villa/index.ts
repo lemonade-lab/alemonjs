@@ -21,8 +21,7 @@ export async function createAlemonByVilla() {
     setClientConfig({
       bot_id: cfg.bot_id,
       bot_secret: cfg.secret,
-      callback_url: '/api/mys/callback',
-      callback_port: 8080,
+      pub_key: cfg.pub_key,
       villa_id: cfg.villa_id,
       token: `${cfg.villa_id}.${cfg.secret}.${cfg.bot_id}`
     })

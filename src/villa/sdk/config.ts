@@ -5,8 +5,7 @@ import { type ClientConfig } from './types.js'
 let ClientCfg: ClientConfig = {
   bot_id: '',
   bot_secret: '',
-  callback_url: '/api/mys/callback',
-  callback_port: 8080,
+  pub_key: '',
   villa_id: 0,
   token: ''
 }

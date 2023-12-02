@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
 import { createHash } from 'crypto'
 import { Readable } from 'stream'
