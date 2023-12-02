@@ -6,6 +6,7 @@ export interface ClientConfig {
   bot_secret?: string
   callback_url?: string
   callback_port?: number
+  villa_id?: number
 }
 /**
  *  api路径地址

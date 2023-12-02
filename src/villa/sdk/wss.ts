@@ -59,7 +59,7 @@ export async function createClientWS() {
         AppId: data.app_id,
         BodyData: ProtoCommand('PLogin').encode({
           uid: data.uid,
-          token: `8488.${ClientCfg.bot_secret}.${ClientCfg.bot_id}`,
+          token: `${ClientCfg.villa_id}.${ClientCfg.bot_secret}.${ClientCfg.bot_id}`,
           platform: data.platform,
           appId: data.app_id,
           deviceId: data.device_id,
@@ -134,7 +134,7 @@ function LongToNumber(obj: any) {
     if (Array.isArray(obj)) {
       // 递归处理数组中的每个元素
       return obj.map(item => LongToNumber(item))
-    } else if (typeof obj?.low == 'number') {
+    } else if (typeof obj?.low == 'number' && typeof obj?.high == 'number') {
       return Number(obj)
     } else {
       const result: any = {}

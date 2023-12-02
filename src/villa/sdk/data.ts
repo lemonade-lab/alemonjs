@@ -29,7 +29,6 @@ export function createMessage(data: {
     0,
     fixedLength + lenth + variableLength
   )
-  parseMessage(byteArray)
   return byteArray
 }
 

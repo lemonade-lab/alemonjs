@@ -28,6 +28,10 @@ export interface VILLAOptions {
    * 端口
    */
   port?: number
+  /**
+   * 测试别野
+   */
+  villa_id?: number
 }
 
 export const defineVILLA = {
@@ -36,5 +40,6 @@ export const defineVILLA = {
   pub_key: '',
   masterID: '',
   url: '/api/mys/callback',
-  port: 8080
+  port: 8080,
+  villa_id: 0
 }
