@@ -1,7 +1,6 @@
 import { checkRobotByVilla } from './login.js'
-import { hmacSha256 } from './sdk/index.js'
+import { hmacSha256, createClient } from './sdk/index.js'
 import { getBotConfigByKey } from '../config/index.js'
-import { createClient } from './sdk/wss.js'
 import { conversation } from './alemon/conversation.js'
 export async function createAlemonByVilla() {
   // 登录

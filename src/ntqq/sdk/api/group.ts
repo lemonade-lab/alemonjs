@@ -10,7 +10,8 @@ import { ApiLog } from '../log.js'
  * @returns
  */
 export async function GroupService(config: AxiosRequestConfig) {
-  const { token, appID } = getBotConfig()
+  const appID = getBotConfig('appID')
+  const token = getBotConfig('token')
   const service = await axios.create({
     baseURL: API_SGROUP,
     timeout: 20000,

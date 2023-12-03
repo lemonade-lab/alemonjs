@@ -6,7 +6,7 @@ import {
   SendMessageParams,
   SendDirectMessageParams
 } from './typings.js'
-import { getKookToken } from './config.js'
+import { getBotConfig } from './config.js'
 import { createPicFrom } from '../../core/index.js'
 
 export function ApiLog(res: AxiosResponse) {
@@ -26,7 +26,7 @@ export function ApiLog(res: AxiosResponse) {
  * @returns
  */
 export function kookService(config: AxiosRequestConfig) {
-  const token = getKookToken()
+  const token = getBotConfig('token')
   const service = axios.create({
     baseURL: 'https://www.kookapp.cn',
     timeout: 30000,

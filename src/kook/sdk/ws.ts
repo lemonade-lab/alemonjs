@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import axios from 'axios'
-import { setKookToken } from './config.js'
+import { setBotConfig } from './config.js'
 import { EventData, SystemData } from './typings.js'
 
 /**
@@ -46,13 +46,13 @@ export async function createClient(
   conversation: (...args: any[]) => any
 ) {
   // 设置token
-  setKookToken(token)
+  setBotConfig('token', token)
   // 请求url
   const gatewayUrl = await getGatewayUrl(token)
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
-      console.info('token ok')
+      console.info('[ws] open')
     })
     // 标记是否已连接
     let isConnected = false

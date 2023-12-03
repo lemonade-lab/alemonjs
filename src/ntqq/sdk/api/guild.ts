@@ -10,7 +10,9 @@ import { API_SGROUP_SANDBOX, API_SGROUP } from './config.js'
  * @returns
  */
 export async function GuildServer(config: AxiosRequestConfig) {
-  const { appID, token, sandbox } = getBotConfig()
+  const token = getBotConfig('token')
+  const sandbox = getBotConfig('sandbox')
+  const appID = getBotConfig('appID')
   const service = await axios.create({
     baseURL: sandbox ? API_SGROUP_SANDBOX : API_SGROUP,
     timeout: 20000,

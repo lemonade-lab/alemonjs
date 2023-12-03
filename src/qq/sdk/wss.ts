@@ -38,7 +38,7 @@ export async function createClient(
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
-      console.info('token ok')
+      console.info('[ws] open')
     })
     /**
      * 标记是否已连接
@@ -98,7 +98,9 @@ export async function createClient(
           // OpCode 10 Hello 消息，处理心跳周期
           isConnected = true
           heartbeat_interval = data.heartbeat_interval
-          const { appID, token, intents } = getBotConfig()
+          const appID = getBotConfig('appID')
+          const token = getBotConfig('token')
+          const intents = getBotConfig('intents')
           /**
            * 发送鉴权
            */

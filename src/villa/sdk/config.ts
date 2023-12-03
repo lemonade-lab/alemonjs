@@ -1,25 +1,32 @@
 import { type ClientConfig } from './types.js'
-/**
- * 配置
- */
-let ClientCfg: ClientConfig = {
+const cfg: ClientConfig = {
   bot_id: '',
   bot_secret: '',
   pub_key: '',
   villa_id: 0,
   token: ''
 }
+
 /**
- * 设置配置
- * @param cfg
+ *
+ * @param key
+ * @param val
  */
-export function setClientConfig(cfg: ClientConfig) {
-  ClientCfg = cfg
+export function setBotConfig<T extends keyof ClientConfig>(
+  key: T,
+  val: ClientConfig[T]
+): void {
+  if (Object.prototype.hasOwnProperty.call(cfg, key)) {
+    cfg[key] = val
+  }
 }
 /**
- * 得到配置
+ *
+ * @param key
  * @returns
  */
-export function getClientConfig() {
-  return ClientCfg
+export function getBotConfig<T extends keyof ClientConfig>(
+  key: T
+): ClientConfig[T] | undefined {
+  return cfg[key]
 }

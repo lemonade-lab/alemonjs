@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { gateway } from './api.js'
-import { getDISCORD } from './config.js'
+import { getBotConfig } from './config.js'
 /**
  * 创建ws监听
  * @param conversation
@@ -23,7 +23,6 @@ export async function createClient(
   wsConn.on('open', async () => {
     console.log('[ws] open')
   })
-
   const call = async () => {
     wsConn.send(
       JSON.stringify({
@@ -33,9 +32,8 @@ export async function createClient(
     )
     setTimeout(call, heartbeat_interval)
   }
-
-  const { token, intent } = getDISCORD()
-
+  const token = getBotConfig('token')
+  const intent = getBotConfig('intent')
   const map = {
     0: ({ d, t }) => {
       conversation(t, d)
@@ -61,6 +59,7 @@ export async function createClient(
     },
     9: message => {
       //  6 或 2 失败
+      // 连接失败
       console.info('[ws] parameter error', message)
     },
     /**

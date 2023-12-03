@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { getDISCORD } from './config.js'
+import { getBotConfig } from './config.js'
 import { ApiLog } from './log.js'
 
 /**
@@ -8,7 +8,7 @@ import { ApiLog } from './log.js'
  * @returns
  */
 export function Service(config: AxiosRequestConfig) {
-  const { token } = getDISCORD()
+  const token = getBotConfig('token')
   const service = axios.create({
     baseURL: 'https://discord.com/api/v10',
     timeout: 6000,

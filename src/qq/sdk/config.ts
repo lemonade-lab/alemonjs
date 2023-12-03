@@ -1,24 +1,32 @@
 import { BotConfig } from './typings.js'
-let cfg: BotConfig = {
+const cfg: BotConfig = {
   appID: '',
   token: '',
   secret: '',
   intents: [],
   sandbox: false
 }
+
 /**
- * 得到机器人配置
- * @returns
+ *
+ * @param key
+ * @param val
  */
-export function getBotConfig() {
-  return cfg
+export function setBotConfig<T extends keyof BotConfig>(
+  key: T,
+  val: BotConfig[T]
+): void {
+  if (Object.prototype.hasOwnProperty.call(cfg, key)) {
+    cfg[key] = val
+  }
 }
 /**
- * 设置机器人配置
- * @param val
+ *
+ * @param key
  * @returns
  */
-export function setBotConfig(val: BotConfig) {
-  cfg = val
-  return
+export function getBotConfig<T extends keyof BotConfig>(
+  key: T
+): BotConfig[T] | undefined {
+  return cfg[key]
 }

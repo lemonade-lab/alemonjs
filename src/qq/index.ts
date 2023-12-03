@@ -29,16 +29,10 @@ export async function createAlemonByQQ() {
       sandbox: cfg.sandbox ?? false
     })
 
-    /**
-     * 设置 qq-channal 配置
-     */
-    setBotQQConfig({
-      token: cfg.token,
-      appID: cfg.appID,
-      intents: cfg.intents,
-      secret: '',
-      sandbox: cfg.sandbox
-    })
+    setBotQQConfig('appID', cfg.appID)
+    setBotQQConfig('token', cfg.token)
+    setBotQQConfig('intents', cfg.intents)
+    setBotQQConfig('sandbox', cfg.sandbox)
 
     /**
      * 创建 websocket

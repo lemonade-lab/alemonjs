@@ -4,7 +4,7 @@ import { Counter } from './counter.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
 import { ClientConfig } from './types.js'
-import { setClientConfig } from './config.js'
+import { setBotConfig } from './config.js'
 const counter = new Counter(1) // 初始值为1
 /**
  * 别野服务
@@ -46,7 +46,11 @@ export async function createClient(
   options: ClientConfig,
   conversation: (...args: any[]) => any
 ) {
-  setClientConfig(options)
+  setBotConfig('bot_id', options.bot_id)
+  setBotConfig('bot_secret', options.bot_secret)
+  setBotConfig('pub_key', options.pub_key)
+  setBotConfig('token', options.token)
+  setBotConfig('villa_id', options?.villa_id ?? 0)
   const data = await getWebsocketInfo(options.bot_id, options.bot_secret).then(
     res => res.data
   )
@@ -56,7 +60,7 @@ export async function createClient(
   }
   const ws = new WebSocket(data.websocket_url)
   ws.on('open', async () => {
-    console.log('open')
+    console.info('[ws] open')
     // login
     ws.send(
       createMessage({

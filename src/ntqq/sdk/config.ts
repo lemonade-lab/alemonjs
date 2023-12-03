@@ -1,92 +1,42 @@
-import { getAuthentication } from './api/auth.js'
-
-interface BotCaCheType {
+export interface BotCaCheType {
   appID: string
   token: string
   secret: string
   intents: number
   isPrivate?: boolean
   sandbox?: boolean
+  shard?: number[]
 }
-
-/**
- * 机器人缓存配置
- */
-let cfg: BotCaCheType = {
+// 机器人缓存配置
+const cfg: BotCaCheType = {
   appID: '',
   token: '',
   secret: '',
   intents: 0,
   isPrivate: false,
-  sandbox: false
+  sandbox: false,
+  shard: [0, 1]
 }
 /**
- * 得到机器人配置
- * @returns
- */
-export function getBotConfig() {
-  return cfg
-}
-/**
- * 设置机器人配置
+ *
+ * @param key
  * @param val
+ */
+export function setBotConfig<T extends keyof BotCaCheType>(
+  key: T,
+  val: BotCaCheType[T]
+): void {
+  if (Object.prototype.hasOwnProperty.call(cfg, key)) {
+    cfg[key] = val
+  }
+}
+/**
+ *
+ * @param key
  * @returns
  */
-export function setBotConfig(val: BotCaCheType) {
-  cfg = val
-  return
-}
-
-interface aut {
-  access_token: string
-  expires_in: number
-  cache: boolean
-}
-
-/**
- * 定时鉴权
- */
-export async function setTimeoutBotConfig(cfg: BotCaCheType) {
-  /**
-   * 发送请求
-   */
-  const data: aut = await getAuthentication(cfg.appID, cfg.secret).then(
-    res => res.data
-  )
-
-  const g: BotCaCheType = {
-    appID: cfg.appID,
-    token: data.access_token,
-    secret: cfg.secret,
-    intents: cfg.intents,
-    isPrivate: cfg.isPrivate,
-    sandbox: cfg.sandbox
-  }
-
-  /**
-   * 设置配置
-   */
-  setBotConfig(g)
-
-  const bal = async () => {
-    /**
-     * 发送请求
-     */
-    const data: aut = await getAuthentication(cfg.appID, cfg.secret).then(
-      res => res.data
-    )
-
-    g.token = data.access_token
-
-    /**
-     * 设置配置
-     */
-    setBotConfig(g)
-
-    console.info('refresh', data.expires_in, 's')
-
-    setTimeout(bal, data.expires_in * 1000)
-  }
-
-  setTimeout(bal, data.expires_in * 1000)
+export function getBotConfig<T extends keyof BotCaCheType>(
+  key: T
+): BotCaCheType[T] | undefined {
+  return cfg[key]
 }

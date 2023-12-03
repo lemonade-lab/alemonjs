@@ -1,17 +1,29 @@
-let token = ''
-
+interface ClientConfig {
+  token: string
+}
+const cfg = {
+  token: ''
+}
 /**
  *
+ * @param key
  * @param val
  */
-export function setKookToken(val: string) {
-  token = val
+export function setBotConfig<T extends keyof ClientConfig>(
+  key: T,
+  val: ClientConfig[T]
+): void {
+  if (Object.prototype.hasOwnProperty.call(cfg, key)) {
+    cfg[key] = val
+  }
 }
-
 /**
  *
+ * @param key
  * @returns
  */
-export function getKookToken() {
-  return token
+export function getBotConfig<T extends keyof ClientConfig>(
+  key: T
+): ClientConfig[T] | undefined {
+  return cfg[key]
 }

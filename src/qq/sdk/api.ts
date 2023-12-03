@@ -9,7 +9,9 @@ import { createPicFrom } from '../../core/index.js'
  * @returns
  */
 export async function requestService(config: AxiosRequestConfig) {
-  const { appID, token, sandbox } = getBotConfig()
+  const appID = getBotConfig('appID')
+  const token = getBotConfig('token')
+  const sandbox = getBotConfig('sandbox')
   const service = await axios.create({
     baseURL: sandbox
       ? 'https://sandbox.api.sgroup.qq.com'

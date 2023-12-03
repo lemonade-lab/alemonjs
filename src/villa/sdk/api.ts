@@ -20,7 +20,7 @@ import {
   StringifyType
 } from './types.js'
 import { createPicFrom } from '../../core/index.js'
-import { getClientConfig } from './config.js'
+import { getBotConfig } from './config.js'
 import { ApiLog } from './log.js'
 
 /**
@@ -30,13 +30,14 @@ import { ApiLog } from './log.js'
  * @returns
  */
 export async function villaService(config: AxiosRequestConfig) {
-  const ClientCfg = getClientConfig()
+  const bot_id = getBotConfig('bot_id')
+  const bot_secret = getBotConfig('bot_secret')
   const service = axios.create({
     baseURL: 'https://bbs-api.miyoushe.com', // 地址
     timeout: 6000, // 响应
     headers: {
-      'x-rpc-bot_id': ClientCfg.bot_id, // 账号
-      'x-rpc-bot_secret': ClientCfg.bot_secret // 密码
+      'x-rpc-bot_id': bot_id, // 账号
+      'x-rpc-bot_secret': bot_secret // 密码
     }
   })
   return await service(config)
