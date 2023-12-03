@@ -1,10 +1,8 @@
 import { checkRobotByVilla } from './login.js'
 import { hmacSha256 } from './sdk/index.js'
 import { getBotConfigByKey } from '../config/index.js'
-import { createClientWS } from './sdk/wss.js'
-import { setClientConfig } from './sdk/config.js'
-import { callBackByVilla } from './alemon/conversation.js'
-
+import { createClient } from './sdk/wss.js'
+import { conversation } from './alemon/conversation.js'
 export async function createAlemonByVilla() {
   // 登录
   if (
@@ -18,14 +16,16 @@ export async function createAlemonByVilla() {
     if ((cfg.pub_key ?? '') != '') {
       cfg.secret = hmacSha256(cfg.secret, cfg.pub_key)
     }
-    setClientConfig({
-      bot_id: cfg.bot_id,
-      bot_secret: cfg.secret,
-      pub_key: cfg.pub_key,
-      villa_id: cfg.villa_id,
-      token: `${cfg.villa_id}.${cfg.secret}.${cfg.bot_id}`
-    })
-    createClientWS(callBackByVilla)
+    await createClient(
+      {
+        bot_id: cfg.bot_id,
+        bot_secret: cfg.secret,
+        pub_key: cfg.pub_key,
+        villa_id: cfg.villa_id,
+        token: `${cfg.villa_id}.${cfg.secret}.${cfg.bot_id}`
+      },
+      conversation
+    )
     return true
   }
   return false

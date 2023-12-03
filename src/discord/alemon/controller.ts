@@ -1,3 +1,4 @@
+import { everyoneError } from '../../log/index.js'
 import {
   type ControllerOption,
   type UserInformationType
@@ -43,7 +44,7 @@ export const Controller = {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, channel_id)
+        return await replyController(content, channel_id).catch(everyoneError)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]

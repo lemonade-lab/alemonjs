@@ -43,7 +43,7 @@ const ConversationMap = {
  * @param req
  * @param res
  */
-export async function callBackByVilla(event: any) {
+export async function conversation(event: any) {
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     return await ConversationMap[event.type](event)
   }

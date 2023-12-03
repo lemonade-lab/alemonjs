@@ -22,9 +22,9 @@ export async function replyController(
   // isBuffer
   if (Buffer.isBuffer(msg)) {
     // 上传图片
-    const url = await ClientVILLA.uploadImage(villa_id, msg).then(
-      res => res?.data?.url
-    )
+    const url = await ClientVILLA.uploadImage(villa_id, msg)
+      .then(res => res?.data?.url)
+      .catch(everyoneError)
     if (!url) return false
     const dimensions = IMGS.imageSize(msg)
     return await ClientVILLA.replyMessage(
@@ -53,9 +53,9 @@ export async function replyController(
     for (const item of buffers) {
       const ISize = IMGS.imageSize(item)
       images.push({
-        url: await ClientVILLA.uploadImage(villa_id, item).then(
-          res => res?.data?.url
-        ),
+        url: await ClientVILLA.uploadImage(villa_id, item)
+          .then(res => res?.data?.url)
+          .catch(everyoneError),
         width: ISize.width,
         height: ISize.height
       })
@@ -96,13 +96,13 @@ export async function replyController(
   if (match) {
     const getUrl = match[1]
     // 先请求确保图片正常
-    const msg = await getUrlbuffer(getUrl)
+    const msg = await getUrlbuffer(getUrl).catch(everyoneError)
     if (!msg) return false
     const dimensions = IMGS.imageSize(msg)
     // url 形式的直接转存
-    const url = await ClientVILLA.transferImage(villa_id, getUrl).then(
-      res => res?.data?.new_url
-    )
+    const url = await ClientVILLA.transferImage(villa_id, getUrl)
+      .then(res => res?.data?.new_url)
+      .catch(everyoneError)
     // 如果是直接的url,应该直接使用转存
     const images = [
       {

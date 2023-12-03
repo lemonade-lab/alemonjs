@@ -27,12 +27,16 @@ export const Controller = {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, guild_id, msg_id)
+        return await replyController(content, guild_id, msg_id).catch(
+          everyoneError
+        )
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, guild_id, msg_id)
+        return await replyController(content, guild_id, msg_id).catch(
+          everyoneError
+        )
       },
       update: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -60,7 +64,9 @@ export const Controller = {
                 srv_send_msg: false,
                 file_type: 3,
                 url: file
-              }).then(res => res.file_info)
+              })
+                .then(res => res.file_info)
+                .catch(everyoneError)
             },
             msg_id,
             msg_type: 7,
@@ -78,7 +84,9 @@ export const Controller = {
                 srv_send_msg: false,
                 file_type: 2,
                 url: file
-              }).then(res => res.file_info)
+              })
+                .then(res => res.file_info)
+                .catch(everyoneError)
             },
             msg_id,
             msg_type: 7,
@@ -94,7 +102,7 @@ export const Controller = {
         const arr = []
         for (const item of msg) {
           arr.push(
-            ClientNTQQ.groupOpenMessages(guild_id, {
+            await ClientNTQQ.groupOpenMessages(guild_id, {
               msg_id,
               ...item,
               msg_seq: ClientNTQQ.getMsgSeq(msg_id)

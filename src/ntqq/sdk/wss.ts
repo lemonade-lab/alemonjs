@@ -1,9 +1,8 @@
 import WebSocket from 'ws'
 import { gateway } from './api/index.js'
 import { getBotConfig } from './config.js'
-
-let reconnectAttempts = 0 // 重新连接计数器
-
+import { Counter } from './counter.js'
+const counter = new Counter(1) // 初始值为1
 /**
  * 使用获取到的网关连接地址建立 WebSocket 连接
  * @param token
@@ -13,48 +12,34 @@ export async function createClient(
   conversation: (...args: any[]) => any,
   shard = [0, 1]
 ) {
-  /**
-   * 请求url
-   */
+  // 请求url
   const gatewayUrl = await gateway()
-
   // 重新连接的逻辑
   const reconnect = async () => {
-    if (reconnectAttempts >= 5) {
+    if (counter.getID() >= 5) {
       console.info(
         'The maximum number of reconnections has been reached, cancel reconnection'
       )
       return
     }
-
     console.info('reconnecting...')
     // 延迟一段时间后发起重新连接
     await new Promise(resolve => setTimeout(resolve, 5000))
-
     // 调用createClient函数重新建立连接
     await createClient(conversation, shard)
-
-    reconnectAttempts++ // 递增重连计数器
+    counter.getNextID()
   }
-
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
       console.info('TOKEN ok')
     })
-    /**
-     * 标记是否已连接
-     */
+    // 标记是否已连接
     let isConnected = false
-    /**
-     * 存储最新的消息序号
-     */
+    // 存储最新的消息序号
     let heartbeat_interval = 30000
-    /**
-     * 鉴权
-     */
+    // 鉴权
     let power
-
     const map = {
       0: ({ t, d }) => {
         // 存在,则执行t对应的函数
@@ -76,7 +61,7 @@ export async function createClient(
         if (t === 'RESUMED') {
           console.info('restore connection')
           // 重制次数
-          reconnectAttempts = 0
+          counter.setID(0)
         }
       },
       6: message => {
@@ -95,12 +80,10 @@ export async function createClient(
       10: ({ d }) => {
         // 重制次数
         isConnected = true
-        //
+        // 记录新循环
         heartbeat_interval = d.heartbeat_interval
         const { token, intents } = getBotConfig()
-        /**
-         * 发送鉴权
-         */
+        // 发送鉴权
         ws.send(
           JSON.stringify({
             op: 2, // op = 2
@@ -116,7 +99,8 @@ export async function createClient(
             }
           })
         )
-        reconnectAttempts = 0
+        // 重制次数
+        counter.setID(0)
       },
       11: () => {
         // OpCode 11 Heartbeat ACK 消息，心跳发送成功
@@ -126,20 +110,20 @@ export async function createClient(
         console.info('platform data', message)
       }
     }
-
-    /**
-     * 监听消息
-     */
+    // 监听消息
     ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))
       const { op, s, d, t } = message
+      if (process.env.NTQQ_WS == 'dev') {
+        console.log('data', d)
+      }
       // 根据 opcode 进行处理
       if (Object.prototype.hasOwnProperty.call(map, op)) {
         map[op]({ d, t })
       }
     })
-    ws.on('close', () => {
-      console.info('[ws] close')
+    ws.on('close', err => {
+      console.info('[ws] close', err)
     })
   }
 }

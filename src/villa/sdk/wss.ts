@@ -1,9 +1,10 @@
 import WebSocket from 'ws'
-import axios, { AxiosRequestConfig } from 'axios'
-import { getClientConfig } from './config.js'
+import axios from 'axios'
 import { Counter } from './counter.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
+import { ClientConfig } from './types.js'
+import { setClientConfig } from './config.js'
 const counter = new Counter(1) // 初始值为1
 /**
  * 别野服务
@@ -11,20 +12,10 @@ const counter = new Counter(1) // 初始值为1
  * @param config 配置
  * @returns
  */
-async function wsService(config: AxiosRequestConfig) {
-  const ClientCfg = getClientConfig()
-  const service = axios.create({
-    baseURL: 'https://bbs-api.miyoushe.com', // 地址
-    timeout: 6000, // 响应
-    headers: {
-      'x-rpc-bot_id': ClientCfg.bot_id, // 账号
-      'x-rpc-bot_secret': ClientCfg.bot_secret // 密码
-    }
-  })
-  return await service(config)
-}
-
-async function getWebsocketInfo(): Promise<{
+export async function getWebsocketInfo(
+  bot_id: string,
+  bot_secret: string
+): Promise<{
   data: {
     uid: number
     websocket_url: string
@@ -34,19 +25,35 @@ async function getWebsocketInfo(): Promise<{
     device_id: string
   }
 }> {
-  return await wsService({
+  return await axios({
+    baseURL: 'https://bbs-api.miyoushe.com', // 地址
+    timeout: 6000, // 响应
+    headers: {
+      'x-rpc-bot_id': bot_id, // 账号
+      'x-rpc-bot_secret': bot_secret // 密码
+    },
     url: '/vila/api/bot/platform/getWebsocketInfo',
     method: 'get'
   }).then(res => res.data)
 }
-
-export async function createClientWS(callBackByVilla: any) {
-  const data = await getWebsocketInfo().then(res => res.data)
+/**
+ *
+ * @param options
+ * @param conversation
+ * @returns
+ */
+export async function createClient(
+  options: ClientConfig,
+  conversation: (...args: any[]) => any
+) {
+  setClientConfig(options)
+  const data = await getWebsocketInfo(options.bot_id, options.bot_secret).then(
+    res => res.data
+  )
   if (!data?.websocket_url) {
     console.log('鉴权失败')
     return
   }
-  const ClientCfg = getClientConfig()
   const ws = new WebSocket(data.websocket_url)
   ws.on('open', async () => {
     console.log('open')
@@ -59,7 +66,7 @@ export async function createClientWS(callBackByVilla: any) {
         AppId: data.app_id,
         BodyData: ProtoCommand('PLogin').encode({
           uid: data.uid,
-          token: ClientCfg.token,
+          token: options.token,
           platform: data.platform,
           appId: data.app_id,
           deviceId: data.device_id,
@@ -93,14 +100,16 @@ export async function createClientWS(callBackByVilla: any) {
         if (obj.bizType == 7) {
           // 登录
           const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
-          if (process.env?.VILLA_WS == 'dev')
+          if (process.env?.VILLA_WS == 'dev') {
             console.log('PLoginReply:', LongToNumber(reply))
+          }
           if (reply.code) console.log('登录失败')
         } else if (obj.bizType == 6) {
           // 心跳
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
-          if (process.env?.VILLA_WS == 'dev')
+          if (process.env?.VILLA_WS == 'dev') {
             console.log('PHeartBeatReply:', LongToNumber(reply))
+          }
           if (reply.code) console.log('心跳错误')
         } else if (obj.bizType == 8) {
           // 退出登录
@@ -116,7 +125,7 @@ export async function createClientWS(callBackByVilla: any) {
           const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
           const data = LongToNumber(reply)
           if (process.env?.VILLA_WS == 'dev') console.log('data', data)
-          callBackByVilla(data)
+          conversation(data)
         } else {
           if (process.env?.VILLA_WS == 'dev') console.log('未知数据')
         }
@@ -129,7 +138,7 @@ export async function createClientWS(callBackByVilla: any) {
   })
 
   ws.on('error', error => {
-    console.error('WebSocket error:', error)
+    console.info('[ws] close', error)
   })
 }
 

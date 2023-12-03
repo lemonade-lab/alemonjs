@@ -51,12 +51,16 @@ const Controller = {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, channel_id, open_id)
+        return await directController(content, channel_id, open_id).catch(
+          everyoneError
+        )
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, channel_id, open_id)
+        return await directController(content, channel_id, open_id).catch(
+          everyoneError
+        )
       },
       /**
        * 更新信息
@@ -163,7 +167,7 @@ export async function directController(
    * isbuffer
    */
   if (Buffer.isBuffer(msg)) {
-    const ret = await ClientKOOK.postImage(msg)
+    const ret = await ClientKOOK.postImage(msg).catch(everyoneError)
     if (ret && ret.data) {
       return await ClientKOOK.createDirectMessage({
         type: 2,
@@ -220,9 +224,9 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await getUrlbuffer(getUrl)
+    const msg = await getUrlbuffer(getUrl).catch(everyoneError)
     if (!msg) return false
-    const ret = await ClientKOOK.postImage(msg)
+    const ret = await ClientKOOK.postImage(msg).catch(everyoneError)
     if (!ret) return false
     if (msg && ret) {
       return await ClientKOOK.createDirectMessage({

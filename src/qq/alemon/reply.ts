@@ -63,7 +63,7 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await getUrlbuffer(getUrl)
+    const msg = await getUrlbuffer(getUrl).catch(everyoneError)
     if (msg) {
       return await Client.postImage({
         id: channel_id,

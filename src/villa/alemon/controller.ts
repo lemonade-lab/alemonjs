@@ -175,7 +175,11 @@ export const Controller = {
       card: async (msg: any[]) => {
         const arr: any[] = []
         for (const item of msg) {
-          arr.push(await ClientVILLA.sendCard(guild_id, channel_id, item))
+          arr.push(
+            await ClientVILLA.sendCard(guild_id, channel_id, item).catch(
+              everyoneError
+            )
+          )
         }
         return arr
       },

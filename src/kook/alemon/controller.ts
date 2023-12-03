@@ -33,7 +33,9 @@ export const Controller = {
         return false
       },
       remove: async () => {
-        return await ClientKOOK.guildKickout(guild_id, user_id)
+        return await ClientKOOK.guildKickout(guild_id, user_id).catch(
+          everyoneError
+        )
       },
       operate: async (role_id: string, add = true) => {
         return false
@@ -45,20 +47,22 @@ export const Controller = {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, channel_id)
+        return await replyController(content, channel_id).catch(everyoneError)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, channel_id)
+        return await replyController(content, channel_id).catch(everyoneError)
       },
       update: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await ClientKOOK.messageUpdate({ msg_id, content })
+        return await ClientKOOK.messageUpdate({ msg_id, content }).catch(
+          everyoneError
+        )
       },
       withdraw: async (hideTip: boolean) => {
-        return await ClientKOOK.messageDelete(msg_id)
+        return await ClientKOOK.messageDelete(msg_id).catch(everyoneError)
       },
       pinning: async (cancel?: boolean) => {
         return false
@@ -78,13 +82,17 @@ export const Controller = {
                 msg_id,
                 emoji: item,
                 user_id
-              })
+              }).catch(everyoneError)
             )
           }
           return arr
         }
         for (const item of msg) {
-          arr.push(await ClientKOOK.messageAddReaction({ msg_id, emoji: item }))
+          arr.push(
+            await ClientKOOK.messageAddReaction({ msg_id, emoji: item }).catch(
+              everyoneError
+            )
+          )
         }
         return arr
       },
@@ -96,7 +104,7 @@ export const Controller = {
             content: file
           }).catch(everyoneError)
         }
-        const ret = await ClientKOOK.postFile(file, name)
+        const ret = await ClientKOOK.postFile(file, name).catch(everyoneError)
         if (!ret) return false
         return await ClientKOOK.createMessage({
           type: 3,
@@ -112,7 +120,7 @@ export const Controller = {
             content: file
           }).catch(everyoneError)
         }
-        const ret = await ClientKOOK.postFile(file, name)
+        const ret = await ClientKOOK.postFile(file, name).catch(everyoneError)
         if (!ret) return false
         return await ClientKOOK.createMessage({
           type: 3,
@@ -126,7 +134,7 @@ export const Controller = {
             type: 10,
             target_id: channel_id,
             content: JSON.stringify(msg)
-          })
+          }).catch(everyoneError)
         ]
       },
       allUsers: async (

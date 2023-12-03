@@ -823,30 +823,3 @@ export async function audit(
     data
   }).then(ApiLog)
 }
-
-/**
- * 得到ws初始化
- * @returns
- */
-export async function getWebsocketInfo(): Promise<{
-  data: {
-    // 接入地址
-    websocket_url: string
-    // 连接使用的 uid 参数
-    websocket_conn_uid: string
-    // 接入使用的 app_id 参数
-    app_id: string
-    // 接入使用的 platform 参数
-    platform: string
-    // 接入使用的 device_id 参数
-    device_id: string
-  }
-}> {
-  return await villaService({
-    method: 'get',
-    url: ApiEnum.getWebsocketInfo,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).then(ApiLog)
-}

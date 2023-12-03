@@ -15,7 +15,7 @@ export async function replyController(
 ) {
   // is buffer
   if (Buffer.isBuffer(msg)) {
-    const url = await ClientKOA.getFileUrl(msg)
+    const url = await ClientKOA.getFileUrl(msg).catch(everyoneError)
     if (!url) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: '',
@@ -43,7 +43,9 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
+    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer).catch(
+      everyoneError
+    )
     if (!url) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: cont,

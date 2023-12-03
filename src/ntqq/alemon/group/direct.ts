@@ -45,12 +45,16 @@ const Controller = {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id)
+        return await directController(content, open_id, msg_id).catch(
+          everyoneError
+        )
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id)
+        return await directController(content, open_id, msg_id).catch(
+          everyoneError
+        )
       },
       /**
        * 更新信息
@@ -92,7 +96,9 @@ const Controller = {
                 srv_send_msg: false,
                 file_type: 3,
                 url: file
-              }).then(res => res.file_info)
+              })
+                .then(res => res.file_info)
+                .catch(everyoneError)
             },
             msg_id,
             msg_type: 7,
@@ -115,7 +121,9 @@ const Controller = {
                 srv_send_msg: false,
                 file_type: 2,
                 url: file
-              }).then(res => res.file_info)
+              })
+                .then(res => res.file_info)
+                .catch(everyoneError)
             },
             msg_id,
             msg_type: 7,
@@ -128,11 +136,11 @@ const Controller = {
         const arr = []
         for (const item of msg) {
           arr.push(
-            ClientNTQQ.usersOpenMessages(open_id, {
+            await ClientNTQQ.usersOpenMessages(open_id, {
               msg_id,
               msg_seq: ClientNTQQ.getMsgSeq(msg_id),
               ...item
-            })
+            }).catch(everyoneError)
           )
         }
         return arr
@@ -195,7 +203,7 @@ export async function directController(
   // isBuffer
   if (Buffer.isBuffer(msg)) {
     try {
-      const url = await ClientKOA.getFileUrl(msg)
+      const url = await ClientKOA.getFileUrl(msg).catch(everyoneError)
       if (!url) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
@@ -204,7 +212,9 @@ export async function directController(
             srv_send_msg: false,
             file_type: 1,
             url: url
-          }).then(res => res.file_info)
+          })
+            .then(res => res.file_info)
+            .catch(everyoneError)
         },
         msg_id,
         msg_type: 7,
@@ -227,7 +237,9 @@ export async function directController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
+    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer).catch(
+      everyoneError
+    )
     if (!url) return false
     return await ClientNTQQ.usersOpenMessages(open_id, {
       content: cont,
@@ -262,9 +274,9 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await getUrlbuffer(getUrl)
+    const msg = await getUrlbuffer(getUrl).catch(everyoneError)
     if (Buffer.isBuffer(msg)) {
-      const url = await ClientKOA.getFileUrl(msg)
+      const url = await ClientKOA.getFileUrl(msg).catch(everyoneError)
       if (!url) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
@@ -273,7 +285,9 @@ export async function directController(
             srv_send_msg: false,
             file_type: 1,
             url: url
-          }).then(res => res.file_info)
+          })
+            .then(res => res.file_info)
+            .catch(everyoneError)
         },
         msg_id,
         msg_type: 7,

@@ -1,5 +1,5 @@
 import { checkRobotByKOOK } from './login.js'
-import { callBackByKOOK } from './alemon/conversation.js'
+import { conversation } from './alemon/conversation.js'
 import { createClient, ClientKOOK } from './sdk/index.js'
 import { setBotMsgByKOOK } from './alemon/bot.js'
 import { getBotConfigByKey } from '../config/index.js'
@@ -25,7 +25,7 @@ export async function createAlemonByKOOK() {
     /**
      * 创建连接
      */
-    await createClient(cfg.token, callBackByKOOK).then(async res => {
+    await createClient(cfg.token, conversation).then(async res => {
       const data = await ClientKOOK.userMe().then(res => res?.data)
       if (data) {
         setBotMsgByKOOK({

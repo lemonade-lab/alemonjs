@@ -15,9 +15,7 @@ export async function getGatewayUrl(
   url = 'https://www.kookapp.cn/api/v3/gateway/index',
   compress = 0
 ): Promise<string | undefined> {
-  /**
-   * 替换为实际的接口地址
-   */
+  // 替换为实际的接口地址
   const Authorization = `Bot ${token}`
   try {
     const response = await axios.get(url, {
@@ -41,50 +39,30 @@ export async function getGatewayUrl(
 /**
  * 使用获取到的网关连接地址建立 WebSocket 连接
  * @param token
- * @param callBack
+ * @param conversation
  */
 export async function createClient(
   token: string,
-  callBack: (...args: any[]) => any
+  conversation: (...args: any[]) => any
 ) {
-  /**
-   * 设置token
-   */
+  // 设置token
   setKookToken(token)
-  /**
-   * 请求url
-   */
+  // 请求url
   const gatewayUrl = await getGatewayUrl(token)
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
     ws.on('open', () => {
       console.info('token ok')
     })
-
-    /**
-     * 标记是否已连接
-     */
+    // 标记是否已连接
     let isConnected = false
-    /**
-     * 存储 session ID
-     */
+    // 存储 session ID
     let sessionID = ''
-    /**
-     * 存储最新的消息序号
-     */
+    // 存储最新的消息序号
     let lastMessageSN = 0
-
-    ws.on('message', msg => {
-      /**
-       *
-       */
+    ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))
-
-      /**
-       *
-       */
-      const { s, d: data, sn } = message
-
+      const { s, d, sn } = message
       switch (s) {
         /**
          * 消息(包含聊天和通知消息)
@@ -94,7 +72,7 @@ export async function createClient(
            * 处理 EVENT 信令
            * 包括按序处理消息和记录最新的消息序号
            */
-          if (data && sn) {
+          if (d && sn) {
             if (sn === lastMessageSN + 1) {
               /**
                * 消息序号正确
@@ -104,10 +82,8 @@ export async function createClient(
               /**
                * 处理消息并传递给almeon
                */
-
-              const event: EventData | SystemData = data
-
-              callBack(event)
+              const event: EventData | SystemData = d
+              await conversation(event)
             } else if (sn > lastMessageSN + 1) {
               /**
                * 消息序号乱序
@@ -127,9 +103,9 @@ export async function createClient(
          * 服务端返回握手结果
          */
         case 1: {
-          if (data && data.code === 0) {
+          if (d && d.code === 0) {
             console.info('ws ok')
-            sessionID = data.session_id
+            sessionID = d.session_id
             isConnected = true
           } else {
             console.info('ws err')
@@ -195,9 +171,7 @@ export async function createClient(
       }
     })
 
-    /**
-     * 心跳定时发送
-     */
+    // 心跳定时发送
     setInterval(() => {
       if (isConnected) {
         ws.send(

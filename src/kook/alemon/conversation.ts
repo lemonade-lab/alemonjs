@@ -125,7 +125,7 @@ const ConversationMap = {
  * @param req
  * @param res
  */
-export async function callBackByKOOK(event: EventData | SystemData) {
+export async function conversation(event: EventData | SystemData) {
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     if (event.channel_type == 'GROUP') {
       return await ConversationMap[event.type]['public'](event)

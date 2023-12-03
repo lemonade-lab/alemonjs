@@ -3,7 +3,6 @@ import { checkRobotByOne } from './login.js'
 import { getBotConfigByKey } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
 export async function createAlemonByONE() {
-  // 登录
   if (
     await checkRobotByOne().catch(err => {
       console.error(err)
@@ -11,9 +10,7 @@ export async function createAlemonByONE() {
     })
   ) {
     const OCFG = getBotConfigByKey('one')
-    /**
-     * 创建监听
-     */
+    // 创建监听
     createWsHandler(
       {
         url: OCFG?.url ?? '',
