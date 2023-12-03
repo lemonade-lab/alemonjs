@@ -136,7 +136,7 @@ export async function createClient(
             JSON.stringify({
               op: 2, // op = 2
               d: {
-                // token: `QQBot ${token}`,
+                token: `QQBot ${token}`,
                 intents: intents,
                 shard: shard,
                 properties: {
