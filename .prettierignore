@@ -2,30 +2,16 @@
 node_modules
 
 # 包
-lib
-types
+plugins//**/*
+public/**/*
+lib/**/*
+types/**/*
 
-# 配置
-/config/
-
-docs
-
-# 插件
-/application/
-/public/
-.apps
-
-# 缓存
-/data/
-/help/
-
-# 额外生成物
-index.js
-alemon.toml
-alemon.json
-apps.js
+# test
+alemon.config.ts
 
 # 打印
 logs
+log
 *.logs
 *.los

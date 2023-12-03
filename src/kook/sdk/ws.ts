@@ -4,7 +4,7 @@ import { setKookToken } from './config.js'
 import { EventData, SystemData } from './typings.js'
 
 /**
- *
+ * 获取鉴权
  * @param token  token
  * @param url 请求地址
  * @param compress 下发数据是否压缩，默认为1，代表压缩
@@ -63,6 +63,9 @@ export async function createClient(
     ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))
       const { s, d, sn } = message
+      if (process.env.KOOK_WS == 'dev') {
+        console.log('data', d)
+      }
       switch (s) {
         /**
          * 消息(包含聊天和通知消息)
@@ -104,11 +107,11 @@ export async function createClient(
          */
         case 1: {
           if (d && d.code === 0) {
-            console.info('ws ok')
+            console.info('[ws] ok')
             sessionID = d.session_id
             isConnected = true
           } else {
-            console.info('ws err')
+            console.info('[ws] err')
           }
           break
         }
@@ -116,7 +119,7 @@ export async function createClient(
          * 心跳，ping
          */
         case 2: {
-          console.info('ws ping')
+          console.info('[ws] ping')
           ws.send(
             JSON.stringify({
               s: 3
@@ -128,21 +131,21 @@ export async function createClient(
          * 心跳，pong
          */
         case 3: {
-          console.info('ws pong')
+          console.info('[ws] pong')
           break
         }
         /**
          * resume, 恢复会话
          */
         case 4: {
-          console.info('ws resume')
+          console.info('[ws] resume')
           break
         }
         /**
          * reconnect, 要求客户端断开当前连接重新连接
          */
         case 5: {
-          console.info('ws Connection failed, reconnect')
+          console.info('[ws] Connection failed, reconnect')
           /**
            * 处理 RECONNECT 信令
            * 断开当前连接并进行重新连接
@@ -161,11 +164,11 @@ export async function createClient(
          * resume ack
          */
         case 6: {
-          console.info('ws resume ack')
+          console.info('[ws] resume ack')
           break
         }
         default: {
-          console.info('ws define')
+          console.info('[ws] define')
           break
         }
       }
@@ -184,7 +187,11 @@ export async function createClient(
     }, 30000)
 
     ws.on('close', () => {
-      console.error('ws close')
+      console.error('[ws] close')
+    })
+
+    ws.on('error', err => {
+      console.error('[ws] error', err)
     })
   }
 }

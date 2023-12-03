@@ -3,6 +3,9 @@ import { gateway } from './api.js'
 import { getDISCORD } from './config.js'
 /**
  * 创建ws监听
+ * @param conversation
+ * @param shard
+ * @returns
  */
 export async function createClient(
   conversation: (...args: any[]) => any,
@@ -14,15 +17,11 @@ export async function createClient(
     return
   }
   const wsConn = new WebSocket(`${url}?v=10&encoding=json`)
-
   let heartbeat_interval = 0
-
   let session_id = ''
-
   let resume_gateway_url = ''
-
   wsConn.on('open', async () => {
-    // 打开成功
+    console.log('[ws] open')
   })
 
   const call = async () => {
@@ -48,7 +47,7 @@ export async function createClient(
       }
     },
     7: () => {
-      console.info('重新请求')
+      console.info('[ws] 重新请求')
       wsConn.send(
         JSON.stringify({
           op: 6,
@@ -62,7 +61,7 @@ export async function createClient(
     },
     9: message => {
       //  6 或 2 失败
-      console.info('parameter error', message)
+      console.info('[ws] parameter error', message)
     },
     /**
      * 打招呼
@@ -70,67 +69,56 @@ export async function createClient(
      */
     10: ({ d }) => {
       const { heartbeat_interval: ih } = d
-
       heartbeat_interval = ih
-
+      //
       wsConn.send(
         JSON.stringify({
           op: 1,
           d: null
         })
       )
-
       setTimeout(call, heartbeat_interval)
-
-      const data = {
-        op: 2,
-        d: {
-          shard: shard,
-          token: `Bot ${token}`,
-          intents: intent,
-          properties: {
-            os: process.platform,
-            browser: 'alemonjs',
-            device: 'alemonjs'
-          }
-        }
-      }
-
-      if (process.argv.includes('dev')) {
-        console.info('data', data)
-      }
-
       // 在初次握手期间启动新会话
-      wsConn.send(JSON.stringify(data))
+      wsConn.send(
+        JSON.stringify({
+          op: 2,
+          d: {
+            shard: shard,
+            token: `Bot ${token}`,
+            intents: intent,
+            properties: {
+              os: process.platform,
+              browser: 'alemonjs',
+              device: 'alemonjs'
+            }
+          }
+        })
+      )
     },
     11: ({ d }) => {
-      console.info('heartbeat transmission')
+      console.info('[ws] heartbeat transmission')
     }
   }
 
   wsConn.on('message', data => {
-    const jsonData = data.toString()
-    const parsedData = JSON.parse(jsonData)
-
-    if (process.argv.includes('dev')) {
-      console.info('parsedData', parsedData)
+    const parsedData = JSON.parse(data.toString())
+    const { op, d } = parsedData
+    if (process.env?.DISCORD_WS == 'dev') {
+      console.info('data', d)
     }
-
-    const { op } = parsedData
     if (Object.prototype.hasOwnProperty.call(map, op)) {
       map[op](parsedData)
     }
   })
 
   // 关闭
-  wsConn.on('close', () => {
-    console.error('ws close')
-    console.error('登录失败,TOKEN存在风险')
+  wsConn.on('close', err => {
+    console.error('[ws] 登录失败,TOKEN存在风险')
   })
 
   // 出错
   wsConn.on('error', error => {
-    console.error('ws error:', error)
+    console.error('[ws] error:', error)
   })
 }
 
