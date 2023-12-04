@@ -1,4 +1,4 @@
-interface ClientConfig {
+export interface ClientConfig {
   token: string
 }
 const cfg = {

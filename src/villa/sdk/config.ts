@@ -1,4 +1,11 @@
-import { type ClientConfig } from './types.js'
+export interface ClientConfig {
+  bot_id: string
+  bot_secret: string
+  pub_key: string
+  villa_id?: number
+  token: string
+}
+
 const cfg: ClientConfig = {
   bot_id: '',
   bot_secret: '',

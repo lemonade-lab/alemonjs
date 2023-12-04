@@ -13,7 +13,7 @@ export async function createClient(
 ) {
   const { url } = await gateway()
   if (!url) {
-    console.error('TOKEN 错误')
+    console.error('[getway] token err')
     return
   }
   const wsConn = new WebSocket(`${url}?v=10&encoding=json`)

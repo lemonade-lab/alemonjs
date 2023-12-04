@@ -1,18 +1,9 @@
 /**
- * 登录配置
- */
-export interface BotConfig {
-  appID: string
-  token: string
-  secret: string
-  intents: IntentsEnum[]
-  sandbox: boolean
-}
-
-export type IntentsEnum = (typeof AvailableIntentsEventsEnum)[number]
-
-/**
  * 订阅枚举
+ */
+export type IntentsEnum = (typeof AvailableIntentsEventsEnum)[number]
+/**
+ *
  */
 export const AvailableIntentsEventsEnum = [
   'GUILDS',

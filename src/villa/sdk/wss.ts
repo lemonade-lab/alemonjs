@@ -3,8 +3,7 @@ import axios from 'axios'
 import { Counter } from './counter.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
-import { ClientConfig } from './types.js'
-import { setBotConfig } from './config.js'
+import { setBotConfig, type ClientConfig } from './config.js'
 const counter = new Counter(1) // 初始值为1
 /**
  * 别野服务
@@ -55,7 +54,7 @@ export async function createClient(
     res => res.data
   )
   if (!data?.websocket_url) {
-    console.log('鉴权失败')
+    console.log('[getway] secret err')
     return
   }
   const ws = new WebSocket(data.websocket_url)
@@ -107,14 +106,14 @@ export async function createClient(
           if (process.env?.VILLA_WS == 'dev') {
             console.log('PLoginReply:', LongToNumber(reply))
           }
-          if (reply.code) console.log('登录失败')
+          if (reply.code) console.log('[ws] login err')
         } else if (obj.bizType == 6) {
           // 心跳
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
           if (process.env?.VILLA_WS == 'dev') {
             console.log('PHeartBeatReply:', LongToNumber(reply))
           }
-          if (reply.code) console.log('心跳错误')
+          if (reply.code) console.log('[ws] 心跳错误')
         } else if (obj.bizType == 8) {
           // 退出登录
           const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)

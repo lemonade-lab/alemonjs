@@ -1,4 +1,4 @@
-export interface BotCaCheType {
+export interface ClientConfig {
   appID: string
   token: string
   secret: string
@@ -8,7 +8,7 @@ export interface BotCaCheType {
   shard?: number[]
 }
 // 机器人缓存配置
-const cfg: BotCaCheType = {
+const cfg: ClientConfig = {
   appID: '',
   token: '',
   secret: '',
@@ -22,9 +22,9 @@ const cfg: BotCaCheType = {
  * @param key
  * @param val
  */
-export function setBotConfig<T extends keyof BotCaCheType>(
+export function setBotConfig<T extends keyof ClientConfig>(
   key: T,
-  val: BotCaCheType[T]
+  val: ClientConfig[T]
 ): void {
   if (Object.prototype.hasOwnProperty.call(cfg, key)) {
     cfg[key] = val
@@ -35,8 +35,8 @@ export function setBotConfig<T extends keyof BotCaCheType>(
  * @param key
  * @returns
  */
-export function getBotConfig<T extends keyof BotCaCheType>(
+export function getBotConfig<T extends keyof ClientConfig>(
   key: T
-): BotCaCheType[T] | undefined {
+): ClientConfig[T] | undefined {
   return cfg[key]
 }

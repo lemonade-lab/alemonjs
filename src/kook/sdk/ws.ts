@@ -29,10 +29,10 @@ export async function getGatewayUrl(
     if (response.data.code === 0) {
       return response.data.data.url
     } else {
-      console.error('http err', response.data.message)
+      console.error('[getway] http err', response.data.message)
     }
   } catch (error) {
-    console.error('token err', error.message)
+    console.error('[getway] token err', error.message)
   }
 }
 

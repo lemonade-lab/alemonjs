@@ -37,11 +37,11 @@ export async function gateway() {
       if (url) {
         return url
       } else {
-        console.error('http err:', null)
+        console.error('[getway] http err:', null)
       }
     })
     .catch(error => {
-      console.error('token err:', error.message)
+      console.error('[getway] token err:', error.message)
     })
 }
 

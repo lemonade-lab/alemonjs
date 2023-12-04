@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 import { gateway, getAuthentication } from './api/index.js'
 import { getBotConfig, setBotConfig } from './config.js'
-import { type BotCaCheType } from './config.js'
+import { type ClientConfig } from './config.js'
 import { Counter } from './counter.js'
 
 const counter = new Counter(1) // 初始值为1
@@ -35,7 +35,7 @@ async function setTimeoutBotConfig() {
  * @param conversation
  */
 export async function createClient(
-  cfg: BotCaCheType,
+  cfg: ClientConfig,
   conversation: (...args: any[]) => any
 ) {
   setBotConfig('appID', cfg.appID)
@@ -63,7 +63,7 @@ export async function createClient(
       return
     }
     setTimeout(() => {
-      console.info('reconnecting...')
+      console.info('[ws] reconnecting...')
       // 重新starrt
       start()
       // 记录
@@ -102,25 +102,25 @@ export async function createClient(
           }
           // Resumed Event，恢复连接成功
           if (t === 'RESUMED') {
-            console.info('restore connection')
+            console.info('[ws] restore connection')
             // 重制次数
             counter.setID(0)
           }
           return
         },
         6: ({ d }) => {
-          console.info('connection attempt', d)
+          console.info('[ws] connection attempt', d)
           return
         },
         7: async ({ d }) => {
           // 执行重新连接
-          console.info('reconnect', d)
+          console.info('[ws] reconnect', d)
           // 取消鉴权发送
           if (power) clearInterval(power)
           return
         },
         9: ({ d, t }) => {
-          console.info('parameter error', d)
+          console.info('[ws] parameter error', d)
           return
         },
         10: ({ d }) => {
@@ -151,13 +151,13 @@ export async function createClient(
         },
         11: () => {
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.info('heartbeat transmission')
+          console.info('[ws] heartbeat transmission')
           // 重制次数
           counter.setID(0)
           return
         },
         12: ({ d }) => {
-          console.info('platform data', d)
+          console.info('[ws] platform data', d)
           return
         }
       }

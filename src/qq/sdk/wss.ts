@@ -15,10 +15,10 @@ export async function getGatewayUrl(): Promise<string | undefined> {
     if (response.url) {
       return response.url
     } else {
-      console.error('http err:', null)
+      console.error('[getway] http err:', null)
     }
   } catch (error) {
-    console.error('token err:', error.message)
+    console.error('[getway] token err:', error.message)
   }
 }
 
@@ -123,7 +123,7 @@ export async function createClient(
         }
         case 11: {
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.info('heartbeat transmission')
+          console.info('[ws] heartbeat transmission')
           break
         }
         case 12: {
@@ -133,7 +133,7 @@ export async function createClient(
     })
 
     ws.on('close', () => {
-      console.error('ws close')
+      console.error('[ws]  close')
     })
   }
 }
