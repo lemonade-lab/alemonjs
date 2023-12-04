@@ -4,6 +4,13 @@ let myIp: string | false
  * 得到本机IP地址
  * @returns
  */
+export async function setPublicIP(val: string) {
+  myIp = val
+}
+/**
+ * 得到本机IP地址
+ * @returns
+ */
 export async function getPublicIP(options: Options = {}) {
   if (myIp) return myIp
   return await publicIp({
