@@ -195,7 +195,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     e.at_user = e.at_users.find(item => item.bot != true)
   }
 
-  if (e.bot.avatar == 'string') {
+  if (e.bot.avatar == '') {
     /**
      * 配置一下机器人头像
      */

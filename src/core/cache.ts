@@ -83,7 +83,7 @@ export function getAppCharacter(key: string) {
  * @param key 插件名
  * @param val 字符
  */
-export function setAppCharacter(key: string, val: '/' | '#') {
+export function setAppCharacter(key: string, val: '/' | '#' = '/') {
   CAT[key] = val
 }
 /**

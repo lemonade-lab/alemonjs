@@ -13,7 +13,7 @@ export const conversation = {
       setBotMsgByONE({
         id: bot.self.user_id,
         name: bot.self.nickname,
-        avatar: 'string' // 头像是什么
+        avatar: '' // 头像是什么
       })
     }
   },

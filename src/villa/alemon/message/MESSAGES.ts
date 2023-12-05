@@ -85,6 +85,7 @@ export async function MESSAGES(event: {
    * 消息原文
    */
   const txt = MessageContent.content.text
+
   /**
    * 解析
    */
@@ -101,7 +102,7 @@ export async function MESSAGES(event: {
       at_users.push({
         id: item.entity.user_id,
         name,
-        avatar: 'string',
+        avatar: '',
         bot: false
       })
       continue
@@ -110,7 +111,7 @@ export async function MESSAGES(event: {
       at_users.push({
         id: item.entity.bot_id,
         name,
-        avatar: 'string',
+        avatar: '',
         bot: true
       })
       continue

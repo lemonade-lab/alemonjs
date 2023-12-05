@@ -38,7 +38,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     at_users.push({
       id: item.role_id,
       name: item.name,
-      avatar: 'string',
+      avatar: '',
       bot: true
     })
     msg = msg.replace(`(rol)${item.role_id}(rol)`, '').trim()

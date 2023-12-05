@@ -7,7 +7,7 @@ interface BotMessage {
 let bot: BotMessage = {
   id: '',
   name: '',
-  avatar: 'string'
+  avatar: ''
 }
 
 export function setBotMsgByKOOK(val: BotMessage) {

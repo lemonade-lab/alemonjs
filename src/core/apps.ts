@@ -10,7 +10,7 @@ import {
 import { setApp } from './app.js'
 
 /**
- * 引用路径
+ * 应用路径
  * @param url
  * @returns
  */
@@ -44,18 +44,20 @@ export function getAppName(url: string | URL) {
 /**
  * 创建应用对象
  * @param url import.meta.url
- * @returns AppName目录名
+   @deprecated createApp()
+ * @returns 
  */
 export function createApps(url: string) {
-  return createApp(getAppName(url))
+  return createApp(url)
 }
 
 /**
  * 创建应用对象
- * @param AppName 目录名 getAppName(import.meta.url)
- * @returns 应用app对象
+ * @param url import.meta.url
+ * @returns
  */
-export function createApp(AppName: string) {
+export function createApp(url: string) {
+  const AppName = getAppName(url)
   /**
    * 应用集
    */
@@ -67,8 +69,11 @@ export function createApp(AppName: string) {
   /**
    * 设置默认指令规则
    */
-  setAppCharacter(AppName, '/')
-  return {
+  setAppCharacter(AppName)
+  /**
+   * 应用
+   */
+  const app = {
     /**
      * 设置正则最低优先级
      * 当设置了500，而所有优先级为5000时
@@ -77,28 +82,26 @@ export function createApp(AppName: string) {
      * @param val
      * @returns
      */
-    setPriority: (val: number) => {
+    priority: (val: number) => {
       try {
         setAppPriority(AppName, val)
-        return true
       } catch (err) {
         console.error('APP setEvent', err)
-        return false
       }
+      return app
     },
     /**
      * 设置正则默认消息
      * @param val
      * @returns
      */
-    setEvent: (val: 'MESSAGES' | 'message') => {
+    event: (val: 'MESSAGES' | 'message') => {
       try {
         setAppEvent(AppName, val)
-        return true
       } catch (err) {
         console.error('APP setEvent', err)
-        return false
       }
+      return app
     },
     /**
      * 设置指令规则
@@ -106,11 +109,10 @@ export function createApp(AppName: string) {
     setCharacter: (val: '#' | '/') => {
       try {
         setAppCharacter(AppName, val)
-        return true
       } catch (err) {
         console.error('APP setCharacter', err)
-        return false
       }
+      return app
     },
     /**
      * 设置扩展参
@@ -118,29 +120,42 @@ export function createApp(AppName: string) {
     setArg: (fnc: (...args: any[]) => any[] | Promise<any[]>) => {
       try {
         setAppArg(AppName, fnc)
-        return true
       } catch (err) {
         console.error('APP setArg', err)
-        return false
       }
+      return app
     },
     /**
-     * 重定义消息
+     * 重定义事件
      * @param fnc 回调函数
+     * @returns 是否成功定义
+     */
+    reSetEvent: (fnc: (...args: any[]) => any) => {
+      try {
+        setAppMessage(AppName, fnc)
+      } catch (err) {
+        console.error('APP setMessage', err)
+      }
+      return app
+    },
+    /**
+     * 重定义事件
+     * @param fnc 回调函数
+     * @deprecated 废弃,请使用reSetEvent()
      * @returns 是否成功定义
      */
     setMessage: (fnc: (...args: any[]) => any) => {
       try {
         setAppMessage(AppName, fnc)
-        return true
       } catch (err) {
         console.error('APP setMessage', err)
-        return false
       }
+      return app
     },
     /**
      * 创建应用
      * @param app 应用对象
+     * @deprecated 废弃,请使用use()
      */
     component: (urlObject: object = {}) => {
       try {
@@ -178,14 +193,59 @@ export function createApp(AppName: string) {
             }
           }
         }
-        return true
       } catch (err) {
         console.error('APP component', err)
-        return false
       }
+      return app
+    },
+    /**
+     * 创建应用
+     * @param app 应用对象
+     */
+    use: (urlObject: object = {}) => {
+      try {
+        for (const item in urlObject) {
+          /**
+           * 如果该导出是class
+           */
+          if (urlObject[item].prototype) {
+            if (!Object.prototype.hasOwnProperty.call(apps, item)) {
+              /**
+               * 不重名
+               */
+              apps[item] = urlObject[item]
+              continue
+            }
+            const T = true
+            while (T) {
+              const keyName = `${item}$${acount}`
+              if (!Object.prototype.hasOwnProperty.call(apps, keyName)) {
+                /**
+                 * 不重名
+                 */
+                apps[keyName] = urlObject[item]
+                /**
+                 * 重置为0
+                 */
+                acount = 0
+                break
+              } else {
+                /**
+                 * 加1
+                 */
+                acount++
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('APP use', err)
+      }
+      return app
     },
     /**
      * 挂起应用
+     * @returns
      */
     mount: () => {
       try {
@@ -193,6 +253,8 @@ export function createApp(AppName: string) {
       } catch (err) {
         console.error('APP mount', err)
       }
+      return app
     }
   }
+  return app
 }

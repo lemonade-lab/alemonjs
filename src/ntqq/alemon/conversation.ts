@@ -12,7 +12,7 @@ export function conversation(t: string, d: any) {
     setBotMsgByNtqq({
       id: d.user.id,
       name: d.user.name,
-      avatar: 'string'
+      avatar: ''
     })
   } else if (t == 'GROUP_AT_MESSAGE_CREATE') {
     GROUP_AT_MESSAGE_CREATE(d)

@@ -46,7 +46,7 @@ export const createConversationByQQ = ws => {
     const bot = {
       id: robot.user.id,
       name: robot.user.username,
-      avatar: 'string'
+      avatar: ''
     }
     // 设置bot信息
     setBotMsgByQQ(bot)
