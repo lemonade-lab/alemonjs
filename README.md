@@ -2,8 +2,6 @@
 
 ## 阿柠檬跨平台开发框架机器人
 
-> 需要配置机器人才可启动
-
 开发文档 OPEN[https://alemonjs.com](https://alemonjs.com)
 
 类型/接口 OPEN[docs](https://ningmengchongshui.github.io/alemon/)
