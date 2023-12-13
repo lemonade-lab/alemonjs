@@ -57,42 +57,36 @@ export async function createClient(
     console.log('[getway] secret err')
     return
   }
+
+  let IntervalID = null
+
+  let size = 0
+
+  const time = 20 * 1000
+
+  const getLoginData = () => {
+    return {
+      ID: counter.getNextID(),
+      Flag: 1, // 发送
+      BizType: 7,
+      AppId: data.app_id,
+      BodyData: ProtoCommand('PLogin').encode({
+        uid: data.uid,
+        token: options.token,
+        platform: data.platform,
+        appId: data.app_id,
+        deviceId: data.device_id,
+        region: '',
+        meta: null
+      })
+    }
+  }
+
   const ws = new WebSocket(data.websocket_url)
   ws.on('open', async () => {
-    console.info('[ws] open')
+    console.info('[ws] login open')
     // login
-    ws.send(
-      createMessage({
-        ID: counter.getNextID(),
-        Flag: 1, // 发送
-        BizType: 7,
-        AppId: data.app_id,
-        BodyData: ProtoCommand('PLogin').encode({
-          uid: data.uid,
-          token: options.token,
-          platform: data.platform,
-          appId: data.app_id,
-          deviceId: data.device_id,
-          region: '',
-          meta: null
-        })
-      })
-    )
-
-    // 20s 心跳
-    setInterval(() => {
-      ws.send(
-        createMessage({
-          ID: counter.getNextID(),
-          Flag: 1, // 发送
-          BizType: 6,
-          AppId: data.app_id,
-          BodyData: ProtoCommand('PHeartBeat').encode({
-            clientTimestamp: `${new Date().getTime()}`
-          })
-        })
-      )
-    }, 20 * 1000)
+    ws.send(createMessage(getLoginData()))
   })
 
   ws.on('message', message => {
@@ -107,13 +101,41 @@ export async function createClient(
             console.log('PLoginReply:', LongToNumber(reply))
           }
           if (reply.code) console.log('[ws] login err')
+          else {
+            console.log('[ws] login success')
+            size = 0
+            // 20s 心跳
+            IntervalID = setInterval(() => {
+              ws.send(
+                createMessage({
+                  ID: counter.getNextID(),
+                  Flag: 1, // 发送
+                  BizType: 6,
+                  AppId: data.app_id,
+                  BodyData: ProtoCommand('PHeartBeat').encode({
+                    clientTimestamp: `${new Date().getTime()}`
+                  })
+                })
+              )
+            }, time)
+          }
         } else if (obj.bizType == 6) {
           // 心跳
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
           if (process.env?.VILLA_WS == 'dev') {
             console.log('PHeartBeatReply:', LongToNumber(reply))
           }
-          if (reply.code) console.log('[ws] 心跳错误')
+          if (reply.code) {
+            console.log('[ws] 心跳错误')
+            // 心跳错误,关闭心跳记时器
+            if (IntervalID) clearInterval(IntervalID)
+            if (size < 5) {
+              // 重新发送鉴权
+              ws.send(createMessage(getLoginData()))
+            } else {
+              console.log('重鉴权次数上限')
+            }
+          }
         } else if (obj.bizType == 8) {
           // 退出登录
           const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)

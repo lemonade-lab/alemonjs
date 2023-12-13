@@ -21,9 +21,9 @@ export interface VILLAOptions {
    */
   masterID?: string
   /**
-   * 测试别野
+   * 别野
    */
-  villa_id?: number
+  villa_id: number
 }
 
 export const defineVILLA = {
