@@ -13,6 +13,7 @@ alemonjs 是消息正则匹配的跨平台开发框架,支持 QQ 群、QQ 频道
 ```sh
 npm init alemonjs@latest -y
 cd alemonb
+npm install
 npm run dev
 ```
 
@@ -25,9 +26,11 @@ import { LoginMap } from 'alemonjs'
 export const login: LoginMap = {
   // 配置名
   test: {
-    // 平台名
+    // 平台名 qq discord ntqq qq villa
     qq: {
       // ... 配置信息
+      // ...详细请看
+      // alemonjs.com
     }
   }
 }
@@ -44,8 +47,6 @@ npm run dev test qq
 ### 开发示例
 
 启动开发模式后会以`apps`作为应用目录
-
-每当文件有修改或进行保存时就会自动刷新应用
 
 ```ts
 // apps/word.ts
@@ -73,3 +74,17 @@ export class PluginName extends APlugin {
   }
 }
 ```
+
+每当文件有修改或进行保存时就会自动刷新应用
+
+当确认该应用可用于生成环境时,可进行打包操作
+
+```sh
+npm run build
+```
+
+> 注意,请确保内容修改都是在 npm run dev 下进行
+
+打包完成后,会生成`dist/main.js`和`package.json`文件
+
+该程序可放置于`plugins/your plugin name`文件夹下
