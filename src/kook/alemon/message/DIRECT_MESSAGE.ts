@@ -62,8 +62,8 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     at: false,
     at_users: [],
     at_user: undefined,
-    msg: event.content,
-    msg_txt: event.content,
+    msg: event?.extra?.kmarkdown?.raw_content ?? event.content,
+    msg_txt: event?.extra?.kmarkdown?.raw_content ?? event.content,
     msg_id: event.msg_id,
     open_id: open_id,
     //

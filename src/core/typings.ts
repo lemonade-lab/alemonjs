@@ -99,6 +99,7 @@ export const EventEnum = [
   'MESSAGES',
   /**
    * 消息
+   * @deprecated MESSAGES
    */
   'message',
   /**

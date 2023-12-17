@@ -14,6 +14,7 @@ import { type AMessage, type EventType, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
 import { type PluginInitType, APlugin } from './plugin.js'
+import { getAppCall, orderByAppCall } from './call.js'
 /**
  * ************
  * 插件实例类型
@@ -297,6 +298,21 @@ function dataInit() {
  * 插件初始化
  */
 export async function appsInit() {
+  /**
+   * *********
+   * 回调系统
+   * ********
+   */
+
+  // 排序
+  orderByAppCall()
+
+  /**
+   * ************
+   * 正则系统
+   * ************
+   */
+
   // 清空当前的apps
   dataInit()
   // 得到所有插件名
@@ -374,6 +390,42 @@ export async function InstructionMatching(e: AMessage) {
   if (handler && state) {
     await handler(e, state)
     return true
+  }
+
+  let t = false
+
+  /**
+   * 回调系统
+   */
+  for (const app of getAppCall('MESSAGES')) {
+    if (t === true) break
+    try {
+      // app.call
+      const back = await app.call(e)
+      if (back === true) {
+        t = back
+      }
+    } catch (err) {
+      console.error(`[${e.event}]`, `[${app.call}]`, `[${false}]\n`, `[${err}]`)
+      continue
+    }
+  }
+
+  /**
+   * 回调系统
+   */
+  for (const app of getAppCall('message')) {
+    if (t === true) break
+    try {
+      // app.call
+      const back = await app.call(e)
+      if (back === true) {
+        t = back
+      }
+    } catch (err) {
+      console.error(`[${e.event}]`, `[${app.call}]`, `[${false}]\n`, `[${err}]`)
+      continue
+    }
   }
 
   const APPCACHE: {
@@ -483,6 +535,21 @@ export async function typeMessage(e: AMessage) {
   if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
 
   if (!CommandNotMessage[e.event]) return true
+
+  /**
+   * 回调系统
+   */
+  const event = getAppCall(e.event)
+  for (const app of event) {
+    try {
+      // app.call
+      const back = await app.call(e)
+      if (back === true) break
+    } catch (err) {
+      console.error(`[${e.event}]`, `[${app.call}]`, `[${false}]\n`, `[${err}]`)
+      continue
+    }
+  }
 
   const APPCACHE: {
     [key: string]: APlugin

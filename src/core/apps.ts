@@ -8,6 +8,8 @@ import {
   setAppPriority
 } from './cache.js'
 import { setApp } from './app.js'
+import { AMessage, EventEnum } from './typings.js'
+import { setAllCall } from './call.js'
 
 /**
  * 应用路径
@@ -240,6 +242,25 @@ export function createApp(url: string) {
         }
       } catch (err) {
         console.error('APP use', err)
+      }
+      return app
+    },
+    /**
+     * 比正则系统更优先的回调系统
+     * 且无视所有event设置
+     * @param event 事件
+     * @param call 回调
+     * @param priority 优先级
+     */
+    on: (
+      event: (typeof EventEnum)[number],
+      call: (e: AMessage) => any,
+      priority = 9000
+    ) => {
+      try {
+        setAllCall(event, call, priority)
+      } catch (err) {
+        console.error('APP on', err)
       }
       return app
     },

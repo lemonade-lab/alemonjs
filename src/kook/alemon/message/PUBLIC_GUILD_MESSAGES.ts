@@ -27,7 +27,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
 
   let at = false
   const at_users: UserType[] = []
-  let msg = event.content
+  let msg = event?.extra?.kmarkdown?.raw_content ?? event.content
   /**
    * 艾特类型所得到的
    * 包括机器人在内
@@ -107,7 +107,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     at_users,
     at_user,
     msg,
-    msg_txt: event.content,
+    msg_txt: event?.extra?.kmarkdown?.raw_content ?? event.content,
     msg_id: event.msg_id,
     open_id: data?.code ?? '', // 私聊标记 空的 需要创建私聊 每次请求都自动创建
     //
