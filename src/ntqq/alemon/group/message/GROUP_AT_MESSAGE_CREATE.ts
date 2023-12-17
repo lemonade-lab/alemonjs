@@ -2,7 +2,7 @@ import {
   InstructionMatching,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
@@ -36,7 +36,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   const e = {
     platform: 'ntqq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByNtqq(),

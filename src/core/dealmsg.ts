@@ -10,7 +10,7 @@ import {
   getAppPriority
 } from './cache.js'
 import { getApp, delApp, getAppKey } from './app.js'
-import { type AMessage, type EventType, EventEnum } from './typings.js'
+import { type AMessage, type TypingEnum, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
 import { type PluginInitType, APlugin } from './plugin.js'
@@ -30,7 +30,7 @@ interface CommandType {
   reg: RegExp
   priority: number
   event: (typeof EventEnum)[number]
-  eventType: (typeof EventType)[number]
+  typing: (typeof TypingEnum)[number]
   fncName: string
   APP: string
 }
@@ -115,7 +115,7 @@ async function synthesis(AppName: string, AppsObj: object) {
     const keys: APlugin = new AppsObj[item]()
     if (shield.find(item => item == keys['event'])) continue
     // 控制类型
-    const eventType: PluginInitType['eventType'] = keys['eventType'] ?? 'CREATE'
+    const typing: PluginInitType['typing'] = keys['typing'] ?? 'CREATE'
     // 不合法
     if (
       !keys['rule'] ||
@@ -170,7 +170,7 @@ async function synthesis(AppName: string, AppsObj: object) {
         // 推送
         plugins[AppName].push({
           event: event,
-          eventType: eventType,
+          typing: typing,
           reg: String(reg),
           dsc,
           doc,
@@ -180,7 +180,7 @@ async function synthesis(AppName: string, AppsObj: object) {
         // 保存
         Command[event].push({
           event: event,
-          eventType: eventType,
+          typing: typing,
           reg: new RegExp(reg),
           priority,
           fncName,
@@ -192,7 +192,7 @@ async function synthesis(AppName: string, AppsObj: object) {
         // 推送
         plugins[AppName].push({
           event: event,
-          eventType: eventType,
+          typing: typing,
           dsc,
           doc,
           priority
@@ -200,7 +200,7 @@ async function synthesis(AppName: string, AppsObj: object) {
         // 保存
         CommandNotMessage[event].push({
           event: event,
-          eventType: eventType,
+          typing: typing,
           priority:
             AppPriority && AppPriority < priority ? AppPriority : priority,
           reg: /./,
@@ -382,13 +382,21 @@ export async function loadInit() {
  */
 export async function InstructionMatching(e: AMessage) {
   if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
+
   /**
    * 对话机
    */
-  const state = await getConversationState(e.user_id)
-  const handler = conversationHandlers.get(e.user_id)
-  if (handler && state) {
-    await handler(e, state)
+  const guild_state = await getConversationState(e.guild_id)
+  const channel_state = await getConversationState(e.channel_id)
+  const user_state = await getConversationState(e.user_id)
+
+  if (guild_state || channel_state || user_state) {
+    const guild_handler = conversationHandlers.get(e.guild_id)
+    if (guild_handler) await guild_handler(e, guild_state)
+    const channel_handler = conversationHandlers.get(e.channel_id)
+    if (channel_handler) await channel_handler(e, channel_state)
+    const user_handler = conversationHandlers.get(e.user_id)
+    if (user_handler) await user_handler(e, user_state)
     return true
   }
 
@@ -500,7 +508,7 @@ export async function InstructionMatching(e: AMessage) {
    */
   for (const data of Command[e.event]) {
     if (
-      e.eventType != data.eventType ||
+      e.typing != data.typing ||
       data.reg === undefined ||
       !data.reg.test(e.msg)
     ) {
@@ -577,7 +585,7 @@ export async function typeMessage(e: AMessage) {
 
   // 循环查找
   for (const data of CommandNotMessage[e.event]) {
-    if (e.eventType != data.eventType) continue
+    if (e.typing != data.typing) continue
     try {
       const app = APPCACHE[data.APP]
       const res = await app[data.fncName](...[e, ...(ARGCACHE[data.APP] ?? [])])

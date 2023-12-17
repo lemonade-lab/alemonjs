@@ -1,4 +1,4 @@
-import { type AMessage } from './typings.js'
+import { AMessage } from './typings.js'
 
 /**
  * 对话处理函数集
@@ -39,6 +39,12 @@ export type ConversationHandler = (
 export type conversationHandlersMap = Map<string, ConversationHandler>
 
 /**
+ * 注册对话处理器
+ * @deprecated Conversation.add
+ */
+export const conversationHandlers: conversationHandlersMap = new Map()
+
+/**
  *对话缓存
  */
 const Sockes: SockesMap = {}
@@ -71,40 +77,37 @@ const delAsync = async (key: string) => {
 }
 
 /**
- * 注册对话处理器
- */
-export const conversationHandlers: conversationHandlersMap = new Map()
-
-/**
  * 获取对话状态
- * @param userId 用户编号
+ * @param ID 编号
  * @returns 对话状态值
+ * @deprecated 不推荐使用
  */
 export const getConversationState = async (
-  userId: string
+  ID: string
 ): Promise<ConversationState | null> => {
-  const state = await getAsync(`conversation-state:${userId}`)
+  const state = await getAsync(`conversation-state:${ID}`)
   return state ? JSON.parse(state) : null
 }
 
 /**
  * 设置对话状态
- * @param userId 用户编号
+ * @param ID 编号
  * @param state 状态记录
+ * @deprecated Conversation.passing
  */
 export const setConversationState = async (
-  userId: string,
+  ID: string,
   state: ConversationState
 ): Promise<void> => {
-  await setAsync(`conversation-state:${userId}`, JSON.stringify(state))
+  await setAsync(`conversation-state:${ID}`, JSON.stringify(state))
 }
 
 /**
  * 删除对话状态
- * @param userId 用户编号
+ * @param ID 编号
+ * @deprecated Conversation.del
  */
-export const deleteConversationState = async (
-  userId: string
-): Promise<void> => {
-  await delAsync(`conversation-state:${userId}`)
+export const deleteConversationState = async (ID: string): Promise<void> => {
+  // 删除数据
+  await delAsync(`conversation-state:${ID}`)
 }

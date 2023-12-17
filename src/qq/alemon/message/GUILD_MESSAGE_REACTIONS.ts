@@ -3,7 +3,7 @@ import {
   typeMessage,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -57,9 +57,9 @@ export const GUILD_MESSAGE_REACTIONS = async (
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
-    eventType: new RegExp(/ADD$/).test(event.eventType)
+    typing: new RegExp(/ADD$/).test(event.eventType)
       ? 'CREATE'
-      : ('DELETE' as (typeof EventType)[number]),
+      : ('DELETE' as (typeof TypingEnum)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
@@ -127,6 +127,6 @@ export const GUILD_MESSAGE_REACTIONS = async (
    * 只匹配类型
    */
   return await typeMessage(e)
-    .then(() => AlemonJSEventLog(e.event, e.eventType))
-    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
+    .then(() => AlemonJSEventLog(e.event, e.typing))
+    .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

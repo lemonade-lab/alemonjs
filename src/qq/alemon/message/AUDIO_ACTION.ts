@@ -3,7 +3,7 @@ import {
   typeMessage,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -47,7 +47,7 @@ export const AUDIO_ACTION = async (event: any) => {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'AUDIO_MICROPHONE' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
@@ -105,18 +105,18 @@ export const AUDIO_ACTION = async (event: any) => {
   if (new RegExp(/MIC$/).test(event.eventType)) {
     if (!new RegExp(/ON_MIC$/).test(event.eventType)) {
       // 下麦
-      e.eventType = 'DELETE'
+      e.typing = 'DELETE'
     }
   } else {
     // 音频事件
     e.event = 'AUDIO_FREQUENCY'
     if (!new RegExp(/^AUDIO_START$/).test(event.eventType)) {
       // 音频播放结束时
-      e.eventType = 'DELETE'
+      e.typing = 'DELETE'
     }
   }
 
   return await typeMessage(e)
-    .then(() => AlemonJSEventLog(e.event, e.eventType))
-    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
+    .then(() => AlemonJSEventLog(e.event, e.typing))
+    .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

@@ -3,7 +3,7 @@ import {
   typeMessage,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -92,7 +92,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
@@ -165,14 +165,14 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
    * 类型匹配
    */
   if (new RegExp(/CREATE$/).test(event.eventType)) {
-    e.eventType = 'CREATE'
+    e.typing = 'CREATE'
   } else if (new RegExp(/UPDATE$/).test(event.eventType)) {
-    e.eventType = 'UPDATE'
+    e.typing = 'UPDATE'
   } else {
-    e.eventType = 'DELETE'
+    e.typing = 'DELETE'
   }
 
   return await typeMessage(e)
-    .then(() => AlemonJSEventLog(e.event, e.eventType))
-    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
+    .then(() => AlemonJSEventLog(e.event, e.typing))
+    .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

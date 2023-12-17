@@ -2,7 +2,7 @@ import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import {
   typeMessage,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption,
   type PlatformEnum
 } from '../../../core/index.js'
@@ -77,9 +77,9 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
   const e = {
     platform: 'villa' as (typeof PlatformEnum)[number],
     event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
-    eventType: event.extendData.addQuickEmoticon.isCancel
+    typing: event.extendData.addQuickEmoticon.isCancel
       ? 'DELETE'
-      : ('CREATE' as (typeof EventType)[number]),
+      : ('CREATE' as (typeof TypingEnum)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: {
@@ -146,6 +146,6 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
    * 只匹配类型
    */
   return await typeMessage(e)
-    .then(() => AlemonJSEventLog(e.event, e.eventType))
-    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
+    .then(() => AlemonJSEventLog(e.event, e.typing))
+    .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

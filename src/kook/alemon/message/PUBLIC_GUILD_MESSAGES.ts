@@ -3,7 +3,7 @@ import {
   InstructionMatching,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { ClientKOOK, type EventData } from '../../sdk/index.js'
@@ -87,7 +87,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
   const e = {
     platform: 'kook' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'private' as 'publick' | 'private',
     attribute:
       event.channel_type == 'GROUP'

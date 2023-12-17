@@ -26,7 +26,7 @@ interface EventBase {
   /**
    * 消息类型
    */
-  eventType: (typeof EventType)[number]
+  typing: (typeof TypingEnum)[number]
 }
 
 /**
@@ -136,7 +136,7 @@ export const EventEnum = [
 /**
  * 消息判断
  */
-export const EventType = ['CREATE', 'UPDATE', 'DELETE'] as const
+export const TypingEnum = ['CREATE', 'UPDATE', 'DELETE'] as const
 
 /**
  * 机器人相关

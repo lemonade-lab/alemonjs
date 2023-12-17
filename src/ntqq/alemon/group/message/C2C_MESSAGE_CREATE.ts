@@ -2,7 +2,7 @@ import {
   InstructionMatching,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
@@ -34,7 +34,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const e = {
     platform: 'ntqq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByNtqq(),

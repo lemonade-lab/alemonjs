@@ -4,7 +4,7 @@ import {
   InstructionMatching,
   type EventEnum,
   type PlatformEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentQQ } from '../segment.js'
@@ -87,7 +87,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: getBotMsgByQQ(),
@@ -132,13 +132,13 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
    * 撤回事件
    */
   if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(event.eventType)) {
-    e.eventType = 'DELETE'
+    e.typing = 'DELETE'
     /**
      * 只匹配类型
      */
     return await typeMessage(e)
-      .then(() => AlemonJSEventLog(e.event, e.eventType))
-      .catch(err => AlemonJSEventError(err, e.event, e.eventType))
+      .then(() => AlemonJSEventLog(e.event, e.typing))
+      .catch(err => AlemonJSEventError(err, e.event, e.typing))
   }
 
   /**

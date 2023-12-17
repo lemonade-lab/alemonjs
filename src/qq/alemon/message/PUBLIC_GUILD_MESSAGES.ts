@@ -2,7 +2,7 @@ import {
   typeMessage,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
@@ -91,7 +91,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByQQ(),
@@ -151,11 +151,11 @@ export const PUBLIC_GUILD_MESSAGES = async (
    * 消息撤回
    */
   if (new RegExp(/DELETE$/).test(event.eventType)) {
-    e.eventType = 'DELETE'
+    e.typing = 'DELETE'
 
     return await typeMessage(e)
-      .then(() => AlemonJSEventLog(e.event, e.eventType))
-      .catch(err => AlemonJSEventError(err, e.event, e.eventType))
+      .then(() => AlemonJSEventLog(e.event, e.typing))
+      .catch(err => AlemonJSEventError(err, e.event, e.typing))
   }
 
   // 屏蔽其他机器人的消息

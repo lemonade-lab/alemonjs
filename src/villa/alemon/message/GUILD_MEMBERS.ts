@@ -2,7 +2,7 @@ import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import {
   typeMessage,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption,
   type PlatformEnum
 } from '../../../core/index.js'
@@ -72,7 +72,7 @@ export async function GUILD_MEMBERS(event: {
   const e = {
     platform: 'villa' as (typeof PlatformEnum)[number],
     event: 'GUILD_MEMBERS' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: {
@@ -138,6 +138,6 @@ export async function GUILD_MEMBERS(event: {
    * 只匹配类型
    */
   return await typeMessage(e)
-    .then(() => AlemonJSEventLog(e.event, e.eventType))
-    .catch(err => AlemonJSEventError(err, e.event, e.eventType))
+    .then(() => AlemonJSEventLog(e.event, e.typing))
+    .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

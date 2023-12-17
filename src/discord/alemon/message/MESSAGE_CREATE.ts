@@ -1,6 +1,6 @@
 import {
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   InstructionMatching,
   type MessageBingdingOption,
   type PlatformEnum,
@@ -132,7 +132,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
   const e = {
     platform: 'qq' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: getBotMsgByDISCORD(),

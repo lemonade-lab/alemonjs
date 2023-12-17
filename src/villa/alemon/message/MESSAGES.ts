@@ -1,7 +1,7 @@
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import {
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   InstructionMatching,
   type MessageBingdingOption,
   type PlatformEnum,
@@ -159,7 +159,7 @@ export async function MESSAGES(event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     bot: {
       id: event.robot.template.id,
       name: event.robot.template.name,

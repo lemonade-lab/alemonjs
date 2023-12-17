@@ -1,4 +1,4 @@
-import { type AMessage, type EventEnum, type EventType } from './typings.js'
+import { type AMessage, type EventEnum, type TypingEnum } from './typings.js'
 
 /**
  * 状态缓存
@@ -25,7 +25,7 @@ interface TaskType {
  */
 export interface PluginInitType {
   event?: (typeof EventEnum)[number]
-  eventType?: (typeof EventType)[number]
+  typing?: (typeof TypingEnum)[number]
   priority?: number
   name?: string
   dsc?: string
@@ -86,7 +86,7 @@ export class plugin {
   /**
    * 事件类型
    */
-  eventType?: (typeof EventType)[number]
+  typing?: (typeof TypingEnum)[number]
   /**
    * 匹配优先级
    */
@@ -102,7 +102,7 @@ export class plugin {
   /**
    * @param name 类名标记        default app-name
    * @param event 事件类型       default MESSAGES
-   * @param eventType 消息类型   default CREATE
+   * @param typing 消息类型   default CREATE
    * @param priority 优先级      越小优越高 default 9000
    * @param rule.reg 命令正则    RegExp | string
    * @param rule.fnc 命令函数    function
@@ -113,14 +113,14 @@ export class plugin {
   constructor({
     name = 'app-name',
     event = 'message',
-    eventType = 'CREATE',
+    typing = 'CREATE',
     priority = 9000,
     rule = [],
     task
   }: PluginInitType) {
     this.name = name
     this.event = event
-    this.eventType = eventType
+    this.typing = typing
     this.priority = priority
     this.rule = rule
     this.task = {
@@ -257,7 +257,7 @@ export class APlugin {
   /**
    * 事件类型
    */
-  eventType?: (typeof EventType)[number]
+  typing?: (typeof TypingEnum)[number]
   /**
    * 匹配优先级
    */
@@ -273,7 +273,7 @@ export class APlugin {
   /**
    * @param name 类名标记        default app-name
    * @param event 事件类型       default MESSAGES
-   * @param eventType 消息类型   default CREATE
+   * @param typing 消息类型   default CREATE
    * @param priority 优先级      越小优越高 default 9000
    * @param rule.reg 命令正则    RegExp | string
    * @param rule.fnc 命令函数    function
@@ -284,14 +284,14 @@ export class APlugin {
   constructor({
     name = 'app-name',
     event = 'MESSAGES',
-    eventType = 'CREATE',
+    typing = 'CREATE',
     priority = 9000,
     rule = [],
     task
   }: PluginInitType) {
     this.name = name
     this.event = event
-    this.eventType = eventType
+    this.typing = typing
     this.priority = priority
     this.rule = rule
     this.task = {

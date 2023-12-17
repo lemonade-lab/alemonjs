@@ -2,7 +2,7 @@ import {
   InstructionMatching,
   type PlatformEnum,
   type EventEnum,
-  type EventType,
+  type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
 import {
@@ -49,7 +49,7 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
   const e = {
     platform: 'kook' as (typeof PlatformEnum)[number],
     event: 'MESSAGES' as (typeof EventEnum)[number],
-    eventType: 'CREATE' as (typeof EventType)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'private' as 'publick' | 'private',
     attribute:
       event.channel_type == 'GROUP'
