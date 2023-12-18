@@ -17,14 +17,6 @@ export interface AlemonOptions {
    */
   shieldEvent?: string[]
   /**
-   * 自定义起始符规则
-   */
-  character?: RegExp
-  /**
-   * 默认特征
-   */
-  defaultCharacter?: '/' | '#'
-  /**
    * 个人应用
    */
   app?: {

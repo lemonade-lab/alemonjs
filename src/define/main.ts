@@ -298,18 +298,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   }
 
   /**
-   * **************
-   * 设置起始符规则
-   * *************
-   */
-  if (Options?.character) {
-    setAppProCoinfg('character', Options?.character)
-  }
-  if (Options?.defaultCharacter) {
-    setAppProCoinfg('defaultCharacter', Options?.defaultCharacter)
-  }
-
-  /**
    * ************
    * 扫描插件
    * ************

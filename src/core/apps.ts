@@ -5,7 +5,8 @@ import {
   setAppArg,
   setAppCharacter,
   setAppEvent,
-  setAppPriority
+  setAppPriority,
+  setAppSlicing
 } from './cache.js'
 import { setApp } from './app.js'
 import { AMessage, EventEnum } from './typings.js'
@@ -259,6 +260,23 @@ export function createApp(url: string) {
     ) => {
       try {
         setAllCall(event, call, priority)
+      } catch (err) {
+        console.error('APP on', err)
+      }
+      return app
+    },
+    /**
+     * 消息字符串切割
+     * @param str
+     * @param reg
+     * @returns
+     */
+    replace: (reg: RegExp, str: string) => {
+      try {
+        setAppSlicing(AppName, {
+          str,
+          reg
+        })
       } catch (err) {
         console.error('APP on', err)
       }

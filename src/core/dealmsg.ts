@@ -7,7 +7,8 @@ import {
   getAppEvent,
   getAppCharacter,
   getAppMessage,
-  getAppPriority
+  getAppPriority,
+  getAppSlicing
 } from './cache.js'
 import { getApp, delApp, getAppKey } from './app.js'
 import { type AMessage, type TypingEnum, EventEnum } from './typings.js'
@@ -107,9 +108,7 @@ function createPluginHelp() {
  */
 async function synthesis(AppName: string, AppsObj: object) {
   // 没有记载
-  if (!plugins[AppName]) {
-    plugins[AppName] = []
-  }
+  if (!plugins[AppName]) plugins[AppName] = []
   const shield = getAppProCoinfg('event')
   for (const item in AppsObj) {
     const keys: APlugin = new AppsObj[item]()
@@ -451,12 +450,25 @@ export async function InstructionMatching(e: AMessage) {
     const { name, APP } = CommandApp[item]
     const AppFnc = getAppMessage(name)
     const AppArg = getAppArg(name)
+
+    /**
+     * tudo
+     * 废弃
+     */
     const _character = getAppProCoinfg('character')
     if (_character.test(e.msg)) {
       const character = getAppCharacter(name)
       const __character = getAppProCoinfg('defaultCharacter')
       e.msg = e.msg.replace(_character, character ?? __character)
     }
+
+    const arr = getAppSlicing(name)
+    if (arr && Array.isArray(arr) && arr.length != 0) {
+      for (const item of arr) {
+        e.msg = e.msg.replace(item.reg, item.str)
+      }
+    }
+
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
       if (typeof AppArg == 'function') ARGCACHE[item] = await AppArg(e)
