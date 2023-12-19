@@ -1,4 +1,15 @@
-<p align="center"><a href="https://alemonjs.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://alemonjs.com/img/alemon.jpg" alt="Vue logo"></a></p>
+<p align="center">
+  <a 
+  href="https://alemonjs.com/" 
+  target="_blank" 
+  rel="noopener noreferrer">
+  <img 
+   width="256" 
+   src="https://alemonjs.com/img/alemon.jpg" 
+   alt="AlemonJS LOGO"
+   >
+  </a>
+</p>
 
 ## AlemonJS [https://alemonjs.com](https://alemonjs.com)
 
