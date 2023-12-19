@@ -8,17 +8,36 @@
 
 ## Ecosystem
 
-| Project           | Status                                | Description         |
-| ----------------- | ------------------------------------- | ------------------- |
-| [alemonjs]        | [![alemonjs]][alemonjs]               | 应用创建包          |
-| [create-alemonjs] | [![create-alemonjs]][create-alemonjs] | 模板创建脚手架      |
-| [afloat]          | [![afloat]][afloat]                   | 热开发及打包工具    |
-| [alemon-ffmpeg]   | [![alemon-ffmpeg]][alemon-ffmpeg]     | ffmpeg 自动下载安装 |
+| Project           | Status                                               | Description         |
+| ----------------- | ---------------------------------------------------- | ------------------- |
+| [alemonjs]        | [![alemonjs-status]][alemonjs-package]               | 应用创建包          |
+| [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架      |
+| [afloat]          | [![afloat-status]][afloat-package]                   | 热开发及打包工具    |
+| [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载安装 |
 
-[alemonjs]: https://www.npmjs.com/package/alemonjs
-[create-alemonjs]: https://www.npmjs.com/package/create-alemonjs
-[afloat]: https://www.npmjs.com/package/afloat
-[alemon-ffmpeg]: https://www.npmjs.com/package/alemon-ffmpeg
+<p>
+
+[alemonjs]: https://github.com/ningmengchongshui/alemon
+[alemonjs-status]: https://img.shields.io/npm/v/alemonjs.svg
+[alemonjs-package]: https://www.npmjs.com/package/alemonjs
+
+<p>
+
+[create-alemonjs]: https://github.com/ningmengchongshui/alemon/tree/cli
+[create-alemonjs-status]: https://img.shields.io/npm/v/create-alemonjs.svg
+[create-alemonjs-package]: https://www.npmjs.com/package/create-alemonjs
+
+<p>
+
+[afloat]: https://github.com/ningmengchongshui/alemon/tree/rollup
+[afloat-status]: https://img.shields.io/npm/v/afloat.svg
+[afloat-package]: https://www.npmjs.com/package/afloat
+
+<p>
+
+[alemon-ffmpeg]: https://github.com/kongxiangyiren/alemon-ffmpeg
+[alemon-ffmpeg-status]: https://img.shields.io/npm/v/alemon-ffmpeg.svg
+[alemon-ffmpeg-package]: https://www.npmjs.com/package/alemon-ffmpeg
 
 ### 快速开始
 
