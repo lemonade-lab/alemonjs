@@ -1,3 +1,5 @@
+# AlemonJS [https://alemonjs.com](https://alemonjs.com)
+
 <div align="center">
   <a 
   href="https://alemonjs.com/" 
@@ -12,11 +14,13 @@
   </a>
 </div>
 
-# AlemonJS [https://alemonjs.com](https://alemonjs.com)
-
+<div align="center">
+  
 事件匹配的跨平台开发框架,支持 QQ 群、QQ 频道、KOOK、Discord、米游社大别野等平台,只需要一套代码即可快速构建机器人。
 
 提供了热开发和打包编译工具,除此,也能自行混淆压缩来提高机器人响应速度
+
+</div>
 
 ### Ecosystem
 
