@@ -11,6 +11,7 @@ import {
 import { setApp } from './app.js'
 import { AMessage, EventEnum } from './typings.js'
 import { setAllCall } from './call.js'
+import { APlugin } from './plugin.js'
 
 /**
  * 应用路径
@@ -50,17 +51,25 @@ export function getAppName(url: string | URL) {
    @deprecated createApp()
  * @returns 
  */
-export function createApps(url: string) {
+export function createApps(url: string | URL) {
   return createApp(url)
 }
-
 /**
  * 创建应用对象
  * @param url import.meta.url
  * @returns
  */
-export function createApp(url: string) {
+export function createApp(url: string | URL) {
   const AppName = getAppName(url)
+  return createSubApp(AppName)
+}
+
+/**
+ * 创建指定名称应用
+ * @param AppName
+ * @returns
+ */
+export function createSubApp(AppName: string) {
   /**
    * 应用集
    */
@@ -78,6 +87,20 @@ export function createApp(url: string) {
    */
   const app = {
     /**
+     * 设置正则默认消息
+     * @param val
+     * @deprecated 废弃
+     * @returns
+     */
+    event: (val: 'MESSAGES' | 'message') => {
+      try {
+        setAppEvent(AppName, val)
+      } catch (err) {
+        console.error('APP setEvent', err)
+      }
+      return app
+    },
+    /**
      * 设置正则最低优先级
      * 当设置了500，而所有优先级为5000时
      * 则全部默认为500,但有优先级为300的子应用
@@ -94,50 +117,16 @@ export function createApp(url: string) {
       return app
     },
     /**
-     * 设置正则默认消息
-     * @param val
-     * @returns
-     */
-    event: (val: 'MESSAGES' | 'message') => {
-      try {
-        setAppEvent(AppName, val)
-      } catch (err) {
-        console.error('APP setEvent', err)
-      }
-      return app
-    },
-    /**
      * 设置指令规则
+     * @param val
+     * @deprecated 废弃,请使用replace()
+     * @returns
      */
     setCharacter: (val: '#' | '/') => {
       try {
         setAppCharacter(AppName, val)
       } catch (err) {
         console.error('APP setCharacter', err)
-      }
-      return app
-    },
-    /**
-     * 设置扩展参
-     */
-    setArg: (fnc: (...args: any[]) => any[] | Promise<any[]>) => {
-      try {
-        setAppArg(AppName, fnc)
-      } catch (err) {
-        console.error('APP setArg', err)
-      }
-      return app
-    },
-    /**
-     * 重定义事件
-     * @param fnc 回调函数
-     * @returns 是否成功定义
-     */
-    reSetEvent: (fnc: (...args: any[]) => any) => {
-      try {
-        setAppMessage(AppName, fnc)
-      } catch (err) {
-        console.error('APP setMessage', err)
       }
       return app
     },
@@ -155,6 +144,7 @@ export function createApp(url: string) {
       }
       return app
     },
+
     /**
      * 创建应用
      * @param app 应用对象
@@ -201,11 +191,48 @@ export function createApp(url: string) {
       }
       return app
     },
+
+    /**
+     * ********
+     * 以上废弃
+     * ********
+     */
+
+    /**
+     * 参数扩展
+     * @param fnc
+     * @returns
+     */
+    setArg: (fnc: (...args: any[]) => any[] | Promise<any[]>) => {
+      try {
+        setAppArg(AppName, fnc)
+      } catch (err) {
+        console.error('APP setArg', err)
+      }
+      return app
+    },
+    /**
+     * 重定义事件
+     * @param fnc 回调函数
+     * @returns 是否成功定义
+     */
+    reSetEvent: (fnc: (...args: any[]) => any) => {
+      try {
+        setAppMessage(AppName, fnc)
+      } catch (err) {
+        console.error('APP setMessage', err)
+      }
+      return app
+    },
     /**
      * 创建应用
      * @param app 应用对象
      */
-    use: (urlObject: object = {}) => {
+    use: (
+      urlObject: {
+        [key: string]: typeof APlugin
+      } = {}
+    ) => {
       try {
         for (const item in urlObject) {
           /**

@@ -10,6 +10,7 @@ types/**/*
 # test
 alemon.config.ts
 main.ts
+apps.ts
 
 # 打印
 logs

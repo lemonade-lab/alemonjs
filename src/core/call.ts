@@ -4,7 +4,6 @@ import lodash from 'lodash'
 /**
  * 回调系统
  */
-
 type CallType = {
   [Event in (typeof EventEnum)[number]]: {
     priority: number

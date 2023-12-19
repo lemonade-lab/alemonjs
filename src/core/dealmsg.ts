@@ -14,14 +14,9 @@ import { getApp, delApp, getAppKey } from './app.js'
 import { type AMessage, type TypingEnum, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
-import { type PluginInitType, APlugin } from './plugin.js'
+import { APlugin } from './plugin.js'
 import { getAppCall, orderByAppCall } from './call.js'
-/**
- * ************
- * 插件实例类型
- * ************
- */
-type PluginApp = new (config: PluginInitType) => APlugin
+import { APluginInitType } from './plugin.types.js'
 /**
  * **************
  * CommandType
@@ -43,7 +38,7 @@ interface CommandType {
 interface PluginAppMap {
   [key: string]: {
     name: string
-    APP: PluginApp
+    APP: typeof APlugin
   }
 }
 
@@ -111,10 +106,11 @@ async function synthesis(AppName: string, AppsObj: object) {
   if (!plugins[AppName]) plugins[AppName] = []
   const shield = getAppProCoinfg('event')
   for (const item in AppsObj) {
+    // 取出实例
     const keys: APlugin = new AppsObj[item]()
     if (shield.find(item => item == keys['event'])) continue
     // 控制类型
-    const typing: PluginInitType['typing'] = keys['typing'] ?? 'CREATE'
+    const typing: APluginInitType['typing'] = keys['typing'] ?? 'CREATE'
     // 不合法
     if (
       !keys['rule'] ||
@@ -138,9 +134,10 @@ async function synthesis(AppName: string, AppsObj: object) {
       itemX = `${item}${x}`
       x++
     }
+    // 缓存实例
     CommandApp[itemX] = {
       name: AppName,
-      APP: AppsObj[item] as PluginApp
+      APP: AppsObj[item] as typeof APlugin
     }
 
     for await (const key of keys['rule']) {
@@ -161,7 +158,7 @@ async function synthesis(AppName: string, AppsObj: object) {
       // 如果类型正确
       if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
         // 存在正则就必须是MESSAGES
-        const event: PluginInitType['event'] =
+        const event: APluginInitType['event'] =
           getAppEvent(AppName) ?? 'MESSAGES'
         // 得到解析
         const reg = key['reg']
@@ -187,7 +184,7 @@ async function synthesis(AppName: string, AppsObj: object) {
         })
       } else {
         // 控制消息 -- 类型必须要存在的
-        const event: PluginInitType['event'] = keys['event']
+        const event: APluginInitType['event'] = keys['event']
         // 推送
         plugins[AppName].push({
           event: event,
@@ -484,7 +481,10 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            if (app[fnc]) app[fnc](context[fnc])
+            const back = app[fnc]
+            if (back && typeof back == 'function') {
+              back(context[fnc] as never)
+            }
           }
           return
         }
@@ -498,7 +498,10 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            if (app[fnc]) app[fnc](context[fnc])
+            const back = app[fnc]
+            if (back && typeof back == 'function') {
+              back(context[fnc] as never)
+            }
             return
           }
         }
@@ -528,15 +531,20 @@ export async function InstructionMatching(e: AMessage) {
     }
     try {
       const app = APPCACHE[data.APP]
-      const res = await app[data.fncName](...[e, ...(ARGCACHE[data.APP] ?? [])])
-        .then(info(data))
-        .catch(logErr(data))
-      if (typeof res != 'boolean') {
-        e.reply(res).catch(err => {
-          console.error('APP REPLY', err)
-        })
+      const back = app[data.fncName]
+      if (back && typeof back == 'function') {
+        const res = await (
+          back(e as never, ...[ARGCACHE[data.APP] ?? []]) as Promise<any>
+        )
+          .then(info(data))
+          .catch(logErr(data))
+        if (typeof res != 'boolean') {
+          e.reply(res).catch(err => {
+            console.error('APP REPLY', err)
+          })
+        }
+        if (res != false) break
       }
-      if (res != false) break
     } catch (err) {
       logErr(data)(err)
       return false
@@ -600,13 +608,20 @@ export async function typeMessage(e: AMessage) {
     if (e.typing != data.typing) continue
     try {
       const app = APPCACHE[data.APP]
-      const res = await app[data.fncName](...[e, ...(ARGCACHE[data.APP] ?? [])])
-      if (typeof res != 'boolean') {
-        e.reply(res).catch(err => {
-          console.error('APP REPLY', err)
-        })
+      const back = app[data.fncName]
+      if (back && typeof back == 'function') {
+        const res = await (
+          back(e as never, ...[ARGCACHE[data.APP] ?? []]) as Promise<any>
+        )
+          .then(info(data))
+          .catch(logErr(data))
+        if (typeof res != 'boolean') {
+          e.reply(res).catch(err => {
+            console.error('APP REPLY', err)
+          })
+        }
+        if (res != false) break
       }
-      if (res != false) break
     } catch (err) {
       logErr(data)(err)
       continue
