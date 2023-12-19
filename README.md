@@ -11,13 +11,13 @@
   </a>
 </p>
 
-## AlemonJS [https://alemonjs.com](https://alemonjs.com)
+### AlemonJS [https://alemonjs.com](https://alemonjs.com)
 
 事件匹配的跨平台开发框架,支持 QQ 群、QQ 频道、KOOK、Discord、米游社大别野等平台,只需要一套代码即可快速构建机器人。
 
 提供了热开发和打包编译工具,除此,也能自行混淆压缩来提高机器人响应速度
 
-## Ecosystem
+### Ecosystem
 
 | Project           | Status                                               | Description         |
 | ----------------- | ---------------------------------------------------- | ------------------- |
@@ -50,7 +50,7 @@
 [alemon-ffmpeg-status]: https://img.shields.io/npm/v/alemon-ffmpeg.svg
 [alemon-ffmpeg-package]: https://www.npmjs.com/package/alemon-ffmpeg
 
-### 快速开始
+### Quick Start
 
 可直接执行脚手架 并快速启动程序
 
@@ -88,7 +88,7 @@ export const login: LoginMap = {
 npm run dev test qq
 ```
 
-### 开发示例
+### Development Examples
 
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
@@ -139,8 +139,6 @@ createApp(import.meta.url)
 ```sh
 npm run build
 ```
-
-> 注意,请确保内容修改都是在 npm run dev 下进行
 
 打包完成后,会生成`dist/main.js`和`package.json`文件
 
