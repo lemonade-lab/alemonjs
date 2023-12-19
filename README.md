@@ -12,8 +12,13 @@
 | ----------------- | ------------------------------------- | ------------------- |
 | [alemonjs]        | [![alemonjs]][alemonjs]               | 应用创建包          |
 | [create-alemonjs] | [![create-alemonjs]][create-alemonjs] | 模板创建脚手架      |
-| [afloat]          | [![afloat]][create-alemonjs]          | 热开发及打包工具    |
+| [afloat]          | [![afloat]][afloat]                   | 热开发及打包工具    |
 | [alemon-ffmpeg]   | [![alemon-ffmpeg]][alemon-ffmpeg]     | ffmpeg 自动下载安装 |
+
+[alemonjs]: https://www.npmjs.com/package/alemonjs
+[create-alemonjs]: https://www.npmjs.com/package/create-alemonjs
+[afloat]: https://www.npmjs.com/package/afloat
+[alemon-ffmpeg]: https://www.npmjs.com/package/alemon-ffmpeg
 
 ### 快速开始
 
