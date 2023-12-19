@@ -1,17 +1,18 @@
-<p align="center">
+<div align="center">
   <a 
   href="https://alemonjs.com/" 
   target="_blank" 
   rel="noopener noreferrer">
   <img 
    width="256" 
+   height="128"
    src="https://alemonjs.com/img/alemon.jpg" 
    alt="AlemonJS LOGO"
    >
   </a>
-</p>
+</div>
 
-### AlemonJS [https://alemonjs.com](https://alemonjs.com)
+# AlemonJS [https://alemonjs.com](https://alemonjs.com)
 
 事件匹配的跨平台开发框架,支持 QQ 群、QQ 频道、KOOK、Discord、米游社大别野等平台,只需要一套代码即可快速构建机器人。
 
