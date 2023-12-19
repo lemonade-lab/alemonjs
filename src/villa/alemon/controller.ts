@@ -4,6 +4,23 @@ import { ControllerOption, UserInformationType } from '../../core/index.js'
 import { getBotConfigByKey } from '../../config/index.js'
 import { everyoneError } from '../../log/index.js'
 
+interface ButtonType {
+  // 文字
+  text: string
+  // 类型
+  type?: number
+  // 跳转地址
+  link?: string
+  // 跳转时携带的token
+  token?: boolean
+  // 点击后所得文本你
+  input?: string
+  // 是否回调
+  callback?: boolean
+  // 回调时携带的标记
+  extra?: string
+}
+
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
     return {
@@ -183,6 +200,98 @@ export const Controller = {
         }
         return arr
       },
+      // button: async (
+      //   content: Buffer | string | number | (Buffer | number | string)[],
+      //   on: ButtonType[][]
+      // ) => {
+      //   const big_component_group_list = [] // 1
+      //   const mid_component_group_list = [] // 2
+      //   const small_component_group_list = [] // 3
+
+      //   /**
+      //    * 第一道程序,清除所有异常字数的按钮
+      //    */
+      //   const Arr: ButtonType[][] = []
+      //   for (const item of on) {
+      //     const itemArr: ButtonType[] = []
+      //     for (const jtem of item) {
+      //       if (jtem.text.length < 10) {
+      //         // 字符超标,删除
+      //         itemArr.push(jtem)
+      //       }
+      //     }
+      //     if (itemArr.length == 0) continue
+      //     Arr.push(itemArr)
+      //   }
+
+      //   /**
+      //    * 第二道工序, 根据文字长度是否符合预期来异构
+      //    */
+
+      //   /**
+      //    * 优先按原规则输入
+      //    *
+      //    * >3的，求3的余数
+      //    *
+      //    * 同一行同 存在 字数不复合的  异构
+      //    * 如  [2,4,2]  , 中间的4异构 变成  [2],[4],[2]
+      //    *
+      //    */
+
+      //   // 高度
+      //   const h = on.length
+      //   let x = 1
+      //   let y = 99
+      //   // 每一行长度不一样
+      //   const arr = []
+      //   for (const item of Arr) {
+      //     x++
+      //     y--
+      //     if (item.length == 1) {
+      //       /**
+      //        * 看看是什么类型
+      //        *
+      //        * 点击  跳转、回调、出文字
+      //        *
+      //        * 1回传型 回调 ，2输入型 input，3跳转型 link
+      //        *
+      //        */
+
+      //       let c_type = 1
+
+      //       if (item[0].link) {
+      //         // link 存在 是跳转类型
+      //         c_type = 2
+      //       } else if (item[0].input) {
+      //         // 按钮类型
+      //         c_type = 1
+      //       }
+
+      //       // 第一行 就一个
+      //       big_component_group_list.push([
+      //         [
+      //           {
+      //             id: `${x}${y}`,
+      //             text: item[0].text,
+      //             type: 1,
+      //             c_type: c_type,
+      //             input: item[0]?.input ?? undefined,
+      //             need_callback: item[0].callback ?? false,
+      //             extra: item[0].extra ?? ''
+      //           }
+      //         ]
+      //       ])
+      //       continue
+      //     }
+      //   }
+      //   // 调用解析
+      //   return await ClientVILLA.sendCard(guild_id, channel_id, {
+      //     content: {
+      //       text: String(content)
+      //     },
+      //     panel: ClientVILLA.buttonAutomaticArrangement(arr)
+      //   }).catch(everyoneError)
+      // },
       allUsers: async (
         reactionObj: any,
         options = {
