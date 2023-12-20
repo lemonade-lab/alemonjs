@@ -137,6 +137,38 @@ createApp(import.meta.url)
   .mount()
 ```
 
+```ts
+import { createApp, AMessage, APlugin } from 'alemonjs'
+createApp(import.meta.url)
+  .on(
+    'MESSAGE',
+    e => {
+      if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
+      // 放行
+      return false
+    },
+    7000
+  )
+  .on(
+    'MESSAGE',
+    e => {
+      if (e.typing == 'DELETE') console.log(e.user_id, '撤回了一条消息')
+      // 不放行
+    },
+    8000
+  )
+  .on(
+    'MESSAGE',
+    e => {
+      // 不再执行
+    },
+    9000
+  )
+  .on('GUILD_MEMBERS', e => {
+    console.log('成员', e.user_name, '加入')
+  })
+```
+
 每当文件有修改或进行保存时就会自动刷新应用
 
 当确认该应用可用于生成环境时,可进行打包操作
