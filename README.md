@@ -151,6 +151,7 @@ createApp(import.meta.url)
     e => {
       if (e.typing == 'DELETE') console.log(e.user_id, '撤回了一条消息')
       // 不放行
+      console.log('停止了')
     },
     8000
   )
@@ -158,12 +159,28 @@ createApp(import.meta.url)
     'MESSAGE',
     e => {
       // 不再执行
+      console.log('看不到我')
     },
     9000
   )
   .on('GUILD_MEMBERS', e => {
+    // 执行,非同名事件独立
     console.log('成员', e.user_name, '加入')
   })
+```
+
+```ts
+import { createApp, AMessage, APlugin } from 'alemonjs'
+// 回调写法 比use优先的自由写法
+createApp(import.meta.url).on('MESSAGE', e => {
+  if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
+})
+```
+
+```ts
+// 创建子应用(独立环境)
+import { createApp, AMessage, APlugin } from 'alemonjs'
+createSubApp(`#${getAppName(import.meta.url)}1`).on('MESSAGE', e => {})
 ```
 
 每当文件有修改或进行保存时就会自动刷新应用
