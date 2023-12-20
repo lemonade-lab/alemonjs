@@ -97,12 +97,8 @@ npm run dev test qq
 
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
+// 继承写法
 createApp(import.meta.url)
-  // 回调写法 比use优先的自由写法
-  .on('MESSAGES', e => {
-    if (/^你好$/.test(e.msg)) e.reply('你好呀')
-  })
-  // 继承写法 可直接指定  正则的优先级
   .use({
     word: class word extends APlugin {
       constructor() {
@@ -139,6 +135,7 @@ createApp(import.meta.url)
 
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
+// 回调写法 比use优先的自由写法
 createApp(import.meta.url)
   .on(
     'MESSAGE',
