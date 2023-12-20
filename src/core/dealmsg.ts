@@ -396,19 +396,17 @@ export async function InstructionMatching(e: AMessage) {
     return true
   }
 
-  let t = false
+  let t = true
 
   /**
    * 回调系统
    */
   for (const app of getAppCall('MESSAGES')) {
-    if (t === true) break
+    if (t === false) break
     try {
       // app.call
       const back = await app.call(e)
-      if (back === true) {
-        t = back
-      }
+      if (back != false) t = false
     } catch (err) {
       console.error(`[${e.event}]`, `[${app.call}]`, `[${false}]\n`, `[${err}]`)
       continue
@@ -419,13 +417,11 @@ export async function InstructionMatching(e: AMessage) {
    * 回调系统
    */
   for (const app of getAppCall('message')) {
-    if (t === true) break
+    if (t === false) break
     try {
       // app.call
       const back = await app.call(e)
-      if (back === true) {
-        t = back
-      }
+      if (back != false) t = false
     } catch (err) {
       console.error(`[${e.event}]`, `[${app.call}]`, `[${false}]\n`, `[${err}]`)
       continue

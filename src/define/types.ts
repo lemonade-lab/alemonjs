@@ -2,6 +2,36 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { ServerOptions } from '../koa/types.js'
+
+export interface PlatformsItemType {
+  /**
+   * 机器人名称与login对应
+   */
+  name: string
+  /**
+   * 登录
+   */
+  call: (options: any) => {
+    /**
+     * 事件
+     * @param event
+     * @param func 函数
+     * @returns
+     */
+    event: (event: string, func: any) => void
+    /**
+     * 消息配置
+     */
+    message: {
+      // 消息类型
+      type: string
+      // vent构造值
+      val: any
+    }[]
+    controlller: any
+  }
+}
+
 /**
  * ******
  * config
@@ -15,34 +45,7 @@ export interface AlemonOptions {
   /**
    * 平台
    */
-  platforms?: {
-    /**
-     * 机器人名称与login对应
-     */
-    name: string
-    /**
-     * 登录
-     */
-    call: (options: any) => {
-      /**
-       * 事件
-       * @param event
-       * @param func 函数
-       * @returns
-       */
-      event: (event: string, func: any) => void
-      /**
-       * 消息配置
-       */
-      message: {
-        // 消息类型
-        type: string
-        // vent构造值
-        val: any
-      }[]
-      controlller: any
-    }
-  }[]
+  platforms?: PlatformsItemType[]
   /**
    * login配置
    */
