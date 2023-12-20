@@ -3,8 +3,7 @@ import {
   InstructionMatching,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption,
-  type PlatformEnum
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
@@ -74,7 +73,7 @@ export async function MESSAGE_BUTTON(event: {
    * 制作e消息对象
    */
   const e = {
-    platform: 'villa' as (typeof PlatformEnum)[number],
+    platform: 'villa',
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -99,6 +98,7 @@ export async function MESSAGE_BUTTON(event: {
     msg_id: msg_id,
     msg: '',
     msg_txt: '',
+    quote: '',
     open_id: '',
 
     //

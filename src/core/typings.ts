@@ -16,9 +16,9 @@ export interface AMessage
  */
 interface EventBase {
   /**
-   * 平台 qq | kook | villa | ntqq | discord | one
+   * 平台
    */
-  platform: (typeof PlatformEnum)[number]
+  platform: string
   /**
    * 事件类型
    */
@@ -28,21 +28,6 @@ interface EventBase {
    */
   typing: (typeof TypingEnum)[number]
 }
-
-/**
- * 平台枚举
- */
-export const PlatformEnum = [
-  'qq',
-  'kook',
-  'villa',
-  'ntqq',
-  'wechat',
-  'telegram',
-  'dodo',
-  'discord',
-  'one'
-] as const
 
 /**
  * 消息枚举
@@ -205,6 +190,10 @@ interface MsgBase {
    * 消息编号
    */
   msg_id: string
+  /**
+   * 引用的消息id
+   */
+  quote: string
   /**
    *  私聊会话
    *  存在即允许私聊

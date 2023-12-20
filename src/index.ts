@@ -25,7 +25,11 @@ export * from './define/index.js'
 /**
  * api
  */
-export * from './api.js'
+export * from './api/index.js'
+/**
+ * client
+ */
+export * from './client.js'
 /**
  * *************
  * exit

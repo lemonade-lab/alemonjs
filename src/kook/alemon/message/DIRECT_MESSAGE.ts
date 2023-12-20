@@ -1,6 +1,5 @@
 import {
   InstructionMatching,
-  type PlatformEnum,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -41,7 +40,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
   const Member = ClientControllerOnMember()
 
   const e = {
-    platform: 'kook' as (typeof PlatformEnum)[number],
+    platform: 'kook',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'private' as 'publick' | 'private',
@@ -65,6 +64,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     msg: event?.extra?.kmarkdown?.raw_content ?? event.content,
     msg_txt: event?.extra?.kmarkdown?.raw_content ?? event.content,
     msg_id: event.msg_id,
+    quote: '',
     open_id: open_id,
     //
     user_id: event.extra.author.id,

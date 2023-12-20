@@ -36,14 +36,6 @@ export const rebotMap = {
       return false
     })
   },
-  one: async (): Promise<boolean> => {
-    const { createAlemonByONE: one } = await import('../one/index.js')
-    return one().catch(err => {
-      console.error(err)
-      console.error('ONE BOT open err')
-      return false
-    })
-  },
   discord: async (): Promise<boolean> => {
     const { createAlemonByDISCORD: discord } = await import(
       '../discord/index.js'

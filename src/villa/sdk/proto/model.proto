@@ -55,6 +55,7 @@ message QuoteMessageInfo {
     uint64 from_user_id = 6;  // 发送者id
     string from_user_id_str = 7;  // 发送者id（string）
     string from_user_nickname = 8; // 发送者昵称
+    string msg_poc = 9; // 回调图片
 }
 
 message RobotEvent {

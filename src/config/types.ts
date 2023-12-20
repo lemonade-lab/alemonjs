@@ -5,7 +5,6 @@ import { type KOOKOptions } from '../kook/kook.js'
 import { type VILLAOptions } from '../villa/villa.js'
 import { type QQOptions } from '../qq/qq.js'
 import { type NTQQOptions } from '../ntqq/ntqq.js'
-import { type OneOptions } from '../one/one.js'
 import { type DISOCRDOptions } from '../discord/discord.js'
 /**
  * ******
@@ -13,6 +12,13 @@ import { type DISOCRDOptions } from '../discord/discord.js'
  * ******
  */
 export interface ConfigType {
+  /**
+   * 支持其他配置
+   */
+  [key: string]: any
+  /**
+   *
+   */
   redis: RedisOptions
   mysql: MysqlOptions
   kook: KOOKOptions
@@ -21,6 +27,5 @@ export interface ConfigType {
   server: ServerOptions
   puppeteer: PuppeteerLaunchOptions
   ntqq: NTQQOptions
-  one: OneOptions
   discord: DISOCRDOptions
 }

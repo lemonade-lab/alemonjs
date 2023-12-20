@@ -2,7 +2,6 @@ import { VILLAOptions } from '../villa/villa.js'
 import { KOOKOptions } from '../kook/kook.js'
 import { QQOptions } from '../qq/qq.js'
 import { NTQQOptions } from '../ntqq/ntqq.js'
-import { OneOptions } from '../one/one.js'
 import { DISOCRDOptions } from '../discord/discord.js'
 /**
  * *****
@@ -10,6 +9,10 @@ import { DISOCRDOptions } from '../discord/discord.js'
  * ****
  */
 export interface LoginOptions {
+  /**
+   * 支持其他配置
+   */
+  [key: string]: any
   /**
    * kook配置
    */
@@ -27,13 +30,8 @@ export interface LoginOptions {
    */
   ntqq?: NTQQOptions
   /**
-   * qq配置
-   */
-  one?: OneOptions
-  /**
    * discord配置
    */
-
   discord?: DISOCRDOptions
 }
 

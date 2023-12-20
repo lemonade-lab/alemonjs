@@ -1,10 +1,9 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import {
-  typeMessage,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption,
-  type PlatformEnum
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { getBotConfigByKey } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
@@ -70,7 +69,7 @@ export async function GUILD_MEMBERS(event: {
    * 制作e消息对象
    */
   const e = {
-    platform: 'villa' as (typeof PlatformEnum)[number],
+    platform: 'villa',
     event: 'GUILD_MEMBERS' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -95,6 +94,7 @@ export async function GUILD_MEMBERS(event: {
     msg: '',
     msg_id: msg_id,
     msg_txt: '',
+    quote: '',
     open_id: '',
 
     //
@@ -137,7 +137,7 @@ export async function GUILD_MEMBERS(event: {
   /**
    * 只匹配类型
    */
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

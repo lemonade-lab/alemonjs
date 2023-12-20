@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -37,7 +36,7 @@ export const MESSAGE_AUDIT = async (event: any) => {
   })
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'MESSAGE_AUDIT' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -57,6 +56,7 @@ export const MESSAGE_AUDIT = async (event: any) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    quote: '',
     open_id: event.msg.guild_id,
 
     user_id: '',
@@ -104,7 +104,7 @@ export const MESSAGE_AUDIT = async (event: any) => {
   /**
    * 只匹配类型
    */
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

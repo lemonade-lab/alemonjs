@@ -4,7 +4,6 @@ import {
   type TypingEnum,
   InstructionMatching,
   type MessageBingdingOption,
-  type PlatformEnum,
   type UserType
 } from '../../../core/index.js'
 import { MessageContentType } from '../../sdk/index.js'
@@ -39,13 +38,22 @@ export async function MESSAGES(event: {
   extendData: {
     sendMessage: {
       content: string // 字符串消息合集  MessageContentType
-      fromUserId: number // 来自用户id
+      fromUserId?: number // 来自用户id
       sendAt: number // 发送事件编号
       objectName: number // 对象名称
       roomId: number // 房间号
       nickname: string // 昵称
       msgUid: string // 消息ID
       villaId: string // 别野编号
+      quoteMsg?: {
+        content: string
+        msgUid: string
+        sendAt: number
+        msgType: string
+        botMsgId: string
+        fromUserIdStr: string
+        msgPoc: string
+      }
     }
   }
   createdAt: number
@@ -155,7 +163,7 @@ export async function MESSAGES(event: {
    * 制作e消息对象
    */
   const e = {
-    platform: 'villa' as (typeof PlatformEnum)[number],
+    platform: 'villa',
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -171,7 +179,7 @@ export async function MESSAGES(event: {
     guild_avatar: '',
     channel_name: '',
     channel_id: String(SendMessage.roomId),
-    attachments: [],
+    attachments: [event.extendData.sendMessage.quoteMsg],
     specials: [],
     //
     at,
@@ -180,6 +188,9 @@ export async function MESSAGES(event: {
     msg_id: msg_id,
     msg: msg,
     msg_txt: txt,
+    quote: MessageContent.quote
+      ? `${MessageContent.quote.original_message_id}.${MessageContent.quote.original_message_send_time}`
+      : '',
     open_id: '',
 
     //

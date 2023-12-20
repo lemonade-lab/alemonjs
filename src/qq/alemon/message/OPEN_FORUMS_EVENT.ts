@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -90,7 +89,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
   })
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -111,6 +110,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     msg_id: '',
     msg_txt: '',
     msg: '',
+    quote: '',
     open_id: event.msg.guild_id,
 
     //
@@ -172,7 +172,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
     e.typing = 'DELETE'
   }
 
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

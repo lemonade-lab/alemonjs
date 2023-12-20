@@ -1,9 +1,7 @@
 /**
  * ********
- * public
+ * private
  * ********
- * core
- * *******
  */
 export * from './plugin.js'
 export * from './configs.js'

@@ -559,7 +559,7 @@ export async function InstructionMatching(e: AMessage) {
  * @param e alemonjs message
  * @returns 是否处理完成
  */
-export async function typeMessage(e: AMessage) {
+export async function InstructionMatchingByNotMessage(e: AMessage) {
   if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
 
   if (!CommandNotMessage[e.event]) return true

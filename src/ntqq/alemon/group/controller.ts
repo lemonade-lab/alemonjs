@@ -6,7 +6,7 @@ import {
 import { ClientNTQQ } from '../../sdk/index.js'
 import { everyoneError } from '../../../log/index.js'
 export const Controller = {
-  Member: () => {
+  Member: ({ guild_id, user_id }) => {
     return {
       information: async (): Promise<UserInformationType | false> => {
         return false
@@ -150,6 +150,8 @@ export const ClientController = (data: {
  */
 export const ClientControllerOnMember = () => {
   return (select?: ControllerOption) => {
-    return Controller.Member()
+    const guild_id = select?.guild_id
+    const user_id = select?.guild_id
+    return Controller.Member({ guild_id, user_id })
   }
 }

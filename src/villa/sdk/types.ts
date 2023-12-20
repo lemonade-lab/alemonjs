@@ -169,6 +169,12 @@ export interface MessageContentType {
     // 消息文本
     text?: string
   }
+  quote?: {
+    quoted_message_id: string
+    quoted_message_send_time: number
+    original_message_id: string
+    original_message_send_time: number
+  }
 }
 
 /**

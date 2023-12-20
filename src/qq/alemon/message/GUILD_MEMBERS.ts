@@ -1,6 +1,5 @@
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type TypingEnum,
   type EventEnum,
   type MessageBingdingOption
@@ -59,7 +58,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
   const masterID = cfg.masterID
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'GUILD_MEMBERS' as (typeof EventEnum)[number],
     typing: new RegExp(/ADD$/).test(event.eventType)
       ? 'CREATE'
@@ -77,6 +76,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     guild_avatar: '',
     channel_name: '',
     channel_id: '',
+    quote: '',
     open_id: '',
     //
     at: false,
@@ -122,7 +122,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     Message
   }
 
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

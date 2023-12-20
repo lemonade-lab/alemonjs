@@ -1,6 +1,5 @@
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -21,12 +20,19 @@ interface PUBLIC_GUILD_MESSAGES_TYPE {
   eventId: string
   msg: {
     attachments?: {
-      content_type: string
-      filename: string
-      height: number
+      // id
       id: string
-      size: number
+      // url
       url: string
+      // 类型
+      content_type: string
+      // 文件名
+      filename: string
+      // 大小
+      size: number
+      // 高度
+      height: number
+      // 宽度
       width: number
     }[]
     author: {
@@ -89,7 +95,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
   const masterID = cfg.masterID
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -110,6 +116,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     msg_id: event.msg.id,
     msg_txt: event.msg?.content ?? '',
     msg: event.msg?.content ?? '',
+    quote: '',
     open_id: event.msg.guild_id,
 
     //
@@ -153,7 +160,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.typing = 'DELETE'
 
-    return await typeMessage(e)
+    return await InstructionMatchingByNotMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.typing))
       .catch(err => AlemonJSEventError(err, e.event, e.typing))
   }

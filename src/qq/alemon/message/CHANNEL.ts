@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -66,7 +65,7 @@ export const CHANNEL = async (event: EventChannelType) => {
   })
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: new RegExp(/^GUILD.*$/).test(event.eventType)
       ? 'GUILD'
       : ('CHANNEL' as (typeof EventEnum)[number]),
@@ -93,6 +92,7 @@ export const CHANNEL = async (event: EventChannelType) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    quote: '',
     open_id: event.msg.guild_id,
     //
     user_id: '',
@@ -133,7 +133,7 @@ export const CHANNEL = async (event: EventChannelType) => {
   /**
    * 只匹配类型
    */
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

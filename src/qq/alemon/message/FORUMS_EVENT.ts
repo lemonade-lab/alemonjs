@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -86,7 +85,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
   const content: ContentType = JSON.parse(event.msg.thread_info.content)
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: new RegExp(/^FORUM_THREAD/).test(event.eventType)
       ? 'FORUMS_THREAD'
       : new RegExp(/^FORUM_POST/).test(event.eventType)
@@ -115,6 +114,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    quote: '',
     open_id: event.msg.guild_id,
     //
     user_id: '',
@@ -152,7 +152,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     Message
   }
 
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

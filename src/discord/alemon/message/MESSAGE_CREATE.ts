@@ -3,7 +3,6 @@ import {
   type TypingEnum,
   InstructionMatching,
   type MessageBingdingOption,
-  type PlatformEnum,
   type UserType
 } from '../../../core/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
@@ -130,7 +129,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
   }
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -151,6 +150,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
     msg_id: event.id,
     msg_txt: event.content,
     msg: msg,
+    quote: '',
     open_id: '',
 
     //

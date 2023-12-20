@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -55,7 +54,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
   const masterID = cfg.masterID
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
     typing: new RegExp(/ADD$/).test(event.eventType)
       ? 'CREATE'
@@ -86,6 +85,8 @@ export const GUILD_MESSAGE_REACTIONS = async (
     msg: '',
     msg_id: event.msg.target.id,
     msg_txt: '',
+    quote: '',
+
     open_id: event.msg.guild_id,
 
     //
@@ -126,7 +127,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
   /**
    * 只匹配类型
    */
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

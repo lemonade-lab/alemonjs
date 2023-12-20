@@ -1,6 +1,5 @@
 import {
   InstructionMatching,
-  type PlatformEnum,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -32,7 +31,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const Member = ClientControllerOnMember()
 
   const e = {
-    platform: 'ntqq' as (typeof PlatformEnum)[number],
+    platform: 'ntqq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -53,6 +52,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     msg_txt: event.content,
     msg: event.content,
     msg_id: event.id,
+    quote: '',
     open_id: open_id,
     //
     user_id: event.author.id,

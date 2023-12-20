@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -37,7 +36,7 @@ export const INTERACTION = async event => {
   })
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'INTERACTION' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -58,6 +57,7 @@ export const INTERACTION = async event => {
     msg: '',
     msg_id: '',
     msg_txt: '',
+    quote: '',
     open_id: event.msg.guild_id,
 
     //
@@ -102,7 +102,7 @@ export const INTERACTION = async event => {
     e.typing = 'DELETE'
   }
 
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

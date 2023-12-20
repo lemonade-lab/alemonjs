@@ -1,10 +1,9 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import {
-  typeMessage,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption,
-  type PlatformEnum
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
@@ -69,7 +68,7 @@ export async function GUILD_BOT(event: {
    * 制作e消息对象
    */
   const e = {
-    platform: 'villa' as (typeof PlatformEnum)[number],
+    platform: 'villa',
     event: 'GUILD_BOT' as (typeof EventEnum)[number],
     typing:
       event.type == 3 ? 'CREATE' : ('DELETE' as (typeof TypingEnum)[number]),
@@ -95,6 +94,7 @@ export async function GUILD_BOT(event: {
     msg: '',
     msg_id: `${event.id}.${event.sendAt}`,
     msg_txt: '',
+    quote: '',
     open_id: '',
 
     //
@@ -132,7 +132,7 @@ export async function GUILD_BOT(event: {
   /**
    * 只匹配类型
    */
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

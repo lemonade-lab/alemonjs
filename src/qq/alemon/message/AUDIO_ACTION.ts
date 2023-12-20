@@ -1,7 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -45,7 +44,7 @@ export const AUDIO_ACTION = async (event: any) => {
   })
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'AUDIO_MICROPHONE' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -66,6 +65,7 @@ export const AUDIO_ACTION = async (event: any) => {
     at: false,
     at_user: undefined,
     at_users: [],
+    quote: '',
     open_id: event.msg.guild_id,
     //
     user_id: '',
@@ -116,7 +116,7 @@ export const AUDIO_ACTION = async (event: any) => {
     }
   }
 
-  return await typeMessage(e)
+  return await InstructionMatchingByNotMessage(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

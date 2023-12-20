@@ -1,6 +1,5 @@
 import {
-  typeMessage,
-  type PlatformEnum,
+  InstructionMatchingByNotMessage,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -48,7 +47,7 @@ export const GUILD_MESSAGES = async (event: any) => {
   const masterID = cfg.masterID
 
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'private' as 'publick' | 'private',
@@ -68,6 +67,7 @@ export const GUILD_MESSAGES = async (event: any) => {
     msg: event.msg?.content ?? '',
     msg_txt: event.msg?.content ?? '',
     msg_id: event.msg?.id ?? '',
+    quote: '',
     open_id: event.msg.guild_id,
 
     user_id: event.msg?.author?.id ?? '',
@@ -109,7 +109,7 @@ export const GUILD_MESSAGES = async (event: any) => {
    */
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.typing = 'DELETE'
-    return await typeMessage(e)
+    return await InstructionMatchingByNotMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.typing))
       .catch(err => AlemonJSEventError(err, e.event, e.typing))
   }

@@ -1,9 +1,8 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import {
-  typeMessage,
+  InstructionMatchingByNotMessage,
   InstructionMatching,
   type EventEnum,
-  type PlatformEnum,
   type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
@@ -85,7 +84,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
   const cfg = getBotConfigByKey('qq')
   const masterID = cfg.masterID
   const e = {
-    platform: 'qq' as (typeof PlatformEnum)[number],
+    platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -106,6 +105,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     msg: event.msg?.content ?? '',
     msg_txt: event.msg?.content ?? '',
     msg_id: event.msg.id,
+    quote: '',
     open_id: open_id,
     //
     user_id: event.msg.author.id,
@@ -136,7 +136,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     /**
      * 只匹配类型
      */
-    return await typeMessage(e)
+    return await InstructionMatchingByNotMessage(e)
       .then(() => AlemonJSEventLog(e.event, e.typing))
       .catch(err => AlemonJSEventError(err, e.event, e.typing))
   }

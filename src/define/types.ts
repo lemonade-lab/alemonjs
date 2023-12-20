@@ -9,13 +9,48 @@ import { ServerOptions } from '../koa/types.js'
  */
 export interface AlemonOptions {
   /**
-   * 是否解析应用
+   * 配置
+   */
+  [key: string]: any
+  /**
+   * 平台
+   */
+  platforms?: {
+    /**
+     * 机器人名称与login对应
+     */
+    name: string
+    /**
+     * 登录
+     */
+    call: (options: any) => {
+      /**
+       * 事件
+       * @param event
+       * @param func 函数
+       * @returns
+       */
+      event: (event: string, func: any) => void
+      /**
+       * 消息配置
+       */
+      message: {
+        // 消息类型
+        type: string
+        // vent构造值
+        val: any
+      }[]
+      controlller: any
+    }
+  }[]
+  /**
+   * login配置
+   */
+  login?: LoginOptions
+  /**
+   * 是否挂载应用
    */
   mount?: false
-  /**
-   * 事件屏蔽
-   */
-  shieldEvent?: string[]
   /**
    * 个人应用
    */
@@ -74,9 +109,9 @@ export interface AlemonOptions {
     type?: 'ts' | 'js' | 'stript'
   }
   /**
-   * login配置
+   * 事件屏蔽
    */
-  login?: LoginOptions
+  shieldEvent?: string[]
   /**
    * 附加运行等待时间
    * defaukt app*1000

@@ -12,7 +12,9 @@ import {
   setAppProCoinfg,
   startChrom,
   getPublicIP,
-  setPublicIP
+  setPublicIP,
+  InstructionMatching,
+  InstructionMatchingByNotMessage
 } from '../core/index.js'
 import {
   getPupPath,
@@ -23,6 +25,7 @@ import { createWeb } from '../koa/index.js'
 import { autoClearFiles } from '../koa/file.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { join } from 'path'
+import { setControlller } from '../api/controller.js'
 
 let OptionsCache: AlemonOptions
 
@@ -192,10 +195,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
         ...{ intents },
         ...Options.login.ntqq
       })
-
-      /**
-       *
-       */
     }
     if (Options.login?.kook) {
       // 自定义覆盖
@@ -205,18 +204,45 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       // 自定义覆盖
       setBotConfigByKey('villa', Options.login.villa)
     }
-    if (Options.login?.one) {
-      // 自定义覆盖
-      setBotConfigByKey('one', Options.login.one)
-    }
     if (Options.login?.discord) {
       // 自定义覆盖
       setBotConfigByKey('discord', Options.login.discord)
     }
+
+    /**
+     * 插件登录执行
+     */
+    if (Options?.plugins) {
+      for (const item in Options.login) {
+        // 非内置机器人
+        if (!['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
+          const back = Options.plugins.find(i => i.name == item)
+          // 存在login  但不存在插件
+          if (!back) continue
+          // 登录
+          const app = back.call(Options.login[back.name])
+          // 设置回调
+          for (const i of app.message) {
+            if (i.type == 'msg') {
+              app.event(i.val, InstructionMatching)
+            } else {
+              app.event(i.val, InstructionMatchingByNotMessage)
+            }
+          }
+          // 存入控制器
+          setControlller(app.name, app.controlller)
+        }
+      }
+    }
+
+    /**
+     * 内部登录执行
+     */
     for (const item in Options.login) {
       if (arr.indexOf(item) != -1) continue
       if (!rebotMap[item]) continue
       arr.push(item)
+      // 登录执行
       await rebotMap[item]()
     }
   }
@@ -249,18 +275,22 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     }
   }
 
+  // jsonCreate
+  if (Options?.app?.regJSON?.create === false) {
+    setAppProCoinfg('regex', Options?.app?.regJSON?.create)
+  }
+
+  // json地址
+  if (Options?.app?.regJSON?.address) {
+    setAppProCoinfg('route', Options?.app?.regJSON?.address)
+  }
+
   /**
    * ***********
    * 加载应用
    * ************
    */
   if (Options?.login && Options?.app?.init !== false) {
-    if (Options?.app?.regJSON?.create === false) {
-      setAppProCoinfg('regex', Options?.app?.regJSON?.create)
-    }
-    if (Options?.app?.regJSON?.address) {
-      setAppProCoinfg('route', Options?.app?.regJSON?.address)
-    }
     if (Options?.app?.scripts && typeof Options?.app?.scripts == 'string') {
       const dir = join(process.cwd(), Options?.app?.scripts)
       await import(`file://${dir}`).catch(err => {
@@ -307,6 +337,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     await loadInit()
   }
 
+  /**
+   *
+   */
   const shieldEvent = Options?.shieldEvent ?? []
   if (
     shieldEvent &&

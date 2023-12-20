@@ -1,7 +1,6 @@
 import {
   type UserType,
   InstructionMatching,
-  type PlatformEnum,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -85,7 +84,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
   )
 
   const e = {
-    platform: 'kook' as (typeof PlatformEnum)[number],
+    platform: 'kook',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'private' as 'publick' | 'private',
@@ -109,6 +108,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     msg,
     msg_txt: event?.extra?.kmarkdown?.raw_content ?? event.content,
     msg_id: event.msg_id,
+    quote: '',
     open_id: data?.code ?? '', // 私聊标记 空的 需要创建私聊 每次请求都自动创建
     //
     user_id: event.extra.author.id,

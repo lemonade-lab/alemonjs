@@ -1,6 +1,5 @@
 import {
   InstructionMatching,
-  type PlatformEnum,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -34,7 +33,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   const Member = ClientControllerOnMember()
 
   const e = {
-    platform: 'ntqq' as (typeof PlatformEnum)[number],
+    platform: 'ntqq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
@@ -51,6 +50,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     msg_txt: event.content,
     msg: event.content.trim(),
     msg_id: event.id,
+    quote: '',
     open_id: event.author.user_openid,
     user_id: event.author.id,
     user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
