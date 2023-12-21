@@ -24,13 +24,13 @@
 
 ### Ecosystem
 
-| Project           | Status                                               | Description         |
-| ----------------- | ---------------------------------------------------- | ------------------- |
-| [alemonjs]        | [![alemonjs-status]][alemonjs-package]               | 应用创建包          |
-| [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架      |
-| [afloat]          | [![afloat-status]][afloat-package]                   | 热开发及打包工具    |
-| [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载安装 |
-| [alemon-onebot]   | [![alemon-onebot-status]][alemon-onebot-package]     | OneBot 协议平台     |
+| Project           | Status                                               | Description     |
+| ----------------- | ---------------------------------------------------- | --------------- |
+| [alemonjs]        | [![alemonjs-status]][alemonjs-package]               | 标准应用解析器  |
+| [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架  |
+| [afloat]          | [![afloat-status]][afloat-package]                   | 热开发&打包工具 |
+| [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载 |
+| [alemon-onebot]   | [![alemon-onebot-status]][alemon-onebot-package]     | OneBot 协议平台 |
 
 <p>
 
