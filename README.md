@@ -95,9 +95,11 @@ npm run dev test qq
 
 ### Development Examples
 
+- 模板继承
+
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
-// 继承写法
+// 继承可执行更多配置
 createApp(import.meta.url)
   .use({
     word: class word extends APlugin {
@@ -133,9 +135,11 @@ createApp(import.meta.url)
   .mount()
 ```
 
+- 自由回调
+
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
-// 回调写法 比use优先的自由写法
+// 比use优先的自由写法
 createApp(import.meta.url).on('MESSAGE', e => {
   if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
 })
@@ -143,7 +147,6 @@ createApp(import.meta.url).on('MESSAGE', e => {
 
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
-// 回调写法 比use优先的自由写法
 createApp(import.meta.url)
   .on(
     'MESSAGE',

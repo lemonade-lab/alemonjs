@@ -272,13 +272,13 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   }
 
   // jsonCreate
-  if (Options?.app?.regJSON?.create === false) {
-    setAppProCoinfg('regex', Options?.app?.regJSON?.create)
+  if (Options?.JSON?.init === false) {
+    setAppProCoinfg('regex', Options?.JSON.init)
   }
 
   // json地址
-  if (Options?.app?.regJSON?.address) {
-    setAppProCoinfg('route', Options?.app?.regJSON?.address)
+  if (Options?.JSON?.address) {
+    setAppProCoinfg('route', Options?.JSON?.address)
   }
 
   /**

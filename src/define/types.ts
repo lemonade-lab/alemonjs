@@ -6,10 +6,6 @@ import {
   InstructionMatching,
   InstructionMatchingByNotMessage
 } from '../core/index.js'
-import {
-  type MessageControllerType,
-  type MemberControllerType
-} from '../core/index.js'
 
 export interface PlatformsItemType {
   /**
@@ -41,8 +37,8 @@ export interface PlatformsItemType {
      * 控制器
      */
     controller: {
-      Message: MessageControllerType
-      Member: MemberControllerType
+      Message: any
+      Member: any
     }
   }
 }
@@ -74,24 +70,12 @@ export interface AlemonOptions {
    */
   app?: {
     /**
-     * 是否执行
+     * 是否初始化
      */
     init?: boolean
     /**
-     * 指令预览
+     * 执行脚本
      */
-    regJSON?: {
-      /**
-       * 是否生成
-       * defaukt true
-       */
-      create?: false
-      /**
-       * 生成地址
-       * defaukt /publick/defset
-       */
-      address?: string
-    }
     scripts?: string
   }
   /**
@@ -127,9 +111,60 @@ export interface AlemonOptions {
     type?: 'ts' | 'js' | 'stript'
   }
   /**
+   * 指令预览
+   */
+  JSON?: {
+    /**
+     * 是否生成
+     * defaukt true
+     */
+    init?: false
+    /**
+     * 生成地址
+     * defaukt /publick/defset
+     */
+    address?: string
+  }
+  /**
    * 事件屏蔽
    */
   shieldEvent?: string[]
+
+  /**
+   * **********
+   *
+   *
+   * ************
+   */
+
+  /**
+   * puppeteer配置
+   */
+  puppeteer?: PuppeteerLaunchOptions
+  /**
+   * 是否启动pup
+   * defaut true
+   */
+  pupStart?: false
+  /**
+   * 服务配置
+   */
+  server?: ServerOptions
+  /**
+   * redis配置
+   */
+  redis?: RedisOptions
+  /**
+   * mysql配置
+   */
+  mysql?: MysqlOptions
+
+  /**
+   * **************
+   * 特殊
+   * ************
+   */
+
   /**
    * 附加运行等待时间
    * defaukt app*1000
@@ -153,25 +188,4 @@ export interface AlemonOptions {
     name?: 'ts-node' | 'node'
     file: string
   }[]
-  /**
-   * 服务配置
-   */
-  server?: ServerOptions
-  /**
-   * puppeteer配置
-   */
-  puppeteer?: PuppeteerLaunchOptions
-  /**
-   * 是否启动pup
-   * defaut true
-   */
-  pupStart?: false
-  /**
-   * redis配置
-   */
-  redis?: RedisOptions
-  /**
-   * mysql配置
-   */
-  mysql?: MysqlOptions
 }
