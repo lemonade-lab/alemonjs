@@ -30,6 +30,7 @@
 | [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架      |
 | [afloat]          | [![afloat-status]][afloat-package]                   | 热开发及打包工具    |
 | [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载安装 |
+| [alemon-onebot]   | [![alemon-onebot-status]][alemon-onebot-package]     | OneBot 协议平台     |
 
 <p>
 
@@ -54,6 +55,12 @@
 [alemon-ffmpeg]: https://github.com/kongxiangyiren/alemon-ffmpeg
 [alemon-ffmpeg-status]: https://img.shields.io/npm/v/alemon-ffmpeg.svg
 [alemon-ffmpeg-package]: https://www.npmjs.com/package/alemon-ffmpeg
+
+<p>
+
+[alemon-onebot]: https://github.com/ningmengchongshui/alemon/tree/alemon-onebot
+[alemon-onebot-status]: https://img.shields.io/npm/v/alemon-onebot.svg
+[alemon-onebot-package]: https://www.npmjs.com/package/alemon-onebot
 
 ### Quick Start
 
