@@ -5,12 +5,13 @@ import lodash from 'lodash'
 import {
   getAppArg,
   getAppEvent,
-  getAppCharacter,
   getAppMessage,
   getAppPriority,
-  getAppSlicing
+  getAppSlicing,
+  getApp,
+  delApp,
+  getAppKey
 } from './cache.js'
-import { getApp, delApp, getAppKey } from './app.js'
 import { type AMessage, type TypingEnum, EventEnum } from './typings.js'
 import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
@@ -443,17 +444,6 @@ export async function InstructionMatching(e: AMessage) {
     const { name, APP } = CommandApp[item]
     const AppFnc = getAppMessage(name)
     const AppArg = getAppArg(name)
-
-    /**
-     * tudo
-     * 废弃
-     */
-    const _character = getAppProCoinfg('character')
-    if (_character.test(e.msg)) {
-      const character = getAppCharacter(name)
-      const __character = getAppProCoinfg('defaultCharacter')
-      e.msg = e.msg.replace(_character, character ?? __character)
-    }
 
     const arr = getAppSlicing(name)
     if (arr && Array.isArray(arr) && arr.length != 0) {

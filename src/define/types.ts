@@ -2,6 +2,14 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { ServerOptions } from '../koa/types.js'
+import {
+  InstructionMatching,
+  InstructionMatchingByNotMessage
+} from '../core/index.js'
+import {
+  type MessageControllerType,
+  type MemberControllerType
+} from '../core/index.js'
 
 export interface PlatformsItemType {
   /**
@@ -11,24 +19,31 @@ export interface PlatformsItemType {
   /**
    * 登录
    */
-  call: (options: any) => {
+  login: (
     /**
-     * 事件
-     * @param event
-     * @param func 函数
-     * @returns
+     * 登录配置
      */
-    event: (event: string, func: any) => void
+    options: any,
     /**
-     * 消息配置
+     * 消息事件
      */
-    message: {
-      // 消息类型
-      type: string
-      // vent构造值
-      val: any
-    }[]
-    controlller: any
+    Instruction: typeof InstructionMatching,
+    /**
+     * 非消息事件
+     */
+    InstructionByNotMessage: typeof InstructionMatchingByNotMessage
+  ) => {
+    /**
+     * 客户端
+     */
+    client: any
+    /**
+     * 控制器
+     */
+    controller: {
+      Message: MessageControllerType
+      Member: MemberControllerType
+    }
   }
 }
 

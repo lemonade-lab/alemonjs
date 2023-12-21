@@ -3,12 +3,11 @@ import { fileURLToPath } from 'url'
 import {
   setAppMessage,
   setAppArg,
-  setAppCharacter,
   setAppEvent,
   setAppPriority,
-  setAppSlicing
+  setAppSlicing,
+  setApp
 } from './cache.js'
-import { setApp } from './app.js'
 import { AMessage, EventEnum } from './typings.js'
 import { setAllCall } from './call.js'
 import { APlugin } from './plugin.js'
@@ -20,10 +19,9 @@ import { APlugin } from './plugin.js'
  */
 export function importPath(url: string | URL) {
   const DirPath = getAppPath(url)
-  const AppName = basename(DirPath)
   return {
     cwd: () => DirPath,
-    name: AppName
+    name: basename(DirPath)
   }
 }
 
@@ -60,8 +58,7 @@ export function createApps(url: string | URL) {
  * @returns
  */
 export function createApp(url: string | URL) {
-  const AppName = getAppName(url)
-  return createSubApp(AppName)
+  return createSubApp(getAppName(url))
 }
 
 /**
@@ -78,10 +75,6 @@ export function createSubApp(AppName: string) {
    * 重名控制器
    */
   let acount = 0
-  /**
-   * 设置默认指令规则
-   */
-  setAppCharacter(AppName)
   /**
    * 应用
    */
@@ -124,9 +117,12 @@ export function createSubApp(AppName: string) {
      */
     setCharacter: (val: '#' | '/') => {
       try {
-        setAppCharacter(AppName, val)
+        setAppSlicing(AppName, {
+          str: val,
+          reg: /^(#|\/)/
+        })
       } catch (err) {
-        console.error('APP setCharacter', err)
+        console.error('APP Slicing', err)
       }
       return app
     },

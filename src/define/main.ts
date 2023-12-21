@@ -210,27 +210,23 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     }
 
     /**
-     * 插件登录执行
+     * 登录执行
      */
-    if (Options?.plugins) {
+    if (Options?.platforms) {
       for (const item in Options.login) {
         // 非内置机器人
         if (!['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
-          const back = Options.plugins.find(i => i.name == item)
+          const back = Options.platforms.find(i => i.name == item)
           // 存在login  但不存在插件
           if (!back) continue
           // 登录
-          const app = back.call(Options.login[back.name])
-          // 设置回调
-          for (const i of app.message) {
-            if (i.type == 'msg') {
-              app.event(i.val, InstructionMatching)
-            } else {
-              app.event(i.val, InstructionMatchingByNotMessage)
-            }
-          }
+          const app = back.login(
+            Options.login[back.name],
+            InstructionMatching,
+            InstructionMatchingByNotMessage
+          )
           // 存入控制器
-          setControlller(app.name, app.controlller)
+          setControlller(back.name, app.controller)
         }
       }
     }

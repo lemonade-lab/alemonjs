@@ -1,4 +1,4 @@
-import { getPathBuffer } from '../../core/buffer.js'
+import { getPathBuffer } from '../../core/utils/buffer.js'
 export const segmentDISCORD = {
   at: function (uid: string): string {
     return `<@${uid}>`
