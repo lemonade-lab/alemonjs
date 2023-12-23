@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { writeFile } from 'fs/promises'
 import { existsSync, mkdirSync, readdirSync } from 'fs'
-import lodash from 'lodash'
+import { isEmpty, orderBy } from 'lodash-es'
 import {
   getAppArg,
   getAppEvent,
@@ -327,12 +327,12 @@ export async function appsInit() {
 
   // 排序
   for (const val in Command) {
-    Command[val] = lodash.orderBy(Command[val], ['priority'], ['asc'])
+    Command[val] = orderBy(Command[val], ['priority'], ['asc'])
   }
 
   // 排序
   for (const val in CommandNotMessage) {
-    CommandNotMessage[val] = lodash.orderBy(
+    CommandNotMessage[val] = orderBy(
       CommandNotMessage[val],
       ['priority'],
       ['asc']
@@ -463,7 +463,7 @@ export async function InstructionMatching(e: AMessage) {
         // 得到缓存
         const context = app.getContext()
         // 是否为 null && undefined && '' && [] && {}
-        if (!lodash.isEmpty(context)) {
+        if (!isEmpty(context)) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
@@ -480,7 +480,7 @@ export async function InstructionMatching(e: AMessage) {
         // 得到缓存
         const context = app.getContextGroup()
         // 是否为 null && undefined && '' && [] && {}
-        if (!lodash.isEmpty(context)) {
+        if (!isEmpty(context)) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己

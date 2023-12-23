@@ -198,3 +198,25 @@ npm run build
 打包完成后,会生成`dist/main.js`和`package.json`文件
 
 该程序可放置于`plugins/your plugin name`文件夹下
+
+### dependencies
+
+```json
+{
+  "axios": "API",
+  "file-type": "文件类型判断",
+  "form-data": "文件流",
+  "image-size": "图片大小",
+  "koa": "服务器框架",
+  "koa-bodyparser": "body解析",
+  "koa-router": "路由中间件",
+  "koa2-cors": "跨域",
+  "lodash-es": "工具包",
+  "mime-types": "文件类型",
+  "protobufjs": "新文件格式",
+  "public-ip": "公网识别",
+  "puppeteer": "浏览器",
+  "qrcode": "二维码",
+  "ws": "连接协议"
+}
+```

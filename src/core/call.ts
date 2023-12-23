@@ -1,5 +1,5 @@
 import { AMessage, EventEnum } from './typings.js'
-import lodash from 'lodash'
+import { orderBy } from 'lodash-es'
 
 /**
  * 回调系统
@@ -33,7 +33,7 @@ const CALL = {
 export function orderByAppCall() {
   // 排序
   for (const val in CALL) {
-    CALL[val] = lodash.orderBy(CALL[val], ['priority'], ['asc'])
+    CALL[val] = orderBy(CALL[val], ['priority'], ['asc'])
   }
 }
 

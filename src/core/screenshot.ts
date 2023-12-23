@@ -1,4 +1,4 @@
-import lodash from 'lodash'
+import { isEqual } from 'lodash-es'
 import { join, basename } from 'path'
 import { readFileSync, watch, mkdirSync } from 'fs'
 import { getAppProCoinfg } from './configs.js'
@@ -177,7 +177,7 @@ export function createStr(Options: {
   /**
    * 模板对象不同需要更新数据
    */
-  if (!lodash.isEqual(CacheData[tplFile], data ?? {})) {
+  if (!isEqual(CacheData[tplFile], data ?? {})) {
     CacheData[tplFile] = data ?? {}
     control = true
   }

@@ -2,7 +2,8 @@ import {
   APluginInitType,
   APluginRuleType,
   APluginTaskType,
-  APluginType
+  APluginType,
+  funcBase
 } from './plugin.types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from './typings.js'
 
@@ -17,7 +18,66 @@ const stateCache = {}
 const timeoutCache = {}
 
 /**
+ * base plugin
  * 插件基础类
+ * @class
+ */
+export class BPlugin {
+  [key: string]:
+    | string
+    | number
+    | (typeof EventEnum)[number]
+    | (typeof TypingEnum)[number]
+    | AMessage
+    | funcBase
+    | APluginRuleType[]
+  /**
+   * this.e 方法
+   */
+  e: AMessage
+  /**
+   * 模块名
+   */
+  name = ''
+  /**
+   * 模块说明
+   */
+  dsc = ''
+  /**
+   * 事件枚举
+   */
+  event = 'MESSAGES' as (typeof EventEnum)[number]
+  /**
+   * 事件类型
+   */
+  typing = 'CREATE' as (typeof TypingEnum)[number]
+  /**
+   * 匹配优先级
+   */
+  priority = 9000
+  /**
+   * 匹配集
+   */
+  rule = [] as APluginRuleType[]
+  /**
+   * @param name 类名标记        default app-name
+   * @param event 事件类型       default MESSAGES
+   * @param typing 消息类型      default CREATE
+   * @param priority 优先级      default 9000 越小优先级越高
+   * @param rule.reg 命令正则    RegExp | string
+   * @param rule.fnc 命令函数    Function
+   * @param rule.dsc 指令示范    sdc
+   * @param rule.doc 指令文档    doc
+   * @param rule.priority 优先级 数字越小优先级越高
+   */
+  constructor(init?: APluginInitType) {
+    Object.assign(this, init)
+  }
+}
+
+/**
+ * alemonjs plugin
+ * 插件标准类
  * @class
  */
 export class APlugin {
@@ -65,25 +125,8 @@ export class APlugin {
    * @param rule.doc 指令文档    doc
    * @param rule.priority 优先级    数字越小优先级越高
    */
-  constructor({
-    name = 'app-name',
-    event = 'MESSAGES',
-    typing = 'CREATE',
-    priority = 9000,
-    rule = [],
-    task
-  }: APluginInitType) {
-    this.name = name
-    this.event = event
-    this.typing = typing
-    this.priority = priority
-    this.rule = rule
-    this.task = {
-      name: task?.name ?? '',
-      fnc: task?.fnc ?? '',
-      cron: task?.cron ?? '',
-      log: task?.log ?? false
-    }
+  constructor(init?: APluginInitType) {
+    Object.assign(this, init)
   }
 
   /**
