@@ -17,7 +17,7 @@ import { conversationHandlers, getConversationState } from './dialogue.js'
 import { getAppProCoinfg } from './configs.js'
 import { APlugin } from './plugin.js'
 import { getAppCall, orderByAppCall } from './call.js'
-import { APluginInitType } from './plugin.types.js'
+import { APluginInitType, funcBase } from './plugin.types.js'
 /**
  * **************
  * CommandType
@@ -517,20 +517,18 @@ export async function InstructionMatching(e: AMessage) {
     }
     try {
       const app = APPCACHE[data.APP]
-      const back = app[data.fncName]
-      if (back && typeof back == 'function') {
-        const res = await (
-          back(e as never, ...[ARGCACHE[data.APP] ?? []]) as Promise<any>
-        )
-          .then(info(data))
-          .catch(logErr(data))
-        if (typeof res != 'boolean') {
-          e.reply(res).catch(err => {
-            console.error('APP REPLY', err)
-          })
-        }
-        if (res != false) break
+      const res = await (app[data.fncName] as funcBase)(
+        e,
+        ...[ARGCACHE[data.APP] ?? []]
+      )
+        .then(info(data))
+        .catch(logErr(data))
+      if (typeof res != 'boolean') {
+        e.reply(res).catch(err => {
+          console.error('APP REPLY', err)
+        })
       }
+      if (res != false) break
     } catch (err) {
       logErr(data)(err)
       return false
@@ -594,20 +592,18 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
     if (e.typing != data.typing) continue
     try {
       const app = APPCACHE[data.APP]
-      const back = app[data.fncName]
-      if (back && typeof back == 'function') {
-        const res = await (
-          back(e as never, ...[ARGCACHE[data.APP] ?? []]) as Promise<any>
-        )
-          .then(info(data))
-          .catch(logErr(data))
-        if (typeof res != 'boolean') {
-          e.reply(res).catch(err => {
-            console.error('APP REPLY', err)
-          })
-        }
-        if (res != false) break
+      const res = await (app[data.fncName] as funcBase)(
+        e,
+        ...[ARGCACHE[data.APP] ?? []]
+      )
+        .then(info(data))
+        .catch(logErr(data))
+      if (typeof res != 'boolean') {
+        e.reply(res).catch(err => {
+          console.error('APP REPLY', err)
+        })
       }
+      if (res != false) break
     } catch (err) {
       logErr(data)(err)
       continue
