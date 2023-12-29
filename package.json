@@ -1,12 +1,11 @@
 {
   "name": "alemonjs",
-  "version": "1.1.32",
+  "version": "1.1.33",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "dev": "ts-node alemon.config.ts",
     "tsc": "tsc",
     "ts": "ts-node",
-    "gulp": "gulp",
     "doc": "typedoc --options typedoc.json",
     "format": "prettier --write .",
     "test": "",
@@ -35,7 +34,6 @@
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-router": "^7.4.7",
     "@types/koa2-cors": "^2.0.5",
-    "@types/lodash": "^4.14.186",
     "@types/lodash-es": "^4.17.12",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^20.2.4",
@@ -48,8 +46,6 @@
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "gulp": "^4.0.2",
-    "gulp-cli": "^2.3.0",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
     "typedoc": "^0.25.4",
@@ -62,12 +58,18 @@
   "main": "lib/index.js",
   "files": [
     "lib",
-    "types"
+    "types",
+    "config.js",
+    "config.d.ts"
   ],
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./types/index.d.ts"
+    },
+    "./login": {
+      "import": "./lib/login.js",
+      "types": "./types/login.d.ts"
     }
   },
   "publishConfig": {

@@ -1,11 +1,5 @@
 /**
  * *************
- * core-main
- * *************
- */
-export * from './core/main.js'
-/**
- * *************
  * config system
  * *************
  */
@@ -22,6 +16,13 @@ export * from './login.js'
  * *************
  */
 export * from './define/index.js'
+
+/**
+ * *************
+ * core-main
+ * *************
+ */
+export * from './core/main.js'
 /**
  * api
  */

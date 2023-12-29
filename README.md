@@ -16,9 +16,7 @@
 
 <div align="center">
   
-事件匹配的跨平台开发框架,支持 QQ 群、QQ 频道、KOOK、Discord、米游社大别野等平台,只需要一套代码即可快速构建机器人。
-
-提供了热开发和打包编译工具,除此,也能自行混淆压缩来提高机器人响应速度
+事件驱动的跨平台开发框架,支持 QQ (群&频道)、KOOK、Discord、米游社大别野等平台
 
 </div>
 
@@ -203,14 +201,14 @@ npm run build
 
 ```json
 {
-  "axios": "API",
+  "axios": "接口",
   "file-type": "文件类型判断",
   "form-data": "文件流",
   "image-size": "图片大小",
-  "koa": "服务器框架",
-  "koa-bodyparser": "body解析",
-  "koa-router": "路由中间件",
-  "koa2-cors": "跨域",
+  "koa": "服务框架",
+  "koa-bodyparser": "数据解析",
+  "koa-router": "路由处理",
+  "koa2-cors": "跨域处理",
   "lodash-es": "工具包",
   "mime-types": "文件类型",
   "protobufjs": "新文件格式",

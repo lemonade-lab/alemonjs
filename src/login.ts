@@ -1,4 +1,5 @@
-import { AlemonOptions } from './index.js'
+import { AlemonOptions } from './define/types.js'
+
 /**
  * ***********
  * 登录集成map
@@ -7,6 +8,7 @@ import { AlemonOptions } from './index.js'
 export interface LoginMap {
   [key: string]: AlemonOptions['login']
 }
+
 /**
  * map登录校验
  * @param val 校验值

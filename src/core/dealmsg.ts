@@ -13,11 +13,15 @@ import {
   getAppKey
 } from './cache.js'
 import { type AMessage, type TypingEnum, EventEnum } from './typings.js'
-import { conversationHandlers, getConversationState } from './dialogue.js'
+import {
+  conversationHandlers,
+  getConversationState
+} from './conversation/dialogue.js'
 import { getAppProCoinfg } from './configs.js'
-import { APlugin } from './plugin.js'
+import { APlugin } from './plugin/plugin.js'
 import { getAppCall, orderByAppCall } from './call.js'
-import { APluginInitType, funcBase } from './plugin.types.js'
+import { APluginInitType, funcBase } from './plugin/types.js'
+
 /**
  * **************
  * CommandType

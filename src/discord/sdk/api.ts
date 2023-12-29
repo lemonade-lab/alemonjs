@@ -1,4 +1,4 @@
-import { type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import { type AxiosRequestConfig } from 'axios'
 import { Service } from './base.js'
 import FormData from 'form-data'
 import { createPicFrom } from '../../core/index.js'

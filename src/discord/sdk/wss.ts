@@ -16,15 +16,15 @@ export async function createClient(
     console.error('[getway] token err')
     return
   }
-  const wsConn = new WebSocket(`${url}?v=10&encoding=json`)
+  const ws = new WebSocket(`${url}?v=10&encoding=json`)
   let heartbeat_interval = 0
   let session_id = ''
   let resume_gateway_url = ''
-  wsConn.on('open', async () => {
+  ws.on('open', async () => {
     console.log('[ws] open')
   })
   const call = async () => {
-    wsConn.send(
+    ws.send(
       JSON.stringify({
         op: 1, //  op = 1
         d: null // 如果是第一次连接，传null
@@ -46,7 +46,7 @@ export async function createClient(
     },
     7: () => {
       console.info('[ws] 重新请求')
-      wsConn.send(
+      ws.send(
         JSON.stringify({
           op: 6,
           d: {
@@ -70,7 +70,7 @@ export async function createClient(
       const { heartbeat_interval: ih } = d
       heartbeat_interval = ih
       //
-      wsConn.send(
+      ws.send(
         JSON.stringify({
           op: 1,
           d: null
@@ -78,7 +78,7 @@ export async function createClient(
       )
       setTimeout(call, heartbeat_interval)
       // 在初次握手期间启动新会话
-      wsConn.send(
+      ws.send(
         JSON.stringify({
           op: 2,
           d: {
@@ -99,7 +99,7 @@ export async function createClient(
     }
   }
 
-  wsConn.on('message', data => {
+  ws.on('message', data => {
     const parsedData = JSON.parse(data.toString())
     const { op, d } = parsedData
     if (process.env?.DISCORD_WS == 'dev') {
@@ -111,12 +111,12 @@ export async function createClient(
   })
 
   // 关闭
-  wsConn.on('close', err => {
+  ws.on('close', err => {
     console.error('[ws] 登录失败,TOKEN存在风险')
   })
 
   // 出错
-  wsConn.on('error', error => {
+  ws.on('error', error => {
     console.error('[ws] error:', error)
   })
 }

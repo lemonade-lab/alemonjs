@@ -10,7 +10,7 @@ import {
 } from './cache.js'
 import { AMessage, EventEnum } from './typings.js'
 import { setAllCall } from './call.js'
-import { APlugin } from './plugin.js'
+import { APlugin } from './plugin/plugin.js'
 
 /**
  * 应用路径

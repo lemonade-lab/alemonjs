@@ -4,8 +4,8 @@ import {
   APluginTaskType,
   APluginType,
   funcBase
-} from './plugin.types.js'
-import { type AMessage, type EventEnum, type TypingEnum } from './typings.js'
+} from './types.js'
+import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
 
 /**
  * 状态缓存

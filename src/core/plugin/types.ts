@@ -1,4 +1,4 @@
-import { AMessage, EventEnum, TypingEnum } from './typings.js'
+import { AMessage, EventEnum, TypingEnum } from '../typings.js'
 
 /**
  * 定时类型
