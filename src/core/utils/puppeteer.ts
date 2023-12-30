@@ -42,7 +42,7 @@ export function setLanchConfig(val: PuppeteerLaunchOptions) {
  * 得到pup配置
  * @returns config
  */
-export function getLanchConfig() {
+export function getLanchConfig(): PuppeteerLaunchOptions {
   return LaunchCfg
 }
 
