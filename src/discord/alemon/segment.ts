@@ -1,3 +1,4 @@
+import { createQrcode } from '../../core/utils/qrcode.js'
 import { getPathBuffer } from '../../core/utils/buffer.js'
 export const segmentDISCORD = {
   at: function (uid: string): string {
@@ -7,6 +8,7 @@ export const segmentDISCORD = {
     return `@everyone`
   },
   img: getPathBuffer,
+  qrcode: createQrcode,
   http: (url: string): string => {
     return `<http>${url}</http>`
   },

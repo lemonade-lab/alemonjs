@@ -471,10 +471,7 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            const back = app[fnc]
-            if (back && typeof back == 'function') {
-              back(context[fnc] as never)
-            }
+            await (app[fnc] as funcBase)(context[fnc])
           }
           return
         }
@@ -488,10 +485,7 @@ export async function InstructionMatching(e: AMessage) {
           // 得到缓存中的e消息
           for (const fnc in context) {
             // 丢给自己
-            const back = app[fnc]
-            if (back && typeof back == 'function') {
-              back(context[fnc] as never)
-            }
+            await (app[fnc] as funcBase)(context[fnc])
             return
           }
         }
@@ -520,10 +514,9 @@ export async function InstructionMatching(e: AMessage) {
       continue
     }
     try {
-      const app = APPCACHE[data.APP]
-      const res = await (app[data.fncName] as funcBase)(
+      const res = await (APPCACHE[data.APP][data.fncName] as funcBase)(
         e,
-        ...[ARGCACHE[data.APP] ?? []]
+        ...(ARGCACHE[data.APP] ?? [])
       )
         .then(info(data))
         .catch(logErr(data))
@@ -595,10 +588,9 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
   for (const data of CommandNotMessage[e.event]) {
     if (e.typing != data.typing) continue
     try {
-      const app = APPCACHE[data.APP]
-      const res = await (app[data.fncName] as funcBase)(
+      const res = await (APPCACHE[data.APP][data.fncName] as funcBase)(
         e,
-        ...[ARGCACHE[data.APP] ?? []]
+        ...(ARGCACHE[data.APP] ?? [])
       )
         .then(info(data))
         .catch(logErr(data))

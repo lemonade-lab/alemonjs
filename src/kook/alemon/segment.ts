@@ -1,4 +1,5 @@
 import { getPathBuffer } from '../../core/utils/buffer.js'
+import { createQrcode } from '../../core/utils/qrcode.js'
 export const segmentKOOK = {
   at: (uid: string): string => {
     return `(met)${uid}(met)`
@@ -7,6 +8,7 @@ export const segmentKOOK = {
     return `(met)all(met)`
   },
   img: getPathBuffer,
+  qrcode: createQrcode,
   http: (url: string) => {
     return `<http>${url}</http>`
   },

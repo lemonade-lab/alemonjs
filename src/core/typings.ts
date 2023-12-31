@@ -287,6 +287,13 @@ export interface SegmentType {
    */
   img(dir: string): Buffer | false
   /**
+   * 链接转化为二维码
+   * @param text 链接
+   * @param localpath 可选,要保存的路径
+   * @returns buffer
+   */
+  qrcode(text: string, localpath?: string): Promise<false | Buffer>
+  /**
    * 标注GET请求
    * @param url
    */
