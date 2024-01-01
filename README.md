@@ -26,35 +26,42 @@
 | ----------------- | ---------------------------------------------------- | --------------- |
 | [alemonjs]        | [![alemonjs-status]][alemonjs-package]               | 标准应用解析器  |
 | [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架  |
-| [afloat]          | [![afloat-status]][afloat-package]                   | 热开发&打包工具 |
+| [afloat]          | [![afloat-status]][afloat-package]                   | 应用构建工具    |
+| [alemon-image]    | [![alemon-image-status]][alemon-image-package]       | 图片调试工具    |
 | [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载 |
 | [alemon-onebot]   | [![alemon-onebot-status]][alemon-onebot-package]     | OneBot 协议平台 |
 
-<p>
+>
 
 [alemonjs]: https://github.com/ningmengchongshui/alemon
 [alemonjs-status]: https://img.shields.io/npm/v/alemonjs.svg
 [alemonjs-package]: https://www.npmjs.com/package/alemonjs
 
-<p>
+>
 
 [create-alemonjs]: https://github.com/ningmengchongshui/alemon/tree/cli
 [create-alemonjs-status]: https://img.shields.io/npm/v/create-alemonjs.svg
 [create-alemonjs-package]: https://www.npmjs.com/package/create-alemonjs
 
-<p>
+>
 
 [afloat]: https://github.com/ningmengchongshui/alemon/tree/rollup
 [afloat-status]: https://img.shields.io/npm/v/afloat.svg
 [afloat-package]: https://www.npmjs.com/package/afloat
 
-<p>
+>
 
 [alemon-ffmpeg]: https://github.com/kongxiangyiren/alemon-ffmpeg
 [alemon-ffmpeg-status]: https://img.shields.io/npm/v/alemon-ffmpeg.svg
 [alemon-ffmpeg-package]: https://www.npmjs.com/package/alemon-ffmpeg
 
-<p>
+>
+
+[alemon-image]: https://github.com/ningmengchongshui/alemon/tree/alemon-image
+[alemon-image-status]: https://img.shields.io/npm/v/alemon-image.svg
+[alemon-image-package]: https://www.npmjs.com/package/alemon-image
+
+>
 
 [alemon-onebot]: https://github.com/ningmengchongshui/alemon/tree/alemon-onebot
 [alemon-onebot-status]: https://img.shields.io/npm/v/alemon-onebot.svg
@@ -102,31 +109,31 @@ npm run dev test qq
 
 - 模板继承
 
+继承写法可使用多个配置函数
+
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
-// 继承可执行更多配置
+class word extends APlugin {
+  constructor() {
+    super({
+      // 默认9000, 以 .priority()为准
+      priority: 500,
+      rule: [
+        {
+          reg: /^\/滴滴$/,
+          fnc: 'post',
+          // 默认值,以 上一级 priority 为准
+          priority: 300
+        }
+      ]
+    })
+  }
+  async post(e: AMessage) {
+    e.reply('哒哒')
+  }
+}
 createApp(import.meta.url)
-  .use({
-    word: class word extends APlugin {
-      constructor() {
-        super({
-          // 默认9000, 以 .priority(9000)为准
-          priority: 500, // 可有可无
-          rule: [
-            {
-              reg: /^\/滴滴$/,
-              fnc: 'post',
-              // 默认值,以 上一级为准
-              priority: 300 // 500，可有可无
-            }
-          ]
-        })
-      }
-      async post(e: AMessage) {
-        e.reply('哒哒')
-      }
-    }
-  })
+  .use({ word })
   // 把所有 / 或 # 开头的消息 替换为 /
   // 表示#滴滴 和 /滴滴 消息一致
   .replace(/^(#|\/)/, '/')
@@ -142,45 +149,27 @@ createApp(import.meta.url)
 
 - 自由回调
 
-```ts
-import { createApp, AMessage, APlugin } from 'alemonjs'
-// 比use优先的自由写法
-createApp(import.meta.url).on('MESSAGE', e => {
-  if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
-})
-```
+比继承优先的自由写法
 
 ```ts
 import { createApp, AMessage, APlugin } from 'alemonjs'
 createApp(import.meta.url)
-  .on(
-    'MESSAGE',
-    e => {
-      if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
-      // 放行
-      return false
-    },
-    7000
-  )
-  .on(
-    'MESSAGE',
-    e => {
-      if (e.typing == 'DELETE') console.log(e.user_id, '撤回了一条消息')
-      // 不放行
-      console.log('停止了')
-    },
-    8000
-  )
-  .on(
-    'MESSAGE',
-    e => {
-      // 不再执行
-      console.log('看不到我')
-    },
-    9000
-  )
+  .on('MESSAGE', e => {
+    if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
+    // 放行
+    return false
+  })
+  .on('MESSAGE', e => {
+    if (e.typing == 'DELETE') console.log(e.user_id, '撤回了一条消息')
+    // 不放行
+    console.log('停止了')
+  })
+  .on('MESSAGE', e => {
+    // 不再执行
+    console.log('看不到我')
+  })
   .on('GUILD_MEMBERS', e => {
-    // 执行,非同名事件独立
+    // 执行
     console.log('成员', e.user_name, '加入')
   })
 ```
@@ -193,7 +182,7 @@ createApp(import.meta.url)
 npm run build
 ```
 
-打包完成后,会生成`dist/main.js`和`package.json`文件
+打包完成后,会生成`dist/main.js`和`dist/package.json`文件
 
 该程序可放置于`plugins/your plugin name`文件夹下
 
