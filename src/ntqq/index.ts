@@ -1,5 +1,5 @@
 import { checkRobotByQQ } from './login.js'
-import { getBotConfigByKey } from '../config/index.js'
+import { BOTCONFIG } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
 import { createClient, getIntentsMask } from './sdk/index.js'
 export async function createAlemonByNtqq() {
@@ -10,7 +10,7 @@ export async function createAlemonByNtqq() {
     })
   ) {
     // 读取配置
-    const cfg = getBotConfigByKey('ntqq')
+    const cfg = BOTCONFIG.get('ntqq')
     const intents = getIntentsMask(cfg.intents)
     // 创建客户端
     await createClient(

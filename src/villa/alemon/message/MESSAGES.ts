@@ -7,7 +7,7 @@ import {
   type UserType
 } from '../../../core/index.js'
 import { MessageContentType } from '../../sdk/index.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
 import {
@@ -140,7 +140,7 @@ export async function MESSAGES(event: {
    */
   const msg = txt.replace(/(@[^\s]+\s)(?!<)/g, '').trim()
 
-  const cfg = getBotConfigByKey('villa')
+  const cfg = BOTCONFIG.get('villa')
   const masterID = cfg.masterID
 
   const msg_id = `${SendMessage.msgUid}.${SendMessage.sendAt}`

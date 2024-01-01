@@ -6,7 +6,7 @@ import {
   type UserType
 } from '../../../core/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { getBotMsgByDISCORD } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'
@@ -88,7 +88,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
     user_id: event.author?.id ?? ''
   })
 
-  const cfg = getBotConfigByKey('discord')
+  const cfg = BOTCONFIG.get('discord')
   const masterID = cfg.masterID
 
   /**

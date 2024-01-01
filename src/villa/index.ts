@@ -1,6 +1,6 @@
 import { checkRobotByVilla } from './login.js'
 import { hmacSha256, createClient } from './sdk/index.js'
-import { getBotConfigByKey } from '../config/index.js'
+import { BOTCONFIG } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
 export async function createAlemonByVilla() {
   // 登录
@@ -11,7 +11,7 @@ export async function createAlemonByVilla() {
     })
   ) {
     // 读取配置
-    const cfg = getBotConfigByKey('villa')
+    const cfg = BOTCONFIG.get('villa')
     if ((cfg.pub_key ?? '') != '') {
       cfg.secret = hmacSha256(cfg.secret, cfg.pub_key)
     }

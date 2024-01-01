@@ -9,7 +9,7 @@ import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
 import { InstructionMatching } from '../../../core/index.js'
 import { setBotMsgByQQ } from '../bot.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { replyController } from '../reply.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
@@ -91,7 +91,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     user_id: event.msg?.author?.id ?? ''
   })
 
-  const cfg = getBotConfigByKey('qq')
+  const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 
   const e = {

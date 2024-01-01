@@ -1,87 +1,15 @@
-import {
-  APluginInitType,
-  APluginRuleType,
-  APluginTaskType,
-  APluginType,
-  funcBase
-} from './types.js'
+import { APluginInitType, APluginRuleType, APluginTaskType } from './types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
-
-/**
- * 状态缓存
- */
-const stateCache = {}
-
-/**
- * 定时器记录
- */
-const timeoutCache = {}
-
-/**
- * base plugin
- * 插件基础类
- * @class
- */
-export class BPlugin {
-  [key: string]:
-    | string
-    | number
-    | (typeof EventEnum)[number]
-    | (typeof TypingEnum)[number]
-    | AMessage
-    | funcBase
-    | APluginRuleType[]
-  /**
-   * this.e 方法
-   */
-  e: AMessage
-  /**
-   * 模块名
-   */
-  name = ''
-  /**
-   * 模块说明
-   */
-  dsc = ''
-  /**
-   * 事件枚举
-   */
-  event = 'MESSAGES' as (typeof EventEnum)[number]
-  /**
-   * 事件类型
-   */
-  typing = 'CREATE' as (typeof TypingEnum)[number]
-  /**
-   * 匹配优先级
-   */
-  priority = 9000
-  /**
-   * 匹配集
-   */
-  rule = [] as APluginRuleType[]
-  /**
-   * @param name 类名标记        default app-name
-   * @param event 事件类型       default MESSAGES
-   * @param typing 消息类型      default CREATE
-   * @param priority 优先级      default 9000 越小优先级越高
-   * @param rule.reg 命令正则    RegExp | string
-   * @param rule.fnc 命令函数    Function
-   * @param rule.dsc 指令示范    sdc
-   * @param rule.doc 指令文档    doc
-   * @param rule.priority 优先级 数字越小优先级越高
-   */
-  constructor(init?: APluginInitType) {
-    Object.assign(this, init)
-  }
+const cache = {
+  state: {},
+  timeout: {}
 }
-
 /**
  * alemonjs plugin
  * 插件标准类
  * @class
  */
 export class APlugin {
-  [key: string]: APluginType
   /**
    * this.e 方法
    */
@@ -169,14 +97,14 @@ export class APlugin {
     // 得到缓存key
     const key = this.conKey(isGroup)
     // 不存在
-    if (!stateCache[key]) stateCache[key] = {}
-    stateCache[key][type] = this.e
+    if (!cache.state[key]) cache.state[key] = {}
+    cache.state[key][type] = this.e
     // 定时
     if (!(time && typeof time == 'number')) return
     //
-    if (!timeoutCache[key]) timeoutCache[key] = {}
+    if (!cache.timeout[key]) cache.timeout[key] = {}
     //
-    timeoutCache[key][type] = setTimeout(() => {
+    cache.timeout[key][type] = setTimeout(() => {
       this.finish(type, isGroup)
       this.e.reply('操作超时已取消')
     }, time * 1000)
@@ -188,7 +116,7 @@ export class APlugin {
    * @returns message
    */
   getContext() {
-    return stateCache[this.conKey()]
+    return cache.state[this.conKey()]
   }
 
   /**
@@ -196,7 +124,7 @@ export class APlugin {
    * @returns message
    */
   getContextGroup() {
-    return stateCache[this.conKey(true)]
+    return cache.state[this.conKey(true)]
   }
 
   /**
@@ -208,25 +136,24 @@ export class APlugin {
     if (!this.conKey(isGroup)) return
     if (
       // 检擦key
-      stateCache[this.conKey(isGroup)] &&
+      cache.state[this.conKey(isGroup)] &&
       // 检查方法
-      stateCache[this.conKey(isGroup)][type]
+      cache.state[this.conKey(isGroup)][type]
     ) {
       // 删除方法
-      delete stateCache[this.conKey(isGroup)][type]
+      delete cache.state[this.conKey(isGroup)][type]
     }
     if (
       // 检擦key
-      timeoutCache[this.conKey(isGroup)] &&
+      cache.timeout[this.conKey(isGroup)] &&
       // 检查方法
-      timeoutCache[this.conKey(isGroup)][type]
+      cache.timeout[this.conKey(isGroup)][type]
     ) {
       /**
        * 删除定时任务
        */
-      clearTimeout(timeoutCache[this.conKey(isGroup)][type])
+      clearTimeout(cache.timeout[this.conKey(isGroup)][type])
     }
   }
 }
-
 export const plugin = APlugin

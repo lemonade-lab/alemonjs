@@ -5,7 +5,7 @@ import {
   type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
 import {
@@ -50,7 +50,7 @@ export async function MESSAGE_BUTTON(event: {
 
   const ClickMsgComponent = event.extendData.clickMsgComponent
 
-  const cfg = getBotConfigByKey('villa')
+  const cfg = BOTCONFIG.get('villa')
   const masterID = cfg.masterID
 
   const msg_id = `${ClickMsgComponent.msgUid}.0`

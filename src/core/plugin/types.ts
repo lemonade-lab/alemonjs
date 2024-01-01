@@ -53,22 +53,3 @@ export interface APluginInitType {
 }
 
 export type funcBase = (e: AMessage, ...args: any[]) => Promise<boolean | void>
-type funcFinish = (type: string, isGroup?: boolean) => void
-type funcReply = (
-  content: string | number | Buffer | (string | number | Buffer)[],
-  select?: { quote?: string; withdraw?: number }
-) => Promise<any>
-type funcGroup = (isGroup?: boolean) => string
-
-export type APluginType =
-  | string
-  | number
-  | funcBase
-  | AMessage
-  | funcFinish
-  | funcReply
-  | funcGroup
-  | APluginRuleType[]
-  | APluginTaskType
-  | (typeof EventEnum)[number]
-  | (typeof TypingEnum)[number]

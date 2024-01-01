@@ -6,7 +6,7 @@ import {
 } from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
-import { getBotConfigByKey } from '../../../../config/index.js'
+import { BOTCONFIG } from '../../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
 import { AlemonJSError, AlemonJSLog } from '../../../../log/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
@@ -22,7 +22,7 @@ import { directController } from '../direct.js'
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const cfg = getBotConfigByKey('ntqq')
+  const cfg = BOTCONFIG.get('ntqq')
   const masterID = cfg.masterID
 
   const Message = ClientController({

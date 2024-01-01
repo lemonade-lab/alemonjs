@@ -2,7 +2,7 @@ import { checkRobotByKOOK } from './login.js'
 import { conversation } from './alemon/conversation.js'
 import { createClient, ClientKOOK } from './sdk/index.js'
 import { setBotMsgByKOOK } from './alemon/bot.js'
-import { getBotConfigByKey } from '../config/index.js'
+import { BOTCONFIG } from '../config/index.js'
 /**
  * 创建实例
  * @returns
@@ -20,7 +20,7 @@ export async function createAlemonByKOOK() {
     /**
      * 读取配置
      */
-    const cfg = getBotConfigByKey('kook')
+    const cfg = BOTCONFIG.get('kook')
 
     /**
      * 创建连接

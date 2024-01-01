@@ -1,4 +1,3 @@
-import PupOptions from '../default/pup.js'
 import { AlemonOptions } from './types.js'
 import { rebotMap } from './map.js'
 import { nodeScripts } from './child_process.js'
@@ -6,21 +5,16 @@ import { IntentsEnum } from '../ntqq/sdk/index.js'
 import { command } from './command.js'
 import { AppNameError } from '../log/index.js'
 import {
-  setLanchConfig,
+  Screenshot,
   loadInit,
   appsInit,
-  setAppProCoinfg,
-  startChrom,
+  APPCONFIG,
   getPublicIP,
   setPublicIP,
   InstructionMatching,
   InstructionMatchingByNotMessage
 } from '../core/index.js'
-import {
-  getPupPath,
-  setBotConfigByKey,
-  getBotConfigByKey
-} from '../config/index.js'
+import { getPupPath, BOTCONFIG } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { autoClearFiles } from '../koa/file.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
@@ -49,20 +43,20 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * pup配置
    * *******
    */
-  const pCig = { ...PupOptions, ...getPupPath() }
-  setBotConfigByKey('puppeteer', pCig)
+  const pCig = { ...Screenshot.launch, ...getPupPath() }
+  BOTCONFIG.set('puppeteer', pCig)
   if (Options?.puppeteer) {
-    setBotConfigByKey('puppeteer', Options?.puppeteer)
+    BOTCONFIG.set('puppeteer', Options?.puppeteer)
   }
-  const pData = getBotConfigByKey('puppeteer')
-  await setLanchConfig(pData)
+  const pData = BOTCONFIG.get('puppeteer')
+  Screenshot.setLaunch(pData)
   /**
    * *********
    * pup启动
    * ********
    */
   if (Options.pupStart !== false) {
-    await startChrom()
+    await Screenshot.start()
   }
   /**
    * *********
@@ -70,7 +64,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * *********
    */
   if (Options?.mysql) {
-    setBotConfigByKey('mysql', Options.mysql)
+    BOTCONFIG.set('mysql', Options.mysql)
   }
   /**
    * *********
@@ -78,7 +72,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * *********
    */
   if (Options?.redis) {
-    setBotConfigByKey('redis', Options.redis)
+    BOTCONFIG.set('redis', Options.redis)
   }
   /**
    * *********
@@ -86,7 +80,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * *********
    */
   if (Options?.server) {
-    setBotConfigByKey('server', Options.server)
+    BOTCONFIG.set('server', Options.server)
   }
   /**
    * **********
@@ -108,7 +102,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     if (Options.login?.qq) {
       // 开启私域
       if (Options.login?.qq?.isPrivate) {
-        setBotConfigByKey('qq', {
+        BOTCONFIG.set('qq', {
           intents: [
             // 基础事件
             AvailableIntentsEventsEnum.GUILDS, //频道进出
@@ -126,7 +120,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           ...Options.login.qq
         })
       } else {
-        setBotConfigByKey('qq', {
+        BOTCONFIG.set('qq', {
           intents: [
             // 基础事件
             AvailableIntentsEventsEnum.GUILDS, //频道进出
@@ -146,7 +140,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
        */
       const intents: IntentsEnum[] = []
 
-      const c = getBotConfigByKey('ntqq')
+      const c = BOTCONFIG.get('ntqq')
 
       if (!Options.login.ntqq.mode) {
         Options.login.ntqq.mode = c.mode
@@ -191,22 +185,22 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       }
 
       // 自定义覆盖
-      setBotConfigByKey('ntqq', {
+      BOTCONFIG.set('ntqq', {
         ...{ intents },
         ...Options.login.ntqq
       })
     }
     if (Options.login?.kook) {
       // 自定义覆盖
-      setBotConfigByKey('kook', Options.login.kook)
+      BOTCONFIG.set('kook', Options.login.kook)
     }
     if (Options.login?.villa) {
       // 自定义覆盖
-      setBotConfigByKey('villa', Options.login.villa)
+      BOTCONFIG.set('villa', Options.login.villa)
     }
     if (Options.login?.discord) {
       // 自定义覆盖
-      setBotConfigByKey('discord', Options.login.discord)
+      BOTCONFIG.set('discord', Options.login.discord)
     }
 
     /**
@@ -273,12 +267,12 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
 
   // jsonCreate
   if (Options?.JSON?.init === false) {
-    setAppProCoinfg('regex', Options?.JSON.init)
+    APPCONFIG.set('regex', Options?.JSON.init)
   }
 
   // json地址
   if (Options?.JSON?.address) {
-    setAppProCoinfg('route', Options?.JSON?.address)
+    APPCONFIG.set('route', Options?.JSON?.address)
   }
 
   /**
@@ -302,13 +296,13 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ************
    */
   if (Options?.plugin?.directory) {
-    setAppProCoinfg('dir', Options?.plugin?.directory)
+    APPCONFIG.set('dir', Options?.plugin?.directory)
   }
   if (Options?.plugin?.main) {
-    setAppProCoinfg('main', Options?.plugin?.main)
+    APPCONFIG.set('main', Options?.plugin?.main)
   }
   if (Options?.plugin?.type) {
-    setAppProCoinfg('type', Options?.plugin?.type)
+    APPCONFIG.set('type', Options?.plugin?.type)
   }
 
   /**
@@ -317,10 +311,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ***********
    */
   if (Options?.plugin?.RegexOpen) {
-    setAppProCoinfg('openRegex', Options?.plugin?.RegexOpen)
+    APPCONFIG.set('openRegex', Options?.plugin?.RegexOpen)
   }
   if (Options?.plugin?.RegexClose) {
-    setAppProCoinfg('closeRegex', Options?.plugin?.RegexClose)
+    APPCONFIG.set('closeRegex', Options?.plugin?.RegexClose)
   }
 
   /**
@@ -342,7 +336,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     Array.isArray(Options.shieldEvent) &&
     shieldEvent.every((item: any) => typeof item === 'string')
   ) {
-    setAppProCoinfg('event', shieldEvent)
+    APPCONFIG.set('event', shieldEvent)
   }
 
   /**

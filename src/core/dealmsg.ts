@@ -2,24 +2,12 @@ import { join } from 'path'
 import { writeFile } from 'fs/promises'
 import { existsSync, mkdirSync, readdirSync } from 'fs'
 import { isEmpty, orderBy } from 'lodash-es'
-import {
-  getAppArg,
-  getAppEvent,
-  getAppMessage,
-  getAppPriority,
-  getAppSlicing,
-  getApp,
-  delApp,
-  getAppKey
-} from './cache.js'
+import { ARG, EVENT, MSG, PRIORITY, SLICING, APP } from './cache.js'
 import { type AMessage, type TypingEnum, EventEnum } from './typings.js'
-import {
-  conversationHandlers,
-  getConversationState
-} from './conversation/dialogue.js'
-import { getAppProCoinfg } from './configs.js'
+import { Conversation } from './conversation/index.js'
+import { APPCONFIG } from './configs.js'
 import { APlugin } from './plugin/plugin.js'
-import { getAppCall, orderByAppCall } from './call.js'
+import { CALL } from './call.js'
 import { APluginInitType, funcBase } from './plugin/types.js'
 
 /**
@@ -73,7 +61,7 @@ let mergedRegex: RegExp
  * 创建机器人帮助
  */
 function createPluginHelp() {
-  const c = getAppProCoinfg('regex')
+  const c = APPCONFIG.get('regex')
   if (c === false) return
   // 存在app才创建
   if (Object.values(plugins).length != 0) {
@@ -85,7 +73,7 @@ function createPluginHelp() {
       }
     }
     if (t) {
-      const dir = join(process.cwd(), getAppProCoinfg('route'))
+      const dir = join(process.cwd(), APPCONFIG.get('route'))
       // 不存在
       if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
       // 创建help
@@ -109,7 +97,7 @@ function createPluginHelp() {
 async function synthesis(AppName: string, AppsObj: object) {
   // 没有记载
   if (!plugins[AppName]) plugins[AppName] = []
-  const shield = getAppProCoinfg('event')
+  const shield = APPCONFIG.get('event')
   for (const item in AppsObj) {
     // 取出实例
     const keys: APlugin = new AppsObj[item]()
@@ -159,12 +147,11 @@ async function synthesis(AppName: string, AppsObj: object) {
       /**
        * 对比优先级,比设置的低
        */
-      const AppPriority = getAppPriority(AppName)
+      const AppPriority = PRIORITY.get(AppName)
       // 如果类型正确
       if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
         // 存在正则就必须是MESSAGES
-        const event: APluginInitType['event'] =
-          getAppEvent(AppName) ?? 'MESSAGES'
+        const event: APluginInitType['event'] = EVENT.get(AppName) ?? 'MESSAGES'
         // 得到解析
         const reg = key['reg']
         if (!reg) continue
@@ -189,7 +176,7 @@ async function synthesis(AppName: string, AppsObj: object) {
         })
       } else {
         // 控制消息 -- 类型必须要存在的
-        const event: APluginInitType['event'] = keys['event']
+        const event: APluginInitType['event'] = keys['event'] ?? 'MESSAGES'
         // 推送
         plugins[AppName].push({
           event: event,
@@ -223,8 +210,8 @@ async function loadPlugins(dir: string) {
   const flies = readdirSync(dir)
   if (flies.length == 0) return
   // 读取配置
-  const open = getAppProCoinfg('openRegex')
-  const close: undefined | RegExp = getAppProCoinfg('closeRegex')
+  const open = APPCONFIG.get('openRegex')
+  const close: undefined | RegExp = APPCONFIG.get('closeRegex')
   // 排除
   const apps = flies
     .filter(item => open.test(item))
@@ -233,8 +220,8 @@ async function loadPlugins(dir: string) {
       return !close.test(item)
     })
   //动态扫描
-  const main = getAppProCoinfg('main')
-  const typeVal = getAppProCoinfg('type')
+  const main = APPCONFIG.get('main')
+  const typeVal = APPCONFIG.get('type')
   const types = []
   if (typeVal != 'stript') {
     types.push(typeVal)
@@ -306,7 +293,7 @@ export async function appsInit() {
    */
 
   // 排序
-  orderByAppCall()
+  CALL.order()
 
   /**
    * ************
@@ -317,16 +304,16 @@ export async function appsInit() {
   // 清空当前的apps
   dataInit()
   // 得到所有插件名
-  const APPARR = getAppKey()
+  const APPARR = APP.getAllKey()
 
   // 导出所有插件名
   for await (const AppName of APPARR) {
     // 获取插件集
-    const apps = getApp(AppName)
+    const apps = APP.get(AppName)
     // 分析插件集
     await synthesis(AppName, apps)
     // 删除指集
-    delApp(AppName)
+    APP.del(AppName)
   }
 
   // 排序
@@ -373,7 +360,7 @@ export function getMergedRegex() {
  * 扫描插件
  */
 export async function loadInit() {
-  await loadPlugins(join(process.cwd(), getAppProCoinfg('dir')))
+  await loadPlugins(join(process.cwd(), APPCONFIG.get('dir')))
 }
 
 /**
@@ -387,16 +374,16 @@ export async function InstructionMatching(e: AMessage) {
   /**
    * 对话机
    */
-  const guild_state = await getConversationState(e.guild_id)
-  const channel_state = await getConversationState(e.channel_id)
-  const user_state = await getConversationState(e.user_id)
+  const guild_state = await Conversation.getState(e.guild_id)
+  const channel_state = await Conversation.getState(e.channel_id)
+  const user_state = await Conversation.getState(e.user_id)
 
   if (guild_state || channel_state || user_state) {
-    const guild_handler = conversationHandlers.get(e.guild_id)
+    const guild_handler = Conversation.get(e.guild_id)
     if (guild_handler) await guild_handler(e, guild_state)
-    const channel_handler = conversationHandlers.get(e.channel_id)
+    const channel_handler = Conversation.get(e.channel_id)
     if (channel_handler) await channel_handler(e, channel_state)
-    const user_handler = conversationHandlers.get(e.user_id)
+    const user_handler = Conversation.get(e.user_id)
     if (user_handler) await user_handler(e, user_state)
     return true
   }
@@ -406,7 +393,7 @@ export async function InstructionMatching(e: AMessage) {
   /**
    * 回调系统
    */
-  for (const app of getAppCall('MESSAGES')) {
+  for (const app of CALL.get('MESSAGES')) {
     if (t === false) break
     try {
       // app.call
@@ -421,7 +408,7 @@ export async function InstructionMatching(e: AMessage) {
   /**
    * 回调系统
    */
-  for (const app of getAppCall('message')) {
+  for (const app of CALL.get('message')) {
     if (t === false) break
     try {
       // app.call
@@ -446,10 +433,9 @@ export async function InstructionMatching(e: AMessage) {
    */
   for (const item in CommandApp) {
     const { name, APP } = CommandApp[item]
-    const AppFnc = getAppMessage(name)
-    const AppArg = getAppArg(name)
-
-    const arr = getAppSlicing(name)
+    const AppFnc = MSG.get(name)
+    const AppArg = ARG.get(name)
+    const arr = SLICING.get(name)
     if (arr && Array.isArray(arr) && arr.length != 0) {
       for (const item of arr) {
         e.msg = e.msg.replace(item.reg, item.str)
@@ -548,7 +534,7 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
   /**
    * 回调系统
    */
-  const event = getAppCall(e.event)
+  const event = CALL.get(e.event)
   for (const app of event) {
     try {
       // app.call
@@ -570,8 +556,8 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
 
   for (const item in CommandApp) {
     const { name, APP } = CommandApp[item]
-    const AppFnc = getAppMessage(name)
-    const AppArg = getAppArg(name)
+    const AppFnc = MSG.get(name)
+    const AppArg = ARG.get(name)
     try {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
       if (typeof AppArg == 'function') ARGCACHE[item] = await AppArg(e)

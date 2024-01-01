@@ -1,17 +1,17 @@
-import { setBotConfigByKey, getBotConfigByKey } from '../config/index.js'
+import { BOTCONFIG } from '../config/index.js'
 /**
  * 登录配置
  * @param Bcf
  * @returns
  */
 export async function checkRobotByQQ() {
-  const config = getBotConfigByKey('qq')
+  const config = BOTCONFIG.get('qq')
   if (
     (config ?? '') !== '' &&
     (config.appID ?? '') !== '' &&
     (config.token ?? '') !== ''
   ) {
-    setBotConfigByKey('qq', config)
+    BOTCONFIG.set('qq', config)
     return true
   }
   console.error('[LOGIN]', '-----------------------')

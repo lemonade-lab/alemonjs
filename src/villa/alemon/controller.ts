@@ -1,7 +1,7 @@
 import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
-import { getBotConfigByKey } from '../../config/index.js'
+import { BOTCONFIG } from '../../config/index.js'
 import { everyoneError } from '../../log/index.js'
 
 interface ButtonType {
@@ -34,7 +34,7 @@ export const Controller = {
           .then(res => res.data)
           .catch(everyoneError)
         if (!data) return false
-        const cfg = getBotConfigByKey('villa')
+        const cfg = BOTCONFIG.get('villa')
         const masterID = cfg.masterID
         return {
           id: data.member.basic.uid,

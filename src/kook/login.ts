@@ -1,4 +1,4 @@
-import { setBotConfigByKey, getBotConfigByKey } from '../config/index.js'
+import { BOTCONFIG } from '../config/index.js'
 
 /**
  * 登录配置
@@ -10,9 +10,9 @@ export async function checkRobotByKOOK() {
   /**
    * 读取配置
    */
-  const config = getBotConfigByKey('kook')
+  const config = BOTCONFIG.get('kook')
   if ((config ?? '') !== '' && (config.token ?? '') !== '') {
-    setBotConfigByKey('kook', config)
+    BOTCONFIG.set('kook', config)
     return true
   }
   console.error('[LOGIN]', '-----------------------')

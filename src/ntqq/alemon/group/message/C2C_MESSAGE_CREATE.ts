@@ -8,7 +8,7 @@ import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { USER_DATA } from '../types.js'
 import { AlemonJSError, AlemonJSLog } from '../../../../log/index.js'
-import { getBotConfigByKey } from '../../../../config/index.js'
+import { BOTCONFIG } from '../../../../config/index.js'
 import {
   directController,
   ClientDirectController,
@@ -18,7 +18,7 @@ import {
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const cfg = getBotConfigByKey('ntqq')
+  const cfg = BOTCONFIG.get('ntqq')
   const masterID = cfg.masterID
 
   const open_id = event.author.user_openid

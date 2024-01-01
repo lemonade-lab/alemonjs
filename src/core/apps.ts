@@ -1,16 +1,9 @@
 import { dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
-import {
-  setAppMessage,
-  setAppArg,
-  setAppEvent,
-  setAppPriority,
-  setAppSlicing,
-  setApp
-} from './cache.js'
+import { MSG, ARG, EVENT, PRIORITY, SLICING, APP } from './cache.js'
 import { AMessage, EventEnum } from './typings.js'
-import { setAllCall } from './call.js'
 import { APlugin } from './plugin/plugin.js'
+import { CALL } from './call.js'
 
 /**
  * 应用路径
@@ -87,7 +80,7 @@ export function createSubApp(AppName: string) {
      */
     event: (val: 'MESSAGES' | 'message') => {
       try {
-        setAppEvent(AppName, val)
+        EVENT.set(AppName, val)
       } catch (err) {
         console.error('APP setEvent', err)
       }
@@ -103,7 +96,7 @@ export function createSubApp(AppName: string) {
      */
     priority: (val: number) => {
       try {
-        setAppPriority(AppName, val)
+        PRIORITY.set(AppName, val)
       } catch (err) {
         console.error('APP setEvent', err)
       }
@@ -117,7 +110,7 @@ export function createSubApp(AppName: string) {
      */
     setCharacter: (val: '#' | '/') => {
       try {
-        setAppSlicing(AppName, {
+        SLICING.set(AppName, {
           str: val,
           reg: /^(#|\/)/
         })
@@ -134,7 +127,7 @@ export function createSubApp(AppName: string) {
      */
     setMessage: (fnc: (...args: any[]) => any) => {
       try {
-        setAppMessage(AppName, fnc)
+        MSG.set(AppName, fnc)
       } catch (err) {
         console.error('APP setMessage', err)
       }
@@ -201,7 +194,7 @@ export function createSubApp(AppName: string) {
      */
     setArg: (fnc: (...args: any[]) => any[] | Promise<any[]>) => {
       try {
-        setAppArg(AppName, fnc)
+        ARG.set(AppName, fnc)
       } catch (err) {
         console.error('APP setArg', err)
       }
@@ -214,7 +207,7 @@ export function createSubApp(AppName: string) {
      */
     reSetEvent: (fnc: (...args: any[]) => any) => {
       try {
-        setAppMessage(AppName, fnc)
+        MSG.set(AppName, fnc)
       } catch (err) {
         console.error('APP setMessage', err)
       }
@@ -282,7 +275,7 @@ export function createSubApp(AppName: string) {
       priority = 9000
     ) => {
       try {
-        setAllCall(event, call, priority)
+        CALL.set(event, call, priority)
       } catch (err) {
         console.error('APP on', err)
       }
@@ -296,7 +289,7 @@ export function createSubApp(AppName: string) {
      */
     replace: (reg: RegExp, str: string) => {
       try {
-        setAppSlicing(AppName, {
+        SLICING.set(AppName, {
           str,
           reg
         })
@@ -311,7 +304,7 @@ export function createSubApp(AppName: string) {
      */
     mount: () => {
       try {
-        setApp(AppName, apps)
+        APP.set(AppName, apps)
       } catch (err) {
         console.error('APP mount', err)
       }

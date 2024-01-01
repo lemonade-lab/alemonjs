@@ -1,6 +1,6 @@
 import { join, basename } from 'path'
 import { readFileSync, watch, mkdirSync } from 'fs'
-import { getAppProCoinfg } from '../configs.js'
+import { APPCONFIG } from '../configs.js'
 // 源码缓存
 const html = {}
 // 监听器
@@ -36,7 +36,7 @@ function watchCT(tplFile: string) {
  * @returns 文件地址|模板字符串
  */
 export function createHtml(AppName: string, tplFile: string) {
-  const appDir = getAppProCoinfg('dir')
+  const appDir = APPCONFIG.get('dir')
   // 插件路径
   const basePath = join(process.cwd(), appDir, AppName)
   // 数据路径

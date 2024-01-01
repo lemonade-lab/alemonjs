@@ -7,7 +7,7 @@ import {
 import { type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import {
   ClientDirectController,
@@ -26,7 +26,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
 
   const open_id = event.extra.code
 
-  const cfg = getBotConfigByKey('kook')
+  const cfg = BOTCONFIG.get('kook')
   const masterID = cfg.masterID
 
   const avatar = event.extra.author.avatar

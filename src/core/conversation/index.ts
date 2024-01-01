@@ -1,31 +1,73 @@
-import {
-  conversationHandlers,
-  deleteConversationState,
-  setConversationState
-} from './dialogue.js'
+import { AMessage } from '../typings.js'
 
 /**
- * 对话机
+ * 会话控制器
  */
-export const Conversation = {
+class ConversationMap extends Map {
+  Sockes: {
+    [key: string]: any
+  } = {}
+  constructor() {
+    // 初始化
+    super()
+  }
+
   /**
-   * 设置对话状态
-   * @param ID 用户编号
-   * @param state 状态记录
+   * 删除状态
+   * @param ID
    */
-  passing: setConversationState,
-  /**
-   * 删除对话状态
-   * @param ID 用户编号
-   */
-  remove: (ID: string) => {
+  deleteState(ID: string) {
     // 删除数据
-    deleteConversationState(ID)
-    // 删除函数
-    conversationHandlers.delete(ID)
-  },
+    delete this.Sockes[`conversation-state:${ID}`]
+  }
+
   /**
-   * 注册对话
+   * 得到状态
+   * @param ID
+   * @returns
    */
-  add: conversationHandlers.set
+  getState(ID: string) {
+    return this.Sockes[`conversation-state:${ID}`]
+  }
+
+  /**
+   * 设置状态
+   * @param ID
+   * @param state
+   */
+  setState(ID: string, state: any) {
+    this.Sockes[`conversation-state:${ID}`] = state
+  }
+
+  /**
+   * 设置状态
+   * @param ID
+   * @param state
+   */
+  passing = this.setState
+
+  /**
+   * 增加会话
+   * @param key
+   * @param val
+   */
+  add = (key: string, val: (e: AMessage, state: any) => Promise<void>) => {
+    this.set(key, val)
+  }
+
+  /**
+   * 移除会话
+   * @param ID
+   */
+  remove(ID: string) {
+    // 删除状态
+    this.deleteState(ID)
+    // 删除函数
+    this.delete(ID)
+  }
 }
+
+/**
+ * 注册对话处理器
+ */
+export const Conversation = new ConversationMap()

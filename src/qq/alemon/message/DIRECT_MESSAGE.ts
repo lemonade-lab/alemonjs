@@ -14,7 +14,7 @@ import {
   AlemonJSEventError,
   AlemonJSEventLog
 } from '../../../log/index.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import {
   ClientDirectController,
   directController,
@@ -81,7 +81,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
 
   const Member = ClientControllerOnMember()
 
-  const cfg = getBotConfigByKey('qq')
+  const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
   const e = {
     platform: 'qq',

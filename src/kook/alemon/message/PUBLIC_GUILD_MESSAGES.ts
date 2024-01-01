@@ -8,7 +8,7 @@ import {
 import { ClientKOOK, type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
@@ -63,7 +63,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     }
   }
 
-  const cfg = getBotConfigByKey('kook')
+  const cfg = BOTCONFIG.get('kook')
   const masterID = cfg.masterID
 
   const avatar = event.extra.author.avatar

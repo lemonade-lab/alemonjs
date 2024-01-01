@@ -33,49 +33,28 @@ interface ApplicationProcessingOpsion {
   event: string[]
 }
 
-/**
- * ***********
- * 插件解析配置
- * ***********
- */
-const ApplicationProcessingConfiguration: ApplicationProcessingOpsion = {
-  dir: '/plugins',
-  main: '/main',
-  type: 'stript',
-  openRegex: /./,
-  closeRegex: undefined,
-  event: [],
-  route: '/public/defset',
-  regex: true
-}
-
-/**
- * 设置插件解析配置
- * @param key 配置名
- * @param val 配置值
- */
-export function setAppProCoinfg<T extends keyof ApplicationProcessingOpsion>(
-  key: T,
-  val: ApplicationProcessingOpsion[T]
-): void {
-  // 当前仅当同属性名的时候才会覆盖默认配置
-  if (
-    Object.prototype.hasOwnProperty.call(
-      ApplicationProcessingConfiguration,
-      key
-    )
-  ) {
-    ApplicationProcessingConfiguration[key] = val
+class AppConfig {
+  data = {
+    dir: '/plugins',
+    main: '/main',
+    type: 'stript',
+    openRegex: /./,
+    closeRegex: undefined,
+    event: [],
+    route: '/public/defset',
+    regex: true
+  }
+  set<T extends keyof ApplicationProcessingOpsion>(
+    key: T,
+    val: ApplicationProcessingOpsion[T]
+  ): void {
+    // 当前仅当同属性名的时候才会覆盖默认配置
+    if (Object.prototype.hasOwnProperty.call(this.data, key)) {
+      this.data[key] = val
+    }
+  }
+  get<T extends keyof ApplicationProcessingOpsion>(key: T) {
+    return this.data[key]
   }
 }
-
-/**
- * 得到插件解析配置
- * @param key 配置名
- * @returns 配置值
- */
-export function getAppProCoinfg<T extends keyof ApplicationProcessingOpsion>(
-  key: T
-) {
-  return ApplicationProcessingConfiguration[key]
-}
+export const APPCONFIG = new AppConfig()

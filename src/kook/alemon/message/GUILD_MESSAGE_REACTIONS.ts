@@ -11,7 +11,7 @@ import {
 } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
@@ -27,7 +27,7 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
 
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const cfg = getBotConfigByKey('kook')
+  const cfg = BOTCONFIG.get('kook')
   const masterID = cfg.masterID
 
   const Message = ClientController({

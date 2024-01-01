@@ -9,7 +9,7 @@ import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
-import { getBotConfigByKey } from '../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
 
@@ -54,7 +54,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     user_id: event.msg.user.id
   })
 
-  const cfg = getBotConfigByKey('qq')
+  const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 
   const e = {

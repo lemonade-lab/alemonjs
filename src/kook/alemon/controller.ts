@@ -4,7 +4,7 @@ import {
   type ControllerOption,
   type UserInformationType
 } from '../../core/index.js'
-import { getBotConfigByKey } from '../../config/index.js'
+import { BOTCONFIG } from '../../config/index.js'
 import { everyoneError } from '../../log/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
@@ -14,7 +14,7 @@ export const Controller = {
           .then(res => res.data)
           .catch(everyoneError)
         if (data) {
-          const cfg = getBotConfigByKey('qq')
+          const cfg = BOTCONFIG.get('qq')
           const masterID = cfg.masterID
           return {
             id: data.id,

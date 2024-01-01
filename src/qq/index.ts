@@ -2,7 +2,7 @@ import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
 import { setBotConfig as setBotQQConfig } from './sdk/index.js'
 import { checkRobotByQQ } from './login.js'
 import { createConversationByQQ } from './alemon/conversation.js'
-import { getBotConfigByKey } from '../config/index.js'
+import { BOTCONFIG } from '../config/index.js'
 declare global {
   var ClientQQ: IOpenAPI
 }
@@ -19,7 +19,7 @@ export async function createAlemonByQQ() {
     /**
      * 读取配置
      */
-    const cfg = getBotConfigByKey('qq')
+    const cfg = BOTCONFIG.get('qq')
     /**
      * 创建 ClientQQ
      */
