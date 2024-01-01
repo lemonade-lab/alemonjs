@@ -132,9 +132,7 @@ export interface AlemonOptions {
 
   /**
    * **********
-   *
-   *
-   * ************
+   * **********
    */
 
   /**
@@ -158,34 +156,4 @@ export interface AlemonOptions {
    * mysql配置
    */
   mysql?: MysqlOptions
-
-  /**
-   * **************
-   * 特殊
-   * ************
-   */
-
-  /**
-   * 附加运行等待时间
-   * defaukt app*1000
-   */
-  waitingTime?: number
-  /**
-   * 附加指令
-   */
-  command?: {
-    cess?: 'execSync' | 'exec'
-    cmd: string
-  }[]
-  /**
-   * 附加运行脚本
-   */
-  scripts?: {
-    /**
-     * 参数
-     */
-    ars?: string[]
-    name?: 'ts-node' | 'node'
-    file: string
-  }[]
 }

@@ -1,7 +1,5 @@
 import { type ConfigType } from './types.js'
-import redis from '../default/redis.js'
-import mysql from '../default/mysql.js'
-import server from '../default/server.js'
+import { DefaultConfig } from '../default/index.js'
 import { defineKOOK as kook } from '../kook/kook.js'
 import { defineVILLA as villa } from '../villa/villa.js'
 import { defineQQ as qq } from '../qq/qq.js'
@@ -10,13 +8,11 @@ import { defineDISCORD as discord } from '../discord/discord.js'
 import { Screenshot } from '../core/index.js'
 class BotConfig {
   data = {
-    redis,
-    mysql,
+    ...DefaultConfig,
     kook,
     villa,
     qq,
     ntqq,
-    server,
     puppeteer: Screenshot.launch,
     discord
   } as ConfigType

@@ -2,7 +2,7 @@ import { join } from 'path'
 import { writeFileSync, readdirSync, unlinkSync, existsSync } from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
 import { getServerConfig } from './config.js'
-import { getPublicIP } from '../core/index.js'
+import { IP } from '../core/index.js'
 import { createHash } from 'crypto'
 
 /**
@@ -24,7 +24,7 @@ export async function getLocalFileUrl(address: string) {
   const http = getServerConfig('http')
   let ip = getServerConfig('ip')
   if (ip == 'localhost') {
-    const ipp = await getPublicIP()
+    const ipp = await IP.get()
     if (ipp) ip = ipp
   }
   const url = `${http}://${ip}:${port}${addressRouter}?address=${address}`
@@ -46,7 +46,7 @@ export async function getFileUrl(file: Buffer, name?: string) {
   const http = getServerConfig('http')
   let ip = getServerConfig('ip')
   if (ip == 'localhost') {
-    const ipp = await getPublicIP()
+    const ipp = await IP.get()
     if (ipp) ip = ipp
   }
   // 使用 'bin' 作为默认扩展名

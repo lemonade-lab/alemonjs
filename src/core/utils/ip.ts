@@ -1,23 +1,18 @@
 import { publicIp, Options } from 'public-ip'
-let myIp: string | false
-/**
- * 得到本机IP地址
- * @returns
- */
-export async function setPublicIP(val: string) {
-  myIp = val
+class Ip {
+  data: string | false
+  set(val: string) {
+    this.data = val
+  }
+  async get(options: Options = {}) {
+    if (this.data) return this.data
+    return await publicIp({
+      onlyHttps: true,
+      ...options
+    }).then(ip => {
+      if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) this.data = ip
+      return this.data ?? false
+    })
+  }
 }
-/**
- * 得到本机IP地址
- * @returns
- */
-export async function getPublicIP(options: Options = {}) {
-  if (myIp) return myIp
-  return await publicIp({
-    onlyHttps: true,
-    ...options
-  }).then(ip => {
-    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) myIp = ip
-    return myIp ?? false
-  })
-}
+export const IP = new Ip()

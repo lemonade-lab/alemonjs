@@ -5,26 +5,18 @@ import puppeteer, {
   PuppeteerLifeCycleEvent
 } from 'puppeteer'
 import queryString from 'querystring'
-
-/**
- * 截图选项
- */
-export interface urlScreenshotOptions {
-  url: string
-  time?: number
-  rand?: ScreenshotOptions
-  params?: queryString.ParsedUrlQueryInput
-  tab?: string
-  timeout?: number
-  cache?: boolean
-  waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
-}
+import { watch } from 'fs'
 
 class Pup {
+  // 截图次数记录
   pic = 0
+  // 重启次数控制
   restart = 200
+  // 应用缓存
   browser: Browser
+  // 状态
   isBrowser = false
+  // 配置
   launch = {
     headless: process.env?.ALEMONJS_PUPPERTEER_HEADLESS ?? 'new',
     timeout: Number(process.env?.ALEMONJS_PUPPERTEER_TIMEOUT ?? 30000),
@@ -39,9 +31,18 @@ class Pup {
     ],
     skipDownload: true
   } as PuppeteerLaunchOptions
+
+  /**
+   * 设置
+   * @param val
+   */
   setLaunch(val: PuppeteerLaunchOptions) {
     this.launch = val
   }
+  /**
+   * 获取
+   * @returns
+   */
   getLaunch() {
     return this.launch
   }
@@ -147,7 +148,16 @@ class Pup {
    * @param val url地址
    * @returns buffer
    */
-  async toUrl(val: urlScreenshotOptions) {
+  async toUrl(val: {
+    url: string
+    time?: number
+    rand?: ScreenshotOptions
+    params?: queryString.ParsedUrlQueryInput
+    tab?: string
+    timeout?: number
+    cache?: boolean
+    waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
+  }) {
     if (!(await this.isStart())) return false
     const {
       url,
@@ -199,6 +209,33 @@ class Pup {
       console.error('screenshot newPage', err)
       return false
     }
+  }
+
+  // 解析后的html缓存
+  cache = {}
+  // 模板缓存
+  html = {}
+  // 监听器缓存
+  watchCache = {}
+
+  /**
+   * 缓存监听
+   * @param tplFile 模板地址
+   */
+  watch(tplFile: string) {
+    // 监听存在,直接返回
+    if (this.watchCache[tplFile]) return
+    // 监听不存在,增加监听
+    this.watchCache[tplFile] = watch(tplFile)
+      .on('change', () => {
+        // 模板改变,删除模板
+        delete this.html[tplFile]
+        console.info('html update', tplFile)
+      })
+      .on('close', () => {
+        // 监听器被移除,删除监听器
+        delete this.watchCache[tplFile]
+      })
   }
 }
 export const Screenshot = new Pup()

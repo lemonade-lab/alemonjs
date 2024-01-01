@@ -1,367 +1,11 @@
-import { join } from 'path'
-import { writeFile } from 'fs/promises'
-import { existsSync, mkdirSync, readdirSync } from 'fs'
-import { isEmpty, orderBy } from 'lodash-es'
-import { ARG, EVENT, MSG, PRIORITY, SLICING, APP } from './cache.js'
-import { type AMessage, type TypingEnum, EventEnum } from './typings.js'
+import { isEmpty } from 'lodash-es'
+import { ARG, MSG, SLICING } from './cache.js'
+import { type AMessage } from './typings.js'
 import { Conversation } from './conversation/index.js'
-import { APPCONFIG } from './configs.js'
 import { APlugin } from './plugin/plugin.js'
 import { CALL } from './call.js'
-import { APluginInitType, funcBase } from './plugin/types.js'
-
-/**
- * **************
- * CommandType
- * **************
- */
-interface CommandType {
-  reg: RegExp
-  priority: number
-  event: (typeof EventEnum)[number]
-  typing: (typeof TypingEnum)[number]
-  fncName: string
-  APP: string
-}
-/**
- * **********
- * AppMap
- * ***********
- */
-interface PluginAppMap {
-  [key: string]: {
-    name: string
-    APP: typeof APlugin
-  }
-}
-
-/**
- * *******
- * CommandMap
- * *******
- * Command message
- * CommandNotMessage other message
- */
-type CommandMap = {
-  [Event in (typeof EventEnum)[number]]: CommandType[]
-}
-const Command: CommandMap = {} as CommandMap
-const CommandNotMessage: CommandMap = {} as CommandMap
-const CommandApp: PluginAppMap = {}
-
-/**
- * 机器人统计
- */
-const plugins: object = {}
-
-// 大正则
-let mergedRegex: RegExp
-
-/**
- * 创建机器人帮助
- */
-function createPluginHelp() {
-  const c = APPCONFIG.get('regex')
-  if (c === false) return
-  // 存在app才创建
-  if (Object.values(plugins).length != 0) {
-    // 同时key不能是空数组
-    let t = false
-    for (const item in plugins) {
-      if (plugins[item] && plugins[item].length != 0) {
-        t = true
-      }
-    }
-    if (t) {
-      const dir = join(process.cwd(), APPCONFIG.get('route'))
-      // 不存在
-      if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
-      // 创建help
-      for (const item in plugins) {
-        if (plugins[item] && plugins[item].length != 0) {
-          const basePath = join(dir, `${item}.json`)
-          const jsonData = JSON.stringify(plugins[item], null, 2)
-          // 异步创建避免阻塞
-          writeFile(basePath, jsonData, 'utf-8')
-        }
-      }
-    }
-  }
-}
-
-/**
- * 应用挂载
- * @param AppName 插件名
- * @param AppsObj 插件集成对象
- */
-async function synthesis(AppName: string, AppsObj: object) {
-  // 没有记载
-  if (!plugins[AppName]) plugins[AppName] = []
-  const shield = APPCONFIG.get('event')
-  for (const item in AppsObj) {
-    // 取出实例
-    const keys: APlugin = new AppsObj[item]()
-    if (shield.find(item => item == keys['event'])) continue
-    // 控制类型
-    const typing: APluginInitType['typing'] = keys['typing'] ?? 'CREATE'
-    // 不合法
-    if (
-      !keys['rule'] ||
-      !Array.isArray(keys['rule']) ||
-      keys['rule'].length == 0
-    ) {
-      continue
-    }
-    /**
-     * 收藏app
-     */
-    let x = 1
-    let itemX = item
-    const T = true
-    while (T) {
-      // 名字不重复
-      if (!Object.prototype.hasOwnProperty.call(CommandApp, itemX)) {
-        break
-      }
-      // 同名了 需要重命名
-      itemX = `${item}${x}`
-      x++
-    }
-    // 缓存实例
-    CommandApp[itemX] = {
-      name: AppName,
-      APP: AppsObj[item] as typeof APlugin
-    }
-
-    for await (const key of keys['rule']) {
-      if (!key['fnc'] || typeof keys[key['fnc']] !== 'function') {
-        /// 函数指定不存在 得到的不是函数
-        continue
-      }
-      // 先看指令优先级,没有就看类优先级,再没有则默认优先级
-      const priority = key['priority'] ?? keys['priority'] ?? 9000
-      // 得到函数名
-      const fncName = key['fnc']
-      const doc = key['doc'] ?? ''
-      const dsc = key['dsc'] ?? ''
-      /**
-       * 对比优先级,比设置的低
-       */
-      const AppPriority = PRIORITY.get(AppName)
-      // 如果类型正确
-      if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
-        // 存在正则就必须是MESSAGES
-        const event: APluginInitType['event'] = EVENT.get(AppName) ?? 'MESSAGES'
-        // 得到解析
-        const reg = key['reg']
-        if (!reg) continue
-        // 推送
-        plugins[AppName].push({
-          event: event,
-          typing: typing,
-          reg: String(reg),
-          dsc,
-          doc,
-          priority:
-            AppPriority && AppPriority < priority ? AppPriority : priority
-        })
-        // 保存
-        Command[event].push({
-          event: event,
-          typing: typing,
-          reg: new RegExp(reg),
-          priority,
-          fncName,
-          APP: itemX
-        })
-      } else {
-        // 控制消息 -- 类型必须要存在的
-        const event: APluginInitType['event'] = keys['event'] ?? 'MESSAGES'
-        // 推送
-        plugins[AppName].push({
-          event: event,
-          typing: typing,
-          dsc,
-          doc,
-          priority
-        })
-        // 保存
-        CommandNotMessage[event].push({
-          event: event,
-          typing: typing,
-          priority:
-            AppPriority && AppPriority < priority ? AppPriority : priority,
-          reg: /./,
-          fncName,
-          APP: itemX
-        })
-      }
-    }
-  }
-  return
-}
-
-/**
- * 加载应用插件
- * @param dir 插件路径
- */
-async function loadPlugins(dir: string) {
-  if (!existsSync(dir)) return
-  const flies = readdirSync(dir)
-  if (flies.length == 0) return
-  // 读取配置
-  const open = APPCONFIG.get('openRegex')
-  const close: undefined | RegExp = APPCONFIG.get('closeRegex')
-  // 排除
-  const apps = flies
-    .filter(item => open.test(item))
-    .filter(item => {
-      if (!close) return true
-      return !close.test(item)
-    })
-  //动态扫描
-  const main = APPCONFIG.get('main')
-  const typeVal = APPCONFIG.get('type')
-  const types = []
-  if (typeVal != 'stript') {
-    types.push(typeVal)
-  } else {
-    types.push('js')
-    types.push('ts')
-  }
-  for (const type of types) {
-    for await (const appname of apps) {
-      if (existsSync(`${dir}/${appname}${main}.${type}`)) {
-        await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
-          console.error(`file://${dir}/${appname}${main}.${type}`)
-          // 属于依赖缺失
-          const match = /Cannot find package '(.+)' imported from/.exec(
-            err.message
-          )
-          if (match && match[1]) {
-            const packageName = match[1]
-            console.error(`[APP] [${appname}] 缺失 ${packageName} 包`)
-            // 发送消息
-            process.send?.({
-              type: 'lack-of-package',
-              message: {
-                packageName
-              }
-            })
-            return
-          } else {
-            // 其他错误
-            console.error(`[APP] [${appname}]`, err)
-            process.send?.({
-              type: 'error',
-              message: err
-            })
-          }
-        })
-      }
-    }
-  }
-  return
-}
-
-/**
- * 初始化应用
- */
-function dataInit() {
-  // 清事件
-  for (const item of EventEnum) {
-    if (isNaN(Number(item))) {
-      Command[item] = []
-      CommandNotMessage[item] = []
-    }
-  }
-  // 清class
-  for (const item in CommandApp) {
-    delete CommandApp[item]
-  }
-  return
-}
-
-/**
- * 插件初始化
- */
-export async function appsInit() {
-  /**
-   * *********
-   * 回调系统
-   * ********
-   */
-
-  // 排序
-  CALL.order()
-
-  /**
-   * ************
-   * 正则系统
-   * ************
-   */
-
-  // 清空当前的apps
-  dataInit()
-  // 得到所有插件名
-  const APPARR = APP.getAllKey()
-
-  // 导出所有插件名
-  for await (const AppName of APPARR) {
-    // 获取插件集
-    const apps = APP.get(AppName)
-    // 分析插件集
-    await synthesis(AppName, apps)
-    // 删除指集
-    APP.del(AppName)
-  }
-
-  // 排序
-  for (const val in Command) {
-    Command[val] = orderBy(Command[val], ['priority'], ['asc'])
-  }
-
-  // 排序
-  for (const val in CommandNotMessage) {
-    CommandNotMessage[val] = orderBy(
-      CommandNotMessage[val],
-      ['priority'],
-      ['asc']
-    )
-  }
-
-  // 排序之后把所有正则变成一条正则
-  const mergedRegexArr = []
-  for (const val in Command) {
-    for await (const { reg } of Command[val]) {
-      mergedRegexArr.push(reg)
-    }
-  }
-
-  // 机器人整体指令正则
-  mergedRegex = new RegExp(mergedRegexArr.map(regex => regex.source).join('|'))
-
-  // 生成指令json
-  createPluginHelp()
-
-  // 打印
-  console.info('[APP INIT]', `APPS*${Object.keys(plugins).length} `)
-}
-
-/**
- * 得到指令大正则
- * @returns 正则
- */
-export function getMergedRegex() {
-  return mergedRegex
-}
-
-/**
- * 扫描插件
- */
-export async function loadInit() {
-  await loadPlugins(join(process.cwd(), APPCONFIG.get('dir')))
-}
+import { funcBase } from './plugin/types.js'
+import { APPLICATION, CommandType } from './application.js'
 
 /**
  * 指令匹配
@@ -370,7 +14,6 @@ export async function loadInit() {
  */
 export async function InstructionMatching(e: AMessage) {
   if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
-
   /**
    * 对话机
    */
@@ -431,8 +74,8 @@ export async function InstructionMatching(e: AMessage) {
   /**
    * 上下文
    */
-  for (const item in CommandApp) {
-    const { name, APP } = CommandApp[item]
+  for (const item in this.CommandApp) {
+    const { name, APP } = this.CommandApp[item]
     const AppFnc = MSG.get(name)
     const AppArg = ARG.get(name)
     const arr = SLICING.get(name)
@@ -486,12 +129,13 @@ export async function InstructionMatching(e: AMessage) {
   /**
    *  撤回事件 || 匹配不到事件 || 大正则不匹配
    */
-  if (!Command[e.event] || !mergedRegex.test(e.msg)) return true
+  if (!this.Command[e.event] || !APPLICATION.mergedRegex.test(e.msg))
+    return true
 
   /**
    * 循环所有指令
    */
-  for (const data of Command[e.event]) {
+  for (const data of this.Command[e.event]) {
     if (
       e.typing != data.typing ||
       data.reg === undefined ||
@@ -529,7 +173,7 @@ export async function InstructionMatching(e: AMessage) {
 export async function InstructionMatchingByNotMessage(e: AMessage) {
   if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
 
-  if (!CommandNotMessage[e.event]) return true
+  if (!this.CommandNotMessage[e.event]) return true
 
   /**
    * 回调系统
@@ -554,8 +198,8 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
     [key: string]: any[]
   } = {}
 
-  for (const item in CommandApp) {
-    const { name, APP } = CommandApp[item]
+  for (const item in this.CommandApp) {
+    const { name, APP } = this.CommandApp[item]
     const AppFnc = MSG.get(name)
     const AppArg = ARG.get(name)
     try {
@@ -571,7 +215,7 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
   }
 
   // 循环查找
-  for (const data of CommandNotMessage[e.event]) {
+  for (const data of this.CommandNotMessage[e.event]) {
     if (e.typing != data.typing) continue
     try {
       const res = await (APPCACHE[data.APP][data.fncName] as funcBase)(

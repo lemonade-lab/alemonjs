@@ -1,16 +1,12 @@
 import { AlemonOptions } from './types.js'
 import { rebotMap } from './map.js'
-import { nodeScripts } from './child_process.js'
 import { IntentsEnum } from '../ntqq/sdk/index.js'
-import { command } from './command.js'
 import { AppNameError } from '../log/index.js'
 import {
   Screenshot,
-  loadInit,
-  appsInit,
+  APPLICATION,
   APPCONFIG,
-  getPublicIP,
-  setPublicIP,
+  IP,
   InstructionMatching,
   InstructionMatchingByNotMessage
 } from '../core/index.js'
@@ -259,9 +255,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       autoClearFiles()
     }
     if (Options?.server?.ip) {
-      setPublicIP(Options?.server?.ip)
+      IP.set(Options?.server?.ip)
     } else {
-      getPublicIP()
+      IP.get()
     }
   }
 
@@ -324,7 +320,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    */
   if (Options?.login && Options?.plugin?.init !== false) {
     // 加载插件
-    await loadInit()
+    await APPLICATION.load()
   }
 
   /**
@@ -344,38 +340,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 开始解析
    * ************
    */
-  if (Options?.mount !== false) {
-    await appsInit()
-  }
+  if (Options?.mount !== false) await APPLICATION.init()
 
-  /**
-   * 延迟执行
-   */
-  setTimeout(async () => {
-    /**
-     * **********
-     * 附加执行
-     * **********
-     */
-    if (Options?.command) {
-      for await (const item of Options.command) {
-        if (item?.cmd) {
-          // 默认同步
-          await command(item?.cess ?? 'execSync', item?.cmd)
-        }
-      }
-    }
-    /**
-     * **********
-     * 附加脚本
-     * **********
-     */
-    if (Options?.scripts) {
-      for await (const item of Options.scripts) {
-        const name = item?.name ?? 'node'
-        nodeScripts(name, item?.file, item?.ars ?? [])
-      }
-    }
-  }, Options?.waitingTime ?? Object.keys(Options?.login ?? {}).length * 1000)
   return
 }

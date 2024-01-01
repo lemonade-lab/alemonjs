@@ -1,32 +1,7 @@
 import { join, basename } from 'path'
-import { readFileSync, watch, mkdirSync } from 'fs'
+import { readFileSync, mkdirSync } from 'fs'
 import { APPCONFIG } from '../configs.js'
-// 源码缓存
-const html = {}
-// 监听器
-const watcher = {}
-// 模板缓存
-const absolutePathTemplateCache = {}
-
-/**
- * 缓存监听
- * @param tplFile 模板地址
- */
-function watchCT(tplFile: string) {
-  // 监听存在,直接返回
-  if (watcher[tplFile]) return
-  // 监听不存在,增加监听
-  watcher[tplFile] = watch(tplFile)
-    .on('change', () => {
-      // 模板改变,删除模板
-      delete html[tplFile]
-      console.info('html update', tplFile)
-    })
-    .on('close', () => {
-      // 监听器被移除,删除监听器
-      delete watcher[tplFile]
-    })
-}
+import { Screenshot } from './puppeteer.js'
 
 /**
  * 对指定html进行资源矫正
@@ -48,18 +23,18 @@ export function createHtml(AppName: string, tplFile: string) {
   /// 判断初始模板是否改变
   let control = false
   // 缓存不存在
-  if (!html[tplFile]) {
+  if (!Screenshot.html[tplFile]) {
     // 读取文件
-    html[tplFile] = readFileSync(tplFile, 'utf8')
+    Screenshot.html[tplFile] = readFileSync(tplFile, 'utf8')
     // 读取后监听文件
-    watchCT(tplFile)
+    Screenshot.watch(tplFile)
     control = true
   }
   // 模板更改和数据更改都会生成生成html
   if (control) {
     const reg =
       /url\(['"](@[^'"]+)['"]\)|href=['"](@[^'"]+)['"]|src=['"](@[^'"]+)['"]/g
-    absolutePathTemplateCache[tplFile] = html[tplFile].replace(
+    Screenshot.cache[tplFile] = Screenshot.html[tplFile].replace(
       reg,
       (match, urlPath, hrefPath, srcPath) => {
         const relativePath = urlPath ?? hrefPath ?? srcPath
@@ -80,7 +55,7 @@ export function createHtml(AppName: string, tplFile: string) {
     // 模板地址
     AdressHtml,
     // 模板字符
-    template: absolutePathTemplateCache[tplFile]
+    template: Screenshot.cache[tplFile]
   }
 }
 

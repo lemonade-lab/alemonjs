@@ -125,61 +125,17 @@ export function createSubApp(AppName: string) {
      * @deprecated 废弃,请使用reSetEvent()
      * @returns 是否成功定义
      */
-    setMessage: (fnc: (...args: any[]) => any) => {
-      try {
-        MSG.set(AppName, fnc)
-      } catch (err) {
-        console.error('APP setMessage', err)
-      }
-      return app
-    },
-
+    setMessage: (fnc: (...args: any[]) => any) => app.reSetEvent(fnc),
     /**
      * 创建应用
      * @param app 应用对象
      * @deprecated 废弃,请使用use()
      */
-    component: (urlObject: object = {}) => {
-      try {
-        for (const item in urlObject) {
-          /**
-           * 如果该导出是class
-           */
-          if (urlObject[item].prototype) {
-            if (!Object.prototype.hasOwnProperty.call(apps, item)) {
-              /**
-               * 不重名
-               */
-              apps[item] = urlObject[item]
-              continue
-            }
-            const T = true
-            while (T) {
-              const keyName = `${item}$${acount}`
-              if (!Object.prototype.hasOwnProperty.call(apps, keyName)) {
-                /**
-                 * 不重名
-                 */
-                apps[keyName] = urlObject[item]
-                /**
-                 * 重置为0
-                 */
-                acount = 0
-                break
-              } else {
-                /**
-                 * 加1
-                 */
-                acount++
-              }
-            }
-          }
-        }
-      } catch (err) {
-        console.error('APP component', err)
-      }
-      return app
-    },
+    component: (
+      urlObject: {
+        [key: string]: typeof APlugin
+      } = {}
+    ) => app.use(urlObject),
 
     /**
      * ********
