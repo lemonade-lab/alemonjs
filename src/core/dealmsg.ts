@@ -74,8 +74,8 @@ export async function InstructionMatching(e: AMessage) {
   /**
    * 上下文
    */
-  for (const item in this.CommandApp) {
-    const { name, APP } = this.CommandApp[item]
+  for (const item in APPLICATION.CommandApp) {
+    const { name, APP } = APPLICATION.CommandApp[item]
     const AppFnc = MSG.get(name)
     const AppArg = ARG.get(name)
     const arr = SLICING.get(name)
@@ -89,7 +89,7 @@ export async function InstructionMatching(e: AMessage) {
       if (typeof AppFnc == 'function') e = await AppFnc(e)
       if (typeof AppArg == 'function') ARGCACHE[item] = await AppArg(e)
       const app = new APP(e)
-      // 设置this.e
+      // 设置this
       app.e = e
       // 如果存在用户上下文
       if (app.getContext) {
@@ -129,13 +129,13 @@ export async function InstructionMatching(e: AMessage) {
   /**
    *  撤回事件 || 匹配不到事件 || 大正则不匹配
    */
-  if (!this.Command[e.event] || !APPLICATION.mergedRegex.test(e.msg))
+  if (!APPLICATION.Command[e.event] || !APPLICATION.mergedRegex.test(e.msg))
     return true
 
   /**
    * 循环所有指令
    */
-  for (const data of this.Command[e.event]) {
+  for (const data of APPLICATION.Command[e.event]) {
     if (
       e.typing != data.typing ||
       data.reg === undefined ||
@@ -173,7 +173,7 @@ export async function InstructionMatching(e: AMessage) {
 export async function InstructionMatchingByNotMessage(e: AMessage) {
   if (process.env?.ALEMONJS_MESSAGE == 'dev') console.info('e', e)
 
-  if (!this.CommandNotMessage[e.event]) return true
+  if (!APPLICATION.CommandNotMessage[e.event]) return true
 
   /**
    * 回调系统
@@ -198,8 +198,8 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
     [key: string]: any[]
   } = {}
 
-  for (const item in this.CommandApp) {
-    const { name, APP } = this.CommandApp[item]
+  for (const item in APPLICATION.CommandApp) {
+    const { name, APP } = APPLICATION.CommandApp[item]
     const AppFnc = MSG.get(name)
     const AppArg = ARG.get(name)
     try {
@@ -215,7 +215,7 @@ export async function InstructionMatchingByNotMessage(e: AMessage) {
   }
 
   // 循环查找
-  for (const data of this.CommandNotMessage[e.event]) {
+  for (const data of APPLICATION.CommandNotMessage[e.event]) {
     if (e.typing != data.typing) continue
     try {
       const res = await (APPCACHE[data.APP][data.fncName] as funcBase)(
