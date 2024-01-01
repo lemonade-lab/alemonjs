@@ -47,8 +47,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * pup配置
    * *******
    */
-  const pCig = { ...Screenshot.launch, ...Screenshot.init() }
-  BOTCONFIG.set('puppeteer', pCig)
+  BOTCONFIG.set('puppeteer', Screenshot.launch)
   if (Options?.puppeteer) {
     BOTCONFIG.set('puppeteer', Options?.puppeteer)
   }

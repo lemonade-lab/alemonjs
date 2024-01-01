@@ -6,7 +6,7 @@ import puppeteer, {
 } from 'puppeteer'
 import queryString from 'querystring'
 import { watch } from 'fs'
-import { getPupPath as PupPath } from './pup.js'
+import { executablePath } from './pup.js'
 
 class Pup {
   // 截图次数记录
@@ -18,9 +18,10 @@ class Pup {
   // 状态
   isBrowser = false
   // 配置
-  launch = {
-    headless: process.env?.ALEMONJS_PUPPERTEER_HEADLESS ?? 'new',
-    timeout: Number(process.env?.ALEMONJS_PUPPERTEER_TIMEOUT ?? 30000),
+  launch: PuppeteerLaunchOptions = {
+    headless: 'new',
+    timeout: 30000,
+    executablePath,
     args: [
       '--disable-gpu',
       '--disable-dev-shm-usage',
@@ -29,10 +30,8 @@ class Pup {
       '--no-sandbox',
       '--no-zygote',
       '--single-process'
-    ],
-    skipDownload: true
-  } as PuppeteerLaunchOptions
-
+    ]
+  }
   /**
    * 设置
    * @param val
@@ -44,7 +43,7 @@ class Pup {
    * 获取
    * @returns
    */
-  getLaunch() {
+  getLaunch(): PuppeteerLaunchOptions {
     return this.launch
   }
   /**
@@ -213,11 +212,17 @@ class Pup {
   }
 
   // 解析后的html缓存
-  cache = {}
+  cache: {
+    [key: string]: any
+  } = {}
   // 模板缓存
-  html = {}
+  html: {
+    [key: string]: any
+  } = {}
   // 监听器缓存
-  watchCache = {}
+  watchCache: {
+    [key: string]: any
+  } = {}
 
   /**
    * 缓存监听
@@ -238,13 +243,8 @@ class Pup {
         delete this.watchCache[tplFile]
       })
   }
-  init = PupPath
 }
 export const Screenshot = new Pup()
-/**
- * @deprecated 已废弃
- */
-export const getPupPath = Screenshot.init
 /**
  * @deprecated 已废弃
  */
