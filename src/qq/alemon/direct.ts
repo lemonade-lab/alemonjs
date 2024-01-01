@@ -1,4 +1,4 @@
-import { getUrlbuffer } from '../../core/index.js'
+import { BUFFER } from '../../core/index.js'
 import { ClientQQ as Client } from '../sdk/index.js'
 import { everyoneError } from '../../log/index.js'
 import { ControllerOption, type UserInformationType } from '../../core/index.js'
@@ -210,7 +210,7 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await getUrlbuffer(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
     if (msg) {
       return await Client.postImage({
         id: open_id,

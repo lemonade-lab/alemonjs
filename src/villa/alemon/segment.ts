@@ -1,7 +1,7 @@
-import { getPathBuffer, createQrcode } from '../../core/utils/index.js'
+import { BUFFER } from '../../core/utils/index.js'
 export const segmentVILLA = {
-  img: getPathBuffer,
-  qrcode: createQrcode,
+  img: BUFFER.getPath,
+  qrcode: BUFFER.qrcode,
   http: (url: string) => {
     return `<http>${url}</http>`
   },

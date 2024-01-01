@@ -1,5 +1,5 @@
 import { AlemonOptions } from './types.js'
-import { rebotMap } from './map.js'
+import { RebotMap } from './map.js'
 import { IntentsEnum } from '../ntqq/sdk/index.js'
 import { AppNameError } from '../log/index.js'
 import {
@@ -10,22 +10,30 @@ import {
   InstructionMatching,
   InstructionMatchingByNotMessage
 } from '../core/index.js'
-import { getPupPath, BOTCONFIG } from '../config/index.js'
+import { BOTCONFIG } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { autoClearFiles } from '../koa/file.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { join } from 'path'
-import { setControlller } from '../api/controller.js'
+import { CONTOLLER } from '../api/controller.js'
 
-let OptionsCache: AlemonOptions
+class AlemonConfig {
+  data: AlemonOptions
+  get() {
+    this.data
+  }
+  set(val: AlemonOptions) {
+    this.data = val
+  }
+}
+export const ALEMONCONFIG = new AlemonConfig()
 
 /**
  * 得到初始化配置
+ * @deprecated 已废弃
  * @returns
  */
-export function getAlemonConfig() {
-  return OptionsCache
-}
+export const getAlemonConfig = ALEMONCONFIG.get
 
 /**
  * 配置机器人启动规则
@@ -33,13 +41,13 @@ export function getAlemonConfig() {
  */
 export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (!Options) return
-  OptionsCache = Options
+  ALEMONCONFIG.set(Options)
   /**
    * *******
    * pup配置
    * *******
    */
-  const pCig = { ...Screenshot.launch, ...getPupPath() }
+  const pCig = { ...Screenshot.launch, ...Screenshot.init() }
   BOTCONFIG.set('puppeteer', pCig)
   if (Options?.puppeteer) {
     BOTCONFIG.set('puppeteer', Options?.puppeteer)
@@ -216,7 +224,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
             InstructionMatchingByNotMessage
           )
           // 存入控制器
-          setControlller(back.name, app.controller)
+          CONTOLLER.set(back.name, app.controller)
         }
       }
     }
@@ -226,10 +234,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
      */
     for (const item in Options.login) {
       if (arr.indexOf(item) != -1) continue
-      if (!rebotMap[item]) continue
+      if (!RebotMap[item]) continue
       arr.push(item)
       // 登录执行
-      await rebotMap[item]()
+      await RebotMap[item]()
     }
   }
 

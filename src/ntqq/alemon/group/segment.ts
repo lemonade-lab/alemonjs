@@ -1,4 +1,4 @@
-import { getPathBuffer, createQrcode } from '../../../core/utils/index.js'
+import { BUFFER } from '../../../core/utils/index.js'
 export const segmentNTQQ = {
   at: (uid: string): string => {
     return `<@${uid}>`
@@ -6,8 +6,8 @@ export const segmentNTQQ = {
   atAll: (): string => {
     return '@everyone'
   },
-  img: getPathBuffer,
-  qrcode: createQrcode,
+  img: BUFFER.getPath,
+  qrcode: BUFFER.qrcode,
   http: (url: string) => {
     return `<http>${url}</http>`
   },

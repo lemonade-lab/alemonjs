@@ -7,33 +7,40 @@ import {
   type MemberControllerType,
   type ControllerOption
 } from '../core/index.js'
-
-const map: {
-  [key: string]: {
-    Message: any
-    Member: any
+/**
+ * 控制器管理
+ */
+export const CONTOLLER = new (class con {
+  data: {
+    [key: string]: {
+      Message: any
+      Member: any
+    }
+  } = {
+    villa: villaController,
+    qq: qqController,
+    ntqq: ntqqController,
+    kook: kookController
   }
-} = {
-  villa: villaController,
-  qq: qqController,
-  ntqq: ntqqController,
-  kook: kookController
-}
-
+  set(
+    platform: string,
+    val: {
+      Message: any
+      Member: any
+    }
+  ) {
+    this.data[platform] = val
+  }
+  get(platform: string) {
+    return this.data[platform]
+  }
+})()
 /**
  * 私有
  * @param platform
+ * @deprecated 已废弃
  */
-export function setControlller(
-  platform: string,
-  val: {
-    Message: any
-    Member: any
-  }
-) {
-  map[platform] = val
-}
-
+export const setControlller = CONTOLLER.set
 /**
  * 控制器
  * @param platform
@@ -52,8 +59,8 @@ export function Controller(platform: string) {
     Member: MemberControllerType
   } => {
     return {
-      Message: map[platform].Message(options as any),
-      Member: map[platform].Member(options as any)
+      Message: CONTOLLER.data[platform].Message(options as any),
+      Member: CONTOLLER.data[platform].Member(options as any)
     }
   }
 }

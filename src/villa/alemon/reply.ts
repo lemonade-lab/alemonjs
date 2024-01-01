@@ -1,7 +1,7 @@
 import { ClientVILLA } from '../sdk/index.js'
 import { everyoneError } from '../../log/index.js'
 import IMGS from 'image-size'
-import { getUrlbuffer } from '../../core/index.js'
+import { BUFFER } from '../../core/index.js'
 
 /**
  * 回复控制器
@@ -96,7 +96,7 @@ export async function replyController(
   if (match) {
     const getUrl = match[1]
     // 先请求确保图片正常
-    const msg = await getUrlbuffer(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
     if (!msg) return false
     const dimensions = IMGS.imageSize(msg)
     // url 形式的直接转存

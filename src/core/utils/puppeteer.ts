@@ -6,6 +6,7 @@ import puppeteer, {
 } from 'puppeteer'
 import queryString from 'querystring'
 import { watch } from 'fs'
+import { getPupPath as PupPath } from './pup.js'
 
 class Pup {
   // 截图次数记录
@@ -237,15 +238,18 @@ class Pup {
         delete this.watchCache[tplFile]
       })
   }
+  init = PupPath
 }
 export const Screenshot = new Pup()
 /**
- *
+ * @deprecated 已废弃
+ */
+export const getPupPath = Screenshot.init
+/**
  * @deprecated 已废弃
  */
 export const screenshotByFile = Screenshot.toFile
 /**
- *
  * @deprecated 已废弃
  */
 export const screenshotByUrl = Screenshot.toUrl

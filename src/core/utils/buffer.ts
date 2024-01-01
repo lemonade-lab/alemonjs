@@ -1,9 +1,6 @@
-import { existsSync, readFileSync, createReadStream } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import axios from 'axios'
 import { join } from 'path'
-import { Readable, isReadable } from 'stream'
-import { basename } from 'path'
-import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
 import { toDataURL } from 'qrcode'
 import { writeFile, readFile } from 'fs'
 class BufferData {
@@ -22,7 +19,6 @@ class BufferData {
         return false
       })
   }
-
   /**
    * 读取本地图片
    * @param val
@@ -40,7 +36,6 @@ class BufferData {
     }
     return false
   }
-
   /**
    * 链接转化为二维码
    * @param text 链接
@@ -114,12 +109,14 @@ export const BUFFER = new BufferData()
  * 读取buffer文件
  * @param localpath 读取地址
  * @returns buffer
+ * @deprecated 已废弃
  */
 export const getBuffer = BUFFER.get
 /**
  * 写入buffer
  * @param localpath 写入地址
  * @param bufferData 数据
+ * @deprecated 已废弃
  */
 export const setBuffer = BUFFER.set
 /**
@@ -127,46 +124,20 @@ export const setBuffer = BUFFER.set
  * @param text 链接
  * @param localpath 可选,要保存的路径
  * @returns buffer
+ * @deprecated 已废弃
  */
 export const createQrcode = BUFFER.qrcode
 /**
  * 异步请求图片
  * @param url 网络地址
  * @returns buffer
+ * @deprecated 已废弃
  */
 export const getUrlbuffer = BUFFER.getUrl
 /**
  * 读取本地图片
  * @param val
+ * @deprecated 已废弃
  * @returns
  */
 export const getPathBuffer = BUFFER.getPath
-
-/**
- * 创建form
- * @param image
- * @param name
- * @returns
- */
-export async function createPicFrom(image: any, name = 'image.jpg') {
-  let picData: Readable | Buffer[]
-  // 是 string
-  if (typeof image === 'string') {
-    if (!existsSync(image)) return false
-    if (!name) name = basename(image)
-    picData = createReadStream(image)
-    // 是 buffer
-  } else if (Buffer.isBuffer(image)) {
-    if (!name) name = 'file.' + (await fileTypeFromBuffer(image)).ext
-    picData = new Readable()
-    picData.push(image)
-    picData.push(null)
-    // 是 文件流
-  } else if (isReadable(image)) {
-    if (!name) name = 'file.' + (await fileTypeFromStream(image)).ext
-    picData = image
-  } else {
-    return false
-  }
-  return { picData, image, name }
-}

@@ -3,7 +3,7 @@
  * 机器人启动集
  * **********
  */
-export const rebotMap = {
+export const RebotMap = {
   qq: async (): Promise<boolean> => {
     const { createAlemonByQQ: qq } = await import('../qq/index.js')
     return qq().catch(err => {

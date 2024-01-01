@@ -1,7 +1,7 @@
 import {
   type ControllerOption,
   type UserInformationType,
-  getUrlbuffer
+  BUFFER
 } from '../../../core/index.js'
 import { ClientNTQQ } from '../../sdk/index.js'
 import { ClientKOA } from '../../../koa/index.js'
@@ -274,7 +274,7 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await getUrlbuffer(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
     if (Buffer.isBuffer(msg)) {
       const url = await ClientKOA.getFileUrl(msg).catch(everyoneError)
       if (!url) return false
