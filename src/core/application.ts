@@ -1,10 +1,10 @@
 import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
 import { orderBy } from 'lodash-es'
-import { EVENT, PRIORITY, APP } from './cache.js'
+import { EVENT, PRIORITY, APP } from './cache/index.js'
 import { type TypingEnum, EventEnum } from './typings.js'
 import { APPCONFIG } from './configs.js'
-import { APlugin } from './plugin/plugin.js'
+import { APlugin } from './plugin/index.js'
 import { CALL } from './call.js'
 import { APluginInitType } from './plugin/types.js'
 import { HELP } from './help.js'
@@ -290,4 +290,7 @@ class Application {
     return
   }
 }
+/**
+ * 应用数据对象
+ */
 export const APPLICATION = new Application()

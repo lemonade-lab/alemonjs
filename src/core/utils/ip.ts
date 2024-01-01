@@ -16,3 +16,11 @@ class Ip {
   }
 }
 export const IP = new Ip()
+/**
+ * @deprecated 已废弃
+ */
+export const setPublicIP = IP.set
+/**
+ * @deprecated 已废弃
+ */
+export const getPublicIP = IP.get

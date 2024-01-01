@@ -1,5 +1,4 @@
 import { AMessage } from '../typings.js'
-
 /**
  * 会话控制器
  */
@@ -11,7 +10,6 @@ class ConversationMap extends Map {
     // 初始化
     super()
   }
-
   /**
    * 删除状态
    * @param ID
@@ -20,7 +18,6 @@ class ConversationMap extends Map {
     // 删除数据
     delete this.Sockes[`conversation-state:${ID}`]
   }
-
   /**
    * 得到状态
    * @param ID
@@ -29,7 +26,6 @@ class ConversationMap extends Map {
   getState(ID: string) {
     return this.Sockes[`conversation-state:${ID}`]
   }
-
   /**
    * 设置状态
    * @param ID
@@ -66,8 +62,34 @@ class ConversationMap extends Map {
     this.delete(ID)
   }
 }
-
 /**
- * 注册对话处理器
+ * 对话处理器
  */
 export const Conversation = new ConversationMap()
+/**
+ * 对话处理器
+ * @deprecated 已废弃
+ */
+export const conversationHandlers = new ConversationMap()
+/**
+ * 获取对话状态
+ * @param ID 编号
+ * @returns 对话状态值
+ * @deprecated 已废弃
+ */
+export const getConversationState = conversationHandlers.getState
+/**
+ * 设置对话状态
+ * @param ID 编号
+ * @param state 状态记录
+ * @deprecated Conversation.passing
+ * @deprecated 已废弃
+ */
+export const setConversationState = conversationHandlers.setState
+/**
+ * 删除对话状态
+ * @param ID 编号
+ * @deprecated Conversation.del
+ * @deprecated 已废弃
+ */
+export const deleteConversationState = conversationHandlers.deleteState

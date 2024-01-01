@@ -1,8 +1,8 @@
 import { dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
-import { MSG, ARG, EVENT, PRIORITY, SLICING, APP } from './cache.js'
+import { MSG, ARG, EVENT, PRIORITY, SLICING, APP } from './cache/index.js'
 import { AMessage, EventEnum } from './typings.js'
-import { APlugin } from './plugin/plugin.js'
+import { APlugin } from './plugin/index.js'
 import { CALL } from './call.js'
 
 /**

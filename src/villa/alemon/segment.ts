@@ -1,5 +1,4 @@
-import { createQrcode } from '../../core/utils/qrcode.js'
-import { getPathBuffer } from '../../core/utils/buffer.js'
+import { getPathBuffer, createQrcode } from '../../core/utils/index.js'
 export const segmentVILLA = {
   img: getPathBuffer,
   qrcode: createQrcode,
