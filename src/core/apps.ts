@@ -231,7 +231,8 @@ export function createSubApp(AppName: string) {
       priority = 9000
     ) => {
       try {
-        CALL.set(event, call, priority)
+        // 强制为大写
+        CALL.set(event == 'message' ? 'MESSAGES' : event, call, priority)
       } catch (err) {
         console.error('APP on', err)
       }

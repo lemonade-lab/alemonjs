@@ -21,7 +21,7 @@ export interface APluginRuleType {
   /**
    * 方法(函数)
    */
-  fnc: string
+  fnc: string | funcBase
   /**
    * 指令示范
    */

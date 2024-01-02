@@ -48,21 +48,6 @@ export async function InstructionMatching(e: AMessage) {
     }
   }
 
-  /**
-   * 回调系统
-   */
-  for (const app of CALL.get('message')) {
-    if (t === false) break
-    try {
-      // app.call
-      const back = await app.call(e)
-      if (back != false) t = false
-    } catch (err) {
-      console.error(`[${e.event}]`, `[${app.call}]`, `[${false}]\n`, `[${err}]`)
-      continue
-    }
-  }
-
   const APPCACHE: {
     [key: string]: APlugin
   } = {}

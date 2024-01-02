@@ -222,7 +222,15 @@ class Application {
       }
 
       for await (const key of keys['rule']) {
-        if (!key['fnc'] || typeof keys[key['fnc']] !== 'function') {
+        // 不是字符串,也不是函数
+        const ty = typeof key['fnc']
+        if (ty == 'function') {
+          continue
+        }
+        if (
+          typeof key['fnc'] == 'string' &&
+          (!key['fnc'] || typeof keys[key['fnc']] !== 'function')
+        ) {
           /// 函数指定不存在 得到的不是函数
           continue
         }
@@ -260,7 +268,7 @@ class Application {
             typing: typing,
             reg: new RegExp(reg),
             priority,
-            fncName,
+            fncName: fncName as string,
             APP: itemX
           })
         } else {
@@ -281,7 +289,7 @@ class Application {
             priority:
               AppPriority && AppPriority < priority ? AppPriority : priority,
             reg: /./,
-            fncName,
+            fncName: fncName as string,
             APP: itemX
           })
         }
