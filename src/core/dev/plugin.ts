@@ -5,7 +5,7 @@ import {
 } from '../plugin/types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
 
-import { APP } from './start.js'
+import { APPS } from './application.js'
 
 /**
  * alemonjs plugin
@@ -98,10 +98,10 @@ export class APlugin {
   setContext(func: string, isGroup = false, time = 120) {
     const c = String(this).match(/(\w+)$/)[1] // 字符串化
     // 订阅消息
-    APP.subscribe(
+    APPS.addSubscribe(
       this.conKey(isGroup),
       setTimeout(() => {
-        APP.unsubscribe(this.conKey(isGroup), c, func)
+        APPS.unsubscribe(this.conKey(isGroup), c, func)
         this.e.reply('操作超时已取消')
       }, time * 1000),
       c,
@@ -133,7 +133,7 @@ export class APlugin {
    */
   finish(func: string, isGroup = false) {
     // 取消订阅
-    APP.unsubscribe(this.conKey(isGroup), String(this), func)
+    APPS.unsubscribe(this.conKey(isGroup), String(this), func)
   }
 }
 export const plugin = APlugin

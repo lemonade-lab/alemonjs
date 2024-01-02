@@ -17,11 +17,11 @@ export class APlugin {
   /**
    * 模块名
    */
-  name?: string
+  name?: string = String(this)
   /**
    * 模块说明
    */
-  dsc?: string
+  dsc?: string = ''
   /**
    * 事件枚举
    */
@@ -42,6 +42,7 @@ export class APlugin {
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
   task?: APluginTaskType
+
   /**
    * @param name 类名标记        default app-name
    * @param event 事件类型       default MESSAGES

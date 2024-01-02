@@ -20,7 +20,9 @@ export class List {
    * @returns
    */
   push(val: any) {
+    console.log('val', val)
     const node = new Node(val)
+    this.#count++
     if (this.#head === null) {
       this.#head = node
       return
@@ -32,7 +34,6 @@ export class List {
       p = p.next
     }
     p.next = node
-    this.#count++
   }
 
   /**
@@ -53,6 +54,7 @@ export class List {
    * @returns
    */
   getNodeAt(index: number) {
+    console.log('')
     if (this.v(index)) return undefined
     // 位置
     let p = this.#head
