@@ -1,17 +1,27 @@
 import { AppMap } from './data.js'
+import { NodeDataType } from './listtable.js'
 /**
  * ************
  * 订阅-双key结构
- * key1 user_id
- * key2 calss
- * val xxxx
+ * key1 k
+ * key2 c
+ * val func
  * ***********
+ *
+ * 事件发生时,k识别,会存在多个class,也就是触发多个
+ *
+ * 使用 c 和 func来寻找,
+ * 如果存在一个app使用了两次use同一个的情况,
+ * 应该排出去
+ *
  */
 export class Subscribe {
   #sb: {
     [key: string]: {
+      data: any
+      // 定时器id
       id: any
-      node: any
+      node: NodeDataType
     }
   } = {}
   /**
@@ -22,24 +32,24 @@ export class Subscribe {
    * @param f
    * @returns
    */
-  add(key: string, id: any, c: string, f: string) {
-    let con = false
+  add(key: string, id: any, c: string, f: string, data) {
+    let node: NodeDataType
     for (const item in AppMap.keys()) {
       // 寻找节点
-      const node = AppMap.get[item].find(c, f)
-      if (node) {
-        con = true
-        // 记录订阅
-        this.#sb[key] = {
-          id, // 定时器
-          node // 节点
-        }
-        break
-      }
+      node = AppMap.get(item).find(c, f)
+      if (node) break
     }
     // 订阅失败
-    if (!con) clearTimeout(id)
-    return con
+    if (!node) clearTimeout(id)
+    // 订阅前把上一个取消
+    this.cancel(key)
+    // 记录订阅
+    this.#sb[key] = {
+      data,
+      id, // 定时器
+      node // 节点
+    }
+    return true
   }
 
   /**

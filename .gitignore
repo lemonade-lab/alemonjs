@@ -11,6 +11,7 @@ types/**/*
 alemon.config.ts
 main.ts
 apps.ts
+notes.md
 
 # 打印
 logs

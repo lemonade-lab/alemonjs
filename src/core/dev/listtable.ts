@@ -1,3 +1,22 @@
+export interface NodeDataType {
+  // 应用归属
+  name: string
+  // 集合id
+  i: string
+  // 实例名
+  j: string
+  // 正则
+  reg: RegExp
+  // 事件
+  event: string
+  // 优先级
+  priority: number
+  // 类型
+  typing: string
+  // 方法
+  func: string
+}
+
 /**
  * ******
  * 节点
@@ -5,7 +24,7 @@
  */
 export class Node {
   next: typeof Node.prototype = null
-  data = undefined
+  data: NodeDataType = undefined
   constructor(data: any) {
     this.data = data
   }
@@ -38,7 +57,7 @@ export class ListTable {
    * @param val
    * @returns
    */
-  push(val: any) {
+  push(val: NodeDataType) {
     const node = new Node(val)
     this.#count++
     if (this.#head === null) {

@@ -1,7 +1,7 @@
 import { AMessage, EventEnum } from '../typings.js'
 import { APlugin } from '../plugin/index.js'
 import { CALL } from '../call.js'
-import { ListTable } from './listtable.js'
+import { ListTable, NodeDataType } from './listtable.js'
 import { AppMap } from './data.js'
 import { getAppName } from './path.js'
 
@@ -15,7 +15,9 @@ export class Alemon {
   #acount = 0
   // 集合
   #data: {
+    // 集合索引
     [key: string]: {
+      // 应用索引 - 应用
       [key: string]: typeof APlugin
     }
   } = {}
@@ -49,14 +51,9 @@ export class Alemon {
   find(c: string, f: string) {
     // 存在则返回
     const list = this.#list
-    let val = null
+    let val: NodeDataType = null
     for (let i = 0; i < list.size(); i++) {
-      const node: {
-        i: string
-        j: string
-        reg: RegExp
-        func: string
-      } = list.removeAt(0)
+      const node = list.removeAt(0)
       if (node.j == c && node.func == f) {
         val = node
         break
@@ -78,7 +75,7 @@ export class Alemon {
    * @param e
    * @param node
    */
-  async responseNode(e: AMessage, node: { func: any; i: string; j: string }) {
+  async responseNode(e: AMessage, node: NodeDataType) {
     // 缓存 new
     const cache: {
       [key: string]: typeof APlugin.prototype
@@ -108,6 +105,7 @@ export class Alemon {
       app.e = e
       cache[key] = app
     }
+
     // 执行
     const res = await cache[key][node.func](e, ...arr)
       .then(res => {
@@ -162,12 +160,7 @@ export class Alemon {
      */
     for (let i = 0; i < list.size(); i++) {
       // 不断的取出索引
-      const node: {
-        i: string
-        j: string
-        reg: RegExp
-        func: string
-      } = list.removeAt(0)
+      const node = list.removeAt(0)
       // 索引匹配
       if (node.reg.test(e.msg)) {
         const key = `${node.i}${node.j}`
@@ -177,23 +170,29 @@ export class Alemon {
           app.e = e
           cache[key] = app
         }
-        // 执行
-        const res = await cache[key][node.func](e, ...arr)
-          .then(res => {
-            console.info(this.info(e, String(node.func)))
-            return res
-          })
-          .catch(err => {
-            console.error(this.err(e, String(node.func)), err)
-          })
-        // 重执行
-        if (res && typeof res != 'boolean') {
-          await e.reply(res).catch(err => {
-            console.error(this.err(e, String(node.func)), err)
-          })
+        try {
+          // 执行
+          const res = await cache[key][node.func](e, ...arr)
+            .then(res => {
+              console.info(this.info(e, String(node.func)))
+              return res
+            })
+            .catch(err => {
+              console.error(this.err(e, String(node.func)), err)
+              // 错误了就强制中断
+            })
+          // 重执行
+          if (res && typeof res != 'boolean') {
+            await e.reply(res).catch(err => {
+              console.error(this.err(e, String(node.func)), err)
+            })
+          }
+          // 不是 false ,也就是不放行
+          if (res != false) break
+        } catch (err) {
+          console.error(this.err(e, String(node.func)), err)
+          break
         }
-        // 不是 false ,也就是不放行
-        if (res != false) break
       }
     }
   }
@@ -228,13 +227,7 @@ export class Alemon {
      * *****
      */
     for (let i = 0; i < list.size(); i++) {
-      const node: {
-        i: string
-        j: string
-        event: string
-        typing: string
-        func: string
-      } = list.removeAt(0)
+      const node = list.removeAt(0)
       // 类型不符
       if (node.event !== e.event || node.typing !== e.typing) continue
       //
@@ -244,21 +237,26 @@ export class Alemon {
         app.e = e
         cache[key] = app
       }
-      const res = await cache[key][node.func](e, ...arr)
-        .then(res => {
-          console.info(this.info(e, String(node.func)))
-          return res
-        })
-        .catch(err => {
-          console.error(this.err(e, String(node.func)), err)
-        })
-      if (res && typeof res != 'boolean') {
-        await e.reply(res).catch(err => {
-          console.error(this.err(e, String(node.func)), err)
-        })
+      try {
+        const res = await cache[key][node.func](e, ...arr)
+          .then(res => {
+            console.info(this.info(e, String(node.func)))
+            return res
+          })
+          .catch(err => {
+            console.error(this.err(e, String(node.func)), err)
+          })
+        if (res && typeof res != 'boolean') {
+          await e.reply(res).catch(err => {
+            console.error(this.err(e, String(node.func)), err)
+          })
+        }
+        // 不是 false ,也就是不放行
+        if (res != false) break
+      } catch (err) {
+        console.error(this.err(e, String(node.func)), err)
+        break
       }
-      // 不是 false ,也就是不放行
-      if (res != false) break
     }
   }
 
@@ -306,19 +304,15 @@ export class Alemon {
       [key: string]: typeof APlugin
     } = {}
   ) {
-    try {
-      this.#data[this.#acount] = AplguinMap
-      this.#acount++
-    } catch (err) {
-      console.error('APP use', err)
-    }
+    this.#data[this.#acount] = AplguinMap
+    this.#acount++
     return this
   }
 
   /**
-   * 挂载应用
+   * 挂载
    */
-  analysis() {
+  mount() {
     for (const i in this.#data) {
       for (const j in this.#data[i]) {
         const keys = new this.#data[i][j]()
@@ -331,17 +325,14 @@ export class Alemon {
           continue
         }
         for (const key of keys['rule']) {
-          // 不是字符串,也不是函数
           const ty = typeof key['fnc']
-          if (ty !== 'string' && ty !== 'function') {
-            continue
-          }
-          // 是字符串,但匹配不出函数
           if (
-            typeof key['fnc'] == 'string' &&
-            typeof keys[key['fnc']] !== 'function'
+            (ty !== 'string' && ty !== 'function') ||
+            (typeof key['fnc'] == 'string' &&
+              typeof keys[key['fnc']] !== 'function')
           ) {
-            /// 函数指定不存在 得到的不是函数
+            // 不是字符串,也不是函数
+            // 是字符串,但匹配不出函数
             continue
           }
           // 解析出索引
@@ -353,28 +344,32 @@ export class Alemon {
               name: this.#name,
               i,
               j,
+              event: keys['event'] ?? 'MESSAGES',
+              typing: keys['typing'] ?? 'CREATE',
               reg,
               priority: key['priority'] ?? 9000,
               func:
-                ty == 'string'
+                typeof key['fnc'] == 'string'
                   ? key['fnc']
                   : String(key['fnc']).match(/:\s*(\w+)\]/)[1]
             })
-          } else {
-            // 类型索引
-            this.#elist.push({
-              name: this.#name,
-              i,
-              j,
-              event: keys['event'],
-              typing: keys['typing'],
-              priority: key['priority'],
-              func:
-                ty == 'string'
-                  ? key['fnc']
-                  : String(key['fnc']).match(/:\s*(\w+)\]/)[1]
-            })
+            continue
           }
+          // 类型索引
+          this.#elist.push({
+            name: this.#name,
+            i,
+            j,
+            event: keys['event'],
+            typing: keys['typing'],
+            priority: key['priority'],
+            reg: /.*/,
+            func:
+              typeof key['fnc'] == 'string'
+                ? key['fnc']
+                : String(key['fnc']).match(/:\s*(\w+)\]/)[1]
+          })
+          continue
         }
       }
     }
@@ -382,13 +377,6 @@ export class Alemon {
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
-  }
-
-  /**
-   * 挂载
-   */
-  mount() {
-    this.analysis()
     AppMap.set(this.#name, this)
   }
 
@@ -424,12 +412,8 @@ export class Alemon {
     call: (e: AMessage) => any,
     priority: 9000
   ) {
-    try {
-      // 强制为大写的
-      CALL.set(event == 'message' ? 'MESSAGES' : event, call, priority)
-    } catch (err) {
-      console.error('APP on', err)
-    }
+    // 强制为大写的
+    CALL.set(event == 'message' ? 'MESSAGES' : event, call, priority)
     return this
   }
 }

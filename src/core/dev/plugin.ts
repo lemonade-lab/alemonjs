@@ -108,7 +108,8 @@ export class APlugin {
         if (ron) this.e.reply('操作已超时')
       }, time * 1000),
       c,
-      func
+      func,
+      this.e
     )
     if (!con) this.e.reply('订阅错误')
   }
@@ -135,7 +136,7 @@ export class APlugin {
    * @param type 执行方法
    * @param isGroup 是否公信
    */
-  finish(func: string, isGroup = false) {
+  finish(isGroup = false) {
     const c = String(this).match(/(\w+)$/)[1] // 字符串化
     // 取消订阅
     APPS.subscribe.cancel(this.conKey(isGroup))

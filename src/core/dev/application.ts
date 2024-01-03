@@ -5,13 +5,10 @@ import { APPCONFIG } from '../configs.js'
 import { AppMap } from './data.js'
 import { Subscribe } from './subscribe.js'
 
+/**
+ * 应用
+ */
 class App {
-  /**
-   * *******
-   * 插件
-   * *******
-   */
-
   /**
    * 扫码
    * @returns
@@ -128,23 +125,13 @@ class App {
     const channel_sb = this.subscribe.find(e.channel_id)
     if (channel_sb) {
       con = true
-      const node: {
-        name: string
-        i: string
-        j: string
-        func: string
-      } = channel_sb.node
+      const node = channel_sb.node
       AppMap.get(node.name).responseNode(e, node)
     }
     const user_sb = this.subscribe.find(e.user_id)
     if (user_sb && !con) {
       con = true
-      const node: {
-        name: string
-        i: string
-        j: string
-        func: string
-      } = user_sb.node
+      const node = user_sb.node
       AppMap.get(node.name).responseNode(e, node)
       return
     }
