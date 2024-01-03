@@ -1,3 +1,8 @@
+/**
+ * ******
+ * 节点
+ * *****
+ */
 export class Node {
   next: typeof Node.prototype = null
   data = undefined
@@ -6,10 +11,24 @@ export class Node {
   }
 }
 
-export class List {
+/**
+ * *******
+ * 链表
+ * *******
+ * 在此基础上,需要增加
+ * 根据优先级去插入
+ * 优先级越小的排在前面
+ * 执行时从头走到尾
+ */
+export class ListTable {
+  // 记数
   #count = 0
+  // 头部
   #head: typeof Node.prototype = null
-
+  /**
+   * 得到头部节点
+   * @returns
+   */
   getHead() {
     return this.#head
   }
@@ -20,7 +39,6 @@ export class List {
    * @returns
    */
   push(val: any) {
-    console.log('val', val)
     const node = new Node(val)
     this.#count++
     if (this.#head === null) {
@@ -37,25 +55,21 @@ export class List {
   }
 
   /**
-   * 校验
+   * 校验索引是否合规
    * @param index
    * @returns
    */
-  v(index: number) {
+  verify(index: number) {
     return index < 0 || index >= this.#count
   }
 
-  // 从0开始
-  // data，next - data，next - data,next
-
   /**
-   * 得到节点
+   * 得到索引节点
    * @param index
    * @returns
    */
   getNodeAt(index: number) {
-    console.log('')
-    if (this.v(index)) return undefined
+    if (this.verify(index)) return undefined
     // 位置
     let p = this.#head
     for (let i = 0; i < index; i++) {
@@ -66,12 +80,12 @@ export class List {
   }
 
   /**
-   * 删除指定位置
+   * 删除指定索引
    * @param index
    * @returns
    */
   removeAt(index: number) {
-    if (this.v(index)) return undefined
+    if (this.verify(index)) return undefined
     this.#count--
     if (index === 0) {
       // 直接断掉第一个
@@ -137,16 +151,14 @@ export class List {
    * @param index
    */
   insert(data: any, index: any) {
-    if (index < 0 || index > this.#count) {
-      return false
-    }
+    if (index < 0 || index > this.#count) return false
     const node = new Node(data)
     this.#count++
     if (index == 0) {
       const current = this.#head
       node.next = current
       this.#head = node
-      return false
+      return true
     }
     // 前一个节点
     const c = this.getNodeAt(index - 1)

@@ -97,16 +97,20 @@ export class APlugin {
    */
   setContext(func: string, isGroup = false, time = 120) {
     const c = String(this).match(/(\w+)$/)[1] // 字符串化
+    // 订阅前确保前者删除
+    APPS.subscribe.cancel(this.conKey(isGroup))
     // 订阅消息
-    APPS.addSubscribe(
+    const con = APPS.subscribe.add(
       this.conKey(isGroup),
       setTimeout(() => {
-        APPS.unsubscribe(this.conKey(isGroup), c, func)
-        this.e.reply('操作超时已取消')
+        const ron = APPS.subscribe.cancel(this.conKey(isGroup))
+        // 定时取消成功
+        if (ron) this.e.reply('操作已超时')
       }, time * 1000),
       c,
       func
     )
+    if (!con) this.e.reply('订阅错误')
   }
 
   /**
@@ -115,7 +119,7 @@ export class APlugin {
    * @returns message
    */
   getContext() {
-    //
+    return APPS.subscribe.find(this.conKey())
   }
 
   /**
@@ -123,7 +127,7 @@ export class APlugin {
    * @returns message
    */
   getContextGroup() {
-    //
+    return APPS.subscribe.find(this.conKey(true))
   }
 
   /**
@@ -132,8 +136,9 @@ export class APlugin {
    * @param isGroup 是否公信
    */
   finish(func: string, isGroup = false) {
+    const c = String(this).match(/(\w+)$/)[1] // 字符串化
     // 取消订阅
-    APPS.unsubscribe(this.conKey(isGroup), String(this), func)
+    APPS.subscribe.cancel(this.conKey(isGroup))
   }
 }
 export const plugin = APlugin

@@ -1,38 +1,51 @@
 import { AMessage, EventEnum } from '../typings.js'
 import { APlugin } from '../plugin/index.js'
 import { CALL } from '../call.js'
-import { List } from '../structure/list.js'
-import { DATA } from './data.js'
-import { getAppName } from '../apps.js'
+import { ListTable } from './listtable.js'
+import { AppMap } from './data.js'
+import { getAppName } from './path.js'
 
 /**
  * 应用结构
  */
 export class Alemon {
   // 应用名
-  #name: string
-  // 数据
+  #name = 'alemonb'
+  // map计数
+  #acount = 0
+  // 集合
   #data: {
     [key: string]: {
       [key: string]: typeof APlugin
     }
   } = {}
-  // map计数
-  #acount = 0
   // 配置缓存
-  #dataMap = new Map()
+  #dataMap = new Map<string, any>()
   // 切割字符串数据集
   #strArr = []
   // 正则集
   #mergedRegexArr: RegExp[] = []
   // 大正则
-  #regular: RegExp
+  #regular: RegExp | null = null
   // 链表
-  #list = new List()
+  #list = new ListTable()
   // 事件链表
-  #elist = new List()
+  #elist = new ListTable()
 
-  // 寻找指定class - func
+  /**
+   * 创建应用
+   * @param name 应用名
+   */
+  constructor(name: string) {
+    this.#name = name
+  }
+
+  /**
+   * 寻找指定 class - func
+   * @param c
+   * @param f
+   * @returns
+   */
   find(c: string, f: string) {
     // 存在则返回
     const list = this.#list
@@ -65,7 +78,7 @@ export class Alemon {
    * @param e
    * @param node
    */
-  async responseNode(e: AMessage, node) {
+  async responseNode(e: AMessage, node: { func: any; i: string; j: string }) {
     // 缓存 new
     const cache: {
       [key: string]: typeof APlugin.prototype
@@ -250,14 +263,6 @@ export class Alemon {
   }
 
   /**
-   * 创建应用
-   * @param name 应用名
-   */
-  constructor(name: string) {
-    this.#name = name
-  }
-
-  /**
    * 扩展参数
    * @param fnc
    * @returns
@@ -308,22 +313,6 @@ export class Alemon {
       console.error('APP use', err)
     }
     return this
-  }
-
-  /**
-   * 增加新模块
-   * @param key
-   */
-  addModel(key: string) {
-    //
-  }
-
-  /**
-   * 删除模块
-   * @param key
-   */
-  delModel(key: string) {
-    //
   }
 
   /**
@@ -400,8 +389,7 @@ export class Alemon {
    */
   mount() {
     this.analysis()
-    console.log('list', this.#list)
-    DATA.set(this.#name, this)
+    AppMap.set(this.#name, this)
   }
 
   /**

@@ -2,11 +2,19 @@ import { AMessage } from '../typings.js'
 import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
 import { APPCONFIG } from '../configs.js'
-import { DATA } from './data.js'
+import { AppMap } from './data.js'
+import { Subscribe } from './subscribe.js'
 
 class App {
   /**
-   * 扫描插件
+   * *******
+   * 插件
+   * *******
+   */
+
+  /**
+   * 扫码
+   * @returns
    */
   load() {
     const dir = join(process.cwd(), APPCONFIG.get('dir'))
@@ -68,115 +76,27 @@ class App {
     return
   }
 
-  // 大正则：
-  #regular: RegExp
   // 大正则数组
   #mergedRegexArr: RegExp[] = []
+  // 数组化正则
+  #regular: RegExp
   // 正则-key
   #regMap = {}
 
-  // 订阅详细
-  #sb: {
-    [key: string]: {
-      id: any
-      node: any
-    }
-  } = {}
+  subscribe = new Subscribe()
 
   /**
-   * 发布订阅
-   * @param key
-   * @param id
-   * @param c
-   * @param f
-   * @returns
+   * ***********
+   * ***********
    */
-  addSubscribe(key: string, id: any, c: string, f: string) {
-    let con = false
-    for (const item in DATA.all()) {
-      // 寻找节点
-      const node = DATA.get[item].find(c, f)
-      if (node) {
-        con = true
-        // 记录订阅
-        this.#sb[key] = {
-          id, // 定时器
-          node // 节点
-        }
-        break
-      }
-    }
-    return con
-  }
-
-  /**
-   * 取消订阅
-   * @param key
-   * @param c
-   * @param f
-   */
-  unsubscribe(key: string, c: string, f: string) {
-    // 取消的时候,先把定时器关闭
-    if (!Object.prototype.hasOwnProperty.call(this.#sb, key)) return false
-    const id = this.#sb[key].id
-    clearTimeout(id)
-    delete this.#sb[key]
-    return false
-  }
-
-  /**
-   * 寻找订阅
-   * @param key
-   * @param c
-   * @param f
-   * @returns
-   */
-  findSubscribe(key: string) {
-    // 取消的时候,先把定时器关闭
-    if (!Object.prototype.hasOwnProperty.call(this.#sb, key)) return false
-    return this.#sb[key]
-  }
-
-  /**
-   * 得到大正则
-   * @returns
-   */
-  getReg() {
-    return this.#regular
-  }
-
-  /**
-   * 得到正则key
-   * @returns
-   */
-  getMap() {
-    return this.#regMap
-  }
-
-  /**
-   * 删除指定模块
-   * @param key
-   * @param model
-   */
-  delModel(key: string, model: string) {
-    //
-  }
-
-  /**
-   * 增加指定模块
-   * @param key
-   */
-  addModel(key: string) {
-    //
-  }
 
   /**
    * 初始化
    */
   init() {
     // 得到所有key
-    for (const item in DATA.all()) {
-      const reg = DATA.get(item).getReg()
+    for (const item in AppMap.keys()) {
+      const reg = AppMap.get(item).getReg()
       if (reg) this.#mergedRegexArr.push()
     }
     // 构造大正则
@@ -205,7 +125,7 @@ class App {
    */
   response(e: AMessage) {
     let con = false
-    const channel_sb = this.findSubscribe(e.channel_id)
+    const channel_sb = this.subscribe.find(e.channel_id)
     if (channel_sb) {
       con = true
       const node: {
@@ -214,11 +134,9 @@ class App {
         j: string
         func: string
       } = channel_sb.node
-
-      DATA.get(node.name).responseNode(e, node)
+      AppMap.get(node.name).responseNode(e, node)
     }
-
-    const user_sb = this.findSubscribe(e.user_id)
+    const user_sb = this.subscribe.find(e.user_id)
     if (user_sb && !con) {
       con = true
       const node: {
@@ -227,7 +145,7 @@ class App {
         j: string
         func: string
       } = user_sb.node
-      DATA.get(node.name).responseNode(e, node)
+      AppMap.get(node.name).responseNode(e, node)
       return
     }
 
@@ -235,12 +153,12 @@ class App {
 
     // 正则系统
     if (!this.trigger(e.msg)) return
-    const map = this.getMap()
-    for (const item in map) {
+    // 分发
+    for (const item in this.#regMap) {
       // key触发
       if (new RegExp(item).test(e.msg)) {
         // app name
-        DATA.get(map[item]).response(e)
+        AppMap.get(this.#regMap[item]).response(e)
       }
     }
   }
@@ -250,14 +168,12 @@ class App {
    * @param e
    */
   responseEventType(e: AMessage) {
-    // 分发出去
-    for (const item in DATA.all()) {
-      DATA.get(item).responseEventType(e)
+    // 分发
+    for (const item in AppMap.keys()) {
+      AppMap.get(item).responseEventType(e)
     }
   }
 }
 
-/**
- * 索引系统
- */
+// 索引系统
 export const APPS = new App()
