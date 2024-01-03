@@ -4,7 +4,6 @@ import {
   APluginTaskType
 } from '../plugin/types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
-
 import { APPS } from './application.js'
 
 /**

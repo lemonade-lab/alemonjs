@@ -7,13 +7,6 @@ import { NodeDataType } from './listtable.js'
  * key2 c
  * val func
  * ***********
- *
- * 事件发生时,k识别,会存在多个class,也就是触发多个
- *
- * 使用 c 和 func来寻找,
- * 如果存在一个app使用了两次use同一个的情况,
- * 应该排出去
- *
  */
 export class Subscribe {
   #sb: {
@@ -24,15 +17,17 @@ export class Subscribe {
       node: NodeDataType
     }
   } = {}
+
   /**
    * 发布订阅
    * @param key
    * @param id
    * @param c
    * @param f
+   * @param data
    * @returns
    */
-  add(key: string, id: any, c: string, f: string, data) {
+  add(key: string, id: any, c: string, f: string, data: any) {
     let node: NodeDataType
     for (const item in AppMap.keys()) {
       // 寻找节点

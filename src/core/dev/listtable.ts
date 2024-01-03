@@ -1,19 +1,38 @@
+/**
+ * 索引节点
+ */
 export interface NodeDataType {
-  // 应用归属
+  /**
+   * 应用归属
+   */
   name: string
-  // 集合id
+  /**
+   * 集合id
+   */
   i: string
-  // 实例名
+  /**
+   * 实例名
+   */
   j: string
-  // 正则
+  /**
+   * 正则
+   */
   reg: RegExp
-  // 事件
+  /**
+   * 事件
+   */
   event: string
-  // 优先级
-  priority: number
-  // 类型
+  /**
+   * 类型
+   */
   typing: string
-  // 方法
+  /**
+   * 优先级
+   */
+  priority: number
+  /**
+   * 方法
+   */
   func: string
 }
 
@@ -23,7 +42,13 @@ export interface NodeDataType {
  * *****
  */
 export class Node {
+  /**
+   * 下一个节点
+   */
   next: typeof Node.prototype = null
+  /**
+   * 当前节点数据
+   */
   data: NodeDataType = undefined
   constructor(data: any) {
     this.data = data
@@ -32,18 +57,19 @@ export class Node {
 
 /**
  * *******
- * 链表
+ * 索引链表
  * *******
- * 在此基础上,需要增加
- * 根据优先级去插入
- * 优先级越小的排在前面
- * 执行时从头走到尾
  */
 export class ListTable {
-  // 记数
+  /**
+   * 记数
+   */
   #count = 0
-  // 头部
+  /**
+   * 头部
+   */
   #head: typeof Node.prototype = null
+
   /**
    * 得到头部节点
    * @returns
@@ -161,9 +187,6 @@ export class ListTable {
     return this.removeAt(this.indexOf(val))
   }
 
-  // 从0开始
-  // data，next - data，next - data,next
-
   /**
    * 指定位置插入
    * @param data
@@ -187,10 +210,18 @@ export class ListTable {
     return true
   }
 
+  /**
+   * 长度 | 大小
+   * @returns
+   */
   size() {
     return this.#count
   }
 
+  /**
+   * 是否为空
+   * @returns
+   */
   isEmpty() {
     return this.size() == 0
   }
