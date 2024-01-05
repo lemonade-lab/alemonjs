@@ -39,10 +39,10 @@ export function createWeb(
 
   // 处理图片请求
   const imgRouter = getServerConfig('fileRouter')
-  router.get(`${imgRouter}/:filename`, getLocalFile)
+  router.get(`${imgRouter}/:filename`, getLocalFile as any)
 
   const addressRouter = getServerConfig('addressRouter')
-  router.get(`${addressRouter}`, getFileByAddress)
+  router.get(`${addressRouter}`, getFileByAddress as any)
 
   const port = getServerConfig('port')
   // 将路由注册到应用
