@@ -16,7 +16,6 @@ export * from './login.js'
  * *************
  */
 export * from './define/index.js'
-
 /**
  * *************
  * core-main
@@ -31,6 +30,10 @@ export * from './api/index.js'
  * client
  */
 export * from './client.js'
+/**
+ * image
+ */
+export * from './image.js'
 /**
  * *************
  * exit

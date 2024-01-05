@@ -167,7 +167,7 @@ export class ListTable {
    * @param val
    * @returns
    */
-  indexOf(val: any): number {
+  indexOf(val: number): number {
     let p = this.#head
     for (let i = 0; i < this.#count; i++) {
       // 判断？
@@ -192,7 +192,7 @@ export class ListTable {
    * @param data
    * @param index
    */
-  insert(data: any, index: any) {
+  insert(data: any, index: number) {
     if (index < 0 || index > this.#count) return false
     const node = new Node(data)
     this.#count++
@@ -208,6 +208,43 @@ export class ListTable {
     node.next = p
     c.next = node
     return true
+  }
+
+  /**
+   * 条件插入
+   * @param condition
+   * @param val
+   */
+  traverseAndInsert(
+    condition: (val: NodeDataType) => boolean,
+    val: NodeDataType
+  ) {
+    let current = this.#head
+    let prev = null
+    // 循环走动
+    while (current) {
+      // 传入函数
+      if (condition(current.data)) {
+        // 新节点
+        const node = new Node(val)
+        // 该节点的下一个节点是 走动的节点
+        node.next = current
+        // 如果上一个存在
+        if (prev) {
+          // 上一个指向该节点
+          prev.next = node
+        } else {
+          // 不存在就是头
+          this.#head = node
+        }
+        prev = node
+        return true
+      }
+      // 保存上一个节点
+      prev = current
+      // 走动
+      current = current.next
+    }
   }
 
   /**

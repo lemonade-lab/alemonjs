@@ -335,40 +335,60 @@ export class Alemon {
             // 是字符串,但匹配不出函数
             continue
           }
-          // 解析出索引
-          if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
-            // 消息索引
-            const reg = new RegExp(key['reg'])
-            this.#mergedRegexArr.push(reg)
-            this.#list.push({
-              name: this.#name,
-              i,
-              j,
-              event: keys['event'] ?? 'MESSAGES',
-              typing: keys['typing'] ?? 'CREATE',
-              reg,
-              priority: key['priority'] ?? 9000,
-              func:
-                typeof key['fnc'] == 'string'
-                  ? key['fnc']
-                  : String(key['fnc']).match(/:\s*(\w+)\]/)[1]
-            })
-            continue
-          }
-          // 类型索引
-          this.#elist.push({
+          const priority = key['priority'] ?? 9000
+          const node = {
             name: this.#name,
             i,
             j,
             event: keys['event'],
             typing: keys['typing'],
-            priority: key['priority'],
             reg: /.*/,
+            priority: priority,
             func:
               typeof key['fnc'] == 'string'
                 ? key['fnc']
                 : String(key['fnc']).match(/:\s*(\w+)\]/)[1]
-          })
+          }
+          // 解析出索引
+          if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
+            // 消息索引
+            const reg = new RegExp(key['reg'])
+            this.#mergedRegexArr.push(reg)
+            // 更改内容
+            node.reg = reg
+            node.event = 'MESSAGES'
+            node.typing = 'CREATE'
+            if (this.#list.isEmpty()) {
+              this.#list.push(node)
+            } else {
+              // 条件插入
+              if (
+                !this.#list.traverseAndInsert(
+                  node => priority < node.priority,
+                  node
+                )
+              ) {
+                // 没插入,就说明走到尾巴都没满足
+                this.#list.push(node)
+              }
+            }
+            continue
+          }
+          // 类型索引
+          if (this.#elist.isEmpty()) {
+            this.#elist.push(node)
+          } else {
+            // 条件插入
+            if (
+              !this.#elist.traverseAndInsert(
+                node => priority < node.priority,
+                node
+              )
+            ) {
+              // 没插入,就说明走到尾巴都没满足
+              this.#elist.push(node)
+            }
+          }
           continue
         }
       }

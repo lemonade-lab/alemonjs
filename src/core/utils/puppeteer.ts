@@ -8,6 +8,26 @@ import queryString from 'querystring'
 import { watch } from 'fs'
 import { executablePath } from './pup.js'
 
+export interface ScreenshotFileOptions {
+  SOptions: {
+    type: 'jpeg' | 'png' | 'webp'
+    quality: number
+  }
+  tab: string
+  timeout: number
+}
+
+export interface ScreenshotUrlOptions {
+  url: string
+  time?: number
+  rand?: ScreenshotOptions
+  params?: queryString.ParsedUrlQueryInput
+  tab?: string
+  timeout?: number
+  cache?: boolean
+  waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
+}
+
 class Pup {
   // 截图次数记录
   pic = 0
@@ -110,11 +130,7 @@ class Pup {
    */
   async toFile(
     htmlPath: string | Buffer | URL,
-    Options: {
-      SOptions: ScreenshotOptions
-      tab?: string
-      timeout?: number
-    }
+    Options: ScreenshotFileOptions
   ) {
     if (!(await this.isStart())) return false
     const { SOptions, tab = 'body', timeout = 120000 } = Options
@@ -148,16 +164,7 @@ class Pup {
    * @param val url地址
    * @returns buffer
    */
-  async toUrl(val: {
-    url: string
-    time?: number
-    rand?: ScreenshotOptions
-    params?: queryString.ParsedUrlQueryInput
-    tab?: string
-    timeout?: number
-    cache?: boolean
-    waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
-  }) {
+  async toUrl(val: ScreenshotUrlOptions) {
     if (!(await this.isStart())) return false
     const {
       url,

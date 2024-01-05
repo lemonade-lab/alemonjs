@@ -1,6 +1,5 @@
 import { existsSync, realpathSync } from 'fs'
 import { execSync } from 'child_process'
-import { Configuration } from 'puppeteer'
 const platform = process.platform
 const win32Edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 // Path
