@@ -70,24 +70,32 @@ export class DoublyLinkedList<T> {
   prepend(value: T): void {
     // 创建节点
     const newNode = new Node(value)
-    // 更新记录
-    this.size++
     // 是否为空
     if (this.isEmpty()) {
+      // 更新记录
+      this.size++
       this.head = newNode
       this.tail = newNode
-      this.middle = newNode
+      this.middle = this.head
     } else {
+      // 更新记录
+      this.size++
       // 新节点的下一个记录为头部
       newNode.next = this.head
-      // 头部的 前一个 记录为 新节点
-      this.head.prev = newNode
+      this.head!.prev = newNode
       // 头部 重定向为  新节点
       this.head = newNode
       // 计算中间节点
-      if (this.size % 2 === 1) {
-        // 如果是单的,更新中间节点
-        this.middle = this.middle.prev
+      if (this.size == 2) {
+        this.middle = this.head
+      } else if (this.size == 3) {
+        // 走到中间
+        this.middle = this.head.next
+      } else if (this.size % 2 === 1) {
+        this.upMiddle(() => {
+          // 如果是单的,更新中间节点
+          this.middle = this.middle.prev
+        })
       }
     }
   }
@@ -99,22 +107,31 @@ export class DoublyLinkedList<T> {
   append(value: T): void {
     // 建立节点
     const newNode = new Node(value)
-    // 更新记录
-    this.size++
     // 是否为空
     if (this.isEmpty()) {
+      // 更新记录
+      this.size++
       this.head = newNode
       this.tail = newNode
       this.middle = newNode
     } else {
+      // 更新记录
+      this.size++
       // 新节点的 前一个 记录为 尾部
       newNode.prev = this.tail
-      // 尾部的下一个 记录为 新节点
-      this.tail.next = newNode
+      this.tail!.prev = newNode
       // 更新尾部节点
       this.tail = newNode
-      if (this.size % 2 === 1) {
-        this.middle = this.middle.next
+
+      if (this.size == 2) {
+        this.middle = this.head
+      } else if (this.size == 3) {
+        // 走到中间
+        this.middle = this.head.next
+      } else if (this.size % 2 === 1) {
+        this.upMiddle(() => {
+          this.middle = this.middle.next
+        })
       }
     }
   }
@@ -147,6 +164,13 @@ export class DoublyLinkedList<T> {
 
         // 缩减
         this.size--
+
+        if (this.size == 2) {
+          this.middle = this.head
+        } else if (this.size == 3) {
+          // 走到中间
+          this.middle = this.head.next
+        }
 
         // 如果刚好是中间节点被移除
         if (this.middle.value == value) {
@@ -292,6 +316,22 @@ export class DoublyLinkedList<T> {
     }
 
     return false
+  }
+
+  /**
+   * 更新中间节点
+   * @param func
+   */
+  upMiddle(func: () => any) {
+    if (this.size == 2) {
+      // 固定在头部
+      this.middle = this.head
+    } else if (this.size == 3) {
+      // 走到中间
+      this.middle = this.head.next
+    } else if (this.size % 2 === 1) {
+      func.call(this)
+    }
   }
 
   /**

@@ -82,7 +82,7 @@ export class APlugin {
    * @param isGroup
    * @returns key
    */
-  #conKey(isGroup = false) {
+  conKey(isGroup = false) {
     // 应用名 频道号
     if (isGroup) return this.e.channel_id
     // 应用名 用户编号
@@ -98,15 +98,15 @@ export class APlugin {
   setContext(func: string, isGroup = false, time = 120) {
     const belong = String(this).match(/(\w+)$/)[1] // 字符串化
     // 订阅前确保前者删除
-    ASubscribe.cancel(this.#conKey(isGroup))
+    ASubscribe.cancel(this.conKey(isGroup))
     // 订阅消息
     const con = ASubscribe.add(
       this.acount,
       belong,
       func,
-      this.#conKey(isGroup),
+      this.conKey(isGroup),
       setTimeout(() => {
-        const ron = ASubscribe.cancel(this.#conKey(isGroup))
+        const ron = ASubscribe.cancel(this.conKey(isGroup))
         // 定时取消成功
         if (ron) this.e.reply('操作已超时')
       }, time * 1000)
@@ -120,7 +120,7 @@ export class APlugin {
    * @returns message
    */
   getContext() {
-    return ASubscribe.find(this.#conKey())
+    return ASubscribe.find(this.conKey())
   }
 
   /**
@@ -128,7 +128,7 @@ export class APlugin {
    * @returns message
    */
   getContextGroup() {
-    return ASubscribe.find(this.#conKey(true))
+    return ASubscribe.find(this.conKey(true))
   }
 
   /**
@@ -138,7 +138,7 @@ export class APlugin {
    */
   finish(isGroup = false) {
     // 取消订阅
-    ASubscribe.cancel(this.#conKey(isGroup))
+    ASubscribe.cancel(this.conKey(isGroup))
   }
 }
 export const plugin = APlugin

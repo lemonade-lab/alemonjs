@@ -1,5 +1,5 @@
 import { AMessage, EventEnum } from '../typings.js'
-import { APlugin } from '../plugin/index.js'
+import { APlugin } from './plugin.js'
 import { NodeDataType } from './types.js'
 import { AppMap } from './data.js'
 import { getAppName } from './path.js'
@@ -315,6 +315,7 @@ export class Alemon {
           // 是字符串,但匹配不出函数
           continue
         }
+        const priority = key['priority'] ?? 9000
         const node = {
           name: keys.name,
           acount: keys.acount,
@@ -322,7 +323,7 @@ export class Alemon {
           event: keys['event'],
           typing: keys['typing'],
           reg: /.*/,
-          priority: key['priority'],
+          priority: priority,
           func:
             typeof key['fnc'] == 'string'
               ? key['fnc']
@@ -342,25 +343,25 @@ export class Alemon {
             this.#list.prepend(node)
           } else {
             // 比头部小
-            if (key['priority'] < this.#list.getHead().value.priority) {
+            if (priority <= this.#list.getHead().value.priority) {
               this.#list.prepend(node)
               continue
             }
             // 比尾部大
-            if (key['priority'] > this.#list.getTail().value.priority) {
+            if (priority >= this.#list.getTail().value.priority) {
               this.#list.append(node)
               continue
             }
-            if (key['priority'] < this.#list.getMiddle().value.priority) {
+            if (priority <= this.#list.getMiddle().value.priority) {
               // 比中间的节点小, 顺序插入
               this.#elist.traverseAndInsert(
-                node => key['priority'] < node.priority,
+                node => priority < node.priority,
                 node
               )
             } else {
               // 逆序插入
               this.#elist.traverseAndInsertTail(
-                node => key['priority'] < node.priority,
+                node => priority < node.priority,
                 node
               )
             }
@@ -372,26 +373,26 @@ export class Alemon {
           this.#elist.prepend(node)
         } else {
           // 比头部小
-          if (key['priority'] < this.#list.getHead().value.priority) {
+          if (priority <= this.#list.getHead().value.priority) {
             this.#list.prepend(node)
             continue
           }
           // 比尾部大
-          if (key['priority'] > this.#list.getTail().value.priority) {
+          if (priority >= this.#list.getTail().value.priority) {
             this.#list.append(node)
             continue
           }
 
-          if (key['priority'] < this.#list.getMiddle().value.priority) {
+          if (priority <= this.#list.getMiddle().value.priority) {
             // 比中间的节点小, 顺序插入
             this.#elist.traverseAndInsert(
-              node => key['priority'] < node.priority,
+              node => priority < node.priority,
               node
             )
           } else {
             // 逆序插入
             this.#elist.traverseAndInsertTail(
-              node => key['priority'] < node.priority,
+              node => priority < node.priority,
               node
             )
           }
@@ -412,6 +413,7 @@ export class Alemon {
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
+    console.log('list', this.#list)
     AppMap.set(this.#name, this)
   }
 
