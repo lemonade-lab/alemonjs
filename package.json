@@ -3,12 +3,12 @@
   "version": "1.1.39",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
+    "test": "ts-node apps.ts",
     "dev": "ts-node alemon.config.ts",
     "tsc": "tsc",
     "ts": "ts-node",
     "doc": "typedoc --options typedoc.json",
     "format": "prettier --write .",
-    "test": "",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },
   "dependencies": {

@@ -4,7 +4,7 @@ import {
   APluginTaskType
 } from '../plugin/types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
-import { APPS } from './application.js'
+import { ASubscribe } from './subscribe.js'
 
 /**
  * alemonjs plugin
@@ -19,11 +19,11 @@ export class APlugin {
   /**
    * 模块名
    */
-  name?: string
+  name?: string = 'alemonb'
   /**
-   * 模块说明
+   * 层级
    */
-  dsc?: string
+  acount?: number = 0
   /**
    * 事件枚举
    */
@@ -45,18 +45,20 @@ export class APlugin {
    */
   task?: APluginTaskType
   /**
-   * @param name 类名标记        default app-name
    * @param event 事件类型       default MESSAGES
    * @param typing 消息类型   default CREATE
    * @param priority 优先级      越小优越高 default 9000
+   * @param rule.priority 优先级    数字越小优先级越高
    * @param rule.reg 命令正则    RegExp | string
    * @param rule.fnc 命令函数    function
    * @param rule.dsc 指令示范    sdc
    * @param rule.doc 指令文档    doc
-   * @param rule.priority 优先级    数字越小优先级越高
    */
   constructor(init?: APluginInitType) {
-    Object.assign(this, init)
+    this.event = init?.event ?? 'MESSAGES'
+    this.typing = init?.typing ?? 'CREATE'
+    this.priority = init?.priority ?? 9000
+    this.rule = init?.rule ?? []
   }
 
   /**
@@ -72,8 +74,7 @@ export class APlugin {
       withdraw?: number
     }
   ) {
-    if (!this.e.reply || !content || content == '') return false
-    return await this.e.reply(content, select)
+    return this.e.reply(content, select)
   }
 
   /**
@@ -81,7 +82,7 @@ export class APlugin {
    * @param isGroup
    * @returns key
    */
-  conKey(isGroup = false) {
+  #conKey(isGroup = false) {
     // 应用名 频道号
     if (isGroup) return this.e.channel_id
     // 应用名 用户编号
@@ -95,20 +96,20 @@ export class APlugin {
    * @param time 操作时间，默认120秒
    */
   setContext(func: string, isGroup = false, time = 120) {
-    const c = String(this).match(/(\w+)$/)[1] // 字符串化
+    const belong = String(this).match(/(\w+)$/)[1] // 字符串化
     // 订阅前确保前者删除
-    APPS.subscribe.cancel(this.conKey(isGroup))
+    ASubscribe.cancel(this.#conKey(isGroup))
     // 订阅消息
-    const con = APPS.subscribe.add(
-      this.conKey(isGroup),
+    const con = ASubscribe.add(
+      this.acount,
+      belong,
+      func,
+      this.#conKey(isGroup),
       setTimeout(() => {
-        const ron = APPS.subscribe.cancel(this.conKey(isGroup))
+        const ron = ASubscribe.cancel(this.#conKey(isGroup))
         // 定时取消成功
         if (ron) this.e.reply('操作已超时')
-      }, time * 1000),
-      c,
-      func,
-      this.e
+      }, time * 1000)
     )
     if (!con) this.e.reply('订阅错误')
   }
@@ -119,7 +120,7 @@ export class APlugin {
    * @returns message
    */
   getContext() {
-    return APPS.subscribe.find(this.conKey())
+    return ASubscribe.find(this.#conKey())
   }
 
   /**
@@ -127,7 +128,7 @@ export class APlugin {
    * @returns message
    */
   getContextGroup() {
-    return APPS.subscribe.find(this.conKey(true))
+    return ASubscribe.find(this.#conKey(true))
   }
 
   /**
@@ -136,9 +137,8 @@ export class APlugin {
    * @param isGroup 是否公信
    */
   finish(isGroup = false) {
-    const c = String(this).match(/(\w+)$/)[1] // 字符串化
     // 取消订阅
-    APPS.subscribe.cancel(this.conKey(isGroup))
+    ASubscribe.cancel(this.#conKey(isGroup))
   }
 }
 export const plugin = APlugin

@@ -3,7 +3,7 @@ import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
 import { APPCONFIG } from '../configs.js'
 import { AppMap } from './data.js'
-import { Subscribe } from './subscribe.js'
+import { ASubscribe } from './subscribe.js'
 
 /**
  * 应用
@@ -80,8 +80,6 @@ class App {
   // 正则-key
   #regMap = {}
 
-  subscribe = new Subscribe()
-
   /**
    * ***********
    * ***********
@@ -122,13 +120,13 @@ class App {
    */
   response(e: AMessage) {
     let con = false
-    const channel_sb = this.subscribe.find(e.channel_id)
+    const channel_sb = ASubscribe.find(e.channel_id)
     if (channel_sb) {
       con = true
       const node = channel_sb.node
       AppMap.get(node.name).responseNode(e, node)
     }
-    const user_sb = this.subscribe.find(e.user_id)
+    const user_sb = ASubscribe.find(e.user_id)
     if (user_sb && !con) {
       con = true
       const node = user_sb.node
@@ -140,6 +138,7 @@ class App {
 
     // 正则系统
     if (!this.trigger(e.msg)) return
+
     // 分发
     for (const item in this.#regMap) {
       // key触发

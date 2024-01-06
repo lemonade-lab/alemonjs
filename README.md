@@ -27,7 +27,6 @@
 | [alemonjs]        | [![alemonjs-status]][alemonjs-package]               | 标准应用解析器  |
 | [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架  |
 | [afloat]          | [![afloat-status]][afloat-package]                   | 应用构建工具    |
-| [alemon-image]    | [![alemon-image-status]][alemon-image-package]       | 图片调试工具    |
 | [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载 |
 | [alemon-onebot]   | [![alemon-onebot-status]][alemon-onebot-package]     | OneBot 协议平台 |
 
@@ -54,12 +53,6 @@
 [alemon-ffmpeg]: https://github.com/kongxiangyiren/alemon-ffmpeg
 [alemon-ffmpeg-status]: https://img.shields.io/npm/v/alemon-ffmpeg.svg
 [alemon-ffmpeg-package]: https://www.npmjs.com/package/alemon-ffmpeg
-
->
-
-[alemon-image]: https://github.com/ningmengchongshui/alemon/tree/alemon-image
-[alemon-image-status]: https://img.shields.io/npm/v/alemon-image.svg
-[alemon-image-package]: https://www.npmjs.com/package/alemon-image
 
 >
 
@@ -186,7 +179,7 @@ npm run build
 
 该程序可放置于`plugins/your plugin name`文件夹下
 
-### dependencies
+### Dependencies
 
 ```json
 {

@@ -11,13 +11,11 @@ import { NodeDataType } from './listtable.js'
 export class Subscribe {
   #sb: {
     [key: string]: {
-      data: any
       // 定时器id
       id: any
       node: NodeDataType
     }
   } = {}
-
   /**
    * 发布订阅
    * @param key
@@ -27,11 +25,11 @@ export class Subscribe {
    * @param data
    * @returns
    */
-  add(key: string, id: any, c: string, f: string, data: any) {
+  add(acount: number, c: string, func: string, key: string, id: any) {
     let node: NodeDataType
     for (const item in AppMap.keys()) {
       // 寻找节点
-      node = AppMap.get(item).find(c, f)
+      node = AppMap.get(item).find(acount, c, func)
       if (node) break
     }
     // 订阅失败
@@ -40,7 +38,6 @@ export class Subscribe {
     this.cancel(key)
     // 记录订阅
     this.#sb[key] = {
-      data,
       id, // 定时器
       node // 节点
     }
@@ -75,3 +72,4 @@ export class Subscribe {
     return this.#sb[key]
   }
 }
+export const ASubscribe = new Subscribe()

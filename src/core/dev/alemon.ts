@@ -18,7 +18,8 @@ export class Alemon {
     // 集合索引
     [key: string]: {
       // 应用索引 - 应用
-      [key: string]: typeof APlugin
+      [key: string]: typeof APlugin.prototype
+      //
     }
   } = {}
   // 配置缓存
@@ -29,7 +30,7 @@ export class Alemon {
   #mergedRegexArr: RegExp[] = []
   // 大正则
   #regular: RegExp | null = null
-  // 链表
+  // 消息链表
   #list = new ListTable()
   // 事件链表
   #elist = new ListTable()
@@ -43,23 +44,29 @@ export class Alemon {
   }
 
   /**
-   * 寻找指定 class - func
-   * @param c
-   * @param f
+   * 寻找节点
+   * @param acount
+   * @param example
+   * @param func
    * @returns
    */
-  find(c: string, f: string) {
-    // 存在则返回
-    const list = this.#list
-    let val: NodeDataType = null
-    for (let i = 0; i < list.size(); i++) {
-      const node = list.removeAt(0)
-      if (node.j == c && node.func == f) {
-        val = node
-        break
+  find(acount: number, example: string, func: string) {
+    if (
+      this.#data[acount][example] &&
+      this.#data[acount][example][func] &&
+      typeof this.#data[acount][example][func] == 'function'
+    ) {
+      return {
+        name: this.#name,
+        acount: acount,
+        example: example,
+        reg: /.*/,
+        event: 'MESSAGES',
+        typing: 'CREATE',
+        priority: 90000,
+        func: func
       }
     }
-    return val
   }
 
   /**
@@ -76,10 +83,6 @@ export class Alemon {
    * @param node
    */
   async responseNode(e: AMessage, node: NodeDataType) {
-    // 缓存 new
-    const cache: {
-      [key: string]: typeof APlugin.prototype
-    } = {}
     /**
      * **********
      * 构造配置
@@ -95,30 +98,23 @@ export class Alemon {
     if (typeof argFunc == 'function') {
       arr = await argFunc(e)
     }
-    /**
-     * 节点响应
-     */
-    const key = `${node.i}${node.j}`
-    // 看看有没有缓存new
-    if (!Object.prototype.hasOwnProperty.call(cache, key)) {
-      const app = new this.#data[node.i][node.j]()
-      app.e = e
-      cache[key] = app
-    }
+
+    this.#data[node.acount][node.example].e = e
 
     // 执行
-    const res = await cache[key][node.func](e, ...arr)
+    const res = await this.#data[node.acount][node.example]
+      [node.func](e, ...arr)
       .then(res => {
-        console.info(this.info(e, String(node.func)))
+        console.info(this.info(e, node.func))
         return res
       })
       .catch(err => {
-        console.error(this.err(e, String(node.func)), err)
+        console.error(this.err(e, node.func), err)
       })
     // 重执行
     if (res && typeof res != 'boolean') {
       await e.reply(res).catch(err => {
-        console.error(this.err(e, String(node.func)), err)
+        console.error(this.err(e, node.func), err)
       })
     }
   }
@@ -132,10 +128,6 @@ export class Alemon {
     if (this.#list.isEmpty) return
     // 消息进来,开始走表
     const list = this.#list
-    // 缓存 new
-    const cache: {
-      [key: string]: typeof APlugin.prototype
-    } = {}
 
     /**
      * **********
@@ -163,34 +155,29 @@ export class Alemon {
       const node = list.removeAt(0)
       // 索引匹配
       if (node.reg.test(e.msg)) {
-        const key = `${node.i}${node.j}`
-        // 看看有没有缓存new
-        if (!Object.prototype.hasOwnProperty.call(cache, key)) {
-          const app = new this.#data[node.i][node.j]()
-          app.e = e
-          cache[key] = app
-        }
+        this.#data[node.acount][node.example].e = e
         try {
           // 执行
-          const res = await cache[key][node.func](e, ...arr)
+          const res = await this.#data[node.acount][node.example]
+            [node.func](e, ...arr)
             .then(res => {
-              console.info(this.info(e, String(node.func)))
+              console.info(this.info(e, node.func))
               return res
             })
             .catch(err => {
-              console.error(this.err(e, String(node.func)), err)
+              console.error(this.err(e, node.func), err)
               // 错误了就强制中断
             })
           // 重执行
           if (res && typeof res != 'boolean') {
             await e.reply(res).catch(err => {
-              console.error(this.err(e, String(node.func)), err)
+              console.error(this.err(e, node.func), err)
             })
           }
           // 不是 false ,也就是不放行
           if (res != false) break
         } catch (err) {
-          console.error(this.err(e, String(node.func)), err)
+          console.error(this.err(e, node.func), err)
           break
         }
       }
@@ -205,9 +192,6 @@ export class Alemon {
     // 空的
     if (this.#elist.isEmpty) return
     const list = this.#elist
-    const cache: {
-      [key: string]: typeof APlugin.prototype
-    } = {}
     /**
      * *****
      * ******
@@ -231,14 +215,10 @@ export class Alemon {
       // 类型不符
       if (node.event !== e.event || node.typing !== e.typing) continue
       //
-      const key = `${node.i}${node.j}`
-      if (!Object.prototype.hasOwnProperty.call(cache, key)) {
-        const app = new this.#data[node.i][node.j]()
-        app.e = e
-        cache[key] = app
-      }
+      this.#data[node.acount][node.example].e = e
       try {
-        const res = await cache[key][node.func](e, ...arr)
+        const res = await this.#data[node.acount][node.example]
+          [node.func](e, ...arr)
           .then(res => {
             console.info(this.info(e, String(node.func)))
             return res
@@ -304,7 +284,92 @@ export class Alemon {
       [key: string]: typeof APlugin
     } = {}
   ) {
-    this.#data[this.#acount] = AplguinMap
+    // 分配集合
+    this.#data[this.#acount] = {}
+    // 收集
+    for (const example in AplguinMap) {
+      const keys = new AplguinMap[example]()
+      // 标记name和层级
+      keys.name = this.#name
+      keys.acount = this.#acount
+      // 记录
+      this.#data[this.#acount][example] = keys
+      // 忽视非法key
+      if (
+        !keys['rule'] ||
+        !Array.isArray(keys['rule']) ||
+        keys['rule'].length == 0
+      ) {
+        continue
+      }
+      for (const key of keys['rule']) {
+        const ty = typeof key['fnc']
+        if (
+          (ty !== 'string' && ty !== 'function') ||
+          (typeof key['fnc'] == 'string' &&
+            typeof keys[key['fnc']] !== 'function')
+        ) {
+          // 不是字符串,也不是函数
+          // 是字符串,但匹配不出函数
+          continue
+        }
+        const node = {
+          name: keys.name,
+          acount: keys.acount,
+          example: example,
+          event: keys['event'],
+          typing: keys['typing'],
+          reg: /.*/,
+          priority: key['priority'],
+          func:
+            typeof key['fnc'] == 'string'
+              ? key['fnc']
+              : String(key['fnc']).match(/:\s*(\w+)\]/)[1]
+        }
+        // 解析出索引
+        if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
+          // 消息索引
+          const reg = new RegExp(key['reg'])
+          this.#mergedRegexArr.push(reg)
+          // 更改内容
+          node.reg = reg
+          node.event = 'MESSAGES'
+          node.typing = 'CREATE'
+          if (this.#list.isEmpty()) {
+            this.#list.push(node)
+          } else {
+            // 条件插入
+            if (
+              !this.#list.traverseAndInsert(
+                node => key['priority'] < node.priority,
+                node
+              )
+            ) {
+              // 没插入,就说明走到尾巴都没满足
+              this.#list.push(node)
+            }
+          }
+          continue
+        }
+        // 类型索引
+        if (this.#elist.isEmpty()) {
+          this.#elist.push(node)
+        } else {
+          // 条件插入
+          if (
+            !this.#elist.traverseAndInsert(
+              node => key['priority'] < node.priority,
+              node
+            )
+          ) {
+            // 没插入,就说明走到尾巴都没满足
+            this.#elist.push(node)
+          }
+        }
+        continue
+      }
+    }
+    // 累计
     this.#acount++
     return this
   }
@@ -313,86 +378,6 @@ export class Alemon {
    * 挂载
    */
   mount() {
-    for (const i in this.#data) {
-      for (const j in this.#data[i]) {
-        const keys = new this.#data[i][j]()
-        // 忽视非法key
-        if (
-          !keys['rule'] ||
-          !Array.isArray(keys['rule']) ||
-          keys['rule'].length == 0
-        ) {
-          continue
-        }
-        for (const key of keys['rule']) {
-          const ty = typeof key['fnc']
-          if (
-            (ty !== 'string' && ty !== 'function') ||
-            (typeof key['fnc'] == 'string' &&
-              typeof keys[key['fnc']] !== 'function')
-          ) {
-            // 不是字符串,也不是函数
-            // 是字符串,但匹配不出函数
-            continue
-          }
-          const priority = key['priority'] ?? 9000
-          const node = {
-            name: this.#name,
-            i,
-            j,
-            event: keys['event'],
-            typing: keys['typing'],
-            reg: /.*/,
-            priority: priority,
-            func:
-              typeof key['fnc'] == 'string'
-                ? key['fnc']
-                : String(key['fnc']).match(/:\s*(\w+)\]/)[1]
-          }
-          // 解析出索引
-          if (typeof key['reg'] === 'string' || key['reg'] instanceof RegExp) {
-            // 消息索引
-            const reg = new RegExp(key['reg'])
-            this.#mergedRegexArr.push(reg)
-            // 更改内容
-            node.reg = reg
-            node.event = 'MESSAGES'
-            node.typing = 'CREATE'
-            if (this.#list.isEmpty()) {
-              this.#list.push(node)
-            } else {
-              // 条件插入
-              if (
-                !this.#list.traverseAndInsert(
-                  node => priority < node.priority,
-                  node
-                )
-              ) {
-                // 没插入,就说明走到尾巴都没满足
-                this.#list.push(node)
-              }
-            }
-            continue
-          }
-          // 类型索引
-          if (this.#elist.isEmpty()) {
-            this.#elist.push(node)
-          } else {
-            // 条件插入
-            if (
-              !this.#elist.traverseAndInsert(
-                node => priority < node.priority,
-                node
-              )
-            ) {
-              // 没插入,就说明走到尾巴都没满足
-              this.#elist.push(node)
-            }
-          }
-          continue
-        }
-      }
-    }
     // 构造大正则
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')

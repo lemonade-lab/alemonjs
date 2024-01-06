@@ -17,11 +17,11 @@ export class APlugin {
   /**
    * 模块名
    */
-  name?: string = String(this)
+  name?: string = 'alemonb'
   /**
-   * 模块说明
+   * 层级
    */
-  dsc?: string = ''
+  acount?: number = 0
   /**
    * 事件枚举
    */
@@ -55,7 +55,10 @@ export class APlugin {
    * @param rule.priority 优先级    数字越小优先级越高
    */
   constructor(init?: APluginInitType) {
-    Object.assign(this, init)
+    this.priority = init.priority ?? 9000
+    this.event = init.event ?? 'MESSAGES'
+    this.typing = init.typing ?? 'CREATE'
+    this.rule = init.rule ?? []
   }
 
   /**

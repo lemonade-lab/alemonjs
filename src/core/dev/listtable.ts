@@ -9,11 +9,11 @@ export interface NodeDataType {
   /**
    * 集合id
    */
-  i: string
+  acount: number
   /**
    * 实例名
    */
-  j: string
+  example: string
   /**
    * 正则
    */
