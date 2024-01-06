@@ -1,4 +1,4 @@
-import { AMessage } from '../typings.js'
+import { AMessage, EventEnum } from '../typings.js'
 import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
 import { APPCONFIG } from '../configs.js'
@@ -114,11 +114,24 @@ class App {
   }
 
   /**
+   * 响应回调
+   * @param e
+   * @returns
+   */
+  response(e: AMessage, event: (typeof EventEnum)[number]) {
+    // 分发
+    for (const item in this.#regMap) {
+      // key触发
+      AppMap.get(this.#regMap[item]).response(e, event)
+    }
+  }
+
+  /**
    * 响应消息
    * @param e
    * @returns
    */
-  response(e: AMessage) {
+  responseMessage(e: AMessage) {
     let con = false
     const channel_sb = ASubscribe.find(e.channel_id)
     if (channel_sb) {
@@ -144,7 +157,7 @@ class App {
       // key触发
       if (new RegExp(item).test(e.msg)) {
         // app name
-        AppMap.get(this.#regMap[item]).response(e)
+        AppMap.get(this.#regMap[item]).responseMessage(e)
       }
     }
   }

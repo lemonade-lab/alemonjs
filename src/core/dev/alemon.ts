@@ -1,9 +1,11 @@
 import { AMessage, EventEnum } from '../typings.js'
 import { APlugin } from '../plugin/index.js'
-import { CALL } from '../call.js'
-import { ListTable, NodeDataType } from './listtable.js'
+import { NodeDataType } from './types.js'
 import { AppMap } from './data.js'
 import { getAppName } from './path.js'
+import { DoublyLinkedList } from './listdouble.js'
+
+type CallBackType = (e: AMessage, ...args: any[]) => Promise<any>
 
 /**
  * 应用结构
@@ -22,18 +24,25 @@ export class Alemon {
       //
     }
   } = {}
+
   // 配置缓存
   #dataMap = new Map<string, any>()
+
   // 切割字符串数据集
   #strArr = []
+
+  #CallData: {
+    [Event in (typeof EventEnum)[number]]?: CallBackType
+  } = {}
+
   // 正则集
   #mergedRegexArr: RegExp[] = []
   // 大正则
   #regular: RegExp | null = null
   // 消息链表
-  #list = new ListTable()
+  #list = new DoublyLinkedList<NodeDataType>()
   // 事件链表
-  #elist = new ListTable()
+  #elist = new DoublyLinkedList<NodeDataType>()
 
   /**
    * 创建应用
@@ -100,21 +109,22 @@ export class Alemon {
     }
 
     this.#data[node.acount][node.example].e = e
-
+    const time = Date.now()
     // 执行
     const res = await this.#data[node.acount][node.example]
       [node.func](e, ...arr)
       .then(res => {
-        console.info(this.info(e, node.func))
+        console.info(this.info(e, node.func, time - Date.now()))
         return res
       })
       .catch(err => {
-        console.error(this.err(e, node.func), err)
+        console.error(this.err(e, node.func, time - Date.now()), err)
       })
+
     // 重执行
     if (res && typeof res != 'boolean') {
       await e.reply(res).catch(err => {
-        console.error(this.err(e, node.func), err)
+        console.error(this.err(e, node.func, time - Date.now()), err)
       })
     }
   }
@@ -123,7 +133,7 @@ export class Alemon {
    * 应用解析
    * @param e
    */
-  async response(e: AMessage) {
+  async responseMessage(e: AMessage) {
     // 空的
     if (this.#list.isEmpty) return
     // 消息进来,开始走表
@@ -150,36 +160,32 @@ export class Alemon {
      * 走表
      * **********
      */
-    for (let i = 0; i < list.size(); i++) {
+    for (let i = 0; i < list.getSize(); i++) {
       // 不断的取出索引
       const node = list.removeAt(0)
       // 索引匹配
       if (node.reg.test(e.msg)) {
         this.#data[node.acount][node.example].e = e
-        try {
-          // 执行
-          const res = await this.#data[node.acount][node.example]
-            [node.func](e, ...arr)
-            .then(res => {
-              console.info(this.info(e, node.func))
-              return res
-            })
-            .catch(err => {
-              console.error(this.err(e, node.func), err)
-              // 错误了就强制中断
-            })
-          // 重执行
-          if (res && typeof res != 'boolean') {
-            await e.reply(res).catch(err => {
-              console.error(this.err(e, node.func), err)
-            })
-          }
-          // 不是 false ,也就是不放行
-          if (res != false) break
-        } catch (err) {
-          console.error(this.err(e, node.func), err)
-          break
+        const time = Date.now()
+        // 执行
+        const res = await this.#data[node.acount][node.example]
+          [node.func](e, ...arr)
+          .then(res => {
+            console.info(this.info(e, node.func, time - Date.now()))
+            return res
+          })
+          .catch(err => {
+            console.error(this.err(e, node.func, time - Date.now()), err)
+            // 错误了就强制中断
+          })
+        // 重执行
+        if (res && typeof res != 'boolean') {
+          await e.reply(res).catch(err => {
+            console.error(this.err(e, node.func, time - Date.now()), err)
+          })
         }
+        // 不是 false ,也就是不放行
+        if (res != false) break
       }
     }
   }
@@ -210,33 +216,29 @@ export class Alemon {
      * ******
      * *****
      */
-    for (let i = 0; i < list.size(); i++) {
+    for (let i = 0; i < list.getSize(); i++) {
       const node = list.removeAt(0)
       // 类型不符
       if (node.event !== e.event || node.typing !== e.typing) continue
       //
       this.#data[node.acount][node.example].e = e
-      try {
-        const res = await this.#data[node.acount][node.example]
-          [node.func](e, ...arr)
-          .then(res => {
-            console.info(this.info(e, String(node.func)))
-            return res
-          })
-          .catch(err => {
-            console.error(this.err(e, String(node.func)), err)
-          })
-        if (res && typeof res != 'boolean') {
-          await e.reply(res).catch(err => {
-            console.error(this.err(e, String(node.func)), err)
-          })
-        }
-        // 不是 false ,也就是不放行
-        if (res != false) break
-      } catch (err) {
-        console.error(this.err(e, String(node.func)), err)
-        break
+      const time = Date.now()
+      const res = await this.#data[node.acount][node.example]
+        [node.func](e, ...arr)
+        .then(res => {
+          console.info(this.info(e, node.func, time - Date.now()))
+          return res
+        })
+        .catch(err => {
+          console.error(this.err(e, node.func, time - Date.now()), err)
+        })
+      if (res && typeof res != 'boolean') {
+        await e.reply(res).catch(err => {
+          console.error(this.err(e, node.func, time - Date.now()), err)
+        })
       }
+      // 不是 false ,也就是不放行
+      if (res != false) break
     }
   }
 
@@ -335,35 +337,63 @@ export class Alemon {
           node.reg = reg
           node.event = 'MESSAGES'
           node.typing = 'CREATE'
+          // 为空
           if (this.#list.isEmpty()) {
-            this.#list.push(node)
+            this.#list.prepend(node)
           } else {
-            // 条件插入
-            if (
-              !this.#list.traverseAndInsert(
+            // 比头部小
+            if (key['priority'] < this.#list.getHead().value.priority) {
+              this.#list.prepend(node)
+              continue
+            }
+            // 比尾部大
+            if (key['priority'] > this.#list.getTail().value.priority) {
+              this.#list.append(node)
+              continue
+            }
+            if (key['priority'] < this.#list.getMiddle().value.priority) {
+              // 比中间的节点小, 顺序插入
+              this.#elist.traverseAndInsert(
                 node => key['priority'] < node.priority,
                 node
               )
-            ) {
-              // 没插入,就说明走到尾巴都没满足
-              this.#list.push(node)
+            } else {
+              // 逆序插入
+              this.#elist.traverseAndInsertTail(
+                node => key['priority'] < node.priority,
+                node
+              )
             }
           }
           continue
         }
-        // 类型索引
+        // 为空
         if (this.#elist.isEmpty()) {
-          this.#elist.push(node)
+          this.#elist.prepend(node)
         } else {
-          // 条件插入
-          if (
-            !this.#elist.traverseAndInsert(
+          // 比头部小
+          if (key['priority'] < this.#list.getHead().value.priority) {
+            this.#list.prepend(node)
+            continue
+          }
+          // 比尾部大
+          if (key['priority'] > this.#list.getTail().value.priority) {
+            this.#list.append(node)
+            continue
+          }
+
+          if (key['priority'] < this.#list.getMiddle().value.priority) {
+            // 比中间的节点小, 顺序插入
+            this.#elist.traverseAndInsert(
               node => key['priority'] < node.priority,
               node
             )
-          ) {
-            // 没插入,就说明走到尾巴都没满足
-            this.#elist.push(node)
+          } else {
+            // 逆序插入
+            this.#elist.traverseAndInsertTail(
+              node => key['priority'] < node.priority,
+              node
+            )
           }
         }
         continue
@@ -391,8 +421,8 @@ export class Alemon {
    * @param funcName
    * @returns
    */
-  err(e: AMessage, funcName: string) {
-    return `[${e.event}] [${false}] [${funcName}]`
+  err(e: AMessage, funcName: string, time: number) {
+    return `[${e.event}] [${false}] [${funcName}] [${time}ms]`
   }
 
   /**
@@ -401,8 +431,41 @@ export class Alemon {
    * @param funcName
    * @returns
    */
-  info(e: AMessage, funcName: string) {
-    return `[${e.event}] [${true}] [${funcName}]`
+  info(e: AMessage, funcName: string, time: number) {
+    return `[${e.event}] [${true}] [${funcName}] [${time}ms]`
+  }
+
+  /**
+   * 响应消息类型
+   * @param e
+   */
+  async response(e: AMessage, event: (typeof EventEnum)[number]) {
+    if (this.#CallData[event]) {
+      const func = this.#dataMap.get('event')
+      if (func) e = func(e)
+      for (const item of this.#strArr) {
+        e.msg = e.msg.replace(item.reg, item.str)
+      }
+      const argFunc = this.#dataMap.get('arg')
+      let arr = []
+      if (typeof argFunc == 'function') {
+        arr = await argFunc(e)
+      }
+      const FuncName = String(this.#CallData[event]['fnc']).match(
+        /:\s*(\w+)\]/
+      )[1]
+      const time = Date.now()
+      this.#CallData
+        [event](e, ...arr)
+        .then(res => {
+          console.info(this.info(e, FuncName, time - Date.now()))
+          return res
+        })
+        .catch(err => {
+          console.error(this.err(e, FuncName, time - Date.now()), err)
+        })
+    }
+    return false
   }
 
   /**
@@ -412,13 +475,9 @@ export class Alemon {
    * @param priority 优先级
    * @returns
    */
-  on(
-    event: (typeof EventEnum)[number],
-    call: (e: AMessage) => any,
-    priority: 9000
-  ) {
-    // 强制为大写的
-    CALL.set(event == 'message' ? 'MESSAGES' : event, call, priority)
+  on(event: (typeof EventEnum)[number], call: CallBackType) {
+    const Event = event == 'message' ? 'MESSAGES' : event
+    this.#CallData[Event] = call
     return this
   }
 }

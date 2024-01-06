@@ -1,5 +1,5 @@
 import { AppMap } from './data.js'
-import { NodeDataType } from './listtable.js'
+import { NodeDataType } from './types.js'
 /**
  * ************
  * 订阅-双key结构
