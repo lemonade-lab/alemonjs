@@ -162,7 +162,7 @@ export class Alemon {
      */
     for (let i = 0; i < list.getSize(); i++) {
       // 不断的取出索引
-      const node = list.removeAt(0)
+      const node = list.shift()
       // 索引匹配
       if (node.reg.test(e.msg)) {
         this.#data[node.acount][node.example].e = e
@@ -217,7 +217,7 @@ export class Alemon {
      * *****
      */
     for (let i = 0; i < list.getSize(); i++) {
-      const node = list.removeAt(0)
+      const node = list.shift()
       // 类型不符
       if (node.event !== e.event || node.typing !== e.typing) continue
       //
@@ -344,24 +344,27 @@ export class Alemon {
           } else {
             // 比头部小
             if (priority <= this.#list.getHead().value.priority) {
+              console.log('比头部小')
               this.#list.prepend(node)
               continue
-            }
-            // 比尾部大
-            if (priority >= this.#list.getTail().value.priority) {
+            } else if (priority >= this.#list.getTail().value.priority) {
+              // 比尾部大
               this.#list.append(node)
+              console.log('比尾部大')
               continue
             }
             if (priority <= this.#list.getMiddle().value.priority) {
               // 比中间的节点小, 顺序插入
+              console.log('顺序插入')
               this.#elist.traverseAndInsert(
                 node => priority < node.priority,
                 node
               )
             } else {
+              console.log('逆序插入')
               // 逆序插入
               this.#elist.traverseAndInsertTail(
-                node => priority < node.priority,
+                node => priority >= node.priority,
                 node
               )
             }
@@ -375,24 +378,27 @@ export class Alemon {
           // 比头部小
           if (priority <= this.#list.getHead().value.priority) {
             this.#list.prepend(node)
+            console.log('比头部小')
             continue
-          }
-          // 比尾部大
-          if (priority >= this.#list.getTail().value.priority) {
+          } else if (priority >= this.#list.getTail().value.priority) {
+            // 比尾部大
             this.#list.append(node)
+            console.log('比尾部大')
             continue
           }
 
           if (priority <= this.#list.getMiddle().value.priority) {
+            console.log('顺序插入')
             // 比中间的节点小, 顺序插入
             this.#elist.traverseAndInsert(
               node => priority < node.priority,
               node
             )
           } else {
+            console.log('逆序插入')
             // 逆序插入
             this.#elist.traverseAndInsertTail(
-              node => priority < node.priority,
+              node => priority >= node.priority,
               node
             )
           }
