@@ -149,20 +149,8 @@ import { createApp, AMessage, APlugin } from 'alemonjs'
 createApp(import.meta.url)
   .on('MESSAGE', e => {
     if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
-    // 放行
-    return false
-  })
-  .on('MESSAGE', e => {
-    if (e.typing == 'DELETE') console.log(e.user_id, '撤回了一条消息')
-    // 不放行
-    console.log('停止了')
-  })
-  .on('MESSAGE', e => {
-    // 不再执行
-    console.log('看不到我')
   })
   .on('GUILD_MEMBERS', e => {
-    // 执行
     console.log('成员', e.user_name, '加入')
   })
 ```
@@ -197,3 +185,7 @@ npm run build
   "ws": "连接协议"
 }
 ```
+
+### Community
+
+QQ Group 806943302

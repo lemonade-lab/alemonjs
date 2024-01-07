@@ -29,7 +29,7 @@ export class Subscribe {
     let node: NodeDataType
     for (const item in AppMap.keys()) {
       // 寻找节点
-      node = AppMap.get(item).find(acount, c, func)
+      node = AppMap.get(item).findByKey(acount, c, func)
       if (node) break
     }
     // 订阅失败

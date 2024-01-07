@@ -53,13 +53,13 @@ export class Alemon {
   }
 
   /**
-   * 寻找节点
+   * 模糊信息查询节点
    * @param acount
    * @param example
    * @param func
    * @returns
    */
-  find(acount: number, example: string, func: string) {
+  findByKey(acount: number, example: string, func: string) {
     if (
       this.#data[acount][example] &&
       this.#data[acount][example][func] &&
@@ -75,6 +75,17 @@ export class Alemon {
         priority: 90000,
         func: func
       }
+    }
+  }
+
+  /**
+   * list查询
+   */
+  find() {
+    //
+    const list = this.#list
+    for (let i = 0; i < list.getSize(); i++) {
+      const node = list.shift()
     }
   }
 
@@ -340,68 +351,36 @@ export class Alemon {
           node.typing = 'CREATE'
           // 为空
           if (this.#list.isEmpty()) {
-            this.#list.prepend(node)
+            this.#list.unshift(node)
           } else {
             // 比头部小
             if (priority <= this.#list.getHead().value.priority) {
-              console.log('比头部小')
-              this.#list.prepend(node)
+              this.#list.unshift(node)
               continue
             } else if (priority >= this.#list.getTail().value.priority) {
               // 比尾部大
-              this.#list.append(node)
-              console.log('比尾部大')
+              this.#list.push(node)
               continue
             }
-            if (priority <= this.#list.getMiddle().value.priority) {
-              // 比中间的节点小, 顺序插入
-              console.log('顺序插入')
-              this.#elist.traverseAndInsert(
-                node => priority < node.priority,
-                node
-              )
-            } else {
-              console.log('逆序插入')
-              // 逆序插入
-              this.#elist.traverseAndInsertTail(
-                node => priority >= node.priority,
-                node
-              )
-            }
+            this.#list.traverseAndInsert(node => priority < node.priority, node)
           }
           continue
         }
         // 为空
         if (this.#elist.isEmpty()) {
-          this.#elist.prepend(node)
+          this.#elist.unshift(node)
         } else {
-          // 比头部小
+          // 比头部小(同等级的放前面,损耗最小)
           if (priority <= this.#list.getHead().value.priority) {
-            this.#list.prepend(node)
-            console.log('比头部小')
+            this.#list.unshift(node)
             continue
           } else if (priority >= this.#list.getTail().value.priority) {
-            // 比尾部大
-            this.#list.append(node)
-            console.log('比尾部大')
+            // 比尾部大(同等级的放后面,损耗最小)
+            this.#list.push(node)
             continue
           }
-
-          if (priority <= this.#list.getMiddle().value.priority) {
-            console.log('顺序插入')
-            // 比中间的节点小, 顺序插入
-            this.#elist.traverseAndInsert(
-              node => priority < node.priority,
-              node
-            )
-          } else {
-            console.log('逆序插入')
-            // 逆序插入
-            this.#elist.traverseAndInsertTail(
-              node => priority >= node.priority,
-              node
-            )
-          }
+          // 顺序插入
+          this.#elist.traverseAndInsert(node => priority < node.priority, node)
         }
         continue
       }

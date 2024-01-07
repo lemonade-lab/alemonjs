@@ -33,7 +33,7 @@ export * from './client.js'
 /**
  * image
  */
-export * from './image.js'
+export * from './image/index.js'
 /**
  * *************
  * exit

@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { getAppPath } from './core/index.js'
+import { getAppPath } from '../core/index.js'
 
 const reg =
   /url\(['"](@[^'"]+)['"]\)|href=['"](@[^'"]+)['"]|src=['"](@[^'"]+)['"]/g
@@ -7,7 +7,7 @@ const reg =
 const regLocal =
   /url\(['"](~[^'"]+)['"]\)|href=['"](~[^'"]+)['"]|src=['"](~[^'"]+)['"]/g
 
-const imageDir = join(getAppPath(import.meta.url), '../.image')
+const imageDir = join(getAppPath(import.meta.url), '../../.image')
 
 /**
  * 替换 ~ 字符串

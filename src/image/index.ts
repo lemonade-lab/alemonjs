@@ -1,9 +1,9 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { Screenshot, type ScreenshotFileOptions } from './core/index.js'
+import { Screenshot, type ScreenshotFileOptions } from '../core/index.js'
 import { getStrMatchSize, replaceLocal } from './utils.js'
-import { cache } from './cache/html.js'
+import { cache } from './html.js'
 
 function render(str: string, arr: { reg: RegExp; val: string }[]) {
   // 传入一个 []  key:reg , val:xxx
