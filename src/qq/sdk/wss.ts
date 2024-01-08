@@ -21,7 +21,7 @@ export async function getGatewayUrl(): Promise<string | undefined> {
 }
 
 /**
- * 使用获取到的网关连接地址建立 WebSocket 连接
+ * 建立 WebSocket 连接
  * @param token
  * @param callBack
  */
@@ -29,15 +29,14 @@ export async function createClient(
   callBack: (...args: any[]) => any,
   shard = [0, 4]
 ) {
-  /**
-   * 请求url
-   */
   const gatewayUrl = await getGatewayUrl()
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
+
     ws.on('open', () => {
       console.info('[ws] open')
     })
+
     /**
      * 标记是否已连接
      */
@@ -46,6 +45,71 @@ export async function createClient(
      * 存储最新的消息序号
      */
     let heartbeat_interval = 30000
+
+    const map = {
+      0: ({ d, t }) => {
+        callBack(d)
+        if (t === 'READY') {
+          // Ready Event，鉴权成功
+          setInterval(() => {
+            /**
+             * 心跳定时发送
+             */
+            if (isConnected) {
+              ws.send(
+                JSON.stringify({
+                  op: 1, //  op = 1
+                  d: null // 如果是第一次连接，传null
+                })
+              )
+            }
+          }, heartbeat_interval)
+        } else if (t === 'RESUMED') {
+          // Resumed Event，恢复连接成功
+        } else {
+          // 处理不同类型的事件内容
+        }
+      },
+      7: message => {
+        console.log(message)
+      },
+      9: message => {
+        console.log(message)
+      },
+      10: ({ d }) => {
+        // OpCode 10 Hello 消息，处理心跳周期
+        isConnected = true
+        heartbeat_interval = d.heartbeat_interval
+        const appID = config.get('appID')
+        const token = config.get('token')
+        const intents = config.get('intents')
+        /**
+         * 发送鉴权
+         */
+        ws.send(
+          JSON.stringify({
+            op: 2, // op = 2
+            d: {
+              token: `Bot ${appID}.${token}`,
+              intents: getIntentsMask(intents),
+              shard,
+              properties: {
+                $os: 'linux',
+                $browser: 'my_library',
+                $device: 'my_library'
+              }
+            }
+          })
+        )
+      },
+      11: message => {
+        console.info('[ws] heartbeat transmission')
+      },
+      12: message => {
+        console.log(message)
+      }
+    }
+
     ws.on('message', msg => {
       const message = JSON.parse(msg.toString('utf8'))
       /**
@@ -57,77 +121,9 @@ export async function createClient(
        *
        * d 代表事件内容
        */
-      const { op, s, d: data, t } = message
+      const { op, s, d, t } = message
       // 根据 opcode 进行处理
-      switch (op) {
-        case 0: {
-          callBack(data)
-          if (t === 'READY') {
-            // Ready Event，鉴权成功
-            setInterval(() => {
-              /**
-               * 心跳定时发送
-               */
-              if (isConnected) {
-                ws.send(
-                  JSON.stringify({
-                    op: 1, //  op = 1
-                    d: null // 如果是第一次连接，传null
-                  })
-                )
-              }
-            }, heartbeat_interval)
-          } else if (t === 'RESUMED') {
-            // Resumed Event，恢复连接成功
-          } else {
-            // 处理不同类型的事件内容
-          }
-          break
-        }
-        case 7: {
-          console.info(message)
-          break
-        }
-        case 9: {
-          console.info(message)
-          break
-        }
-        case 10: {
-          // OpCode 10 Hello 消息，处理心跳周期
-          isConnected = true
-          heartbeat_interval = data.heartbeat_interval
-          const appID = config.get('appID')
-          const token = config.get('token')
-          const intents = config.get('intents')
-          /**
-           * 发送鉴权
-           */
-          ws.send(
-            JSON.stringify({
-              op: 2, // op = 2
-              d: {
-                token: `Bot ${appID}.${token}`,
-                intents: getIntentsMask(intents),
-                shard,
-                properties: {
-                  $os: 'linux',
-                  $browser: 'my_library',
-                  $device: 'my_library'
-                }
-              }
-            })
-          )
-          break
-        }
-        case 11: {
-          // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-          console.info('[ws] heartbeat transmission')
-          break
-        }
-        case 12: {
-          console.info(12, message)
-        }
-      }
+      if (map[op]) map[op](message)
     })
 
     ws.on('close', () => {
