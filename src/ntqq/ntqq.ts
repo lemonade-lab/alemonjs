@@ -31,10 +31,6 @@ export interface NTQQOptions {
    */
   shard?: number[]
   /**
-   * 订阅模式
-   */
-  mode?: 'qq-guild' | 'qq-group' | 'qq'
-  /**
    * 是否是私域
    */
   isPrivate?: boolean
@@ -51,7 +47,6 @@ export const defineNtqq = {
   masterID: '',
   intents: ['GROUP_AT_MESSAGE_CREATE', 'C2C_MESSAGE_CREATE'] as IntentsEnum[],
   shard: [0, 1],
-  mode: 'qq-group' as 'qq-guild' | 'qq-group' | 'qq',
   isPrivate: false,
   sandbox: false
 }

@@ -1,12 +1,4 @@
 /**
- * 'FRIEND_DEL', // 用户删除机器人
-'C2C_MSG_REJECT', // 拒绝机器人主动消息 | 允许机器人主动消息
-'GROUP_DEL_ROBOT', // 机器人退出群聊
-'GROUP_MSG_REJECT', // 群聊拒绝机器人主动消息
-'GROUP_MSG_RECEIVE', // 群聊接受机器人主动消息
- */
-
-/**
  * 订阅枚举
  */
 export const AvailableIntentsEventsEnum = [
@@ -19,23 +11,7 @@ export const AvailableIntentsEventsEnum = [
   'GROUP_DEL_ROBOT', // 机器人退出群聊
   'GROUP_MSG_REJECT', // 群聊拒绝机器人主动消息
   'GROUP_MSG_RECEIVE', // 群聊接受机器人主动消息
-  'INTERACTION_CREATE', // 点击回调按钮
-  /**
-   * 频道
-   */
-  'GUILDS',
-  'GUILD_MEMBERS',
-  'DIRECT_MESSAGE',
-  'AUDIO_ACTION',
-  'MESSAGE_AUDIT',
-  'INTERACTION',
-  'GUILD_MESSAGE_REACTIONS',
-  'GUILD_MESSAGES',
-  'FORUMS_EVENT',
-  /**
-   * 公的
-   */
-  'PUBLIC_GUILD_MESSAGES'
+  'INTERACTION_CREATE' // 点击回调按钮
 ] as const
 
 /**

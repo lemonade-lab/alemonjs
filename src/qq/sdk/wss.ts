@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
-import { requestService } from './api.js'
-import { getBotConfig } from './config.js'
+import { ClientQQ } from './api.js'
+import { config } from './config.js'
 import { getIntentsMask } from './intents.js'
 
 /**
@@ -9,7 +9,7 @@ import { getIntentsMask } from './intents.js'
  */
 export async function getGatewayUrl(): Promise<string | undefined> {
   try {
-    const response = await requestService({
+    const response = await ClientQQ.request({
       url: '/gateway'
     }).then(res => res.data)
     if (response.url) {
@@ -98,9 +98,9 @@ export async function createClient(
           // OpCode 10 Hello 消息，处理心跳周期
           isConnected = true
           heartbeat_interval = data.heartbeat_interval
-          const appID = getBotConfig('appID')
-          const token = getBotConfig('token')
-          const intents = getBotConfig('intents')
+          const appID = config.get('appID')
+          const token = config.get('token')
+          const intents = config.get('intents')
           /**
            * 发送鉴权
            */

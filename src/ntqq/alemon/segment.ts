@@ -1,4 +1,4 @@
-import { BUFFER } from '../../../core/utils/index.js'
+import { BUFFER } from '../../core/utils/index.js'
 export const segmentNTQQ = {
   at: (uid: string): string => {
     return `<@${uid}>`

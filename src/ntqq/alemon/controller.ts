@@ -2,9 +2,9 @@ import { replyController } from './reply.js'
 import {
   type ControllerOption,
   type UserInformationType
-} from '../../../core/index.js'
-import { ClientNTQQ } from '../../sdk/index.js'
-import { everyoneError } from '../../../log/index.js'
+} from '../../core/index.js'
+import { ClientNTQQ } from '../sdk/index.js'
+import { everyoneError } from '../../log/index.js'
 export const Controller = {
   Member: ({ guild_id, user_id }) => {
     return {

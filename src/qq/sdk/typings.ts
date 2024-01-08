@@ -1,10 +1,6 @@
 /**
  * 订阅枚举
  */
-export type IntentsEnum = (typeof AvailableIntentsEventsEnum)[number]
-/**
- *
- */
 export const AvailableIntentsEventsEnum = [
   'GUILDS',
   'GUILD_MEMBERS',
@@ -17,3 +13,7 @@ export const AvailableIntentsEventsEnum = [
   'MESSAGE_AUDIT',
   'INTERACTION'
 ] as const
+/**
+ * 订阅枚举
+ */
+export type IntentsEnum = (typeof AvailableIntentsEventsEnum)[number]

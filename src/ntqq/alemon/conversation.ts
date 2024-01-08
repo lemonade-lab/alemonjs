@@ -1,6 +1,6 @@
-import { GROUP_AT_MESSAGE_CREATE } from './group/message/GROUP_AT_MESSAGE_CREATE.js'
-import { C2C_MESSAGE_CREATE } from './group/message/C2C_MESSAGE_CREATE.js'
-import { setBotMsgByNtqq } from './group/bot.js'
+import { GROUP_AT_MESSAGE_CREATE } from './message/GROUP_AT_MESSAGE_CREATE.js'
+import { C2C_MESSAGE_CREATE } from './message/C2C_MESSAGE_CREATE.js'
+import { setBotMsgByNtqq } from './bot.js'
 /**
  *
  * @param t

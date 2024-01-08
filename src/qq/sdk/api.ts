@@ -1,103 +1,112 @@
 import FormData from 'form-data'
 import axios, { type AxiosRequestConfig } from 'axios'
-import { getBotConfig } from './config.js'
+import { config } from './config.js'
 import { createPicFrom } from '../../core/index.js'
+/**
+ * api接口
+ */
+class ClientQq {
+  async request(opstion: AxiosRequestConfig) {
+    const appID = config.get('appID')
+    const token = config.get('token')
+    const sandbox = config.get('sandbox')
+    const service = await axios.create({
+      baseURL: sandbox
+        ? 'https://sandbox.api.sgroup.qq.com'
+        : 'https://api.sgroup.qq.com',
+      timeout: 20000,
+      headers: {
+        Authorization: `Bot ${appID}.${token}`
+      }
+    })
+    return service(opstion)
+  }
 
-/**
- * 创建axios实例
- * @param config
- * @returns
- */
-export async function requestService(config: AxiosRequestConfig) {
-  const appID = getBotConfig('appID')
-  const token = getBotConfig('token')
-  const sandbox = getBotConfig('sandbox')
-  const service = await axios.create({
-    baseURL: sandbox
-      ? 'https://sandbox.api.sgroup.qq.com'
-      : 'https://api.sgroup.qq.com',
-    timeout: 20000,
-    headers: {
-      Authorization: `Bot ${appID}.${token}`
-    }
-  })
-  return service(config)
-}
-/**
- * 发送buffer图片
- * @param id 私信传频道id,公信传子频道id
- * @param message {消息编号,图片,内容}
- * @param isGroup 是否是群聊
- * @returns
- */
-export async function postImage(message: {
-  id: string
-  msg_id: string
-  image: Buffer
-  content?: string
-  name?: string
-}): Promise<any> {
-  const formdata = await createFrom(
-    message.image,
-    message.msg_id,
-    message.content,
-    message.name
-  )
-  const dary = formdata != false ? formdata.getBoundary() : ''
-  return requestService({
-    method: 'post',
-    url: `/channels/${message.id}/messages`,
-    headers: {
-      'Content-Type': `multipart/form-data; boundary=${dary}`
-    },
-    data: formdata
-  })
-}
-/**
- * 私聊发送buffer图片
- * @param id 私信传频道id,公信传子频道id
- * @param message {消息编号,图片,内容}
- * @returns
- */
-export async function postDirectImage(message: {
-  id: string
-  msg_id: string
-  image: Buffer
-  content?: string
-  name?: string
-}): Promise<any> {
-  const formdata = await createFrom(
-    message.image,
-    message.msg_id,
-    message.content,
-    message.name
-  )
-  const dary = formdata != false ? formdata.getBoundary() : ''
-  return requestService({
-    method: 'post',
-    url: `/dms/${message.id}/messages`,
-    headers: {
-      'Content-Type': `multipart/form-data; boundary=${dary}`
-    },
-    data: formdata
-  })
-}
+  /**
+   * 创建form
+   * @param image
+   * @param msg_id
+   * @param content
+   * @param name
+   * @returns
+   */
+  async createFrom(
+    image: Buffer,
+    msg_id: string,
+    content: any,
+    Name = 'image.jpg'
+  ) {
+    const from = await createPicFrom(image, Name)
+    if (!from) return false
+    const { picData, name } = from
+    const formdata = new FormData()
+    formdata.append('msg_id', msg_id)
+    if (typeof content === 'string') formdata.append('content', content)
+    formdata.append('file_image', picData, name)
+    return formdata
+  }
 
-/**
- * 创建form
- * @param image
- * @param msg_id
- * @param content
- * @param name
- * @returns
- */
-async function createFrom(image, msg_id, content, Name = 'image.jpg') {
-  const from = await createPicFrom(image, Name)
-  if (!from) return false
-  const { picData, name } = from
-  const formdata = new FormData()
-  formdata.append('msg_id', msg_id)
-  if (typeof content === 'string') formdata.append('content', content)
-  formdata.append('file_image', picData, name)
-  return formdata
+  /**
+   * 发送buffer图片
+   * @param id 私信传频道id,公信传子频道id
+   * @param message {消息编号,图片,内容}
+   * @param isGroup 是否是群聊
+   * @returns
+   */
+  async postImage(message: {
+    id: string
+    msg_id: string
+    image: Buffer
+    content?: string
+    name?: string
+  }): Promise<any> {
+    const formdata = await this.createFrom(
+      message.image,
+      message.msg_id,
+      message.content,
+      message.name
+    )
+    const dary = formdata != false ? formdata.getBoundary() : ''
+    return this.request({
+      method: 'post',
+      url: `/channels/${message.id}/messages`,
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${dary}`
+      },
+      data: formdata
+    })
+  }
+  /**
+   * 私聊发送buffer图片
+   * @param id 私信传频道id,公信传子频道id
+   * @param message {消息编号,图片,内容}
+   * @returns
+   */
+  async postDirectImage(message: {
+    id: string
+    msg_id: string
+    image: Buffer
+    content?: string
+    name?: string
+  }): Promise<any> {
+    const formdata = await this.createFrom(
+      message.image,
+      message.msg_id,
+      message.content,
+      message.name
+    )
+    const dary = formdata != false ? formdata.getBoundary() : ''
+    return this.request({
+      method: 'post',
+      url: `/dms/${message.id}/messages`,
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${dary}`
+      },
+      data: formdata
+    })
+  }
 }
+/**
+ * QQ接口
+ */
+export const ClientQQ = new ClientQq()

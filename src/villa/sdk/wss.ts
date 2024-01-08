@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Counter } from './counter.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
-import { setBotConfig, type ClientConfig } from './config.js'
+import { config, type ClientConfig } from './config.js'
 const counter = new Counter(1) // 初始值为1
 /**
  * 别野服务
@@ -45,11 +45,11 @@ export async function createClient(
   options: ClientConfig,
   conversation: (...args: any[]) => any
 ) {
-  setBotConfig('bot_id', options.bot_id)
-  setBotConfig('bot_secret', options.bot_secret)
-  setBotConfig('pub_key', options.pub_key)
-  setBotConfig('token', options.token)
-  setBotConfig('villa_id', options?.villa_id ?? 0)
+  config.set('bot_id', options.bot_id)
+  config.set('bot_secret', options.bot_secret)
+  config.set('pub_key', options.pub_key)
+  config.set('token', options.token)
+  config.set('villa_id', options?.villa_id ?? 0)
   const data = await getWebsocketInfo(options.bot_id, options.bot_secret).then(
     res => res.data
   )

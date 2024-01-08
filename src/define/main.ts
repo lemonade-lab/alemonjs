@@ -1,6 +1,5 @@
 import { AlemonOptions } from './types.js'
 import { RebotMap } from './map.js'
-import { IntentsEnum } from '../ntqq/sdk/index.js'
 import { AppNameError } from '../log/index.js'
 import {
   Screenshot,
@@ -95,6 +94,23 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     Options?.login &&
     (Options?.plugin?.init !== false || Options?.app?.init !== false)
   ) {
+    if (Options.login?.ntqq) {
+      // 自定义覆盖
+      BOTCONFIG.set('ntqq', Options.login.ntqq)
+    }
+    if (Options.login?.kook) {
+      // 自定义覆盖
+      BOTCONFIG.set('kook', Options.login.kook)
+    }
+    if (Options.login?.villa) {
+      // 自定义覆盖
+      BOTCONFIG.set('villa', Options.login.villa)
+    }
+    if (Options.login?.discord) {
+      // 自定义覆盖
+      BOTCONFIG.set('discord', Options.login.discord)
+    }
+
     // 开启私域
     if (Options.login?.qq) {
       // 开启私域
@@ -129,75 +145,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           ...Options.login.qq
         })
       }
-    }
-
-    if (Options.login?.ntqq) {
-      /**
-       * 根据模式来选择
-       */
-      const intents: IntentsEnum[] = []
-
-      const c = BOTCONFIG.get('ntqq')
-
-      if (!Options.login.ntqq.mode) {
-        Options.login.ntqq.mode = c.mode
-      }
-
-      if (Options.login.ntqq.mode == 'qq') {
-        // 全部都要推
-        intents.push('GUILDS') //频道进出
-        intents.push('GUILD_MEMBERS') //成员资料
-        intents.push('DIRECT_MESSAGE') //私信
-        if (Options.login?.qq?.isPrivate == true) {
-          intents.push('AUDIO_ACTION')
-          intents.push('MESSAGE_AUDIT')
-          intents.push('INTERACTION')
-          intents.push('INTERACTION')
-          intents.push('GUILD_MESSAGES')
-          intents.push('FORUMS_EVENT')
-        } else {
-          intents.push('PUBLIC_GUILD_MESSAGES')
-        }
-        intents.push('GROUP_AT_MESSAGE_CREATE') //频道进出
-        intents.push('C2C_MESSAGE_CREATE') //成员资料
-      } else if (Options.login.ntqq.mode == 'qq-group') {
-        intents.push('GROUP_AT_MESSAGE_CREATE') //频道进出
-        intents.push('C2C_MESSAGE_CREATE') //成员资料
-      } else if (Options.login.ntqq.mode == 'qq-guild') {
-        // 默认是 qq-guild
-        intents.push('GUILDS') //频道进出
-        intents.push('GUILD_MEMBERS') //成员资料
-        intents.push('DIRECT_MESSAGE') //私信
-        // 公的私的
-        if (Options.login?.qq?.isPrivate == true) {
-          intents.push('AUDIO_ACTION')
-          intents.push('MESSAGE_AUDIT')
-          intents.push('INTERACTION')
-          intents.push('INTERACTION')
-          intents.push('GUILD_MESSAGES')
-          intents.push('FORUMS_EVENT')
-        } else {
-          intents.push('PUBLIC_GUILD_MESSAGES')
-        }
-      }
-
-      // 自定义覆盖
-      BOTCONFIG.set('ntqq', {
-        ...{ intents },
-        ...Options.login.ntqq
-      })
-    }
-    if (Options.login?.kook) {
-      // 自定义覆盖
-      BOTCONFIG.set('kook', Options.login.kook)
-    }
-    if (Options.login?.villa) {
-      // 自定义覆盖
-      BOTCONFIG.set('villa', Options.login.villa)
-    }
-    if (Options.login?.discord) {
-      // 自定义覆盖
-      BOTCONFIG.set('discord', Options.login.discord)
     }
 
     /**

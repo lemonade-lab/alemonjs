@@ -4,6 +4,7 @@ import { NodeDataType } from './types.js'
 import { AppMap } from './data.js'
 import { getAppName } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
+import * as memory from './memory.js'
 
 type CallBackType = (e: AMessage, ...args: any[]) => Promise<any>
 
@@ -166,6 +167,37 @@ export class Alemon {
       arr = await argFunc(e)
     }
 
+    // 自动延长过期周期
+    const CacheData: NodeDataType[] = memory.get(e.msg)
+    if (CacheData) {
+      for (const node of CacheData) {
+        this.#data[node.acount][node.example].e = e
+        const time = Date.now()
+        // 执行
+        const res = await this.#data[node.acount][node.example]
+          [node.func](e, ...arr)
+          .then(res => {
+            console.info(this.info(e, node.func, time - Date.now()))
+            return res
+          })
+          .catch(err => {
+            console.error(this.err(e, node.func, time - Date.now()), err)
+            // 错误了就强制中断
+          })
+        // 重执行
+        if (res && typeof res != 'boolean') {
+          await e.reply(res).catch(err => {
+            console.error(this.err(e, node.func, time - Date.now()), err)
+          })
+        }
+
+        // 不是 false ,也就是不放行
+        if (res != false) break
+      }
+      return
+    }
+
+    const cache: NodeDataType[] = []
     /**
      * *******
      * 走表
@@ -195,10 +227,24 @@ export class Alemon {
             console.error(this.err(e, node.func, time - Date.now()), err)
           })
         }
+        // 推送缓存
+        cache.push(node)
         // 不是 false ,也就是不放行
         if (res != false) break
       }
     }
+
+    /**
+     * ********
+     * 记录缓存
+     * ********
+     */
+    if (cache.length != 0) {
+      // 15分钟的缓存
+      memory.put(e.msg, cache, 60 * 15)
+    }
+
+    return
   }
 
   /**
@@ -223,6 +269,37 @@ export class Alemon {
     if (typeof argFunc == 'function') {
       arr = await argFunc(e)
     }
+
+    const key = `${e.event}:${e.typing}`
+
+    // 自动延长过期周期
+    const CacheData: NodeDataType[] = memory.get(key)
+    if (CacheData) {
+      for (const node of CacheData) {
+        this.#data[node.acount][node.example].e = e
+        const time = Date.now()
+        const res = await this.#data[node.acount][node.example]
+          [node.func](e, ...arr)
+          .then(res => {
+            console.info(this.info(e, node.func, time - Date.now()))
+            return res
+          })
+          .catch(err => {
+            console.error(this.err(e, node.func, time - Date.now()), err)
+          })
+        if (res && typeof res != 'boolean') {
+          await e.reply(res).catch(err => {
+            console.error(this.err(e, node.func, time - Date.now()), err)
+          })
+        }
+        // 不是 false ,也就是不放行
+        if (res != false) break
+      }
+      return
+    }
+
+    const cache: NodeDataType[] = []
+
     /**
      * ******
      * *****
@@ -248,9 +325,23 @@ export class Alemon {
           console.error(this.err(e, node.func, time - Date.now()), err)
         })
       }
+      // 推送缓存
+      cache.push(node)
       // 不是 false ,也就是不放行
       if (res != false) break
     }
+
+    /**
+     * ********
+     * 记录缓存
+     * ********
+     */
+    if (cache.length != 0) {
+      // 15分钟的缓存
+      memory.put(key, cache, 60 * 15)
+    }
+
+    return
   }
 
   /**

@@ -1,9 +1,9 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { getBotConfig } from './config.js'
+import { config } from './config.js'
 import { ApiLog } from './log.js'
 const BaseUrl = 'https://cdn.discordapp.com'
-export function ServiceApp(config: AxiosRequestConfig) {
-  const token = getBotConfig('token')
+export function ServiceApp(options: AxiosRequestConfig) {
+  const token = config.get('token')
   const service = axios.create({
     baseURL: BaseUrl,
     timeout: 6000,
@@ -12,7 +12,7 @@ export function ServiceApp(config: AxiosRequestConfig) {
       'Authorization': `Bot ${token}`
     }
   })
-  return service(config)
+  return service(options)
 }
 
 /**

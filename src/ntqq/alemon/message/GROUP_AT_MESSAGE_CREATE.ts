@@ -3,12 +3,12 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../../core/index.js'
+} from '../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
-import { BOTCONFIG } from '../../../../config/index.js'
+import { BOTCONFIG } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
-import { AlemonJSError, AlemonJSLog } from '../../../../log/index.js'
+import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'

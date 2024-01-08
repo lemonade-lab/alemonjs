@@ -1,5 +1,5 @@
 import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
-import { setBotConfig as setBotQQConfig } from './sdk/index.js'
+import { config } from './sdk/index.js'
 import { checkRobotByQQ } from './login.js'
 import { createConversationByQQ } from './alemon/conversation.js'
 import { BOTCONFIG } from '../config/index.js'
@@ -29,10 +29,15 @@ export async function createAlemon() {
       sandbox: cfg.sandbox ?? false
     })
 
-    setBotQQConfig('appID', cfg.appID)
-    setBotQQConfig('token', cfg.token)
-    setBotQQConfig('intents', cfg.intents)
-    setBotQQConfig('sandbox', cfg.sandbox)
+    /**
+     * **********
+     * sdk-config
+     * **********
+     */
+    config.set('appID', cfg.appID)
+    config.set('token', cfg.token)
+    config.set('intents', cfg.intents)
+    config.set('sandbox', cfg.sandbox)
 
     /**
      * 创建 websocket

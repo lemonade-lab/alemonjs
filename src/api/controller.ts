@@ -1,6 +1,6 @@
 import { Controller as villa } from '../villa/alemon/controller.js'
 import { Controller as qq } from '../qq/alemon/controller.js'
-import { Controller as ntqq } from '../ntqq/alemon/group/controller.js'
+import { Controller as ntqq } from '../ntqq/alemon/controller.js'
 import { Controller as kook } from '../kook/alemon/controller.js'
 import {
   type MessageControllerType,

@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import axios from 'axios'
-import { setBotConfig } from './config.js'
+import { config } from './config.js'
 import { EventData, SystemData } from './typings.js'
 
 /**
@@ -46,7 +46,7 @@ export async function createClient(
   conversation: (...args: any[]) => any
 ) {
   // 设置token
-  setBotConfig('token', token)
+  config.set('token', token)
   // 请求url
   const gatewayUrl = await getGatewayUrl(token)
   if (gatewayUrl) {

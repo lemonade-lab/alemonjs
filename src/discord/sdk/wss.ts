@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { gateway } from './api.js'
-import { getBotConfig } from './config.js'
+import { config } from './config.js'
 /**
  * 创建ws监听
  * @param conversation
@@ -32,8 +32,8 @@ export async function createClient(
     )
     setTimeout(call, heartbeat_interval)
   }
-  const token = getBotConfig('token')
-  const intent = getBotConfig('intent')
+  const token = config.get('token')
+  const intent = config.get('intent')
   const map = {
     0: ({ d, t }) => {
       conversation(t, d)
