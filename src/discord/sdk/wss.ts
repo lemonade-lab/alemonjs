@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { gateway } from './api.js'
+import { ClientDISOCRD } from './api.js'
 import { config } from './config.js'
 /**
  * 创建ws监听
@@ -11,7 +11,7 @@ export async function createClient(
   conversation: (...args: any[]) => any,
   shard = [0, 1]
 ) {
-  const { url } = await gateway()
+  const { url } = await ClientDISOCRD.gateway()
   if (!url) {
     console.error('[getway] token err')
     return

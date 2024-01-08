@@ -103,7 +103,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
     at_users.push({
       id: item.id,
       name: item.username,
-      avatar: ClientDISOCRD.UserAvatar(item.id, item.avatar),
+      avatar: ClientDISOCRD.userAvatar(item.id, item.avatar),
       bot: item.bot
     })
   }
@@ -156,7 +156,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
     //
     user_id: event.author?.id ?? '',
     user_name: event.author?.username ?? '',
-    user_avatar: ClientDISOCRD.UserAvatar(
+    user_avatar: ClientDISOCRD.userAvatar(
       event.author?.id,
       event.author?.avatar
     ),

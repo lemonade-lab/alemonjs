@@ -1,5 +1,5 @@
 import { BUFFER } from '../../core/index.js'
-import { ClientDISOCRD as Client } from '../sdk/index.js'
+import { ClientDISOCRD } from '../sdk/index.js'
 import { everyoneError } from '../../log/index.js'
 
 /**
@@ -18,7 +18,7 @@ export async function replyController(
   }
 ) {
   if (Buffer.isBuffer(msg)) {
-    return await Client.channelsMessagesImage(channel_id, msg).catch(
+    return await ClientDISOCRD.channelsMessagesImage(channel_id, msg).catch(
       everyoneError
     )
   }
@@ -33,7 +33,7 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    return await Client.channelsMessagesImage(
+    return await ClientDISOCRD.channelsMessagesImage(
       channel_id,
       msg[isBuffer],
       cont
@@ -54,13 +54,13 @@ export async function replyController(
     const getUrl = match[1]
     const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
     if (msg) {
-      return await Client.channelsMessagesImage(channel_id, msg).catch(
+      return await ClientDISOCRD.channelsMessagesImage(channel_id, msg).catch(
         everyoneError
       )
     }
   }
 
-  return Client.channelsMessages(channel_id, {
+  return ClientDISOCRD.channelsMessages(channel_id, {
     content: content
   }).catch(everyoneError)
 }

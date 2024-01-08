@@ -24,7 +24,7 @@ export function conversation(t: string, d: any) {
     setBotMsgByDISOCRD({
       id: d.user.id,
       name: d.user.username,
-      avatar: ClientDISOCRD.UserAvatar(d.user.id, d.user.avatar)
+      avatar: ClientDISOCRD.userAvatar(d.user.id, d.user.avatar)
     })
   } else if (t == 'GUILD_CREATE') {
     // 频道信息创建
