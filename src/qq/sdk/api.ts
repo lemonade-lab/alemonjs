@@ -6,6 +6,11 @@ import { createPicFrom } from '../../core/index.js'
  * api接口
  */
 class ClientQq {
+  /**
+   * 基础请求
+   * @param opstion
+   * @returns
+   */
   async request(opstion: AxiosRequestConfig) {
     const appID = config.get('appID')
     const token = config.get('token')
@@ -47,6 +52,12 @@ class ClientQq {
   }
 
   /**
+   * ************
+   * 消息-图片接口
+   * ***********
+   */
+
+  /**
    * 发送buffer图片
    * @param id 私信传频道id,公信传子频道id
    * @param message {消息编号,图片,内容}
@@ -74,8 +85,9 @@ class ClientQq {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    })
+    }).then(res => res.data)
   }
+
   /**
    * 私聊发送buffer图片
    * @param id 私信传频道id,公信传子频道id
@@ -103,7 +115,172 @@ class ClientQq {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    })
+    }).then(res => res.data)
+  }
+
+  /**
+   * ********
+   * 用户api
+   * *******
+   */
+
+  /**
+   * 获取用户详情
+   * @param message
+   * @returns
+   */
+  async usersMe() {
+    return this.request({
+      method: 'get',
+      url: `/users/@me`
+    }).then(res => res.data)
+  }
+
+  /**
+   * 获取用户频道列表
+   * @param message
+   * @returns
+   */
+  async usersMeGuilds(params: {
+    before: string
+    after: string
+    limit: number
+  }) {
+    return this.request({
+      method: 'get',
+      url: `/users/@me/guilds`,
+      params
+    }).then(res => res.data)
+  }
+
+  /**
+   * **********
+   * 频道api
+   * **********
+   */
+
+  /**
+   * 获取频道详细
+   * @param guild_id
+   * @returns
+   */
+  async guilds(guild_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/guilds/${guild_id}`
+    }).then(res => res.data)
+  }
+
+  /**
+   * ************
+   * 子频道api
+   * ***********
+   */
+
+  /**
+   * *********
+   * 成员api
+   * *********
+   */
+
+  /**
+   * ***********
+   * 频道身份api
+   * ***********
+   */
+
+  /**
+   * **********
+   * 子频道权限api
+   * **********
+   */
+
+  /**
+   * *******
+   * 消息api
+   * ********
+   */
+
+  /**
+   * ************
+   * 消息频率api
+   * **********
+   */
+
+  /**
+   * ***********
+   * 私信api
+   * **********
+   */
+
+  /**
+   * *********
+   * 禁言api
+   * *******
+   */
+
+  /**
+   * *******
+   * 公告api
+   * *******
+   */
+
+  /**
+   * **********
+   * 精华消息api
+   * **********
+   */
+
+  /**
+   * ********
+   * 日程api
+   * *******
+   */
+
+  /**
+   * ***********
+   * 表情表态api
+   * ***********
+   */
+
+  /**
+   * ***********
+   * 音频api
+   * **********
+   */
+
+  /**
+   * **********
+   * 帖子api
+   * **********
+   */
+
+  /**
+   * ********
+   * 接口权限api
+   * **********
+   */
+
+  /**
+   * 获得频道可用权限列表
+   * @param guild_id
+   * @returns
+   */
+  async guildApiPermission(guild_id: string) {
+    return this.request({
+      url: `/guilds/${guild_id}/api_permission`
+    }).then(res => res.data)
+  }
+
+  /**
+   * ********
+   * 通讯api
+   * *********
+   */
+  async geteway() {
+    return this.request({
+      url: '/gateway'
+    }).then(res => res.data)
   }
 }
 /**

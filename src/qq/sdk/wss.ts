@@ -9,9 +9,7 @@ import { getIntentsMask } from './intents.js'
  */
 export async function getGatewayUrl(): Promise<string | undefined> {
   try {
-    const response = await ClientQQ.request({
-      url: '/gateway'
-    }).then(res => res.data)
+    const response = await ClientQQ.geteway()
     if (response.url) {
       return response.url
     } else {
