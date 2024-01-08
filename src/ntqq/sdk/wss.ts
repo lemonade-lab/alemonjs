@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { gateway, getAuthentication } from './api/index.js'
-import { getBotConfig, setBotConfig } from './config.js'
+import { config } from './config.js'
 import { type ClientConfig } from './config.js'
 import { Counter } from './counter.js'
 
@@ -13,15 +13,15 @@ const counter = new Counter(1) // 初始值为1
  */
 async function setTimeoutBotConfig() {
   const callBack = async () => {
-    const appID = getBotConfig('appID')
-    const secret = getBotConfig('secret')
+    const appID = config.get('appID')
+    const secret = config.get('secret')
     // 发送请求
     const data: {
       access_token: string
       expires_in: number
       cache: boolean
     } = await getAuthentication(appID, secret).then(res => res.data)
-    setBotConfig('token', data.access_token)
+    config.set('token', data.access_token)
     console.info('refresh', data.expires_in, 's')
     setTimeout(callBack, data.expires_in * 1000)
   }
@@ -38,13 +38,13 @@ export async function createClient(
   cfg: ClientConfig,
   conversation: (...args: any[]) => any
 ) {
-  setBotConfig('appID', cfg.appID)
-  setBotConfig('token', cfg.token)
-  setBotConfig('intents', cfg.intents)
-  setBotConfig('shard', cfg.shard)
-  setBotConfig('isPrivate', cfg.isPrivate)
-  setBotConfig('sandbox', cfg.sandbox)
-  setBotConfig('secret', cfg.secret)
+  config.set('appID', cfg.appID)
+  config.set('token', cfg.token)
+  config.set('intents', cfg.intents)
+  config.set('shard', cfg.shard)
+  config.set('isPrivate', cfg.isPrivate)
+  config.set('sandbox', cfg.sandbox)
+  config.set('secret', cfg.secret)
 
   /**
    * 定时模式
@@ -128,9 +128,9 @@ export async function createClient(
           isConnected = true
           // 记录新循环
           heartbeat_interval = d.heartbeat_interval
-          const token = getBotConfig('token')
-          const intents = getBotConfig('intents')
-          const shard = getBotConfig('shard')
+          const token = config.get('token')
+          const intents = config.get('intents')
+          const shard = config.get('shard')
           // 发送鉴权
           ws.send(
             JSON.stringify({

@@ -1,6 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  InstructionMatchingByNotMessage,
+  RESPONSE,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -127,7 +127,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
   /**
    * 只匹配类型
    */
-  return await InstructionMatchingByNotMessage(e)
+  return await RESPONSE.event(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

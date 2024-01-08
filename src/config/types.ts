@@ -11,7 +11,7 @@ import { type DISOCRDOptions } from '../discord/discord.js'
  * config
  * ******
  */
-export interface ConfigType {
+export interface BotConfigType {
   [key: string]: any
   redis: RedisOptions
   mysql: MysqlOptions

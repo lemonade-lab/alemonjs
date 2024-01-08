@@ -1,6 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import {
-  InstructionMatchingByNotMessage,
+  RESPONSE,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -132,7 +132,7 @@ export async function GUILD_BOT(event: {
   /**
    * 只匹配类型
    */
-  return await InstructionMatchingByNotMessage(e)
+  return await RESPONSE.event(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

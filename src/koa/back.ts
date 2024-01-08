@@ -2,7 +2,7 @@ import { createReadStream, existsSync } from 'fs'
 import { join } from 'path'
 import { type Context } from 'koa'
 import mime from 'mime-types'
-import { getServerConfig } from './config.js'
+import { config } from './config.js'
 
 /**
  * 响应指定本地文件
@@ -48,7 +48,7 @@ export async function getFileByAddress(ctx: Context) {
  * @param ctx
  */
 export function getLocalFile(ctx: Context) {
-  const fileDir = getServerConfig('fileDir')
+  const fileDir = config.get('fileDir')
   const filename = ctx.params.filename
   const filePath = join(process.cwd(), fileDir, filename)
   try {

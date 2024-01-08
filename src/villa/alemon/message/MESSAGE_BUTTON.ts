@@ -1,6 +1,6 @@
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import {
-  InstructionMatching,
+  RESPONSE,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -133,9 +133,9 @@ export async function MESSAGE_BUTTON(event: {
   }
 
   /**
-   * 业务处理
+   *
    */
-  return await InstructionMatching(e)
+  return await RESPONSE.event(e)
     .then(() => AlemonJSLog(e.channel_id, e.user_name, ''))
     .catch(err => AlemonJSError(err, e.channel_id, e.user_name, ''))
 }

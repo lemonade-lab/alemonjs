@@ -1,5 +1,5 @@
 import {
-  InstructionMatching,
+  RESPONSE,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -91,7 +91,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
   /**
    * 业务处理
    */
-  return await InstructionMatching(e)
+  return await RESPONSE.message(e)
     .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
     .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }

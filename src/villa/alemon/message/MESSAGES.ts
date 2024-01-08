@@ -2,7 +2,7 @@ import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import {
   type EventEnum,
   type TypingEnum,
-  InstructionMatching,
+  RESPONSE,
   type MessageBingdingOption,
   type UserType
 } from '../../../core/index.js'
@@ -227,7 +227,7 @@ export async function MESSAGES(event: {
   /**
    * 业务处理
    */
-  return await InstructionMatching(e)
+  return await RESPONSE.message(e)
     .then(() =>
       AlemonJSLog(e.channel_id, e.user_name, MessageContent.content.text)
     )

@@ -6,8 +6,7 @@ import {
   APPLICATION,
   APPCONFIG,
   IP,
-  InstructionMatching,
-  InstructionMatchingByNotMessage
+  RESPONSE
 } from '../core/index.js'
 import { BOTCONFIG } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
@@ -160,8 +159,8 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           // 登录
           const app = back.login(
             Options.login[back.name],
-            InstructionMatching,
-            InstructionMatchingByNotMessage
+            RESPONSE.message,
+            RESPONSE.event
           )
           // 存入控制器
           CONTOLLER.set(back.name, app.controller)

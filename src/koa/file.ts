@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { writeFileSync, readdirSync, unlinkSync, existsSync } from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
-import { getServerConfig } from './config.js'
+import { config } from './config.js'
 import { IP } from '../core/index.js'
 import { createHash } from 'crypto'
 
@@ -19,10 +19,10 @@ export async function getLocalFileUrl(address: string) {
     filePath = join(process.cwd(), address)
   }
   if (!existsSync(filePath)) return false
-  const addressRouter = getServerConfig('addressRouter')
-  const port = getServerConfig('port')
-  const http = getServerConfig('http')
-  let ip = getServerConfig('ip')
+  const addressRouter = config.get('addressRouter')
+  const port = config.get('port')
+  const http = config.get('http')
+  let ip = config.get('ip')
   if (ip == 'localhost') {
     const ipp = await IP.get()
     if (ipp) ip = ipp
@@ -40,11 +40,11 @@ export async function getLocalFileUrl(address: string) {
  */
 export async function getFileUrl(file: Buffer, name?: string) {
   if (!Buffer.isBuffer(file)) return false
-  const fileDir = getServerConfig('fileDir')
-  const fileRouter = getServerConfig('fileRouter')
-  const port = getServerConfig('port')
-  const http = getServerConfig('http')
-  let ip = getServerConfig('ip')
+  const fileDir = config.get('fileDir')
+  const fileRouter = config.get('fileRouter')
+  const port = config.get('port')
+  const http = config.get('http')
+  let ip = config.get('ip')
   if (ip == 'localhost') {
     const ipp = await IP.get()
     if (ipp) ip = ipp
@@ -72,7 +72,7 @@ export async function getFileUrl(file: Buffer, name?: string) {
  * @param options
  */
 export function autoClearFiles(options?: { time?: number; dir?: string }) {
-  const fileDir = options?.dir ?? getServerConfig('fileDir')
+  const fileDir = options?.dir ?? config.get('fileDir')
   setInterval(() => {
     const files = readdirSync(join(process.cwd(), fileDir))
     for (const file of files) {

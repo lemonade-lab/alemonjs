@@ -1,7 +1,6 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import {
-  InstructionMatchingByNotMessage,
-  InstructionMatching,
+  RESPONSE,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -136,7 +135,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     /**
      * 只匹配类型
      */
-    return await InstructionMatchingByNotMessage(e)
+    return await RESPONSE.event(e)
       .then(() => AlemonJSEventLog(e.event, e.typing))
       .catch(err => AlemonJSEventError(err, e.event, e.typing))
   }
@@ -144,7 +143,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
   /**
    * 业务处理
    */
-  return await InstructionMatching(e)
+  return await RESPONSE.message(e)
     .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
     .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }

@@ -1,6 +1,6 @@
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  InstructionMatchingByNotMessage,
+  RESPONSE,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -102,7 +102,7 @@ export const INTERACTION = async event => {
     e.typing = 'DELETE'
   }
 
-  return await InstructionMatchingByNotMessage(e)
+  return await RESPONSE.event(e)
     .then(() => AlemonJSEventLog(e.event, e.typing))
     .catch(err => AlemonJSEventError(err, e.event, e.typing))
 }

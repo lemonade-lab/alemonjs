@@ -5,7 +5,7 @@ import cors from 'koa2-cors'
 import { mkdirSync } from 'fs'
 import { getFileByAddress, getLocalFile } from './back.js'
 import { ServerOptions } from './types.js'
-import { getServerConfig, setServerCoinfg } from './config.js'
+import { config } from './config.js'
 import { join } from 'path'
 
 /**
@@ -20,7 +20,7 @@ export function createWeb(
 ) {
   if (val) {
     for (const item in val) {
-      setServerCoinfg(item as keyof ServerOptions, val[item])
+      config.set(item as keyof ServerOptions, val[item])
     }
   }
   // 创建 Koa 应用
@@ -34,17 +34,17 @@ export function createWeb(
   app.use(bodyParser())
 
   // 确保目录存在
-  const fileDir = getServerConfig('fileDir')
+  const fileDir = config.get('fileDir')
   mkdirSync(join(process.cwd(), fileDir), { recursive: true })
 
   // 处理图片请求
-  const imgRouter = getServerConfig('fileRouter')
+  const imgRouter = config.get('fileRouter')
   router.get(`${imgRouter}/:filename`, getLocalFile as any)
 
-  const addressRouter = getServerConfig('addressRouter')
+  const addressRouter = config.get('addressRouter')
   router.get(`${addressRouter}`, getFileByAddress as any)
 
-  const port = getServerConfig('port')
+  const port = config.get('port')
   // 将路由注册到应用
   app.use(router.routes())
   app.use(router.allowedMethods())
@@ -84,7 +84,7 @@ export function createWeb(
     app
       .listen(port, async () => {
         if (logFnc) await logFnc(port)
-        setServerCoinfg('port', port)
+        config.set('port', port)
         console.info('server', `http://[::]:${port}`)
       })
       .on('error', handlePortConflict)

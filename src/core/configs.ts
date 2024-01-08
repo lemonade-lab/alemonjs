@@ -1,4 +1,32 @@
-interface ApplicationProcessingOpsion {
+/**
+ * 基础配置结构
+ */
+export class BaseConfig<D> {
+  #data: D = null
+  constructor(val: D) {
+    this.#data = val
+  }
+  /**
+   * 设置配置
+   * @param key
+   * @param val
+   */
+  set<T extends keyof D>(key: T, val: D[T]) {
+    if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
+      this.#data[key] = val
+    }
+  }
+  /**
+   * 读取配置
+   * @param key
+   * @returns
+   */
+  get<T extends keyof D>(key: T): D[T] | undefined {
+    return this.#data[key]
+  }
+}
+
+export interface ApplicationProcessingOpsion {
   /**
    * 根目录
    */
@@ -33,28 +61,16 @@ interface ApplicationProcessingOpsion {
   event: string[]
 }
 
-class AppConfig {
-  data = {
-    dir: '/plugins',
-    main: '/main',
-    type: 'stript',
-    openRegex: /./,
-    closeRegex: undefined,
-    event: [],
-    route: '/public/defset',
-    regex: true
-  }
-  set<T extends keyof ApplicationProcessingOpsion>(
-    key: T,
-    val: ApplicationProcessingOpsion[T]
-  ): void {
-    // 当前仅当同属性名的时候才会覆盖默认配置
-    if (Object.prototype.hasOwnProperty.call(this.data, key)) {
-      this.data[key] = val
-    }
-  }
-  get<T extends keyof ApplicationProcessingOpsion>(key: T) {
-    return this.data[key]
-  }
-}
-export const APPCONFIG = new AppConfig()
+/**
+ * 应用配置
+ */
+export const APPCONFIG = new BaseConfig<ApplicationProcessingOpsion>({
+  dir: '/plugins',
+  main: '/main',
+  type: 'stript',
+  openRegex: /./,
+  closeRegex: undefined,
+  event: [],
+  route: '/public/defset',
+  regex: true
+})

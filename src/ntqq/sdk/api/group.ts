@@ -1,4 +1,4 @@
-import { getBotConfig } from '../config.js'
+import { config } from '../config.js'
 import axios, { type AxiosRequestConfig } from 'axios'
 import { API_SGROUP } from './config.js'
 import { FileType, MsgType } from '../typings.js'
@@ -9,9 +9,9 @@ import { ApiLog } from '../log.js'
  * @param config
  * @returns
  */
-export async function GroupService(config: AxiosRequestConfig) {
-  const appID = getBotConfig('appID')
-  const token = getBotConfig('token')
+export async function GroupService(options: AxiosRequestConfig) {
+  const appID = config.get('appID')
+  const token = config.get('token')
   const service = await axios.create({
     baseURL: API_SGROUP,
     timeout: 20000,
@@ -20,7 +20,7 @@ export async function GroupService(config: AxiosRequestConfig) {
       'Authorization': `QQBot ${token}`
     }
   })
-  return service(config)
+  return service(options)
 }
 
 /**

@@ -1,5 +1,5 @@
 import {
-  InstructionMatchingByNotMessage,
+  RESPONSE,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -7,7 +7,6 @@ import {
 import { getBotMsgByQQ } from '../bot.js'
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
-import { InstructionMatching } from '../../../core/index.js'
 import { setBotMsgByQQ } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
@@ -109,7 +108,7 @@ export const GUILD_MESSAGES = async (event: any) => {
    */
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.typing = 'DELETE'
-    return await InstructionMatchingByNotMessage(e)
+    return await RESPONSE.event(e)
       .then(() => AlemonJSEventLog(e.event, e.typing))
       .catch(err => AlemonJSEventError(err, e.event, e.typing))
   }
@@ -165,7 +164,7 @@ export const GUILD_MESSAGES = async (event: any) => {
   /**
    * 业务处理
    */
-  return await InstructionMatching(e)
+  return await RESPONSE.message(e)
     .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
     .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
 }

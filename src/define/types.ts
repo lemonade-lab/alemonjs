@@ -2,10 +2,7 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { ServerOptions } from '../koa/types.js'
-import {
-  InstructionMatching,
-  InstructionMatchingByNotMessage
-} from '../core/index.js'
+import { RESPONSE } from '../core/index.js'
 
 export interface PlatformsItemType {
   /**
@@ -23,11 +20,11 @@ export interface PlatformsItemType {
     /**
      * 消息事件
      */
-    Instruction: typeof InstructionMatching,
+    Instruction: typeof RESPONSE.message,
     /**
      * 非消息事件
      */
-    InstructionByNotMessage: typeof InstructionMatchingByNotMessage
+    InstructionByNotMessage: typeof RESPONSE.event
   ) => {
     /**
      * 客户端
