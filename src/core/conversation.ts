@@ -1,4 +1,4 @@
-import { AMessage } from '../typings.js'
+import { AMessage } from './typings.js'
 /**
  * 会话控制器
  */

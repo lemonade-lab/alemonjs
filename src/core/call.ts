@@ -1,6 +1,9 @@
 import { AMessage, EventEnum } from './typings.js'
 import { orderBy } from 'lodash-es'
 class Call {
+  /**
+   * 初始化数据
+   */
   data = {
     AUDIO_FREQUENCY: [],
     AUDIO_MICROPHONE: [],
@@ -22,12 +25,21 @@ class Call {
     }[]
   }
 
+  /**
+   * 回调排序
+   */
   order() {
     for (const val in this.data) {
       this.data[val] = orderBy(this.data[val], ['priority'], ['asc'])
     }
   }
 
+  /**
+   * 设置回调
+   * @param event
+   * @param call
+   * @param priority
+   */
   set(
     event: (typeof EventEnum)[number],
     call: (e: AMessage) => any,
@@ -39,6 +51,11 @@ class Call {
     })
   }
 
+  /**
+   * 得到回调
+   * @param key
+   * @returns
+   */
   get(key: string) {
     return this.data[key]
   }

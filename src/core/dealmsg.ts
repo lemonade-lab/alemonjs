@@ -1,7 +1,7 @@
 import { isEmpty } from 'lodash-es'
 import { ARG, MSG, SLICING } from './cache/index.js'
 import { type AMessage } from './typings.js'
-import { Conversation } from './conversation/index.js'
+import { Conversation } from './conversation.js'
 import { APlugin } from './plugin/index.js'
 import { CALL } from './call.js'
 import { funcBase } from './plugin/types.js'
