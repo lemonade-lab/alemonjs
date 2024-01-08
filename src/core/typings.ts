@@ -9,7 +9,10 @@ export interface AMessage
     BotBase,
     ReplyBase,
     MemberControllerBase,
-    MessageControllerBase {}
+    MessageControllerBase {
+  // 允许自定义
+  [key: string]: any
+}
 
 /**
  * 事件相关

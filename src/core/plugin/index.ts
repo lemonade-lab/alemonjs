@@ -157,6 +157,7 @@ export class APlugin {
        * 删除定时任务
        */
       clearTimeout(cache.timeout[this.conKey(isGroup)][type])
+      delete cache.timeout[this.conKey(isGroup)][type]
     }
   }
 }
