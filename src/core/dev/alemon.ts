@@ -82,11 +82,17 @@ export class Alemon {
   /**
    * list查询
    */
-  find() {
-    //
+  find(acount: number, example: string, func: string) {
     const list = this.#list
     for (let i = 0; i < list.getSize(); i++) {
       const node = list.shift()
+      if (
+        node.acount == acount &&
+        node.example == example &&
+        node.func == func
+      ) {
+        return node
+      }
     }
   }
 
@@ -123,22 +129,23 @@ export class Alemon {
     this.#data[node.acount][node.example].e = e
     const time = Date.now()
     // 执行
-    const res = await this.#data[node.acount][node.example]
+    this.#data[node.acount][node.example]
       [node.func](e, ...arr)
       .then(res => {
         console.info(this.info(e, node.func, time - Date.now()))
         return res
       })
+      .then(res => {
+        if (res && typeof res != 'boolean') {
+          e.reply(res).catch(err => {
+            console.error(this.err(e, node.func, time - Date.now()), err)
+          })
+        }
+        return res
+      })
       .catch(err => {
         console.error(this.err(e, node.func, time - Date.now()), err)
       })
-
-    // 重执行
-    if (res && typeof res != 'boolean') {
-      await e.reply(res).catch(err => {
-        console.error(this.err(e, node.func, time - Date.now()), err)
-      })
-    }
   }
 
   /**
@@ -172,6 +179,7 @@ export class Alemon {
     if (CacheData) {
       for (const node of CacheData) {
         this.#data[node.acount][node.example].e = e
+
         const time = Date.now()
         // 执行
         const res = await this.#data[node.acount][node.example]
@@ -180,16 +188,17 @@ export class Alemon {
             console.info(this.info(e, node.func, time - Date.now()))
             return res
           })
+          .then(res => {
+            if (res && typeof res != 'boolean') {
+              e.reply(res).catch(err => {
+                console.error(this.err(e, node.func, time - Date.now()), err)
+              })
+            }
+            return res
+          })
           .catch(err => {
             console.error(this.err(e, node.func, time - Date.now()), err)
-            // 错误了就强制中断
           })
-        // 重执行
-        if (res && typeof res != 'boolean') {
-          await e.reply(res).catch(err => {
-            console.error(this.err(e, node.func, time - Date.now()), err)
-          })
-        }
 
         // 不是 false ,也就是不放行
         if (res != false) break
@@ -217,16 +226,20 @@ export class Alemon {
             console.info(this.info(e, node.func, time - Date.now()))
             return res
           })
+          .then(res => {
+            if (res && typeof res != 'boolean') {
+              e.reply(res).catch(err => {
+                console.error(this.err(e, node.func, time - Date.now()), err)
+              })
+            }
+            return res
+          })
           .catch(err => {
             console.error(this.err(e, node.func, time - Date.now()), err)
             // 错误了就强制中断
           })
         // 重执行
-        if (res && typeof res != 'boolean') {
-          await e.reply(res).catch(err => {
-            console.error(this.err(e, node.func, time - Date.now()), err)
-          })
-        }
+
         // 推送缓存
         cache.push(node)
         // 不是 false ,也就是不放行
@@ -284,14 +297,18 @@ export class Alemon {
             console.info(this.info(e, node.func, time - Date.now()))
             return res
           })
+          .then(res => {
+            if (res && typeof res != 'boolean') {
+              e.reply(res).catch(err => {
+                console.error(this.err(e, node.func, time - Date.now()), err)
+              })
+            }
+            return res
+          })
           .catch(err => {
             console.error(this.err(e, node.func, time - Date.now()), err)
           })
-        if (res && typeof res != 'boolean') {
-          await e.reply(res).catch(err => {
-            console.error(this.err(e, node.func, time - Date.now()), err)
-          })
-        }
+
         // 不是 false ,也就是不放行
         if (res != false) break
       }
@@ -317,14 +334,17 @@ export class Alemon {
           console.info(this.info(e, node.func, time - Date.now()))
           return res
         })
+        .then(res => {
+          if (res && typeof res != 'boolean') {
+            e.reply(res).catch(err => {
+              console.error(this.err(e, node.func, time - Date.now()), err)
+            })
+          }
+          return res
+        })
         .catch(err => {
           console.error(this.err(e, node.func, time - Date.now()), err)
         })
-      if (res && typeof res != 'boolean') {
-        await e.reply(res).catch(err => {
-          console.error(this.err(e, node.func, time - Date.now()), err)
-        })
-      }
       // 推送缓存
       cache.push(node)
       // 不是 false ,也就是不放行
@@ -489,7 +509,6 @@ export class Alemon {
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
-    console.log('list', this.#list)
     AppMap.set(this.#name, this)
   }
 

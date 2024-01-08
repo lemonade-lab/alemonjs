@@ -18,13 +18,9 @@ class Response {
     /**
      * 对话机
      */
-    const guild_state = await Conversation.getState(e.guild_id)
     const channel_state = await Conversation.getState(e.channel_id)
     const user_state = await Conversation.getState(e.user_id)
-
-    if (guild_state || channel_state || user_state) {
-      const guild_handler = Conversation.get(e.guild_id)
-      if (guild_handler) await guild_handler(e, guild_state)
+    if (channel_state || user_state) {
       const channel_handler = Conversation.get(e.channel_id)
       if (channel_handler) await channel_handler(e, channel_state)
       const user_handler = Conversation.get(e.user_id)
@@ -140,12 +136,15 @@ class Response {
           ...(ARGCACHE[data.APP] ?? [])
         )
           .then(this.info(data))
-          .catch(this.logErr(data))
-        if (typeof res != 'boolean') {
-          e.reply(res).catch(err => {
-            console.error('APP REPLY', err)
+          .then(res => {
+            if (typeof res != 'boolean') {
+              e.reply(res).catch(err => {
+                console.error('APP REPLY', err)
+              })
+            }
+            return res
           })
-        }
+          .catch(this.logErr(data))
         if (res != false) break
       } catch (err) {
         this.logErr(data)(err)
@@ -213,12 +212,15 @@ class Response {
           ...(ARGCACHE[data.APP] ?? [])
         )
           .then(this.info(data))
-          .catch(this.logErr(data))
-        if (typeof res != 'boolean') {
-          e.reply(res).catch(err => {
-            console.error('APP REPLY', err)
+          .then(res => {
+            if (typeof res != 'boolean') {
+              e.reply(res).catch(err => {
+                console.error('APP REPLY', err)
+              })
+            }
+            return res
           })
-        }
+          .catch(this.logErr(data))
         if (res != false) break
       } catch (err) {
         this.logErr(data)(err)
