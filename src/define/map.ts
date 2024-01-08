@@ -4,46 +4,39 @@
  * **********
  */
 export const RebotMap = {
-  qq: async (): Promise<boolean> => {
-    const { createAlemonByQQ: qq } = await import('../qq/index.js')
-    return qq().catch(err => {
+  qq: async () => {
+    const { createAlemon } = await import('../qq/index.js')
+    createAlemon().catch(err => {
       console.error(err)
       console.error('QQ BOT open err')
-      return false
     })
   },
-  villa: async (): Promise<boolean> => {
-    const { createAlemonByVilla: villa } = await import('../villa/index.js')
-    return villa().catch(err => {
+  villa: async () => {
+    const { createAlemon } = await import('../villa/index.js')
+    createAlemon().catch(err => {
       console.error(err)
       console.error('VILLA BOT open err')
-      return false
     })
   },
-  kook: async (): Promise<boolean> => {
-    const { createAlemonByKOOK: kook } = await import('../kook/index.js')
-    return kook().catch(err => {
+  kook: async () => {
+    const { createAlemon } = await import('../kook/index.js')
+    createAlemon().catch(err => {
       console.error(err)
       console.error('KOOK BOT open err')
-      return false
     })
   },
-  ntqq: async (): Promise<boolean> => {
-    const { createAlemonByNtqq: ntqq } = await import('../ntqq/index.js')
-    return ntqq().catch(err => {
+  ntqq: async () => {
+    const { createAlemon } = await import('../ntqq/index.js')
+    createAlemon().catch(err => {
       console.error(err)
       console.error('NTQQ BOT open err')
-      return false
     })
   },
-  discord: async (): Promise<boolean> => {
-    const { createAlemonByDISCORD: discord } = await import(
-      '../discord/index.js'
-    )
-    return discord().catch(err => {
+  discord: async () => {
+    const { createAlemon } = await import('../discord/index.js')
+    createAlemon().catch(err => {
       console.error(err)
       console.error('DISCORD BOT open err')
-      return false
     })
   }
 }

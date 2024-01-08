@@ -23,15 +23,15 @@ export * from './define/index.js'
  */
 export * from './core/main.js'
 /**
- * api
+ * **************
+ * api-controler-client
+ * **************
  */
 export * from './api/index.js'
 /**
- * client
- */
-export * from './client.js'
-/**
+ * **********
  * image
+ * ************
  */
 export * from './image/index.js'
 /**

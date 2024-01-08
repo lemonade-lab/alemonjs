@@ -6,7 +6,7 @@ import { BOTCONFIG } from '../config/index.js'
 declare global {
   var ClientQQ: IOpenAPI
 }
-export async function createAlemonByQQ() {
+export async function createAlemon() {
   /**
    * 登录
    */

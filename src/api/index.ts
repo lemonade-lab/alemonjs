@@ -27,4 +27,4 @@ export { ClientDISOCRD } from '../discord/index.js'
 /**
  * Controller
  */
-export { Controller } from './controller.js'
+export * from './controller.js'

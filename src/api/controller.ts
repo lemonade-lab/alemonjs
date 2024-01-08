@@ -1,46 +1,42 @@
-import { Controller as villaController } from '../villa/alemon/controller.js'
-import { Controller as qqController } from '../qq/alemon/controller.js'
-import { Controller as ntqqController } from '../ntqq/alemon/group/controller.js'
-import { Controller as kookController } from '../kook/alemon/controller.js'
+import { Controller as villa } from '../villa/alemon/controller.js'
+import { Controller as qq } from '../qq/alemon/controller.js'
+import { Controller as ntqq } from '../ntqq/alemon/group/controller.js'
+import { Controller as kook } from '../kook/alemon/controller.js'
 import {
   type MessageControllerType,
   type MemberControllerType,
   type ControllerOption
 } from '../core/index.js'
+
+interface ControllerType {
+  Message: any
+  Member: any
+}
+
+interface ControllerMap {
+  [key: string]: ControllerType
+}
+
 /**
  * 控制器管理
  */
 export const CONTOLLER = new (class con {
-  data: {
-    [key: string]: {
-      Message: any
-      Member: any
-    }
-  } = {
-    villa: villaController,
-    qq: qqController,
-    ntqq: ntqqController,
-    kook: kookController
-  }
-  set(
-    platform: string,
-    val: {
-      Message: any
-      Member: any
-    }
-  ) {
+  data: ControllerMap = { villa, qq, ntqq, kook }
+  set(platform: string, val: ControllerType) {
     this.data[platform] = val
   }
   get(platform: string) {
     return this.data[platform]
   }
 })()
+
 /**
  * 私有
  * @param platform
  * @deprecated 已废弃
  */
 export const setControlller = CONTOLLER.set
+
 /**
  * 控制器
  * @param platform

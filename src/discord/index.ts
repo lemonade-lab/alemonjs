@@ -2,7 +2,7 @@ import { getIntents, createClient, setBotConfig } from './sdk/index.js'
 import { conversation } from './alemon/conversation.js'
 import { checkRobotByDISCORD } from './login.js'
 import { BOTCONFIG } from '../config/index.js'
-export async function createAlemonByDISCORD() {
+export async function createAlemon() {
   if (
     await checkRobotByDISCORD().catch(err => {
       console.error(err)

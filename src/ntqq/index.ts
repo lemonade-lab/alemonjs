@@ -2,7 +2,7 @@ import { checkRobotByQQ } from './login.js'
 import { BOTCONFIG } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
 import { createClient, getIntentsMask } from './sdk/index.js'
-export async function createAlemonByNtqq() {
+export async function createAlemon() {
   if (
     await checkRobotByQQ().catch(err => {
       console.error(err)

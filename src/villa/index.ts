@@ -2,7 +2,7 @@ import { checkRobotByVilla } from './login.js'
 import { hmacSha256, createClient } from './sdk/index.js'
 import { BOTCONFIG } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
-export async function createAlemonByVilla() {
+export async function createAlemon() {
   // 登录
   if (
     await checkRobotByVilla().catch(err => {

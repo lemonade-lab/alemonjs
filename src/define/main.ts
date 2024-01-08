@@ -26,6 +26,7 @@ class AlemonConfig {
     this.data = val
   }
 }
+
 export const ALEMONCONFIG = new AlemonConfig()
 
 /**

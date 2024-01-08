@@ -7,7 +7,7 @@ import { BOTCONFIG } from '../config/index.js'
  * 创建实例
  * @returns
  */
-export async function createAlemonByKOOK() {
+export async function createAlemon() {
   /**
    * 创建登录配置
    */

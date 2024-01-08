@@ -32,19 +32,19 @@
 
 >
 
-[alemonjs]: https://github.com/ningmengchongshui/alemon
+[alemonjs]: https://github.com/ningmengchongshui/alemonjs
 [alemonjs-status]: https://img.shields.io/npm/v/alemonjs.svg
 [alemonjs-package]: https://www.npmjs.com/package/alemonjs
 
 >
 
-[create-alemonjs]: https://github.com/ningmengchongshui/alemon/tree/cli
+[create-alemonjs]: https://github.com/ningmengchongshui/alemonjs/tree/create-alemonjs
 [create-alemonjs-status]: https://img.shields.io/npm/v/create-alemonjs.svg
 [create-alemonjs-package]: https://www.npmjs.com/package/create-alemonjs
 
 >
 
-[afloat]: https://github.com/ningmengchongshui/alemon/tree/rollup
+[afloat]: https://github.com/ningmengchongshui/alemonjs/tree/rollup
 [afloat-status]: https://img.shields.io/npm/v/afloat.svg
 [afloat-package]: https://www.npmjs.com/package/afloat
 
@@ -56,7 +56,7 @@
 
 >
 
-[alemon-onebot]: https://github.com/ningmengchongshui/alemon/tree/alemon-onebot
+[alemon-onebot]: https://github.com/ningmengchongshui/alemonjs/tree/alemon-onebot
 [alemon-onebot-status]: https://img.shields.io/npm/v/alemon-onebot.svg
 [alemon-onebot-package]: https://www.npmjs.com/package/alemon-onebot
 
