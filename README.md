@@ -167,6 +167,20 @@ npm run build
 
 该程序可放置于`plugins/your plugin name`文件夹下
 
+# Unknown file ".ts"
+
+node >= 20.0.0
+
+```ts
+ts-node alemon.config.ts
+```
+
+更改为
+
+```ts
+node --no-warnings=ExperimentalWarning --loader ts-node/esm alemon.config.ts
+```
+
 ### Dependencies
 
 ```json

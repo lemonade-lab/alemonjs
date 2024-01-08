@@ -12,7 +12,7 @@
     ],
     "declaration": true,
     "declarationDir": "types",
-    "outDir": "lib"
+    "outDir": "lib",
   },
   "ts-node": {
     "esm": true,

@@ -3,7 +3,7 @@
   "version": "1.1.40",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
-    "test": "ts-node apps.ts",
+    "test": "node --no-warnings=ExperimentalWarning --loader ts-node/esm apps.ts",
     "dev": "ts-node alemon.config.ts",
     "tsc": "tsc",
     "ts": "ts-node",
@@ -53,9 +53,9 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typedoc": "^0.25.4",
-    "typescript": "^5.0.4"
+    "typescript": "^5.3.3"
   },
   "author": "ningmengchongshui",
   "license": "MIT",

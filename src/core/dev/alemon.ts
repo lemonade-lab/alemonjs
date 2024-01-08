@@ -4,7 +4,7 @@ import { NodeDataType } from './types.js'
 import { AppMap } from './data.js'
 import { getAppName } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
-import * as memory from './memory.js'
+import * as memory from 'memory-cache'
 
 type CallBackType = (e: AMessage, ...args: any[]) => Promise<any>
 
