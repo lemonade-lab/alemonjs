@@ -30,13 +30,6 @@ class AlemonConfig {
 export const ALEMONCONFIG = new AlemonConfig()
 
 /**
- * 得到初始化配置
- * @deprecated 已废弃
- * @returns
- */
-export const getAlemonConfig = ALEMONCONFIG.get
-
-/**
  * 配置机器人启动规则
  * @param Options
  */

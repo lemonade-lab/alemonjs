@@ -1,6 +1,5 @@
 export * from './buffer.js'
 export * from './ip.js'
-export * from './screenshot.js'
 export * from './puppeteer.js'
 export * from './utils.js'
 export * from './child_process.js'

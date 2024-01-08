@@ -66,30 +66,3 @@ class ConversationMap extends Map {
  * 对话处理器
  */
 export const Conversation = new ConversationMap()
-/**
- * 对话处理器
- * @deprecated 已废弃
- */
-export const conversationHandlers = new ConversationMap()
-/**
- * 获取对话状态
- * @param ID 编号
- * @returns 对话状态值
- * @deprecated 已废弃
- */
-export const getConversationState = conversationHandlers.getState
-/**
- * 设置对话状态
- * @param ID 编号
- * @param state 状态记录
- * @deprecated Conversation.passing
- * @deprecated 已废弃
- */
-export const setConversationState = conversationHandlers.setState
-/**
- * 删除对话状态
- * @param ID 编号
- * @deprecated Conversation.del
- * @deprecated 已废弃
- */
-export const deleteConversationState = conversationHandlers.deleteState

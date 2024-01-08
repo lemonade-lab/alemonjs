@@ -252,11 +252,3 @@ class Pup {
   }
 }
 export const Screenshot = new Pup()
-/**
- * @deprecated 已废弃
- */
-export const screenshotByFile = Screenshot.toFile
-/**
- * @deprecated 已废弃
- */
-export const screenshotByUrl = Screenshot.toUrl

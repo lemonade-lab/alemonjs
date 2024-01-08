@@ -48,17 +48,3 @@ class BotConfig {
  * 机器人配置
  */
 export const BOTCONFIG = new BotConfig()
-/**
- * 设置机器人基础配置
- * @param key 配置名
- * @param val 配置值
- * @deprecated 已废弃
- */
-export const setBotConfigByKey = BOTCONFIG.set
-/**
- * g得到机器人基础配置
- * @param key 配置名
- * @returns 得到配置值
- * @deprecated 已废弃
- */
-export const getBotConfigByKey = BOTCONFIG.get

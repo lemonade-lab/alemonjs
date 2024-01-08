@@ -42,7 +42,3 @@ class Help {
   }
 }
 export const HELP = new Help()
-/**
- * @deprecated 已废弃
- */
-export const getPluginHelp = HELP.get

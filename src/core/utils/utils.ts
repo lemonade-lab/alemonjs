@@ -12,13 +12,3 @@ class Utils {
   }
 }
 export const UTILS = new Utils()
-/**
- * 字符串数组转正则
- * [''] => /^$/
- * ['abc'] => /^abc$/
- * ['a','b','c'] => /^(a|b|c)$/
- * @param APP
-   @deprecated 已废弃
- * @returns
- */
-export const arrayToRule = UTILS.arrayToRule

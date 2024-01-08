@@ -63,7 +63,7 @@ class BufferData {
       })
       const bufferData = Buffer.from(qrDataURL.split(',')[1], 'base64')
       if (localpath != undefined) {
-        setBuffer(localpath, bufferData)
+        this.set(localpath, bufferData)
       }
       return bufferData
     } catch (err) {
@@ -105,39 +105,3 @@ class BufferData {
   }
 }
 export const BUFFER = new BufferData()
-/**
- * 读取buffer文件
- * @param localpath 读取地址
- * @returns buffer
- * @deprecated 已废弃
- */
-export const getBuffer = BUFFER.get
-/**
- * 写入buffer
- * @param localpath 写入地址
- * @param bufferData 数据
- * @deprecated 已废弃
- */
-export const setBuffer = BUFFER.set
-/**
- * 链接转化为二维码
- * @param text 链接
- * @param localpath 可选,要保存的路径
- * @returns buffer
- * @deprecated 已废弃
- */
-export const createQrcode = BUFFER.qrcode
-/**
- * 异步请求图片
- * @param url 网络地址
- * @returns buffer
- * @deprecated 已废弃
- */
-export const getUrlbuffer = BUFFER.getUrl
-/**
- * 读取本地图片
- * @param val
- * @deprecated 已废弃
- * @returns
- */
-export const getPathBuffer = BUFFER.getPath

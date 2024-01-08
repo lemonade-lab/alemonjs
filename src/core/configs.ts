@@ -58,17 +58,3 @@ class AppConfig {
   }
 }
 export const APPCONFIG = new AppConfig()
-/**
- * 设置插件解析配置
- * @param key 配置名
- * @param val 配置值
- * @deprecated 已废弃
- */
-export const setAppProCoinfg = APPCONFIG.set
-/**
- * 得到插件解析配置
- * @param key 配置名
- * @returns 配置值
- * @deprecated 已废弃
- */
-export const getAppProCoinfg = APPCONFIG.get

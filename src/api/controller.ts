@@ -31,13 +31,6 @@ export const CONTOLLER = new (class con {
 })()
 
 /**
- * 私有
- * @param platform
- * @deprecated 已废弃
- */
-export const setControlller = CONTOLLER.set
-
-/**
  * 控制器
  * @param platform
  * @returns
