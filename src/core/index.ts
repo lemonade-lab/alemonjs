@@ -3,7 +3,7 @@
  * private
  * ********
  */
-export * from './configs.js'
+export * from './processor/configs.js'
 export * from './typings.js'
 export * from './utils/index.js'
 export * from './types.js'

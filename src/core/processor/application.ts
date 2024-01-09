@@ -1,7 +1,7 @@
 import { AMessage, EventEnum } from '../typings.js'
 import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
-import { APPCONFIG } from '../configs.js'
+import { APPCONFIG } from './configs.js'
 import { AppMap } from './data.js'
 import { ASubscribe } from './subscribe.js'
 

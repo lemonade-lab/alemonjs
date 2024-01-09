@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { existsSync, mkdirSync, readFileSync } from 'fs'
-import { APPCONFIG } from '../configs.js'
+import { APPCONFIG } from './configs.js'
 import { writeFile } from 'fs/promises'
 import { NodeDataType } from './types.js'
 export class Help {

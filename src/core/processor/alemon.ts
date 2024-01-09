@@ -6,6 +6,7 @@ import { getAppName } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
 import { Help } from './help.js'
+import { APPCONFIG } from './configs.js'
 
 type CallBackType = (e: AMessage, ...args: any[]) => Promise<any>
 
@@ -433,6 +434,13 @@ export class Alemon {
     // 收集
     for (const example in AplguinMap) {
       const keys = new AplguinMap[example]()
+
+      // 过滤事件
+      const event = APPCONFIG.get('event')
+      if (keys.event && event.find(item => item == keys.event)) {
+        continue
+      }
+
       // name
       keys.name = this.#name
       // 层级

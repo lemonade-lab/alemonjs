@@ -3,7 +3,7 @@
  * public
  * ********
  */
-export * from './configs.js'
+export * from './processor/configs.js'
 export * from './processor/help.js'
 export * from './index.js'
 export * from './utils/index.js'
