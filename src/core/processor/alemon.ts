@@ -143,7 +143,7 @@ export class Alemon {
           e.reply(res)
         }
         console.info(
-          this.info(e, node.name, node.acount, node.example, node.func),
+          this.#infoFunc(e, node.name, node.acount, node.example, node.func),
           true,
           Date.now() - time
         )
@@ -151,7 +151,7 @@ export class Alemon {
       })
       .catch(err => {
         console.error(
-          this.error(e, node.name, node.acount, node.example, node.func),
+          this.#errorFunc(e, node.name, node.acount, node.example, node.func),
           false,
           Date.now() - time,
           err
@@ -198,7 +198,13 @@ export class Alemon {
               e.reply(res)
             }
             console.info(
-              this.info(e, node.name, node.acount, node.example, node.func),
+              this.#infoFunc(
+                e,
+                node.name,
+                node.acount,
+                node.example,
+                node.func
+              ),
               true,
               Date.now() - time
             )
@@ -206,7 +212,13 @@ export class Alemon {
           })
           .catch(err => {
             console.error(
-              this.error(e, node.name, node.acount, node.example, node.func),
+              this.#errorFunc(
+                e,
+                node.name,
+                node.acount,
+                node.example,
+                node.func
+              ),
               false,
               Date.now() - time,
               err
@@ -238,7 +250,13 @@ export class Alemon {
               e.reply(res)
             }
             console.info(
-              this.info(e, node.name, node.acount, node.example, node.func),
+              this.#infoFunc(
+                e,
+                node.name,
+                node.acount,
+                node.example,
+                node.func
+              ),
               true,
               Date.now() - time
             )
@@ -246,7 +264,13 @@ export class Alemon {
           })
           .catch(err => {
             console.error(
-              this.error(e, node.name, node.acount, node.example, node.func),
+              this.#errorFunc(
+                e,
+                node.name,
+                node.acount,
+                node.example,
+                node.func
+              ),
               false,
               Date.now() - time,
               err
@@ -310,7 +334,13 @@ export class Alemon {
           [node.func](e, ...arr)
           .then(res => {
             console.info(
-              this.info(e, node.name, node.acount, node.example, node.func),
+              this.#infoFunc(
+                e,
+                node.name,
+                node.acount,
+                node.example,
+                node.func
+              ),
               true,
               Date.now() - time
             )
@@ -321,7 +351,13 @@ export class Alemon {
           })
           .catch(err => {
             console.error(
-              this.error(e, node.name, node.acount, node.example, node.func),
+              this.#errorFunc(
+                e,
+                node.name,
+                node.acount,
+                node.example,
+                node.func
+              ),
               false,
               Date.now() - time,
               err
@@ -352,7 +388,7 @@ export class Alemon {
             e.reply(res)
           }
           console.info(
-            this.info(e, node.name, node.acount, node.example, node.func),
+            this.#infoFunc(e, node.name, node.acount, node.example, node.func),
             true,
             Date.now() - time
           )
@@ -360,7 +396,7 @@ export class Alemon {
         })
         .catch(err => {
           console.error(
-            this.error(e, node.name, node.acount, node.example, node.func),
+            this.#errorFunc(e, node.name, node.acount, node.example, node.func),
             false,
             Date.now() - time,
             err
@@ -595,19 +631,13 @@ export class Alemon {
     new Help(this.#name).create(this.#listArr)
   }
 
-  /**
-   * 错误打印
-   * @param data
-   * @param funcName
-   * @returns
-   */
-  error(
+  #infoFunc = (
     e: AMessage,
     name: string,
     acount: number,
     example: string,
     funcName: string
-  ) {
+  ) => {
     return `[${e.event}] [${e.typing}] [${name}] [${acount}] [${example}] [${funcName}]`
   }
 
@@ -618,13 +648,45 @@ export class Alemon {
    * @returns
    */
   info(
+    func: (
+      e: AMessage,
+      name: string,
+      acount: number,
+      example: string,
+      funcName: string
+    ) => string
+  ) {
+    this.#infoFunc = func
+    return this
+  }
+
+  #errorFunc = (
     e: AMessage,
     name: string,
     acount: number,
     example: string,
     funcName: string
-  ) {
+  ) => {
     return `[${e.event}] [${e.typing}] [${name}] [${acount}] [${example}] [${funcName}]`
+  }
+
+  /**
+   * 错误打印
+   * @param data
+   * @param funcName
+   * @returns
+   */
+  error(
+    func: (
+      e: AMessage,
+      name: string,
+      acount: number,
+      example: string,
+      funcName: string
+    ) => string
+  ) {
+    this.#errorFunc = func
+    return this
   }
 
   /**
@@ -654,7 +716,7 @@ export class Alemon {
             e.reply(res)
           }
           console.info(
-            this.info(e, this.#name, 0, 'on', FuncName),
+            this.#infoFunc(e, this.#name, 0, 'on', FuncName),
             true,
             Date.now() - time
           )
@@ -662,7 +724,7 @@ export class Alemon {
         })
         .catch(err => {
           console.error(
-            this.error(e, this.#name, 0, 'on', FuncName),
+            this.#infoFunc(e, this.#name, 0, 'on', FuncName),
             false,
             Date.now() - time,
             err
