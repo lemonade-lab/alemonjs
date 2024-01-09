@@ -11,25 +11,24 @@ import { EventData, SystemData } from './typings.js'
  * @returns
  */
 export async function getGatewayUrl(
-  token: string,
-  url = 'https://www.kookapp.cn/api/v3/gateway/index',
-  compress = 0
+  token: string
 ): Promise<string | undefined> {
   // 替换为实际的接口地址
-  const Authorization = `Bot ${token}`
   try {
-    const response = await axios.get(url, {
-      params: {
-        compress: compress
-      },
-      headers: {
-        Authorization: Authorization
-      }
-    })
-    if (response.data.code === 0) {
-      return response.data.data.url
+    const response = await axios
+      .get('https://www.kookapp.cn/api/v3/gateway/index', {
+        params: {
+          compress: 0
+        },
+        headers: {
+          Authorization: `Bot ${token}`
+        }
+      })
+      .then(res => res.data)
+    if (response.code === 0) {
+      return response.data.url
     } else {
-      console.error('[getway] http err', response.data.message)
+      console.error('[getway] http err', response.message)
     }
   } catch (error) {
     console.error('[getway] token err', error.message)

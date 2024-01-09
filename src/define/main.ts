@@ -5,7 +5,6 @@ import { Screenshot, APPCONFIG, IP, APPS } from '../core/index.js'
 import { BOTCONFIG } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { ClientKOA } from '../koa/file.js'
-import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { join } from 'path'
 
 class AlemonConfig {
@@ -110,17 +109,17 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
         BOTCONFIG.set('qq', {
           intents: [
             // 基础事件
-            AvailableIntentsEventsEnum.GUILDS, //频道进出
-            AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
-            AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
+            'GUILDS', //频道进出
+            'GUILD_MEMBERS', //成员资料
+            'DIRECT_MESSAGE', //私信
             // 需申请的
-            AvailableIntentsEventsEnum.AUDIO_ACTION, //音频
-            AvailableIntentsEventsEnum.MESSAGE_AUDIT, //消息审核
-            AvailableIntentsEventsEnum.INTERACTION, //互动事件
-            AvailableIntentsEventsEnum.GUILD_MESSAGE_REACTIONS, //表情表态
+            'AUDIO_ACTION', //音频
+            'MESSAGE_AUDIT', //消息审核
+            'INTERACTION', //互动事件
+            'GUILD_MESSAGE_REACTIONS', //表情表态
             // 私域特有
-            AvailableIntentsEventsEnum.GUILD_MESSAGES, //私域事件
-            AvailableIntentsEventsEnum.FORUMS_EVENT //私域论坛
+            'GUILD_MESSAGES', //私域事件
+            'FORUMS_EVENT' //私域论坛
           ],
           ...Options.login.qq
         })
@@ -128,11 +127,11 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
         BOTCONFIG.set('qq', {
           intents: [
             // 基础事件
-            AvailableIntentsEventsEnum.GUILDS, //频道进出
-            AvailableIntentsEventsEnum.GUILD_MEMBERS, //成员资料
-            AvailableIntentsEventsEnum.DIRECT_MESSAGE, //私信
+            'GUILDS', //频道进出
+            'GUILD_MEMBERS', //成员资料
+            'DIRECT_MESSAGE', //私信
             // 公域特有
-            AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES //公域事件
+            'PUBLIC_GUILD_MESSAGES' //公域事件
           ],
           ...Options.login.qq
         })

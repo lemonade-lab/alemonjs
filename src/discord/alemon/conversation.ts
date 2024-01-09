@@ -1,5 +1,5 @@
 import { ClientDISOCRD } from '../sdk/index.js'
-import { setBotMsgByDISOCRD } from './bot.js'
+import { BotMessage } from './bot.js'
 import { MESSAGE_CREATE } from './message/MESSAGE_CREATE.js'
 import { PRESENCE_UPDATE } from './message/PRESENCE_UPDATE.js'
 import { MESSAGE_UPDATE } from './message/MESSAGE_UPDATE.js'
@@ -21,11 +21,9 @@ import { GUILD_MEMBER_REMOVE } from './message/GUILD_MEMBER_REMOVE.js'
 export function conversation(t: string, d: any) {
   if (t == 'READY') {
     // 上线
-    setBotMsgByDISOCRD({
-      id: d.user.id,
-      name: d.user.username,
-      avatar: ClientDISOCRD.userAvatar(d.user.id, d.user.avatar)
-    })
+    BotMessage.set('avatar', ClientDISOCRD.userAvatar(d.user.id, d.user.avatar))
+    BotMessage.set('id', d.user.id)
+    BotMessage.set('name', d.user.username)
   } else if (t == 'GUILD_CREATE') {
     // 频道信息创建
   } else if (t == 'MESSAGE_CREATE') {

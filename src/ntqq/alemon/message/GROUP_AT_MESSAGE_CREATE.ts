@@ -5,7 +5,7 @@ import {
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
-import { getBotMsgByNtqq } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
 import { Controllers } from '../controller.js'
@@ -30,7 +30,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
-    bot: getBotMsgByNtqq(),
+    bot: BotMessage.get(),
     isMaster: event.author.id == masterID ? true : false,
     guild_id: event.group_id,
     guild_name: '',

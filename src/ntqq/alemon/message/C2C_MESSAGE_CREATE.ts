@@ -5,7 +5,7 @@ import {
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
-import { getBotMsgByNtqq } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { USER_DATA } from '../types.js'
 import { BOTCONFIG } from '../../../config/index.js'
 
@@ -25,7 +25,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
-    bot: getBotMsgByNtqq(),
+    bot: BotMessage.get(),
     isMaster: event.author.id == masterID ? true : false,
     channel_id: event.author.user_openid,
     guild_name: '',

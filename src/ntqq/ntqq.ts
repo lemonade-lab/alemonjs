@@ -40,7 +40,7 @@ export interface NTQQOptions {
   sandbox?: boolean
 }
 
-export const defineNtqq = {
+export const defineNtqq: NTQQOptions = {
   appID: '',
   token: '',
   secret: '',

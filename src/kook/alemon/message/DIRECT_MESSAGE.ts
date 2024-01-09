@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 import { type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
-import { getBotMsgByKOOK } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers, directController } from '../direct.js'
 
@@ -35,7 +35,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
       event.channel_type == 'GROUP'
         ? 'group'
         : ('single' as 'group' | 'single'),
-    bot: getBotMsgByKOOK(),
+    bot: BotMessage.get(),
     isMaster: event.extra.author.id == masterID,
     guild_id: '', // 频道号
     guild_name: '',

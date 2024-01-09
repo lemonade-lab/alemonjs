@@ -1,10 +1,5 @@
-import { createOpenAPI, createWebsocket, IOpenAPI } from 'qq-guild-bot'
-import { config } from './sdk/index.js'
-import { createConversationByQQ } from './alemon/conversation.js'
+import { config, createClient } from './sdk/index.js'
 import { BOTCONFIG } from '../config/index.js'
-declare global {
-  var ClientQQ: IOpenAPI
-}
 export async function createAlemon() {
   /**
    * 登录
@@ -22,14 +17,6 @@ export async function createAlemon() {
    */
   const cfg = BOTCONFIG.get('qq')
   /**
-   * 创建 ClientQQ
-   */
-  global.ClientQQ = createOpenAPI({
-    appID: cfg.appID,
-    token: cfg.token,
-    sandbox: cfg.sandbox ?? false
-  })
-  /**
    * **********
    * sdk-config
    * **********
@@ -39,18 +26,13 @@ export async function createAlemon() {
   config.set('intents', cfg.intents)
   config.set('sandbox', cfg.sandbox)
   /**
-   * 创建 websocket
+   * *********
+   * *********
    */
-  const WebsocketClient = createWebsocket({
-    appID: cfg.appID,
-    token: cfg.token,
-    sandbox: cfg.sandbox,
-    intents: cfg.intents
+  createClient((t, d) => {
+    console.log('t', t)
+    console.log('d', d)
   })
-  /**
-   * 创建 conversation
-   */
-  createConversationByQQ(WebsocketClient)
 }
 // 客户端
-export const ClientQQ = global.ClientQQ
+export { ClientQQ } from './sdk/index.js'

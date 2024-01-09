@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 
 import { segmentQQ } from '../segment.js'
-import { getBotMsgByQQ } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { Controllers } from '../controller.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { directController } from '../direct.js'
@@ -53,7 +53,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
       : ('DELETE' as (typeof TypingEnum)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
-    bot: getBotMsgByQQ(),
+    bot: BotMessage.get(),
     isMaster: masterID == event.msg.user.id,
     attachments: [],
     specials: [],

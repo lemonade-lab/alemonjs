@@ -1,4 +1,32 @@
 /**
+ * 机器人信息缓存
+ */
+export class BaseBotMessage<D> {
+  #data: D = null
+  constructor(val: D) {
+    this.#data = val
+  }
+  /**
+   * 设置配置
+   * @param key
+   * @param val
+   */
+  set<T extends keyof D>(key: T, val: D[T]) {
+    if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
+      this.#data[key] = val
+    }
+  }
+  /**
+   * 读取配置
+   * @param key
+   * @returns
+   */
+  get(): D {
+    return this.#data
+  }
+}
+
+/**
  * 基础配置结构
  */
 export class BaseConfig<D> {

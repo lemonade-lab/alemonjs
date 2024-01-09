@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { ClientKOOK, type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
-import { getBotMsgByKOOK } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
@@ -80,7 +80,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       event.channel_type == 'GROUP'
         ? 'group'
         : ('single' as 'group' | 'single'),
-    bot: getBotMsgByKOOK(),
+    bot: BotMessage.get(),
     isMaster: event.extra.author.id == masterID ? true : false,
     guild_id: event.extra.guild_id, // 频道
     guild_name: '',

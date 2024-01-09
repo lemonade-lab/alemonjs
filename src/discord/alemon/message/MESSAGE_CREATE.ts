@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers } from '../controller.js'
-import { getBotMsgByDISCORD } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'
 import { replyController } from '../reply.js'
 import { ClientDISOCRD } from '../../sdk/index.js'
@@ -120,7 +120,7 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
-    bot: getBotMsgByDISCORD(),
+    bot: BotMessage.get(),
     isMaster: event.author?.id == masterID,
     attachments: event?.attachments ?? [],
     specials: [],

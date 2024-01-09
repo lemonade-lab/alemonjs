@@ -4,7 +4,7 @@ import {
   type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
-import { getBotMsgByQQ } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
@@ -65,7 +65,7 @@ export const GUILD = async (event: EventGuildType) => {
       : ('DELETE' as (typeof TypingEnum)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
-    bot: getBotMsgByQQ(),
+    bot: BotMessage.get(),
     isMaster: false,
     attachments: [],
     specials: [],

@@ -4,6 +4,7 @@ import { Counter } from './counter.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
 import { config, type ClientConfig } from './config.js'
+import { ApiLog } from './log.js'
 
 const counter = new Counter(1) // 初始值为1
 
@@ -35,7 +36,7 @@ export async function getWebsocketInfo(
     },
     url: '/vila/api/bot/platform/getWebsocketInfo',
     method: 'get'
-  }).then(res => res.data)
+  }).then(ApiLog)
 }
 /**
  *

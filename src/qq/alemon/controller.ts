@@ -1,9 +1,9 @@
-import { type IMember } from 'qq-guild-bot'
 import { replyController } from './reply.js'
 import { ControllerOption, type UserInformationType } from '../../core/index.js'
 import { BOTCONFIG } from '../../config/index.js'
 import { directController } from './direct.js'
 import { everyoneError } from '../../log/index.js'
+import { ClientQQ } from '../sdk/index.js'
 
 export class Controllers {
   select: ControllerOption
@@ -22,11 +22,7 @@ export class Controllers {
        * @returns
        */
       information: async (): Promise<UserInformationType | false> => {
-        const data: IMember = await ClientQQ.guildApi
-          .guildMember(guild_id, user_id)
-          .then(res => res.data)
-          .catch(everyoneError)
-
+        const data: any = {}
         if (data) {
           const cfg = BOTCONFIG.get('qq')
           const masterID = cfg.masterID
@@ -50,26 +46,16 @@ export class Controllers {
        */
       mute: async (option?: { time?: number; cancel?: boolean }) => {
         if (option.cancel) {
-          return await ClientQQ.muteApi
-            .muteMember(guild_id, user_id, {
-              seconds: String(option.time ?? 60000 / 1000)
-            })
-            .catch(everyoneError)
+          //
         } else {
-          return await ClientQQ.muteApi
-            .muteMember(guild_id, user_id, {
-              seconds: '0'
-            })
-            .catch(everyoneError)
+          //
         }
       },
       /**
        * 踢出
        */
       remove: async () => {
-        return await ClientQQ.guildApi
-          .deleteGuildMember(guild_id, user_id)
-          .catch(everyoneError)
+        //
       },
       /**
        * 身分组
@@ -79,13 +65,9 @@ export class Controllers {
        */
       operate: async (role_id: string, add = true) => {
         if (add) {
-          return await ClientQQ.memberApi
-            .memberAddRole(guild_id, role_id, user_id, channel_id)
-            .catch(everyoneError)
+          //
         } else {
-          return await ClientQQ.memberApi
-            .memberDeleteRole(guild_id, role_id, user_id, channel_id)
-            .catch(everyoneError)
+          //
         }
       }
     }
@@ -127,58 +109,30 @@ export class Controllers {
       ) => {
         return false
       },
-      withdraw: async (hideTip = true) => {
-        return await ClientQQ.messageApi
-          .deleteMessage(channel_id, msg_id, hideTip)
-          .catch(everyoneError)
-      },
+      withdraw: async (hideTip = true) => {},
       pinning: async (cancel?: boolean) => {
         if (cancel) {
-          return await ClientQQ.pinsMessageApi
-            .deletePinsMessage(channel_id, msg_id)
-            .catch(everyoneError)
+          //
         }
-        return await ClientQQ.pinsMessageApi
-          .putPinsMessage(channel_id, msg_id)
-          .catch(everyoneError)
       },
       forward: async () => {
         return false
       },
       horn: async (cancel?: boolean) => {
         if (cancel) {
-          return await ClientQQ.announceApi
-            .deleteGuildAnnounce(guild_id, msg_id)
-            .catch(everyoneError)
+          //
         }
-        return await ClientQQ.announceApi
-          .postGuildAnnounce(guild_id, channel_id, msg_id)
-          .catch(everyoneError)
       },
       emoji: async (msg: any[], cancel?: boolean) => {
         const arr: any[] = []
         if (cancel) {
           for (const item of msg) {
-            arr.push(
-              await ClientQQ.reactionApi
-                .deleteReaction(channel_id, {
-                  message_id: msg_id,
-                  ...item
-                })
-                .catch(everyoneError)
-            )
+            arr.push()
           }
           return arr
         }
         for (const item of msg) {
-          arr.push(
-            await ClientQQ.reactionApi
-              .postReaction(channel_id, {
-                message_id: msg_id,
-                ...item
-              })
-              .catch(everyoneError)
-          )
+          arr.push()
         }
         return arr
       },
@@ -202,14 +156,7 @@ export class Controllers {
         // 卡片消息
         const arr: any[] = []
         for (const item of msg) {
-          arr.push(
-            await ClientQQ.messageApi
-              .postMessage(channel_id, {
-                msg_id: msg_id,
-                ...item
-              })
-              .catch(everyoneError)
-          )
+          arr.push()
         }
         return arr
       },
@@ -220,9 +167,7 @@ export class Controllers {
           limit: 20
         }
       ) => {
-        return await ClientQQ.reactionApi
-          .getReactionUserList(channel_id, reactionObj, options)
-          .catch(everyoneError)
+        //
       },
       article: async (msg: any) => {
         return false

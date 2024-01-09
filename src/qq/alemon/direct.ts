@@ -1,5 +1,5 @@
 import { BUFFER } from '../../core/index.js'
-import { ClientQQ as Client } from '../sdk/index.js'
+import { ClientQQ } from '../sdk/index.js'
 import { everyoneError } from '../../log/index.js'
 import { ControllerOption, type UserInformationType } from '../../core/index.js'
 
@@ -146,19 +146,14 @@ export async function directController(
   if (select?.open_id && select?.user_id) {
     const {
       data: { guild_id }
-    }: any = await ClientQQ.directMessageApi
-      .createDirectMessage({
-        source_guild_id: select?.open_id,
-        recipient_id: select?.user_id
-      })
-      .catch(everyoneError)
+    }: any = {}
     if (!guild_id) return false
     open_id = guild_id
   }
   // isBuffer
   // if withdraw == 0 ， false 不撤回
   if (Buffer.isBuffer(msg)) {
-    return await Client.postDirectImage({
+    return await ClientQQ.postDirectImage({
       id: open_id,
       msg_id: msg_id, //消息id, 必须
       image: msg //buffer
@@ -174,7 +169,7 @@ export async function directController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    return await Client.postDirectImage({
+    return await ClientQQ.postDirectImage({
       id: open_id,
       msg_id: msg_id, //消息id, 必须
       image: msg[isBuffer] as Buffer, //buffer
@@ -197,7 +192,7 @@ export async function directController(
     const getUrl = match[1]
     const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
     if (msg) {
-      return await Client.postImage({
+      return await ClientQQ.postImage({
         id: open_id,
         msg_id: msg_id, //消息id, 必须
         image: msg //buffer
@@ -205,10 +200,5 @@ export async function directController(
     }
   }
 
-  return await ClientQQ.directMessageApi
-    .postDirectMessage(open_id, {
-      msg_id: msg_id,
-      content
-    })
-    .catch(everyoneError)
+  return
 }

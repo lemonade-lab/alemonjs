@@ -10,7 +10,7 @@ import {
   type SystemData
 } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
-import { getBotMsgByKOOK } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
@@ -42,7 +42,7 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
       event.channel_type == 'GROUP'
         ? 'group'
         : ('single' as 'group' | 'single'),
-    bot: getBotMsgByKOOK(),
+    bot: BotMessage.get(),
     isMaster: body.user_id == masterID ? true : false,
     guild_id: event.target_id, // 频道
     guild_name: '',

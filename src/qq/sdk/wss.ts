@@ -2,34 +2,16 @@ import WebSocket from 'ws'
 import { ClientQQ } from './api.js'
 import { config } from './config.js'
 import { getIntentsMask } from './intents.js'
-
-/**
- * @param token  token
- * @returns
- */
-export async function getGatewayUrl(): Promise<string | undefined> {
-  try {
-    const response = await ClientQQ.geteway()
-    if (response.url) {
-      return response.url
-    } else {
-      console.error('[getway] http err:', null)
-    }
-  } catch (error) {
-    console.error('[getway] token err:', error.message)
-  }
-}
-
 /**
  * 建立 WebSocket 连接
- * @param token
  * @param callBack
+ * @param shard
  */
 export async function createClient(
   callBack: (...args: any[]) => any,
   shard = [0, 4]
 ) {
-  const gatewayUrl = await getGatewayUrl()
+  const gatewayUrl = await ClientQQ.geteway().then(res => res.url)
   if (gatewayUrl) {
     const ws = new WebSocket(gatewayUrl)
 
@@ -41,14 +23,24 @@ export async function createClient(
      * 标记是否已连接
      */
     let isConnected = false
+
     /**
      * 存储最新的消息序号
      */
     let heartbeat_interval = 30000
 
+    /**
+     * opcode
+     *
+     * s 标识消息的唯一性
+     *
+     * t 代表事件类型
+     *
+     * d 代表事件内容
+     */
     const map = {
       0: ({ d, t }) => {
-        callBack(d)
+        callBack(t, d)
         if (t === 'READY') {
           // Ready Event，鉴权成功
           setInterval(() => {
@@ -83,6 +75,8 @@ export async function createClient(
         const appID = config.get('appID')
         const token = config.get('token')
         const intents = config.get('intents')
+        const s = getIntentsMask(intents)
+        console.log('s', s)
         /**
          * 发送鉴权
          */
@@ -91,12 +85,12 @@ export async function createClient(
             op: 2, // op = 2
             d: {
               token: `Bot ${appID}.${token}`,
-              intents: getIntentsMask(intents),
+              intents: s,
               shard,
               properties: {
-                $os: 'linux',
-                $browser: 'my_library',
-                $device: 'my_library'
+                $os: process.platform,
+                $browser: 'alemonjs',
+                $device: 'alemonjs'
               }
             }
           })
@@ -112,18 +106,8 @@ export async function createClient(
 
     ws.on('message', msg => {
       const message = JSON.parse(msg.toString('utf8'))
-      /**
-       * opcode
-       *
-       * s 标识消息的唯一性
-       *
-       * t 代表事件类型
-       *
-       * d 代表事件内容
-       */
-      const { op, s, d, t } = message
       // 根据 opcode 进行处理
-      if (map[op]) map[op](message)
+      if (map[message.op]) map[message.op](message)
     })
 
     ws.on('close', () => {

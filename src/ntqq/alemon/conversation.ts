@@ -1,6 +1,6 @@
 import { GROUP_AT_MESSAGE_CREATE } from './message/GROUP_AT_MESSAGE_CREATE.js'
 import { C2C_MESSAGE_CREATE } from './message/C2C_MESSAGE_CREATE.js'
-import { setBotMsgByNtqq } from './bot.js'
+import { BotMessage } from './bot.js'
 /**
  *
  * @param t
@@ -9,11 +9,8 @@ import { setBotMsgByNtqq } from './bot.js'
 export function conversation(t: string, d: any) {
   if (t == 'READY') {
     // 设置bot信息
-    setBotMsgByNtqq({
-      id: d.user.id,
-      name: d.user.name,
-      avatar: ''
-    })
+    BotMessage.set('id', d.user.id)
+    BotMessage.set('name', d.user.name)
   } else if (t == 'GROUP_AT_MESSAGE_CREATE') {
     GROUP_AT_MESSAGE_CREATE(d)
   } else if (t == 'C2C_MESSAGE_CREATE') {

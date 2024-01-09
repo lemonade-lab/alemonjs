@@ -1,18 +1,11 @@
-interface BotMessage {
+import { BaseBotMessage } from '../../core/index.js'
+interface BotMessageType {
   id: string
   name: string
   avatar?: string
 }
-
-let bot: BotMessage = {
+export const BotMessage = new BaseBotMessage<BotMessageType>({
   id: '',
   name: '',
   avatar: ''
-}
-export function setBotMsgByQQ(val: BotMessage) {
-  bot = val
-}
-
-export function getBotMsgByQQ() {
-  return bot
-}
+})

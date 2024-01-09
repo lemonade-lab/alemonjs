@@ -1,4 +1,3 @@
-import { IOpenAPI } from 'qq-guild-bot'
 import {
   APPS,
   type EventEnum,
@@ -6,14 +5,9 @@ import {
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentQQ } from '../segment.js'
-import { getBotMsgByQQ } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers, directController } from '../direct.js'
-
-declare global {
-  //接口对象
-  var ClientQQ: IOpenAPI
-}
 
 interface directEventData {
   eventType: 'AT_MESSAGE_CREATE'
@@ -71,7 +65,7 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
-    bot: getBotMsgByQQ(),
+    bot: BotMessage.get(),
     isMaster: event.msg.author.id == masterID ? true : false,
     guild_id: event.msg.guild_id,
     guild_name: '',

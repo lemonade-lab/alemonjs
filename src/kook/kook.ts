@@ -13,7 +13,10 @@ export interface KOOKOptions {
    */
   masterID?: string
 }
-export const defineKOOK = {
+/**
+ *
+ */
+export const defineKOOK: KOOKOptions = {
   token: '',
   masterID: ''
 }

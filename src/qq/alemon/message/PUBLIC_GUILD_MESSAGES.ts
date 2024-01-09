@@ -4,9 +4,8 @@ import {
   type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
-import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { setBotMsgByQQ } from '../bot.js'
+import { BotMessage } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
@@ -84,7 +83,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
-    bot: getBotMsgByQQ(),
+    bot: BotMessage.get(),
     isMaster: event.msg?.author?.id == masterID,
     attachments: event?.msg?.attachments ?? [],
     specials: [],
@@ -191,7 +190,9 @@ export const PUBLIC_GUILD_MESSAGES = async (
     const bot = e.at_users.find(item => item.bot == true && item.id == e.bot.id)
     if (bot) {
       e.bot.avatar = bot.avatar
-      setBotMsgByQQ(bot)
+      BotMessage.set('id', e.bot.id)
+      BotMessage.set('name', e.bot.name)
+      BotMessage.set('avatar', e.bot.avatar)
     }
   }
 

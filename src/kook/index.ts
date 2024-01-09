@@ -1,6 +1,6 @@
 import { conversation } from './alemon/conversation.js'
 import { createClient, ClientKOOK } from './sdk/index.js'
-import { setBotMsgByKOOK } from './alemon/bot.js'
+import { BotMessage } from './alemon/bot.js'
 import { BOTCONFIG } from '../config/index.js'
 /**
  * 创建实例
@@ -28,11 +28,12 @@ export async function createAlemon() {
   await createClient(cfg.token, conversation).then(async res => {
     const data = await ClientKOOK.userMe().then(res => res?.data)
     if (data) {
-      setBotMsgByKOOK({
-        id: data.id,
-        name: data.username,
-        avatar: data.avatar
-      })
+      BotMessage.set('id', data.id)
+
+      BotMessage.set('name', data.username)
+
+      BotMessage.set('avatar', data.avatar)
+
       console.info('KOOK Welcome back', data.username)
     }
   })

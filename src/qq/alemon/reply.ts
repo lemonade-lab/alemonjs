@@ -76,13 +76,5 @@ export async function replyController(
   /**
    * 发送接口
    */
-  return await ClientQQ.messageApi
-    .postMessage(channel_id, {
-      msg_id: msg_id,
-      content,
-      message_reference: select?.quote
-        ? { message_id: select?.quote }
-        : undefined
-    })
-    .catch(everyoneError)
+  return
 }

@@ -1,4 +1,4 @@
-import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
+import { IntentsEnum } from './sdk/typings.js'
 
 /**
  * ******
@@ -29,7 +29,7 @@ export interface QQOptions {
   /**
    * 事件订阅
    */
-  intents?: AvailableIntentsEventsEnum[]
+  intents?: IntentsEnum[]
   /**
    * 是否是私域
    */
@@ -40,16 +40,17 @@ export interface QQOptions {
   sandbox?: boolean
 }
 
-export const defineQQ = {
+export const defineQQ: QQOptions = {
   appID: '',
   token: '',
   secret: '',
   masterID: '',
   intents: [
-    AvailableIntentsEventsEnum.GUILDS,
-    AvailableIntentsEventsEnum.PUBLIC_GUILD_MESSAGES,
-    AvailableIntentsEventsEnum.DIRECT_MESSAGE
-  ] as AvailableIntentsEventsEnum[],
+    'GUILDS', //频道进出
+    'GUILD_MEMBERS', //成员资料
+    'DIRECT_MESSAGE', //私信
+    'PUBLIC_GUILD_MESSAGES' //公域事件
+  ],
   isPrivate: false,
   sandbox: false,
   shard: [0, 1]
