@@ -77,8 +77,6 @@ class App {
   #mergedRegexArr: RegExp[] = []
   // 数组化正则
   #regular: RegExp
-  // 正则-key
-  #regMap = {}
 
   /**
    * ***********
@@ -119,11 +117,10 @@ class App {
    * @returns
    */
   response(e: AMessage, event: (typeof EventEnum)[number]) {
-    console.log(`[${e.event}] [${e.typing}] [${e.msg}]`)
+    console.log(`[${e.event}] [${e.typing}] ${e.msg}`)
     // 分发
-    for (const item in this.#regMap) {
-      // key触发
-      AppMap.get(this.#regMap[item]).response(e, event)
+    for (const [item, app] of AppMap) {
+      app.response(e, event)
     }
   }
 
@@ -133,7 +130,7 @@ class App {
    * @returns
    */
   responseMessage(e: AMessage) {
-    console.log(`[${e.event}] [${e.typing}] [${e.msg}]`)
+    console.log(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
     const channel_sb = ASubscribe.find(e.channel_id)
     if (channel_sb) {
@@ -149,18 +146,15 @@ class App {
       return
     }
 
-    if (!con) return
+    if (con) return
 
     // 正则系统
     if (!this.trigger(e.msg)) return
 
     // 分发
-    for (const item in this.#regMap) {
-      // key触发
-      if (new RegExp(item).test(e.msg)) {
-        // app name
-        AppMap.get(this.#regMap[item]).responseMessage(e)
-      }
+    for (const [item, app] of AppMap) {
+      // app name
+      app.responseMessage(e)
     }
   }
 
@@ -171,8 +165,8 @@ class App {
   responseEventType(e: AMessage) {
     console.log(`[${e.event}] [${e.typing}]`)
     // 分发
-    for (const item in AppMap.keys()) {
-      AppMap.get(item).responseEventType(e)
+    for (const [item, app] of AppMap) {
+      app.responseEventType(e)
     }
   }
 }

@@ -1,9 +1,9 @@
 {
   "name": "alemonjs",
-  "version": "1.1.40",
+  "version": "1.2.0",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
-    "test": "node --no-warnings=ExperimentalWarning --loader ts-node/esm apps.ts",
+    "test": "ts-node apps.ts",
     "dev": "ts-node alemon.config.ts",
     "tsc": "tsc",
     "ts": "ts-node",
