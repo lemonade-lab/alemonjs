@@ -20,24 +20,12 @@ export interface PlatformsItemType {
     /**
      * 消息事件
      */
-    Instruction: typeof APPS.responseMessage,
+    responseMessage: typeof APPS.responseMessage,
     /**
      * 非消息事件
      */
-    InstructionByNotMessage: typeof APPS.responseEventType
-  ) => {
-    /**
-     * 客户端
-     */
-    client: any
-    /**
-     * 控制器
-     */
-    controller: {
-      Message: any
-      Member: any
-    }
-  }
+    responseEventType: typeof APPS.responseEventType
+  ) => any
 }
 
 /**

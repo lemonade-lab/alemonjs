@@ -133,16 +133,14 @@ class App {
     console.log(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
     const channel_sb = ASubscribe.find(e.channel_id)
-    if (channel_sb) {
+    if (channel_sb && channel_sb.node) {
       con = true
-      const node = channel_sb.node
-      AppMap.get(node.name).responseNode(e, node)
+      AppMap.get(channel_sb.node.name).responseNode(e, channel_sb.node)
     }
     const user_sb = ASubscribe.find(e.user_id)
-    if (user_sb && !con) {
+    if (user_sb && user_sb.node && !con) {
       con = true
-      const node = user_sb.node
-      AppMap.get(node.name).responseNode(e, node)
+      AppMap.get(user_sb.node.name).responseNode(e, user_sb.node)
       return
     }
 

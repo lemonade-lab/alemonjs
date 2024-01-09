@@ -18,20 +18,24 @@ export class Subscribe {
   } = {}
   /**
    * 发布订阅
+   * @param acount
+   * @param example
+   * @param func
    * @param key
    * @param id
-   * @param c
-   * @param f
-   * @param data
    * @returns
    */
-  add(acount: number, c: string, func: string, key: string, id: any) {
-    let node: NodeDataType
-    for (const item in AppMap.keys()) {
-      // 寻找节点
-      node = AppMap.get(item).findByKey(acount, c, func)
-      if (node) break
-    }
+  add(
+    name: string,
+    acount: number,
+    example: string,
+    func: string,
+    key: string,
+    id: any
+  ) {
+    console.log('func', func)
+    const node: NodeDataType = AppMap.get(name).findByKey(acount, example, func)
+    console.log('node', node)
     // 订阅失败
     if (!node) clearTimeout(id)
     // 订阅前把上一个取消
@@ -47,8 +51,6 @@ export class Subscribe {
   /**
    * 取消订阅
    * @param key
-   * @param c
-   * @param f
    */
   cancel(key: string) {
     // 取消的时候,先把定时器关闭
@@ -62,8 +64,6 @@ export class Subscribe {
   /**
    * 寻找订阅
    * @param key
-   * @param c
-   * @param f
    * @returns
    */
   find(key: string) {

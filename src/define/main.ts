@@ -279,6 +279,5 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ************
    */
   if (Options?.mount !== false) APPS.init()
-
   return
 }

@@ -70,9 +70,6 @@ export const APPCONFIG = new BaseConfig<ApplicationProcessingOpsion>({
   type: 'stript',
   openRegex: /./,
   closeRegex: undefined,
-  /**
-   * 事件屏蔽器
-   */
   event: [],
   route: '/public/defset',
   regex: true

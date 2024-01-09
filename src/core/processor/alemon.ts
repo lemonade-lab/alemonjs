@@ -5,6 +5,7 @@ import { AppMap } from './data.js'
 import { getAppName } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
+import { Help } from './help.js'
 
 type CallBackType = (e: AMessage, ...args: any[]) => Promise<any>
 
@@ -38,12 +39,19 @@ export class Alemon {
 
   // 正则集
   #mergedRegexArr: RegExp[] = []
+
   // 大正则
   #regular: RegExp | null = null
+
   // 消息链表
   #list = new DoublyLinkedList<NodeDataType>()
+
+  #listArr: NodeDataType[] = []
+
   // 事件链表
   #elist = new DoublyLinkedList<NodeDataType>()
+
+  #elistArr: NodeDataType[] = []
 
   /**
    * 创建应用
@@ -83,8 +91,7 @@ export class Alemon {
    * list查询
    */
   find(acount: number, example: string, func: string) {
-    const list = this.#list.toArray()
-    for (const node of list) {
+    for (const node of this.#listArr) {
       if (
         node.acount == acount &&
         node.example == example &&
@@ -131,23 +138,23 @@ export class Alemon {
     this.#data[node.acount][node.example]
       [node.func](e, ...arr)
       .then(res => {
-        console.info(this.info(e, this.#name, node.func, Date.now() - time))
-        return res
-      })
-      .then(res => {
         if (res && typeof res != 'boolean') {
-          e.reply(res).catch(err => {
-            console.error(
-              this.err(e, this.#name, node.func, Date.now() - time),
-              err
-            )
-          })
+          e.reply(res)
         }
+        console.info(
+          this.info(e, this.#name, node.func),
+          true,
+          Date.now() - time,
+          'sm'
+        )
         return res
       })
       .catch(err => {
         console.error(
-          this.err(e, this.#name, node.func, Date.now() - time),
+          this.error(e, this.#name, node.func),
+          false,
+          Date.now() - time,
+          'sm',
           err
         )
       })
@@ -162,8 +169,6 @@ export class Alemon {
     if (this.#list.isEmpty()) return
     //
     const time = Date.now()
-    // 消息进来,开始走表
-    const list = this.#list.toArray()
     /**
      * **********
      * 构造配置
@@ -190,23 +195,23 @@ export class Alemon {
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
           .then(res => {
-            console.info(this.info(e, this.#name, node.func, Date.now() - time))
-            return res
-          })
-          .then(res => {
             if (res && typeof res != 'boolean') {
-              e.reply(res).catch(err => {
-                console.error(
-                  this.err(e, this.#name, node.func, Date.now() - time),
-                  err
-                )
-              })
+              e.reply(res)
             }
+            console.info(
+              this.info(e, this.#name, node.func),
+              true,
+              Date.now() - time,
+              'sm'
+            )
             return res
           })
           .catch(err => {
             console.error(
-              this.err(e, this.#name, node.func, Date.now() - time),
+              this.error(e, this.#name, node.func),
+              false,
+              Date.now() - time,
+              'sm',
               err
             )
           })
@@ -224,7 +229,7 @@ export class Alemon {
      * 走表
      * **********
      */
-    for (const node of list) {
+    for (const node of this.#listArr) {
       // 索引匹配
       if (node.reg.test(e.msg)) {
         this.#data[node.acount][node.example].e = e
@@ -232,23 +237,23 @@ export class Alemon {
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
           .then(res => {
-            console.info(this.info(e, this.#name, node.func, Date.now() - time))
-            return res
-          })
-          .then(res => {
             if (res && typeof res != 'boolean') {
-              e.reply(res).catch(err => {
-                console.error(
-                  this.err(e, this.#name, node.func, Date.now() - time),
-                  err
-                )
-              })
+              e.reply(res)
             }
+            console.info(
+              this.info(e, this.#name, node.func),
+              true,
+              Date.now() - time,
+              'sm'
+            )
             return res
           })
           .catch(err => {
             console.error(
-              this.err(e, this.#name, node.func, Date.now() - time),
+              this.error(e, this.#name, node.func),
+              false,
+              Date.now() - time,
+              'sm',
               err
             )
             // 错误了就强制中断
@@ -283,7 +288,6 @@ export class Alemon {
 
     const time = Date.now()
 
-    const list = this.#elist.toArray()
     /**
      * *****
      * ******
@@ -310,23 +314,23 @@ export class Alemon {
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
           .then(res => {
-            console.info(this.info(e, this.#name, node.func, Date.now() - time))
-            return res
-          })
-          .then(res => {
+            console.info(
+              this.info(e, this.#name, node.func),
+              true,
+              Date.now() - time,
+              'sm'
+            )
             if (res && typeof res != 'boolean') {
-              e.reply(res).catch(err => {
-                console.error(
-                  this.err(e, this.#name, node.func, Date.now() - time),
-                  err
-                )
-              })
+              e.reply(res)
             }
             return res
           })
           .catch(err => {
             console.error(
-              this.err(e, this.#name, node.func, Date.now() - time),
+              this.error(e, this.#name, node.func),
+              false,
+              Date.now() - time,
+              'sm',
               err
             )
           })
@@ -343,7 +347,7 @@ export class Alemon {
      * ******
      * *****
      */
-    for (const node of list) {
+    for (const node of this.#elistArr) {
       // 类型不符
       if (node.event !== e.event || node.typing !== e.typing) continue
       //
@@ -351,23 +355,23 @@ export class Alemon {
       const res = await this.#data[node.acount][node.example]
         [node.func](e, ...arr)
         .then(res => {
-          console.info(this.info(e, this.#name, node.func, Date.now() - time))
-          return res
-        })
-        .then(res => {
           if (res && typeof res != 'boolean') {
-            e.reply(res).catch(err => {
-              console.error(
-                this.err(e, this.#name, node.func, Date.now() - time),
-                err
-              )
-            })
+            e.reply(res)
           }
+          console.info(
+            this.info(e, this.#name, node.func),
+            true,
+            Date.now() - time,
+            'sm'
+          )
           return res
         })
         .catch(err => {
           console.error(
-            this.err(e, this.#name, node.func, Date.now() - time),
+            this.error(e, this.#name, node.func),
+            false,
+            Date.now() - time,
+            'sm',
             err
           )
         })
@@ -439,9 +443,12 @@ export class Alemon {
     // 收集
     for (const example in AplguinMap) {
       const keys = new AplguinMap[example]()
-      // 标记name和层级
+      // name
       keys.name = this.#name
+      // 层级
       keys.acount = this.#acount
+      // 实例名
+      keys.example = example
       // 记录
       this.#data[this.#acount][example] = keys
       // 忽视非法key
@@ -535,7 +542,13 @@ export class Alemon {
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
+    // 数组化
+    this.#elistArr = this.#elist.toArray()
+    this.#listArr = this.#list.toArray()
+    // 设置
     AppMap.set(this.#name, this)
+    // 生成json
+    new Help(this.#name).create(this.#listArr)
   }
 
   /**
@@ -544,10 +557,8 @@ export class Alemon {
    * @param funcName
    * @returns
    */
-  err(e: AMessage, name: string, funcName: string, time: number) {
-    return `[${e.event}] [${
-      e.typing
-    }] [${name}] [${funcName}] [${false}] [${time}ms]`
+  error(e: AMessage, name: string, funcName: string) {
+    return `[${e.event}] [${e.typing}] [${name}] [${funcName}]`
   }
 
   /**
@@ -556,10 +567,8 @@ export class Alemon {
    * @param funcName
    * @returns
    */
-  info(e: AMessage, name: string, funcName: string, time: number) {
-    return `[${e.event}] [${
-      e.typing
-    }] [${name}] [${funcName}] [${true}] [${time}ms]`
+  info(e: AMessage, name: string, funcName: string) {
+    return `[${e.event}] [${e.typing}] [${name}] [${funcName}]`
   }
 
   /**
@@ -585,12 +594,23 @@ export class Alemon {
       this.#CallData
         [event](e, ...arr)
         .then(res => {
-          console.info(this.info(e, FuncName, this.#name, Date.now() - time))
+          if (res && typeof res != 'boolean') {
+            e.reply(res)
+          }
+          console.info(
+            this.info(e, FuncName, this.#name),
+            true,
+            Date.now() - time,
+            'sm'
+          )
           return res
         })
         .catch(err => {
           console.error(
-            this.err(e, this.#name, FuncName, Date.now() - time),
+            this.error(e, this.#name, FuncName),
+            false,
+            Date.now() - time,
+            'sm',
             err
           )
         })

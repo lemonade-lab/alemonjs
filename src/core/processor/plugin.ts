@@ -1,4 +1,9 @@
-import { APluginInitType, APluginRuleType, APluginTaskType } from './types.js'
+import {
+  APluginInitType,
+  APluginRuleType,
+  APluginTaskType,
+  funcBase
+} from './types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
 import { ASubscribe } from './subscribe.js'
 
@@ -13,7 +18,7 @@ export class APlugin {
    */
   e: AMessage
   /**
-   * 模块名
+   * 应用名
    */
   name?: string = 'alemonb'
   /**
@@ -21,21 +26,25 @@ export class APlugin {
    */
   acount?: number = 0
   /**
+   * 实例名
+   */
+  example?: string = 'APlugin'
+  /**
    * 事件枚举
    */
-  event?: (typeof EventEnum)[number]
+  event?: (typeof EventEnum)[number] = 'MESSAGES'
   /**
    * 事件类型
    */
-  typing?: (typeof TypingEnum)[number]
+  typing?: (typeof TypingEnum)[number] = 'CREATE'
   /**
    * 匹配优先级
    */
-  priority?: number
+  priority?: number = 9000
   /**
    * 匹配集
    */
-  rule?: APluginRuleType[]
+  rule?: APluginRuleType[] = []
   /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
@@ -91,14 +100,16 @@ export class APlugin {
    * @param isGroup 是否群聊
    * @param time 操作时间，默认120秒
    */
-  setContext(func: string, isGroup = false, time = 120) {
-    const belong = String(this).match(/(\w+)$/)[1] // 字符串化
+  setContext(func: string | funcBase, isGroup = false, time = 120) {
+    const reg = /\s+(.*)\s+/
+    func = typeof func == 'string' ? func : String(func).match(reg)[1]
     // 订阅前确保前者删除
     ASubscribe.cancel(this.conKey(isGroup))
     // 订阅消息
     const con = ASubscribe.add(
+      this.name,
       this.acount,
-      belong,
+      this.example,
       func,
       this.conKey(isGroup),
       setTimeout(() => {
