@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
 
@@ -69,17 +69,9 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
 export const FORUMS_EVENT = async (event: ForumsEventType) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const Message = ClientController({
+  const con = new Controllers({
     guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    msg_id: '0',
-    user_id: ''
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    user_id: ''
+    channel_id: event.msg.channel_id
   })
 
   const content: ContentType = JSON.parse(event.msg.thread_info.content)
@@ -122,7 +114,6 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     user_avatar: '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
-    Member,
     /**
      * 发现消息
      * @param msg
@@ -149,7 +140,8 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
         withdraw
       })
     },
-    Message
+    Message: con.Message,
+    Member: con.Member
   }
 
   return await RESPONSE.event(e)

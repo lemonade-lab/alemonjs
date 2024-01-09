@@ -7,9 +7,9 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
+import { Controllers } from '../controller.js'
 
 /**
  * TUDO
@@ -30,17 +30,9 @@ AUDIO_ACTION (1 << 29)
 export const AUDIO_ACTION = async (event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const Message = ClientController({
+  const con = new Controllers({
     guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    msg_id: '',
-    user_id: ''
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    user_id: ''
+    channel_id: event.msg.channel_id
   })
 
   const e = {
@@ -98,8 +90,8 @@ export const AUDIO_ACTION = async (event: any) => {
         withdraw
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   if (new RegExp(/MIC$/).test(event.eventType)) {

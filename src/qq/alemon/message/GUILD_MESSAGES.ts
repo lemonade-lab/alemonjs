@@ -11,7 +11,7 @@ import { setBotMsgByQQ } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { replyController } from '../reply.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
 
 /**
@@ -29,17 +29,11 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
 export const GUILD_MESSAGES = async (event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const Message = ClientController({
+  const con = new Controllers({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
-    msg_id: event.msg?.id ?? '',
-    user_id: event.msg?.author?.id ?? ''
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    user_id: event.msg?.author?.id ?? ''
+    msg_id: event.msg?.id,
+    user_id: event.msg?.author?.id
   })
 
   const cfg = BOTCONFIG.get('qq')
@@ -99,8 +93,8 @@ export const GUILD_MESSAGES = async (event: any) => {
         withdraw
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

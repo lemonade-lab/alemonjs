@@ -11,7 +11,7 @@ import { setBotMsgByQQ } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { replyController } from '../reply.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
 
 interface PUBLIC_GUILD_MESSAGES_TYPE {
@@ -77,17 +77,11 @@ export const PUBLIC_GUILD_MESSAGES = async (
 ) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const Message = ClientController({
+  const con = new Controllers({
     guild_id: event.msg.guild_id,
     channel_id: event.msg.channel_id,
     msg_id: event.msg.id,
-    user_id: event.msg?.author?.id ?? ''
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    user_id: event.msg?.author?.id ?? ''
+    user_id: event.msg?.author?.id
   })
 
   const cfg = BOTCONFIG.get('qq')
@@ -124,8 +118,6 @@ export const PUBLIC_GUILD_MESSAGES = async (
     user_avatar: event.msg?.author?.avatar ?? '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
-    Message,
-    Member,
     /**
      * 发送消息
      * @param msg
@@ -150,7 +142,9 @@ export const PUBLIC_GUILD_MESSAGES = async (
         quote: select?.quote,
         withdraw
       })
-    }
+    },
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

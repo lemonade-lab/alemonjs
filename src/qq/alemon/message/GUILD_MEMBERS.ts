@@ -8,7 +8,7 @@ import {
 import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
@@ -41,16 +41,8 @@ GUILD_MEMBERS (1 << 1)
 export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const Message = ClientController({
+  const con = new Controllers({
     guild_id: event.msg.guild_id,
-    channel_id: '',
-    msg_id: '',
-    user_id: event.msg.user.id
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.msg.guild_id,
-    channel_id: '',
     user_id: event.msg.user.id
   })
 
@@ -91,7 +83,6 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     user_avatar: event.msg.user.avatar,
     segment: segmentQQ,
     send_at: new Date(event.msg.joined_at).getTime(),
-    Member,
     /**
      * 发现消息
      * @param msg
@@ -119,7 +110,8 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
         withdraw
       })
     },
-    Message
+    Message: con.Message,
+    Member: con.Member
   }
 
   return await RESPONSE.event(e)

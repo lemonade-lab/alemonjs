@@ -8,10 +8,7 @@ import {
 import { segmentVILLA } from '../segment.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import {
-  ClientControllerOnMember,
-  ClientControllerOnMessage
-} from '../controller.js'
+import { Controllers } from '../controller.js'
 
 /**
  * 表情表态
@@ -59,14 +56,10 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
 
   const msg_id = `${AddQuickEmoticon.msgUid}.${event.sendAt}`
 
-  const Message = ClientControllerOnMessage({
-    guild_id: AddQuickEmoticon.villaId,
-    channel_id: AddQuickEmoticon.roomId,
-    msg_id: msg_id
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: AddQuickEmoticon.villaId,
+  const con = new Controllers({
+    guild_id: String(AddQuickEmoticon.villaId),
+    channel_id: String(AddQuickEmoticon.roomId),
+    msg_id: msg_id,
     user_id: String(AddQuickEmoticon.uid)
   })
 
@@ -138,8 +131,8 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
         quote: select?.quote
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

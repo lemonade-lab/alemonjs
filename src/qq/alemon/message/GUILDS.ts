@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
 
@@ -54,17 +54,8 @@ GUILDS (1 << 0)
 export const GUILD = async (event: EventGuildType) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const Message = ClientController({
-    guild_id: event.msg.id,
-    channel_id: '',
-    msg_id: '',
-    user_id: ''
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.msg.id,
-    channel_id: '',
-    user_id: ''
+  const con = new Controllers({
+    guild_id: event.msg.id
   })
 
   const e = {
@@ -130,8 +121,8 @@ export const GUILD = async (event: EventGuildType) => {
         withdraw
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

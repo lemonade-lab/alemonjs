@@ -7,10 +7,7 @@ import {
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import {
-  ClientControllerOnMember,
-  ClientControllerOnMessage
-} from '../controller.js'
+import { Controllers } from '../controller.js'
 
 /**
  * 机器人进出
@@ -53,14 +50,10 @@ export async function GUILD_BOT(event: {
       ? extendData.createRobot.villaId
       : extendData.deleteRobot.villaId
 
-  const Message = ClientControllerOnMessage({
-    guild_id: guild_id,
-    channel_id: 0,
-    msg_id: '0'
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: guild_id,
+  const con = new Controllers({
+    guild_id: String(guild_id),
+    channel_id: '0',
+    msg_id: '0',
     user_id: event.robot.template.id
   })
 
@@ -125,8 +118,8 @@ export async function GUILD_BOT(event: {
         quote: select?.quote
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

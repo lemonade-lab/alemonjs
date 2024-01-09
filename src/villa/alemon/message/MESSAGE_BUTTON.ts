@@ -8,10 +8,7 @@ import {
 import { BOTCONFIG } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import {
-  ClientControllerOnMessage,
-  ClientControllerOnMember
-} from '../controller.js'
+import { Controllers } from '../controller.js'
 
 /**
  * @param event 按钮数据
@@ -55,17 +52,10 @@ export async function MESSAGE_BUTTON(event: {
 
   const msg_id = `${ClickMsgComponent.msgUid}.0`
 
-  /**
-   * 制作控制器
-   */
-  const Message = ClientControllerOnMessage({
-    guild_id: ClickMsgComponent.villaId,
-    channel_id: ClickMsgComponent.roomId,
-    msg_id: msg_id
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: ClickMsgComponent.villaId,
+  const con = new Controllers({
+    guild_id: String(ClickMsgComponent.villaId),
+    channel_id: String(ClickMsgComponent.roomId),
+    msg_id: msg_id,
     user_id: String(ClickMsgComponent.uid)
   })
 
@@ -128,8 +118,8 @@ export async function MESSAGE_BUTTON(event: {
         quote: select?.quote
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

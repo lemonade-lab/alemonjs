@@ -8,10 +8,7 @@ import {
 import { BOTCONFIG } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import {
-  ClientControllerOnMember,
-  ClientControllerOnMessage
-} from '../controller.js'
+import { Controllers } from '../controller.js'
 
 /**
  * 成员进入
@@ -54,14 +51,10 @@ export async function GUILD_MEMBERS(event: {
 
   const msg_id = `${event.id}.${JoinVilla.joinAt}`
 
-  const Message = ClientControllerOnMessage({
-    guild_id: JoinVilla.villaId,
-    channel_id: 0,
-    msg_id: msg_id
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: JoinVilla.villaId,
+  const con = new Controllers({
+    guild_id: String(JoinVilla.villaId),
+    channel_id: '0',
+    msg_id: msg_id,
     user_id: String(event.extendData.joinVilla.joinUid)
   })
 
@@ -130,8 +123,8 @@ export async function GUILD_MEMBERS(event: {
         quote: select?.quote
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

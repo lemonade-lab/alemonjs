@@ -8,10 +8,7 @@ import {
 import { segmentVILLA } from '../segment.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import {
-  ClientControllerOnMember,
-  ClientControllerOnMessage
-} from '../controller.js'
+import { Controllers } from '../controller.js'
 
 /**
  * 审核事件
@@ -57,14 +54,10 @@ export async function MESSAGE_AUDIT(event: {
 
   const msg_id = `${AuditCallback.auditId}.${event.sendAt}`
 
-  const Message = ClientControllerOnMessage({
-    guild_id: AuditCallback.villaId,
-    channel_id: AuditCallback.roomId,
-    msg_id: msg_id
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: AuditCallback.villaId,
+  const con = new Controllers({
+    guild_id: String(AuditCallback.villaId),
+    channel_id: String(AuditCallback.roomId),
+    msg_id: msg_id,
     user_id: String(AuditCallback.userId)
   })
 
@@ -127,8 +120,8 @@ export async function MESSAGE_AUDIT(event: {
         quote: select?.quote
       })
     },
-    Message,
-    Member
+    Message: con.Message,
+    Member: con.Member
   }
 
   /**

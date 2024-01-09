@@ -13,7 +13,6 @@ import { createWeb } from '../koa/index.js'
 import { autoClearFiles } from '../koa/file.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { join } from 'path'
-import { CONTOLLER } from '../api/controller.js'
 
 class AlemonConfig {
   data: AlemonOptions
@@ -157,13 +156,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           // 存在login  但不存在插件
           if (!back) continue
           // 登录
-          const app = back.login(
-            Options.login[back.name],
-            RESPONSE.message,
-            RESPONSE.event
-          )
-          // 存入控制器
-          CONTOLLER.set(back.name, app.controller)
+          back.login(Options.login[back.name], RESPONSE.message, RESPONSE.event)
         }
       }
     }
