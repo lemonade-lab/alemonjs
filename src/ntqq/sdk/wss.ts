@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { gateway, getAuthentication } from './api/index.js'
+import { ClientNTQQ } from './api.js'
 import { config } from './config.js'
 import { type ClientConfig } from './config.js'
 import { Counter } from './counter.js'
@@ -20,7 +20,7 @@ async function setTimeoutBotConfig() {
       access_token: string
       expires_in: number
       cache: boolean
-    } = await getAuthentication(appID, secret).then(res => res.data)
+    } = await ClientNTQQ.getAuthentication(appID, secret).then(res => res.data)
     config.set('token', data.access_token)
     console.info('refresh', data.expires_in, 's')
     setTimeout(callBack, data.expires_in * 1000)
@@ -52,7 +52,7 @@ export async function createClient(
   if (cfg.secret != '') await setTimeoutBotConfig()
 
   // 请求url
-  const gatewayUrl = await gateway()
+  const gatewayUrl = await ClientNTQQ.gateway()
 
   // 重新连接的逻辑
   const reconnect = async () => {

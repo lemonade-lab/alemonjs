@@ -4,7 +4,9 @@ import { Counter } from './counter.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
 import { config, type ClientConfig } from './config.js'
+
 const counter = new Counter(1) // 初始值为1
+
 /**
  * 别野服务
  * @param villa_id 别野编号
