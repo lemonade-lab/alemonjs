@@ -1,5 +1,5 @@
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -94,9 +94,9 @@ export const GUILD_MESSAGES = async (event: any) => {
    */
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.typing = 'DELETE'
-    return await RESPONSE.event(e)
-      .then(() => AlemonJSEventLog(e.event, e.typing))
-      .catch(err => AlemonJSEventError(err, e.event, e.typing))
+
+    APPS.responseEventType(e)
+    return
   }
 
   // 屏蔽其他机器人的消息
@@ -147,10 +147,6 @@ export const GUILD_MESSAGES = async (event: any) => {
     }
   }
 
-  /**
-   * 业务处理
-   */
-  return await RESPONSE.message(e)
-    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
-    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
+  APPS.responseMessage(e)
+  return
 }

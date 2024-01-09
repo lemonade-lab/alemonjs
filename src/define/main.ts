@@ -1,13 +1,7 @@
 import { AlemonOptions } from './types.js'
 import { RebotMap } from './map.js'
 import { AppNameError } from '../log/index.js'
-import {
-  Screenshot,
-  APPLICATION,
-  APPCONFIG,
-  IP,
-  RESPONSE
-} from '../core/index.js'
+import { Screenshot, APPCONFIG, IP, APPS } from '../core/index.js'
 import { BOTCONFIG } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { autoClearFiles } from '../koa/file.js'
@@ -156,7 +150,11 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           // 存在login  但不存在插件
           if (!back) continue
           // 登录
-          back.login(Options.login[back.name], RESPONSE.message, RESPONSE.event)
+          back.login(
+            Options.login[back.name],
+            APPS.responseMessage,
+            APPS.responseEventType
+          )
         }
       }
     }
@@ -260,7 +258,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    */
   if (Options?.login && Options?.plugin?.init !== false) {
     // 加载插件
-    await APPLICATION.load()
+    APPS.load()
   }
 
   /**
@@ -280,7 +278,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * 开始解析
    * ************
    */
-  if (Options?.mount !== false) await APPLICATION.init()
+  if (Options?.mount !== false) APPS.init()
 
   return
 }

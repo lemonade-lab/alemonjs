@@ -1,6 +1,6 @@
 import { IOpenAPI } from 'qq-guild-bot'
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -120,18 +120,10 @@ export const DIRECT_MESSAGE = async (event: directEventData) => {
    */
   if (new RegExp(/^DIRECT_MESSAGE_DELETE$/).test(event.eventType)) {
     e.typing = 'DELETE'
-    /**
-     * 只匹配类型
-     */
-    return await RESPONSE.event(e)
-      .then(() => AlemonJSEventLog(e.event, e.typing))
-      .catch(err => AlemonJSEventError(err, e.event, e.typing))
+    APPS.responseEventType(e)
+    return
   }
 
-  /**
-   * 业务处理
-   */
-  return await RESPONSE.message(e)
-    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
-    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
+  APPS.responseMessage(e)
+  return
 }

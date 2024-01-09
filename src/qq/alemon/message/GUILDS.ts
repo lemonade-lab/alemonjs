@@ -1,6 +1,5 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -120,10 +119,6 @@ export const GUILD = async (event: EventGuildType) => {
     Controllers
   }
 
-  /**
-   * 只匹配类型
-   */
-  return await RESPONSE.event(e)
-    .then(() => AlemonJSEventLog(e.event, e.typing))
-    .catch(err => AlemonJSEventError(err, e.event, e.typing))
+  APPS.responseEventType(e)
+  return
 }

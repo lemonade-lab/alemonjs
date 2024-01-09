@@ -1,5 +1,5 @@
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -84,10 +84,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     e.at_user = e.at_users.find(item => item.bot != true)
   }
 
-  /**
-   * 业务处理
-   */
-  return await RESPONSE.message(e)
-    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
-    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
+  APPS.responseMessage(e)
+  return
 }

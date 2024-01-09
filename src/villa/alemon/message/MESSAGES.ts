@@ -2,7 +2,7 @@ import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import {
   type EventEnum,
   type TypingEnum,
-  RESPONSE,
+  APPS,
   type MessageBingdingOption,
   type UserType
 } from '../../../core/index.js'
@@ -205,15 +205,6 @@ export async function MESSAGES(event: {
     },
     Controllers
   }
-
-  /**
-   * 业务处理
-   */
-  return await RESPONSE.message(e)
-    .then(() =>
-      AlemonJSLog(e.channel_id, e.user_name, MessageContent.content.text)
-    )
-    .catch(err =>
-      AlemonJSError(err, e.channel_id, e.user_name, MessageContent.content.text)
-    )
+  APPS.responseMessage(e)
+  return
 }

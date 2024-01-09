@@ -1,6 +1,6 @@
 import {
   type UserType,
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -124,10 +124,6 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     Controllers
   }
 
-  /**
-   * 业务处理
-   */
-  return await RESPONSE.message(e)
-    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
-    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
+  APPS.responseEventType(e)
+  return
 }

@@ -1,6 +1,5 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../..//log/index.js'
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -116,10 +115,6 @@ export async function MESSAGE_AUDIT(event: {
     Controllers
   }
 
-  /**
-   * 只匹配类型
-   */
-  return await RESPONSE.event(e)
-    .then(() => AlemonJSEventLog(e.event, e.typing))
-    .catch(err => AlemonJSEventError(err, e.event, e.typing))
+  APPS.responseEventType(e)
+  return
 }

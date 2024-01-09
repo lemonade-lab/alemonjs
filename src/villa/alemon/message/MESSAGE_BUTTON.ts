@@ -1,9 +1,8 @@
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import {
-  RESPONSE,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  APPS
 } from '../../../core/index.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
@@ -114,10 +113,6 @@ export async function MESSAGE_BUTTON(event: {
     Controllers
   }
 
-  /**
-   *
-   */
-  return await RESPONSE.event(e)
-    .then(() => AlemonJSLog(e.channel_id, e.user_name, ''))
-    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, ''))
+  APPS.responseEventType(e)
+  return
 }

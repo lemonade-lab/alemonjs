@@ -1,6 +1,5 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -138,7 +137,6 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
     Controllers
   }
 
-  return await RESPONSE.event(e)
-    .then(() => AlemonJSEventLog(e.event, e.typing))
-    .catch(err => AlemonJSEventError(err, e.event, e.typing))
+  APPS.responseEventType(e)
+  return
 }

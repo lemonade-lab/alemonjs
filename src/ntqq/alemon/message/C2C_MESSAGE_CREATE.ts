@@ -1,5 +1,5 @@
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -60,10 +60,6 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     Controllers
   }
 
-  /**
-   * 业务处理
-   */
-  return await RESPONSE.message(e)
-    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
-    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
+  APPS.responseMessage(e)
+  return
 }

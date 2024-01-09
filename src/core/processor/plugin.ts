@@ -1,8 +1,4 @@
-import {
-  APluginInitType,
-  APluginRuleType,
-  APluginTaskType
-} from '../plugin/types.js'
+import { APluginInitType, APluginRuleType, APluginTaskType } from './types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
 import { ASubscribe } from './subscribe.js'
 

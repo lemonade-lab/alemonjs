@@ -2,7 +2,7 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { ServerOptions } from '../koa/types.js'
-import { RESPONSE } from '../core/index.js'
+import { APPS } from '../core/index.js'
 
 export interface PlatformsItemType {
   /**
@@ -20,11 +20,11 @@ export interface PlatformsItemType {
     /**
      * 消息事件
      */
-    Instruction: typeof RESPONSE.message,
+    Instruction: typeof APPS.responseMessage,
     /**
      * 非消息事件
      */
-    InstructionByNotMessage: typeof RESPONSE.event
+    InstructionByNotMessage: typeof APPS.responseEventType
   ) => {
     /**
      * 客户端

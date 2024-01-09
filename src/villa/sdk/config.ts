@@ -3,8 +3,8 @@ export interface ClientConfig {
   bot_id: string
   bot_secret: string
   pub_key: string
-  villa_id?: number
-  token: string
+  villa_id: number
+  token?: string
 }
 export const config = new BaseConfig<ClientConfig>({
   bot_id: '',

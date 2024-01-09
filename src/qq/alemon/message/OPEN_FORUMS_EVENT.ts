@@ -1,6 +1,5 @@
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/event.js'
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -157,8 +156,6 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
   } else {
     e.typing = 'DELETE'
   }
-
-  return await RESPONSE.event(e)
-    .then(() => AlemonJSEventLog(e.event, e.typing))
-    .catch(err => AlemonJSEventError(err, e.event, e.typing))
+  APPS.responseEventType(e)
+  return
 }

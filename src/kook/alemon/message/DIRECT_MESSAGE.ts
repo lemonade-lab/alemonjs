@@ -1,5 +1,5 @@
 import {
-  RESPONSE,
+  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
@@ -8,7 +8,6 @@ import { type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { Controllers, directController } from '../direct.js'
 
 /**
@@ -75,10 +74,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     Controllers
   }
 
-  /**
-   * 业务处理
-   */
-  return await RESPONSE.message(e)
-    .then(() => AlemonJSLog(e.channel_id, e.user_name, e.msg_txt))
-    .catch(err => AlemonJSError(err, e.channel_id, e.user_name, e.msg_txt))
+  APPS.responseMessage(e)
+
+  return
 }

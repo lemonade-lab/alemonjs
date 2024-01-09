@@ -1,5 +1,5 @@
 import {
-  RESPONSE,
+  APPS,
   type TypingEnum,
   type EventEnum,
   type MessageBingdingOption
@@ -108,7 +108,6 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
     Controllers
   }
 
-  return await RESPONSE.event(e)
-    .then(() => AlemonJSEventLog(e.event, e.typing))
-    .catch(err => AlemonJSEventError(err, e.event, e.typing))
+  APPS.responseEventType(e)
+  return
 }
