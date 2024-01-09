@@ -1,4 +1,4 @@
-import { AlemonOptions } from './define/types.js'
+import { AlemonOptions } from '../define/types.js'
 
 /**
  * ***********

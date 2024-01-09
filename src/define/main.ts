@@ -4,7 +4,7 @@ import { AppNameError } from '../log/index.js'
 import { Screenshot, APPCONFIG, IP, APPS } from '../core/index.js'
 import { BOTCONFIG } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
-import { autoClearFiles } from '../koa/file.js'
+import { ClientKOA } from '../koa/file.js'
 import { AvailableIntentsEventsEnum } from 'qq-guild-bot'
 import { join } from 'path'
 
@@ -190,7 +190,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     createWeb(Options?.server)
     if (Options?.server?.clear != false) {
       // 定时清除
-      autoClearFiles()
+      ClientKOA.autoClearFiles()
     }
     if (Options?.server?.ip) {
       IP.set(Options?.server?.ip)
