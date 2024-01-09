@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import axios from 'axios'
-import { Counter } from './counter.js'
+import { Counter } from '../../core/index.js'
 import { createMessage, parseMessage } from './data.js'
 import { ProtoCommand, ProtoModel } from './proto.js'
 import { config } from './config.js'
@@ -51,15 +51,15 @@ export const defineVILLA = {
  */
 export class Client {
   // 初始值为1
-  private ID = new Counter(1)
+  #ID = new Counter(1)
   // 重连次数
-  private counter = new Counter(0)
+  #counter = new Counter(0)
   // 编号
-  private IntervalID = null
+  #IntervalID = null
   // 发送
-  private time = 20 * 1000
+  #time = 20 * 1000
   // 数据
-  private data: {
+  #data: {
     uid: number
     websocket_url: string
     websocket_conn_uid: number
@@ -71,7 +71,7 @@ export class Client {
    * 得到鉴权
    * @returns
    */
-  private async gateway(): Promise<{
+  async #gateway(): Promise<{
     data: {
       uid: number
       websocket_url: string
@@ -124,18 +124,18 @@ export class Client {
    * login配置
    * @returns
    */
-  private getLoginData() {
+  #getLoginData() {
     return {
-      ID: this.ID.getNextID(),
+      ID: this.#ID.getNextID(),
       Flag: 1, // 发送
       BizType: 7,
-      AppId: this.data.app_id,
+      AppId: this.#data.app_id,
       BodyData: ProtoCommand('PLogin').encode({
-        uid: this.data.uid,
+        uid: this.#data.uid,
         token: config.get('token'),
-        platform: this.data.platform,
-        appId: this.data.app_id,
-        deviceId: this.data.device_id,
+        platform: this.#data.platform,
+        appId: this.#data.app_id,
+        deviceId: this.#data.device_id,
         region: '',
         meta: null
       })
@@ -148,17 +148,17 @@ export class Client {
    * @returns
    */
   async connect(conversation: (...args: any[]) => any) {
-    this.data = await this.gateway().then(res => res.data)
-    if (!this.data?.websocket_url) {
+    this.#data = await this.#gateway().then(res => res.data)
+    if (!this.#data?.websocket_url) {
       console.info('[getway] secret err')
       return
     }
 
-    const ws = new WebSocket(this.data.websocket_url)
+    const ws = new WebSocket(this.#data.websocket_url)
     ws.on('open', async () => {
       console.info('[ws] login open')
       // login
-      ws.send(createMessage(this.getLoginData()))
+      ws.send(createMessage(this.#getLoginData()))
     })
 
     ws.on('message', message => {
@@ -170,40 +170,40 @@ export class Client {
             // 登录
             const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
             if (process.env?.VILLA_WS == 'dev') {
-              console.info('PLoginReply:', this.longToNumber(reply))
+              console.info('PLoginReply:', this.#longToNumber(reply))
             }
             if (reply.code) console.info('[ws] login err')
             else {
               console.info('[ws] login success')
-              this.counter.reStart()
+              this.#counter.reStart()
               // 20s 心跳
-              this.IntervalID = setInterval(() => {
+              this.#IntervalID = setInterval(() => {
                 ws.send(
                   createMessage({
-                    ID: this.ID.getNextID(),
+                    ID: this.#ID.getNextID(),
                     Flag: 1, // 发送
                     BizType: 6,
-                    AppId: this.data.app_id,
+                    AppId: this.#data.app_id,
                     BodyData: ProtoCommand('PHeartBeat').encode({
                       clientTimestamp: `${new Date().getTime()}`
                     })
                   })
                 )
-              }, this.time)
+              }, this.#time)
             }
           } else if (obj.bizType == 6) {
             // 心跳
             const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
             if (process.env?.VILLA_WS == 'dev') {
-              console.info('PHeartBeatReply:', this.longToNumber(reply))
+              console.info('PHeartBeatReply:', this.#longToNumber(reply))
             }
             if (reply.code) {
               console.info('[ws] 心跳错误')
               // 心跳错误,关闭心跳记时器
-              if (this.IntervalID) clearInterval(this.IntervalID)
-              if (this.counter.get() < 5) {
+              if (this.#IntervalID) clearInterval(this.#IntervalID)
+              if (this.#counter.get() < 5) {
                 // 重新发送鉴权
-                ws.send(createMessage(this.getLoginData()))
+                ws.send(createMessage(this.#getLoginData()))
               } else {
                 console.info('重鉴权次数上限')
               }
@@ -212,7 +212,7 @@ export class Client {
             // 退出登录
             const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)
             if (process.env?.VILLA_WS == 'dev')
-              console.info('PLogoutReply:', this.longToNumber(reply))
+              console.info('PLogoutReply:', this.#longToNumber(reply))
           } else if (obj.bizType == 53) {
             // 强制下线
           } else if (obj.bizType == 52) {
@@ -220,7 +220,7 @@ export class Client {
           } else if (obj.bizType == 30001) {
             // 回调数据包
             const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
-            const data = this.longToNumber(reply)
+            const data = this.#longToNumber(reply)
             if (process.env?.VILLA_WS == 'dev') console.info('data', data)
             conversation(data)
           } else {
@@ -244,13 +244,13 @@ export class Client {
    * @param obj
    * @returns
    */
-  private longToNumber(obj: any) {
+  #longToNumber(obj: any) {
     if (typeof obj == 'string') return obj
     if (typeof obj == 'number') return obj
     if (obj !== null && typeof obj == 'object') {
       if (Array.isArray(obj)) {
         // 递归处理数组中的每个元素
-        return obj.map(item => this.longToNumber(item))
+        return obj.map(item => this.#longToNumber(item))
       } else if (typeof obj?.low == 'number' && typeof obj?.high == 'number') {
         return Number(obj)
       } else {
@@ -258,7 +258,7 @@ export class Client {
         for (const key in obj) {
           // 递归处理对象的每个属性
           if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            result[key] = this.longToNumber(obj[key])
+            result[key] = this.#longToNumber(obj[key])
           }
         }
         return result

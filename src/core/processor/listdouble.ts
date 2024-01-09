@@ -15,18 +15,18 @@ class Node<T> {
  */
 export class DoublyLinkedList<T> {
   // 头部
-  private head: Node<T> | null = null
+  #head: Node<T> | null = null
   // 尾部
-  private tail: Node<T> | null = null
+  #tail: Node<T> | null = null
   // 大小
-  private size = 0
+  #size = 0
 
   /**
    * 得到尾部
    * @returns
    */
   getHead(): Node<T> | null {
-    return this.head
+    return this.#head
   }
 
   /**
@@ -34,7 +34,7 @@ export class DoublyLinkedList<T> {
    * @returns
    */
   getTail(): Node<T> | null {
-    return this.tail
+    return this.#tail
   }
 
   /**
@@ -42,7 +42,7 @@ export class DoublyLinkedList<T> {
    * @returns
    */
   getSize(): number {
-    return this.size
+    return this.#size
   }
 
   /**
@@ -50,7 +50,7 @@ export class DoublyLinkedList<T> {
    * @returns
    */
   isEmpty(): boolean {
-    return this.size === 0
+    return this.#size === 0
   }
 
   /**
@@ -63,17 +63,17 @@ export class DoublyLinkedList<T> {
     // 是否为空
     if (this.isEmpty()) {
       // 更新记录
-      this.size++
-      this.head = newNode
-      this.tail = newNode
+      this.#size++
+      this.#head = newNode
+      this.#tail = newNode
     } else {
       // 更新记录
-      this.size++
+      this.#size++
       // 新节点的下一个记录为头部
-      newNode.next = this.head
-      this.head!.prev = newNode
+      newNode.next = this.#head
+      this.#head!.prev = newNode
       // 头部 重定向为  新节点
-      this.head = newNode
+      this.#head = newNode
     }
   }
 
@@ -87,18 +87,18 @@ export class DoublyLinkedList<T> {
     // 是否为空
     if (this.isEmpty()) {
       // 更新记录
-      this.size++
-      this.head = newNode
-      this.tail = newNode
+      this.#size++
+      this.#head = newNode
+      this.#tail = newNode
     } else {
       // 更新记录
-      this.size++
+      this.#size++
       // 新节点的 前一个 记录为 尾部
-      newNode.prev = this.tail
-      this.tail!.prev = newNode
+      newNode.prev = this.#tail
+      this.#tail!.prev = newNode
 
       // 更新尾部节点
-      this.tail = newNode
+      this.#tail = newNode
     }
   }
 
@@ -107,12 +107,12 @@ export class DoublyLinkedList<T> {
    */
   shift() {
     // 缩减
-    this.size--
+    this.#size--
 
-    const c = this.head
+    const c = this.#head
 
     // 头部删
-    this.head = this.head.next
+    this.#head = this.#head.next
 
     return c.value
   }
@@ -122,12 +122,12 @@ export class DoublyLinkedList<T> {
    */
   pop() {
     // 缩减
-    this.size--
+    this.#size--
 
-    const c = this.tail
+    const c = this.#tail
 
     // 头部删
-    this.tail = this.tail.prev
+    this.#tail = this.#tail.prev
 
     return c.value
   }
@@ -140,7 +140,7 @@ export class DoublyLinkedList<T> {
    */
   traverseAndInsert(condition: (val: T) => boolean, value: T): boolean {
     // 记录尾部
-    let current = this.head
+    let current = this.#head
     let prev = null
 
     while (current) {
@@ -154,13 +154,13 @@ export class DoublyLinkedList<T> {
         newNode.prev = prev
         // 恰巧是头部
         if (prev == null) {
-          this.head = newNode
+          this.#head = newNode
         } else {
           prev.next = newNode
         }
         current.prev = newNode
         // 更新
-        this.size++
+        this.#size++
 
         return true
       }
@@ -177,7 +177,7 @@ export class DoublyLinkedList<T> {
    */
   toArray(): T[] {
     const array: T[] = []
-    let currentNode = this.head
+    let currentNode = this.#head
     while (currentNode !== null) {
       array.push(currentNode.value)
       currentNode = currentNode.next

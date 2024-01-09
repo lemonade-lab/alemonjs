@@ -70,15 +70,15 @@ export class Client {
   /**
    * 连接地址
    */
-  private url = null
+  #url = null
   /**
    * 标记是否已连接
    */
-  private isConnected = false
+  #isConnected = false
   /**
    * 周期
    */
-  private heartbeat_interval = 30000
+  #heartbeat_interval = 30000
 
   /**
    * 设置配置
@@ -95,7 +95,7 @@ export class Client {
    * 得到鉴权配置
    * @returns
    */
-  private art() {
+  #art() {
     const appID = config.get('appID')
     const token = config.get('token')
     const intents = config.get('intents')
@@ -131,10 +131,10 @@ export class Client {
    * @param shard
    */
   async connect(callBack: (...args: any[]) => any) {
-    this.url = await ClientQQ.geteway().then(res => res.url)
-    if (!this.url) return
+    this.#url = await ClientQQ.geteway().then(res => res.url)
+    if (!this.#url) return
 
-    const ws = new WebSocket(this.url)
+    const ws = new WebSocket(this.#url)
 
     ws.on('open', () => {
       console.info('[ws] open')
@@ -149,7 +149,7 @@ export class Client {
             /**
              * 心跳定时发送
              */
-            if (this.isConnected) {
+            if (this.#isConnected) {
               ws.send(
                 JSON.stringify({
                   op: 1, //  op = 1
@@ -157,7 +157,7 @@ export class Client {
                 })
               )
             }
-          }, this.heartbeat_interval)
+          }, this.#heartbeat_interval)
         } else if (t === 'RESUMED') {
           // Resumed Event，恢复连接成功
         } else {
@@ -172,12 +172,12 @@ export class Client {
       },
       10: ({ d }) => {
         // OpCode 10 Hello 消息，处理心跳周期
-        this.isConnected = true
-        this.heartbeat_interval = d.heartbeat_interval
+        this.#isConnected = true
+        this.#heartbeat_interval = d.heartbeat_interval
         /**
          * 发送鉴权
          */
-        ws.send(JSON.stringify(this.art()))
+        ws.send(JSON.stringify(this.#art()))
       },
       11: message => {
         console.info('[ws] heartbeat transmission')

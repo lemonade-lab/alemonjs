@@ -105,7 +105,7 @@ class ClientNtqq {
   // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
 
   // map会越来越大,应该自动delte第一个key
-  private map = {}
+  #map = {}
 
   /**
    * 得到消息计数器
@@ -113,17 +113,17 @@ class ClientNtqq {
    * @returns
    */
   getMsgSeq(MsgId: string) {
-    if (Object.prototype.hasOwnProperty.call(this.map, MsgId)) {
-      this.map[MsgId] = this.map[MsgId] + 1
+    if (Object.prototype.hasOwnProperty.call(this.#map, MsgId)) {
+      this.#map[MsgId] = this.#map[MsgId] + 1
     } else {
-      this.map[MsgId] = 1
+      this.#map[MsgId] = 1
     }
-    const arr = Object.keys(this.map)
+    const arr = Object.keys(this.#map)
     if (arr.length > 15) {
       const firstKey = arr[0]
-      delete this.map[firstKey]
+      delete this.#map[firstKey]
     }
-    return this.map[MsgId]
+    return this.#map[MsgId]
   }
 
   /**

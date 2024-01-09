@@ -2,7 +2,7 @@ import WebSocket from 'ws'
 import { ClientNTQQ } from './api.js'
 import { config } from './config.js'
 import { type ClientConfig } from './config.js'
-import { Counter } from './counter.js'
+import { Counter } from '../../core/index.js'
 
 const counter = new Counter(1) // 初始值为1
 
@@ -56,7 +56,7 @@ export async function createClient(
 
   // 重新连接的逻辑
   const reconnect = async () => {
-    if (counter.getID() >= 5) {
+    if (counter.get() >= 5) {
       console.info(
         'The maximum number of reconnections has been reached, cancel reconnection'
       )
@@ -104,7 +104,7 @@ export async function createClient(
           if (t === 'RESUMED') {
             console.info('[ws] restore connection')
             // 重制次数
-            counter.setID(0)
+            counter.reStart()
           }
           return
         },
@@ -153,7 +153,7 @@ export async function createClient(
           // OpCode 11 Heartbeat ACK 消息，心跳发送成功
           console.info('[ws] heartbeat transmission')
           // 重制次数
-          counter.setID(0)
+          counter.reStart()
           return
         },
         12: ({ d }) => {
