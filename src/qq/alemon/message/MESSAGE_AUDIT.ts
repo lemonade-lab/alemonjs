@@ -22,11 +22,6 @@ MESSAGE_AUDIT (1 << 27)
 export const MESSAGE_AUDIT = async (event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id
-  })
-
   const e = {
     platform: 'qq',
     event: 'MESSAGE_AUDIT' as (typeof EventEnum)[number],
@@ -81,8 +76,7 @@ export const MESSAGE_AUDIT = async (event: any) => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

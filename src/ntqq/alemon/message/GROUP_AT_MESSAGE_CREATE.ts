@@ -9,7 +9,7 @@ import { getBotMsgByNtqq } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
 
@@ -24,13 +24,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
 
   const cfg = BOTCONFIG.get('ntqq')
   const masterID = cfg.masterID
-
-  const Message = ClientController({
-    guild_id: event.group_id,
-    msg_id: event.id
-  })
-
-  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'ntqq',
@@ -60,8 +53,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     at: false,
     at_user: undefined,
     send_at: new Date().getTime(),
-    Message,
-    Member,
+
     /**
      * 消息发送机制
      * @param msg 消息
@@ -78,7 +70,8 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       }
       const group_id = select?.guild_id ?? event.group_id
       return await replyController(msg, group_id, msg_id)
-    }
+    },
+    Controllers
   }
 
   /**

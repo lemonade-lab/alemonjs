@@ -69,11 +69,6 @@ FORUMS_EVENT (1 << 28)  // 论坛事件，仅 *私域* 机器人能够设置此 
 export const FORUMS_EVENT = async (event: ForumsEventType) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id
-  })
-
   const content: ContentType = JSON.parse(event.msg.thread_info.content)
 
   const e = {
@@ -140,8 +135,7 @@ export const FORUMS_EVENT = async (event: ForumsEventType) => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   return await RESPONSE.event(e)

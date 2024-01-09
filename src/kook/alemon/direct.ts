@@ -12,9 +12,17 @@ import { everyoneError } from '../../log/index.js'
  * ******************
  * 私聊会话 是子频道类型之一
  */
-
-const Controller = {
-  Member: () => {
+export class Controllers {
+  select: ControllerOption
+  constructor(select?: ControllerOption) {
+    this.select = select
+  }
+  Member(select?: ControllerOption) {
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       /**
        * 查看信息
@@ -45,8 +53,13 @@ const Controller = {
         return false
       }
     }
-  },
-  Message: ({ open_id, channel_id }) => {
+  }
+  Message(select?: ControllerOption) {
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -121,33 +134,6 @@ const Controller = {
         return false
       }
     }
-  }
-}
-
-/**
- * 客户端控制器
- * @param select
- * @returns
- */
-export const ClientDirectController = (data: {
-  channel_id: string
-  open_id: string
-}) => {
-  return (select?: ControllerOption) => {
-    const channel_id = select?.channel_id ?? data.channel_id
-    const open_id = select?.open_id ?? data.open_id
-    return Controller.Message({ channel_id, open_id })
-  }
-}
-
-/**
- * 成员控制器
- * @param select
- * @returns
- */
-export const ClientControllerOnMember = () => {
-  return (select?: ControllerOption) => {
-    return Controller.Member()
   }
 }
 

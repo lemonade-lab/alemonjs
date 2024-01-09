@@ -142,13 +142,6 @@ export async function MESSAGES(event: {
 
   const msg_id = `${SendMessage.msgUid}.${SendMessage.sendAt}`
 
-  const con = new Controllers({
-    guild_id: SendMessage.villaId,
-    channel_id: String(SendMessage.roomId),
-    msg_id: msg_id,
-    user_id: MessageContent.user.id
-  })
-
   /**
    * 制作e消息对象
    */
@@ -210,8 +203,7 @@ export async function MESSAGES(event: {
         quote: select?.quote
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

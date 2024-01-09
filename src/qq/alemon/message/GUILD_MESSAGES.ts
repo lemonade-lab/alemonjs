@@ -29,13 +29,6 @@ GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置�
 export const GUILD_MESSAGES = async (event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    msg_id: event.msg?.id,
-    user_id: event.msg?.author?.id
-  })
-
   const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 
@@ -93,8 +86,7 @@ export const GUILD_MESSAGES = async (event: any) => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

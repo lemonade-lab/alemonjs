@@ -75,11 +75,6 @@ interface content {
 export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id
-  })
-
   const e = {
     platform: 'qq',
     event: 'FORUMS_THREAD' as (typeof EventEnum)[number],
@@ -137,8 +132,7 @@ export const OPEN_FORUMS_EVENT = async (event: ForumsEventType) => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

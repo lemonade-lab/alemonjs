@@ -54,13 +54,6 @@ export async function MESSAGE_AUDIT(event: {
 
   const msg_id = `${AuditCallback.auditId}.${event.sendAt}`
 
-  const con = new Controllers({
-    guild_id: String(AuditCallback.villaId),
-    channel_id: String(AuditCallback.roomId),
-    msg_id: msg_id,
-    user_id: String(AuditCallback.userId)
-  })
-
   /**
    * 制作e消息对象
    */
@@ -120,8 +113,7 @@ export async function MESSAGE_AUDIT(event: {
         quote: select?.quote
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

@@ -51,10 +51,6 @@ GUILDS (1 << 0)
 export const CHANNEL = async (event: EventChannelType) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id
-  })
-
   const e = {
     platform: 'qq',
     event: new RegExp(/^GUILD.*$/).test(event.eventType)
@@ -117,8 +113,7 @@ export const CHANNEL = async (event: EventChannelType) => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

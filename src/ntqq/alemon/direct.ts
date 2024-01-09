@@ -7,8 +7,17 @@ import { ClientNTQQ } from '../sdk/index.js'
 import { ClientKOA } from '../../koa/index.js'
 import { everyoneError } from '../../log/index.js'
 
-const Controller = {
-  Member: () => {
+export class Controllers {
+  select: ControllerOption
+  constructor(select?: ControllerOption) {
+    this.select = select
+  }
+  Member(select?: ControllerOption) {
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       /**
        * 查看信息
@@ -39,8 +48,14 @@ const Controller = {
         return false
       }
     }
-  },
-  Message: ({ open_id, msg_id }) => {
+  }
+
+  Message(select?: ControllerOption) {
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -158,33 +173,6 @@ const Controller = {
         return false
       }
     }
-  }
-}
-
-/**
- * 客户端控制器
- * @param select
- * @returns
- */
-export const ClientDirectController = (data: {
-  open_id: string
-  msg_id: string
-}) => {
-  return (select?: ControllerOption) => {
-    const open_id = select?.open_id ?? data.open_id
-    const msg_id = select?.msg_id ?? data.msg_id
-    return Controller.Message({ open_id, msg_id })
-  }
-}
-
-/**
- * 成员控制器
- * @param select
- * @returns
- */
-export const ClientControllerOnMember = () => {
-  return (select?: ControllerOption) => {
-    return Controller.Member()
   }
 }
 

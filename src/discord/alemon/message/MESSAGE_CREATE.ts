@@ -7,7 +7,7 @@ import {
 } from '../../../core/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { BOTCONFIG } from '../../../config/index.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { getBotMsgByDISCORD } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'
 import { replyController } from '../reply.js'
@@ -74,19 +74,6 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
   if (event.author?.bot) return
 
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
-  const Message = ClientController({
-    guild_id: event.guild_id,
-    channel_id: event.channel_id,
-    msg_id: event.id,
-    user_id: event.author?.id ?? ''
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.guild_id,
-    channel_id: event.channel_id,
-    user_id: event.author?.id ?? ''
-  })
 
   const cfg = BOTCONFIG.get('discord')
   const masterID = cfg.masterID
@@ -162,8 +149,6 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
     ),
     segment: segmentDISCORD,
     send_at: new Date(event.timestamp).getTime(),
-    Message,
-    Member,
     /**
      * 发送消息
      * @param msg
@@ -184,7 +169,8 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
         quote: select?.quote,
         withdraw
       })
-    }
+    },
+    Controllers
   }
 
   /**

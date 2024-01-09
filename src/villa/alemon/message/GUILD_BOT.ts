@@ -50,13 +50,6 @@ export async function GUILD_BOT(event: {
       ? extendData.createRobot.villaId
       : extendData.deleteRobot.villaId
 
-  const con = new Controllers({
-    guild_id: String(guild_id),
-    channel_id: '0',
-    msg_id: '0',
-    user_id: event.robot.template.id
-  })
-
   /**
    * 制作e消息对象
    */
@@ -118,8 +111,7 @@ export async function GUILD_BOT(event: {
         quote: select?.quote
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

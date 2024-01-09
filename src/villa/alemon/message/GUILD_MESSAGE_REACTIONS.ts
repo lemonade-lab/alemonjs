@@ -56,13 +56,6 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
 
   const msg_id = `${AddQuickEmoticon.msgUid}.${event.sendAt}`
 
-  const con = new Controllers({
-    guild_id: String(AddQuickEmoticon.villaId),
-    channel_id: String(AddQuickEmoticon.roomId),
-    msg_id: msg_id,
-    user_id: String(AddQuickEmoticon.uid)
-  })
-
   /**
    * 制作e消息对象
    */
@@ -131,8 +124,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
         quote: select?.quote
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

@@ -6,16 +6,16 @@ import { directController } from './direct.js'
 import { everyoneError } from '../../log/index.js'
 
 export class Controllers {
-  #data: ControllerOption
+  select: ControllerOption
   constructor(select?: ControllerOption) {
-    this.#data = select
+    this.select = select
   }
   Member(select?: ControllerOption) {
-    const guild_id = select.guild_id ?? this.#data?.guild_id
-    const open_id = select.open_id ?? this.#data?.open_id
-    const channel_id = select.channel_id ?? this.#data?.channel_id
-    const msg_id = select.msg_id ?? this.#data?.msg_id
-    const user_id = select.user_id ?? this.#data?.user_id
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       /**
        * 查看信息
@@ -91,11 +91,11 @@ export class Controllers {
     }
   }
   Message(select?: ControllerOption) {
-    const guild_id = select.guild_id ?? this.#data?.guild_id
-    const open_id = select.open_id ?? this.#data?.open_id
-    const channel_id = select.channel_id ?? this.#data?.channel_id
-    const msg_id = select.msg_id ?? this.#data?.msg_id
-    const user_id = select.user_id ?? this.#data?.user_id
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]

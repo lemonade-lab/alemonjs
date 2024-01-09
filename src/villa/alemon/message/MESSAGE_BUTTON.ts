@@ -52,13 +52,6 @@ export async function MESSAGE_BUTTON(event: {
 
   const msg_id = `${ClickMsgComponent.msgUid}.0`
 
-  const con = new Controllers({
-    guild_id: String(ClickMsgComponent.villaId),
-    channel_id: String(ClickMsgComponent.roomId),
-    msg_id: msg_id,
-    user_id: String(ClickMsgComponent.uid)
-  })
-
   /**
    * 制作e消息对象
    */
@@ -118,8 +111,7 @@ export async function MESSAGE_BUTTON(event: {
         quote: select?.quote
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

@@ -9,11 +9,7 @@ import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import {
-  ClientDirectController,
-  ClientControllerOnMember,
-  directController
-} from '../direct.js'
+import { Controllers, directController } from '../direct.js'
 
 /**
  * @param event
@@ -30,14 +26,6 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
   const masterID = cfg.masterID
 
   const avatar = event.extra.author.avatar
-
-  // 私聊中 控制器并非私聊接口
-  const Message = ClientDirectController({
-    channel_id: event.target_id, // 频道号
-    open_id: open_id
-  })
-
-  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'kook',
@@ -72,8 +60,6 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     user_avatar: avatar.substring(0, avatar.indexOf('?')),
     segment: segmentKOOK,
     send_at: event.msg_timestamp,
-    Message,
-    Member,
     /**
      * 消息发送机制
      * @param content 消息内容
@@ -85,7 +71,8 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
     ): Promise<any> => {
       const channel_id = select?.channel_id ?? event.target_id
       return await directController(msg, channel_id, select?.open_id ?? open_id)
-    }
+    },
+    Controllers
   }
 
   /**

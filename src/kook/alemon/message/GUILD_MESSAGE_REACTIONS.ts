@@ -13,7 +13,7 @@ import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
-import { ClientController, ClientControllerOnMember } from '../controller.js'
+import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
 
@@ -29,17 +29,6 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
 
   const cfg = BOTCONFIG.get('kook')
   const masterID = cfg.masterID
-
-  const Message = ClientController({
-    channel_id: event.target_id, // 子频道
-    msg_id: event.msg_id,
-    user_id: body.user_id
-  })
-
-  const Member = ClientControllerOnMember({
-    guild_id: event.target_id, // 频道
-    user_id: body.user_id
-  })
 
   const data = await ClientKOOK.userChatCreate(body.user_id).then(
     res => res?.data
@@ -78,8 +67,6 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
     user_avatar: '',
     segment: segmentKOOK,
     send_at: event.msg_timestamp,
-    Message,
-    Member,
     /**
      * 消息发送机制
      * @param content 消息内容
@@ -95,7 +82,8 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
         return false
       }
       return await replyController(msg, channel_id)
-    }
+    },
+    Controllers
   }
 
   /**

@@ -4,8 +4,17 @@ import {
   type UserInformationType
 } from '../../core/index.js'
 import { replyController } from './reply.js'
-export const Controller = {
-  Member: ({ guild_id, user_id, channel_id }) => {
+export class Controllers {
+  select: ControllerOption
+  constructor(select?: ControllerOption) {
+    this.select = select
+  }
+  Member(select?: ControllerOption) {
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       /**
        * 查看信息
@@ -38,8 +47,14 @@ export const Controller = {
         return false
       }
     }
-  },
-  Message: ({ guild_id, channel_id, msg_id, open_id, user_id }) => {
+  }
+
+  Message(select?: ControllerOption) {
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
+    const user_id = select.user_id ?? this.select?.user_id
     return {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -111,50 +126,5 @@ export const Controller = {
         return false
       }
     }
-  }
-}
-
-/**
- * 客户端控制器
- * @param select
- * @returns
- */
-export const ClientController = (data: {
-  guild_id: string
-  channel_id: string
-  msg_id: string
-  user_id: string
-}) => {
-  return (select?: ControllerOption) => {
-    const guild_id = select?.guild_id ?? data.guild_id
-    const channel_id = select?.channel_id ?? data.channel_id
-    const msg_id = select?.msg_id ?? data.msg_id
-    const user_id = select?.user_id ?? data.user_id
-    const open_id = select?.open_id
-    return Controller.Message({
-      guild_id,
-      channel_id,
-      user_id,
-      msg_id,
-      open_id
-    })
-  }
-}
-
-/**
- * 成员控制器
- * @param select
- * @returns
- */
-export const ClientControllerOnMember = (data?: {
-  guild_id: string | number
-  user_id: string
-  channel_id: string
-}) => {
-  return (select?: ControllerOption) => {
-    const guild_id = select?.guild_id ?? data.guild_id
-    const user_id = select?.guild_id ?? data.user_id
-    const channel_id = select?.channel_id ?? data.channel_id
-    return Controller.Member({ guild_id, user_id, channel_id })
   }
 }

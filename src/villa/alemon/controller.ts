@@ -3,13 +3,14 @@ import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
 import { BOTCONFIG } from '../../config/index.js'
 import { everyoneError } from '../../log/index.js'
+
 /**
  * 控制器
  */
 export class Controllers {
-  #data: ControllerOption
+  select: ControllerOption
   constructor(select?: ControllerOption) {
-    this.#data = select
+    this.select = select
   }
   /**
    * 消息控制器
@@ -17,10 +18,10 @@ export class Controllers {
    * @returns
    */
   Message(select?: ControllerOption) {
-    const guild_id = select.guild_id ?? this.#data?.guild_id
-    const open_id = select.open_id ?? this.#data?.open_id
-    const channel_id = select.channel_id ?? this.#data?.channel_id
-    const msg_id = select.msg_id ?? this.#data?.msg_id
+    const guild_id = select.guild_id ?? this.select?.guild_id
+    const open_id = select.open_id ?? this.select?.open_id
+    const channel_id = select.channel_id ?? this.select?.channel_id
+    const msg_id = select.msg_id ?? this.select?.msg_id
     return {
       /**
        * 回复
@@ -165,8 +166,8 @@ export class Controllers {
    * @returns
    */
   Member(select?: ControllerOption) {
-    const guild_id = select?.guild_id ?? this.#data?.guild_id
-    const user_id = select.user_id ?? this.#data.user_id
+    const guild_id = select?.guild_id ?? this.select?.guild_id
+    const user_id = select.user_id ?? this.select.user_id
     return {
       /**
        * 查看信息

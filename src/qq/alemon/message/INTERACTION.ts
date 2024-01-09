@@ -22,11 +22,6 @@ INTERACTION (1 << 26)
 export const INTERACTION = async event => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id
-  })
-
   const e = {
     platform: 'qq',
     event: 'INTERACTION' as (typeof EventEnum)[number],
@@ -83,8 +78,7 @@ export const INTERACTION = async event => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

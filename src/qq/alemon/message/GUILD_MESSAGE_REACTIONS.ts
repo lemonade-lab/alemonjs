@@ -37,13 +37,6 @@ export const GUILD_MESSAGE_REACTIONS = async (
 ) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id,
-    msg_id: event.msg.target.id,
-    user_id: event.msg.user_id
-  })
-
   const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 
@@ -114,8 +107,7 @@ export const GUILD_MESSAGE_REACTIONS = async (
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

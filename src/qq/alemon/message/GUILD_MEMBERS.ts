@@ -41,11 +41,6 @@ GUILD_MEMBERS (1 << 1)
 export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    user_id: event.msg.user.id
-  })
-
   const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 
@@ -110,8 +105,7 @@ export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   return await RESPONSE.event(e)

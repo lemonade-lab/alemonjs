@@ -51,13 +51,6 @@ export async function GUILD_MEMBERS(event: {
 
   const msg_id = `${event.id}.${JoinVilla.joinAt}`
 
-  const con = new Controllers({
-    guild_id: String(JoinVilla.villaId),
-    channel_id: '0',
-    msg_id: msg_id,
-    user_id: String(event.extendData.joinVilla.joinUid)
-  })
-
   /**
    * 制作e消息对象
    */
@@ -123,8 +116,7 @@ export async function GUILD_MEMBERS(event: {
         quote: select?.quote
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   /**

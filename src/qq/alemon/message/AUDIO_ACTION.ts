@@ -30,11 +30,6 @@ AUDIO_ACTION (1 << 29)
 export const AUDIO_ACTION = async (event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const con = new Controllers({
-    guild_id: event.msg.guild_id,
-    channel_id: event.msg.channel_id
-  })
-
   const e = {
     platform: 'qq',
     event: 'AUDIO_MICROPHONE' as (typeof EventEnum)[number],
@@ -90,8 +85,7 @@ export const AUDIO_ACTION = async (event: any) => {
         withdraw
       })
     },
-    Message: con.Message,
-    Member: con.Member
+    Controllers
   }
 
   if (new RegExp(/MIC$/).test(event.eventType)) {

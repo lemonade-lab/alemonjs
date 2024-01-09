@@ -10,11 +10,7 @@ import { USER_DATA } from '../types.js'
 import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { BOTCONFIG } from '../../../config/index.js'
 
-import {
-  directController,
-  ClientDirectController,
-  ClientControllerOnMember
-} from '../direct.js'
+import { directController, Controllers } from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
@@ -23,13 +19,6 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const masterID = cfg.masterID
 
   const open_id = event.author.user_openid
-
-  const Message = ClientDirectController({
-    open_id: open_id,
-    msg_id: event.id
-  })
-
-  const Member = ClientControllerOnMember()
 
   const e = {
     platform: 'ntqq',
@@ -61,7 +50,6 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
     segment: segmentNTQQ,
     send_at: new Date().getTime(),
-    Member,
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
@@ -69,7 +57,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       const msg_id = select?.msg_id ?? event.id
       return await directController(msg, open_id, msg_id)
     },
-    Message
+    Controllers
   }
 
   /**

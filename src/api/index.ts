@@ -16,3 +16,6 @@ export { ClientDISOCRD } from '../discord/index.js'
  */
 export { Controllers as ControllerVILLA } from '../villa/alemon/controller.js'
 export { Controllers as ControllerQQ } from '../qq/alemon/controller.js'
+export { Controllers as ControllerDISCORD } from '../discord/alemon/controller.js'
+export { Controllers as ControllerNTQQ } from '../ntqq/alemon/controller.js'
+export { Controllers as ControllerKOOK } from '../kook/alemon/controller.js'
