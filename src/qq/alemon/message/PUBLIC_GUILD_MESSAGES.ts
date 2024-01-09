@@ -197,5 +197,4 @@ export const PUBLIC_GUILD_MESSAGES = async (
   }
 
   APPS.responseMessage(e)
-  return
 }

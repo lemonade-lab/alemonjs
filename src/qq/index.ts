@@ -1,5 +1,6 @@
 import { config, createClient } from './sdk/index.js'
 import { BOTCONFIG } from '../config/index.js'
+import { Conversation } from './alemon/conversation.js'
 export async function createAlemon() {
   /**
    * 登录
@@ -32,6 +33,7 @@ export async function createAlemon() {
   createClient((t, d) => {
     console.log('t', t)
     console.log('d', d)
+    Conversation(t, d)
   })
 }
 // 客户端

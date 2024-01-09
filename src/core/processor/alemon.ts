@@ -396,6 +396,17 @@ export class Alemon {
   }
 
   /**
+   *
+   * 扩展参数
+   * @param fnc
+   * @returns
+   * @deprecated 已废弃
+   */
+  setArg(fnc: (e: AMessage) => any[] | Promise<any[]>) {
+    return this.arg(fnc)
+  }
+
+  /**
    * 重定义ecent
    * @param fnc
    * @returns
@@ -403,6 +414,16 @@ export class Alemon {
   event(fnc: (...args: any[]) => any) {
     this.#dataMap.set('event', fnc)
     return this
+  }
+
+  /**
+   * 重定义ecent
+   * @param fnc
+   * @returns
+   * @deprecated 已废弃
+   */
+  setMessage(fnc: (...args: any[]) => any) {
+    return this.event(fnc)
   }
 
   /**
@@ -417,6 +438,17 @@ export class Alemon {
       reg
     })
     return this
+  }
+
+  /**
+   * 字符串切割
+   * @param reg
+   * @param str
+   * @returns
+   * @deprecated 已废弃
+   */
+  setCharacter(val: '#' | '/') {
+    return this.replace(/^(\/|#)/, val)
   }
 
   /**
@@ -437,7 +469,7 @@ export class Alemon {
 
       // 过滤事件
       const event = APPCONFIG.get('event')
-      if (keys.event && event.find(item => item == keys.event)) {
+      if (keys.event && event.includes(keys.event)) {
         continue
       }
 
@@ -530,6 +562,20 @@ export class Alemon {
     // 累计
     this.#acount++
     return this
+  }
+
+  /**
+   * 加载
+   * @param AplguinMap
+   * @returns
+   * @deprecated 已废弃
+   */
+  component(
+    AplguinMap: {
+      [key: string]: typeof APlugin
+    } = {}
+  ) {
+    return this.use(AplguinMap)
   }
 
   /**
