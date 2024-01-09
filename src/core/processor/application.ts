@@ -4,7 +4,7 @@ import { existsSync, readdirSync } from 'fs'
 import { APPCONFIG } from './configs.js'
 import { AppMap } from './data.js'
 import { ASubscribe } from './subscribe.js'
-import { loadError } from '../log.js'
+import { loadError } from './log.js'
 
 /**
  * 应用
