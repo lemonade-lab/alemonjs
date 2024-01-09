@@ -172,7 +172,7 @@ npm run build
 node >= 20.0.0
 
 ```ts
-ts-node alemon.config.ts
+npx ts-node alemon.config.ts
 ```
 
 更改为
