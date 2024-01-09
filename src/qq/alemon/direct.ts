@@ -1,6 +1,6 @@
 import { BUFFER } from '../../core/index.js'
 import { ClientQQ } from '../sdk/index.js'
-import { everyoneError } from '../../log/index.js'
+
 import { ControllerOption, type UserInformationType } from '../../core/index.js'
 
 export class Controllers {
@@ -53,16 +53,12 @@ export class Controllers {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id).catch(
-          everyoneError
-        )
+        return await directController(content, open_id, msg_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id).catch(
-          everyoneError
-        )
+        return await directController(content, open_id, msg_id)
       },
       /**
        * 更新信息
@@ -157,7 +153,7 @@ export async function directController(
       id: open_id,
       msg_id: msg_id, //消息id, 必须
       image: msg //buffer
-    }).catch(everyoneError)
+    })
   }
   // arr && find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -174,7 +170,7 @@ export async function directController(
       msg_id: msg_id, //消息id, 必须
       image: msg[isBuffer] as Buffer, //buffer
       content: cont
-    }).catch(everyoneError)
+    })
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -190,13 +186,13 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl)
     if (msg) {
       return await ClientQQ.postImage({
         id: open_id,
         msg_id: msg_id, //消息id, 必须
         image: msg //buffer
-      }).catch(everyoneError)
+      })
     }
   }
 

@@ -1,7 +1,6 @@
 import { AlemonOptions } from './types.js'
 import { RebotMap } from './map.js'
-import { AppNameError } from '../log/index.js'
-import { Screenshot, APPCONFIG, IP, APPS } from '../core/index.js'
+import { Screenshot, APPCONFIG, IP, APPS, loadError } from '../core/index.js'
 import { BOTCONFIG } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { ClientKOA } from '../koa/file.js'
@@ -218,7 +217,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       const dir = join(process.cwd(), Options?.app?.scripts)
       await import(`file://${dir}`).catch(err => {
         console.error(`file://${dir}`)
-        AppNameError('local dev', err)
+        loadError('local dev', err)
       })
     }
   }

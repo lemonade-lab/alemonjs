@@ -1,14 +1,10 @@
-export const everyoneError = (err: any) => {
-  console.error(err)
-  return err
-}
 /**
- * 捕捉插件错误
+ * 捕捉插件加载错误
  * @param appname
  * @param err
  * @returns
  */
-export const AppNameError = (appname: string, err: any) => {
+export const loadError = (appname: string, err: any) => {
   // 属于依赖缺失
   const match = /Cannot find package '(.+)' imported from/.exec(err.message)
   if (match && match[1]) {

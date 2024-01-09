@@ -50,6 +50,9 @@ class ClientNtqq {
       url: '/gateway'
     })
       .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
       .then(data => {
         const { url } = data
         if (url) {
@@ -92,7 +95,11 @@ class ClientNtqq {
       url: `/v2/users/${openid}/messages`,
       method: 'post',
       data: data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
@@ -146,7 +153,11 @@ class ClientNtqq {
       url: `/v2/groups/${group_openid}/messages`,
       method: 'post',
       data: data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   // markdown = {content}
@@ -174,7 +185,11 @@ class ClientNtqq {
       url: `/v2/users/${openid}/files`,
       method: 'post',
       data: data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -199,7 +214,11 @@ class ClientNtqq {
       url: `/v2/groups/${openid}/files`,
       method: 'post',
       data: data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 }
 

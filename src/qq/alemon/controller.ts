@@ -2,7 +2,7 @@ import { replyController } from './reply.js'
 import { ControllerOption, type UserInformationType } from '../../core/index.js'
 import { BOTCONFIG } from '../../config/index.js'
 import { directController } from './direct.js'
-import { everyoneError } from '../../log/index.js'
+
 import { ClientQQ } from '../sdk/index.js'
 
 export class Controllers {
@@ -86,18 +86,16 @@ export class Controllers {
           return await directController(content, open_id, msg_id, {
             open_id: open_id,
             user_id: user_id
-          }).catch(everyoneError)
+          })
         }
-        return await replyController(content, channel_id, msg_id).catch(
-          everyoneError
-        )
+        return await replyController(content, channel_id, msg_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
         return await replyController(content, channel_id, msg_id, {
           quote: msg_id
-        }).catch(everyoneError)
+        })
       },
       /**
        * 更新信息

@@ -1,6 +1,6 @@
 import { ClientNTQQ } from '../sdk/index.js'
 import { ClientKOA } from '../../koa/index.js'
-import { everyoneError } from '../../log/index.js'
+
 /**
  * 回复控制器
  * @param msg
@@ -15,7 +15,7 @@ export async function replyController(
 ) {
   // is buffer
   if (Buffer.isBuffer(msg)) {
-    const url = await ClientKOA.getFileUrl(msg).catch(everyoneError)
+    const url = await ClientKOA.getFileUrl(msg)
     if (!url) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: '',
@@ -24,14 +24,12 @@ export async function replyController(
           srv_send_msg: false,
           file_type: 1,
           url
-        })
-          .then(res => res.file_info)
-          .catch(everyoneError)
+        }).then(res => res.file_info)
       },
       msg_id,
       msg_type: 7,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-    }).catch(everyoneError)
+    })
   }
 
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -43,9 +41,7 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer).catch(
-      everyoneError
-    )
+    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
     if (!url) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: cont,
@@ -54,14 +50,12 @@ export async function replyController(
           srv_send_msg: false,
           file_type: 1,
           url
-        })
-          .then(res => res.file_info)
-          .catch(everyoneError)
+        }).then(res => res.file_info)
       },
       msg_id,
       msg_type: 7,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-    }).catch(everyoneError)
+    })
   }
 
   const content = Array.isArray(msg)
@@ -84,14 +78,12 @@ export async function replyController(
           srv_send_msg: false,
           file_type: 1,
           url: getUrl
-        })
-          .then(res => res.file_info)
-          .catch(everyoneError)
+        }).then(res => res.file_info)
       },
       msg_id,
       msg_type: 7,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-    }).catch(everyoneError)
+    })
   }
 
   return await ClientNTQQ.groupOpenMessages(guild_id, {
@@ -99,5 +91,5 @@ export async function replyController(
     msg_id,
     msg_type: 0,
     msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-  }).catch(everyoneError)
+  })
 }

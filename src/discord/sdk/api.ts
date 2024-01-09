@@ -67,7 +67,11 @@ class ClientDc {
     return this.requestCDN({
       url: url,
       method: 'get'
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -78,7 +82,11 @@ class ClientDc {
     return this.request({
       method: 'get',
       url: '/applications/@me'
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -105,7 +113,11 @@ class ClientDc {
       method: 'post',
       headers: headers,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -265,7 +277,11 @@ class ClientDc {
     return this.request({
       method: 'get',
       url: '/gateway'
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 }
 

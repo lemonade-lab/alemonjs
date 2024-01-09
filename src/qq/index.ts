@@ -1,10 +1,7 @@
-import { config, createClient } from './sdk/index.js'
+import { Client } from './sdk/index.js'
 import { BOTCONFIG } from '../config/index.js'
 import { Conversation } from './alemon/conversation.js'
 export async function createAlemon() {
-  /**
-   * 登录
-   */
   const qq = BOTCONFIG.get('qq')
   if ((qq ?? '') !== '' && (qq.appID ?? '') !== '' && (qq.token ?? '') !== '') {
     BOTCONFIG.set('qq', qq)
@@ -13,24 +10,12 @@ export async function createAlemon() {
     console.error('[LOGIN]', 'QQ ERR')
     return
   }
-  /**
-   * 读取配置
-   */
-  const cfg = BOTCONFIG.get('qq')
-  /**
-   * **********
-   * sdk-config
-   * **********
-   */
-  config.set('appID', cfg.appID)
-  config.set('token', cfg.token)
-  config.set('intents', cfg.intents)
-  config.set('sandbox', cfg.sandbox)
-  /**
-   * *********
-   * *********
-   */
-  createClient((t, d) => {
+
+  const c = new Client()
+
+  c.set(qq)
+
+  c.connect((t, d) => {
     console.log('t', t)
     console.log('d', d)
     Conversation(t, d)

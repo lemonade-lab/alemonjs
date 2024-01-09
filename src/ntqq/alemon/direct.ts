@@ -5,7 +5,6 @@ import {
 } from '../../core/index.js'
 import { ClientNTQQ } from '../sdk/index.js'
 import { ClientKOA } from '../../koa/index.js'
-import { everyoneError } from '../../log/index.js'
 
 export class Controllers {
   select: ControllerOption
@@ -60,16 +59,12 @@ export class Controllers {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id).catch(
-          everyoneError
-        )
+        return await directController(content, open_id, msg_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, open_id, msg_id).catch(
-          everyoneError
-        )
+        return await directController(content, open_id, msg_id)
       },
       /**
        * 更新信息
@@ -111,14 +106,12 @@ export class Controllers {
                 srv_send_msg: false,
                 file_type: 3,
                 url: file
-              })
-                .then(res => res.file_info)
-                .catch(everyoneError)
+              }).then(res => res.file_info)
             },
             msg_id,
             msg_type: 7,
             msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          }).catch(everyoneError)
+          })
         }
         return false
       },
@@ -136,14 +129,12 @@ export class Controllers {
                 srv_send_msg: false,
                 file_type: 2,
                 url: file
-              })
-                .then(res => res.file_info)
-                .catch(everyoneError)
+              }).then(res => res.file_info)
             },
             msg_id,
             msg_type: 7,
             msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          }).catch(everyoneError)
+          })
         }
         return
       },
@@ -155,7 +146,7 @@ export class Controllers {
               msg_id,
               msg_seq: ClientNTQQ.getMsgSeq(msg_id),
               ...item
-            }).catch(everyoneError)
+            })
           )
         }
         return arr
@@ -191,7 +182,7 @@ export async function directController(
   // isBuffer
   if (Buffer.isBuffer(msg)) {
     try {
-      const url = await ClientKOA.getFileUrl(msg).catch(everyoneError)
+      const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
@@ -200,14 +191,12 @@ export async function directController(
             srv_send_msg: false,
             file_type: 1,
             url: url
-          })
-            .then(res => res.file_info)
-            .catch(everyoneError)
+          }).then(res => res.file_info)
         },
         msg_id,
         msg_type: 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-      }).catch(everyoneError)
+      })
     } catch (err) {
       console.error(err)
       return err
@@ -225,9 +214,7 @@ export async function directController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer).catch(
-      everyoneError
-    )
+    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
     if (!url) return false
     return await ClientNTQQ.usersOpenMessages(open_id, {
       content: cont,
@@ -236,14 +223,12 @@ export async function directController(
           srv_send_msg: false,
           file_type: 1,
           url: url
-        })
-          .then(res => res.file_info)
-          .catch(everyoneError)
+        }).then(res => res.file_info)
       },
       msg_id,
       msg_type: 7,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-    }).catch(everyoneError)
+    })
   }
 
   const content = Array.isArray(msg)
@@ -262,9 +247,9 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl)
     if (Buffer.isBuffer(msg)) {
-      const url = await ClientKOA.getFileUrl(msg).catch(everyoneError)
+      const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
@@ -273,14 +258,12 @@ export async function directController(
             srv_send_msg: false,
             file_type: 1,
             url: url
-          })
-            .then(res => res.file_info)
-            .catch(everyoneError)
+          }).then(res => res.file_info)
         },
         msg_id,
         msg_type: 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-      }).catch(everyoneError)
+      })
     }
   }
 
@@ -289,5 +272,5 @@ export async function directController(
     msg_id,
     msg_type: 0,
     msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-  }).catch(everyoneError)
+  })
 }

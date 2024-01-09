@@ -5,7 +5,7 @@ import {
   type UserInformationType
 } from '../../core/index.js'
 import { BOTCONFIG } from '../../config/index.js'
-import { everyoneError } from '../../log/index.js'
+
 export class Controllers {
   select: ControllerOption
   constructor(select?: ControllerOption) {
@@ -19,9 +19,10 @@ export class Controllers {
     const user_id = select.user_id ?? this.select?.user_id
     return {
       information: async (): Promise<UserInformationType | false> => {
-        const data = await ClientKOOK.userView(guild_id, user_id)
-          .then(res => res.data)
-          .catch(everyoneError)
+        const data = await ClientKOOK.userView(guild_id, user_id).then(
+          res => res.data
+        )
+
         if (data) {
           const cfg = BOTCONFIG.get('qq')
           const masterID = cfg.masterID
@@ -42,9 +43,7 @@ export class Controllers {
         return false
       },
       remove: async () => {
-        return await ClientKOOK.guildKickout(guild_id, user_id).catch(
-          everyoneError
-        )
+        return await ClientKOOK.guildKickout(guild_id, user_id)
       },
       operate: async (role_id: string, add = true) => {
         return false
@@ -61,22 +60,20 @@ export class Controllers {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, channel_id).catch(everyoneError)
+        return await replyController(content, channel_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, channel_id).catch(everyoneError)
+        return await replyController(content, channel_id)
       },
       update: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await ClientKOOK.messageUpdate({ msg_id, content }).catch(
-          everyoneError
-        )
+        return await ClientKOOK.messageUpdate({ msg_id, content })
       },
       withdraw: async (hideTip: boolean) => {
-        return await ClientKOOK.messageDelete(msg_id).catch(everyoneError)
+        return await ClientKOOK.messageDelete(msg_id)
       },
       pinning: async (cancel?: boolean) => {
         return false
@@ -96,17 +93,13 @@ export class Controllers {
                 msg_id,
                 emoji: item,
                 user_id
-              }).catch(everyoneError)
+              })
             )
           }
           return arr
         }
         for (const item of msg) {
-          arr.push(
-            await ClientKOOK.messageAddReaction({ msg_id, emoji: item }).catch(
-              everyoneError
-            )
-          )
+          arr.push(await ClientKOOK.messageAddReaction({ msg_id, emoji: item }))
         }
         return arr
       },
@@ -116,15 +109,15 @@ export class Controllers {
             type: 3,
             target_id: channel_id,
             content: file
-          }).catch(everyoneError)
+          })
         }
-        const ret = await ClientKOOK.postFile(file, name).catch(everyoneError)
+        const ret = await ClientKOOK.postFile(file, name)
         if (!ret) return false
         return await ClientKOOK.createMessage({
           type: 3,
           target_id: channel_id,
           content: ret.data.url
-        }).catch(everyoneError)
+        })
       },
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
@@ -132,15 +125,15 @@ export class Controllers {
             type: 3,
             target_id: channel_id,
             content: file
-          }).catch(everyoneError)
+          })
         }
-        const ret = await ClientKOOK.postFile(file, name).catch(everyoneError)
+        const ret = await ClientKOOK.postFile(file, name)
         if (!ret) return false
         return await ClientKOOK.createMessage({
           type: 3,
           target_id: channel_id,
           content: ret.data.url
-        }).catch(everyoneError)
+        })
       },
       card: async (msg: any[]) => {
         return [
@@ -148,7 +141,7 @@ export class Controllers {
             type: 10,
             target_id: channel_id,
             content: JSON.stringify(msg)
-          }).catch(everyoneError)
+          })
         ]
       },
       allUsers: async (
@@ -159,9 +152,7 @@ export class Controllers {
         }
       ) => {
         // 该消息下 指定emoji的所有用户
-        return await ClientKOOK.messageReactionList({ msg_id, emoji }).catch(
-          everyoneError
-        )
+        return await ClientKOOK.messageReactionList({ msg_id, emoji })
       },
       article: async (msg: any) => {
         return false

@@ -7,6 +7,7 @@ export interface ClientConfig {
   secret: string
   intents: IntentsEnum[]
   sandbox: boolean
+  shard?: number[]
 }
 
 export const config = new BaseConfig<ClientConfig>({
@@ -14,5 +15,6 @@ export const config = new BaseConfig<ClientConfig>({
   token: '',
   secret: '',
   intents: [],
-  sandbox: false
+  sandbox: false,
+  shard: [0, 1]
 })

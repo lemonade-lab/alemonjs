@@ -1,6 +1,5 @@
 import { BUFFER } from '../../core/index.js'
 import { ClientKOOK } from '../sdk/index.js'
-import { everyoneError } from '../../log/index.js'
 
 /**
  * 回复控制器
@@ -17,13 +16,13 @@ export async function replyController(
    * isbuffer
    */
   if (Buffer.isBuffer(msg)) {
-    const ret = await ClientKOOK.postImage(msg).catch(everyoneError)
+    const ret = await ClientKOOK.postImage(msg)
     if (ret && ret.data) {
       return await ClientKOOK.createMessage({
         type: 2,
         target_id: channel_id,
         content: ret.data.url
-      }).catch(everyoneError)
+      })
     }
     return false
   }
@@ -42,21 +41,19 @@ export async function replyController(
       .filter(element => typeof element === 'string')
       .join('')
     // 转存
-    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer).catch(
-      everyoneError
-    )
+    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer)
     if (!ret) return false
     if (ret?.data) {
       await ClientKOOK.createMessage({
         type: 9,
         target_id: channel_id,
         content: content
-      }).catch(everyoneError)
+      })
       return await ClientKOOK.createMessage({
         type: 2,
         target_id: channel_id,
         content: ret.data.url
-      }).catch(everyoneError)
+      })
     }
   }
   const content = Array.isArray(msg)
@@ -72,21 +69,21 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl)
     if (!msg) return false
-    const ret = await ClientKOOK.postImage(msg).catch(everyoneError)
+    const ret = await ClientKOOK.postImage(msg)
     if (!ret) return false
     if (msg && ret) {
       return await ClientKOOK.createMessage({
         type: 2,
         target_id: channel_id,
         content: ret.data.url
-      }).catch(everyoneError)
+      })
     }
   }
   return await ClientKOOK.createMessage({
     type: 9,
     target_id: channel_id,
     content
-  }).catch(everyoneError)
+  })
 }

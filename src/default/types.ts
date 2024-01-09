@@ -1,6 +1,6 @@
-import { VILLAOptions } from '../villa/villa.js'
+import { VILLAOptions } from '../villa/sdk/wss.js'
 import { KOOKOptions } from '../kook/kook.js'
-import { QQOptions } from '../qq/qq.js'
+import { QQOptions } from '../qq/sdk/wss.js'
 import { NTQQOptions } from '../ntqq/ntqq.js'
 import { DISOCRDOptions } from '../discord/discord.js'
 /**

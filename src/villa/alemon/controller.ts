@@ -2,7 +2,6 @@ import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
 import { BOTCONFIG } from '../../config/index.js'
-import { everyoneError } from '../../log/index.js'
 
 /**
  * 控制器
@@ -36,9 +35,7 @@ export class Controllers {
           console.error('VILLA 无私信')
           return false
         }
-        return await replyController(guild_id, channel_id, content).catch(
-          everyoneError
-        )
+        return await replyController(guild_id, channel_id, content)
       },
       /**
        * 引用
@@ -54,7 +51,7 @@ export class Controllers {
         }
         return await replyController(guild_id, channel_id, content, {
           quote: msg_id
-        }).catch(everyoneError)
+        })
       },
       /**
        * 更新信息
@@ -74,7 +71,7 @@ export class Controllers {
         return await ClientVILLA.recallMessage(guild_id, {
           room_id: channel_id,
           msg_uid: msg_id
-        }).catch(everyoneError)
+        })
       },
       /**
        *  钉选
@@ -86,7 +83,7 @@ export class Controllers {
           room_id: channel_id,
           is_cancel: cancel,
           msg_uid: msg_id
-        }).catch(everyoneError)
+        })
       },
       /**
        *  喇叭
@@ -137,11 +134,7 @@ export class Controllers {
       card: async (msg: any[]) => {
         const arr: any[] = []
         for (const item of msg) {
-          arr.push(
-            await ClientVILLA.sendCard(guild_id, channel_id, item).catch(
-              everyoneError
-            )
-          )
+          arr.push(await ClientVILLA.sendCard(guild_id, channel_id, item))
         }
         return arr
       },
@@ -175,9 +168,10 @@ export class Controllers {
        */
       information: async (): Promise<UserInformationType | false> => {
         // 对进行进行过滤,并以固定格式返回
-        const data = await ClientVILLA.getMember(guild_id, user_id)
-          .then(res => res.data)
-          .catch(everyoneError)
+        const data = await ClientVILLA.getMember(guild_id, user_id).then(
+          res => res.data
+        )
+
         if (!data) return false
         const cfg = BOTCONFIG.get('villa')
         const masterID = cfg.masterID
@@ -202,9 +196,7 @@ export class Controllers {
        * 踢出
        */
       remove: async () => {
-        return await ClientVILLA.deleteVillaMember(guild_id, user_id).catch(
-          everyoneError
-        )
+        return await ClientVILLA.deleteVillaMember(guild_id, user_id)
       },
       /**
        * 身分组
@@ -217,7 +209,7 @@ export class Controllers {
           role_id,
           uid: user_id,
           is_add: add
-        }).catch(everyoneError)
+        })
       }
     }
   }

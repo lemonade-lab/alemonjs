@@ -71,7 +71,11 @@ class ClientVilla {
       data: {
         url
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -92,7 +96,11 @@ class ClientVilla {
         ext: ext
       },
       url: ApiEnum.localImage
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -131,7 +139,11 @@ class ClientVilla {
       url: data.params.host,
       method: 'post',
       data: formData
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -161,7 +173,11 @@ class ClientVilla {
       data: {
         token
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -187,7 +203,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       url: ApiEnum.getVilla
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -218,7 +238,11 @@ class ClientVilla {
         offset_str,
         size
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -251,7 +275,11 @@ class ClientVilla {
       params: {
         uid: String(uid)
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -272,7 +300,11 @@ class ClientVilla {
       data: {
         uid: String(uid)
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * *******
@@ -309,7 +341,11 @@ class ClientVilla {
         object_name: data.object_name,
         msg_content: data.msg_content
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -349,7 +385,11 @@ class ClientVilla {
       data: {
         panel: JSON.stringify(panel)
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -381,7 +421,11 @@ class ClientVilla {
         room_id: String(data.room_id), // 房间 id
         send_at: Number(send_at) // 发送时间
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -411,7 +455,11 @@ class ClientVilla {
         msg_uid: String(msg_uid), // 消息 id
         msg_time: Number(send_at) // 发送时间
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -443,7 +491,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       data: { group_name }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -467,7 +519,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       data: { group_id, group_name }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * ？？
@@ -485,7 +541,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       data: { group_id }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -506,7 +566,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       url: ApiEnum.getGroupList
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * ??
@@ -532,7 +596,11 @@ class ClientVilla {
         room_id: Number(room_id),
         room_name: String(room_name)
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * ??
@@ -552,7 +620,11 @@ class ClientVilla {
       data: {
         room_id: String(room_id)
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * 已测
@@ -579,7 +651,11 @@ class ClientVilla {
       params: {
         room_id: Number(room_id)
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * 已测
@@ -599,7 +675,11 @@ class ClientVilla {
       headers: {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * ******
@@ -629,7 +709,11 @@ class ClientVilla {
       },
       url: ApiEnum.operateMemberToRole,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -659,7 +743,11 @@ class ClientVilla {
       },
       url: ApiEnum.createMemberRole,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
   /**
    * ??
@@ -685,7 +773,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -706,7 +798,11 @@ class ClientVilla {
       data: {
         id
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -727,7 +823,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       url: ApiEnum.getVillaMemberRoles
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -747,7 +847,11 @@ class ClientVilla {
       params: {
         role_id
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -774,7 +878,11 @@ class ClientVilla {
         'x-rpc-bot_villa_id': String(villa_id) // 别墅编号
       },
       url: ApiEnum.getAllEmoticons
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -808,7 +916,11 @@ class ClientVilla {
       },
       url: ApiEnum.audit,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**

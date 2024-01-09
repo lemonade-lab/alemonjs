@@ -81,7 +81,11 @@ class ClientKook {
       url: ApiEnum.AssetCreate,
       data: formdata,
       headers: formdata.getHeaders()
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -106,7 +110,11 @@ class ClientKook {
       method: 'post',
       url: ApiEnum.MessageCreate,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -141,7 +149,11 @@ class ClientKook {
       data: {
         target_id
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -160,7 +172,11 @@ class ClientKook {
       method: 'post',
       url: ApiEnum.DirectMessageCreate,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -181,7 +197,11 @@ class ClientKook {
       data: {
         msg_id
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -205,7 +225,11 @@ class ClientKook {
       method: 'post',
       url: ApiEnum.MessageUpdate,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -226,7 +250,11 @@ class ClientKook {
       method: 'post',
       url: ApiEnum.MessageDeleteReaction,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -243,7 +271,11 @@ class ClientKook {
       method: 'post',
       url: ApiEnum.MessageAddReaction,
       data
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -277,7 +309,11 @@ class ClientKook {
       method: 'get',
       url: ApiEnum.MessageReactionList,
       params
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -315,7 +351,11 @@ class ClientKook {
     return this.kookService({
       method: 'get',
       url: ApiEnum.UserMe
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -352,7 +392,11 @@ class ClientKook {
         guild_id,
         user_id
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -376,7 +420,11 @@ class ClientKook {
         guild_id,
         target_id: user_id
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -403,7 +451,11 @@ class ClientKook {
         type,
         value
       }
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 }
 

@@ -86,7 +86,11 @@ class ClientQq {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -116,7 +120,11 @@ class ClientQq {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -134,7 +142,11 @@ class ClientQq {
     return this.request({
       method: 'get',
       url: `/users/@me`
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -151,7 +163,11 @@ class ClientQq {
       method: 'get',
       url: `/users/@me/guilds`,
       params
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -169,7 +185,11 @@ class ClientQq {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}`
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -270,7 +290,11 @@ class ClientQq {
   async guildApiPermission(guild_id: string) {
     return this.request({
       url: `/guilds/${guild_id}/api_permission`
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   /**
@@ -281,7 +305,11 @@ class ClientQq {
   async geteway() {
     return this.request({
       url: '/gateway'
-    }).then(ApiLog)
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
   }
 }
 /**

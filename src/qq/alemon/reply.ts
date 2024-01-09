@@ -1,6 +1,5 @@
 import { BUFFER } from '../../core/index.js'
 import { ClientQQ as Client } from '../sdk/index.js'
-import { everyoneError } from '../../log/index.js'
 
 /**
  * 回复控制器
@@ -27,7 +26,7 @@ export async function replyController(
       id: channel_id,
       msg_id: msg_id, //消息id, 必须,不然就是主动消息了
       image: msg //buffer
-    }).catch(everyoneError)
+    })
   }
   // arr & find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -44,7 +43,7 @@ export async function replyController(
       msg_id: msg_id, //消息id, 必须
       image: msg[isBuffer] as Buffer, //buffer
       content: cont
-    }).catch(everyoneError)
+    })
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -63,13 +62,13 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl)
     if (msg) {
       return await Client.postImage({
         id: channel_id,
         msg_id: msg_id, //消息id, 必须
         image: msg //buffer
-      }).catch(everyoneError)
+      })
     }
   }
 

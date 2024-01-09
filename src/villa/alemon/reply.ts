@@ -1,5 +1,5 @@
 import { ClientVILLA } from '../sdk/index.js'
-import { everyoneError } from '../../log/index.js'
+
 import IMGS from 'image-size'
 import { BUFFER } from '../../core/index.js'
 
@@ -22,9 +22,10 @@ export async function replyController(
   // isBuffer
   if (Buffer.isBuffer(msg)) {
     // 上传图片
-    const url = await ClientVILLA.uploadImage(villa_id, msg)
-      .then(res => res?.data?.url)
-      .catch(everyoneError)
+    const url = await ClientVILLA.uploadImage(villa_id, msg).then(
+      res => res?.data?.url
+    )
+
     if (!url) return false
     const dimensions = IMGS.imageSize(msg)
     return await ClientVILLA.replyMessage(
@@ -40,7 +41,7 @@ export async function replyController(
         ]
       },
       select?.quote
-    ).catch(everyoneError)
+    )
   }
   // isString arr and find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -53,9 +54,9 @@ export async function replyController(
     for (const item of buffers) {
       const ISize = IMGS.imageSize(item)
       images.push({
-        url: await ClientVILLA.uploadImage(villa_id, item)
-          .then(res => res?.data?.url)
-          .catch(everyoneError),
+        url: await ClientVILLA.uploadImage(villa_id, item).then(
+          res => res?.data?.url
+        ),
         width: ISize.width,
         height: ISize.height
       })
@@ -76,7 +77,7 @@ export async function replyController(
         images: images
       },
       select?.quote
-    ).catch(everyoneError)
+    )
   }
 
   // string and string[]
@@ -96,13 +97,14 @@ export async function replyController(
   if (match) {
     const getUrl = match[1]
     // 先请求确保图片正常
-    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl)
     if (!msg) return false
     const dimensions = IMGS.imageSize(msg)
     // url 形式的直接转存
-    const url = await ClientVILLA.transferImage(villa_id, getUrl)
-      .then(res => res?.data?.new_url)
-      .catch(everyoneError)
+    const url = await ClientVILLA.transferImage(villa_id, getUrl).then(
+      res => res?.data?.new_url
+    )
+
     // 如果是直接的url,应该直接使用转存
     const images = [
       {
@@ -120,7 +122,7 @@ export async function replyController(
         images: images
       },
       select?.quote
-    ).catch(everyoneError)
+    )
   }
 
   return await ClientVILLA.replyMessage(
@@ -130,5 +132,5 @@ export async function replyController(
       msg: cont
     },
     select?.quote
-  ).catch(everyoneError)
+  )
 }

@@ -4,7 +4,6 @@ import {
   BUFFER
 } from '../../core/index.js'
 import { ClientKOOK } from '../sdk/index.js'
-import { everyoneError } from '../../log/index.js'
 
 /**
  * ******************
@@ -64,16 +63,12 @@ export class Controllers {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, channel_id, open_id).catch(
-          everyoneError
-        )
+        return await directController(content, channel_id, open_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await directController(content, channel_id, open_id).catch(
-          everyoneError
-        )
+        return await directController(content, channel_id, open_id)
       },
       /**
        * 更新信息
@@ -153,14 +148,14 @@ export async function directController(
    * isbuffer
    */
   if (Buffer.isBuffer(msg)) {
-    const ret = await ClientKOOK.postImage(msg).catch(everyoneError)
+    const ret = await ClientKOOK.postImage(msg)
     if (ret && ret.data) {
       return await ClientKOOK.createDirectMessage({
         type: 2,
         target_id: channel_id,
         chat_code: open_id,
         content: ret.data.url
-      }).catch(everyoneError)
+      })
     }
     return false
   }
@@ -179,9 +174,7 @@ export async function directController(
       .filter(element => typeof element === 'string')
       .join('')
     // 转存
-    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer).catch(
-      everyoneError
-    )
+    const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer)
     if (!ret) return false
     // 私聊
     await ClientKOOK.createDirectMessage({
@@ -189,13 +182,13 @@ export async function directController(
       target_id: channel_id,
       chat_code: open_id,
       content: content
-    }).catch(everyoneError)
+    })
     return await ClientKOOK.createDirectMessage({
       type: 2,
       target_id: channel_id,
       chat_code: open_id,
       content: String(ret.data.url)
-    }).catch(everyoneError)
+    })
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -210,9 +203,9 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl).catch(everyoneError)
+    const msg = await BUFFER.getUrl(getUrl)
     if (!msg) return false
-    const ret = await ClientKOOK.postImage(msg).catch(everyoneError)
+    const ret = await ClientKOOK.postImage(msg)
     if (!ret) return false
     if (msg && ret) {
       return await ClientKOOK.createDirectMessage({
@@ -220,7 +213,7 @@ export async function directController(
         target_id: channel_id,
         chat_code: open_id,
         content: ret.data.url
-      }).catch(everyoneError)
+      })
     }
   }
   return await ClientKOOK.createDirectMessage({
@@ -228,5 +221,5 @@ export async function directController(
     target_id: channel_id,
     chat_code: open_id,
     content
-  }).catch(everyoneError)
+  })
 }

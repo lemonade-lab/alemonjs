@@ -4,7 +4,7 @@ import {
   type UserInformationType
 } from '../../core/index.js'
 import { ClientNTQQ } from '../sdk/index.js'
-import { everyoneError } from '../../log/index.js'
+
 export class Controllers {
   select: ControllerOption
   constructor(select?: ControllerOption) {
@@ -41,16 +41,12 @@ export class Controllers {
       reply: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, guild_id, msg_id).catch(
-          everyoneError
-        )
+        return await replyController(content, guild_id, msg_id)
       },
       quote: async (
         content: Buffer | string | number | (Buffer | number | string)[]
       ) => {
-        return await replyController(content, guild_id, msg_id).catch(
-          everyoneError
-        )
+        return await replyController(content, guild_id, msg_id)
       },
       update: async (
         content: Buffer | string | number | (Buffer | number | string)[]
@@ -78,14 +74,12 @@ export class Controllers {
                 srv_send_msg: false,
                 file_type: 3,
                 url: file
-              })
-                .then(res => res.file_info)
-                .catch(everyoneError)
+              }).then(res => res.file_info)
             },
             msg_id,
             msg_type: 7,
             msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          }).catch(everyoneError)
+          })
         }
         return false
       },
@@ -98,14 +92,12 @@ export class Controllers {
                 srv_send_msg: false,
                 file_type: 2,
                 url: file
-              })
-                .then(res => res.file_info)
-                .catch(everyoneError)
+              }).then(res => res.file_info)
             },
             msg_id,
             msg_type: 7,
             msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          }).catch(everyoneError)
+          })
         }
         return false
       },
@@ -120,7 +112,7 @@ export class Controllers {
               msg_id,
               ...item,
               msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-            }).catch(everyoneError)
+            })
           )
         }
         return arr
