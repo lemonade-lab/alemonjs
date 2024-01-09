@@ -7,7 +7,6 @@ import {
 import { segmentNTQQ } from '../segment.js'
 import { getBotMsgByNtqq } from '../bot.js'
 import { USER_DATA } from '../types.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { BOTCONFIG } from '../../../config/index.js'
 
 import { directController, Controllers } from '../direct.js'

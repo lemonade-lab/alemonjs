@@ -5,7 +5,6 @@ import {
   type MessageBingdingOption
 } from '../../../core/index.js'
 
-import { AlemonJSEventError, AlemonJSEventLog } from '../../../log/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
 import { Controllers } from '../controller.js'

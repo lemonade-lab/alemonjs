@@ -132,19 +132,25 @@ export class Alemon {
     this.#data[node.acount][node.example]
       [node.func](e, ...arr)
       .then(res => {
-        console.info(this.info(e, node.func, time - Date.now()))
+        console.info(this.info(e, this.#name, node.func, time - Date.now()))
         return res
       })
       .then(res => {
         if (res && typeof res != 'boolean') {
           e.reply(res).catch(err => {
-            console.error(this.err(e, node.func, time - Date.now()), err)
+            console.error(
+              this.err(e, this.#name, node.func, time - Date.now()),
+              err
+            )
           })
         }
         return res
       })
       .catch(err => {
-        console.error(this.err(e, node.func, time - Date.now()), err)
+        console.error(
+          this.err(e, this.#name, node.func, time - Date.now()),
+          err
+        )
       })
   }
 
@@ -185,19 +191,25 @@ export class Alemon {
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
           .then(res => {
-            console.info(this.info(e, node.func, time - Date.now()))
+            console.info(this.info(e, this.#name, node.func, time - Date.now()))
             return res
           })
           .then(res => {
             if (res && typeof res != 'boolean') {
               e.reply(res).catch(err => {
-                console.error(this.err(e, node.func, time - Date.now()), err)
+                console.error(
+                  this.err(e, this.#name, node.func, time - Date.now()),
+                  err
+                )
               })
             }
             return res
           })
           .catch(err => {
-            console.error(this.err(e, node.func, time - Date.now()), err)
+            console.error(
+              this.err(e, this.#name, node.func, time - Date.now()),
+              err
+            )
           })
 
         // 不是 false ,也就是不放行
@@ -223,19 +235,25 @@ export class Alemon {
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
           .then(res => {
-            console.info(this.info(e, node.func, time - Date.now()))
+            console.info(this.info(e, this.#name, node.func, time - Date.now()))
             return res
           })
           .then(res => {
             if (res && typeof res != 'boolean') {
               e.reply(res).catch(err => {
-                console.error(this.err(e, node.func, time - Date.now()), err)
+                console.error(
+                  this.err(e, this.#name, node.func, time - Date.now()),
+                  err
+                )
               })
             }
             return res
           })
           .catch(err => {
-            console.error(this.err(e, node.func, time - Date.now()), err)
+            console.error(
+              this.err(e, this.#name, node.func, time - Date.now()),
+              err
+            )
             // 错误了就强制中断
           })
         // 重执行
@@ -294,19 +312,25 @@ export class Alemon {
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
           .then(res => {
-            console.info(this.info(e, node.func, time - Date.now()))
+            console.info(this.info(e, this.#name, node.func, time - Date.now()))
             return res
           })
           .then(res => {
             if (res && typeof res != 'boolean') {
               e.reply(res).catch(err => {
-                console.error(this.err(e, node.func, time - Date.now()), err)
+                console.error(
+                  this.err(e, this.#name, node.func, time - Date.now()),
+                  err
+                )
               })
             }
             return res
           })
           .catch(err => {
-            console.error(this.err(e, node.func, time - Date.now()), err)
+            console.error(
+              this.err(e, this.#name, node.func, time - Date.now()),
+              err
+            )
           })
 
         // 不是 false ,也就是不放行
@@ -331,19 +355,25 @@ export class Alemon {
       const res = await this.#data[node.acount][node.example]
         [node.func](e, ...arr)
         .then(res => {
-          console.info(this.info(e, node.func, time - Date.now()))
+          console.info(this.info(e, this.#name, node.func, time - Date.now()))
           return res
         })
         .then(res => {
           if (res && typeof res != 'boolean') {
             e.reply(res).catch(err => {
-              console.error(this.err(e, node.func, time - Date.now()), err)
+              console.error(
+                this.err(e, this.#name, node.func, time - Date.now()),
+                err
+              )
             })
           }
           return res
         })
         .catch(err => {
-          console.error(this.err(e, node.func, time - Date.now()), err)
+          console.error(
+            this.err(e, this.#name, node.func, time - Date.now()),
+            err
+          )
         })
       // 推送缓存
       cache.push(node)
@@ -518,8 +548,8 @@ export class Alemon {
    * @param funcName
    * @returns
    */
-  err(e: AMessage, funcName: string, time: number) {
-    return `[${e.event}] [${false}] [${funcName}] [${time}ms]`
+  err(e: AMessage, name: string, funcName: string, time: number) {
+    return `[${e.event}] [${false}] [${name}] [${funcName}] [${time}ms]`
   }
 
   /**
@@ -528,8 +558,8 @@ export class Alemon {
    * @param funcName
    * @returns
    */
-  info(e: AMessage, funcName: string, time: number) {
-    return `[${e.event}] [${true}] [${funcName}] [${time}ms]`
+  info(e: AMessage, name: string, funcName: string, time: number) {
+    return `[${e.event}] [${true}] [${name}] [${funcName}] [${time}ms]`
   }
 
   /**
@@ -555,11 +585,14 @@ export class Alemon {
       this.#CallData
         [event](e, ...arr)
         .then(res => {
-          console.info(this.info(e, FuncName, time - Date.now()))
+          console.info(this.info(e, FuncName, this.#name, time - Date.now()))
           return res
         })
         .catch(err => {
-          console.error(this.err(e, FuncName, time - Date.now()), err)
+          console.error(
+            this.err(e, this.#name, FuncName, time - Date.now()),
+            err
+          )
         })
     }
     return false

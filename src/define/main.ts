@@ -258,7 +258,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    */
   if (Options?.login && Options?.plugin?.init !== false) {
     // 加载插件
-    APPS.load()
+    await APPS.load()
   }
 
   /**

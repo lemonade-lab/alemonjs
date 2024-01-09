@@ -5,7 +5,6 @@ import {
   type MessageBingdingOption,
   type UserType
 } from '../../../core/index.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers } from '../controller.js'
 import { getBotMsgByDISCORD } from '../bot.js'

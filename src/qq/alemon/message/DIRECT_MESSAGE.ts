@@ -7,12 +7,6 @@ import {
 } from '../../../core/index.js'
 import { segmentQQ } from '../segment.js'
 import { getBotMsgByQQ } from '../bot.js'
-import {
-  AlemonJSError,
-  AlemonJSLog,
-  AlemonJSEventError,
-  AlemonJSEventLog
-} from '../../../log/index.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers, directController } from '../direct.js'
 

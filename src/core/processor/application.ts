@@ -13,7 +13,7 @@ class App {
    * 扫码
    * @returns
    */
-  load() {
+  async load() {
     const dir = join(process.cwd(), APPCONFIG.get('dir'))
     if (!existsSync(dir)) return
     const flies = readdirSync(dir)
@@ -41,7 +41,7 @@ class App {
     for (const type of types) {
       for (const appname of apps) {
         if (existsSync(`${dir}/${appname}${main}.${type}`)) {
-          import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
+          await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
             console.error(`file://${dir}/${appname}${main}.${type}`)
             // 属于依赖缺失
             const match = /Cannot find package '(.+)' imported from/.exec(
@@ -119,6 +119,7 @@ class App {
    * @returns
    */
   response(e: AMessage, event: (typeof EventEnum)[number]) {
+    console.log(`[${e.event}] [${e.typing}] [${e.msg}]`)
     // 分发
     for (const item in this.#regMap) {
       // key触发
@@ -132,6 +133,7 @@ class App {
    * @returns
    */
   responseMessage(e: AMessage) {
+    console.log(`[${e.event}] [${e.typing}] [${e.msg}]`)
     let con = false
     const channel_sb = ASubscribe.find(e.channel_id)
     if (channel_sb) {
@@ -167,6 +169,7 @@ class App {
    * @param e
    */
   responseEventType(e: AMessage) {
+    console.log(`[${e.event}] [${e.typing}]`)
     // 分发
     for (const item in AppMap.keys()) {
       AppMap.get(item).responseEventType(e)

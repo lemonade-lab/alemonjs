@@ -12,7 +12,6 @@ import {
 import { segmentKOOK } from '../segment.js'
 import { getBotMsgByKOOK } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
-import { AlemonJSError, AlemonJSLog } from '../../../log/index.js'
 import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
