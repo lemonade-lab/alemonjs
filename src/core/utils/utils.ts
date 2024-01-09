@@ -1,4 +1,4 @@
-class Utils {
+export class Utils {
   /**
    * 字符串数组转正则
    * [''] => /^$/
@@ -11,4 +11,3 @@ class Utils {
     return APP.length == 0 ? /^$/ : new RegExp(APP.join('|'))
   }
 }
-export const UTILS = new Utils()

@@ -117,7 +117,7 @@ class App {
    * @returns
    */
   response(e: AMessage, event: (typeof EventEnum)[number]) {
-    console.log(`[${e.event}] [${e.typing}] ${e.msg}`)
+    console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     // 分发
     for (const [item, app] of AppMap) {
       app.response(e, event)
@@ -130,7 +130,7 @@ class App {
    * @returns
    */
   responseMessage(e: AMessage) {
-    console.log(`[${e.event}] [${e.typing}] ${e.msg}`)
+    console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
     const channel_sb = ASubscribe.find(e.channel_id)
     if (channel_sb && channel_sb.node) {
@@ -161,7 +161,7 @@ class App {
    * @param e
    */
   responseEventType(e: AMessage) {
-    console.log(`[${e.event}] [${e.typing}]`)
+    console.info(`[${e.event}] [${e.typing}]`)
     // 分发
     for (const [item, app] of AppMap) {
       app.responseEventType(e)

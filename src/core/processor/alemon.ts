@@ -144,8 +144,7 @@ export class Alemon {
         console.info(
           this.info(e, this.#name, node.func),
           true,
-          Date.now() - time,
-          'sm'
+          Date.now() - time
         )
         return res
       })
@@ -154,7 +153,6 @@ export class Alemon {
           this.error(e, this.#name, node.func),
           false,
           Date.now() - time,
-          'sm',
           err
         )
       })
@@ -201,8 +199,7 @@ export class Alemon {
             console.info(
               this.info(e, this.#name, node.func),
               true,
-              Date.now() - time,
-              'sm'
+              Date.now() - time
             )
             return res
           })
@@ -211,7 +208,6 @@ export class Alemon {
               this.error(e, this.#name, node.func),
               false,
               Date.now() - time,
-              'sm',
               err
             )
           })
@@ -243,8 +239,7 @@ export class Alemon {
             console.info(
               this.info(e, this.#name, node.func),
               true,
-              Date.now() - time,
-              'sm'
+              Date.now() - time
             )
             return res
           })
@@ -253,7 +248,6 @@ export class Alemon {
               this.error(e, this.#name, node.func),
               false,
               Date.now() - time,
-              'sm',
               err
             )
             // 错误了就强制中断
@@ -317,8 +311,7 @@ export class Alemon {
             console.info(
               this.info(e, this.#name, node.func),
               true,
-              Date.now() - time,
-              'sm'
+              Date.now() - time
             )
             if (res && typeof res != 'boolean') {
               e.reply(res)
@@ -330,7 +323,6 @@ export class Alemon {
               this.error(e, this.#name, node.func),
               false,
               Date.now() - time,
-              'sm',
               err
             )
           })
@@ -361,8 +353,7 @@ export class Alemon {
           console.info(
             this.info(e, this.#name, node.func),
             true,
-            Date.now() - time,
-            'sm'
+            Date.now() - time
           )
           return res
         })
@@ -371,7 +362,6 @@ export class Alemon {
             this.error(e, this.#name, node.func),
             false,
             Date.now() - time,
-            'sm',
             err
           )
         })
@@ -600,8 +590,7 @@ export class Alemon {
           console.info(
             this.info(e, FuncName, this.#name),
             true,
-            Date.now() - time,
-            'sm'
+            Date.now() - time
           )
           return res
         })
@@ -610,7 +599,6 @@ export class Alemon {
             this.error(e, this.#name, FuncName),
             false,
             Date.now() - time,
-            'sm',
             err
           )
         })

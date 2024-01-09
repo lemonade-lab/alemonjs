@@ -54,7 +54,7 @@ export async function createClient(
     res => res.data
   )
   if (!data?.websocket_url) {
-    console.log('[getway] secret err')
+    console.info('[getway] secret err')
     return
   }
 
@@ -98,11 +98,11 @@ export async function createClient(
           // 登录
           const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
           if (process.env?.VILLA_WS == 'dev') {
-            console.log('PLoginReply:', LongToNumber(reply))
+            console.info('PLoginReply:', LongToNumber(reply))
           }
-          if (reply.code) console.log('[ws] login err')
+          if (reply.code) console.info('[ws] login err')
           else {
-            console.log('[ws] login success')
+            console.info('[ws] login success')
             size = 0
             // 20s 心跳
             IntervalID = setInterval(() => {
@@ -123,24 +123,24 @@ export async function createClient(
           // 心跳
           const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
           if (process.env?.VILLA_WS == 'dev') {
-            console.log('PHeartBeatReply:', LongToNumber(reply))
+            console.info('PHeartBeatReply:', LongToNumber(reply))
           }
           if (reply.code) {
-            console.log('[ws] 心跳错误')
+            console.info('[ws] 心跳错误')
             // 心跳错误,关闭心跳记时器
             if (IntervalID) clearInterval(IntervalID)
             if (size < 5) {
               // 重新发送鉴权
               ws.send(createMessage(getLoginData()))
             } else {
-              console.log('重鉴权次数上限')
+              console.info('重鉴权次数上限')
             }
           }
         } else if (obj.bizType == 8) {
           // 退出登录
           const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)
           if (process.env?.VILLA_WS == 'dev')
-            console.log('PLogoutReply:', LongToNumber(reply))
+            console.info('PLogoutReply:', LongToNumber(reply))
         } else if (obj.bizType == 53) {
           // 强制下线
         } else if (obj.bizType == 52) {
@@ -149,16 +149,16 @@ export async function createClient(
           // 回调数据包
           const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
           const data = LongToNumber(reply)
-          if (process.env?.VILLA_WS == 'dev') console.log('data', data)
+          if (process.env?.VILLA_WS == 'dev') console.info('data', data)
           conversation(data)
         } else {
-          if (process.env?.VILLA_WS == 'dev') console.log('未知数据')
+          if (process.env?.VILLA_WS == 'dev') console.info('未知数据')
         }
       } catch {
-        if (process.env?.VILLA_WS == 'dev') console.log('代码错误')
+        if (process.env?.VILLA_WS == 'dev') console.info('代码错误')
       }
     } else {
-      if (process.env?.VILLA_WS == 'dev') console.log('未知数据')
+      if (process.env?.VILLA_WS == 'dev') console.info('未知数据')
     }
   })
 

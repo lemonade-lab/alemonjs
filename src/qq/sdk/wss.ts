@@ -71,10 +71,10 @@ export async function createClient(
         }
       },
       7: message => {
-        console.log(message)
+        console.info(message)
       },
       9: message => {
-        console.log(message)
+        console.info(message)
       },
       10: ({ d }) => {
         // OpCode 10 Hello 消息，处理心跳周期
@@ -106,7 +106,7 @@ export async function createClient(
         console.info('[ws] heartbeat transmission')
       },
       12: message => {
-        console.log(message)
+        console.info(message)
       }
     }
 

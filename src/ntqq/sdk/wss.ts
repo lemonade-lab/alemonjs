@@ -166,7 +166,7 @@ export async function createClient(
         const message = JSON.parse(msg.toString('utf8'))
         const { op, s, d, t } = message
         if (process.env.NTQQ_WS == 'dev') {
-          console.log('data', d)
+          console.info('data', d)
         }
         // 根据 opcode 进行处理
         if (Object.prototype.hasOwnProperty.call(map, op)) {

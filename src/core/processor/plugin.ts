@@ -1,9 +1,4 @@
-import {
-  APluginInitType,
-  APluginRuleType,
-  APluginTaskType,
-  funcBase
-} from './types.js'
+import { APluginInitType, APluginRuleType, APluginTaskType } from './types.js'
 import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
 import { ASubscribe } from './subscribe.js'
 
@@ -100,9 +95,7 @@ export class APlugin {
    * @param isGroup 是否群聊
    * @param time 操作时间，默认120秒
    */
-  setContext(func: string | funcBase, isGroup = false, time = 120) {
-    const reg = /\s+(.*)\s+/
-    func = typeof func == 'string' ? func : String(func).match(reg)[1]
+  setContext(func: string, isGroup = false, time = 120) {
     // 订阅前确保前者删除
     ASubscribe.cancel(this.conKey(isGroup))
     // 订阅消息

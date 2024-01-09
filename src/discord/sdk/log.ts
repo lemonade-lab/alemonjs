@@ -1,11 +1,12 @@
 import { type AxiosResponse } from 'axios'
 export function ApiLog(res: AxiosResponse) {
   if (process.env?.DISCORD_API_REQUEST == 'dev')
-    console.log('api-config', res?.request)
+    console.info('api-config', res?.request)
   if (process.env?.DISCORD_API_HEADERS == 'dev')
-    console.log('api-config', res?.headers)
+    console.info('api-config', res?.headers)
   if (process.env?.DISCORD_API_CONFIG == 'dev')
-    console.log('api-config', res?.config)
-  if (process.env?.DISCORD_API_DATA == 'dev') console.log('api-data', res?.data)
+    console.info('api-config', res?.config)
+  if (process.env?.DISCORD_API_DATA == 'dev')
+    console.info('api-data', res?.data)
   return res?.data
 }

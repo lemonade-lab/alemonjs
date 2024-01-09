@@ -21,7 +21,7 @@ export async function createClient(
   let session_id = ''
   let resume_gateway_url = ''
   ws.on('open', async () => {
-    console.log('[ws] open')
+    console.info('[ws] open')
   })
   const call = async () => {
     ws.send(

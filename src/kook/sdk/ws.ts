@@ -64,7 +64,7 @@ export async function createClient(
       const message = JSON.parse(msg.toString('utf8'))
       const { s, d, sn } = message
       if (process.env.KOOK_WS == 'dev') {
-        console.log('data', d)
+        console.info('data', d)
       }
       switch (s) {
         /**

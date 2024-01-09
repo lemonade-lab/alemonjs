@@ -2,10 +2,7 @@ import { AppMap } from './data.js'
 import { NodeDataType } from './types.js'
 /**
  * ************
- * 订阅-双key结构
- * key1 k
- * key2 c
- * val func
+ * 订阅
  * ***********
  */
 export class Subscribe {
@@ -33,9 +30,7 @@ export class Subscribe {
     key: string,
     id: any
   ) {
-    console.log('func', func)
     const node: NodeDataType = AppMap.get(name).findByKey(acount, example, func)
-    console.log('node', node)
     // 订阅失败
     if (!node) clearTimeout(id)
     // 订阅前把上一个取消

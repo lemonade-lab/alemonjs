@@ -2,6 +2,7 @@ import FormData from 'form-data'
 import axios, { type AxiosRequestConfig } from 'axios'
 import { config } from './config.js'
 import { createPicFrom } from '../../core/index.js'
+import { ApiLog } from './log.js'
 /**
  * api接口
  */
@@ -85,7 +86,7 @@ class ClientQq {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    }).then(res => res.data)
+    }).then(ApiLog)
   }
 
   /**
@@ -115,7 +116,7 @@ class ClientQq {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    }).then(res => res.data)
+    }).then(ApiLog)
   }
 
   /**
@@ -133,7 +134,7 @@ class ClientQq {
     return this.request({
       method: 'get',
       url: `/users/@me`
-    }).then(res => res.data)
+    }).then(ApiLog)
   }
 
   /**
@@ -150,7 +151,7 @@ class ClientQq {
       method: 'get',
       url: `/users/@me/guilds`,
       params
-    }).then(res => res.data)
+    }).then(ApiLog)
   }
 
   /**
@@ -168,7 +169,7 @@ class ClientQq {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}`
-    }).then(res => res.data)
+    }).then(ApiLog)
   }
 
   /**
@@ -269,7 +270,7 @@ class ClientQq {
   async guildApiPermission(guild_id: string) {
     return this.request({
       url: `/guilds/${guild_id}/api_permission`
-    }).then(res => res.data)
+    }).then(ApiLog)
   }
 
   /**
@@ -280,7 +281,7 @@ class ClientQq {
   async geteway() {
     return this.request({
       url: '/gateway'
-    }).then(res => res.data)
+    }).then(ApiLog)
   }
 }
 /**

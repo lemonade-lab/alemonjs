@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
 import { Readable } from 'stream'
 import {
@@ -8,16 +8,13 @@ import {
 } from './typings.js'
 import { config } from './config.js'
 import { createPicFrom } from '../../core/index.js'
+import { ApiLog } from './log.js'
 
-export function ApiLog(res: AxiosResponse) {
-  if (process.env?.KOOK_API_REQUEST == 'dev')
-    console.log('api-config', res?.request)
-  if (process.env?.KOOK_API_HEADERS == 'dev')
-    console.log('api-config', res?.headers)
-  if (process.env?.KOOK_API_CONFIG == 'dev')
-    console.log('api-config', res?.config)
-  if (process.env?.KOOK_API_DATA == 'dev') console.log('api-data', res?.data)
-  return res?.data
+/**
+ * api接口
+ */
+class ClientKook {
+  //
 }
 
 /**
