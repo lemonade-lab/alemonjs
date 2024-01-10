@@ -65,13 +65,15 @@ class ClientQq {
    * @param isGroup 是否是群聊
    * @returns
    */
-  async postImage(message: {
-    id: string
-    msg_id: string
-    image: Buffer
-    content?: string
-    name?: string
-  }): Promise<any> {
+  async postImage(
+    channel_id: string,
+    message: {
+      msg_id: string
+      image: Buffer
+      content?: string
+      name?: string
+    }
+  ): Promise<any> {
     const formdata = await this.createFrom(
       message.image,
       message.msg_id,
@@ -81,7 +83,7 @@ class ClientQq {
     const dary = formdata != false ? formdata.getBoundary() : ''
     return this.request({
       method: 'post',
-      url: `/channels/${message.id}/messages`,
+      url: `/channels/${channel_id}/messages`,
       headers: {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
@@ -99,13 +101,15 @@ class ClientQq {
    * @param message {消息编号,图片,内容}
    * @returns
    */
-  async postDirectImage(message: {
-    id: string
-    msg_id: string
-    image: Buffer
-    content?: string
-    name?: string
-  }): Promise<any> {
+  async postDirectImage(
+    guild_id: string,
+    message: {
+      msg_id: string
+      image: Buffer
+      content?: string
+      name?: string
+    }
+  ): Promise<any> {
     const formdata = await this.createFrom(
       message.image,
       message.msg_id,
@@ -115,7 +119,7 @@ class ClientQq {
     const dary = formdata != false ? formdata.getBoundary() : ''
     return this.request({
       method: 'post',
-      url: `/dms/${message.id}/messages`,
+      url: `/dms/${guild_id}/messages`,
       headers: {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
@@ -199,16 +203,300 @@ class ClientQq {
    */
 
   /**
+   * 获取子频道列表
+   * @param guild_id
+   * @returns
+   */
+  async guildsChannels(guild_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/guilds/${guild_id}/channels`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 获取子频道详情
+   * @param channel_id
+   * @returns
+   */
+  async channels(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 创建子频道
+   * @param guild_id
+   * @returns
+   */
+  async guildsChannelsCreate(
+    guild_id: string,
+    data: {
+      name: string
+      type: number
+      sub_type: number
+      position: number
+      parent_id: string
+      private_type: number
+      private_user_ids: string[]
+      speak_permission: number
+      application_id: string
+    }
+  ) {
+    return this.request({
+      method: 'post',
+      url: `/guilds/${guild_id}/channels`,
+      data
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 创建子频道
+   * @param channel_id
+   * @returns
+   */
+  async guildsChannelsUpdate(
+    channel_id: string,
+    data: {
+      name: string
+      position: number
+      parent_id: string
+      private_type: number
+      speak_permission: number
+    }
+  ) {
+    return this.request({
+      method: 'PATCH',
+      url: `/channels/${channel_id}`,
+      data
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 删除子频道
+   * @param channel_id
+   * @param data
+   * @returns
+   */
+  async guildsChannelsdelete(
+    channel_id: string,
+    data: {
+      name: string
+      position: number
+      parent_id: string
+      private_type: number
+      speak_permission: number
+    }
+  ) {
+    return this.request({
+      method: 'DELETE',
+      url: `/channels/${channel_id}`,
+      data
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 获取在线成员数
+   * @param channel_id
+   * @returns
+   */
+  async channelsChannelOnlineNums(channel_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/channels/${channel_id}/online_nums`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
    * *********
    * 成员api
    * *********
    */
 
   /**
+   * 获取频道成员列表
+   * @param guild_id
+   * @returns
+   */
+  async guildsMembers(
+    guild_id: string,
+    params: {
+      after: string
+      limit: number
+    }
+  ) {
+    return this.request({
+      method: 'GET',
+      url: `/guilds/${guild_id}/members`,
+      params
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 获取频道身份组成员列表
+   * @param guild_id
+   * @param role_id
+   * @param params
+   * @returns
+   */
+  async guildsRolesMembers(
+    guild_id: string,
+    role_id: string,
+    params: {
+      start_index: string
+      limit: number
+    }
+  ) {
+    return this.request({
+      method: 'GET',
+      url: `/guilds/${guild_id}/roles/${role_id}/members`,
+      params
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 获取成员详情
+   * @param guild_id
+   * @param user_id
+   * @returns
+   */
+  async guildsMembersMessage(guild_id: string, user_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/guilds/${guild_id}/members/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 删除频道成员
+   * @param guild_id
+   * @param user_id
+   * @returns
+   */
+  async guildsMembersDelete(guild_id: string, user_id: string) {
+    return this.request({
+      method: 'DELETE',
+      url: `/guilds/${guild_id}/members/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
    * ***********
    * 频道身份api
    * ***********
    */
+
+  /**
+   * 获取指定消息
+   * @param channel_id
+   * @param message_id
+   * @returns
+   */
+  async channelsMessages(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/channels/${channel_id}/messages/${message_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 发送消息
+   * @param channel_id
+   * @param message_id
+   * @param data
+   * @returns
+   */
+  async channelsMessagesPost(
+    channel_id: string,
+    data: {
+      content?: string
+      embed?: any
+      ark?: any
+      message_reference?: any
+      image?: string
+      msg_id?: string
+      event_id?: string
+      markdown?: any
+    }
+  ) {
+    return this.request({
+      method: 'POST',
+      url: `/channels/${channel_id}/messages`,
+      data
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 撤回消息
+   * @param channel_id
+   * @param message_id
+   * @param hidetip
+   * @returns
+   */
+  async channelsMessagesDelete(
+    channel_id: string,
+    message_id: string,
+    hidetip: boolean
+  ) {
+    return this.request({
+      method: 'DELETE',
+      url: `/channels/${channel_id}/messages/${message_id}?hidetip=${hidetip}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
 
   /**
    * **********

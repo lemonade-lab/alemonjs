@@ -3,63 +3,46 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../../core/index.js'
-import { BotMessage } from '../../bot.js'
-import { segmentQQ } from '../../segment.js'
-import { Controllers } from '../../controller.js'
-import { directController } from '../../direct.js'
-import { replyController } from '../../reply.js'
+} from '../../../core/index.js'
+import { BotMessage } from '../bot.js'
+import { segmentQQ } from '../segment.js'
+import { Controllers } from '../controller.js'
+import { directController } from '../direct.js'
+import { replyController } from '../reply.js'
 
 /**
-GUILDS (1 << 0)
-
-  - GUILD_CREATE           // 当机器人加入新guild时
-  - GUILD_UPDATE           // 当guild资料发生变更时
-  - GUILD_DELETE           // 当机器人退出guild时
-  - 
-  - CHANNEL_CREATE         // 当channel被创建时
-  - CHANNEL_UPDATE         // 当channel被更新时
-  - CHANNEL_DELETE         // 当channel被删除时
+ * 子频道创建
+ * @param event
+ * @returns
  */
-
-export const CHANNEL = async (event: {
-  eventType: string
-  eventId: string
-  msg: {
-    application_id?: string // 创建时
-    guild_id: string // 频道id
-    id: string
-    name: string // 频道name
-    op_user_id: string
-    owner_id: string
-    parent_id?: string // 创建时
-    permissions?: string // 创建时
-    position?: number // 创建时
-    private_type: number
-    speak_permission: number
-    sub_type: number
-    type: number
-  }
+export const CHANNEL_CREATE = async (event: {
+  application_id?: string // 创建时
+  guild_id: string // 频道id
+  id: string
+  name: string // 频道name
+  op_user_id: string
+  owner_id: string
+  parent_id?: string // 创建时
+  permissions?: string // 创建时
+  position?: number // 创建时
+  private_type: number
+  speak_permission: number
+  sub_type: number
+  type: number
 }) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const e = {
     platform: 'qq',
-    event: new RegExp(/^GUILD.*$/).test(event.eventType)
-      ? 'GUILD'
-      : ('CHANNEL' as (typeof EventEnum)[number]),
-    typing: new RegExp(/CREATE$/).test(event.eventType)
-      ? 'CREATE'
-      : new RegExp(/UPDATE$/).test(event.eventType)
-      ? 'UPDATE'
-      : ('DELETE' as (typeof TypingEnum)[number]),
+    event: 'CHANNEL' as (typeof EventEnum)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
     isMaster: false,
     attachments: [],
     specials: [],
-    guild_id: event.msg?.guild_id, // ?
+    guild_id: event?.guild_id, // ?
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
@@ -72,7 +55,7 @@ export const CHANNEL = async (event: {
     msg_id: '',
     msg_txt: '',
     quote: '',
-    open_id: event.msg.guild_id,
+    open_id: event.guild_id,
     //
     user_id: '',
     user_name: '',
@@ -89,7 +72,7 @@ export const CHANNEL = async (event: {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.msg.id
+      const msg_id = select?.msg_id ?? event.id
       const withdraw = select?.withdraw ?? 0
       if (select?.open_id && select?.user_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {

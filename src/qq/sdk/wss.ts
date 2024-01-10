@@ -56,7 +56,8 @@ export const defineQQ: QQOptions = {
     'GUILDS', //频道进出
     'GUILD_MEMBERS', //成员资料
     'DIRECT_MESSAGE', //私信
-    'PUBLIC_GUILD_MESSAGES' //公域事件
+    'PUBLIC_GUILD_MESSAGES', //公域事件
+    'GUILD_MESSAGE_REACTIONS' // 表情表态
   ],
   isPrivate: false,
   sandbox: false,

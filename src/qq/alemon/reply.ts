@@ -1,5 +1,5 @@
 import { BUFFER } from '../../core/index.js'
-import { ClientQQ as Client } from '../sdk/index.js'
+import { ClientQQ } from '../sdk/index.js'
 
 /**
  * 回复控制器
@@ -22,8 +22,7 @@ export async function replyController(
   // if withdraw == 0 ， false 不撤回
 
   if (Buffer.isBuffer(msg)) {
-    return await Client.postImage({
-      id: channel_id,
+    return await ClientQQ.postImage(channel_id, {
       msg_id: msg_id, //消息id, 必须,不然就是主动消息了
       image: msg //buffer
     })
@@ -38,8 +37,7 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    return await Client.postImage({
-      id: channel_id,
+    return await ClientQQ.postImage(channel_id, {
       msg_id: msg_id, //消息id, 必须
       image: msg[isBuffer] as Buffer, //buffer
       content: cont
@@ -64,8 +62,7 @@ export async function replyController(
     const getUrl = match[1]
     const msg = await BUFFER.getUrl(getUrl)
     if (msg) {
-      return await Client.postImage({
-        id: channel_id,
+      return await ClientQQ.postImage(channel_id, {
         msg_id: msg_id, //消息id, 必须
         image: msg //buffer
       })
@@ -75,5 +72,8 @@ export async function replyController(
   /**
    * 发送接口
    */
-  return
+  return ClientQQ.channelsMessagesPost(channel_id, {
+    content,
+    msg_id
+  })
 }

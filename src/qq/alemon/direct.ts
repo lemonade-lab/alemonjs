@@ -149,8 +149,7 @@ export async function directController(
   // isBuffer
   // if withdraw == 0 ， false 不撤回
   if (Buffer.isBuffer(msg)) {
-    return await ClientQQ.postDirectImage({
-      id: open_id,
+    return await ClientQQ.postDirectImage(open_id, {
       msg_id: msg_id, //消息id, 必须
       image: msg //buffer
     })
@@ -165,8 +164,7 @@ export async function directController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    return await ClientQQ.postDirectImage({
-      id: open_id,
+    return await ClientQQ.postDirectImage(open_id, {
       msg_id: msg_id, //消息id, 必须
       image: msg[isBuffer] as Buffer, //buffer
       content: cont
@@ -188,8 +186,7 @@ export async function directController(
     const getUrl = match[1]
     const msg = await BUFFER.getUrl(getUrl)
     if (msg) {
-      return await ClientQQ.postImage({
-        id: open_id,
+      return await ClientQQ.postImage(open_id, {
         msg_id: msg_id, //消息id, 必须
         image: msg //buffer
       })

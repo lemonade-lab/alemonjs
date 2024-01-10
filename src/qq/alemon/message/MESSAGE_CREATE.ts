@@ -3,27 +3,24 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../../core/index.js'
-import { BotMessage } from '../../bot.js'
-import { segmentQQ } from '../../segment.js'
-import { BOTCONFIG } from '../../../../config/index.js'
-import { replyController } from '../../reply.js'
-import { Controllers } from '../../controller.js'
-import { directController } from '../../direct.js'
+} from '../../../core/index.js'
+import { BotMessage } from '../bot.js'
+import { segmentQQ } from '../segment.js'
+import { BOTCONFIG } from '../../../config/index.js'
+import { replyController } from '../reply.js'
+import { Controllers } from '../controller.js'
+import { directController } from '../direct.js'
 
 /**
  * *私域*
  */
 
-/** 
-GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置此 intents。
-  - MESSAGE_CREATE         
-  // 频道内的全部消息，
-  而不只是 at 机器人的消息。
-  内容与 AT_MESSAGE_CREATE 相同
-  - MESSAGE_DELETE         // 删除（撤回）消息事件
- * */
-export const GUILD_MESSAGES = async (event: any) => {
+/**
+ * 频道内的全部消息
+ * @param event
+ * @returns
+ */
+export const MESSAGE_CREATE = async (event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const cfg = BOTCONFIG.get('qq')
@@ -36,26 +33,26 @@ export const GUILD_MESSAGES = async (event: any) => {
     boundaries: 'private' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.msg?.author?.id == masterID,
-    attachments: event?.msg?.attachments ?? [],
+    isMaster: event?.author?.id == masterID,
+    attachments: event?.attachments ?? [],
     specials: [],
-    guild_id: event.msg.guild_id,
+    guild_id: event.guild_id,
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: event.msg.channel_id,
+    channel_id: event.channel_id,
     at: false,
     at_user: undefined,
     at_users: [],
-    msg: event.msg?.content ?? '',
-    msg_txt: event.msg?.content ?? '',
-    msg_id: event.msg?.id ?? '',
+    msg: event?.content ?? '',
+    msg_txt: event?.content ?? '',
+    msg_id: event?.id ?? '',
     quote: '',
-    open_id: event.msg.guild_id,
+    open_id: event.guild_id,
 
-    user_id: event.msg?.author?.id ?? '',
-    user_name: event.msg?.author?.username ?? '',
-    user_avatar: event.msg?.author?.avatar ?? '',
+    user_id: event?.author?.id ?? '',
+    user_name: event?.author?.username ?? '',
+    user_avatar: event?.author?.avatar ?? '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
     /**
@@ -69,15 +66,15 @@ export const GUILD_MESSAGES = async (event: any) => {
       select?: MessageBingdingOption
     ): Promise<any> => {
       const withdraw = select?.withdraw ?? 0
-      const msg_id = select?.channel_id ?? event.msg?.id
+      const msg_id = select?.channel_id ?? event?.id
       if (select?.open_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
           withdraw,
           open_id: select?.open_id,
-          user_id: event.msg?.author?.id ?? ''
+          user_id: event?.author?.id ?? ''
         })
       }
-      const channel_id = select?.channel_id ?? event.msg.channel_id
+      const channel_id = select?.channel_id ?? event.channel_id
       return await replyController(msg, channel_id, msg_id, {
         quote: select?.quote,
         withdraw
@@ -97,13 +94,13 @@ export const GUILD_MESSAGES = async (event: any) => {
   }
 
   // 屏蔽其他机器人的消息
-  if (event.msg.author.bot) return
+  if (event.author.bot) return
 
-  if (event.msg.mentions) {
+  if (event.mentions) {
     /**
      * 去掉@ 转为纯消息
      */
-    for await (const item of event.msg.mentions) {
+    for await (const item of event.mentions) {
       if (item.bot != true) {
         // 用户艾特才会为真
         e.at = true

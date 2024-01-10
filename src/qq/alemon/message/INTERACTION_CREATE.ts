@@ -3,19 +3,19 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../../core/index.js'
-import { BotMessage } from '../../bot.js'
-import { segmentQQ } from '../../segment.js'
-import { Controllers } from '../../controller.js'
-import { directController } from '../../direct.js'
-import { replyController } from '../../reply.js'
+} from '../../../core/index.js'
+import { BotMessage } from '../bot.js'
+import { segmentQQ } from '../segment.js'
+import { Controllers } from '../controller.js'
+import { directController } from '../direct.js'
+import { replyController } from '../reply.js'
 
 /**
- * 按钮事件
-INTERACTION (1 << 26)
-  - INTERACTION_CREATE     // 互动事件创建时
+ * 交互消息事件 | 按钮消息
+ * @param event
+ * @returns
  */
-export const INTERACTION = async event => {
+export const INTERACTION_CREATE = async event => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const e = {
@@ -28,11 +28,11 @@ export const INTERACTION = async event => {
     isMaster: false,
     attachments: [],
     specials: [],
-    guild_id: event.msg.guild_id,
+    guild_id: event.guild_id,
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: event.msg.channel_id,
+    channel_id: event.channel_id,
     //
     at: false,
     at_user: undefined,
@@ -41,7 +41,7 @@ export const INTERACTION = async event => {
     msg_id: '',
     msg_txt: '',
     quote: '',
-    open_id: event.msg.guild_id,
+    open_id: event.guild_id,
 
     //
     user_id: '',
@@ -59,7 +59,7 @@ export const INTERACTION = async event => {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.msg.id
+      const msg_id = select?.msg_id ?? event.id
       const withdraw = select?.withdraw ?? 0
       if (select?.open_id && select?.user_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
@@ -68,20 +68,13 @@ export const INTERACTION = async event => {
           user_id: select?.user_id
         })
       }
-      const channel_id = select?.channel_id ?? event.msg.channel_id
+      const channel_id = select?.channel_id ?? event.channel_id
       return await replyController(msg, channel_id, msg_id, {
         quote: select?.quote,
         withdraw
       })
     },
     Controllers
-  }
-
-  /**
-   * 事件匹配
-   */
-  if (!new RegExp(/CREATE$/).test(event.eventType)) {
-    e.typing = 'DELETE'
   }
 
   APPS.responseEventType(e)
