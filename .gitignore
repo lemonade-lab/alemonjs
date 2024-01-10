@@ -8,6 +8,7 @@ lib/**/*
 types/**/*
 
 # test
+a.login.config.ts
 alemon.config.ts
 main.ts
 apps.ts

@@ -166,7 +166,9 @@ export class Alemon {
   async responseMessage(e: AMessage) {
     // 空的
     if (this.#list.isEmpty()) return
-    //
+
+    console.log('进来了', this.#list)
+
     const time = Date.now()
     /**
      * **********

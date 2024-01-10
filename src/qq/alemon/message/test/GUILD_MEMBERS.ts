@@ -3,16 +3,22 @@ import {
   type TypingEnum,
   type EventEnum,
   type MessageBingdingOption
-} from '../../../core/index.js'
+} from '../../../../core/index.js'
 
-import { segmentQQ } from '../segment.js'
-import { BotMessage } from '../bot.js'
-import { Controllers } from '../controller.js'
-import { BOTCONFIG } from '../../../config/index.js'
-import { directController } from '../direct.js'
-import { replyController } from '../reply.js'
+import { segmentQQ } from '../../segment.js'
+import { BotMessage } from '../../bot.js'
+import { Controllers } from '../../controller.js'
+import { BOTCONFIG } from '../../../../config/index.js'
+import { directController } from '../../direct.js'
+import { replyController } from '../../reply.js'
 
-interface EventGuildMembersType {
+/**
+GUILD_MEMBERS (1 << 1)
+  - GUILD_MEMBER_ADD       // 当成员加入时
+  - GUILD_MEMBER_UPDATE    // 当成员资料变更时
+  - GUILD_MEMBER_REMOVE    // 当成员被移除时
+ */
+export const GUILD_MEMBERS = async (event: {
   eventType: 'GUILD_MEMBER_ADD' | 'GUILD_MEMBER_UPDATE' | 'GUILD_MEMBER_REMOVE'
   eventId: string
   msg: {
@@ -29,15 +35,7 @@ interface EventGuildMembersType {
       username: string
     }
   }
-}
-
-/**
-GUILD_MEMBERS (1 << 1)
-  - GUILD_MEMBER_ADD       // 当成员加入时
-  - GUILD_MEMBER_UPDATE    // 当成员资料变更时
-  - GUILD_MEMBER_REMOVE    // 当成员被移除时
- */
-export const GUILD_MEMBERS = async (event: EventGuildMembersType) => {
+}) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const cfg = BOTCONFIG.get('qq')

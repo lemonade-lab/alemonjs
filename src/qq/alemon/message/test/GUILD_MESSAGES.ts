@@ -3,75 +3,27 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../core/index.js'
-import { segmentQQ } from '../segment.js'
-import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
-import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
-import { directController } from '../direct.js'
-
-interface PUBLIC_GUILD_MESSAGES_TYPE {
-  eventType: 'AT_MESSAGE_CREATE'
-  eventId: string
-  msg: {
-    attachments?: {
-      // id
-      id: string
-      // url
-      url: string
-      // 类型
-      content_type: string
-      // 文件名
-      filename: string
-      // 大小
-      size: number
-      // 高度
-      height: number
-      // 宽度
-      width: number
-    }[]
-    author: {
-      avatar: string
-      bot: boolean
-      id: string
-      username: string
-    }
-    channel_id: string
-    content: string
-    guild_id: string
-    id: string
-    member: {
-      joined_at: string
-      nick: string
-      roles: string[]
-    }
-    mentions: {
-      avatar: string
-      bot: boolean
-      id: string
-      username: string
-    }[]
-    seq: number
-    seq_in_channel: string
-    timestamp: string
-  }
-}
+} from '../../../../core/index.js'
+import { BotMessage } from '../../bot.js'
+import { segmentQQ } from '../../segment.js'
+import { BOTCONFIG } from '../../../../config/index.js'
+import { replyController } from '../../reply.js'
+import { Controllers } from '../../controller.js'
+import { directController } from '../../direct.js'
 
 /**
- * *
- * 公域
- * *
+ * *私域*
  */
 
-/**
- PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
- AT_MESSAGE_CREATE       // 当收到@机器人的消息时
- PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时
- */
-export const PUBLIC_GUILD_MESSAGES = async (
-  event: PUBLIC_GUILD_MESSAGES_TYPE
-) => {
+/** 
+GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置此 intents。
+  - MESSAGE_CREATE         
+  // 频道内的全部消息，
+  而不只是 at 机器人的消息。
+  内容与 AT_MESSAGE_CREATE 相同
+  - MESSAGE_DELETE         // 删除（撤回）消息事件
+ * */
+export const GUILD_MESSAGES = async (event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const cfg = BOTCONFIG.get('qq')
@@ -81,7 +33,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
     platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
-    boundaries: 'publick' as 'publick' | 'private',
+    boundaries: 'private' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
     isMaster: event.msg?.author?.id == masterID,
@@ -92,24 +44,22 @@ export const PUBLIC_GUILD_MESSAGES = async (
     guild_avatar: '',
     channel_name: '',
     channel_id: event.msg.channel_id,
-    //
     at: false,
     at_user: undefined,
     at_users: [],
-    msg_id: event.msg.id,
-    msg_txt: event.msg?.content ?? '',
     msg: event.msg?.content ?? '',
+    msg_txt: event.msg?.content ?? '',
+    msg_id: event.msg?.id ?? '',
     quote: '',
     open_id: event.msg.guild_id,
 
-    //
     user_id: event.msg?.author?.id ?? '',
     user_name: event.msg?.author?.username ?? '',
     user_avatar: event.msg?.author?.avatar ?? '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
     /**
-     * 发送消息
+     * 发现消息
      * @param msg
      * @param img
      * @returns
@@ -118,8 +68,8 @@ export const PUBLIC_GUILD_MESSAGES = async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.msg.id
       const withdraw = select?.withdraw ?? 0
+      const msg_id = select?.channel_id ?? event.msg?.id
       if (select?.open_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
           withdraw,
@@ -137,7 +87,7 @@ export const PUBLIC_GUILD_MESSAGES = async (
   }
 
   /**
-   * 消息撤回
+   * 撤回消息
    */
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.typing = 'DELETE'
@@ -197,4 +147,5 @@ export const PUBLIC_GUILD_MESSAGES = async (
   }
 
   APPS.responseMessage(e)
+  return
 }

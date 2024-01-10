@@ -60,19 +60,19 @@ export const defineNtqq: NTQQOptions = {
  */
 export class Client {
   //
-  counter = new Counter(1) // 初始值为1
+  #counter = new Counter(1) // 初始值为1
 
   // 标记是否已连接
-  isConnected = false
+  #isConnected = false
 
   // 存储最新的消息序号
-  heartbeat_interval = 30000
+  #heartbeat_interval = 30000
 
   // 鉴权
-  IntervalID = null
+  #IntervalID = null
 
   // url
-  gatewayUrl = null
+  #gatewayUrl = null
 
   /**
    * 设置配置
@@ -117,7 +117,7 @@ export class Client {
    * 鉴权数据
    * @returns
    */
-  aut() {
+  #aut() {
     const token = config.get('token')
     const intents = config.get('intents')
     const shard = config.get('shard')
@@ -146,12 +146,12 @@ export class Client {
     await this.#setTimeoutBotConfig()
 
     // 请求url
-    if (!this.gatewayUrl) this.gatewayUrl = await ClientNTQQ.gateway()
-    if (!this.gatewayUrl) return
+    if (!this.#gatewayUrl) this.#gatewayUrl = await ClientNTQQ.gateway()
+    if (!this.#gatewayUrl) return
 
     // 重新连接的逻辑
     const reconnect = async () => {
-      if (this.counter.get() >= 5) {
+      if (this.#counter.get() >= 5) {
         console.info(
           'The maximum number of reconnections has been reached, cancel reconnection'
         )
@@ -162,20 +162,20 @@ export class Client {
         // 重新starrt
         start()
         // 记录
-        this.counter.getNextID()
+        this.#counter.getNextID()
       }, 5000)
     }
 
     const start = () => {
-      if (this.gatewayUrl) {
+      if (this.#gatewayUrl) {
         const map = {
           0: async ({ t, d }) => {
             // 存在,则执行t对应的函数
             await conversation(t, d)
             // Ready Event，鉴权成功
             if (t === 'READY') {
-              this.IntervalID = setInterval(() => {
-                if (this.isConnected) {
+              this.#IntervalID = setInterval(() => {
+                if (this.#isConnected) {
                   ws.send(
                     JSON.stringify({
                       op: 1, //  op = 1
@@ -183,13 +183,13 @@ export class Client {
                     })
                   )
                 }
-              }, this.heartbeat_interval)
+              }, this.#heartbeat_interval)
             }
             // Resumed Event，恢复连接成功
             if (t === 'RESUMED') {
               console.info('[ws] restore connection')
               // 重制次数
-              this.counter.reStart()
+              this.#counter.reStart()
             }
             return
           },
@@ -201,7 +201,7 @@ export class Client {
             // 执行重新连接
             console.info('[ws] reconnect', d)
             // 取消鉴权发送
-            if (this.IntervalID) clearInterval(this.IntervalID)
+            if (this.#IntervalID) clearInterval(this.#IntervalID)
             return
           },
           9: ({ d, t }) => {
@@ -210,18 +210,18 @@ export class Client {
           },
           10: ({ d }) => {
             // 重制次数
-            this.isConnected = true
+            this.#isConnected = true
             // 记录新循环
-            this.heartbeat_interval = d.heartbeat_interval
+            this.#heartbeat_interval = d.heartbeat_interval
             // 发送鉴权
-            ws.send(JSON.stringify(this.aut()))
+            ws.send(JSON.stringify(this.#aut()))
             return
           },
           11: () => {
             // OpCode 11 Heartbeat ACK 消息，心跳发送成功
             console.info('[ws] heartbeat transmission')
             // 重制次数
-            this.counter.reStart()
+            this.#counter.reStart()
             return
           },
           12: ({ d }) => {
@@ -230,7 +230,7 @@ export class Client {
           }
         }
         // 连接
-        const ws = new WebSocket(this.gatewayUrl)
+        const ws = new WebSocket(this.#gatewayUrl)
         ws.on('open', () => {
           console.info('[ws] open')
         })

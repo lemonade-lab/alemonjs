@@ -72,7 +72,7 @@ export class Client {
    *
    * @returns
    */
-  aut() {
+  #aut() {
     const token = config.get('token')
     const intent = config.get('intent')
     const shard = config.get('shard')
@@ -94,21 +94,23 @@ export class Client {
   /**
    *
    */
-  reAut() {
+  #reAut() {
     const token = config.get('token')
     return {
       op: 6,
       d: {
         token: token,
-        session_id: this.session_id,
+        session_id: this.#session_id,
         seq: 1337
       }
     }
   }
 
-  heartbeat_interval = 0
-  session_id = ''
-  resume_gateway_url = ''
+  #heartbeat_interval = 0
+
+  #session_id = ''
+
+  #resume_gateway_url = ''
 
   /**
    * 创建ws监听
@@ -130,7 +132,7 @@ export class Client {
           d: null // 如果是第一次连接，传null
         })
       )
-      setTimeout(call, this.heartbeat_interval)
+      setTimeout(call, this.#heartbeat_interval)
     }
 
     //
@@ -138,15 +140,15 @@ export class Client {
       0: ({ d, t }) => {
         conversation(t, d)
         if (t == 'READY') {
-          this.session_id = d?.session_id
+          this.#session_id = d?.session_id
           if (d?.resume_gateway_url) {
-            this.resume_gateway_url = d?.resume_gateway_url
+            this.#resume_gateway_url = d?.resume_gateway_url
           }
         }
       },
       7: () => {
         console.info('[ws] 重新请求')
-        ws.send(JSON.stringify(this.reAut()))
+        ws.send(JSON.stringify(this.#reAut()))
       },
       9: message => {
         //  6 或 2 失败
@@ -159,7 +161,7 @@ export class Client {
        */
       10: ({ d }) => {
         const { heartbeat_interval: ih } = d
-        this.heartbeat_interval = ih
+        this.#heartbeat_interval = ih
         //
         ws.send(
           JSON.stringify({
@@ -167,9 +169,9 @@ export class Client {
             d: null
           })
         )
-        setTimeout(call, this.heartbeat_interval)
+        setTimeout(call, this.#heartbeat_interval)
         // 在初次握手期间启动新会话
-        ws.send(JSON.stringify(this.aut()))
+        ws.send(JSON.stringify(this.#aut()))
       },
       11: ({ d }) => {
         console.info('[ws] heartbeat transmission')

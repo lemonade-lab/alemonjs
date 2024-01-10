@@ -11,6 +11,7 @@ import { BOTCONFIG } from '../../../config/index.js'
 import { Controllers, directController } from '../direct.js'
 
 /**
+ * 私聊消息
  * @param event
  * @returns
  */

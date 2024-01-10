@@ -3,60 +3,50 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../core/index.js'
-import { BotMessage } from '../bot.js'
-import { segmentQQ } from '../segment.js'
-import { directController } from '../direct.js'
-import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
+} from '../../../../core/index.js'
+import { BotMessage } from '../../bot.js'
+import { segmentQQ } from '../../segment.js'
+import { Controllers } from '../../controller.js'
+import { directController } from '../../direct.js'
+import { replyController } from '../../reply.js'
 
 /**
- * TUDO
+ * 按钮事件
+INTERACTION (1 << 26)
+  - INTERACTION_CREATE     // 互动事件创建时
  */
-
-/**
- * AUDIO_MICROPHONE 音频
- * AUDIO_FREQUENCY 麦克风
- */
-
-/**
-AUDIO_ACTION (1 << 29)
-  - AUDIO_START             // 音频开始播放时  create
-  - AUDIO_FINISH            // 音频播放结束时 delete
-  - AUDIO_ON_MIC            // 上麦时  create
-  - AUDIO_OFF_MIC           // 下麦时 delete
- */
-export const AUDIO_ACTION = async (event: any) => {
+export const INTERACTION = async event => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const e = {
     platform: 'qq',
-    event: 'AUDIO_MICROPHONE' as (typeof EventEnum)[number],
+    event: 'INTERACTION' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
     isMaster: false,
+    attachments: [],
+    specials: [],
     guild_id: event.msg.guild_id,
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
     channel_id: event.msg.channel_id,
-    attachments: [],
-    specials: [],
     //
-    msg_id: '',
-    msg_txt: '',
-    msg: '',
     at: false,
     at_user: undefined,
     at_users: [],
+    msg: '',
+    msg_id: '',
+    msg_txt: '',
     quote: '',
     open_id: event.msg.guild_id,
+
     //
     user_id: '',
-    user_avatar: '',
     user_name: '',
+    user_avatar: '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
     /**
@@ -87,19 +77,13 @@ export const AUDIO_ACTION = async (event: any) => {
     Controllers
   }
 
-  if (new RegExp(/MIC$/).test(event.eventType)) {
-    if (!new RegExp(/ON_MIC$/).test(event.eventType)) {
-      // 下麦
-      e.typing = 'DELETE'
-    }
-  } else {
-    // 音频事件
-    e.event = 'AUDIO_FREQUENCY'
-    if (!new RegExp(/^AUDIO_START$/).test(event.eventType)) {
-      // 音频播放结束时
-      e.typing = 'DELETE'
-    }
+  /**
+   * 事件匹配
+   */
+  if (!new RegExp(/CREATE$/).test(event.eventType)) {
+    e.typing = 'DELETE'
   }
+
   APPS.responseEventType(e)
   return
 }

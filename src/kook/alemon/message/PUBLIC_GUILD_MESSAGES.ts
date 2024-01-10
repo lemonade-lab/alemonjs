@@ -14,7 +14,7 @@ import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
 
 /**
- *
+ * 群聊消息
  * @param event
  * @returns
  */
@@ -123,6 +123,6 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     Controllers
   }
 
-  APPS.responseEventType(e)
+  APPS.responseMessage(e)
   return
 }

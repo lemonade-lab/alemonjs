@@ -28,13 +28,13 @@ export const defineKOOK: KOOKOptions = {
 
 export class Client {
   // 标记是否已连接
-  isConnected = false
+  #isConnected = false
 
   // 存储 session ID
-  sessionID = ''
+  #sessionID = null
 
   // 存储最新的消息序号
-  lastMessageSN = 0
+  #lastMessageSN = 0
 
   /**
    * 获取鉴权
@@ -43,7 +43,7 @@ export class Client {
    * @param compress 下发数据是否压缩，默认为1，代表压缩
    * @returns
    */
-  async getGatewayUrl(): Promise<string | undefined> {
+  async #getGatewayUrl(): Promise<string | undefined> {
     // 替换为实际的接口地址
     const token = config.get('token')
     try {
@@ -82,7 +82,7 @@ export class Client {
    */
   async connect(conversation: (...args: any[]) => any) {
     // 请求url
-    const gatewayUrl = await this.getGatewayUrl()
+    const gatewayUrl = await this.#getGatewayUrl()
 
     if (gatewayUrl) {
       // 建立连接
@@ -94,18 +94,18 @@ export class Client {
            * 包括按序处理消息和记录最新的消息序号
            */
           if (d && sn) {
-            if (sn === this.lastMessageSN + 1) {
+            if (sn === this.#lastMessageSN + 1) {
               /**
                * 消息序号正确
                * 按序处理消息
                */
-              this.lastMessageSN = sn
+              this.#lastMessageSN = sn
               /**
                * 处理消息并传递给almeon
                */
               const event: EventData | SystemData = d
               await conversation(event)
-            } else if (sn > this.lastMessageSN + 1) {
+            } else if (sn > this.#lastMessageSN + 1) {
               /**
                * 消息序号乱序
                * 存入暂存区等待正确的序号处理
@@ -121,8 +121,8 @@ export class Client {
         1: ({ d }) => {
           if (d && d.code === 0) {
             console.info('[ws] ok')
-            this.sessionID = d.session_id
-            this.isConnected = true
+            this.#sessionID = d.session_id
+            this.#isConnected = true
           } else {
             console.info('[ws] err')
           }
@@ -147,14 +147,8 @@ export class Client {
            * 处理 RECONNECT 信令
            * 断开当前连接并进行重新连接
            */
-          this.isConnected = false
-          /**
-           *
-           */
-          this.sessionID = ''
-          /**
-           * 清空本地的 sn 计数和消息队列
-           */
+          this.#isConnected = false
+          this.#sessionID = null
         },
         6: message => {
           console.info('[ws] resume ack')
@@ -174,11 +168,11 @@ export class Client {
 
       // 心跳定时发送
       setInterval(() => {
-        if (this.isConnected) {
+        if (this.#isConnected) {
           ws.send(
             JSON.stringify({
               s: 2,
-              sn: this.lastMessageSN
+              sn: this.#lastMessageSN
             })
           )
         }

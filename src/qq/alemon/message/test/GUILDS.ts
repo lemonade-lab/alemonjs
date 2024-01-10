@@ -3,37 +3,21 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../core/index.js'
-import { BotMessage } from '../bot.js'
-import { segmentQQ } from '../segment.js'
-import { Controllers } from '../controller.js'
-import { directController } from '../direct.js'
-import { replyController } from '../reply.js'
+} from '../../../../core/index.js'
+import { BotMessage } from '../../bot.js'
+import { segmentQQ } from '../../segment.js'
+import { Controllers } from '../../controller.js'
+import { directController } from '../../direct.js'
+import { replyController } from '../../reply.js'
 
 /**
  * GUILD 频道
  * CHANNEL 子频道
  */
 
-interface EventChannelType {
-  eventType: string
-  eventId: string
-  msg: {
-    application_id?: string // 创建时
-    guild_id: string // 频道id
-    id: string
-    name: string // 频道name
-    op_user_id: string
-    owner_id: string
-    parent_id?: string // 创建时
-    permissions?: string // 创建时
-    position?: number // 创建时
-    private_type: number
-    speak_permission: number
-    sub_type: number
-    type: number
-  }
-}
+/**
+ * DO
+ */
 
 /**
 GUILDS (1 << 0)
@@ -46,8 +30,25 @@ GUILDS (1 << 0)
   - CHANNEL_UPDATE         // 当channel被更新时
   - CHANNEL_DELETE         // 当channel被删除时
  */
-
-export const CHANNEL = async (event: EventChannelType) => {
+export const GUILD = async (event: {
+  eventType: string
+  eventId: string
+  msg: {
+    description: string
+    icon: string // 频道 a
+    id: string // 频道 id
+    joined_at: string // msg_time
+    max_members: number
+    member_count: number
+    name: string // 频道name
+    op_user_id: string
+    owner: boolean
+    owner_id: string
+    union_appid: string
+    union_org_id: string
+    union_world_id: string
+  }
+}) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const e = {
@@ -66,7 +67,7 @@ export const CHANNEL = async (event: EventChannelType) => {
     isMaster: false,
     attachments: [],
     specials: [],
-    guild_id: event.msg?.guild_id, // ?
+    guild_id: event.msg.id,
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
@@ -79,7 +80,8 @@ export const CHANNEL = async (event: EventChannelType) => {
     msg_id: '',
     msg_txt: '',
     quote: '',
-    open_id: event.msg.guild_id,
+    open_id: event.msg.id,
+
     //
     user_id: '',
     user_name: '',

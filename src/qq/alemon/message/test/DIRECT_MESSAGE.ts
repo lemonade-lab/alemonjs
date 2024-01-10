@@ -3,13 +3,24 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../core/index.js'
-import { segmentQQ } from '../segment.js'
-import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
-import { Controllers, directController } from '../direct.js'
+} from '../../../../core/index.js'
+import { segmentQQ } from '../../segment.js'
+import { BotMessage } from '../../bot.js'
+import { BOTCONFIG } from '../../../../config/index.js'
+import { Controllers, directController } from '../../direct.js'
 
-interface directEventData {
+/**
+ * *
+ * 私信
+ * *
+ */
+
+/**
+DIRECT_MESSAGE (1 << 12)
+  - DIRECT_MESSAGE_CREATE   // 当收到用户发给机器人的私信消息时
+  - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
+ */
+export const DIRECT_MESSAGE = async (event: {
   eventType: 'AT_MESSAGE_CREATE'
   eventId: string
   msg: {
@@ -39,20 +50,7 @@ interface directEventData {
     src_guild_id: string
     timestamp: string
   }
-}
-
-/**
- * *
- * 私信
- * *
- */
-
-/**
-DIRECT_MESSAGE (1 << 12)
-  - DIRECT_MESSAGE_CREATE   // 当收到用户发给机器人的私信消息时
-  - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
- */
-export const DIRECT_MESSAGE = async (event: directEventData) => {
+}) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const open_id = event.msg?.guild_id

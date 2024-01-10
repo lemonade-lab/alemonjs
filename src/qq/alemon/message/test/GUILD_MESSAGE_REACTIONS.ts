@@ -3,15 +3,20 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
-} from '../../../core/index.js'
-import { BotMessage } from '../bot.js'
-import { segmentQQ } from '../segment.js'
-import { Controllers } from '../controller.js'
-import { BOTCONFIG } from '../../../config/index.js'
-import { directController } from '../direct.js'
-import { replyController } from '../reply.js'
+} from '../../../../core/index.js'
+import { BotMessage } from '../../bot.js'
+import { segmentQQ } from '../../segment.js'
+import { Controllers } from '../../controller.js'
+import { BOTCONFIG } from '../../../../config/index.js'
+import { directController } from '../../direct.js'
+import { replyController } from '../../reply.js'
 
-interface GUILD_MESSAGE_REACTIONS {
+/**
+GUILD_MESSAGE_REACTIONS (1 << 10)
+  - MESSAGE_REACTION_ADD    // 为消息添加表情表态
+  - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
+ */
+export const GUILD_MESSAGE_REACTIONS = async (event: {
   eventType: 'MESSAGE_REACTION_ADD' | 'MESSAGE_REACTION_REMOVE'
   eventId: string
   msg: {
@@ -24,16 +29,7 @@ interface GUILD_MESSAGE_REACTIONS {
     }
     user_id: string
   }
-}
-
-/**
-GUILD_MESSAGE_REACTIONS (1 << 10)
-  - MESSAGE_REACTION_ADD    // 为消息添加表情表态
-  - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
- */
-export const GUILD_MESSAGE_REACTIONS = async (
-  event: GUILD_MESSAGE_REACTIONS
-) => {
+}) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
   const cfg = BOTCONFIG.get('qq')

@@ -4,62 +4,100 @@ import {
   type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
-import { BotMessage } from '../bot.js'
 import { segmentQQ } from '../segment.js'
+import { BotMessage } from '../bot.js'
 import { BOTCONFIG } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
 
 /**
- * *私域*
+ * 公域
+ * @param event
+ * @returns
  */
-
-/** 
-GUILD_MESSAGES (1 << 9)    // 消息事件，仅 *私域* 机器人能够设置此 intents。
-  - MESSAGE_CREATE         
-  // 频道内的全部消息，
-  而不只是 at 机器人的消息。
-  内容与 AT_MESSAGE_CREATE 相同
-  - MESSAGE_DELETE         // 删除（撤回）消息事件
- * */
-export const GUILD_MESSAGES = async (event: any) => {
+export const AT_MESSAGE_CREATE = async (event: {
+  attachments?: {
+    // id
+    id: string
+    // url
+    url: string
+    // 类型
+    content_type: string
+    // 文件名
+    filename: string
+    // 大小
+    size: number
+    // 高度
+    height: number
+    // 宽度
+    width: number
+  }[]
+  author: {
+    avatar: string
+    bot: boolean
+    id: string
+    username: string
+  }
+  channel_id: string
+  content: string
+  guild_id: string
+  id: string
+  member: {
+    joined_at: string
+    nick: string
+    roles: string[]
+  }
+  mentions: {
+    avatar: string
+    bot: boolean
+    id: string
+    username: string
+  }[]
+  seq: number
+  seq_in_channel: string
+  timestamp: string
+}) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
 
-  const cfg = BOTCONFIG.get('qq')
-  const masterID = cfg.masterID
+  // 屏蔽其他机器人的消息
+  if (event.author.bot) return
+
+  const masterID = BOTCONFIG.get('qq').masterID
 
   const e = {
     platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
-    boundaries: 'private' as 'publick' | 'private',
+    boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.msg?.author?.id == masterID,
-    attachments: event?.msg?.attachments ?? [],
+    isMaster: event?.author?.id == masterID,
+    attachments: event?.attachments ?? [],
     specials: [],
-    guild_id: event.msg.guild_id,
+    guild_id: event.guild_id,
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: event.msg.channel_id,
+    channel_id: event.channel_id,
+    //
     at: false,
     at_user: undefined,
     at_users: [],
-    msg: event.msg?.content ?? '',
-    msg_txt: event.msg?.content ?? '',
-    msg_id: event.msg?.id ?? '',
+    msg_id: event.id,
+    msg_txt: event?.content ?? '',
+    msg: event?.content ?? '',
     quote: '',
-    open_id: event.msg.guild_id,
+    open_id: event.guild_id,
 
-    user_id: event.msg?.author?.id ?? '',
-    user_name: event.msg?.author?.username ?? '',
-    user_avatar: event.msg?.author?.avatar ?? '',
+    //
+    user_id: event?.author?.id ?? '',
+    user_name: event?.author?.username ?? '',
+    user_avatar: event?.author?.avatar ?? '',
     segment: segmentQQ,
     send_at: new Date().getTime(),
     /**
-     * 发现消息
+     * 发送消息
      * @param msg
      * @param img
      * @returns
@@ -68,16 +106,16 @@ export const GUILD_MESSAGES = async (event: any) => {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
+      const msg_id = select?.msg_id ?? event.id
       const withdraw = select?.withdraw ?? 0
-      const msg_id = select?.channel_id ?? event.msg?.id
       if (select?.open_id && select?.open_id != '') {
         return await directController(msg, select?.open_id, msg_id, {
           withdraw,
           open_id: select?.open_id,
-          user_id: event.msg?.author?.id ?? ''
+          user_id: event?.author?.id ?? ''
         })
       }
-      const channel_id = select?.channel_id ?? event.msg.channel_id
+      const channel_id = select?.channel_id ?? event.channel_id
       return await replyController(msg, channel_id, msg_id, {
         quote: select?.quote,
         withdraw
@@ -86,24 +124,11 @@ export const GUILD_MESSAGES = async (event: any) => {
     Controllers
   }
 
-  /**
-   * 撤回消息
-   */
-  if (new RegExp(/DELETE$/).test(event.eventType)) {
-    e.typing = 'DELETE'
-
-    APPS.responseEventType(e)
-    return
-  }
-
-  // 屏蔽其他机器人的消息
-  if (event.msg.author.bot) return
-
-  if (event.msg.mentions) {
+  if (event.mentions) {
     /**
      * 去掉@ 转为纯消息
      */
-    for await (const item of event.msg.mentions) {
+    for await (const item of event.mentions) {
       if (item.bot != true) {
         // 用户艾特才会为真
         e.at = true
@@ -147,5 +172,4 @@ export const GUILD_MESSAGES = async (event: any) => {
   }
 
   APPS.responseMessage(e)
-  return
 }
