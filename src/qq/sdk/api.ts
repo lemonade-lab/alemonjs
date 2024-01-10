@@ -486,7 +486,7 @@ class ClientQq {
   async channelsMessagesDelete(
     channel_id: string,
     message_id: string,
-    hidetip: boolean
+    hidetip: boolean = true
   ) {
     return this.request({
       method: 'DELETE',
@@ -521,6 +521,73 @@ class ClientQq {
    * 私信api
    * **********
    */
+
+  /**
+   * 创建私信会话
+   * @param recipient_id 接收者 id
+   * @param source_guild_id 源频道 id
+   * @returns
+   */
+  async usersMeDms(recipient_id: string, source_guild_id: string) {
+    return this.request({
+      method: 'POST',
+      url: `/users/@me/dms`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 发送私信
+   * @param guild_id
+   * @returns
+   */
+  async dmsMessage(
+    guild_id: string,
+    data: {
+      content?: string
+      embed?: any
+      ark?: any
+      message_reference?: any
+      image?: string
+      msg_id?: string
+      event_id?: string
+      markdown?: any
+    }
+  ) {
+    return this.request({
+      method: 'POST',
+      url: `/dms/${guild_id}/messages`,
+      data
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 撤回私信
+   * @param guild_id
+   * @param data
+   * @returns
+   */
+  async dmsMessageDelete(
+    guild_id: string,
+    message_id: string,
+    hidetip: boolean = true
+  ) {
+    return this.request({
+      method: 'DELETE',
+      url: `/dms/${guild_id}/messages/${message_id}?hidetip=${hidetip}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
 
   /**
    * *********

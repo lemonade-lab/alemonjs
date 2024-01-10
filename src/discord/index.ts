@@ -10,11 +10,8 @@ export async function createAlemon() {
     console.error('[LOGIN]', 'KOOK ERR')
     return
   }
-
   const c = new Client()
-
   c.set(discord)
-
   c.connect(conversation)
 }
 export { ClientDISOCRD } from './sdk/index.js'

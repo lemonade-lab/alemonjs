@@ -136,7 +136,7 @@ export class APlugin {
    * @param type 执行方法
    * @param isGroup 是否公信
    */
-  finish(isGroup = false) {
+  finish(func: string, isGroup = false) {
     // 取消订阅
     ASubscribe.cancel(this.conKey(isGroup))
   }

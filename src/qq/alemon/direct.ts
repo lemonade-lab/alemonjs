@@ -193,5 +193,8 @@ export async function directController(
     }
   }
 
-  return
+  return ClientQQ.dmsMessage(open_id, {
+    content,
+    msg_id
+  })
 }

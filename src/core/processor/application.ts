@@ -96,6 +96,7 @@ class App {
    * @returns
    */
   response(e: AEvent, event: (typeof EventEnum)[number]) {
+    if (process.env.ALEMONJS_AEVENT == 'dev') console.log('AEvent', e)
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     // 分发
     for (const [item, app] of AppMap) {
@@ -109,8 +110,7 @@ class App {
    * @returns
    */
   responseMessage(e: AEvent) {
-    if ((process.env.ALEMONJS_AEVENT = 'dev')) console.log('aevent', e)
-
+    if (process.env.ALEMONJS_AEVENT == 'dev') console.log('AEvent', e)
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
     const channel_sb = ASubscribe.find(e.channel_id)
@@ -142,6 +142,7 @@ class App {
    * @param e
    */
   responseEventType(e: AEvent) {
+    if (process.env.ALEMONJS_AEVENT == 'dev') console.log('AEvent', e)
     console.info(`[${e.event}] [${e.typing}]`)
     // 分发
     for (const [item, app] of AppMap) {
