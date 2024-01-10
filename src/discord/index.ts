@@ -1,4 +1,4 @@
-import { getIntents, createClient, config } from './sdk/index.js'
+import { Client } from './sdk/index.js'
 import { conversation } from './alemon/conversation.js'
 import { BOTCONFIG } from '../config/index.js'
 export async function createAlemon() {
@@ -10,11 +10,11 @@ export async function createAlemon() {
     console.error('[LOGIN]', 'KOOK ERR')
     return
   }
-  // 读取配置
-  const cfg = BOTCONFIG.get('discord')
-  config.set('token', cfg.token)
-  config.set('intent', getIntents(cfg.intent))
-  // 启动监听
-  createClient(conversation, cfg?.shard)
+
+  const c = new Client()
+
+  c.set(discord)
+
+  c.connect(conversation)
 }
 export { ClientDISOCRD } from './sdk/index.js'

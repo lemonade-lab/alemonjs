@@ -5,6 +5,9 @@ node_modules
 lib/**/*
 types/**/*
 
+# docs
+docs
+
 # 打印
 logs
 log

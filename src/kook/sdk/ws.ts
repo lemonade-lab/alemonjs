@@ -4,89 +4,108 @@ import { config } from './config.js'
 import { EventData, SystemData } from './typings.js'
 
 /**
- * 获取鉴权
- * @param token  token
- * @param url 请求地址
- * @param compress 下发数据是否压缩，默认为1，代表压缩
- * @returns
+ * ****
+ * ***
  */
-export async function getGatewayUrl(
+export interface KOOKOptions {
+  /**
+   * 钥匙
+   */
   token: string
-): Promise<string | undefined> {
-  // 替换为实际的接口地址
-  try {
-    const response = await axios
-      .get('https://www.kookapp.cn/api/v3/gateway/index', {
-        params: {
-          compress: 0
-        },
-        headers: {
-          Authorization: `Bot ${token}`
-        }
-      })
-      .then(res => res.data)
-    if (response.code === 0) {
-      return response.data.url
-    } else {
-      console.error('[getway] http err', response.message)
-    }
-  } catch (error) {
-    console.error('[getway] token err', error.message)
-  }
+  /**
+   * 主人编号
+   */
+  masterID?: string
 }
 
 /**
- * 使用获取到的网关连接地址建立 WebSocket 连接
- * @param token
- * @param conversation
+ *
  */
-export async function createClient(
-  token: string,
-  conversation: (...args: any[]) => any
-) {
-  // 设置token
-  config.set('token', token)
-  // 请求url
-  const gatewayUrl = await getGatewayUrl(token)
-  if (gatewayUrl) {
-    const ws = new WebSocket(gatewayUrl)
-    ws.on('open', () => {
-      console.info('[ws] open')
-    })
-    // 标记是否已连接
-    let isConnected = false
-    // 存储 session ID
-    let sessionID = ''
-    // 存储最新的消息序号
-    let lastMessageSN = 0
-    ws.on('message', async msg => {
-      const message = JSON.parse(msg.toString('utf8'))
-      const { s, d, sn } = message
-      if (process.env.KOOK_WS == 'dev') {
-        console.info('data', d)
+export const defineKOOK: KOOKOptions = {
+  token: '',
+  masterID: ''
+}
+
+export class Client {
+  // 标记是否已连接
+  isConnected = false
+
+  // 存储 session ID
+  sessionID = ''
+
+  // 存储最新的消息序号
+  lastMessageSN = 0
+
+  /**
+   * 获取鉴权
+   * @param token  token
+   * @param url 请求地址
+   * @param compress 下发数据是否压缩，默认为1，代表压缩
+   * @returns
+   */
+  async getGatewayUrl(): Promise<string | undefined> {
+    // 替换为实际的接口地址
+    const token = config.get('token')
+    try {
+      const response = await axios
+        .get('https://www.kookapp.cn/api/v3/gateway/index', {
+          params: {
+            compress: 0
+          },
+          headers: {
+            Authorization: `Bot ${token}`
+          }
+        })
+        .then(res => res.data)
+      if (response.code === 0) {
+        return response.data.url
+      } else {
+        console.error('[getway] http err', response.message)
       }
-      switch (s) {
-        /**
-         * 消息(包含聊天和通知消息)
-         */
-        case 0: {
+    } catch (error) {
+      console.error('[getway] token err', error.message)
+    }
+  }
+
+  /**
+   * 设置配置
+   * @param opstion
+   */
+  set(opstion: KOOKOptions) {
+    config.set('token', opstion.token)
+  }
+
+  /**
+   * 使用获取到的网关连接地址建立 WebSocket 连接
+   * @param token
+   * @param conversation
+   */
+  async connect(conversation: (...args: any[]) => any) {
+    // 请求url
+    const gatewayUrl = await this.getGatewayUrl()
+
+    if (gatewayUrl) {
+      // 建立连接
+
+      const map = {
+        0: async ({ d, sn }) => {
           /**
            * 处理 EVENT 信令
            * 包括按序处理消息和记录最新的消息序号
            */
           if (d && sn) {
-            if (sn === lastMessageSN + 1) {
+            if (sn === this.lastMessageSN + 1) {
               /**
                * 消息序号正确
                * 按序处理消息
                */
-              lastMessageSN = sn
+              this.lastMessageSN = sn
               /**
                * 处理消息并传递给almeon
                */
               const event: EventData | SystemData = d
               await conversation(event)
-            } else if (sn > lastMessageSN + 1) {
+            } else if (sn > this.lastMessageSN + 1) {
               /**
                * 消息序号乱序
                * 存入暂存区等待正确的序号处理
@@ -98,99 +117,80 @@ export async function createClient(
              * 则直接丢弃
              */
           }
-          break
-        }
-        /**
-         * 客户端连接 ws 时,
-         * 服务端返回握手结果
-         */
-        case 1: {
+        },
+        1: ({ d }) => {
           if (d && d.code === 0) {
             console.info('[ws] ok')
-            sessionID = d.session_id
-            isConnected = true
+            this.sessionID = d.session_id
+            this.isConnected = true
           } else {
             console.info('[ws] err')
           }
-          break
-        }
-        /**
-         * 心跳，ping
-         */
-        case 2: {
+        },
+        2: message => {
           console.info('[ws] ping')
           ws.send(
             JSON.stringify({
               s: 3
             })
           )
-          break
-        }
-        /**
-         * 心跳，pong
-         */
-        case 3: {
+        },
+        3: message => {
           console.info('[ws] pong')
-          break
-        }
-        /**
-         * resume, 恢复会话
-         */
-        case 4: {
+        },
+        4: message => {
           console.info('[ws] resume')
-          break
-        }
-        /**
-         * reconnect, 要求客户端断开当前连接重新连接
-         */
-        case 5: {
+        },
+        5: message => {
           console.info('[ws] Connection failed, reconnect')
           /**
            * 处理 RECONNECT 信令
            * 断开当前连接并进行重新连接
            */
-          isConnected = false
+          this.isConnected = false
           /**
            *
            */
-          sessionID = ''
+          this.sessionID = ''
           /**
            * 清空本地的 sn 计数和消息队列
            */
-          break
-        }
-        /**
-         * resume ack
-         */
-        case 6: {
+        },
+        6: message => {
           console.info('[ws] resume ack')
-          break
-        }
-        default: {
-          console.info('[ws] define')
-          break
         }
       }
-    })
 
-    // 心跳定时发送
-    setInterval(() => {
-      if (isConnected) {
-        ws.send(
-          JSON.stringify({
-            s: 2,
-            sn: lastMessageSN
-          })
-        )
-      }
-    }, 30000)
+      const ws = new WebSocket(gatewayUrl)
+      ws.on('open', () => {
+        console.info('[ws] open')
+      })
 
-    ws.on('close', () => {
-      console.error('[ws] close')
-    })
+      ws.on('message', async msg => {
+        const message = JSON.parse(msg.toString('utf8'))
+        if (process.env.KOOK_WS == 'dev') console.info('message', message)
+        if (map[message.s]) map[message.s](message)
+      })
 
-    ws.on('error', err => {
-      console.error('[ws] error', err)
-    })
+      // 心跳定时发送
+      setInterval(() => {
+        if (this.isConnected) {
+          ws.send(
+            JSON.stringify({
+              s: 2,
+              sn: this.lastMessageSN
+            })
+          )
+        }
+      }, 30000)
+
+      ws.on('close', () => {
+        console.error('[ws] close')
+      })
+
+      ws.on('error', err => {
+        console.error('[ws] error', err)
+      })
+    }
   }
 }

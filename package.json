@@ -8,8 +8,7 @@
     "tsc": "tsc",
     "ts": "ts-node",
     "doc": "typedoc --options typedoc.json",
-    "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
+    "format": "prettier --write ."
   },
   "dependencies": {
     "axios": "^1.4.0",
@@ -46,11 +45,6 @@
     "@types/progress": "^2.0.5",
     "@types/qrcode": "^1.5.0",
     "@types/ws": "^8.5.5",
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.60.0",
-    "eslint": "^8.43.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.2",
     "typedoc": "^0.25.4",

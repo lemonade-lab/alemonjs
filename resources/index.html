@@ -1,42 +1,39 @@
 <!DOCTYPE html>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title> AlemonJS Image</title>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlemonJS Image</title>
 
-  <style>
-    body,
-    html {
-      margin: 0;
-    };
-  </style>
+    <style>
+      body,
+      html {
+        margin: 0;
+      }
+    </style>
 
-  <ImageStyle />
+    <ImageStyle />
 
-  <ImageHead />
+    <ImageHead />
 
-  <ImageLink />
+    <ImageLink />
+  </head>
 
-</head>
+  <body>
+    <div id="app">
+      <ImageTemplate />
+    </div>
 
-<body>
+    <script src="~/vue.js"></script>
 
-  <div id="app">
-    <ImageTemplate />
-  </div>
-  
-  <script src="~/vue.js"></script>
+    <script>
+      const BOT_DATA = JSON.parse(`<ImageData/>`)
+      const { createApp } = Vue
+    </script>
 
-  <script>
-    const BOT_DATA = JSON.parse(`<ImageData/>`);
-    const { createApp } = Vue;
-  </script>
+    <ImageScript />
 
-  <ImageScript />
-  
-  <script src="~/ws.js"></script>
-
-</body>
-
+    <script src="~/ws.js"></script>
+  </body>
 </html>

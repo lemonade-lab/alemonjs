@@ -1,11 +1,11 @@
 import { type PuppeteerLaunchOptions } from 'puppeteer'
 import { type MysqlOptions, type RedisOptions } from '../default/index.js'
 import { type ServerOptions } from '../koa/types.js'
-import { type KOOKOptions } from '../kook/kook.js'
+import { type KOOKOptions } from '../kook/sdk/ws.js'
 import { type VILLAOptions } from '../villa/sdk/wss.js'
 import { type QQOptions } from '../qq/sdk/wss.js'
-import { type NTQQOptions } from '../ntqq/ntqq.js'
-import { type DISOCRDOptions } from '../discord/discord.js'
+import { type NTQQOptions } from '../ntqq/sdk/wss.js'
+import { type DISOCRDOptions } from '../discord/sdk/wss.js'
 /**
  * ******
  * config

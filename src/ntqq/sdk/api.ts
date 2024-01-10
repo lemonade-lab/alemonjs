@@ -50,19 +50,9 @@ class ClientNtqq {
       url: '/gateway'
     })
       .then(ApiLog)
-      .catch(err => {
-        console.error(err)
-      })
-      .then(data => {
-        const { url } = data
-        if (url) {
-          return url
-        } else {
-          console.error('[getway] http err:', null)
-        }
-      })
+      .then(data => data.url)
       .catch(error => {
-        console.error('[getway] token err:', error.message)
+        console.error('[getway] token ', error.message)
       })
   }
 
