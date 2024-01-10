@@ -39,13 +39,17 @@ export function analysis(val: LoginMap) {
       return {} as AlemonOptions['login']
     }
   }
+  let arr: string[] = []
   // 剔除不存在的
   for (const item in val[ket]) {
     if (!ars.includes(item)) {
       delete val[ket][item]
     }
   }
-  console.info('LOAD BOT', ket)
+  for (const item in val[ket]) {
+    arr.push(item)
+  }
+  console.info('[LOAD] BOT', ket, arr.join(' '))
   return val[ket] as AlemonOptions['login']
 }
 

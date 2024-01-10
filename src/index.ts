@@ -39,8 +39,8 @@ export * from './image/index.js'
  * exit
  * *************
  */
-process.on('SIGINT', signals => {
-  console.info(signals)
+process.on('SIGINT', () => {
+  console.info('[SIGINT] EXIT')
   if (process.pid) process.exit()
   return
 })

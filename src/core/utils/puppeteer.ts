@@ -74,11 +74,11 @@ class Pup {
     try {
       this.browser = await puppeteer.launch(this.launch)
       this.isBrowser = true
-      console.info('puppeteer open success')
+      console.info('[puppeteer] open success')
       return true
     } catch (err) {
       this.isBrowser = false
-      console.error('puppeteer err', err)
+      console.error('[puppeteer] err', err)
       return false
     }
   }
@@ -107,12 +107,12 @@ class Pup {
        * 重置次数
        */
       this.pic = 0
-      console.info('puppeteer close')
+      console.info('[puppeteer] close')
       this.isBrowser = false
       this.browser.close().catch(err => {
-        console.error('puppeteer close', err)
+        console.error('[puppeteer] close', err)
       })
-      console.info('puppeteer reopen')
+      console.info('[puppeteer] reopen')
       if (!(await this.start())) return false
       this.pic++
     }
@@ -138,23 +138,23 @@ class Pup {
       const page = await this.browser.newPage()
       await page.goto(`file://${htmlPath}`, { timeout })
       const body = await page.$(tab)
-      console.info('puppeteer success')
+      console.info('[puppeteer] success')
       const buff: string | false | Buffer = await body
         .screenshot(SOptions)
         .catch(err => {
-          console.error('puppeteer', 'screenshot', err)
+          console.error('[puppeteer]', 'screenshot', err)
           return false
         })
       await page.close().catch((err: any) => {
-        console.error('puppeteer', 'page close', err)
+        console.error('[puppeteer]', 'page close', err)
       })
       if (!buff) {
-        console.error('puppeteer', htmlPath)
+        console.error('[puppeteer]', htmlPath)
         return false
       }
       return buff
     } catch (err) {
-      console.error('puppeteer newPage', err)
+      console.error('[puppeteer] newPage', err)
       return false
     }
   }
@@ -186,11 +186,11 @@ class Pup {
         timeout: timeout ?? 120000,
         waitUntil
       })
-      console.info(`screenshot open ${isurl}`)
+      console.info('[screenshot] open', isurl)
       const body = await page.$(tab)
       if (!body) {
         await page.close()
-        console.error('screenshot tab err')
+        console.error('[screenshot] tab err')
         return false
       }
       await new Promise(resolve => setTimeout(resolve, time ?? 1000))
@@ -203,17 +203,17 @@ class Pup {
           }
         )
         .catch(err => {
-          console.error('screenshot page body', err)
+          console.error('[screenshot] page body', err)
           return false
         })
       await page.close()
       if (!buff) {
-        console.error('screenshot buffer err', url)
+        console.error('[screenshot] buffer err', url)
         return false
       }
       return buff
     } catch (err) {
-      console.error('screenshot newPage', err)
+      console.error('[screenshot] newPage', err)
       return false
     }
   }
