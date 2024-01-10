@@ -56,8 +56,6 @@ export async function MESSAGES(event: {
   id: string
   sendAt: number
 }) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const SendMessage = event.extendData.sendMessage
 
   /**

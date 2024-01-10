@@ -31,8 +31,6 @@ export const GUILD_MEMBER_UPDATE = async (event: {
     username: string
   }
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 

@@ -36,7 +36,7 @@ export interface NodeDataType {
   func: string
 }
 
-import { AMessage, EventEnum, TypingEnum } from '../typings.js'
+import { AEvent, EventEnum, TypingEnum } from '../typings.js'
 
 /**
  * 定时类型
@@ -94,4 +94,4 @@ export interface APluginInitType {
   task?: APluginTaskType
 }
 
-export type funcBase = (e: AMessage, ...args: any[]) => Promise<boolean | void>
+export type funcBase = (e: AEvent, ...args: any[]) => Promise<boolean | void>

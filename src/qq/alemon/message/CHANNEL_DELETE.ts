@@ -30,8 +30,6 @@ export const CHANNEL_DELETE = async (event: {
   sub_type: number
   type: number
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const e = {
     platform: 'qq',
     event: 'CHANNEL' as (typeof EventEnum)[number],

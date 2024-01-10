@@ -136,6 +136,8 @@ export class Client {
     }
   }
 
+  #ws: WebSocket
+
   /**
    *
    * @param cfg
@@ -176,7 +178,7 @@ export class Client {
             if (t === 'READY') {
               this.#IntervalID = setInterval(() => {
                 if (this.#isConnected) {
-                  ws.send(
+                  this.#ws.send(
                     JSON.stringify({
                       op: 1, //  op = 1
                       d: null // 如果是第一次连接，传null
@@ -214,7 +216,7 @@ export class Client {
             // 记录新循环
             this.#heartbeat_interval = d.heartbeat_interval
             // 发送鉴权
-            ws.send(JSON.stringify(this.#aut()))
+            this.#ws.send(JSON.stringify(this.#aut()))
             return
           },
           11: () => {
@@ -230,19 +232,19 @@ export class Client {
           }
         }
         // 连接
-        const ws = new WebSocket(this.#gatewayUrl)
-        ws.on('open', () => {
+        this.#ws = new WebSocket(this.#gatewayUrl)
+        this.#ws.on('open', () => {
           console.info('[ws] open')
         })
         // 监听消息
-        ws.on('message', async msg => {
+        this.#ws.on('message', async msg => {
           const message = JSON.parse(msg.toString('utf8'))
           if (process.env.NTQQ_WS == 'dev') console.info('message', message)
           // 根据 opcode 进行处理
           if (map[message.op]) await map[message.op](message)
         })
         // 关闭
-        ws.on('close', async err => {
+        this.#ws.on('close', async err => {
           await reconnect()
           console.info('[ws] close', err)
         })

@@ -41,8 +41,6 @@ export const DIRECT_MESSAGE_CREATE = async (event: {
   src_guild_id: string
   timestamp: string
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const open_id = event?.guild_id
 
   const cfg = BOTCONFIG.get('qq')

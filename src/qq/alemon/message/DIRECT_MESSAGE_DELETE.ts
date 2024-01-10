@@ -26,8 +26,6 @@ export const DIRECT_MESSAGE_DELETE = async (event: {
   }
   op_user: { id: string }
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const open_id = event.message?.guild_id
 
   const cfg = BOTCONFIG.get('qq')

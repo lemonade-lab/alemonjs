@@ -16,8 +16,6 @@ import { replyController } from '../reply.js'
  * @returns
  */
 export const INTERACTION_CREATE = async event => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const e = {
     platform: 'qq',
     event: 'INTERACTION' as (typeof EventEnum)[number],

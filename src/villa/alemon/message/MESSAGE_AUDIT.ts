@@ -45,8 +45,6 @@ export async function MESSAGE_AUDIT(event: {
   id: string // 消息编号
   sendAt: number // 发送事件编号
 }) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const AuditCallback = event.extendData.auditCallback
   const cfg = BOTCONFIG.get('villa')
   const masterID = cfg.masterID

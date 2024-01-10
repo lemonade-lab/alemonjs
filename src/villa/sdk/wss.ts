@@ -142,6 +142,8 @@ export class Client {
     }
   }
 
+  #ws: WebSocket
+
   /**
    * 连接
    * @param conversation
@@ -154,14 +156,14 @@ export class Client {
       return
     }
 
-    const ws = new WebSocket(this.#data.websocket_url)
-    ws.on('open', async () => {
+    this.#ws = new WebSocket(this.#data.websocket_url)
+    this.#ws.on('open', async () => {
       console.info('[ws] login open')
       // login
-      ws.send(createMessage(this.#getLoginData()))
+      this.#ws.send(createMessage(this.#getLoginData()))
     })
 
-    ws.on('message', message => {
+    this.#ws.on('message', message => {
       if (Buffer.isBuffer(message)) {
         try {
           const obj = parseMessage(new Uint8Array(message))
@@ -178,7 +180,7 @@ export class Client {
               this.#counter.reStart()
               // 20s 心跳
               this.#IntervalID = setInterval(() => {
-                ws.send(
+                this.#ws.send(
                   createMessage({
                     ID: this.#ID.getNextID(),
                     Flag: 1, // 发送
@@ -203,7 +205,7 @@ export class Client {
               if (this.#IntervalID) clearInterval(this.#IntervalID)
               if (this.#counter.get() < 5) {
                 // 重新发送鉴权
-                ws.send(createMessage(this.#getLoginData()))
+                this.#ws.send(createMessage(this.#getLoginData()))
               } else {
                 console.info('重鉴权次数上限')
               }
@@ -234,7 +236,7 @@ export class Client {
       }
     })
 
-    ws.on('error', error => {
+    this.#ws.on('error', error => {
       console.info('[ws] close', error)
     })
   }

@@ -7,6 +7,7 @@ import { BotMessage } from './bot.js'
  * @param d
  */
 export function conversation(t: string, d: any) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', d)
   if (t == 'READY') {
     // 设置bot信息
     BotMessage.set('id', d.user.id)

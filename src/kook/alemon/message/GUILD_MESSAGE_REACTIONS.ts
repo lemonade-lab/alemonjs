@@ -24,8 +24,6 @@ import { directController } from '../direct.js'
 export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
   const body = event.extra.body as StatementData
 
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const cfg = BOTCONFIG.get('kook')
   const masterID = cfg.masterID
 

@@ -30,8 +30,6 @@ export const GUILD_UPDATE = async (event: {
   union_org_id: string
   union_world_id: string
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const e = {
     platform: 'qq',
     event: 'GUILD' as (typeof EventEnum)[number],

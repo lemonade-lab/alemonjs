@@ -42,8 +42,6 @@ export async function MESSAGE_BUTTON(event: {
   id: string
   sendAt: number
 }) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const ClickMsgComponent = event.extendData.clickMsgComponent
 
   const cfg = BOTCONFIG.get('villa')

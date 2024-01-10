@@ -21,8 +21,6 @@ import { directController } from '../direct.js'
  * @returns
  */
 export const MESSAGE_CREATE = async (event: any) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 

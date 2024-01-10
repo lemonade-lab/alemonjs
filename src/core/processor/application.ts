@@ -1,4 +1,4 @@
-import { AMessage, EventEnum } from '../typings.js'
+import { AEvent, EventEnum } from '../typings.js'
 import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
 import { APPCONFIG } from './configs.js'
@@ -95,7 +95,7 @@ class App {
    * @param e
    * @returns
    */
-  response(e: AMessage, event: (typeof EventEnum)[number]) {
+  response(e: AEvent, event: (typeof EventEnum)[number]) {
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     // 分发
     for (const [item, app] of AppMap) {
@@ -108,7 +108,9 @@ class App {
    * @param e
    * @returns
    */
-  responseMessage(e: AMessage) {
+  responseMessage(e: AEvent) {
+    if ((process.env.ALEMONJS_AEVENT = 'dev')) console.log('aevent', e)
+
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
     const channel_sb = ASubscribe.find(e.channel_id)
@@ -139,7 +141,7 @@ class App {
    * 响应消息类型
    * @param e
    */
-  responseEventType(e: AMessage) {
+  responseEventType(e: AEvent) {
     console.info(`[${e.event}] [${e.typing}]`)
     // 分发
     for (const [item, app] of AppMap) {

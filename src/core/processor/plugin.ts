@@ -1,5 +1,5 @@
 import { APluginInitType, APluginRuleType, APluginTaskType } from './types.js'
-import { type AMessage, type EventEnum, type TypingEnum } from '../typings.js'
+import { type AEvent, type EventEnum, type TypingEnum } from '../typings.js'
 import { ASubscribe } from './subscribe.js'
 
 /**
@@ -11,7 +11,7 @@ export class APlugin {
   /**
    * this.e 方法
    */
-  e: AMessage
+  e: AEvent
   /**
    * 应用名
    */

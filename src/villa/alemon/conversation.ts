@@ -44,6 +44,7 @@ const ConversationMap = {
  * @param res
  */
 export async function conversation(event: any) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     return await ConversationMap[event.type](event)
   }

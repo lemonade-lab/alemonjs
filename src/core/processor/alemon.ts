@@ -1,4 +1,4 @@
-import { AMessage, EventEnum } from '../typings.js'
+import { AEvent, EventEnum } from '../typings.js'
 import { APlugin } from './plugin.js'
 import { NodeDataType } from './types.js'
 import { AppMap } from './data.js'
@@ -8,7 +8,7 @@ import memory from 'memory-cache'
 import { Help } from './help.js'
 import { APPCONFIG } from './configs.js'
 
-type CallBackType = (e: AMessage, ...args: any[]) => Promise<any>
+type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
 
 /**
  * 应用结构
@@ -116,7 +116,7 @@ export class Alemon {
    * @param e
    * @param node
    */
-  async responseNode(e: AMessage, node: NodeDataType) {
+  async responseNode(e: AEvent, node: NodeDataType) {
     //
     const time = Date.now()
     /**
@@ -163,7 +163,7 @@ export class Alemon {
    * 应用解析
    * @param e
    */
-  async responseMessage(e: AMessage) {
+  async responseMessage(e: AEvent) {
     // 空的
     if (this.#list.isEmpty()) return
     const time = Date.now()
@@ -300,7 +300,7 @@ export class Alemon {
    * 响应消息类型
    * @param e
    */
-  async responseEventType(e: AMessage) {
+  async responseEventType(e: AEvent) {
     // 空的
     if (this.#elist.isEmpty()) return
 
@@ -425,7 +425,7 @@ export class Alemon {
    * @param fnc
    * @returns
    */
-  arg(fnc: (e: AMessage) => any[] | Promise<any[]>) {
+  arg(fnc: (e: AEvent) => any[] | Promise<any[]>) {
     this.#dataMap.set('arg', fnc)
     return this
   }
@@ -437,7 +437,7 @@ export class Alemon {
    * @returns
    * @deprecated 已废弃
    */
-  setArg(fnc: (e: AMessage) => any[] | Promise<any[]>) {
+  setArg(fnc: (e: AEvent) => any[] | Promise<any[]>) {
     return this.arg(fnc)
   }
 
@@ -631,7 +631,7 @@ export class Alemon {
   }
 
   #infoFunc = (
-    e: AMessage,
+    e: AEvent,
     name: string,
     acount: number,
     example: string,
@@ -648,7 +648,7 @@ export class Alemon {
    */
   info(
     func: (
-      e: AMessage,
+      e: AEvent,
       name: string,
       acount: number,
       example: string,
@@ -660,7 +660,7 @@ export class Alemon {
   }
 
   #errorFunc = (
-    e: AMessage,
+    e: AEvent,
     name: string,
     acount: number,
     example: string,
@@ -677,7 +677,7 @@ export class Alemon {
    */
   error(
     func: (
-      e: AMessage,
+      e: AEvent,
       name: string,
       acount: number,
       example: string,
@@ -692,7 +692,7 @@ export class Alemon {
    * 响应消息类型
    * @param e
    */
-  async response(e: AMessage, event: (typeof EventEnum)[number]) {
+  async response(e: AEvent, event: (typeof EventEnum)[number]) {
     const time = Date.now()
     if (this.#CallData[event]) {
       const func = this.#dataMap.get('event')

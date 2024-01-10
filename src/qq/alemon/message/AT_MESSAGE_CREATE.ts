@@ -58,8 +58,6 @@ export const AT_MESSAGE_CREATE = async (event: {
   seq_in_channel: string
   timestamp: string
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   // 屏蔽其他机器人的消息
   if (event.author.bot) return
 

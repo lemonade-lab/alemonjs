@@ -112,6 +112,8 @@ export class Client {
 
   #resume_gateway_url = ''
 
+  #ws: WebSocket
+
   /**
    * 创建ws监听
    * @param conversation
@@ -126,7 +128,7 @@ export class Client {
     }
 
     const call = async () => {
-      ws.send(
+      this.#ws.send(
         JSON.stringify({
           op: 1, //  op = 1
           d: null // 如果是第一次连接，传null
@@ -148,7 +150,7 @@ export class Client {
       },
       7: () => {
         console.info('[ws] 重新请求')
-        ws.send(JSON.stringify(this.#reAut()))
+        this.#ws.send(JSON.stringify(this.#reAut()))
       },
       9: message => {
         //  6 或 2 失败
@@ -163,7 +165,7 @@ export class Client {
         const { heartbeat_interval: ih } = d
         this.#heartbeat_interval = ih
         //
-        ws.send(
+        this.#ws.send(
           JSON.stringify({
             op: 1,
             d: null
@@ -171,33 +173,33 @@ export class Client {
         )
         setTimeout(call, this.#heartbeat_interval)
         // 在初次握手期间启动新会话
-        ws.send(JSON.stringify(this.#aut()))
+        this.#ws.send(JSON.stringify(this.#aut()))
       },
       11: ({ d }) => {
         console.info('[ws] heartbeat transmission')
       }
     }
 
-    const ws = new WebSocket(`${url}?v=10&encoding=json`)
+    this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
 
-    ws.on('open', async () => {
+    this.#ws.on('open', async () => {
       console.info('[ws] open')
     })
 
     // 消息
-    ws.on('message', data => {
+    this.#ws.on('message', data => {
       const message = JSON.parse(data.toString())
       if (process.env?.DISCORD_WS == 'dev') console.info('message', message)
       if (map[message.op]) map[message.op](message)
     })
 
     // 关闭
-    ws.on('close', err => {
+    this.#ws.on('close', err => {
       console.error('[ws] 登录失败,TOKEN存在风险')
     })
 
     // 出错
-    ws.on('error', error => {
+    this.#ws.on('error', error => {
       console.error('[ws] error:', error)
     })
   }

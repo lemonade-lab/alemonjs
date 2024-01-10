@@ -30,6 +30,4 @@ interface CHANNEL_UPDATE_TYPE {
  * 基础消息
  * @param event
  */
-export async function CHANNEL_UPDATE(event: CHANNEL_UPDATE_TYPE) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-}
+export async function CHANNEL_UPDATE(event: CHANNEL_UPDATE_TYPE) {}

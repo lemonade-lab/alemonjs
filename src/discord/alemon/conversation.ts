@@ -19,6 +19,7 @@ import { GUILD_MEMBER_REMOVE } from './message/GUILD_MEMBER_REMOVE.js'
  * @param d
  */
 export function conversation(t: string, d: any) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', d)
   if (t == 'READY') {
     // 上线
     BotMessage.set('avatar', ClientDISOCRD.userAvatar(d.user.id, d.user.avatar))
@@ -65,10 +66,5 @@ export function conversation(t: string, d: any) {
   } else if (t == 'GUILD_MEMBER_REMOVE') {
     //
     GUILD_MEMBER_REMOVE(d)
-  } else {
-    if (process.env?.ALEMONJS_EVENT == 'dev') {
-      console.log(t)
-      console.log('数据', d)
-    }
   }
 }

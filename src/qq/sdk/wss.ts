@@ -116,6 +116,8 @@ export class Client {
     }
   }
 
+  #ws: WebSocket
+
   /**
    * opcode
    *
@@ -135,12 +137,6 @@ export class Client {
     this.#url = await ClientQQ.geteway().then(res => res.url)
     if (!this.#url) return
 
-    const ws = new WebSocket(this.#url)
-
-    ws.on('open', () => {
-      console.info('[ws] open')
-    })
-
     const map = {
       0: ({ d, t }) => {
         callBack(t, d)
@@ -151,7 +147,7 @@ export class Client {
              * 心跳定时发送
              */
             if (this.#isConnected) {
-              ws.send(
+              this.#ws.send(
                 JSON.stringify({
                   op: 1, //  op = 1
                   d: null // 如果是第一次连接，传null
@@ -178,7 +174,7 @@ export class Client {
         /**
          * 发送鉴权
          */
-        ws.send(JSON.stringify(this.#art()))
+        this.#ws.send(JSON.stringify(this.#art()))
       },
       11: message => {
         console.info('[ws] heartbeat transmission')
@@ -188,13 +184,20 @@ export class Client {
       }
     }
 
-    ws.on('message', msg => {
+    this.#ws = new WebSocket(this.#url)
+
+    this.#ws.on('open', () => {
+      console.info('[ws] open')
+    })
+
+    this.#ws.on('message', msg => {
       const message = JSON.parse(msg.toString('utf8'))
       // 根据 opcode 进行处理
+      if (process.env.QQ_WS == 'dev') console.info('message', message)
       if (map[message.op]) map[message.op](message)
     })
 
-    ws.on('close', () => {
+    this.#ws.on('close', () => {
       console.error('[ws]  close')
     })
   }

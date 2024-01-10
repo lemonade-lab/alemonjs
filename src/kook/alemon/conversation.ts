@@ -61,9 +61,6 @@ const ConversationMap = {
    */
   [255]: {
     public: async (event: SystemData) => {
-      // overheadData | memberData
-      if (process.env?.ALEMONJS_EVENT == 'dev') console.info(event.extra.body)
-
       if (
         event.extra.type == 'added_reaction' ||
         event.extra.type == 'deleted_reaction'
@@ -126,6 +123,7 @@ const ConversationMap = {
  * @param res
  */
 export async function conversation(event: EventData | SystemData) {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
   if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) {
     if (event.channel_type == 'GROUP') {
       return await ConversationMap[event.type]['public'](event)

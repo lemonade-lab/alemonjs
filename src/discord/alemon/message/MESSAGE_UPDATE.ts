@@ -50,6 +50,4 @@ interface MESSAGE_UPDATE_TYPE {
  * 基础消息
  * @param event
  */
-export async function MESSAGE_UPDATE(event: MESSAGE_UPDATE_TYPE) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-}
+export async function MESSAGE_UPDATE(event: MESSAGE_UPDATE_TYPE) {}

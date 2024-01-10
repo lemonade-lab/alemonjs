@@ -75,6 +75,8 @@ export class Client {
     config.set('token', opstion.token)
   }
 
+  #ws: WebSocket
+
   /**
    * 使用获取到的网关连接地址建立 WebSocket 连接
    * @param token
@@ -129,7 +131,7 @@ export class Client {
         },
         2: message => {
           console.info('[ws] ping')
-          ws.send(
+          this.#ws.send(
             JSON.stringify({
               s: 3
             })
@@ -155,12 +157,12 @@ export class Client {
         }
       }
 
-      const ws = new WebSocket(gatewayUrl)
-      ws.on('open', () => {
+      this.#ws = new WebSocket(gatewayUrl)
+      this.#ws.on('open', () => {
         console.info('[ws] open')
       })
 
-      ws.on('message', async msg => {
+      this.#ws.on('message', async msg => {
         const message = JSON.parse(msg.toString('utf8'))
         if (process.env.KOOK_WS == 'dev') console.info('message', message)
         if (map[message.s]) map[message.s](message)
@@ -169,7 +171,7 @@ export class Client {
       // 心跳定时发送
       setInterval(() => {
         if (this.#isConnected) {
-          ws.send(
+          this.#ws.send(
             JSON.stringify({
               s: 2,
               sn: this.#lastMessageSN
@@ -178,11 +180,11 @@ export class Client {
         }
       }, 30000)
 
-      ws.on('close', () => {
+      this.#ws.on('close', () => {
         console.error('[ws] close')
       })
 
-      ws.on('error', err => {
+      this.#ws.on('error', err => {
         console.error('[ws] error', err)
       })
     }

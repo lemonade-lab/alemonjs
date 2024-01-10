@@ -72,8 +72,6 @@ interface MESSAGES_TYPE {
 export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
   if (event.author?.bot) return
 
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const cfg = BOTCONFIG.get('discord')
   const masterID = cfg.masterID
 

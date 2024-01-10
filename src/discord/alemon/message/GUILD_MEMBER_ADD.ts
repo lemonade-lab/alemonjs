@@ -26,6 +26,4 @@ interface GUILD_MEMBER_ADD_TYPE {
  * 基础消息
  * @param event
  */
-export async function GUILD_MEMBER_ADD(event: GUILD_MEMBER_ADD_TYPE) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-}
+export async function GUILD_MEMBER_ADD(event: GUILD_MEMBER_ADD_TYPE) {}

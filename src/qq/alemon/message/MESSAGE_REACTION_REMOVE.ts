@@ -21,8 +21,6 @@ export const MESSAGE_REACTION_REMOVE = async (event: {
   }
   user_id: string
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const cfg = BOTCONFIG.get('qq')
   const masterID = cfg.masterID
 

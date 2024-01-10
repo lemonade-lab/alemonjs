@@ -12,8 +12,6 @@ import { BOTCONFIG } from '../../../config/index.js'
 import { directController, Controllers } from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const cfg = BOTCONFIG.get('ntqq')
   const masterID = cfg.masterID
 

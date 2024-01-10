@@ -66,6 +66,7 @@ const ConversationMap = {
  * @param ws
  */
 export const Conversation = (key: string, event: any) => {
+  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
   if (Object.prototype.hasOwnProperty.call(ConversationMap, key)) {
     ConversationMap[key](event)
   }

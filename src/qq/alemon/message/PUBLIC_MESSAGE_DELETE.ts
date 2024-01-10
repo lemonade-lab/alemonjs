@@ -24,8 +24,6 @@ export const PUBLIC_MESSAGE_DELETE = async (event: {
   }
   op_user: { id: string }
 }) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-
   const masterID = BOTCONFIG.get('qq').masterID
 
   const e = {

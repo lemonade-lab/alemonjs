@@ -3,7 +3,7 @@ import { ControllersType } from './types.js'
 /**
  * AlemonjsMessageData
  */
-export interface AMessage
+export interface AEvent
   extends EventBase,
     UserBase,
     MsgBase,
@@ -14,6 +14,8 @@ export interface AMessage
   // 允许自定义
   [key: string]: any
 }
+
+export type AMessage = AEvent
 
 /**
  * 事件相关
