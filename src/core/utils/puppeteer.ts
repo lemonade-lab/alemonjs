@@ -39,9 +39,13 @@ class Pup {
   isBrowser = false
   // 配置
   launch: PuppeteerLaunchOptions = {
+    // 禁用超时
+    timeout: 0,
+    protocolTimeout: 0,
+    // 请求头
     headless: 'new',
-    timeout: 30000,
     executablePath,
+    //
     args: [
       '--disable-gpu',
       '--disable-dev-shm-usage',
@@ -135,7 +139,10 @@ class Pup {
     if (!(await this.isStart())) return false
     const { SOptions, tab = 'body', timeout = 120000 } = Options
     try {
-      const page = await this.browser.newPage()
+      const page = await this.browser.newPage().catch(err => {
+        console.error(err)
+      })
+      if (!page) return false
       await page.goto(`file://${htmlPath}`, { timeout })
       const body = await page.$(tab)
       console.info('[puppeteer] success')
@@ -177,7 +184,11 @@ class Pup {
       waitUntil = 'networkidle2'
     } = val
     try {
-      const page = await this.browser.newPage()
+      // 经常出现超时错误
+      const page = await this.browser.newPage().catch(err => {
+        console.error(err)
+      })
+      if (!page) return false
       const query = params == undefined ? '' : queryString.stringify(params)
       const isurl = params == undefined ? url : `${url}?${query}`
       await page.setCacheEnabled(cache == undefined ? true : cache)

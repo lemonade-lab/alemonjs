@@ -770,3 +770,13 @@ export function createSubApp(AppName: string) {
 export function createApp(url: string) {
   return createSubApp(getAppName(url))
 }
+
+/**
+ * 创建应用对象
+ * @param url import.meta.url
+ * @returns
+ * @deprecated 已废弃
+ */
+export function createApps(url: string) {
+  return createApp(url)
+}
