@@ -1,6 +1,6 @@
 import { APluginInitType, APluginRuleType, APluginTaskType } from './types.js'
 import { type AEvent, type EventEnum, type TypingEnum } from '../typings.js'
-import { ASubscribe } from './subscribe.js'
+import { AObserver } from './subscribe.js'
 
 /**
  * alemonjs plugin
@@ -97,16 +97,16 @@ export class APlugin {
    */
   setContext(func: string, isGroup = false, time = 120) {
     // 订阅前确保前者删除
-    ASubscribe.cancel(this.conKey(isGroup))
+    AObserver.cancel(this.conKey(isGroup))
     // 订阅消息
-    const con = ASubscribe.add(
+    const con = AObserver.add(
       this.name,
       this.acount,
       this.example,
       func,
       this.conKey(isGroup),
       setTimeout(() => {
-        const ron = ASubscribe.cancel(this.conKey(isGroup))
+        const ron = AObserver.cancel(this.conKey(isGroup))
         // 定时取消成功
         if (ron) this.e.reply('操作已超时')
       }, time * 1000)
@@ -120,7 +120,7 @@ export class APlugin {
    * @returns message
    */
   getContext() {
-    return ASubscribe.find(this.conKey())
+    return AObserver.find(this.conKey())
   }
 
   /**
@@ -128,7 +128,7 @@ export class APlugin {
    * @returns message
    */
   getContextGroup() {
-    return ASubscribe.find(this.conKey(true))
+    return AObserver.find(this.conKey(true))
   }
 
   /**
@@ -138,7 +138,41 @@ export class APlugin {
    */
   finish(func: string, isGroup = false) {
     // 取消订阅
-    ASubscribe.cancel(this.conKey(isGroup))
+    AObserver.cancel(this.conKey(isGroup))
+  }
+
+  /**
+   * add
+   * @param func 执行方法
+   * @param isGroup 是否群聊
+   * @param time 操作时间，默认120秒
+   */
+  subscribe(func: string, isGroup = false, time = 120) {
+    // 订阅前确保前者删除
+    AObserver.cancel(this.conKey(isGroup))
+    // 订阅消息
+    const con = AObserver.add(
+      this.name,
+      this.acount,
+      this.example,
+      func,
+      this.conKey(isGroup),
+      setTimeout(() => {
+        const ron = AObserver.cancel(this.conKey(isGroup))
+        // 定时取消成功
+        if (ron) this.e.reply('操作已超时')
+      }, time * 1000)
+    )
+    if (!con) this.e.reply('订阅错误')
+  }
+
+  /**
+   * 移除
+   * @param isGroup 是否公信
+   */
+  cancel(isGroup = false) {
+    // 取消订阅
+    AObserver.cancel(this.conKey(isGroup))
   }
 }
 export const plugin = APlugin

@@ -156,13 +156,13 @@ class Controllers {
    * @param param0
    * @returns
    */
-  Message: (select: ControllerOption) => MessageControllerType
+  Message: (select?: ControllerOption) => MessageControllerType
   /**
    * 成员控制器
    * @param param0
    * @returns
    */
-  Member: (select: ControllerOption) => MemberControllerType
+  Member: (select?: ControllerOption) => MemberControllerType
 }
 
 export type ControllersType = typeof Controllers

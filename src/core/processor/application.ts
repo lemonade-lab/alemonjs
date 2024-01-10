@@ -3,7 +3,7 @@ import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
 import { APPCONFIG } from './configs.js'
 import { AppMap } from './data.js'
-import { ASubscribe } from './subscribe.js'
+import { AObserver } from './subscribe.js'
 import { loadError } from './log.js'
 
 /**
@@ -113,12 +113,12 @@ class App {
     if (process.env.ALEMONJS_AEVENT == 'dev') console.log('AEvent', e)
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
-    const channel_sb = ASubscribe.find(e.channel_id)
+    const channel_sb = AObserver.find(e.channel_id)
     if (channel_sb && channel_sb.node) {
       con = true
       AppMap.get(channel_sb.node.name).responseNode(e, channel_sb.node)
     }
-    const user_sb = ASubscribe.find(e.user_id)
+    const user_sb = AObserver.find(e.user_id)
     if (user_sb && user_sb.node && !con) {
       con = true
       AppMap.get(user_sb.node.name).responseNode(e, user_sb.node)

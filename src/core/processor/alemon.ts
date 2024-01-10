@@ -118,6 +118,9 @@ export class Alemon {
    */
   async responseNode(e: AEvent, node: NodeDataType) {
     //
+
+    if (!e) return
+
     const time = Date.now()
     /**
      * **********
@@ -125,7 +128,7 @@ export class Alemon {
      * **********
      */
     const func = this.#dataMap.get('event')
-    if (func) e = func(e)
+    if (typeof func == 'function') e = func(e)
     for (const item of this.#strArr) {
       e.msg = e.msg.replace(item.reg, item.str)
     }
@@ -134,7 +137,7 @@ export class Alemon {
     if (typeof argFunc == 'function') {
       arr = await argFunc(e)
     }
-    this.#data[node.acount][node.example].e = e
+    this.#data[node.acount][node.example]['e'] = e
     // 执行
     this.#data[node.acount][node.example]
       [node.func](e, ...arr)
@@ -165,7 +168,7 @@ export class Alemon {
    */
   async responseMessage(e: AEvent) {
     // 空的
-    if (this.#list.isEmpty()) return
+    if (this.#list.isEmpty() || !e) return
     const time = Date.now()
     /**
      * **********
@@ -173,7 +176,7 @@ export class Alemon {
      * **********
      */
     const func = this.#dataMap.get('event')
-    if (func) e = func(e)
+    if (typeof func == 'function') e = func(e)
     for (const item of this.#strArr) {
       e.msg = e.msg.replace(item.reg, item.str)
     }
@@ -183,11 +186,14 @@ export class Alemon {
       arr = await argFunc(e)
     }
 
+    const key = `${this.#name}:${e.msg}`
+
     // 自动延长过期周期
-    const CacheData: NodeDataType[] = memory.get(e.msg)
+    const CacheData: NodeDataType[] = memory.get(key)
+
     if (CacheData) {
       for (const node of CacheData) {
-        this.#data[node.acount][node.example].e = e
+        this.#data[node.acount][node.example]['e'] = e
         const time = Date.now()
         // 执行
         const res = await this.#data[node.acount][node.example]
@@ -240,7 +246,7 @@ export class Alemon {
     for (const node of this.#listArr) {
       // 索引匹配
       if (node.reg.test(e.msg)) {
-        this.#data[node.acount][node.example].e = e
+        this.#data[node.acount][node.example]['e'] = e
         // 执行
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
@@ -302,7 +308,7 @@ export class Alemon {
    */
   async responseEventType(e: AEvent) {
     // 空的
-    if (this.#elist.isEmpty()) return
+    if (this.#elist.isEmpty() || !e) return
 
     const time = Date.now()
 
@@ -311,7 +317,7 @@ export class Alemon {
      * ******
      */
     const func = this.#dataMap.get('event')
-    if (func) e = func(e)
+    if (typeof func == 'function') e = func(e)
     for (const item of this.#strArr) {
       e.msg = e.msg.replace(item.reg, item.str)
     }
@@ -321,13 +327,13 @@ export class Alemon {
       arr = await argFunc(e)
     }
 
-    const key = `${e.event}:${e.typing}`
+    const key = `${this.#name}:${e.event}:${e.typing}`
 
     // 自动延长过期周期
     const CacheData: NodeDataType[] = memory.get(key)
     if (CacheData) {
       for (const node of CacheData) {
-        this.#data[node.acount][node.example].e = e
+        this.#data[node.acount][node.example]['e'] = e
         const time = Date.now()
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
@@ -379,7 +385,7 @@ export class Alemon {
       // 类型不符
       if (node.event !== e.event || node.typing !== e.typing) continue
       //
-      this.#data[node.acount][node.example].e = e
+      this.#data[node.acount][node.example]['e'] = e
       const res = await this.#data[node.acount][node.example]
         [node.func](e, ...arr)
         .then(res => {
@@ -696,7 +702,7 @@ export class Alemon {
     const time = Date.now()
     if (this.#CallData[event]) {
       const func = this.#dataMap.get('event')
-      if (func) e = func(e)
+      if (typeof func == 'function') e = func(e)
       for (const item of this.#strArr) {
         e.msg = e.msg.replace(item.reg, item.str)
       }

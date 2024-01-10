@@ -67,4 +67,4 @@ export class Subscribe {
     return this.#sb[key]
   }
 }
-export const ASubscribe = new Subscribe()
+export const AObserver = new Subscribe()
