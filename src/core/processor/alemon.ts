@@ -6,7 +6,7 @@ import { getAppName } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
 import { AInstruct } from './help.js'
-import { APPCONFIG } from './configs.js'
+import { AppLoadConfig } from './configs.js'
 
 type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
 
@@ -519,7 +519,7 @@ export class Alemon {
       const keys = new AplguinMap[example]()
 
       // 过滤事件
-      const event = APPCONFIG.get('event')
+      const event = AppLoadConfig.get('event')
       if (keys.event && event.includes(keys.event)) {
         continue
       }

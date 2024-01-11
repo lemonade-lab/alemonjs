@@ -92,7 +92,7 @@ export interface ApplicationProcessingOpsion {
 /**
  * 应用配置
  */
-export const APPCONFIG = new BaseConfig<ApplicationProcessingOpsion>({
+export const AppLoadConfig = new BaseConfig<ApplicationProcessingOpsion>({
   dir: '/plugins',
   main: '/main',
   type: 'stript',

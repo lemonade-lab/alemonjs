@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { existsSync, mkdirSync, readFileSync } from 'fs'
-import { APPCONFIG } from './configs.js'
+import { AppLoadConfig } from './configs.js'
 import { writeFile } from 'fs/promises'
 import { NodeDataType } from './types.js'
 export class AInstruct {
@@ -14,9 +14,9 @@ export class AInstruct {
    * @returns
    */
   get() {
-    const c = APPCONFIG.get('regex')
+    const c = AppLoadConfig.get('regex')
     if (!this.AppName || c === false) return {}
-    const dir = APPCONFIG.get('route')
+    const dir = AppLoadConfig.get('route')
     const basePath = join(process.cwd(), dir, `${this.AppName}.json`)
     return JSON.parse(readFileSync(basePath, 'utf8'))
   }
@@ -25,9 +25,9 @@ export class AInstruct {
    * @returns
    */
   create(arr: NodeDataType[]) {
-    const c = APPCONFIG.get('regex')
+    const c = AppLoadConfig.get('regex')
     if (!this.AppName || c === false) return
-    const dir = APPCONFIG.get('route')
+    const dir = AppLoadConfig.get('route')
     const basePath = join(process.cwd(), dir)
     if (!existsSync(basePath)) mkdirSync(basePath, { recursive: true })
     writeFile(

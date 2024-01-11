@@ -1,7 +1,7 @@
 import { AEvent, EventEnum } from '../typings.js'
 import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
-import { APPCONFIG } from './configs.js'
+import { AppLoadConfig } from './configs.js'
 import { AppMap } from './data.js'
 import { AObserver } from './subscribe.js'
 import { loadError } from './log.js'
@@ -16,13 +16,13 @@ class App {
    * @returns
    */
   async load() {
-    const dir = join(process.cwd(), APPCONFIG.get('dir'))
+    const dir = join(process.cwd(), AppLoadConfig.get('dir'))
     if (!existsSync(dir)) return
     const flies = readdirSync(dir)
     if (flies.length == 0) return
     // 读取配置
-    const open = APPCONFIG.get('openRegex')
-    const close: undefined | RegExp = APPCONFIG.get('closeRegex')
+    const open = AppLoadConfig.get('openRegex')
+    const close: undefined | RegExp = AppLoadConfig.get('closeRegex')
     // 排除
     const apps = flies
       .filter(item => open.test(item))
@@ -31,8 +31,8 @@ class App {
         return !close.test(item)
       })
     //动态扫描
-    const main = APPCONFIG.get('main')
-    const typeVal = APPCONFIG.get('type')
+    const main = AppLoadConfig.get('main')
+    const typeVal = AppLoadConfig.get('type')
     const types = []
     if (typeVal != 'stript') {
       types.push(typeVal)

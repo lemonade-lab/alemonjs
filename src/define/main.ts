@@ -1,6 +1,12 @@
 import { AlemonOptions } from './types.js'
 import { RebotMap } from './map.js'
-import { Screenshot, APPCONFIG, IP, APPS, loadError } from '../core/index.js'
+import {
+  Screenshot,
+  AppLoadConfig,
+  IP,
+  APPS,
+  loadError
+} from '../core/index.js'
 import { ABotConfig } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { ClientKOA } from '../koa/file.js'
@@ -176,12 +182,12 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
 
   // jsonCreate
   if (Options?.JSON?.init === false) {
-    APPCONFIG.set('regex', Options?.JSON.init)
+    AppLoadConfig.set('regex', Options?.JSON.init)
   }
 
   // json地址
   if (Options?.JSON?.address) {
-    APPCONFIG.set('route', Options?.JSON?.address)
+    AppLoadConfig.set('route', Options?.JSON?.address)
   }
 
   /**
@@ -205,13 +211,13 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ************
    */
   if (Options?.plugin?.directory) {
-    APPCONFIG.set('dir', Options?.plugin?.directory)
+    AppLoadConfig.set('dir', Options?.plugin?.directory)
   }
   if (Options?.plugin?.main) {
-    APPCONFIG.set('main', Options?.plugin?.main)
+    AppLoadConfig.set('main', Options?.plugin?.main)
   }
   if (Options?.plugin?.type) {
-    APPCONFIG.set('type', Options?.plugin?.type)
+    AppLoadConfig.set('type', Options?.plugin?.type)
   }
 
   /**
@@ -220,10 +226,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ***********
    */
   if (Options?.plugin?.RegexOpen) {
-    APPCONFIG.set('openRegex', Options?.plugin?.RegexOpen)
+    AppLoadConfig.set('openRegex', Options?.plugin?.RegexOpen)
   }
   if (Options?.plugin?.RegexClose) {
-    APPCONFIG.set('closeRegex', Options?.plugin?.RegexClose)
+    AppLoadConfig.set('closeRegex', Options?.plugin?.RegexClose)
   }
 
   /**
@@ -245,7 +251,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     Array.isArray(Options.shieldEvent) &&
     shieldEvent.every((item: any) => typeof item === 'string')
   ) {
-    APPCONFIG.set('event', shieldEvent)
+    AppLoadConfig.set('event', shieldEvent)
   }
 
   /**
