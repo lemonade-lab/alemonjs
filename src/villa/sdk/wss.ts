@@ -105,7 +105,6 @@ export class Client {
    */
   set(options: VILLAOptions) {
     config.set('bot_id', options.bot_id)
-
     config.set(
       'bot_secret',
       options?.pub_key
@@ -118,6 +117,7 @@ export class Client {
       `${options.villa_id}.${options.secret}.${options.bot_id}`
     )
     config.set('villa_id', options?.villa_id ?? 0)
+    return this
   }
 
   /**

@@ -58,6 +58,14 @@ export const defineDISCORD: DISOCRDOptions = {
 }
 
 export class Client {
+  #heartbeat_interval = 0
+
+  #session_id = ''
+
+  #resume_gateway_url = ''
+
+  #ws: WebSocket
+
   /**
    * 设置配置
    * @param opstion
@@ -66,6 +74,7 @@ export class Client {
     config.set('intent', getIntents(opstion.intent))
     config.set('shard', opstion.shard)
     config.set('token', opstion.token)
+    return this
   }
 
   /**
@@ -105,14 +114,6 @@ export class Client {
       }
     }
   }
-
-  #heartbeat_interval = 0
-
-  #session_id = ''
-
-  #resume_gateway_url = ''
-
-  #ws: WebSocket
 
   /**
    * 创建ws监听

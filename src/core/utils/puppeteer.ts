@@ -62,6 +62,7 @@ class Pup {
    */
   setLaunch(val: PuppeteerLaunchOptions) {
     this.launch = val
+    return this
   }
   /**
    * 获取

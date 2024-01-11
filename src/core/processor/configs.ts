@@ -15,6 +15,7 @@ export class BaseBotMessage<D> {
     if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
       this.#data[key] = val
     }
+    return this
   }
   /**
    * 读取配置
@@ -43,6 +44,7 @@ export class BaseConfig<D> {
     if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
       this.#data[key] = val
     }
+    return this
   }
   /**
    * 读取配置

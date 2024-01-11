@@ -10,9 +10,7 @@ export async function createAlemon() {
     console.error('[LOGIN]', 'QQ ERR')
     return
   }
-  const c = new Client()
-  c.set(qq)
-  c.connect(Conversation)
+  new Client().set(qq).connect(Conversation)
 }
 // 客户端
 export { ClientQQ } from './sdk/index.js'

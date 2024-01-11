@@ -17,11 +17,7 @@ export async function createAlemon() {
     return
   }
   // 创建客户端
-  const c = new Client()
-  // 设置
-  c.set(villa)
-  // 连接
-  c.connect(conversation)
+  new Client().set(villa).connect(conversation)
 }
 // 客户端
 export { ClientVILLA } from './sdk/index.js'

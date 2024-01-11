@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.2.0-rc.5",
+  "version": "1.2.0-rc.6",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "test": "ts-node apps.ts",

@@ -86,6 +86,7 @@ export class Client {
     config.set('isPrivate', opstion.isPrivate)
     config.set('sandbox', opstion.sandbox)
     config.set('secret', opstion.secret)
+    return this
   }
 
   /**

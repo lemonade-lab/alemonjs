@@ -15,17 +15,18 @@ export async function createAlemon() {
     console.error('[LOGIN]', 'KOOK ERR')
     return
   }
-  const c = new Client()
-  c.set(kook)
-  c.connect(conversation).then(async res => {
-    const data = await ClientKOOK.userMe().then(res => res?.data)
-    if (data) {
-      BotMessage.set('id', data.id)
-      BotMessage.set('name', data.username)
-      BotMessage.set('avatar', data.avatar)
-      console.info('KOOK Welcome back', data.username)
-    }
-  })
+  new Client()
+    .set(kook)
+    .connect(conversation)
+    .then(async res => {
+      const data = await ClientKOOK.userMe().then(res => res?.data)
+      if (data) {
+        BotMessage.set('id', data.id)
+        BotMessage.set('name', data.username)
+        BotMessage.set('avatar', data.avatar)
+        console.info('KOOK Welcome back', data.username)
+      }
+    })
 }
 // 客户端
 export { ClientKOOK } from './sdk/index.js'

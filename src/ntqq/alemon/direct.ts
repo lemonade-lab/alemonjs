@@ -1,172 +1,169 @@
 import {
   type ControllerOption,
   type UserInformationType,
-  ABuffer
+  ABuffer,
+  BaseConfig
 } from '../../core/index.js'
 import { ClientNTQQ } from '../sdk/index.js'
 import { ClientKOA } from '../../koa/index.js'
 
-export class Controllers {
-  select: ControllerOption
+export class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
-    this.select = select
+    super(select)
   }
-  Member(select?: ControllerOption) {
-    const guild_id = select.guild_id ?? this.select?.guild_id
-    const open_id = select.open_id ?? this.select?.open_id
-    const channel_id = select.channel_id ?? this.select?.channel_id
-    const msg_id = select.msg_id ?? this.select?.msg_id
-    const user_id = select.user_id ?? this.select?.user_id
-    return {
-      /**
-       * 查看信息
-       * @returns
-       */
-      information: async (): Promise<UserInformationType | false> => {
-        return false
-      },
-      /**
-       * 禁言
-       */
-      mute: async (option?: { time?: number; cancel?: boolean }) => {
-        return false
-      },
-      /**
-       * 踢出
-       */
-      remove: async () => {
-        return false
-      },
-      /**
-       * 身分组
-       * @param role_id 身分组编号
-       * @param is_add 默认添加行为
-       * @returns
-       */
-      operate: async (role_id: string, add = true) => {
-        return false
-      }
+
+  Member = {
+    /**
+     * 查看信息
+     * @returns
+     */
+    information: async (): Promise<UserInformationType | false> => {
+      return false
+    },
+    /**
+     * 禁言
+     */
+    mute: async (option?: { time?: number; cancel?: boolean }) => {
+      return false
+    },
+    /**
+     * 踢出
+     */
+    remove: async () => {
+      return false
+    },
+    /**
+     * 身分组
+     * @param role_id 身分组编号
+     * @param is_add 默认添加行为
+     * @returns
+     */
+    operate: async (role_id: string, add = true) => {
+      return false
     }
   }
 
-  Message(select?: ControllerOption) {
-    const guild_id = select.guild_id ?? this.select?.guild_id
-    const open_id = select.open_id ?? this.select?.open_id
-    const channel_id = select.channel_id ?? this.select?.channel_id
-    const msg_id = select.msg_id ?? this.select?.msg_id
-    const user_id = select.user_id ?? this.select?.user_id
-    return {
-      reply: async (
-        content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {
-        return await directController(content, open_id, msg_id)
-      },
-      quote: async (
-        content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {
-        return await directController(content, open_id, msg_id)
-      },
-      /**
-       * 更新信息
-       * @param content
-       * @returns
-       */
-      update: async (
-        content: Buffer | string | number | (Buffer | number | string)[]
-      ) => {
-        return false
-      },
-      withdraw: async (hideTip = true) => {
-        return false
-      },
-      pinning: async (cancel?: boolean) => {
-        return false
-      },
-      forward: async () => {
-        return false
-      },
-      horn: async (cancel?: boolean) => {
-        return false
-      },
-      emoji: async (msg: any[], cancel?: boolean) => {
-        // 不同的场景下 api不同  私聊是不具有这么多功能的
-        return []
-      },
-      /**
-       * 音频
-       * @param file
-       * @param name
-       */
-      audio: async (file: Buffer | string, name?: string) => {
-        if (typeof file == 'string') {
-          const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
-            srv_send_msg: false,
-            file_type: 3,
-            url: file
-          }).then(res => res.file_info)
-          if (!file_info) return false
-          await ClientNTQQ.usersOpenMessages(open_id, {
-            content: '',
-            media: {
-              file_info
-            },
-            msg_id,
-            msg_type: 7,
-            msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          })
-        }
-        return false
-      },
-      /**
-       * 视频
-       * @param file
-       * @param name
-       */
-      video: async (file: Buffer | string, name?: string) => {
-        if (typeof file == 'string') {
-          const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
-            srv_send_msg: false,
-            file_type: 2,
-            url: file
-          }).then(res => res.file_info)
-          if (!file_info) return false
-          await ClientNTQQ.usersOpenMessages(open_id, {
-            content: '',
-            media: {
-              file_info
-            },
-            msg_id,
-            msg_type: 7,
-            msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-          })
-        }
-        return
-      },
-      card: async (msg: any[]) => {
-        const arr = []
-        for (const item of msg) {
-          arr.push(
-            await ClientNTQQ.usersOpenMessages(open_id, {
-              msg_id,
-              msg_seq: ClientNTQQ.getMsgSeq(msg_id),
-              ...item
-            })
-          )
-        }
-        return arr
-      },
-      allUsers: async (
-        reactionObj: any,
-        options = {
-          cookie: '',
-          limit: 20
-        }
-      ) => {
-        return false
-      },
-      article: async (msg: any) => {
-        return false
+  Message = {
+    reply: async (
+      content: Buffer | string | number | (Buffer | number | string)[]
+    ) => {
+      const open_id = this.get('open_id')
+      const msg_id = this.get('msg_id')
+      return await directController(content, open_id, msg_id)
+    },
+    quote: async (
+      content: Buffer | string | number | (Buffer | number | string)[]
+    ) => {
+      const open_id = this.get('open_id')
+      const msg_id = this.get('msg_id')
+      return await directController(content, open_id, msg_id)
+    },
+    /**
+     * 更新信息
+     * @param content
+     * @returns
+     */
+    update: async (
+      content: Buffer | string | number | (Buffer | number | string)[]
+    ) => {
+      return false
+    },
+    withdraw: async (hideTip = true) => {
+      return false
+    },
+    pinning: async (cancel?: boolean) => {
+      return false
+    },
+    forward: async () => {
+      return false
+    },
+    horn: async (cancel?: boolean) => {
+      return false
+    },
+    emoji: async (msg: any[], cancel?: boolean) => {
+      // 不同的场景下 api不同  私聊是不具有这么多功能的
+      return []
+    },
+    /**
+     * 音频
+     * @param file
+     * @param name
+     */
+    audio: async (file: Buffer | string, name?: string) => {
+      const open_id = this.get('open_id')
+      const msg_id = this.get('msg_id')
+      if (typeof file == 'string') {
+        const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+          srv_send_msg: false,
+          file_type: 3,
+          url: file
+        }).then(res => res.file_info)
+        if (!file_info) return false
+        await ClientNTQQ.usersOpenMessages(open_id, {
+          content: '',
+          media: {
+            file_info
+          },
+          msg_id,
+          msg_type: 7,
+          msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+        })
       }
+      return false
+    },
+    /**
+     * 视频
+     * @param file
+     * @param name
+     */
+    video: async (file: Buffer | string, name?: string) => {
+      const open_id = this.get('open_id')
+      const msg_id = this.get('msg_id')
+      if (typeof file == 'string') {
+        const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+          srv_send_msg: false,
+          file_type: 2,
+          url: file
+        }).then(res => res.file_info)
+        if (!file_info) return false
+        await ClientNTQQ.usersOpenMessages(open_id, {
+          content: '',
+          media: {
+            file_info
+          },
+          msg_id,
+          msg_type: 7,
+          msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+        })
+      }
+      return
+    },
+    card: async (msg: any[]) => {
+      const open_id = this.get('open_id')
+      const msg_id = this.get('msg_id')
+      const arr = []
+      for (const item of msg) {
+        arr.push(
+          await ClientNTQQ.usersOpenMessages(open_id, {
+            msg_id,
+            msg_seq: ClientNTQQ.getMsgSeq(msg_id),
+            ...item
+          })
+        )
+      }
+      return arr
+    },
+    allUsers: async (
+      reactionObj: any,
+      options = {
+        cookie: '',
+        limit: 20
+      }
+    ) => {
+      return false
+    },
+    article: async (msg: any) => {
+      return false
     }
   }
 }

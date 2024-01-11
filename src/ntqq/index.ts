@@ -15,9 +15,7 @@ export async function createAlemon() {
     console.error('[LOGIN]', 'NTQQ ERR')
     return
   }
-  const c = new Client()
-  c.set(ntqq)
-  c.connect(conversation)
+  new Client().set(ntqq).connect(conversation)
 }
 // 客户端
 export { ClientNTQQ } from './sdk/index.js'

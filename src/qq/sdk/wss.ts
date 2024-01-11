@@ -94,6 +94,7 @@ export class Client {
     config.set('intents', opstion.intents)
     config.set('sandbox', opstion.sandbox)
     config.set('shard', opstion.shard)
+    return this
   }
 
   /**

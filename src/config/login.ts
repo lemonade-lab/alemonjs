@@ -40,6 +40,7 @@ class BaseConfig<D> {
         }
       }
     }
+    return this
   }
   /**
    * 读取配置

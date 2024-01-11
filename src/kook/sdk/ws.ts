@@ -73,6 +73,7 @@ export class Client {
    */
   set(opstion: KOOKOptions) {
     config.set('token', opstion.token)
+    return this
   }
 
   #ws: WebSocket
