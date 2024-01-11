@@ -21,8 +21,7 @@ export const MESSAGE_REACTION_ADD = async (event: {
   }
   user_id: string
 }) => {
-  const cfg = ABotConfig.get('qq')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('qq').masterID
 
   const e = {
     platform: 'qq',
@@ -31,7 +30,9 @@ export const MESSAGE_REACTION_ADD = async (event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.user_id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event?.user_id)
+      : event.user_id == masterID,
     guild_id: event.guild_id,
     guild_name: '',
     guild_avatar: '',

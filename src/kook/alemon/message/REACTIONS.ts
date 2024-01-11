@@ -24,8 +24,7 @@ import { directController } from '../direct.js'
 export const REACTIONS = async (event: SystemData) => {
   const body = event.extra.body as StatementData
 
-  const cfg = ABotConfig.get('kook')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('kook').masterID
 
   const data = await ClientKOOK.userChatCreate(body.user_id).then(
     res => res?.data
@@ -41,7 +40,9 @@ export const REACTIONS = async (event: SystemData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: BotMessage.get(),
-    isMaster: body.user_id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(body.user_id)
+      : body.user_id == masterID,
     guild_id: event.target_id, // 频道
     guild_name: '',
     guild_avatar: '',

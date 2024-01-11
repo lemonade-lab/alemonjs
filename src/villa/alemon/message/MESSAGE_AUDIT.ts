@@ -46,8 +46,7 @@ export async function MESSAGE_AUDIT(event: {
   sendAt: number // 发送事件编号
 }) {
   const AuditCallback = event.extendData.auditCallback
-  const cfg = ABotConfig.get('villa')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('villa').masterID
 
   const msg_id = `${AuditCallback.auditId}.${event.sendAt}`
 
@@ -65,7 +64,9 @@ export async function MESSAGE_AUDIT(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: masterID == String(AuditCallback.userId),
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(String(AuditCallback.userId))
+      : masterID == String(AuditCallback.userId),
     guild_id: String(AuditCallback.villaId),
     guild_name: '',
     guild_avatar: '',

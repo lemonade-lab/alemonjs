@@ -43,8 +43,7 @@ export const DIRECT_MESSAGE_CREATE = async (event: {
 }) => {
   const open_id = event?.guild_id
 
-  const cfg = ABotConfig.get('qq')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('qq').masterID
   const e = {
     platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -52,7 +51,9 @@ export const DIRECT_MESSAGE_CREATE = async (event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.author.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event?.author?.id)
+      : event.author.id == masterID,
     guild_id: event.guild_id,
     guild_name: '',
     guild_avatar: '',

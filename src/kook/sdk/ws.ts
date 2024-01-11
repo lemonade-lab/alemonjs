@@ -15,7 +15,7 @@ export interface KOOKOptions {
   /**
    * 主人编号
    */
-  masterID?: string
+  masterID?: string | string[]
 }
 
 /**

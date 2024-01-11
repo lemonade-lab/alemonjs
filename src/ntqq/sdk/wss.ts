@@ -25,7 +25,7 @@ export interface NTQQOptions {
   /**
    * 主人编号
    */
-  masterID?: string
+  masterID?: string | string[]
   /**
    * 事件订阅
    */

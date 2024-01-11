@@ -58,7 +58,9 @@ export async function MESSAGE_REACTION_ADD(event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.member.user.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.member.user.id)
+      : event.member.user.id == masterID,
     attachments: [],
     specials: [],
     guild_id: event.guild_id,

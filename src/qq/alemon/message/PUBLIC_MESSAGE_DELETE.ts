@@ -33,7 +33,9 @@ export const PUBLIC_MESSAGE_DELETE = async (event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.message.author.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.message.author.id)
+      : event.message.author.id == masterID,
     attachments: [],
     specials: [],
     guild_id: event.message.guild_id,

@@ -37,7 +37,9 @@ export async function GUILD_MEMBER_REMOVE(event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.user.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.user.id)
+      : event.user.id == masterID,
     attachments: [],
     specials: [],
     guild_id: event.guild_id,

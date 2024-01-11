@@ -27,8 +27,7 @@ export const DIRECT_MESSAGE_DELETE = async (event: {
 }) => {
   const open_id = event.message?.guild_id
 
-  const cfg = ABotConfig.get('qq')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('qq').masterID
   const e = {
     platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -36,7 +35,9 @@ export const DIRECT_MESSAGE_DELETE = async (event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.message.author.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.message.author.id)
+      : event.message.author.id == masterID,
     guild_id: event.message.guild_id,
     guild_name: '',
     guild_avatar: '',

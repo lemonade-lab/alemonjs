@@ -28,7 +28,7 @@ export interface VILLAOptions {
   /**
    * 主人编号
    */
-  masterID?: string
+  masterID?: string | string[]
   /**
    * 别野
    */

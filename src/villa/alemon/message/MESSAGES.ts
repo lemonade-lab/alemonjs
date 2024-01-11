@@ -134,8 +134,7 @@ export async function MESSAGES(event: {
    */
   const msg = txt.replace(/(@[^\s]+\s)(?!<)/g, '').trim()
 
-  const cfg = ABotConfig.get('villa')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('villa').masterID
 
   const msg_id = `${SendMessage.msgUid}.${SendMessage.sendAt}`
 
@@ -153,7 +152,9 @@ export async function MESSAGES(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: MessageContent.user.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(String(MessageContent.user.id))
+      : MessageContent.user.id == masterID,
     guild_id: String(SendMessage.villaId),
     guild_name: '',
     guild_avatar: '',

@@ -31,8 +31,7 @@ export const GUILD_MEMBER_ADD = async (event: {
     username: string
   }
 }) => {
-  const cfg = ABotConfig.get('qq')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('qq').masterID
 
   const e = {
     platform: 'qq',
@@ -41,7 +40,9 @@ export const GUILD_MEMBER_ADD = async (event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: masterID == event.user.id,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.user.id)
+      : masterID == event.user.id,
     attachments: [],
     specials: [],
     guild_id: event.guild_id,

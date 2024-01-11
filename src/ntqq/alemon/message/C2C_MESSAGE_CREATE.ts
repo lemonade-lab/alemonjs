@@ -24,7 +24,9 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.author.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.author.id)
+      : event.author.id == masterID,
     channel_id: event.author.user_openid,
     guild_name: '',
     guild_avatar: '',

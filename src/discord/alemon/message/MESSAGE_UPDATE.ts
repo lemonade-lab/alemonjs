@@ -112,7 +112,9 @@ export async function MESSAGE_UPDATE(event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.author?.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.author.id)
+      : event.author?.id == masterID,
     attachments: event?.attachments ?? [],
     specials: [],
     guild_id: event.guild_id,

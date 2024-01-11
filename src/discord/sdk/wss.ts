@@ -25,7 +25,7 @@ export interface DISOCRDOptions {
   /**
    * 主人编号
    */
-  masterID?: string
+  masterID?: string | string[]
 }
 /**
  *

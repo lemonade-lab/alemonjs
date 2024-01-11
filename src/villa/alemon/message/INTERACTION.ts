@@ -44,8 +44,7 @@ export async function INTERACTION(event: {
 }) {
   const ClickMsgComponent = event.extendData.clickMsgComponent
 
-  const cfg = ABotConfig.get('villa')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('villa').masterID
 
   const msg_id = `${ClickMsgComponent.msgUid}.0`
 
@@ -63,7 +62,9 @@ export async function INTERACTION(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: String(ClickMsgComponent.uid) == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(String(ClickMsgComponent.uid))
+      : String(ClickMsgComponent.uid) == masterID,
     guild_id: String(ClickMsgComponent.villaId),
     guild_name: '',
     guild_avatar: '',

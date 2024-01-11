@@ -41,7 +41,9 @@ export const GUILD_MEMBER_UPDATE = async (event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: masterID == event.user.id,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.user.id)
+      : masterID == event.user.id,
     attachments: [],
     specials: [],
     guild_id: event.guild_id,

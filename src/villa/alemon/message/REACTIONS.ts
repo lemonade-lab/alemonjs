@@ -48,9 +48,7 @@ export async function REACTIONS(event: {
 }) {
   const AddQuickEmoticon = event.extendData.addQuickEmoticon
 
-  const cfg = ABotConfig.get('villa')
-  const masterID = cfg.masterID
-
+  const masterID = ABotConfig.get('villa').masterID
   const msg_id = `${AddQuickEmoticon.msgUid}.${event.sendAt}`
 
   /**
@@ -69,7 +67,9 @@ export async function REACTIONS(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: masterID == String(AddQuickEmoticon.uid),
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(String(AddQuickEmoticon.uid))
+      : masterID == String(AddQuickEmoticon.uid),
     guild_id: String(AddQuickEmoticon.villaId),
     guild_name: '',
     guild_avatar: '',

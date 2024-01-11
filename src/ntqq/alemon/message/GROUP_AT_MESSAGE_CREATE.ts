@@ -29,7 +29,9 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.author.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.author.id)
+      : event.author.id == masterID,
     guild_id: event.group_id,
     guild_name: '',
     guild_avatar: '',

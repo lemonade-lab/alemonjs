@@ -43,8 +43,7 @@ export async function MEMBERS(event: {
 }) {
   const JoinVilla = event.extendData.joinVilla
 
-  const cfg = ABotConfig.get('villa')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('villa').masterID
 
   const msg_id = `${event.id}.${JoinVilla.joinAt}`
 
@@ -62,7 +61,9 @@ export async function MEMBERS(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: masterID == String(JoinVilla.joinUid),
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(String(JoinVilla.joinUid))
+      : masterID == String(JoinVilla.joinUid),
     guild_id: String(JoinVilla.villaId),
     guild_name: '',
     guild_avatar: '',

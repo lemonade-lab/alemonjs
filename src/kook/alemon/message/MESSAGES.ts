@@ -20,8 +20,7 @@ export const MESSAGES = async (event: EventData) => {
 
   const open_id = event.extra.code
 
-  const cfg = ABotConfig.get('kook')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('kook').masterID
 
   const avatar = event.extra.author.avatar
 
@@ -35,7 +34,9 @@ export const MESSAGES = async (event: EventData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: BotMessage.get(),
-    isMaster: event.extra.author.id == masterID,
+    isMaster: Array.isArray(masterID)
+      ? masterID.includes(event.extra.author.id)
+      : event.extra.author.id == masterID,
     guild_id: '', // 频道号
     guild_name: '',
     guild_avatar: '',
