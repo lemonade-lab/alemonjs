@@ -128,7 +128,7 @@ export class Alemon {
      * **********
      */
     const func = this.#dataMap.get('event')
-    if (typeof func == 'function') e = func(e)
+    if (typeof func == 'function') e = await func(e)
     for (const item of this.#strArr) {
       e.msg = e.msg.replace(item.reg, item.str)
     }
@@ -176,7 +176,7 @@ export class Alemon {
      * **********
      */
     const func = this.#dataMap.get('event')
-    if (typeof func == 'function') e = func(e)
+    if (typeof func == 'function') e = await func(e)
     for (const item of this.#strArr) {
       e.msg = e.msg.replace(item.reg, item.str)
     }
@@ -317,7 +317,7 @@ export class Alemon {
      * ******
      */
     const func = this.#dataMap.get('event')
-    if (typeof func == 'function') e = func(e)
+    if (typeof func == 'function') e = await func(e)
     for (const item of this.#strArr) {
       e.msg = e.msg.replace(item.reg, item.str)
     }
@@ -712,7 +712,7 @@ export class Alemon {
     const time = Date.now()
     if (this.#CallData[event]) {
       const func = this.#dataMap.get('event')
-      if (typeof func == 'function') e = func(e)
+      if (typeof func == 'function') e = await func(e)
       for (const item of this.#strArr) {
         e.msg = e.msg.replace(item.reg, item.str)
       }
