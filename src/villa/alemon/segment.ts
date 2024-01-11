@@ -1,7 +1,7 @@
-import { BUFFER } from '../../core/utils/index.js'
+import { ABuffer } from '../../core/utils/index.js'
 export const segmentVILLA = {
-  img: BUFFER.getPath,
-  qrcode: BUFFER.qrcode,
+  img: ABuffer.getPath,
+  qrcode: ABuffer.qrcode,
   http: (url: string) => {
     return `<http>${url}</http>`
   },

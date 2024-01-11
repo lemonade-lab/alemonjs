@@ -1,7 +1,7 @@
 import {
   type ControllerOption,
   type UserInformationType,
-  BUFFER
+  ABuffer
 } from '../../core/index.js'
 import { ClientNTQQ } from '../sdk/index.js'
 import { ClientKOA } from '../../koa/index.js'
@@ -99,14 +99,16 @@ export class Controllers {
        */
       audio: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
+          const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+            srv_send_msg: false,
+            file_type: 3,
+            url: file
+          }).then(res => res.file_info)
+          if (!file_info) return false
           await ClientNTQQ.usersOpenMessages(open_id, {
             content: '',
             media: {
-              file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
-                srv_send_msg: false,
-                file_type: 3,
-                url: file
-              }).then(res => res.file_info)
+              file_info
             },
             msg_id,
             msg_type: 7,
@@ -122,14 +124,16 @@ export class Controllers {
        */
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
+          const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+            srv_send_msg: false,
+            file_type: 2,
+            url: file
+          }).then(res => res.file_info)
+          if (!file_info) return false
           await ClientNTQQ.usersOpenMessages(open_id, {
             content: '',
             media: {
-              file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
-                srv_send_msg: false,
-                file_type: 2,
-                url: file
-              }).then(res => res.file_info)
+              file_info
             },
             msg_id,
             msg_type: 7,
@@ -184,14 +188,16 @@ export async function directController(
     try {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
+      const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+        srv_send_msg: false,
+        file_type: 1,
+        url: url
+      }).then(res => res.file_info)
+      if (!file_info) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
         media: {
-          file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
-            srv_send_msg: false,
-            file_type: 1,
-            url: url
-          }).then(res => res.file_info)
+          file_info
         },
         msg_id,
         msg_type: 7,
@@ -216,14 +222,16 @@ export async function directController(
       .join('')
     const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
     if (!url) return false
+    const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+      srv_send_msg: false,
+      file_type: 1,
+      url: url
+    }).then(res => res.file_info)
+    if (!file_info) return false
     return await ClientNTQQ.usersOpenMessages(open_id, {
       content: cont,
       media: {
-        file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
-          srv_send_msg: false,
-          file_type: 1,
-          url: url
-        }).then(res => res.file_info)
+        file_info
       },
       msg_id,
       msg_type: 7,
@@ -247,18 +255,20 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl)
+    const msg = await ABuffer.getUrl(getUrl)
     if (Buffer.isBuffer(msg)) {
       const url = await ClientKOA.getFileUrl(msg)
       if (!url) return false
+      const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+        srv_send_msg: false,
+        file_type: 1,
+        url: url
+      }).then(res => res.file_info)
+      if (!file_info) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
         media: {
-          file_info: await ClientNTQQ.postRichMediaByGroup(open_id, {
-            srv_send_msg: false,
-            file_type: 1,
-            url: url
-          }).then(res => res.file_info)
+          file_info
         },
         msg_id,
         msg_type: 7,

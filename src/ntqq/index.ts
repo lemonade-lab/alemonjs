@@ -1,15 +1,15 @@
-import { BOTCONFIG } from '../config/index.js'
+import { ABotConfig } from '../config/index.js'
 import { conversation } from './alemon/conversation.js'
 import { Client } from './sdk/index.js'
 export async function createAlemon() {
-  const ntqq = BOTCONFIG.get('ntqq')
+  const ntqq = ABotConfig.get('ntqq')
   if (
     (ntqq ?? '') !== '' &&
     (ntqq.appID ?? '') !== '' &&
     (ntqq.token ?? '') !== '' &&
     (ntqq.secret ?? '') !== ''
   ) {
-    BOTCONFIG.set('ntqq', ntqq)
+    ABotConfig.set('ntqq', ntqq)
   } else {
     console.error('[LOGIN]', '-----------------------')
     console.error('[LOGIN]', 'NTQQ ERR')

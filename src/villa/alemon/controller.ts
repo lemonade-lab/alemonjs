@@ -1,7 +1,7 @@
 import { ClientVILLA } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import { ControllerOption, UserInformationType } from '../../core/index.js'
-import { BOTCONFIG } from '../../config/index.js'
+import { ABotConfig } from '../../config/index.js'
 
 /**
  * 控制器
@@ -173,7 +173,7 @@ export class Controllers {
         )
 
         if (!data) return false
-        const cfg = BOTCONFIG.get('villa')
+        const cfg = ABotConfig.get('villa')
         const masterID = cfg.masterID
         return {
           id: data.member.basic.uid,

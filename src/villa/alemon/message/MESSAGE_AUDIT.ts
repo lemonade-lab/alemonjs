@@ -5,7 +5,7 @@ import {
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 
@@ -46,7 +46,7 @@ export async function MESSAGE_AUDIT(event: {
   sendAt: number // 发送事件编号
 }) {
   const AuditCallback = event.extendData.auditCallback
-  const cfg = BOTCONFIG.get('villa')
+  const cfg = ABotConfig.get('villa')
   const masterID = cfg.masterID
 
   const msg_id = `${AuditCallback.auditId}.${event.sendAt}`

@@ -1,15 +1,15 @@
 import { conversation } from './alemon/conversation.js'
 import { Client, ClientKOOK } from './sdk/index.js'
 import { BotMessage } from './alemon/bot.js'
-import { BOTCONFIG } from '../config/index.js'
+import { ABotConfig } from '../config/index.js'
 /**
  * 创建实例
  * @returns
  */
 export async function createAlemon() {
-  const kook = BOTCONFIG.get('kook')
+  const kook = ABotConfig.get('kook')
   if ((kook ?? '') !== '' && (kook.token ?? '') !== '') {
-    BOTCONFIG.set('kook', kook)
+    ABotConfig.set('kook', kook)
   } else {
     console.error('[LOGIN]', '-----------------------')
     console.error('[LOGIN]', 'KOOK ERR')

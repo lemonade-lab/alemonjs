@@ -1,4 +1,4 @@
-import { BUFFER } from '../../core/utils/index.js'
+import { ABuffer } from '../../core/utils/index.js'
 export const segmentKOOK = {
   at: (uid: string): string => {
     return `(met)${uid}(met)`
@@ -6,8 +6,8 @@ export const segmentKOOK = {
   atAll: (): string => {
     return `(met)all(met)`
   },
-  img: BUFFER.getPath,
-  qrcode: BUFFER.qrcode,
+  img: ABuffer.getPath,
+  qrcode: ABuffer.qrcode,
   http: (url: string) => {
     return `<http>${url}</http>`
   },

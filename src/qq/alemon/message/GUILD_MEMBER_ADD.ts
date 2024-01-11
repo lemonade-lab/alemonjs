@@ -8,7 +8,7 @@ import {
 import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { Controllers } from '../controller.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
 
@@ -31,7 +31,7 @@ export const GUILD_MEMBER_ADD = async (event: {
     username: string
   }
 }) => {
-  const cfg = BOTCONFIG.get('qq')
+  const cfg = ABotConfig.get('qq')
   const masterID = cfg.masterID
 
   const e = {

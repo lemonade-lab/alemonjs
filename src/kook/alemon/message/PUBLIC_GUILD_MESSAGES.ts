@@ -8,7 +8,7 @@ import {
 import { ClientKOOK, type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
@@ -60,7 +60,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     }
   }
 
-  const cfg = BOTCONFIG.get('kook')
+  const cfg = ABotConfig.get('kook')
   const masterID = cfg.masterID
 
   const avatar = event.extra.author.avatar
@@ -79,7 +79,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: BotMessage.get(),
-    isMaster: event.extra.author.id == masterID ? true : false,
+    isMaster: event.extra.author.id == masterID,
     guild_id: event.extra.guild_id, // 频道
     guild_name: '',
     guild_avatar: '',

@@ -13,6 +13,28 @@ import { VOICE_CHANNEL_STATUS_UPDATE } from './message/VOICE_CHANNEL_STATUS_UPDA
 import { MESSAGE_DELETE } from './message/MESSAGE_DELETE.js'
 import { CHANNEL_UPDATE } from './message/CHANNEL_UPDATE.js'
 import { GUILD_MEMBER_REMOVE } from './message/GUILD_MEMBER_REMOVE.js'
+
+const ConversationMap = {
+  READY: d => {
+    BotMessage.set('avatar', ClientDISOCRD.userAvatar(d.user.id, d.user.avatar))
+    BotMessage.set('id', d.user.id)
+    BotMessage.set('name', d.user.username)
+  },
+  MESSAGE_CREATE,
+  PRESENCE_UPDATE,
+  MESSAGE_UPDATE,
+  TYPING_START,
+  MESSAGE_REACTION_ADD,
+  VOICE_STATE_UPDATE,
+  GUILD_MEMBER_UPDATE,
+  GUILD_MEMBER_ADD,
+  CHANNEL_TOPIC_UPDATE,
+  VOICE_CHANNEL_STATUS_UPDATE,
+  MESSAGE_DELETE,
+  CHANNEL_UPDATE,
+  GUILD_MEMBER_REMOVE
+}
+
 /**
  *
  * @param t
@@ -20,51 +42,6 @@ import { GUILD_MEMBER_REMOVE } from './message/GUILD_MEMBER_REMOVE.js'
  */
 export function conversation(t: string, d: any) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', d)
-  if (t == 'READY') {
-    // 上线
-    BotMessage.set('avatar', ClientDISOCRD.userAvatar(d.user.id, d.user.avatar))
-    BotMessage.set('id', d.user.id)
-    BotMessage.set('name', d.user.username)
-  } else if (t == 'GUILD_CREATE') {
-    // 频道信息创建
-  } else if (t == 'MESSAGE_CREATE') {
-    // 消息创建
-    MESSAGE_CREATE(d)
-  } else if (t == 'PRESENCE_UPDATE') {
-    // 成员状态更新
-    PRESENCE_UPDATE(d)
-  } else if (t == 'MESSAGE_UPDATE') {
-    // 子频道信息更新
-    MESSAGE_UPDATE(d)
-  } else if (t == 'TYPING_START') {
-    //
-    TYPING_START(d)
-  } else if (t == 'MESSAGE_REACTION_ADD') {
-    //
-    MESSAGE_REACTION_ADD(d)
-  } else if (t == 'VOICE_STATE_UPDATE') {
-    //
-    VOICE_STATE_UPDATE(d)
-  } else if (t == 'GUILD_MEMBER_UPDATE') {
-    //
-    GUILD_MEMBER_UPDATE(d)
-  } else if (t == 'GUILD_MEMBER_ADD') {
-    //
-    GUILD_MEMBER_ADD(d)
-  } else if (t == 'CHANNEL_TOPIC_UPDATE') {
-    //
-    CHANNEL_TOPIC_UPDATE(d)
-  } else if (t == 'VOICE_CHANNEL_STATUS_UPDATE') {
-    //
-    VOICE_CHANNEL_STATUS_UPDATE(d)
-  } else if (t == 'MESSAGE_DELETE') {
-    //
-    MESSAGE_DELETE(d)
-  } else if (t == 'CHANNEL_UPDATE') {
-    //
-    CHANNEL_UPDATE(d)
-  } else if (t == 'GUILD_MEMBER_REMOVE') {
-    //
-    GUILD_MEMBER_REMOVE(d)
-  }
+  if (!Object.prototype.hasOwnProperty.call(ConversationMap, t)) return
+  ConversationMap[t](d)
 }

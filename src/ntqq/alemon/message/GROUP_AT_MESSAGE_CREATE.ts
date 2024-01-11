@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
 import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
@@ -19,7 +19,7 @@ import { directController } from '../direct.js'
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
-  const cfg = BOTCONFIG.get('ntqq')
+  const cfg = ABotConfig.get('ntqq')
   const masterID = cfg.masterID
 
   const e = {
@@ -29,7 +29,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.author.id == masterID ? true : false,
+    isMaster: event.author.id == masterID,
     guild_id: event.group_id,
     guild_name: '',
     guild_avatar: '',

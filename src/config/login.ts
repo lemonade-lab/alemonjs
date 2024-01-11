@@ -54,7 +54,7 @@ class BaseConfig<D> {
 /**
  * 机器人配置
  */
-export const BOTCONFIG = new BaseConfig<BotConfigType>({
+export const ABotConfig = new BaseConfig<BotConfigType>({
   ...DefaultConfig,
   kook,
   villa,

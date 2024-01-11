@@ -5,14 +5,18 @@ import {
   type MessageBingdingOption,
   type UserType
 } from '../../../core/index.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { Controllers } from '../controller.js'
 import { BotMessage } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'
 import { replyController } from '../reply.js'
 import { ClientDISOCRD } from '../../sdk/index.js'
 
-interface MESSAGES_TYPE {
+/**
+ * 基础消息
+ * @param event
+ */
+export async function MESSAGE_CREATE(event: {
   type: number
   tts: boolean
   timestamp: string
@@ -64,16 +68,10 @@ interface MESSAGES_TYPE {
   }
   attachments: any[]
   guild_id: string
-}
-/**
- * 基础消息
- * @param event
- */
-export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
+}) {
   if (event.author?.bot) return
 
-  const cfg = BOTCONFIG.get('discord')
-  const masterID = cfg.masterID
+  const masterID = ABotConfig.get('discord').masterID
 
   /**
    * 艾特消息处理
@@ -138,12 +136,9 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
     open_id: '',
 
     //
-    user_id: event.author?.id ?? '',
-    user_name: event.author?.username ?? '',
-    user_avatar: ClientDISOCRD.userAvatar(
-      event.author?.id,
-      event.author?.avatar
-    ),
+    user_id: event.author.id,
+    user_name: event.author.username,
+    user_avatar: ClientDISOCRD.userAvatar(event.author.id, event.author.avatar),
     segment: segmentDISCORD,
     send_at: new Date(event.timestamp).getTime(),
     /**
@@ -156,7 +151,6 @@ export async function MESSAGE_CREATE(event: MESSAGES_TYPE) {
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
     ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.id
       const withdraw = select?.withdraw ?? 0
       if (select?.open_id && select?.open_id != '') {
         return false

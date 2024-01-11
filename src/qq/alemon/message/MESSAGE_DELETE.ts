@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 import { BotMessage } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
@@ -21,7 +21,7 @@ import { directController } from '../direct.js'
  * @returns
  */
 export const MESSAGE_DELETE = async (event: any) => {
-  const cfg = BOTCONFIG.get('qq')
+  const cfg = ABotConfig.get('qq')
   const masterID = cfg.masterID
 
   const e = {

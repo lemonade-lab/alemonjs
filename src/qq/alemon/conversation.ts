@@ -1,5 +1,5 @@
 import { BotMessage } from './bot.js'
-import { BOTCONFIG } from '../../config/index.js'
+import { ABotConfig } from '../../config/index.js'
 import { AT_MESSAGE_CREATE } from './message/AT_MESSAGE_CREATE.js'
 import { PUBLIC_MESSAGE_DELETE } from './message/PUBLIC_MESSAGE_DELETE.js'
 import { MESSAGE_REACTION_REMOVE } from './message/MESSAGE_REACTION_REMOVE.js'
@@ -33,7 +33,7 @@ function READY(event: {
     1: number
   }
 }) {
-  const cfg = BOTCONFIG.get('qq')
+  const cfg = ABotConfig.get('qq')
   if (cfg.sandbox) console.info('ready', event)
   BotMessage.set('id', event.user.id)
   BotMessage.set('name', event.user.username)
@@ -67,7 +67,6 @@ const ConversationMap = {
  */
 export const Conversation = (key: string, event: any) => {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-  if (Object.prototype.hasOwnProperty.call(ConversationMap, key)) {
-    ConversationMap[key](event)
-  }
+  if (!Object.prototype.hasOwnProperty.call(ConversationMap, key)) return
+  ConversationMap[key](event)
 }

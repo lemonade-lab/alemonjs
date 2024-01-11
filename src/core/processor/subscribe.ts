@@ -5,7 +5,7 @@ import { NodeDataType } from './types.js'
  * 订阅
  * ***********
  */
-export class Subscribe {
+class Observer {
   #sb: {
     [key: string]: {
       // 定时器id
@@ -67,4 +67,4 @@ export class Subscribe {
     return this.#sb[key]
   }
 }
-export const AObserver = new Subscribe()
+export const AObserver = new Observer()

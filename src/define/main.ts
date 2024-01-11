@@ -1,22 +1,10 @@
 import { AlemonOptions } from './types.js'
 import { RebotMap } from './map.js'
 import { Screenshot, APPCONFIG, IP, APPS, loadError } from '../core/index.js'
-import { BOTCONFIG } from '../config/index.js'
+import { ABotConfig } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { ClientKOA } from '../koa/file.js'
 import { join } from 'path'
-
-class AlemonConfig {
-  data: AlemonOptions
-  get() {
-    this.data
-  }
-  set(val: AlemonOptions) {
-    this.data = val
-  }
-}
-
-export const ALEMONCONFIG = new AlemonConfig()
 
 /**
  * 配置机器人启动规则
@@ -24,17 +12,16 @@ export const ALEMONCONFIG = new AlemonConfig()
  */
 export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (!Options) return
-  ALEMONCONFIG.set(Options)
   /**
    * *******
    * pup配置
    * *******
    */
-  BOTCONFIG.set('puppeteer', Screenshot.launch)
+  ABotConfig.set('puppeteer', Screenshot.launch)
   if (Options?.puppeteer) {
-    BOTCONFIG.set('puppeteer', Options?.puppeteer)
+    ABotConfig.set('puppeteer', Options?.puppeteer)
   }
-  const pData = BOTCONFIG.get('puppeteer')
+  const pData = ABotConfig.get('puppeteer')
   Screenshot.setLaunch(pData)
   /**
    * *********
@@ -50,7 +37,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * *********
    */
   if (Options?.mysql) {
-    BOTCONFIG.set('mysql', Options.mysql)
+    ABotConfig.set('mysql', Options.mysql)
   }
   /**
    * *********
@@ -58,7 +45,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * *********
    */
   if (Options?.redis) {
-    BOTCONFIG.set('redis', Options.redis)
+    ABotConfig.set('redis', Options.redis)
   }
   /**
    * *********
@@ -66,7 +53,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * *********
    */
   if (Options?.server) {
-    BOTCONFIG.set('server', Options.server)
+    ABotConfig.set('server', Options.server)
   }
   /**
    * **********
@@ -86,26 +73,26 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   ) {
     if (Options.login?.ntqq) {
       // 自定义覆盖
-      BOTCONFIG.set('ntqq', Options.login.ntqq)
+      ABotConfig.set('ntqq', Options.login.ntqq)
     }
     if (Options.login?.kook) {
       // 自定义覆盖
-      BOTCONFIG.set('kook', Options.login.kook)
+      ABotConfig.set('kook', Options.login.kook)
     }
     if (Options.login?.villa) {
       // 自定义覆盖
-      BOTCONFIG.set('villa', Options.login.villa)
+      ABotConfig.set('villa', Options.login.villa)
     }
     if (Options.login?.discord) {
       // 自定义覆盖
-      BOTCONFIG.set('discord', Options.login.discord)
+      ABotConfig.set('discord', Options.login.discord)
     }
 
     // 开启私域
     if (Options.login?.qq) {
       // 开启私域
       if (Options.login?.qq?.isPrivate) {
-        BOTCONFIG.set('qq', {
+        ABotConfig.set('qq', {
           intents: [
             // 基础事件
             'GUILDS', //频道进出
@@ -123,7 +110,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           ...Options.login.qq
         })
       } else {
-        BOTCONFIG.set('qq', Options.login.qq)
+        ABotConfig.set('qq', Options.login.qq)
       }
     }
 

@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync } from 'fs'
 import { APPCONFIG } from './configs.js'
 import { writeFile } from 'fs/promises'
 import { NodeDataType } from './types.js'
-export class Help {
+export class AInstruct {
   AppName: string
   constructor(AppName?: string) {
     this.AppName = AppName

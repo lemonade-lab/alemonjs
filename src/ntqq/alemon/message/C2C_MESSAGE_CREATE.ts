@@ -7,12 +7,12 @@ import {
 import { segmentNTQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { USER_DATA } from '../types.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 
 import { directController, Controllers } from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
-  const cfg = BOTCONFIG.get('ntqq')
+  const cfg = ABotConfig.get('ntqq')
   const masterID = cfg.masterID
 
   const open_id = event.author.user_openid
@@ -24,7 +24,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'single' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.author.id == masterID ? true : false,
+    isMaster: event.author.id == masterID,
     channel_id: event.author.user_openid,
     guild_name: '',
     guild_avatar: '',

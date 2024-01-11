@@ -4,7 +4,7 @@ import {
   type MessageBingdingOption,
   APPS
 } from '../../../core/index.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
@@ -44,7 +44,7 @@ export async function MESSAGE_BUTTON(event: {
 }) {
   const ClickMsgComponent = event.extendData.clickMsgComponent
 
-  const cfg = BOTCONFIG.get('villa')
+  const cfg = ABotConfig.get('villa')
   const masterID = cfg.masterID
 
   const msg_id = `${ClickMsgComponent.msgUid}.0`

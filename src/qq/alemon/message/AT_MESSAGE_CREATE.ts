@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
@@ -61,7 +61,7 @@ export const AT_MESSAGE_CREATE = async (event: {
   // 屏蔽其他机器人的消息
   if (event.author.bot) return
 
-  const masterID = BOTCONFIG.get('qq').masterID
+  const masterID = ABotConfig.get('qq').masterID
 
   const e = {
     platform: 'qq',

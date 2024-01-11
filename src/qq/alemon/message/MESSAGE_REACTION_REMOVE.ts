@@ -7,7 +7,7 @@ import {
 import { BotMessage } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { Controllers } from '../controller.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
 
@@ -21,7 +21,7 @@ export const MESSAGE_REACTION_REMOVE = async (event: {
   }
   user_id: string
 }) => {
-  const cfg = BOTCONFIG.get('qq')
+  const cfg = ABotConfig.get('qq')
   const masterID = cfg.masterID
 
   const e = {

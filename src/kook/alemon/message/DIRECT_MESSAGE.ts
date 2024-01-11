@@ -7,7 +7,7 @@ import {
 import { type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { Controllers, directController } from '../direct.js'
 
 /**
@@ -20,7 +20,7 @@ export const DIRECT_MESSAGE = async (event: EventData) => {
 
   const open_id = event.extra.code
 
-  const cfg = BOTCONFIG.get('kook')
+  const cfg = ABotConfig.get('kook')
   const masterID = cfg.masterID
 
   const avatar = event.extra.author.avatar

@@ -1,6 +1,6 @@
 import { replyController } from './reply.js'
 import { ControllerOption, type UserInformationType } from '../../core/index.js'
-import { BOTCONFIG } from '../../config/index.js'
+import { ABotConfig } from '../../config/index.js'
 import { directController } from './direct.js'
 
 import { ClientQQ } from '../sdk/index.js'
@@ -24,7 +24,7 @@ export class Controllers {
       information: async (): Promise<UserInformationType | false> => {
         const data: any = {}
         if (data) {
-          const cfg = BOTCONFIG.get('qq')
+          const cfg = ABotConfig.get('qq')
           const masterID = cfg.masterID
           return {
             id: data.user.id,

@@ -4,7 +4,7 @@ import {
   type ControllerOption,
   type UserInformationType
 } from '../../core/index.js'
-import { BOTCONFIG } from '../../config/index.js'
+import { ABotConfig } from '../../config/index.js'
 
 export class Controllers {
   select: ControllerOption
@@ -24,7 +24,7 @@ export class Controllers {
         )
 
         if (data) {
-          const cfg = BOTCONFIG.get('qq')
+          const cfg = ABotConfig.get('qq')
           const masterID = cfg.masterID
           return {
             id: data.id,

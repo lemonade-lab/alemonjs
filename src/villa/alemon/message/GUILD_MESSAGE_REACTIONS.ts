@@ -5,7 +5,7 @@ import {
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 
@@ -48,7 +48,7 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
 }) {
   const AddQuickEmoticon = event.extendData.addQuickEmoticon
 
-  const cfg = BOTCONFIG.get('villa')
+  const cfg = ABotConfig.get('villa')
   const masterID = cfg.masterID
 
   const msg_id = `${AddQuickEmoticon.msgUid}.${event.sendAt}`

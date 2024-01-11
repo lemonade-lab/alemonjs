@@ -1,4 +1,4 @@
-import { BUFFER } from '../../core/index.js'
+import { ABuffer } from '../../core/index.js'
 import { ClientQQ } from '../sdk/index.js'
 
 /**
@@ -60,7 +60,7 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl)
+    const msg = await ABuffer.getUrl(getUrl)
     if (msg) {
       return await ClientQQ.postImage(channel_id, {
         msg_id: msg_id, //消息id, 必须

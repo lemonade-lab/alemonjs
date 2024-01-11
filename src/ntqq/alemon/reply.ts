@@ -17,14 +17,16 @@ export async function replyController(
   if (Buffer.isBuffer(msg)) {
     const url = await ClientKOA.getFileUrl(msg)
     if (!url) return false
+    const file_info = await ClientNTQQ.postRichMediaByGroup(guild_id, {
+      srv_send_msg: false,
+      file_type: 1,
+      url
+    }).then(res => res.file_info)
+    if (!file_info) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: '',
       media: {
-        file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
-          srv_send_msg: false,
-          file_type: 1,
-          url
-        }).then(res => res.file_info)
+        file_info
       },
       msg_id,
       msg_type: 7,
@@ -43,14 +45,16 @@ export async function replyController(
       .join('')
     const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
     if (!url) return false
+    const file_info = await ClientNTQQ.postRichMediaByGroup(guild_id, {
+      srv_send_msg: false,
+      file_type: 1,
+      url
+    }).then(res => res.file_info)
+    if (!file_info) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: cont,
       media: {
-        file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
-          srv_send_msg: false,
-          file_type: 1,
-          url
-        }).then(res => res.file_info)
+        file_info
       },
       msg_id,
       msg_type: 7,
@@ -71,14 +75,16 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
+    const file_info = await ClientNTQQ.postRichMediaByGroup(guild_id, {
+      srv_send_msg: false,
+      file_type: 1,
+      url: getUrl
+    }).then(res => res.file_info)
+    if (!file_info) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: '',
       media: {
-        file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
-          srv_send_msg: false,
-          file_type: 1,
-          url: getUrl
-        }).then(res => res.file_info)
+        file_info
       },
       msg_id,
       msg_type: 7,

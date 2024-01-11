@@ -5,6 +5,7 @@ import { APPCONFIG } from './configs.js'
 import { AppMap } from './data.js'
 import { AObserver } from './subscribe.js'
 import { loadError } from './log.js'
+import { Alemon } from './alemon.js'
 
 /**
  * 应用
@@ -54,18 +55,16 @@ class App {
 
   // 大正则数组
   #mergedRegexArr: RegExp[] = []
+
   // 数组化正则
   #regular: RegExp
-
-  /**
-   * ***********
-   * ***********
-   */
 
   /**
    * 初始化
    */
   init() {
+    // 清空
+    this.#mergedRegexArr = []
     // 得到所有key
     for (const item in AppMap.keys()) {
       const reg = AppMap.get(item).getReg()
@@ -148,6 +147,31 @@ class App {
     for (const [item, app] of AppMap) {
       app.responseEventType(e)
     }
+  }
+
+  /**
+   * 删除指定应用
+   * @param key
+   */
+  del(key: string) {
+    if (!AppMap.has(key)) return
+    // 删除
+    AppMap.delete(key)
+    // 重新init
+    this.init()
+  }
+
+  /**
+   * 设置指定应用
+   * @param key
+   * @param val
+   */
+  set(key: string, val: typeof Alemon.prototype) {
+    // 如果存在先删除
+    if (AppMap.has(key)) AppMap.delete(key)
+    AppMap.set(key, val)
+    // 重新init
+    this.init()
   }
 }
 

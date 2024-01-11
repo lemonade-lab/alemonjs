@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 import { directController } from '../direct.js'
@@ -24,7 +24,7 @@ export const PUBLIC_MESSAGE_DELETE = async (event: {
   }
   op_user: { id: string }
 }) => {
-  const masterID = BOTCONFIG.get('qq').masterID
+  const masterID = ABotConfig.get('qq').masterID
 
   const e = {
     platform: 'qq',
@@ -33,7 +33,7 @@ export const PUBLIC_MESSAGE_DELETE = async (event: {
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: BotMessage.get(),
-    isMaster: event.message.author.id == masterID ? true : false,
+    isMaster: event.message.author.id == masterID,
     attachments: [],
     specials: [],
     guild_id: event.message.guild_id,

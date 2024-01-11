@@ -1,4 +1,22 @@
-interface MESSAGE_UPDATE_TYPE {
+import {
+  APPS,
+  type EventEnum,
+  type TypingEnum,
+  type MessageBingdingOption,
+  type UserType
+} from '../../../core/index.js'
+import { ABotConfig } from '../../../config/index.js'
+import { Controllers } from '../controller.js'
+import { BotMessage } from '../bot.js'
+import { segmentDISCORD } from '../segment.js'
+import { replyController } from '../reply.js'
+import { ClientDISOCRD } from '../../sdk/index.js'
+
+/**
+ * 消息更新
+ * @param event
+ */
+export async function MESSAGE_UPDATE(event: {
   type: number
   tts: boolean
   timestamp: string
@@ -44,10 +62,105 @@ interface MESSAGE_UPDATE_TYPE {
   }
   attachments: any[]
   guild_id: string
-}
+}) {
+  if (event.author?.bot) return
 
-/**
- * 基础消息
- * @param event
- */
-export async function MESSAGE_UPDATE(event: MESSAGE_UPDATE_TYPE) {}
+  const cfg = ABotConfig.get('discord')
+  const masterID = cfg.masterID
+
+  /**
+   * 艾特消息处理
+   */
+  const at_users: UserType[] = []
+
+  /**
+   * 切割
+   */
+  for (const item of event.mentions) {
+    at_users.push({
+      id: item.id,
+      name: item.username,
+      avatar: ClientDISOCRD.userAvatar(item.id, item.avatar),
+      bot: item.bot
+    })
+  }
+
+  /**
+   * 清除 @ 相关
+   */
+  let msg = event.content
+  for await (const item of at_users) {
+    msg = msg.replace(`<@${item.id}>`, '').trim()
+  }
+
+  /**
+   * 艾特处理
+   */
+  let at = false
+  let at_user: UserType | undefined = undefined
+  if (at_users.some(item => item.bot != true)) {
+    at = true
+  }
+  if (at) {
+    at_user = at_users.find(item => item.bot != true)
+  }
+
+  const e = {
+    platform: 'qq',
+    event: 'MESSAGES' as (typeof EventEnum)[number],
+    typing: 'UPDATE' as (typeof TypingEnum)[number],
+    boundaries: 'publick' as 'publick' | 'private',
+    attribute: 'group' as 'group' | 'single',
+    bot: BotMessage.get(),
+    isMaster: event.author?.id == masterID,
+    attachments: event?.attachments ?? [],
+    specials: [],
+    guild_id: event.guild_id,
+    guild_name: '',
+    guild_avatar: '',
+    channel_name: '',
+    channel_id: event.channel_id,
+    //
+    at: at,
+    at_user: at_user,
+    at_users: at_users,
+    msg_id: event.id,
+    msg_txt: event.content,
+    msg: msg,
+    quote: '',
+    open_id: '',
+    //
+    user_id: event.author?.id ?? '',
+    user_name: event.author?.username ?? '',
+    user_avatar: ClientDISOCRD.userAvatar(
+      event.author?.id,
+      event.author?.avatar
+    ),
+    segment: segmentDISCORD,
+    send_at: new Date(event.timestamp).getTime(),
+    /**
+     * 发送消息
+     * @param msg
+     * @param img
+     * @returns
+     */
+    reply: async (
+      msg: Buffer | string | number | (Buffer | number | string)[],
+      select?: MessageBingdingOption
+    ): Promise<any> => {
+      const withdraw = select?.withdraw ?? 0
+      if (select?.open_id && select?.open_id != '') {
+        return false
+      }
+      const channel_id = select?.channel_id ?? event.channel_id
+      return await replyController(msg, channel_id, {
+        quote: select?.quote,
+        withdraw
+      })
+    },
+    Controllers
+  }
+
+  APPS.responseEventType(e)
+  return
+}

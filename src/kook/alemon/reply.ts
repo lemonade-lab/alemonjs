@@ -1,4 +1,4 @@
-import { BUFFER } from '../../core/index.js'
+import { ABuffer } from '../../core/index.js'
 import { ClientKOOK } from '../sdk/index.js'
 
 /**
@@ -69,7 +69,7 @@ export async function replyController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl)
+    const msg = await ABuffer.getUrl(getUrl)
     if (!msg) return false
     const ret = await ClientKOOK.postImage(msg)
     if (!ret) return false

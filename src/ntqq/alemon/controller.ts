@@ -67,14 +67,16 @@ export class Controllers {
       },
       audio: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
+          const file_info = await ClientNTQQ.postRichMediaByGroup(guild_id, {
+            srv_send_msg: false,
+            file_type: 3,
+            url: file
+          }).then(res => res?.file_info)
+          if (!file_info) return false
           return await ClientNTQQ.groupOpenMessages(guild_id, {
             content: '',
             media: {
-              file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
-                srv_send_msg: false,
-                file_type: 3,
-                url: file
-              }).then(res => res.file_info)
+              file_info
             },
             msg_id,
             msg_type: 7,
@@ -85,14 +87,16 @@ export class Controllers {
       },
       video: async (file: Buffer | string, name?: string) => {
         if (typeof file == 'string') {
+          const file_info = await ClientNTQQ.postRichMediaByGroup(guild_id, {
+            srv_send_msg: false,
+            file_type: 2,
+            url: file
+          }).then(res => res.file_info)
+          if (!file_info) return false
           return await ClientNTQQ.groupOpenMessages(guild_id, {
             content: '',
             media: {
-              file_info: await ClientNTQQ.postRichMediaByGroup(guild_id, {
-                srv_send_msg: false,
-                file_type: 2,
-                url: file
-              }).then(res => res.file_info)
+              file_info
             },
             msg_id,
             msg_type: 7,

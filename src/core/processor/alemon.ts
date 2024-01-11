@@ -5,7 +5,7 @@ import { AppMap } from './data.js'
 import { getAppName } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
-import { Help } from './help.js'
+import { AInstruct } from './help.js'
 import { APPCONFIG } from './configs.js'
 
 type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
@@ -468,6 +468,16 @@ export class Alemon {
   }
 
   /**
+   * 重定义ecent
+   * @param fnc
+   * @returns
+   * @deprecated 已废弃
+   */
+  reSetEvent(fnc: (...args: any[]) => any) {
+    return this.event(fnc)
+  }
+
+  /**
    * 字符串切割
    * @param reg
    * @param str
@@ -633,7 +643,7 @@ export class Alemon {
     // 设置
     AppMap.set(this.#name, this)
     // 生成json
-    new Help(this.#name).create(this.#listArr)
+    new AInstruct(this.#name).create(this.#listArr)
   }
 
   #infoFunc = (

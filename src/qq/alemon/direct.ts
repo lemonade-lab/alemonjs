@@ -1,4 +1,4 @@
-import { BUFFER } from '../../core/index.js'
+import { ABuffer } from '../../core/index.js'
 import { ClientQQ } from '../sdk/index.js'
 
 import { ControllerOption, type UserInformationType } from '../../core/index.js'
@@ -184,7 +184,7 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BUFFER.getUrl(getUrl)
+    const msg = await ABuffer.getUrl(getUrl)
     if (msg) {
       return await ClientQQ.postImage(open_id, {
         msg_id: msg_id, //消息id, 必须

@@ -104,4 +104,4 @@ class BufferData {
     return
   }
 }
-export const BUFFER = new BufferData()
+export const ABuffer = new BufferData()

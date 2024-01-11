@@ -1,4 +1,4 @@
-import { BUFFER } from '../../core/utils/index.js'
+import { ABuffer } from '../../core/utils/index.js'
 export const segmentQQ = {
   at: (uid: string): string => {
     return `<@!${uid}>`
@@ -6,8 +6,8 @@ export const segmentQQ = {
   atAll: (): string => {
     return `@everyone`
   },
-  img: BUFFER.getPath,
-  qrcode: BUFFER.qrcode,
+  img: ABuffer.getPath,
+  qrcode: ABuffer.qrcode,
   http: (url: string) => {
     return `<http>${url}</http>`
   },

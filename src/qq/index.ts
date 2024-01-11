@@ -1,10 +1,10 @@
 import { Client } from './sdk/index.js'
-import { BOTCONFIG } from '../config/index.js'
+import { ABotConfig } from '../config/index.js'
 import { Conversation } from './alemon/conversation.js'
 export async function createAlemon() {
-  const qq = BOTCONFIG.get('qq')
+  const qq = ABotConfig.get('qq')
   if ((qq ?? '') !== '' && (qq.appID ?? '') !== '' && (qq.token ?? '') !== '') {
-    BOTCONFIG.set('qq', qq)
+    ABotConfig.set('qq', qq)
   } else {
     console.error('[LOGIN]', '-----------------------')
     console.error('[LOGIN]', 'QQ ERR')

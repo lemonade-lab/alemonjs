@@ -1,7 +1,7 @@
 import { ClientVILLA } from '../sdk/index.js'
 
 import IMGS from 'image-size'
-import { BUFFER } from '../../core/index.js'
+import { ABuffer } from '../../core/index.js'
 
 /**
  * 回复控制器
@@ -97,7 +97,7 @@ export async function replyController(
   if (match) {
     const getUrl = match[1]
     // 先请求确保图片正常
-    const msg = await BUFFER.getUrl(getUrl)
+    const msg = await ABuffer.getUrl(getUrl)
     if (!msg) return false
     const dimensions = IMGS.imageSize(msg)
     // url 形式的直接转存

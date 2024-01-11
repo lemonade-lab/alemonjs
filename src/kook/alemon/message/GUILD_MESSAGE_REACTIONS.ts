@@ -11,7 +11,7 @@ import {
 } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
-import { BOTCONFIG } from '../../../config/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { Controllers } from '../controller.js'
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
@@ -24,7 +24,7 @@ import { directController } from '../direct.js'
 export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
   const body = event.extra.body as StatementData
 
-  const cfg = BOTCONFIG.get('kook')
+  const cfg = ABotConfig.get('kook')
   const masterID = cfg.masterID
 
   const data = await ClientKOOK.userChatCreate(body.user_id).then(
@@ -41,7 +41,7 @@ export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
         ? 'group'
         : ('single' as 'group' | 'single'),
     bot: BotMessage.get(),
-    isMaster: body.user_id == masterID ? true : false,
+    isMaster: body.user_id == masterID,
     guild_id: event.target_id, // 频道
     guild_name: '',
     guild_avatar: '',
