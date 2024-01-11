@@ -47,7 +47,7 @@ export async function GUILD_MEMBER_UPDATE(event: {
 
   const e = {
     platform: 'qq',
-    event: 'GUILD_MEMBERS' as (typeof EventEnum)[number],
+    event: 'MEMBERS' as (typeof EventEnum)[number],
     typing: 'UPDATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

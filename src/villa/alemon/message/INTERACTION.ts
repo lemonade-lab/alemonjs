@@ -1,18 +1,18 @@
 import {
-  APPS,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  APPS
 } from '../../../core/index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 
 /**
- * 机器人进出
- * @param event 回调数据
+ * @param event 按钮数据
  */
-export async function GUILD_BOT(event: {
+export async function INTERACTION(event: {
   robot: {
     template: {
       id: string
@@ -29,68 +29,69 @@ export async function GUILD_BOT(event: {
   }
   type: number
   extendData: {
-    deleteRobot: {
-      villaId: number // 别野编号
-    }
-    createRobot: {
-      villaId: number // 别野编号
+    clickMsgComponent: {
+      villaId: number
+      roomId: number
+      componentId: string
+      msgUid: string
+      uid: number
+      botMsgId: string
     }
   }
   createdAt: number
   id: string
   sendAt: number
 }) {
-  const extendData = event.extendData
+  const ClickMsgComponent = event.extendData.clickMsgComponent
 
-  const guild_id =
-    event.type == 3
-      ? extendData.createRobot.villaId
-      : extendData.deleteRobot.villaId
+  const cfg = ABotConfig.get('villa')
+  const masterID = cfg.masterID
+
+  const msg_id = `${ClickMsgComponent.msgUid}.0`
 
   /**
    * 制作e消息对象
    */
   const e = {
     platform: 'villa',
-    event: 'GUILD_BOT' as (typeof EventEnum)[number],
-    typing:
-      event.type == 3 ? 'CREATE' : ('DELETE' as (typeof TypingEnum)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
+    event: 'INTERACTION' as (typeof EventEnum)[number],
+    typing: 'CREATE' as (typeof TypingEnum)[number],
     bot: {
       id: event.robot.template.id,
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: false,
-    guild_id: String(guild_id),
+    isMaster: String(ClickMsgComponent.uid) == masterID,
+    guild_id: String(ClickMsgComponent.villaId),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: '',
+    channel_id: String(ClickMsgComponent.roomId),
     attachments: [],
     specials: [],
     //
     at: false,
-    at_user: undefined,
     at_users: [],
+    at_user: undefined,
+    msg_id: msg_id,
     msg: '',
-    msg_id: `${event.id}.${event.sendAt}`,
     msg_txt: '',
     quote: '',
     open_id: '',
 
     //
-    user_id: '',
+    user_id: String(ClickMsgComponent.uid),
     user_name: '',
     user_avatar: '',
     //
-    send_at: event.sendAt,
+    send_at: 0,
     segment: segmentVILLA,
     /**
-     * 消息回复
+     *消息发送
      * @param msg
-     * @param select
+     * @param img
      * @returns
      */
     reply: async (
@@ -101,15 +102,15 @@ export async function GUILD_BOT(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villaId = select?.guild_id ?? guild_id
-      const roomId = select?.channel_id ?? false
-      if (!roomId) return false
+      const villaId = select?.guild_id ?? ClickMsgComponent.villaId
+      const roomId = select?.channel_id ?? ClickMsgComponent.roomId
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },
     Controllers
   }
+
   APPS.responseEventType(e)
   return
 }

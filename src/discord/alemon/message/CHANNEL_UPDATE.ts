@@ -42,7 +42,7 @@ export async function CHANNEL_UPDATE(event: {
 }) {
   const e = {
     platform: 'qq',
-    event: 'MESSAGES' as (typeof EventEnum)[number],
+    event: 'CHANNEL' as (typeof EventEnum)[number],
     typing: 'UPDATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

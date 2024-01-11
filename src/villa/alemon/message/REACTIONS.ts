@@ -10,11 +10,10 @@ import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 
 /**
- * 审核事件
+ * 表情表态
  * @param event 回调数据
  */
-export async function MESSAGE_AUDIT(event: {
-  // 机器人相关信息
+export async function REACTIONS(event: {
   robot: {
     template: {
       id: string
@@ -27,37 +26,42 @@ export async function MESSAGE_AUDIT(event: {
         desc: string // 指令说明
       }>
     }
-    villaId: number // 事件所属的大别野 id
+    villaId: number
   }
-  type: number // 消息类型
+  type: number
   extendData: {
-    auditCallback: {
-      auditId: string // 审核事件 id
-      botTplId: string // 机器人 id
-      villaId: number // 大别野 id
-      roomId: number // 房间 id（和审核接口调用方传入的值一致）
-      userId: number // 用户 id（和审核接口调用方传入的值一致）
-      passThrough: string // 透传数据（和审核接口调用方传入的值一致）
-      auditResult: number // 审核结果，0作兼容，1审核通过，2审核驳回
+    // 增加和删除都是一个数据位
+    addQuickEmoticon: {
+      villaId: number // 别野编号
+      roomId: number // 房间编号
+      uid: number // 用户编号
+      emoticonId: number // 表情编号
+      emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
+      isCancel?: boolean // 是撤回为  ture
+      msgUid: string // 消息是谁的
+      botMsgId: string // 机器人消息编号
     }
   }
-  createdAt: number // 创建事件编号
-  id: string // 消息编号
-  sendAt: number // 发送事件编号
+  createdAt: number
+  id: string
+  sendAt: number
 }) {
-  const AuditCallback = event.extendData.auditCallback
+  const AddQuickEmoticon = event.extendData.addQuickEmoticon
+
   const cfg = ABotConfig.get('villa')
   const masterID = cfg.masterID
 
-  const msg_id = `${AuditCallback.auditId}.${event.sendAt}`
+  const msg_id = `${AddQuickEmoticon.msgUid}.${event.sendAt}`
 
   /**
    * 制作e消息对象
    */
   const e = {
     platform: 'villa',
-    event: 'AUDIT' as (typeof EventEnum)[number],
-    typing: 'CREATE' as (typeof TypingEnum)[number],
+    event: 'REACTIONS' as (typeof EventEnum)[number],
+    typing: event.extendData.addQuickEmoticon.isCancel
+      ? 'DELETE'
+      : ('CREATE' as (typeof TypingEnum)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: {
@@ -65,14 +69,22 @@ export async function MESSAGE_AUDIT(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: masterID == String(AuditCallback.userId),
-    guild_id: String(AuditCallback.villaId),
+    isMaster: masterID == String(AddQuickEmoticon.uid),
+    guild_id: String(AddQuickEmoticon.villaId),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: String(AuditCallback.roomId),
+    channel_id: String(AddQuickEmoticon.roomId),
     attachments: [],
-    specials: [],
+    specials: [
+      {
+        emoticon_id: AddQuickEmoticon.emoticonId,
+        emoticon_type: 0,
+        emoticon: AddQuickEmoticon.emoticon,
+        is_cancel: AddQuickEmoticon?.isCancel ?? false,
+        msg_uid: AddQuickEmoticon.msgUid
+      }
+    ],
     //
     at: false,
     at_user: undefined,
@@ -84,10 +96,9 @@ export async function MESSAGE_AUDIT(event: {
     open_id: '',
 
     //
-    user_id: String(AuditCallback.userId),
+    user_id: String(AddQuickEmoticon.uid),
     user_name: '', // dodo 可权限获得
     user_avatar: '', // dodo 可权限获得
-    //
     send_at: event.sendAt,
     segment: segmentVILLA,
     /**
@@ -104,8 +115,8 @@ export async function MESSAGE_AUDIT(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villaId = select?.guild_id ?? AuditCallback.villaId
-      const roomId = select?.channel_id ?? AuditCallback.roomId
+      const villaId = select?.guild_id ?? AddQuickEmoticon.villaId
+      const roomId = select?.channel_id ?? AddQuickEmoticon.roomId
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })

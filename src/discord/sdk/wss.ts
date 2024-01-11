@@ -41,9 +41,9 @@ export const defineDISCORD: DISOCRDOptions = {
     //
     IntentsEnum.GUILDS,
     IntentsEnum.GUILD_MESSAGE_TYPING,
-    IntentsEnum.GUILD_MESSAGE_REACTIONS,
+    IntentsEnum.REACTIONS,
     IntentsEnum.GUILD_MESSAGES,
-    IntentsEnum.GUILD_MEMBERS,
+    IntentsEnum.MEMBERS,
     //
     IntentsEnum.GUILD_MODERATION,
     IntentsEnum.GUILD_EMOJIS_AND_STICKERS,

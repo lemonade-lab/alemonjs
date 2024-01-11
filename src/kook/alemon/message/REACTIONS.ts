@@ -21,7 +21,7 @@ import { directController } from '../direct.js'
  * @param event
  * @returns
  */
-export const GUILD_MESSAGE_REACTIONS = async (event: SystemData) => {
+export const REACTIONS = async (event: SystemData) => {
   const body = event.extra.body as StatementData
 
   const cfg = ABotConfig.get('kook')

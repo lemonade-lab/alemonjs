@@ -102,9 +102,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           intents: [
             // 基础事件
             'GUILDS', //频道进出
-            'GUILD_MEMBERS', //成员资料
+            'MEMBERS', //成员资料
             'DIRECT_MESSAGE', //私信
-            'GUILD_MESSAGE_REACTIONS', //表情表态
+            'REACTIONS', //表情表态
             // 需申请的
             'AUDIO_ACTION', //音频
             'MESSAGE_AUDIT', //消息审核

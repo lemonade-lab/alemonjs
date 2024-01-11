@@ -25,7 +25,7 @@ export async function VOICE_CHANNEL_STATUS_UPDATE(event: {
 
   const e = {
     platform: 'qq',
-    event: 'AUDIO_FREQUENCY' as (typeof EventEnum)[number],
+    event: 'REACTIONS' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

@@ -15,7 +15,7 @@ import { Controllers, directController } from '../direct.js'
  * @param event
  * @returns
  */
-export const DIRECT_MESSAGE = async (event: EventData) => {
+export const MESSAGES = async (event: EventData) => {
   if (event.extra?.author?.bot) return false
 
   const open_id = event.extra.code

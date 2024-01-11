@@ -32,7 +32,7 @@ export const GUILD_DELETE = async (event: {
 }) => {
   const e = {
     platform: 'qq',
-    event: 'GUILD' as (typeof EventEnum)[number],
+    event: 'BOT' as (typeof EventEnum)[number],
     typing: 'DELETE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

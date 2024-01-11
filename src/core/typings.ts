@@ -1,7 +1,7 @@
 import { ControllersType } from './types.js'
 
 /**
- * AlemonjsMessageData
+ * AlemonjsEventData
  */
 export interface AEvent
   extends EventBase,
@@ -15,6 +15,9 @@ export interface AEvent
   [key: string]: any
 }
 
+/**
+ * AlemonjsEventData
+ */
 export type AMessage = AEvent
 
 /**
@@ -40,51 +43,6 @@ interface EventBase {
  */
 export const EventEnum = [
   /**
-   * **********
-   * 频道
-   * **********
-   */
-  /**
-   * 频道事件
-   */
-  'GUILD',
-  /**
-   * 机器人进出事件
-   */
-  'GUILD_BOT',
-  /**
-   * 子频道事件
-   */
-  'CHANNEL',
-  /**
-   * 成员进出
-   */
-  'GUILD_MEMBERS',
-  /**
-   * ***********
-   * 论坛
-   * *********
-   */
-  /**
-   * 论坛主题
-   */
-  'FORUMS_THREAD',
-  /**
-   * 论坛POST
-   */
-  'FORUMS_POST',
-  /**
-   * 论坛评论
-   */
-  'FORUMS_REPLY',
-  /**
-   * *********
-   * 会话消息
-   * ********
-   * MESSAGES=message
-   * =MESSAGE+DIRECT+PUBLIC
-   */
-  /**
    * 消息
    */
   'MESSAGES',
@@ -94,34 +52,45 @@ export const EventEnum = [
    */
   'message',
   /**
+   * 频道事件
+   */
+  'GUILD',
+  /**
+   * 机器人进出事件
+   */
+  'BOT',
+  /**
+   * 子频道事件
+   */
+  'CHANNEL',
+  /**
+   * 成员进出
+   */
+  'MEMBERS',
+  /**
+   * 论坛
+   */
+  'FORUM',
+  /**
    * 表态
    */
-  'GUILD_MESSAGE_REACTIONS',
+  'REACTIONS',
   /**
-   * 按钮回调
-   */
-  'MESSAGE_BUTTON',
-  /**
-   * 互动事件监听
+   * 互动
    */
   'INTERACTION',
   /**
-   * ***********
-   * 音频事件
-   * ***********
-   */
-  /**
    * 视频
    */
-  'AUDIO_FREQUENCY',
+  'FREQUENCY',
   /**
    * 麦克风
    */
-  'AUDIO_MICROPHONE',
+  'MICROPHONE',
   /**
    * 审核消息
    */
-  'MESSAGE_AUDIT'
+  'AUDIT'
 ] as const
 
 /**

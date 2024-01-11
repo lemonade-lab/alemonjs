@@ -5,15 +5,14 @@ import {
   type MessageBingdingOption
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
-import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
 import { Controllers } from '../controller.js'
 
 /**
- * 表情表态
+ * 机器人进出
  * @param event 回调数据
  */
-export async function GUILD_MESSAGE_REACTIONS(event: {
+export async function BOT(event: {
   robot: {
     template: {
       id: string
@@ -30,38 +29,32 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
   }
   type: number
   extendData: {
-    // 增加和删除都是一个数据位
-    addQuickEmoticon: {
+    deleteRobot: {
       villaId: number // 别野编号
-      roomId: number // 房间编号
-      uid: number // 用户编号
-      emoticonId: number // 表情编号
-      emoticon: string // 表情说明  emoticon:狗头  =>  [狗头]
-      isCancel?: boolean // 是撤回为  ture
-      msgUid: string // 消息是谁的
-      botMsgId: string // 机器人消息编号
+    }
+    createRobot: {
+      villaId: number // 别野编号
     }
   }
   createdAt: number
   id: string
   sendAt: number
 }) {
-  const AddQuickEmoticon = event.extendData.addQuickEmoticon
+  const extendData = event.extendData
 
-  const cfg = ABotConfig.get('villa')
-  const masterID = cfg.masterID
-
-  const msg_id = `${AddQuickEmoticon.msgUid}.${event.sendAt}`
+  const guild_id =
+    event.type == 3
+      ? extendData.createRobot.villaId
+      : extendData.deleteRobot.villaId
 
   /**
    * 制作e消息对象
    */
   const e = {
     platform: 'villa',
-    event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
-    typing: event.extendData.addQuickEmoticon.isCancel
-      ? 'DELETE'
-      : ('CREATE' as (typeof TypingEnum)[number]),
+    event: 'BOT' as (typeof EventEnum)[number],
+    typing:
+      event.type == 3 ? 'CREATE' : ('DELETE' as (typeof TypingEnum)[number]),
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',
     bot: {
@@ -69,36 +62,29 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
       name: event.robot.template.name,
       avatar: event.robot.template.icon
     },
-    isMaster: masterID == String(AddQuickEmoticon.uid),
-    guild_id: String(AddQuickEmoticon.villaId),
+    isMaster: false,
+    guild_id: String(guild_id),
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: String(AddQuickEmoticon.roomId),
+    channel_id: '',
     attachments: [],
-    specials: [
-      {
-        emoticon_id: AddQuickEmoticon.emoticonId,
-        emoticon_type: 0,
-        emoticon: AddQuickEmoticon.emoticon,
-        is_cancel: AddQuickEmoticon?.isCancel ?? false,
-        msg_uid: AddQuickEmoticon.msgUid
-      }
-    ],
+    specials: [],
     //
     at: false,
     at_user: undefined,
     at_users: [],
     msg: '',
-    msg_id: msg_id,
+    msg_id: `${event.id}.${event.sendAt}`,
     msg_txt: '',
     quote: '',
     open_id: '',
 
     //
-    user_id: String(AddQuickEmoticon.uid),
-    user_name: '', // dodo 可权限获得
-    user_avatar: '', // dodo 可权限获得
+    user_id: '',
+    user_name: '',
+    user_avatar: '',
+    //
     send_at: event.sendAt,
     segment: segmentVILLA,
     /**
@@ -115,15 +101,15 @@ export async function GUILD_MESSAGE_REACTIONS(event: {
         console.error('VILLA 无私信')
         return false
       }
-      const villaId = select?.guild_id ?? AddQuickEmoticon.villaId
-      const roomId = select?.channel_id ?? AddQuickEmoticon.roomId
+      const villaId = select?.guild_id ?? guild_id
+      const roomId = select?.channel_id ?? false
+      if (!roomId) return false
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
     },
     Controllers
   }
-
   APPS.responseEventType(e)
   return
 }

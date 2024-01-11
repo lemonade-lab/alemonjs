@@ -43,7 +43,7 @@ export async function GUILD_MEMBER_ADD(event: {
 
   const e = {
     platform: 'qq',
-    event: 'GUILD_MEMBERS' as (typeof EventEnum)[number],
+    event: 'MEMBERS' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

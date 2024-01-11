@@ -56,7 +56,7 @@ export async function VOICE_STATE_UPDATE(event: {
 
   const e = {
     platform: 'qq',
-    event: 'AUDIO_FREQUENCY' as (typeof EventEnum)[number],
+    event: 'FREQUENCY' as (typeof EventEnum)[number],
     typing: 'UPDATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

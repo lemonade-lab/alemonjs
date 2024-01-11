@@ -81,7 +81,7 @@ export async function PRESENCE_UPDATE(event: {
 
   const e = {
     platform: 'qq',
-    event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
+    event: 'REACTIONS' as (typeof EventEnum)[number],
     typing: 'UPDATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

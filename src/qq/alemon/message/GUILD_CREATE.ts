@@ -32,7 +32,7 @@ export const GUILD_CREATE = async (event: {
 }) => {
   const e = {
     platform: 'qq',
-    event: 'GUILD' as (typeof EventEnum)[number],
+    event: 'BOT' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

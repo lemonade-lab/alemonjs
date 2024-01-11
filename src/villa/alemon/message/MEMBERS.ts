@@ -13,7 +13,7 @@ import { Controllers } from '../controller.js'
  * 成员进入
  * @param event 回调数据
  */
-export async function GUILD_MEMBERS(event: {
+export async function MEMBERS(event: {
   robot: {
     template: {
       id: string
@@ -53,7 +53,7 @@ export async function GUILD_MEMBERS(event: {
    */
   const e = {
     platform: 'villa',
-    event: 'GUILD_MEMBERS' as (typeof EventEnum)[number],
+    event: 'MEMBERS' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

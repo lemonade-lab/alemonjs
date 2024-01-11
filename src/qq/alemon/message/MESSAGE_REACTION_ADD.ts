@@ -26,7 +26,7 @@ export const MESSAGE_REACTION_ADD = async (event: {
 
   const e = {
     platform: 'qq',
-    event: 'GUILD_MESSAGE_REACTIONS' as (typeof EventEnum)[number],
+    event: 'REACTIONS' as (typeof EventEnum)[number],
     typing: 'CREATE' as (typeof TypingEnum)[number],
     boundaries: 'publick' as 'publick' | 'private',
     attribute: 'group' as 'group' | 'single',

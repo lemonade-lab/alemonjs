@@ -1,9 +1,9 @@
 import { MESSAGES } from './message/MESSAGES.js'
-import { GUILD_MEMBERS } from './message/GUILD_MEMBERS.js'
-import { GUILD_MESSAGE_REACTIONS } from './message/GUILD_MESSAGE_REACTIONS.js'
+import { MEMBERS } from './message/MEMBERS.js'
+import { REACTIONS } from './message/REACTIONS.js'
 import { MESSAGE_AUDIT } from './message/MESSAGE_AUDIT.js'
-import { GUILD_BOT } from './message/GUILD_BOT.js'
-import { MESSAGE_BUTTON } from './message/MESSAGE_BUTTON.js'
+import { BOT } from './message/BOT.js'
+import { INTERACTION } from './message/INTERACTION.js'
 
 /**
  * 事件处理集
@@ -12,7 +12,7 @@ const ConversationMap = {
   /**
    * 房间消息--成员进入
    */
-  [1]: GUILD_MEMBERS,
+  [1]: MEMBERS,
   /**
    * 会话消息
    */
@@ -20,15 +20,15 @@ const ConversationMap = {
   /**
    * 别野消息--机器人进入
    */
-  [3]: GUILD_BOT,
+  [3]: BOT,
   /**
    * 别野消息--机器人退出
    */
-  [4]: GUILD_BOT,
+  [4]: BOT,
   /**
    *  表情表态
    */
-  [5]: GUILD_MESSAGE_REACTIONS,
+  [5]: REACTIONS,
   /**
    *  审核事件
    */
@@ -36,7 +36,7 @@ const ConversationMap = {
   /**
    * 按钮回调
    */
-  [7]: MESSAGE_BUTTON
+  [7]: INTERACTION
 }
 /**
  * 消息接收入口

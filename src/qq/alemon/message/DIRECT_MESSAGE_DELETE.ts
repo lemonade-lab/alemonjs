@@ -14,7 +14,6 @@ import { Controllers, directController } from '../direct.js'
  * 私信
  * *
  */
-
 export const DIRECT_MESSAGE_DELETE = async (event: {
   message: {
     author: { bot: boolean; id: string; username: string }

@@ -3,9 +3,9 @@
  */
 export const AvailableIntentsEventsEnum = [
   'GUILDS',
-  'GUILD_MEMBERS',
+  'MEMBERS',
   'GUILD_MESSAGES',
-  'GUILD_MESSAGE_REACTIONS',
+  'REACTIONS',
   'DIRECT_MESSAGE',
   'FORUMS_EVENT',
   'AUDIO_ACTION',

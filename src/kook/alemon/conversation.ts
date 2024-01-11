@@ -1,7 +1,7 @@
 import { PUBLIC_GUILD_MESSAGES_KOOK } from './message/PUBLIC_GUILD_MESSAGES.js'
-import { DIRECT_MESSAGE } from './message/DIRECT_MESSAGE.js'
+import { MESSAGES } from './message/MESSAGES.js'
 import { EventData, SystemData } from '../sdk/index.js'
-import { GUILD_MESSAGE_REACTIONS } from './message/GUILD_MESSAGE_REACTIONS.js'
+import { REACTIONS } from './message/REACTIONS.js'
 /**
  * 事件处理集
  */
@@ -11,49 +11,49 @@ const ConversationMap = {
    */
   [1]: {
     public: PUBLIC_GUILD_MESSAGES_KOOK,
-    direct: DIRECT_MESSAGE
+    direct: MESSAGES
   },
   /**
    * 图片消息，
    */
   [2]: {
     public: PUBLIC_GUILD_MESSAGES_KOOK,
-    direct: DIRECT_MESSAGE
+    direct: MESSAGES
   },
   /**
    * 视频消息，
    */
   [3]: {
     public: PUBLIC_GUILD_MESSAGES_KOOK,
-    direct: DIRECT_MESSAGE
+    direct: MESSAGES
   },
   /**
    * 文件消息，
    */
   [4]: {
     public: PUBLIC_GUILD_MESSAGES_KOOK,
-    direct: DIRECT_MESSAGE
+    direct: MESSAGES
   },
   /**
    * 音频消息，
    */
   [8]: {
     public: PUBLIC_GUILD_MESSAGES_KOOK,
-    direct: DIRECT_MESSAGE
+    direct: MESSAGES
   },
   /**
    * mk消息
    */
   [9]: {
     public: PUBLIC_GUILD_MESSAGES_KOOK,
-    direct: DIRECT_MESSAGE
+    direct: MESSAGES
   },
   /**
    * card消息，
    */
   [10]: {
     public: PUBLIC_GUILD_MESSAGES_KOOK,
-    direct: DIRECT_MESSAGE
+    direct: MESSAGES
   },
   /**
    * 系统消息
@@ -66,7 +66,7 @@ const ConversationMap = {
         event.extra.type == 'deleted_reaction'
       ) {
         //StatementData
-        return await GUILD_MESSAGE_REACTIONS(event)
+        return await REACTIONS(event)
       } else if (event.extra.type == 'joined_channel') {
         //
         console.info('joined_channel')

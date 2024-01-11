@@ -2,9 +2,9 @@ import { IntentsEnum } from './typings.js'
 
 const intentsMap = {
   GUILDS: 1 << 0,
-  GUILD_MEMBERS: 1 << 1,
+  MEMBERS: 1 << 1,
   GUILD_MESSAGES: 1 << 9,
-  GUILD_MESSAGE_REACTIONS: 1 << 10,
+  REACTIONS: 1 << 10,
   DIRECT_MESSAGE: 1 << 12,
   OPEN_FORUMS_EVENT: 1 << 18,
   AUDIO_OR_LIVE_CHANNEL_MEMBER: 1 << 19,
