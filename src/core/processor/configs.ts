@@ -1,3 +1,5 @@
+import { BaseConfig } from '../config.js'
+
 /**
  * 机器人信息缓存
  */
@@ -24,35 +26,6 @@ export class BaseBotMessage<D> {
    */
   get(): D {
     return this.#data
-  }
-}
-
-/**
- * 基础配置结构
- */
-export class BaseConfig<D> {
-  #data: D = null
-  constructor(val: D) {
-    this.#data = val
-  }
-  /**
-   * 设置配置
-   * @param key
-   * @param val
-   */
-  set<T extends keyof D>(key: T, val: D[T]) {
-    if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
-      this.#data[key] = val
-    }
-    return this
-  }
-  /**
-   * 读取配置
-   * @param key
-   * @returns
-   */
-  get<T extends keyof D>(key: T): D[T] | undefined {
-    return this.#data[key]
   }
 }
 

@@ -6,6 +6,7 @@ import puppeteer, {
 } from 'puppeteer'
 import queryString from 'querystring'
 import { executablePath } from './pup.js'
+import { BaseConfig } from '../config.js'
 
 export interface ScreenshotFileOptions {
   SOptions: {
@@ -27,40 +28,42 @@ export interface ScreenshotUrlOptions {
   waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
 }
 
-class Puppeteer {
+export const ALunchConfig = new BaseConfig<PuppeteerLaunchOptions>({
+  // 禁用超时
+  timeout: 0,
+  protocolTimeout: 0,
+  // 请求头
+  headless: 'new',
+  executablePath,
+  //
+  args: [
+    '--disable-gpu',
+    '--disable-dev-shm-usage',
+    '--disable-setuid-sandbox',
+    '--no-first-run',
+    '--no-sandbox',
+    '--no-zygote',
+    '--single-process'
+  ]
+})
+
+export class Puppeteer {
   // 截图次数记录
-  pic = 0
+  #pic = 0
   // 重启次数控制
-  restart = 200
+  #restart = 200
   // 应用缓存
-  browser: Browser
+  #browser: Browser
   // 状态
-  isBrowser = false
+  #isBrowser = false
   // 配置
-  launch: PuppeteerLaunchOptions = {
-    // 禁用超时
-    timeout: 0,
-    protocolTimeout: 0,
-    // 请求头
-    headless: 'new',
-    executablePath,
-    //
-    args: [
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-setuid-sandbox',
-      '--no-first-run',
-      '--no-sandbox',
-      '--no-zygote',
-      '--single-process'
-    ]
-  }
+  #launch: PuppeteerLaunchOptions = ALunchConfig.all()
   /**
    * 设置
    * @param val
    */
   setLaunch(val: PuppeteerLaunchOptions) {
-    this.launch = val
+    this.#launch = val
     return this
   }
   /**
@@ -68,7 +71,7 @@ class Puppeteer {
    * @returns
    */
   getLaunch(): PuppeteerLaunchOptions {
-    return this.launch
+    return this.#launch
   }
   /**
    * 启动pup
@@ -76,12 +79,12 @@ class Puppeteer {
    */
   async start() {
     try {
-      this.browser = await puppeteer.launch(this.launch)
-      this.isBrowser = true
+      this.#browser = await puppeteer.launch(this.#launch)
+      this.#isBrowser = true
       console.info('[puppeteer] open success')
       return true
     } catch (err) {
-      this.isBrowser = false
+      this.#isBrowser = false
       console.error('[puppeteer] err', err)
       return false
     }
@@ -95,30 +98,28 @@ class Puppeteer {
     /**
      * 检测是否开启
      */
-    if (!this.isBrowser) {
+    if (!this.#isBrowser) {
       const T = await this.start()
-      if (!T) {
-        return false
-      }
+      if (!T) return false
     }
-    if (this.pic <= this.restart) {
+    if (this.#pic <= this.#restart) {
       /**
        * 记录次数
        */
-      this.pic++
+      this.#pic++
     } else {
       /**
        * 重置次数
        */
-      this.pic = 0
+      this.#pic = 0
       console.info('[puppeteer] close')
-      this.isBrowser = false
-      this.browser.close().catch(err => {
+      this.#isBrowser = false
+      this.#browser.close().catch(err => {
         console.error('[puppeteer] close', err)
       })
       console.info('[puppeteer] reopen')
       if (!(await this.start())) return false
-      this.pic++
+      this.#pic++
     }
     return true
   }
@@ -137,17 +138,18 @@ class Puppeteer {
     Options: ScreenshotFileOptions
   ) {
     if (!(await this.isStart())) return false
-    const { SOptions, tab = 'body', timeout = 120000 } = Options
     try {
-      const page = await this.browser.newPage().catch(err => {
+      const page = await this.#browser.newPage().catch(err => {
         console.error(err)
       })
       if (!page) return false
-      await page.goto(`file://${htmlPath}`, { timeout })
-      const body = await page.$(tab)
+      await page.goto(`file://${htmlPath}`, {
+        timeout: Options.timeout ?? 120000
+      })
+      const body = await page.$(Options.tab ?? 'body')
       console.info('[puppeteer] success')
       const buff: string | false | Buffer = await body
-        .screenshot(SOptions)
+        .screenshot(Options.SOptions)
         .catch(err => {
           console.error('[puppeteer]', 'screenshot', err)
           return false
@@ -171,43 +173,37 @@ class Puppeteer {
    * @param val url地址
    * @returns buffer
    */
-  async toUrl(val: ScreenshotUrlOptions) {
+  async toUrl(Options: ScreenshotUrlOptions) {
     if (!(await this.isStart())) return false
-    const {
-      url,
-      time,
-      rand,
-      params,
-      tab = 'body',
-      cache,
-      timeout,
-      waitUntil = 'networkidle2'
-    } = val
     try {
       // 经常出现超时错误
-      const page = await this.browser.newPage().catch(err => {
+      const page = await this.#browser.newPage().catch(err => {
         console.error(err)
       })
       if (!page) return false
-      const query = params == undefined ? '' : queryString.stringify(params)
-      const isurl = params == undefined ? url : `${url}?${query}`
-      await page.setCacheEnabled(cache == undefined ? true : cache)
+      const query =
+        Options.params == undefined ? '' : queryString.stringify(Options.params)
+      const isurl =
+        Options.params == undefined ? Options.url : `${Options.url}?${query}`
+      await page.setCacheEnabled(
+        Options.cache == undefined ? true : Options.cache
+      )
       // 等待资源加载完成后进行
       await page.goto(isurl, {
-        timeout: timeout ?? 120000,
-        waitUntil
+        timeout: Options.timeout ?? 120000,
+        waitUntil: Options.waitUntil ?? 'networkidle2'
       })
       console.info('[screenshot] open', isurl)
-      const body = await page.$(tab)
+      const body = await page.$(Options.tab ?? 'body')
       if (!body) {
         await page.close()
         console.error('[screenshot] tab err')
         return false
       }
-      await new Promise(resolve => setTimeout(resolve, time ?? 1000))
+      await new Promise(resolve => setTimeout(resolve, Options.time ?? 1000))
       const buff: string | false | Buffer = await body
         .screenshot(
-          rand ?? {
+          Options.rand ?? {
             type: 'jpeg',
             quality: 90,
             path: ''
@@ -219,7 +215,7 @@ class Puppeteer {
         })
       await page.close()
       if (!buff) {
-        console.error('[screenshot] buffer err', url)
+        console.error('[screenshot] buffer err', Options.url)
         return false
       }
       return buff
@@ -229,4 +225,3 @@ class Puppeteer {
     }
   }
 }
-export const Screenshot = new Puppeteer()

@@ -1,7 +1,7 @@
 import { AlemonOptions } from './types.js'
 import { RebotMap } from './map.js'
 import {
-  Screenshot,
+  ALunchConfig,
   AppLoadConfig,
   IP,
   APPS,
@@ -17,14 +17,6 @@ import { AControllers } from '../api/index.js'
  * @param Options
  */
 export async function runAlemon(Options?: AlemonOptions) {
-  /**
-   * *********
-   * pup启动
-   * ********
-   */
-  if (Options.pupStart !== false) {
-    await Screenshot.start()
-  }
   /**
    * ***********
    * 挂起web服务
@@ -124,9 +116,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
    * ************
    */
   if (Options?.puppeteer) {
-    ABotConfig.set('puppeteer', Options.puppeteer)
+    for (const item in Options.puppeteer) {
+      ALunchConfig.set(item as any, Options.puppeteer[item])
+    }
   }
-  Screenshot.setLaunch(ABotConfig.get('puppeteer'))
   /**
    * *********
    * mysql配置

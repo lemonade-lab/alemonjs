@@ -1,9 +1,10 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { Screenshot, type ScreenshotFileOptions } from '../core/index.js'
+import { Puppeteer, type ScreenshotFileOptions } from '../core/index.js'
 import { getStrMatchSize, replaceLocal } from './utils.js'
 import { cache } from './html.js'
+import { PuppeteerLaunchOptions } from 'puppeteer'
 
 function render(str: string, arr: { reg: RegExp; val: string }[]) {
   // 传入一个 []  key:reg , val:xxx
@@ -29,7 +30,17 @@ export function createImage(cwd?: string) {
 
   const ImageLink: string[] = []
 
+  // 实例化
+  const pup = new Puppeteer()
+
+  // 启动
+  pup.start()
+
   const app = {
+    setLaunch: (val: PuppeteerLaunchOptions) => {
+      pup.setLaunch(val)
+      return app
+    },
     /**
      * 设置 @ 路径
      * @param cwd
@@ -170,7 +181,7 @@ export function createImage(cwd?: string) {
       mkdirSync(dirname(directory), { recursive: true })
       // 写入文件
       writeFileSync(directory, ImageHtml)
-      return Screenshot.toFile(directory, {
+      return pup.toFile(directory, {
         SOptions: ImageOptions?.SOptions ?? { type: 'jpeg', quality: 90 },
         tab: ImageOptions?.tab ?? 'body',
         timeout: ImageOptions?.timeout ?? 120000

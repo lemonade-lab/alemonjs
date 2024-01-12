@@ -5,7 +5,7 @@ import { defineVILLA as villa } from '../villa/sdk/wss.js'
 import { defineQQ as qq } from '../qq/sdk/wss.js'
 import { defineNtqq as ntqq } from '../ntqq/sdk/wss.js'
 import { defineDISCORD as discord } from '../discord/sdk/wss.js'
-import { Screenshot } from '../core/index.js'
+import { ALunchConfig } from '../core/index.js'
 
 class BaseConfig<D> {
   #data: D = null
@@ -61,6 +61,6 @@ export const ABotConfig = new BaseConfig<BotConfigType>({
   villa,
   qq,
   ntqq,
-  puppeteer: Screenshot.launch,
+  puppeteer: ALunchConfig.all(),
   discord
 })

@@ -1,4 +1,4 @@
-import { BaseConfig } from './processor/configs.js'
+import { BaseConfig } from './config.js'
 
 export interface UserInformationType {
   id: string
