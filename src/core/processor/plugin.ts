@@ -15,31 +15,31 @@ export class APlugin {
   /**
    * 应用名
    */
-  name?: string = 'alemonb'
+  name: string = 'alemonb'
   /**
    * 层级
    */
-  acount?: number = 0
+  acount: number = 0
   /**
    * 实例名
    */
-  example?: string = 'APlugin'
+  example: string = 'APlugin'
   /**
    * 事件枚举
    */
-  event?: (typeof EventEnum)[number] = 'MESSAGES'
+  event: (typeof EventEnum)[number] = 'MESSAGES'
   /**
    * 事件类型
    */
-  typing?: (typeof TypingEnum)[number] = 'CREATE'
+  typing: (typeof TypingEnum)[number] = 'CREATE'
   /**
    * 匹配优先级
    */
-  priority?: number = 9000
+  priority: number = 9000
   /**
    * 匹配集
    */
-  rule?: APluginRuleType[] = []
+  rule: APluginRuleType[] = []
   /**
    * @deprecated 已废弃,建议使用原生模块 node-schedule
    */
