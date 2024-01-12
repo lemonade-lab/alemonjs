@@ -5,7 +5,6 @@ import puppeteer, {
   PuppeteerLifeCycleEvent
 } from 'puppeteer'
 import queryString from 'querystring'
-import { watch } from 'fs'
 import { executablePath } from './pup.js'
 
 export interface ScreenshotFileOptions {
@@ -28,7 +27,7 @@ export interface ScreenshotUrlOptions {
   waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
 }
 
-class Pup {
+class Puppeteer {
   // 截图次数记录
   pic = 0
   // 重启次数控制
@@ -229,38 +228,5 @@ class Pup {
       return false
     }
   }
-
-  // 解析后的html缓存
-  cache: {
-    [key: string]: any
-  } = {}
-  // 模板缓存
-  html: {
-    [key: string]: any
-  } = {}
-  // 监听器缓存
-  watchCache: {
-    [key: string]: any
-  } = {}
-
-  /**
-   * 缓存监听
-   * @param tplFile 模板地址
-   */
-  watch(tplFile: string) {
-    // 监听存在,直接返回
-    if (this.watchCache[tplFile]) return
-    // 监听不存在,增加监听
-    this.watchCache[tplFile] = watch(tplFile)
-      .on('change', () => {
-        // 模板改变,删除模板
-        delete this.html[tplFile]
-        console.info('html update', tplFile)
-      })
-      .on('close', () => {
-        // 监听器被移除,删除监听器
-        delete this.watchCache[tplFile]
-      })
-  }
 }
-export const Screenshot = new Pup()
+export const Screenshot = new Puppeteer()
