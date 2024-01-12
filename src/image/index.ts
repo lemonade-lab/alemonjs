@@ -37,6 +37,16 @@ export function createImage(cwd?: string) {
   pup.start()
 
   const app = {
+    /**
+     * 得到配置
+     * @returns
+     */
+    getLaunch: () => pup.getLaunch,
+    /**
+     * 设置配置
+     * @param val
+     * @returns
+     */
     setLaunch: (val: PuppeteerLaunchOptions) => {
       pup.setLaunch(val)
       return app
