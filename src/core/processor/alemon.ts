@@ -596,12 +596,12 @@ export class Alemon {
           this.#elist.unshift(node)
         } else {
           // 比头部小(同等级的放前面,损耗最小)
-          if (priority <= this.#list.getHead().value.priority) {
-            this.#list.unshift(node)
+          if (priority <= this.#elist.getHead().value.priority) {
+            this.#elist.unshift(node)
             continue
-          } else if (priority >= this.#list.getTail().value.priority) {
+          } else if (priority >= this.#elist.getTail().value.priority) {
             // 比尾部大(同等级的放后面,损耗最小)
-            this.#list.push(node)
+            this.#elist.push(node)
             continue
           }
           // 顺序插入
