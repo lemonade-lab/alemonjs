@@ -7,7 +7,7 @@ import {
 
 import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
-import { Controllers } from '../controller.js'
+
 import { ABotConfig } from '../../../config/index.js'
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
@@ -91,8 +91,7 @@ export const GUILD_MEMBER_REMOVE = async (event: {
         quote: select?.quote,
         withdraw
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

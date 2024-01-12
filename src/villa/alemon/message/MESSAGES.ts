@@ -9,7 +9,6 @@ import { MessageContentType } from '../../sdk/index.js'
 import { ABotConfig } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
 
 /**
  * 消息会话
@@ -200,8 +199,7 @@ export async function MESSAGES(event: {
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseMessage(e)

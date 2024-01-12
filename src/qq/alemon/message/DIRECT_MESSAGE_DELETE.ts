@@ -70,8 +70,7 @@ export const DIRECT_MESSAGE_DELETE = async (event: {
       return await directController(msg, open_id, msg_id, {
         withdraw
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

@@ -8,7 +8,7 @@ import { segmentNTQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
-import { Controllers } from '../controller.js'
+
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
 
@@ -69,8 +69,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
       }
       const group_id = select?.guild_id ?? event.group_id
       return await replyController(msg, group_id, msg_id)
-    },
-    Controllers
+    }
   }
 
   /**

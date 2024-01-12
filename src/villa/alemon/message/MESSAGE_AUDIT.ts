@@ -7,7 +7,6 @@ import {
 import { segmentVILLA } from '../segment.js'
 import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
 
 /**
  * 审核事件
@@ -110,8 +109,7 @@ export async function MESSAGE_AUDIT(event: {
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

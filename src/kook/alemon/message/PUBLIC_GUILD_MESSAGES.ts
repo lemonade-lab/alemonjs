@@ -9,7 +9,7 @@ import { ClientKOOK, type EventData } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../config/index.js'
-import { Controllers } from '../controller.js'
+
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
 
@@ -118,8 +118,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
         return false
       }
       return await replyController(msg, channel_id)
-    },
-    Controllers
+    }
   }
 
   APPS.responseMessage(e)

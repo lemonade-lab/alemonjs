@@ -144,6 +144,10 @@ export interface MessageControllerType {
  */
 export interface ControllerOption {
   /**
+   * 平台
+   */
+  platform?: string
+  /**
    * 频道号
    */
   guild_id?: string

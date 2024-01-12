@@ -6,7 +6,6 @@ import {
 } from '../../../core/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
 
 /**
  * 机器人进出
@@ -107,8 +106,7 @@ export async function BOT(event: {
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
-    },
-    Controllers
+    }
   }
   APPS.responseEventType(e)
   return

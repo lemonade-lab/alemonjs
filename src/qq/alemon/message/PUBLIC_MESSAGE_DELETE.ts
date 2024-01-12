@@ -8,7 +8,7 @@ import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
+
 import { directController } from '../direct.js'
 
 /**
@@ -83,8 +83,7 @@ export const PUBLIC_MESSAGE_DELETE = async (event: {
         quote: select?.quote,
         withdraw
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

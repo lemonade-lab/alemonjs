@@ -8,7 +8,7 @@ import { BotMessage } from '../bot.js'
 import { segmentQQ } from '../segment.js'
 import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
+
 import { directController } from '../direct.js'
 
 /**
@@ -78,8 +78,7 @@ export const MESSAGE_CREATE = async (event: any) => {
         quote: select?.quote,
         withdraw
       })
-    },
-    Controllers
+    }
   }
 
   /**

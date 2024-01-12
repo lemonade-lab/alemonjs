@@ -1,5 +1,3 @@
-import { ControllersType } from './types.js'
-
 /**
  * AlemonjsEventData
  */
@@ -10,7 +8,6 @@ export interface AEvent
     Serverbase,
     BotBase,
     ReplyBase {
-  Controllers: ControllersType
   // 允许自定义
   [key: string]: any
 }

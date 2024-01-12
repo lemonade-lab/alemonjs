@@ -6,7 +6,7 @@ import {
 } from '../../../core/index.js'
 import { BotMessage } from '../bot.js'
 import { segmentQQ } from '../segment.js'
-import { Controllers } from '../controller.js'
+
 import { directController } from '../direct.js'
 import { replyController } from '../reply.js'
 
@@ -85,8 +85,7 @@ export const CHANNEL_CREATE = async (event: {
         quote: select?.quote,
         withdraw
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

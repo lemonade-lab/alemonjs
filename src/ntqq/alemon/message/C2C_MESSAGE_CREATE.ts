@@ -55,8 +55,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? event.id
       return await directController(msg, open_id, msg_id)
-    },
-    Controllers
+    }
   }
 
   APPS.responseMessage(e)

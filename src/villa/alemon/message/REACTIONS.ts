@@ -7,7 +7,6 @@ import {
 import { segmentVILLA } from '../segment.js'
 import { ABotConfig } from '../../../config/index.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
 
 /**
  * 表情表态
@@ -120,8 +119,7 @@ export async function REACTIONS(event: {
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

@@ -70,8 +70,7 @@ export const MESSAGES = async (event: EventData) => {
     ): Promise<any> => {
       const channel_id = select?.channel_id ?? event.target_id
       return await directController(msg, channel_id, select?.open_id ?? open_id)
-    },
-    Controllers
+    }
   }
 
   APPS.responseMessage(e)

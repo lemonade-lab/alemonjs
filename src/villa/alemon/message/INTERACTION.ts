@@ -7,7 +7,6 @@ import {
 import { ABotConfig } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
 
 /**
  * @param event 按钮数据
@@ -108,8 +107,7 @@ export async function INTERACTION(event: {
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

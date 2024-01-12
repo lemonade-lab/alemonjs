@@ -6,7 +6,7 @@ import {
   type UserType
 } from '../../../core/index.js'
 import { ABotConfig } from '../../../config/index.js'
-import { Controllers } from '../controller.js'
+
 import { BotMessage } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'
 import { replyController } from '../reply.js'
@@ -82,8 +82,7 @@ export async function GUILD_MEMBER_REMOVE(event: {
         quote: select?.quote,
         withdraw
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

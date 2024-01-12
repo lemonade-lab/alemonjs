@@ -12,7 +12,7 @@ import {
 import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../config/index.js'
-import { Controllers } from '../controller.js'
+
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
 
@@ -80,8 +80,7 @@ export const REACTIONS = async (event: SystemData) => {
         return false
       }
       return await replyController(msg, channel_id)
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)

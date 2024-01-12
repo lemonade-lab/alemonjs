@@ -7,7 +7,6 @@ import {
 import { ABotConfig } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'
-import { Controllers } from '../controller.js'
 
 /**
  * 成员进入
@@ -113,8 +112,7 @@ export async function MEMBERS(event: {
       return await replyController(villaId, roomId, msg, {
         quote: select?.quote
       })
-    },
-    Controllers
+    }
   }
 
   APPS.responseEventType(e)
