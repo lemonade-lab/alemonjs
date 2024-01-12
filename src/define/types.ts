@@ -2,7 +2,7 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { ServerOptions } from '../koa/types.js'
-import { APPS } from '../core/index.js'
+import { APPS, ControllersType } from '../core/index.js'
 
 export interface PlatformsItemType {
   /**
@@ -25,7 +25,7 @@ export interface PlatformsItemType {
      * 非消息事件
      */
     responseEventType: typeof APPS.responseEventType
-  ) => any
+  ) => ControllersType
 }
 
 /**

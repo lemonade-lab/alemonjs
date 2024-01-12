@@ -8,10 +8,8 @@ import { segmentNTQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../config/index.js'
 import { GROUP_DATA } from '../types.js'
-
 import { replyController } from '../reply.js'
 import { directController } from '../direct.js'
-
 /**
  * 公私域合并
  * @param e
@@ -19,9 +17,7 @@ import { directController } from '../direct.js'
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
-  const cfg = ABotConfig.get('ntqq')
-  const masterID = cfg.masterID
-
+  const masterID = ABotConfig.get('ntqq').masterID
   const e = {
     platform: 'ntqq',
     event: 'MESSAGES' as (typeof EventEnum)[number],

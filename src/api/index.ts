@@ -1,6 +1,6 @@
 /**
  * ***********
- * SDK接口管理
+ * clinent
  * ***********
  */
 export { ClientQQ } from '../qq/index.js'
@@ -9,9 +9,10 @@ export { ClientNTQQ } from '../ntqq/index.js'
 export { ClientKOOK } from '../kook/index.js'
 export { ClientDISOCRD } from '../discord/index.js'
 export { ClientKOA } from '../koa/index.js'
+
 /**
  * ************
- * Controllers
+ * controllers
  * ************
  */
 import { Controllers as ControllerVILLA } from '../villa/alemon/controller.js'
@@ -22,7 +23,9 @@ import { Controllers as ControllerKOOK } from '../kook/alemon/controller.js'
 import { BaseConfig, ControllerOption, ControllersType } from '../core/index.js'
 
 /**
- * 控制器缓存
+ * *********
+ * AControllers
+ * ***********
  */
 export const AControllers = new BaseConfig<{
   [key: string]: ControllersType
@@ -40,11 +43,11 @@ export const AControllers = new BaseConfig<{
 })
 
 /**
- * 控制器工厂
+ * controllers reate
  * @param select
  * @returns
  */
-export function Controllers(select?: ControllerOption) {
+export function Controllers(select: ControllerOption) {
   const platform = AControllers.get(select.platform)
   return new platform(select)
 }

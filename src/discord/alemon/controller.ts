@@ -46,6 +46,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
     reply: async (
       content: Buffer | string | number | (Buffer | number | string)[]
     ) => {
+      const attribute = this.get('attribute')
+      if (attribute == 'single') return
       const channel_id = this.get('channel_id')
       return await replyController(content, channel_id)
     },

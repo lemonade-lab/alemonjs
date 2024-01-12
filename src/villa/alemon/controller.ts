@@ -29,13 +29,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       content: Buffer | string | number | (Buffer | number | string)[]
     ) => {
       const guild_id = this.get('guild_id')
-      const open_id = this.get('open_id')
       const channel_id = this.get('channel_id')
-      // villa未有回复api
-      if (open_id) {
-        console.error('VILLA 无私信')
-        return false
-      }
       return await replyController(guild_id, channel_id, content)
     },
     /**
@@ -47,13 +41,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
       content: Buffer | string | number | (Buffer | number | string)[]
     ) => {
       const guild_id = this.get('guild_id')
-      const open_id = this.get('open_id')
       const channel_id = this.get('channel_id')
       const msg_id = this.get('msg_id')
-      if (open_id) {
-        console.error('VILLA 无私信')
-        return false
-      }
       return await replyController(guild_id, channel_id, content, {
         quote: msg_id
       })
@@ -182,7 +171,6 @@ export class Controllers extends BaseConfig<ControllerOption> {
       const data = await ClientVILLA.getMember(guild_id, user_id).then(
         res => res.data
       )
-
       if (!data) return false
       const cfg = ABotConfig.get('villa')
       const masterID = cfg.masterID

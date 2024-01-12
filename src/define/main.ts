@@ -11,6 +11,7 @@ import { ABotConfig } from '../config/index.js'
 import { createWeb } from '../koa/index.js'
 import { ClientKOA } from '../koa/file.js'
 import { join } from 'path'
+import { AControllers } from '../api/index.js'
 
 /**
  * 配置机器人启动规则
@@ -130,12 +131,16 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
           const back = Options.platforms.find(i => i.name == item)
           // 存在login  但不存在插件
           if (!back) continue
+          // 登录配置
+          const login = Options.login[back.name]
           // 登录
-          back.login(
-            Options.login[back.name],
+          const c = back.login(
+            login,
             APPS.responseMessage,
             APPS.responseEventType
           )
+          // 设置控制器
+          AControllers.set(back.name, c)
         }
       }
     }

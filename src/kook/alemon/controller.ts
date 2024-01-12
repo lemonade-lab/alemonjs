@@ -6,6 +6,7 @@ import {
   type UserInformationType
 } from '../../core/index.js'
 import { ABotConfig } from '../../config/index.js'
+import { directController } from './direct.js'
 
 export class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
@@ -52,13 +53,23 @@ export class Controllers extends BaseConfig<ControllerOption> {
     reply: async (
       content: Buffer | string | number | (Buffer | number | string)[]
     ) => {
+      const attribute = this.get('attribute')
       const channel_id = this.get('channel_id')
+      if (attribute == 'single') {
+        const open_id = this.get('open_id')
+        return await directController(content, channel_id, open_id)
+      }
       return await replyController(content, channel_id)
     },
     quote: async (
       content: Buffer | string | number | (Buffer | number | string)[]
     ) => {
       const channel_id = this.get('channel_id')
+      const attribute = this.get('attribute')
+      if (attribute == 'single') {
+        const open_id = this.get('open_id')
+        return await directController(content, channel_id, open_id)
+      }
       return await replyController(content, channel_id)
     },
     update: async (

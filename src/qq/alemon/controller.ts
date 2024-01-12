@@ -68,6 +68,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       }
     }
   }
+
   Message = {
     reply: async (
       content: Buffer | string | number | (Buffer | number | string)[]
@@ -76,7 +77,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
       const user_id = this.get('user_id')
       const msg_id = this.get('msg_id')
       const channel_id = this.get('channel_id')
-      if (open_id && open_id != '' && user_id) {
+      const attribute = this.get('attribute')
+      if (attribute == 'single') {
         return await directController(content, open_id, msg_id, {
           open_id: open_id,
           user_id: user_id
@@ -103,7 +105,9 @@ export class Controllers extends BaseConfig<ControllerOption> {
     ) => {
       return false
     },
-    withdraw: async (hideTip = true) => {},
+    withdraw: async (hideTip = true) => {
+      //
+    },
     pinning: async (cancel?: boolean) => {
       if (cancel) {
         //

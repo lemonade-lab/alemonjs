@@ -146,7 +146,11 @@ export interface ControllerOption {
   /**
    * 平台
    */
-  platform?: string
+  platform: string
+  /**
+   * 群聊 | 私聊
+   */
+  attribute?: 'group' | 'single'
   /**
    * 频道号
    */

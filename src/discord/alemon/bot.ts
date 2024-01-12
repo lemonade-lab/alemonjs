@@ -1,10 +1,9 @@
 import { BaseBotMessage } from '../../core/index.js'
-interface BotMessageType {
+export const BotMessage = new BaseBotMessage<{
   id: string
   name: string
   avatar?: string
-}
-export const BotMessage = new BaseBotMessage<BotMessageType>({
+}>({
   id: '',
   name: '',
   avatar: ''

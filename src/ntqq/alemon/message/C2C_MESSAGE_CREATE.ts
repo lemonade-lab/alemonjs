@@ -9,14 +9,11 @@ import { BotMessage } from '../bot.js'
 import { USER_DATA } from '../types.js'
 import { ABotConfig } from '../../../config/index.js'
 
-import { directController, Controllers } from '../direct.js'
+import { directController } from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
-  const cfg = ABotConfig.get('ntqq')
-  const masterID = cfg.masterID
-
+  const masterID = ABotConfig.get('ntqq').masterID
   const open_id = event.author.user_openid
-
   const e = {
     platform: 'ntqq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -57,7 +54,6 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
       return await directController(msg, open_id, msg_id)
     }
   }
-
   APPS.responseMessage(e)
   return
 }
