@@ -8,6 +8,10 @@ import { ApiLog } from './log.js'
  * api接口
  */
 class ClientDc {
+  API_URL = 'https://discord.com/api/v10'
+
+  CDB_URL = 'https://cdn.discordapp.com'
+
   /**
    * 基础请求
    * @param opstion
@@ -16,7 +20,7 @@ class ClientDc {
   request(options: AxiosRequestConfig) {
     const token = config.get('token')
     const service = axios.create({
-      baseURL: 'https://discord.com/api/v10',
+      baseURL: this.API_URL,
       timeout: 6000,
       headers: {
         'Content-Type': 'application/json',
@@ -33,9 +37,8 @@ class ClientDc {
    */
   requestCDN(options: AxiosRequestConfig) {
     const token = config.get('token')
-    const BaseUrl = config.get('BaseUrl')
     const service = axios.create({
-      baseURL: BaseUrl,
+      baseURL: this.CDB_URL,
       timeout: 6000,
       headers: {
         'Content-Type': 'application/json',
@@ -52,8 +55,7 @@ class ClientDc {
    * @returns
    */
   userAvatar(user_id: string, avatar_hash: string) {
-    const BaseUrl = config.get('BaseUrl')
-    return `${BaseUrl}/avatars/${user_id}/${avatar_hash}.png`
+    return `${this.CDB_URL}/avatars/${user_id}/${avatar_hash}.png`
   }
 
   /**

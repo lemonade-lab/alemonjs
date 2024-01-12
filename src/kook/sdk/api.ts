@@ -14,6 +14,8 @@ import { ApiLog } from './log.js'
  * api接口
  */
 class ClientKook {
+  API_URL = 'https://www.kookapp.cn'
+
   /**
    * KOOK服务
    * @param config
@@ -22,7 +24,7 @@ class ClientKook {
   kookService(opstoin: AxiosRequestConfig) {
     const token = config.get('token')
     const service = axios.create({
-      baseURL: 'https://www.kookapp.cn',
+      baseURL: this.API_URL,
       timeout: 30000,
       headers: {
         Authorization: `Bot ${token}`

@@ -45,14 +45,14 @@ export class Alemon {
   #regular: RegExp | null = null
 
   // 消息链表
-  #list = new DoublyLinkedList<NodeDataType>()
+  #MessageList = new DoublyLinkedList<NodeDataType>()
 
-  #listArr: NodeDataType[] = []
+  #MessageListArr: NodeDataType[] = []
 
   // 事件链表
-  #elist = new DoublyLinkedList<NodeDataType>()
+  #EventList = new DoublyLinkedList<NodeDataType>()
 
-  #elistArr: NodeDataType[] = []
+  #EventListArr: NodeDataType[] = []
 
   /**
    * 创建应用
@@ -92,7 +92,7 @@ export class Alemon {
    * list查询
    */
   find(acount: number, example: string, func: string) {
-    for (const node of this.#listArr) {
+    for (const node of this.#MessageListArr) {
       if (
         node.acount == acount &&
         node.example == example &&
@@ -168,7 +168,7 @@ export class Alemon {
    */
   async responseMessage(e: AEvent) {
     // 空的
-    if (this.#list.isEmpty() || !e) return
+    if (this.#MessageList.isEmpty() || !e) return
     const time = Date.now()
     /**
      * **********
@@ -243,7 +243,7 @@ export class Alemon {
      * 走表
      * **********
      */
-    for (const node of this.#listArr) {
+    for (const node of this.#MessageListArr) {
       // 索引匹配
       if (node.reg.test(e.msg)) {
         this.#data[node.acount][node.example]['e'] = e
@@ -308,7 +308,7 @@ export class Alemon {
    */
   async responseEventType(e: AEvent) {
     // 空的
-    if (this.#elist.isEmpty() || !e) return
+    if (this.#EventList.isEmpty() || !e) return
 
     const time = Date.now()
 
@@ -381,7 +381,7 @@ export class Alemon {
      * ******
      * *****
      */
-    for (const node of this.#elistArr) {
+    for (const node of this.#EventListArr) {
       // 类型不符
       if (node.event !== e.event || node.typing !== e.typing) continue
       //
@@ -575,37 +575,43 @@ export class Alemon {
           node.event = 'MESSAGES'
           node.typing = 'CREATE'
           // 为空
-          if (this.#list.isEmpty()) {
-            this.#list.unshift(node)
+          if (this.#MessageList.isEmpty()) {
+            this.#MessageList.unshift(node)
           } else {
             // 比头部小
-            if (priority <= this.#list.getHead().value.priority) {
-              this.#list.unshift(node)
+            if (priority <= this.#MessageList.getHead().value.priority) {
+              this.#MessageList.unshift(node)
               continue
-            } else if (priority >= this.#list.getTail().value.priority) {
+            } else if (priority >= this.#MessageList.getTail().value.priority) {
               // 比尾部大
-              this.#list.push(node)
+              this.#MessageList.push(node)
               continue
             }
-            this.#list.traverseAndInsert(node => priority < node.priority, node)
+            this.#MessageList.traverseAndInsert(
+              node => priority < node.priority,
+              node
+            )
           }
           continue
         }
         // 为空
-        if (this.#elist.isEmpty()) {
-          this.#elist.unshift(node)
+        if (this.#EventList.isEmpty()) {
+          this.#EventList.unshift(node)
         } else {
           // 比头部小(同等级的放前面,损耗最小)
-          if (priority <= this.#elist.getHead().value.priority) {
-            this.#elist.unshift(node)
+          if (priority <= this.#EventList.getHead().value.priority) {
+            this.#EventList.unshift(node)
             continue
-          } else if (priority >= this.#elist.getTail().value.priority) {
+          } else if (priority >= this.#EventList.getTail().value.priority) {
             // 比尾部大(同等级的放后面,损耗最小)
-            this.#elist.push(node)
+            this.#EventList.push(node)
             continue
           }
           // 顺序插入
-          this.#elist.traverseAndInsert(node => priority < node.priority, node)
+          this.#EventList.traverseAndInsert(
+            node => priority < node.priority,
+            node
+          )
         }
         continue
       }
@@ -638,12 +644,12 @@ export class Alemon {
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
     // 数组化
-    this.#elistArr = this.#elist.toArray()
-    this.#listArr = this.#list.toArray()
+    this.#EventListArr = this.#EventList.toArray()
+    this.#MessageListArr = this.#MessageList.toArray()
     // 设置
     AppMap.set(this.#name, this)
     // 生成json
-    new AInstruct(this.#name).create(this.#listArr)
+    new AInstruct(this.#name).create(this.#MessageListArr)
   }
 
   #infoFunc = (

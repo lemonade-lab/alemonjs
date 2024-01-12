@@ -4,9 +4,11 @@ import { FileType, MsgType } from './typings.js'
 import { ApiLog } from './log.js'
 
 class ClientNtqq {
-  API_BOTS = 'https://bots.qq.com'
-  API_SGROUP = 'https://api.sgroup.qq.com'
-  API_SGROUP_SANDBOX = 'https://sandbox.api.sgroup.qq.com'
+  BOTS_API_RUL = 'https://bots.qq.com'
+
+  API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com'
+
+  API_URL = 'https://api.sgroup.qq.com'
 
   /**
    * 得到鉴权
@@ -16,7 +18,7 @@ class ClientNtqq {
    * @returns
    */
   getAuthentication(appId: string, clientSecret: string) {
-    return axios.post(`${this.API_BOTS}/app/getAppAccessToken`, {
+    return axios.post(`${this.BOTS_API_RUL}/app/getAppAccessToken`, {
       appId: appId,
       clientSecret: clientSecret
     })
@@ -31,7 +33,7 @@ class ClientNtqq {
     const appID = config.get('appID')
     const token = config.get('token')
     const service = await axios.create({
-      baseURL: this.API_SGROUP,
+      baseURL: this.API_URL,
       timeout: 20000,
       headers: {
         'X-Union-Appid': appID,

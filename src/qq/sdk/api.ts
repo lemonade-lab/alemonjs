@@ -7,6 +7,10 @@ import { ApiLog } from './log.js'
  * api接口
  */
 class ClientQq {
+  SANDBOT_API_URL = 'https://sandbox.api.sgroup.qq.com'
+
+  API_URL = 'https://api.sgroup.qq.com'
+
   /**
    * 基础请求
    * @param opstion
@@ -17,9 +21,7 @@ class ClientQq {
     const token = config.get('token')
     const sandbox = config.get('sandbox')
     const service = await axios.create({
-      baseURL: sandbox
-        ? 'https://sandbox.api.sgroup.qq.com'
-        : 'https://api.sgroup.qq.com',
+      baseURL: sandbox ? this.SANDBOT_API_URL : this.API_URL,
       timeout: 20000,
       headers: {
         Authorization: `Bot ${appID}.${token}`
