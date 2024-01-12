@@ -85,18 +85,15 @@ export async function runAlemon(Options?: AlemonOptions) {
       // 非内置机器人
       if (!['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
         const back = Options.platforms.find(i => i.name == item)
-        // 存在login  但不存在插件
         if (!back) continue
-        // 登录配置
-        const login = Options.login[back.name]
         // 登录
-        const c = back.login(
-          login,
+        back.login(
+          Options.login[back.name],
           APPS.responseMessage,
           APPS.responseEventType
         )
         // 设置控制器
-        AControllers.set(back.name, c)
+        AControllers.set(back.name, back.controllers)
       }
     }
   }

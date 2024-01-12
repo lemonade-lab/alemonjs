@@ -10,6 +10,10 @@ export interface PlatformsItemType {
    */
   name: string
   /**
+   * 控制器
+   */
+  controllers: ControllersType
+  /**
    * 登录
    */
   login: (
@@ -25,7 +29,7 @@ export interface PlatformsItemType {
      * 非消息事件
      */
     responseEventType: typeof APPS.responseEventType
-  ) => ControllersType
+  ) => any
 }
 
 /**
