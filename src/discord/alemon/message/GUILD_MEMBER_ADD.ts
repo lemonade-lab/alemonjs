@@ -2,8 +2,7 @@ import {
   APPS,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption,
-  type UserType
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { ABotConfig } from '../../../config/index.js'
 

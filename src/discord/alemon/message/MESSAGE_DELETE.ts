@@ -2,15 +2,12 @@ import {
   APPS,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption,
-  type UserType
+  type MessageBingdingOption
 } from '../../../core/index.js'
-import { ABotConfig } from '../../../config/index.js'
 
 import { BotMessage } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'
 import { replyController } from '../reply.js'
-import { ClientDISOCRD } from '../../sdk/index.js'
 
 /**
  * 消息撤回
@@ -21,8 +18,6 @@ export async function MESSAGE_DELETE(event: {
   channel_id: string
   guild_id: string
 }) {
-  const masterID = ABotConfig.get('discord').masterID
-
   const e = {
     platform: 'qq',
     event: 'MESSAGES' as (typeof EventEnum)[number],

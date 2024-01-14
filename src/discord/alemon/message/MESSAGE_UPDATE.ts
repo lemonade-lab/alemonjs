@@ -74,36 +74,15 @@ export async function MESSAGE_UPDATE(event: {
   const at_users: UserType[] = []
 
   /**
-   * 切割
-   */
-  for (const item of event.mentions) {
-    at_users.push({
-      id: item.id,
-      name: item.username,
-      avatar: ClientDISOCRD.userAvatar(item.id, item.avatar),
-      bot: item.bot
-    })
-  }
-
-  /**
    * 清除 @ 相关
    */
   let msg = event.content
-  for await (const item of at_users) {
-    msg = msg.replace(`<@${item.id}>`, '').trim()
-  }
 
   /**
    * 艾特处理
    */
   let at = false
   let at_user: UserType | undefined = undefined
-  if (at_users.some(item => item.bot != true)) {
-    at = true
-  }
-  if (at) {
-    at_user = at_users.find(item => item.bot != true)
-  }
 
   const e = {
     platform: 'qq',

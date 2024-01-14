@@ -520,9 +520,9 @@ export class Alemon {
 
       // 过滤事件
       const event = AppLoadConfig.get('event')
-      if (keys.event && event.includes(keys.event)) {
-        continue
-      }
+
+      //
+      if (keys.event && event.includes(keys.event)) continue
 
       // name
       keys.name = this.#name
@@ -532,6 +532,7 @@ export class Alemon {
       keys.example = example
       // 记录
       this.#data[this.#acount][example] = keys
+
       // 忽视非法key
       if (
         !keys['rule'] ||
@@ -649,7 +650,20 @@ export class Alemon {
     // 设置
     AppMap.set(this.#name, this)
     // 生成json
-    new AInstruct(this.#name).create(this.#MessageListArr)
+    new AInstruct(this.#name).create(
+      this.#MessageList.map(item => {
+        return {
+          name: item.name,
+          acount: item.acount,
+          example: item.example,
+          event: item.event,
+          typing: item.typing,
+          priority: item.priority,
+          func: item.func,
+          reg: String(item.reg)
+        }
+      })
+    )
   }
 
   #infoFunc = (

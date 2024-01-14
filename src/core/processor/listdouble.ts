@@ -184,4 +184,19 @@ export class DoublyLinkedList<T> {
     }
     return array
   }
+
+  /**
+   *
+   * @param func
+   * @returns
+   */
+  map(func: (val: T) => any): any[] {
+    const array: any[] = []
+    let currentNode = this.#head
+    while (currentNode !== null) {
+      array.push(func(currentNode.value))
+      currentNode = currentNode.next
+    }
+    return array
+  }
 }
