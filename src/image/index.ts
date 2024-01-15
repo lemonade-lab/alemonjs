@@ -1,11 +1,16 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { readFileSync } from 'node:fs'
+import { readFileSync, cpSync } from 'node:fs'
 import { Puppeteer, type ScreenshotFileOptions } from '../core/index.js'
 import { getStrMatchSize, replaceLocal } from './utils.js'
 import { cache } from './html.js'
 import { PuppeteerLaunchOptions } from 'puppeteer'
-
+/**
+ * 插入模板
+ * @param str
+ * @param arr
+ * @returns
+ */
 function render(str: string, arr: { reg: RegExp; val: string }[]) {
   // 传入一个 []  key:reg , val:xxx
   for (const item of arr) {
@@ -21,6 +26,14 @@ function render(str: string, arr: { reg: RegExp; val: string }[]) {
 export function createImage(cwd?: string) {
   // 传进来,设置一些参数
   let ImageCwd = (cwd ?? process.cwd()).replace(/\\/g, '/')
+
+  const im = join(ImageCwd, '.image')
+
+  // 确保目录存在
+  mkdirSync(im, { recursive: true })
+
+  // 复制文件
+  cpSync(im, join(process.cwd(), '.image'))
 
   let ImageLate: string
 
@@ -81,7 +94,11 @@ export function createImage(cwd?: string) {
       data?: any
       cance?: boolean
     }) => {
-      // 字符串解析
+      /**
+       * **********
+       * 字符串解析
+       * *********
+       */
       const head = getStrMatchSize(
         ImageCwd,
         str,
@@ -114,6 +131,11 @@ export function createImage(cwd?: string) {
         cance
       )
 
+      /**
+       * ********
+       * 插入模板
+       * ********
+       */
       ImageHtml = replaceLocal(
         render(cache, [
           {
@@ -139,6 +161,10 @@ export function createImage(cwd?: string) {
           {
             reg: /<ImageScript\s*\/>/,
             val: script
+          },
+          {
+            reg: /<ImageDir\s*\/>/,
+            val: ImageCwd
           }
         ]),
         cance

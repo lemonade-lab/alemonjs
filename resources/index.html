@@ -6,34 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AlemonJS Image</title>
 
-    <style>
-      body,
-      html {
-        margin: 0;
-      }
-    </style>
-
     <ImageStyle />
 
     <ImageHead />
 
     <ImageLink />
+    
   </head>
 
   <body>
-    <div id="app">
-      <ImageTemplate />
-    </div>
-
     <script src="~/vue.js"></script>
 
+    <ImageTemplate />
+
     <script>
+      const BOT_DIR = `<ImageDir>`
       const BOT_DATA = JSON.parse(`<ImageData/>`)
-      const { createApp } = Vue
     </script>
 
     <ImageScript />
 
     <script src="~/ws.js"></script>
+
   </body>
 </html>
