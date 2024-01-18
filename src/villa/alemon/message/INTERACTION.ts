@@ -35,6 +35,7 @@ export async function INTERACTION(event: {
       msgUid: string
       uid: number
       botMsgId: string
+      extra: string
     }
   }
   createdAt: number
@@ -76,7 +77,8 @@ export async function INTERACTION(event: {
     at_users: [],
     at_user: undefined,
     msg_id: msg_id,
-    msg: '',
+    // 回调透传信息
+    msg: String(ClickMsgComponent.extra),
     msg_txt: '',
     quote: '',
     open_id: '',
