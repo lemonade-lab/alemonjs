@@ -650,20 +650,7 @@ export class Alemon {
     // 设置
     AppMap.set(this.#name, this)
     // 生成json
-    new AInstruct(this.#name).create(
-      this.#MessageList.map(item => {
-        return {
-          name: item.name,
-          acount: item.acount,
-          example: item.example,
-          event: item.event,
-          typing: item.typing,
-          priority: item.priority,
-          func: item.func,
-          reg: String(item.reg)
-        }
-      })
-    )
+    new AInstruct(this.#name).create(this.#MessageListArr)
   }
 
   #infoFunc = (

@@ -6,6 +6,7 @@ import { ProtoCommand, ProtoModel } from './proto.js'
 import { config } from './config.js'
 import { ApiLog } from './log.js'
 import { hmacSha256 } from './hs.js'
+import { ReStart } from '../../core/index.js'
 
 /**
  * ****
@@ -56,6 +57,8 @@ export class Client {
   #counter = new Counter(0)
   // 编号
   #IntervalID = null
+  //
+  #at = new ReStart(3)
   // 发送
   #time = 20 * 1000
   // 数据
@@ -66,7 +69,7 @@ export class Client {
     app_id: number
     platform: number
     device_id: string
-  }
+  } = null
   /**
    * 得到鉴权
    * @returns
@@ -97,6 +100,18 @@ export class Client {
       .catch(err => {
         console.error(err)
       })
+  }
+
+  #aut() {
+    return {
+      ID: this.#ID.getNextID(),
+      Flag: 1, // 发送
+      BizType: 6,
+      AppId: this.#data.app_id,
+      BodyData: ProtoCommand('PHeartBeat').encode({
+        clientTimestamp: `${new Date().getTime()}`
+      })
+    }
   }
 
   /**
@@ -151,83 +166,98 @@ export class Client {
    */
   async connect(conversation: (...args: any[]) => any) {
     this.#data = await this.#gateway().then(res => res.data)
+
     if (!this.#data?.websocket_url) {
       console.info('[getway] secret err')
       return
     }
 
+    const map = {
+      7: ({ BodyData }) => {
+        // 登录
+        const reply = ProtoCommand('PLoginReply').decode(BodyData)
+        if (process.env?.VILLA_WS == 'dev') {
+          console.info('PLoginReply:', this.#longToNumber(reply))
+        }
+        if (reply.code) {
+          console.info('[ws] login err')
+        } else {
+          console.info('[ws] login success')
+          // 重置
+          this.#at.del()
+          this.#counter.reStart()
+          // 20s 心跳
+          this.#IntervalID = setInterval(() => {
+            this.#ws.send(createMessage(this.#aut()))
+          }, this.#time)
+        }
+      },
+      6: ({ BodyData }) => {
+        // 心跳
+        const reply = ProtoCommand('PHeartBeatReply').decode(BodyData)
+        if (process.env?.VILLA_WS == 'dev') {
+          console.info('PHeartBeatReply:', this.#longToNumber(reply))
+        }
+        if (reply.code) {
+          console.info('[ws] 心跳错误')
+          // 心跳错误,关闭心跳记时器
+          if (this.#IntervalID) clearInterval(this.#IntervalID)
+          if (this.#counter.get() < 5) {
+            // 重新发送鉴权
+            this.#ws.send(createMessage(this.#getLoginData()))
+          } else {
+            console.info('重鉴权次数上限')
+          }
+        }
+      },
+      8: ({ BodyData }) => {
+        // 退出登录
+        const reply = ProtoCommand('PLogoutReply').decode(BodyData)
+        if (process.env?.VILLA_WS == 'dev') {
+          console.info('PLogoutReply:', this.#longToNumber(reply))
+        }
+      },
+      // 被踢下线
+      53: () => {
+        // 确保之前的被删除
+        clearTimeout(this.#IntervalID)
+        // 重新计数
+        this.#counter.reStart()
+      },
+      // 服务器关机
+      52: () => {
+        // 尝试重连
+
+        // 开始连接
+        this.#start(map)
+      },
+      30001: ({ BodyData }) => {
+        // 回调数据包
+        const reply = ProtoModel('RobotEvent').decode(BodyData)
+        const data = this.#longToNumber(reply)
+        if (process.env?.VILLA_WS == 'dev') console.info('data', data)
+        conversation(data)
+      }
+    }
+
+    // 开始连接
+    this.#start(map)
+  }
+
+  #start(map: any) {
     this.#ws = new WebSocket(this.#data.websocket_url)
     this.#ws.on('open', async () => {
       console.info('[ws] login open')
       // login
       this.#ws.send(createMessage(this.#getLoginData()))
     })
-
     this.#ws.on('message', message => {
       if (Buffer.isBuffer(message)) {
         try {
+          // 解析数据
           const obj = parseMessage(new Uint8Array(message))
           if (!obj) return
-          if (obj.bizType == 7) {
-            // 登录
-            const reply = ProtoCommand('PLoginReply').decode(obj.BodyData)
-            if (process.env?.VILLA_WS == 'dev') {
-              console.info('PLoginReply:', this.#longToNumber(reply))
-            }
-            if (reply.code) console.info('[ws] login err')
-            else {
-              console.info('[ws] login success')
-              this.#counter.reStart()
-              // 20s 心跳
-              this.#IntervalID = setInterval(() => {
-                this.#ws.send(
-                  createMessage({
-                    ID: this.#ID.getNextID(),
-                    Flag: 1, // 发送
-                    BizType: 6,
-                    AppId: this.#data.app_id,
-                    BodyData: ProtoCommand('PHeartBeat').encode({
-                      clientTimestamp: `${new Date().getTime()}`
-                    })
-                  })
-                )
-              }, this.#time)
-            }
-          } else if (obj.bizType == 6) {
-            // 心跳
-            const reply = ProtoCommand('PHeartBeatReply').decode(obj.BodyData)
-            if (process.env?.VILLA_WS == 'dev') {
-              console.info('PHeartBeatReply:', this.#longToNumber(reply))
-            }
-            if (reply.code) {
-              console.info('[ws] 心跳错误')
-              // 心跳错误,关闭心跳记时器
-              if (this.#IntervalID) clearInterval(this.#IntervalID)
-              if (this.#counter.get() < 5) {
-                // 重新发送鉴权
-                this.#ws.send(createMessage(this.#getLoginData()))
-              } else {
-                console.info('重鉴权次数上限')
-              }
-            }
-          } else if (obj.bizType == 8) {
-            // 退出登录
-            const reply = ProtoCommand('PLogoutReply').decode(obj.BodyData)
-            if (process.env?.VILLA_WS == 'dev')
-              console.info('PLogoutReply:', this.#longToNumber(reply))
-          } else if (obj.bizType == 53) {
-            // 强制下线
-          } else if (obj.bizType == 52) {
-            // 服务器关机
-          } else if (obj.bizType == 30001) {
-            // 回调数据包
-            const reply = ProtoModel('RobotEvent').decode(obj.BodyData)
-            const data = this.#longToNumber(reply)
-            if (process.env?.VILLA_WS == 'dev') console.info('data', data)
-            conversation(data)
-          } else {
-            if (process.env?.VILLA_WS == 'dev') console.info('未知数据')
-          }
+          map[obj.bizType](obj)
         } catch {
           if (process.env?.VILLA_WS == 'dev') console.info('代码错误')
         }
@@ -235,10 +265,33 @@ export class Client {
         if (process.env?.VILLA_WS == 'dev') console.info('未知数据')
       }
     })
-
     this.#ws.on('error', error => {
       console.info('[ws] close', error)
+      this.#timeout(map)
     })
+  }
+
+  /**
+   * 定时重启
+   * @returns
+   */
+  #timeout(map: any) {
+    // 确保之前的被删除
+    clearTimeout(this.#IntervalID)
+    const size = this.#at.getSize()
+    if (size >= 6) return
+    // 一定时间后开始重新连接
+    if (size === 1) {
+      // 第一次
+      setTimeout(() => {
+        this.#start(map)
+      }, this.#at.get())
+    } else {
+      // 累加
+      setTimeout(() => {
+        this.#start(map)
+      }, this.#at.next())
+    }
   }
 
   /**

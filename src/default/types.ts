@@ -1,5 +1,5 @@
 import { VILLAOptions } from '../villa/sdk/wss.js'
-import { KOOKOptions } from '../kook/sdk/ws.js'
+import { KOOKOptions } from '../kook/sdk/wss.js'
 import { QQOptions } from '../qq/sdk/wss.js'
 import { NTQQOptions } from '../ntqq/sdk/wss.js'
 import { DISOCRDOptions } from '../discord/sdk/wss.js'

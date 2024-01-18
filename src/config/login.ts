@@ -1,6 +1,6 @@
 import { type BotConfigType } from './types.js'
 import { DefaultConfig } from '../default/index.js'
-import { defineKOOK as kook } from '../kook/sdk/ws.js'
+import { defineKOOK as kook } from '../kook/sdk/wss.js'
 import { defineVILLA as villa } from '../villa/sdk/wss.js'
 import { defineQQ as qq } from '../qq/sdk/wss.js'
 import { defineNtqq as ntqq } from '../ntqq/sdk/wss.js'

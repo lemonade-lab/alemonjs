@@ -3,6 +3,7 @@ import { ClientDISOCRD } from './api.js'
 import { config } from './config.js'
 import { IntentsEnum } from './types.js'
 import { getIntents } from './intents.js'
+import { ReStart } from '../../core/index.js'
 
 /**
  * ****
@@ -66,6 +67,12 @@ export class Client {
 
   #ws: WebSocket
 
+  #at = new ReStart(3)
+
+  #timeoutID = null
+
+  #url = null
+
   /**
    * 设置配置
    * @param opstion
@@ -78,7 +85,7 @@ export class Client {
   }
 
   /**
-   *
+   * 得到鉴权
    * @returns
    */
   #aut() {
@@ -101,7 +108,7 @@ export class Client {
   }
 
   /**
-   *
+   * 重新鉴权
    */
   #reAut() {
     const token = config.get('token')
@@ -116,33 +123,41 @@ export class Client {
   }
 
   /**
+   * 发送机心跳
+   */
+  #call() {
+    this.#ws.send(
+      JSON.stringify({
+        op: 1, //  op = 1
+        d: null // 如果是第一次连接，传null
+      })
+    )
+    this.#timeoutID = setTimeout(this.#call, this.#heartbeat_interval)
+  }
+
+  /**
    * 创建ws监听
    * @param conversation
    * @param shard
    * @returns
    */
   async connect(conversation: (...args: any[]) => any) {
-    const { url } = await ClientDISOCRD.gateway()
-    if (!url) {
+    this.#url = await ClientDISOCRD.gateway().then(res => res?.url)
+
+    if (!this.#url) {
       console.error('[getway] token err')
       return
     }
 
-    const call = async () => {
-      this.#ws.send(
-        JSON.stringify({
-          op: 1, //  op = 1
-          d: null // 如果是第一次连接，传null
-        })
-      )
-      setTimeout(call, this.#heartbeat_interval)
-    }
-
-    //
+    // 定义处理map
     const map = {
+      // 数据处理
       0: ({ d, t }) => {
         conversation(t, d)
         if (t == 'READY') {
+          // 连接成功
+          this.#at.del()
+
           this.#session_id = d?.session_id
           if (d?.resume_gateway_url) {
             this.#resume_gateway_url = d?.resume_gateway_url
@@ -154,35 +169,44 @@ export class Client {
         this.#ws.send(JSON.stringify(this.#reAut()))
       },
       9: message => {
-        //  6 或 2 失败
-        // 连接失败
+        //  6 | 2 err
         console.info('[ws] parameter error', message)
+        // 尝试重启
+        this.#timeout(map)
       },
       /**
        * 打招呼
        * @param param0
        */
       10: ({ d }) => {
-        const { heartbeat_interval: ih } = d
-        this.#heartbeat_interval = ih
-        //
+        this.#heartbeat_interval = d.heartbeat_interval
+        // 回传
         this.#ws.send(
           JSON.stringify({
             op: 1,
             d: null
           })
         )
-        setTimeout(call, this.#heartbeat_interval)
-        // 在初次握手期间启动新会话
+        // 发送鉴权
         this.#ws.send(JSON.stringify(this.#aut()))
+        // 一定时间后回复
+        this.#timeoutID = setTimeout(this.#call, this.#heartbeat_interval)
       },
+      //
       11: ({ d }) => {
         console.info('[ws] heartbeat transmission')
       }
     }
+    // 开始连接
+    this.#start(map)
+  }
 
-    this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
-
+  /**
+   * 开始连接
+   * @param map
+   */
+  #start(map: any) {
+    this.#ws = new WebSocket(`${this.#url}?v=10&encoding=json`)
     this.#ws.on('open', async () => {
       console.info('[ws] open')
     })
@@ -197,11 +221,38 @@ export class Client {
     // 关闭
     this.#ws.on('close', err => {
       console.error('[ws] 登录失败,TOKEN存在风险')
+      // 尝试重启
+      this.#timeout(map)
     })
 
     // 出错
     this.#ws.on('error', error => {
       console.error('[ws] error:', error)
+      // 尝试重启
+      this.#timeout(map)
     })
+  }
+
+  /**
+   * 定时重启
+   * @returns
+   */
+  #timeout(map: any) {
+    // 确保之前的被删除
+    clearTimeout(this.#timeoutID)
+    const size = this.#at.getSize()
+    if (size >= 6) return
+    // 一定时间后开始重新连接
+    if (size === 1) {
+      // 第一次
+      setTimeout(() => {
+        this.#start(map)
+      }, this.#at.get())
+    } else {
+      // 累加
+      setTimeout(() => {
+        this.#start(map)
+      }, this.#at.next())
+    }
   }
 }
