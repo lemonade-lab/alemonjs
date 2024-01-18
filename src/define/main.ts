@@ -144,14 +144,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.server) {
     ABotConfig.set('server', Options.server)
   }
-  // jsonCreate
-  if (Options?.JSON?.init === false) {
-    AppLoadConfig.set('regex', Options?.JSON.init)
-  }
-  // json地址
-  if (Options?.JSON?.address) {
-    AppLoadConfig.set('route', Options?.JSON?.address)
-  }
   /**
    * ************
    * 设置加载目录

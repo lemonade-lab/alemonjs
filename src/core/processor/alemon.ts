@@ -649,8 +649,11 @@ export class Alemon {
     this.#MessageListArr = this.#MessageList.toArray()
     // 设置
     AppMap.set(this.#name, this)
-    // 生成json
-    new AInstruct(this.#name).create(this.#MessageListArr)
+    // 开发模式才生成
+    if (process.env.ALEMONJS_JSON == 'dev') {
+      // 生成json
+      new AInstruct(this.#name).create(this.#MessageListArr)
+    }
   }
 
   #infoFunc = (

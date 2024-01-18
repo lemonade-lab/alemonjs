@@ -100,25 +100,9 @@ export interface AlemonOptions {
     type?: 'ts' | 'js' | 'stript'
   }
   /**
-   * 指令预览
-   */
-  JSON?: {
-    /**
-     * 是否生成
-     * defaukt true
-     */
-    init?: false
-    /**
-     * 生成地址
-     * defaukt /publick/defset
-     */
-    address?: string
-  }
-  /**
    * 事件屏蔽
    */
   shieldEvent?: string[]
-
   /**
    * **********
    * **********
