@@ -77,21 +77,6 @@ class ClientDc {
   }
 
   /**
-   * 得到应用详细信息
-   * @returns
-   */
-  async applicationsMe() {
-    return this.request({
-      method: 'get',
-      url: '/applications/@me'
-    })
-      .then(ApiLog)
-      .catch(err => {
-        console.error(err)
-      })
-  }
-
-  /**
    *
    * @param user_id
    * @param avatar_hash
@@ -162,7 +147,7 @@ class ClientDc {
    *
    * 获取应用程序角色连接元数据记录
    */
-  async getApplication_Metadata(application_id: string) {
+  async applicationRoleConnectionsMetadata(application_id: string) {
     return this.request({
       method: 'get',
       url: `/applications/${application_id}/role-connections/metadata`
@@ -176,7 +161,7 @@ class ClientDc {
    *
    * 更新应用程序角色连接元数据记录
    */
-  async updateApplication_Metadata(application_id: string) {
+  async applicationRoleConnectionsMetadataUpdate(application_id: string) {
     return this.request({
       method: 'put',
       url: `/applications/${application_id}/role-connections/metadata`
@@ -208,12 +193,13 @@ class ClientDc {
         console.error(err)
       })
   }
+
   /**
    * 根据id获取用户详情
    * @param message
    * @returns
    */
-  async usersMe_id(user_id: string) {
+  async userMessage(user_id: string) {
     return this.request({
       method: 'get',
       url: `/users/${user_id}`
@@ -252,7 +238,7 @@ class ClientDc {
    * 获取当前用户频道成员
    * *********
    */
-  async current_User(guild_id: string) {
+  async usersMeGuildsMember(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/users/@me/guilds/${guild_id}/member`
@@ -267,7 +253,7 @@ class ClientDc {
    * 获取当前用户频道成员
    * *********
    */
-  async user_Guilds(guild_id: string) {
+  async guildsMember(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/member`
@@ -282,7 +268,7 @@ class ClientDc {
    * 离开频道
    * *********
    */
-  async leave_Guild(guild_id: string) {
+  async usersMeGuildsDelete(guild_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/users/@me/guilds/${guild_id}`
@@ -297,7 +283,7 @@ class ClientDc {
    * 创建DM
    * *********
    */
-  async create_DM() {
+  async userMeChannels() {
     return this.request({
       method: 'post',
       url: `/user/@me/channels`
@@ -319,7 +305,7 @@ class ClientDc {
    * 获取当前应用程序
    * *********
    */
-  async current_Application() {
+  async applicationsMe() {
     return this.request({
       method: 'GET',
       url: `/applications/@me`
@@ -329,12 +315,13 @@ class ClientDc {
         console.error(err)
       })
   }
+
   /**
    * *********
    * 编辑当前应用程序
    * *********
    */
-  async editcurrent_Application() {
+  async applicationsMeUpdate() {
     return this.request({
       method: 'PATCH',
       url: `/applications/@me`
@@ -350,7 +337,7 @@ class ClientDc {
    * 获取当前用户连接
    * *********
    */
-  async user_Connections() {
+  async usersMeConnections() {
     return this.request({
       method: 'GET',
       url: `/users/@me/connections`
@@ -365,7 +352,7 @@ class ClientDc {
    * 获取当前用户应用程序角色连接
    * *********
    */
-  async getUser_Application(application_id: string) {
+  async usersMeApplicationsRoleConnection(application_id: string) {
     return this.request({
       method: 'GET',
       url: `/users/@me/applications/${application_id}/role-connection`
@@ -380,7 +367,7 @@ class ClientDc {
    * 更新当前用户应用程序角色连接
    * *********
    */
-  async updateCurrent_User(application_id: string) {
+  async usersMeApplicationsRoleConnectionUpdate(application_id: string) {
     return this.request({
       method: 'PUT',
       url: `/users/@me/applications/${application_id}/role-connection`
@@ -401,7 +388,7 @@ class ClientDc {
    * 创建频道
    * *********
    */
-  async create_Guild() {
+  async guildsCreate() {
     return this.request({
       method: 'post',
       url: `/guilds`
@@ -416,7 +403,7 @@ class ClientDc {
    * 获取频道
    * *********
    */
-  async get_Guild(guild_id: string) {
+  async guild(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}`
@@ -431,7 +418,7 @@ class ClientDc {
    * 获取频道预览
    * *********
    */
-  async get_GuildPreview(guild_id: string) {
+  async guildsPreview(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/preview`
@@ -446,7 +433,7 @@ class ClientDc {
    * 修改频道
    * *********
    */
-  async modify_Guild(guild_id: string) {
+  async guildsUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}`
@@ -462,7 +449,7 @@ class ClientDc {
    * 修改频道
    * *********
    */
-  async delete_Guild(guild_id: string) {
+  async guildsDelete(guild_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}`
@@ -477,7 +464,7 @@ class ClientDc {
    * 列出活跃的频道线程
    * *********
    */
-  async guild_Threads(guild_id: string) {
+  async guildsThreadsActive(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/threads/active`
@@ -492,7 +479,7 @@ class ClientDc {
    * 列出频道成员
    * *********
    */
-  async listguild_Members(guild_id: string) {
+  async guildsMembers(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members`
@@ -507,7 +494,7 @@ class ClientDc {
    * 搜索频道成员
    * *********
    */
-  async searchguild_members(guild_id: string) {
+  async guildsMembersSearch(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members/search`
@@ -522,7 +509,7 @@ class ClientDc {
    * 添加频道成员
    * *********
    */
-  async addguild_members(guild_id: string, user_id: string) {
+  async guildsMembersAdd(guild_id: string, user_id: string) {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}`
@@ -532,12 +519,13 @@ class ClientDc {
         console.error(err)
       })
   }
+
   /**
    * *********
    * 修改频道成员
    * *********
    */
-  async modifyguild_members(guild_id: string, user_id: string) {
+  async guildsMembersUpdate(guild_id: string, user_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/${user_id}`
@@ -553,7 +541,7 @@ class ClientDc {
    * 修改当前成员
    * *********
    */
-  async modifyUser_Member(guild_id: string) {
+  async guildsMembersMeNick(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
@@ -568,7 +556,7 @@ class ClientDc {
    * 修改当前用户昵称
    * *********
    */
-  async modifyUser_Nick(guild_id: string) {
+  async guildsMembersMeNickUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
@@ -583,7 +571,7 @@ class ClientDc {
    * 获取频道角色
    * *********
    */
-  async getUser_Role(guild_id: string) {
+  async guildsRoles(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/roles`
@@ -598,7 +586,7 @@ class ClientDc {
    * 创建频道角色
    * *********
    */
-  async createUser_Role(guild_id: string) {
+  async guildsRolesCreate(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/roles`
@@ -613,7 +601,7 @@ class ClientDc {
    * 修改频道角色位置
    * *********
    */
-  async modifyUser_RolePosi(guild_id: string) {
+  async guildsRolesUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles`
@@ -628,7 +616,7 @@ class ClientDc {
    * 修改频道角色
    * *********
    */
-  async modifyUser_Role(guild_id: string, role_id: string) {
+  async guildsRolesUpdateById(guild_id: string, role_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles/${role_id}`
@@ -643,7 +631,11 @@ class ClientDc {
    * 添加频道成员角色
    * *********
    */
-  async AddUser_Role(guild_id: string, user_id: string, role_id: string) {
+  async guildsMEmbersRolesAdd(
+    guild_id: string,
+    user_id: string,
+    role_id: string
+  ) {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
@@ -658,7 +650,11 @@ class ClientDc {
    * 删除频道成员角色
    * *********
    */
-  async delUser_Role(guild_id: string, user_id: string, role_id: string) {
+  async guildsMembersRolesDelete(
+    guild_id: string,
+    user_id: string,
+    role_id: string
+  ) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
@@ -673,7 +669,7 @@ class ClientDc {
    * 删除频道角色
    * *********
    */
-  async delguild_Role(guild_id: string, role_id: string) {
+  async guildsRolesDelete(guild_id: string, role_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/roles/${role_id}`
@@ -688,7 +684,7 @@ class ClientDc {
    * 删除频道成员
    * *********
    */
-  async delUser_Member(guild_id: string, user_id: string) {
+  async guildsMembersDelete(guild_id: string, user_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}`
@@ -703,7 +699,7 @@ class ClientDc {
    * 获取频道禁令
    * *********
    */
-  async getGuild_Bans(guild_id: string) {
+  async guildsBans(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/bans`
@@ -718,7 +714,7 @@ class ClientDc {
    * 获得频道禁令
    * *********
    */
-  async getGuild_Ban(guild_id: string, user_id: string) {
+  async guildsBansDelete(guild_id: string, user_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
@@ -728,12 +724,13 @@ class ClientDc {
         console.error(err)
       })
   }
+
   /**
    * *********
    * 创建频道禁令
    * *********
    */
-  async creatGuild_Ban(guild_id: string, user_id: string) {
+  async guildsBansCreateByUserId(guild_id: string, user_id: string) {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/bans/${user_id}`
@@ -748,7 +745,7 @@ class ClientDc {
    * 解除频道禁令
    * *********
    */
-  async delGuild_Ban(guild_id: string, user_id: string) {
+  async guildsBansDeleteByUserId(guild_id: string, user_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
@@ -763,7 +760,7 @@ class ClientDc {
    * 修改频道MFA级别
    * *********
    */
-  async modifyGuild_MFALevel(guild_id: string) {
+  async guildsMfa(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/mfa`
@@ -778,7 +775,7 @@ class ClientDc {
    * 获取频道修剪数量
    * *********
    */
-  async GetGuild_PruneCount(guild_id: string) {
+  async guildsPrune(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/prune`
@@ -793,7 +790,7 @@ class ClientDc {
    * 开始频道修剪
    * *********
    */
-  async beginGuild_Prune(guild_id: string) {
+  async guildsPruneUpdate(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/prune`
@@ -808,7 +805,7 @@ class ClientDc {
    * 获取频道邀请
    * *********
    */
-  async getGuild_Invites(guild_id: string) {
+  async guildsInvites(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/invites`
@@ -823,7 +820,7 @@ class ClientDc {
    * 获取频道集成
    * *********
    */
-  async getGuild_Integrations(guild_id: string) {
+  async guildsIntegrations(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/integrations`
@@ -838,7 +835,7 @@ class ClientDc {
    * 删除频道集成
    * *********
    */
-  async delGuild_Integrations(guild_id: string, integration_id: string) {
+  async guildsDeleteByIntegrationsId(guild_id: string, integration_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/${integration_id}`
@@ -853,7 +850,7 @@ class ClientDc {
    * 获取频道小部件设置
    * *********
    */
-  async getGuild_WidgetSettings(guild_id: string) {
+  async guildsWidget(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget`
@@ -868,7 +865,7 @@ class ClientDc {
    * 修改频道小部件
    * *********
    */
-  async modifyGuild_Widget(guild_id: string) {
+  async guildsWidgetUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/widget`
@@ -883,7 +880,7 @@ class ClientDc {
    * 获取频道小部件
    * *********
    */
-  async GetGuild_Widget(guild_id: string) {
+  async guildsWidgetJSON(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.json`
@@ -898,7 +895,7 @@ class ClientDc {
    * 获取频道个性网址
    * *********
    */
-  async GetGuild_VanityURL(guild_id: string) {
+  async guildVanityUrl(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/vanity-url`
@@ -913,7 +910,7 @@ class ClientDc {
    * 获取频道小部件图像
    * *********
    */
-  async GetGuild_WidgetImage(guild_id: string) {
+  async guildsWidgetPNG(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.png`
@@ -928,7 +925,7 @@ class ClientDc {
    * 获取频道欢迎屏幕
    * *********
    */
-  async GetGuild_welcomeScreen(guild_id: string) {
+  async guildsWelconScreen(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/welcome-screen`
@@ -943,7 +940,7 @@ class ClientDc {
    * 修改频道欢迎界面
    * *********
    */
-  async modifyGuild_welcomeScreen(guild_id: string) {
+  async guildsWelconmeScreen(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/welcome-screen`
@@ -958,7 +955,7 @@ class ClientDc {
    * 获取频道入职
    * *********
    */
-  async getGuild_Onboarding(guild_id: string) {
+  async guildsOnboarding(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/onboarding`
@@ -973,7 +970,7 @@ class ClientDc {
    * 修改频道入职
    * *********
    */
-  async modifyGuild_Onboarding(guild_id: string) {
+  async guildsOnboardingUpdate(guild_id: string) {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/onboarding`
@@ -988,7 +985,7 @@ class ClientDc {
    * 获取公会审核日志
    * *********
    */
-  async getGuild_AuditLog(guild_id: string) {
+  async guildsAuditLogs(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/audit-logs`
@@ -1003,7 +1000,10 @@ class ClientDc {
    * 获取自动审核规则
    * *********
    */
-  async getGuild_AutoRule(guild_id: string, auto_moderation_rule_id: string) {
+  async guildsAutoModerationsRules(
+    guild_id: string,
+    auto_moderation_rule_id: string
+  ) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
@@ -1018,7 +1018,7 @@ class ClientDc {
    * 创建自动审核规则
    * *********
    */
-  async creatGuild_AutoRule(guild_id: string) {
+  async guildsAutoModerationRulesCreate(guild_id: string) {
     return this.request({
       method: 'POST',
       url: `/guilds/${guild_id}/auto-moderation/rules`
@@ -1033,7 +1033,7 @@ class ClientDc {
    * 修改自动审核规则
    * *********
    */
-  async modifyGuild_AutoRule(
+  async guildsAutoModerationsRulesUpdate(
     guild_id: string,
     auto_moderation_rule_id: string
   ) {
@@ -1051,7 +1051,10 @@ class ClientDc {
    * 删除自动审核规则
    * *********
    */
-  async delGuild_AutoRule(guild_id: string, auto_moderation_rule_id: string) {
+  async guildsAutoModerationsRulesDelete(
+    guild_id: string,
+    auto_moderation_rule_id: string
+  ) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
@@ -1072,7 +1075,7 @@ class ClientDc {
    * 获取子频道
    * *********
    */
-  async get_Channels(guild_id: string) {
+  async guildsChannels(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/channels`
@@ -1087,7 +1090,7 @@ class ClientDc {
    * 创建子频道
    * *********
    */
-  async creat_Channels(guild_id: string) {
+  async guildsChannelsCreate(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/channels`
@@ -1102,7 +1105,7 @@ class ClientDc {
    * 修改子频道位置
    * *********
    */
-  async Modify_ChannelsPosi(guild_id: string) {
+  async guildsChannelsUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/channels`
@@ -1183,7 +1186,7 @@ class ClientDc {
    * 获取频道语音区域
    * *********
    */
-  async getGuild_VoiceRegions(guild_id: string) {
+  async guildsRegions(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/regions`
@@ -1198,7 +1201,7 @@ class ClientDc {
    * 修改当前用户语音状态
    * *********
    */
-  async modifyCurrentUser_VoiceState(guild_id: string) {
+  async guildsVoiveStatesMe(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/@me`
@@ -1213,7 +1216,7 @@ class ClientDc {
    * 修改用户语音状态
    * *********
    */
-  async modifyUser_VoiceState(guild_id: string, user_id: string) {
+  async guildsVoiceStatesUpdate(guild_id: string, user_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/${user_id}`

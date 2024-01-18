@@ -57,7 +57,6 @@
   "main": "lib/index.js",
   "files": [
     "resources",
-    ".image",
     "lib",
     "types"
   ],
