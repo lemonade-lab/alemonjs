@@ -21,7 +21,7 @@ export async function replyController(
       srv_send_msg: false,
       file_type: 1,
       url
-    }).then(res => res.file_info)
+    }).then(res => res?.file_info)
     if (!file_info) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: '',
@@ -49,7 +49,7 @@ export async function replyController(
       srv_send_msg: false,
       file_type: 1,
       url
-    }).then(res => res.file_info)
+    }).then(res => res?.file_info)
     if (!file_info) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: cont,
@@ -79,7 +79,7 @@ export async function replyController(
       srv_send_msg: false,
       file_type: 1,
       url: getUrl
-    }).then(res => res.file_info)
+    }).then(res => res?.file_info)
     if (!file_info) return false
     return await ClientNTQQ.groupOpenMessages(guild_id, {
       content: '',

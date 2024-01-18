@@ -110,7 +110,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
           srv_send_msg: false,
           file_type: 2,
           url: file
-        }).then(res => res.file_info)
+        }).then(res => res?.file_info)
         if (!file_info) return false
         const attribute = this.get('attribute')
         const open_id = this.get('open_id')

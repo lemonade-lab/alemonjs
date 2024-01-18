@@ -23,7 +23,7 @@ export async function directController(
         srv_send_msg: false,
         file_type: 1,
         url: url
-      }).then(res => res.file_info)
+      }).then(res => res?.file_info)
       if (!file_info) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
@@ -57,7 +57,7 @@ export async function directController(
       srv_send_msg: false,
       file_type: 1,
       url: url
-    }).then(res => res.file_info)
+    }).then(res => res?.file_info)
     if (!file_info) return false
     return await ClientNTQQ.usersOpenMessages(open_id, {
       content: cont,
@@ -94,7 +94,7 @@ export async function directController(
         srv_send_msg: false,
         file_type: 1,
         url: url
-      }).then(res => res.file_info)
+      }).then(res => res?.file_info)
       if (!file_info) return false
       return await ClientNTQQ.usersOpenMessages(open_id, {
         content: '',
