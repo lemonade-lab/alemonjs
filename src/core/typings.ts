@@ -339,7 +339,10 @@ export interface ReplyBase {
      * 选择
      */
     select?: MessageBingdingOption
-  ): Promise<any>
+  ): Promise<{
+    middle: any[]
+    backhaul: any
+  }>
 }
 
 export interface MessageBingdingOption {

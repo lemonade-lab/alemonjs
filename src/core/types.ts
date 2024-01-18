@@ -66,7 +66,10 @@ export interface MessageControllerType {
    */
   reply(
     content: Buffer | string | number | (Buffer | number | string)[]
-  ): Promise<any>
+  ): Promise<{
+    middle: any[]
+    backhaul: any
+  }>
   /**
    * 引用消息
    * @param content

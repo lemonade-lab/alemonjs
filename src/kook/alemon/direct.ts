@@ -134,21 +134,30 @@ export async function directController(
   msg: Buffer | string | number | (Buffer | number | string)[],
   channel_id: string,
   open_id: string
-) {
+): Promise<{
+  middle: any[]
+  backhaul: any
+}> {
   /**
    * isbuffer
    */
   if (Buffer.isBuffer(msg)) {
     const ret = await ClientKOOK.postImage(msg)
     if (ret && ret.data) {
-      return await ClientKOOK.createDirectMessage({
-        type: 2,
-        target_id: channel_id,
-        chat_code: open_id,
-        content: ret.data.url
-      })
+      return {
+        middle: [],
+        backhaul: await ClientKOOK.createDirectMessage({
+          type: 2,
+          target_id: channel_id,
+          chat_code: open_id,
+          content: ret.data.url
+        })
+      }
     }
-    return false
+    return {
+      middle: [],
+      backhaul: false
+    }
   }
   /**
    * string[] arr and find buffer
@@ -166,7 +175,12 @@ export async function directController(
       .join('')
     // 转存
     const ret = await ClientKOOK.postImage(msg[isBuffer] as Buffer)
-    if (!ret) return false
+    if (!ret) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
     // 私聊
     await ClientKOOK.createDirectMessage({
       type: 9,
@@ -174,12 +188,15 @@ export async function directController(
       chat_code: open_id,
       content: content
     })
-    return await ClientKOOK.createDirectMessage({
-      type: 2,
-      target_id: channel_id,
-      chat_code: open_id,
-      content: String(ret.data.url)
-    })
+    return {
+      middle: [],
+      backhaul: await ClientKOOK.createDirectMessage({
+        type: 2,
+        target_id: channel_id,
+        chat_code: open_id,
+        content: String(ret.data.url)
+      })
+    }
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -189,28 +206,49 @@ export async function directController(
     ? `${msg}`
     : ''
 
-  if (content == '') return false
+  if (content == '') {
+    return {
+      middle: [],
+      backhaul: false
+    }
+  }
 
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
     const msg = await ABuffer.getUrl(getUrl)
-    if (!msg) return false
+    if (!msg) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
     const ret = await ClientKOOK.postImage(msg)
-    if (!ret) return false
+    if (!ret) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
     if (msg && ret) {
-      return await ClientKOOK.createDirectMessage({
-        type: 2,
-        target_id: channel_id,
-        chat_code: open_id,
-        content: ret.data.url
-      })
+      return {
+        middle: [],
+        backhaul: await ClientKOOK.createDirectMessage({
+          type: 2,
+          target_id: channel_id,
+          chat_code: open_id,
+          content: ret.data.url
+        })
+      }
     }
   }
-  return await ClientKOOK.createDirectMessage({
-    type: 9,
-    target_id: channel_id,
-    chat_code: open_id,
-    content
-  })
+  return {
+    middle: [],
+    backhaul: await ClientKOOK.createDirectMessage({
+      type: 9,
+      target_id: channel_id,
+      chat_code: open_id,
+      content
+    })
+  }
 }

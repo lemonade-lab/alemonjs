@@ -12,26 +12,46 @@ export async function replyController(
   msg: Buffer | string | number | (Buffer | number | string)[],
   guild_id: string,
   msg_id: string
-) {
+): Promise<{
+  middle: any[]
+  backhaul: any
+}> {
   // is buffer
   if (Buffer.isBuffer(msg)) {
     const url = await ClientKOA.getFileUrl(msg)
-    if (!url) return false
+    if (!url) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
     const file_info = await ClientNTQQ.postRichMediaByGroup(guild_id, {
       srv_send_msg: false,
       file_type: 1,
       url
     }).then(res => res?.file_info)
-    if (!file_info) return false
-    return await ClientNTQQ.groupOpenMessages(guild_id, {
-      content: '',
-      media: {
-        file_info
-      },
-      msg_id,
-      msg_type: 7,
-      msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-    })
+    if (!file_info) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
+    return {
+      middle: [
+        {
+          url: file_info
+        }
+      ],
+      backhaul: await ClientNTQQ.groupOpenMessages(guild_id, {
+        content: '',
+        media: {
+          file_info
+        },
+        msg_id,
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+      })
+    }
   }
 
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -44,22 +64,39 @@ export async function replyController(
       .filter(element => typeof element === 'string')
       .join('')
     const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
-    if (!url) return false
+    if (!url) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
     const file_info = await ClientNTQQ.postRichMediaByGroup(guild_id, {
       srv_send_msg: false,
       file_type: 1,
       url
     }).then(res => res?.file_info)
-    if (!file_info) return false
-    return await ClientNTQQ.groupOpenMessages(guild_id, {
-      content: cont,
-      media: {
-        file_info
-      },
-      msg_id,
-      msg_type: 7,
-      msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-    })
+    if (!file_info) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
+    return {
+      middle: [
+        {
+          url: file_info
+        }
+      ],
+      backhaul: await ClientNTQQ.groupOpenMessages(guild_id, {
+        content: cont,
+        media: {
+          file_info
+        },
+        msg_id,
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+      })
+    }
   }
 
   const content = Array.isArray(msg)
@@ -70,7 +107,12 @@ export async function replyController(
     ? `${msg}`
     : ''
 
-  if (content == '') return false
+  if (content == '') {
+    return {
+      middle: [],
+      backhaul: false
+    }
+  }
 
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
@@ -80,22 +122,37 @@ export async function replyController(
       file_type: 1,
       url: getUrl
     }).then(res => res?.file_info)
-    if (!file_info) return false
-    return await ClientNTQQ.groupOpenMessages(guild_id, {
-      content: '',
-      media: {
-        file_info
-      },
+    if (!file_info) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
+    return {
+      middle: [
+        {
+          url: file_info
+        }
+      ],
+      backhaul: await ClientNTQQ.groupOpenMessages(guild_id, {
+        content: '',
+        media: {
+          file_info
+        },
+        msg_id,
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+      })
+    }
+  }
+
+  return {
+    middle: [],
+    backhaul: await ClientNTQQ.groupOpenMessages(guild_id, {
+      content,
       msg_id,
-      msg_type: 7,
+      msg_type: 0,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)
     })
   }
-
-  return await ClientNTQQ.groupOpenMessages(guild_id, {
-    content,
-    msg_id,
-    msg_type: 0,
-    msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-  })
 }

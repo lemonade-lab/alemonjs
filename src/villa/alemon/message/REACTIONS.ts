@@ -109,11 +109,7 @@ export async function REACTIONS(event: {
     reply: async (
       msg: Buffer | string | number | (Buffer | number | string)[],
       select?: MessageBingdingOption
-    ): Promise<any> => {
-      if (select?.open_id && select?.open_id != '') {
-        console.error('VILLA 无私信')
-        return false
-      }
+    ) => {
       const villaId = select?.guild_id ?? AddQuickEmoticon.villaId
       const roomId = select?.channel_id ?? AddQuickEmoticon.roomId
       return await replyController(villaId, roomId, msg, {

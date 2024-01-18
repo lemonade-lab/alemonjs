@@ -15,9 +15,15 @@ export async function replyController(
     quote?: string
     withdraw?: number
   }
-) {
+): Promise<{
+  middle: any[]
+  backhaul: any
+}> {
   if (Buffer.isBuffer(msg)) {
-    return await ClientDISOCRD.channelsMessagesImage(channel_id, msg)
+    return {
+      middle: [],
+      backhaul: await ClientDISOCRD.channelsMessagesImage(channel_id, msg)
+    }
   }
 
   // arr & find buffer
@@ -30,11 +36,14 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    return await ClientDISOCRD.channelsMessagesImage(
-      channel_id,
-      msg[isBuffer],
-      cont
-    )
+    return {
+      middle: [],
+      backhaul: await ClientDISOCRD.channelsMessagesImage(
+        channel_id,
+        msg[isBuffer],
+        cont
+      )
+    }
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -44,18 +53,29 @@ export async function replyController(
     ? `${msg}`
     : ''
 
-  if (content == '') return false
+  if (content == '') {
+    return {
+      middle: [],
+      backhaul: false
+    }
+  }
 
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
     const msg = await ABuffer.getUrl(getUrl)
     if (msg) {
-      return await ClientDISOCRD.channelsMessagesImage(channel_id, msg)
+      return {
+        middle: [],
+        backhaul: await ClientDISOCRD.channelsMessagesImage(channel_id, msg)
+      }
     }
   }
 
-  return ClientDISOCRD.channelsMessages(channel_id, {
-    content: content
-  })
+  return {
+    middle: [],
+    backhaul: await ClientDISOCRD.channelsMessages(channel_id, {
+      content: content
+    })
+  }
 }

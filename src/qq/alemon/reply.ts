@@ -22,10 +22,13 @@ export async function replyController(
   // if withdraw == 0 ， false 不撤回
 
   if (Buffer.isBuffer(msg)) {
-    return await ClientQQ.postImage(channel_id, {
-      msg_id: msg_id, //消息id, 必须,不然就是主动消息了
-      image: msg //buffer
-    })
+    return {
+      middle: {},
+      backhaul: await ClientQQ.postImage(channel_id, {
+        msg_id: msg_id, //消息id, 必须,不然就是主动消息了
+        image: msg //buffer
+      })
+    }
   }
   // arr & find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -37,11 +40,15 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    return await ClientQQ.postImage(channel_id, {
-      msg_id: msg_id, //消息id, 必须
-      image: msg[isBuffer] as Buffer, //buffer
-      content: cont
-    })
+
+    return {
+      middle: {},
+      backhaul: await ClientQQ.postImage(channel_id, {
+        msg_id: msg_id, //消息id, 必须
+        image: msg[isBuffer] as Buffer, //buffer
+        content: cont
+      })
+    }
   }
   const content = Array.isArray(msg)
     ? msg.join('')
@@ -51,7 +58,12 @@ export async function replyController(
     ? `${msg}`
     : ''
 
-  if (content == '') return false
+  if (content == '') {
+    return {
+      middle: {},
+      backhaul: false
+    }
+  }
 
   /**
    * http
@@ -62,18 +74,24 @@ export async function replyController(
     const getUrl = match[1]
     const msg = await ABuffer.getUrl(getUrl)
     if (msg) {
-      return await ClientQQ.postImage(channel_id, {
-        msg_id: msg_id, //消息id, 必须
-        image: msg //buffer
-      })
+      return {
+        middle: {},
+        backhaul: await ClientQQ.postImage(channel_id, {
+          msg_id: msg_id, //消息id, 必须
+          image: msg //buffer
+        })
+      }
     }
   }
 
   /**
    * 发送接口
    */
-  return ClientQQ.channelsMessagesPost(channel_id, {
-    content,
-    msg_id
-  })
+  return {
+    middle: {},
+    backhaul: await ClientQQ.channelsMessagesPost(channel_id, {
+      content,
+      msg_id
+    })
+  }
 }

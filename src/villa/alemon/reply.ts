@@ -18,30 +18,46 @@ export async function replyController(
     quote?: string
     withdraw?: number
   }
-) {
+): Promise<{
+  middle: any[]
+  backhaul: any
+}> {
   // isBuffer
   if (Buffer.isBuffer(msg)) {
     // 上传图片
     const url = await ClientVILLA.uploadImage(villa_id, msg).then(
       res => res?.data?.url
     )
-
-    if (!url) return false
+    if (!url) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
     const dimensions = IMGS.imageSize(msg)
-    return await ClientVILLA.replyMessage(
-      villa_id,
-      room_id,
-      {
-        images: [
-          {
-            url,
-            width: dimensions.width,
-            height: dimensions.height
-          }
-        ]
-      },
-      select?.quote
-    )
+    return {
+      middle: [
+        {
+          url,
+          width: dimensions.width,
+          height: dimensions.height
+        }
+      ],
+      backhaul: await ClientVILLA.replyMessage(
+        villa_id,
+        room_id,
+        {
+          images: [
+            {
+              url,
+              width: dimensions.width,
+              height: dimensions.height
+            }
+          ]
+        },
+        select?.quote
+      )
+    }
   }
   // isString arr and find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
@@ -69,15 +85,18 @@ export async function replyController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    return await ClientVILLA.replyMessage(
-      villa_id,
-      room_id,
-      {
-        msg: cont,
-        images: images
-      },
-      select?.quote
-    )
+    return {
+      middle: images,
+      backhaul: await ClientVILLA.replyMessage(
+        villa_id,
+        room_id,
+        {
+          msg: cont,
+          images: images
+        },
+        select?.quote
+      )
+    }
   }
 
   // string and string[]
@@ -88,7 +107,13 @@ export async function replyController(
     : typeof msg === 'number'
     ? `${msg}`
     : ''
-  if (cont == '') return false
+
+  if (cont == '') {
+    return {
+      middle: [],
+      backhaul: false
+    }
+  }
 
   /**
    * http
@@ -98,7 +123,12 @@ export async function replyController(
     const getUrl = match[1]
     // 先请求确保图片正常
     const msg = await ABuffer.getUrl(getUrl)
-    if (!msg) return false
+    if (!msg) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    }
     const dimensions = IMGS.imageSize(msg)
     // url 形式的直接转存
     const url = await ClientVILLA.transferImage(villa_id, getUrl).then(
@@ -113,24 +143,32 @@ export async function replyController(
         height: dimensions.height
       }
     ]
+
     const contreplace = cont.replace(/<http>(.*?)<\/http>/, '')
-    return await ClientVILLA.replyMessage(
+
+    return {
+      middle: images,
+      backhaul: await ClientVILLA.replyMessage(
+        villa_id,
+        room_id,
+        {
+          msg: contreplace == '' ? undefined : contreplace,
+          images: images
+        },
+        select?.quote
+      )
+    }
+  }
+
+  return {
+    middle: [],
+    backhaul: await ClientVILLA.replyMessage(
       villa_id,
       room_id,
       {
-        msg: contreplace == '' ? undefined : contreplace,
-        images: images
+        msg: cont
       },
       select?.quote
     )
   }
-
-  return await ClientVILLA.replyMessage(
-    villa_id,
-    room_id,
-    {
-      msg: cont
-    },
-    select?.quote
-  )
 }

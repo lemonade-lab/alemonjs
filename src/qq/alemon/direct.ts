@@ -56,7 +56,12 @@ export async function directController(
     : typeof msg === 'number'
     ? `${msg}`
     : ''
-  if (content == '') return false
+  if (content == '') {
+    return {
+      middle: {},
+      backhaul: false
+    }
+  }
   /**
    * http
    */
