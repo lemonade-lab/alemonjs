@@ -28,12 +28,13 @@ export function createImage(cwd?: string) {
   let ImageCwd = (cwd ?? process.cwd()).replace(/\\/g, '/')
 
   const im = join(ImageCwd, '.image')
+  const y = join(process.cwd(), '.image')
 
   // 确保目录存在
   mkdirSync(im, { recursive: true })
 
-  // 复制文件
-  cpSync(im, join(process.cwd(), '.image'))
+  // 同步.image文件
+  if (y != im) cpSync(im, y, { recursive: true })
 
   let ImageLate: string
 
