@@ -75,15 +75,6 @@ export function createImage(cwd?: string) {
       return app
     },
     /**
-     * 设置引用
-     * @param link
-     * @returns
-     */
-    link: (link: string) => {
-      ImageLink.push(link)
-      return app
-    },
-    /**
      * 渲染指定vue文件
      */
     Render: ({
@@ -96,80 +87,73 @@ export function createImage(cwd?: string) {
       cance?: boolean
     }) => {
       /**
-       * **********
-       * 字符串解析
-       * *********
+       * ********
+       * 字符串解析 - 同时替换@ - 插入模板
+       * ********
        */
-      const head = getStrMatchSize(
-        ImageCwd,
-        str,
-        /<\s*head\s*>([\s\S]*?)<\/head\s*>/,
-        1,
-        cance
-      )
-
-      const template = getStrMatchSize(
-        ImageCwd,
-        str,
-        /<\s*template\s*>([\s\S]*?)<\/template\s*>/,
-        1,
-        cance
-      )
-
-      const style = getStrMatchSize(
-        ImageCwd,
-        str,
-        /<\s*style\s*>([\s\S]*?)<\/style\s*>/,
-        0,
-        cance
-      )
-
-      const script = getStrMatchSize(
-        ImageCwd,
-        str,
-        /<\s*script\s*>([\s\S]*?)<\/script\s*>/,
-        0,
-        cance
-      )
+      const html = render(cache, [
+        {
+          reg: /<ImageStyle\s*\/>/,
+          // 提取 替换
+          val: getStrMatchSize(
+            ImageCwd,
+            str,
+            /<\s*style\s*>([\s\S]*?)<\/style\s*>/,
+            0,
+            cance
+          )
+        },
+        {
+          reg: /<ImageHead\s*\/>/,
+          // 提取 替换
+          val: getStrMatchSize(
+            ImageCwd,
+            str,
+            /<\s*head\s*>([\s\S]*?)<\/head\s*>/,
+            1,
+            cance
+          )
+        },
+        {
+          reg: /<ImageTemplate\s*\/>/,
+          // 提取 替换
+          val: getStrMatchSize(
+            ImageCwd,
+            str,
+            /<\s*template\s*>([\s\S]*?)<\/template\s*>/,
+            1,
+            cance
+          )
+        },
+        {
+          reg: /<ImageScript\s*\/>/,
+          // 提取 替换
+          val: getStrMatchSize(
+            ImageCwd,
+            str,
+            /<\s*script\s*>([\s\S]*?)<\/script\s*>/,
+            0,
+            cance
+          )
+        },
+        {
+          reg: /<ImageData\s*\/>/,
+          // 插入数据
+          val: JSON.stringify(data)
+        },
+        {
+          reg: /<ImageDir\s*\/>/,
+          // 插入地址
+          val: ImageCwd
+        }
+      ])
 
       /**
        * ********
-       * 插入模板
+       * 解析 替换 ~
        * ********
        */
-      ImageHtml = replaceLocal(
-        render(cache, [
-          {
-            reg: /<ImageStyle\s*\/>/,
-            val: style
-          },
-          {
-            reg: /<ImageHead\s*\/>/,
-            val: head
-          },
-          {
-            reg: /<ImageLink\s*\/>/,
-            val: ImageLink.join('\n')
-          },
-          {
-            reg: /<ImageTemplate\s*\/>/,
-            val: template
-          },
-          {
-            reg: /<ImageData\s*\/>/,
-            val: JSON.stringify(data)
-          },
-          {
-            reg: /<ImageScript\s*\/>/,
-            val: script
-          },
-          {
-            reg: /<ImageDir\s*\/>/,
-            val: ImageCwd
-          }
-        ]),
-        cance
-      )
+      ImageHtml = replaceLocal(html, cance)
 
       return app
     },

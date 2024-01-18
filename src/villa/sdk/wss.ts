@@ -165,12 +165,9 @@ export class Client {
    * @returns
    */
   async connect(conversation: (...args: any[]) => any) {
-    this.#data = await this.#gateway().then(res => res.data)
+    this.#data = await this.#gateway().then(res => res?.data)
 
-    if (!this.#data?.websocket_url) {
-      console.info('[getway] secret err')
-      return
-    }
+    if (!this.#data && !this.#data?.websocket_url) return
 
     const map = {
       7: ({ BodyData }) => {
@@ -226,10 +223,8 @@ export class Client {
       },
       // 服务器关机
       52: () => {
-        // 尝试重连
-
-        // 开始连接
-        this.#start(map)
+        // 尝试重新启动
+        this.#timeout(map)
       },
       30001: ({ BodyData }) => {
         // 回调数据包
@@ -267,6 +262,7 @@ export class Client {
     })
     this.#ws.on('error', error => {
       console.info('[ws] close', error)
+      // 尝试重新启动
       this.#timeout(map)
     })
   }

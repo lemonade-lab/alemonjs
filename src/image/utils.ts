@@ -1,12 +1,6 @@
 import { join } from 'path'
 import { getAppPath } from '../core/index.js'
 
-const reg =
-  /url\(['"](@[^'"]+)['"]\)|href=['"](@[^'"]+)['"]|src=['"](@[^'"]+)['"]/g
-
-const regLocal =
-  /url\(['"](~[^'"]+)['"]\)|href=['"](~[^'"]+)['"]|src=['"](~[^'"]+)['"]/g
-
 const imageDir = join(getAppPath(import.meta.url), '../../.image')
 
 /**
@@ -16,18 +10,21 @@ const imageDir = join(getAppPath(import.meta.url), '../../.image')
  * @returns
  */
 export function replaceLocal(item = '', c = false) {
-  return item.replace(regLocal, (match, urlPath, hrefPath, srcPath) => {
-    const relativePath = urlPath ?? hrefPath ?? srcPath
-    const substr = relativePath.substr(1)
-    // 替换@
-    const absolutePath = (c ? substr : join(imageDir, substr)).replace(
-      /\\/g,
-      '/'
-    )
-    if (urlPath) return `url('${absolutePath}')`
-    if (hrefPath) return `href='${absolutePath}'`
-    if (srcPath) return `src='${absolutePath}'`
-  })
+  return item.replace(
+    /url\(['"](~[^'"]+)['"]\)|href=['"](~[^'"]+)['"]|src=['"](~[^'"]+)['"]/g,
+    (match, urlPath, hrefPath, srcPath) => {
+      const relativePath = urlPath ?? hrefPath ?? srcPath
+      const substr = relativePath.substr(1)
+      // 替换@
+      const absolutePath = (c ? substr : join(imageDir, substr)).replace(
+        /\\/g,
+        '/'
+      )
+      if (urlPath) return `url('${absolutePath}')`
+      if (hrefPath) return `href='${absolutePath}'`
+      if (srcPath) return `src='${absolutePath}'`
+    }
+  )
 }
 
 /**
@@ -38,26 +35,30 @@ export function replaceLocal(item = '', c = false) {
  * @returns
  */
 export function replaceStr(dir: string, item = '', c = false) {
-  return item.replace(reg, (match, urlPath, hrefPath, srcPath) => {
-    const relativePath = urlPath ?? hrefPath ?? srcPath
-    const substr = relativePath.substr(1)
-    // 替换@
-    const absolutePath = (c ? substr : join(dir, 'public', substr)).replace(
-      /\\/g,
-      '/'
-    )
-    if (urlPath) return `url('${absolutePath}')`
-    if (hrefPath) return `href='${absolutePath}'`
-    if (srcPath) return `src='${absolutePath}'`
-  })
+  // 从str中,替换@
+  return item.replace(
+    /url\(['"](@[^'"]+)['"]\)|href=['"](@[^'"]+)['"]|src=['"](@[^'"]+)['"]/g,
+    (match, urlPath, hrefPath, srcPath) => {
+      const relativePath = urlPath ?? hrefPath ?? srcPath
+      const substr = relativePath.substr(1)
+      // 替换@
+      const absolutePath = (c ? substr : join(dir, 'public', substr)).replace(
+        /\\/g,
+        '/'
+      )
+      if (urlPath) return `url('${absolutePath}')`
+      if (hrefPath) return `href='${absolutePath}'`
+      if (srcPath) return `src='${absolutePath}'`
+    }
+  )
 }
 
 /**
  * 捕获字符串
- * @param cwd
- * @param val
- * @param reg
- * @param size
+ * @param cwd 地址
+ * @param val 对应字符
+ * @param reg  提取规则
+ * @param size 选择数据
  * @returns
  */
 export function getStrMatchSize(
@@ -67,7 +68,9 @@ export function getStrMatchSize(
   size: number,
   c = false
 ) {
+  // 提取
   const arr = val.match(reg)
   if (!arr) return ''
+  // 使用
   return replaceStr(cwd, arr[size], c)
 }

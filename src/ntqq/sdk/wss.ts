@@ -153,7 +153,9 @@ export class Client {
     await this.#setTimeoutBotConfig()
 
     // 请求url
-    if (!this.#gatewayUrl) this.#gatewayUrl = await ClientNTQQ.gateway()
+    if (!this.#gatewayUrl) {
+      this.#gatewayUrl = await ClientNTQQ.gateway().then(data => data?.url)
+    }
 
     //
     if (!this.#gatewayUrl) return

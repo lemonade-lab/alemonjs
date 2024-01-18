@@ -129,7 +129,8 @@ export class Client {
    * @param conversation
    */
   async connect(conversation: (...args: any[]) => any) {
-    this.#gatewayUrl = await ClientQQ.geteway().then(res => res.url)
+    this.#gatewayUrl = await ClientQQ.geteway().then(res => res?.url)
+
     // 请求url
     if (!this.#gatewayUrl) return
 

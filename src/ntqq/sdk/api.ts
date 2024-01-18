@@ -52,7 +52,6 @@ class ClientNtqq {
       url: '/gateway'
     })
       .then(ApiLog)
-      .then(data => data.url)
       .catch(error => {
         console.error('[getway] token ', error.message)
       })

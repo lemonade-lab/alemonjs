@@ -144,10 +144,7 @@ export class Client {
   async connect(conversation: (...args: any[]) => any) {
     this.#url = await ClientDISOCRD.gateway().then(res => res?.url)
 
-    if (!this.#url) {
-      console.error('[getway] token err')
-      return
-    }
+    if (!this.#url) return
 
     // 定义处理map
     const map = {
