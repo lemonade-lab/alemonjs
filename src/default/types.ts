@@ -1,8 +1,8 @@
-import { VILLAOptions } from '../villa/sdk/wss.js'
-import { KOOKOptions } from '../kook/sdk/wss.js'
-import { QQOptions } from '../qq/sdk/wss.js'
-import { NTQQOptions } from '../ntqq/sdk/wss.js'
-import { DISOCRDOptions } from '../discord/sdk/wss.js'
+import { VILLAOptions } from '../platform/villa/sdk/wss.js'
+import { KOOKOptions } from '../platform/kook/sdk/wss.js'
+import { QQOptions } from '../platform/qq/sdk/wss.js'
+import { NTQQOptions } from '../platform/ntqq/sdk/wss.js'
+import { DISOCRDOptions } from '../platform/discord/sdk/wss.js'
 /**
  * *****
  * login

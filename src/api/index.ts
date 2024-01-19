@@ -3,11 +3,11 @@
  * clinent
  * ***********
  */
-export { ClientQQ } from '../qq/index.js'
-export { ClientVILLA } from '../villa/index.js'
-export { ClientNTQQ } from '../ntqq/index.js'
-export { ClientKOOK } from '../kook/index.js'
-export { ClientDISOCRD } from '../discord/index.js'
+export { ClientQQ } from '../platform/qq/index.js'
+export { ClientVILLA } from '../platform/villa/index.js'
+export { ClientNTQQ } from '../platform/ntqq/index.js'
+export { ClientKOOK } from '../platform/kook/index.js'
+export { ClientDISOCRD } from '../platform/discord/index.js'
 export { ClientKOA } from '../koa/index.js'
 
 /**
@@ -15,11 +15,11 @@ export { ClientKOA } from '../koa/index.js'
  * controllers
  * ************
  */
-import { Controllers as ControllerVILLA } from '../villa/alemon/controller.js'
-import { Controllers as ControllerQQ } from '../qq/alemon/controller.js'
-import { Controllers as ControllerDISCORD } from '../discord/alemon/controller.js'
-import { Controllers as ControllerNTQQ } from '../ntqq/alemon/controller.js'
-import { Controllers as ControllerKOOK } from '../kook/alemon/controller.js'
+import { Controllers as ControllerVILLA } from '../platform/villa/alemon/controller.js'
+import { Controllers as ControllerQQ } from '../platform/qq/alemon/controller.js'
+import { Controllers as ControllerDISCORD } from '../platform/discord/alemon/controller.js'
+import { Controllers as ControllerNTQQ } from '../platform/ntqq/alemon/controller.js'
+import { Controllers as ControllerKOOK } from '../platform/kook/alemon/controller.js'
 import { BaseConfig } from '../core/index.js'
 import { type ControllerOption, type ControllersType } from '../core/index.js'
 

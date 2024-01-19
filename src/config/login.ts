@@ -1,10 +1,10 @@
 import { type BotConfigType } from './types.js'
 import { DefaultConfig } from '../default/index.js'
-import { defineKOOK as kook } from '../kook/sdk/wss.js'
-import { defineVILLA as villa } from '../villa/sdk/wss.js'
-import { defineQQ as qq } from '../qq/sdk/wss.js'
-import { defineNtqq as ntqq } from '../ntqq/sdk/wss.js'
-import { defineDISCORD as discord } from '../discord/sdk/wss.js'
+import { defineKOOK as kook } from '../platform/kook/sdk/wss.js'
+import { defineVILLA as villa } from '../platform/villa/sdk/wss.js'
+import { defineQQ as qq } from '../platform/qq/sdk/wss.js'
+import { defineNtqq as ntqq } from '../platform/ntqq/sdk/wss.js'
+import { defineDISCORD as discord } from '../platform/discord/sdk/wss.js'
 import { ALunchConfig } from '../core/index.js'
 
 class BaseConfig<D> {

@@ -7,7 +7,7 @@ rm -rf types
 
 npm run tsc
 
-cp -rf src/villa/sdk/proto lib/villa/sdk/proto
+cp -rf src/platform/villa/sdk/proto lib/platform/villa/sdk/proto
 
 # test
 
