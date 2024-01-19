@@ -24,7 +24,6 @@ export async function createAlemon() {
         BotMessage.set('id', data.id)
         BotMessage.set('name', data.username)
         BotMessage.set('avatar', data.avatar)
-        console.info('KOOK Welcome back', data.username)
       }
     })
 }

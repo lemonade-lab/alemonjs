@@ -124,7 +124,7 @@ const ConversationMap = {
  */
 export async function conversation(event: EventData | SystemData) {
   if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
-  if (Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) return
+  if (!Object.prototype.hasOwnProperty.call(ConversationMap, event.type)) return
   if (event.channel_type == 'GROUP') {
     ConversationMap[event.type]['public'](event)
   } else {

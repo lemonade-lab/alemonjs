@@ -163,6 +163,7 @@ export class Client {
     }
 
     this.#ws = new WebSocket(gatewayUrl)
+
     this.#ws.on('open', () => {
       console.info('[ws] open')
     })
@@ -187,7 +188,6 @@ export class Client {
 
     this.#ws.on('close', () => {
       console.error('[ws] close')
-
       if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
           subject: 'AlemonJS-BOT',
