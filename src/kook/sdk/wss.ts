@@ -144,11 +144,13 @@ export class Client {
       // 心跳
       2: message => {
         console.info('[ws] ping')
-        this.#ws.send(
-          JSON.stringify({
-            s: 3
-          })
-        )
+        if (this.#ws.readyState == 1) {
+          this.#ws.send(
+            JSON.stringify({
+              s: 3
+            })
+          )
+        }
       },
       // 连接失败
       3: message => {
@@ -206,12 +208,14 @@ export class Client {
     this.#intervalID = setInterval(() => {
       // 定时发送心跳?
       if (this.#isConnected) {
-        this.#ws.send(
-          JSON.stringify({
-            s: 2,
-            sn: this.#lastMessageSN
-          })
-        )
+        if (this.#ws.readyState == 1) {
+          this.#ws.send(
+            JSON.stringify({
+              s: 2,
+              sn: this.#lastMessageSN
+            })
+          )
+        }
       }
     }, 30000)
 

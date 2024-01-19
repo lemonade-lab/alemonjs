@@ -149,12 +149,14 @@ export class Client {
 
           // 发送回复
           this.#IntervalID = setInterval(() => {
-            this.#ws.send(
-              JSON.stringify({
-                op: 1, //  op = 1
-                d: null // 如果是第一次连接，传null
-              })
-            )
+            if (this.#ws.readyState == 1) {
+              this.#ws.send(
+                JSON.stringify({
+                  op: 1, //  op = 1
+                  d: null // 如果是第一次连接，传null
+                })
+              )
+            }
           }, this.#heartbeat_interval)
         }
 
@@ -191,7 +193,10 @@ export class Client {
         // 记录新循环
         this.#heartbeat_interval = d.heartbeat_interval
         // 发送鉴权
-        this.#ws.send(JSON.stringify(this.#aut()))
+
+        if (this.#ws.readyState == 1) {
+          this.#ws.send(JSON.stringify(this.#aut()))
+        }
         return
       },
       11: () => {
@@ -221,6 +226,7 @@ export class Client {
       // 根据 opcode 进行处理
       if (map[message.op]) await map[message.op](message)
     })
+
     // 关闭
     this.#ws.on('close', async err => {
       console.info('[ws] close', err)

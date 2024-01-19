@@ -189,7 +189,9 @@ export class Client {
           this.#counter.reStart()
           // 20s 心跳
           this.#IntervalID = setInterval(() => {
-            this.#ws.send(createMessage(this.#aut()))
+            if (this.#ws.readyState == 1) {
+              this.#ws.send(createMessage(this.#aut()))
+            }
           }, this.#time)
         }
       },
@@ -205,7 +207,9 @@ export class Client {
           if (this.#IntervalID) clearInterval(this.#IntervalID)
           if (this.#counter.get() < 5) {
             // 重新发送鉴权
-            this.#ws.send(createMessage(this.#getLoginData()))
+            if (this.#ws.readyState == 1) {
+              this.#ws.send(createMessage(this.#getLoginData()))
+            }
           } else {
             console.info('重鉴权次数上限')
           }
@@ -248,7 +252,9 @@ export class Client {
     this.#ws.on('open', async () => {
       console.info('[ws] login open')
       // login
-      this.#ws.send(createMessage(this.#getLoginData()))
+      if (this.#ws.readyState == 1) {
+        this.#ws.send(createMessage(this.#getLoginData()))
+      }
     })
     this.#ws.on('message', message => {
       if (Buffer.isBuffer(message)) {

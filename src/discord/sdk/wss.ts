@@ -129,12 +129,14 @@ export class Client {
    * 发送机心跳
    */
   #call() {
-    this.#ws.send(
-      JSON.stringify({
-        op: 1, //  op = 1
-        d: null // 如果是第一次连接，传null
-      })
-    )
+    if (this.#ws.readyState == 1) {
+      this.#ws.send(
+        JSON.stringify({
+          op: 1, //  op = 1
+          d: null // 如果是第一次连接，传null
+        })
+      )
+    }
     this.#timeoutID = setTimeout(this.#call, this.#heartbeat_interval)
   }
 
@@ -166,7 +168,9 @@ export class Client {
       },
       7: () => {
         console.info('[ws] 重新请求')
-        this.#ws.send(JSON.stringify(this.#reAut()))
+        if (this.#ws.readyState == 1) {
+          this.#ws.send(JSON.stringify(this.#reAut()))
+        }
       },
       9: message => {
         //  6 | 2 err
@@ -181,14 +185,18 @@ export class Client {
       10: ({ d }) => {
         this.#heartbeat_interval = d.heartbeat_interval
         // 回传
-        this.#ws.send(
-          JSON.stringify({
-            op: 1,
-            d: null
-          })
-        )
+        if (this.#ws.readyState == 1) {
+          this.#ws.send(
+            JSON.stringify({
+              op: 1,
+              d: null
+            })
+          )
+        }
         // 发送鉴权
-        this.#ws.send(JSON.stringify(this.#aut()))
+        if (this.#ws.readyState == 1) {
+          this.#ws.send(JSON.stringify(this.#aut()))
+        }
         // 一定时间后回复
         this.#timeoutID = setTimeout(this.#call, this.#heartbeat_interval)
       },
