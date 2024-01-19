@@ -42,8 +42,6 @@ export function createImage(cwd?: string) {
 
   let ImageOptions: ScreenshotFileOptions
 
-  const ImageLink: string[] = []
-
   // 实例化
   const pup = new Puppeteer()
 
