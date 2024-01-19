@@ -210,7 +210,8 @@ export class Client {
         console.info('[ws] parameter error', d)
 
         // 尝试重启
-        this.#timeout(map)
+
+        if (this.#ws.readyState == 1) this.#ws.close()
         return
       },
       10: ({ d }) => {
@@ -232,7 +233,8 @@ export class Client {
         this.#counter.reStart()
 
         // 尝试重启
-        this.#timeout(map)
+
+        if (this.#ws.readyState == 1) this.#ws.close()
 
         return
       },

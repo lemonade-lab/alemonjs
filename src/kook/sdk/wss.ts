@@ -156,13 +156,15 @@ export class Client {
       3: message => {
         console.info('[ws] pong')
         // 尝试重启
-        this.#timeout(map)
+
+        if (this.#ws.readyState == 1) this.#ws.close()
       },
       // 重新连接
       4: message => {
         console.info('[ws] resume')
         // 尝试重启
-        this.#timeout(map)
+
+        if (this.#ws.readyState == 1) this.#ws.close()
       },
       // 断开了
       5: message => {
@@ -175,7 +177,8 @@ export class Client {
         this.#sessionID = null
 
         // 尝试重启
-        this.#timeout(map)
+
+        if (this.#ws.readyState == 1) this.#ws.close()
       },
       // 成功
       6: message => {

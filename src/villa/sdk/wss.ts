@@ -232,7 +232,7 @@ export class Client {
       // 服务器关机
       52: () => {
         // 尝试重新启动
-        this.#timeout(map)
+        if (this.#ws.readyState == 1) this.#ws.close()
       },
       30001: ({ BodyData }) => {
         // 回调数据包

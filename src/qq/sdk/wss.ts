@@ -110,7 +110,10 @@ export class Client {
     const intents = config.get('intents')
     const shard = config.get('shard')
     return {
-      op: 2, // op = 2
+      /**
+       * 客户端发送鉴权
+       */
+      op: 2,
       d: {
         token: `Bot ${appID}.${token}`,
         intents: getIntentsMask(intents),
@@ -152,8 +155,11 @@ export class Client {
             if (this.#ws.readyState == 1) {
               this.#ws.send(
                 JSON.stringify({
-                  op: 1, //  op = 1
-                  d: null // 如果是第一次连接，传null
+                  /**
+                   * 客户端或服务端发送心跳
+                   */
+                  op: 1,
+                  d: null
                 })
               )
             }
@@ -171,26 +177,33 @@ export class Client {
         return
       },
       6: ({ d }) => {
+        /**
+         * 客户端恢复连接
+         */
         console.info('[ws] connection attempt', d)
         return
       },
       7: async ({ d }) => {
-        // 请求重连
+        /**
+         * 服务端通知客户端重新连接
+         */
         console.info('[ws] reconnect', d)
         // 尝试重连
-        this.#timeout(map)
+        if (this.#ws.readyState == 1) this.#ws.close()
         return
       },
       9: ({ d, t }) => {
-        // 错误
+        /**
+         * 当identify或resume的时候，如果参数有错，服务端会返回该消息
+         */
         console.info('[ws] parameter error', d)
-        // 尝试重连
-        this.#timeout(map)
+        if (this.#ws.readyState == 1) this.#ws.close()
         return
       },
-      // 打招呼
       10: ({ d }) => {
-        // 记录新循环
+        /**
+         * 当客户端与网关建立ws连接之后，网关下发的第一条消息
+         */
         this.#heartbeat_interval = d.heartbeat_interval
         // 发送鉴权
 
@@ -200,11 +213,16 @@ export class Client {
         return
       },
       11: () => {
-        // OpCode 11 Heartbeat ACK 消息，心跳发送成功
+        /**
+         * 当发送心跳成功之后，就会收到该消息
+         */
         console.info('[ws] heartbeat transmission')
         return
       },
       12: ({ d }) => {
+        /**
+         * 仅用于 http 回调模式的回包，代表机器人收到了平台推送的数据
+         */
         console.info('[ws] platform data', d)
         return
       }
@@ -216,9 +234,11 @@ export class Client {
   #start(map: any) {
     // 连接
     this.#ws = new WebSocket(this.#gatewayUrl)
+
     this.#ws.on('open', () => {
       console.info('[ws] open')
     })
+
     // 监听消息
     this.#ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))

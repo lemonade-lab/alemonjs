@@ -176,7 +176,8 @@ export class Client {
         //  6 | 2 err
         console.info('[ws] parameter error', message)
         // 尝试重启
-        this.#timeout(map)
+
+        if (this.#ws.readyState == 1) this.#ws.close()
       },
       /**
        * 打招呼
@@ -230,7 +231,8 @@ export class Client {
     this.#ws.on('close', err => {
       console.error('[ws] 登录失败,TOKEN存在风险')
       // 尝试重启
-      this.#timeout(map)
+
+      if (this.#ws.readyState == 1) this.#ws.close()
     })
 
     // 出错
