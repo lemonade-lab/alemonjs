@@ -229,7 +229,7 @@ export class Client {
     this.#ws.on('error', error => {
       console.error('[ws] error:', error)
 
-      if (process.env?.DISCORD_WS && process.env?.DISCORD_WS != 'dev') {
+      if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
           subject: 'AlemonJS-BOT',
           text: 'DISCORD-WS-close'

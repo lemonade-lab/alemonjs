@@ -263,7 +263,7 @@ export class Client {
     this.#ws.on('close', async err => {
       console.info('[ws] close', err)
 
-      if (process.env.NTQQ_WS && process.env.NTQQ_WS != 'dev') {
+      if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
           subject: 'AlemonJS-BOT',
           text: 'NTQQ-WS-close'

@@ -225,7 +225,7 @@ export class Client {
     this.#ws.on('close', async err => {
       console.info('[ws] close', err)
 
-      if (process.env.QQ_WS && process.env.QQ_WS != 'dev') {
+      if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
           subject: 'AlemonJS-BOT',
           text: 'QQ-WS-close'

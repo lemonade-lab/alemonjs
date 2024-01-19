@@ -224,7 +224,7 @@ export class Client {
     this.#ws.on('error', err => {
       console.error('[ws] error', err)
 
-      if (process.env.KOOK_WS && process.env.KOOK_WS != 'dev') {
+      if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
           subject: 'AlemonJS-BOT',
           text: 'KOOK-WS-close'

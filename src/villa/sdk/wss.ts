@@ -268,7 +268,7 @@ export class Client {
     this.#ws.on('error', error => {
       console.info('[ws] close', error)
 
-      if (process.env?.VILLA_WS && process.env?.VILLA_WS != 'dev') {
+      if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
           subject: 'AlemonJS-BOT',
           text: 'VILLA-WS-close'
