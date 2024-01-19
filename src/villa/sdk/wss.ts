@@ -7,6 +7,7 @@ import { config } from './config.js'
 import { ApiLog } from './log.js'
 import { hmacSha256 } from './hs.js'
 import { ReStart } from '../../core/index.js'
+import { Email } from '../../email/email.js'
 
 /**
  * ****
@@ -70,6 +71,9 @@ export class Client {
     platform: number
     device_id: string
   } = null
+
+  Email = new Email()
+
   /**
    * 得到鉴权
    * @returns
@@ -260,8 +264,17 @@ export class Client {
         if (process.env?.VILLA_WS == 'dev') console.info('未知数据')
       }
     })
+    //
     this.#ws.on('error', error => {
       console.info('[ws] close', error)
+
+      if (process.env?.VILLA_WS && process.env?.VILLA_WS != 'dev') {
+        this.Email.send({
+          subject: 'AlemonJS-BOT',
+          text: 'VILLA-WS-close'
+        })
+      }
+
       // 尝试重新启动
       this.#timeout(map)
     })

@@ -5,6 +5,7 @@ import { getIntentsMask } from './intents.js'
 import { IntentsEnum } from './typings.js'
 import { Counter } from '../../core/index.js'
 import { ReStart } from '../../core/index.js'
+import { Email } from '../../email/email.js'
 
 /**
  * ******
@@ -83,6 +84,8 @@ export class Client {
 
   // url
   #gatewayUrl = null
+
+  Email = new Email()
 
   /**
    * 设置配置
@@ -214,13 +217,21 @@ export class Client {
     // 监听消息
     this.#ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))
-      if (process.env.NTQQ_WS == 'dev') console.info('message', message)
+      if (process.env.QQ_WS == 'dev') console.info('message', message)
       // 根据 opcode 进行处理
       if (map[message.op]) await map[message.op](message)
     })
     // 关闭
     this.#ws.on('close', async err => {
       console.info('[ws] close', err)
+
+      if (process.env.QQ_WS && process.env.QQ_WS != 'dev') {
+        this.Email.send({
+          subject: 'AlemonJS-BOT',
+          text: 'QQ-WS-close'
+        })
+      }
+
       this.#timeout(map)
     })
   }

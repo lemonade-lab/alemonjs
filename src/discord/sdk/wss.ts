@@ -4,6 +4,7 @@ import { config } from './config.js'
 import { IntentsEnum } from './types.js'
 import { getIntents } from './intents.js'
 import { ReStart } from '../../core/index.js'
+import { Email } from '../../email/email.js'
 
 /**
  * ****
@@ -72,6 +73,8 @@ export class Client {
   #timeoutID = null
 
   #url = null
+
+  Email = new Email()
 
   /**
    * 设置配置
@@ -225,6 +228,14 @@ export class Client {
     // 出错
     this.#ws.on('error', error => {
       console.error('[ws] error:', error)
+
+      if (process.env?.DISCORD_WS && process.env?.DISCORD_WS != 'dev') {
+        this.Email.send({
+          subject: 'AlemonJS-BOT',
+          text: 'DISCORD-WS-close'
+        })
+      }
+
       // 尝试重启
       this.#timeout(map)
     })

@@ -1,5 +1,6 @@
 import { type PuppeteerLaunchOptions } from 'puppeteer'
 import { type MysqlOptions, type RedisOptions } from '../default/index.js'
+import { type EmailOptions } from '../email/types.js'
 import { type ServerOptions } from '../koa/types.js'
 import { type KOOKOptions } from '../kook/sdk/wss.js'
 import { type VILLAOptions } from '../villa/sdk/wss.js'
@@ -22,4 +23,5 @@ export interface BotConfigType {
   puppeteer: PuppeteerLaunchOptions
   ntqq: NTQQOptions
   discord: DISOCRDOptions
+  email: EmailOptions
 }

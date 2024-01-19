@@ -4,6 +4,7 @@ import { config } from './config.js'
 import { Counter } from '../../core/index.js'
 import { IntentsEnum, getIntentsMask } from './intents.js'
 import { ReStart } from '../../core/index.js'
+import { Email } from '../../email/email.js'
 
 /**
  * *****
@@ -77,6 +78,8 @@ export class Client {
 
   //
   #at = new ReStart(3)
+
+  Email = new Email()
 
   /**
    * 设置配置
@@ -259,6 +262,14 @@ export class Client {
     // 关闭
     this.#ws.on('close', async err => {
       console.info('[ws] close', err)
+
+      if (process.env.NTQQ_WS && process.env.NTQQ_WS != 'dev') {
+        this.Email.send({
+          subject: 'AlemonJS-BOT',
+          text: 'NTQQ-WS-close'
+        })
+      }
+
       // 尝试重启
       this.#timeout(map)
     })

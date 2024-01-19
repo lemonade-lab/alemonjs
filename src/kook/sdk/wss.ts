@@ -3,6 +3,7 @@ import axios from 'axios'
 import { config } from './config.js'
 import { EventData, SystemData } from './typings.js'
 import { ReStart } from '../../core/index.js'
+import { Email } from '../../email/email.js'
 
 /**
  * ****
@@ -36,6 +37,8 @@ export class Client {
 
   // 存储最新的消息序号
   #lastMessageSN = 0
+
+  Email = new Email()
 
   /**
    * 获取鉴权
@@ -220,6 +223,14 @@ export class Client {
 
     this.#ws.on('error', err => {
       console.error('[ws] error', err)
+
+      if (process.env.KOOK_WS && process.env.KOOK_WS != 'dev') {
+        this.Email.send({
+          subject: 'AlemonJS-BOT',
+          text: 'KOOK-WS-close'
+        })
+      }
+
       // 尝试重启
       this.#timeout(map)
     })

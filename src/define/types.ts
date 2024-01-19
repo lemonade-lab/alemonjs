@@ -3,6 +3,7 @@ import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { ServerOptions } from '../koa/types.js'
 import { APPS, ControllersType } from '../core/index.js'
+import { EmailOptions } from '../email/types.js'
 
 export interface PlatformsItemType {
   /**
@@ -129,4 +130,8 @@ export interface AlemonOptions {
    * mysql配置
    */
   mysql?: MysqlOptions
+  /**
+   * 系统状态-邮箱订阅
+   */
+  email?: EmailOptions
 }

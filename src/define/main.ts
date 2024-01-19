@@ -121,6 +121,14 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     }
   }
   /**
+   * ********
+   * email
+   * ********
+   */
+  if (Options.email) {
+    ABotConfig.set('email', Options.email)
+  }
+  /**
    * *********
    * mysql配置
    * *********

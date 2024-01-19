@@ -15,6 +15,18 @@ export const DefaultConfig = {
   server: {
     host: process.env?.ALEMONJS_SERVER_HOST ?? 'localhost',
     port: Number(process.env?.ALEMONJS_SERVER_PORT) ?? 5000
+  },
+  email: {
+    smt: {
+      // 平台
+      service: 'qq',
+      // 账号密码
+      auth: {
+        user: '',
+        pass: ''
+      }
+    },
+    to: ''
   }
 }
 export * from './types.js'
