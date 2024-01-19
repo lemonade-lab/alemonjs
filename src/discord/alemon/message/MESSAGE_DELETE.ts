@@ -1,9 +1,9 @@
 import {
-  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
+import { APPS } from '../../../core/index.js'
 
 import { BotMessage } from '../bot.js'
 import { segmentDISCORD } from '../segment.js'

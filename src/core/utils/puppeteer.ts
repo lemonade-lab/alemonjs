@@ -1,9 +1,9 @@
-import puppeteer, {
-  Browser,
-  PuppeteerLaunchOptions,
-  ScreenshotOptions,
-  PuppeteerLifeCycleEvent
+import {
+  type PuppeteerLaunchOptions,
+  type ScreenshotOptions,
+  type PuppeteerLifeCycleEvent
 } from 'puppeteer'
+import puppeteer, { Browser } from 'puppeteer'
 import queryString from 'querystring'
 import { executablePath } from './pup.js'
 import { BaseConfig } from '../config.js'

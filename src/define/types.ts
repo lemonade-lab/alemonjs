@@ -2,7 +2,8 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { ServerOptions } from '../koa/types.js'
-import { APPS, ControllersType } from '../core/index.js'
+import { type ControllersType } from '../core/index.js'
+import { APPS } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
 
 export interface PlatformsItemType {

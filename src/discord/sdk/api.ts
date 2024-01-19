@@ -1,6 +1,7 @@
 import FormData from 'form-data'
 import { createPicFrom } from '../../core/index.js'
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios from 'axios'
+import { type AxiosRequestConfig } from 'axios'
 import { config } from './config.js'
 import { ApiLog } from './log.js'
 

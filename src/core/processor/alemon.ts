@@ -1,6 +1,6 @@
-import { AEvent, EventEnum } from '../typings.js'
+import { type AEvent, type EventEnum } from '../typings.js'
 import { APlugin } from './plugin.js'
-import { NodeDataType } from './types.js'
+import { type NodeDataType } from './types.js'
 import { AppMap } from './data.js'
 import { getAppName } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'

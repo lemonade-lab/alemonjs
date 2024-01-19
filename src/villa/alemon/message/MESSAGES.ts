@@ -1,11 +1,12 @@
+import { APPS } from '../../../core/index.js'
 import {
   type EventEnum,
   type TypingEnum,
-  APPS,
   type MessageBingdingOption,
   type UserType
 } from '../../../core/index.js'
-import { MessageContentType } from '../../sdk/index.js'
+
+import { type MessageContentType } from '../../sdk/index.js'
 import { ABotConfig } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'
 import { replyController } from '../reply.js'

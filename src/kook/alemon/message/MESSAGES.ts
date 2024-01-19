@@ -1,5 +1,5 @@
+import { APPS } from '../../../core/index.js'
 import {
-  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption

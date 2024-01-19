@@ -1,10 +1,10 @@
 import { ClientKOOK } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import {
-  BaseConfig,
   type ControllerOption,
   type UserInformationType
 } from '../../core/index.js'
+import { BaseConfig } from '../../core/index.js'
 import { ABotConfig } from '../../config/index.js'
 import { directController } from './direct.js'
 

@@ -1,8 +1,8 @@
+import { APPS } from '../../../core/index.js'
 import {
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption,
-  APPS
+  type MessageBingdingOption
 } from '../../../core/index.js'
 import { ABotConfig } from '../../../config/index.js'
 import { segmentVILLA } from '../segment.js'

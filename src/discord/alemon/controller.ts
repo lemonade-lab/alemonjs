@@ -1,5 +1,5 @@
+import { BaseConfig } from '../../core/index.js'
 import {
-  BaseConfig,
   type ControllerOption,
   type UserInformationType
 } from '../../core/index.js'

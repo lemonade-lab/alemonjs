@@ -20,7 +20,8 @@ import { Controllers as ControllerQQ } from '../qq/alemon/controller.js'
 import { Controllers as ControllerDISCORD } from '../discord/alemon/controller.js'
 import { Controllers as ControllerNTQQ } from '../ntqq/alemon/controller.js'
 import { Controllers as ControllerKOOK } from '../kook/alemon/controller.js'
-import { BaseConfig, ControllerOption, ControllersType } from '../core/index.js'
+import { BaseConfig } from '../core/index.js'
+import { type ControllerOption, type ControllersType } from '../core/index.js'
 
 /**
  * *********
@@ -29,11 +30,6 @@ import { BaseConfig, ControllerOption, ControllersType } from '../core/index.js'
  */
 export const AControllers = new BaseConfig<{
   [key: string]: ControllersType
-  villa: typeof ControllerVILLA
-  qq: typeof ControllerQQ
-  discord: typeof ControllerDISCORD
-  ntqq: typeof ControllerNTQQ
-  kook: typeof ControllerKOOK
 }>({
   villa: ControllerVILLA,
   qq: ControllerQQ,

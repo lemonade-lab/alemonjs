@@ -1,11 +1,12 @@
+import { APPS } from '../../../core/index.js'
 import {
   type UserType,
-  APPS,
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption
 } from '../../../core/index.js'
-import { ClientKOOK, type EventData } from '../../sdk/index.js'
+import { type EventData } from '../../sdk/index.js'
+import { ClientKOOK } from '../../sdk/index.js'
 import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../config/index.js'

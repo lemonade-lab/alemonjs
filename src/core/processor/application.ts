@@ -40,13 +40,15 @@ class App {
       types.push('js')
       types.push('ts')
     }
-    for (const type of types) {
+    for (const typing of types) {
       for (const appname of apps) {
-        if (existsSync(`${dir}/${appname}${main}.${type}`)) {
-          await import(`file://${dir}/${appname}${main}.${type}`).catch(err => {
-            console.error(`file://${dir}/${appname}${main}.${type}`)
-            loadError(appname, err)
-          })
+        if (existsSync(`${dir}/${appname}${main}.${typing}`)) {
+          await import(`file://${dir}/${appname}${main}.${typing}`).catch(
+            err => {
+              console.error(`file://${dir}/${appname}${main}.${typing}`)
+              loadError(appname, err)
+            }
+          )
         }
       }
     }
