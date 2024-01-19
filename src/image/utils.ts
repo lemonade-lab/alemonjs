@@ -1,7 +1,4 @@
 import { join } from 'path'
-import { getAppPath } from '../core/index.js'
-
-const imageDir = join(getAppPath(import.meta.url), '../../.image')
 
 /**
  * 替换 ~ 字符串
@@ -16,10 +13,9 @@ export function replaceLocal(item = '', c = false) {
       const relativePath = urlPath ?? hrefPath ?? srcPath
       const substr = relativePath.substr(1)
       // 替换@
-      const absolutePath = (c ? substr : join(imageDir, substr)).replace(
-        /\\/g,
-        '/'
-      )
+      const absolutePath = (
+        c ? substr : join(process.cwd(), '.image', substr)
+      ).replace(/\\/g, '/')
       if (urlPath) return `url('${absolutePath}')`
       if (hrefPath) return `href='${absolutePath}'`
       if (srcPath) return `src='${absolutePath}'`
