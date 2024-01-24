@@ -65,7 +65,8 @@
 可直接执行脚手架 并快速启动程序
 
 ```sh
-npm init alemonjs@latest -y
+npm install pnpm -g
+pnpm create alemonjs@latest -y
 cd alemonb
 npm install
 npm run dev
@@ -109,13 +110,13 @@ import { createApp, AMessage, APlugin } from 'alemonjs'
 class word extends APlugin {
   constructor() {
     super({
-      // 默认9000, 以 .priority()为准
+      // 优先级,默认9000
       priority: 500,
       rule: [
         {
           reg: /^\/滴滴$/,
           fnc: 'post',
-          // 默认值,以 上一级 priority 为准
+          // 提高优先级
           priority: 300
         }
       ]
@@ -125,17 +126,13 @@ class word extends APlugin {
     e.reply('哒哒')
   }
 }
+// 构建应用
 createApp(import.meta.url)
+  //使用指令
   .use({ word })
   // 把所有 / 或 # 开头的消息 替换为 /
   // 表示#滴滴 和 /滴滴 消息一致
   .replace(/^(#|\/)/, '/')
-  // 修改 顶部优先级 默认值为 9000
-  .priority(8000)
-  // 可修改 e
-  .reSetEvent(e => e)
-  // 扩展 post 为 async post(e,control1,control2){}
-  .setArg(e => [() => 'I am control2', () => 'I am control2'])
   // 挂载
   .mount()
 ```
