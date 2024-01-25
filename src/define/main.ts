@@ -132,6 +132,9 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options.app.port) {
     AppServerConfig.set('port', Options.app.port)
   }
+  if (Options.app.cors) {
+    AppServerConfig.set('options', Options.app.cors)
+  }
 
   /**
    * ********

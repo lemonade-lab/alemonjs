@@ -49,8 +49,14 @@ class Server {
    */
   connect() {
     this.#app = new Koa()
-    // 允许跨域请求
-    this.#app.use(cors())
+    const options = AppServerConfig.get('options')
+    if (options) {
+      // 允许跨域请求
+      this.#app.use(cors(options))
+    } else {
+      // 允许跨域请求
+      this.#app.use(cors())
+    }
     // 处理 POST 请求体中的 JSON 数据
     this.#app.use(bodyParser())
     // 推送路由

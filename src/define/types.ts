@@ -5,6 +5,7 @@ import { ServerOptions } from '../koa/types.js'
 import { type ControllersType } from '../core/index.js'
 import { APPS } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
+import cors from 'koa2-cors'
 
 export interface PlatformsItemType {
   /**
@@ -72,6 +73,10 @@ export interface AlemonOptions {
      * 应用端口
      */
     port?: number
+    /**
+     * 跨域参数
+     */
+    cors?: cors.Options
   }
   /**
    * 插件配置
