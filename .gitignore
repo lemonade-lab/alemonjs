@@ -10,10 +10,10 @@ types/**/*
 # test
 a.login.config.ts
 alemon.config.ts
-main.ts
-apps.ts
-notes.md
-api.ts
+a.main.ts
+a.apps.ts
+a.notes.md
+a.api.ts
 
 # 打印
 logs
