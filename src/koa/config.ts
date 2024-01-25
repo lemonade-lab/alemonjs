@@ -18,7 +18,7 @@ export const config = new BaseConfig<ServerOptions>({
    */
   fileRouter: '/api/alemonjs/file',
   /**
-   *
+   * 地址
    */
   addressRouter: '/api/alemonjs/local',
   /**

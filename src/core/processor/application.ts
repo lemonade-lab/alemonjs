@@ -6,6 +6,7 @@ import { AppMap } from './data.js'
 import { AObserver } from './subscribe.js'
 import { loadError } from './log.js'
 import { Alemon } from './alemon.js'
+import { BotServer } from '../index.js'
 
 /**
  * 应用
@@ -76,6 +77,12 @@ class App {
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
+    if (BotServer.isE()) {
+      /**
+       * 启动 server服务器
+       */
+      BotServer.connect()
+    }
   }
 
   /**

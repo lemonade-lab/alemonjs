@@ -7,6 +7,8 @@ import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
 import { AInstruct } from './help.js'
 import { AppLoadConfig } from './configs.js'
+import { BotServer } from '../index.js'
+import Router from 'koa-router'
 
 type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
 
@@ -500,6 +502,14 @@ export class Alemon {
    */
   setCharacter(val: '#' | '/') {
     return this.replace(/^(\/|#)/, val)
+  }
+
+  /**
+   * 接口路由
+   */
+  router(val: typeof Router.prototype) {
+    // 推送
+    BotServer.push(this.#name, val)
   }
 
   /**

@@ -68,6 +68,10 @@ export interface AlemonOptions {
      * 执行脚本
      */
     scripts?: string
+    /**
+     * 应用端口
+     */
+    port?: number
   }
   /**
    * 插件配置
@@ -105,6 +109,12 @@ export interface AlemonOptions {
    * 事件屏蔽
    */
   shieldEvent?: string[]
+
+  /**
+   * 图片存储函数
+   */
+  imageStorage?: (val: Buffer) => Promise<string | false>
+
   /**
    * **********
    * **********

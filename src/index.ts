@@ -29,6 +29,10 @@ export * from './define/index.js'
  */
 export * from './api/index.js'
 /**
+ * koa api
+ */
+export * from './koa/main.js'
+/**
  * **********
  * image
  * ************

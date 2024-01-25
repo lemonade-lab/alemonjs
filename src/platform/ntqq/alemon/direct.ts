@@ -1,6 +1,5 @@
-import { ABuffer } from '../../../core/index.js'
 import { ClientNTQQ } from '../sdk/index.js'
-import { ClientKOA } from '../../../koa/index.js'
+import { ClientKOA, DrawingBed } from '../../../koa/index.js'
 
 /**
  * 回复控制器
@@ -19,7 +18,12 @@ export async function directController(
 }> {
   // isBuffer
   if (Buffer.isBuffer(msg)) {
-    const url = await ClientKOA.getFileUrl(msg)
+    let url = null
+    if (DrawingBed.get('state')) {
+      url = await DrawingBed.get('func')(msg)
+    } else {
+      url = await ClientKOA.getFileUrl(msg)
+    }
     if (!url) {
       return {
         middle: [],
@@ -62,7 +66,12 @@ export async function directController(
       })
       .filter(element => typeof element === 'string')
       .join('')
-    const url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
+    let url = null
+    if (DrawingBed.get('state')) {
+      url = await DrawingBed.get('func')(msg[isBuffer] as Buffer)
+    } else {
+      url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
+    }
     if (!url) {
       return {
         middle: [],
@@ -115,38 +124,28 @@ export async function directController(
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await ABuffer.getUrl(getUrl)
-    if (Buffer.isBuffer(msg)) {
-      const url = await ClientKOA.getFileUrl(msg)
-      if (!url) {
-        return {
-          middle: [],
-          backhaul: false
-        }
-      }
-      const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
-        srv_send_msg: false,
-        file_type: 1,
-        url: url
-      }).then(res => res?.file_info)
-      if (!file_info) {
-        return {
-          middle: [],
-          backhaul: false
-        }
-      }
+    const file_info = await ClientNTQQ.postRichMediaByGroup(open_id, {
+      srv_send_msg: false,
+      file_type: 1,
+      url: getUrl
+    }).then(res => res?.file_info)
+    if (!file_info) {
       return {
-        middle: [{ url: file_info }],
-        backhaul: await ClientNTQQ.usersOpenMessages(open_id, {
-          content: '',
-          media: {
-            file_info
-          },
-          msg_id,
-          msg_type: 7,
-          msg_seq: ClientNTQQ.getMsgSeq(msg_id)
-        })
+        middle: [],
+        backhaul: false
       }
+    }
+    return {
+      middle: [{ url: file_info }],
+      backhaul: await ClientNTQQ.usersOpenMessages(open_id, {
+        content: '',
+        media: {
+          file_info
+        },
+        msg_id,
+        msg_type: 7,
+        msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+      })
     }
   }
 

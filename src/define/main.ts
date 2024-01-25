@@ -8,29 +8,15 @@ import {
   loadError
 } from '../core/index.js'
 import { ABotConfig } from '../config/index.js'
-import { createWeb } from '../koa/index.js'
-import { ClientKOA } from '../koa/file.js'
+import { DrawingBed, ServerOptions, config } from '../koa/index.js'
 import { join } from 'path'
 import { AControllers } from '../api/index.js'
+import { AppServerConfig } from '../core/koa/config.js'
 /**
  * 启动器
  * @param Options
  */
 export async function runAlemon(Options?: AlemonOptions) {
-  /**
-   * ***********
-   * 挂起web服务
-   * **********
-   */
-  if (Options?.server?.state) {
-    // 创建server端
-    createWeb(Options?.server)
-    if (Options?.server?.clear != false) {
-      // 定时清除
-      ClientKOA.autoClearFiles()
-    }
-    IP.get()
-  }
   /**
    * ***********
    * 加载应用
@@ -66,7 +52,7 @@ export async function runAlemon(Options?: AlemonOptions) {
    * ********
    */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
-    console.info('login no bot')
+    console.info('Not Login Config')
     return
   }
   /**
@@ -101,6 +87,16 @@ export async function runAlemon(Options?: AlemonOptions) {
     // 登录执行
     await RebotMap[item]()
   }
+  /**
+   * ***********
+   * 挂起file服务
+   * **********
+   */
+  if (Options?.server) {
+    for (const item in Options?.server) {
+      config.set(item as keyof ServerOptions, Options?.server[item])
+    }
+  }
 }
 
 /**
@@ -120,6 +116,23 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       ALunchConfig.set(item as any, Options.puppeteer[item])
     }
   }
+  /**
+   * ********
+   * 图片存储
+   * ********
+   */
+  if (Options?.imageStorage) {
+    DrawingBed.set('func', Options.imageStorage)
+    DrawingBed.set('state', true)
+  }
+
+  /***
+   * app post
+   */
+  if (Options.app.port) {
+    AppServerConfig.set('port', Options.app.port)
+  }
+
   /**
    * ********
    * email

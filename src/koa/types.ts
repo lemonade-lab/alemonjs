@@ -26,13 +26,4 @@ export interface ServerOptions {
    * 本地缓存地址
    */
   fileDir?: string
-  /**
-   * 当前服务状态
-   */
-  state?: boolean
-  /**
-   * 定时清除是否开启
-   * 默认关闭
-   */
-  clear?: boolean
 }

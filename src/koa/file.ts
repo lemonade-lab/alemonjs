@@ -1,17 +1,28 @@
 import { join } from 'path'
-import { writeFileSync, readdirSync, unlinkSync, existsSync } from 'fs'
+import { writeFileSync, existsSync } from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
 import { config } from './config.js'
 import { IP } from '../core/index.js'
 import { createHash } from 'crypto'
+import { FServer } from './client.js'
 
 class ClientKoa {
+  #size = 0
+  #file = false
   /**
    * 得到本地文件请求地址
    * @param address
    * @returns
    */
   async getLocalFileUrl(address: string) {
+    /**
+     * 检查服务器是否启动
+     */
+    if (!FServer.getState() && this.#size <= 1) {
+      this.#size++
+      // 尝试启动
+      FServer.connect()
+    }
     // 检查文件是否存在
     let filePath: string
     if (existsSync(address)) {
@@ -41,6 +52,14 @@ class ClientKoa {
    */
   async getFileUrl(file: Buffer, name?: string) {
     if (!Buffer.isBuffer(file)) return false
+    /**
+     * 检查服务器是否启动
+     */
+    if (!FServer.getState() && this.#size <= 1) {
+      this.#size++
+      // 尝试启动
+      FServer.connect()
+    }
     const fileDir = config.get('fileDir')
     const fileRouter = config.get('fileRouter')
     const port = config.get('port')
@@ -65,22 +84,5 @@ class ClientKoa {
     console.info('setLocalFile url', url)
     return url
   }
-
-  /**
-   *
-   * 自动清除机制
-   * 清除挂载下的所有文件
-   * @param options
-   */
-  autoClearFiles(options?: { time?: number; dir?: string }) {
-    const fileDir = options?.dir ?? config.get('fileDir')
-    setInterval(() => {
-      const files = readdirSync(join(process.cwd(), fileDir))
-      for (const file of files) {
-        unlinkSync(join(process.cwd(), fileDir, file))
-      }
-    }, options?.time ?? 300000)
-  }
 }
-
 export const ClientKOA = new ClientKoa()
