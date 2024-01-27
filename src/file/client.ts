@@ -1,12 +1,10 @@
-import Koa from 'koa'
-import bodyParser from 'koa-bodyparser'
-import cors from 'koa2-cors'
 import { getFileRouter } from './back.js'
 import { readdirSync, unlinkSync } from 'fs'
 import { config } from './config.js'
 import { join } from 'path'
+import { ABodyParser, ACors, AKoa } from '../core/index.js'
 class Server {
-  #app: typeof Koa.prototype = null
+  #app: typeof AKoa.prototype = null
   #currentPort = 4399
   #size = 0
   // 是否已经启动
@@ -22,11 +20,11 @@ class Server {
    * 启动
    */
   connect() {
-    this.#app = new Koa()
+    this.#app = new AKoa()
     // 允许跨域请求
-    this.#app.use(cors())
+    this.#app.use(ACors())
     // 处理 POST 请求体中的 JSON 数据
-    this.#app.use(bodyParser())
+    this.#app.use(ABodyParser())
     // 推送路由
     const router = getFileRouter()
     // 路由
@@ -65,7 +63,7 @@ class Server {
         // 只要启动成功
         this.#state = true
 
-        console.info('server', `http://[::]:${port}`)
+        console.info('server', `http://localhost:${port}`)
 
         // 自动删除
         const fileDir = config.get('fileDir')

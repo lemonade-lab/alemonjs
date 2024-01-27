@@ -20,8 +20,4 @@ export * from './config.js'
  * 工具
  */
 export * from './utils/index.js'
-/**
- * 路由中间件
- */
-import router from 'koa-router'
-export const Router = router
+export * from './koa/main.js'

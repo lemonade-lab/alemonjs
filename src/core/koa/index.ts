@@ -1,7 +1,5 @@
 import Koa from 'koa'
 import Router from 'koa-router'
-import bodyParser from 'koa-bodyparser'
-import cors from 'koa2-cors'
 import { AppServerConfig } from './config.js'
 
 class Server {
@@ -10,9 +8,20 @@ class Server {
   #size = 0
   // 是否已经启动
   #state = false
+  // 路由存储
   #routers: {
     [key: string]: (typeof Router.prototype)[]
   } = {}
+
+  del() {
+    this.#routers = {}
+  }
+
+  /**
+   * 中间件
+   */
+  #middleware: any[] = []
+
   /**
    * 推送路由
    * @param val
@@ -21,6 +30,7 @@ class Server {
     if (!this.#routers[key]) this.#routers[key] = []
     this.#routers[key].push(val)
   }
+
   /**
    * 查看状态
    * @returns
@@ -34,6 +44,7 @@ class Server {
    * @returns
    */
   isE() {
+    // 默认是空
     let t = false
     for (const item in this.#routers) {
       if (this.#routers[item].length != 0) {
@@ -49,16 +60,14 @@ class Server {
    */
   connect() {
     this.#app = new Koa()
-    const options = AppServerConfig.get('options')
-    if (options) {
-      // 允许跨域请求
-      this.#app.use(cors(options))
-    } else {
-      // 允许跨域请求
-      this.#app.use(cors())
+    //
+    const mid = AppServerConfig.get('middleware')
+    // 中间中间件
+    for (const item of mid) {
+      this.#app.use(item)
     }
-    // 处理 POST 请求体中的 JSON 数据
-    this.#app.use(bodyParser())
+    // 中间间会很大,要清空
+    AppServerConfig.set('middleware', [])
     // 推送路由
     for (const item in this.#routers) {
       for (const router of this.#routers[item]) {
@@ -101,7 +110,7 @@ class Server {
         AppServerConfig.set('port', port)
         // 只要启动成功
         this.#state = true
-        console.info('server', `http://[::]:${port}`)
+        console.info('server', `http://localhost:${port}`)
       })
       .on('error', this.#handlePortConflict)
   }

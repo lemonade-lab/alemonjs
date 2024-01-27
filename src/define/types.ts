@@ -1,11 +1,10 @@
 import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
-import { ServerOptions } from '../koa/types.js'
+import { ServerOptions } from '../file/types.js'
 import { type ControllersType } from '../core/index.js'
 import { APPS } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
-import cors from 'koa2-cors'
 
 export interface PlatformsItemType {
   /**
@@ -69,14 +68,6 @@ export interface AlemonOptions {
      * 执行脚本
      */
     scripts?: string
-    /**
-     * 应用端口
-     */
-    port?: number
-    /**
-     * 跨域参数
-     */
-    cors?: cors.Options
   }
   /**
    * 插件配置
@@ -114,30 +105,36 @@ export interface AlemonOptions {
    * 事件屏蔽
    */
   shieldEvent?: string[]
-
   /**
    * 图片存储函数
    */
   imageStorage?: (val: Buffer) => Promise<string | false>
-
   /**
-   * **********
-   * **********
+   * 服务器
    */
-
+  server?: {
+    /**
+     * 应用端口
+     */
+    port?: number
+    /**
+     * 中间件
+     */
+    middleware?: any[]
+  }
   /**
-   * puppeteer配置
+   * 服务配置
    */
-  puppeteer?: PuppeteerLaunchOptions
+  file?: ServerOptions
   /**
    * 是否启动pup
    * defaut true
    */
   pupStart?: false
   /**
-   * 服务配置
+   * puppeteer配置
    */
-  server?: ServerOptions
+  puppeteer?: PuppeteerLaunchOptions
   /**
    * redis配置
    */

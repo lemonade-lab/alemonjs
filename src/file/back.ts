@@ -1,10 +1,10 @@
 import { createReadStream, existsSync } from 'fs'
 import { join } from 'path'
-import mime from 'mime-types'
 import { config } from './config.js'
-import Router from 'koa-router'
+import { ARouter } from '../core/index.js'
+import mime from 'mime-types'
 export function getFileRouter() {
-  const router = new Router()
+  const router = new ARouter()
   // 处理图片请求
   const imgRouter = config.get('fileRouter')
   router.get(`${imgRouter}/:filename`, async ctx => {

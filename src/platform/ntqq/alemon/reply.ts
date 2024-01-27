@@ -1,5 +1,5 @@
 import { ClientNTQQ } from '../sdk/index.js'
-import { ClientKOA, DrawingBed } from '../../../koa/index.js'
+import { ClientFile, DrawingBed } from '../../../file/index.js'
 
 /**
  * 回复控制器
@@ -22,7 +22,7 @@ export async function replyController(
     if (DrawingBed.get('state')) {
       url = await DrawingBed.get('func')(msg)
     } else {
-      url = await ClientKOA.getFileUrl(msg)
+      url = await ClientFile.getFileUrl(msg)
     }
     if (!url) {
       return {
@@ -73,7 +73,7 @@ export async function replyController(
     if (DrawingBed.get('state')) {
       url = await DrawingBed.get('func')(msg[isBuffer] as Buffer)
     } else {
-      url = await ClientKOA.getFileUrl(msg[isBuffer] as Buffer)
+      url = await ClientFile.getFileUrl(msg[isBuffer] as Buffer)
     }
 
     if (!url) {

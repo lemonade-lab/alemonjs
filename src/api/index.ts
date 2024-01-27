@@ -8,7 +8,7 @@ export { ClientVILLA } from '../platform/villa/index.js'
 export { ClientNTQQ } from '../platform/ntqq/index.js'
 export { ClientKOOK } from '../platform/kook/index.js'
 export { ClientDISOCRD } from '../platform/discord/index.js'
-export { ClientKOA } from '../koa/index.js'
+export { ClientFile } from '../file/index.js'
 
 /**
  * ************

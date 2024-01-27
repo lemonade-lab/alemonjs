@@ -31,7 +31,7 @@ export * from './api/index.js'
 /**
  * koa api
  */
-export * from './koa/main.js'
+export * from './file/main.js'
 /**
  * **********
  * image

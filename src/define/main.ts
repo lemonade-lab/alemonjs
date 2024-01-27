@@ -8,7 +8,7 @@ import {
   loadError
 } from '../core/index.js'
 import { ABotConfig } from '../config/index.js'
-import { DrawingBed, ServerOptions, config } from '../koa/index.js'
+import { DrawingBed, ServerOptions, config } from '../file/index.js'
 import { join } from 'path'
 import { AControllers } from '../api/index.js'
 import { AppServerConfig } from '../core/koa/config.js'
@@ -127,13 +127,13 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   }
 
   /***
-   * app post
+   * server
    */
-  if (Options.app.port) {
-    AppServerConfig.set('port', Options.app.port)
+  if (Options.server.port) {
+    AppServerConfig.set('port', Options.server.port)
   }
-  if (Options.app.cors) {
-    AppServerConfig.set('options', Options.app.cors)
+  if (Options.server.middleware) {
+    AppServerConfig.set('middleware', Options.server.middleware)
   }
 
   /**
@@ -160,13 +160,17 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.redis) {
     ABotConfig.set('redis', Options.redis)
   }
+
   /**
    * *********
-   * serer配置
+   * file配置
    * *********
    */
-  if (Options?.server) {
-    ABotConfig.set('server', Options.server)
+  if (Options?.file) {
+    ABotConfig.set('file', Options.file)
+  }
+  if (Options?.file?.ip) {
+    IP.set(Options?.file?.ip)
   }
   /**
    * ************
@@ -255,9 +259,7 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
       }
     }
   }
-  if (Options?.server?.ip) {
-    IP.set(Options?.server?.ip)
-  }
+
   /**
    * ************
    * ************

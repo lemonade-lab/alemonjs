@@ -17,6 +17,9 @@ class App {
    * @returns
    */
   async load() {
+    /**
+     * 开始扫描
+     */
     const dir = join(process.cwd(), AppLoadConfig.get('dir'))
     if (!existsSync(dir)) return
     const flies = readdirSync(dir)
@@ -78,9 +81,6 @@ class App {
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
     if (BotServer.isE()) {
-      /**
-       * 启动 server服务器
-       */
       BotServer.connect()
     }
   }

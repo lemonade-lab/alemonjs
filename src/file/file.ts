@@ -6,9 +6,8 @@ import { IP } from '../core/index.js'
 import { createHash } from 'crypto'
 import { FServer } from './client.js'
 
-class ClientKoa {
+class CF {
   #size = 0
-  #file = false
   /**
    * 得到本地文件请求地址
    * @param address
@@ -85,4 +84,4 @@ class ClientKoa {
     return url
   }
 }
-export const ClientKOA = new ClientKoa()
+export const ClientFile = new CF()
