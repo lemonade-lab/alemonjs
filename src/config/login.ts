@@ -1,5 +1,7 @@
 import { type BotConfigType } from './types.js'
-import { DefaultConfig } from '../default/index.js'
+import { DefaultMysqlOptions, DefaultRedisOptions } from '../default/index.js'
+import { DefaultFileOptions } from '../file/default.js'
+import { DefaultEmailOptions } from '../email/default.js'
 import { defineKOOK as kook } from '../platform/kook/sdk/wss.js'
 import { defineVILLA as villa } from '../platform/villa/sdk/wss.js'
 import { defineQQ as qq } from '../platform/qq/sdk/wss.js'
@@ -56,7 +58,10 @@ class BaseConfig<D> {
  * 机器人配置
  */
 export const ABotConfig = new BaseConfig<BotConfigType>({
-  ...DefaultConfig,
+  mysql: DefaultMysqlOptions,
+  redis: DefaultRedisOptions,
+  file: DefaultFileOptions,
+  email: DefaultEmailOptions,
   kook,
   villa,
   qq,

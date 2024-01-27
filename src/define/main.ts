@@ -8,7 +8,7 @@ import {
   loadError
 } from '../core/index.js'
 import { ABotConfig } from '../config/index.js'
-import { DrawingBed, ServerOptions, config } from '../file/index.js'
+import { DrawingBed, FileOptions, config } from '../file/index.js'
 import { join } from 'path'
 import { AControllers } from '../api/index.js'
 import { AppServerConfig } from '../core/koa/config.js'
@@ -94,7 +94,7 @@ export async function runAlemon(Options?: AlemonOptions) {
    */
   if (Options?.server) {
     for (const item in Options?.server) {
-      config.set(item as keyof ServerOptions, Options?.server[item])
+      config.set(item as keyof FileOptions, Options?.server[item])
     }
   }
 }

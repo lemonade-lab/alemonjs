@@ -17,7 +17,7 @@ class CF {
     /**
      * 检查服务器是否启动
      */
-    if (!FServer.getState() && this.#size <= 1) {
+    if (!FServer.getState() && this.#size <= 3) {
       this.#size++
       // 尝试启动
       FServer.connect()
@@ -31,14 +31,8 @@ class CF {
     }
     if (!existsSync(filePath)) return false
     const addressRouter = config.get('addressRouter')
-    const port = config.get('port')
-    const http = config.get('http')
-    let ip = config.get('ip')
-    if (ip == 'localhost') {
-      const ipp = await IP.get()
-      if (ipp) ip = ipp
-    }
-    const url = `${http}://${ip}:${port}${addressRouter}?address=${address}`
+    const base = await this.#getBaseUrl()
+    const url = `${base}${addressRouter}?address=${address}`
     console.info('server url', url)
     return url
   }
@@ -54,20 +48,13 @@ class CF {
     /**
      * 检查服务器是否启动
      */
-    if (!FServer.getState() && this.#size <= 1) {
+    if (!FServer.getState() && this.#size <= 3) {
       this.#size++
       // 尝试启动
       FServer.connect()
     }
     const fileDir = config.get('fileDir')
     const fileRouter = config.get('fileRouter')
-    const port = config.get('port')
-    const http = config.get('http')
-    let ip = config.get('ip')
-    if (ip == 'localhost') {
-      const ipp = await IP.get()
-      if (ipp) ip = ipp
-    }
     // 使用 'bin' 作为默认扩展名
     const extension = (await fileTypeFromBuffer(file))?.ext ?? name ?? 'bin'
     const md5Hash = createHash('md5').update(file).digest('hex')
@@ -79,9 +66,26 @@ class CF {
       console.info('server create', filePath)
       writeFileSync(filePath, file)
     }
-    const url = `${http}://${ip}:${port}${fileRouter}/${filename}`
+    const base = await this.#getBaseUrl()
+    const url = `${base}${fileRouter}/${filename}`
     console.info('setLocalFile url', url)
     return url
+  }
+
+  async #getBaseUrl() {
+    const port = config.get('port')
+    const http = config.get('http')
+    const ip = await this.#getIp()
+    return `${http}://${ip}:${port}`
+  }
+
+  async #getIp() {
+    let ip = config.get('ip')
+    if (ip == 'localhost') {
+      const ipp = await IP.get()
+      if (ipp) ip = ipp
+    }
+    return ip
   }
 }
 export const ClientFile = new CF()

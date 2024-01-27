@@ -1,8 +1,8 @@
 import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { MysqlOptions, RedisOptions } from '../default/types.js'
-import { ServerOptions } from '../file/types.js'
-import { type ControllersType } from '../core/index.js'
+import { FileOptions } from '../file/types.js'
+import { type ControllersType, type ServerOptions } from '../core/index.js'
 import { APPS } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
 
@@ -112,20 +112,11 @@ export interface AlemonOptions {
   /**
    * 服务器
    */
-  server?: {
-    /**
-     * 应用端口
-     */
-    port?: number
-    /**
-     * 中间件
-     */
-    middleware?: any[]
-  }
+  server?: ServerOptions
   /**
    * 服务配置
    */
-  file?: ServerOptions
+  file?: FileOptions
   /**
    * 是否启动pup
    * defaut true

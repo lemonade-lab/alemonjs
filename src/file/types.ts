@@ -1,7 +1,7 @@
 /**
  * 客户端配置
  */
-export interface ServerOptions {
+export interface FileOptions {
   /**
    * 协议
    */
