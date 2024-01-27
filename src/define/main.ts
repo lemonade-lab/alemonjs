@@ -129,10 +129,10 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   /***
    * server
    */
-  if (Options.server.port) {
+  if (Options.server?.port) {
     AppServerConfig.set('port', Options.server.port)
   }
-  if (Options.server.middleware) {
+  if (Options.server?.middleware) {
     AppServerConfig.set('middleware', Options.server.middleware)
   }
 

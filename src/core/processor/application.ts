@@ -80,7 +80,7 @@ class App {
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
-    if (BotServer.isE()) {
+    if (!BotServer.isE()) {
       BotServer.connect()
     }
   }

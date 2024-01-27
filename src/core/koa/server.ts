@@ -45,14 +45,14 @@ class Server {
    */
   isE() {
     // 默认是空
-    let t = false
+    let t = true
     for (const item in this.#routers) {
       if (this.#routers[item].length != 0) {
-        t = true
+        t = false
         break
       }
     }
-    return this.#routers
+    return t
   }
 
   /**
