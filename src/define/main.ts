@@ -12,11 +12,20 @@ import { DrawingBed, FileOptions, config } from '../file/index.js'
 import { join } from 'path'
 import { AControllers } from '../api/index.js'
 import { AppServerConfig } from '../core/koa/config.js'
+import { configDotenv } from 'dotenv'
+import { LoginMap, analysis } from './login.js'
+import { existsSync } from 'fs'
 /**
  * 启动器
  * @param Options
  */
 export async function runAlemon(Options?: AlemonOptions) {
+  /**
+   * *********
+   * dov
+   * ********
+   */
+  configDotenv(Options.env)
   /**
    * ***********
    * 加载应用
@@ -100,10 +109,24 @@ export async function runAlemon(Options?: AlemonOptions) {
 }
 
 /**
+ *
+ * @param Options
+ */
+export function ALoginOptions(Options?: LoginMap) {
+  return analysis(Options) ?? {}
+}
+
+/**
  * 配置机器人启动规则
  * @param Options
  */
 export async function defineAlemonConfig(Options?: AlemonOptions) {
+  if (!Options.env) {
+    Options.env = {}
+  }
+  if (!Options.env?.path) {
+    Options.env.path = 'alemon.env'
+  }
   /**
    * ************
    * ************
@@ -125,7 +148,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
     DrawingBed.set('func', Options.imageStorage)
     DrawingBed.set('state', true)
   }
-
   /***
    * server
    */
@@ -135,7 +157,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options.server?.middleware) {
     AppServerConfig.set('middleware', Options.server.middleware)
   }
-
   /**
    * ********
    * email
@@ -160,7 +181,6 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   if (Options?.redis) {
     ABotConfig.set('redis', Options.redis)
   }
-
   /**
    * *********
    * file配置
@@ -208,6 +228,22 @@ export async function defineAlemonConfig(Options?: AlemonOptions) {
   ) {
     AppLoadConfig.set('event', shieldEvent)
   }
+
+  /**
+   * 检查login文件是否存在
+   */
+  const lg_ts = join(process.cwd(), 'alemon.login.ts')
+  const lg_js = join(process.cwd(), 'alemon.login.js')
+  if (Options.loginDir) {
+    Options.login = (
+      await import(`file://${join(process.cwd(), Options.loginDir)}`)
+    ).default
+  } else if (existsSync(lg_ts)) {
+    Options.login = (await import(`file://${lg_ts}`)).default
+  } else if (existsSync(lg_js)) {
+    Options.login = (await import(`file://${lg_js}`)).default
+  }
+
   /**
    * *********
    * 登录机器人

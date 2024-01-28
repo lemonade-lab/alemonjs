@@ -1,10 +1,10 @@
 import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
-import { MysqlOptions, RedisOptions } from '../default/types.js'
 import { FileOptions } from '../file/types.js'
 import { type ControllersType, type ServerOptions } from '../core/index.js'
 import { APPS } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
+import { type DotenvConfigOptions } from 'dotenv'
 
 export interface PlatformsItemType {
   /**
@@ -52,6 +52,10 @@ export interface AlemonOptions {
    * login配置
    */
   login?: LoginOptions
+  /**
+   * 指定读取登录ts/js文件
+   */
+  loginDir?: string
   /**
    * 是否挂载应用
    */
@@ -127,13 +131,9 @@ export interface AlemonOptions {
    */
   puppeteer?: PuppeteerLaunchOptions
   /**
-   * redis配置
+   * env
    */
-  redis?: RedisOptions
-  /**
-   * mysql配置
-   */
-  mysql?: MysqlOptions
+  env?: DotenvConfigOptions
   /**
    * 系统状态-邮箱订阅
    */

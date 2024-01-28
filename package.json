@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.2.0-rc.18",
+  "version": "1.2.0-rc.19",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "test": "ts-node apps.ts",
@@ -29,6 +29,7 @@
     "public-ip": "^6.0.1",
     "puppeteer": "^20.7.1",
     "qrcode": "^1.5.3",
+    "dotenv": "^16.4.1",
     "ws": "^8.13.0"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@ import { readFileSync, cpSync } from 'node:fs'
 import { Puppeteer } from '../core/index.js'
 import { type ScreenshotFileOptions } from '../core/index.js'
 import { getStrMatchSize, replaceLocal } from './utils.js'
-import { cache } from './html.js'
+import { Cache } from './html.js'
 import { PuppeteerLaunchOptions } from 'puppeteer'
 /**
  * 插入模板
@@ -90,7 +90,7 @@ export function createImage(cwd?: string) {
        * 字符串解析 - 同时替换@ - 插入模板
        * ********
        */
-      const html = render(cache, [
+      const html = render(Cache.get(), [
         {
           reg: /<ImageStyle\s*\/>/,
           // 提取 替换

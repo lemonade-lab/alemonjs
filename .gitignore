@@ -7,13 +7,19 @@ public/**/*
 lib/**/*
 types/**/*
 
+
+# docs
+docs
+
 # test
-a.login.config.ts
+alemon.login.ts
 alemon.config.ts
 a.main.ts
 a.apps.ts
-a.notes.md
 a.api.ts
+
+# env 
+alemon.env
 
 # 打印
 logs

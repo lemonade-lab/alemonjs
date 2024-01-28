@@ -1,5 +1,4 @@
 import { type BotConfigType } from './types.js'
-import { DefaultMysqlOptions, DefaultRedisOptions } from '../default/index.js'
 import { DefaultFileOptions } from '../file/default.js'
 import { DefaultEmailOptions } from '../email/default.js'
 import { defineKOOK as kook } from '../platform/kook/sdk/wss.js'
@@ -58,8 +57,6 @@ class BaseConfig<D> {
  * 机器人配置
  */
 export const ABotConfig = new BaseConfig<BotConfigType>({
-  mysql: DefaultMysqlOptions,
-  redis: DefaultRedisOptions,
   file: DefaultFileOptions,
   email: DefaultEmailOptions,
   kook,
