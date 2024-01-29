@@ -21,6 +21,9 @@ import { directController } from '../direct.js'
  * @returns
  */
 export const MESSAGE_DELETE = async (event: any) => {
+  // 屏蔽其他机器人的消息
+  if (event.author?.bot) return
+
   const masterID = ABotConfig.get('qq').masterID
 
   const e = {
@@ -90,9 +93,6 @@ export const MESSAGE_DELETE = async (event: any) => {
     APPS.responseEventType(e)
     return
   }
-
-  // 屏蔽其他机器人的消息
-  if (event.author.bot) return
 
   if (event.mentions) {
     /**
