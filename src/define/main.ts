@@ -19,7 +19,7 @@ import { existsSync } from 'fs'
  * 启动器
  * @param Options
  */
-export async function runAlemon(Options?: AlemonOptions) {
+async function runAlemon(Options?: AlemonOptions) {
   /**
    * *********
    * dov
@@ -112,7 +112,7 @@ export async function runAlemon(Options?: AlemonOptions) {
  *
  * @param Options
  */
-export function ALoginOptions(Options?: LoginMap) {
+export function ALoginOptions<T>(Options?: LoginMap & T) {
   return analysis(Options) ?? {}
 }
 
@@ -120,7 +120,16 @@ export function ALoginOptions(Options?: LoginMap) {
  * 配置机器人启动规则
  * @param Options
  */
-export async function defineAlemonConfig(Options?: AlemonOptions) {
+export async function defineConfig<T>(Options?: AlemonOptions & T) {
+  return await defineAlemonConfig(Options)
+}
+
+/**
+ * 配置机器人启动规则
+ * @deprecated 已废弃
+ * @param Options
+ */
+export async function defineAlemonConfig<T>(Options?: AlemonOptions & T) {
   if (!Options.env) {
     Options.env = {}
   }

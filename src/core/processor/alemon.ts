@@ -510,6 +510,7 @@ export class Alemon {
   router(val: typeof Router.prototype) {
     // 推送
     BotServer.push(this.#name, val)
+    return this
   }
 
   /**

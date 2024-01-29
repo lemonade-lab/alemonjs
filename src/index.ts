@@ -36,15 +36,6 @@ export * from './image/index.js'
  * email
  */
 export * from './email/index.js'
-
-import { LoginOptions } from './default/types.js'
-import { ALoginOptions as Alogin, LoginMap } from './define/index.js'
-
-declare global {
-  var ALoginOptions: (Options?: LoginMap) => LoginOptions
-}
-global.ALoginOptions = Alogin
-
 /**
  * *************
  * exit
