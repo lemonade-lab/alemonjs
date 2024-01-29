@@ -74,11 +74,7 @@ async function runAlemon(Options?: AlemonOptions) {
         const back = Options.platforms.find(i => i.name == item)
         if (!back) continue
         // 登录
-        back.login(
-          Options.login[back.name],
-          APPS.responseMessage,
-          APPS.responseEventType
-        )
+        back.login(Options.login[back.name])
         // 设置控制器
         AControllers.set(back.name, back.controllers)
       }

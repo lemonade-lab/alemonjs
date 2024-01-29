@@ -2,7 +2,6 @@ import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions } from '../default/types.js'
 import { FileOptions } from '../file/types.js'
 import { type ControllersType, type ServerOptions } from '../core/index.js'
-import { APPS } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
 import { type DotenvConfigOptions } from 'dotenv'
 
@@ -22,15 +21,7 @@ export interface PlatformsItemType {
     /**
      * 登录配置
      */
-    options: any,
-    /**
-     * 消息事件
-     */
-    responseMessage: typeof APPS.responseMessage,
-    /**
-     * 非消息事件
-     */
-    responseEventType: typeof APPS.responseEventType
+    options: any
   ) => any
 }
 
