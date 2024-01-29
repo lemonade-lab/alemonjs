@@ -28,7 +28,8 @@
 | [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架  |
 | [afloat]          | [![afloat-status]][afloat-package]                   | 应用构建工具    |
 | [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载 |
-| [alemon-onebot]   | [![alemon-onebot-status]][alemon-onebot-package]     | OneBot 协议平台 |
+| [alemon-onebot]   | [![alemon-onebot-status]][alemon-onebot-package]     | OneBot 协议     |
+| [alemon-icqq]     | [![alemon-icqq-status]][alemon-icqq-package]         | icqq 协议       |
 
 >
 
@@ -56,9 +57,15 @@
 
 >
 
-[alemon-onebot]: https://github.com/ningmengchongshui/alemonjs/tree/alemon-onebot
+[alemon-onebot]: https://github.com/ningmengchongshui/alemon-onebot
 [alemon-onebot-status]: https://img.shields.io/npm/v/alemon-onebot.svg
 [alemon-onebot-package]: https://www.npmjs.com/package/alemon-onebot
+
+>
+
+[alemon-icqq]: https://github.com/ningmengchongshui/alemon-icqq
+[alemon-icqq-status]: https://img.shields.io/npm/v/alemon-icqq.svg
+[alemon-icqq-package]: https://www.npmjs.com/package/alemon-icqq
 
 ### Quick Start
 
@@ -74,21 +81,25 @@ npm run dev
 
 连接平台需要正确配置登录
 
-`a.login.config.ts`
+`alemon.login.ts`
 
 ```ts
-import { LoginMap } from 'alemonjs'
-export const login: LoginMap = {
-  // 配置名
+import { ALoginOptions } from 'alemonjs'
+export default ALoginOptions({
+  // 配置名 test
   test: {
-    // 平台名 qq discord ntqq qq villa
+    // qq平台配置
     qq: {
-      // ... 配置信息
-      // ...详细请看
-      // alemonjs.com
+      appID: 'your app id',
+      token: 'your token'
     }
+  },
+  // 配置名 pro
+  pro: {
+    // kook平台配置
+    kook: {}
   }
-}
+})
 ```
 
 > npm run [脚本名] [配置名] [平台名]
