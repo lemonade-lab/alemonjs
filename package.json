@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.2.0-rc.21",
+  "version": "1.2.0-rc.22",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "test": "ts-node apps.ts",
@@ -61,12 +61,16 @@
   "files": [
     "resources",
     "lib",
-    "types"
+    "types",
+    ".puppeteerrc.cjs"
   ],
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./types/index.d.ts"
+    },
+    "./.puppeteerrc.cjs": {
+      "require": "./.puppeteerrc.cjs"
     }
   },
   "publishConfig": {
