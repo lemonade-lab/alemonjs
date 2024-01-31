@@ -425,12 +425,6 @@ class ClientQq {
   }
 
   /**
-   * ***********
-   * 频道身份api
-   * ***********
-   */
-
-  /**
    * 获取指定消息
    * @param channel_id
    * @param message_id
@@ -493,6 +487,161 @@ class ClientQq {
     return this.request({
       method: 'DELETE',
       url: `/channels/${channel_id}/messages/${message_id}?hidetip=${hidetip}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * ***********
+   * 频道身份api
+   * ***********
+   */
+
+  /**
+   * 获取频道身份组列表
+   * @param guild_id 频道id
+   * @returns
+   */
+  async guildsRoles(guild_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/guilds/${guild_id}/roles`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 创建频道身份组
+   * @param guild_id 频道id
+   * @param {object} data 参数
+   * @param {object?} data.name 身份组名称
+   * @param {object?} data.color ARGB 的 HEX 十六进制颜色值转换后的十进制数值
+   * @param {object?} data.hoist 在成员列表中单独展示: 0-否, 1-是
+   * @returns
+   */
+  async guildsRolesPost(
+    guild_id: string,
+    data: {
+      name?: string
+      color?: number
+      hoist?: 0 | 1
+    }
+  ) {
+    return this.request({
+      method: 'POST',
+      url: `/guilds/${guild_id}/roles`,
+      data
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 修改频道身份组
+   * @param guild_id 频道id
+   * @param {object} data 参数
+   * @param {object?} data.name 身份组名称
+   * @param {object?} data.color ARGB 的 HEX 十六进制颜色值转换后的十进制数值
+   * @param {object?} data.hoist 在成员列表中单独展示: 0-否, 1-是
+   * @returns
+   */
+  async guildsRolesPatch(
+    guild_id: string,
+    role_id: string,
+    data: {
+      name?: string
+      color?: number
+      hoist?: 0 | 1
+    }
+  ) {
+    return this.request({
+      method: 'PATCH',
+      url: `/guilds/${guild_id}/roles/${role_id}`,
+      data
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 删除频道身份组
+   * @param guild_id 频道id
+   * @param role_id 身份组id
+   */
+  async guildsRolesDelete(guild_id: string, role_id: string) {
+    return this.request({
+      method: 'DELETE',
+      url: `/guilds/${guild_id}/roles/${role_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 将成员添加到频道身份组
+   * @param guild_id 频道id
+   * @param channel_id 子频道id
+   * @param user_id 用户id
+   * @param role_id 身份组id
+   * @returns
+   */
+
+  async guildsRolesMembersPut(
+    guild_id: string,
+    channel_id: string,
+    user_id: string,
+    role_id: string
+  ) {
+    return this.request({
+      method: 'PUT',
+      url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`,
+      data: {
+        channel: {
+          id: channel_id
+        }
+      }
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * 将成员从频道身份组移除
+   * @param guild_id 频道id
+   * @param channel_id 子频道id
+   * @param user_id 用户id
+   * @param role_id 身份组id
+   * @returns
+   */
+
+  async guildsRolesMembersDelete(
+    guild_id: string,
+    channel_id: string,
+    user_id: string,
+    role_id: string
+  ) {
+    return this.request({
+      method: 'DELETE',
+      url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`,
+      data: {
+        channel: {
+          id: channel_id
+        }
+      }
     })
       .then(ApiLog)
       .catch(err => {
@@ -1045,13 +1194,10 @@ class ClientQq {
    * @param message_id 消息id
    * @param type 表情类型 1：系统表情 2：emoji表情
    * @param id 表情id 参考https://bot.q.qq.com/wiki/develop/api-v2/openapi/emoji/model.html#Emoji%20%E5%88%97%E8%A1%A8
-   * @param cookie 返回的cookie 第一次请求不传，后续请求传上次返回的cookie
-   * @param limit 返回的用户数量 默认20 最大50
-   * @returns 
-字段名	  类型	      描述
-users	  array	  用户对象，参考 User，会返回 id, username, avatar
-cookie	string	分页参数，用于拉取下一页
-is_end	bool	  是否已拉取完成到最后一页，true代表完成
+   * @param {object} data
+   * @param {object} data.cookie 返回的cookie 第一次请求不传，后续请求传上次返回的cookie
+   * @param {object} data.limit 返回的用户数量 默认20 最大50
+   * @returns data:{ users:User[], cookie:string,is_end:true|false }
    */
   async channelsMessagesReactionsUsers(
     channel_id: string,
