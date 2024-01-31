@@ -47,39 +47,21 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param {string[]} option.userlist 批量禁言成员列表
      * @returns
      */
-    mute: async (option: {
-      time?: string
-      mute_end_timestamp?: string
-      userId?: string
-      all?: boolean
-      userlist?: string[]
-    }) => {
+    mute: async (option?: { time?: number; cancel?: boolean }) => {
       const guildId = this.get('guild_id')
-      const userId = option.userId || ''
+      const userId = this.get('user_id')
       const time = option.time || '0'
-      const mute_end_timestamp = option.mute_end_timestamp || '0'
-      const all = option.all || false
-      const userlist = option.userlist || []
-      if (all) {
-        return await ClientQQ.guildsMuteAll(guildId, { mute_seconds: time })
-      }
-      if (userlist.length > 0) {
-        return await ClientQQ.guildsMute(guildId, {
-          user_ids: userlist,
-          mute_seconds: time
-        })
-      }
       return await ClientQQ.guildsMemberMute(guildId, userId, {
-        mute_seconds: time
+        mute_seconds: String(time)
       })
     },
     /**
-     * 踢出
-     * @param user_id 用户ID
+     * 踢出成员
      * @returns
      */
-    remove: async (user_id: string) => {
+    remove: async () => {
       const guildId = this.get('guild_id')
+      const user_id = this.get('user_id')
       return await ClientQQ.guildsMembersDelete(guildId, user_id)
     },
     /**
@@ -89,9 +71,10 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param add 为true时添加，为false时移除 默认为true
      * @returns
      */
-    operate: async (user_id: string, role_id: string, add: boolean = true) => {
+    operate: async (role_id: string, add: boolean = true) => {
       const guildId = this.get('guild_id')
       const channel_id = this.get('channel_id')
+      const user_id = this.get('user_id')
       if (add) {
         return await ClientQQ.guildsRolesMembersPut(
           guildId,
@@ -168,16 +151,14 @@ export class Controllers extends BaseConfig<ControllerOption> {
     },
     /**
      * 转发消息
+     * @param channel_id 频道ID
+     * @param msgId 消息ID(不填则为当前消息)
      * @returns
      */
-    forward: async (channel_id: string, msgId?: string) => {
-      const msg_id = msgId ?? this.get('msg_id')
-      const msg = await ClientQQ.channelsMessages(channel_id, msg_id)
-      return await ClientQQ.channelsMessagesPost(channel_id, msg)
-    },
+    forward: async () => {},
     audio: async () => {},
     video: async () => {},
-
+    update: async () => {},
     horn: async (cancel?: boolean) => {
       if (cancel) {
         //
@@ -215,21 +196,23 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     allUsers: async (
-      type: 1 | 2,
-      id: string,
-      msgId?: string,
+      msg: {
+        type: 1 | 2
+        id: string
+        msgId?: string
+      },
       option: {
         limit?: number
         cookie?: string
       } = {}
     ) => {
       const channel_id = this.get('channel_id')
-      const msg_id = msgId ?? this.get('msg_id')
+      const msg_id = msg.msgId ?? this.get('msg_id')
       return ClientQQ.channelsMessagesReactionsUsers(
         channel_id,
         msg_id,
-        type,
-        id,
+        msg.type,
+        msg.id,
         option
       )
     },
