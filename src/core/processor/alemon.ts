@@ -2,13 +2,14 @@ import { type AEvent, type EventEnum } from '../typings.js'
 import { APlugin } from './plugin.js'
 import { type NodeDataType } from './types.js'
 import { AppMap } from './data.js'
-import { getAppName } from './path.js'
+import { getAppPath } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
 import { AInstruct } from './help.js'
 import { AppLoadConfig } from './configs.js'
 import { BotServer } from '../index.js'
 import Router from 'koa-router'
+import { basename } from 'path'
 
 type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
 
@@ -799,7 +800,7 @@ export function createSubApp(AppName: string) {
  * @returns
  */
 export function createApp(url: string) {
-  return createSubApp(getAppName(url))
+  return createSubApp(basename(getAppPath(url)))
 }
 
 /**
