@@ -1,33 +1,56 @@
-import { dirname, basename } from 'path'
+import { dirname, basename, join } from 'path'
 import { fileURLToPath } from 'url'
+import { AppLoadConfig } from './configs.js'
 
 /**
- * 得到执行路径
- * @param url  import.meta.url
- * @returns AppName目录名
+ *
+ * @param url import.meta.url
+ * @returns 执行路径
  */
 export function getAppPath(url: string | URL) {
   return dirname(fileURLToPath(url)).replace(/\\/g, '/')
 }
 
 /**
- * 得到执行目录
- * @param {} url import.meta.url
- * @returns AppName目录名
- */
-export function getAppName(url: string | URL) {
-  return basename(getAppPath(url))
-}
-
-/**
- * 应用路径
+ *
  * @param url
  * @returns
  */
 export function importPath(url: string | URL) {
-  const DirPath = getAppPath(url)
+  // 检查 URL 参数
+  if (!url || (typeof url !== 'string' && !(url instanceof URL))) {
+    throw new Error('Invalid URL parameter')
+  }
   return {
-    cwd: () => DirPath,
-    name: basename(DirPath)
+    name: () => {
+      const dir = getAppPath(url)
+      // 是否有该地址
+      const PluginsDir = AppLoadConfig.get('dir')
+      const index = dir.indexOf(PluginsDir)
+      // 判断是否有
+      if (index == -1) {
+        // 不存在,以根目录为准
+        const cacheDir = process.cwd().replace(/\\/g, '/')
+        return basename(cacheDir)
+      }
+      const subDir = dir.slice(index + PluginsDir.length + 1)
+      const name = subDir.indexOf('/') === -1 ? subDir : subDir.split('/')[0]
+      return name
+    },
+    cwd: () => {
+      const dir = getAppPath(url)
+      // 是否有该地址
+      const PluginsDir = AppLoadConfig.get('dir')
+      const index = dir.indexOf(PluginsDir)
+      // 判断是否有
+      if (index == -1) {
+        // 不存在,以根目录为准
+        return process.cwd().replace(/\\/g, '/')
+      }
+      const NewDir = dir.substring(0, index + PluginsDir.length)
+      const subDir = dir.slice(index + PluginsDir.length + 1)
+      const name = subDir.indexOf('/') === -1 ? subDir : subDir.split('/')[0]
+      return join(NewDir, name).replace(/\\/g, '/')
+    }
   }
 }
