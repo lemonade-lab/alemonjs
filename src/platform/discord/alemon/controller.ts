@@ -3,6 +3,8 @@ import {
   type ControllerOption,
   type UserInformationType
 } from '../../../core/index.js'
+import { ClientDISOCRD } from '../index.js'
+import { ABotConfig } from '../../../config/index.js'
 import { replyController } from './reply.js'
 export class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
@@ -15,6 +17,23 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     information: async (): Promise<UserInformationType | false> => {
+      const guildId = this.get('guild_id')
+      const user_id = this.get('user_id')
+      const data = await ClientDISOCRD.getGuildMember(guildId, user_id)
+      if (data) {
+        const cfg = ABotConfig.get('discord')
+        const masterID = cfg.masterID
+        return {
+          id: data.user.id,
+          name: data.user.username,
+          avatar: data.user.avatar,
+          introduce: '',
+          joined_at: new Date(data.joined_at).getTime(),
+          bot: data.user.bot,
+          isMaster: masterID == data.user.id,
+          role: data.roles
+        }
+      }
       return false
     },
     /**
@@ -29,7 +48,9 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * 踢出
      */
     remove: async () => {
-      return false
+      const guildId = this.get('guild_id')
+      const user_id = this.get('user_id')
+      return await ClientDISOCRD.guildsMembersDelete(guildId, user_id)
     },
     /**
      * 身分组
@@ -38,7 +59,20 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     operate: async (role_id: string, add = true) => {
-      return false
+      const guildId = this.get('guild_id')
+      const user_id = this.get('user_id')
+      if (add) {
+        return await ClientDISOCRD.guildsMEmbersRolesAdd(
+          guildId,
+          user_id,
+          role_id
+        )
+      }
+      return await ClientDISOCRD.guildsMembersRolesDelete(
+        guildId,
+        user_id,
+        role_id
+      )
     }
   }
 
@@ -54,7 +88,11 @@ export class Controllers extends BaseConfig<ControllerOption> {
     quote: async (
       content: Buffer | string | number | (Buffer | number | string)[]
     ) => {
-      return false
+      const msg_id = this.get('msg_id')
+      const channel_id = this.get('channel_id')
+      return await replyController(content, channel_id, {
+        quote: msg_id
+      })
     },
     /**
      * 更新信息
@@ -66,11 +104,18 @@ export class Controllers extends BaseConfig<ControllerOption> {
     ) => {
       return false
     },
-    withdraw: async (hideTip = true) => {
-      return false
+    withdraw: async (msgId?: string) => {
+      const msg_id = msgId ?? this.get('msg_id')
+      const channel_id = this.get('channel_id')
+      return await ClientDISOCRD.deleteMessage(channel_id, msg_id)
     },
-    pinning: async (cancel?: boolean) => {
-      return false
+    pinning: async (cancel?: boolean, msgId?: string) => {
+      const channel_id = this.get('channel_id')
+      let msg_id = msgId ?? this.get('msg_id')
+      if (cancel) {
+        return await ClientDISOCRD.deletepinMessage(channel_id, msg_id)
+      }
+      return await ClientDISOCRD.pinMessage(channel_id, msg_id)
     },
     forward: async () => {
       return false

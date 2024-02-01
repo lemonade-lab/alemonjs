@@ -251,7 +251,7 @@ class ClientDc {
   }
   /**
    * *********
-   * 获取当前用户频道成员
+   * 获取频道成员
    * *********
    */
   async guildsMember(guild_id: string) {
@@ -447,7 +447,7 @@ class ClientDc {
 
   /**
    * *********
-   * 修改频道
+   * 删除频道
    * *********
    */
   async guildsDelete(guild_id: string) {
@@ -469,6 +469,21 @@ class ClientDc {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/threads/active`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 获取频道成员消息
+   * *********
+   */
+  async getGuildMember(guild_id: string, user_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/guilds/${guild_id}/members/${user_id}`
     })
       .then(ApiLog)
       .catch(err => {
@@ -1073,13 +1088,58 @@ class ClientDc {
 
   /**
    * *********
-   * 获取子频道
+   * 获取所有子频道
    * *********
    */
-  async guildsChannels(guild_id: string) {
+  async guildsanyChannels(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/channels`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 获取子频道
+   * *********
+   */
+  async guildsChannels(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 修改子频道
+   * *********
+   */
+  async guildsChannelsUpdate(channel_id: string) {
+    return this.request({
+      method: 'PATCH',
+      url: `/channels/${channel_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 删除子频道
+   * *********
+   */
+  async guildsChannelsDELETE(channel_id: string) {
+    return this.request({
+      method: 'DELETE',
+      url: `/channels/${channel_id}`
     })
       .then(ApiLog)
       .catch(err => {
@@ -1106,7 +1166,7 @@ class ClientDc {
    * 修改子频道位置
    * *********
    */
-  async guildsChannelsUpdate(guild_id: string) {
+  async guildsChannelsUpdateposi(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/channels`
@@ -1116,6 +1176,280 @@ class ClientDc {
         console.error(err)
       })
   }
+
+  /**
+   * *********
+   * 获取频道邀请
+   * *********
+   */
+  async getChannelInvites(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/ ${channel_id} /invites`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 创建频道邀请
+   * *********
+   */
+  async createChannelInvites(channel_id: string) {
+    return this.request({
+      method: 'POST',
+      url: `/channels/ ${channel_id} /invites`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 删除频道邀请
+   * *********
+   */
+  async deleteChannelInvites(channel_id: string) {
+    return this.request({
+      method: 'POST',
+      url: `/channels/ ${channel_id} /invites`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * *********
+   *触发输入指示器
+   * *********
+   */
+  async triggerTypingIndicator(channel_id: string) {
+    return this.request({
+      method: 'POST',
+      url: `/channels/ ${channel_id} /typing`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * *********
+   *群组 DM 添加收件人
+   * *********
+   */
+  async groupDMAddRecipient(channel_id: string, user_id: string) {
+    return this.request({
+      method: 'put',
+      url: `/channels/ ${channel_id} /recipients/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *群组DM删除收件人
+   * *********
+   */
+  async groupDMdeleteRecipient(channel_id: string, user_id: string) {
+    return this.request({
+      method: 'delete',
+      url: `/channels/ ${channel_id} /recipients/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *启动消息开始线程
+   * *********
+   */
+  async startThreadfromMessage(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'post',
+      url: `/channels/${channel_id} /messages/${message_id} /threads`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *启动没有消息的线程
+   * *********
+   */
+  async startThreadwithoutMessag(channel_id: string) {
+    return this.request({
+      method: 'post',
+      url: `/channels/${channel_id}/threads`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *在论坛或媒体频道中启动话题
+   * *********
+   */
+  async startThreadinForum(channel_id: string) {
+    return this.request({
+      method: 'post',
+      url: `/channels/${channel_id}/threads`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *加入话题
+   * *********
+   */
+  async joinThread(channel_id: string) {
+    return this.request({
+      method: 'PUT',
+      url: `/channels/${channel_id}/thread-members/@me`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *添加话题成员
+   * *********
+   */
+  async addThreadMember(channel_id: string, user_id: string) {
+    return this.request({
+      method: 'PUT',
+      url: `/channels/${channel_id}/thread-members/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *删除话题
+   * *********
+   */
+  async leavethread(channel_id: string) {
+    return this.request({
+      method: 'delete',
+      url: `/channels/${channel_id}/thread-members/@me`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *删除线程成员
+   * *********
+   */
+  async removeThreadMember(channel_id: string, user_id: string) {
+    return this.request({
+      method: 'delete',
+      url: `/channels/${channel_id}/thread-members/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *获取线程成员
+   * *********
+   */
+  async getThreadMember(channel_id: string, user_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}/thread-members/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *列出线程成员
+   * *********
+   */
+  async listThreadMembers(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}/thread-members`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *列出公共存档主题
+   * *********
+   */
+  async listPublicArchivedThread(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}/threads/archived/public`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *列出私有存档线程
+   * *********
+   */
+  async listPrivateArchivedThreads(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}/threads/archived/private`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *列出已加入的私人存档主题
+   * *********
+   */
+  async listoinedPrivateThreads(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}/users/@me/threads/archived/private`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
   /**
    * ***********
    * 频道身份api
@@ -1129,10 +1463,250 @@ class ClientDc {
    */
 
   /**
+   * *********
+   * 编辑频道权限
+   * *********
+   */
+  async editChannelPermissions(channel_id: string, overwrite_id: string) {
+    return this.request({
+      method: 'PATCH',
+      url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 删除频道权限
+   * *********
+   */
+  async deleteChannelPermissions(channel_id: string, overwrite_id: string) {
+    return this.request({
+      method: 'delete',
+      url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
    * *******
    * 消息api
    * ********
    */
+
+  /**
+   * *********
+   * 获取子频道消息
+   * *********
+   */
+  async guildsChannelsanymessages(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}/messages`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 获取单条子频道消息
+   * *********
+   */
+  async guildsChannelsmessages(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/${channel_id}/messages/${message_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 创建子频道消息
+   * *********
+   */
+  async guildsChannelscreatmess(channel_id: string) {
+    return this.request({
+      method: 'post',
+      url: `/channels/${channel_id}/messages`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 交叉发布消息
+   * *********
+   */
+  async crosspostmessages(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'POST',
+      url: `/channels/ ${channel_id} /messages/ ${message_id} /crosspost`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * *********
+   * 创造反应
+   * *********
+   */
+  async createareaction(channel_id: string, message_id: string, emoji: string) {
+    return this.request({
+      method: 'PUT',
+      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 删除自己的反应
+   * *********
+   */
+  async deleteownreaction(
+    channel_id: string,
+    message_id: string,
+    emoji: string
+  ) {
+    return this.request({
+      method: 'DELETE',
+      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 删除别人的反应
+   * *********
+   */
+  async deleteareuserction(
+    channel_id: string,
+    message_id: string,
+    emoji: string,
+    user_id: string
+  ) {
+    return this.request({
+      method: 'DELETE',
+      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/${user_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 获取反应
+   * *********
+   */
+  async getownreaction(channel_id: string, message_id: string, emoji: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 删除所有反应
+   * *********
+   */
+  async deleteAllreaction(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'DELETE',
+      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 删除表情符号的所有反应
+   * *********
+   */
+  async deleteAllreactionforEmoji(
+    channel_id: string,
+    message_id: string,
+    emoji: string
+  ) {
+    return this.request({
+      method: 'DELETE',
+      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 编辑消息
+   * *********
+   */
+  async editMessage(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'PATCH',
+      url: `/channels/${channel_id}/messages/${message_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 撤回消息
+   * *********
+   */
+  async deleteMessage(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'PATCH',
+      url: `/channels/${channel_id}/messages/${message_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   * 批量删除消息
+   * *********
+   */
+  async bulkdeleteMessage(channel_id: string) {
+    return this.request({
+      method: 'post',
+      url: `/channels/${channel_id}/messages/bulk-delete`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
 
   /**
    * ************
@@ -1157,12 +1731,73 @@ class ClientDc {
    * 公告api
    * *******
    */
-
+  /**
+   * *********
+   * 关注公告频道
+   * *********
+   */
+  async followAnnouncementChannel(channel_id: string) {
+    return this.request({
+      method: 'POST',
+      url: `/channels/ ${channel_id} /followers`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
   /**
    * **********
    * 精华消息api
    * **********
    */
+
+  /**
+   * *********
+   *获取置顶消息
+   * *********
+   */
+  async getPinnedMessages(channel_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/channels/ ${channel_id}/pins`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
+   * *********
+   *置顶消息
+   * *********
+   */
+  async pinMessage(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'put',
+      url: `/channels/ ${channel_id}/${message_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *取消置顶消息
+   * *********
+   */
+  async deletepinMessage(channel_id: string, message_id: string) {
+    return this.request({
+      method: 'delete',
+      url: `/channels/ ${channel_id}/${message_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
 
   /**
    * ********
@@ -1177,10 +1812,207 @@ class ClientDc {
    */
 
   /**
+   * *********
+   *获取贴纸
+   * *********
+   */
+  async getsticker(sticker_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/stickers/${sticker_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *列出贴纸包
+   * *********
+   */
+  async listStickerPacks() {
+    return this.request({
+      method: 'get',
+      url: `/stickers`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *列出公会贴纸
+   * *********
+   */
+  async listGuildStickers(sticker_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/stickers/${sticker_id}/stickers`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *获取公会贴纸
+   * *********
+   */
+  async getGuildSticker(guild_id: string, sticker_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/guilds/${guild_id}/stickers/${sticker_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *创建公会贴纸
+   * *********
+   */
+  async createGuildSticker(guild_id: string) {
+    return this.request({
+      method: 'post',
+      url: `/guilds/${guild_id}/stickers`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *修改公会贴纸
+   * *********
+   */
+  async modifyGuildSticker(guild_id: string, sticker_id: string) {
+    return this.request({
+      method: 'PATCH',
+      url: `/guilds/${guild_id}/stickers/${sticker_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *删除公会贴纸
+   * *********
+   */
+  async deleteGuildSticker(guild_id: string, sticker_id: string) {
+    return this.request({
+      method: 'delete',
+      url: `/guilds/${guild_id}/stickers/${sticker_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *列出公会表情符号
+   * *********
+   */
+  async listGuildEmojis(guild_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/guilds/ ${guild_id} /emojis`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *获取公会表情符号
+   * *********
+   */
+  async getGuildEmoji(guild_id: string, emoji_id: string) {
+    return this.request({
+      method: 'get',
+      url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *创建公会表情符号
+   * *********
+   */
+  async createGuildEmoji(guild_id: string) {
+    return this.request({
+      method: 'post',
+      url: `/guilds/ ${guild_id} /emojis`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *修改公会表情
+   * *********
+   */
+  async modifyGuildEmoji(guild_id: string, emoji_id: string) {
+    return this.request({
+      method: 'PATCH',
+      url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+  /**
+   * *********
+   *删除公会表情符号
+   * *********
+   */
+  async deleteGuildEmoji(guild_id: string, emoji_id: string) {
+    return this.request({
+      method: 'delete',
+      url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
+
+  /**
    * ***********
    * 音频api
    * **********
    */
+
+  /**
+   * *********
+   * 列出语音区域
+   * *********
+   */
+  async listVoiceRegions() {
+    return this.request({
+      method: 'get',
+      url: `/voice/regions`
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
 
   /**
    * *********
