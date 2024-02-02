@@ -1,5 +1,5 @@
-import { ABuffer } from '../../../core/utils/index.js'
-export const segmentKOOK = {
+import { ABuffer, type SegmentType } from '../../../core/index.js'
+export const segmentKOOK: SegmentType = {
   at: (uid: string): string => {
     return `(met)${uid}(met)`
   },
@@ -65,5 +65,6 @@ export const segmentKOOK = {
    */
   block: (txt: string): string => {
     return `\`${txt}\``
-  }
+  },
+  spoiler: (content: string): string => content
 }

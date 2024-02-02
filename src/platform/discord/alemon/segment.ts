@@ -1,5 +1,5 @@
-import { ABuffer } from '../../../core/utils/index.js'
-export const segmentDISCORD = {
+import { ABuffer, type SegmentType } from '../../../core/index.js'
+export const segmentDISCORD: SegmentType = {
   at: function (uid: string): string {
     return `<@${uid}>`
   },
@@ -28,5 +28,9 @@ export const segmentDISCORD = {
   },
   strikethrough: function (txt: string): string {
     return `~~${txt}~~`
-  }
+  },
+  role: (role_id: string): string => '',
+  spoiler: (content: string): string => content,
+  expression: (name: string, id: string): string => '',
+  boldItalic: (txt: string): string => txt
 }

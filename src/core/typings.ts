@@ -274,52 +274,52 @@ export interface SegmentType {
    * 艾特频道
    * @param channel_id
    */
-  atChannel?(channel_id: string): string
+  atChannel(channel_id: string): string
   /**
    *
    * @param role_id 角色
    */
-  role?(role_id: string): string
+  role(role_id: string): string
   /**
    *  点击后才显示
    * @param content 内容
    */
-  spoiler?(content: string): string
+  spoiler(content: string): string
   /**
    *
    * @param name  服务器表情名
    * @param id   服务器表情id
    */
-  expression?(name: string, id: string): string
+  expression(name: string, id: string): string
   /**
    * @param txt 链接文字
    * @param url 链接地址
    */
-  link?(txt: string, url: string): string
+  link(txt: string, url: string): string
   /**
    * 加粗
    * @param txt
    */
-  Bold?(txt: string): string
+  Bold(txt: string): string
   /**
    * 斜体
    * @param txt
    */
-  italic?(txt: string): string
+  italic(txt: string): string
   /**
    * 加粗斜体
    */
-  boldItalic?(txt: string): string
+  boldItalic(txt: string): string
   /**
    * 删除线
    * @param txt
    */
-  strikethrough?(txt: string): string
+  strikethrough(txt: string): string
   /**
    * 代码块
    * @param txt
    */
-  block?(txt: string): string
+  block(txt: string): string
 }
 
 export interface ReplyBase {
