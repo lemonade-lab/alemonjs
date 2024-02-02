@@ -4,9 +4,7 @@ if (
   process.env.ALEMONJS_LOG != 'false'
 ) {
   const fun = () => {
-    return `[${
-      process.env?.ALEMONJS_NAME ?? 'ALmonJS'
-    }] [${new Date().toLocaleDateString(undefined, {
+    return `[ALemonJS] [${new Date().toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
