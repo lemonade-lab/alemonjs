@@ -179,4 +179,10 @@ export class APlugin {
     AObserver.cancel(this.conKey(isGroup))
   }
 }
+
+/**
+ * alemonjs plugin
+ * 插件标准类
+ * @deprecated 已废弃
+ */
 export const plugin = APlugin

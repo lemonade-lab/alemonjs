@@ -4,7 +4,6 @@ import { existsSync, readdirSync } from 'fs'
 import { AppLoadConfig } from './configs.js'
 import { AppMap } from './data.js'
 import { AObserver } from './subscribe.js'
-import { loadError } from './log.js'
 import { Alemon } from './alemon.js'
 import { BotServer } from '../index.js'
 import { readScript } from './read.js'
@@ -70,7 +69,7 @@ class App {
     // 得到所有key
     for (const item in AppMap.keys()) {
       const reg = AppMap.get(item).getReg()
-      if (reg) this.#mergedRegexArr.push()
+      if (reg) this.#mergedRegexArr.push(reg)
     }
     // 构造大正则
     this.#regular = new RegExp(

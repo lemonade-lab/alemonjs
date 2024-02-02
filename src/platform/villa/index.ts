@@ -1,7 +1,7 @@
 import { Client } from './sdk/index.js'
 import { ABotConfig } from '../../config/index.js'
 import { conversation } from './alemon/conversation.js'
-export async function createAlemon() {
+export default async function createAlemon() {
   // 登录
   const villa = ABotConfig.get('villa')
   // 存在

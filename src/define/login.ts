@@ -4,6 +4,7 @@ import { AlemonOptions } from './types.js'
  * ***********
  * 登录集成map
  * **********
+ * @deprecated 已废弃
  */
 export interface LoginMap {
   [key: string]: AlemonOptions['login']
@@ -13,6 +14,7 @@ export interface LoginMap {
  * map登录校验
  * @param val 校验值
  * @returns 返回校验所得login配置
+ * @deprecated 已废弃
  */
 export function analysis(val: LoginMap): AlemonOptions['login'] {
   const argv = [...process.argv]

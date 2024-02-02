@@ -14,6 +14,7 @@ export interface AEvent
 
 /**
  * AlemonjsEventData
+ * @deprecated 已废弃
  */
 export type AMessage = AEvent
 

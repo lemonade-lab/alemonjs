@@ -6,7 +6,7 @@ import { ABotConfig } from '../../config/index.js'
  * 创建实例
  * @returns
  */
-export async function createAlemon() {
+export default async function createAlemon() {
   const kook = ABotConfig.get('kook')
   if ((kook ?? '') !== '' && (kook.token ?? '') !== '') {
     ABotConfig.set('kook', kook)
