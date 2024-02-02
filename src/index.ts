@@ -1,3 +1,37 @@
+// uodate log
+if (
+  process.env.NODE_ENV != 'production' &&
+  process.env.ALEMONJS_LOG != 'false'
+) {
+  const fun = () => {
+    return `[${
+      process.env?.ALEMONJS_NAME ?? 'ALmonJS'
+    }] [${new Date().toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric'
+    })}]`
+  }
+  const log = console.log
+  global.console.log = (...argv: any[]) => {
+    log(fun(), ...argv)
+  }
+  const info = console.info
+  global.console.info = (...argv: any[]) => {
+    info(fun(), ...argv)
+  }
+  const error = console.error
+  global.console.error = (...argv: any[]) => {
+    error(fun(), ...argv)
+  }
+  const debug = console.debug
+  global.console.debug = (...argv: any[]) => {
+    debug(fun(), ...argv)
+  }
+}
 /**
  * *************
  * core-main
