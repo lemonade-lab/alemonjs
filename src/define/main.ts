@@ -5,7 +5,8 @@ import {
   AppLoadConfig,
   IP,
   APPS,
-  loadError
+  loadError,
+  readScript
 } from '../core/index.js'
 import { ABotConfig } from '../config/index.js'
 import { DrawingBed, FileOptions, config } from '../file/index.js'
@@ -20,7 +21,7 @@ import { existsSync } from 'fs'
  * 启动器
  * @param Options
  */
-async function runAlemon(Options?: AlemonOptions) {
+export async function runAlemon(Options?: AlemonOptions) {
   /**
    * *********
    * dov
@@ -35,10 +36,20 @@ async function runAlemon(Options?: AlemonOptions) {
   if (Options?.login && Options?.app?.init !== false) {
     if (Options?.app?.scripts && typeof Options?.app?.scripts == 'string') {
       const dir = join(process.cwd(), Options?.app?.scripts)
-      await import(`file://${dir}`).catch(err => {
-        console.error(`file://${dir}`)
-        loadError('local dev', err)
-      })
+      // 如果是ts，而且存在
+      if (existsSync(dir)) {
+        await readScript(dir)
+      } else {
+        let directory = dir
+        if (dir.endsWith('ts')) {
+          directory = directory.replace(/\.ts$/, '.js')
+        } else if (dir.endsWith('js')) {
+          directory = directory.replace(/\.js$/, '.ts')
+        }
+        if (existsSync(directory)) {
+          await readScript(directory)
+        }
+      }
     }
   }
   /**
@@ -62,7 +73,7 @@ async function runAlemon(Options?: AlemonOptions) {
    * ********
    */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
-    console.info('Not Login Config')
+    console.info('[LOGIN] Not Config')
     return
   }
   /**
@@ -114,11 +125,15 @@ export function ALoginOptions<T>(Options?: LoginMap & T) {
 }
 
 /**
- * 配置机器人启动规则
+ *
  * @param Options
  */
-export async function defineConfig<T>(Options?: AlemonOptions & T) {
-  return await defineAlemonConfig(Options)
+export function defineLogin<T>(
+  Options?: LoginMap & {
+    [key: string]: T
+  }
+) {
+  return analysis(Options) ?? {}
 }
 
 /**
@@ -127,6 +142,14 @@ export async function defineConfig<T>(Options?: AlemonOptions & T) {
  * @param Options
  */
 export async function defineAlemonConfig<T>(Options?: AlemonOptions & T) {
+  return await defineConfig<T>(Options)
+}
+
+/**
+ * 配置机器人启动规则
+ * @param Options
+ */
+export async function defineConfig<T>(Options?: AlemonOptions & T) {
   if (!Options.env) {
     Options.env = {}
   }
@@ -171,22 +194,7 @@ export async function defineAlemonConfig<T>(Options?: AlemonOptions & T) {
   if (Options.email) {
     ABotConfig.set('email', Options.email)
   }
-  /**
-   * *********
-   * mysql配置
-   * *********
-   */
-  if (Options?.mysql) {
-    ABotConfig.set('mysql', Options.mysql)
-  }
-  /**
-   * *********
-   * redis配置
-   * *********
-   */
-  if (Options?.redis) {
-    ABotConfig.set('redis', Options.redis)
-  }
+
   /**
    * *********
    * file配置
@@ -242,12 +250,12 @@ export async function defineAlemonConfig<T>(Options?: AlemonOptions & T) {
   const lg_js = join(process.cwd(), 'alemon.login.js')
   if (Options.loginDir) {
     Options.login = (
-      await import(`file://${join(process.cwd(), Options.loginDir)}`)
-    ).default
+      await readScript(join(process.cwd(), Options.loginDir))
+    )?.default
   } else if (existsSync(lg_ts)) {
-    Options.login = (await import(`file://${lg_ts}`)).default
+    Options.login = (await readScript(lg_ts))?.default
   } else if (existsSync(lg_js)) {
-    Options.login = (await import(`file://${lg_js}`)).default
+    Options.login = (await readScript(lg_js))?.default
   }
 
   /**
@@ -312,5 +320,5 @@ export async function defineAlemonConfig<T>(Options?: AlemonOptions & T) {
   if (process.env.ALEMONJS_RUN != 'dev') {
     await runAlemon(Options)
   }
-  return
+  return Options
 }

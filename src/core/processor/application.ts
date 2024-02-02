@@ -7,6 +7,7 @@ import { AObserver } from './subscribe.js'
 import { loadError } from './log.js'
 import { Alemon } from './alemon.js'
 import { BotServer } from '../index.js'
+import { readScript } from './read.js'
 
 /**
  * 应用
@@ -47,12 +48,7 @@ class App {
     for (const typing of types) {
       for (const appname of apps) {
         if (existsSync(`${dir}/${appname}${main}.${typing}`)) {
-          await import(`file://${dir}/${appname}${main}.${typing}`).catch(
-            err => {
-              console.error(`file://${dir}/${appname}${main}.${typing}`)
-              loadError(appname, err)
-            }
-          )
+          await readScript(`${dir}/${appname}${main}.${typing}`)
         }
       }
     }
@@ -104,12 +100,9 @@ class App {
    * @returns
    */
   response(e: AEvent, event: (typeof EventEnum)[number]) {
-    if (process.env.ALEMONJS_AEVENT == 'dev') console.log('AEvent', e)
+    if (process.env.ALEMONJS_AEVENT == 'dev') console.info('AEvent', e)
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
-    // 分发
-    for (const [item, app] of AppMap) {
-      app.response(e, event)
-    }
+    Promise.all(Array.from(AppMap.values()).map(app => app.response(e, event)))
   }
 
   /**
@@ -118,7 +111,7 @@ class App {
    * @returns
    */
   responseMessage(e: AEvent) {
-    if (process.env.ALEMONJS_AEVENT == 'dev') console.log('AEvent', e)
+    if (process.env.ALEMONJS_AEVENT == 'dev') console.info('AEvent', e)
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
     const channel_sb = AObserver.find(e.channel_id)
@@ -137,12 +130,7 @@ class App {
 
     // 正则系统
     if (!this.trigger(e.msg)) return
-
-    // 分发
-    for (const [item, app] of AppMap) {
-      // app name
-      app.responseMessage(e)
-    }
+    Promise.all(Array.from(AppMap.values()).map(app => app.responseMessage(e)))
   }
 
   /**
@@ -150,12 +138,11 @@ class App {
    * @param e
    */
   responseEventType(e: AEvent) {
-    if (process.env.ALEMONJS_AEVENT == 'dev') console.log('AEvent', e)
+    if (process.env.ALEMONJS_AEVENT == 'dev') console.info('AEvent', e)
     console.info(`[${e.event}] [${e.typing}]`)
-    // 分发
-    for (const [item, app] of AppMap) {
-      app.responseEventType(e)
-    }
+    Promise.all(
+      Array.from(AppMap.values()).map(app => app.responseEventType(e))
+    )
   }
 
   /**

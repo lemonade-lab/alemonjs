@@ -2,14 +2,13 @@ import { type AEvent, type EventEnum } from '../typings.js'
 import { APlugin } from './plugin.js'
 import { type NodeDataType } from './types.js'
 import { AppMap } from './data.js'
-import { getAppPath, importPath } from './path.js'
+import { importPath } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
 import { AInstruct } from './help.js'
 import { AppLoadConfig } from './configs.js'
 import { BotServer } from '../index.js'
 import Router from 'koa-router'
-import { basename } from 'path'
 
 type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
 
@@ -190,6 +189,12 @@ export class Alemon {
     }
 
     const key = `${this.#name}:${e.msg}`
+
+    /**
+     * 选择性缓存
+     * 带数字的消息都不会进入缓存
+     * 因为数字多变  如 打开/宝箱1 213 购买51315 这个数字是多变的
+     */
 
     // 自动延长过期周期
     const CacheData: NodeDataType[] = memory.get(key)

@@ -3,16 +3,36 @@ import { KOOKOptions } from '../platform/kook/sdk/wss.js'
 import { QQOptions } from '../platform/qq/sdk/wss.js'
 import { NTQQOptions } from '../platform/ntqq/sdk/wss.js'
 import { DISOCRDOptions } from '../platform/discord/sdk/wss.js'
+import { ControllersType } from '../core/index.js'
+
+type options = any
+
+export type PlatformsItemType = {
+  /**
+   * 机器人名称与login对应
+   */
+  name: string
+  /**
+   * 登录
+   */
+  login: (
+    /**
+     * 登录配置
+     */
+    options: options
+  ) => any
+  /**
+   * 控制器
+   */
+  controllers: ControllersType
+}
+
 /**
  * *****
  * login
  * ****
  */
-export interface LoginOptions {
-  /**
-   * 支持其他配置
-   */
-  [key: string]: any
+export type LoginOptions = {
   /**
    * kook配置
    */
