@@ -1,7 +1,7 @@
 import { Client } from './sdk/index.js'
 import { ABotConfig } from '../../config/index.js'
 import { Conversation } from './alemon/conversation.js'
-export async function createAlemon() {
+export default async function createAlemon() {
   const qq = ABotConfig.get('qq')
   if ((qq ?? '') !== '' && (qq.appID ?? '') !== '' && (qq.token ?? '') !== '') {
     ABotConfig.set('qq', qq)

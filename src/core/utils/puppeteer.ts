@@ -5,7 +5,6 @@ import {
 } from 'puppeteer'
 import puppeteer, { Browser } from 'puppeteer'
 import queryString from 'querystring'
-import { executablePath } from './pup.js'
 import { BaseConfig } from '../config.js'
 
 export interface ScreenshotFileOptions {
@@ -31,10 +30,10 @@ export interface ScreenshotUrlOptions {
 export const ALunchConfig = new BaseConfig<PuppeteerLaunchOptions>({
   // 禁用超时
   timeout: 0,
+  //
   protocolTimeout: 0,
   // 请求头
   headless: 'new',
-  executablePath,
   //
   args: [
     '--disable-gpu',

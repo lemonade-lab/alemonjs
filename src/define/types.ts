@@ -1,29 +1,9 @@
 import { PuppeteerLaunchOptions } from 'puppeteer'
-import { LoginOptions } from '../default/types.js'
+import { LoginOptions, PlatformsItemType } from '../default/types.js'
 import { FileOptions } from '../file/types.js'
-import { type ControllersType, type ServerOptions } from '../core/index.js'
+import { type ServerOptions } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
 import { type DotenvConfigOptions } from 'dotenv'
-
-export interface PlatformsItemType {
-  /**
-   * 机器人名称与login对应
-   */
-  name: string
-  /**
-   * 控制器
-   */
-  controllers: ControllersType
-  /**
-   * 登录
-   */
-  login: (
-    /**
-     * 登录配置
-     */
-    options: any
-  ) => any
-}
 
 /**
  * ******
@@ -31,10 +11,6 @@ export interface PlatformsItemType {
  * ******
  */
 export interface AlemonOptions {
-  /**
-   * 配置
-   */
-  [key: string]: any
   /**
    * 平台
    */

@@ -26,18 +26,21 @@ class BaseConfig<D> {
       }
     } else {
       for (const item in val) {
-        // 当前仅当同属性名的时候才会覆盖默认配置
-        if (Object.prototype.hasOwnProperty.call(this.#data[key], item)) {
-          this.#data[key][item] = val[item]
-        } else {
-          // 不属于默认
-          try {
-            this.#data[key] = {} as any
-            this.#data[key] = val[item] as any
-            console.info('KEY secess')
-          } catch {
-            console.info('KEY err')
+        if (this.#data[key]) {
+          // 当前仅当同属性名的时候才会覆盖默认配置
+          if (Object.prototype.hasOwnProperty.call(this.#data[key], item)) {
+            this.#data[key][item] = val[item]
+          } else {
+            // 不属于默认
+            try {
+              this.#data[key] = val[item] as any
+              console.info('KEY secess')
+            } catch {
+              console.info('KEY err')
+            }
           }
+        } else {
+          this.#data[key] = val[item] as any
         }
       }
     }

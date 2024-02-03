@@ -1,9 +1,8 @@
 {
   "name": "alemonjs",
-  "version": "1.2.0-rc.22",
+  "version": "1.2.0-rc.27",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
-    "test": "ts-node apps.ts",
     "dev": "ts-node alemon.config.ts",
     "tsc": "tsc",
     "ts": "ts-node",
@@ -12,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.4.0",
+    "dotenv": "^16.4.1",
     "file-type": "^18.5.0",
     "form-data": "^4.0.0",
     "image-size": "^1.0.2",
@@ -29,7 +29,6 @@
     "public-ip": "^6.0.1",
     "puppeteer": "^20.7.1",
     "qrcode": "^1.5.3",
-    "dotenv": "^16.4.1",
     "ws": "^8.13.0"
   },
   "devDependencies": {

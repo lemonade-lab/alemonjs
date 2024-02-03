@@ -2,7 +2,7 @@ import { type AEvent, type EventEnum } from '../typings.js'
 import { APlugin } from './plugin.js'
 import { type NodeDataType } from './types.js'
 import { AppMap } from './data.js'
-import { getAppName } from './path.js'
+import { importPath } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
 import { AInstruct } from './help.js'
@@ -189,6 +189,12 @@ export class Alemon {
     }
 
     const key = `${this.#name}:${e.msg}`
+
+    /**
+     * 选择性缓存
+     * 带数字的消息都不会进入缓存
+     * 因为数字多变  如 打开/宝箱1 213 购买51315 这个数字是多变的
+     */
 
     // 自动延长过期周期
     const CacheData: NodeDataType[] = memory.get(key)
@@ -799,7 +805,7 @@ export function createSubApp(AppName: string) {
  * @returns
  */
 export function createApp(url: string) {
-  return createSubApp(getAppName(url))
+  return createSubApp(importPath(url).name())
 }
 
 /**
