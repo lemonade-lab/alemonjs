@@ -20,7 +20,7 @@ import { existsSync } from 'fs'
  * 启动器
  * @param Options
  */
-export async function runAlemon(Options?: AlemonOptions) {
+export function runAlemon(Options?: AlemonOptions) {
   /**
    * *********
    * dov
@@ -75,56 +75,48 @@ export async function runAlemon(Options?: AlemonOptions) {
       if (Options?.mount !== false) {
         APPS.init()
       }
-      /**
-       * ********
-       * 登录提示
-       * ********
-       */
-      if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
-        console.info('[LOGIN] Not Config')
-        return
-      }
-
-      const promises = []
-
-      /**
-       * 登录第三方机器人
-       */
-      if (Options?.platforms) {
-        for (const item in Options.login) {
-          // 非内置机器人
-          if (
-            !['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)
-          ) {
-            const back = Options.platforms.find(i => i.name == item)
-            if (!back) continue
-            promises.push(Options.login[back.name])
-            // 设置控制器
-            AControllers.set(back.name, back.controllers)
-          }
-        }
-      }
-
-      // 防止重复登录
-      const arr: string[] = []
-
-      /**
-       * 登录机器人
-       */
-      for (const item in Options.login) {
-        if (arr.indexOf(item) != -1) continue
-        if (!RebotMap[item]) continue
-        arr.push(item)
-        // 登录执行
-        promise.push(RebotMap[item]())
-      }
-
-      // 并发登录
-      Promise.all(promises).catch(console.error)
-
-      //
     })
     .catch(console.error)
+
+  /**
+   * ********
+   * 登录提示
+   * ********
+   */
+  if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
+    console.info('[LOGIN] Not Config')
+    return
+  }
+
+  const promises = []
+
+  /**
+   * 登录第三方机器人
+   */
+  if (Options?.platforms) {
+    for (const item in Options.login) {
+      // 非内置机器人
+      if (!['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
+        const back = Options.platforms.find(i => i.name == item)
+        if (!back) continue
+        promises.push(Options.login[back.name])
+        // 设置控制器
+        AControllers.set(back.name, back.controllers)
+      }
+    }
+  }
+
+  /**
+   * 登录机器人
+   */
+  for (const item in Options.login) {
+    if (!RebotMap[item]) continue
+    // 登录执行
+    promise.push(RebotMap[item]())
+  }
+
+  // 并发登录
+  Promise.all(promises).catch(console.error)
 }
 
 /**
