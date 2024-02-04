@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { writeFileSync, existsSync } from 'fs'
+import { writeFileSync, existsSync, mkdirSync } from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
 import { config } from './config.js'
 import { IP } from '../core/index.js'
@@ -45,6 +45,7 @@ class CF {
    */
   async getFileUrl(file: Buffer, name?: string) {
     if (!Buffer.isBuffer(file)) return false
+    const fileDir = config.get('fileDir')
     /**
      * 检查服务器是否启动
      */
@@ -52,8 +53,11 @@ class CF {
       this.#size++
       // 尝试启动
       FServer.connect()
+      // 确保文件存在
+      mkdirSync(join(process.cwd(), fileDir), {
+        recursive: true
+      })
     }
-    const fileDir = config.get('fileDir')
     const fileRouter = config.get('fileRouter')
     // 使用 'bin' 作为默认扩展名
     const extension = (await fileTypeFromBuffer(file))?.ext ?? name ?? 'bin'
@@ -62,7 +66,6 @@ class CF {
     const filePath = join(process.cwd(), fileDir, filename)
     if (!existsSync(filePath)) {
       // 保存文件到文件系统
-      // 仅有该文件不存在的时候才写入
       console.info('server create', filePath)
       writeFileSync(filePath, file)
     }
