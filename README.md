@@ -84,8 +84,8 @@ npm run dev
 `alemon.login.ts`
 
 ```ts
-import { ALoginOptions } from 'alemonjs'
-export default ALoginOptions({
+import { defineConfig } from 'alemonjs'
+export default defineConfig({
   // 配置名 test
   test: {
     // qq平台配置
