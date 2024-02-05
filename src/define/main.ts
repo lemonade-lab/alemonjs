@@ -99,7 +99,16 @@ export function runAlemon(Options?: AlemonOptions) {
       if (!['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
         const back = Options.platforms.find(i => i.name == item)
         if (!back) continue
-        promises.push(Options.login[back.name])
+        promises.push(
+          new Promise((resolve, reject) => {
+            try {
+              back.login(Options.login[back.name])
+              resolve(true)
+            } catch (e) {
+              reject(e)
+            }
+          })
+        )
         // 设置控制器
         AControllers.set(back.name, back.controllers)
       }

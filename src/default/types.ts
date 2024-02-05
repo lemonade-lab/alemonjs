@@ -5,8 +5,6 @@ import { NTQQOptions } from '../platform/ntqq/sdk/wss.js'
 import { DISOCRDOptions } from '../platform/discord/sdk/wss.js'
 import { ControllersType } from '../core/index.js'
 
-type options = any
-
 export type PlatformsItemType = {
   /**
    * 机器人名称与login对应
@@ -19,7 +17,7 @@ export type PlatformsItemType = {
     /**
      * 登录配置
      */
-    options: options
+    options: any
   ) => any
   /**
    * 控制器
