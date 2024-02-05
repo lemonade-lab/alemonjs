@@ -32,7 +32,7 @@ type ImageType = {
 
 const GlobalUrl =
   process.env?.ALEMONJS_IMAGE_GLOVAL_JS ??
-  'https://unpkg.com/vue@3/dist/vue.global.js'
+  'https://registry.npmmirror.com/vue/3/files/dist/vue.global.js'
 
 /**
  * 创建图片对象
@@ -93,7 +93,10 @@ export function createImage(optoins?: string | ImageType) {
       )
     }
   }
-  Promise.all(promises).catch(console.error)
+  Promise.all(promises).catch(res => {
+    console.error('[Image] 下载失败', res?.config?.url)
+    console.error('[Image] 请使用浏览器访问并下载至.image/文件夹')
+  })
 
   let ImageLate: string
 
