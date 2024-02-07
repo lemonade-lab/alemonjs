@@ -17,7 +17,7 @@ class CF {
     /**
      * 检查服务器是否启动
      */
-    if (!FServer.getState() && this.#size <= 3) {
+    if (!FServer.static && this.#size <= 3) {
       this.#size++
       // 尝试启动
       FServer.connect()
@@ -49,7 +49,7 @@ class CF {
     /**
      * 检查服务器是否启动
      */
-    if (!FServer.getState() && this.#size <= 3) {
+    if (!FServer.static && this.#size <= 3) {
       this.#size++
       // 尝试启动
       FServer.connect()
