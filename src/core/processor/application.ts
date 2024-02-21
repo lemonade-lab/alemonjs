@@ -44,14 +44,15 @@ class App {
       types.push('js')
       types.push('ts')
     }
+    const promise = []
     for (const typing of types) {
       for (const appname of apps) {
         if (existsSync(`${dir}/${appname}${main}.${typing}`)) {
-          await readScript(`${dir}/${appname}${main}.${typing}`)
+          promise.push(readScript(`${dir}/${appname}${main}.${typing}`))
         }
       }
     }
-    return
+    return Promise.all(promise)
   }
 
   // 大正则数组

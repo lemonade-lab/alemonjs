@@ -35,7 +35,7 @@ class Server {
    * 查看状态
    * @returns
    */
-  getState() {
+  get static() {
     return this.#state
   }
 

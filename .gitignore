@@ -2,10 +2,10 @@
 node_modules
 
 # 包
-plugins//**/*
-public/**/*
-lib/**/*
-types/**/*
+/plugins/**/*
+/public/**/*
+/lib/**/*
+/types/**/*
 
 
 # docs
@@ -17,6 +17,7 @@ alemon.config.ts
 a.main.ts
 a.apps.ts
 a.api.ts
+.image
 
 # env 
 alemon.env

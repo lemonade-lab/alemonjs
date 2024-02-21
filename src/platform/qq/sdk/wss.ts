@@ -233,8 +233,9 @@ export class Client {
         this.#ws.on('message', async msg => {
           const message = JSON.parse(msg.toString('utf8'))
           if (process.env.QQ_WS == 'dev') console.info('message', message)
-          // 根据 opcode 进行处理
-          if (map[message.op]) await map[message.op](message)
+          if (map[message.op]) {
+            map[message.op](message)
+          }
         })
         // 关闭
         this.#ws.on('close', async err => {

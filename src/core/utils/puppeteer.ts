@@ -8,12 +8,12 @@ import queryString from 'querystring'
 import { BaseConfig } from '../config.js'
 
 export interface ScreenshotFileOptions {
-  SOptions: {
+  SOptions?: {
     type: 'jpeg' | 'png' | 'webp'
     quality: number
   }
-  tab: string
-  timeout: number
+  tab?: string
+  timeout?: number
 }
 
 export interface ScreenshotUrlOptions {

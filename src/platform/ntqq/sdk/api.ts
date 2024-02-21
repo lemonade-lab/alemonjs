@@ -4,10 +4,15 @@ import { FileType, MsgType } from './typings.js'
 import { ApiLog } from './log.js'
 
 class ClientNtqq {
+  /**
+   * qq机器人
+   */
   BOTS_API_RUL = 'https://bots.qq.com'
 
+  /**
+   * qq群
+   */
   API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com'
-
   API_URL = 'https://api.sgroup.qq.com'
 
   /**

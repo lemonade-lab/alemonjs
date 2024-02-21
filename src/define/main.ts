@@ -20,13 +20,16 @@ import { existsSync } from 'fs'
  * 启动器
  * @param Options
  */
-export async function runAlemon(Options?: AlemonOptions) {
+export function runAlemon(Options?: AlemonOptions) {
   /**
    * *********
    * dov
    * ********
    */
   configDotenv(Options.env)
+
+  const promise = []
+
   /**
    * ***********
    * 加载应用
@@ -37,7 +40,7 @@ export async function runAlemon(Options?: AlemonOptions) {
       const dir = join(process.cwd(), Options?.app?.scripts)
       // 如果是ts，而且存在
       if (existsSync(dir)) {
-        await readScript(dir)
+        promise.push(readScript(dir))
       } else {
         let directory = dir
         if (dir.endsWith('ts')) {
@@ -46,7 +49,7 @@ export async function runAlemon(Options?: AlemonOptions) {
           directory = directory.replace(/\.js$/, '.ts')
         }
         if (existsSync(directory)) {
-          await readScript(directory)
+          promise.push(readScript(directory))
         }
       }
     }
@@ -58,14 +61,23 @@ export async function runAlemon(Options?: AlemonOptions) {
    */
   if (Options?.login && Options?.plugin?.init !== false) {
     // 加载插件
-    await APPS.load()
+    promise.push(APPS.load())
   }
-  /**
-   * ************
-   * 开始解析
-   * ************
-   */
-  if (Options?.mount !== false) APPS.init()
+
+  // 推送加载
+  Promise.all(promise)
+    .then(async () => {
+      /**
+       * ************
+       * 开始解析
+       * ************
+       */
+      if (Options?.mount !== false) {
+        APPS.init()
+      }
+    })
+    .catch(console.error)
+
   /**
    * ********
    * 登录提示
@@ -75,6 +87,9 @@ export async function runAlemon(Options?: AlemonOptions) {
     console.info('[LOGIN] Not Config')
     return
   }
+
+  const promises = []
+
   /**
    * 登录第三方机器人
    */
@@ -84,35 +99,33 @@ export async function runAlemon(Options?: AlemonOptions) {
       if (!['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
         const back = Options.platforms.find(i => i.name == item)
         if (!back) continue
-        // 登录
-        await back.login(Options.login[back.name])
+        promises.push(
+          new Promise((resolve, reject) => {
+            try {
+              back.login(Options.login[back.name])
+              resolve(true)
+            } catch (e) {
+              reject(e)
+            }
+          })
+        )
         // 设置控制器
         AControllers.set(back.name, back.controllers)
       }
     }
   }
-  // 防止重复登录
-  const arr: string[] = []
+
   /**
    * 登录机器人
    */
   for (const item in Options.login) {
-    if (arr.indexOf(item) != -1) continue
     if (!RebotMap[item]) continue
-    arr.push(item)
     // 登录执行
-    await RebotMap[item]()
+    promise.push(RebotMap[item]())
   }
-  /**
-   * ***********
-   * 挂起file服务
-   * **********
-   */
-  if (Options?.server) {
-    for (const item in Options?.server) {
-      config.set(item as keyof FileOptions, Options?.server[item])
-    }
-  }
+
+  // 并发登录
+  Promise.all(promises).catch(console.error)
 }
 
 /**
@@ -310,6 +323,17 @@ export async function defineConfig<T>(Options?: AlemonOptions & T) {
   }
 
   /**
+   * ***********
+   * file配置
+   * **********
+   */
+  if (Options?.server) {
+    for (const item in Options?.server) {
+      config.set(item as keyof FileOptions, Options?.server[item])
+    }
+  }
+
+  /**
    * ************
    * ************
    * 配置信息启动
@@ -317,7 +341,7 @@ export async function defineConfig<T>(Options?: AlemonOptions & T) {
    * ************
    */
   if (process.env.ALEMONJS_RUN != 'dev') {
-    await runAlemon(Options)
+    runAlemon(Options)
   }
   return Options
 }
