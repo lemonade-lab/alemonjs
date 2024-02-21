@@ -138,6 +138,65 @@ class ClientDc {
    * 消息-图片接口
    * ***********
    */
+  /**
+   * 创建form
+   * @param image
+   * @param msg_id
+   * @param content
+   * @param name
+   * @returns
+   */
+  async createFrom(
+    image: Buffer,
+    msg_id: string,
+    content: any,
+    Name = 'image.jpg'
+  ) {
+    const from = await createPicFrom(image, Name)
+    if (!from) return false
+    const { picData, name } = from
+    const formdata = new FormData()
+    formdata.append('msg_id', msg_id)
+    if (typeof content === 'string') formdata.append('content', content)
+    formdata.append('file_image', picData, name)
+    return formdata
+  }
+
+  /**
+   * 发送buffer图片
+   * @param id 传子频道id
+   * @param message {消息编号,图片,内容}
+   * @returns
+   */
+  async postImage(
+    channel_id: string,
+    message: {
+      msg_id: string
+      image: Buffer
+      content?: string
+      name?: string
+    }
+  ): Promise<any> {
+    const formdata = await this.createFrom(
+      message.image,
+      message.msg_id,
+      message.content,
+      message.name
+    )
+    const dary = formdata != false ? formdata.getBoundary() : ''
+    return this.request({
+      method: 'post',
+      url: `/channels/${channel_id}/messages`,
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${dary}`
+      },
+      data: formdata
+    })
+      .then(ApiLog)
+      .catch(err => {
+        console.error(err)
+      })
+  }
 
   /**
    * ***********

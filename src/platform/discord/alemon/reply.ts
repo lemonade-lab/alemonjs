@@ -25,7 +25,6 @@ export async function replyController(
       backhaul: await ClientDISOCRD.channelsMessagesImage(channel_id, msg)
     }
   }
-
   // arr & find buffer
   if (Array.isArray(msg) && msg.find(item => Buffer.isBuffer(item))) {
     const isBuffer = msg.findIndex(item => Buffer.isBuffer(item))

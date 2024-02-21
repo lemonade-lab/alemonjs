@@ -37,6 +37,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return false
     },
     /**
+     *
      * 禁言
      * @param param0
      * @returns
