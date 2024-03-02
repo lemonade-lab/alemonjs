@@ -105,8 +105,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
     ) => {
       return false
     },
-    withdraw: async (msgId?: string) => {
-      const msg_id = msgId ?? this.get('msg_id')
+    withdraw: async () => {
+      const msg_id = this.get('msg_id')
       const channel_id = this.get('channel_id')
       return await ClientDISOCRD.deleteMessage(channel_id, msg_id)
     },

@@ -124,8 +124,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param msgId 消息ID(不填则为当前消息)
      * @param hideTip 是否隐藏提示
      */
-    withdraw: async (hideTip: boolean = true, msgId?: string) => {
-      const msg_id = msgId ?? this.get('msg_id')
+    withdraw: async (hideTip: boolean = true) => {
+      const msg_id = this.get('msg_id')
       const channel_id = this.get('channel_id')
       return await ClientQQ.channelsMessagesDelete(channel_id, msg_id, hideTip)
     },
