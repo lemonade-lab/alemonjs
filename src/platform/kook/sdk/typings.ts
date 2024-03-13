@@ -472,5 +472,9 @@ export const SystemDataEnum = [
   /**
    * 消息更新
    */
-  'updated_message'
+  'updated_message',
+  /**
+   * 按钮点击事件
+   */
+  'message_btn_click'
 ] as const

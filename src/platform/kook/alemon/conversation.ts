@@ -2,6 +2,7 @@ import { PUBLIC_GUILD_MESSAGES_KOOK } from './message/PUBLIC_GUILD_MESSAGES.js'
 import { MESSAGES } from './message/MESSAGES.js'
 import { EventData, SystemData } from '../sdk/index.js'
 import { REACTIONS } from './message/REACTIONS.js'
+import { INTERACTION } from './message/INTERACTION.js'
 /**
  * 事件处理集
  */
@@ -61,6 +62,7 @@ const ConversationMap = {
    */
   [255]: {
     public: async (event: SystemData) => {
+      console.info('系统消息', event)
       if (
         event.extra.type == 'added_reaction' ||
         event.extra.type == 'deleted_reaction'
@@ -69,11 +71,11 @@ const ConversationMap = {
         return await REACTIONS(event)
       } else if (event.extra.type == 'joined_channel') {
         //
-        console.info('joined_channel')
+        console.info('111joined_channel')
         return
       } else if (event.extra.type == 'exited_channel') {
         //
-        console.info('exited_channel')
+        console.info('111exited_channel')
         return
       } else if (event.extra.type == 'updated_channel') {
         // ChannelData
@@ -105,6 +107,9 @@ const ConversationMap = {
         // overheadData
         console.info('pinned_message')
         return
+      } else if (event.extra.type == 'message_btn_click') {
+        console.info('message_btn_click')
+        return await INTERACTION(event)
       }
     },
     direct: async (event: SystemData) => {
