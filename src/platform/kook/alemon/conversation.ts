@@ -116,7 +116,8 @@ const ConversationMap = {
       } else if (event.extra.type == 'message_btn_click') {
         //按钮事件
         console.info('message_btn_click')
-        return await INTERACTION(event)
+        await INTERACTION(event)
+        return
       }
     }
   }
