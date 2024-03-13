@@ -62,7 +62,6 @@ const ConversationMap = {
    */
   [255]: {
     public: async (event: SystemData) => {
-      console.info('系统消息', event)
       if (
         event.extra.type == 'added_reaction' ||
         event.extra.type == 'deleted_reaction'
@@ -71,7 +70,7 @@ const ConversationMap = {
         return await REACTIONS(event)
       } else if (event.extra.type == 'joined_channel') {
         //
-        console.info('111joined_channel')
+        console.info('joined_channel')
         return
       } else if (event.extra.type == 'exited_channel') {
         //
@@ -107,9 +106,6 @@ const ConversationMap = {
         // overheadData
         console.info('pinned_message')
         return
-      } else if (event.extra.type == 'message_btn_click') {
-        console.info('message_btn_click')
-        return await INTERACTION(event)
       }
     },
     direct: async (event: SystemData) => {
@@ -117,6 +113,10 @@ const ConversationMap = {
         //OnLineData
         console.info('exited_guild')
         return
+      } else if (event.extra.type == 'message_btn_click') {
+        //按钮事件
+        console.info('message_btn_click')
+        return await INTERACTION(event)
       }
     }
   }
