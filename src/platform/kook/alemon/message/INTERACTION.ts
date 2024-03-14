@@ -7,14 +7,14 @@ import {
 import { ABotConfig } from '../../../../config/index.js'
 import { segmentKOOK } from '../segment.js'
 import { replyController } from '../reply.js'
-import { type SystemData, type StatementData } from '../../sdk/index.js'
+import { type SystemData, type ButtonData } from '../../sdk/index.js'
 import { directController } from '../direct.js'
 
 /**
  * @param event 按钮数据
  */
 export async function INTERACTION(event: SystemData) {
-  const body = event.extra.body as StatementData
+  const body = event.extra.body as ButtonData
   const masterID = ABotConfig.get('kook').masterID
   const msg_id = body.msg_id
 
@@ -39,7 +39,7 @@ export async function INTERACTION(event: SystemData) {
     guild_name: '',
     guild_avatar: '',
     channel_name: '',
-    channel_id: String(body.channel_id),
+    channel_id: String(body.target_id),
     attachments: [],
     specials: [],
     //
@@ -49,7 +49,7 @@ export async function INTERACTION(event: SystemData) {
     msg_id: msg_id,
     // 回调透传信息
     msg: String(event.msg_id) ?? '',
-    msg_txt: '',
+    msg_txt: body.value,
     quote: '',
     open_id: '',
 

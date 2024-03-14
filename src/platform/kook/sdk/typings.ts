@@ -401,9 +401,22 @@ export interface StatementData {
   msg_id: string
 }
 
+export interface ButtonData {
+  channel_id: string // 子频道
+  target_id: string //按钮子频道
+  emoji: {
+    // 根据实际情况提供Emoji对象的属性和类型
+    [key: string]: any
+  }
+  user_id: string
+  msg_id: string
+  value: string
+}
+
 export interface EditingData {
   version_id: string
   channel_id: string // 子频道
+  target_id: string //按钮子频道
   content: string
   mention: string[]
   mention_all: boolean
