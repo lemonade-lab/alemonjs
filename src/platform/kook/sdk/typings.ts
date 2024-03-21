@@ -389,6 +389,7 @@ export interface ChannelData {
   last_msg_id: string // 频道最后消息的编号
   sync_guild_region: number
   region: string
+  joined_at: number
 }
 
 export interface StatementData {
@@ -411,6 +412,11 @@ export interface ButtonData {
   user_id: string
   msg_id: string
   value: string
+}
+
+export interface joinedData {
+  user_id: string
+  joined_at: number //加入时间
 }
 
 export interface EditingData {

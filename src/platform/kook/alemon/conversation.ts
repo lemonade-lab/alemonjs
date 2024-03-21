@@ -3,6 +3,8 @@ import { MESSAGES } from './message/MESSAGES.js'
 import { EventData, SystemData } from '../sdk/index.js'
 import { REACTIONS } from './message/REACTIONS.js'
 import { INTERACTION } from './message/INTERACTION.js'
+import { GUILD_MEMBER_ADD } from './message/GUILD_MEMBER_ADD.js'
+import { GUILD_MEMBER_REMOVE } from './message/GUILD_MEMBER_REMOVE.js'
 /**
  * 事件处理集
  */
@@ -87,9 +89,11 @@ const ConversationMap = {
          */
       } else if (event.extra.type == 'joined_guild') {
         console.info('joined_guild')
+        await GUILD_MEMBER_ADD(event)
         return
       } else if (event.extra.type == 'exited_guild') {
         console.info('exited_guild')
+        await GUILD_MEMBER_REMOVE(event)
         return
         /**
          * **********
