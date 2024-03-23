@@ -1,4 +1,3 @@
-import { VILLAOptions } from '../platform/villa/sdk/wss.js'
 import { KOOKOptions } from '../platform/kook/sdk/wss.js'
 import { QQOptions } from '../platform/qq/sdk/wss.js'
 import { NTQQOptions } from '../platform/ntqq/sdk/wss.js'
@@ -35,10 +34,6 @@ export type LoginOptions = {
    * kook配置
    */
   kook?: KOOKOptions
-  /**
-   * villa配置
-   */
-  villa?: VILLAOptions
   /**
    * qq配置
    */

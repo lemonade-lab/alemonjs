@@ -96,7 +96,7 @@ export function runAlemon(Options?: AlemonOptions) {
   if (Options?.platforms) {
     for (const item in Options.login) {
       // 非内置机器人
-      if (!['qq', 'villa', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
+      if (!['qq', 'discord', 'kook', 'ntqq'].find(i => i == item)) {
         const back = Options.platforms.find(i => i.name == item)
         if (!back) continue
         promises.push(
@@ -286,10 +286,6 @@ export async function defineConfig<T>(Options?: AlemonOptions & T) {
     if (Options.login?.kook) {
       // 自定义覆盖
       ABotConfig.set('kook', Options.login.kook)
-    }
-    if (Options.login?.villa) {
-      // 自定义覆盖
-      ABotConfig.set('villa', Options.login.villa)
     }
     if (Options.login?.discord) {
       // 自定义覆盖

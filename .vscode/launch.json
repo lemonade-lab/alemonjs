@@ -20,12 +20,6 @@
       "type": "node-terminal"
     },
     {
-      "command": "npx ts-node alemon.config.ts villa",
-      "name": "AlemonJS villa Debug",
-      "request": "launch",
-      "type": "node-terminal"
-    },
-    {
       "command": "npx ts-node alemon.config.ts ntqq",
       "name": "AlemonJS ntqq Debug",
       "request": "launch",

@@ -4,8 +4,7 @@ import { ClientKOOK } from '../sdk/index.js'
 /**
  * 回复控制器
  * @param msg
- * @param villa_id
- * @param room_id
+ * @param channel_id
  * @returns
  */
 export async function replyController(

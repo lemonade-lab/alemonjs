@@ -125,7 +125,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
 /**
  * 回复控制器
  * @param msg
- * @param villa_id
+ * @param channel_id
  * @param room_id
  * @returns
  */

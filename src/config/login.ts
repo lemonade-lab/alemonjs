@@ -2,7 +2,6 @@ import { type BotConfigType } from './types.js'
 import { DefaultFileOptions } from '../file/default.js'
 import { DefaultEmailOptions } from '../email/default.js'
 import { defineKOOK as kook } from '../platform/kook/sdk/wss.js'
-import { defineVILLA as villa } from '../platform/villa/sdk/wss.js'
 import { defineQQ as qq } from '../platform/qq/sdk/wss.js'
 import { defineNtqq as ntqq } from '../platform/ntqq/sdk/wss.js'
 import { defineDISCORD as discord } from '../platform/discord/sdk/wss.js'
@@ -63,7 +62,6 @@ export const ABotConfig = new BaseConfig<BotConfigType>({
   file: DefaultFileOptions,
   email: DefaultEmailOptions,
   kook,
-  villa,
   qq,
   ntqq,
   puppeteer: ALunchConfig.all(),

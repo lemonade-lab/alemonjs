@@ -178,6 +178,18 @@ export class APlugin {
     // 取消订阅
     AObserver.cancel(this.conKey(isGroup))
   }
+
+  /**
+   *
+   * @param plugin
+   * @param tpl
+   * @param data
+   * @param cfg
+   * @deprecated 已废弃
+   */
+  async renderImg(plugin, tpl, data, cfg) {
+    return
+  }
 }
 
 /**
