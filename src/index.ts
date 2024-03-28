@@ -59,12 +59,6 @@ export * from './api/index.js'
  */
 export * from './file/main.js'
 /**
- * **********
- * image
- * ************
- */
-export * from './image/index.js'
-/**
  * email
  */
 export * from './email/index.js'

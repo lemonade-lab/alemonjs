@@ -134,7 +134,7 @@ export class Puppeteer {
    */
   async toFile(
     htmlPath: string | Buffer | URL,
-    Options: ScreenshotFileOptions
+    Options?: ScreenshotFileOptions
   ) {
     if (!(await this.isStart())) return false
     try {
@@ -143,12 +143,17 @@ export class Puppeteer {
       })
       if (!page) return false
       await page.goto(`file://${htmlPath}`, {
-        timeout: Options.timeout ?? 120000
+        timeout: Options?.timeout ?? 120000
       })
-      const body = await page.$(Options.tab ?? 'body')
+      const body = await page.$(Options?.tab ?? 'body')
       console.info('[puppeteer] success')
       const buff: string | false | Buffer = await body
-        .screenshot(Options.SOptions)
+        .screenshot(
+          Options?.SOptions ?? {
+            type: 'jpeg',
+            quality: 90
+          }
+        )
         .catch(err => {
           console.error('[puppeteer]', 'screenshot', err)
           return false

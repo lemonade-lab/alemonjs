@@ -58,7 +58,6 @@
   "types": "types",
   "main": "lib/index.js",
   "files": [
-    "resources",
     "lib",
     "types",
     ".puppeteerrc.cjs"
