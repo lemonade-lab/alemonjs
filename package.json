@@ -1,13 +1,15 @@
 {
   "name": "alemonjs",
-  "version": "1.2.0-rc.33",
+  "version": "1.2.0-rc.34",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "dev": "ts-node alemon.config.ts",
     "tsc": "tsc",
     "ts": "ts-node",
     "doc": "typedoc --options typedoc.json",
-    "format": "prettier --write ."
+    "lint": "commitlint --config .commitlint.config.cjs -e -V",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "axios": "^1.4.0",
@@ -47,6 +49,9 @@
     "@types/progress": "^2.0.5",
     "@types/qrcode": "^1.5.0",
     "@types/ws": "^8.5.5",
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
+    "husky": "^9.0.11",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.2",
     "typedoc": "^0.25.4",
