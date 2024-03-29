@@ -7,7 +7,6 @@
     "tsc": "tsc",
     "ts": "ts-node",
     "doc": "typedoc --options typedoc.json",
-    "lint": "commitlint --config .commitlint.config.cjs -e -V",
     "format": "prettier --write .",
     "prepare": "husky"
   },
@@ -49,8 +48,6 @@
     "@types/progress": "^2.0.5",
     "@types/qrcode": "^1.5.0",
     "@types/ws": "^8.5.5",
-    "@commitlint/cli": "^19.2.1",
-    "@commitlint/config-conventional": "^19.1.0",
     "husky": "^9.0.11",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.2",
