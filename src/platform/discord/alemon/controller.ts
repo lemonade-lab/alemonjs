@@ -79,7 +79,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
 
   Message = {
     reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
+      content: Buffer | string | number | (Buffer | number | string)[],
+      ...arg: string[][]
     ) => {
       const attribute = this.get('attribute')
       if (attribute == 'single') return

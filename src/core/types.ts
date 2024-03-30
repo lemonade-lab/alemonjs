@@ -65,7 +65,8 @@ export interface MessageControllerType {
    * @param content
    */
   reply(
-    content: Buffer | string | number | (Buffer | number | string)[]
+    content: Buffer | string | number | (Buffer | number | string)[],
+    ...arg: string[][]
   ): Promise<{
     middle: any[]
     backhaul: any

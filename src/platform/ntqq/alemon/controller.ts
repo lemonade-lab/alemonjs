@@ -27,7 +27,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
   }
   Message = {
     reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
+      content: Buffer | string | number | (Buffer | number | string)[],
+      ...arg: string[][]
     ) => {
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')

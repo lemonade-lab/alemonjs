@@ -12,6 +12,9 @@ export class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
     super(select)
   }
+  /**
+   *
+   */
   Member = {
     /**
      * 查看信息
@@ -92,9 +95,18 @@ export class Controllers extends BaseConfig<ControllerOption> {
     }
   }
 
+  /**
+   *
+   */
   Message = {
+    /**
+     *
+     * @param content
+     * @returns
+     */
     reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
+      content: Buffer | string | number | (Buffer | number | string)[],
+      ...arg: string[][]
     ) => {
       const open_id = this.get('open_id')
       const user_id = this.get('user_id')
@@ -109,7 +121,11 @@ export class Controllers extends BaseConfig<ControllerOption> {
       }
       return await replyController(content, channel_id, msg_id)
     },
-
+    /**
+     *
+     * @param content
+     * @returns
+     */
     quote: async (
       content: Buffer | string | number | (Buffer | number | string)[]
     ) => {
@@ -216,6 +232,11 @@ export class Controllers extends BaseConfig<ControllerOption> {
         option
       )
     },
+    /**
+     *
+     * @param msg
+     * @returns
+     */
     article: async (msg: any) => {
       return false
     }
