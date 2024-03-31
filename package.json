@@ -7,12 +7,15 @@
     "tsc": "tsc",
     "ts": "ts-node",
     "doc": "typedoc --options typedoc.json",
+    "lint": "commitlint --config .commitlint.config.cjs -e -V",
     "format": "prettier --write .",
     "prepare": "husky"
   },
   "dependencies": {
     "axios": "^1.4.0",
     "dotenv": "^16.4.1",
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
     "file-type": "^18.5.0",
     "form-data": "^4.0.0",
     "image-size": "^1.0.2",
