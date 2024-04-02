@@ -103,7 +103,7 @@ npm run dev test qq
 继承写法可使用多个配置函数
 
 ```ts
-import { createApp, AMessage, APlugin } from 'alemonjs'
+import { createApp, type AEvent, APlugin } from 'alemonjs'
 class word extends APlugin {
   constructor() {
     super({
@@ -119,7 +119,7 @@ class word extends APlugin {
       ]
     })
   }
-  async post(e: AMessage) {
+  async post(e: AEvent) {
     e.reply('哒哒')
   }
 }
@@ -139,7 +139,7 @@ createApp(import.meta.url)
 比继承优先的自由写法
 
 ```ts
-import { createApp, AMessage, APlugin } from 'alemonjs'
+import { createApp } from 'alemonjs'
 createApp(import.meta.url)
   .on('MESSAGE', e => {
     if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
@@ -148,18 +148,6 @@ createApp(import.meta.url)
     console.log('成员', e.user_name, '加入')
   })
 ```
-
-每当文件有修改或进行保存时就会自动刷新应用
-
-当确认该应用可用于生成环境时,可进行打包操作
-
-```sh
-npm run build
-```
-
-打包完成后,会生成`dist/main.js`和`dist/package.json`文件
-
-该程序可放置于`plugins/your plugin name`文件夹下
 
 # Unknown file ".ts"
 
