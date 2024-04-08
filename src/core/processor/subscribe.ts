@@ -69,8 +69,8 @@ export class Observer {
 }
 if (!global?.alemonjs) {
   global.alemonjs = {}
-  if (!global.alemonjs.observer) {
-    global.alemonjs.observer = new Observer()
-  }
+}
+if (!global.alemonjs?.observer) {
+  global.alemonjs.observer = new Observer()
 }
 export const AObserver = global.alemonjs.observer

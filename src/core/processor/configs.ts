@@ -66,18 +66,18 @@ export interface ApplicationProcessingOpsion {
 
 if (!global?.alemonjs) {
   global.alemonjs = {}
-  if (!global.alemonjs.config) {
-    global.alemonjs.config = new BaseConfig<ApplicationProcessingOpsion>({
-      dir: '/plugins',
-      main: '/main',
-      type: 'stript',
-      openRegex: /./,
-      closeRegex: undefined,
-      event: [],
-      route: '/public/defset',
-      regex: true
-    })
-  }
+}
+if (!global.alemonjs?.config) {
+  global.alemonjs.config = new BaseConfig<ApplicationProcessingOpsion>({
+    dir: '/plugins',
+    main: '/main',
+    type: 'stript',
+    openRegex: /./,
+    closeRegex: undefined,
+    event: [],
+    route: '/public/defset',
+    regex: true
+  })
 }
 /**
  * 应用配置

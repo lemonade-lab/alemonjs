@@ -170,13 +170,11 @@ export class App {
     this.init()
   }
 }
-
 if (!global?.alemonjs) {
   global.alemonjs = {}
-  if (!global.alemonjs.applications) {
-    global.alemonjs.applications = new App()
-  }
 }
-
+if (!global.alemonjs?.applications) {
+  global.alemonjs.applications = new App()
+}
 // 索引系统
 export const APPS = global.alemonjs.applications

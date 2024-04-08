@@ -193,9 +193,9 @@ export class APlugin {
 }
 if (!global?.alemonjs) {
   global.alemonjs = {}
-  if (!global.alemonjs.plugin) {
-    global.alemonjs.plugin = APlugin
-  }
+}
+if (!global.alemonjs?.plugin) {
+  global.alemonjs.plugin = APlugin
 }
 /**
  * alemonjs plugin
