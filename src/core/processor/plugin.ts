@@ -191,10 +191,15 @@ export class APlugin {
     return
   }
 }
-
+if (!global?.alemonjs) {
+  global.alemonjs = {}
+  if (!global.alemonjs.plugin) {
+    global.alemonjs.plugin = APlugin
+  }
+}
 /**
  * alemonjs plugin
  * 插件标准类
  * @deprecated 已废弃
  */
-export const plugin = APlugin
+export const plugin = global.alemonjs.plugin

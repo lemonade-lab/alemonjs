@@ -5,7 +5,7 @@ import { type NodeDataType } from './types.js'
  * 订阅
  * ***********
  */
-class Observer {
+export class Observer {
   #sb: {
     [key: string]: {
       // 定时器id
@@ -67,4 +67,10 @@ class Observer {
     return this.#sb[key]
   }
 }
-export const AObserver = new Observer()
+if (!global?.alemonjs) {
+  global.alemonjs = {}
+  if (!global.alemonjs.observer) {
+    global.alemonjs.observer = new Observer()
+  }
+}
+export const AObserver = global.alemonjs.observer

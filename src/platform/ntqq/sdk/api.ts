@@ -100,26 +100,17 @@ class ClientNtqq {
 
   // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
 
-  // map会越来越大,应该自动delte第一个key
-  #map = {}
-
-  /**
-   * 得到消息计数器
-   * @param MsgId
-   * @returns
-   */
-  getMsgSeq(MsgId: string) {
-    if (Object.prototype.hasOwnProperty.call(this.#map, MsgId)) {
-      this.#map[MsgId] = this.#map[MsgId] + 1
-    } else {
-      this.#map[MsgId] = 1
+  #map: Map<string, number> = new Map()
+  getMsgSeq(MsgId: string): number {
+    let seq = this.#map.get(MsgId) || 0
+    seq++
+    this.#map.set(MsgId, seq)
+    // 如果映射表大小超过 100，则删除最早添加的 MsgId
+    if (this.#map.size > 100) {
+      const firstKey = this.#map.keys().next().value
+      this.#map.delete(firstKey)
     }
-    const arr = Object.keys(this.#map)
-    if (arr.length > 15) {
-      const firstKey = arr[0]
-      delete this.#map[firstKey]
-    }
-    return this.#map[MsgId]
+    return seq
   }
 
   /**

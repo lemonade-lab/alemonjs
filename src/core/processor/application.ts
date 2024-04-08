@@ -11,7 +11,7 @@ import { readScript } from './read.js'
 /**
  * 应用
  */
-class App {
+export class App {
   /**
    * 扫码
    * @returns
@@ -171,5 +171,12 @@ class App {
   }
 }
 
+if (!global?.alemonjs) {
+  global.alemonjs = {}
+  if (!global.alemonjs.applications) {
+    global.alemonjs.applications = new App()
+  }
+}
+
 // 索引系统
-export const APPS = new App()
+export const APPS = global.alemonjs.applications
