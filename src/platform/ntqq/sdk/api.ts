@@ -3,6 +3,48 @@ import axios, { type AxiosRequestConfig } from 'axios'
 import { FileType, MsgType } from './typings.js'
 import { ApiLog } from './log.js'
 
+interface ButtonType {
+  // 编号
+  id: string
+  render_data: {
+    // 标头
+    label: string
+    // 点击后的标头
+    visited_label: string
+    // 0 灰色
+    // 1 蓝色
+    // 风格
+    style: number
+  }
+  action: {
+    // 0 跳转按钮：http 或 小程序 客户端识别 scheme
+    // 1 回调按钮：回调后台接口, data 传给后台
+    // 2 指令按钮：自动在输入框插入 @bot data
+    type: number
+    permission: {
+      // 0 指定用户可操作
+      // 1 仅管理者可操作
+      // 2 所有人可操作
+      // 3 指定身份组可操作（仅频道可用）
+      type: number
+    }
+    // 默认 false
+    reply?: boolean
+    // 自动发送
+    enter?: boolean
+    // 兼容性提示文本
+    unsupport_tips: string
+    // 内容
+    data: string
+  }
+}
+
+interface KeyboardType {
+  content: {
+    rows: { buttons: ButtonType[] }[]
+  }
+}
+
 class ClientNtqq {
   /**
    * qq机器人
@@ -76,8 +118,10 @@ class ClientNtqq {
       content?: string
       msg_type: MsgType
       markdown?: any
-      keyboard?: any
-      media?: any
+      keyboard?: KeyboardType
+      media?: {
+        file_info: string
+      }
       ark?: any
       image?: any
       message_reference?: any
@@ -126,8 +170,10 @@ class ClientNtqq {
       content?: string
       msg_type: MsgType
       markdown?: any
-      keyboard?: any
-      media?: any
+      keyboard?: KeyboardType
+      media?: {
+        file_info: string
+      }
       ark?: any
       image?: any
       message_reference?: any

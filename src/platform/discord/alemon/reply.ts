@@ -1,4 +1,8 @@
-import { ABuffer, type MessageContentType } from '../../../core/index.js'
+import {
+  ABuffer,
+  MessageButtonType,
+  type MessageContentType
+} from '../../../core/index.js'
 import { ClientDISOCRD } from '../sdk/index.js'
 
 /**
@@ -14,7 +18,8 @@ export async function replyController(
   select?: {
     quote?: string
     withdraw?: number
-  }
+  },
+  button?: MessageButtonType[][]
 ): Promise<{
   middle: any[]
   backhaul: any

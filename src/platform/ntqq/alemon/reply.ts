@@ -1,6 +1,10 @@
 import { ClientNTQQ } from '../sdk/index.js'
 import { ClientFile, DrawingBed } from '../../../file/index.js'
-import { type MessageContentType } from '../../../core/types.js'
+import {
+  type MessageButtonType,
+  type MessageContentType
+} from '../../../core/types.js'
+import { getKeyboardData } from './utils.js'
 
 /**
  * 回复控制器
@@ -12,7 +16,8 @@ import { type MessageContentType } from '../../../core/types.js'
 export async function replyController(
   msg: MessageContentType,
   guild_id: string,
-  msg_id: string
+  msg_id: string,
+  buttons?: MessageButtonType[][]
 ): Promise<{
   middle: any[]
   backhaul: any
@@ -53,6 +58,7 @@ export async function replyController(
         media: {
           file_info
         },
+        keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
         msg_type: 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
@@ -105,6 +111,7 @@ export async function replyController(
         media: {
           file_info
         },
+        keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
         msg_type: 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
@@ -152,6 +159,7 @@ export async function replyController(
         media: {
           file_info
         },
+        keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
         msg_type: 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
@@ -163,6 +171,7 @@ export async function replyController(
     middle: [],
     backhaul: await ClientNTQQ.groupOpenMessages(guild_id, {
       content,
+      keyboard: buttons ? getKeyboardData(buttons) : undefined,
       msg_id,
       msg_type: 0,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)

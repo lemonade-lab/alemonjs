@@ -37,9 +37,9 @@ export class Controllers extends BaseConfig<ControllerOption> {
       const open_id = this.get('open_id')
       const attribute = this.get('attribute')
       if (attribute == 'single') {
-        return await directController(content, open_id, msg_id)
+        return await directController(content, open_id, msg_id, arg)
       }
-      return await replyController(content, guild_id, msg_id)
+      return await replyController(content, guild_id, msg_id, arg)
     },
     quote: async (content: MessageContentType) => {
       const guild_id = this.get('guild_id')

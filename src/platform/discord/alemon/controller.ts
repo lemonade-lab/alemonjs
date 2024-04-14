@@ -89,7 +89,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       const attribute = this.get('attribute')
       if (attribute == 'single') return
       const channel_id = this.get('channel_id')
-      return await replyController(content, channel_id)
+      return await replyController(content, channel_id, {}, arg)
     },
     quote: async (content: MessageContentType) => {
       const msg_id = this.get('msg_id')

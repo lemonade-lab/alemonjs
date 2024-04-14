@@ -63,11 +63,18 @@ export type MessageContentType =
   | (Buffer | number | string)[]
 
 export type MessageButtonType = {
+  // 标头
   label: string
-  link: string
-  value: string
-  call: string
-  enter: boolean
+  // 值
+  value?: string
+  // 链接地址
+  link?: string
+  // 回调函数
+  call?: string
+  // 是否自动发送
+  enter?: boolean
+  // 是否引用回复
+  reply?: boolean
 }
 
 /**
