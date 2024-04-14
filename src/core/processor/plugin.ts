@@ -5,6 +5,7 @@ import {
 } from './types.js'
 import { type AEvent, type EventEnum, type TypingEnum } from '../typings.js'
 import { AObserver } from './subscribe.js'
+import { MessageContentType } from '../types.js'
 
 /**
  * alemonjs plugin
@@ -72,7 +73,7 @@ export class APlugin {
    * @returns 是否处理完成
    */
   async reply(
-    content: Buffer | string | number | (Buffer | number | string)[],
+    content: MessageContentType,
     select?: {
       quote?: string
       withdraw?: number

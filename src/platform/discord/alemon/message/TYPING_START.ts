@@ -1,7 +1,8 @@
 import {
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  MessageContentType
 } from '../../../../core/index.js'
 import { APPS } from '../../../../core/index.js'
 import { ABotConfig } from '../../../../config/index.js'
@@ -87,7 +88,7 @@ export async function TYPING_START(event: {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const withdraw = select?.withdraw ?? 0

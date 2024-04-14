@@ -56,6 +56,20 @@ export interface MemberControllerType {
   operate: (role_id: string, add?: boolean) => Promise<any>
 }
 
+export type MessageContentType =
+  | Buffer
+  | string
+  | number
+  | (Buffer | number | string)[]
+
+export type MessageButtonType = {
+  label: string
+  link: string
+  value: string
+  call: string
+  enter: boolean
+}
+
 /**
  * 消息控制器
  */
@@ -65,8 +79,8 @@ export interface MessageControllerType {
    * @param content
    */
   reply(
-    content: Buffer | string | number | (Buffer | number | string)[],
-    ...arg: string[][]
+    content: MessageContentType,
+    ...arg: MessageButtonType[][]
   ): Promise<{
     middle: any[]
     backhaul: any
@@ -75,15 +89,11 @@ export interface MessageControllerType {
    * 引用消息
    * @param content
    */
-  quote(
-    content: Buffer | string | number | (Buffer | number | string)[]
-  ): Promise<any>
+  quote(content: MessageContentType): Promise<any>
   /**
    * 更新信息
    */
-  update(
-    content: Buffer | string | number | (Buffer | number | string)[]
-  ): Promise<any>
+  update(content: MessageContentType): Promise<any>
   /**
    * 撤回
    * @param time 撤回时间

@@ -2,7 +2,8 @@ import {
   APPS,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  type MessageContentType
 } from '../../../../core/index.js'
 import { BotMessage } from '../bot.js'
 import { segmentQQ } from '../segment.js'
@@ -72,7 +73,7 @@ export const MESSAGE_REACTION_REMOVE = async (event: {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? event.target.id

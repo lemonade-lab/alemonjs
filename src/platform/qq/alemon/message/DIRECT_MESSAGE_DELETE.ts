@@ -2,7 +2,8 @@ import {
   APPS,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  type MessageContentType
 } from '../../../../core/index.js'
 import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
@@ -61,7 +62,7 @@ export const DIRECT_MESSAGE_DELETE = async (event: {
     segment: segmentQQ,
     send_at: new Date().getTime(),
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const open_id = select?.open_id ?? event.message.guild_id

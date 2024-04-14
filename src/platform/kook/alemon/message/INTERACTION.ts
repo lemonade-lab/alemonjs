@@ -1,4 +1,4 @@
-import { APPS } from '../../../../core/index.js'
+import { APPS, MessageContentType } from '../../../../core/index.js'
 import {
   type EventEnum,
   type TypingEnum,
@@ -67,7 +67,7 @@ export async function INTERACTION(event: SystemData) {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const channel_id = select?.channel_id ?? body.channel_id

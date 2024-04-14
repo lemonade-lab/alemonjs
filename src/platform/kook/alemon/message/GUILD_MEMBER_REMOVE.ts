@@ -2,7 +2,8 @@ import {
   APPS,
   type TypingEnum,
   type EventEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  MessageContentType
 } from '../../../../core/index.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../../config/index.js'
@@ -58,7 +59,7 @@ export const GUILD_MEMBER_REMOVE = async (event: SystemData) => {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? false

@@ -1,4 +1,5 @@
 import {
+  type MessageContentType,
   type ControllerOption,
   type UserInformationType
 } from '../../../core/index.js'
@@ -47,16 +48,12 @@ export class Controllers extends BaseConfig<ControllerOption> {
     }
   }
   Message = {
-    reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    reply: async (content: MessageContentType) => {
       const channel_id = this.get('channel_id')
       const open_id = this.get('open_id')
       return await directController(content, channel_id, open_id)
     },
-    quote: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    quote: async (content: MessageContentType) => {
       const channel_id = this.get('channel_id')
       const open_id = this.get('open_id')
       return await directController(content, channel_id, open_id)
@@ -66,9 +63,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param content
      * @returns
      */
-    update: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    update: async (content: MessageContentType) => {
       return false
     },
     withdraw: async (hideTip = true) => {
@@ -130,7 +125,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
  * @returns
  */
 export async function directController(
-  msg: Buffer | string | number | (Buffer | number | string)[],
+  msg: MessageContentType,
   channel_id: string,
   open_id: string
 ): Promise<{

@@ -1,3 +1,5 @@
+import { MessageContentType } from './types.js'
+
 /**
  * AlemonjsEventData
  */
@@ -335,7 +337,7 @@ export interface ReplyBase {
     /**
      * 消息内容
      */
-    content: Buffer | string | number | (Buffer | number | string)[],
+    content: MessageContentType,
     /**
      * 选择
      */

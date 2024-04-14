@@ -2,6 +2,8 @@ import { replyController } from './reply.js'
 import {
   BaseConfig,
   ControllerOption,
+  MessageButtonType,
+  MessageContentType,
   type UserInformationType
 } from '../../../core/index.js'
 import { ABotConfig } from '../../../config/index.js'
@@ -105,8 +107,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[],
-      ...arg: string[][]
+      content: MessageContentType,
+      ...arg: MessageButtonType[][]
     ) => {
       const open_id = this.get('open_id')
       const user_id = this.get('user_id')
@@ -126,9 +128,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param content
      * @returns
      */
-    quote: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    quote: async (content: MessageContentType) => {
       const msg_id = this.get('msg_id')
       const channel_id = this.get('channel_id')
       return await replyController(content, channel_id, msg_id, {

@@ -1,4 +1,4 @@
-import { APPS } from '../../../../core/index.js'
+import { APPS, MessageContentType } from '../../../../core/index.js'
 import {
   type EventEnum,
   type TypingEnum,
@@ -56,7 +56,7 @@ export async function CHANNEL_TOPIC_UPDATE(event: {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const withdraw = select?.withdraw ?? 0

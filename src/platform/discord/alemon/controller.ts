@@ -1,4 +1,8 @@
-import { BaseConfig } from '../../../core/index.js'
+import {
+  BaseConfig,
+  MessageButtonType,
+  MessageContentType
+} from '../../../core/index.js'
 import {
   type ControllerOption,
   type UserInformationType
@@ -79,17 +83,15 @@ export class Controllers extends BaseConfig<ControllerOption> {
 
   Message = {
     reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[],
-      ...arg: string[][]
+      content: MessageContentType,
+      ...arg: MessageButtonType[][]
     ) => {
       const attribute = this.get('attribute')
       if (attribute == 'single') return
       const channel_id = this.get('channel_id')
       return await replyController(content, channel_id)
     },
-    quote: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    quote: async (content: MessageContentType) => {
       const msg_id = this.get('msg_id')
       const channel_id = this.get('channel_id')
       return await replyController(content, channel_id, {
@@ -101,9 +103,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param content
      * @returns
      */
-    update: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    update: async (content: MessageContentType) => {
       return false
     },
     withdraw: async () => {

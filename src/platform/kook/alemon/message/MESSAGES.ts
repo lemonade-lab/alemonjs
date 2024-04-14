@@ -1,4 +1,4 @@
-import { APPS } from '../../../../core/index.js'
+import { APPS, MessageContentType } from '../../../../core/index.js'
 import {
   type EventEnum,
   type TypingEnum,
@@ -65,7 +65,7 @@ export const MESSAGES = async (event: EventData) => {
      * @param obj 额外消息 可选
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const channel_id = select?.channel_id ?? event.target_id

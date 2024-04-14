@@ -2,6 +2,7 @@
   "name": "alemonjs",
   "version": "1.2.0-rc.36",
   "description": "DOCS https://alemonjs.com/",
+  "main": "lib/index.js",
   "scripts": {
     "dev": "ts-node alemon.config.ts",
     "tsc": "tsc",
@@ -61,7 +62,6 @@
   "license": "MIT",
   "type": "module",
   "types": "types",
-  "main": "lib/index.js",
   "files": [
     "lib",
     "types",

@@ -2,7 +2,8 @@ import {
   type EventEnum,
   type TypingEnum,
   type MessageBingdingOption,
-  type UserType
+  type UserType,
+  MessageContentType
 } from '../../../../core/index.js'
 import { APPS } from '../../../../core/index.js'
 import { ABotConfig } from '../../../../config/index.js'
@@ -126,7 +127,7 @@ export async function MESSAGE_UPDATE(event: {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const withdraw = select?.withdraw ?? 0

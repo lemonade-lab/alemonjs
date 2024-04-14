@@ -2,7 +2,8 @@ import {
   APPS,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  MessageContentType
 } from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
@@ -47,7 +48,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     segment: segmentNTQQ,
     send_at: new Date().getTime(),
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? event.id

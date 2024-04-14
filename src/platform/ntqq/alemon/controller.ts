@@ -1,6 +1,8 @@
 import { replyController } from './reply.js'
 import {
   BaseConfig,
+  MessageButtonType,
+  MessageContentType,
   type ControllerOption,
   type UserInformationType
 } from '../../../core/index.js'
@@ -27,8 +29,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
   }
   Message = {
     reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[],
-      ...arg: string[][]
+      content: MessageContentType,
+      ...arg: MessageButtonType[][]
     ) => {
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')
@@ -39,9 +41,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       }
       return await replyController(content, guild_id, msg_id)
     },
-    quote: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    quote: async (content: MessageContentType) => {
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')
       const open_id = this.get('open_id')
@@ -51,9 +51,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       }
       return await replyController(content, guild_id, msg_id)
     },
-    update: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    update: async (content: MessageContentType) => {
       return false
     },
     withdraw: async (hideTip: boolean) => {

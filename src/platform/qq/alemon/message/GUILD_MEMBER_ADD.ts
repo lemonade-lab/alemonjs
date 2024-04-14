@@ -2,7 +2,8 @@ import {
   APPS,
   type TypingEnum,
   type EventEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  type MessageContentType
 } from '../../../../core/index.js'
 
 import { segmentQQ } from '../segment.js'
@@ -72,7 +73,7 @@ export const GUILD_MEMBER_ADD = async (event: {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? false

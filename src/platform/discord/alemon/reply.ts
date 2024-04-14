@@ -1,4 +1,4 @@
-import { ABuffer } from '../../../core/index.js'
+import { ABuffer, type MessageContentType } from '../../../core/index.js'
 import { ClientDISOCRD } from '../sdk/index.js'
 
 /**
@@ -9,7 +9,7 @@ import { ClientDISOCRD } from '../sdk/index.js'
  * @returns
  */
 export async function replyController(
-  msg: Buffer | string | number | (Buffer | number | string)[],
+  msg: MessageContentType,
   channel_id: string,
   select?: {
     quote?: string

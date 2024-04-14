@@ -1,6 +1,8 @@
 import { ClientKOOK } from '../sdk/index.js'
 import { replyController } from './reply.js'
 import {
+  MessageButtonType,
+  MessageContentType,
   type ControllerOption,
   type UserInformationType
 } from '../../../core/index.js'
@@ -51,8 +53,8 @@ export class Controllers extends BaseConfig<ControllerOption> {
   }
   Message = {
     reply: async (
-      content: Buffer | string | number | (Buffer | number | string)[],
-      ...arg: string[][]
+      content: MessageContentType,
+      ...arg: MessageButtonType[][]
     ) => {
       const attribute = this.get('attribute')
       const channel_id = this.get('channel_id')
@@ -62,9 +64,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       }
       return await replyController(content, channel_id)
     },
-    quote: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    quote: async (content: MessageContentType) => {
       const channel_id = this.get('channel_id')
       const attribute = this.get('attribute')
       if (attribute == 'single') {
@@ -73,9 +73,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       }
       return await replyController(content, channel_id)
     },
-    update: async (
-      content: Buffer | string | number | (Buffer | number | string)[]
-    ) => {
+    update: async (content: MessageContentType) => {
       const msg_id = this.get('msg_id')
       return await ClientKOOK.messageUpdate({ msg_id, content })
     },

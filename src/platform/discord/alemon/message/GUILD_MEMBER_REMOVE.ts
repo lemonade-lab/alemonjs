@@ -1,7 +1,8 @@
 import {
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  MessageContentType
 } from '../../../../core/index.js'
 import { APPS } from '../../../../core/index.js'
 
@@ -70,7 +71,7 @@ export async function GUILD_MEMBER_REMOVE(event: {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const withdraw = select?.withdraw ?? 0

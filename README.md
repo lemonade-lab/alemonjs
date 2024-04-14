@@ -16,7 +16,7 @@
 
 <div align="center">
   
-事件驱动机器人,支持 QQ (群&频道)、KOOK、Discord
+事件驱动机器人 | 支持 QQ (群&频道)、KOOK、DC
 
 </div>
 
@@ -161,25 +161,6 @@ npx ts-node alemon.config.ts
 
 ```ts
 node --no-warnings=ExperimentalWarning --loader ts-node/esm alemon.config.ts
-```
-
-### Dependencies
-
-```json
-{
-  "axios": "接口",
-  "file-type": "文件类型判断",
-  "form-data": "文件流",
-  "image-size": "图片大小",
-  "koa": "服务框架",
-  "lodash-es": "工具包",
-  "mime-types": "文件类型",
-  "protobufjs": "新文件格式",
-  "public-ip": "公网识别",
-  "puppeteer": "浏览器",
-  "qrcode": "二维码",
-  "ws": "连接协议"
-}
 ```
 
 ### Community

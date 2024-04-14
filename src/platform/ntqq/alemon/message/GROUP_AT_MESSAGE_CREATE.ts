@@ -2,7 +2,8 @@ import {
   APPS,
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  type MessageBingdingOption,
+  MessageContentType
 } from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
@@ -56,7 +57,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
      * @returns
      */
     reply: async (
-      msg: Buffer | string | number | (Buffer | number | string)[],
+      msg: MessageContentType,
       select?: MessageBingdingOption
     ): Promise<any> => {
       const msg_id = select?.msg_id ?? event.id

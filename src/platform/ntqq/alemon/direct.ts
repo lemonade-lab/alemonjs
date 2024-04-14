@@ -1,5 +1,6 @@
 import { ClientNTQQ } from '../sdk/index.js'
 import { ClientFile, DrawingBed } from '../../../file/index.js'
+import { type MessageContentType } from '../../../core/types.js'
 
 /**
  * 回复控制器
@@ -9,7 +10,7 @@ import { ClientFile, DrawingBed } from '../../../file/index.js'
  * @returns
  */
 export async function directController(
-  msg: Buffer | string | number | (Buffer | number | string)[],
+  msg: MessageContentType,
   open_id: string,
   msg_id: string
 ): Promise<{
