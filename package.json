@@ -15,8 +15,6 @@
   "dependencies": {
     "axios": "^1.4.0",
     "dotenv": "^16.4.1",
-    "@commitlint/cli": "^19.2.1",
-    "@commitlint/config-conventional": "^19.1.0",
     "file-type": "^18.5.0",
     "form-data": "^4.0.0",
     "image-size": "^1.0.2",
@@ -37,6 +35,8 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
     "@types/koa": "^2.13.11",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-router": "^7.4.7",

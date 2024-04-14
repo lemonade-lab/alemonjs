@@ -7,7 +7,6 @@ node_modules
 /lib/**/*
 /types/**/*
 
-
 # docs
 docs
 
@@ -17,7 +16,6 @@ alemon.config.ts
 a.main.ts
 a.apps.ts
 a.api.ts
-.image
 
 # env 
 alemon.env
@@ -25,8 +23,10 @@ alemon.env
 # 打印
 logs
 log
+los
 *.logs
 *.los
+*.log
 
 
 # npm
