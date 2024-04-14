@@ -60,7 +60,7 @@ export async function replyController(
         },
         keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
-        msg_type: 7,
+        msg_type: buttons ? 2 : 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       })
     }
@@ -113,7 +113,7 @@ export async function replyController(
         },
         keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
-        msg_type: 7,
+        msg_type: buttons ? 2 : 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       })
     }
@@ -161,7 +161,7 @@ export async function replyController(
         },
         keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
-        msg_type: 7,
+        msg_type: buttons ? 2 : 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
       })
     }
@@ -173,7 +173,7 @@ export async function replyController(
       content,
       keyboard: buttons ? getKeyboardData(buttons) : undefined,
       msg_id,
-      msg_type: 0,
+      msg_type: buttons ? 2 : 0,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)
     })
   }

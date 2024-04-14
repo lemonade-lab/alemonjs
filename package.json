@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.2.0-rc.39",
+  "version": "1.2.0-rc.40",
   "description": "DOCS https://alemonjs.com/",
   "main": "lib/index.js",
   "scripts": {

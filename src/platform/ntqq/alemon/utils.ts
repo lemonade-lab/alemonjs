@@ -13,14 +13,15 @@ export function getKeyboardData(arrs: MessageButtonType[][]) {
     for (const item of arr) {
       id++
       buttons.push({
-        id,
+        id: String(id),
         render_data: {
           label: item?.label ?? '/帮助',
           visited_label: item?.label ?? '/帮助',
-          style: 1
+          // link 是灰色按钮
+          style: item?.link ? 0 : 1
         },
         action: {
-          type: 2,
+          type: item?.link ? 0 : 2,
           permission: {
             type: 2
           },
@@ -29,7 +30,7 @@ export function getKeyboardData(arrs: MessageButtonType[][]) {
           // 默认不是引用回复
           reply: item?.reply ?? false,
           unsupport_tips: '请升级至最新版',
-          data: item?.value ?? item?.label ?? item
+          data: item?.link ?? item?.value ?? item?.label ?? item
         }
       })
     }

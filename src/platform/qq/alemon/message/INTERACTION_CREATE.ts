@@ -74,7 +74,6 @@ export const INTERACTION_CREATE = async event => {
       })
     }
   }
-
   APPS.responseEventType(e)
   return
 }
