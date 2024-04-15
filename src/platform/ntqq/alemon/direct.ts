@@ -103,6 +103,7 @@ export async function directController(
         media: {
           file_info
         },
+        keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
         msg_type: buttons ? 2 : 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
@@ -119,9 +120,22 @@ export async function directController(
     : ''
 
   if (content == '') {
-    return {
-      middle: [],
-      backhaul: false
+    if (!buttons) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    } else {
+      return {
+        middle: [],
+        backhaul: await ClientNTQQ.usersOpenMessages(open_id, {
+          content,
+          keyboard: getKeyboardData(buttons),
+          msg_id,
+          msg_type: 2,
+          msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+        })
+      }
     }
   }
 
@@ -149,6 +163,7 @@ export async function directController(
         media: {
           file_info
         },
+        keyboard: buttons ? getKeyboardData(buttons) : undefined,
         msg_id,
         msg_type: buttons ? 2 : 7,
         msg_seq: ClientNTQQ.getMsgSeq(msg_id)
@@ -161,6 +176,7 @@ export async function directController(
     backhaul: await ClientNTQQ.usersOpenMessages(open_id, {
       content,
       msg_id,
+      keyboard: buttons ? getKeyboardData(buttons) : undefined,
       msg_type: buttons ? 2 : 0,
       msg_seq: ClientNTQQ.getMsgSeq(msg_id)
     })

@@ -128,9 +128,22 @@ export async function replyController(
     : ''
 
   if (content == '') {
-    return {
-      middle: [],
-      backhaul: false
+    if (!buttons) {
+      return {
+        middle: [],
+        backhaul: false
+      }
+    } else {
+      return {
+        middle: [],
+        backhaul: await ClientNTQQ.groupOpenMessages(guild_id, {
+          content,
+          keyboard: getKeyboardData(buttons),
+          msg_id,
+          msg_type: 2,
+          msg_seq: ClientNTQQ.getMsgSeq(msg_id)
+        })
+      }
     }
   }
 
