@@ -16,6 +16,17 @@ export class BaseConfig<D> {
     return this
   }
   /**
+   *
+   * @param key
+   * @returns
+   */
+  has(key: string) {
+    if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
+      true
+    }
+    return false
+  }
+  /**
    * 读取配置
    * @param key
    * @returns

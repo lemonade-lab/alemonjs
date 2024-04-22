@@ -1,7 +1,11 @@
 import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions, PlatformsItemType } from '../default/types.js'
 import { FileOptions } from '../file/types.js'
-import { type ServerOptions } from '../core/index.js'
+import {
+  type ApplicationProcessKeyScriptType,
+  type ApplicationProcessingOpsion,
+  type ServerOptions
+} from '../core/index.js'
 import { EmailOptions } from '../email/types.js'
 import { type DotenvConfigOptions } from 'dotenv'
 
@@ -61,6 +65,10 @@ export interface AlemonOptions {
      */
     RegexClose?: RegExp
     /**
+     * 消息时间间隔
+     */
+    intervalTime?: number
+    /**
      * 插件入口
      * 默认index
      * type='ts'
@@ -70,8 +78,8 @@ export interface AlemonOptions {
     /**
      * 入口文件类型
      */
-    type?: 'ts' | 'js' | 'stript'
-  }
+    type?: ApplicationProcessKeyScriptType
+  } & ApplicationProcessingOpsion
   /**
    * 事件屏蔽
    */

@@ -9,6 +9,17 @@ export class BaseBotMessage<D> {
     this.#data = val
   }
   /**
+   *
+   * @param key
+   * @returns
+   */
+  has(key: string) {
+    if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
+      true
+    }
+    return false
+  }
+  /**
    * 设置配置
    * @param key
    * @param val
@@ -29,6 +40,8 @@ export class BaseBotMessage<D> {
   }
 }
 
+export type ApplicationProcessKeyScriptType = 'ts' | 'js' | 'stript'
+
 export interface ApplicationProcessingOpsion {
   /**
    * 根目录
@@ -41,7 +54,7 @@ export interface ApplicationProcessingOpsion {
   /**
    * 主文件类型
    */
-  type: 'ts' | 'js' | 'stript'
+  type: ApplicationProcessKeyScriptType
   /**
    * 匹配正则
    */
@@ -58,6 +71,10 @@ export interface ApplicationProcessingOpsion {
    * 是否生成json
    */
   regex: boolean
+  /**
+   * 消息执行间隔时间
+   */
+  intervalTime: number
   /**
    * 事件屏蔽器
    */
@@ -76,6 +93,7 @@ if (!global.alemonjs?.config) {
     closeRegex: undefined,
     event: [],
     route: '/public/defset',
+    intervalTime: 3000,
     regex: true
   })
 }

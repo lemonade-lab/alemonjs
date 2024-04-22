@@ -220,28 +220,15 @@ export async function defineConfig<T>(Options?: AlemonOptions & T) {
   }
   /**
    * ************
-   * 设置加载目录
+   * 设置加载目录 | 设置扫描规则
    * ************
    */
-  if (Options?.plugin?.directory) {
-    AppLoadConfig.set('dir', Options?.plugin?.directory)
-  }
-  if (Options?.plugin?.main) {
-    AppLoadConfig.set('main', Options?.plugin?.main)
-  }
-  if (Options?.plugin?.type) {
-    AppLoadConfig.set('type', Options?.plugin?.type)
-  }
-  /**
-   * ************
-   * 设置扫描规则
-   * ***********
-   */
-  if (Options?.plugin?.RegexOpen) {
-    AppLoadConfig.set('openRegex', Options?.plugin?.RegexOpen)
-  }
-  if (Options?.plugin?.RegexClose) {
-    AppLoadConfig.set('closeRegex', Options?.plugin?.RegexClose)
+  if (Options?.plugin) {
+    for (const key in Options.plugin) {
+      if (AppLoadConfig.has(key)) {
+        AppLoadConfig.set(key as any, Options.plugin[key])
+      }
+    }
   }
   /**
    * 设置事件忽略规则

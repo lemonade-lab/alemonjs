@@ -117,7 +117,7 @@ export class App {
     if (cache.has(e.user_id)) {
       const time = cache.get(e.user_id)
       // 1s 内 并发限制
-      if (now < time + 1000) {
+      if (now < time + AppLoadConfig.get('intervalTime')) {
         return
       }
     }
