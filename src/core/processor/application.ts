@@ -7,6 +7,8 @@ import { AObserver } from './subscribe.js'
 import { Alemon } from './alemon.js'
 import { BotServer } from '../index.js'
 import { readScript } from './read.js'
+import { LRUCache } from 'lru-cache'
+const cache = new LRUCache<string, number>({ max: 100 })
 
 /**
  * 应用
@@ -111,6 +113,15 @@ export class App {
    * @returns
    */
   responseMessage(e: AEvent) {
+    const now = Date.now()
+    if (cache.has(e.user_id)) {
+      const time = cache.get(e.user_id)
+      // 1s 内 并发限制
+      if (now < time + 1000) {
+        return
+      }
+    }
+    cache.set(e.user_id, now)
     if (process.env.ALEMONJS_AEVENT == 'dev') console.info('AEvent', e)
     console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
