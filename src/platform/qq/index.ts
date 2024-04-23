@@ -1,13 +1,14 @@
 import { Client } from './sdk/index.js'
 import { ABotConfig } from '../../config/index.js'
 import { Conversation } from './alemon/conversation.js'
+import { loger } from '../../log.js'
 export default async function createAlemon() {
   const qq = ABotConfig.get('qq')
   if ((qq ?? '') !== '' && (qq.appID ?? '') !== '' && (qq.token ?? '') !== '') {
     ABotConfig.set('qq', qq)
   } else {
-    console.error('[LOGIN]', '-----------------------')
-    console.error('[LOGIN]', 'QQ ERR')
+    loger.error('[LOGIN]', '-----------------------')
+    loger.error('[LOGIN]', 'QQ ERR')
     return
   }
   new Client().set(qq).connect(Conversation)

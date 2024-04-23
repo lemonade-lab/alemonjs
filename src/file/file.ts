@@ -5,6 +5,7 @@ import { config } from './config.js'
 import { IP } from '../core/index.js'
 import { createHash } from 'crypto'
 import { FServer } from './client.js'
+import { loger } from '../log.js'
 
 class CF {
   #size = 0
@@ -33,7 +34,7 @@ class CF {
     const addressRouter = config.get('addressRouter')
     const base = await this.#getBaseUrl()
     const url = `${base}${addressRouter}?address=${address}`
-    console.info('server url', url)
+    loger.info('server url', url)
     return url
   }
 
@@ -66,12 +67,12 @@ class CF {
     const filePath = join(process.cwd(), fileDir, filename)
     if (!existsSync(filePath)) {
       // 保存文件到文件系统
-      console.info('server create', filePath)
+      loger.info('server create', filePath)
       writeFileSync(filePath, file)
     }
     const base = await this.#getBaseUrl()
     const url = `${base}${fileRouter}/${filename}`
-    console.info('setLocalFile url', url)
+    loger.info('setLocalFile url', url)
     return url
   }
 

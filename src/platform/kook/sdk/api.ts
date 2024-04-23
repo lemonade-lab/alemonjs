@@ -9,6 +9,7 @@ import {
 import { config } from './config.js'
 import { createPicFrom } from '../../../core/index.js'
 import { ApiLog } from './log.js'
+import { loger } from '../../../log.js'
 
 /**
  * api接口
@@ -86,7 +87,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -115,7 +116,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -154,7 +155,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -177,7 +178,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -202,7 +203,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -230,7 +231,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -255,7 +256,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -276,7 +277,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -314,7 +315,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -356,7 +357,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -397,7 +398,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -425,7 +426,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -456,7 +457,7 @@ class ClientKook {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 }

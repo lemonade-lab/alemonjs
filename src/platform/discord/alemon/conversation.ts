@@ -13,6 +13,7 @@ import { VOICE_CHANNEL_STATUS_UPDATE } from './message/VOICE_CHANNEL_STATUS_UPDA
 import { MESSAGE_DELETE } from './message/MESSAGE_DELETE.js'
 import { CHANNEL_UPDATE } from './message/CHANNEL_UPDATE.js'
 import { GUILD_MEMBER_REMOVE } from './message/GUILD_MEMBER_REMOVE.js'
+import { loger } from '../../../log.js'
 
 const ConversationMap = {
   READY: d => {
@@ -41,7 +42,7 @@ const ConversationMap = {
  * @param d
  */
 export function conversation(t: string, d: any) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', d)
+  if (process.env?.ALEMONJS_EVENT == 'dev') loger.info('event', d)
   if (!Object.prototype.hasOwnProperty.call(ConversationMap, t)) return
   ConversationMap[t](d)
 }

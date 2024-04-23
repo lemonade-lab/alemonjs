@@ -15,6 +15,7 @@ import { AppServerConfig } from '../core/koa/config.js'
 import { configDotenv } from 'dotenv'
 import { LoginMap, analysis } from './login.js'
 import { existsSync } from 'fs'
+import { loger } from '../log.js'
 
 /**
  * 启动器
@@ -76,7 +77,7 @@ export function runAlemon(Options?: AlemonOptions) {
         APPS.init()
       }
     })
-    .catch(console.error)
+    .catch(loger.error)
 
   /**
    * ********
@@ -84,7 +85,7 @@ export function runAlemon(Options?: AlemonOptions) {
    * ********
    */
   if (!Options?.login || Object.keys(Options?.login ?? {}).length == 0) {
-    console.info('[LOGIN] Not Config')
+    loger.info('[LOGIN] Not Config')
     return
   }
 
@@ -125,7 +126,7 @@ export function runAlemon(Options?: AlemonOptions) {
   }
 
   // 并发登录
-  Promise.all(promises).catch(console.error)
+  Promise.all(promises).catch(loger.error)
 }
 
 /**

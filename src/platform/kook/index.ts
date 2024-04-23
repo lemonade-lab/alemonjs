@@ -2,6 +2,7 @@ import { conversation } from './alemon/conversation.js'
 import { Client, ClientKOOK } from './sdk/index.js'
 import { BotMessage } from './alemon/bot.js'
 import { ABotConfig } from '../../config/index.js'
+import { loger } from '../../log.js'
 /**
  * 创建实例
  * @returns
@@ -11,8 +12,8 @@ export default async function createAlemon() {
   if ((kook ?? '') !== '' && (kook.token ?? '') !== '') {
     ABotConfig.set('kook', kook)
   } else {
-    console.error('[LOGIN]', '-----------------------')
-    console.error('[LOGIN]', 'KOOK ERR')
+    loger.error('[LOGIN]', '-----------------------')
+    loger.error('[LOGIN]', 'KOOK ERR')
     return
   }
   new Client()

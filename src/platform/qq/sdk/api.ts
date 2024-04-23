@@ -3,6 +3,7 @@ import axios, { type AxiosRequestConfig } from 'axios'
 import { config } from './config.js'
 import { createPicFrom } from '../../../core/index.js'
 import { ApiLog } from './log.js'
+import { loger } from '../../../log.js'
 /**
  * api接口
  */
@@ -92,9 +93,7 @@ class ClientQq {
       data: formdata
     })
       .then(ApiLog)
-      .catch(err => {
-        console.error(err)
-      })
+      .catch(loger.error)
   }
 
   /**
@@ -129,7 +128,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -151,7 +150,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -172,7 +171,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -194,7 +193,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -216,7 +215,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -232,7 +231,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -262,7 +261,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -288,7 +287,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -315,7 +314,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -331,7 +330,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -360,7 +359,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -386,7 +385,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -403,7 +402,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -420,7 +419,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -437,7 +436,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -468,7 +467,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -490,7 +489,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -512,7 +511,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -540,7 +539,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -569,7 +568,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -585,7 +584,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -615,7 +614,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -645,7 +644,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -666,7 +665,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -692,7 +691,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -720,7 +719,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -742,7 +741,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -771,7 +770,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -792,7 +791,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -819,7 +818,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -843,7 +842,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -868,7 +867,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -905,7 +904,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -922,7 +921,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -946,7 +945,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -964,7 +963,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -981,7 +980,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1004,7 +1003,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1022,7 +1021,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1064,7 +1063,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1107,7 +1106,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1128,7 +1127,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1159,7 +1158,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1184,7 +1183,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1216,7 +1215,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1250,7 +1249,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1266,7 +1265,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1282,7 +1281,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1308,7 +1307,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1326,7 +1325,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1354,7 +1353,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1371,7 +1370,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1391,7 +1390,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1406,7 +1405,7 @@ class ClientQq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 }

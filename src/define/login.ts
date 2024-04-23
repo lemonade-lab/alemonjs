@@ -1,3 +1,4 @@
+import { loger } from '../log.js'
 import { AlemonOptions } from './types.js'
 
 /**
@@ -51,7 +52,7 @@ export function analysis(val: LoginMap): AlemonOptions['login'] {
   for (const item in val[ket]) {
     arr.push(item)
   }
-  console.info('[LOAD] BOT', ket, arr.join(' '))
+  loger.info('[LOAD] BOT', ket, arr.join(' '))
   return val[ket]
 }
 

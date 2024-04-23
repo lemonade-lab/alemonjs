@@ -1,6 +1,7 @@
 import Koa from 'koa'
 import Router from 'koa-router'
 import { AppServerConfig } from './config.js'
+import { loger } from '../../log.js'
 
 class Server {
   #app: typeof Koa.prototype = null
@@ -87,18 +88,18 @@ class Server {
    */
   #handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.error(
+      loger.error(
         `port ${this.#currentPort} occupied, attempting to start a new port...`
       )
       this.#currentPort++
       this.#size++
       if (this.#size >= 5) {
-        console.error('find port err')
+        loger.error('find port err')
         return
       }
       this.#listen(this.#currentPort)
     } else {
-      console.error('An error occurred while starting the #application', err)
+      loger.error('An error occurred while starting the #application', err)
     }
   }
 
@@ -110,7 +111,7 @@ class Server {
         AppServerConfig.set('port', port)
         // 只要启动成功
         this.#state = true
-        console.info('server', `http://localhost:${port}`)
+        loger.info('server', `http://localhost:${port}`)
       })
       .on('error', this.#handlePortConflict)
   }

@@ -2,6 +2,7 @@ import { config } from './config.js'
 import axios, { type AxiosRequestConfig } from 'axios'
 import { FileType, MsgType } from './typings.js'
 import { ApiLog } from './log.js'
+import { loger } from '../../../log.js'
 
 interface ButtonType {
   // 编号
@@ -100,7 +101,7 @@ class ClientNtqq {
     })
       .then(ApiLog)
       .catch(error => {
-        console.error('[getway] token ', error.message)
+        loger.error('[getway] token ', error.message)
       })
   }
 
@@ -138,7 +139,7 @@ class ClientNtqq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -189,7 +190,7 @@ class ClientNtqq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -221,7 +222,7 @@ class ClientNtqq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -250,7 +251,7 @@ class ClientNtqq {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 }

@@ -9,6 +9,7 @@ import { AInstruct } from './help.js'
 import { AppLoadConfig } from './configs.js'
 import { BotServer } from '../index.js'
 import Router from 'koa-router'
+import { loger } from '../../log.js'
 
 type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
 
@@ -147,7 +148,7 @@ export class Alemon {
         if (res && typeof res != 'boolean') {
           e.reply(res)
         }
-        console.info(
+        loger.info(
           this.#infoFunc(e, node.name, node.acount, node.example, node.func),
           true,
           Date.now() - time
@@ -155,7 +156,7 @@ export class Alemon {
         return res
       })
       .catch(err => {
-        console.error(
+        loger.error(
           this.#errorFunc(e, node.name, node.acount, node.example, node.func),
           false,
           Date.now() - time,
@@ -210,7 +211,7 @@ export class Alemon {
             if (res && typeof res != 'boolean') {
               e.reply(res)
             }
-            console.info(
+            loger.info(
               this.#infoFunc(
                 e,
                 node.name,
@@ -224,7 +225,7 @@ export class Alemon {
             return res
           })
           .catch(err => {
-            console.error(
+            loger.error(
               this.#errorFunc(
                 e,
                 node.name,
@@ -262,7 +263,7 @@ export class Alemon {
             if (res && typeof res != 'boolean') {
               e.reply(res)
             }
-            console.info(
+            loger.info(
               this.#infoFunc(
                 e,
                 node.name,
@@ -276,7 +277,7 @@ export class Alemon {
             return res
           })
           .catch(err => {
-            console.error(
+            loger.error(
               this.#errorFunc(
                 e,
                 node.name,
@@ -346,7 +347,7 @@ export class Alemon {
         const res = await this.#data[node.acount][node.example]
           [node.func](e, ...arr)
           .then(res => {
-            console.info(
+            loger.info(
               this.#infoFunc(
                 e,
                 node.name,
@@ -363,7 +364,7 @@ export class Alemon {
             return res
           })
           .catch(err => {
-            console.error(
+            loger.error(
               this.#errorFunc(
                 e,
                 node.name,
@@ -400,7 +401,7 @@ export class Alemon {
           if (res && typeof res != 'boolean') {
             e.reply(res)
           }
-          console.info(
+          loger.info(
             this.#infoFunc(e, node.name, node.acount, node.example, node.func),
             true,
             Date.now() - time
@@ -408,7 +409,7 @@ export class Alemon {
           return res
         })
         .catch(err => {
-          console.error(
+          loger.error(
             this.#errorFunc(e, node.name, node.acount, node.example, node.func),
             false,
             Date.now() - time,
@@ -757,7 +758,7 @@ export class Alemon {
           if (res && typeof res != 'boolean') {
             e.reply(res)
           }
-          console.info(
+          loger.info(
             this.#infoFunc(e, this.#name, 0, 'on', FuncName),
             true,
             Date.now() - time
@@ -765,7 +766,7 @@ export class Alemon {
           return res
         })
         .catch(err => {
-          console.error(
+          loger.error(
             this.#infoFunc(e, this.#name, 0, 'on', FuncName),
             false,
             Date.now() - time,

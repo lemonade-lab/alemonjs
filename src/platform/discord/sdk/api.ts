@@ -4,6 +4,7 @@ import axios from 'axios'
 import { type AxiosRequestConfig } from 'axios'
 import { config } from './config.js'
 import { ApiLog } from './log.js'
+import { loger } from '../../../log.js'
 
 /**
  * api接口
@@ -73,7 +74,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -104,7 +105,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -194,7 +195,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -214,7 +215,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -228,7 +229,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -250,7 +251,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -266,7 +267,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -290,7 +291,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -305,7 +306,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -320,7 +321,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -335,7 +336,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -350,7 +351,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -372,7 +373,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -388,7 +389,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -404,7 +405,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -419,7 +420,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -434,7 +435,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -455,7 +456,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -470,7 +471,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -485,7 +486,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -500,7 +501,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -516,7 +517,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -531,7 +532,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -546,7 +547,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -561,7 +562,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -576,7 +577,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -591,7 +592,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -607,7 +608,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -623,7 +624,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -638,7 +639,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -653,7 +654,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -668,7 +669,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -683,7 +684,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -698,7 +699,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -717,7 +718,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -736,7 +737,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -751,7 +752,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -766,7 +767,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -781,7 +782,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -796,7 +797,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -812,7 +813,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -827,7 +828,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -842,7 +843,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -857,7 +858,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -872,7 +873,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -887,7 +888,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -902,7 +903,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -917,7 +918,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -932,7 +933,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -947,7 +948,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -962,7 +963,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -977,7 +978,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -992,7 +993,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1007,7 +1008,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1022,7 +1023,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1037,7 +1038,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1052,7 +1053,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1067,7 +1068,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1085,7 +1086,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1100,7 +1101,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1118,7 +1119,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1136,7 +1137,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1157,7 +1158,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1172,7 +1173,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1187,7 +1188,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1202,7 +1203,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1217,7 +1218,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1232,7 +1233,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1248,7 +1249,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1263,7 +1264,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1278,7 +1279,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1294,7 +1295,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1310,7 +1311,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1325,7 +1326,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1340,7 +1341,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1355,7 +1356,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1370,7 +1371,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1385,7 +1386,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1400,7 +1401,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1415,7 +1416,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1430,7 +1431,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1445,7 +1446,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1460,7 +1461,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1475,7 +1476,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1490,7 +1491,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1505,7 +1506,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1533,7 +1534,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1548,7 +1549,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1569,7 +1570,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1584,7 +1585,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1599,7 +1600,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1614,7 +1615,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1630,7 +1631,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1649,7 +1650,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1669,7 +1670,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1684,7 +1685,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1699,7 +1700,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1718,7 +1719,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1733,7 +1734,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1748,7 +1749,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1763,7 +1764,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1802,7 +1803,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1823,7 +1824,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1839,7 +1840,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1854,7 +1855,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -1882,7 +1883,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1897,7 +1898,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1912,7 +1913,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1927,7 +1928,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1942,7 +1943,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1957,7 +1958,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1972,7 +1973,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -1987,7 +1988,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -2002,7 +2003,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -2017,7 +2018,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -2032,7 +2033,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -2047,7 +2048,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -2069,7 +2070,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -2085,7 +2086,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -2100,7 +2101,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
   /**
@@ -2115,7 +2116,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 
@@ -2146,7 +2147,7 @@ class ClientDc {
     })
       .then(ApiLog)
       .catch(err => {
-        console.error(err)
+        loger.error(err)
       })
   }
 }

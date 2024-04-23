@@ -4,6 +4,7 @@ import { config } from './config.js'
 import { Counter } from '../../../core/index.js'
 import { IntentsEnum, getIntentsMask } from './intents.js'
 import { Email } from '../../../email/email.js'
+import { loger } from '../../../log.js'
 
 /**
  * *****
@@ -110,7 +111,7 @@ export class Client {
         res => res.data
       )
       config.set('token', data.access_token)
-      console.info('refresh', data.expires_in, 's')
+      loger.info('refresh', data.expires_in, 's')
       setTimeout(callBack, data.expires_in * 1000)
     }
     await callBack()
@@ -160,13 +161,13 @@ export class Client {
     // 重新连接的逻辑
     const reconnect = async () => {
       if (this.#counter.get() >= 5) {
-        console.info(
+        loger.info(
           'The maximum number of reconnections has been reached, cancel reconnection'
         )
         return
       }
       setTimeout(() => {
-        console.info('[ws] reconnecting...')
+        loger.info('[ws] reconnecting...')
         // 重新starrt
         start()
         // 记录
@@ -195,25 +196,25 @@ export class Client {
             }
             // Resumed Event，恢复连接成功
             if (t === 'RESUMED') {
-              console.info('[ws] restore connection')
+              loger.info('[ws] restore connection')
               // 重制次数
               this.#counter.reStart()
             }
             return
           },
           6: ({ d }) => {
-            console.info('[ws] connection attempt', d)
+            loger.info('[ws] connection attempt', d)
             return
           },
           7: async ({ d }) => {
             // 执行重新连接
-            console.info('[ws] reconnect', d)
+            loger.info('[ws] reconnect', d)
             // 取消鉴权发送
             if (this.#IntervalID) clearInterval(this.#IntervalID)
             return
           },
           9: ({ d, t }) => {
-            console.info('[ws] parameter error', d)
+            loger.info('[ws] parameter error', d)
             return
           },
           10: ({ d }) => {
@@ -227,20 +228,20 @@ export class Client {
           },
           11: () => {
             // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-            console.info('[ws] heartbeat transmission')
+            loger.info('[ws] heartbeat transmission')
             // 重制次数
             this.#counter.reStart()
             return
           },
           12: ({ d }) => {
-            console.info('[ws] platform data', d)
+            loger.info('[ws] platform data', d)
             return
           }
         }
         // 连接
         this.#ws = new WebSocket(this.#gatewayUrl)
         this.#ws.on('open', () => {
-          console.info('[ws] open')
+          loger.info('[ws] open')
 
           if (process.env?.NODE_ENV == 'production') {
             this.Email.send({
@@ -252,7 +253,7 @@ export class Client {
         // 监听消息
         this.#ws.on('message', async msg => {
           const message = JSON.parse(msg.toString('utf8'))
-          if (process.env.NTQQ_WS == 'dev') console.info('message', message)
+          if (process.env.NTQQ_WS == 'dev') loger.info('message', message)
           // 根据 opcode 进行处理
           if (map[message.op]) {
             map[message.op](message)
@@ -261,7 +262,7 @@ export class Client {
         // 关闭
         this.#ws.on('close', async err => {
           await reconnect()
-          console.info('[ws] close', err)
+          loger.info('[ws] close', err)
         })
       }
     }

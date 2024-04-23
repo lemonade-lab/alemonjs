@@ -1,4 +1,5 @@
 import { ABotConfig } from '../../config/index.js'
+import { loger } from '../../log.js'
 import { conversation } from './alemon/conversation.js'
 import { Client } from './sdk/index.js'
 export default async function createAlemon() {
@@ -11,8 +12,8 @@ export default async function createAlemon() {
   ) {
     ABotConfig.set('ntqq', ntqq)
   } else {
-    console.error('[LOGIN]', '-----------------------')
-    console.error('[LOGIN]', 'NTQQ ERR')
+    loger.error('[LOGIN]', '-----------------------')
+    loger.error('[LOGIN]', 'NTQQ ERR')
     return
   }
   new Client().set(ntqq).connect(conversation)

@@ -8,6 +8,8 @@ import { Alemon } from './alemon.js'
 import { BotServer } from '../index.js'
 import { readScript } from './read.js'
 import { LRUCache } from 'lru-cache'
+import { loger } from '../../log.js'
+import { globalKey } from '../key.js'
 const cache = new LRUCache<string, number>({ max: 100 })
 
 /**
@@ -102,8 +104,8 @@ export class App {
    * @returns
    */
   response(e: AEvent, event: (typeof EventEnum)[number]) {
-    if (process.env.ALEMONJS_AEVENT == 'dev') console.info('AEvent', e)
-    console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
+    if (process.env.ALEMONJS_AEVENT == 'dev') loger.info('AEvent', e)
+    loger.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     Promise.all(Array.from(AppMap.values()).map(app => app.response(e, event)))
   }
 
@@ -122,8 +124,8 @@ export class App {
       }
     }
     cache.set(e.user_id, now)
-    if (process.env.ALEMONJS_AEVENT == 'dev') console.info('AEvent', e)
-    console.info(`[${e.event}] [${e.typing}] ${e.msg}`)
+    if (process.env.ALEMONJS_AEVENT == 'dev') loger.info('AEvent', e)
+    loger.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     let con = false
     const channel_sb = AObserver.find(e.channel_id)
     if (channel_sb && channel_sb.node) {
@@ -149,8 +151,8 @@ export class App {
    * @param e
    */
   responseEventType(e: AEvent) {
-    if (process.env.ALEMONJS_AEVENT == 'dev') console.info('AEvent', e)
-    console.info(`[${e.event}] [${e.typing}]`)
+    if (process.env.ALEMONJS_AEVENT == 'dev') loger.info('AEvent', e)
+    loger.info(`[${e.event}] [${e.typing}]`)
     Promise.all(
       Array.from(AppMap.values()).map(app => app.responseEventType(e))
     )
@@ -181,11 +183,10 @@ export class App {
     this.init()
   }
 }
-if (!global?.alemonjs) {
-  global.alemonjs = {}
-}
-if (!global.alemonjs?.applications) {
+
+if (!globalKey('app')) {
   global.alemonjs.applications = new App()
 }
+
 // 索引系统
 export const APPS = global.alemonjs.applications

@@ -3,6 +3,7 @@ import { readdirSync, unlinkSync } from 'fs'
 import { config } from './config.js'
 import { join } from 'path'
 import { ABodyParser, ACors, AKoa } from '../core/index.js'
+import { loger } from '../log.js'
 class Server {
   #app: typeof AKoa.prototype = null
   #currentPort = 4399
@@ -40,18 +41,18 @@ class Server {
    */
   #handlePortConflict(err: { code: string }) {
     if (err.code === 'EADDRINUSE') {
-      console.error(
+      loger.error(
         `port ${this.#currentPort} occupied, attempting to start a new port...`
       )
       this.#currentPort++
       this.#size++
       if (this.#size >= 5) {
-        console.error('find port err')
+        loger.error('find port err')
         return
       }
       this.#listen(this.#currentPort)
     } else {
-      console.error('An error occurred while starting the #application', err)
+      loger.error('An error occurred while starting the #application', err)
     }
   }
   // 监听
@@ -63,7 +64,7 @@ class Server {
         // 只要启动成功
         this.#state = true
 
-        console.info('server', `http://localhost:${port}`)
+        loger.info('server', `http://localhost:${port}`)
 
         // 自动删除
         const fileDir = config.get('fileDir')

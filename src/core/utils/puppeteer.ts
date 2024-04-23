@@ -6,6 +6,7 @@ import {
 import puppeteer, { Browser } from 'puppeteer'
 import queryString from 'querystring'
 import { BaseConfig } from '../config.js'
+import { loger } from '../../log.js'
 
 export interface ScreenshotFileOptions {
   SOptions?: {
@@ -80,11 +81,11 @@ export class Puppeteer {
     try {
       this.#browser = await puppeteer.launch(this.#launch)
       this.#isBrowser = true
-      console.info('[puppeteer] open success')
+      loger.info('[puppeteer] open success')
       return true
     } catch (err) {
       this.#isBrowser = false
-      console.error('[puppeteer] err', err)
+      loger.error('[puppeteer] err', err)
       return false
     }
   }
@@ -111,12 +112,12 @@ export class Puppeteer {
        * 重置次数
        */
       this.#pic = 0
-      console.info('[puppeteer] close')
+      loger.info('[puppeteer] close')
       this.#isBrowser = false
       this.#browser.close().catch(err => {
-        console.error('[puppeteer] close', err)
+        loger.error('[puppeteer] close', err)
       })
-      console.info('[puppeteer] reopen')
+      loger.info('[puppeteer] reopen')
       if (!(await this.start())) return false
       this.#pic++
     }
@@ -139,14 +140,14 @@ export class Puppeteer {
     if (!(await this.isStart())) return false
     try {
       const page = await this.#browser.newPage().catch(err => {
-        console.error(err)
+        loger.error(err)
       })
       if (!page) return false
       await page.goto(`file://${htmlPath}`, {
         timeout: Options?.timeout ?? 120000
       })
       const body = await page.$(Options?.tab ?? 'body')
-      console.info('[puppeteer] success')
+      loger.info('[puppeteer] success')
       const buff: string | false | Buffer = await body
         .screenshot(
           Options?.SOptions ?? {
@@ -155,19 +156,19 @@ export class Puppeteer {
           }
         )
         .catch(err => {
-          console.error('[puppeteer]', 'screenshot', err)
+          loger.error('[puppeteer]', 'screenshot', err)
           return false
         })
       await page.close().catch((err: any) => {
-        console.error('[puppeteer]', 'page close', err)
+        loger.error('[puppeteer]', 'page close', err)
       })
       if (!buff) {
-        console.error('[puppeteer]', htmlPath)
+        loger.error('[puppeteer]', htmlPath)
         return false
       }
       return buff
     } catch (err) {
-      console.error('[puppeteer] newPage', err)
+      loger.error('[puppeteer] newPage', err)
       return false
     }
   }
@@ -182,7 +183,7 @@ export class Puppeteer {
     try {
       // 经常出现超时错误
       const page = await this.#browser.newPage().catch(err => {
-        console.error(err)
+        loger.error(err)
       })
       if (!page) return false
       const query =
@@ -197,11 +198,11 @@ export class Puppeteer {
         timeout: Options.timeout ?? 120000,
         waitUntil: Options.waitUntil ?? 'networkidle2'
       })
-      console.info('[screenshot] open', isurl)
+      loger.info('[screenshot] open', isurl)
       const body = await page.$(Options.tab ?? 'body')
       if (!body) {
         await page.close()
-        console.error('[screenshot] tab err')
+        loger.error('[screenshot] tab err')
         return false
       }
       await new Promise(resolve => setTimeout(resolve, Options.time ?? 1000))
@@ -214,17 +215,17 @@ export class Puppeteer {
           }
         )
         .catch(err => {
-          console.error('[screenshot] page body', err)
+          loger.error('[screenshot] page body', err)
           return false
         })
       await page.close()
       if (!buff) {
-        console.error('[screenshot] buffer err', Options.url)
+        loger.error('[screenshot] buffer err', Options.url)
         return false
       }
       return buff
     } catch (err) {
-      console.error('[screenshot] newPage', err)
+      loger.error('[screenshot] newPage', err)
       return false
     }
   }

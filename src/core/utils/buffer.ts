@@ -3,6 +3,7 @@ import axios from 'axios'
 import { join } from 'path'
 import { toDataURL } from 'qrcode'
 import { writeFile, readFile } from 'fs'
+import { loger } from '../../log.js'
 class BufferData {
   /**
    * 异步请求图片
@@ -32,7 +33,7 @@ class BufferData {
       // 相对路径
       if (existsSync(val)) return Buffer.from(readFileSync(val))
     } catch (err) {
-      console.info(err)
+      loger.info(err)
     }
     return false
   }
@@ -53,7 +54,7 @@ class BufferData {
           },
           (err: any, qrDataURL: any) => {
             if (err) {
-              console.error(err)
+              loger.error(err)
               reject(err)
             } else {
               resolve(qrDataURL)
@@ -67,7 +68,7 @@ class BufferData {
       }
       return bufferData
     } catch (err) {
-      console.error(err)
+      loger.error(err)
       return false
     }
   }
@@ -84,7 +85,7 @@ class BufferData {
           if (err) {
             reject(err)
           } else {
-            console.info('buffer read', localpath)
+            loger.info('buffer read', localpath)
             resolve(bufferData)
           }
         }
@@ -99,7 +100,7 @@ class BufferData {
   set(localpath: string, bufferData: Buffer) {
     writeFile(localpath, bufferData, (err: NodeJS.ErrnoException | null) => {
       if (err) throw err
-      console.info('buffer set', localpath)
+      loger.info('buffer set', localpath)
     })
     return
   }

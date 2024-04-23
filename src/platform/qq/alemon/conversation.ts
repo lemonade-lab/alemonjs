@@ -18,6 +18,7 @@ import { GUILD_MEMBER_UPDATE } from './message/GUILD_MEMBER_UPDATE.js'
 import { INTERACTION_CREATE } from './message/INTERACTION_CREATE.js'
 import { MESSAGE_CREATE } from './message/MESSAGE_CREATE.js'
 import { MESSAGE_DELETE } from './message/MESSAGE_DELETE.js'
+import { loger } from '../../../log.js'
 
 function READY(event: {
   version: number
@@ -34,7 +35,7 @@ function READY(event: {
   }
 }) {
   const cfg = ABotConfig.get('qq')
-  if (cfg.sandbox) console.info('ready', event)
+  if (cfg.sandbox) loger.info('ready', event)
   BotMessage.set('id', event.user.id)
   BotMessage.set('name', event.user.username)
 }
@@ -66,7 +67,7 @@ const ConversationMap = {
  * @param ws
  */
 export const Conversation = (key: string, event: any) => {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', event)
+  if (process.env?.ALEMONJS_EVENT == 'dev') loger.info('event', event)
   if (!Object.prototype.hasOwnProperty.call(ConversationMap, key)) return
   ConversationMap[key](event)
 }

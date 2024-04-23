@@ -6,6 +6,7 @@ import { defineQQ as qq } from '../platform/qq/sdk/wss.js'
 import { defineNtqq as ntqq } from '../platform/ntqq/sdk/wss.js'
 import { defineDISCORD as discord } from '../platform/discord/sdk/wss.js'
 import { ALunchConfig } from '../core/index.js'
+import { loger } from '../log.js'
 
 class BaseConfig<D> {
   #data: D = null
@@ -33,9 +34,9 @@ class BaseConfig<D> {
             // 不属于默认
             try {
               this.#data[key] = val[item] as any
-              console.info('KEY secess')
+              loger.info('KEY secess')
             } catch {
-              console.info('KEY err')
+              loger.info('KEY err')
             }
           }
         } else {

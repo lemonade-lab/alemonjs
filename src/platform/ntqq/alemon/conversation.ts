@@ -1,13 +1,14 @@
 import { GROUP_AT_MESSAGE_CREATE } from './message/GROUP_AT_MESSAGE_CREATE.js'
 import { C2C_MESSAGE_CREATE } from './message/C2C_MESSAGE_CREATE.js'
 import { BotMessage } from './bot.js'
+import { loger } from '../../../log.js'
 /**
  *
  * @param t
  * @param d
  */
 export function conversation(t: string, d: any) {
-  if (process.env?.ALEMONJS_EVENT == 'dev') console.info('event', d)
+  if (process.env?.ALEMONJS_EVENT == 'dev') loger.info('event', d)
   switch (t) {
     case 'READY': {
       BotMessage.set('id', d.user.id)

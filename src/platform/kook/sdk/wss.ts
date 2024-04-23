@@ -3,6 +3,7 @@ import axios from 'axios'
 import { config } from './config.js'
 import { EventData, SystemData } from './typings.js'
 import { Email } from '../../../email/email.js'
+import { loger } from '../../../log.js'
 
 /**
  * ****
@@ -63,10 +64,10 @@ export class Client {
       if (response.code === 0) {
         return response.data.url
       } else {
-        console.error('[getway] http err', response.message)
+        loger.error('[getway] http err', response.message)
       }
     } catch (error) {
-      console.error('[getway] token err', error.message)
+      loger.error('[getway] token err', error.message)
     }
   }
 
@@ -127,15 +128,15 @@ export class Client {
       },
       1: ({ d }) => {
         if (d && d.code === 0) {
-          console.info('[ws] ok')
+          loger.info('[ws] ok')
           this.#sessionID = d.session_id
           this.#isConnected = true
         } else {
-          console.info('[ws] err')
+          loger.info('[ws] err')
         }
       },
       2: message => {
-        console.info('[ws] ping')
+        loger.info('[ws] ping')
         this.#ws.send(
           JSON.stringify({
             s: 3
@@ -143,13 +144,13 @@ export class Client {
         )
       },
       3: message => {
-        console.info('[ws] pong')
+        loger.info('[ws] pong')
       },
       4: message => {
-        console.info('[ws] resume')
+        loger.info('[ws] resume')
       },
       5: message => {
-        console.info('[ws] Connection failed, reconnect')
+        loger.info('[ws] Connection failed, reconnect')
         /**
          * 处理 RECONNECT 信令
          * 断开当前连接并进行重新连接
@@ -158,19 +159,19 @@ export class Client {
         this.#sessionID = null
       },
       6: message => {
-        console.info('[ws] resume ack')
+        loger.info('[ws] resume ack')
       }
     }
 
     this.#ws = new WebSocket(gatewayUrl)
 
     this.#ws.on('open', () => {
-      console.info('[ws] open')
+      loger.info('[ws] open')
     })
 
     this.#ws.on('message', async msg => {
       const message = JSON.parse(msg.toString('utf8'))
-      if (process.env.KOOK_WS == 'dev') console.info('message', message)
+      if (process.env.KOOK_WS == 'dev') loger.info('message', message)
       if (map[message.s]) map[message.s](message)
     })
 
@@ -187,7 +188,7 @@ export class Client {
     }, 30000)
 
     this.#ws.on('close', () => {
-      console.error('[ws] close')
+      loger.error('[ws] close')
       if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
           subject: 'AlemonJS-BOT',
@@ -197,7 +198,7 @@ export class Client {
     })
 
     this.#ws.on('error', err => {
-      console.error('[ws] error', err)
+      loger.error('[ws] error', err)
     })
   }
 }

@@ -4,6 +4,7 @@ import { config } from './config.js'
 import { IntentsEnum } from './types.js'
 import { getIntents } from './intents.js'
 import { Email } from '../../../email/email.js'
+import { loger } from '../../../log.js'
 
 /**
  * ****
@@ -149,13 +150,13 @@ export class Client {
         }
       },
       7: () => {
-        console.info('[ws] 重新请求')
+        loger.info('[ws] 重新请求')
         this.#ws.send(JSON.stringify(this.#reAut()))
       },
       9: message => {
         //  6 或 2 失败
         // 连接失败
-        console.info('[ws] parameter error', message)
+        loger.info('[ws] parameter error', message)
       },
       /**
        * 打招呼
@@ -176,26 +177,26 @@ export class Client {
         this.#ws.send(JSON.stringify(this.#aut()))
       },
       11: ({ d }) => {
-        console.info('[ws] heartbeat transmission')
+        loger.info('[ws] heartbeat transmission')
       }
     }
 
     this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
 
     this.#ws.on('open', async () => {
-      console.info('[ws] open')
+      loger.info('[ws] open')
     })
 
     // 消息
     this.#ws.on('message', data => {
       const message = JSON.parse(data.toString())
-      if (process.env?.DISCORD_WS == 'dev') console.info('message', message)
+      if (process.env?.DISCORD_WS == 'dev') loger.info('message', message)
       if (map[message.op]) map[message.op](message)
     })
 
     // 关闭
     this.#ws.on('close', err => {
-      console.error('[ws] 登录失败,TOKEN存在风险')
+      loger.error('[ws] 登录失败,TOKEN存在风险')
 
       if (process.env?.NODE_ENV == 'production') {
         this.Email.send({
@@ -207,7 +208,7 @@ export class Client {
 
     // 出错
     this.#ws.on('error', error => {
-      console.error('[ws] error:', error)
+      loger.error('[ws] error:', error)
     })
   }
 }

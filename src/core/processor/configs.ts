@@ -1,4 +1,5 @@
 import { BaseConfig } from '../config.js'
+import { globalKey } from '../key.js'
 
 /**
  * 机器人信息缓存
@@ -7,17 +8,6 @@ export class BaseBotMessage<D> {
   #data: D = null
   constructor(val: D) {
     this.#data = val
-  }
-  /**
-   *
-   * @param key
-   * @returns
-   */
-  has(key: string) {
-    if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
-      true
-    }
-    return false
   }
   /**
    * 设置配置
@@ -46,45 +36,42 @@ export interface ApplicationProcessingOpsion {
   /**
    * 根目录
    */
-  dir: string
+  dir?: string
   /**
    * 主文件
    */
-  main: string
+  main?: string
   /**
    * 主文件类型
    */
-  type: ApplicationProcessKeyScriptType
+  type?: ApplicationProcessKeyScriptType
   /**
    * 匹配正则
    */
-  openRegex: RegExp
+  openRegex?: RegExp
   /**
    * 不匹配正则
    */
-  closeRegex: RegExp | undefined
+  closeRegex?: RegExp | undefined
   /**
    * 指令json路由
    */
-  route: string
+  route?: string
   /**
    * 是否生成json
    */
-  regex: boolean
+  regex?: boolean
   /**
    * 消息执行间隔时间
    */
-  intervalTime: number
+  intervalTime?: number
   /**
    * 事件屏蔽器
    */
-  event: string[]
+  event?: string[]
 }
 
-if (!global?.alemonjs) {
-  global.alemonjs = {}
-}
-if (!global.alemonjs?.config) {
+if (!globalKey('config')) {
   global.alemonjs.config = new BaseConfig<ApplicationProcessingOpsion>({
     dir: '/plugins',
     main: '/main',
@@ -97,6 +84,7 @@ if (!global.alemonjs?.config) {
     regex: true
   })
 }
+
 /**
  * 应用配置
  */
