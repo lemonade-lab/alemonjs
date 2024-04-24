@@ -1,4 +1,4 @@
-import { globalKey } from '../key.js'
+import { globalKey } from '../global.key.js'
 import { AppMap } from './data.js'
 import { type NodeDataType } from './types.js'
 /**

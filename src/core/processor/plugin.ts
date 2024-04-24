@@ -6,7 +6,7 @@ import {
 import { type AEvent, type EventEnum, type TypingEnum } from '../typings.js'
 import { AObserver } from './subscribe.js'
 import { MessageContentType } from '../types.js'
-import { globalKey } from '../key.js'
+import { globalKey } from '../global.key.js'
 
 /**
  * alemonjs plugin

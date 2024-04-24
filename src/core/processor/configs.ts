@@ -1,5 +1,5 @@
 import { BaseConfig } from '../config.js'
-import { globalKey } from '../key.js'
+import { globalKey } from '../global.key.js'
 
 /**
  * 机器人信息缓存

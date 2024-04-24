@@ -14,18 +14,22 @@ export interface UserInformationType {
 /**
  * 频道控制器
  */
+export interface GuildControllerType {}
 
 /**
  * 分组控制器
  */
+export interface GroupControllerType {}
 
 /**
  * 子频道控制器
  */
+export interface ChannelControllerType {}
 
 /**
  * 角色控制器
  */
+export interface RoleControllerType {}
 
 /**
  * 成员控制器

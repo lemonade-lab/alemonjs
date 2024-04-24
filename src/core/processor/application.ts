@@ -9,7 +9,7 @@ import { BotServer } from '../index.js'
 import { readScript } from './read.js'
 import { LRUCache } from 'lru-cache'
 import { loger } from '../../log.js'
-import { globalKey } from '../key.js'
+import { globalKey } from '../global.key.js'
 const cache = new LRUCache<string, number>({ max: 100 })
 
 /**

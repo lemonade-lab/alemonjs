@@ -1,4 +1,4 @@
-import { globalKey } from '../key.js'
+import { globalKey } from '../global.key.js'
 import { Alemon } from './alemon.js'
 if (!globalKey('app')) {
   global.alemonjs.app = new Map<string, typeof Alemon.prototype>()
