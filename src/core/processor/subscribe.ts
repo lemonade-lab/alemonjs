@@ -1,4 +1,3 @@
-import { globalKey } from '../global.key.js'
 import { AppMap } from './data.js'
 import { type NodeDataType } from './types.js'
 /**
@@ -69,8 +68,7 @@ export class Observer {
   }
 }
 
-if (!globalKey('observer')) {
-  global.alemonjs.observer = new Observer()
-}
+if (!global?.alemonjs) global.alemonjs = {}
+if (!global.alemonjs.observer) global.alemonjs.observer = new Observer()
 
 export const AObserver = global.alemonjs.observer

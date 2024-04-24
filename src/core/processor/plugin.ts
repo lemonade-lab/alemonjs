@@ -6,7 +6,6 @@ import {
 import { type AEvent, type EventEnum, type TypingEnum } from '../typings.js'
 import { AObserver } from './subscribe.js'
 import { MessageContentType } from '../types.js'
-import { globalKey } from '../global.key.js'
 
 /**
  * alemonjs plugin
@@ -194,9 +193,8 @@ export class APlugin {
   }
 }
 
-if (!globalKey('plugin')) {
-  global.alemonjs.plugin = APlugin
-}
+if (!global?.alemonjs) global.alemonjs = {}
+if (!global.alemonjs.plugin) global.alemonjs.plugin = APlugin
 
 /**
  * alemonjs plugin

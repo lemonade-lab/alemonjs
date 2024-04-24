@@ -9,7 +9,6 @@ import { BotServer } from '../index.js'
 import { readScript } from './read.js'
 import { LRUCache } from 'lru-cache'
 import { loger } from '../../log.js'
-import { globalKey } from '../global.key.js'
 const cache = new LRUCache<string, number>({ max: 100 })
 
 /**
@@ -184,9 +183,8 @@ export class App {
   }
 }
 
-if (!globalKey('app')) {
-  global.alemonjs.applications = new App()
-}
+if (!global?.alemonjs) global.alemonjs = {}
+if (!global.alemonjs.applications) global.alemonjs.applications = new App()
 
 // 索引系统
 export const APPS = global.alemonjs.applications

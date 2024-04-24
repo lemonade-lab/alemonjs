@@ -1,5 +1,4 @@
 import { BaseConfig } from '../config.js'
-import { globalKey } from '../global.key.js'
 
 /**
  * 机器人信息缓存
@@ -71,7 +70,8 @@ export interface ApplicationProcessingOpsion {
   event?: string[]
 }
 
-if (!globalKey('config')) {
+if (!global?.alemonjs) global.alemonjs = {}
+if (!global.alemonjs.config)
   global.alemonjs.config = new BaseConfig<ApplicationProcessingOpsion>({
     dir: '/plugins',
     main: '/main',
@@ -83,7 +83,6 @@ if (!globalKey('config')) {
     intervalTime: 3000,
     regex: true
   })
-}
 
 /**
  * 应用配置
