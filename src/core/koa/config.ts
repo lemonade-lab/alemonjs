@@ -1,4 +1,4 @@
-import { BaseConfig } from '../index.js'
+import { BaseConfig } from '../config.js'
 export const AppServerConfig = new BaseConfig<{
   port: number
   middleware: any[]

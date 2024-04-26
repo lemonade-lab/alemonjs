@@ -1,10 +1,10 @@
 import { type PuppeteerLaunchOptions } from 'puppeteer'
 import { type EmailOptions } from '../email/types.js'
 import { type FileOptions } from '../file/index.js'
-import { type KOOKOptions } from '../platform/kook/sdk/wss.js'
-import { type QQOptions } from '../platform/qq/sdk/wss.js'
-import { type NTQQOptions } from '../platform/ntqq/sdk/wss.js'
-import { type DISOCRDOptions } from '../platform/discord/sdk/wss.js'
+import { type KOOKOptions } from '../platform/kook/sdk/wss.types.js'
+import { type QQOptions } from '../platform/qq/sdk/wss.types.js'
+import { type NTQQOptions } from '../platform/ntqq/sdk/wss.types.js'
+import { type DISOCRDOptions } from '../platform/discord/sdk/wss.types.js'
 /**
  * ******
  * config

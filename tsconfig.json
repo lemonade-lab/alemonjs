@@ -9,13 +9,14 @@
     "preserveConstEnums": true,
     "typeRoots": ["node_modules/@types"],
     "declaration": true,
-    "declarationDir": "types",
-    "outDir": "lib"
+    "declarationDir": "dist",
+    "outDir": "dist"
   },
   "ts-node": {
     "esm": true,
+    "transpileOnly": true,
     "experimentalSpecifierResolution": "node"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "lib", "types"]
+  "exclude": ["node_modules"]
 }

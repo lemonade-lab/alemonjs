@@ -31,3 +31,12 @@ los
 
 # npm
 yarn.lock
+
+dist
+
+# 
+min.js
+min.d.ts
+es.js
+es.d.ts
+index.d.ts

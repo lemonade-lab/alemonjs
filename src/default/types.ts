@@ -1,7 +1,7 @@
-import { KOOKOptions } from '../platform/kook/sdk/wss.js'
-import { QQOptions } from '../platform/qq/sdk/wss.js'
-import { NTQQOptions } from '../platform/ntqq/sdk/wss.js'
-import { DISOCRDOptions } from '../platform/discord/sdk/wss.js'
+import { KOOKOptions } from '../platform/kook/sdk/wss.types.js'
+import { QQOptions } from '../platform/qq/sdk/wss.types.js'
+import { NTQQOptions } from '../platform/ntqq/sdk/wss.types.js'
+import { DISOCRDOptions } from '../platform/discord/sdk/wss.types.js'
 import { ControllersType } from '../core/index.js'
 
 export type PlatformsItemType = {

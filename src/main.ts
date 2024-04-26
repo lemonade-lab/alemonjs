@@ -1,21 +1,21 @@
-import { AlemonOptions } from './types.js'
-import { RebotMap } from './map.js'
+import { join } from 'path'
+import { configDotenv } from 'dotenv'
 import {
   ALunchConfig,
   AppLoadConfig,
   IP,
   APPS,
-  readScript
-} from '../core/index.js'
-import { ABotConfig } from '../config/index.js'
-import { DrawingBed, FileOptions, config } from '../file/index.js'
-import { join } from 'path'
-import { AControllers } from '../api/index.js'
-import { AppServerConfig } from '../core/koa/config.js'
-import { configDotenv } from 'dotenv'
-import { LoginMap, analysis } from './login.js'
+  readScript,
+  AppServerConfig
+} from './core/index.js'
+import { ABotConfig } from './config/index.js'
+import { AlemonOptions, LoginMap, analysis } from './define/index.js'
+import { DrawingBed, FileOptions, config } from './file/index.js'
+import { AControllers } from './api/index.js'
 import { existsSync } from 'fs'
-import { loger } from '../log.js'
+import { loger } from './log.js'
+
+import * as RebotMap from './platform/index.js'
 
 /**
  * 启动器
@@ -135,27 +135,6 @@ export function runAlemon(Options?: AlemonOptions) {
  */
 export function ALoginOptions<T>(Options?: LoginMap & T) {
   return analysis(Options) ?? {}
-}
-
-/**
- *
- * @param Options
- */
-export function defineLogin<T>(
-  Options?: LoginMap & {
-    [key: string]: T
-  }
-) {
-  return analysis(Options) ?? {}
-}
-
-/**
- * 配置机器人启动规则
- * @deprecated 已废弃
- * @param Options
- */
-export async function defineAlemonConfig<T>(Options?: AlemonOptions & T) {
-  return await defineConfig<T>(Options)
 }
 
 /**

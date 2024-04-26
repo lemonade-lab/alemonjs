@@ -2,7 +2,7 @@ import { Client } from './sdk/index.js'
 import { conversation } from './alemon/conversation.js'
 import { ABotConfig } from '../../config/index.js'
 import { loger } from '../../log.js'
-export default async function createAlemon() {
+export function createDISCORD() {
   const discord = ABotConfig.get('discord')
   if ((discord ?? '') !== '' && (discord.token ?? '') !== '') {
     ABotConfig.set('kook', discord)

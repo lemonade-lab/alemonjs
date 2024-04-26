@@ -3,7 +3,6 @@ import { LoginOptions, PlatformsItemType } from '../default/types.js'
 import { FileOptions } from '../file/types.js'
 import {
   ApplicationProcessingOpsion,
-  type ApplicationProcessKeyScriptType,
   type ServerOptions
 } from '../core/index.js'
 import { EmailOptions } from '../email/types.js'

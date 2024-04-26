@@ -2,7 +2,7 @@ import { ABotConfig } from '../../config/index.js'
 import { loger } from '../../log.js'
 import { conversation } from './alemon/conversation.js'
 import { Client } from './sdk/index.js'
-export default async function createAlemon() {
+export function createNTQQ() {
   const ntqq = ABotConfig.get('ntqq')
   if (
     (ntqq ?? '') !== '' &&

@@ -7,7 +7,7 @@ import { loger } from '../../log.js'
  * 创建实例
  * @returns
  */
-export default async function createAlemon() {
+export function createKOOK() {
   const kook = ABotConfig.get('kook')
   if ((kook ?? '') !== '' && (kook.token ?? '') !== '') {
     ABotConfig.set('kook', kook)
@@ -19,7 +19,7 @@ export default async function createAlemon() {
   new Client()
     .set(kook)
     .connect(conversation)
-    .then(async res => {
+    .then(async () => {
       const data = await ClientKOOK.userMe().then(res => res?.data)
       if (data) {
         BotMessage.set('id', data.id)

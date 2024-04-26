@@ -5,7 +5,7 @@ import { AppLoadConfig } from './configs.js'
 import { AppMap } from './data.js'
 import { AObserver } from './subscribe.js'
 import { Alemon } from './alemon.js'
-import { BotServer } from '../index.js'
+import { BotServer } from '../koa/index.js'
 import { readScript } from './read.js'
 import { LRUCache } from 'lru-cache'
 import { loger } from '../../log.js'
@@ -105,7 +105,11 @@ export class App {
   response(e: AEvent, event: (typeof EventEnum)[number]) {
     if (process.env.ALEMONJS_AEVENT == 'dev') loger.info('AEvent', e)
     loger.info(`[${e.event}] [${e.typing}] ${e.msg}`)
-    Promise.all(Array.from(AppMap.values()).map(app => app.response(e, event)))
+    Promise.all(
+      Array.from(AppMap.values()).map((app: typeof Alemon.prototype) =>
+        app.response(e, event)
+      )
+    )
   }
 
   /**
@@ -142,7 +146,11 @@ export class App {
 
     // 正则系统
     if (!this.trigger(e.msg)) return
-    Promise.all(Array.from(AppMap.values()).map(app => app.responseMessage(e)))
+    Promise.all(
+      Array.from(AppMap.values()).map((app: typeof Alemon.prototype) =>
+        app.responseMessage(e)
+      )
+    )
   }
 
   /**
@@ -153,7 +161,9 @@ export class App {
     if (process.env.ALEMONJS_AEVENT == 'dev') loger.info('AEvent', e)
     loger.info(`[${e.event}] [${e.typing}]`)
     Promise.all(
-      Array.from(AppMap.values()).map(app => app.responseEventType(e))
+      Array.from(AppMap.values()).map((app: typeof Alemon.prototype) =>
+        app.responseEventType(e)
+      )
     )
   }
 

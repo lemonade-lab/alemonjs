@@ -1,14 +1,15 @@
 {
   "name": "alemonjs",
-  "version": "1.2.0-rc.45",
+  "version": "1.2.0-rc.46",
   "description": "DOCS https://alemonjs.com/",
-  "main": "lib/index.js",
   "scripts": {
     "dev": "ts-node alemon.config.ts",
-    "tsc": "tsc",
-    "ts": "ts-node",
-    "doc": "typedoc --options typedoc.json",
+    "push": "npm run build  && npm run build:min && npm run build:min.d",
+    "build": "rollup --config version/rollup.config.js",
+    "build:min": "rollup --config version/min.config.js",
+    "build:min.d": "rollup --config version/min.config.d.js",
     "lint": "commitlint --config .commitlint.config.cjs -e -V",
+    "doc": "typedoc --options typedoc.json",
     "format": "prettier --write .",
     "prepare": "husky"
   },
@@ -38,6 +39,9 @@
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
     "@commitlint/config-conventional": "^19.1.0",
+    "@rollup/plugin-multi-entry": "^6.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/koa": "^2.13.11",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-router": "^7.4.7",
@@ -55,6 +59,8 @@
     "@types/ws": "^8.5.5",
     "husky": "^9.0.11",
     "prettier": "^2.8.8",
+    "rollup": "^4.16.4",
+    "rollup-plugin-dts": "^6.1.0",
     "ts-node": "^10.9.2",
     "typedoc": "^0.25.4",
     "typescript": "^5.3.3"
@@ -62,19 +68,25 @@
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
-  "types": "types",
   "files": [
-    "lib",
-    "types",
-    ".puppeteerrc.cjs"
+    "dist",
+    ".puppeteerrc.cjs",
+    "min.js",
+    "min.d.ts"
   ],
+  "main": "dist/index.js",
+  "types": "dist",
   "exports": {
     ".": {
-      "import": "./lib/index.js",
-      "types": "./types/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./.puppeteerrc.cjs": {
       "require": "./.puppeteerrc.cjs"
+    },
+    "./min.js": {
+      "require": "./min.js",
+      "types": "./min.d.ts"
     }
   },
   "publishConfig": {

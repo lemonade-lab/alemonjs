@@ -4,29 +4,7 @@ import { config } from './config.js'
 import { EventData, SystemData } from './typings.js'
 import { Email } from '../../../email/email.js'
 import { loger } from '../../../log.js'
-
-/**
- * ****
- * ***
- */
-export interface KOOKOptions {
-  /**
-   * 钥匙
-   */
-  token: string
-  /**
-   * 主人编号
-   */
-  masterID?: string | string[]
-}
-
-/**
- *
- */
-export const defineKOOK: KOOKOptions = {
-  token: '',
-  masterID: ''
-}
+import { KOOKOptions } from './wss.types.js'
 
 export class Client {
   //

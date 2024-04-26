@@ -1,6 +1,6 @@
 import { createTransport, SendMailOptions } from 'nodemailer'
 import { EmailOptions } from './types.js'
-import { ABotConfig } from '../config/index.js'
+import { ABotConfig } from '../config/login.js'
 export class Email {
   options: EmailOptions
   constructor(options?: EmailOptions) {
