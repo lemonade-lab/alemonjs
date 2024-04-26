@@ -1,6 +1,6 @@
 import { getFileRouter } from './back.js'
 import { readdirSync, unlinkSync } from 'fs'
-import { config } from './config.js'
+import { FileConfig } from './config.js'
 import { join } from 'path'
 import { ABodyParser, ACors, AKoa } from '../core/index.js'
 import { loger } from '../log.js'
@@ -32,7 +32,7 @@ class Server {
     this.#app.use(router.routes())
     this.#app.use(router.allowedMethods())
     // 启动端口
-    this.#listen(config.get('port'))
+    this.#listen(FileConfig.get('port'))
   }
   /**
    * 寻找端口
@@ -60,14 +60,14 @@ class Server {
     this.#currentPort = port
     this.#app
       .listen(port, async () => {
-        config.set('port', port)
+        FileConfig.set('port', port)
         // 只要启动成功
         this.#state = true
 
         loger.info('server', `http://localhost:${port}`)
 
         // 自动删除
-        const fileDir = config.get('fileDir')
+        const fileDir = FileConfig.get('fileDir')
         setInterval(() => {
           const files = readdirSync(join(process.cwd(), fileDir))
           for (const file of files) {

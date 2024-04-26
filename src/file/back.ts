@@ -1,14 +1,14 @@
 import { createReadStream, existsSync } from 'fs'
 import { join } from 'path'
-import { config } from './config.js'
+import { FileConfig } from './config.js'
 import { ARouter } from '../core/index.js'
 import mime from 'mime-types'
 export function getFileRouter() {
   const router = new ARouter()
   // 处理图片请求
-  const imgRouter = config.get('fileRouter')
+  const imgRouter = FileConfig.get('fileRouter')
   router.get(`${imgRouter}/:filename`, async ctx => {
-    const fileDir = config.get('fileDir')
+    const fileDir = FileConfig.get('fileDir')
     const filename = ctx.params.filename
     const filePath = join(process.cwd(), fileDir, filename)
     try {
@@ -24,7 +24,7 @@ export function getFileRouter() {
       ctx.body = 'Not Found'
     }
   })
-  const addressRouter = config.get('addressRouter')
+  const addressRouter = FileConfig.get('addressRouter')
   router.get(`${addressRouter}`, async ctx => {
     const address = ctx.query.address // 从请求中获取 address 参数
     if (!address) {

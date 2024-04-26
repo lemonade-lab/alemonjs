@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { writeFileSync, existsSync, mkdirSync } from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
-import { config } from './config.js'
+import { FileConfig } from './config.js'
 import { IP } from '../core/index.js'
 import { createHash } from 'crypto'
 import { FServer } from './client.js'
@@ -31,7 +31,7 @@ class CF {
       filePath = join(process.cwd(), address)
     }
     if (!existsSync(filePath)) return false
-    const addressRouter = config.get('addressRouter')
+    const addressRouter = FileConfig.get('addressRouter')
     const base = await this.#getBaseUrl()
     const url = `${base}${addressRouter}?address=${address}`
     loger.info('server url', url)
@@ -46,7 +46,7 @@ class CF {
    */
   async getFileUrl(file: Buffer, name?: string) {
     if (!Buffer.isBuffer(file)) return false
-    const fileDir = config.get('fileDir')
+    const fileDir = FileConfig.get('fileDir')
     /**
      * 检查服务器是否启动
      */
@@ -59,7 +59,7 @@ class CF {
         recursive: true
       })
     }
-    const fileRouter = config.get('fileRouter')
+    const fileRouter = FileConfig.get('fileRouter')
     // 使用 'bin' 作为默认扩展名
     const extension = (await fileTypeFromBuffer(file))?.ext ?? name ?? 'bin'
     const md5Hash = createHash('md5').update(file).digest('hex')
@@ -77,14 +77,14 @@ class CF {
   }
 
   async #getBaseUrl() {
-    const port = config.get('port')
-    const http = config.get('http')
+    const port = FileConfig.get('port')
+    const http = FileConfig.get('http')
     const ip = await this.#getIp()
     return `${http}://${ip}:${port}`
   }
 
   async #getIp() {
-    let ip = config.get('ip')
+    let ip = FileConfig.get('ip')
     if (ip == 'localhost') {
       const ipp = await IP.get()
       if (ipp) ip = ipp
