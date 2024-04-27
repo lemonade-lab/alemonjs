@@ -2,7 +2,7 @@
 import { spawn } from 'child_process'
 import { dirname, join, resolve } from 'path'
 import { fileURLToPath } from 'url'
-const argv = [...process.argv.splice(2)]
+const argv = [...process.argv].splice(2)
 const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
 const cwd = resolve(currentDirPath)
