@@ -47,7 +47,7 @@ npm install pnpm -g
 pnpm create alemonjs@latest -y
 cd alemonb
 npm install
-npm run dev
+npx alemonjs
 ```
 
 连接平台需要正确配置登录
@@ -78,7 +78,7 @@ export default defineConfig({
 启动时带上匹配规则机器人正确启动
 
 ```sh
-npm run dev test qq
+npx alemonjs test qq
 ```
 
 ### Development Examples
@@ -138,14 +138,14 @@ createApp(import.meta.url)
 
 node >= 20.0.0
 
-```ts
-npx ts-node alemon.config.ts
+```sh
+npx ts-node node_modules/bin/index.js
 ```
 
 更改为
 
-```ts
-node --no-warnings=ExperimentalWarning --loader ts-node/esm alemon.config.ts
+```sh
+node --no-warnings=ExperimentalWarning --loader ts-node/esm node_modules/bin/index.js
 ```
 
 ### Community
