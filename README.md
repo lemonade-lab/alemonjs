@@ -139,13 +139,13 @@ createApp(import.meta.url)
 node >= 20.0.0
 
 ```sh
-npx ts-node node_modules/bin/index.js
+npx ts-node node_modules/alemonjs/bin/index.js
 ```
 
 更改为
 
 ```sh
-node --no-warnings=ExperimentalWarning --loader ts-node/esm node_modules/bin/index.js
+node --no-warnings=ExperimentalWarning --loader ts-node/esm node_modules/alemonjs/bin/index.js
 ```
 
 ### Community
