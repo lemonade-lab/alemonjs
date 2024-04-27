@@ -11,18 +11,22 @@ const lg_js = join(process.cwd(), 'alemon.login.ts')
 const configs = existsSync(conig_js)
   ? (await readScript(conig_js))?.default
   : (await readScript(conig_ts))?.default
-const configLogin = existsSync(lg_js)
-  ? (await readScript(lg_js))?.default
-  : (await readScript(lg_ts))?.default
-// 运行
-createBot(configs, configLogin)
+
+if (existsSync(lg_js)) {
+  const configLogin = (await readScript(lg_js))?.default
+  createBot(configs, configLogin)
+} else if (existsSync(lg_ts)) {
+  const configLogin = (await readScript(lg_ts))?.default
+  createBot(configs, configLogin)
+} else {
+  createBot(configs)
+}
+
 /**
  * *************
  * exit
  * *************
  */
 process.on('SIGINT', () => {
-  console.info('[SIGINT] EXIT')
   if (process.pid) process.exit()
-  return
 })

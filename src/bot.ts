@@ -23,8 +23,8 @@ import * as RebotMap from './platform/index.js'
  * 配置机器人启动规则
  * @param Options
  */
-export async function createBot(Options: AlemonOptions, login: LoginMap) {
-  Options.login = login
+export function createBot(Options: AlemonOptions, login: LoginMap) {
+  if (login) Options.login = login
   /**
    * ************
    * ************

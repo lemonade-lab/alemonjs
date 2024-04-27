@@ -41,4 +41,4 @@ es.js
 es.d.ts
 index.d.ts
 
-bin/alemonjs.js
+bin/*.js

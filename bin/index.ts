@@ -13,7 +13,16 @@ const argvs = argv.join(' ').replace(/(\S+\.js|\S+\.ts)/g, '')
  * 启动内部运行脚本
  * ***************
  */
-spawn(`npx ts-node ${app} ${argvs}`, {
+const child = spawn(`npx ts-node ${app}`, argvs.split(' '), {
   shell: true,
   stdio: 'inherit'
+})
+/**
+ * *************
+ * exit
+ * *************
+ */
+process.on('SIGINT', () => {
+  if (child.pid) process.kill(child.pid)
+  if (process.pid) process.exit()
 })

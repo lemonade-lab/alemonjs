@@ -5,12 +5,12 @@
   "scripts": {
     "test": "npx alemonjs",
     "dev": "ts-node alemon.config.ts",
-    "tsc:bin": "tsc --module NodeNext  ./bin/alemonjs.ts",
+    "build:bin": "tsc --module NodeNext  ./bin/index.ts",
     "build:min.d": "rollup --config version/min.config.d.js",
     "build": "rollup --config version/rollup.config.js",
     "build:min": "rollup --config version/min.config.js",
     "build:run": "rollup --config version/run.config.js",
-    "push": "npm run build  && npm run build:min && npm run build:min.d && npm run build:run && npm run tsc:bin",
+    "push": "npm run build  && npm run build:min && npm run build:min.d && npm run build:run && npm run build:bin",
     "lint": "commitlint --config .commitlint.config.cjs -e -V",
     "doc": "typedoc --options typedoc.json",
     "format": "prettier --write .",
@@ -90,10 +90,13 @@
     "./min.js": {
       "require": "./min.js",
       "types": "./min.d.ts"
+    },
+    "./bin/index.js": {
+      "require": "./bin/index.js"
     }
   },
   "bin": {
-    "alemonjs": "./bin/alemonjs.js"
+    "alemonjs": "./bin/index.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

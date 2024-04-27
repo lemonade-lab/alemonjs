@@ -3,7 +3,7 @@ import { AlemonOptions, LoginMap, analysis } from './define/index.js'
  * 配置机器人启动规则
  * @param Options
  */
-export async function defineConfig<T>(Options?: AlemonOptions & T) {
+export function defineConfig<T>(Options?: AlemonOptions & T) {
   if (!Options.env) {
     Options.env = {}
   }
