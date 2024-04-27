@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.2.1-rc.0",
+  "version": "1.2.1-rc.2",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "test": "npx alemonjs",
@@ -72,10 +72,11 @@
   "license": "MIT",
   "type": "module",
   "files": [
-    "dist",
     ".puppeteerrc.cjs",
+    "pm2.config.cjs",
     "min.js",
-    "min.d.ts"
+    "min.d.ts",
+    "dist"
   ],
   "main": "dist/index.js",
   "types": "dist",
@@ -84,15 +85,18 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./.puppeteerrc.cjs": {
-      "require": "./.puppeteerrc.cjs"
-    },
     "./min.js": {
       "require": "./min.js",
       "types": "./min.d.ts"
     },
+    "./.puppeteerrc.cjs": {
+      "require": "./.puppeteerrc.cjs"
+    },
     "./bin/index.js": {
       "require": "./bin/index.js"
+    },
+    "./pm2.config.cjs": {
+      "require": "./pm2.config.cjs"
     }
   },
   "bin": {
