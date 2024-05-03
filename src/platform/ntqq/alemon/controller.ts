@@ -13,17 +13,30 @@ export class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
     super(select)
   }
+
+  /**
+   * 可行性
+   */
+  get feasibility() {
+    if (this.get('platform') !== 'ntqq') return false
+    return true
+  }
+
   Member = {
     information: async (): Promise<UserInformationType | false> => {
+      if (!this.feasibility) return false
       return false
     },
     mute: async (option?: { time?: number; cancel?: boolean }) => {
+      if (!this.feasibility) return false
       return false
     },
     remove: async () => {
+      if (!this.feasibility) return false
       return false
     },
     operate: async (role_id: string, add = true) => {
+      if (!this.feasibility) return false
       return false
     }
   }
@@ -32,6 +45,12 @@ export class Controllers extends BaseConfig<ControllerOption> {
       content: MessageContentType,
       ...arg: MessageButtonType[][]
     ) => {
+      if (!this.feasibility) {
+        return {
+          middle: [],
+          backhaul: null
+        }
+      }
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')
       const open_id = this.get('open_id')
@@ -42,6 +61,12 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return await replyController(content, guild_id, msg_id, arg)
     },
     quote: async (content: MessageContentType) => {
+      if (!this.feasibility) {
+        return {
+          middle: [],
+          backhaul: null
+        }
+      }
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')
       const open_id = this.get('open_id')
@@ -52,21 +77,27 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return await replyController(content, guild_id, msg_id)
     },
     update: async (content: MessageContentType) => {
+      if (!this.feasibility) return false
       return false
     },
     withdraw: async (hideTip: boolean) => {
+      if (!this.feasibility) return false
       return false
     },
     pinning: async (cancel?: boolean) => {
+      if (!this.feasibility) return false
       return false
     },
     forward: async () => {
+      if (!this.feasibility) return false
       return false
     },
     horn: async (cancel?: boolean) => {
+      if (!this.feasibility) return false
       return false
     },
     audio: async (file: Buffer | string, name?: string) => {
+      if (!this.feasibility) return false
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')
       if (typeof file == 'string') {
@@ -102,6 +133,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return false
     },
     video: async (file: Buffer | string, name?: string) => {
+      if (!this.feasibility) return false
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')
       if (typeof file == 'string') {
@@ -137,9 +169,11 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return false
     },
     emoji: async (msg: any[], cancel?: boolean) => {
+      if (!this.feasibility) return []
       return []
     },
     card: async (msg: any[]) => {
+      if (!this.feasibility) return []
       const guild_id = this.get('guild_id')
       const msg_id = this.get('msg_id')
       const attribute = this.get('attribute')
@@ -169,9 +203,11 @@ export class Controllers extends BaseConfig<ControllerOption> {
         limit: 20
       }
     ) => {
+      if (!this.feasibility) return false
       return false
     },
     article: async (msg: any) => {
+      if (!this.feasibility) return false
       return false
     }
   }

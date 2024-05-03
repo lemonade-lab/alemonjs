@@ -14,6 +14,15 @@ export class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
     super(select)
   }
+
+  /**
+   * 可行性
+   */
+  get feasibility() {
+    if (this.get('platform') !== 'qq') return false
+    return true
+  }
+
   /**
    *
    */
@@ -23,6 +32,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     information: async (): Promise<UserInformationType | false> => {
+      if (!this.feasibility) return false
       const userId = this.get('user_id')
       const guildId = this.get('guild_id')
       const data = await ClientQQ.guildsMembersMessage(guildId, userId)
@@ -53,6 +63,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     mute: async (option?: { time?: number; cancel?: boolean }) => {
+      if (!this.feasibility) return false
       const guildId = this.get('guild_id')
       const userId = this.get('user_id')
       const time = option.time || '0'
@@ -65,6 +76,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     remove: async () => {
+      if (!this.feasibility) return false
       const guildId = this.get('guild_id')
       const user_id = this.get('user_id')
       return await ClientQQ.guildsMembersDelete(guildId, user_id)
@@ -77,6 +89,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     operate: async (role_id: string, add: boolean = true) => {
+      if (!this.feasibility) return false
       const guildId = this.get('guild_id')
       const channel_id = this.get('channel_id')
       const user_id = this.get('user_id')
@@ -110,6 +123,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       content: MessageContentType,
       ...arg: MessageButtonType[][]
     ) => {
+      if (!this.feasibility) return false
       const open_id = this.get('open_id')
       const user_id = this.get('user_id')
       const msg_id = this.get('msg_id')
@@ -129,6 +143,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     quote: async (content: MessageContentType) => {
+      if (!this.feasibility) return false
       const msg_id = this.get('msg_id')
       const channel_id = this.get('channel_id')
       return await replyController(content, channel_id, msg_id, {
@@ -141,6 +156,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param hideTip 是否隐藏提示
      */
     withdraw: async (hideTip: boolean = true) => {
+      if (!this.feasibility) return false
       const msg_id = this.get('msg_id')
       const channel_id = this.get('channel_id')
       return await ClientQQ.channelsMessagesDelete(channel_id, msg_id, hideTip)
@@ -157,6 +173,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       msgId?: string,
       all: boolean = false
     ) => {
+      if (!this.feasibility) return false
       const channel_id = this.get('channel_id')
       let msg_id = msgId ?? this.get('msg_id')
       if (cancel) {
@@ -171,16 +188,31 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @param msgId 消息ID(不填则为当前消息)
      * @returns
      */
-    forward: async () => {},
-    audio: async () => {},
-    video: async () => {},
-    update: async () => {},
+    forward: async () => {
+      if (!this.feasibility) return false
+      return false
+    },
+    audio: async () => {
+      if (!this.feasibility) return false
+      return false
+    },
+    video: async () => {
+      if (!this.feasibility) return false
+      return false
+    },
+    update: async () => {
+      if (!this.feasibility) return false
+      return false
+    },
     horn: async (cancel?: boolean) => {
+      if (!this.feasibility) return false
       if (cancel) {
-        //
+        return false
       }
+      return false
     },
     emoji: async (msg: any[], cancel?: boolean) => {
+      if (!this.feasibility) return []
       const arr: any[] = []
       if (cancel) {
         for (const item of msg) {
@@ -194,6 +226,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return arr
     },
     card: async (msg: any[]) => {
+      if (!this.feasibility) return []
       // 卡片消息
       const arr: any[] = []
       for (const item of msg) {
@@ -222,6 +255,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
         cookie?: string
       } = {}
     ) => {
+      if (!this.feasibility) return false
       const channel_id = this.get('channel_id')
       const msg_id = msg.msgId ?? this.get('msg_id')
       return ClientQQ.channelsMessagesReactionsUsers(
@@ -238,6 +272,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
      * @returns
      */
     article: async (msg: any) => {
+      if (!this.feasibility) return false
       return false
     }
   }

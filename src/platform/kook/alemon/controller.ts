@@ -15,8 +15,17 @@ export class Controllers extends BaseConfig<ControllerOption> {
     super(select)
   }
 
+  /**
+   * 可行性
+   */
+  get feasibility() {
+    if (this.get('platform') !== 'kook') return false
+    return true
+  }
+
   Member = {
     information: async (): Promise<UserInformationType | false> => {
+      if (!this.feasibility) return false
       const guild_id = this.get('guild_id')
       const user_id = this.get('user_id')
       const data = await ClientKOOK.userView(guild_id, user_id).then(
@@ -40,14 +49,17 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return false
     },
     mute: async (option?: { time?: number; cancel?: boolean }) => {
+      if (!this.feasibility) return false
       return false
     },
     remove: async () => {
+      if (!this.feasibility) return false
       const guild_id = this.get('guild_id')
       const user_id = this.get('user_id')
       return await ClientKOOK.guildKickout(guild_id, user_id)
     },
     operate: async (role_id: string, add = true) => {
+      if (!this.feasibility) return false
       return false
     }
   }
@@ -56,6 +68,12 @@ export class Controllers extends BaseConfig<ControllerOption> {
       content: MessageContentType,
       ...arg: MessageButtonType[][]
     ) => {
+      if (!this.feasibility) {
+        return {
+          middle: [],
+          backhaul: null
+        }
+      }
       const attribute = this.get('attribute')
       const channel_id = this.get('channel_id')
       if (attribute == 'single') {
@@ -65,6 +83,12 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return await replyController(content, channel_id)
     },
     quote: async (content: MessageContentType) => {
+      if (!this.feasibility) {
+        return {
+          middle: [],
+          backhaul: null
+        }
+      }
       const channel_id = this.get('channel_id')
       const attribute = this.get('attribute')
       if (attribute == 'single') {
@@ -74,23 +98,29 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return await replyController(content, channel_id)
     },
     update: async (content: MessageContentType) => {
+      if (!this.feasibility) return false
       const msg_id = this.get('msg_id')
       return await ClientKOOK.messageUpdate({ msg_id, content })
     },
     withdraw: async (hideTip: boolean) => {
+      if (!this.feasibility) return false
       const msg_id = this.get('msg_id')
       return await ClientKOOK.messageDelete(msg_id)
     },
     pinning: async (cancel?: boolean) => {
+      if (!this.feasibility) return false
       return false
     },
     forward: async () => {
+      if (!this.feasibility) return false
       return false
     },
     horn: async (cancel?: boolean) => {
+      if (!this.feasibility) return false
       return false
     },
     emoji: async (msg: any[], cancel?: boolean) => {
+      if (!this.feasibility) return []
       const msg_id = this.get('msg_id')
       const user_id = this.get('user_id')
       const arr: any[] = []
@@ -112,6 +142,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       return arr
     },
     audio: async (file: Buffer | string, name?: string) => {
+      if (!this.feasibility) return false
       const channel_id = this.get('channel_id')
       if (typeof file == 'string') {
         return await ClientKOOK.createMessage({
@@ -129,6 +160,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       })
     },
     video: async (file: Buffer | string, name?: string) => {
+      if (!this.feasibility) return false
       const channel_id = this.get('channel_id')
       if (typeof file == 'string') {
         return await ClientKOOK.createMessage({
@@ -146,6 +178,7 @@ export class Controllers extends BaseConfig<ControllerOption> {
       })
     },
     card: async (msg: any[]) => {
+      if (!this.feasibility) return []
       const channel_id = this.get('channel_id')
       return [
         await ClientKOOK.createMessage({
@@ -162,10 +195,12 @@ export class Controllers extends BaseConfig<ControllerOption> {
         limit: 20
       }
     ) => {
+      if (!this.feasibility) return false
       const msg_id = this.get('msg_id')
       return await ClientKOOK.messageReactionList({ msg_id, emoji })
     },
     article: async (msg: any) => {
+      if (!this.feasibility) return false
       return false
     }
   }

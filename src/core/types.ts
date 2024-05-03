@@ -206,6 +206,12 @@ class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
     super(select)
   }
+
+  /**
+   * 执行可行性
+   */
+  feasibility: boolean
+
   /**
    * 消息控制器
    * @param param0
