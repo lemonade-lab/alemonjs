@@ -254,6 +254,122 @@ class ClientNtqq {
         loger.error(err)
       })
   }
+
+  /**
+   * 创建模板
+   * *********
+   * 使用该方法,你需要申请模板ID
+   * 并设置markdown源码为{{.text_0}}{{.text_1}}
+   * {{.text_2}}{{.text_3}}{{.text_4}}{{.text_5}}
+   * {{.text_6}}{{.text_7}}{{.text_8}}{{.text_9}}
+   * 当前,你也可以传递回调对key和values进行休整
+   * @param custom_template_id
+   * @param callBack
+   * @returns
+   */
+  createTemplate(
+    custom_template_id: string,
+    callBack = (key: string, values: string[]) => {
+      // 可以对  text_0 映射 成新的值 {"text_0":"image"}
+      return {
+        key,
+        values
+      }
+    }
+  ) {
+    let size = -1
+    const params = []
+    const ID = custom_template_id
+
+    /**
+     * 消耗一个参数
+     * @param value
+     * @param change 是否换行
+     * @returns
+     */
+    const text = (value: string, change = false) => {
+      // 仅限push 9 此
+      if (size > 9) return
+      size++
+      params.push(callBack(`text_${size}`, [`${value}${change ? '\r' : ''}`]))
+    }
+
+    /**
+     * 消耗一个参数
+     * @param value
+     * @param change 是否换行
+     * @returns
+     */
+    const prefix = (label: string) => {
+      text(`[${label}]`)
+    }
+
+    /**
+     * 消耗一个参数
+     * @param label
+     * @returns
+     */
+    const suffix = ({ value, enter = true, reply = false, change = false }) => {
+      text(
+        `(mqqapi://aio/inlinecmd?command=${value}&enter=${enter}&reply=${reply})${
+          change ? '\r' : ''
+        }`
+      )
+    }
+
+    /**
+     * 消耗2个参数
+     * @param param0
+     */
+    const button = ({
+      label,
+      value,
+      enter = true,
+      reply = false,
+      change = false
+    }) => {
+      prefix(label)
+      suffix({ value, enter, reply, change })
+    }
+
+    /**
+     * 代码块跟在后面
+     * 前面需要设置换行
+     * 消耗5个参数
+     * @param param0
+     */
+    const code = (val: string) => {
+      text('``')
+      text('`javascript\r' + val)
+      text('\r`')
+      text('``\r')
+    }
+
+    const getParam = () => {
+      return {
+        msg_type: 2,
+        markdown: {
+          custom_template_id: ID,
+          params
+        }
+      }
+    }
+
+    const getArray = () => {
+      return [getParam()]
+    }
+
+    return {
+      size,
+      text,
+      prefix,
+      suffix,
+      button,
+      code,
+      getParam,
+      getArray
+    }
+  }
 }
 
 export const ClientNTQQ = new ClientNtqq()

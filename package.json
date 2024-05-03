@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.2.1-rc.2",
+  "version": "1.2.1-rc.3",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "test": "npx alemonjs",
@@ -11,7 +11,6 @@
     "build:min": "rollup --config version/min.config.js",
     "build:run": "rollup --config version/run.config.js",
     "push": "npm run build  && npm run build:min && npm run build:min.d && npm run build:run && npm run build:bin",
-    "lint": "commitlint --config .commitlint.config.cjs -e -V",
     "doc": "typedoc --options typedoc.json",
     "format": "prettier --write .",
     "prepare": "husky"
@@ -40,8 +39,6 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.2.1",
-    "@commitlint/config-conventional": "^19.1.0",
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
