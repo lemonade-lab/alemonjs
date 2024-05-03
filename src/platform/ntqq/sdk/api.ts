@@ -296,8 +296,8 @@ class ClientNtqq {
      * @param change 是否换行
      * @returns
      */
-    const prefix = (label: string) => {
-      text(`[${label}]`)
+    const prefix = (txt: string, label: string) => {
+      text(`${txt}[${label}]`)
     }
 
     /**
@@ -320,13 +320,14 @@ class ClientNtqq {
     const button = ({
       label,
       value,
+      text = '',
       enter = true,
       reply = false,
       change = false
     }) => {
       // size 只少留两个
       if (size > mac - 1 - 2) return
-      prefix(label)
+      prefix(text, label)
       suffix({ value, enter, reply, change })
     }
 
