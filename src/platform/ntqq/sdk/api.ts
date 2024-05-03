@@ -264,18 +264,14 @@ class ClientNtqq {
    * {{.text_6}}{{.text_7}}{{.text_8}}{{.text_9}}
    * 当前,你也可以传递回调对key和values进行休整
    * @param custom_template_id
-   * @param callBack
+   * @param mac 默认 9
+   * @param callBack 默认 (key,values)=>({key,values})
    * @returns
    */
   createTemplate(
     custom_template_id: string,
-    callBack = (key: string, values: string[]) => {
-      // 可以对  text_0 映射 成新的值 {"text_0":"image"}
-      return {
-        key,
-        values
-      }
-    }
+    mac = 10,
+    callBack = (key: string, values: string[]) => ({ key, values })
   ) {
     let size = -1
     const params = []
@@ -288,8 +284,8 @@ class ClientNtqq {
      * @returns
      */
     const text = (value: string, change = false) => {
-      // 仅限push 9 此
-      if (size > 9) return
+      // 仅限push
+      if (size > mac - 1) return
       size++
       params.push(callBack(`text_${size}`, [`${value}${change ? '\r' : ''}`]))
     }
@@ -328,6 +324,8 @@ class ClientNtqq {
       reply = false,
       change = false
     }) => {
+      // size 只少留两个
+      if (size > mac - 1 - 2) return
       prefix(label)
       suffix({ value, enter, reply, change })
     }
@@ -339,6 +337,8 @@ class ClientNtqq {
      * @param param0
      */
     const code = (val: string) => {
+      // size 至少留4个
+      if (size > mac - 1 - 4) return
       text('``')
       text('`javascript\r' + val)
       text('\r`')
@@ -355,10 +355,6 @@ class ClientNtqq {
       }
     }
 
-    const getArray = () => {
-      return [getParam()]
-    }
-
     return {
       size,
       text,
@@ -366,8 +362,7 @@ class ClientNtqq {
       suffix,
       button,
       code,
-      getParam,
-      getArray
+      getParam
     }
   }
 }
