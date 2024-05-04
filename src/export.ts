@@ -17,6 +17,12 @@ export * from './config/index.js'
  */
 export * from './define/index.js'
 /**
+ * *********
+ * default
+ * *********
+ */
+export * from './default/index.js'
+/**
  * **************
  * api-controler-client
  * **************

@@ -1,16 +1,11 @@
 {
   "name": "alemonjs",
-  "version": "1.2.1-rc.7",
+  "version": "1.2.1-rc.8",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "test": "npx alemonjs",
     "dev": "ts-node alemon.config.ts",
-    "build:bin": "tsc --module NodeNext  ./bin/index.ts",
-    "build:min.d": "rollup --config version/min.config.d.js",
-    "build": "rollup --config version/rollup.config.js",
-    "build:min": "rollup --config version/min.config.js",
-    "build:run": "rollup --config version/run.config.js",
-    "push": "npm run build  && npm run build:min && npm run build:min.d && npm run build:run && npm run build:bin",
+    "build": "rollup --config rollup.config.js",
     "doc": "typedoc --options typedoc.json",
     "format": "prettier --write .",
     "prepare": "husky"

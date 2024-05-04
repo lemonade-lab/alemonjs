@@ -15,7 +15,8 @@ import {
   readScript,
   AppServerConfig,
   FileOptions,
-  FileConfig
+  FileConfig,
+  LoginOptions
 } from './export.js'
 import * as RebotMap from './platform/index.js'
 
@@ -23,7 +24,7 @@ import * as RebotMap from './platform/index.js'
  * 配置机器人启动规则
  * @param Options
  */
-export function createBot(Options: AlemonOptions, login: LoginMap) {
+export function createBot(Options: AlemonOptions, login: LoginOptions) {
   if (login) Options.login = login
   /**
    * ************
