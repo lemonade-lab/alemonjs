@@ -279,7 +279,7 @@ class ClientNtqq {
 
     /**
      * 消耗一个参数
-     * @param value
+     * @param value 值
      * @param change 是否换行
      * @returns
      */
@@ -292,22 +292,31 @@ class ClientNtqq {
 
     /**
      * 消耗一个参数
-     * @param value
+     * @param start  开始的值
      * @param change 是否换行
      * @returns
      */
-    const prefix = (txt: string, label: string) => {
-      text(`${txt}[${label}]`)
+    const prefix = (start: string, label: string) => {
+      text(`${start}[${label}]`)
     }
 
     /**
      * 消耗一个参数
-     * @param label
-     * @returns
+     * @param param0.value 发送的值
+     * @param param0.enter 是否自动发送
+     * @param param0.reply 是否回复
+     * @param param0.change 是否换行
+     * @param param0.end 尾部字符串
      */
-    const suffix = ({ value, enter = true, reply = false, change = false }) => {
+    const suffix = ({
+      value,
+      enter = true,
+      reply = false,
+      change = false,
+      end = ''
+    }) => {
       text(
-        `(mqqapi://aio/inlinecmd?command=${value}&enter=${enter}&reply=${reply})${
+        `(mqqapi://aio/inlinecmd?command=${value}&enter=${enter}&reply=${reply})${end}${
           change ? '\r' : ''
         }`
       )
@@ -315,27 +324,38 @@ class ClientNtqq {
 
     /**
      * 消耗2个参数
-     * @param param0
+     * @param param0.label 显示的值
+     * @param param0.value 发送的值
+     * @param param0.enter 是否自动发送
+     * @param param0.reply 是否回复
+     * @param param0.change 是否换行
+     * @param param0.start 头部字符串
+     * @param param0.end 尾部字符串
      */
     const button = ({
       label,
       value,
-      text = '',
+      start = '',
+      end = '',
       enter = true,
       reply = false,
       change = false
     }) => {
       // size 只少留两个
       if (size > mac - 1 - 2) return
-      prefix(text, label)
-      suffix({ value, enter, reply, change })
+      prefix(start, label)
+      suffix({ value, enter, reply, change, end })
     }
 
     /**
-     * 代码块跟在后面
+     * **********
+     * 代码块
+     * **********
+     * 跟在后面
      * 前面需要设置换行
-     * 消耗5个参数
-     * @param param0
+     * 消耗4个参数
+     * @param val
+     * @returns
      */
     const code = (val: string) => {
       // size 至少留4个
