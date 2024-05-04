@@ -1,6 +1,3 @@
-const args = [...process.argv].slice(2)
-const index = args.indexOf('--run')
-const main = argv[index + 1]
 const argv = [...process.argv].slice(4)
 const BotName = 'alemonb'
 const findArgs = argv.find(item => item.startsWith('@'))
@@ -33,7 +30,7 @@ console.log('------------------------------------------')
 module.exports = {
   apps: apps.map(app => ({
     name: app.name,
-    script: main ?? 'node_modules/alemonjs/bin/index.js',
+    script: 'node_modules/alemonjs/bin/index.js',
     // exec_mode: 'cluster',
     args: app.args,
     error_file: `./logs/${app.name}/err.log`,

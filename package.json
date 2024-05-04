@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "1.2.1-rc.8",
+  "version": "1.2.1-rc.9",
   "description": "DOCS https://alemonjs.com/",
   "scripts": {
     "test": "npx alemonjs",
