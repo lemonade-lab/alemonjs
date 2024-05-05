@@ -21,5 +21,8 @@ export * from './config.js'
  */
 export * from './utils/index.js'
 export * from './koa/main.js'
-
 export * from './processor/read.js'
+/**
+ *
+ */
+export * from './func.js'

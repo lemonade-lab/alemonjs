@@ -83,43 +83,27 @@ npx alemonjs test qq
 
 ### Development Examples
 
-- 模板继承
+- 消息匹配
 
 继承写法可使用多个配置函数
 
 ```ts
-import { createApp, type AEvent, APlugin } from 'alemonjs'
-class word extends APlugin {
-  constructor() {
-    super({
-      // 优先级,默认9000
-      priority: 500,
-      rule: [
-        {
-          reg: /^\/滴滴$/,
-          fnc: 'post',
-          // 提高优先级
-          priority: 300
-        }
-      ]
-    })
-  }
-  async post(e: AEvent) {
-    e.reply('哒哒')
-  }
-}
+import { createApp } from 'alemonjs'
+import { Messages } from 'alemonjs'
+const message = new Messages()
+// 匹配消息 并 回复
+message.response(/^(#|\/)?滴滴/, async e => {
+  e.reply('嗒嗒')
+})
 // 构建应用
 createApp(import.meta.url)
-  //使用指令
-  .use({ word })
-  // 把所有 / 或 # 开头的消息 替换为 /
-  // 表示#滴滴 和 /滴滴 消息一致
-  .replace(/^(#|\/)/, '/')
-  // 挂载
+  .use({
+    word: message.ok
+  })
   .mount()
 ```
 
-- 自由回调
+- 事件回调
 
 比继承优先的自由写法
 
