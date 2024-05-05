@@ -85,11 +85,8 @@ npx alemonjs test qq
 
 - 消息匹配
 
-继承写法可使用多个配置函数
-
 ```ts
-import { createApp } from 'alemonjs'
-import { Messages } from 'alemonjs'
+import { createApp, Messages } from 'alemonjs'
 const message = new Messages()
 // 匹配消息 并 回复
 message.response(/^(#|\/)?滴滴/, async e => {
@@ -104,8 +101,6 @@ createApp(import.meta.url)
 ```
 
 - 事件回调
-
-比继承优先的自由写法
 
 ```ts
 import { createApp } from 'alemonjs'
