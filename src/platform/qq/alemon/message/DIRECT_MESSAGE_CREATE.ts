@@ -89,7 +89,7 @@ export const DIRECT_MESSAGE_CREATE = async (event: {
       })
     }
   }
-
+  APPS.response(e)
   APPS.responseMessage(e)
   return
 }

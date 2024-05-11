@@ -14,11 +14,11 @@ export interface AEvent
   [key: string]: any
 }
 
-/**
- * AlemonjsEventData
- * @deprecated 已废弃
- */
-export type AMessage = AEvent
+export type MessageFunction = (e: AEvent) => Promise<boolean | undefined | void>
+export type EventFunction = (e: AEvent, ...args: any[]) => Promise<any>
+export type EventFunctionMap = {
+  [Event in (typeof EventEnum)[number]]?: EventFunction
+}
 
 /**
  * 事件相关

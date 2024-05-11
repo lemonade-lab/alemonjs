@@ -47,7 +47,7 @@ npm install pnpm -g
 pnpm create alemonjs@latest -y
 cd alemonb
 npm install
-npx alemonjs
+npm run dev
 ```
 
 连接平台需要正确配置登录
@@ -83,34 +83,26 @@ npx alemonjs test qq
 
 ### Development Examples
 
-- 消息匹配
-
 ```ts
-import { createApp, Messages } from 'alemonjs'
+import { createApp, Events, Messages } from 'alemonjs'
+// 监听事件
+const event = new Events()
+event.response('MEMBERS', async e => {
+  if (/^你好$/.test(e.msg)) e.reply('你好呀')
+})
+event.response('MEMBERS', async e => {
+  console.log('成员', e.user_name, '加入')
+})
+// 响应消息
 const message = new Messages()
-// 匹配消息 并 回复
-message.response(/^(#|\/)?滴滴/, async e => {
-  e.reply('嗒嗒')
+message.response(/^你好吗/, async e => {
+  e.reply('当然')
 })
 // 构建应用
-createApp(import.meta.url)
-  .use({
-    word: message.ok
-  })
-  .mount()
-```
-
-- 事件回调
-
-```ts
-import { createApp } from 'alemonjs'
-createApp(import.meta.url)
-  .on('MESSAGE', e => {
-    if (/^你好$/.test(e.msg)) e.reply('你好呀', e.user_name)
-  })
-  .on('GUILD_MEMBERS', e => {
-    console.log('成员', e.user_name, '加入')
-  })
+const app = createApp(import.meta.url)
+app.on(event.ok)
+app.use(message.ok)
+app.mount()
 ```
 
 # Unknown file ".ts"

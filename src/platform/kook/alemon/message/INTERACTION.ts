@@ -78,6 +78,7 @@ export async function INTERACTION(event: SystemData) {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

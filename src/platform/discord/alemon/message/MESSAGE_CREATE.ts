@@ -166,7 +166,7 @@ export async function MESSAGE_CREATE(event: {
       })
     }
   }
-
+  APPS.response(e)
   APPS.responseMessage(e)
   return
 }

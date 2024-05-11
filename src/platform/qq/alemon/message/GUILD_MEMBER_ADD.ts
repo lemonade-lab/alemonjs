@@ -95,6 +95,7 @@ export const GUILD_MEMBER_ADD = async (event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

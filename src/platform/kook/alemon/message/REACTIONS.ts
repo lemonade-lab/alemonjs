@@ -83,7 +83,7 @@ export const REACTIONS = async (event: SystemData) => {
       return await replyController(msg, channel_id)
     }
   }
-
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

@@ -89,6 +89,7 @@ export const CHANNEL_CREATE = async (event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

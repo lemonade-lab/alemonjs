@@ -86,6 +86,7 @@ export async function GUILD_MEMBER_REMOVE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

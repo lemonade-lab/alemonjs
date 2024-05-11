@@ -94,6 +94,7 @@ export async function CHANNEL_UPDATE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

@@ -90,6 +90,7 @@ export const GUILD_DELETE = async (event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

@@ -131,6 +131,7 @@ export async function PRESENCE_UPDATE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

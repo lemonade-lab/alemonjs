@@ -1,6 +1,10 @@
-import { type AEvent, type EventEnum } from '../typings.js'
-import { APlugin } from './plugin.js'
+import {
+  type EventFunctionMap,
+  type AEvent,
+  type EventEnum
+} from '../typings.js'
 import { type NodeDataType } from './types.js'
+import { APlugin } from './plugin.js'
 import { AppMap } from './data.js'
 import { importPath } from './path.js'
 import { DoublyLinkedList } from './listdouble.js'
@@ -10,8 +14,6 @@ import { AppLoadConfig } from './configs.js'
 import { BotServer } from '../index.js'
 import Router from 'koa-router'
 import { loger } from '../../log.js'
-
-type CallBackType = (e: AEvent, ...args: any[]) => Promise<any>
 
 /**
  * 应用结构
@@ -37,9 +39,7 @@ export class Alemon {
   // 切割字符串数据集
   #strArr = []
 
-  #CallData: {
-    [Event in (typeof EventEnum)[number]]?: CallBackType
-  } = {}
+  #CallData: EventFunctionMap = {}
 
   // 正则集
   #mergedRegexArr: RegExp[] = []
@@ -63,6 +63,26 @@ export class Alemon {
    */
   constructor(name: string) {
     this.#name = name
+  }
+
+  #infoFunc = (
+    e: AEvent,
+    name: string,
+    acount: number,
+    example: string,
+    funcName: string
+  ) => {
+    return `[${e.event}] [${e.typing}] [${name}] [${acount}] [${example}] [${funcName}]`
+  }
+
+  #errorFunc = (
+    e: AEvent,
+    name: string,
+    acount: number,
+    example: string,
+    funcName: string
+  ) => {
+    return `[${e.event}] [${e.typing}] [${name}] [${acount}] [${example}] [${funcName}]`
   }
 
   /**
@@ -120,10 +140,7 @@ export class Alemon {
    * @param node
    */
   async responseNode(e: AEvent, node: NodeDataType) {
-    //
-
     if (!e) return
-
     const time = Date.now()
     /**
      * **********
@@ -446,17 +463,6 @@ export class Alemon {
   }
 
   /**
-   *
-   * 扩展参数
-   * @param fnc
-   * @returns
-   * @deprecated 已废弃
-   */
-  setArg(fnc: (e: AEvent) => any[] | Promise<any[]>) {
-    return this.arg(fnc)
-  }
-
-  /**
    * 重定义ecent
    * @param fnc
    * @returns
@@ -464,26 +470,6 @@ export class Alemon {
   event(fnc: (...args: any[]) => any) {
     this.#dataMap.set('event', fnc)
     return this
-  }
-
-  /**
-   * 重定义ecent
-   * @param fnc
-   * @returns
-   * @deprecated 已废弃
-   */
-  setMessage(fnc: (...args: any[]) => any) {
-    return this.event(fnc)
-  }
-
-  /**
-   * 重定义ecent
-   * @param fnc
-   * @returns
-   * @deprecated 已废弃
-   */
-  reSetEvent(fnc: (...args: any[]) => any) {
-    return this.event(fnc)
   }
 
   /**
@@ -501,17 +487,6 @@ export class Alemon {
   }
 
   /**
-   * 字符串切割
-   * @param reg
-   * @param str
-   * @returns
-   * @deprecated 已废弃
-   */
-  setCharacter(val: '#' | '/') {
-    return this.replace(/^(\/|#)/, val)
-  }
-
-  /**
    * 接口路由
    */
   router(val: typeof Router.prototype) {
@@ -520,28 +495,134 @@ export class Alemon {
     return this
   }
 
+  #AppData: { [key: string]: typeof APlugin } = {}
+  #AppCount = 0
+
   /**
-   * 集合
-   * @param AplguinMap
+   *
+   * @param plugin
+   */
+  use(plugin: typeof APlugin) {
+    this.#AppCount++
+    this.#AppData[`plugin_${this.#AppCount}`] = plugin
+    return this
+  }
+
+  /**
+   * 解析
    * @returns
    */
-  use(
-    AplguinMap: {
-      [key: string]: typeof APlugin
-    } = {}
+  chainUp() {
+    return this
+  }
+
+  /**
+   * 自定义
+   * @param data
+   * @param funcName
+   * @returns
+   */
+  info(
+    func: (
+      e: AEvent,
+      name: string,
+      acount: number,
+      example: string,
+      funcName: string
+    ) => string
   ) {
+    this.#infoFunc = func
+    return this
+  }
+
+  /**
+   * 错误打印
+   * @param data
+   * @param funcName
+   * @returns
+   */
+  error(
+    func: (
+      e: AEvent,
+      name: string,
+      acount: number,
+      example: string,
+      funcName: string
+    ) => string
+  ) {
+    this.#errorFunc = func
+    return this
+  }
+
+  /**
+   * 响应回调
+   * @param e
+   */
+  async response(e: AEvent) {
+    const time = Date.now()
+    if (this.#CallData[e.event]) {
+      const func = this.#dataMap.get('event')
+      if (typeof func == 'function') e = await func(e)
+      for (const item of this.#strArr) {
+        e.msg = e.msg.replace(item.reg, item.str)
+      }
+      const argFunc = this.#dataMap.get('arg')
+      let arr = []
+      if (typeof argFunc == 'function') {
+        arr = await argFunc(e)
+      }
+      this.#CallData
+        [e.event](e, ...arr)
+        .then(res => {
+          if (res && typeof res != 'boolean') {
+            e.reply(res)
+          }
+          loger.info(
+            this.#infoFunc(e, this.#name, 0, 'on', ''),
+            true,
+            Date.now() - time
+          )
+          return res
+        })
+        .catch(err => {
+          loger.error(
+            this.#infoFunc(e, this.#name, 0, 'on', ''),
+            false,
+            Date.now() - time,
+            err
+          )
+        })
+    }
+    return false
+  }
+
+  /**
+   * 监听系统
+   * @param event 事件
+   * @param call 回调
+   * @param priority 优先级
+   * @returns
+   */
+  on(data: EventFunctionMap) {
+    for (const key in data) {
+      this.#CallData[key] = data[key]
+    }
+    return this
+  }
+
+  /**
+   * 挂载
+   */
+  mount() {
     // 分配集合
     this.#data[this.#acount] = {}
     // 收集
-    for (const example in AplguinMap) {
-      const keys = new AplguinMap[example]()
-
+    for (const example in this.#AppData) {
+      const keys = new this.#AppData[example]()
       // 过滤事件
       const event = AppLoadConfig.get('event')
-
       //
       if (keys.event && event.includes(keys.event)) continue
-
       // name
       keys.name = this.#name
       // 层级
@@ -550,7 +631,6 @@ export class Alemon {
       keys.example = example
       // 记录
       this.#data[this.#acount][example] = keys
-
       // 忽视非法key
       if (
         !keys['rule'] ||
@@ -637,27 +717,12 @@ export class Alemon {
     }
     // 累计
     this.#acount++
-    return this
-  }
 
-  /**
-   * 加载
-   * @param AplguinMap
-   * @returns
-   * @deprecated 已废弃
-   */
-  component(
-    AplguinMap: {
-      [key: string]: typeof APlugin
-    } = {}
-  ) {
-    return this.use(AplguinMap)
-  }
+    /**
+     * *************
+     * ************
+     */
 
-  /**
-   * 挂载
-   */
-  mount() {
     // 构造大正则
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
@@ -672,122 +737,6 @@ export class Alemon {
       // 生成json
       new AInstruct(this.#name).create(this.#MessageListArr)
     }
-  }
-
-  #infoFunc = (
-    e: AEvent,
-    name: string,
-    acount: number,
-    example: string,
-    funcName: string
-  ) => {
-    return `[${e.event}] [${e.typing}] [${name}] [${acount}] [${example}] [${funcName}]`
-  }
-
-  /**
-   * 自定义
-   * @param data
-   * @param funcName
-   * @returns
-   */
-  info(
-    func: (
-      e: AEvent,
-      name: string,
-      acount: number,
-      example: string,
-      funcName: string
-    ) => string
-  ) {
-    this.#infoFunc = func
-    return this
-  }
-
-  #errorFunc = (
-    e: AEvent,
-    name: string,
-    acount: number,
-    example: string,
-    funcName: string
-  ) => {
-    return `[${e.event}] [${e.typing}] [${name}] [${acount}] [${example}] [${funcName}]`
-  }
-
-  /**
-   * 错误打印
-   * @param data
-   * @param funcName
-   * @returns
-   */
-  error(
-    func: (
-      e: AEvent,
-      name: string,
-      acount: number,
-      example: string,
-      funcName: string
-    ) => string
-  ) {
-    this.#errorFunc = func
-    return this
-  }
-
-  /**
-   * 响应消息类型
-   * @param e
-   */
-  async response(e: AEvent, event: (typeof EventEnum)[number]) {
-    const time = Date.now()
-    if (this.#CallData[event]) {
-      const func = this.#dataMap.get('event')
-      if (typeof func == 'function') e = await func(e)
-      for (const item of this.#strArr) {
-        e.msg = e.msg.replace(item.reg, item.str)
-      }
-      const argFunc = this.#dataMap.get('arg')
-      let arr = []
-      if (typeof argFunc == 'function') {
-        arr = await argFunc(e)
-      }
-      const FuncName = String(this.#CallData[event]['fnc']).match(
-        /:\s*(\w+)\]/
-      )[1]
-      this.#CallData
-        [event](e, ...arr)
-        .then(res => {
-          if (res && typeof res != 'boolean') {
-            e.reply(res)
-          }
-          loger.info(
-            this.#infoFunc(e, this.#name, 0, 'on', FuncName),
-            true,
-            Date.now() - time
-          )
-          return res
-        })
-        .catch(err => {
-          loger.error(
-            this.#infoFunc(e, this.#name, 0, 'on', FuncName),
-            false,
-            Date.now() - time,
-            err
-          )
-        })
-    }
-    return false
-  }
-
-  /**
-   * 监听系统
-   * @param event 事件
-   * @param call 回调
-   * @param priority 优先级
-   * @returns
-   */
-  on(event: (typeof EventEnum)[number], call: CallBackType) {
-    const Event = event == 'message' ? 'MESSAGES' : event
-    this.#CallData[Event] = call
-    return this
   }
 }
 
@@ -807,14 +756,4 @@ export function createSubApp(AppName: string) {
  */
 export function createApp(url: string) {
   return createSubApp(importPath(url).name())
-}
-
-/**
- * 创建应用对象
- * @param url import.meta.url
- * @returns
- * @deprecated 已废弃
- */
-export function createApps(url: string) {
-  return createApp(url)
 }

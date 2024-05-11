@@ -87,5 +87,6 @@ export const PUBLIC_MESSAGE_DELETE = async (event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
 }

@@ -75,6 +75,7 @@ export async function VOICE_CHANNEL_STATUS_UPDATE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

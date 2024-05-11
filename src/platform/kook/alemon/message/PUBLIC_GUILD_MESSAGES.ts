@@ -121,7 +121,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
       return await replyController(msg, channel_id)
     }
   }
-
+  APPS.response(e)
   APPS.responseMessage(e)
   return
 }

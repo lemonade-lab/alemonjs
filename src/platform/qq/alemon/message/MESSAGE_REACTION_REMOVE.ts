@@ -93,6 +93,7 @@ export const MESSAGE_REACTION_REMOVE = async (event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }
