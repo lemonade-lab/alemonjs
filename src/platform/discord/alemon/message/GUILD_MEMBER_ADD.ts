@@ -96,6 +96,7 @@ export async function GUILD_MEMBER_ADD(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

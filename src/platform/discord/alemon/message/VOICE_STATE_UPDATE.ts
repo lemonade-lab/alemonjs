@@ -110,6 +110,7 @@ export async function VOICE_STATE_UPDATE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

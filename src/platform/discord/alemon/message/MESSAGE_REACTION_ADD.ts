@@ -109,6 +109,7 @@ export async function MESSAGE_REACTION_ADD(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

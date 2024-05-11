@@ -72,8 +72,7 @@ export const MESSAGES = async (event: EventData) => {
       return await directController(msg, channel_id, select?.open_id ?? open_id)
     }
   }
-
+  APPS.response(e)
   APPS.responseMessage(e)
-
   return
 }

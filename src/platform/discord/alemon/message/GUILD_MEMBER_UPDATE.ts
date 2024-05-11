@@ -100,6 +100,7 @@ export async function GUILD_MEMBER_UPDATE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

@@ -102,12 +102,12 @@ export class App {
    * @param e
    * @returns
    */
-  response(e: AEvent, event: (typeof EventEnum)[number]) {
+  response(e: AEvent) {
     if (process.env.ALEMONJS_AEVENT == 'dev') loger.info('AEvent', e)
     loger.info(`[${e.event}] [${e.typing}] ${e.msg}`)
     Promise.all(
       Array.from(AppMap.values()).map((app: typeof Alemon.prototype) =>
-        app.response(e, event)
+        app.response(e)
       )
     )
   }

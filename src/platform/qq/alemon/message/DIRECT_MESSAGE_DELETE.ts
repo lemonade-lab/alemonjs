@@ -74,6 +74,7 @@ export const DIRECT_MESSAGE_DELETE = async (event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

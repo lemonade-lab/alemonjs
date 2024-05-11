@@ -39,7 +39,7 @@ export class Alemon {
   // 切割字符串数据集
   #strArr = []
 
-  #CallData: EventFunctionMap
+  #CallData: EventFunctionMap = {}
 
   // 正则集
   #mergedRegexArr: RegExp[] = []
@@ -555,12 +555,12 @@ export class Alemon {
   }
 
   /**
-   * 响应消息类型
+   * 响应回调
    * @param e
    */
-  async response(e: AEvent, event: (typeof EventEnum)[number]) {
+  async response(e: AEvent) {
     const time = Date.now()
-    if (this.#CallData[event]) {
+    if (this.#CallData[e.event]) {
       const func = this.#dataMap.get('event')
       if (typeof func == 'function') e = await func(e)
       for (const item of this.#strArr) {
@@ -571,17 +571,14 @@ export class Alemon {
       if (typeof argFunc == 'function') {
         arr = await argFunc(e)
       }
-      const FuncName = String(this.#CallData[event]['fnc']).match(
-        /:\s*(\w+)\]/
-      )[1]
       this.#CallData
-        [event](e, ...arr)
+        [e.event](e, ...arr)
         .then(res => {
           if (res && typeof res != 'boolean') {
             e.reply(res)
           }
           loger.info(
-            this.#infoFunc(e, this.#name, 0, 'on', FuncName),
+            this.#infoFunc(e, this.#name, 0, 'on', ''),
             true,
             Date.now() - time
           )
@@ -589,7 +586,7 @@ export class Alemon {
         })
         .catch(err => {
           loger.error(
-            this.#infoFunc(e, this.#name, 0, 'on', FuncName),
+            this.#infoFunc(e, this.#name, 0, 'on', ''),
             false,
             Date.now() - time,
             err

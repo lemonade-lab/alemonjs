@@ -142,6 +142,7 @@ export async function MESSAGE_UPDATE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

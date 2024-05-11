@@ -72,6 +72,7 @@ export const GUILD_MEMBER_ADD = async (event: SystemData) => {
       return await replyController(msg, `${channel_id}`)
     }
   }
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

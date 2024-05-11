@@ -89,6 +89,7 @@ export const CHANNEL_DELETE = async (event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

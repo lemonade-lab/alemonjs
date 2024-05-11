@@ -72,6 +72,7 @@ export async function MESSAGE_DELETE(event: {
     }
   }
 
+  APPS.response(e)
   APPS.responseEventType(e)
   return
 }

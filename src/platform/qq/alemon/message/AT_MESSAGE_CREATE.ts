@@ -171,6 +171,6 @@ export const AT_MESSAGE_CREATE = async (event: {
       BotMessage.set('avatar', e.bot.avatar)
     }
   }
-
+  APPS.response(e)
   APPS.responseMessage(e)
 }

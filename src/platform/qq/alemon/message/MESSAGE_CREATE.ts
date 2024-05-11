@@ -91,6 +91,7 @@ export const MESSAGE_CREATE = async (event: any) => {
   if (new RegExp(/DELETE$/).test(event.eventType)) {
     e.typing = 'DELETE'
 
+    APPS.response(e)
     APPS.responseEventType(e)
     return
   }
@@ -141,7 +142,7 @@ export const MESSAGE_CREATE = async (event: any) => {
       BotMessage.set('avatar', e.bot.avatar)
     }
   }
-
+  APPS.response(e)
   APPS.responseMessage(e)
   return
 }

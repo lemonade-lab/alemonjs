@@ -78,7 +78,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
      */
     e.at_user = e.at_users.find(item => item.bot != true)
   }
-
+  APPS.response(e)
   APPS.responseMessage(e)
   return
 }
