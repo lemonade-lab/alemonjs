@@ -16,7 +16,7 @@
 
 <div align="center">
   
-事件驱动机器人 | 支持 QQ (群&频道)、KOOK、DC
+跨平台开发的事件驱动机器人 | 支持 QQ (群&频道)、KOOK、Discord
 
 </div>
 
@@ -78,7 +78,7 @@ export default defineConfig({
 启动时带上匹配规则机器人正确启动
 
 ```sh
-npx alemonjs test qq
+npm run dev test qq
 ```
 
 ### Development Examples
@@ -95,8 +95,8 @@ event.response('MEMBERS', async e => {
 })
 // 响应消息
 const message = new Messages()
-message.response(/^你好吗/, async e => {
-  e.reply('当然')
+message.response(/^最近怎么样/, async e => {
+  e.reply('很好')
 })
 // 构建应用
 const app = createApp(import.meta.url)
