@@ -13,7 +13,7 @@ import { ABotConfig } from '../../../../config/index.js'
 import { directController } from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
-  const masterID = ABotConfig.get('ntqq').masterID
+  const { appID, masterID } = ABotConfig.get('ntqq')
   const open_id = event.author.user_openid
   const e = {
     platform: 'ntqq',
@@ -43,8 +43,8 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     open_id: open_id,
     //
     user_id: event.author.id,
-    user_name: '柠檬冲水',
-    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
+    user_name: '无',
+    user_avatar: `https://q.qlogo.cn/qqapp/${appID}/${event.author.id}/640`,
     segment: segmentNTQQ,
     send_at: new Date().getTime(),
     reply: async (

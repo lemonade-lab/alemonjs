@@ -18,7 +18,7 @@ import { directController } from '../direct.js'
  * @returns
  */
 export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
-  const masterID = ABotConfig.get('ntqq').masterID
+  const { appID, masterID } = ABotConfig.get('ntqq')
   const e = {
     platform: 'ntqq',
     event: 'MESSAGES' as (typeof EventEnum)[number],
@@ -42,8 +42,8 @@ export const GROUP_AT_MESSAGE_CREATE = async (event: GROUP_DATA) => {
     quote: '',
     open_id: event.author.member_openid,
     user_id: event.author.id,
-    user_avatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=1715713638',
-    user_name: '柠檬冲水',
+    user_name: '无',
+    user_avatar: `https://q.qlogo.cn/qqapp/${appID}/${event.author.id}/640`,
     segment: segmentNTQQ,
     at_users: [],
     at: false,
