@@ -8,6 +8,9 @@ import queryString from 'querystring'
 import { BaseConfig } from '../config.js'
 import { loger } from '../../log.js'
 
+/**
+ *
+ */
 export interface ScreenshotFileOptions {
   SOptions?: {
     type: 'jpeg' | 'png' | 'webp'
@@ -17,6 +20,9 @@ export interface ScreenshotFileOptions {
   timeout?: number
 }
 
+/**
+ *
+ */
 export interface ScreenshotUrlOptions {
   url: string
   time?: number
@@ -28,6 +34,9 @@ export interface ScreenshotUrlOptions {
   waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[]
 }
 
+/**
+ *
+ */
 export const ALunchConfig = new BaseConfig<PuppeteerLaunchOptions>({
   // 禁用超时
   timeout: 0,
@@ -47,6 +56,9 @@ export const ALunchConfig = new BaseConfig<PuppeteerLaunchOptions>({
   ]
 })
 
+/**
+ *
+ */
 export class Puppeteer {
   // 截图次数记录
   #pic = 0

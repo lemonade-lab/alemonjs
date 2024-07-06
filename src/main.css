@@ -1,0 +1,8 @@
+body {
+  /* 消除默认边距 */
+  margin: 0;
+  padding: 0;
+  /* 去除margin重叠 */
+  display: flex;
+  flex-direction: column;
+}

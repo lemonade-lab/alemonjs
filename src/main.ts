@@ -4,12 +4,8 @@ import { AlemonOptions, LoginMap, analysis } from './define/index.js'
  * @param Options
  */
 export function defineConfig<T>(Options?: AlemonOptions & T) {
-  if (!Options.env) {
-    Options.env = {}
-  }
-  if (!Options.env?.path) {
-    Options.env.path = 'alemon.env'
-  }
+  if (!Options.env) Options.env = {}
+  if (!Options.env?.path) Options.env.path = 'alemon.env'
   return Options
 }
 /**
