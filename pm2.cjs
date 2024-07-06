@@ -1,40 +1,27 @@
 const argv = [...process.argv].slice(4)
-const BotName = 'alemonb'
-const findArgs = argv.find(item => item.startsWith('@'))
-const apps = []
-if (!findArgs) {
-  apps.push({
-    name: BotName,
-    args: argv
-  })
-} else {
-  if (!argv[0].startsWith('@')) argv.unshift(BotName)
-  const msg = argv.join(' ')
-  const arr = msg.split('@')
-  for (const arg of arr) {
-    if (arg == '') continue
-    const ar = arg.split(' ')
-    const existingApp = apps.find(app => app.name === ar[0])
-    if (!existingApp) {
-      const name = ar.shift()
-      if (name != undefined) {
-        apps.push({
-          name: name,
-          args: ar ?? []
-        })
-      }
-    }
-  }
-}
-console.log('------------------------------------------')
-module.exports = {
-  apps: apps.map(app => ({
-    name: app.name,
-    script: 'node_modules/alemonjs/bin/index.js',
-    // exec_mode: 'cluster',
-    args: app.args,
-    error_file: `./logs/${app.name}/err.log`,
-    out_file: `./logs/${app.name}/out.log`,
+
+/**
+ *
+ * @param {*} name
+ * @param {*} script
+ * @returns
+ */
+function getRunScriptApp(script = 'index.ts', options = {}) {
+  const { name } = options
+  const initName = name ?? 'alemonb'
+  return {
+    name: initName,
+    script: 'node',
+    args: [
+      '--no-warnings=ExperimentalWarning',
+      '--loader',
+      'ts-node/esm',
+      script
+    ].concat(argv),
+    interpreter: 'none',
+    ext: 'ts',
+    error_file: `./logs/${initName}/err.log`,
+    out_file: `./logs/${initName}/out.log`,
     // 是否将所有进程的日志合并到一个文件中
     merge_logs: true,
     // 达到这个大小后日志文件进行轮转
@@ -63,6 +50,9 @@ module.exports = {
     watch: false,
     env: {
       NODE_ENV: 'production'
-    }
-  }))
+    },
+    ...options
+  }
 }
+
+module.exports = getRunScriptApp

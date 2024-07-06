@@ -1,7 +1,11 @@
 {
   "name": "alemonjs",
   "version": "1.3.0-rc.0",
-  "description": "DOCS https://alemonjs.com/",
+  "description": "啊柠檬脚本",
+  "author": "ningmengchongshui",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rollup --config rollup.config.js",
     "format": "prettier --write .",
@@ -29,7 +33,8 @@
     "qrcode": "^1.5.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "ws": "^8.13.0"
+    "ws": "^8.13.0",
+    "@alemonjs/tsconfig-config": "^1.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-multi-entry": "^6.0.1",
@@ -55,19 +60,15 @@
     "rollup": "^4.16.4",
     "rollup-plugin-dts": "^6.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.5.3"
   },
-  "author": "ningmengchongshui",
-  "license": "MIT",
-  "type": "module",
+  "types": "dist",
   "files": [
     ".puppeteerrc.cjs",
     "pm2.config.cjs",
     "env.d.ts",
     "dist"
   ],
-  "main": "dist/index.js",
-  "types": "dist",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -79,8 +80,12 @@
     "./env": {
       "types": "./env.d.ts"
     },
-    "./pm2.config.cjs": {
-      "require": "./pm2.config.cjs"
+    "./pm2.cjs": {
+      "require": "./pm2.cjs"
+    },
+    "./tsconfig.json": {
+      "import": "./config/tsconfig.json",
+      "require": "./config/tsconfig.json"
     }
   },
   "publishConfig": {
@@ -88,5 +93,11 @@
   },
   "engines": {
     "node": ">=16.14.0"
-  }
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  },
+  "homepage": "https://alemonjs.com/"
 }
