@@ -80,9 +80,6 @@
     "./env": {
       "types": "./env.d.ts"
     },
-    "./pm2.cjs": {
-      "require": "./pm2.cjs"
-    },
     "./tsconfig.json": {
       "import": "./config/tsconfig.json",
       "require": "./config/tsconfig.json"

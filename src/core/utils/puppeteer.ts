@@ -145,7 +145,7 @@ export class Puppeteer {
    * @param timeout 响应检查
    * @returns buffer
    */
-  async toFile(
+  async render(
     htmlPath: string | Buffer | URL,
     Options?: ScreenshotFileOptions
   ) {
@@ -184,6 +184,12 @@ export class Puppeteer {
       return false
     }
   }
+
+  /**
+   * 废弃
+   * @deprecated 已废弃
+   */
+  toFile = this.render
 
   /**
    * 对url截图进行截图
