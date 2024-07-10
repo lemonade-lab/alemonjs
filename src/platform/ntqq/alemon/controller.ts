@@ -6,8 +6,9 @@ import {
   type ControllerOption,
   type UserInformationType
 } from '../../../core/index.js'
-import { ClientNTQQ } from '../sdk/index.js'
+import { ApiRequestData, ClientNTQQ, MarkdownType } from '../sdk/index.js'
 import { directController } from './direct.js'
+import { getKeyboardData } from './utils.js'
 
 export class Controllers extends BaseConfig<ControllerOption> {
   constructor(select?: ControllerOption) {
@@ -209,6 +210,30 @@ export class Controllers extends BaseConfig<ControllerOption> {
     article: async (msg: any) => {
       if (!this.feasibility) return false
       return false
+    },
+    /**
+     * 发送markdown消息，需要申请模板
+     * @param custom_template_id 
+     * @param content 消息内容，如果是内邀用户直接传string，否则需要传递模版内变量与填充值的kv映射
+     */
+    markdown: async (markdown: MarkdownType, ...arg: ([string] | MessageButtonType[]) & MessageButtonType[][]) => {
+      const guild_id = this.get('guild_id')
+      const msg_id = this.get('msg_id')
+      const attribute = this.get('attribute')
+      const open_id = this.get('open_id')
+      const data: ApiRequestData = { msg_id, msg_seq: ClientNTQQ.getMsgSeq(msg_id), msg_type: 2 as const, markdown }
+
+      if (arg && arg.length > 0) {
+        if (typeof arg[0] === 'string') {
+          data.keyboard = { id: arg[0] }
+        } else {
+          data.keyboard = getKeyboardData(arg)
+        }
+      }
+
+      return attribute == 'single'
+      ? await ClientNTQQ.usersOpenMessages(open_id, data)
+      : await ClientNTQQ.groupOpenMessages(guild_id, data)
     }
   }
 }

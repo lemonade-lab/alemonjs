@@ -40,10 +40,36 @@ interface ButtonType {
   }
 }
 
-interface KeyboardType {
-  content: {
+export interface KeyboardType {
+  id?: string;
+  content?: {
     rows: { buttons: ButtonType[] }[]
   }
+}
+
+export interface MarkdownType {
+  /** markdown 模版id，申请模版后获得 */
+  custom_template_id: string;
+  /** 原生 markdown 文本内容（内邀使用） */
+  content?: string;
+  /** 模版内变量与填充值的kv映射 */
+  params?: Array<{key: string, values: string[]}>
+}
+
+export interface ApiRequestData {
+  content?: string
+  msg_type: MsgType
+  markdown?: MarkdownType
+  keyboard?: KeyboardType
+  media?: {
+    file_info: string
+  }
+  ark?: any
+  image?: any
+  message_reference?: any
+  event_id?: any
+  msg_id?: string
+  msg_seq?: number
 }
 
 class ClientNtqq {
@@ -115,21 +141,7 @@ class ClientNtqq {
    */
   async usersOpenMessages(
     openid: string,
-    data: {
-      content?: string
-      msg_type: MsgType
-      markdown?: any
-      keyboard?: KeyboardType
-      media?: {
-        file_info: string
-      }
-      ark?: any
-      image?: any
-      message_reference?: any
-      event_id?: any
-      msg_id?: string
-      msg_seq?: number
-    },
+    data: ApiRequestData,
     msg_id?: string
   ): Promise<{ id: string; timestamp: number }> {
     return this.GroupService({
@@ -167,21 +179,7 @@ class ClientNtqq {
    */
   async groupOpenMessages(
     group_openid: string,
-    data: {
-      content?: string
-      msg_type: MsgType
-      markdown?: any
-      keyboard?: KeyboardType
-      media?: {
-        file_info: string
-      }
-      ark?: any
-      image?: any
-      message_reference?: any
-      event_id?: any
-      msg_id?: string
-      msg_seq?: number
-    }
+    data: ApiRequestData,
   ): Promise<{ id: string; timestamp: number }> {
     return this.GroupService({
       url: `/v2/groups/${group_openid}/messages`,
