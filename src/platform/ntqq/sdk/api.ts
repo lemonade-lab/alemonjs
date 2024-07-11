@@ -41,7 +41,7 @@ interface ButtonType {
 }
 
 export interface KeyboardType {
-  id?: string;
+  id?: string
   content?: {
     rows: { buttons: ButtonType[] }[]
   }
@@ -49,11 +49,11 @@ export interface KeyboardType {
 
 export interface MarkdownType {
   /** markdown 模版id，申请模版后获得 */
-  custom_template_id: string;
+  custom_template_id: string
   /** 原生 markdown 文本内容（内邀使用） */
-  content?: string;
+  content?: string
   /** 模版内变量与填充值的kv映射 */
-  params?: Array<{key: string, values: string[]}>
+  params?: Array<{ key: string; values: string[] }>
 }
 
 export interface ApiRequestData {
@@ -179,7 +179,7 @@ class ClientNtqq {
    */
   async groupOpenMessages(
     group_openid: string,
-    data: ApiRequestData,
+    data: ApiRequestData
   ): Promise<{ id: string; timestamp: number }> {
     return this.GroupService({
       url: `/v2/groups/${group_openid}/messages`,

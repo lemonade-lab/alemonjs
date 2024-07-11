@@ -1,5 +1,4 @@
 {
-  "display": "alemonjs",
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
