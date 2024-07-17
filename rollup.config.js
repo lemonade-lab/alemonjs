@@ -1,7 +1,4 @@
 import typescript from '@rollup/plugin-typescript'
-import { copyFileSync, mkdirSync } from 'fs'
-// import dts from 'rollup-plugin-dts'
-// import terser from '@rollup/plugin-terser'
 export default [
   // 编译 core
   {
@@ -20,10 +17,3 @@ export default [
     }
   }
 ]
-
-mkdirSync('./dist', {
-  recursive: true
-})
-
-// 复制文件
-copyFileSync('./src/main.css', './dist/main.css')

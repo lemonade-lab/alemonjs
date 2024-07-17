@@ -1,4 +1,3 @@
-import { type PuppeteerLaunchOptions } from 'puppeteer'
 import { type EmailOptions } from '../email/types.js'
 import { type FileOptions } from '../file/index.js'
 import { type KOOKOptions } from '../platform/kook/sdk/wss.types.js'
@@ -15,7 +14,6 @@ export interface BotConfigType {
   kook: KOOKOptions
   qq: QQOptions
   file: FileOptions
-  puppeteer: PuppeteerLaunchOptions
   ntqq: NTQQOptions
   discord: DISOCRDOptions
   email: EmailOptions

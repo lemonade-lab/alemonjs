@@ -1,4 +1,3 @@
-import { PuppeteerLaunchOptions } from 'puppeteer'
 import { LoginOptions, PlatformsItemType } from '../default/types.js'
 import { FileOptions } from '../file/types.js'
 import {
@@ -77,10 +76,6 @@ export interface AlemonOptions {
    * defaut true
    */
   pupStart?: false
-  /**
-   * puppeteer配置
-   */
-  puppeteer?: PuppeteerLaunchOptions
   /**
    * env
    */

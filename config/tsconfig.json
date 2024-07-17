@@ -14,16 +14,13 @@
     "allowJs": false,
     "suppressImplicitAnyIndexErrors": true,
     "typeRoots": ["node_modules/@types"],
-
     /*  */
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-
     /* Bundler mode */
     "resolveJsonModule": true,
     "isolatedModules": true,
-
     /* Linting */
     // "strict": true, 严格模式
     "noUnusedLocals": true,

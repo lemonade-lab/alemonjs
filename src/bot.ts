@@ -7,7 +7,6 @@ import {
   AlemonOptions,
   AControllers,
   loger,
-  ALunchConfig,
   AppLoadConfig,
   IP,
   APPS,
@@ -25,18 +24,6 @@ import * as RebotMap from './platform/index.js'
  */
 export function createBot(Options: AlemonOptions, login: LoginOptions) {
   if (login) Options.login = login
-  /**
-   * ************
-   * ************
-   * 配置信息载入
-   * ************
-   * ************
-   */
-  if (Options?.puppeteer) {
-    for (const item in Options.puppeteer) {
-      ALunchConfig.set(item as any, Options.puppeteer[item])
-    }
-  }
   /**
    * ********
    * 图片存储

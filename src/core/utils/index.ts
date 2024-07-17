@@ -1,6 +1,5 @@
 export * from './buffer.js'
 export * from './ip.js'
-export * from './puppeteer.js'
 export * from './from.js'
 export * from './counter.js'
 export * from './hash.js'

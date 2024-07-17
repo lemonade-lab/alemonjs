@@ -6,7 +6,6 @@ tsconfig.json
 .vscode
 .prettierignore
 .prettierrc.json
-.puppeteerrc.cjs
 .eslintrc.cjs
 .gitignore
 .npmrc

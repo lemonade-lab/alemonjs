@@ -22,9 +22,6 @@ export * from './config.js'
 export * from './utils/index.js'
 export * from './koa/main.js'
 export * from './processor/read.js'
-export * from './utils/component.js'
-export * from './utils/module.js'
-export * from './utils/picture.js'
 /**
  *
  */

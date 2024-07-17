@@ -1,4 +1,4 @@
-import { AEvent, EventEnum } from '../typings.js'
+import { AEvent } from '../typings.js'
 import { join } from 'path'
 import { existsSync, readdirSync } from 'fs'
 import { AppLoadConfig } from './configs.js'
