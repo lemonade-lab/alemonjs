@@ -8,8 +8,7 @@ export interface AEvent
     UserBase,
     MsgBase,
     Serverbase,
-    BotBase,
-    ReplyBase {
+    BotBase {
   // 允许自定义
   [key: string]: any
 }
@@ -194,10 +193,6 @@ interface MsgBase {
    * 纯消息
    */
   msg: string
-  /**
-   * 快捷接口
-   */
-  segment: SegmentType
 }
 
 /**
@@ -323,29 +318,6 @@ export interface SegmentType {
    * @param txt
    */
   block(txt: string): string
-}
-
-export interface ReplyBase {
-  /**
-   * 消息发送机制
-   * @param content 消息
-   * @param select.quote 引用消息编号,默认无引用
-   * @param select.withdraw 撤回消息,默认不撤回
-   * 文件名会进行解析后得到正确文件后缀
-   */
-  reply(
-    /**
-     * 消息内容
-     */
-    content: MessageContentType,
-    /**
-     * 选择
-     */
-    select?: MessageBingdingOption
-  ): Promise<{
-    middle: any[]
-    backhaul: any
-  }>
 }
 
 export interface MessageBingdingOption {

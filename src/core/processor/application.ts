@@ -5,7 +5,6 @@ import { AppLoadConfig } from './configs.js'
 import { AppMap } from './data.js'
 import { AObserver } from './subscribe.js'
 import { Alemon } from './alemon.js'
-import { BotServer } from '../koa/index.js'
 import { readScript } from './read.js'
 import { LRUCache } from 'lru-cache'
 import { loger } from '../../log.js'
@@ -79,9 +78,6 @@ export class App {
     this.#regular = new RegExp(
       this.#mergedRegexArr.map(regex => regex.source).join('|')
     )
-    if (!BotServer.isE()) {
-      BotServer.connect()
-    }
   }
 
   /**

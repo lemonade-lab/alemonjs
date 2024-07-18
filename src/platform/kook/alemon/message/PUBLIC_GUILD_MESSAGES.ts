@@ -1,18 +1,13 @@
-import { APPS, MessageContentType } from '../../../../core/index.js'
+import { APPS } from '../../../../core/index.js'
 import {
   type UserType,
   type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption
+  type TypingEnum
 } from '../../../../core/index.js'
 import { type EventData } from '../../sdk/index.js'
 import { ClientKOOK } from '../../sdk/index.js'
-import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../../config/index.js'
-
-import { replyController } from '../reply.js'
-import { directController } from '../direct.js'
 
 /**
  * 群聊消息
@@ -102,24 +97,7 @@ export const PUBLIC_GUILD_MESSAGES_KOOK = async (event: EventData) => {
     user_id: event.extra.author.id,
     user_name: event.extra.author.username,
     user_avatar: avatar.substring(0, avatar.indexOf('?')),
-    segment: segmentKOOK,
-    send_at: event.msg_timestamp,
-    /**
-     * 消息发送机制
-     * @param content 消息内容
-     * @param obj 额外消息 可选
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const channel_id = select?.channel_id ?? event.target_id // 子频道
-      if (select?.open_id && select?.open_id != '') {
-        directController(msg, channel_id, select?.open_id)
-        return false
-      }
-      return await replyController(msg, channel_id)
-    }
+    send_at: event.msg_timestamp
   }
   APPS.response(e)
   APPS.responseMessage(e)

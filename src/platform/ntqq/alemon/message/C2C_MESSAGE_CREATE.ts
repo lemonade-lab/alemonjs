@@ -1,16 +1,12 @@
 import {
   APPS,
   type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption,
-  MessageContentType
+  type TypingEnum
 } from '../../../../core/index.js'
 import { segmentNTQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { USER_DATA } from '../types.js'
 import { ABotConfig } from '../../../../config/index.js'
-
-import { directController } from '../direct.js'
 
 export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
   const { appID, masterID } = ABotConfig.get('ntqq')
@@ -46,14 +42,7 @@ export const C2C_MESSAGE_CREATE = async (event: USER_DATA) => {
     user_name: '无',
     user_avatar: `https://q.qlogo.cn/qqapp/${appID}/${event.author.id}/640`,
     segment: segmentNTQQ,
-    send_at: new Date().getTime(),
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.id
-      return await directController(msg, open_id, msg_id)
-    }
+    send_at: new Date().getTime()
   }
   APPS.response(e)
   APPS.responseMessage(e)

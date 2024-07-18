@@ -64,33 +64,7 @@ export const MESSAGE_REACTION_ADD = async (event: {
     user_id: event.user_id,
     user_name: '',
     user_avatar: '',
-    segment: segmentQQ,
-    send_at: new Date().getTime(),
-    /**
-     * 发现消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.target.id
-      const withdraw = select?.withdraw ?? 0
-      if (select?.open_id && select?.open_id != '') {
-        return await directController(msg, select?.open_id, msg_id, {
-          withdraw,
-          open_id: select?.open_id,
-          user_id: event.user_id
-        })
-      }
-      const channel_id = select?.channel_id ?? event.channel_id
-      return await replyController(msg, channel_id, msg_id, {
-        quote: select?.quote,
-        withdraw
-      })
-    }
+    send_at: new Date().getTime()
   }
 
   APPS.response(e)

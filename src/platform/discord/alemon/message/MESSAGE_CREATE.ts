@@ -1,17 +1,11 @@
 import {
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption,
-  type UserType,
-  MessageContentType
+  type UserType
 } from '../../../../core/index.js'
 import { APPS } from '../../../../core/index.js'
-
 import { ABotConfig } from '../../../../config/index.js'
-
 import { BotMessage } from '../bot.js'
-import { segmentDISCORD } from '../segment.js'
-import { replyController } from '../reply.js'
 import { ClientDISOCRD } from '../../sdk/index.js'
 
 /**
@@ -138,33 +132,10 @@ export async function MESSAGE_CREATE(event: {
     msg: msg,
     quote: '',
     open_id: '',
-
-    //
     user_id: event.author.id,
     user_name: event.author.username,
     user_avatar: ClientDISOCRD.userAvatar(event.author.id, event.author.avatar),
-    segment: segmentDISCORD,
-    send_at: new Date(event.timestamp).getTime(),
-    /**
-     * 发送消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const withdraw = select?.withdraw ?? 0
-      if (select?.open_id && select?.open_id != '') {
-        return false
-      }
-      const channel_id = select?.channel_id ?? event.channel_id
-      return await replyController(msg, channel_id, {
-        quote: select?.quote,
-        withdraw
-      })
-    }
+    send_at: new Date(event.timestamp).getTime()
   }
   APPS.response(e)
   APPS.responseMessage(e)

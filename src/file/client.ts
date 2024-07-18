@@ -2,8 +2,8 @@ import { getFileRouter } from './back.js'
 import { readdirSync, unlinkSync } from 'fs'
 import { FileConfig } from './config.js'
 import { join } from 'path'
-import { ABodyParser, ACors, AKoa } from '../core/index.js'
 import { loger } from '../log.js'
+import { ABodyParser, ACors, AKoa } from '../core/main.js'
 class Server {
   #app: typeof AKoa.prototype = null
   #currentPort = 4399

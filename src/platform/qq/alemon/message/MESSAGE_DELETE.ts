@@ -1,16 +1,10 @@
 import {
   APPS,
   type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption,
-  type MessageContentType
+  type TypingEnum
 } from '../../../../core/index.js'
 import { BotMessage } from '../bot.js'
-import { segmentQQ } from '../segment.js'
 import { ABotConfig } from '../../../../config/index.js'
-import { replyController } from '../reply.js'
-
-import { directController } from '../direct.js'
 
 /**
  * *私域*
@@ -56,33 +50,7 @@ export const MESSAGE_DELETE = async (event: any) => {
     user_id: event?.author?.id ?? '',
     user_name: event?.author?.username ?? '',
     user_avatar: event?.author?.avatar ?? '',
-    segment: segmentQQ,
-    send_at: new Date().getTime(),
-    /**
-     * 发现消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const withdraw = select?.withdraw ?? 0
-      const msg_id = select?.channel_id ?? event?.id
-      if (select?.open_id && select?.open_id != '') {
-        return await directController(msg, select?.open_id, msg_id, {
-          withdraw,
-          open_id: select?.open_id,
-          user_id: event?.author?.id ?? ''
-        })
-      }
-      const channel_id = select?.channel_id ?? event.channel_id
-      return await replyController(msg, channel_id, msg_id, {
-        quote: select?.quote,
-        withdraw
-      })
-    }
+    send_at: new Date().getTime()
   }
 
   /**

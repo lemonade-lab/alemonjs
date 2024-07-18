@@ -1,8 +1,4 @@
-import {
-  type EventFunctionMap,
-  type AEvent,
-  type EventEnum
-} from '../typings.js'
+import { type EventFunctionMap, type AEvent } from '../typings.js'
 import { type NodeDataType } from './types.js'
 import { APlugin } from './plugin.js'
 import { AppMap } from './data.js'
@@ -11,8 +7,6 @@ import { DoublyLinkedList } from './listdouble.js'
 import memory from 'memory-cache'
 import { AInstruct } from './help.js'
 import { AppLoadConfig } from './configs.js'
-import { BotServer } from '../index.js'
-import Router from 'koa-router'
 import { loger } from '../../log.js'
 
 /**
@@ -483,15 +477,6 @@ export class Alemon {
       str,
       reg
     })
-    return this
-  }
-
-  /**
-   * 接口路由
-   */
-  router(val: typeof Router.prototype) {
-    // 推送
-    BotServer.push(this.#name, val)
     return this
   }
 

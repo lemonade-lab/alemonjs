@@ -1,8 +1,8 @@
 import { createReadStream, existsSync } from 'fs'
 import { join } from 'path'
 import { FileConfig } from './config.js'
-import { ARouter } from '../core/index.js'
 import mime from 'mime-types'
+import { ARouter } from '../core/main.js'
 export function getFileRouter() {
   const router = new ARouter()
   // 处理图片请求

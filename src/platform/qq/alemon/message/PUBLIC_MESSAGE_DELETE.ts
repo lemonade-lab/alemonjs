@@ -1,16 +1,7 @@
 import { APPS } from '../../../../core/index.js'
-import {
-  type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption,
-  type MessageContentType
-} from '../../../../core/index.js'
-import { segmentQQ } from '../segment.js'
+import { type EventEnum, type TypingEnum } from '../../../../core/index.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../../config/index.js'
-import { replyController } from '../reply.js'
-
-import { directController } from '../direct.js'
 
 /**
  * 公域
@@ -58,33 +49,7 @@ export const PUBLIC_MESSAGE_DELETE = async (event: {
     user_id: event.message.author.id,
     user_name: event.message.author.username,
     user_avatar: '',
-    segment: segmentQQ,
-    send_at: new Date().getTime(),
-    /**
-     * 发送消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const msg_id = select?.msg_id ?? event.message.id
-      const withdraw = select?.withdraw ?? 0
-      if (select?.open_id && select?.open_id != '') {
-        return await directController(msg, select?.open_id, msg_id, {
-          withdraw,
-          open_id: select?.open_id,
-          user_id: event.message.author.id
-        })
-      }
-      const channel_id = select?.channel_id
-      return await replyController(msg, channel_id, msg_id, {
-        quote: select?.quote,
-        withdraw
-      })
-    }
+    send_at: new Date().getTime()
   }
 
   APPS.response(e)

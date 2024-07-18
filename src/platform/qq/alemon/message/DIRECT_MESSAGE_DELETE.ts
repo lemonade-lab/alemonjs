@@ -1,14 +1,10 @@
 import {
   APPS,
   type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption,
-  type MessageContentType
+  type TypingEnum
 } from '../../../../core/index.js'
-import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../../config/index.js'
-import { directController } from '../direct.js'
 
 /**
  * *
@@ -59,19 +55,7 @@ export const DIRECT_MESSAGE_DELETE = async (event: {
     user_id: event.message.author.id,
     user_name: event.message.author.username,
     user_avatar: '',
-    segment: segmentQQ,
-    send_at: new Date().getTime(),
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const open_id = select?.open_id ?? event.message.guild_id
-      const msg_id = select?.msg_id ?? event.message.id
-      const withdraw = select?.withdraw ?? 0
-      return await directController(msg, open_id, msg_id, {
-        withdraw
-      })
-    }
+    send_at: new Date().getTime()
   }
 
   APPS.response(e)

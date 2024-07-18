@@ -1,15 +1,10 @@
 import {
   APPS,
   type TypingEnum,
-  type EventEnum,
-  type MessageBingdingOption,
-  MessageContentType
+  type EventEnum
 } from '../../../../core/index.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../../config/index.js'
-import { directController } from '../direct.js'
-import { replyController } from '../reply.js'
-import { segmentKOOK } from '../segment.js'
 import { SystemData, joinedData } from '../../sdk/typings.js'
 
 /**
@@ -50,27 +45,7 @@ export const GUILD_MEMBER_ADD = async (event: SystemData) => {
     user_id: body.user_id,
     user_name: '',
     user_avatar: '',
-    segment: segmentKOOK,
-    send_at: new Date(body.joined_at).getTime(),
-    /**
-     * 发现消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const msg_id = select?.msg_id ?? false
-      const channel_id = select?.channel_id ?? event.target_id
-      if (!msg_id) return false
-      if (select?.open_id && select?.open_id != '') {
-        return await directController(msg_id, channel_id, body.user_id)
-      }
-      if (!channel_id) return false
-      return await replyController(msg, `${channel_id}`)
-    }
+    send_at: new Date(body.joined_at).getTime()
   }
   APPS.response(e)
   APPS.responseEventType(e)

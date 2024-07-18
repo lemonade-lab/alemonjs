@@ -11,7 +11,6 @@ import {
   IP,
   APPS,
   readScript,
-  AppServerConfig,
   FileOptions,
   FileConfig,
   LoginOptions
@@ -32,15 +31,6 @@ export function createBot(Options: AlemonOptions, login: LoginOptions) {
   if (Options?.imageStorage) {
     DrawingBed.set('func', Options.imageStorage)
     DrawingBed.set('state', true)
-  }
-  /***
-   * server
-   */
-  if (Options.server?.port) {
-    AppServerConfig.set('port', Options.server.port)
-  }
-  if (Options.server?.middleware) {
-    AppServerConfig.set('middleware', Options.server.middleware)
   }
   /**
    * ********

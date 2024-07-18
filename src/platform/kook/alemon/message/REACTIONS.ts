@@ -1,21 +1,15 @@
 import {
   APPS,
   type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption,
-  MessageContentType
+  type TypingEnum
 } from '../../../../core/index.js'
 import {
   ClientKOOK,
   type StatementData,
   type SystemData
 } from '../../sdk/index.js'
-import { segmentKOOK } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../../config/index.js'
-
-import { replyController } from '../reply.js'
-import { directController } from '../direct.js'
 
 /**
  *
@@ -64,24 +58,7 @@ export const REACTIONS = async (event: SystemData) => {
     user_id: body.user_id,
     user_name: '',
     user_avatar: '',
-    segment: segmentKOOK,
-    send_at: event.msg_timestamp,
-    /**
-     * 消息发送机制
-     * @param content 消息内容
-     * @param obj 额外消息 可选
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const channel_id = select?.channel_id ?? event.target_id // 子频道
-      if (select?.open_id) {
-        directController(msg, channel_id, select?.open_id)
-        return false
-      }
-      return await replyController(msg, channel_id)
-    }
+    send_at: event.msg_timestamp
   }
   APPS.response(e)
   APPS.responseEventType(e)

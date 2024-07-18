@@ -1,14 +1,6 @@
-import {
-  type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption,
-  MessageContentType
-} from '../../../../core/index.js'
+import { type EventEnum, type TypingEnum } from '../../../../core/index.js'
 import { APPS } from '../../../../core/index.js'
-
 import { BotMessage } from '../bot.js'
-import { segmentDISCORD } from '../segment.js'
-import { replyController } from '../reply.js'
 
 /**
  * 子频道更新
@@ -70,28 +62,7 @@ export async function CHANNEL_UPDATE(event: {
     user_id: '',
     user_name: '',
     user_avatar: '',
-    segment: segmentDISCORD,
-    send_at: new Date().getTime(),
-    /**
-     * 发送消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const withdraw = select?.withdraw ?? 0
-      if (select?.open_id && select?.open_id != '') {
-        return false
-      }
-      const channel_id = select?.channel_id
-      return await replyController(msg, channel_id, {
-        quote: select?.quote,
-        withdraw
-      })
-    }
+    send_at: new Date().getTime()
   }
 
   APPS.response(e)

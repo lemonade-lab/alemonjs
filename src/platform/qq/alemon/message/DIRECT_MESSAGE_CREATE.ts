@@ -1,14 +1,11 @@
 import {
   APPS,
   type EventEnum,
-  type TypingEnum,
-  type MessageBingdingOption,
-  type MessageContentType
+  type TypingEnum
 } from '../../../../core/index.js'
 import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
 import { ABotConfig } from '../../../../config/index.js'
-import { directController } from '../direct.js'
 
 /**
  * 私信
@@ -76,18 +73,7 @@ export const DIRECT_MESSAGE_CREATE = async (event: {
     user_name: event.author.username,
     user_avatar: event.author.avatar,
     segment: segmentQQ,
-    send_at: new Date().getTime(),
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const open_id = select?.open_id ?? event.guild_id
-      const msg_id = select?.msg_id ?? event.id
-      const withdraw = select?.withdraw ?? 0
-      return await directController(msg, open_id, msg_id, {
-        withdraw
-      })
-    }
+    send_at: new Date().getTime()
   }
   APPS.response(e)
   APPS.responseMessage(e)

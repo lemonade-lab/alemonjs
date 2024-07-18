@@ -1,17 +1,11 @@
 import {
   APPS,
   type TypingEnum,
-  type EventEnum,
-  type MessageBingdingOption,
-  type MessageContentType
+  type EventEnum
 } from '../../../../core/index.js'
-
 import { segmentQQ } from '../segment.js'
 import { BotMessage } from '../bot.js'
-
 import { ABotConfig } from '../../../../config/index.js'
-import { directController } from '../direct.js'
-import { replyController } from '../reply.js'
 
 /**
  * 当成员资料变更时
@@ -66,34 +60,7 @@ export const GUILD_MEMBER_UPDATE = async (event: {
     user_name: event.user.username,
     user_avatar: event.user.avatar,
     segment: segmentQQ,
-    send_at: new Date(event.joined_at).getTime(),
-    /**
-     * 发现消息
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const msg_id = select?.msg_id ?? false
-      const withdraw = select?.withdraw ?? 0
-      if (!msg_id) return false
-      if (select?.open_id && select?.open_id != '') {
-        return await directController(msg, select?.open_id, msg_id, {
-          withdraw,
-          open_id: select?.open_id,
-          user_id: event.user.id
-        })
-      }
-      const channel_id = select?.channel_id ?? false
-      if (!channel_id) return false
-      return await replyController(msg, channel_id, msg_id, {
-        quote: select?.quote,
-        withdraw
-      })
-    }
+    send_at: new Date(event.joined_at).getTime()
   }
 
   APPS.response(e)

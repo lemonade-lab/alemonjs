@@ -1,14 +1,10 @@
-import { APPS, MessageContentType } from '../../../../core/index.js'
 import {
   type EventEnum,
   type TypingEnum,
-  type MessageBingdingOption
+  APPS
 } from '../../../../core/index.js'
 import { ABotConfig } from '../../../../config/index.js'
-import { segmentKOOK } from '../segment.js'
-import { replyController } from '../reply.js'
 import { type SystemData, type ButtonData } from '../../sdk/index.js'
-import { directController } from '../direct.js'
 
 /**
  * @param event 按钮数据
@@ -58,24 +54,7 @@ export async function INTERACTION(event: SystemData) {
     user_name: '',
     user_avatar: '',
     //
-    send_at: 0,
-    segment: segmentKOOK,
-    /**
-     *消息发送
-     * @param msg
-     * @param img
-     * @returns
-     */
-    reply: async (
-      msg: MessageContentType,
-      select?: MessageBingdingOption
-    ): Promise<any> => {
-      const channel_id = select?.channel_id ?? body.channel_id
-      if (select?.open_id && select?.open_id != '') {
-        return await directController(msg, `${channel_id}`, body.user_id)
-      }
-      return await replyController(msg, `${channel_id}`)
-    }
+    send_at: 0
   }
 
   APPS.response(e)
