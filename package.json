@@ -1,87 +1,34 @@
 {
-  "name": "alemonjs",
-  "version": "1.3.2",
+  "name": "alemon",
+  "version": "2.0.0",
   "description": "啊柠檬脚本",
   "author": "ningmengchongshui",
+  "private": true,
   "license": "MIT",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "index.ts",
   "scripts": {
-    "build": "rollup --config rollup.config.js",
+    "app": "npx tsx index.ts",
     "format": "prettier --write .",
     "check-format": "git diff --exit-code",
     "prepare": "husky"
   },
-  "dependencies": {
-    "axios": "^1.4.0",
-    "dotenv": "^16.4.1",
-    "file-type": "^18.5.0",
-    "form-data": "^4.0.0",
-    "image-size": "^1.0.2",
-    "koa": "^2.14.2",
-    "koa-bodyparser": "^4.4.1",
-    "koa-router": "^12.0.0",
-    "koa2-cors": "^2.0.6",
-    "lodash-es": "^4.17.21",
-    "lru-cache": "^10.2.0",
-    "memory-cache": "^0.2.0",
-    "mime-types": "^2.1.35",
-    "nodemailer": "^6.9.12",
-    "public-ip": "^6.0.1",
-    "qrcode": "^1.5.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "ws": "^8.13.0"
-  },
   "devDependencies": {
+    "@alemonjs/app/xiuxian": "link:./module/xiuxian",
+    "@alemonjs/discord": "link:./packages/discord",
+    "@alemonjs/kook": "link:./packages/kook",
+    "@alemonjs/qq-group-bot": "link:./packages/qq-group-bot",
+    "@alemonjs/qq-guild-bot": "link:./packages/qq-guild-bot",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/koa": "^2.13.11",
-    "@types/koa-bodyparser": "^4.3.12",
-    "@types/koa-router": "^7.4.7",
-    "@types/koa2-cors": "^2.0.5",
     "@types/lodash-es": "^4.17.12",
-    "@types/memory-cache": "^0.2.5",
-    "@types/mime-types": "^2.1.4",
-    "@types/node": "^20.2.4",
     "@types/node-schedule": "^2.1.2",
-    "@types/nodemailer": "^6.4.14",
-    "@types/progress": "^2.0.5",
-    "@types/qrcode": "^1.5.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@types/ws": "^8.5.5",
+    "@types/react": "^18.3.8",
+    "alemonjs": "link:./packages/alemonjs",
     "husky": "^9.0.11",
     "prettier": "^2.8.8",
+    "react": "^18.3.1",
     "rollup": "^4.18.1",
-    "ts-node": "^10.9.2",
-    "tslib": "^2.6.3",
+    "tsx": "^4.19.1",
     "typescript": "^5.5.3"
-  },
-  "types": "dist",
-  "files": [
-    "dist",
-    "config"
-  ],
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./config/tsconfig.json": {
-      "import": "./config/tsconfig.json",
-      "require": "./config/tsconfig.json"
-    }
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "engines": {
-    "node": ">=16.14.0"
-  },
-  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ningmengchongshui/alemonjs.git"
-  },
-  "homepage": "https://alemonjs.com/"
+  }
 }

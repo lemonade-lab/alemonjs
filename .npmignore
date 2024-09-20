@@ -1,22 +1,5 @@
 # 依赖
 node_modules
-
-# 配置
-tsconfig.json
-.vscode
-.prettierignore
-.prettierrc.json
-.eslintrc.cjs
-.gitignore
-.npmrc
-
-# 插件
-
-# 缓存
-
-# 额外生成物
-
-# 打印
-logs
-*.logs
-*.los
+/*
+!/config
+!/lib

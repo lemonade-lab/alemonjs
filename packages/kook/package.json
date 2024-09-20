@@ -1,0 +1,18 @@
+{
+  "name": "@alemonjs/kook",
+  "version": "1.0.0-rc.0",
+  "description": "啊柠檬脚本",
+  "author": "ningmengchongshui",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "dependencies": {
+    "chat-space": "^0.0.2"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    }
+  }
+}

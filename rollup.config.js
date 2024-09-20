@@ -1,10 +1,9 @@
 import typescript from '@rollup/plugin-typescript'
 export default [
-  // 编译 core
   {
-    input: 'src/index.ts',
+    input: 'packages/alemonjs/src/index.ts',
     output: {
-      dir: 'dist',
+      dir: 'packages/alemonjs/lib',
       format: 'es',
       sourcemap: false
     },
