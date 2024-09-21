@@ -6,6 +6,7 @@ export default OnResponse(
     const Send = useSend(event)
     // 发送消息
     Send(Text('hello'))
+    //
   },
   'message.create',
   /^你好$/

@@ -4,10 +4,10 @@ import { KOOKClient } from 'chat-space'
  *
  * @param val
  */
-export const login = (val: ConfigType) => {
+export const login = (config: ConfigType) => {
   // 创建客户端
   const client = new KOOKClient({
-    token: val.token
+    token: config.token
   })
 
   // 连接
@@ -80,15 +80,11 @@ export const login = (val: ConfigType) => {
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
             const test = useParse('Text', val)
-            return client
-              .createMessage({
-                type: 9,
-                target_id: event.ChannelId,
-                content: test
-              })
-              .catch(err => {
-                console.error(err)
-              })
+            return client.createMessage({
+              type: 9,
+              target_id: event.ChannelId,
+              content: test
+            })
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
             return
