@@ -1,6 +1,6 @@
 import { AEventByMessageCreate } from '../types'
 
-export * from './message'
+export * from './message-format'
 
 type k = keyof AEventByMessageCreate
 

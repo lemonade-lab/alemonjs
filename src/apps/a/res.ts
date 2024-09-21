@@ -1,16 +1,4 @@
-import {
-  Img,
-  OnResponse,
-  Text,
-  Link,
-  useSend,
-  At,
-  Button,
-  Files,
-  Voice,
-  Video,
-  BtBox
-} from 'alemonjs'
+import { Img, Text, Link, useSend, At, Button, Files, Voice, Video, BtBox } from 'alemonjs'
 export default OnResponse(
   (event, { next }) => {
     // 创建一个send

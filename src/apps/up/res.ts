@@ -1,4 +1,4 @@
-import { OnResponse, useObserver, useWithdraw, useReply } from 'alemonjs'
+import { useObserver, useWithdraw, useReply } from 'alemonjs'
 export default OnResponse(
   (event, { next }) => {
     // 引用回复消息。

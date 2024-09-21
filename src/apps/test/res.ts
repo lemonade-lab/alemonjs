@@ -1,4 +1,4 @@
-import { OnResponse, useParse } from 'alemonjs'
+import { useParse } from 'alemonjs'
 export default OnResponse(
   (event, { next }) => {
     // 用户编号

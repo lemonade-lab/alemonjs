@@ -1,6 +1,6 @@
-import { useParse } from '../hook'
+import { useParse } from '../hook/use-api'
 import { AEvents } from '../typing'
-import { getFilesValues } from './files'
+import { getFilesValues } from './event-files'
 
 const values: {
   'message.create': {

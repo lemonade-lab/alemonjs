@@ -1,4 +1,4 @@
-import { OnResponse, Text, useSend } from 'alemonjs'
+import { Text, useSend } from 'alemonjs'
 export default OnResponse(
   (event, { next }) => {
     console.log(event, next)

@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { Config, argv } from './config'
-import { loadFiles } from './app/files'
+import { loadFiles } from './app/event-files'
+import { getArgvValue } from '../lib'
 type options = {
   // 可监听的配置文件
   configDir?: string
@@ -25,12 +26,14 @@ export async function createBot(dir = './alemon.config.js') {
     throw new Error('login is required')
   }
   await loadFiles()
+  // prefix
+  const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
   if (!skip) {
-    const { login } = await import(`@alemonjs/${cfg.values.login}`)
+    const { login } = await import(`${prefix}${cfg.values.login}`)
     login(cfg.values)
     return
   }
-  await import(`@alemonjs/${cfg.values.login}`)
+  await import(`${prefix}${cfg.values.login}`)
 }
 /**
  * 工程化配置
@@ -40,7 +43,7 @@ export function defineConfig(options: options = {}) {
   return options
 }
 export * from './config'
-export * from './hook'
-export * from './app'
+export * from './hook/use-api'
+export * from './app/event-utlis'
 export * from './typing'
-export * from './app/processor'
+export * from './app/event-processor'
