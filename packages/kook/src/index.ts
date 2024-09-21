@@ -19,9 +19,7 @@ export const login = (config: ConfigType) => {
     if (event.extra?.author?.bot) return false
 
     // 私聊标记
-    const data = await client
-      .userChatCreate(event.extra.author.id)
-      .then(res => res?.data)
+    const data = await client.userChatCreate(event.extra.author.id).then(res => res?.data)
 
     let msg = event?.extra?.kmarkdown?.raw_content ?? event.content
 
@@ -75,6 +73,7 @@ export const login = (config: ConfigType) => {
       api: {
         use: {
           observer: (fn: Function, arg: string[]) => {
+            console.log(fn, arg)
             return
           },
           send: (event: AEvents['message.create'], val: any[]) => {
@@ -87,9 +86,11 @@ export const login = (config: ConfigType) => {
             })
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
+            console.log(event, val)
             return
           },
           withdraw: (event: AEvents['message.create'], val: any[]) => {
+            console.log(event, val)
             return
           }
         }

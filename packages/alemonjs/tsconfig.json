@@ -15,7 +15,6 @@
     "ignoreDeprecations": "5.0",
     // strict
     "noImplicitAny": false,
-    "suppressImplicitAnyIndexErrors": true,
     "useDefineForClassFields": true,
     "isolatedModules": true,
     "noUnusedLocals": true,

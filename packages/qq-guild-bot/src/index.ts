@@ -64,6 +64,7 @@ export const login = (config: ConfigType) => {
       api: {
         use: {
           observer: (fn: Function, arg: string[]) => {
+            console.log(fn, arg)
             return
           },
           send: (event: AEvents['message.create'], val: any[]) => {
@@ -75,9 +76,11 @@ export const login = (config: ConfigType) => {
             })
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
+            console.log(event, val)
             return
           },
           withdraw: (event: AEvents['message.create'], val: any[]) => {
+            console.log(event, val)
             return
           }
         }

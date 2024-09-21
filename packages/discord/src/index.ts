@@ -43,18 +43,6 @@ export const login = (config: ConfigType) => {
       msg = msg.replace(`<@${item.id}>`, '').trim()
     }
 
-    /**
-     * 艾特处理
-     */
-    let at = false
-    let at_user: undefined = undefined
-    if (at_users.some(item => item.bot != true)) {
-      at = true
-    }
-    if (at) {
-      at_user = at_users.find(item => item.bot != true)
-    }
-
     // 定义消
     const e = {
       // 事件类型
@@ -103,6 +91,7 @@ export const login = (config: ConfigType) => {
       api: {
         use: {
           observer: (fn: Function, arg: string[]) => {
+            console.log(fn, arg)
             return
           },
           send: (event: AEvents['message.create'], val: any[]) => {
@@ -113,9 +102,11 @@ export const login = (config: ConfigType) => {
             })
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
+            console.log(event, val)
             return
           },
           withdraw: (event: AEvents['message.create'], val: any[]) => {
+            console.log(event, val)
             return
           }
         }

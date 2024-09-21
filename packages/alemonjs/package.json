@@ -10,7 +10,7 @@
     "axios": "^1.4.0",
     "yaml": "^2.5.1"
   },
-  "types": "dist",
+  "types": "lib",
   "exports": {
     ".": {
       "import": "./src/index.js",

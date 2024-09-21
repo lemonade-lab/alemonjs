@@ -9,6 +9,7 @@
   "dependencies": {
     "chat-space": "^0.0.2"
   },
+  "types": "lib",
   "exports": {
     ".": {
       "import": "./src/index.js",

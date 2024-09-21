@@ -123,10 +123,7 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
  * @param event
  * @returns
  */
-export const OnProcessor = <T extends keyof AEvents>(
-  value: AEvents[T],
-  event: T
-) => {
+export const OnProcessor = <T extends keyof AEvents>(value: AEvents[T], event: T) => {
   // 开始调用对应的存储
   if (event === 'message.create') {
     onMessageCreate(value as AEvents['message.create'])

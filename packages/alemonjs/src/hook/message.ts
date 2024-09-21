@@ -92,10 +92,7 @@ export const Voice = (val: any) => {
  *
  * @param val
  */
-export const Img = (
-  val: Buffer | string,
-  typing?: 'buffer' | 'file' | 'network'
-) => {
+export const Img = (val: Buffer | string, typing?: 'buffer' | 'file' | 'network') => {
   return {
     type: 'img',
     value: val,
