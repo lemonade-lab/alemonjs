@@ -7,11 +7,17 @@ const _dir = './src/apps'
  *
  */
 const values: {
-  // 其他配置信息
+  /**
+   * 其他配置信息
+   */
   [key: string]: any
-  // 目录地址
+  /**
+   * 目录地址
+   */
   dir: string
-  // 文件地址
+  /**
+   * 文件地址
+   */
   path: string
 }[] = []
 
@@ -67,8 +73,6 @@ export const loadFiles = async () => {
     } // 保存目录地址和文件地址
     values.push({
       ...v,
-
-      message: v?.message ?? 'message',
       dir: dirname(item),
       path: item
     })

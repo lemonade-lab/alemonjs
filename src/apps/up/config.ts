@@ -1,5 +1,5 @@
 import { ResponseConfig } from 'alemonjs'
 export default ResponseConfig({
-  // 优先级
-  priority: 1
+  // 只响应kook平台
+  platform: 'kook'
 })

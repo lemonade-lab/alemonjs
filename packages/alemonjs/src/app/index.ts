@@ -1,6 +1,6 @@
 import { AEvents } from '../types'
 
-type ControllerType = { next: Function; close: Function; reg: RegExp }
+type ControllerType = { next: Function; reg: RegExp }
 
 /**
  * 处理响应事件

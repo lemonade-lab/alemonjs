@@ -39,4 +39,11 @@ export const useWithdraw = event => {
  * @param event
  * @param value
  */
-export const Parse = (event: 'Text' | 'Img', value: any) => {}
+export const useParse = (event: 'Text' | 'Img', value: any[] = []) => {
+  console.log(value)
+  if (event === 'Text') {
+    const msgs = value.filter(e => e.type === event)
+    return msgs.map(e => e.value).join('')
+  }
+  return
+}
