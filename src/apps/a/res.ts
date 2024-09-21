@@ -13,8 +13,10 @@ import {
 } from 'alemonjs'
 export default OnResponse(
   (event, { next }) => {
+    // 创建一个send
+    const Send = useSend(event)
     // 发送消息
-    useSend(
+    Send(
       // at 某人
       At('123456'),
       // at 所有人
@@ -43,11 +45,11 @@ export default OnResponse(
       BtBox('Row', Button('hello', { send: '/你好' }))
     )
     // 文件
-    useSend(Files('https://www.baidu.com'))
+    Send(Files('https://www.baidu.com'))
     // 视频
-    useSend(Voice('https://www.baidu.com'))
+    Send(Voice('https://www.baidu.com'))
     // 音频
-    useSend(Video('https://www.baidu.com'))
+    Send(Video('https://www.baidu.com'))
   },
   'message.create',
   /^你好呀$/

@@ -29,6 +29,8 @@ const values: {
  * @param message
  */
 const onMessageCreate = async (e: AEvents['message.create']) => {
+  // 如何才能能正确消息调用。
+
   // 获取所有文件
   const files = getFilesValues()
 
@@ -63,9 +65,9 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
       return
     }
     const obj = await import(`file://${file.path}`)
+    const d = obj?.default
     console.log(obj)
-
-    if (obj?.default?.event !== 'message.create') {
+    if (d?.event !== 'message.create') {
       // 继续
       calli()
       return
@@ -75,13 +77,13 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     // 确保下次直接流向 message.create ，不再从头开始
 
     const msg = useParse('Text', e.Megs) ?? ''
-    if (!file?.path || (file?.reg && !file?.reg.test(msg))) {
+    if (d?.reg && !d?.reg.test(msg)) {
       // 继续
       calli()
       return
     }
     // 这里是否继续时 next 说了算
-    obj?.default?.callback(e, { next, reg: obj.reg })
+    d?.callback(e, { next, reg: d.reg })
   }
 
   // 这里必然都是 message.create
@@ -100,14 +102,15 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
       return
     }
     const obj = await import(`file://${file.path}`)
+    const d = obj?.default
     console.log(obj)
     const msg = useParse('Text', e.Megs) ?? ''
-    if (!file?.path || (file?.reg && !file?.reg.test(msg))) {
+    if (d?.reg && !d?.reg.test(msg)) {
       callj()
       return
     }
     // 这里是否继续时 next 说了算
-    obj?.default?.callback(e, { next, reg: obj.reg })
+    d?.callback(e, { next, reg: d.reg })
   }
 
   // 开始调用，调用完了i，再调用j

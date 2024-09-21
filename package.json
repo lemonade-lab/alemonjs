@@ -9,6 +9,7 @@
   "main": "index.ts",
   "scripts": {
     "app": "npx tsx index.ts",
+    "dev": "npx tsx watch --clear-screen=false  index.ts",
     "format": "prettier --write .",
     "check-format": "git diff --exit-code",
     "prepare": "husky"

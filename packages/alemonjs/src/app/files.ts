@@ -58,24 +58,22 @@ const getFiles = (dir: string): string[] => {
  */
 export const loadFiles = async () => {
   const dir = join(process.cwd(), _dir)
-  console.log('dir', dir)
   const files = getFiles(dir)
   // 读取config ，根据config对目录进行分类
   for (const item of files) {
     const dir = dirname(item)
-    // console.log(dir)
     let v: any = {}
     try {
       const obj = await import(`file://${dir}/config.js`)
       v = obj?.default
     } catch (e) {
       // console.error(e)
-    } // 保存目录地址和文件地址
+    }
+    // 保存目录地址和文件地址
     values.push({
       ...v,
       dir: dirname(item),
       path: item
     })
   }
-  console.log('this.#values', values)
 }

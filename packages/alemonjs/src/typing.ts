@@ -2,10 +2,45 @@
  *
  */
 export type AEventByMessageCreate = {
-  UserId: string
-  MsgId: string
-  Megs: any[]
+  /**
+   *
+   */
   Platform: string
+  /**
+   *
+   */
+  GuildId: string
+  /**
+   *
+   */
+  ChannelId: string
+  /**
+   *
+   */
+  UserId: string
+  /**
+   *
+   */
+  UserName: string
+  /**
+   * 用户头像地址
+   */
+  UserAvatar: string
+  /**
+   *
+   */
+  MsgId: string
+  /**
+   *
+   */
+  Megs: any[]
+  /**
+   *
+   */
+  OpenID: string
+  /**
+   * 捕获原始消息格式
+   */
   value: any
 }
 

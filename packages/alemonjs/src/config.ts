@@ -94,7 +94,6 @@ export class Config {
   #initData = (data: BotConfigType) => {
     // 尝试读取执行参数
     let login = getArgvValue('--login')
-    console.log('login', login)
     if (!login) {
       if (data.login) {
         login = data.login
