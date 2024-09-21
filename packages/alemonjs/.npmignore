@@ -1,5 +1,5 @@
 # 依赖
 node_modules
 /*
-!/config
 !/lib
+!/tsconfig.json

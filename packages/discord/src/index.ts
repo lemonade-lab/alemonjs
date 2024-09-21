@@ -96,10 +96,23 @@ export const login = (config: ConfigType) => {
           },
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
-            const content = useParse('Text', val)
-            return client.channelsMessages(event.ChannelId, {
-              content
-            })
+            const content = useParse(val, 'Text')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.channelsMessages(event.ChannelId, {
+                    content: item
+                  })
+                )
+              )
+            }
+            const images = useParse(val, 'Image')
+            if (images) {
+              return Promise.all(
+                images.map(item => client.channelsMessagesImage(event.ChannelId, item))
+              )
+            }
+            return Promise.resolve()
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
             console.log(event, val)

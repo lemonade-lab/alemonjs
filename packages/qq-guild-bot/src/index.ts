@@ -69,11 +69,29 @@ export const login = (config: ConfigType) => {
           },
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
-            const content = useParse('Text', val)
-            return client.channelsMessagesPost(event.GuildId, {
-              content,
-              msg_id: event.MsgId
-            })
+            const content = useParse(val, 'Text')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.channelsMessagesPost(event.ChannelId, {
+                    content: item,
+                    msg_id: event.MsgId
+                  })
+                )
+              )
+            }
+            const images = useParse(val, 'Image')
+            if (images) {
+              return Promise.all(
+                images.map(item =>
+                  client.postImage(event.ChannelId, {
+                    msg_id: event.MsgId,
+                    image: item
+                  })
+                )
+              )
+            }
+            return Promise.resolve()
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
             console.log(event, val)

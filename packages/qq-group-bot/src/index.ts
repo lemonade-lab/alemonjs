@@ -1,5 +1,5 @@
 import { ConfigType, Text, OnProcessor, AEvents, useParse } from 'alemonjs'
-import { QQBotGroupClient } from 'chat-space'
+import { DrawingBed, QQBotGroupClient, FilesServer } from 'chat-space'
 /**
  *
  * @param val
@@ -11,10 +11,10 @@ export const login = (config: ConfigType) => {
     secret: config.secret,
     token: config.token
   })
-
+  // 创建文件服务
+  const ClientFile = new FilesServer()
   // 连接
   client.connect()
-
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE_TYPE', async event => {
     // 定义消
@@ -70,13 +70,50 @@ export const login = (config: ConfigType) => {
           },
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
-            const content = useParse('Text', val)
-            return client.groupOpenMessages(event.GuildId, {
-              content,
-              msg_id: event.MsgId,
-              msg_type: 0,
-              msg_seq: client.getMsgSeq(event.MsgId)
-            })
+            const content = useParse(val, 'Text')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.groupOpenMessages(event.GuildId, {
+                    content: item,
+                    msg_id: event.MsgId,
+                    msg_type: 0,
+                    msg_seq: client.getMsgSeq(event.MsgId)
+                  })
+                )
+              )
+            }
+            const images = useParse(val, 'Image')
+            if (images) {
+              return Promise.all(
+                images.map(async msg => {
+                  let url = null
+                  // 如果状态为true
+                  if (DrawingBed.get('state')) {
+                    url = await DrawingBed.get('func')(msg)
+                  } else {
+                    url = await ClientFile.getFileUrl(msg)
+                  }
+                  const file_info = await client
+                    .postRichMediaByGroup(event.GuildId, {
+                      srv_send_msg: false,
+                      file_type: 1,
+                      url
+                    })
+                    .then(res => res?.file_info)
+                  return client.groupOpenMessages(event.GuildId, {
+                    content: '',
+                    media: {
+                      file_info
+                    },
+                    msg_id: event.MsgId,
+                    msg_type: 7,
+                    msg_seq: client.getMsgSeq(event.MsgId)
+                  })
+                })
+              )
+            }
+            return Promise.resolve()
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
             console.log(event, val)

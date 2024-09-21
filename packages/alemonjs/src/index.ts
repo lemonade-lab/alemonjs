@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { Config, argv } from './config'
 import { loadFiles } from './app/event-files'
-import { getArgvValue } from '../lib'
+import { getArgvValue } from './config'
 type options = {
   // 可监听的配置文件
   configDir?: string

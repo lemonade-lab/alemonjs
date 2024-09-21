@@ -78,12 +78,31 @@ export const login = (config: ConfigType) => {
           },
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
-            const test = useParse('Text', val)
-            return client.createMessage({
-              type: 9,
-              target_id: event.ChannelId,
-              content: test
-            })
+            const content = useParse(val, 'Text')
+            if (content) {
+              return client.createMessage({
+                type: 9,
+                target_id: event.ChannelId,
+                content: content
+              })
+            }
+            const images = useParse(val, 'Image')
+            if (images) {
+              return Promise.all(
+                images.map(async item => {
+                  // 上传图片
+                  const res = await client.postImage(item)
+                  if (!res) return Promise.resolve()
+                  // 发送消息
+                  return await client.createMessage({
+                    type: 2,
+                    target_id: event.ChannelId,
+                    content: res.data.url
+                  })
+                })
+              )
+            }
+            return Promise.resolve()
           },
           reply: (event: AEvents['message.create'], val: any[]) => {
             console.log(event, val)

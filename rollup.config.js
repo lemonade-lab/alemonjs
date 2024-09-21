@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 import alias from '@rollup/plugin-alias'
 import dts from 'rollup-plugin-dts'
 
-const packages = ['alemonjs', 'discord', 'icqq', 'kook', 'qq-group-bot', 'qq-guild-bot']
+const packages = ['alemonjs', 'discord', 'kook', 'qq-group-bot', 'qq-guild-bot']
 
 const config = packages.map(name => {
   return [

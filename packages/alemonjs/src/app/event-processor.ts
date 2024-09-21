@@ -76,7 +76,7 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     // 确保数据转移到 message.create存储位置
     // 确保下次直接流向 message.create ，不再从头开始
 
-    const msg = useParse('Text', e.Megs) ?? ''
+    const msg = useParse(e.Megs, 'Text') ?? ''
     if (d?.reg && !d?.reg.test(msg)) {
       // 继续
       calli()
@@ -104,7 +104,7 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     const obj = await import(`file://${file.path}`)
     const d = obj?.default
     console.log(obj)
-    const msg = useParse('Text', e.Megs) ?? ''
+    const msg = useParse(e.Megs, 'Text') ?? ''
     if (d?.reg && !d?.reg.test(msg)) {
       callj()
       return

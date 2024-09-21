@@ -5,7 +5,7 @@
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "axios": "^1.4.0",
     "yaml": "^2.5.1"
@@ -13,8 +13,8 @@
   "types": "lib",
   "exports": {
     ".": {
-      "import": "./src/index.js",
-      "types": "./src/index.d.ts"
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
     },
     "./tsconfig.json": {
       "import": "./tsconfig.json",
@@ -32,6 +32,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ningmengchongshui/alemonjs.git"
-  },
-  "homepage": "https://alemonjs.com/"
+  }
 }

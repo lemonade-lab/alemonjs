@@ -1,4 +1,6 @@
+import { readFileSync } from 'fs'
 import { AEventByMessageCreate } from '../types'
+import { DataParseType, ParseType } from './message-typing'
 
 export * from './message-format'
 
@@ -52,14 +54,35 @@ export const useWithdraw = (event: any) => {
 
 /**
  * 解析返回指定类型
- * @param event
- * @param value
+ * @param event 事件类型
+ * @param value 值数组
+ * @returns 解析后的值
  */
-export const useParse = (event: 'Text' | 'Img', value: any[] = []) => {
-  if (event === 'Text') {
-    const msgs = value.filter(item => item.type == event)
-    const msg = msgs.map(item => item.value).join('')
-    return msg
+export const useParse = <T extends keyof DataParseType>(
+  value: DataParseType[T][] = [],
+  event: T
+): ParseType[T] | undefined => {
+  const msgs = value.filter(item => item.type === event)
+  if (msgs.length === 0) return undefined
+  switch (event) {
+    case 'Text': {
+      return (msgs as DataParseType['Text'][]).map(item => item.value).join('')
+    }
+    case 'Image': {
+      const d: Buffer[] = []
+      for (const item of msgs as DataParseType['Image'][]) {
+        if (item.typing === 'buffer') {
+          d.push(item.value as Buffer)
+        }
+        // 如果是url。或者是本地文件
+        if (item.typing === 'file') {
+          const m = readFileSync(item.value, 'utf-8')
+          d.push(Buffer.from(readFileSync(m)))
+        }
+      }
+      return d.length > 0 ? d : undefined
+    }
+    default:
+      return undefined
   }
-  return
 }
