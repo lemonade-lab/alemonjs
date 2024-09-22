@@ -2,7 +2,7 @@ import { watch } from 'fs'
 import { join } from 'path'
 import { parse } from 'yaml'
 import { readFileSync, existsSync } from 'fs'
-import { BotConfigType } from './types.js'
+import { BotConfigType } from './typing/types'
 
 // 尝试从参数中，得到更高优先级的配置
 export const argv = [...process.argv].slice(2)
@@ -44,6 +44,8 @@ export class Config {
 
   //
   #values: ConfigType = null
+
+  #value = null
 
   /**
    *
@@ -140,7 +142,7 @@ export class Config {
   #update() {
     // 读取配置文件
     const dir = join(process.cwd(), this.#dir)
-    console.log(dir)
+    console.info(dir)
     // 如果文件不存在
     if (!existsSync(dir)) {
       console.warn('alemon.config.yaml not found')
@@ -156,11 +158,11 @@ export class Config {
     const data = readFileSync(dir, 'utf-8')
     try {
       const d = parse(data)
+      this.#value = d
       this.#initData(d)
-      // 确保参数优先级最高
       this.#initArgs()
     } catch (err) {
-      console.log(err)
+      console.error(err)
       process.cwd()
     }
     // 存在配置文件 , 开始监听文件
@@ -168,18 +170,19 @@ export class Config {
       const data = readFileSync(dir, 'utf-8')
       try {
         const d = parse(data)
+        this.#value = d
         this.#initData(d)
         // 确保参数优先级最高
         this.#initArgs()
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     })
     return this.#values
   }
 
   /**
-   * 得到置
+   * 归一配置值
    */
   get values() {
     if (!this.#values) {
@@ -196,5 +199,12 @@ export class Config {
       return this.#update()
     }
     return this.#values
+  }
+
+  /**
+   * 当且仅当配置文件存在时
+   */
+  get value() {
+    return this.#value
   }
 }

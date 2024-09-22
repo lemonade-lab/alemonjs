@@ -1,10 +1,7 @@
 import { readFileSync } from 'fs'
-import { AEventByMessageCreate } from '../types'
-import { DataParseType, ParseType } from './message-typing'
+import { DataEnums, DataParseType, ParseType } from './message-typing'
 
 export * from './message-format'
-
-type k = keyof AEventByMessageCreate
 
 /**
  * 全局声明
@@ -13,43 +10,10 @@ declare global {
   var alemonjs: {
     api: {
       use: {
-        observer: (fn: Function, arg: k[]) => void
-        send: (event, val: any[]) => void
-        reply: (event, val: any[]) => void
-        withdraw: (event, val: any[]) => void
+        send: (event: { [key: string]: any }, val: any[]) => void
       }
     }
   }
-}
-
-/**
- * 观察消息
- * @param fn
- */
-export const useObserver = (fn: Function, arg: k[]) => {
-  return global.alemonjs.api.use.observer(fn, arg)
-}
-
-/**
- * 发送消息
- */
-export const useSend = (event: any) => {
-  return (...val: any) => global.alemonjs.api.use.send(event, val)
-}
-
-/**
- * 回复消息
- */
-export const useReply = (event: any) => {
-  return (...val: any) => global.alemonjs.api.use.reply(event, val)
-}
-
-/**
- * 撤回消息
- * @param event
- */
-export const useWithdraw = (event: any) => {
-  return (...val: any) => global.alemonjs.api.use.withdraw(event, val)
 }
 
 /**
@@ -82,7 +46,22 @@ export const useParse = <T extends keyof DataParseType>(
       }
       return d.length > 0 ? d : undefined
     }
+    case 'At': {
+      return (msgs as DataParseType['Text'][]).map(item => {
+        return {
+          value: item.value,
+          typing: item.typing
+        }
+      })
+    }
     default:
       return undefined
   }
+}
+
+/**
+ * 发送消息
+ */
+export const useSend = (event: { [key: string]: any }) => {
+  return (...val: DataEnums[]) => global.alemonjs.api.use.send(event, val)
 }

@@ -1,4 +1,4 @@
-import { ConfigType, Text, OnProcessor, AEvents, useParse } from 'alemonjs'
+import { ConfigType, Text, OnProcessor, AEvents, useParse, At } from 'alemonjs'
 import { KOOKClient } from 'chat-space'
 /**
  *
@@ -18,12 +18,55 @@ export const login = (config: ConfigType) => {
     // 过滤机器人
     if (event.extra?.author?.bot) return false
 
-    // 私聊标记
+    // 创建私聊标记
     const data = await client.userChatCreate(event.extra.author.id).then(res => res?.data)
 
-    let msg = event?.extra?.kmarkdown?.raw_content ?? event.content
+    // 主人
+    const master_id = config?.master_id ?? []
+    const isMaster = master_id.includes(event.author_id)
 
+    // 头像
     const avatar = event.extra.author.avatar
+
+    // 获取消息
+    let msg = event.content
+
+    // 艾特消息处理
+    const at_users: {
+      id: string
+      name: string
+      avatar: string
+      bot: boolean
+    }[] = []
+
+    /**
+     * 艾特类型所得到的
+     * 包括机器人在内
+     */
+    const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? []
+    for (const item of mention_role_part) {
+      at_users.push({
+        id: item.role_id,
+        name: item.name,
+        avatar: '',
+        bot: true
+      })
+      msg = msg.replace(`(rol)${item.role_id}(rol)`, '').trim()
+    }
+
+    /**
+     * 艾特用户所得到的
+     */
+    const mention_part = event.extra.kmarkdown?.mention_part ?? []
+    for (const item of mention_part) {
+      at_users.push({
+        id: item.id,
+        name: item.username,
+        avatar: item.avatar,
+        bot: false
+      })
+      msg = msg.replace(`(met)${item.id}(met)`, '').trim()
+    }
 
     // 定义消
     const e = {
@@ -33,6 +76,8 @@ export const login = (config: ConfigType) => {
       GuildId: event.extra.guild_id,
       // 子频道
       ChannelId: event.target_id,
+      // 是否是主人
+      IsMaster: isMaster,
       // 用户ID
       UserId: event.author_id,
       // 用户名
@@ -42,9 +87,16 @@ export const login = (config: ConfigType) => {
       // 格式化数据
       MsgId: event.msg_id,
       // 用户消息
-      Megs: [Text(msg)],
+      Megs: [
+        Text(msg),
+        ...at_users.map(item =>
+          At(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
+        )
+      ],
       // 用户openId
       OpenID: data?.code,
+      // 创建时间
+      CreateAt: Date.now(),
       //
       value: null
     }
@@ -72,10 +124,6 @@ export const login = (config: ConfigType) => {
     global.alemonjs = {
       api: {
         use: {
-          observer: (fn: Function, arg: string[]) => {
-            console.log(fn, arg)
-            return
-          },
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
             const content = useParse(val, 'Text')
@@ -103,14 +151,6 @@ export const login = (config: ConfigType) => {
               )
             }
             return Promise.resolve()
-          },
-          reply: (event: AEvents['message.create'], val: any[]) => {
-            console.log(event, val)
-            return
-          },
-          withdraw: (event: AEvents['message.create'], val: any[]) => {
-            console.log(event, val)
-            return
           }
         }
       }

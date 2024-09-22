@@ -1,14 +1,17 @@
 import {
   DataArkType,
+  DataAtType,
   DataEmbedType,
   DataEmojiType,
+  DataImageType,
   DataLinkType,
   DataTextType
 } from './message-typing'
+
 /**
- * 发送文本
+ * 文本数据
  */
-export const Text = (val: any, typing?: DataTextType['typing']): DataTextType => {
+export const Text = (val: string, typing?: DataTextType['typing']): DataTextType => {
   return {
     type: 'Text',
     value: val,
@@ -17,14 +20,33 @@ export const Text = (val: any, typing?: DataTextType['typing']): DataTextType =>
 }
 
 /**
+ * 图片数据
+ * @param val
+ */
+export const Image = (val: Buffer | string, typing?: 'buffer' | 'file'): DataImageType => {
+  return {
+    type: 'Image',
+    value: val,
+    typing: typing ?? 'buffer'
+  }
+}
+
+/**
  *
  * @param val
  */
-export const At = (user_id?: string, typing?: 'user' | 'guild' | 'channel') => {
+export const At = (
+  UserID?: string,
+  typing?: 'user' | 'guild' | 'channel' | 'everyone',
+  val?: any
+): DataAtType => {
   return {
     type: 'At',
-    value: user_id,
-    typing
+    value: UserID ?? 'everyone',
+    typing: UserID ? typing : 'everyone',
+    name: val?.name ?? '',
+    avatar: val?.avatar ?? '',
+    bot: val?.bot ?? false
   }
 }
 
@@ -51,6 +73,12 @@ export const Button = (
   }
 }
 
+/**
+ *
+ * @param flex "
+ * @param arg
+ * @returns
+ */
 export const BtBox = (flex: 'Col' | 'Row', ...arg: any) => {
   return {
     type: 'BtBox',
@@ -60,7 +88,9 @@ export const BtBox = (flex: 'Col' | 'Row', ...arg: any) => {
 }
 
 /**
- * 发送文件
+ *
+ * @param val
+ * @returns
  */
 export const Files = (val: string) => {
   return {
@@ -94,16 +124,10 @@ export const Voice = (val: any) => {
 
 /**
  *
- * @param val
+ * @param title
+ * @param value
+ * @returns
  */
-export const Image = (val: Buffer | string, typing?: 'buffer' | 'file' | 'network') => {
-  return {
-    type: 'Image',
-    value: val,
-    typing
-  }
-}
-
 export const Link = (title: string, value: string): DataLinkType => {
   return {
     type: 'Link',
@@ -115,6 +139,7 @@ export const Link = (title: string, value: string): DataLinkType => {
 /**
  *
  * @param val
+ * @returns
  */
 export const Ark = (val: any): DataArkType => {
   return {
@@ -135,8 +160,9 @@ export const Embed = (val: any): DataEmbedType => {
 }
 
 /**
- * 发送表态
+ *
  * @param val
+ * @returns
  */
 export const Emoji = (val: 1): DataEmojiType => {
   return {

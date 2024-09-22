@@ -1,4 +1,3 @@
-import { join } from 'node:path'
 import { Config, argv } from './config'
 import { loadFiles } from './app/event-files'
 import { getArgvValue } from './config'
@@ -16,10 +15,8 @@ type options = {
  * 创建机器人
  * @returns
  */
-export async function createBot(dir = './alemon.config.js') {
-  const c = join(process.cwd(), dir)
-  const val: options = (await import(`file://${c}`)).default
-  const configDir = val?.configDir || 'alemon.config.yaml'
+export async function createBot() {
+  const configDir = 'alemon.config.yaml'
   const cfg = new Config(configDir)
   const skip = argv.includes('--skip')
   if (!cfg.values?.login) {
@@ -45,5 +42,5 @@ export function defineConfig(options: options = {}) {
 export * from './config'
 export * from './hook/use-api'
 export * from './app/event-utlis'
-export * from './typing'
+export * from './typing/typing'
 export * from './app/event-processor'

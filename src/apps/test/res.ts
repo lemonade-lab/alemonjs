@@ -6,9 +6,9 @@ export default OnResponse(
     // 消息编号
     const msg_id = event.MsgId
     // 尝试解析消息
-    const text = useParse('Text', event.Megs)
+    const text = useParse(event.Megs, 'Text')
     // 尝试解析图片
-    const image = useParse('Img', event.Megs)
+    const image = useParse(event.Megs, 'Image')
     // 判断当前平台
     const platform = event.Platform
     // 拿出原始数据

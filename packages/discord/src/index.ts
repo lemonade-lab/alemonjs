@@ -1,4 +1,4 @@
-import { ConfigType, Text, OnProcessor, AEvents, useParse } from 'alemonjs'
+import { ConfigType, Text, OnProcessor, AEvents, useParse, At } from 'alemonjs'
 import { DCClient } from 'chat-space'
 /**
  *
@@ -18,14 +18,18 @@ export const login = (config: ConfigType) => {
     // 消除bot消息
     if (event.author?.bot) return
 
-    /**
-     * 艾特消息处理
-     */
-    const at_users: any[] = []
+    const master_id = config?.master_id ?? []
+    const isMaster = master_id.includes(event.author.id)
 
-    /**
-     * 切割
-     */
+    // 艾特消息处理
+    const at_users: {
+      id: string
+      name: string
+      avatar: string
+      bot: boolean
+    }[] = []
+
+    // 获取艾特用户
     for (const item of event.mentions) {
       at_users.push({
         id: item.id,
@@ -35,9 +39,7 @@ export const login = (config: ConfigType) => {
       })
     }
 
-    /**
-     * 清除 @ 相关
-     */
+    // 清除 @ 相关的消息
     let msg = event.content
     for await (const item of at_users) {
       msg = msg.replace(`<@${item.id}>`, '').trim()
@@ -51,6 +53,8 @@ export const login = (config: ConfigType) => {
       GuildId: event.guild_id,
       // 子频道
       ChannelId: event.channel_id,
+      // 是否是主人
+      IsMaster: isMaster,
       // 用户ID
       UserId: event.author.id,
       // 用户名
@@ -60,9 +64,20 @@ export const login = (config: ConfigType) => {
       // 格式化数据
       MsgId: event.id,
       // 用户消息
-      Megs: [Text(event.content.trim())],
+      Megs: [
+        Text(msg),
+        ...at_users.map(item =>
+          At(item.id, 'user', {
+            name: item.name,
+            avatar: item.avatar,
+            bot: item.bot
+          })
+        )
+      ],
       // 用户openId
       OpenID: '',
+      // 创建时间
+      CreateAt: Date.now(),
       //
       value: null
     }
@@ -90,10 +105,6 @@ export const login = (config: ConfigType) => {
     global.alemonjs = {
       api: {
         use: {
-          observer: (fn: Function, arg: string[]) => {
-            console.log(fn, arg)
-            return
-          },
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
             const content = useParse(val, 'Text')
@@ -113,14 +124,6 @@ export const login = (config: ConfigType) => {
               )
             }
             return Promise.resolve()
-          },
-          reply: (event: AEvents['message.create'], val: any[]) => {
-            console.log(event, val)
-            return
-          },
-          withdraw: (event: AEvents['message.create'], val: any[]) => {
-            console.log(event, val)
-            return
           }
         }
       }

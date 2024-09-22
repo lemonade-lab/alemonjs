@@ -3,23 +3,16 @@ import fs from 'node:fs'
 
 const _dir = './src/apps'
 
+type DbKey = {
+  [key: string]: any
+  dir: string
+  path: string
+}
+
 /**
  *
  */
-const values: {
-  /**
-   * 其他配置信息
-   */
-  [key: string]: any
-  /**
-   * 目录地址
-   */
-  dir: string
-  /**
-   * 文件地址
-   */
-  path: string
-}[] = []
+const values: DbKey[] = []
 
 /**
  *

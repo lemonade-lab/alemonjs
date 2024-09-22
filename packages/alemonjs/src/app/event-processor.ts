@@ -1,23 +1,17 @@
 import { useParse } from '../hook/use-api'
-import { AEvents } from '../typing'
+import { AEvents } from '../typing/typing'
 import { getFilesValues } from './event-files'
 
+type DbKey = {
+  [key: string]: any
+  dir: string
+  path: string
+}
+
 const values: {
-  'message.create': {
-    [key: string]: any
-    dir: string
-    path: string
-  }[]
-  'message.delete': {
-    [key: string]: any
-    dir: string
-    path: string
-  }[]
-  'message.update': {
-    [key: string]: any
-    dir: string
-    path: string
-  }[]
+  'message.create': DbKey[]
+  'message.delete': DbKey[]
+  'message.update': DbKey[]
 } = {
   'message.create': [],
   'message.delete': [],
@@ -66,7 +60,6 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     }
     const obj = await import(`file://${file.path}`)
     const d = obj?.default
-    console.log(obj)
     if (d?.event !== 'message.create') {
       // 继续
       calli()
@@ -103,7 +96,6 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     }
     const obj = await import(`file://${file.path}`)
     const d = obj?.default
-    console.log(obj)
     const msg = useParse(e.Megs, 'Text') ?? ''
     if (d?.reg && !d?.reg.test(msg)) {
       callj()

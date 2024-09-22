@@ -17,6 +17,9 @@ export const login = (config: ConfigType) => {
   client.connect()
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE_TYPE', async event => {
+    const master_id = config?.master_id ?? []
+    const isMaster = master_id.includes(event.author.id)
+
     // 定义消
     const e = {
       // 事件类型
@@ -25,6 +28,8 @@ export const login = (config: ConfigType) => {
       GuildId: event.group_id,
       // 子频道
       ChannelId: event.group_id,
+      // 是否是主人
+      IsMaster: isMaster,
       // 用户ID
       UserId: event.author.id,
       // 用户名
@@ -37,6 +42,8 @@ export const login = (config: ConfigType) => {
       Megs: [Text(event.content.trim())],
       // 用户openId
       OpenID: event.author.member_openid,
+      // 创建时间
+      CreateAt: Date.now(),
       //
       value: null
     }
@@ -64,10 +71,6 @@ export const login = (config: ConfigType) => {
     global.alemonjs = {
       api: {
         use: {
-          observer: (fn: Function, arg: string[]) => {
-            console.log(fn, arg)
-            return
-          },
           send: (event: AEvents['message.create'], val: any[]) => {
             if (val.length < 0) return
             const content = useParse(val, 'Text')
@@ -114,14 +117,6 @@ export const login = (config: ConfigType) => {
               )
             }
             return Promise.resolve()
-          },
-          reply: (event: AEvents['message.create'], val: any[]) => {
-            console.log(event, val)
-            return
-          },
-          withdraw: (event: AEvents['message.create'], val: any[]) => {
-            console.log(event, val)
-            return
           }
         }
       }

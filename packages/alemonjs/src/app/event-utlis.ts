@@ -1,28 +1,18 @@
-import { AEvents } from '../types'
-
-type ControllerType = { next: Function; reg: RegExp }
+import { OnObserverType, OnResponseType, ResponseConfigType } from './event-typing'
 
 declare global {
   /**
    * 处理响应事件
    */
-  var OnResponse: <T extends keyof AEvents>(
-    callback: (event: AEvents[T], controller: ControllerType) => any,
-    event: T,
-    reg?: RegExp
-  ) => any
+  var OnResponse: OnResponseType
   /**
    * 处理响应事件配置
    */
-  var ResponseConfig: (options?: ResponseType) => ResponseType
+  var ResponseConfig: ResponseConfigType
   /**
    * 事件观察着
    */
-  var OnObserver: <T extends keyof AEvents>(
-    callback: (event: AEvents[T], controller: ControllerType) => any,
-    event: T,
-    reg?: RegExp
-  ) => any
+  var OnObserver: OnObserverType
 }
 
 /**
@@ -31,11 +21,7 @@ declare global {
  * @param event 事件类型
  * @returns 回调函数的执行结果
  */
-export const OnResponse = <T extends keyof AEvents>(
-  callback: (event: AEvents[T], controller: ControllerType) => any,
-  event: T,
-  reg?: RegExp
-): any => {
+export const OnResponse: OnResponseType = (callback, event, reg) => {
   return { callback, event, reg: reg ?? /(.*)/ }
 }
 
@@ -48,26 +34,15 @@ global.OnResponse = OnResponse
  * @param reg
  * @returns
  */
-export const OnObserver = <T extends keyof AEvents>(
-  callback: (event: AEvents[T], controller: ControllerType) => any,
-  event: T,
-  reg?: RegExp
-): any => {
+export const OnObserver: OnObserverType = (callback, event, reg) => {
   return { callback, event, reg: reg ?? /(.*)/ }
 }
 global.OnObserver = OnObserver
-
-type ResponseType = {
-  platform?: string
-  priority?: number
-  enable?: boolean
-  reg?: RegExp
-}
 
 /**
  *
  * @param options
  * @returns
  */
-export const ResponseConfig = (options?: ResponseType) => options
+export const ResponseConfig: ResponseConfigType = options => options
 global.ResponseConfig = ResponseConfig

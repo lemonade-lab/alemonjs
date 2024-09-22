@@ -2,7 +2,21 @@
 
 跨平台开发的事件驱动机器人
 
-## 2.0
+### Ecosystem
+
+| Project      | Status                          | Description    |
+| ------------ | ------------------------------- | -------------- |
+| [alemonjs]   | [![alemonjs-s]][alemonjs-p]     | 标准应用解析器 |
+| [chat-space] | [![chat-space-s]][chat-space-p] | 模板创建脚手架 |
+
+[alemonjs]: https://github.com/ningmengchongshui/alemonjs
+[alemonjs-s]: https://img.shields.io/npm/v/alemonjs.svg
+[alemonjs-p]: https://www.npmjs.com/package/alemonjs
+[chat-space]: https://github.com/ningmengchongshui/chat-space
+[chat-space-s]: https://img.shields.io/npm/v/chat-space.svg
+[chat-space-p]: https://www.npmjs.com/package/chat-space
+
+## how to use
 
 ```ts
 npm install yarn@1.19.1 -g
@@ -36,7 +50,6 @@ yarna add @alemonjs/kook -W
 import { Text, useSend } from 'alemonjs'
 export default OnResponse(
   (event, { next }) => {
-    console.log(event, next)
     // 创建一个send
     const Send = useSend(event)
     // 发送消息

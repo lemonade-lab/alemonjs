@@ -1,3 +1,30 @@
+export type DataTextType = {
+  type: 'Text'
+  value: string
+  typing: 'none' | 'bold' | 'block' | 'strikethrough' | 'boldItalic' | 'italic'
+}
+
+export type DataImageType = {
+  type: 'Image'
+  value: string | Buffer
+  typing?: 'buffer' | 'file'
+}
+
+export type DataAtType = {
+  type: 'At'
+  value: string
+  typing: 'user' | 'guild' | 'channel' | 'everyone'
+  name: string
+  avatar: string
+  bot: boolean
+}
+
+export type DataLinkType = {
+  type: 'Link'
+  title: string
+  value: string
+}
+
 export type DataEmojiType = {
   type: 'Emoji'
   value: 1
@@ -13,28 +40,10 @@ export type DataArkType = {
   value: any
 }
 
-export type DataLinkType = {
-  type: 'Link'
-  title: string
-  value: string
-}
-
-export type DataImageType = {
-  type: 'Image'
-  value: string | Buffer
-  typing?: 'buffer' | 'file'
-}
-
 export type DataFileType = {
   type: 'File'
   name: string
   url: string
-}
-
-export type DataTextType = {
-  type: 'Text'
-  value: string
-  typing: 'none' | 'bold' | 'block' | 'strikethrough' | 'boldItalic' | 'italic'
 }
 
 export type DataVideoType = {
@@ -80,7 +89,7 @@ export type ParseType = {
   Text: string | undefined
   Image: Buffer[] | undefined
   Link: any
-  At: any
+  At: { value: string; typing: string; name: string; avatar: string; bot: boolean }[] | undefined
   Button: any
   Files: any
   Voice: any
@@ -89,6 +98,7 @@ export type ParseType = {
 }
 
 export type DataEnums =
+  | DataAtType
   | DataEmojiType
   | DataEmbedType
   | DataArkType
@@ -98,6 +108,5 @@ export type DataEnums =
   | DataTextType
   | DataVideoType
   | DataVoiceType
-  | DataButtonType
   | DataBtBoxType
   | DataFilesType
