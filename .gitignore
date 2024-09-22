@@ -1,7 +1,44 @@
 # 依赖
 node_modules
 
-alemon.config.yaml
-alemon.config.json
+# 包
+/plugins/**/*
+/public/**/*
+/lib/**/*
+/types/**/*
 
+# docs
+docs
+
+# test
+alemon.login.ts
+alemon.config.ts
+a.main.ts
+a.apps.ts
+a.api.ts
+
+# env 
+alemon.env
+
+# 打印
+logs
+log
+los
+*.logs
+*.los
+*.log
+
+
+# npm
 yarn.lock
+
+dist
+
+# 
+min.js
+min.d.ts
+es.js
+es.d.ts
+index.d.ts
+
+bin/*.js

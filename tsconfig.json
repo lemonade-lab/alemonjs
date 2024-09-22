@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    // pages
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "rootDir": "./src",
+    /* 生产types  */
+    "declaration": true,
+    "declarationDir": "dist",
+    "outDir": "dist"
   },
-  "include": ["packages/**/*", "src/**/*"],
-  "extends": "alemonjs/tsconfig.json"
+  "include": ["src/**/*"],
+  "extends": "./config/tsconfig.json"
 }
