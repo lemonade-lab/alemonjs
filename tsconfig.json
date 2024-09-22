@@ -6,6 +6,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["packages/**/*", "src/**/*"],
+  "include": ["packages/**/*", "src/**/*", "@alemonjs/**/*"],
   "extends": "alemonjs/tsconfig.json"
 }

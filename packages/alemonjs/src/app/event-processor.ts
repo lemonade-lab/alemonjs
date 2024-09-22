@@ -37,13 +37,13 @@ const values: {
  * @param dir 目录路径
  * @returns 文件路径数组
  */
-const getFiles = (dir: string): string[] => {
+const getAppsFiles = (dir: string): string[] => {
   let results: string[] = []
   const list = fs.readdirSync(dir, { withFileTypes: true })
   list.forEach(item => {
     const fullPath = join(dir, item.name)
     if (item.isDirectory()) {
-      results = results.concat(getFiles(fullPath))
+      results = results.concat(getAppsFiles(fullPath))
     } else if (item.isFile() && item.name.startsWith('res')) {
       if (
         item.name.endsWith('.ts') ||
@@ -59,11 +59,19 @@ const getFiles = (dir: string): string[] => {
 }
 
 /**
+ *
+ * @param val
+ */
+export const pushAppsFiles = (val: DbKey) => {
+  files.push(val)
+}
+
+/**
  * 加载文件
  */
-export const loadFiles = async () => {
-  const dir = join(process.cwd(), _dir)
-  const Filesx = getFiles(dir)
+export const loadFiles = (val?: string) => {
+  const dir = join(process.cwd(), val ?? _dir)
+  const Filesx = getAppsFiles(dir)
   // 读取config ，根据config对目录进行分类
   for (const item of Filesx) {
     // 暂时不使用 config.js

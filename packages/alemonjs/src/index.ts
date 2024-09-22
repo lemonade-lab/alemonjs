@@ -1,5 +1,5 @@
 import { Config, argv } from './config'
-import { loadFiles } from './app/event-processor'
+import { loadFiles, pushAppsFiles } from './app/event-processor'
 import { getArgvValue } from './config'
 type options = {
   // 可监听的配置文件
@@ -22,7 +22,22 @@ export async function createBot() {
   if (!cfg.values?.login) {
     throw new Error('login is required')
   }
-  await loadFiles()
+  // local
+  loadFiles()
+  // module
+  if (cfg?.value?.apps) {
+    if (Array.isArray(cfg?.value?.apps)) {
+      for (const app of cfg?.value?.apps) {
+        const m = await import(app)
+        const c = m?.default()
+        if (c?.apps) {
+          for (const app of c.apps) {
+            pushAppsFiles(app)
+          }
+        }
+      }
+    }
+  }
   // prefix
   const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
   if (!skip) {
@@ -44,3 +59,6 @@ export * from './hook/use-api'
 export * from './app/event-utlis'
 export * from './typing/typing'
 export * from './app/event-processor'
+
+//
+export * from './app/event-files'

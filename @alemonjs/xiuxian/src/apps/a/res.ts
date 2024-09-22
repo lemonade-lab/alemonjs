@@ -1,4 +1,4 @@
-import { Text, Link, useSend, At } from 'alemonjs'
+import { Text, Link, useSend } from 'alemonjs'
 export default OnResponse(
   (event, { next }) => {
     // 创建一个send

@@ -1,0 +1,24 @@
+{
+  "name": "@alemonjs/xiuxian",
+  "version": "0.0.1",
+  "description": "啊柠檬脚本",
+  "author": "ningmengchongshui",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "private": true,
+  "dependencies": {
+    "chat-space": "^0.0.3"
+  },
+  "types": "src",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

@@ -16,11 +16,13 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "alemonjs": "link:./packages/alemonjs",
     "@alemonjs/discord": "link:./packages/discord",
     "@alemonjs/kook": "link:./packages/kook",
     "@alemonjs/qq-group-bot": "link:./packages/qq-group-bot",
     "@alemonjs/qq-guild-bot": "link:./packages/qq-guild-bot",
     "@alemonjs/readline": "link:./packages/readline",
+    "@alemonjs/xiuxian": "link:./@alemonjs/xiuxian",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/inquirer": "^9.0.7",
@@ -31,7 +33,6 @@
     "@types/node-schedule": "^2.1.2",
     "@types/react": "^18.3.8",
     "@types/redis": "^4.0.11",
-    "alemonjs": "link:./packages/alemonjs",
     "husky": "^9.0.11",
     "image-size": "^1.1.1",
     "lodash": "^4.17.21",
