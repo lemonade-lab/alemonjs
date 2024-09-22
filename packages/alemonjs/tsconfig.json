@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    // model
+    "target": "ESNext",
+    "module": "ESNext",
+    "allowJs": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    // jsx
+    "jsx": "react",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    // version
+    "ignoreDeprecations": "5.0",
+    // strict
+    "noImplicitAny": false,
+    "useDefineForClassFields": true,
+    "isolatedModules": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
