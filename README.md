@@ -1,4 +1,4 @@
-# AlemonJS [https://alemonjs.com](https://alemonjs.com)
+# [https://lemonade-lab.github.io/alemonjs.com/](https://lemonade-lab.github.io/alemonjs.com/)
 
 跨平台开发的事件驱动机器人
 
@@ -32,7 +32,7 @@
 [qq-guild-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-guild-bot.svg
 [qq-guild-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-guild-bot
 
-## how to use
+## How to use
 
 ```ts
 npm install yarn@1.19.1 -g
@@ -42,7 +42,6 @@ npm init -y
 ```sh
 yarn add tsx -D
 yarn add alemonjs@2 -W
-yarna add @alemonjs/kook -W
 ```
 
 - tsconfig.json
@@ -84,7 +83,11 @@ import { createBot } from 'alemonjs'
 createBot()
 ```
 
-> 启动 kook 依赖 @alemonjs/kook
+```sh
+yarn add @alemonjs/kook -W
+```
+
+> 启动 kook 平台
 
 ```sh
 npx tsx index.ts --login "kook"
@@ -110,16 +113,6 @@ kook:
   token: 'xxxx'
   # 主人
   master_id: []
-```
-
-- 自定义模块前缀
-
-node_modules/@alemon/icqq
-
-> 默认 @alemonjs/
-
-```sh
-npx tsx index.ts --prefix "@alemon/" --login "icqq"
 ```
 
 ## Community
