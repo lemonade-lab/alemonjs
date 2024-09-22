@@ -1,5 +1,5 @@
 import { Config, argv } from './config'
-import { loadFiles } from './app/event-files'
+import { loadFiles } from './app/event-processor'
 import { getArgvValue } from './config'
 type options = {
   // 可监听的配置文件

@@ -197,7 +197,7 @@ export const login = (config: ConfigType) => {
       api: {
         use: {
           send: (event: AEvents['message.create'], val: any[]) => {
-            if (val.length < 0) return
+            if (val.length < 0) return Promise.all([])
             const content = useParse(val, 'Text')
             if (content) {
               return Promise.all(
@@ -220,7 +220,7 @@ export const login = (config: ConfigType) => {
                 )
               )
             }
-            return Promise.resolve()
+            return Promise.all([])
           }
         }
       }

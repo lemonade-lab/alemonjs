@@ -125,14 +125,18 @@ export const login = (config: ConfigType) => {
       api: {
         use: {
           send: (event: AEvents['message.create'], val: any[]) => {
-            if (val.length < 0) return
+            if (val.length < 0) return Promise.all([])
             const content = useParse(val, 'Text')
             if (content) {
-              return client.createMessage({
-                type: 9,
-                target_id: event.ChannelId,
-                content: content
-              })
+              return Promise.all(
+                [content].map(item =>
+                  client.createMessage({
+                    type: 9,
+                    target_id: event.ChannelId,
+                    content: item
+                  })
+                )
+              )
             }
             const images = useParse(val, 'Image')
             if (images) {
@@ -150,7 +154,7 @@ export const login = (config: ConfigType) => {
                 })
               )
             }
-            return Promise.resolve()
+            return Promise.all([])
           }
         }
       }

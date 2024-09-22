@@ -1,7 +1,10 @@
 import { readFileSync } from 'fs'
 import { DataEnums, DataParseType, ParseType } from './message-typing'
+import { AEvents } from '../typing/typing'
 
 export * from './message-format'
+
+type ApiUseSend = (event: { [key: string]: any }, val: DataEnums[]) => Promise<any[]>
 
 /**
  * 全局声明
@@ -10,9 +13,17 @@ declare global {
   var alemonjs: {
     api: {
       use: {
-        send: (event: { [key: string]: any }, val: any[]) => void
+        send: ApiUseSend
       }
     }
+  }
+  var storeoberver: {
+    [key: string]: {
+      event: {
+        [key: string]: string
+      }
+      callback: Function
+    }[]
   }
 }
 
@@ -64,4 +75,33 @@ export const useParse = <T extends keyof DataParseType>(
  */
 export const useSend = (event: { [key: string]: any }) => {
   return (...val: DataEnums[]) => global.alemonjs.api.use.send(event, val)
+}
+
+/**
+ *
+ * @param event
+ * @param option
+ * @returns
+ */
+export const useOberver = <T extends keyof AEvents>(event: any, option: T) => {
+  return (
+    callback: (e: AEvents[T], { next }: { next: Function }) => any,
+    keys: (keyof AEvents[T])[]
+  ) => {
+    if (keys.length === 0) return
+    // 选取key，丢弃其他值
+    const v: {
+      [key: string]: string
+    } = {}
+    for (const key of keys) {
+      // key是string
+      if (typeof key === 'string' && typeof event[key] === 'string') v[key] = event[key]
+    }
+    // 如果不存在。则创建
+    if (!global.storeoberver) global.storeoberver = {}
+    if (!global.storeoberver[option]) global.storeoberver[option] = []
+    // 如果不存在。则创建
+    global.storeoberver[option].push({ event: v, callback })
+    return
+  }
 }
