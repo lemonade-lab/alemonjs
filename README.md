@@ -1,110 +1,127 @@
 # AlemonJS [https://alemonjs.com](https://alemonjs.com)
 
-<div align="center">
-  <a 
-  href="https://alemonjs.com/" 
-  target="_blank" 
-  rel="noopener noreferrer">
-  <img 
-   width="256" 
-   height="128"
-   src="https://alemonjs.com/img/alemon.jpg" 
-   alt="AlemonJS LOGO"
-   >
-  </a>
-</div>
-
-<div align="center">
-  
-跨平台开发的事件驱动机器人 | 支持 QQ (群&频道)、KOOK、Discord
-
-</div>
+跨平台开发的事件驱动机器人
 
 ### Ecosystem
 
-| Project           | Status                                               | Description     |
-| ----------------- | ---------------------------------------------------- | --------------- |
-| [alemonjs]        | [![alemonjs-status]][alemonjs-package]               | 标准应用解析器  |
-| [create-alemonjs] | [![create-alemonjs-status]][create-alemonjs-package] | 模板创建脚手架  |
-| [alemon-ffmpeg]   | [![alemon-ffmpeg-status]][alemon-ffmpeg-package]     | ffmpeg 自动下载 |
+| Project                  | Status                              | Description       |
+| ------------------------ | ----------------------------------- | ----------------- |
+| [alemonjs]               | [![alemonjs-s]][alemonjs-p]         | 标准应用解析器    |
+| [chat-space]             | [![chat-space-s]][chat-space-p]     | 接口 SDK          |
+| [@alemonjs/kook]         | [![kook-s]][kook-p]                 | KOOK 机器人连接   |
+| [@alemonjs/discord]      | [![discord-s]][discord-p]           | DC 公会机器人连接 |
+| [@alemonjs/qq-group-bot] | [![qq-group-bot-s]][qq-group-bot-p] | QQ 群机器人连接   |
+| [@alemonjs/qq-guild-bot] | [![qq-guild-bot-s]][qq-guild-bot-p] | QQ 频道机器人连接 |
 
 [alemonjs]: https://github.com/ningmengchongshui/alemonjs
-[alemonjs-status]: https://img.shields.io/npm/v/alemonjs.svg
-[alemonjs-package]: https://www.npmjs.com/package/alemonjs
-[create-alemonjs]: https://github.com/ningmengchongshui/alemonjs/tree/create-alemonjs
-[create-alemonjs-status]: https://img.shields.io/npm/v/create-alemonjs.svg
-[create-alemonjs-package]: https://www.npmjs.com/package/create-alemonjs
-[alemon-ffmpeg]: https://github.com/kongxiangyiren/alemon-ffmpeg
-[alemon-ffmpeg-status]: https://img.shields.io/npm/v/alemon-ffmpeg.svg
-[alemon-ffmpeg-package]: https://www.npmjs.com/package/alemon-ffmpeg
+[alemonjs-s]: https://img.shields.io/npm/v/alemonjs.svg
+[alemonjs-p]: https://www.npmjs.com/package/alemonjs
+[chat-space]: https://github.com/ningmengchongshui/chat-space
+[chat-space-s]: https://img.shields.io/npm/v/chat-space.svg
+[chat-space-p]: https://www.npmjs.com/package/chat-space
+[@alemonjs/kook]: https://github.com/alemonjs/kook
+[kook-s]: https://img.shields.io/npm/v/@alemonjs/kook.svg
+[kook-p]: https://www.npmjs.com/package/@alemonjs/kook
+[@alemonjs/discord]: https://github.com/alemonjs/discord
+[discord-s]: https://img.shields.io/npm/v/@alemonjs/discord.svg
+[discord-p]: https://www.npmjs.com/package/@alemonjs/discord
+[@alemonjs/qq-group-bot]: https://github.com/alemonjs/qq-group-bot
+[qq-group-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-group-bot.svg
+[qq-group-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-group-bot
+[@alemonjs/qq-guild-bot]: https://github.com/alemonjs/qq-guild-bot
+[qq-guild-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-guild-bot.svg
+[qq-guild-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-guild-bot
 
-### Quick Start
-
-可直接执行脚手架 并快速启动程序
-
-```sh
-npm install pnpm -g
-pnpm create alemonjs@latest -y
-cd alemonb
-npm install
-npm run dev
-```
-
-连接平台需要正确配置登录
-
-`alemon.login.ts`
+## how to use
 
 ```ts
-import { defineConfig } from 'alemonjs'
-export default defineConfig({
-  // 配置名 test
-  test: {
-    // qq平台配置
-    qq: {
-      appID: 'your app id',
-      token: 'your token'
+npm install yarn@1.19.1 -g
+npm init -y
+```
+
+```sh
+yarn add tsx -D
+yarn add alemonjs@2 -W
+yarna add @alemonjs/kook -W
+```
+
+- tsconfig.json
+
+```ts
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
     }
   },
-  // 配置名 pro
-  pro: {
-    // kook平台配置
-    kook: {}
-  }
-})
+  "include": ["src/**/*"],
+  "extends": "alemonjs/tsconfig.json"
+}
 ```
 
-> npm run [脚本名] [配置名] [平台名]
-
-启动时带上匹配规则机器人正确启动
-
-```sh
-npm run dev test qq
-```
-
-### Development Examples
+- src/apps/hello/res.ts
 
 ```ts
-import { createApp, Events, Messages } from 'alemonjs'
-// 监听事件
-const event = new Events()
-event.response('MEMBERS', async e => {
-  if (/^你好$/.test(e.msg)) e.reply('你好呀')
-})
-event.response('MEMBERS', async e => {
-  console.log('成员', e.user_name, '加入')
-})
-// 响应消息
-const message = new Messages()
-message.response(/^最近怎么样/, async e => {
-  e.reply('很好')
-})
-// 构建应用
-const app = createApp(import.meta.url)
-app.on(event.ok)
-app.use(message.ok)
-app.mount()
+import { Text, useSend } from 'alemonjs'
+export default OnResponse(
+  (event, { next }) => {
+    // 创建一个send
+    const Send = useSend(event)
+    // 发送消息
+    Send(Text('hello'))
+    //
+  },
+  'message.create',
+  /^你好$/
+)
 ```
 
-### Community
+- index.ts
+
+```ts
+import { createBot } from 'alemonjs'
+createBot()
+```
+
+> 启动 kook 依赖 @alemonjs/kook
+
+```sh
+npx tsx index.ts --login "kook"
+```
+
+> 设置 token
+
+```sh
+npx tsx index.ts --token "xxxx"
+```
+
+- alemon.config.yaml
+
+> 默认监听的配置
+
+```yaml
+# 选择登录的机器人
+login: ''
+
+# 机器人配置
+kook:
+  # 令牌
+  token: 'xxxx'
+  # 主人
+  master_id: []
+```
+
+- 自定义模块前缀
+
+node_modules/@alemon/icqq
+
+> 默认 @alemonjs/
+
+```sh
+npx tsx index.ts --prefix "@alemon/" --login "icqq"
+```
+
+## Community
 
 QQ Group 806943302
