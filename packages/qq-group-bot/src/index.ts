@@ -23,7 +23,7 @@ export const login = (config: ConfigType) => {
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'kook',
+      Platform: 'qq-group-bot',
       // 频道
       GuildId: event.group_id,
       // 子频道
