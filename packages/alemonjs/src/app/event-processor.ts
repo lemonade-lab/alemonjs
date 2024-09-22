@@ -126,19 +126,43 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
       next()
       return
     }
+
+    //
+    n++
+
     // 发现订阅
-    const item = global.storeoberver['message.create'][n]
+    const item = global.storeoberver['message.create'][n - 1]
+    if (!item) {
+      // 继续 next
+      nextOberver()
+      return
+    }
+
     for (const key in item.event) {
       // 只要发现不符合的，就继续
       if (item.event[key] !== e[key]) {
         // 不符合。继续 next。
-        n++
         nextOberver()
         return
       }
     }
-    // 符合。调用
-    item.callback(e, { next })
+
+    // 设置为undefined
+    global.storeoberver['message.create'][n - 1] = undefined
+
+    // 放回来
+    const Continue = () => {
+      global.storeoberver['message.create'][n - 1] = item
+      // 直接结束才对
+    }
+
+    // 没有调用下一步。应该删除当前的 n ？
+
+    // 有没有可能。按key来分。
+
+    item.callback(e, { next: Continue })
+
+    //
   }
 
   const calli = async () => {

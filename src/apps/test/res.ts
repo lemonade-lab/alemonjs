@@ -15,9 +15,9 @@ export default OnResponse(
         const text = useParse(event.Megs, 'Text')
         // 判断密码是否正确
         if (text === '123456') {
-          Send(Text('密码正确'))
+          Send(Text('密码正确1'))
         } else {
-          Send(Text('密码不正确'))
+          Send(Text('密码不正确1'))
           next()
         }
       },

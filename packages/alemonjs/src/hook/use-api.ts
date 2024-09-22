@@ -100,8 +100,25 @@ export const useOberver = <T extends keyof AEvents>(event: any, option: T) => {
     // 如果不存在。则创建
     if (!global.storeoberver) global.storeoberver = {}
     if (!global.storeoberver[option]) global.storeoberver[option] = []
-    // 如果不存在。则创建
-    global.storeoberver[option].push({ event: v, callback })
+    let i = 0
+    const next = () => {
+      if (i >= global.storeoberver[option].length) {
+        // 如果不存在。则创建
+        global.storeoberver[option][i] = { event: v, callback }
+        return
+      }
+
+      i++
+
+      // 是空的。占据位置。
+      if (!global.storeoberver[option][i]) {
+        global.storeoberver[option][i] = { event: v, callback }
+      } else {
+        // 不是空的。继续
+        next()
+      }
+    }
+    next()
     return
   }
 }
