@@ -55,6 +55,31 @@ export default defineBot(config => {
   client.on('ERROR', msg => {
     console.error(msg)
   })
+
+  /**
+   *
+   * @param GuildId
+   * @param msg
+   * @returns
+   */
+  const getFileInfo = async (GuildId: string, msg: Buffer) => {
+    let url = null
+    // 如果状态为true
+    if (DrawingBed.get('state')) {
+      url = await DrawingBed.get('func')(msg)
+    } else {
+      url = await ClientFile.getFileUrl(msg)
+    }
+    if (!url) return Promise.resolve(null)
+    return client
+      .postRichMediaByGroup(GuildId, {
+        srv_send_msg: false,
+        file_type: 1,
+        url
+      })
+      .then(res => res?.file_info)
+  }
+
   return {
     api: {
       use: {
@@ -77,20 +102,8 @@ export default defineBot(config => {
           if (images) {
             return Promise.all(
               images.map(async msg => {
-                let url = null
-                // 如果状态为true
-                if (DrawingBed.get('state')) {
-                  url = await DrawingBed.get('func')(msg)
-                } else {
-                  url = await ClientFile.getFileUrl(msg)
-                }
-                const file_info = await client
-                  .postRichMediaByGroup(event.GuildId, {
-                    srv_send_msg: false,
-                    file_type: 1,
-                    url
-                  })
-                  .then(res => res?.file_info)
+                const file_info = await getFileInfo(event.GuildId, msg)
+                if (!file_info) return Promise.resolve(null)
                 return client.groupOpenMessages(event.GuildId, {
                   content: '',
                   media: {
