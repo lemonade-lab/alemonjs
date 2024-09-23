@@ -20,6 +20,7 @@
     "@alemonjs/kook": "link:./packages/kook",
     "@alemonjs/qq-group-bot": "link:./packages/qq-group-bot",
     "@alemonjs/qq-guild-bot": "link:./packages/qq-guild-bot",
+    "@alemonjs/qq": "link:./packages/qq",
     "@alemonjs/readline": "link:./packages/readline",
     "@alemonjs/xiuxian": "link:./@alemonjs/xiuxian",
     "@rollup/plugin-alias": "^5.1.0",

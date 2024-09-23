@@ -62,7 +62,7 @@ export async function createBot() {
   if (!skip) {
     const bot = await import(`${prefix}${cfg.values.login}`)
     // 挂在全局
-    global.alemonjs = bot?.default(cfg.values)
+    global.alemonjs = bot?.default(cfg.values, cfg.value)
     return
   }
   await import(`${prefix}${cfg.values.login}`)
