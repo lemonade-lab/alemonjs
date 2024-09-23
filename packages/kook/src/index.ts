@@ -1,4 +1,4 @@
-import { defineBot, Text, OnProcessor, AEvents, useParse, At } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, At } from 'alemonjs'
 import { KOOKClient } from 'chat-space'
 
 export default defineBot(config => {
@@ -117,7 +117,7 @@ export default defineBot(config => {
   return {
     api: {
       use: {
-        send: (event: AEvents['message.create'], val: any[]) => {
+        send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
           const content = useParse(val, 'Text')
           if (content) {

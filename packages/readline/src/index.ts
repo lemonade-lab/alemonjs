@@ -1,7 +1,6 @@
-import { ConfigType, Text, OnProcessor, AEvents, defineBot } from 'alemonjs'
+import { Text, OnProcessor, defineBot } from 'alemonjs'
 import * as readline from 'readline'
-
-export default defineBot((config: ConfigType) => {
+export default defineBot(config => {
   console.log('config', config)
 
   // 创建接口以读取输入
@@ -59,7 +58,7 @@ export default defineBot((config: ConfigType) => {
   return {
     api: {
       use: {
-        send: (event: AEvents['message.create'], val: any[]) => {
+        send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
           console.log(event)
           console.log(val)

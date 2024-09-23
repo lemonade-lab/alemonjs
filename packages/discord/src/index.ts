@@ -1,6 +1,6 @@
-import { ConfigType, Text, OnProcessor, AEvents, useParse, At, defineBot } from 'alemonjs'
+import { Text, OnProcessor, useParse, At, defineBot } from 'alemonjs'
 import { DCClient } from 'chat-space'
-export default defineBot((config: ConfigType) => {
+export default defineBot(config => {
   // 创建客户端
   const client = new DCClient({
     token: config.token
@@ -97,7 +97,7 @@ export default defineBot((config: ConfigType) => {
   return {
     api: {
       use: {
-        send: (event: AEvents['message.create'], val: any[]) => {
+        send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
           const content = useParse(val, 'Text')
           if (content) {

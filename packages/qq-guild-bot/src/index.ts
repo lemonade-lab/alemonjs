@@ -1,4 +1,4 @@
-import { Text, OnProcessor, AEvents, useParse, At, defineBot } from 'alemonjs'
+import { Text, OnProcessor, useParse, At, defineBot } from 'alemonjs'
 import { QQBotGuildClient } from 'chat-space'
 export default defineBot(config => {
   // 创建客户端
@@ -183,7 +183,7 @@ export default defineBot(config => {
   return {
     api: {
       use: {
-        send: (event: AEvents['message.create'], val: any[]) => {
+        send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
           const content = useParse(val, 'Text')
           if (content) {

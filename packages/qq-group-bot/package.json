@@ -1,13 +1,13 @@
 {
   "name": "@alemonjs/qq-group-bot",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "啊柠檬脚本",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
-    "chat-space": "^0.0.3"
+    "chat-space": "^0.0.4"
   },
   "types": "lib",
   "exports": {
