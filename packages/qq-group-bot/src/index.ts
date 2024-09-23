@@ -12,7 +12,7 @@ export default defineBot(config => {
   // 连接
   client.connect()
   // 监听消息
-  client.on('GROUP_AT_MESSAGE_CREATE_TYPE', async event => {
+  client.on('GROUP_AT_MESSAGE_CREATE', async event => {
     const master_id = config?.master_id ?? []
     const isMaster = master_id.includes(event.author.id)
     // 定义消

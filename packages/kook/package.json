@@ -7,7 +7,7 @@
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
-    "chat-space": "^0.0.4"
+    "chat-space": "^0.0.5"
   },
   "types": "lib",
   "exports": {

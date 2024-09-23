@@ -12,7 +12,7 @@ export default OnResponse(
     console.log(Ats)
 
     // 发送消息
-    Send(Text('hello'))
+    Send(Text('hello')).then(console.info).catch(console.error)
     //
   },
   'message.create',
