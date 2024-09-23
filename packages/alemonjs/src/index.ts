@@ -1,6 +1,9 @@
 import { Config, argv } from './config'
 import { loadFiles, pushAppsFiles } from './app/event-processor'
 import { getArgvValue } from './config'
+import { getAppsFiles } from './app/event-files'
+import { dirname, join } from 'path'
+import { readFileSync } from 'fs'
 type options = {
   // 可监听的配置文件
   configDir?: string
@@ -11,6 +14,26 @@ type options = {
     app?: any[]
   }
 }
+
+/**
+ *
+ * @param app
+ */
+const loadChildrenFiles = app => {
+  const packageJson = JSON.parse(readFileSync(`node_modules/${app}/package.json`, 'utf-8'))
+  const mainPath = join(`node_modules/${app}`, packageJson.main)
+  const mainDir = dirname(mainPath)
+  const appsDir = join(mainDir, 'apps')
+  const files = getAppsFiles(appsDir)
+  for (const file of files) {
+    const dir = join(process.cwd(), file)
+    pushAppsFiles({
+      dir: dirname(dir),
+      path: dir
+    })
+  }
+}
+
 /**
  * 创建机器人
  * @returns
@@ -28,21 +51,18 @@ export async function createBot() {
   if (cfg?.value?.apps) {
     if (Array.isArray(cfg?.value?.apps)) {
       for (const app of cfg?.value?.apps) {
-        const m = await import(app)
-        const c = m?.default()
-        if (c?.apps) {
-          for (const app of c.apps) {
-            pushAppsFiles(app)
-          }
-        }
+        // const m = await import(app)
+        // const c = m?.default()
+        loadChildrenFiles(app)
       }
     }
   }
   // prefix
   const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
   if (!skip) {
-    const { login } = await import(`${prefix}${cfg.values.login}`)
-    login(cfg.values)
+    const bot = await import(`${prefix}${cfg.values.login}`)
+    // 挂在全局
+    global.alemonjs = bot?.default(cfg.values)
     return
   }
   await import(`${prefix}${cfg.values.login}`)
@@ -58,7 +78,8 @@ export * from './config'
 export * from './hook/use-api'
 export * from './app/event-utlis'
 export * from './typing/typing'
+export * from './typing/config'
 export * from './app/event-processor'
-
-//
 export * from './app/event-files'
+export * from './app/event-bot'
+export * from './app/event-chidren'

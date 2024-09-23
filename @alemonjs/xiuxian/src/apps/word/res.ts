@@ -13,6 +13,8 @@ export default OnResponse(
       // buffer 图片
       // 按钮比较复杂一些
     )
+    //
+    next()
   },
   'message.create',
   /^你好呀$/

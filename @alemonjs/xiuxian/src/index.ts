@@ -1,10 +1,9 @@
-import { getLoadFiles } from 'alemonjs'
-const text = getLoadFiles(import.meta.url)
-console.log(text)
-export default config => {
-  console.log(config)
-  // 返回应用路径。
+import { defineChildren } from 'alemonjs'
+export default defineChildren(config => {
+  console.log('config', config)
   return {
-    apps: getLoadFiles(import.meta.url)
+    onCreated() {
+      console.log('onCreated')
+    }
   }
-}
+})

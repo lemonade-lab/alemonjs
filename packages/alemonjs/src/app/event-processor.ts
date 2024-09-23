@@ -8,7 +8,7 @@ import { AEvents } from '../typing/typing'
 type DbKey = {
   // 目录
   dir: string
-  value: {
+  value?: {
     // 正则
     reg: RegExp
     // 事件
@@ -22,8 +22,13 @@ type DbKey = {
 
 const _dir = './src/apps'
 
-//
-const files: DbKey[] = []
+declare global {
+  var AppsFiles: DbKey[]
+}
+
+if (!global.AppsFiles) {
+  global.AppsFiles = []
+}
 
 //
 const values: {
@@ -63,29 +68,19 @@ const getAppsFiles = (dir: string): string[] => {
  * @param val
  */
 export const pushAppsFiles = (val: DbKey) => {
-  files.push(val)
+  global.AppsFiles.push(val)
 }
 
 /**
  * 加载文件
  */
-export const loadFiles = (val?: string) => {
-  const dir = join(process.cwd(), val ?? _dir)
+export const loadFiles = () => {
+  const dir = join(process.cwd(), _dir)
   const Filesx = getAppsFiles(dir)
   // 读取config ，根据config对目录进行分类
   for (const item of Filesx) {
-    // 暂时不使用 config.js
-    // const dir = dirname(item)
-    let v: any = {}
-    // try {
-    //   const obj = await import(`file://${dir}/config.js`)
-    //   v = obj?.default
-    // } catch (e) {
-    //   // console.error(e)
-    // }
     // 保存目录地址和文件地址
-    files.push({
-      ...v,
+    global.AppsFiles.push({
       dir: dirname(item),
       path: item
     })
@@ -104,7 +99,7 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
   }
 
   // copy
-  const messageFiles = [...files]
+  const messageFiles = [...global.AppsFiles]
   const messageCreate = [...values['message.create']]
 
   let i = 0
@@ -209,8 +204,8 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     // 推送, 确保下次直接流向 message.create ，不再从头开始
     if (!values['message.create'].find(v => v.path === file.path)) {
       // update files and values
-      const index = files.findIndex(v => v.path === file.path)
-      files.splice(index, 1)
+      const index = global.AppsFiles.findIndex(v => v.path === file.path)
+      global.AppsFiles.splice(index, 1)
       values['message.create'].push(v)
     }
 

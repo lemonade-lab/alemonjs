@@ -2,7 +2,7 @@ import { watch } from 'fs'
 import { join } from 'path'
 import { parse } from 'yaml'
 import { readFileSync, existsSync } from 'fs'
-import { BotConfigType } from './typing/types'
+import { BotConfigType, ConfigType } from './typing/types'
 
 // 尝试从参数中，得到更高优先级的配置
 export const argv = [...process.argv].slice(2)
@@ -22,17 +22,6 @@ export const getArgvValue = (key: string) => {
     return next
   }
   return null
-}
-
-export type ConfigType = {
-  login: string | undefined
-  app_id: string | undefined
-  token: string | undefined
-  intent: string | undefined
-  secret: string | undefined
-  shard: number[] | undefined
-  intents: string[] | undefined
-  master_id: string[] | undefined
 }
 
 /**

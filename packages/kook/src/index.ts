@@ -1,10 +1,7 @@
-import { ConfigType, Text, OnProcessor, AEvents, useParse, At } from 'alemonjs'
+import { defineBot, Text, OnProcessor, AEvents, useParse, At } from 'alemonjs'
 import { KOOKClient } from 'chat-space'
-/**
- *
- * @param val
- */
-export const login = (config: ConfigType) => {
+
+export default defineBot(config => {
   // 创建客户端
   const client = new KOOKClient({
     token: config.token
@@ -117,47 +114,42 @@ export const login = (config: ConfigType) => {
     console.error(msg)
   })
 
-  /**
-   * 开始实现全局接口
-   */
-  if (!global?.alemonjs) {
-    global.alemonjs = {
-      api: {
-        use: {
-          send: (event: AEvents['message.create'], val: any[]) => {
-            if (val.length < 0) return Promise.all([])
-            const content = useParse(val, 'Text')
-            if (content) {
-              return Promise.all(
-                [content].map(item =>
-                  client.createMessage({
-                    type: 9,
-                    target_id: event.ChannelId,
-                    content: item
-                  })
-                )
-              )
-            }
-            const images = useParse(val, 'Image')
-            if (images) {
-              return Promise.all(
-                images.map(async item => {
-                  // 上传图片
-                  const res = await client.postImage(item)
-                  if (!res) return Promise.resolve()
-                  // 发送消息
-                  return await client.createMessage({
-                    type: 2,
-                    target_id: event.ChannelId,
-                    content: res.data.url
-                  })
+  return {
+    api: {
+      use: {
+        send: (event: AEvents['message.create'], val: any[]) => {
+          if (val.length < 0) return Promise.all([])
+          const content = useParse(val, 'Text')
+          if (content) {
+            return Promise.all(
+              [content].map(item =>
+                client.createMessage({
+                  type: 9,
+                  target_id: event.ChannelId,
+                  content: item
                 })
               )
-            }
-            return Promise.all([])
+            )
           }
+          const images = useParse(val, 'Image')
+          if (images) {
+            return Promise.all(
+              images.map(async item => {
+                // 上传图片
+                const res = await client.postImage(item)
+                if (!res) return Promise.resolve()
+                // 发送消息
+                return await client.createMessage({
+                  type: 2,
+                  target_id: event.ChannelId,
+                  content: res.data.url
+                })
+              })
+            )
+          }
+          return Promise.all([])
         }
       }
     }
   }
-}
+})

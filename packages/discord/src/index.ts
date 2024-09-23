@@ -1,10 +1,6 @@
-import { ConfigType, Text, OnProcessor, AEvents, useParse, At } from 'alemonjs'
+import { ConfigType, Text, OnProcessor, AEvents, useParse, At, defineBot } from 'alemonjs'
 import { DCClient } from 'chat-space'
-/**
- *
- * @param val
- */
-export const login = (config: ConfigType) => {
+export default defineBot((config: ConfigType) => {
   // 创建客户端
   const client = new DCClient({
     token: config.token
@@ -98,35 +94,30 @@ export const login = (config: ConfigType) => {
     console.error(msg)
   })
 
-  /**
-   * 开始实现全局接口
-   */
-  if (!global?.alemonjs) {
-    global.alemonjs = {
-      api: {
-        use: {
-          send: (event: AEvents['message.create'], val: any[]) => {
-            if (val.length < 0) return Promise.all([])
-            const content = useParse(val, 'Text')
-            if (content) {
-              return Promise.all(
-                [content].map(item =>
-                  client.channelsMessages(event.ChannelId, {
-                    content: item
-                  })
-                )
+  return {
+    api: {
+      use: {
+        send: (event: AEvents['message.create'], val: any[]) => {
+          if (val.length < 0) return Promise.all([])
+          const content = useParse(val, 'Text')
+          if (content) {
+            return Promise.all(
+              [content].map(item =>
+                client.channelsMessages(event.ChannelId, {
+                  content: item
+                })
               )
-            }
-            const images = useParse(val, 'Image')
-            if (images) {
-              return Promise.all(
-                images.map(item => client.channelsMessagesImage(event.ChannelId, item))
-              )
-            }
-            return Promise.all([])
+            )
           }
+          const images = useParse(val, 'Image')
+          if (images) {
+            return Promise.all(
+              images.map(item => client.channelsMessagesImage(event.ChannelId, item))
+            )
+          }
+          return Promise.all([])
         }
       }
     }
   }
-}
+})

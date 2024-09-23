@@ -1,10 +1,6 @@
-import { ConfigType, Text, OnProcessor, AEvents, useParse } from 'alemonjs'
+import { ConfigType, Text, OnProcessor, AEvents, useParse, defineBot } from 'alemonjs'
 import { DrawingBed, QQBotGroupClient, FilesServer } from 'chat-space'
-/**
- *
- * @param val
- */
-export const login = (config: ConfigType) => {
+export default defineBot((config: ConfigType) => {
   // 创建客户端
   const client = new QQBotGroupClient({
     appID: config.app_id,
@@ -19,7 +15,6 @@ export const login = (config: ConfigType) => {
   client.on('GROUP_AT_MESSAGE_CREATE_TYPE', async event => {
     const master_id = config?.master_id ?? []
     const isMaster = master_id.includes(event.author.id)
-
     // 定义消
     const e = {
       // 事件类型
@@ -47,79 +42,70 @@ export const login = (config: ConfigType) => {
       //
       value: null
     }
-
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
         return event
       }
     })
-
     // 处理消息
     OnProcessor(e, 'message.create')
   })
-
   // 发送错误时
   client.on('ERROR', msg => {
     console.error(msg)
   })
-
-  /**
-   * 开始实现全局接口
-   */
-  if (!global?.alemonjs) {
-    global.alemonjs = {
-      api: {
-        use: {
-          send: (event: AEvents['message.create'], val: any[]) => {
-            if (val.length < 0) return Promise.all([])
-            const content = useParse(val, 'Text')
-            if (content) {
-              return Promise.all(
-                [content].map(item =>
-                  client.groupOpenMessages(event.GuildId, {
-                    content: item,
-                    msg_id: event.MsgId,
-                    msg_type: 0,
-                    msg_seq: client.getMsgSeq(event.MsgId)
-                  })
-                )
-              )
-            }
-            const images = useParse(val, 'Image')
-            if (images) {
-              return Promise.all(
-                images.map(async msg => {
-                  let url = null
-                  // 如果状态为true
-                  if (DrawingBed.get('state')) {
-                    url = await DrawingBed.get('func')(msg)
-                  } else {
-                    url = await ClientFile.getFileUrl(msg)
-                  }
-                  const file_info = await client
-                    .postRichMediaByGroup(event.GuildId, {
-                      srv_send_msg: false,
-                      file_type: 1,
-                      url
-                    })
-                    .then(res => res?.file_info)
-                  return client.groupOpenMessages(event.GuildId, {
-                    content: '',
-                    media: {
-                      file_info
-                    },
-                    msg_id: event.MsgId,
-                    msg_type: 7,
-                    msg_seq: client.getMsgSeq(event.MsgId)
-                  })
+  return {
+    api: {
+      use: {
+        send: (event: AEvents['message.create'], val: any[]) => {
+          if (val.length < 0) return Promise.all([])
+          const content = useParse(val, 'Text')
+          if (content) {
+            return Promise.all(
+              [content].map(item =>
+                client.groupOpenMessages(event.GuildId, {
+                  content: item,
+                  msg_id: event.MsgId,
+                  msg_type: 0,
+                  msg_seq: client.getMsgSeq(event.MsgId)
                 })
               )
-            }
-            return Promise.all([])
+            )
           }
+          const images = useParse(val, 'Image')
+          if (images) {
+            return Promise.all(
+              images.map(async msg => {
+                let url = null
+                // 如果状态为true
+                if (DrawingBed.get('state')) {
+                  url = await DrawingBed.get('func')(msg)
+                } else {
+                  url = await ClientFile.getFileUrl(msg)
+                }
+                const file_info = await client
+                  .postRichMediaByGroup(event.GuildId, {
+                    srv_send_msg: false,
+                    file_type: 1,
+                    url
+                  })
+                  .then(res => res?.file_info)
+                return client.groupOpenMessages(event.GuildId, {
+                  content: '',
+                  media: {
+                    file_info
+                  },
+                  msg_id: event.MsgId,
+                  msg_type: 7,
+                  msg_seq: client.getMsgSeq(event.MsgId)
+                })
+              })
+            )
+          }
+          return Promise.all([])
         }
       }
     }
   }
-}
+})

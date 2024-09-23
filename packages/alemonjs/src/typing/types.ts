@@ -37,3 +37,4 @@ export interface BotConfigType {
   'qq-group-bot': QQGroupConfig
 }
 export * from './typing'
+export * from './config'

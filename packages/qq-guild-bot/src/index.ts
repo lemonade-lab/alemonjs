@@ -1,23 +1,16 @@
-import { ConfigType, Text, OnProcessor, AEvents, useParse, At } from 'alemonjs'
+import { Text, OnProcessor, AEvents, useParse, At, defineBot } from 'alemonjs'
 import { QQBotGuildClient } from 'chat-space'
-/**
- *
- * @param val
- */
-export const login = (config: ConfigType) => {
+export default defineBot(config => {
   // 创建客户端
   const client = new QQBotGuildClient({
     appID: config.app_id,
     token: config.token
   })
-
   // 连接
   client.connect()
 
   // 监听消息
   client.on('AT_MESSAGE_CREATE', async event => {
-    console.log('AT_MESSAGE_CREATE', event)
-
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) return
 
@@ -100,8 +93,6 @@ export const login = (config: ConfigType) => {
 
   // 私域 -
   client.on('MESSAGE_CREATE', async event => {
-    console.log('MESSAGE_CREATE', event)
-
     // 屏蔽其他机器人的消息
     if (event.author?.bot) return
     // 撤回消息
@@ -189,41 +180,36 @@ export const login = (config: ConfigType) => {
     console.error(msg)
   })
 
-  /**
-   * 开始实现全局接口
-   */
-  if (!global?.alemonjs) {
-    global.alemonjs = {
-      api: {
-        use: {
-          send: (event: AEvents['message.create'], val: any[]) => {
-            if (val.length < 0) return Promise.all([])
-            const content = useParse(val, 'Text')
-            if (content) {
-              return Promise.all(
-                [content].map(item =>
-                  client.channelsMessagesPost(event.ChannelId, {
-                    content: item,
-                    msg_id: event.MsgId
-                  })
-                )
+  return {
+    api: {
+      use: {
+        send: (event: AEvents['message.create'], val: any[]) => {
+          if (val.length < 0) return Promise.all([])
+          const content = useParse(val, 'Text')
+          if (content) {
+            return Promise.all(
+              [content].map(item =>
+                client.channelsMessagesPost(event.ChannelId, {
+                  content: item,
+                  msg_id: event.MsgId
+                })
               )
-            }
-            const images = useParse(val, 'Image')
-            if (images) {
-              return Promise.all(
-                images.map(item =>
-                  client.postImage(event.ChannelId, {
-                    msg_id: event.MsgId,
-                    image: item
-                  })
-                )
-              )
-            }
-            return Promise.all([])
+            )
           }
+          const images = useParse(val, 'Image')
+          if (images) {
+            return Promise.all(
+              images.map(item =>
+                client.postImage(event.ChannelId, {
+                  msg_id: event.MsgId,
+                  image: item
+                })
+              )
+            )
+          }
+          return Promise.all([])
         }
       }
     }
   }
-}
+})

@@ -1,11 +1,7 @@
-import { ConfigType, Text, OnProcessor, AEvents } from 'alemonjs'
+import { ConfigType, Text, OnProcessor, AEvents, defineBot } from 'alemonjs'
 import * as readline from 'readline'
-/**
- *
- * @param config
- */
-export const login = (config: ConfigType) => {
-  //
+
+export default defineBot((config: ConfigType) => {
   console.log('config', config)
 
   // 创建接口以读取输入
@@ -60,21 +56,16 @@ export const login = (config: ConfigType) => {
   // 提示用户输入内容
   console.log('请输入测试内容: ')
 
-  /**
-   * 开始实现全局接口
-   */
-  if (!global?.alemonjs) {
-    global.alemonjs = {
-      api: {
-        use: {
-          send: (event: AEvents['message.create'], val: any[]) => {
-            if (val.length < 0) return Promise.all([])
-            console.log(event)
-            console.log(val)
-            return Promise.all([])
-          }
+  return {
+    api: {
+      use: {
+        send: (event: AEvents['message.create'], val: any[]) => {
+          if (val.length < 0) return Promise.all([])
+          console.log(event)
+          console.log(val)
+          return Promise.all([])
         }
       }
     }
   }
-}
+})
