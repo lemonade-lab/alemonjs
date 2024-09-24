@@ -1,6 +1,8 @@
-import { defineBot, Text, OnProcessor, useParse, At } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse } from 'alemonjs'
 import { Client, segment } from 'icqq'
 import { device, error, qrcode, slider } from './login'
+import { Store } from './store'
+
 export default defineBot((_, { qq: config }) => {
   const d = Number(config?.device)
   // 创建客户端
@@ -13,31 +15,46 @@ export default defineBot((_, { qq: config }) => {
     ver: config?.ver
   })
   const qq = Number(config.qq)
+  // 主人
+  const master_id: string[] = config?.master_id ?? []
   // 连接
   client.login(qq, config.password)
   client.on('system.login.error', event => error(event))
   client.on('system.login.device', event => device(client, event))
   client.on('system.login.qrcode', () => qrcode(client))
   client.on('system.login.slider', event => slider(client, event, qq))
+
+  const LocalStore = new Store()
+
   // 登录
   client.on('system.online', async () => {
-    console.log('ciqq 登录成功')
+    if (master_id[0]) {
+      const val = LocalStore.getItem()
+      const Now = Date.now()
+      if (!val || !val.RunAt || Now > Now + 1000 * 60 * 24) {
+        LocalStore.setItem({
+          RunAt: Now
+        })
+        const UserId = Number(master_id[0])
+        // 是否是好友
+        const friend = client.fl.get(UserId)
+        if (!friend) return
+        // send
+        client.pickUser(UserId).sendMsg('欢迎使用[ @AlemonJS/QQ ]')
+      }
+    }
   })
-  client.on('message.private', async _ => {
-    // console.log('message.private 待完成', event)
-  })
+  // client.on('message.private', async _ => {
+  //   // console.log('message.private 待完成', event)
+  // })
   // 监听消息
   client.on('message.group', async event => {
-    // 主人
-    const master_id = config?.master_id ?? []
     const user_id = String(event.sender.user_id)
     const group_id = String(event.group_id)
     const isMaster = master_id.includes(user_id)
-
     // e.group_avatar = `https://p.qlogo.cn/gh/${e.group_id}/${e.group_id}/640/`
-
     let msg = ''
-    const ats = []
+    const Ats = []
     for (const val of event.message) {
       switch (val.type) {
         case 'text': {
@@ -48,16 +65,35 @@ export default defineBot((_, { qq: config }) => {
           break
         }
         case 'at': {
-          ats.push(val.qq)
+          if (val.qq == 'all') {
+            // everyone
+            Ats.push({
+              type: 'At',
+              value: 'everyone',
+              typing: 'everyone',
+              name: 'everyone',
+              avatar: 'everyone',
+              bot: false
+            })
+          } else {
+            // user
+            Ats.push({
+              type: 'At',
+              value: String(val),
+              typing: 'user',
+              name: '',
+              avatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${val.qq}`,
+              bot: val.qq == qq
+            })
+          }
           break
         }
       }
     }
-
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'kook',
+      Platform: 'qq',
       // 频道
       GuildId: group_id,
       // 子频道
@@ -73,7 +109,7 @@ export default defineBot((_, { qq: config }) => {
       // 格式化数据
       MsgId: event.message_id,
       // 用户消息
-      Megs: [Text(msg), ...ats.map(item => At(item))],
+      Megs: [Text(msg)].concat(Ats),
       // 用户openId
       OpenID: user_id,
       // 创建时间
@@ -81,14 +117,12 @@ export default defineBot((_, { qq: config }) => {
       //
       value: null
     }
-
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
         return event
       }
     })
-
     // 处理消息
     OnProcessor(e, 'message.create')
   })
