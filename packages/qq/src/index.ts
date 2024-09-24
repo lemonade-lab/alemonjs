@@ -79,7 +79,7 @@ export default defineBot((_, { qq: config }) => {
             // user
             Ats.push({
               type: 'At',
-              value: String(val),
+              value: String(val.qq),
               typing: 'user',
               name: '',
               avatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${val.qq}`,

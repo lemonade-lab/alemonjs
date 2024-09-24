@@ -77,7 +77,7 @@ export type DataParseType = {
   Text: DataTextType
   Image: DataImageType
   Link: DataLinkType
-  At: DataTextType
+  At: DataAtType
   Button: DataButtonType
   Files: DataFilesType
   Voice: DataVoiceType

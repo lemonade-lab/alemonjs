@@ -58,12 +58,7 @@ export const useParse = <T extends keyof DataParseType>(
       return d.length > 0 ? d : undefined
     }
     case 'At': {
-      return (msgs as DataParseType['Text'][]).map(item => {
-        return {
-          value: item.value,
-          typing: item.typing
-        }
-      })
+      return msgs as DataParseType['At'][]
     }
     default:
       return undefined
