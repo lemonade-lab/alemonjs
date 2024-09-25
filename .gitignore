@@ -7,3 +7,5 @@ alemon.config.json
 yarn.lock
 
 data
+
+lib
