@@ -14,25 +14,25 @@
 | [@alemonjs/qq]           | [![qq-s]][qq-p]                     | QQ 连接        |
 | [@alemonjs/telegram]     | [![telegram-s]][telegram-p]         | telegram 连接  |
 
-[alemonjs]: https://github.com/lemonade-lab/alemonjs
+[alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/alemonjs
 [alemonjs-s]: https://img.shields.io/npm/v/alemonjs.svg
 [alemonjs-p]: https://www.npmjs.com/package/alemonjs
-[@alemonjs/kook]: https://github.com/lemonade-lab/alemonjs/packages/kook
+[@alemonjs/kook]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/kook
 [kook-s]: https://img.shields.io/npm/v/@alemonjs/kook.svg
 [kook-p]: https://www.npmjs.com/package/@alemonjs/kook
-[@alemonjs/discord]: https://github.com/lemonade-lab/alemonjs/packages/discord
+[@alemonjs/discord]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/discord
 [discord-s]: https://img.shields.io/npm/v/@alemonjs/discord.svg
 [discord-p]: https://www.npmjs.com/package/@alemonjs/discord
-[@alemonjs/qq-group-bot]: https://github.com/lemonade-lab/alemonjs/packages/qq-group-bot
+[@alemonjs/qq-group-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-group-bot
 [qq-group-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-group-bot.svg
 [qq-group-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-group-bot
-[@alemonjs/qq-guild-bot]: https://github.com/lemonade-lab/alemonjs/packages/qq-guild-bot
+[@alemonjs/qq-guild-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-guild-bot
 [qq-guild-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-guild-bot.svg
 [qq-guild-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-guild-bot
-[@alemonjs/qq]: https://github.com/lemonade-lab/alemonjs/packages/qq
+[@alemonjs/qq]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq
 [qq-s]: https://img.shields.io/npm/v/@alemonjs/qq.svg
 [qq-p]: https://www.npmjs.com/package/@alemonjs/telegram
-[@alemonjs/telegram]: https://github.com/lemonade-lab/alemonjs/packages/telegram
+[@alemonjs/telegram]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/telegram
 [telegram-s]: https://img.shields.io/npm/v/@alemonjs/telegram.svg
 [telegram-p]: https://www.npmjs.com/package/@alemonjs/telegram
 
