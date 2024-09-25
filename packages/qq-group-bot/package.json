@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/qq-group-bot",
   "version": "0.0.4",
-  "description": "啊柠檬脚本",
+  "description": "qq-group-bot",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
@@ -21,6 +21,9 @@
     "registry": "https://registry.npmjs.org"
   },
   "keywords": [
-    "alemonjs"
+    "alemonjs",
+    "qq-group-bot",
+    "bot",
+    "chat-bot"
   ]
 }

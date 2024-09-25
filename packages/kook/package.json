@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/kook",
   "version": "0.0.2",
-  "description": "啊柠檬脚本",
+  "description": "kook-bot",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
@@ -21,6 +21,9 @@
     "registry": "https://registry.npmjs.org"
   },
   "keywords": [
-    "alemonjs"
+    "alemonjs",
+    "kook",
+    "bot",
+    "chat-bot"
   ]
 }

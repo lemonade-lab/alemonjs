@@ -5,9 +5,7 @@ export default OnResponse(
     const Send = useSend(event)
     // 发送消息
     Send(
-      Text('你好呀'),
-      // 加粗文本
-      Text('hello', 'bold'),
+      Text('hello Word'),
       // link 文字
       Link('百度', 'https://www.baidu.com')
       // buffer 图片

@@ -21,6 +21,7 @@
     "@alemonjs/qq-group-bot": "link:./packages/qq-group-bot",
     "@alemonjs/qq-guild-bot": "link:./packages/qq-guild-bot",
     "@alemonjs/qq": "link:./packages/qq",
+    "@alemonjs/telegram": "link:./packages/telegram",
     "@alemonjs/readline": "link:./packages/readline",
     "@alemonjs/core": "link:./",
     "@rollup/plugin-alias": "^5.1.0",

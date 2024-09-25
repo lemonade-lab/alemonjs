@@ -1,13 +1,15 @@
 {
-  "name": "@alemonjs/qq-guild-bot",
-  "version": "0.0.4",
-  "description": "qq-guild-bot",
+  "name": "@alemonjs/telegram",
+  "version": "0.0.1",
+  "description": "telegram-bot",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
-    "chat-space": "^0.0.5"
+    "chat-space": "^0.0.4",
+    "grammy": "^1.30.0",
+    "node-telegram-bot-api": "^0.66.0"
   },
   "types": "lib",
   "exports": {
@@ -22,8 +24,12 @@
   },
   "keywords": [
     "alemonjs",
-    "qq-guild-bot",
+    "telegram",
+    "telegram-bot",
     "bot",
     "chat-bot"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.64.7"
+  }
 }

@@ -4,16 +4,16 @@
 
 ## USE
 
-- discord
+- telegram
 
 ```sh
-yarn add @alemonjs/discord
+yarn add @alemonjs/telegram
 ```
 
 - alemon.config.yaml
 
 ```sh
-discord:
+telegram:
   # 令牌
   token: ''
   # 主人

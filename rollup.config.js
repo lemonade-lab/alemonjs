@@ -89,7 +89,8 @@ const config = [
   'kook',
   'qq-group-bot',
   'qq-guild-bot',
-  'readline'
+  'readline',
+  'telegram'
 ].map(name => {
   const input = `packages/${name}/src/index.ts`
   const dir = `packages/${name}/lib`

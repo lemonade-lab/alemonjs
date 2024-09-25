@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/discord",
   "version": "0.0.3",
-  "description": "啊柠檬脚本",
+  "description": "discord-bot",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
@@ -21,6 +21,9 @@
     "registry": "https://registry.npmjs.org"
   },
   "keywords": [
-    "alemonjs"
+    "alemonjs",
+    "discord",
+    "bot",
+    "chat-bot"
   ]
 }
