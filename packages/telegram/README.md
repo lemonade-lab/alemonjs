@@ -14,14 +14,14 @@ yarn add @alemonjs/telegram
 
 ```sh
 telegram:
-  # 令牌
+  # 令牌 （必填）
   token: ''
-  # 主人
+  # 主人编号
   master_id: null
-  # 前缀（非必填）
-  intent: null
-  # 活动 非必填）
-  shard: null
+  base_api_url: null
+  # 代理地址
+  # proxy: 'http://127.0.0.1:7890'
+  proxy: null
 ```
 
 ## Community

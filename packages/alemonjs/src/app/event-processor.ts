@@ -33,8 +33,10 @@ if (!global.AppsFiles) {
 //
 const values: {
   'message.create': DbKey[]
+  'private.message.create': DbKey[]
 } = {
-  'message.create': []
+  'message.create': [],
+  'private.message.create': []
 }
 
 /**
@@ -89,18 +91,22 @@ export const loadFiles = () => {
 
 /**
  *
- * @param message
+ * @param e
+ * @param key
  */
-const onMessageCreate = async (e: AEvents['message.create']) => {
+const onMessage = <T extends keyof AEvents>(
+  e: AEvents['message.create'] | AEvents['private.message.create'],
+  key: T
+) => {
   // 如果不存在。则创建
   if (!global.storeoberver) global.storeoberver = {}
-  if (!global.storeoberver['message.create']) {
-    global.storeoberver['message.create'] = []
+  //
+  if (!global.storeoberver[key]) {
+    global.storeoberver[key] = []
   }
-
   // copy
   const messageFiles = [...global.AppsFiles]
-  const messageCreate = [...values['message.create']]
+  const messageCreate = [...values[key]]
 
   let i = 0
   let j = 0
@@ -124,7 +130,7 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
   //
   const nextOberver = () => {
     // i 结束了
-    if (n >= global.storeoberver['message.create'].length) {
+    if (n >= global.storeoberver[key].length) {
       // 开始调用i
       next()
       return
@@ -134,7 +140,7 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     n++
 
     // 发现订阅
-    const item = global.storeoberver['message.create'][n - 1]
+    const item = global.storeoberver[key][n - 1]
     if (!item) {
       // 继续 next
       nextOberver()
@@ -151,11 +157,11 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     }
 
     // 设置为undefined
-    global.storeoberver['message.create'][n - 1] = undefined
+    global.storeoberver[key][n - 1] = undefined
 
     // 放回来
     const Continue = () => {
-      global.storeoberver['message.create'][n - 1] = item
+      global.storeoberver[key][n - 1] = item
       // 直接结束才对
     }
 
@@ -185,7 +191,7 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
     const obj = await import(`file://${file.path}`)
     const d = obj?.default
 
-    if (d?.event !== 'message.create') {
+    if (d?.event !== key) {
       // 继续
       next()
       return
@@ -196,17 +202,17 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
       path: file.path,
       value: {
         reg: d?.reg,
-        event: d?.event ?? 'message.create',
+        event: d?.event ?? key,
         priority: d?.priority ?? 0
       }
     }
 
-    // 推送, 确保下次直接流向 message.create ，不再从头开始
-    if (!values['message.create'].find(v => v.path === file.path)) {
+    // 推送, 确保下次直接流向 key ，不再从头开始
+    if (!values[key].find(v => v.path === file.path)) {
       // update files and values
       const index = global.AppsFiles.findIndex(v => v.path === file.path)
       global.AppsFiles.splice(index, 1)
-      values['message.create'].push(v)
+      values[key].push(v)
     }
 
     const msg = useParse(e.Megs, 'Text') ?? ''
@@ -270,13 +276,15 @@ const onMessageCreate = async (e: AEvents['message.create']) => {
  * @returns
  */
 export const OnProcessor = <T extends keyof AEvents>(value: AEvents[T], event: T) => {
-  // 开始调用对应的存储
-  if (event === 'message.create') {
-    onMessageCreate(value as AEvents['message.create'])
-  } else if (event === 'message.delete') {
-    //
-  } else if (event === 'message.update') {
-    //
+  switch (event) {
+    case 'message.create':
+      onMessage(value as AEvents['message.create'], 'message.create')
+      break
+    case 'private.message.create':
+      onMessage(value as AEvents['private.message.create'], 'private.message.create')
+      break
+    default:
+      break
   }
   return
 }

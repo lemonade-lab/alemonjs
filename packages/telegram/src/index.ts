@@ -1,6 +1,7 @@
 import { defineBot, OnProcessor, Text, useParse } from 'alemonjs'
 import Client from 'node-telegram-bot-api'
-export default defineBot(config => {
+export default defineBot((_, { telegram: config }) => {
+  //
   const client = new Client(config.token, {
     polling: true,
     baseApiUrl: '',
@@ -9,9 +10,9 @@ export default defineBot(config => {
       proxy: 'http://127.0.0.1:7890'
     }
   })
-
-  // channel_post 消息
-  client.on('channel_post', event => {
+  //
+  client.on('message', event => {
+    // if(event.user_shared.)
     // 定义消
     const e = {
       // 事件类型
@@ -46,7 +47,7 @@ export default defineBot(config => {
       }
     })
     // 处理消息
-    OnProcessor(e, 'message.create')
+    OnProcessor(e, 'private.message.create')
   })
 
   // const eventKeys: string[] = [
@@ -118,6 +119,7 @@ export default defineBot(config => {
   //   })
   // }
 
+  //
   return {
     api: {
       use: {
