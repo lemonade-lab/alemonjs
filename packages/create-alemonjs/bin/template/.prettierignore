@@ -1,0 +1,17 @@
+# Node dependencies
+node_modules
+
+# build
+components.d.ts
+
+# alemon dev/config
+/data/
+stats.html
+
+# app
+example.js
+apps.js
+
+# Logs
+logs
+*.log

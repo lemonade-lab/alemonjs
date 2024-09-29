@@ -1,11 +1,14 @@
 import { defineConfig } from 'rollup'
 import typescript from '@rollup/plugin-typescript'
-import { dirname, resolve } from 'path'
+import { dirname, join, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import alias from '@rollup/plugin-alias'
 import dts from 'rollup-plugin-dts'
+import { getAppsFiles } from 'alemonjs'
+import { readdirSync } from 'fs'
 
 /**
+ *
  * @param {*} input
  * @param {*} dir
  * @param {*} inc
@@ -76,24 +79,47 @@ const buildDts = (input, dir, inc) => {
   }
 }
 
+const config = []
+
+/**
+ * 得到指定目录下的所有ts&js&jsx&tsx文件
+ * @param {*} dir
+ * @returns
+ */
+const getFiles = dir => {
+  let results = []
+  const list = readdirSync(dir, { withFileTypes: true })
+  list.forEach(item => {
+    const fullPath = join(dir, item.name)
+    if (item.isDirectory()) {
+      results = results.concat(getAppsFiles(fullPath))
+    } else if (item.isFile()) {
+      if (
+        item.name.endsWith('.ts') ||
+        item.name.endsWith('.js') ||
+        item.name.endsWith('.jsx') ||
+        item.name.endsWith('.tsx')
+      ) {
+        results.push(fullPath)
+      }
+    }
+  })
+  return results
+}
+
 /**
  *
+ * @param {*} input
+ * @param {*} output
  */
-const config = [
-  'alemonjs',
-  'discord',
-  'qq',
-  'kook',
-  'qq-group-bot',
-  'qq-guild-bot',
-  'readline',
-  'telegram'
-].map(name => {
-  const input = `packages/${name}/src/index.ts`
-  const dir = `packages/${name}/lib`
-  const inc = `packages/${name}/src/**/*`
-  return [buildJs(input, dir, inc), buildDts(input, dir, inc)]
-})
+const build = (input, output) => {
+  // Get all files from src folder
+  const inputFiles = getFiles(join(process.cwd(), input))
+  config.push(buildJs(inputFiles, output, `${input}/**/*`))
+  config.push(buildDts(inputFiles, output, `${input}/**/*`))
+}
+
+build('src', 'lib')
 
 //
 export default defineConfig(config.flat(Infinity))

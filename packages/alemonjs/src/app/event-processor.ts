@@ -1,9 +1,7 @@
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import fs from 'node:fs'
 import { useParse } from '../hook/use-api'
 import { AEvents } from '../typing/typing'
-
-// 0 优先级最低  ，可以无穷大
 
 type DbKey = {
   // 目录
@@ -19,8 +17,6 @@ type DbKey = {
   // 文件路径
   path: string
 }
-
-const _dir = './src/apps'
 
 declare global {
   var AppsFiles: DbKey[]
@@ -71,22 +67,6 @@ const getAppsFiles = (dir: string): string[] => {
  */
 export const pushAppsFiles = (val: DbKey) => {
   global.AppsFiles.push(val)
-}
-
-/**
- * 加载文件
- */
-export const loadFiles = () => {
-  const dir = join(process.cwd(), _dir)
-  const Filesx = getAppsFiles(dir)
-  // 读取config ，根据config对目录进行分类
-  for (const item of Filesx) {
-    // 保存目录地址和文件地址
-    global.AppsFiles.push({
-      dir: dirname(item),
-      path: item
-    })
-  }
 }
 
 /**

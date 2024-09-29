@@ -1,0 +1,9 @@
+node_modules
+yarn.lock
+# 忽略所有文件
+/*
+# 不忽略next
+/bin/alemonjs.ts
+!/bin/template
+!/bin/alemonjs.js
+!.npmrc

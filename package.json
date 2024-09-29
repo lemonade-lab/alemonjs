@@ -9,7 +9,8 @@
   "main": "lib/index.js",
   "scripts": {
     "app": "npx tsx index.ts",
-    "dev": "npx tsx watch --clear-screen=false  index.ts",
+    "start": "npx tsx start.ts",
+    "dev": "npx tsx watch --clear-screen=false index.ts --watch",
     "build": "rollup --config rollup.config.js",
     "format": "prettier --write .",
     "check-format": "git diff --exit-code",
@@ -18,13 +19,14 @@
   "devDependencies": {
     "@alemonjs/discord": "link:./packages/discord",
     "@alemonjs/kook": "link:./packages/kook",
+    "@alemonjs/qq": "link:./packages/qq",
     "@alemonjs/qq-group-bot": "link:./packages/qq-group-bot",
     "@alemonjs/qq-guild-bot": "link:./packages/qq-guild-bot",
-    "@alemonjs/qq": "link:./packages/qq",
-    "@alemonjs/telegram": "link:./packages/telegram",
     "@alemonjs/readline": "link:./packages/readline",
-    "@alemonjs/core": "link:./",
+    "@alemonjs/telegram": "link:./packages/telegram",
     "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/inquirer": "^9.0.7",
     "@types/lodash": "^4.17.7",
@@ -36,16 +38,17 @@
     "@types/redis": "^4.0.11",
     "alemonjs": "link:./packages/alemonjs",
     "husky": "^9.0.11",
-    "image-size": "^1.1.1",
-    "lodash": "^4.17.21",
-    "oicq": "^2.3.1",
     "pm2": "^5.4.2",
     "prettier": "^2.8.8",
-    "react": "^18.3.1",
-    "react-puppeteer": "^1.0.7",
     "rollup": "^4.18.1",
     "rollup-plugin-dts": "^6.1.1",
     "tsx": "^4.19.1",
     "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "image-size": "^1.1.1",
+    "lodash-es": "^4.17.21",
+    "react": "^18.3.1",
+    "react-puppeteer": "^1.0.7"
   }
 }
