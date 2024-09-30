@@ -9,7 +9,11 @@ const app = config?.pm2 ?? {}
 module.exports = {
   apps: [
     {
-      ...app
+      ...app,
+      env: {
+        NODE_ENV: 'production',
+        ...(app?.env ?? {})
+      }
     }
   ]
 }

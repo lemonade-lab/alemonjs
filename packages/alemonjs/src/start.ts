@@ -1,4 +1,4 @@
-import { rollup, watch } from 'rollup'
+import { rollup } from 'rollup'
 import { join } from 'path'
 import { readdirSync } from 'fs'
 import typescript from '@rollup/plugin-typescript'
@@ -51,33 +51,6 @@ const buildJs = async (inputs: string[], output: string) => {
     plugins: [commonjs(), json(), typescript()],
     onwarn: onwarn
   })
-
-  if (process.argv.includes('--watch')) {
-    const watcher = watch({
-      input: inputs,
-      output: {
-        dir: output,
-        format: 'es',
-        sourcemap: false,
-        preserveModules: true
-      },
-      plugins: [commonjs(), json(), typescript()],
-      watch: {
-        include: 'src/**',
-        clearScreen: false
-      }
-    })
-    // 监听bundle事件
-    watcher.on('event', event => {
-      if (event.code === 'BUNDLE_END') {
-        console.log(`Bundle finished in ${event.duration}ms.`)
-        process.exit()
-      } else if (event.code === 'ERROR') {
-        console.error('Error during bundling:', event.error)
-        process.exit()
-      }
-    })
-  }
 
   // 写入输出文件
   await bundle.write({

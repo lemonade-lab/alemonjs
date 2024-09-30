@@ -95,5 +95,4 @@ const config = [
   return [buildJs(input, dir, inc), buildDts(input, dir, inc)]
 })
 
-//
 export default defineConfig(config.flat(Infinity))

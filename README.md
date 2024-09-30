@@ -1,4 +1,4 @@
-# [https://lemonade-lab.github.io/alemonjs.com/](https://lemonade-lab.github.io/alemonjs.com/)
+# [https://alemonjs.com/](https://alemonjs.com/)
 
 跨平台开发的事件驱动机器人
 
@@ -7,6 +7,7 @@
 | Project                  | Status                              | Description    |
 | ------------------------ | ----------------------------------- | -------------- |
 | [alemonjs]               | [![alemonjs-s]][alemonjs-p]         | 标准应用解析器 |
+| [create-alemonjs]        | [![c-s]][c-p]                       | 脚手架         |
 | [@alemonjs/kook]         | [![kook-s]][kook-p]                 | KOOK 连接      |
 | [@alemonjs/discord]      | [![discord-s]][discord-p]           | DC 公会连接    |
 | [@alemonjs/qq-group-bot] | [![qq-group-bot-s]][qq-group-bot-p] | QQ 群连接      |
@@ -17,6 +18,9 @@
 [alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/alemonjs
 [alemonjs-s]: https://img.shields.io/npm/v/alemonjs.svg
 [alemonjs-p]: https://www.npmjs.com/package/alemonjs
+[create-alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/create-alemonjs
+[c-s]: https://img.shields.io/npm/v/create-alemonjs.svg
+[c-p]: https://www.npmjs.com/package/create-alemonjs
 [@alemonjs/kook]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/kook
 [kook-s]: https://img.shields.io/npm/v/@alemonjs/kook.svg
 [kook-p]: https://www.npmjs.com/package/@alemonjs/kook

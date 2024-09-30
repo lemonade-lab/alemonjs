@@ -5,4 +5,4 @@ type callbackObjType = {
   unMounted?: () => void
 }
 type callbackType = (config: ConfigType) => callbackObjType
-export const defineChildren = (_: callbackType) => {}
+export const defineChildren = (callback: callbackType) => callback

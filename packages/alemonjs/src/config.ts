@@ -86,6 +86,7 @@ export class Config {
     // 尝试读取执行参数
     let login = getArgvValue('--login')
     if (!login) {
+      console.log('login', data.login)
       if (data.login) {
         login = data.login
       }
