@@ -1,13 +1,17 @@
 import React from 'react'
-
-export type PropsType = {}
-
-export default function App({}: PropsType) {
+import { BackgroundImage, createRequire } from 'react-puppeteer'
+const require = createRequire(import.meta.url)
+/**
+ *
+ * @param param0
+ * @returns
+ */
+export default function App({ data }: { data: string }) {
   return (
-    <>
-      <div className="body-top"></div>
-      <div className="bg-black">xxx</div>
-      <div className="body-buttom  p-1"></div>
-    </>
+    <section className="flex flex-col">
+      <BackgroundImage url={require('../../../assets/App-Store.png')} size={'100% auto'}>
+        <div>{data}</div>
+      </BackgroundImage>
+    </section>
   )
 }

@@ -8,8 +8,9 @@
   "type": "module",
   "main": "lib/index.js",
   "scripts": {
-    "dev": "alemonjs dev --input ./src/index.ts",
-    "build": "alemonjs build",
+    "dev": "alemonjs dev --input ./src/index.ts --login kook",
+    "build": "alemonjs build --input ./src/index.ts",
+    "start": "alemonjs dev --input ./lib/index.js --login kook",
     "bundle": "rollup --config rollup.config.js",
     "format": "prettier --write .",
     "check-format": "git diff --exit-code",
