@@ -6,6 +6,8 @@ import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
 import { buildAndRun } from './start'
 
+const cwd = process.cwd()
+
 /**
  *
  * @param app
@@ -17,7 +19,7 @@ const loadChildrenFiles = (app: string) => {
   const appsDir = join(mainDir, 'apps')
   const files = getAppsFiles(appsDir)
   for (const file of files) {
-    const dir = join(process.cwd(), file)
+    const dir = join(cwd, file)
     pushAppsFiles({
       dir: dirname(dir),
       path: dir
@@ -81,7 +83,7 @@ const onDev = async (input: string) => {
   }
   //  input
   const run = async () => {
-    const dir = join(process.cwd(), input)
+    const dir = join(cwd, input)
     // src/apps/**/*
     const mainDir = dirname(dir)
     console.log('mainDir', mainDir)
@@ -138,7 +140,7 @@ const onStart = async (input?: string) => {
   // input
   const run = async () => {
     if (input) {
-      const dir = join(process.cwd(), input)
+      const dir = join(cwd, input)
       // src/apps/**/*
       const mainDir = dirname(dir)
       const app = await import(`file://${dir}`)
@@ -188,7 +190,7 @@ const initConfig = async () => {
 }
 
 const main = async () => {
-  if (process.argv.includes('dev')) {
+  if (argv.includes('--dev')) {
     await initConfig()
     // 开发模式
     let input = getArgvValue('--input')
@@ -202,7 +204,7 @@ const main = async () => {
       throw new Error('input is required')
     }
     onDev(input)
-  } else if (process.argv.includes('build')) {
+  } else if (argv.includes('--build')) {
     await initConfig()
     // 构建模式
     let input = getArgvValue('--input')
@@ -217,7 +219,7 @@ const main = async () => {
     }
     const ouput = getArgvValue('--ouput') ?? 'lib'
     onBuild(input, ouput)
-  } else if (process.argv.includes('start')) {
+  } else if (argv.includes('--tart')) {
     // start 模式 没有config 没有ts环境
     const input = getArgvValue('--input')
     onStart(input)

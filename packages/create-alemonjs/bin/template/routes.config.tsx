@@ -7,7 +7,7 @@ export default defineConfig([
     url: '/',
     options: {
       ...defineOptions,
-      html_body: <Word />
+      html_body: <Word data={''} />
     }
   }
 ])

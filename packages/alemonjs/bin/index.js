@@ -8,18 +8,28 @@ const currentDirPath = dirname(currentFilePath)
 const js = join(currentDirPath, '../lib/index.js')
 // 启动模式
 if (args.includes('start')) {
-  const msg = spawnSync('node', [js, ...args], { stdio: 'inherit' })
+  const argsx = args.filter(arg => arg !== 'start')
+  const msg = spawnSync('node', [js, '--start', ...argsx], { stdio: 'inherit' })
   if (msg.error) {
     console.error(msg.error)
-    process.exit(1)
+    process.exit()
   }
-} else {
-  // 开发和构建模式
-  const msg = spawnSync('npx', ['tsx', 'watch', '--clear-screen=false', js, ...args], {
+} else if (args.includes('build')) {
+  const argsx = args.filter(arg => arg !== 'build')
+  const msg = spawnSync('npx', ['tsx', js, '--build', ...argsx], {
     stdio: 'inherit'
   })
   if (msg.error) {
     console.error(msg.error)
-    process.exit(1)
+    process.exit()
+  }
+} else if (args.includes('dev')) {
+  const argsx = args.filter(arg => arg !== 'dev')
+  const msg = spawnSync('npx', ['tsx', 'watch', '--clear-screen=false', js, '--dev', ...argsx], {
+    stdio: 'inherit'
+  })
+  if (msg.error) {
+    console.error(msg.error)
+    process.exit()
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "create-alemonjs",
-  "version": "2.0.0",
+  "version": "2.0.0-rc.0",
   "description": "alemonjs",
   "author": "ningmengchongshui",
   "main": "bin/index.js",
@@ -8,16 +8,11 @@
   "type": "module",
   "scripts": {
     "dev": "node bin/alemonjs.js",
-    "build": "tsc",
-    "format": "prettier --write .",
-    "check-format": "git diff --exit-code",
-    "prepare": "husky"
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/node": "16.7.0",
-    "prettier": "^2.8.8",
-    "typescript": "^5.2.2",
-    "husky": "^9.0.11"
+    "typescript": "^5.2.2"
   },
   "bin": {
     "create-alemonjs": "bin/alemonjs.js"

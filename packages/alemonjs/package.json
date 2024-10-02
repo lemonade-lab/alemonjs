@@ -1,12 +1,13 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.10",
+  "version": "2.0.0-rc.11",
   "description": "啊柠檬脚本",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
+    "rollup-plugin-dts": "^6.1.1",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",

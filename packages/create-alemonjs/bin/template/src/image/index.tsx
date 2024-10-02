@@ -10,12 +10,12 @@ const require = createRequire(import.meta.url)
 export const defineOptions = {
   file_paths: {
     // 定位自身的 md文件，并获取目录地址
-    '@alemonjs': dirname(require('../../README.md'))
+    '@bot': dirname(require('../../README.md'))
   },
   html_head: (
     <>
       <link href={require('../../public/output.css')} />
-      <link href={require('../../public/css/help.css')} />
+      <link href={require('../../assets/css/main.css')} />
     </>
   )
 }
