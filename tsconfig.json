@@ -1,4 +1,4 @@
 {
-  "include": ["packages/**/*", "src/**/*", "@alemonjs/**/*"],
+  "include": ["packages/**/*", "src/**/*"],
   "extends": "alemonjs/tsconfig.json"
 }

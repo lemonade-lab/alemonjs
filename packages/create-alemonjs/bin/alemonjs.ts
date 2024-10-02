@@ -4,7 +4,7 @@ import { cpSync, rmSync } from 'fs'
 import { execSync } from 'child_process'
 import { resolve, join, dirname } from 'path'
 import { fileURLToPath } from 'node:url'
-const args = [...process.argv.slice(2)]
+// const args = [...process.argv.slice(2)]
 
 interface options {
   name: string
@@ -122,18 +122,5 @@ const data: options = {
   name: 'alemonb',
   force: false,
   cancel: false
-}
-const inputName = args.indexOf('@name')
-if (inputName != -1) {
-  const output = args[inputName + 1].replace(/[^\u4e00-\u9fa5a-zA-Z0-9_]/g, '')
-  if (output.length >= 3) data.name = output
-}
-// 强制覆盖
-if (args.includes('force') || args.includes('f')) {
-  data.force = true
-}
-// 取消依赖加载
-if (args.includes('cancel') || args.includes('c')) {
-  data.cancel = true
 }
 createAlemonjs(data)

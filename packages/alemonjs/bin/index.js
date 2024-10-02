@@ -15,7 +15,9 @@ if (args.includes('start')) {
   }
 } else {
   // 开发和构建模式
-  const msg = spawnSync('npx', ['tsx', js, ...args], { stdio: 'inherit' })
+  const msg = spawnSync('npx', ['tsx', 'watch', '--clear-screen=false', js, ...args], {
+    stdio: 'inherit'
+  })
   if (msg.error) {
     console.error(msg.error)
     process.exit(1)

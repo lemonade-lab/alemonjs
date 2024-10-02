@@ -34,10 +34,9 @@ const runChildren = (mainDir: string) => {
   const appsDir = join(mainDir, 'apps')
   const files = getAppsFiles(appsDir)
   for (const file of files) {
-    const dir = join(process.cwd(), file)
     pushAppsFiles({
-      dir: dirname(dir),
-      path: dir
+      dir: dirname(file),
+      path: file
     })
   }
 }
@@ -80,13 +79,19 @@ const onDev = async (input: string) => {
       }
     }
   }
-  const dir = join(process.cwd(), input)
-  // src/apps/**/*
-  const mainDir = dirname(dir)
-  const app = await import(`file://${dir}`)
-  const c = app?.default?.(cfg.values, cfg.value)
-  runChildren(mainDir)
-  c?.onCreated?.()
+  //  input
+  const run = async () => {
+    const dir = join(process.cwd(), input)
+    // src/apps/**/*
+    const mainDir = dirname(dir)
+    console.log('mainDir', mainDir)
+    const app = await import(`file://${dir}`)
+    const c = app?.default?.(cfg.values, cfg.value)
+    runChildren(mainDir)
+    c?.onCreated?.()
+  }
+  await run()
+
   // prefix
   const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
   if (!skip) {
@@ -131,15 +136,18 @@ const onStart = async (input?: string) => {
   }
 
   // input
-  if (input) {
-    const dir = join(process.cwd(), input)
-    // src/apps/**/*
-    const mainDir = dirname(dir)
-    const app = await import(`file://${dir}`)
-    const c = app?.default?.(cfg.values, cfg.value)
-    runChildren(mainDir)
-    c?.onCreated?.()
+  const run = async () => {
+    if (input) {
+      const dir = join(process.cwd(), input)
+      // src/apps/**/*
+      const mainDir = dirname(dir)
+      const app = await import(`file://${dir}`)
+      const c = app?.default?.(cfg.values, cfg.value)
+      runChildren(mainDir)
+      c?.onCreated?.()
+    }
   }
+  await run()
 
   // prefix
   const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
@@ -151,7 +159,7 @@ const onStart = async (input?: string) => {
   await import(`${prefix}${cfg.values.login}`)
 }
 
-let config = null
+let options: Options = null
 
 /**
  *
@@ -174,45 +182,49 @@ const initConfig = async () => {
   if (configDir !== '') {
     const v = await import(`file://${configDir}`)
     if (v?.default) {
-      config = v.default
+      options = v.default
     }
   }
 }
 
-if (process.argv.includes('dev')) {
-  await initConfig()
-  // 开发模式
-  let input = getArgvValue('--input')
-  if (!input) {
-    if (!config?.build?.input) {
+const main = async () => {
+  if (process.argv.includes('dev')) {
+    await initConfig()
+    // 开发模式
+    let input = getArgvValue('--input')
+    if (!input) {
+      if (!options?.build?.input) {
+        throw new Error('input is required')
+      }
+      input = options?.build?.input
+    }
+    if (!existsSync(input)) {
       throw new Error('input is required')
     }
-    input = config?.build?.input
-  }
-  if (!existsSync(input)) {
-    throw new Error('input is required')
-  }
-  onDev(input)
-} else if (process.argv.includes('build')) {
-  await initConfig()
-  // 构建模式
-  let input = getArgvValue('--input')
-  if (!input) {
-    if (!config?.build?.input) {
+    onDev(input)
+  } else if (process.argv.includes('build')) {
+    await initConfig()
+    // 构建模式
+    let input = getArgvValue('--input')
+    if (!input) {
+      if (!options?.build?.input) {
+        throw new Error('input is required')
+      }
+      input = options?.build?.input
+    }
+    if (!existsSync(input)) {
       throw new Error('input is required')
     }
-    input = config?.build?.input
+    const ouput = getArgvValue('--ouput') ?? 'lib'
+    onBuild(input, ouput)
+  } else if (process.argv.includes('start')) {
+    // start 模式 没有config 没有ts环境
+    const input = getArgvValue('--input')
+    onStart(input)
   }
-  if (!existsSync(input)) {
-    throw new Error('input is required')
-  }
-  const ouput = getArgvValue('--ouput') ?? 'lib'
-  onBuild(input, ouput)
-} else if (process.argv.includes('start')) {
-  // start 模式 没有config 没有ts环境
-  const input = getArgvValue('--input')
-  onStart(input)
 }
+
+main()
 
 export * from './config'
 export * from './hook/use-api'
