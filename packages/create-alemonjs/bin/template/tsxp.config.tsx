@@ -7,7 +7,7 @@ export default defineConfig([
     url: '/',
     options: {
       ...defineOptions,
-      html_body: <Word data={''} />
+      html_body: <Word data={'AlemonJS 跨平台开发框架'} />
     }
   }
 ])

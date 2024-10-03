@@ -6,7 +6,7 @@ export default OnResponse(
     const Send = useSend(event)
     // pic
     const img = await Picture({
-      data: 'hello word'
+      data: 'AlemonJS 跨平台开发框架'
     })
     // send
     if (typeof img != 'boolean') {

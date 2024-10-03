@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, writeFileSync } from 'fs'
 import { cpSync, rmSync } from 'fs'
-import { execSync } from 'child_process'
 import { resolve, join, dirname } from 'path'
 import { fileURLToPath } from 'node:url'
-// const args = [...process.argv.slice(2)]
 
 interface options {
   name: string
@@ -19,7 +17,7 @@ const alemonjsCliPath = resolve(currentDirPath)
 const NpmPublish = `
 # 忽略所有文件
 /*   
-# 不忽略next
+# 不忽略
 !/assets
 !/lib
 !/public
@@ -48,21 +46,13 @@ strict-peer-dependencies=false`
 
 const GitBody = `
 node_modules
-/config
 /data
 /logs
-/resources
-/renderers
-/plugins
-/index.js
-/types
-/public
-/temp
 /lib
 yarn.lock
 `
 
-async function createAlemonjs({ name, force, cancel }: options) {
+async function createAlemonjs({ name, force }: options) {
   // 名字不存在
   if (!name) process.exit()
   // 当前目录下
@@ -92,25 +82,10 @@ async function createAlemonjs({ name, force, cancel }: options) {
     // 切换目录
     process.chdir(dirPath)
 
-    // 自动加载依赖
-    if (!cancel) {
-      // 加载基础
-      console.info(`npm install`)
-      execSync('npm install', { stdio: 'inherit' })
-    }
-
-    // execSync('git init', { stdio: 'inherit' })
-
     console.info(`------------------------------------`)
     console.info(`cd ${name}       #进入机器人目录`)
-
-    // 提示加载依赖
-    if (cancel) {
-      console.info(`------------------------------------`)
-      console.info(`rm -rf .npmrc  #国际环境需删除.npmc`)
-      console.info(`npm install`)
-    }
-
+    console.info(`------------------------------------`)
+    console.info(`npm install`)
     console.info(`------------------------------------`)
     console.info(`npm run dev`)
   } catch (error) {

@@ -9,8 +9,12 @@ const require = createRequire(import.meta.url)
 export default function App({ data }: { data: string }) {
   return (
     <section className="flex flex-col">
-      <BackgroundImage url={require('../../../assets/App-Store.png')} size={'100% auto'}>
-        <div>{data}</div>
+      <BackgroundImage
+        className="min-h-[36rem] w-full h-full flex items-end justify-center"
+        url={require('../../../assets/alemonjs.png')}
+        size={'100% auto'}
+      >
+        <div className="text-blue-400 text-5xl">{data}</div>
       </BackgroundImage>
     </section>
   )
