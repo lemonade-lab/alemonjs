@@ -1,17 +1,20 @@
 import React from 'react'
 import { BackgroundImage, createRequire } from 'react-puppeteer'
 const require = createRequire(import.meta.url)
+type Props = {
+  data: string
+  theme?: string
+}
 /**
- *
  * @param param0
  * @returns
  */
-export default function App({ data }: { data: string }) {
+export default function App({ data, theme }: Props) {
   return (
-    <section className="flex flex-col">
+    <section id="root" data-theme={theme} className="flex flex-col">
       <BackgroundImage
-        className="min-h-[36rem] w-full h-full flex items-end justify-center"
-        url={require('../../../assets/alemonjs.png')}
+        className="min-h-[31rem] w-full h-full flex items-end justify-center"
+        url={require('../../../public/alemonjs.png')}
         size={'100% auto'}
       >
         <div className="text-blue-400 text-5xl">{data}</div>

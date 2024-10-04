@@ -1,10 +1,31 @@
+import './main.js'
 import { Config, argv } from './config'
 import { pushAppsFiles } from './app/event-processor'
 import { getArgvValue } from './config'
 import { getAppsFiles } from './app/event-files'
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
-import { buildAndRun } from './start'
+import { buildAndRun } from './build/rullup.js'
+import { BuildOptions } from 'esbuild'
+import { RollupOptions } from 'rollup'
+
+/**
+ * 编译配置
+ */
+type Options = {
+  input: string
+  build?: {
+    esBuildOptions?: BuildOptions
+    rollupOptions?: RollupOptions
+  }
+}
+
+/**
+ *
+ * @param param0
+ * @returns
+ */
+export const defineConfig = async (optoins?: Options) => optoins
 
 const cwd = process.cwd()
 
@@ -42,22 +63,6 @@ const runChildren = (mainDir: string) => {
     })
   }
 }
-
-type BuildOptions = {
-  input: string
-  ouput?: string
-}
-
-type Options = {
-  build?: BuildOptions
-}
-
-/**
- *
- * @param param0
- * @returns
- */
-export const defineConfig = async (optoins?: Options) => optoins
 
 /**
  *
@@ -195,10 +200,10 @@ const main = async () => {
     // 开发模式
     let input = getArgvValue('--input')
     if (!input) {
-      if (!options?.build?.input) {
+      if (!options?.input) {
         throw new Error('input is required')
       }
-      input = options?.build?.input
+      input = options?.input
     }
     if (!existsSync(input)) {
       throw new Error('input is required')
@@ -209,10 +214,10 @@ const main = async () => {
     // 构建模式
     let input = getArgvValue('--input')
     if (!input) {
-      if (!options?.build?.input) {
+      if (!options?.input) {
         throw new Error('input is required')
       }
-      input = options?.build?.input
+      input = options?.input
     }
     if (!existsSync(input)) {
       throw new Error('input is required')

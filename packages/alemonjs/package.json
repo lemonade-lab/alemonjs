@@ -1,13 +1,12 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.11",
+  "version": "2.0.0-rc.12",
   "description": "啊柠檬脚本",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
-    "rollup-plugin-dts": "^6.1.1",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",
@@ -15,6 +14,7 @@
     "axios": "^1.4.0",
     "chokidar": "^4.0.1",
     "rollup": "^4.18.1",
+    "rollup-plugin-dts": "^6.1.1",
     "tsx": "^4.19.1",
     "typescript": "^5.5.3",
     "yaml": "^2.5.1"
@@ -24,6 +24,9 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
+    },
+    "./loader": {
+      "import": "./lib/loader.mjs"
     },
     "./tsconfig.json": {
       "import": "./tsconfig.json",
@@ -44,5 +47,8 @@
   },
   "bin": {
     "alemonjs": "bin/index.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
   }
 }
