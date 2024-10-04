@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.12",
+  "version": "2.0.0-rc.13",
   "description": "啊柠檬脚本",
   "author": "ningmengchongshui",
   "license": "MIT",
@@ -26,7 +26,10 @@
       "types": "./lib/index.d.ts"
     },
     "./loader": {
-      "import": "./lib/loader.mjs"
+      "import": "./dist/loader.mjs"
+    },
+    "./env": {
+      "types": "./env.d.ts"
     },
     "./tsconfig.json": {
       "import": "./tsconfig.json",

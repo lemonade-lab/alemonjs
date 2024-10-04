@@ -96,7 +96,6 @@ const buildJs = async (inputs: string[], output: string) => {
     ],
     onwarn: onwarn
   })
-
   // 写入输出文件
   await bundle.write({
     dir: output,
@@ -105,36 +104,6 @@ const buildJs = async (inputs: string[], output: string) => {
     preserveModules: true
   })
 }
-
-/**
- *
- * @param inputs
- * @param output
- */
-// const buildDts = async (inputs: string[], output: string) => {
-//   const bundle = await rollup({
-//     input: inputs,
-//     plugins: [
-//       rollupNodeImage(),
-//       typescript({
-//         compilerOptions: {
-//           outDir: output
-//         },
-//         include: inputs
-//       }),
-//       dts()
-//     ],
-//     onwarn: onwarn
-//   })
-
-//   // 写入输出文件
-//   await bundle.write({
-//     dir: output,
-//     format: 'es',
-//     sourcemap: false,
-//     preserveModules: true
-//   })
-// }
 
 /**
  *
