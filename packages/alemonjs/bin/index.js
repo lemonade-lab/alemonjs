@@ -5,18 +5,20 @@ import { fileURLToPath } from 'node:url'
 const args = [...process.argv.slice(2)]
 const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
-const js = join(currentDirPath, '../lib/index.js')
 // 启动模式
 if (args.includes('start')) {
+  console.log('start')
+  const js = join(currentDirPath, '../lib/index.js')
   const argsx = args.filter(arg => arg !== 'start')
-  const msg = spawnSync('node', [js, '--start', ...argsx], { stdio: 'inherit' })
+  const msg = spawnSync('node', [js, '--alemonjs-start', ...argsx], { stdio: 'inherit' })
   if (msg.error) {
     console.error(msg.error)
     process.exit()
   }
 } else if (args.includes('build')) {
+  const js = join(currentDirPath, '../lib/index.js')
   const argsx = args.filter(arg => arg !== 'build')
-  const msg = spawnSync('npx', ['tsx', js, '--build', ...argsx], {
+  const msg = spawnSync('npx', ['tsx', js, '--alemonjs-build', ...argsx], {
     stdio: 'inherit'
   })
   if (msg.error) {
@@ -24,10 +26,15 @@ if (args.includes('start')) {
     process.exit()
   }
 } else if (args.includes('dev')) {
+  const js = join(currentDirPath, '../index.js')
   const argsx = args.filter(arg => arg !== 'dev')
-  const msg = spawnSync('npx', ['tsx', 'watch', '--clear-screen=false', js, '--dev', ...argsx], {
-    stdio: 'inherit'
-  })
+  const msg = spawnSync(
+    'npx',
+    ['tsx', 'watch', '--clear-screen=false', js, '---alemonjs-dev', ...argsx],
+    {
+      stdio: 'inherit'
+    }
+  )
   if (msg.error) {
     console.error(msg.error)
     process.exit()

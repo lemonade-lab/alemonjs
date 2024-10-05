@@ -1,11 +1,11 @@
 import { dirname, basename, resolve } from 'path'
 import { readFileSync } from 'fs'
+import { type InputPluginOption } from 'rollup'
 /**
- * Rollup 插件，用于处理图片文件并生成相对路径
  * @param {Object} options
  * @returns {Object}
  */
-const rollupNodeFiles = ({ filter }) => {
+const rollupNodeFiles = ({ filter }: { filter: RegExp }) => {
   return {
     name: 'rollup-node-files',
     resolveId(source, importer) {
@@ -32,7 +32,7 @@ const rollupNodeFiles = ({ filter }) => {
         return contents
       }
     }
-  }
+  } as InputPluginOption
 }
 
 export { rollupNodeFiles }

@@ -1,12 +1,13 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.13",
+  "version": "2.0.0-rc.14",
   "description": "啊柠檬脚本",
   "author": "ningmengchongshui",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",
@@ -26,10 +27,18 @@
       "types": "./lib/index.d.ts"
     },
     "./loader": {
-      "import": "./dist/loader.mjs"
+      "import": "./lib/loader/index.js",
+      "types": "./lib/loader/index.d.ts"
+    },
+    "./register": {
+      "import": "./lib/main.js"
     },
     "./env": {
       "types": "./env.d.ts"
+    },
+    "./plugins": {
+      "import": "./lib/plugins/index.js",
+      "types": "./lib/plugins/index.d.ts"
     },
     "./tsconfig.json": {
       "import": "./tsconfig.json",

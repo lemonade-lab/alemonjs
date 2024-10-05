@@ -79,20 +79,63 @@ const buildDts = (input, dir, inc) => {
 /**
  *
  */
-const config = [
-  'alemonjs',
-  'discord',
-  'qq',
-  'kook',
-  'qq-group-bot',
-  'qq-guild-bot',
-  'readline',
-  'telegram'
-].map(name => {
+const config = []
+
+const BuildByName = name => {
   const input = `packages/${name}/src/index.ts`
   const dir = `packages/${name}/lib`
   const inc = `packages/${name}/src/**/*`
-  return [buildJs(input, dir, inc), buildDts(input, dir, inc)]
-})
+  config.push(buildJs(input, dir, inc))
+  config.push(buildDts(input, dir, inc))
+}
+
+const build1 = () => {
+  const input = `packages/alemonjs/src/plugins/index.ts`
+  const dir = `packages/alemonjs/lib/plugins`
+  const inc = `packages/alemonjs/src/plugins/**/*`
+  config.push(buildJs(input, dir, inc))
+  config.push(buildDts(input, dir, inc))
+}
+
+const build2 = () => {
+  const input = `packages/alemonjs/src/loader/index.ts`
+  const dir = `packages/alemonjs/lib/loader`
+  const inc = `packages/alemonjs/src/loader/**/*`
+  config.push(buildJs(input, dir, inc))
+  config.push(buildDts(input, dir, inc))
+}
+
+const build3 = () => {
+  const input = `packages/alemonjs/src/loader/main.ts`
+  const dir = `packages/alemonjs/lib/loader`
+  const inc = `packages/alemonjs/src/loader/**/*`
+  config.push(buildJs(input, dir, inc))
+  config.push(buildDts(input, dir, inc))
+}
+
+const build = () => {
+  if (process.env.BN == 'discord') {
+    BuildByName('discord')
+  } else if (process.env.BN == 'qq') {
+    BuildByName('qq')
+  } else if (process.env.BN == 'kook') {
+    BuildByName('kook')
+  } else if (process.env.BN == 'qq-group-bot') {
+    BuildByName('qq-group-bot')
+  } else if (process.env.BN == 'qq-guild-bot') {
+    BuildByName('qq-guild-bot')
+  } else if (process.env.BN == 'readline') {
+    BuildByName('readline')
+  } else if (process.env.BN == 'telegram') {
+    BuildByName('telegram')
+  } else {
+    BuildByName('alemonjs')
+    build1()
+    build2()
+    build3()
+  }
+}
+
+build()
 
 export default defineConfig(config.flat(Infinity))

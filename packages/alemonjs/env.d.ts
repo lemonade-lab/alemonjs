@@ -1,14 +1,14 @@
 // CSS
 declare module '*.css' {
-  const classes: { [key: string]: string }
-  export default classes
-}
-
-// images
-declare module '*.apng' {
   const src: string
   export default src
 }
+declare module '*.scss' {
+  const src: string
+  export default src
+}
+
+// images
 declare module '*.png' {
   const src: string
   export default src
@@ -21,18 +21,7 @@ declare module '*.jpeg' {
   const src: string
   export default src
 }
-declare module '*.jfif' {
-  const src: string
-  export default src
-}
-declare module '*.pjpeg' {
-  const src: string
-  export default src
-}
-declare module '*.pjp' {
-  const src: string
-  export default src
-}
+
 declare module '*.gif' {
   const src: string
   export default src
@@ -41,20 +30,16 @@ declare module '*.svg' {
   const src: string
   export default src
 }
-declare module '*.ico' {
-  const src: string
-  export default src
-}
 declare module '*.webp' {
   const src: string
   export default src
 }
-declare module '*.avif' {
+declare module '*.ico' {
   const src: string
   export default src
 }
 
-// media
+// vidoe
 declare module '*.mp4' {
   const src: string
   export default src
@@ -63,10 +48,12 @@ declare module '*.webm' {
   const src: string
   export default src
 }
-declare module '*.ogg' {
+declare module '*.ogv' {
   const src: string
   export default src
 }
+
+// audio
 declare module '*.mp3' {
   const src: string
   export default src
@@ -75,27 +62,7 @@ declare module '*.wav' {
   const src: string
   export default src
 }
-declare module '*.flac' {
-  const src: string
-  export default src
-}
-declare module '*.aac' {
-  const src: string
-  export default src
-}
-declare module '*.opus' {
-  const src: string
-  export default src
-}
-declare module '*.mov' {
-  const src: string
-  export default src
-}
-declare module '*.m4a' {
-  const src: string
-  export default src
-}
-declare module '*.vtt' {
+declare module '*.ogg' {
   const src: string
   export default src
 }

@@ -1,4 +1,3 @@
-import './main.js'
 import { Config, argv } from './config'
 import { pushAppsFiles } from './app/event-processor'
 import { getArgvValue } from './config'
@@ -6,26 +5,7 @@ import { getAppsFiles } from './app/event-files'
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
 import { buildAndRun } from './build/rullup.js'
-import { BuildOptions } from 'esbuild'
-import { RollupOptions } from 'rollup'
-
-/**
- * 编译配置
- */
-type Options = {
-  input: string
-  build?: {
-    esBuildOptions?: BuildOptions
-    rollupOptions?: RollupOptions
-  }
-}
-
-/**
- *
- * @param param0
- * @returns
- */
-export const defineConfig = async (optoins?: Options) => optoins
+import { initConfig } from './store.js'
 
 const cwd = process.cwd()
 
@@ -91,7 +71,6 @@ const onDev = async (input: string) => {
     const dir = join(cwd, input)
     // src/apps/**/*
     const mainDir = dirname(dir)
-    console.log('mainDir', mainDir)
     const app = await import(`file://${dir}`)
     const c = app?.default?.(cfg.values, cfg.value)
     runChildren(mainDir)
@@ -166,67 +145,46 @@ const onStart = async (input?: string) => {
   await import(`${prefix}${cfg.values.login}`)
 }
 
-let options: Options = null
-
-/**
- *
- */
-const initConfig = async () => {
-  const files = [
-    'alemon.config.ts',
-    'alemon.config.js',
-    'alemon.config.mjs',
-    'alemon.config.cjs',
-    'alemon.config.tsx'
-  ]
-  let configDir = ''
-  for (const file of files) {
-    if (existsSync(file)) {
-      configDir = file
-      break
-    }
-  }
-  if (configDir !== '') {
-    const v = await import(`file://${configDir}`)
-    if (v?.default) {
-      options = v.default
-    }
-  }
-}
-
 const main = async () => {
-  if (argv.includes('--dev')) {
+  if (argv.includes('--alemonjs-dev')) {
+    // await initConfig()
+    // 开发模式
+    let input = getArgvValue('--input')
+    if (!input) {
+      input = 'src/index.ts'
+    }
+    if (!existsSync(input)) {
+      input = 'src/index.js'
+    }
+    if (!existsSync(input)) {
+      throw new Error('src/index.js is required')
+    }
+    onDev(input)
+  } else if (argv.includes('--alemonjs-build')) {
     await initConfig()
     // 开发模式
     let input = getArgvValue('--input')
     if (!input) {
-      if (!options?.input) {
-        throw new Error('input is required')
-      }
-      input = options?.input
+      input = 'src/index.ts'
     }
     if (!existsSync(input)) {
-      throw new Error('input is required')
-    }
-    onDev(input)
-  } else if (argv.includes('--build')) {
-    await initConfig()
-    // 构建模式
-    let input = getArgvValue('--input')
-    if (!input) {
-      if (!options?.input) {
-        throw new Error('input is required')
-      }
-      input = options?.input
+      input = 'src/index.js'
     }
     if (!existsSync(input)) {
-      throw new Error('input is required')
+      throw new Error('src/index.js is required')
     }
     const ouput = getArgvValue('--ouput') ?? 'lib'
     onBuild(input, ouput)
-  } else if (argv.includes('--tart')) {
+  } else if (argv.includes('--alemonjs-start')) {
     // start 模式 没有config 没有ts环境
-    const input = getArgvValue('--input')
+    let input = getArgvValue('--input')
+    if (!input) {
+      // 存在lib/index.js
+      if (existsSync('lib/index.js')) {
+        input = 'lib/index.js'
+      }
+    }
+    // getOptions
     onStart(input)
   }
 }
@@ -242,3 +200,5 @@ export * from './app/event-processor'
 export * from './app/event-files'
 export * from './app/event-bot'
 export * from './app/event-chidren'
+
+export { defineConfig } from './store.js'

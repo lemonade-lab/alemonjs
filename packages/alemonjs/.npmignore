@@ -4,5 +4,5 @@ node_modules
 !/lib
 !/tsconfig.json
 !/bin
-!/dist
 !/env.d.ts
+!/index.js

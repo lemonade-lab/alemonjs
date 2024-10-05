@@ -1,4 +1,10 @@
 {
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
   "include": ["packages/**/*", "src/**/*"],
   "extends": "alemonjs/tsconfig.json"
 }
