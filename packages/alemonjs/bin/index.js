@@ -30,7 +30,7 @@ if (args.includes('start')) {
   const argsx = args.filter(arg => arg !== 'dev')
   const msg = spawnSync(
     'npx',
-    ['tsx', 'watch', '--clear-screen=false', js, '---alemonjs-dev', ...argsx],
+    ['tsx', 'watch', '--clear-screen=false', js, '--alemonjs-dev', ...argsx],
     {
       stdio: 'inherit'
     }

@@ -1,5 +1,5 @@
 import { Image, Text, useSend } from 'alemonjs'
-import { Picture } from '../../image/index.js'
+import { Picture } from '@src/image/index.js'
 export default OnResponse(
   async event => {
     // 创建一个send

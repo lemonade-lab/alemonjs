@@ -1,1 +1,1 @@
-/// <reference types="react-puppeteer/env" />
+/// <reference types="alemonjs/env" />

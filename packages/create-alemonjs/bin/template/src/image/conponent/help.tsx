@@ -1,6 +1,6 @@
 import React from 'react'
-import { BackgroundImage, createRequire } from 'react-puppeteer'
-const require = createRequire(import.meta.url)
+import { BackgroundImage } from 'react-puppeteer'
+import img_logo from '@public/alemonjs.png'
 type Props = {
   data: string
   theme?: string
@@ -14,7 +14,7 @@ export default function App({ data, theme }: Props) {
     <section id="root" data-theme={theme} className="flex flex-col">
       <BackgroundImage
         className="min-h-[31rem] w-full h-full flex items-end justify-center"
-        url={require('../../../public/alemonjs.png')}
+        url={img_logo}
         size={'100% auto'}
       >
         <div className="text-blue-400 text-5xl">{data}</div>

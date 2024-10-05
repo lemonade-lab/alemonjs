@@ -1,12 +1,13 @@
 import React from 'react'
-import { render, createRequire, LinkCSS } from 'react-puppeteer'
-import Help from './conponent/help'
-const require = createRequire(import.meta.url)
+import { render, LinkCSS } from 'react-puppeteer'
+import Help from '@src/image/conponent/help'
+import css_output from '@public/output.css'
+import css_main from '@public/main.css'
 export const defineOptions = {
   html_head: (
     <>
-      <LinkCSS src={require('../../public/output.css')} />
-      <LinkCSS src={require('../../public/main.css')} />
+      <LinkCSS src={css_output} />
+      <LinkCSS src={css_main} />
     </>
   )
 }
