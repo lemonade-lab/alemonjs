@@ -147,7 +147,7 @@ const onStart = async (input?: string) => {
 
 const main = async () => {
   if (argv.includes('--alemonjs-dev')) {
-    // await initConfig()
+    await initConfig()
     // 开发模式
     let input = getArgvValue('--input')
     if (!input) {
