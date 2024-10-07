@@ -2,24 +2,11 @@ import { dirname, join, relative, resolve } from 'path'
 import { existsSync, readFileSync } from 'fs'
 import { spawn } from 'child_process'
 import esbuild, { type Plugin } from 'esbuild'
-/**
- *
- * @param input
- * @param output
- */
-const startCssPost = (input: string, output: string) => {
-  const run = ['postcss', input, '-o', output, '--watch']
-  // 启动 Tailwind 进程
-  const cssPostProcess = spawn('npx', run, {
-    stdio: 'inherit'
-  })
-  cssPostProcess.on('error', err => {
-    console.error('Failed to start Tailwind process:', err)
-  })
-}
 
 let tsconfig = null
 let aliases = {}
+const assetsReg = /\.(png|jpg|jpeg|gif|svg|webp|ico)$/
+const cssReg = /\.(css|scss)$/
 
 // 初始化函数，读取并解析 tsconfig.json 文件
 const init = () => {
@@ -39,6 +26,22 @@ const init = () => {
 
 // 初始化配置
 init()
+
+/**
+ *
+ * @param input
+ * @param output
+ */
+const startCssPost = (input: string, output: string) => {
+  const run = ['postcss', input, '-o', output, '--watch']
+  // 启动 Tailwind 进程
+  const cssPostProcess = spawn('npx', run, {
+    stdio: 'inherit'
+  })
+  cssPostProcess.on('error', err => {
+    console.error('Failed to start Tailwind process:', err)
+  })
+}
 
 /**
  * 生成模块内容
@@ -97,10 +100,10 @@ const handleAsstesFile = (url: string) => {
  *
  * @param param0
  */
-export const esBuildAsstesFule = ({
-  namespace = 'assets',
-  filter = /\.(png|jpg|jpeg|gif|svg|webp|ico)$/
-} = {}): Plugin => {
+export const esBuildAsstesFule = (): Plugin => {
+  const str = process.argv[process.argv.indexOf('--import-assets') + 1]
+  const filter = process.argv.includes('--import-assets') && str ? new RegExp(str) : assetsReg
+  const namespace = 'assets'
   return {
     name: 'file-loader',
     setup(build) {
@@ -179,7 +182,10 @@ const handleCSSPath = (url: string) => {
  * @param param0
  * @returns
  */
-export const esBuildCSS = ({ namespace = 'css', filter = /\.(css|scss)$/ } = {}): Plugin => {
+export const esBuildCSS = (): Plugin => {
+  const str = process.argv[process.argv.indexOf('--import-css') + 1]
+  const filter = process.argv.includes('--import-css') && str ? new RegExp(str) : cssReg
+  const namespace = 'css'
   return {
     name: 'css-loader',
     setup(build) {
@@ -209,7 +215,7 @@ export const esBuildCSS = ({ namespace = 'css', filter = /\.(css|scss)$/ } = {})
         }
         // 不是别名资源
         return {
-          contents: generateModuleContent(handleCSS(relativePath)),
+          contents: `export default "${handleCSS(args.path)}";`,
           loader: 'js'
         }
       })

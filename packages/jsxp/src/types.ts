@@ -1,3 +1,5 @@
+import React from 'react'
+
 /**
  * 无头浏览器渲染函数配置参数
  */
@@ -52,3 +54,9 @@ export type JSXPOptions = {
     [key: string]: ComponentCreateOpsionType
   }
 }
+
+export type ObtainProps<T> = T extends React.FC<infer P>
+  ? P
+  : T extends React.ComponentClass<infer P>
+  ? P
+  : never

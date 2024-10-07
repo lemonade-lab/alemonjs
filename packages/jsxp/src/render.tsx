@@ -1,5 +1,6 @@
+import React from 'react'
 import { Picture } from './picture.js'
-import { ComponentCreateOpsionType, ScreenshotFileOptions } from './types.js'
+import { ComponentCreateOpsionType, ObtainProps, ScreenshotFileOptions } from './types.js'
 class ScreenshotPicture extends Picture {
   constructor() {
     // 继承实例
@@ -51,6 +52,7 @@ const processQueue = async () => {
   // 处理下一个任务
   processQueue()
 }
+
 /**
  * 渲染组件为图片
  * @param htmlPath
@@ -71,4 +73,35 @@ export const render = async (
       processQueue()
     }
   })
+}
+
+/**
+ * 对组件 map 进行合并渲染
+ * @param Components
+ * @returns
+ */
+export const renders = <
+  ComponentsType extends Record<string, React.FC<any> | React.ComponentClass<any>>
+>(
+  Components: ComponentsType
+): (<TKey extends keyof ComponentsType>(
+  key: TKey,
+  options: ObtainProps<ComponentsType[TKey]>,
+  name?: string
+) => Promise<false | Buffer>) => {
+  return async (key, props, name) => {
+    // 选择组件
+    const MyComponent = Components[key]
+    const k = String(key)
+    // 确保 MyComponent 是有效的组件
+    if (!MyComponent) {
+      throw new Error(`Component with key "${k}" does not exist.`)
+    }
+    // 截图
+    return render({
+      path: k,
+      name: `${name ?? k}.html`,
+      component: <MyComponent {...props} />
+    })
+  }
 }

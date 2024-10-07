@@ -1,6 +1,6 @@
 {
   "name": "jsxp",
-  "version": "1.0.0-rc.0",
+  "version": "1.0.0",
   "author": "ningmengchongshui",
   "description": "截图tsx组件",
   "main": "./lib/index.js",

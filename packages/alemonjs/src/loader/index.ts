@@ -9,6 +9,8 @@ type LoaderResult = {
 const platform = ['linux', 'android', 'darwin']
 const T = platform.includes(process.platform)
 const reg = T ? /^file:\/\// : /^file:\/\/\//
+const nodeReg = /(node_modules|node_|node:)/
+const jsReg = /\.(js|ts|jsx|tsx)$/
 
 /**
  *
@@ -22,17 +24,16 @@ export const load = async (
   context: any,
   defaultLoad: (url: string, context: any) => Promise<LoaderResult>
 ) => {
-  if (/(node_modules|node_)/.test(url)) {
+  if (nodeReg.test(url)) {
     return defaultLoad(url, context)
   }
-  // 处理所有js文件
-  if (/\.(js|ts|jsx|tsx)$/.test(url)) {
-    const code = await ESBuild(url.replace(reg, ''))
-    return {
-      format: 'module',
-      source: code,
-      shortCircuit: true
-    }
+  if (!jsReg.test(url)) {
+    return defaultLoad(url, context)
   }
-  return defaultLoad(url, context)
+  const code = await ESBuild(url.replace(reg, ''))
+  return {
+    format: 'module',
+    source: code,
+    shortCircuit: true
+  }
 }
