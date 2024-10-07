@@ -6,21 +6,20 @@
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
+  "types": "lib",
   "dependencies": {
     "chat-space": "^0.0.4",
     "grammy": "^1.30.0",
     "node-telegram-bot-api": "^0.66.0"
   },
-  "types": "lib",
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.64.7"
+  },
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     }
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
   },
   "keywords": [
     "alemonjs",
@@ -29,7 +28,12 @@
     "bot",
     "chat-bot"
   ],
-  "devDependencies": {
-    "@types/node-telegram-bot-api": "^0.64.7"
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
   }
 }

@@ -109,9 +109,9 @@ const build = () => {
     BuildByName('qq')
   } else if (process.env.BN == 'kook') {
     BuildByName('kook')
-  } else if (process.env.BN == 'qq-group-bot') {
+  } else if (process.env.BN == 'group') {
     BuildByName('qq-group-bot')
-  } else if (process.env.BN == 'qq-guild-bot') {
+  } else if (process.env.BN == 'guild') {
     BuildByName('qq-guild-bot')
   } else if (process.env.BN == 'readline') {
     BuildByName('readline')
@@ -119,6 +119,10 @@ const build = () => {
     BuildByName('telegram')
   } else if (process.env.BN == 'jsxp') {
     BuildByName('jsxp')
+  } else if (process.env.BN == 'tsxp') {
+    BuildByName('react-puppeteer')
+  } else if (process.env.BN == 'space') {
+    BuildByName('chat-space')
   } else {
     BuildByName('alemonjs')
     build1()

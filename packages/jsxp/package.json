@@ -40,7 +40,9 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
-  "engines": {
-    "node": ">=16.14.0"
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
   }
 }

@@ -17,13 +17,15 @@
   "bin": {
     "create-alemonjs": "bin/alemonjs.js"
   },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
   "keywords": [
     "alemonjs"
   ],
-  "engines": {
-    "node": ">=16.14.0"
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
   }
 }
