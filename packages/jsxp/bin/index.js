@@ -11,20 +11,28 @@ if (args.includes('dev')) {
   let argsx = args.filter(arg => arg !== 'dev')
   const loader = args[args.indexOf('--node-options') + 1]
   if (loader) {
-    const msg = spawn('npx', ['tsx', js, '--jsxp-server', ...argsx], {
-      stdio: 'inherit',
-      env: Object.assign({}, process.env, {
-        NODE_OPTIONS: `--loader ${loader} --no-warnings`
-      })
-    })
+    const msg = spawn(
+      'npx',
+      ['tsx', 'watch', '--clear-screen=false', js, '--jsxp-server', ...argsx],
+      {
+        stdio: 'inherit',
+        env: Object.assign({}, process.env, {
+          NODE_OPTIONS: `--loader ${loader} --no-warnings`
+        })
+      }
+    )
     if (msg.error) {
       console.error(msg.error)
       process.exit()
     }
   } else {
-    const msg = spawn('npx', ['tsx', js, '--jsxp-server', ...argsx], {
-      stdio: 'inherit'
-    })
+    const msg = spawn(
+      'npx',
+      ['tsx', 'watch', '--clear-screen=false', js, '--jsxp-server', ...argsx],
+      {
+        stdio: 'inherit'
+      }
+    )
     if (msg.error) {
       console.error(msg.error)
       process.exit()
