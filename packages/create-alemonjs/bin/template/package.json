@@ -25,7 +25,7 @@
     "@alemonjs/qq": "^0.0.3",
     "@alemonjs/qq-group-bot": "^0.0.4",
     "@alemonjs/qq-guild-bot": "^0.0.4",
-    "alemonjs": "2.0.0-rc.22",
+    "alemonjs": "2.0.0-rc.23",
     "axios": "^1.6.5",
     "bullmq": "^4.12.7",
     "chat-space": "0.0.4",
