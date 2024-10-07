@@ -90,10 +90,22 @@ export class Component {
    * @param mountStatic
    * @returns
    */
-  replaceServerPaths = (htmlContent, mountStatic = '/file') => {
-    const cwd = process.cwd().replace(/\\/g, '\\/')
-    const arg = new RegExp(cwd, 'g')
-    // html
-    return this.replacePaths(htmlContent.replace(arg, mountStatic))
+  replaceServerPaths = (htmlContent: string, mountStatic = '/file') => {
+    return this.replacePaths(deleteCwd(htmlContent, mountStatic))
   }
+}
+
+const deleteCwd = (str: string, mountStatic: string) => {
+  if (process.platform == 'win32') {
+    // 修掉join路径
+    const cwd = process.cwd().replace(/\\/g, '\\\\')
+    const arg = new RegExp(cwd, 'g')
+    // 修掉URL路径
+    const cwd2 = process.cwd().replace(/\\/g, '\\/')
+    const arg2 = new RegExp(cwd2, 'g')
+    return str.replace(arg, mountStatic).replace(arg2, mountStatic)
+  }
+  const cwd = process.cwd().replace(/\\/g, '\\/')
+  const arg = new RegExp(cwd, 'g')
+  return str.replace(arg, mountStatic)
 }

@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server'
 import { mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { basename, join } from 'path'
 import { LinkMain } from './components/link.tsx'
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { ComponentCreateOpsionType } from './types.ts'
 
 //

@@ -3,7 +3,7 @@ import { writeFileSync, existsSync, mkdirSync } from 'fs'
 import { fileTypeFromBuffer } from 'file-type'
 import { FileConfig } from './config.js'
 import { IP } from '../core/utils.js'
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { KoaServer } from './client.js'
 export class FilesServer extends KoaServer {
   constructor() {

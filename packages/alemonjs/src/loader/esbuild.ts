@@ -2,6 +2,7 @@ import { dirname, join, relative, resolve } from 'path'
 import { existsSync, readFileSync } from 'fs'
 import { spawn } from 'child_process'
 import esbuild, { type Plugin } from 'esbuild'
+import crypto from 'node:crypto'
 
 let tsconfig = null
 let aliases = {}
@@ -36,7 +37,8 @@ const startCssPost = (input: string, output: string) => {
   const run = ['postcss', input, '-o', output, '--watch']
   // 启动 Tailwind 进程
   const cssPostProcess = spawn('npx', run, {
-    stdio: 'inherit'
+    stdio: 'inherit',
+    shell: process.platform === 'win32'
   })
   cssPostProcess.on('error', err => {
     console.error('Failed to start Tailwind process:', err)
@@ -66,16 +68,29 @@ const chache = {}
 /**
  *
  * @param str
- * @param size
  * @returns
  */
-function getHash(str: string, size = 33) {
-  let hash = 5381
-  let i = str.length
-  while (i) {
-    hash = (hash * size) ^ str.charCodeAt(--i)
+function getHash(str: string) {
+  // 使用 MD5 算法创建哈希对象
+  const hash = crypto.createHash('md5')
+  // 更新哈希对象内容
+  hash.update(str)
+  const stt = hash.digest('hex')
+  return stt
+}
+
+/**
+ *
+ * @param inputPath
+ * @returns
+ */
+function convertPath(inputPath: string) {
+  if (process.platform === 'win32') {
+    // win32 系统下，需要将路径中的反斜杠转义
+    return inputPath.replace(/\\/g, '\\\\')
+  } else {
+    return inputPath
   }
-  return hash >>> 0
 }
 
 const handleAsstesFile = (url: string) => {
@@ -89,7 +104,7 @@ const handleAsstesFile = (url: string) => {
           aliasPath.replace('/*', ''),
           url.replace(aliasPattern, '')
         )
-        return `export default "${fileUrl}";`
+        return `export default "${convertPath(fileUrl)}";`
       }
     }
   }
@@ -170,7 +185,7 @@ const handleCSSPath = (url: string) => {
           url.replace(aliasPattern, '')
         )
         const outputDir = handleCSS(fileUrl)
-        return `export default "${outputDir}";`
+        return `export default "${convertPath(outputDir)}";`
       }
     }
   }
@@ -215,7 +230,7 @@ export const esBuildCSS = (): Plugin => {
         }
         // 不是别名资源
         return {
-          contents: `export default "${handleCSS(args.path)}";`,
+          contents: `export default "${convertPath(handleCSS(args.path))}";`,
           loader: 'js'
         }
       })
