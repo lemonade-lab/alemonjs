@@ -1,5 +1,7 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
+<img src="./src/alemon.png" />
+
 跨平台开发的事件驱动机器人
 
 ## 生态列表

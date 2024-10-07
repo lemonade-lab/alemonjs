@@ -1,6 +1,6 @@
 import { defineChildren } from 'alemonjs'
 import css from '@src/input.css'
-import png from '@src/xxx.png'
+import png from '@src/alemon.png'
 console.log('png', png)
 console.log('css', css)
 export default defineChildren(config => {
