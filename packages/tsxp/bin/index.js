@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url'
 const args = [...process.argv.slice(2)]
 const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
-const js = join(currentDirPath, '../lib/index.js')
+const jsFile = join(currentDirPath, '../lib/index.js')
+const jsDir = relative(process.cwd(), jsFile)
 // 启动模式
 if (args.includes('dev')) {
   let argsx = args.filter(arg => arg !== 'dev')
@@ -13,12 +14,13 @@ if (args.includes('dev')) {
   if (loader) {
     const msg = spawn(
       'npx',
-      ['tsx', 'watch', '--clear-screen=false', js, '--tsxp-server', ...argsx],
+      ['tsx', 'watch', '--clear-screen=false', jsDir, '--tsxp-server', ...argsx],
       {
         stdio: 'inherit',
         env: Object.assign({}, process.env, {
           NODE_OPTIONS: `--loader ${loader} --no-warnings`
-        })
+        }),
+        shell: process.platform === 'win32'
       }
     )
     if (msg.error) {
@@ -28,9 +30,10 @@ if (args.includes('dev')) {
   } else {
     const msg = spawn(
       'npx',
-      ['tsx', 'watch', '--clear-screen=false', js, '--tsxp-server', ...argsx],
+      ['tsx', 'watch', '--clear-screen=false', jsDir, '--tsxp-server', ...argsx],
       {
-        stdio: 'inherit'
+        stdio: 'inherit',
+        shell: process.platform === 'win32'
       }
     )
     if (msg.error) {
