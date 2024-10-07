@@ -1,32 +1,11 @@
 import { LoggingFunction, rollup, RollupLog } from 'rollup'
 import { join } from 'path'
-import { readdirSync } from 'fs'
 import typescript from '@rollup/plugin-typescript'
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
-
-/**
- * 获取指定目录下的所有 ts、js、jsx、tsx 文件
- * @param dir 目录路径
- * @returns 文件路径数组
- */
-const getFiles = (dir: string) => {
-  const results: string[] = []
-  const list = readdirSync(dir, { withFileTypes: true })
-  list.forEach(item => {
-    const fullPath = join(dir, item.name)
-    if (item.isDirectory()) {
-      results.push(...getFiles(fullPath))
-    } else if (
-      item.isFile() &&
-      /\.(ts|js|jsx|tsx)$/.test(item.name) &&
-      !item.name.endsWith('.d.ts')
-    ) {
-      results.push(fullPath)
-    }
-  })
-  return results
-}
+import styles from 'rollup-plugin-styles'
+import { runRollupStylesCSSImport } from '../plugins/loader-css'
+import { getFiles } from './get-files'
 
 /**
  * 用于忽略警告
@@ -59,7 +38,16 @@ const buildJs = async (inputs: string[], output: string) => {
   }
   const bundle = await rollup({
     input: inputs,
-    plugins: [...plguins, commonjs(), json(), typescript()],
+    plugins: [
+      ...plguins,
+      styles({
+        mode: ['inject', () => '']
+      }),
+      runRollupStylesCSSImport(),
+      commonjs(),
+      json(),
+      typescript()
+    ],
     onwarn: onwarn
   })
   // 写入输出文件

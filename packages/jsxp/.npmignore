@@ -1,0 +1,10 @@
+node_modules
+# 忽略所有文件
+/*   
+# 不忽略
+!public
+!/lib
+!/.puppeteerrc.cjs
+!/env.d.ts
+!/tsconfig.json
+!/bin

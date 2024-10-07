@@ -1,8 +1,5 @@
 import { defineConfig } from 'rollup'
 import typescript from '@rollup/plugin-typescript'
-import { dirname, resolve } from 'path'
-import { fileURLToPath } from 'url'
-import alias from '@rollup/plugin-alias'
 import dts from 'rollup-plugin-dts'
 
 /**
@@ -53,14 +50,6 @@ const buildDts = (input, dir, inc) => {
       preserveModules: true
     },
     plugins: [
-      alias({
-        entries: [
-          {
-            find: '@',
-            replacement: resolve(dirname(fileURLToPath(import.meta.url)), 'src')
-          }
-        ]
-      }),
       typescript({
         compilerOptions: {
           outDir: dir
@@ -128,6 +117,8 @@ const build = () => {
     BuildByName('readline')
   } else if (process.env.BN == 'telegram') {
     BuildByName('telegram')
+  } else if (process.env.BN == 'jsxp') {
+    BuildByName('jsxp')
   } else {
     BuildByName('alemonjs')
     build1()

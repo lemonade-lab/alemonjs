@@ -20,16 +20,16 @@ const rollupNodeFiles = ({ filter }: { filter: RegExp }) => {
           name: basename(id),
           source: readFileSync(id)
         })
-        const contents = `
-                const createUrl = () => {
-                  const platform = ['linux', 'android', 'darwin'];
-                  const T = platform.includes(process.platform);
-                  const reg = T ?  /^file:\\/\\// : /^file:\\/\\/\\//
-                  return import.meta.ROLLUP_FILE_URL_${referenceId}.replace(reg, '') 
-                };
-                export default createUrl();
-              `
-        return contents
+        const content = [
+          'const createUrl = () => {',
+          "const platform = ['linux', 'android', 'darwin'];",
+          'const T = platform.includes(process.platform);',
+          'const reg = T ?  /^file:\\/\\// : /^file:\\/\\/\\//',
+          'return import.meta.ROLLUP_FILE_URL_' + referenceId + ".replace(reg, '')",
+          '};',
+          'export default createUrl();'
+        ].join('\n')
+        return content
       }
     }
   } as InputPluginOption

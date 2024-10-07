@@ -8,12 +8,9 @@ export default defineConfig({
   build: {
     plugins: [
       alias({
-        entries: [
-          { find: '@src', replacement: join(__dirname, 'src') },
-          { find: '@public', replacement: join(__dirname, 'public') }
-        ]
+        entries: [{ find: '@src', replacement: join(__dirname, 'src') }]
       }),
-      files({ filter: /\.(png|jpg|css)$/ })
+      files({ filter: /\.(png|jpg|jpeg|gif|svg)$/ })
     ]
   }
 })

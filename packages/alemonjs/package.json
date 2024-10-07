@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.16",
+  "version": "2.0.0-rc.20",
   "description": "啊柠檬脚本",
   "author": "ningmengchongshui",
   "license": "MIT",
@@ -12,13 +12,25 @@
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-typescript": "^11.1.6",
-    "axios": "^1.4.0",
-    "chokidar": "^4.0.1",
     "rollup": "^4.18.1",
     "rollup-plugin-dts": "^6.1.1",
     "tsx": "^4.19.1",
     "typescript": "^5.5.3",
-    "yaml": "^2.5.1"
+    "yaml": "^2.5.1",
+    "autoprefixer": "^10.4.20",
+    "cssnano": "^7.0.6",
+    "postcss": "^8.4.47",
+    "postcss-cli": "^11.0.0",
+    "postcss-nested": "^6.2.0",
+    "postcss-sass": "^0.5.0",
+    "postcss-scss": "^4.0.9",
+    "postcss-simple-vars": "^7.0.1",
+    "postcss-styled": "^0.34.0",
+    "postcss-syntax": "^0.36.2",
+    "rollup-plugin-styles": "^4.0.0",
+    "sass": "^1.79.4",
+    "tailwindcss": "^3.4.3",
+    "esbuild": "^0.24.0"
   },
   "types": "lib",
   "exports": {
@@ -42,7 +54,6 @@
     },
     "./tsconfig.json": {
       "import": "./tsconfig.json",
-      "require": "./tsconfig.json",
       "types": "./tsconfig.json"
     }
   },
@@ -59,8 +70,5 @@
   },
   "bin": {
     "alemonjs": "bin/index.js"
-  },
-  "devDependencies": {
-    "esbuild": "^0.24.0"
   }
 }

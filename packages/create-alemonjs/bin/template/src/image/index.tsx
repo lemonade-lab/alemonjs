@@ -1,16 +1,6 @@
 import React from 'react'
-import { render, LinkCSS } from 'react-puppeteer'
+import { render } from 'jsxp'
 import Help from '@src/image/conponent/help'
-import css_output from '@public/output.css'
-import css_main from '@public/main.css'
-export const defineOptions = {
-  html_head: (
-    <>
-      <LinkCSS src={css_output} />
-      <LinkCSS src={css_main} />
-    </>
-  )
-}
 /**
  *
  * @param Props
@@ -18,9 +8,8 @@ export const defineOptions = {
  */
 export const Picture = (Props: Parameters<typeof Help>[0]) => {
   return render({
-    ...defineOptions,
-    join_dir: 'help',
-    html_name: 'help.html',
-    html_body: <Help {...Props} />
+    path: 'help',
+    name: 'help.html',
+    component: <Help {...Props} />
   })
 }

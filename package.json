@@ -10,7 +10,6 @@
   "scripts": {
     "dev": "alemonjs dev",
     "build": "alemonjs build",
-    "start": "alemonjs start",
     "bundle": "rollup --config rollup.config.js",
     "format": "prettier --write .",
     "check-format": "git diff --exit-code",
@@ -23,6 +22,7 @@
   },
   "devDependencies": {
     "alemonjs": "file:./packages/alemonjs",
+    "jsxp": "file:./packages/jsxp",
     "@alemonjs/discord": "file:./packages/discord",
     "@alemonjs/kook": "file:./packages/kook",
     "@alemonjs/qq": "file:./packages/qq",
