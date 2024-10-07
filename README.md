@@ -27,7 +27,7 @@
 [chat-space]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/chat-space
 [chat-space-s]: https://img.shields.io/npm/v/chat-space.svg
 [chat-space-p]: https://www.npmjs.com/package/chat-space
-[react-puppeteer]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/react-puppeteer
+[react-puppeteer]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/tsxp
 [tsxp-s]: https://img.shields.io/npm/v/react-puppeteer.svg
 [tsxp-p]: https://www.npmjs.com/package/react-puppeteer
 [create-alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/create-alemonjs
