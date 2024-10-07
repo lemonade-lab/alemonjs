@@ -120,7 +120,7 @@ const build = () => {
   } else if (process.env.BN == 'jsxp') {
     BuildByName('jsxp')
   } else if (process.env.BN == 'tsxp') {
-    BuildByName('react-puppeteer')
+    BuildByName('tsxp')
   } else if (process.env.BN == 'space') {
     BuildByName('chat-space')
   } else {
