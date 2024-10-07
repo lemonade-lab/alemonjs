@@ -2,11 +2,12 @@
 
 跨平台开发的事件驱动机器人
 
-### Ecosystem
+## 生态列表
 
 | Project                  | Status                              | Description    |
 | ------------------------ | ----------------------------------- | -------------- |
 | [alemonjs]               | [![alemonjs-s]][alemonjs-p]         | 标准应用解析器 |
+| [jsxp]                   | [![jsxp-s]][jsxp-p]                 | 渲染器         |
 | [create-alemonjs]        | [![c-s]][c-p]                       | 脚手架         |
 | [@alemonjs/kook]         | [![kook-s]][kook-p]                 | KOOK 连接      |
 | [@alemonjs/discord]      | [![discord-s]][discord-p]           | DC 公会连接    |
@@ -18,6 +19,9 @@
 [alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/alemonjs
 [alemonjs-s]: https://img.shields.io/npm/v/alemonjs.svg
 [alemonjs-p]: https://www.npmjs.com/package/alemonjs
+[jsxp]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/jsxp
+[jsxp-s]: https://img.shields.io/npm/v/jsxp.svg
+[jsxp-p]: https://www.npmjs.com/package/jsxp
 [create-alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/create-alemonjs
 [c-s]: https://img.shields.io/npm/v/create-alemonjs.svg
 [c-p]: https://www.npmjs.com/package/create-alemonjs

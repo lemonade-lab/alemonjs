@@ -1,12 +1,12 @@
 import React from 'react'
-import { render } from 'jsxp'
+import { render, ObtainProps } from 'jsxp'
 import Help from '@src/image/conponent/help'
 /**
  *
  * @param Props
  * @returns
  */
-export const Picture = (Props: Parameters<typeof Help>[0]) => {
+export const Picture = (Props: ObtainProps<typeof Help>) => {
   return render({
     path: 'help',
     name: 'help.html',
