@@ -2,7 +2,7 @@
   "name": "@alemonjs/qq-group-bot",
   "version": "0.0.4",
   "description": "qq-group-bot",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",

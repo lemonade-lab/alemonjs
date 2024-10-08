@@ -10,7 +10,8 @@ const jsDir = relative(process.cwd(), jsFile)
 // 启动模式
 if (args.includes('dev')) {
   let argsx = args.filter(arg => arg !== 'dev')
-  const loader = args[args.indexOf('--node-options') + 1]
+  const index = args.indexOf('--node-options')
+  const loader = index > -1 ? args[index + 1] : undefined
   if (loader) {
     const msg = spawn(
       'npx',

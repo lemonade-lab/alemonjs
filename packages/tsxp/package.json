@@ -1,7 +1,7 @@
 {
   "name": "react-puppeteer",
   "version": "1.1.2",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "description": "截图React组件",
   "type": "module",
   "main": "lib/index.js",

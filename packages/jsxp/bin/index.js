@@ -7,10 +7,12 @@ const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
 const jsFile = join(currentDirPath, '../lib/index.js')
 const jsDir = relative(process.cwd(), jsFile)
+const pkgFilr = join(currentDirPath, '../package.json')
 // 启动模式
 if (args.includes('dev')) {
   let argsx = args.filter(arg => arg !== 'dev')
-  const loader = args[args.indexOf('--node-options') + 1]
+  const index = args.indexOf('--node-options')
+  const loader = index > -1 ? args[index + 1] : undefined
   if (loader) {
     const msg = spawn(
       'npx',
@@ -18,7 +20,8 @@ if (args.includes('dev')) {
       {
         stdio: 'inherit',
         env: Object.assign({}, process.env, {
-          NODE_OPTIONS: `--loader ${loader} --no-warnings`
+          NODE_OPTIONS: `--loader ${loader} --no-warnings`,
+          PKG_DIR: pkgFilr
         }),
         shell: process.platform === 'win32'
       }
@@ -33,6 +36,9 @@ if (args.includes('dev')) {
       ['tsx', 'watch', '--clear-screen=false', jsDir, '--jsxp-server', ...argsx],
       {
         stdio: 'inherit',
+        env: Object.assign({}, process.env, {
+          PKG_DIR: pkgFilr
+        }),
         shell: process.platform === 'win32'
       }
     )

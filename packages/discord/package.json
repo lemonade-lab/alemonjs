@@ -2,7 +2,7 @@
   "name": "@alemonjs/discord",
   "version": "0.0.3",
   "description": "discord-bot",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",

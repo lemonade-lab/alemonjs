@@ -1,4 +1,5 @@
-import { Config, argv } from './config'
+import './logger.js'
+import { getConfig } from './config'
 import { pushAppsFiles } from './app/event-processor'
 import { getArgvValue } from './config'
 import { getAppsFiles } from './app/event-files'
@@ -49,9 +50,8 @@ const runChildren = (mainDir: string) => {
  * @param input
  */
 const onDev = async (input: string) => {
-  const configDir = 'alemon.config.yaml'
-  const cfg = new Config(configDir)
-  const skip = argv.includes('--skip')
+  const cfg = getConfig()
+  const skip = process.argv.includes('--skip')
   // login
   if (!cfg.values?.login) {
     throw new Error('login is required')
@@ -102,9 +102,8 @@ const onBuild = (input: string, ouput: string) => {
  *
  */
 const onStart = async (input?: string) => {
-  const configDir = 'alemon.config.yaml'
-  const cfg = new Config(configDir)
-  const skip = argv.includes('--skip')
+  const cfg = getConfig()
+  const skip = process.argv.includes('--skip')
   // login
   if (!cfg.values?.login) {
     throw new Error('login is required')
@@ -146,7 +145,7 @@ const onStart = async (input?: string) => {
 }
 
 const main = async () => {
-  if (argv.includes('--alemonjs-dev')) {
+  if (process.argv.includes('--alemonjs-dev')) {
     await initConfig()
     // 开发模式
     let input = getArgvValue('--input')
@@ -160,7 +159,7 @@ const main = async () => {
       throw new Error('src/index.js is required')
     }
     onDev(input)
-  } else if (argv.includes('--alemonjs-build')) {
+  } else if (process.argv.includes('--alemonjs-build')) {
     await initConfig()
     // 开发模式
     let input = getArgvValue('--input')
@@ -175,7 +174,7 @@ const main = async () => {
     }
     const ouput = getArgvValue('--ouput') ?? 'lib'
     onBuild(input, ouput)
-  } else if (argv.includes('--alemonjs-start')) {
+  } else if (process.argv.includes('--alemonjs-start')) {
     // start 模式 没有config 没有ts环境
     let input = getArgvValue('--input')
     if (!input) {
@@ -191,14 +190,4 @@ const main = async () => {
 
 main()
 
-export * from './config'
-export * from './hook/use-api'
-export * from './app/event-utlis'
-export * from './typing/typing'
-export * from './typing/config'
-export * from './app/event-processor'
-export * from './app/event-files'
-export * from './app/event-bot'
-export * from './app/event-chidren'
-
-export { defineConfig } from './store.js'
+export * from './post.js'

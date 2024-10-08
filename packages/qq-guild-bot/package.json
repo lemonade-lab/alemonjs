@@ -2,7 +2,7 @@
   "name": "@alemonjs/qq-guild-bot",
   "version": "0.0.4",
   "description": "qq-guild-bot",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",

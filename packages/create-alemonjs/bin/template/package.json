@@ -2,7 +2,7 @@
   "name": "alemonb",
   "version": "1.0.0",
   "description": "template",
-  "author": "",
+  "author": "lemonade",
   "main": "lib/index.js",
   "type": "module",
   "private": true,

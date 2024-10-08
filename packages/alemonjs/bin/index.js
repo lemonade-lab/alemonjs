@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 const args = [...process.argv.slice(2)]
 const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
+const pkgFilr = join(currentDirPath, '../package.json')
 // 启动模式
 if (args.includes('start')) {
   const jsFile = join(currentDirPath, '../index.js')
@@ -12,6 +13,9 @@ if (args.includes('start')) {
   const argsx = args.filter(arg => arg !== 'start')
   const msg = spawn('node', [jsdir, '--alemonjs-start', ...argsx], {
     stdio: 'inherit',
+    env: Object.assign({}, process.env, {
+      PKG_DIR: pkgFilr
+    }),
     shell: process.platform === 'win32'
   })
   if (msg.error) {
@@ -24,6 +28,9 @@ if (args.includes('start')) {
   const argsx = args.filter(arg => arg !== 'build')
   const msg = spawn('npx', ['tsx', jsdir, '--alemonjs-build', ...argsx], {
     stdio: 'inherit',
+    env: Object.assign({}, process.env, {
+      PKG_DIR: pkgFilr
+    }),
     shell: process.platform === 'win32'
   })
   if (msg.error) {
@@ -39,6 +46,9 @@ if (args.includes('start')) {
     ['tsx', 'watch', '--clear-screen=false', jsdir, '--alemonjs-dev', ...argsx],
     {
       stdio: 'inherit',
+      env: Object.assign({}, process.env, {
+        PKG_DIR: pkgFilr
+      }),
       shell: process.platform === 'win32'
     }
   )

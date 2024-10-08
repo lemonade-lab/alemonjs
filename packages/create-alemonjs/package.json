@@ -2,7 +2,7 @@
   "name": "create-alemonjs",
   "version": "2.0.0-rc.11",
   "description": "alemonjs",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "main": "bin/index.js",
   "license": "GPL-2.0",
   "type": "module",

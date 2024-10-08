@@ -4,17 +4,14 @@ import { parse } from 'yaml'
 import { readFileSync, existsSync } from 'fs'
 import { BotConfigType, ConfigType } from './typing/types'
 
-// 尝试从参数中，得到更高优先级的配置
-export const argv = [...process.argv].slice(2)
-
 /**
  * @param key 参数
  * @returns 参数值
  */
 export const getArgvValue = (key: string) => {
-  const v = argv.indexOf(key)
+  const v = process.argv.indexOf(key)
   if (v === -1) return null
-  const next = argv[v + 1]
+  const next = process.argv[v + 1]
   if (typeof next == 'string') {
     // 如果是参数
     if (next.startsWith('-')) return null
@@ -27,7 +24,7 @@ export const getArgvValue = (key: string) => {
 /**
  * 配置类
  */
-export class Config {
+class ConfigCore {
   //
   #dir = null
 
@@ -196,4 +193,31 @@ export class Config {
   get value() {
     return this.#value
   }
+
+  #package = null
+
+  /**
+   * package.json
+   */
+  get package() {
+    if (this.#package) return this.#package
+    const dir = process.env.PKG_DIR || join(process.cwd(), 'package.json')
+    if (!existsSync(dir)) {
+      console.warn('package.json not found')
+      return null
+    }
+    const data = readFileSync(dir, 'utf-8')
+    try {
+      this.#package = JSON.parse(data)
+    } catch (err) {
+      console.error(err)
+    }
+    return this.#package
+  }
+}
+
+export const getConfig = () => {
+  if (global?.config) return global.config
+  global.config = new ConfigCore('alemon.config.yaml')
+  return global.config
 }

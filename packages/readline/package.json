@@ -2,7 +2,7 @@
   "name": "@alemonjs/readline",
   "version": "0.0.1",
   "description": "啊柠檬脚本",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",

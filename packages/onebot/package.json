@@ -1,0 +1,33 @@
+{
+  "name": "@alemonjs/onebot",
+  "version": "0.0.1",
+  "description": "discord-bot",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "dependencies": {
+    "chat-space": "^0.0.4"
+  },
+  "types": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "keywords": [
+    "alemonjs",
+    "onebot",
+    "bot",
+    "chat-bot"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}

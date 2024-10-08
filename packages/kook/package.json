@@ -2,7 +2,7 @@
   "name": "@alemonjs/kook",
   "version": "0.0.2",
   "description": "kook-bot",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",

@@ -1,7 +1,7 @@
 {
   "name": "jsxp",
-  "version": "1.0.3",
-  "author": "ningmengchongshui",
+  "version": "1.0.4",
+  "author": "lemonade",
   "description": "截图tsx组件",
   "main": "./lib/index.js",
   "type": "module",

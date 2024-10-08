@@ -2,7 +2,7 @@
   "name": "chat-space",
   "version": "0.0.4",
   "description": "开放平台机器人SDK",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "type": "module",
   "types": "lib",
   "main": "lib/index.js",

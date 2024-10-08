@@ -2,7 +2,7 @@
   "name": "@alemonjs/telegram",
   "version": "0.0.2",
   "description": "telegram-bot",
-  "author": "ningmengchongshui",
+  "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",

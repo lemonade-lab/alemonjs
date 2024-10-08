@@ -65,18 +65,12 @@ const generateModuleContent = (relativePath: string) => {
 
 const chache = {}
 
-/**
- *
- * @param str
- * @returns
- */
-function getHash(str: string) {
+const getHash = (str: string) => {
   // 使用 MD5 算法创建哈希对象
   const hash = crypto.createHash('md5')
   // 更新哈希对象内容
   hash.update(str)
-  const stt = hash.digest('hex')
-  return stt
+  return hash.digest('hex')
 }
 
 /**
@@ -84,13 +78,8 @@ function getHash(str: string) {
  * @param inputPath
  * @returns
  */
-function convertPath(inputPath: string) {
-  if (process.platform === 'win32') {
-    // win32 系统下，需要将路径中的反斜杠转义
-    return inputPath.replace(/\\/g, '\\\\')
-  } else {
-    return inputPath
-  }
+const convertPath = (inputPath: string) => {
+  return process.platform === 'win32' ? inputPath.replace(/\\/g, '/') : inputPath
 }
 
 const handleAsstesFile = (url: string) => {
@@ -116,8 +105,8 @@ const handleAsstesFile = (url: string) => {
  * @param param0
  */
 export const esBuildAsstesFule = (): Plugin => {
-  const str = process.argv[process.argv.indexOf('--import-assets') + 1]
-  const filter = process.argv.includes('--import-assets') && str ? new RegExp(str) : assetsReg
+  const index = process.argv.indexOf('--import-assets')
+  const filter = index != -1 ? new RegExp(process.argv[index + 1]) : assetsReg
   const namespace = 'assets'
   return {
     name: 'file-loader',
@@ -198,8 +187,8 @@ const handleCSSPath = (url: string) => {
  * @returns
  */
 export const esBuildCSS = (): Plugin => {
-  const str = process.argv[process.argv.indexOf('--import-css') + 1]
-  const filter = process.argv.includes('--import-css') && str ? new RegExp(str) : cssReg
+  const index = process.argv.indexOf('--import-css')
+  const filter = index != -1 ? new RegExp(process.argv[index + 1]) : cssReg
   const namespace = 'css'
   return {
     name: 'css-loader',
