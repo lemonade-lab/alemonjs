@@ -21,7 +21,7 @@ const createIoRedis = () => {
  *
  * @returns
  */
-export const getIoRedis = (): Promise<RedisClient> => {
+export const getIoRedis = (): RedisClient => {
   if (!global.ioRedis) global.ioRedis = createIoRedis()
   return global.ioRedis
 }
