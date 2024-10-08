@@ -3,10 +3,10 @@ import { getConfig } from '../config'
 const createIoRedis = () => {
   const cfg = getConfig()
   const aRedis = new redisClient({
-    host: cfg.redis.host ?? 'localhost',
-    port: cfg.redis.port ?? 6379,
-    password: cfg.redis.password ?? '',
-    db: cfg.redis.db ?? 0,
+    host: cfg.value.redis.host ?? 'localhost',
+    port: cfg.value.redis.port ?? 6379,
+    password: cfg.value.redis.password ?? '',
+    db: cfg.value.redis.db ?? 0,
     maxRetriesPerRequest: null
   })
   aRedis.on('error', (err: any) => {

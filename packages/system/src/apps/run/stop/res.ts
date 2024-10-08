@@ -49,7 +49,7 @@ export default OnResponse(
             process.exit()
           }
 
-          const cfg = getConfig()
+          const cfg = getConfig()?.value
 
           if (!cfg.pm2.name) {
             Send(Text('未配置pm2.name'))

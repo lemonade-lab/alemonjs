@@ -49,7 +49,7 @@ export default OnResponse(
       await Send(Text('开始重启...'))
     }
 
-    const cfg = getConfig()
+    const cfg = getConfig()?.value
     if (!cfg.pm2.name) {
       Send(Text('未配置pm2.name'))
       return
