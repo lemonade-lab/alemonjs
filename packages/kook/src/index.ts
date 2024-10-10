@@ -1,7 +1,11 @@
-import { defineBot, Text, OnProcessor, useParse, At } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, At, getConfig } from 'alemonjs'
 import { KOOKClient } from 'chat-space'
 
-export default defineBot(config => {
+export default defineBot(() => {
+  const cfg = getConfig()
+  const config = cfg.value?.kook
+  if (!config) return
+
   // 创建客户端
   const client = new KOOKClient({
     token: config.token

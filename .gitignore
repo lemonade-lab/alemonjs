@@ -9,3 +9,5 @@ yarn.lock
 data
 
 lib
+
+*.log.ts

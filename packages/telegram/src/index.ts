@@ -1,6 +1,10 @@
-import { defineBot, OnProcessor, Text, useParse } from 'alemonjs'
+import { defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import Client from 'node-telegram-bot-api'
-export default defineBot((_, { telegram: config }) => {
+export default defineBot(() => {
+  const cfg = getConfig()
+  const config = cfg.value?.['telegram']
+  if (!config) return
+
   //
   const client = new Client(config.token, {
     polling: true,

@@ -1,9 +1,13 @@
-import { defineBot, Text, OnProcessor, useParse } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, getConfig } from 'alemonjs'
 import { Client, segment } from 'icqq'
 import { device, error, qrcode, slider } from './login'
 import { Store } from './store'
 
-export default defineBot((_, { qq: config }) => {
+export default defineBot(() => {
+  const cfg = getConfig()
+  const config = cfg.value?.qq
+  if (!config) return
+
   const d = Number(config?.device)
   // 创建客户端
   const client = new Client({

@@ -1,6 +1,10 @@
-import { Text, OnProcessor, useParse, At, defineBot } from 'alemonjs'
+import { Text, OnProcessor, useParse, At, defineBot, getConfig } from 'alemonjs'
 import { QQBotGuildClient } from 'chat-space'
-export default defineBot(config => {
+export default defineBot(() => {
+  const cfg = getConfig()
+  const config = cfg.value?.['qq-guild-bot']
+  if (!config) return
+
   // 创建客户端
   const client = new QQBotGuildClient({
     appID: config.app_id,

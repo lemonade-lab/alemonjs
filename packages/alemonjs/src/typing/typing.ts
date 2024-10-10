@@ -47,6 +47,10 @@ export type AEventByMessageCreate = {
    */
   CreateAt: number
   /**
+   * 标记
+   */
+  tag: string
+  /**
    * 捕获原始消息格式
    */
   value: any

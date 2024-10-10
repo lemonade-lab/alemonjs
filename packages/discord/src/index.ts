@@ -1,6 +1,10 @@
-import { Text, OnProcessor, useParse, At, defineBot } from 'alemonjs'
+import { Text, OnProcessor, useParse, At, defineBot, getConfig } from 'alemonjs'
 import { DCClient } from 'chat-space'
-export default defineBot(config => {
+export default defineBot(() => {
+  const cfg = getConfig()
+  const config = cfg.value?.discord
+  if (!config) return
+
   // 创建客户端
   const client = new DCClient({
     token: config.token

@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/onebot",
   "version": "0.0.1",
-  "description": "discord-bot",
+  "description": "onebot",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

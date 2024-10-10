@@ -1,6 +1,10 @@
-import { Text, OnProcessor, useParse, defineBot } from 'alemonjs'
+import { Text, OnProcessor, useParse, defineBot, getConfig } from 'alemonjs'
 import { DrawingBed, QQBotGroupClient, FilesServer } from 'chat-space'
-export default defineBot(config => {
+export default defineBot(() => {
+  const cfg = getConfig()
+  const config = cfg.value?.['qq-group-bot']
+  if (!config) return
+
   // 创建客户端
   const client = new QQBotGroupClient({
     appID: config.app_id,

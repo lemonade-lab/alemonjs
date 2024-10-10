@@ -103,27 +103,27 @@ const build3 = () => {
 }
 
 const build = () => {
-  if (process.env.BN == 'discord') {
+  if (process.env.B == 'discord') {
     BuildByName('discord')
-  } else if (process.env.BN == 'qq') {
+  } else if (process.env.B == 'qq') {
     BuildByName('qq')
-  } else if (process.env.BN == 'onebot') {
+  } else if (process.env.B == 'onebot') {
     BuildByName('onebot')
-  } else if (process.env.BN == 'kook') {
+  } else if (process.env.B == 'kook') {
     BuildByName('kook')
-  } else if (process.env.BN == 'group') {
+  } else if (process.env.B == 'group') {
     BuildByName('qq-group-bot')
-  } else if (process.env.BN == 'guild') {
+  } else if (process.env.B == 'guild') {
     BuildByName('qq-guild-bot')
-  } else if (process.env.BN == 'readline') {
+  } else if (process.env.B == 'readline') {
     BuildByName('readline')
-  } else if (process.env.BN == 'telegram') {
+  } else if (process.env.B == 'telegram') {
     BuildByName('telegram')
-  } else if (process.env.BN == 'jsxp') {
+  } else if (process.env.B == 'jsxp') {
     BuildByName('jsxp')
-  } else if (process.env.BN == 'tsxp') {
+  } else if (process.env.B == 'tsxp') {
     BuildByName('tsxp')
-  } else if (process.env.BN == 'space') {
+  } else if (process.env.B == 'space') {
     BuildByName('chat-space')
   } else {
     BuildByName('alemonjs')

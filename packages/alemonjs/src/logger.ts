@@ -3,6 +3,7 @@ import log4js from 'log4js'
 import { getConfig } from './config'
 
 type LogType = string | Error | unknown
+
 declare global {
   var logger: {
     /**
@@ -48,6 +49,7 @@ declare global {
  * @returns
  */
 function createLog() {
+  mkdirSync('./logs', { recursive: true })
   const cfg = getConfig()
   log4js.configure({
     appenders: {
@@ -93,7 +95,7 @@ function createLog() {
   /**
    * 调整error日志等级
    */
-  const logger = {
+  return {
     trace() {
       defaultLogger.trace.call(defaultLogger, ...arguments)
     },
@@ -117,11 +119,7 @@ function createLog() {
       errorLogger.mark.call(commandLogger, ...arguments)
     }
   }
-  return logger
 }
-mkdirSync('./logs', {
-  recursive: true
-})
 /**
  * 全局变量 logger
  */
