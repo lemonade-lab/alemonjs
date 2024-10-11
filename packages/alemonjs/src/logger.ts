@@ -84,7 +84,7 @@ function createLog() {
       }
     },
     categories: {
-      default: { appenders: ['console'], level: cfg?.value.log?.level ?? 'info' },
+      default: { appenders: ['console'], level: cfg.value?.log?.level ?? 'info' },
       command: { appenders: ['console', 'command'], level: 'warn' },
       error: { appenders: ['console', 'command', 'error'], level: 'error' }
     }

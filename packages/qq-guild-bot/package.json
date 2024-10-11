@@ -1,13 +1,13 @@
 {
   "name": "@alemonjs/qq-guild-bot",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "qq-guild-bot",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
-    "chat-space": "^0.0.5"
+    "chat-space": "^0.0.6"
   },
   "types": "lib",
   "exports": {

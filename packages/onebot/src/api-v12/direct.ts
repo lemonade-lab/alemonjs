@@ -3,6 +3,33 @@ const BD = new BufferData()
 
 let ClientONE = null
 
+type Message = {
+  // 行为 发送消息
+  action: 'send_message'
+  params: {
+    // 私聊回复
+    detail_type: 'private'
+    // 用户
+    user_id: number
+    // 消息体
+    message: (
+      | {
+          type: 'image'
+          data: {
+            file_id: string
+          }
+        }
+      | {
+          type: 'text'
+          data: {
+            text: string
+          }
+        }
+    )[]
+  }
+  echo: '1234'
+}
+
 /**
  * 回复控制器
  * @param msg
@@ -34,7 +61,7 @@ export async function directController(msg, user_id) {
             ]
           },
           echo: '1234'
-        })
+        } as Message)
       )
       return false
     } catch (err) {
@@ -79,7 +106,7 @@ export async function directController(msg, user_id) {
             ]
           },
           echo: '1234'
-        })
+        } as Message)
       )
       return false
     } catch (err) {
@@ -125,7 +152,7 @@ export async function directController(msg, user_id) {
             ]
           },
           echo: '1234'
-        })
+        } as Message)
       )
     }
   }
@@ -153,7 +180,7 @@ export async function directController(msg, user_id) {
         ]
       },
       echo: '1234'
-    })
+    } as Message)
   )
   return true
 }

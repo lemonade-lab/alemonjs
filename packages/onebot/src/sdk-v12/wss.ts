@@ -1,20 +1,9 @@
 import ws from 'ws'
+import { MESSAGES_TYPE } from './type'
 
 type OneBotEventMap = {
   DIRECT_MESSAGE: any
-  MESSAGES: {
-    detail_type: 'private' | 'group'
-    user_id: string
-    group_id: string
-    group_name: string
-    message_id: string
-    raw_message: string
-    platform: string
-    sender: {
-      nickname: string
-    }
-    message: any[]
-  }
+  MESSAGES: MESSAGES_TYPE
   META: any
   ERROR: any
 }
@@ -73,7 +62,9 @@ export class OneBotClient {
             }
           }
 
-    this.#ws = new ws(url, c)
+    if (!this.#ws) {
+      this.#ws = new ws(url, c)
+    }
 
     // open
     this.#ws.on('open', () => {

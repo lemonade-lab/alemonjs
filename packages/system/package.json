@@ -16,9 +16,6 @@
     "moment": "^2.30.1",
     "pm2": "^5.4.2"
   },
-  "devDependencies": {
-    "alemonjs": "^2.0.0-rc.29"
-  },
   "main": "./lib/index.js",
   "types": "lib",
   "exports": {

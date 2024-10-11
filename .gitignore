@@ -4,7 +4,7 @@ node_modules
 alemon.config.yaml
 alemon.config.json
 
-yarn.lock
+*.lock
 
 data
 

@@ -4,19 +4,18 @@ export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.['telegram']
   if (!config) return
-
   //
   const client = new Client(config.token, {
     polling: true,
     baseApiUrl: '',
     request: {
       url: '',
-      proxy: 'http://127.0.0.1:7890'
+      proxy: config?.proxy ?? 'http://127.0.0.1:7890'
     }
   })
   //
+  //
   client.on('message', event => {
-    // if(event.user_shared.)
     // 定义消
     const e = {
       // 事件类型

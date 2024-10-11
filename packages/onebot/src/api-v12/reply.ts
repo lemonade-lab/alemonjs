@@ -3,6 +3,41 @@ const BD = new BufferData()
 
 let ClientONE = null
 
+type Message = {
+  // 行为 发送消息
+  action: 'send_group_msg'
+  params: {
+    // 用户
+    group_id: number
+    // 消息体
+    message: (
+      | {
+          type: 'image'
+          data: {
+            file_id: string
+          }
+        }
+      | {
+          type: 'text'
+          data: {
+            text: string
+          }
+        }
+      | {
+          type: 'mention'
+          data: {
+            user_id: number
+          }
+        }
+      | {
+          type: 'mention_all'
+          data: any
+        }
+    )[]
+  }
+  echo: '1234'
+}
+
 /**
  * 回复控制器
  * @param msg
@@ -31,7 +66,7 @@ export async function replyController(msg, guild_id) {
             ]
           },
           echo: '1234'
-        })
+        } as Message)
       )
       return false
     } catch (err) {
@@ -73,7 +108,7 @@ export async function replyController(msg, guild_id) {
             ]
           },
           echo: '1234'
-        })
+        } as Message)
       )
       return false
     } catch (err) {
@@ -114,7 +149,7 @@ export async function replyController(msg, guild_id) {
             ]
           },
           echo: '1234'
-        })
+        } as Message)
       )
     }
   }
@@ -167,7 +202,7 @@ export async function replyController(msg, guild_id) {
         message: message
       },
       echo: '1234'
-    })
+    } as Message)
   )
   return true
 }

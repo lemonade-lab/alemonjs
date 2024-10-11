@@ -52,9 +52,10 @@ const runChildren = (mainDir: string) => {
 const onDev = async (input: string) => {
   const cfg = getConfig()
   const skip = process.argv.includes('--skip')
+  const login = cfg.value?.login
   // login
-  if (!cfg.values?.login) {
-    throw new Error('login is required')
+  if (!login && !skip) {
+    return
   }
   // module
   if (cfg?.value?.apps) {
@@ -68,24 +69,27 @@ const onDev = async (input: string) => {
   }
   //  input
   const run = async () => {
+    if (!input) return
     const dir = join(cwd, input)
+    if (!existsSync(dir)) {
+      return
+    }
     // src/apps/**/*
     const mainDir = dirname(dir)
     const app = await import(`file://${dir}`)
-    const c = app?.default?.(cfg.values, cfg.value)
+    const c = app?.default?.()
     runChildren(mainDir)
     c?.onCreated?.()
   }
   await run()
-
   // prefix
   const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
   if (!skip) {
-    const bot = await import(`${prefix}${cfg.values.login}`)
+    const bot = await import(`${prefix}${login}`)
     // 挂在全局
-    global.alemonjs = bot?.default(cfg.values, cfg.value)
+    global.alemonjs = bot?.default()
   }
-  await import(`${prefix}${cfg.values.login}`)
+  await import(`${prefix}${login}`)
 }
 
 /**
@@ -105,10 +109,11 @@ const onStart = async (input?: string) => {
   const cfg = getConfig()
   const skip = process.argv.includes('--skip')
   // login
-  if (!cfg.values?.login) {
-    throw new Error('login is required')
+  const login = cfg.value?.login
+  // login
+  if (!login && !skip) {
+    return
   }
-
   // module
   if (cfg?.value?.apps) {
     if (Array.isArray(cfg?.value?.apps)) {
@@ -119,29 +124,29 @@ const onStart = async (input?: string) => {
       }
     }
   }
-
   // input
   const run = async () => {
-    if (input) {
-      const dir = join(cwd, input)
-      // src/apps/**/*
-      const mainDir = dirname(dir)
-      const app = await import(`file://${dir}`)
-      const c = app?.default?.(cfg.values, cfg.value)
-      runChildren(mainDir)
-      c?.onCreated?.()
+    if (!input) return
+    const dir = join(cwd, input)
+    if (!existsSync(dir)) {
+      return
     }
+    // src/apps/**/*
+    const mainDir = dirname(dir)
+    const app = await import(`file://${dir}`)
+    const c = app?.default?.()
+    runChildren(mainDir)
+    c?.onCreated?.()
   }
   await run()
-
   // prefix
   const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
   if (!skip) {
-    const bot = await import(`${prefix}${cfg.values.login}`)
+    const bot = await import(`${prefix}${login}`)
     // 挂在全局
-    global.alemonjs = bot?.default(cfg.values, cfg.value)
+    global.alemonjs = bot?.default()
   }
-  await import(`${prefix}${cfg.values.login}`)
+  await import(`${prefix}${login}`)
 }
 
 const main = async () => {
@@ -156,7 +161,7 @@ const main = async () => {
       input = 'src/index.js'
     }
     if (!existsSync(input)) {
-      throw new Error('src/index.js is required')
+      input = undefined
     }
     onDev(input)
   } else if (process.argv.includes('--alemonjs-build')) {
@@ -168,9 +173,6 @@ const main = async () => {
     }
     if (!existsSync(input)) {
       input = 'src/index.js'
-    }
-    if (!existsSync(input)) {
-      throw new Error('src/index.js is required')
     }
     const ouput = getArgvValue('--ouput') ?? 'lib'
     onBuild(input, ouput)
