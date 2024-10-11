@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "Debug TypeScript",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["tsx", "index.ts", "--login", "kook"],
+      "runtimeArgs": ["alemonjs", "dev", "--login", "onebot"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }
