@@ -17,6 +17,7 @@
 | [@alemonjs/qq-guild-bot] | [![qq-guild-bot-s]][qq-guild-bot-p] | QQ 频道连接    |
 | [@alemonjs/qq]           | [![qq-s]][qq-p]                     | QQ 连接        |
 | [@alemonjs/telegram]     | [![telegram-s]][telegram-p]         | telegram 连接  |
+| [@alemonjs/onebot]       | [![onebot-s]][onebot-p]             | onebot 连接    |
 
 [alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/alemonjs
 [alemonjs-s]: https://img.shields.io/npm/v/alemonjs.svg
@@ -51,6 +52,9 @@
 [@alemonjs/telegram]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/telegram
 [telegram-s]: https://img.shields.io/npm/v/@alemonjs/telegram.svg
 [telegram-p]: https://www.npmjs.com/package/@alemonjs/telegram
+[@alemonjs/onebot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/onebot
+[onebot-s]: https://img.shields.io/npm/v/@alemonjs/onebot.svg
+[onebot-p]: https://www.npmjs.com/package/@alemonjs/onebot
 
 ## Community
 

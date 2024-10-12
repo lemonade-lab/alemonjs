@@ -139,14 +139,17 @@ export default defineBot(() => {
           if (content) {
             return Promise.all(
               [content].map(item =>
-                client.postMessage(event.ChannelId, [
-                  {
-                    type: 'text',
-                    data: {
-                      text: item
+                client.sendGroupMsg({
+                  group_id: event.ChannelId,
+                  message: [
+                    {
+                      type: 'text',
+                      data: {
+                        text: item
+                      }
                     }
-                  }
-                ])
+                  ]
+                })
               )
             )
           }
@@ -154,14 +157,17 @@ export default defineBot(() => {
           if (images) {
             return Promise.all(
               images.map(item =>
-                client.postMessage(event.ChannelId, [
-                  {
-                    type: 'image',
-                    data: {
-                      file_id: `base64://${item.toString('base64')}`
+                client.sendGroupMsg({
+                  group_id: event.ChannelId,
+                  message: [
+                    {
+                      type: 'image',
+                      data: {
+                        file_id: item
+                      }
                     }
-                  }
-                ])
+                  ]
+                })
               )
             )
           }

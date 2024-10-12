@@ -111,18 +111,28 @@ export class OneBotClient {
 
   /**
    *
-   * @param guild_id
-   * @param message
+   * @param options
    * @returns
    */
-  postMessage(guild_id, message: any[]) {
+  sendGroupMsg(options: { group_id: number; message: any[] }) {
     return this.#ws.send(
       JSON.stringify({
         action: 'send_group_msg',
-        params: {
-          group_id: guild_id,
-          message: message
-        },
+        params: options,
+        echo: '1234'
+      })
+    )
+  }
+
+  /**
+   * @param options
+   * @returns
+   */
+  sendPrivateMsg(options: { user_id: number; message: any[] }) {
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'send_private_msg',
+        params: options,
         echo: '1234'
       })
     )

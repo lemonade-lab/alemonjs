@@ -146,7 +146,7 @@ export default defineBot(() => {
                     {
                       type: 'image',
                       data: {
-                        file_id: `base64://${item.toString('base64')}`
+                        file: `base64://${item.toString('base64')}`
                       }
                     }
                   ]
