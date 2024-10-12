@@ -125,11 +125,14 @@ export class OneBotClient {
    * @param options
    * @returns
    */
-  sendGroupMsg(options: { user_id: number; group_id: number; message: any[] }) {
-    const o = options
-    o['message_type'] = 'group'
-    o['auto_escape'] = false
-    return this.#ws.send(JSON.stringify(options))
+  sendGroupMsg(options: { group_id: number; message: any[] }) {
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'send_group_msg',
+        params: options,
+        echo: '1234'
+      })
+    )
   }
 
   /**
@@ -137,10 +140,13 @@ export class OneBotClient {
    * @returns
    */
   sendPrivateMsg(options: { user_id: number; message: any[] }) {
-    const o = options
-    o['message_type'] = 'private'
-    o['auto_escape'] = false
-    return this.#ws.send(JSON.stringify(options))
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'send_private_msg',
+        params: options,
+        echo: '1234'
+      })
+    )
   }
 
   //

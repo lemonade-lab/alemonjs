@@ -7,7 +7,7 @@
   "type": "module",
   "main": "lib/index.js",
   "dependencies": {
-    "chat-space": "^0.0.4"
+    "chat-space": "^0.0.6"
   },
   "types": "lib",
   "exports": {
@@ -23,7 +23,8 @@
     "chat-bot"
   ],
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
   "repository": {

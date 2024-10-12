@@ -29,7 +29,8 @@
     "chat-bot"
   ],
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
   "repository": {

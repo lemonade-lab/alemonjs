@@ -114,7 +114,7 @@ export class DCClient extends DCAPI {
         if (t == 'READY') {
           this.#session_id = d?.session_id
           if (d?.resume_gateway_url) {
-            this.#gateway_url = d?.gateway_url
+            this.#gateway_url = d?.resume_gateway_url
             console.log('[ws] ', this.#gateway_url)
           }
         }

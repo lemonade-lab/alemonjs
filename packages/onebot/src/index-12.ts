@@ -93,6 +93,8 @@ export default defineBot(() => {
       ],
       // 用户openId
       OpenID: event.user_id,
+      //
+      tag: 'MESSAGES',
       // 创建时间
       CreateAt: Date.now(),
       //

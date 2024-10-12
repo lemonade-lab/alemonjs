@@ -78,7 +78,8 @@ export default defineBot(() => {
       OpenID: String(event.user_id),
       // 创建时间
       CreateAt: Date.now(),
-      tag: '',
+      // 标签
+      tag: 'MESSAGES',
       //
       value: null
     }
@@ -130,8 +131,7 @@ export default defineBot(() => {
                         text: item
                       }
                     }
-                  ],
-                  user_id: event.UserId
+                  ]
                 })
               )
             )
@@ -149,8 +149,7 @@ export default defineBot(() => {
                         file_id: `base64://${item.toString('base64')}`
                       }
                     }
-                  ],
-                  user_id: event.UserId
+                  ]
                 })
               )
             )
