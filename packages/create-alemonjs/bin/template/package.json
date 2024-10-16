@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "lvy dev --alemonjs --login kook",
     "view": "lvy dev --view",
-    "build": "lvy build ",
+    "build": "lvy build",
     "review": "alemonjs start --input ./lib/index.js",
     "start": "pm2 startOrRestart pm2.config.cjs",
     "bundle": "rollup --config rollup.config.js",
@@ -43,7 +43,7 @@
     "@types/ws": "^8.5.5",
     "alemonjs": "2.0.0-rc.41",
     "husky": "^9.0.11",
-    "lvyjs": "^0.0.2",
+    "lvyjs": "^0.0.3",
     "pm2": "^5.3.0",
     "prettier": "^3.0.3"
   }

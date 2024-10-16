@@ -24,8 +24,7 @@
     "@alemonjs/telegram": "file:./packages/telegram",
     "alemonjs": "file:./packages/alemonjs",
     "chat-space": "file:./packages/chat-space",
-    "create-alemonjs": "file:./packages/create-alemonjs",
-    "jsxp": "file:./packages/jsxp"
+    "create-alemonjs": "file:./packages/create-alemonjs"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.7",
