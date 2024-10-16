@@ -5,8 +5,6 @@ import { getArgvValue } from './config'
 import { getAppsFiles } from './app/event-files'
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
-import { buildAndRun } from './build/rullup.js'
-import { initConfig } from './store.js'
 
 const cwd = process.cwd()
 
@@ -49,7 +47,7 @@ const runChildren = (mainDir: string) => {
  *
  * @param input
  */
-const onDev = async (input: string) => {
+export const onStart = async (input: string = 'lib/index.js') => {
   const cfg = getConfig()
   const skip = process.argv.includes('--skip')
   const login = cfg.value?.login
@@ -92,91 +90,8 @@ const onDev = async (input: string) => {
   await import(`${prefix}${login}`)
 }
 
-/**
- *
- * @param input
- * @param ouput
- */
-const onBuild = (input: string, ouput: string) => {
-  const mainDir = dirname(input)
-  buildAndRun(mainDir, ouput)
-}
-
-/**
- *
- */
-const onStart = async (input?: string) => {
-  const cfg = getConfig()
-  const skip = process.argv.includes('--skip')
-  // login
-  const login = cfg.value?.login
-  // login
-  if (!login && !skip) {
-    return
-  }
-  // module
-  if (cfg?.value?.apps) {
-    if (Array.isArray(cfg?.value?.apps)) {
-      for (const app of cfg?.value?.apps) {
-        // const m = await import(app)
-        // const c = m?.default()
-        loadChildrenFiles(app)
-      }
-    }
-  }
-  // input
-  const run = async () => {
-    if (!input) return
-    const dir = join(cwd, input)
-    if (!existsSync(dir)) {
-      return
-    }
-    // src/apps/**/*
-    const mainDir = dirname(dir)
-    const app = await import(`file://${dir}`)
-    const c = app?.default?.()
-    runChildren(mainDir)
-    c?.onCreated?.()
-  }
-  await run()
-  // prefix
-  const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
-  if (!skip) {
-    const bot = await import(`${prefix}${login}`)
-    // 挂在全局
-    global.alemonjs = bot?.default()
-  }
-  await import(`${prefix}${login}`)
-}
-
 const main = async () => {
-  if (process.argv.includes('--alemonjs-dev')) {
-    await initConfig()
-    // 开发模式
-    let input = getArgvValue('--input')
-    if (!input) {
-      input = 'src/index.ts'
-    }
-    if (!existsSync(input)) {
-      input = 'src/index.js'
-    }
-    if (!existsSync(input)) {
-      input = undefined
-    }
-    onDev(input)
-  } else if (process.argv.includes('--alemonjs-build')) {
-    await initConfig()
-    // 开发模式
-    let input = getArgvValue('--input')
-    if (!input) {
-      input = 'src/index.ts'
-    }
-    if (!existsSync(input)) {
-      input = 'src/index.js'
-    }
-    const ouput = getArgvValue('--ouput') ?? 'lib'
-    onBuild(input, ouput)
-  } else if (process.argv.includes('--alemonjs-start')) {
+  if (process.argv.includes('--alemonjs-start')) {
     // start 模式 没有config 没有ts环境
     let input = getArgvValue('--input')
     if (!input) {

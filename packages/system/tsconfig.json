@@ -6,5 +6,5 @@
     }
   },
   "include": ["src/**/*", "jsxp.config.tsx"],
-  "extends": "alemonjs/tsconfig.json"
+  "extends": "lvyjs/tsconfig.json"
 }

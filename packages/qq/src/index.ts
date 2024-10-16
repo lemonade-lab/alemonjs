@@ -21,11 +21,16 @@ export default defineBot(() => {
   const qq = Number(config.qq)
   // 主人
   const master_id: string[] = config?.master_id ?? []
+
   // 连接
   client.login(qq, config.password)
+  // 错误
   client.on('system.login.error', event => error(event))
+  // 设备
   client.on('system.login.device', event => device(client, event))
+  // 二维码
   client.on('system.login.qrcode', () => qrcode(client))
+  // 滑块
   client.on('system.login.slider', event => slider(client, event, qq))
 
   const LocalStore = new Store()
@@ -48,15 +53,12 @@ export default defineBot(() => {
       }
     }
   })
-  // client.on('message.private', async _ => {
-  //   // console.log('message.private 待完成', event)
-  // })
+
   // 监听消息
   client.on('message.group', async event => {
     const user_id = String(event.sender.user_id)
     const group_id = String(event.group_id)
     const isMaster = master_id.includes(user_id)
-    // e.group_avatar = `https://p.qlogo.cn/gh/${e.group_id}/${e.group_id}/640/`
     let msg = ''
     const Ats = []
     for (const val of event.message) {
@@ -118,6 +120,8 @@ export default defineBot(() => {
       OpenID: user_id,
       // 创建时间
       CreateAt: Date.now(),
+      // 标记
+      tag: 'message.group',
       //
       value: null
     }
@@ -130,12 +134,6 @@ export default defineBot(() => {
     // 处理消息
     OnProcessor(e, 'message.create')
   })
-
-  // const friend = client.fl.get(e.user_id)
-  // if (!friend) return
-  // await client
-  // .pickUser(e.user_id)
-  // .sendMsg(msg)
 
   return {
     api: {

@@ -6,14 +6,27 @@ const args = [...process.argv.slice(2)]
 const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
 const pkgFilr = join(currentDirPath, '../package.json')
-console.log('alemonjs', args)
 // 启动模式
-if (args.includes('start')) {
-  // main 使用参数启动
+if (args.includes('build')) {
   const jsFile = join(currentDirPath, '../lib/index.js')
   const jsdir = relative(process.cwd(), jsFile)
-  const argsx = args.filter(arg => arg !== 'start')
-  const msg = spawn('node', [jsdir, '--alemonjs-start', ...argsx], {
+  const argsx = args.filter(arg => arg !== 'build')
+  const msg = spawn('npx', ['tsx', jsdir, '--lvy-build', ...argsx], {
+    stdio: 'inherit',
+    env: Object.assign({}, process.env, {
+      PKG_DIR: pkgFilr
+    }),
+    shell: process.platform === 'win32'
+  })
+  if (msg.error) {
+    console.error(msg.error)
+    process.exit()
+  }
+} else if (args.includes('dev')) {
+  const jsFile = join(currentDirPath, '../lib/index.js')
+  const jsdir = relative(process.cwd(), jsFile)
+  const argsx = args.filter(arg => arg !== 'dev')
+  const msg = spawn('npx', ['tsx', 'watch', '--clear-screen=false', jsdir, '--lvy-dev', ...argsx], {
     stdio: 'inherit',
     env: Object.assign({}, process.env, {
       PKG_DIR: pkgFilr

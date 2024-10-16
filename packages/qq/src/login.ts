@@ -17,8 +17,7 @@ let inSlider = false
 export async function qrcode(client) {
   console.info(`\n`)
   console.info(`请使用登录当前QQ的手机${chalk.green('扫码')}完成登录`)
-  console.info(`如果显示二维码过期，可以按${chalk.green('回车键（Enter）')}刷新`)
-  console.info(`重新输入密码请退出后执行命令：${chalk.green('npm run login')}`)
+  console.info(`如果显示二维码过期,可以按${chalk.green('回车键（Enter）')}刷新`)
   console.info(`\n`)
 
   // 次数
@@ -37,7 +36,7 @@ export async function qrcode(client) {
     if (res.retcode === 0) {
       inSlider = true
 
-      console.info(chalk.green('\n扫码成功，开始登录...\n'))
+      console.info(chalk.green('\n扫码成功,开始登录...\n'))
 
       // 阻塞1秒
       await sleep(1000)
@@ -47,7 +46,7 @@ export async function qrcode(client) {
     }
 
     if (time >= 150) {
-      console.error('等待扫码超时，已停止运行\n')
+      console.error('等待扫码超时,已停止运行\n')
       process.exit()
     } else {
       timeout = setTimeout(start, 1000 * 3)
@@ -62,7 +61,7 @@ export async function qrcode(client) {
     inquirer
       .prompt({
         type: 'input',
-        message: '回车刷新二维码，等待扫码中...\n',
+        message: '回车刷新二维码,等待扫码中...\n',
         name: 'enter'
       })
       .then(async () => {
@@ -86,7 +85,7 @@ export async function qrcode(client) {
 }
 
 /**
- * 收到滑动验证码提示后，必须使用手机拉动，PC浏览器已经无效
+ * 收到滑动验证码提示后,必须使用手机拉动,PC浏览器已经无效
  * @param event
  */
 export async function slider(client, event, uin) {
@@ -94,30 +93,31 @@ export async function slider(client, event, uin) {
   console.log(`\n\n------------------${chalk.green('↓↓滑动验证链接↓↓')}----------------------\n`)
   console.log(chalk.green(event.url))
   console.log('\n--------------------------------------------------------')
-  console.log(`提示：打开上面链接获取ticket，可使用${chalk.green('【滑动验证app】')}获取`)
-  console.log(`链接存在${chalk.green('有效期')}，请尽快操作，多次操作失败可能会被冻结`)
+  console.log(`提示：打开上面链接获取ticket,可使用${chalk.green('【滑动验证app】')}获取`)
+  console.log(`链接存在${chalk.green('有效期')},请尽快操作,多次操作失败可能会被冻结`)
   console.log('滑动验证app下载地址：https://wwp.lanzouy.com/i6w3J08um92h 密码:3kuu\n')
 
   const ret = await inquirer.prompt([
     {
       type: 'list',
       name: 'type',
-      message: '触发滑动验证，需要获取ticket通过验证，请选择获取方式:',
+      message: '触发滑动验证,需要获取ticket通过验证,请选择获取方式:',
       choices: ['0.自动获取ticket', '1.手动获取ticket', '2.滑动验证app请求码获取']
     }
   ])
 
   await sleep(200)
+
   let ticket
 
   if (ret.type == '0.自动获取ticket') {
     ticket = await this.getTicket(event.url, uin)
-    if (!ticket) console.log('\n请求错误，返回手动获取ticket方式\n')
+    if (!ticket) console.log('\n请求错误,返回手动获取ticket方式\n')
   }
 
   if (ret.type == '2.滑动验证app请求码获取') {
     ticket = await this.requestCode(event.url)
-    if (!ticket) console.log('\n请求错误，返回手动获取ticket方式\n')
+    if (!ticket) console.log('\n请求错误,返回手动获取ticket方式\n')
   }
 
   if (!ticket) {
@@ -134,7 +134,9 @@ export async function slider(client, event, uin) {
     })
     ticket = trim(res.ticket, '"')
   }
+
   global.inputTicket = true
+
   client.submitSlider(ticket.trim())
 }
 
@@ -145,6 +147,7 @@ export async function slider(client, event, uin) {
  */
 export async function getTicket(url, uin) {
   const req = `https://hlhs-nb.cn/captcha/slider?key=${uin}`
+
   await fetch(req, {
     method: 'POST',
     body: JSON.stringify({ url })
@@ -190,7 +193,7 @@ export async function requestCode(url) {
   if (!txhelper.code) return false
 
   console.log(
-    `\n请打开滑动验证app，输入请求码${chalk.green('【' + txhelper.code + '】')}，然后完成滑动验证\n`
+    `\n请打开滑动验证app,输入请求码${chalk.green('【' + txhelper.code + '】')},然后完成滑动验证\n`
   )
 
   await sleep(200)
@@ -198,7 +201,7 @@ export async function requestCode(url) {
   //
   await inquirer.prompt({
     type: 'input',
-    message: '验证完成后按回车确认，等待在操作中...',
+    message: '验证完成后按回车确认,等待在操作中...',
     name: 'enter'
   })
 
@@ -232,7 +235,7 @@ export async function device(client, event) {
     {
       type: 'list',
       name: 'type',
-      message: '触发设备锁验证，请选择验证方式:',
+      message: '触发设备锁验证,请选择验证方式:',
       choices: ['1.网页扫码验证', '2.发送短信验证码到密保手机']
     }
   ])
@@ -241,7 +244,7 @@ export async function device(client, event) {
 
   if (ret.type == '1.网页扫码验证') {
     console.log('\n' + chalk.green(event.url) + '\n')
-    console.log('请打开上面链接，完成验证后按回车')
+    console.log('请打开上面链接,完成验证后按回车')
     await inquirer.prompt({
       type: 'input',
       message: '等待操作中...',
@@ -267,13 +270,13 @@ export async function device(client, event) {
  * @param event
  */
 export function error(event) {
-  if (Number(event.code) === 1) console.error('QQ密码错误，运行命令重新登录：npm run login')
+  if (Number(event.code) === 1) console.error('QQ密码错误,运行命令重新登录')
   if (global.inputTicket && event.code == 237) {
-    console.error(`${chalk.red('ticket')}输入错误或者已失效，已停止运行，请重新登录验证`)
+    console.error(`${chalk.red('ticket')}输入错误或者已失效,已停止运行,请重新登录验证`)
   } else if (event?.message.includes('冻结')) {
-    console.error('账号已被冻结，已停止运行')
+    console.error('账号已被冻结,已停止运行')
   } else {
-    console.error('登录错误，已停止运行')
+    console.error('登录错误,已停止运行')
   }
   process.exit()
 }

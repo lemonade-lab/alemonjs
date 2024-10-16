@@ -12,6 +12,10 @@ export class DCClient extends DCAPI {
 
   #gateway_url = ''
 
+  #timeout_id = null
+
+  #seq = null
+
   #ws: WebSocket
 
   /**
@@ -27,7 +31,7 @@ export class DCClient extends DCAPI {
   }
 
   /**
-   *
+   * 连接确认
    * @returns
    */
   #aut() {
@@ -38,6 +42,7 @@ export class DCClient extends DCAPI {
       op: 2,
       d: {
         shard: shard,
+        // 验证token
         token: `Bot ${token}`,
         intents: getIntents(intent),
         properties: {
@@ -50,19 +55,23 @@ export class DCClient extends DCAPI {
   }
 
   /**
-   *
+   * 重新确认
    */
-  #reAut() {
-    const token = config.get('token')
-    return {
-      op: 6,
-      d: {
-        token: token,
-        session_id: this.#session_id,
-        seq: 1337
-      }
-    }
-  }
+  // #reAut() {
+  //   const token = config.get('token')
+  //   const c = {
+  //     op: 6,
+  //     d: {
+  //       // 会话token
+  //       token: token,
+  //       session_id: this.#session_id,
+  //       // 收到的最后一个序列号
+  //       seq: this.#seq
+  //     }
+  //   }
+  //   console.log('[ws] c', c)
+  //   return c
+  // }
 
   #events: {
     [K in keyof DCEventMap]?: (event: DCEventMap[K]) => any
@@ -92,18 +101,45 @@ export class DCClient extends DCAPI {
       })
     if (!url) return
 
+    /**
+     * 心跳恢复
+     */
     const call = async () => {
       this.#ws.send(
         JSON.stringify({
           op: 1, //  op = 1
-          d: null // 如果是第一次连接，传null
+          d: this.#seq // 如果是第一次连接，传null
+          // d: null // 如果是第一次连接，传null
         })
       )
-      setTimeout(call, this.#heartbeat_interval)
+      // 确保清除
+      clearTimeout(this.#timeout_id)
+      // 开始心跳
+      this.#timeout_id = setTimeout(call, this.#heartbeat_interval)
     }
 
     const map = {
-      0: async ({ d, t }) => {
+      /**
+       * 事件接收到
+       * @param param0
+       */
+      0: async ({ d, t, s }) => {
+        if (s) {
+          // 序列号
+          this.#seq = s
+        }
+        // 准备
+        if (t == 'READY') {
+          if (d?.resume_gateway_url) {
+            this.#gateway_url = d?.resume_gateway_url
+            console.log('[ws] gateway_url', this.#gateway_url)
+          }
+          if (d?.session_id) {
+            this.#session_id = d?.session_id
+            console.log('[ws] session_id', this.#session_id)
+          }
+        }
+        // 事件处理
         if (this.#events[t]) {
           try {
             await this.#events[t](d)
@@ -111,47 +147,47 @@ export class DCClient extends DCAPI {
             if (this.#events['ERROR']) this.#events['ERROR'](err)
           }
         }
-        if (t == 'READY') {
-          this.#session_id = d?.session_id
-          if (d?.resume_gateway_url) {
-            this.#gateway_url = d?.resume_gateway_url
-            console.log('[ws] ', this.#gateway_url)
-          }
-        }
-      },
-      7: () => {
-        console.info('[ws] 重新请求')
-        this.#ws.send(JSON.stringify(this.#reAut()))
-      },
-      9: message => {
-        //  6 或 2 失败
-        // 连接失败
-        console.info('[ws] parameter error', message)
+
+        //
       },
       /**
-       * 打招呼
+       * 重新连接
+       */
+      7: () => {
+        console.info('[ws] 重新连接')
+        // clearTimeout(this.#timeout_id) // 清除心跳
+        // this.#ws.send(JSON.stringify(this.#reAut()))
+      },
+      /**
+       * 无效会话
+       * @param message
+       */
+      9: ({ d }) => {
+        console.error('[ws] 无效会话 ', d)
+      },
+      /**
+       * 你好
        * @param param0
        */
       10: ({ d }) => {
-        const { heartbeat_interval: ih } = d
-        this.#heartbeat_interval = ih
-        //
-        this.#ws.send(
-          JSON.stringify({
-            op: 1,
-            d: null
-          })
-        )
-        setTimeout(call, this.#heartbeat_interval)
-        // 在初次握手期间启动新会话
+        // 得到心跳间隔
+        this.#heartbeat_interval = d.heartbeat_interval
+
+        // 开始心跳
+        call()
+
+        // 开启会话
         this.#ws.send(JSON.stringify(this.#aut()))
       },
+      /**
+       * 心跳确认
+       */
       11: () => {
-        console.info('[ws] heartbeat transmission')
+        console.info('[ws] 心跳确认')
       }
     }
 
-    this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
+    if (!this.#ws) this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
 
     this.#ws.on('open', async () => {
       console.info('[ws] open')
@@ -160,18 +196,34 @@ export class DCClient extends DCAPI {
     // 消息
     this.#ws.on('message', data => {
       const message = JSON.parse(data.toString())
-      if (process.env?.DISCORD_WS == 'dev') console.info('message', message)
       if (map[message.op]) map[message.op](message)
     })
 
     // 关闭
     this.#ws.on('close', err => {
-      console.error('[ws] 登录失败,TOKEN存在风险', err)
+      console.error('[ws] 连接已关闭', err)
+      if (err == 1001) {
+        // 无效会话而出错。
+        this.#seq = null
+        clearTimeout(this.#timeout_id)
+        console.log('[ws] 等待重连')
+        this.connect()
+      } else if (err == 1006) {
+        // 被直接关闭
+        this.#seq = null
+        clearTimeout(this.#timeout_id)
+        console.log('[ws] 等待重连')
+        this.connect()
+      } else {
+        console.error('[ws] 未知错误', err)
+      }
     })
 
     // 出错
     this.#ws.on('error', err => {
       console.error('[ws] error:', err)
     })
+
+    ///
   }
 }

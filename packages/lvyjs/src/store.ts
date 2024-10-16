@@ -3,6 +3,20 @@ import { join } from 'path'
 import { RollupOptions } from 'rollup'
 
 export type Options = {
+  plugins?: {
+    // 应用名
+    name: string
+    /**
+     * ⚠️直接optoins进行调整
+     * @param options
+     * @returns
+     */
+    config?: (options: Options) => Options
+    /**
+     * 执行
+     */
+    callback?: () => void
+  }[]
   build?: {
     plugins?: {
       belong: 'rollup' | 'esbuild' | 'other'
@@ -16,24 +30,47 @@ export type Options = {
   }
 }
 
+/**
+ *
+ * @param options
+ * @returns
+ */
+export const pluginConfig = (options: {
+  // 应用名
+  name: string
+  /**
+   * ⚠️直接optoins进行调整
+   * @param options
+   * @returns
+   */
+  config: (options: Options) => Options
+  /**
+   * 执行
+   */
+  callback?: () => void
+}) => options
+
+/**
+ *
+ */
 declare global {
-  var alemonjsconfig: Options
+  var lvyConfig: Options
 }
 
 /**
  *
  */
 export const initConfig = async () => {
-  if (!global.alemonjsconfig) {
+  if (!global.lvyConfig) {
     // init
-    global.alemonjsconfig = {}
+    global.lvyConfig = {}
   }
   const files = [
-    'alemon.config.ts',
-    'alemon.config.js',
-    'alemon.config.mjs',
-    'alemon.config.cjs',
-    'alemon.config.tsx'
+    'lvy.config.ts',
+    'lvy.config.js',
+    'lvy.config.mjs',
+    'lvy.config.cjs',
+    'lvy.config.tsx'
   ]
   let configDir = ''
   for (const file of files) {
@@ -45,7 +82,7 @@ export const initConfig = async () => {
   if (configDir !== '') {
     const v = await import(`file://${join(process.cwd(), configDir)}`)
     if (v?.default) {
-      global.alemonjsconfig = v.default
+      global.lvyConfig = v.default
     }
   }
 }
@@ -54,11 +91,10 @@ export const initConfig = async () => {
  * @returns
  */
 export const getOptions = () => {
-  return global.alemonjsconfig
+  return global.lvyConfig
 }
 
 /**
- *
  * @param param0
  * @returns
  */

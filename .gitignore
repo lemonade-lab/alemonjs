@@ -11,3 +11,5 @@ data
 lib
 
 *.log.ts
+
+logs

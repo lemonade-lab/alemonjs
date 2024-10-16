@@ -78,58 +78,60 @@ const BuildByName = (name: string) => {
   config.push(buildDts(input, dir, inc))
 }
 
-const build1 = () => {
-  const input = `packages/alemonjs/src/plugins/index.ts`
-  const dir = `packages/alemonjs/lib/plugins`
-  const inc = `packages/alemonjs/src/plugins/**/*`
+const build1 = (name = 'alemonjs') => {
+  const input = `packages/${name}/src/plugins/index.ts`
+  const dir = `packages/${name}/lib/plugins`
+  const inc = `packages/${name}/src/plugins/**/*`
   config.push(buildJs(input, dir, inc))
   config.push(buildDts(input, dir, inc))
 }
 
-const build2 = () => {
-  const input = `packages/alemonjs/src/loader/index.ts`
-  const dir = `packages/alemonjs/lib/loader`
-  const inc = `packages/alemonjs/src/loader/**/*`
+const build2 = (name = 'alemonjs') => {
+  const input = `packages/${name}/src/loader/index.ts`
+  const dir = `packages/${name}/lib/loader`
+  const inc = `packages/${name}/src/loader/**/*`
   config.push(buildJs(input, dir, inc))
   config.push(buildDts(input, dir, inc))
 }
 
-const build3 = () => {
-  const input = `packages/alemonjs/src/loader/main.ts`
-  const dir = `packages/alemonjs/lib/loader`
-  const inc = `packages/alemonjs/src/loader/**/*`
+const build3 = (name = 'alemonjs') => {
+  const input = `packages/${name}/src/loader/main.ts`
+  const dir = `packages/${name}/lib/loader`
+  const inc = `packages/${name}/src/loader/**/*`
   config.push(buildJs(input, dir, inc))
   config.push(buildDts(input, dir, inc))
 }
 
 const build = () => {
-  if (process.env.B == 'discord') {
+  if (process.env.build == 'discord') {
     BuildByName('discord')
-  } else if (process.env.B == 'qq') {
+  } else if (process.env.build == 'qq') {
     BuildByName('qq')
-  } else if (process.env.B == 'onebot') {
+  } else if (process.env.build == 'onebot') {
     BuildByName('onebot')
-  } else if (process.env.B == 'kook') {
+  } else if (process.env.build == 'kook') {
     BuildByName('kook')
-  } else if (process.env.B == 'group') {
+  } else if (process.env.build == 'group') {
     BuildByName('qq-group-bot')
-  } else if (process.env.B == 'guild') {
+  } else if (process.env.build == 'guild') {
     BuildByName('qq-guild-bot')
-  } else if (process.env.B == 'readline') {
+  } else if (process.env.build == 'readline') {
     BuildByName('readline')
-  } else if (process.env.B == 'telegram') {
+  } else if (process.env.build == 'telegram') {
     BuildByName('telegram')
-  } else if (process.env.B == 'jsxp') {
+  } else if (process.env.build == 'jsxp') {
     BuildByName('jsxp')
-  } else if (process.env.B == 'tsxp') {
+  } else if (process.env.build == 'tsxp') {
     BuildByName('tsxp')
-  } else if (process.env.B == 'space') {
+  } else if (process.env.build == 'space') {
     BuildByName('chat-space')
+  } else if (process.env.build == 'lvyjs') {
+    BuildByName('lvyjs')
+    build1('lvyjs')
+    build2('lvyjs')
+    build3('lvyjs')
   } else {
     BuildByName('alemonjs')
-    build1()
-    build2()
-    build3()
   }
 }
 

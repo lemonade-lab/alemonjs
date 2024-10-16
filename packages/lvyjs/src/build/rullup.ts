@@ -26,8 +26,8 @@ const buildJs = async (inputs: string[], output: string) => {
   // 从全局变量中，拿到 rollup 的配置
   const plguins = []
   // 存在build配置
-  if (global?.alemonjsconfig?.build) {
-    const p = global.alemonjsconfig.build?.plugins
+  if (global?.lvyConfig?.build) {
+    const p = global.lvyConfig.build?.plugins
     if (p && Array.isArray(p)) {
       // 遍历插件
       const ps = p.filter(item => item.belong == 'rollup')
