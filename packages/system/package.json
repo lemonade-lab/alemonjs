@@ -18,7 +18,8 @@
   },
   "devDependencies": {
     "@alemonjs/kook": "^0.0.3",
-    "lvyjs": "^0.0.3"
+    "alemonjs": "^2.0.0-rc.42",
+    "lvyjs": "^0.1.0"
   },
   "main": "./lib/index.js",
   "types": "lib",

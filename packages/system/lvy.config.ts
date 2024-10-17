@@ -1,5 +1,4 @@
 import { defineConfig } from 'lvyjs'
-import { alias, files } from 'lvyjs/plugins'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 const __filename = fileURLToPath(import.meta.url)
@@ -8,7 +7,7 @@ export default defineConfig({
   plugins: [
     {
       name: 'alemon',
-      callback: () => {
+      useApp: () => {
         if (process.argv.includes('--alemonjs')) {
           process.argv.push('--alemonjs-dev')
           import('alemonjs')
@@ -17,7 +16,7 @@ export default defineConfig({
     },
     {
       name: 'jsxp',
-      callback: async () => {
+      useApp: async () => {
         if (process.argv.includes('--view')) {
           const { createServer } = await import('jsxp')
           createServer()
@@ -26,11 +25,8 @@ export default defineConfig({
     }
   ],
   build: {
-    plugins: [
-      alias({
-        entries: [{ find: '@src', replacement: join(__dirname, 'src') }]
-      }),
-      files({ filter: /\.(png|jpg)$/ })
-    ]
+    alias: {
+      entries: [{ find: '@src', replacement: join(__dirname, 'src') }]
+    }
   }
 })
