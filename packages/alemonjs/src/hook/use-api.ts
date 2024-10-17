@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { DataEnums, DataParseType, ParseType } from './message-typing'
-import { AEvents } from '../typing/typing'
+import { AEvents } from '../env'
 
 export * from './message-format'
 

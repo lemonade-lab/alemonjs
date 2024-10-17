@@ -1,54 +1,11 @@
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 import { getConfig } from './config'
-
-type LogType = string | Error | unknown
-
-declare global {
-  var logger: {
-    /**
-     *痕迹
-     * @param arg
-     */
-    trace(...arg: LogType[]): any
-    /**
-     *调试
-     * @param arg
-     */
-    debug(...arg: LogType[]): any
-    /**
-     *信息
-     * @param arg
-     */
-    info(...arg: LogType[]): any
-    /**
-     *警告
-     * @param arg
-     */
-    warn(...arg: LogType[]): any
-    /**
-     *错误
-     * @param arg
-     */
-    error(...arg: LogType[]): any
-    /**
-     *致命
-     * @param arg
-     */
-    fatal(...arg: LogType[]): any
-    /**
-     *标记
-     * @param arg
-     */
-    mark(...arg: LogType[]): any
-  }
-}
-
 /**
  * 创建日志
  * @returns
  */
-function createLog() {
+const createLog = () => {
   mkdirSync('./logs', { recursive: true })
   const cfg = getConfig()
   log4js.configure({
@@ -123,4 +80,4 @@ function createLog() {
 /**
  * 全局变量 logger
  */
-global.logger = createLog() as any
+global.logger = createLog()

@@ -43,6 +43,7 @@ export default defineBot(() => {
       OpenID: event.author.member_openid,
       // 创建时间
       CreateAt: Date.now(),
+      tag: 'GROUP_AT_MESSAGE_CREATE',
       //
       value: null
     }

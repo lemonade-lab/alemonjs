@@ -78,6 +78,7 @@ export default defineBot(() => {
       OpenID: '',
       // 创建时间
       CreateAt: Date.now(),
+      tag: 'MESSAGE_CREATE',
       //
       value: null
     }

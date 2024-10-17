@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import fs from 'node:fs'
 import { useParse } from '../hook/use-api'
-import { AEvents } from '../typing/typing'
+import { AEvents } from '../env'
 
 type DbKey = {
   // 目录

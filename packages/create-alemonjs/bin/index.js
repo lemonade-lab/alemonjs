@@ -3,17 +3,9 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs'
 import { cpSync, rmSync } from 'fs'
 import { resolve, join, dirname } from 'path'
 import { fileURLToPath } from 'node:url'
-
-interface options {
-  name: string
-  force: boolean
-  cancel: boolean
-}
-
 const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
 const alemonjsCliPath = resolve(currentDirPath)
-
 const NpmPublish = `
 # 忽略所有文件
 /*   
@@ -22,7 +14,6 @@ const NpmPublish = `
 !/lib
 !/public
 `
-
 const NpmrcBody = `# 为项目单独设置镜像
 registry=https://registry.npmmirror.com
 # canvas
@@ -43,7 +34,6 @@ node-linker=hoisted
 shamefully-hoist=true
 # 严格的对等依赖关系
 strict-peer-dependencies=false`
-
 const GitBody = `
 node_modules
 /data
@@ -51,8 +41,7 @@ node_modules
 /lib
 yarn.lock
 `
-
-async function createAlemonjs({ name, force }: options) {
+async function createAlemonjs({ name, force }) {
   // 名字不存在
   if (!name) process.exit()
   // 当前目录下
@@ -74,14 +63,11 @@ async function createAlemonjs({ name, force }: options) {
     const templatePath = join(alemonjsCliPath, 'template')
     console.info('Copying template...')
     cpSync(templatePath, dirPath, { recursive: true })
-
     writeFileSync(join(dirPath, '.npmrc'), NpmrcBody)
     writeFileSync(join(dirPath, '.gitignore'), GitBody)
     writeFileSync(join(dirPath, '.npmignore'), NpmPublish)
-
     // 切换目录
     process.chdir(dirPath)
-
     console.info(`------------------------------------`)
     console.info(`cd ${name}       #进入机器人目录`)
     console.info(`------------------------------------`)
@@ -93,7 +79,7 @@ async function createAlemonjs({ name, force }: options) {
     return
   }
 }
-const data: options = {
+const data = {
   name: 'alemonb',
   force: false,
   cancel: false

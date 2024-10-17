@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.41",
+  "version": "2.0.0-rc.42",
   "description": "alemonjs bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -20,6 +20,9 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
+    },
+    "./env": {
+      "types": "./lib/env.d.ts"
     }
   },
   "bin": {

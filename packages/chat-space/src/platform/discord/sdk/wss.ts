@@ -94,12 +94,21 @@ export class DCClient extends DCAPI {
    * @returns
    */
   async connect() {
+    // 清除序列号
+    this.#seq = null
+    // 清除心跳
+    clearTimeout(this.#timeout_id)
+    // 获取网关
     const url = await this.gateway()
       .then(res => res?.url)
       .catch(err => {
         if (this.#events['ERROR']) this.#events['ERROR'](err)
       })
-    if (!url) return
+    // 没有网关
+    if (!url) {
+      console.error('[ws] 无法获取网关')
+      return
+    }
 
     /**
      * 心跳恢复
@@ -109,7 +118,6 @@ export class DCClient extends DCAPI {
         JSON.stringify({
           op: 1, //  op = 1
           d: this.#seq // 如果是第一次连接，传null
-          // d: null // 如果是第一次连接，传null
         })
       )
       // 确保清除
@@ -155,7 +163,6 @@ export class DCClient extends DCAPI {
        */
       7: () => {
         console.info('[ws] 重新连接')
-        // clearTimeout(this.#timeout_id) // 清除心跳
         // this.#ws.send(JSON.stringify(this.#reAut()))
       },
       /**
@@ -187,7 +194,7 @@ export class DCClient extends DCAPI {
       }
     }
 
-    if (!this.#ws) this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
+    this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
 
     this.#ws.on('open', async () => {
       console.info('[ws] open')
@@ -202,21 +209,8 @@ export class DCClient extends DCAPI {
     // 关闭
     this.#ws.on('close', err => {
       console.error('[ws] 连接已关闭', err)
-      if (err == 1001) {
-        // 无效会话而出错。
-        this.#seq = null
-        clearTimeout(this.#timeout_id)
-        console.log('[ws] 等待重连')
-        this.connect()
-      } else if (err == 1006) {
-        // 被直接关闭
-        this.#seq = null
-        clearTimeout(this.#timeout_id)
-        console.log('[ws] 等待重连')
-        this.connect()
-      } else {
-        console.error('[ws] 未知错误', err)
-      }
+      console.log('[ws] 等待重连')
+      this.connect()
     })
 
     // 出错

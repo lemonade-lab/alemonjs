@@ -1,3 +1,5 @@
+export type LogType = string | Error | unknown
+
 /**
  *
  */
@@ -123,4 +125,44 @@ export type AEvents = {
    */
   'message.create': AEventByMessageCreate
   'private.message.create': AEventByPrivateMessageCreate
+}
+
+declare global {
+  var logger: {
+    /**
+     *痕迹
+     * @param arg
+     */
+    trace(...arg: LogType[]): any
+    /**
+     *调试
+     * @param arg
+     */
+    debug(...arg: LogType[]): any
+    /**
+     *信息
+     * @param arg
+     */
+    info(...arg: LogType[]): any
+    /**
+     *警告
+     * @param arg
+     */
+    warn(...arg: LogType[]): any
+    /**
+     *错误
+     * @param arg
+     */
+    error(...arg: LogType[]): any
+    /**
+     *致命
+     * @param arg
+     */
+    fatal(...arg: LogType[]): any
+    /**
+     *标记
+     * @param arg
+     */
+    mark(...arg: LogType[]): any
+  }
 }

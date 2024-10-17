@@ -98,6 +98,8 @@ export default defineBot(() => {
       OpenID: data?.code,
       // 创建时间
       CreateAt: Date.now(),
+      // 表情
+      tag: 'MESSAGES_PUBLIC',
       //
       value: null
     }

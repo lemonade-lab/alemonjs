@@ -7,7 +7,7 @@
   "license": "GPL-2.0",
   "type": "module",
   "scripts": {
-    "dev": "node bin/alemonjs.js",
+    "dev": "node bin/index.js",
     "build": "tsc"
   },
   "devDependencies": {
@@ -15,7 +15,7 @@
     "typescript": "^5.2.2"
   },
   "bin": {
-    "create-alemonjs": "bin/alemonjs.js"
+    "create-alemonjs": "bin/index.js"
   },
   "keywords": [
     "alemonjs"

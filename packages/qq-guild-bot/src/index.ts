@@ -80,6 +80,7 @@ export default defineBot(() => {
       OpenID: event.guild_id,
       // 创建时间
       CreateAt: Date.now(),
+      tag: 'AT_MESSAGE_CREATE',
       //
       value: null
     }
@@ -164,6 +165,8 @@ export default defineBot(() => {
       OpenID: event.guild_id,
       // 创建时间
       CreateAt: Date.now(),
+
+      tag: 'AT_MESSAGE_CREATE',
       //
       value: null
     }

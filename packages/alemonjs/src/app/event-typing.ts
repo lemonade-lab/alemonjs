@@ -1,4 +1,4 @@
-import { AEvents } from '../typing/typing'
+import { AEvents } from '../env'
 /**
  *
  */
