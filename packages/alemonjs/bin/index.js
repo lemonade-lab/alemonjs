@@ -6,7 +6,6 @@ const args = [...process.argv.slice(2)]
 const currentFilePath = fileURLToPath(import.meta.url)
 const currentDirPath = dirname(currentFilePath)
 const pkgFilr = join(currentDirPath, '../package.json')
-console.log('alemonjs', args)
 // 启动模式
 if (args.includes('start')) {
   // main 使用参数启动

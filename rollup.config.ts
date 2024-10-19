@@ -97,6 +97,8 @@ const build = () => {
     BuildByName('telegram')
   } else if (process.env.build == 'space') {
     BuildByName('chat-space')
+  } else if (process.env.build == 'gui') {
+    BuildByName('gui')
   } else {
     BuildByName('alemonjs')
   }
