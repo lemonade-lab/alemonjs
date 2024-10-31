@@ -1,0 +1,51 @@
+{
+  "name": "alemonb",
+  "version": "1.0.0",
+  "description": "template",
+  "author": "",
+  "main": "lib/index.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "lvy dev --alemonjs --login kook",
+    "view": "lvy dev --view",
+    "build": "lvy build",
+    "review": "alemonjs start --input ./lib/index.js",
+    "start": "pm2 startOrRestart pm2.config.cjs",
+    "bundle": "rollup --config rollup.config.js",
+    "stop": "pm2 stop pm2.config.cjs",
+    "delete": "pm2 delete pm2.config.cjs",
+    "format": "prettier --write .",
+    "check-format": "git diff --exit-code",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "axios": "^1.6.5",
+    "bullmq": "^4.12.7",
+    "classnames": "^2.5.1",
+    "dotenv": "^16.4.5",
+    "ioredis": "^5.3.2",
+    "jsxp": "1.0.4",
+    "mysql2": "^3.6.2",
+    "sequelize": "^6.33.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@alemonjs/gui": "^0.0.1",
+    "@alemonjs/discord": "^0.0.5",
+    "@alemonjs/kook": "^0.0.3",
+    "@alemonjs/qq": "^0.0.4",
+    "@alemonjs/qq-group-bot": "^0.0.6",
+    "@alemonjs/qq-guild-bot": "^0.0.5",
+    "@alemonjs/telegram": "^0.0.3",
+    "@types/node": "^20.3.1",
+    "@types/nodemailer": "^6.4.14",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.5",
+    "alemonjs": "2.0.0-rc.42",
+    "husky": "^9.0.11",
+    "lvyjs": "^0.1.0",
+    "pm2": "^5.3.0",
+    "prettier": "^3.0.3"
+  }
+}

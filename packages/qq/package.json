@@ -1,0 +1,40 @@
+{
+  "name": "@alemonjs/qq",
+  "version": "0.0.4",
+  "description": "qq-bot",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "icqq": "^0.6.10",
+    "inquirer": "^11.0.2",
+    "lodash-es": "^4.17.21",
+    "node-fetch": "^3.3.2",
+    "util": "^0.12.5"
+  },
+  "types": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "keywords": [
+    "alemonjs",
+    "qq",
+    "qq-bot",
+    "bot",
+    "chat-bot"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}

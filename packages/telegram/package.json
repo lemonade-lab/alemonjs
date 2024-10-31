@@ -1,0 +1,40 @@
+{
+  "name": "@alemonjs/telegram",
+  "version": "0.0.3",
+  "description": "telegram-bot",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib",
+  "dependencies": {
+    "chat-space": "^0.0.4",
+    "grammy": "^1.30.0",
+    "node-telegram-bot-api": "^0.66.0"
+  },
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.64.7"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "keywords": [
+    "alemonjs",
+    "telegram",
+    "telegram-bot",
+    "bot",
+    "chat-bot"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}

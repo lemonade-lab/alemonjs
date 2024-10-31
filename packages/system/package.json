@@ -1,0 +1,43 @@
+{
+  "name": "@alemonjs/system",
+  "version": "1.0.0-rc.0",
+  "author": "lemonade",
+  "description": "yz-system",
+  "type": "module",
+  "scripts": {
+    "dev": "lvy dev --alemonjs --login kook",
+    "view": "lvy dev --view",
+    "build": "lvy build"
+  },
+  "dependencies": {
+    "ioredis": "^5.4.1",
+    "jsxp": "^1.0.4",
+    "lodash-es": "^4.17.21",
+    "moment": "^2.30.1",
+    "pm2": "^5.4.2"
+  },
+  "devDependencies": {
+    "@alemonjs/kook": "^0.0.3",
+    "alemonjs": "^2.0.0-rc.42",
+    "lvyjs": "^0.1.0"
+  },
+  "main": "./lib/index.js",
+  "types": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "keywords": [
+    "alemonjs"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}

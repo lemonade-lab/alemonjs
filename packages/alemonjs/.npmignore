@@ -1,0 +1,8 @@
+# 依赖
+node_modules
+/*
+!/lib
+!/tsconfig.json
+!/bin
+!/env.d.ts
+!/index.js

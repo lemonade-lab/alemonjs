@@ -1,0 +1,34 @@
+{
+  "name": "@alemonjs/qq-guild-bot",
+  "version": "0.0.5",
+  "description": "qq-guild-bot",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "dependencies": {
+    "chat-space": "^0.0.6"
+  },
+  "types": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "keywords": [
+    "alemonjs",
+    "qq-guild-bot",
+    "bot",
+    "chat-bot"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}

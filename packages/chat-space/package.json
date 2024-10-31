@@ -1,0 +1,61 @@
+{
+  "name": "chat-space",
+  "version": "0.0.7",
+  "description": "开放平台机器人SDK",
+  "author": "lemonade",
+  "type": "module",
+  "types": "lib",
+  "main": "lib/index.js",
+  "scripts": {
+    "link": "yarn link && yarn link chat-space",
+    "dev": "npx tsx index.ts"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "file-type": "^18.5.0",
+    "form-data": "^4.0.0",
+    "koa": "^2.14.2",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^12.0.0",
+    "koa2-cors": "^2.0.6",
+    "lodash-es": "^4.17.21",
+    "mime-types": "^2.1.35",
+    "public-ip": "^6.0.1",
+    "qrcode": "^1.5.3",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/koa": "^2.13.11",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-router": "^7.4.7",
+    "@types/koa2-cors": "^2.0.5",
+    "@types/lodash-es": "^4.17.12",
+    "@types/mime-types": "^2.1.4",
+    "@types/node": "^20.2.4",
+    "@types/node-schedule": "^2.1.2",
+    "@types/progress": "^2.0.5",
+    "@types/qrcode": "^1.5.0",
+    "@types/ws": "^8.5.5",
+    "husky": "^9.0.11",
+    "prettier": "^2.8.8",
+    "rollup": "^4.18.1",
+    "tslib": "^2.6.3",
+    "typescript": "^5.5.3"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}

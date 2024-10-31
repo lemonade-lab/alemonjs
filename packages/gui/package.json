@@ -1,0 +1,40 @@
+{
+  "name": "@alemonjs/gui",
+  "version": "0.0.2",
+  "description": "gui",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "dependencies": {
+    "koa": "^2.15.3",
+    "koa-mount": "^4.0.0",
+    "koa-static": "^5.0.0",
+    "ws": "^8.18.0"
+  },
+  "types": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "keywords": [
+    "alemonjs"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "@types/koa-mount": "^4.0.5",
+    "@types/koa-router": "^7.4.8",
+    "@types/koa-static": "^4.0.4"
+  }
+}

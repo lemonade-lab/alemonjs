@@ -1,0 +1,8 @@
+# 忽略所有文件
+/*
+node_modules
+yarn.lock
+# 不忽略
+!/bin/template
+!/bin/alemonjs.js
+!.npmrc

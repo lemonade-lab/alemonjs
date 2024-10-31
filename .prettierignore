@@ -1,0 +1,19 @@
+# 依赖
+node_modules
+
+# 包
+lib/**/*
+types/**/*
+
+# docs
+docs
+
+# 打印
+logs
+log
+*.logs
+*.los
+
+
+# build
+dist

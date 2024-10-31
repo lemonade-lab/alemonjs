@@ -1,0 +1,45 @@
+{
+  "name": "alemonjs",
+  "version": "2.0.0-rc.43",
+  "description": "alemonjs bot script",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "ioredis": "^5.4.1",
+    "log4js": "^6.9.1",
+    "logger": "^0.0.1",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.3",
+    "yaml": "^2.5.1"
+  },
+  "types": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./env": {
+      "types": "./lib/env.d.ts"
+    }
+  },
+  "bin": {
+    "alemonjs": "bin/index.js"
+  },
+  "keywords": [
+    "alemonjs",
+    "bot",
+    "chat-bot"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}
