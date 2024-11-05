@@ -111,12 +111,12 @@ export async function slider(client, event, uin) {
   let ticket
 
   if (ret.type == '0.自动获取ticket') {
-    ticket = await this.getTicket(event.url, uin)
+    ticket = await getTicket(event.url, uin)
     if (!ticket) console.log('\n请求错误,返回手动获取ticket方式\n')
   }
 
   if (ret.type == '2.滑动验证app请求码获取') {
-    ticket = await this.requestCode(event.url)
+    ticket = await requestCode(event.url)
     if (!ticket) console.log('\n请求错误,返回手动获取ticket方式\n')
   }
 
