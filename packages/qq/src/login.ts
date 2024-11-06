@@ -43,17 +43,19 @@ export async function qrcode(client) {
 
       // 二维码登录
       client.qrcodeLogin()
+
+      return
     }
 
     if (time >= 150) {
-      console.error('等待扫码超时,已停止运行\n')
-      process.exit()
+      console.error('等待扫码超时...\n')
+      // process.exit()
     } else {
       timeout = setTimeout(start, 1000 * 3)
     }
   }
 
-  timeout = setTimeout(start, 2000)
+  timeout = setTimeout(start, 1000 * 2)
 
   // 未完成
   if (!inSlider) {
@@ -67,8 +69,10 @@ export async function qrcode(client) {
       .then(async () => {
         // 完成登录了
         if (inSlider) return
-        // 取消任务
-        timeout && clearTimeout(timeout)
+
+        if (timeout) {
+          clearTimeout(timeout)
+        }
 
         console.log('\n重新刷新二维码...\n\n')
 
@@ -79,7 +83,9 @@ export async function qrcode(client) {
         client.fetchQrcode()
       })
       .catch(() => {
-        timeout && clearTimeout(timeout)
+        if (timeout) {
+          clearTimeout(timeout)
+        }
       })
   }
 }
