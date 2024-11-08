@@ -1,4 +1,4 @@
-import { getConfig, getIoRedis, Text, useOberver, useParse, useSend } from 'alemonjs'
+import { getConfig, getIoRedis, Text, useObserver, useParse, useSend } from 'alemonjs'
 import { Store } from '@src/model/store'
 import pm2 from 'pm2'
 import { lock } from '@src/model/lock'
@@ -21,9 +21,9 @@ export default OnResponse(
 
     Send(Text('请再次发送，以确认关机'))
 
-    const Oberver = useOberver(event, 'message.create')
+    const Observer = useObserver(event, 'message.create')
 
-    Oberver(
+    Observer(
       async e => {
         const Send = useSend(e)
         //

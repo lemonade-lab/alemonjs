@@ -1,22 +1,18 @@
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
-import { getConfig } from './config'
 /**
  * 创建日志
  * @returns
  */
 const createLog = () => {
   mkdirSync('./logs', { recursive: true })
-  const cfg = getConfig()
   log4js.configure({
     appenders: {
       console: {
         type: 'console',
         layout: {
           type: 'pattern',
-          pattern: `%[[${cfg.package?.name}@${
-            cfg.package?.version ?? '4'
-          }][%d{hh:mm:ss.SSS}][%4.4p]%] %m`
+          pattern: `%[[AJS][%d{hh:mm:ss.SSS}][%4.4p]%] %m`
         }
       },
       command: {
@@ -41,7 +37,7 @@ const createLog = () => {
       }
     },
     categories: {
-      default: { appenders: ['console'], level: cfg.value?.log?.level ?? 'info' },
+      default: { appenders: ['console'], level: 'info' },
       command: { appenders: ['console', 'command'], level: 'warn' },
       error: { appenders: ['console', 'command', 'error'], level: 'error' }
     }
@@ -53,16 +49,18 @@ const createLog = () => {
    * 调整error日志等级
    */
   return {
+    // 不记录级别
     trace() {
       defaultLogger.trace.call(defaultLogger, ...arguments)
     },
+    // 不记录级别
     debug() {
       defaultLogger.debug.call(defaultLogger, ...arguments)
     },
+    // 记录info级别
     info() {
       defaultLogger.info.call(defaultLogger, ...arguments)
     },
-    // warn及以上的日志采用error策略
     warn() {
       commandLogger.warn.call(defaultLogger, ...arguments)
     },

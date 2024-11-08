@@ -24,9 +24,7 @@ declare global {
 export const OnResponse: OnResponseType = (callback, event, reg) => {
   return { callback, event, reg: reg ?? /(.*)/ }
 }
-
 global.OnResponse = OnResponse
-
 /**
  *
  * @param callback
@@ -38,6 +36,15 @@ export const OnObserver: OnObserverType = (callback, event, reg) => {
   return { callback, event, reg: reg ?? /(.*)/ }
 }
 global.OnObserver = OnObserver
+/**
+ * @deprecated 错误命名。请使用 `OnObserver` 代替此函数。
+ * @param callback
+ * @param event
+ * @param reg
+ * @returns
+ */
+export const OnOberver = OnObserver
+global.OnOberver = OnObserver
 
 /**
  *

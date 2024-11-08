@@ -1,5 +1,16 @@
+/**
+ * @fileoverview 关系型数据库处理模块
+ * 获得ioredis时，自动链接
+ * @module ioredis
+ * @author ningmengchongshui
+ */
 import redisClient, { Redis as RedisClient } from 'ioredis'
 import { getConfig } from '../config'
+
+/**
+ * 创建ioredis
+ * @returns
+ */
 const createIoRedis = () => {
   const cfg = getConfig()
   const aRedis = new redisClient({
@@ -10,15 +21,15 @@ const createIoRedis = () => {
     maxRetriesPerRequest: null
   })
   aRedis.on('error', (err: any) => {
-    console.error('\n[REDIS]', err)
-    console.error('\n[REDIS]', '请检查配置')
+    logger.error('\n[REDIS]', err)
+    logger.error('\n[REDIS]', '请检查配置')
     process.cwd()
   })
   return aRedis
 }
 
 /**
- *
+ * 获得ioredis客户端
  * @returns
  */
 export const getIoRedis = (): RedisClient => {

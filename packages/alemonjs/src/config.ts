@@ -54,7 +54,7 @@ class ConfigCore {
   #update() {
     // 读取配置文件
     const dir = join(process.cwd(), this.#dir)
-    console.info('config read', dir)
+    logger.info('config read', dir)
     // 如果文件不存在
     if (!existsSync(dir)) {
       // 尝试读取执行参数
@@ -67,12 +67,12 @@ class ConfigCore {
       this.#value = d
       this.#setLogin()
     } catch (err) {
-      console.error(err)
+      logger.error(err)
       process.cwd()
     }
     // 存在配置文件 , 开始监听文件
     watch(dir, () => {
-      console.info('config update', dir)
+      logger.info('config update', dir)
       const data = readFileSync(dir, 'utf-8')
       try {
         const d = parse(data)
@@ -80,7 +80,7 @@ class ConfigCore {
         // 尝试读取执行参数
         this.#setLogin()
       } catch (err) {
-        console.error(err)
+        logger.error(err)
       }
     })
     return this.#value
@@ -105,14 +105,14 @@ class ConfigCore {
     if (this.#package) return this.#package
     const dir = process.env.PKG_DIR || join(process.cwd(), 'package.json')
     if (!existsSync(dir)) {
-      console.warn('package.json not found')
+      logger.warn('package.json not found')
       return null
     }
     const data = readFileSync(dir, 'utf-8')
     try {
       this.#package = JSON.parse(data)
     } catch (err) {
-      console.error(err)
+      logger.error(err)
     }
     return this.#package
   }

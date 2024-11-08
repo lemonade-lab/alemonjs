@@ -1,5 +1,5 @@
 import { lock } from '@src/model/lock'
-import { Text, useOberver, useParse, useSend } from 'alemonjs'
+import { Text, useObserver, useParse, useSend } from 'alemonjs'
 export default OnResponse(
   event => {
     const Send = useSend(event)
@@ -12,8 +12,8 @@ export default OnResponse(
       return
     }
     Send(Text('请再次发送，以确认关机'))
-    const Oberver = useOberver(event, 'message.create')
-    Oberver(
+    const Observer = useObserver(event, 'message.create')
+    Observer(
       e => {
         const text = useParse(e.Megs, 'Text')
         if (/^(#|\/)结束进程$/.test(text)) {

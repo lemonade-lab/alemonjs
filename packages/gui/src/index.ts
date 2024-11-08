@@ -3,7 +3,6 @@ import { WebSocketServer } from 'ws'
 import Koa from 'koa'
 import KoaStatic from 'koa-static'
 import Router from 'koa-router'
-// import mount from 'koa-mount'
 import { mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 
@@ -47,27 +46,28 @@ export default defineBot(() => {
   const onMessage = event => {
     const e = {
       // 事件类型
-      Platform: 'gui',
+      Platform: event.Platform,
       // 频道
-      GuildId: 'text',
+      GuildId: event.GuildId,
       // 子频道
-      ChannelId: 'text',
+      ChannelId: event.ChannelId,
       // 是否是主人
-      IsMaster: false,
+      IsMaster: event.IsMaster,
       // 用户ID
-      UserId: 'text',
+      UserId: event.ChannelId,
       // 用户名
-      UserName: 'text',
+      UserName: event.UserName,
       // 用户头像
-      UserAvatar: 'text',
+      UserAvatar: event.UserAvatar,
       // 格式化数据
-      MsgId: 'text',
+      MsgId: event.MsgId,
       // 用户消息
       Megs: [Text(event)],
       // 用户openId
-      OpenID: '',
+      OpenID: event.OpenID,
       // 创建时间
       CreateAt: Date.now(),
+      //
       tag: 'MESSAGE_CREATE',
       //
       value: null
@@ -87,7 +87,9 @@ export default defineBot(() => {
    */
   wss.on('connection', ws => {
     console.log('gui connection')
+    //
     client = ws
+
     // 处理消息事件
     ws.on('message', (message: string) => {
       const event = JSON.parse(message)
@@ -106,20 +108,27 @@ export default defineBot(() => {
 
   /**
    *
+   * @param data
+   * @returns
+   */
+  const SendData = (data: any) => {
+    return client.send(JSON.stringify(data))
+  }
+
+  /**
+   *
    * @param txt
    */
   const sendMessage = (txt: string) => {
-    client.send(
-      JSON.stringify({
-        t: 'send_message',
-        d: [
-          {
-            t: 'text',
-            d: txt
-          }
-        ]
-      })
-    )
+    return SendData({
+      t: 'send_message',
+      d: [
+        {
+          t: 'text',
+          d: txt
+        }
+      ]
+    })
   }
 
   /**
@@ -127,19 +136,17 @@ export default defineBot(() => {
    * @param url
    */
   const sendImage = (url: string) => {
-    client.send(
-      JSON.stringify({
-        t: 'send_message',
-        d: [
-          {
-            t: 'image',
-            d: {
-              url: url
-            }
+    return SendData({
+      t: 'send_message',
+      d: [
+        {
+          t: 'image',
+          d: {
+            url: url
           }
-        ]
-      })
-    )
+        }
+      ]
+    })
   }
 
   /**
@@ -160,7 +167,6 @@ export default defineBot(() => {
             return Promise.all(
               images.map(async item => {
                 const url = `/file/${Date.now()}.png`
-                // 保存到本地再发送
                 writeFileSync(join(process.cwd(), 'public', url), item, 'utf-8')
                 return sendImage(url)
               })

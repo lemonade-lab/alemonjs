@@ -78,7 +78,7 @@ export const useSend = (event: { [key: string]: any }) => {
  * @param option
  * @returns
  */
-export const useOberver = <T extends keyof AEvents>(event: any, option: T) => {
+export const useObserver = <T extends keyof AEvents>(event: any, option: T) => {
   return (
     callback: (e: AEvents[T], { next }: { next: Function }) => any,
     keys: (keyof AEvents[T])[]
@@ -102,9 +102,7 @@ export const useOberver = <T extends keyof AEvents>(event: any, option: T) => {
         global.storeoberver[option][i] = { event: v, callback }
         return
       }
-
       i++
-
       // 是空的。占据位置。
       if (!global.storeoberver[option][i]) {
         global.storeoberver[option][i] = { event: v, callback }
@@ -117,3 +115,5 @@ export const useOberver = <T extends keyof AEvents>(event: any, option: T) => {
     return
   }
 }
+
+export const useOberver = useObserver

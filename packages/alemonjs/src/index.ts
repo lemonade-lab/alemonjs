@@ -1,46 +1,60 @@
 import './logger.js'
 import { getConfig } from './config'
-import { pushAppsFiles } from './app/event-processor'
+import { pushAppsFiles, pushMWFiles } from './app/event-processor'
 import { getArgvValue } from './config'
-import { getAppsFiles } from './app/event-files'
+import { getDirFiles } from './app/event-files'
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
 
 const cwd = process.cwd()
 
 /**
- *
+ * 加载文件
  * @param app
  */
-const loadChildrenFiles = (app: string) => {
-  const packageJson = JSON.parse(readFileSync(`node_modules/${app}/package.json`, 'utf-8'))
-  const mainPath = join(`node_modules/${app}`, packageJson.main)
-  const mainDir = dirname(mainPath)
+const loadChildrenFiles = (mainDir: string) => {
   const appsDir = join(mainDir, 'apps')
-  const files = getAppsFiles(appsDir)
-  for (const file of files) {
-    const dir = join(cwd, file)
+  const appsFiles = getDirFiles(appsDir)
+  for (const file of appsFiles) {
     pushAppsFiles({
-      dir: dirname(dir),
-      path: dir
+      dir: dirname(file.path),
+      path: file.path,
+      name: file.name
+    })
+  }
+  const mwDir = join(mainDir, 'middleware')
+  const mwFiles = getDirFiles(mwDir, item => /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name))
+  for (const file of mwFiles) {
+    pushMWFiles({
+      dir: dirname(file.path),
+      path: file.path,
+      name: file.name
     })
   }
 }
 
 /**
- *
+ * 模块文件
  * @param app
  */
-const runChildren = (mainDir: string) => {
-  // src/apps/**/*
-  const appsDir = join(mainDir, 'apps')
-  const files = getAppsFiles(appsDir)
-  for (const file of files) {
-    pushAppsFiles({
-      dir: dirname(file),
-      path: file
-    })
+const moduleChildrenFiles = async (name: string) => {
+  // 存在 package
+  const packageJson = JSON.parse(
+    readFileSync(join(process.cwd(), 'node_modules', name, 'package.json'), 'utf-8')
+  )
+  // main
+  const mainPath = join(process.cwd(), 'node_modules', name, packageJson.main)
+  // 不存在 main
+  if (!existsSync(mainPath)) {
+    return
   }
+  // 根据main来识别apps
+  const mainDir = dirname(mainPath)
+  const obj = await import(`file://${mainPath}`)
+  // 加载
+  loadChildrenFiles(mainDir)
+  // 执行周期
+  obj?.default?.()?.onCreated?.()
 }
 
 /**
@@ -59,25 +73,28 @@ export const onStart = async (input: string = 'lib/index.js') => {
   if (cfg?.value?.apps) {
     if (Array.isArray(cfg?.value?.apps)) {
       for (const app of cfg?.value?.apps) {
-        // const m = await import(app)
-        // const c = m?.default()
-        loadChildrenFiles(app)
+        moduleChildrenFiles(app)
       }
     }
   }
   //  input
   const run = async () => {
-    if (!input) return
-    const dir = join(cwd, input)
-    if (!existsSync(dir)) {
+    // 不存在input
+    if (!input) {
+      return
+    }
+    // 路径
+    const mainPath = join(cwd, input)
+    if (!existsSync(mainPath)) {
       return
     }
     // src/apps/**/*
-    const mainDir = dirname(dir)
-    const app = await import(`file://${dir}`)
-    const c = app?.default?.()
-    runChildren(mainDir)
-    c?.onCreated?.()
+    const mainDir = dirname(mainPath)
+    const obj = await import(`file://${mainPath}`)
+    //
+    loadChildrenFiles(mainDir)
+    // 周期
+    obj?.default?.()?.onCreated?.()
   }
   await run()
   // prefix
