@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.44",
+  "version": "2.0.0-rc.50",
   "description": "alemonjs bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -30,7 +30,6 @@
   },
   "keywords": [
     "alemonjs",
-    "bot",
     "chat-bot"
   ],
   "publishConfig": {

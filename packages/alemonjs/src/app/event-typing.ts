@@ -10,11 +10,11 @@ type ControllerType = { next: Function; reg: RegExp }
 export type OnResponseType = <T extends keyof AEvents>(
   callback: (event: AEvents[T], controller: ControllerType) => any,
   event: T,
-  reg?: RegExp
+  reg?: T extends 'message.create' | 'private.message.create' ? RegExp : never
 ) => {
   callback: (event: AEvents[T], controller: ControllerType) => any
   event: T
-  reg?: RegExp
+  reg?: T extends 'message.create' | 'private.message.create' ? RegExp : never // 这里也使用条件类型
 }
 
 type ResponseType = {

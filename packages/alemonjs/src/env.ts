@@ -1,131 +1,48 @@
+import { PublicEventChannalCreate, PublicEventChannalDelete } from './typing/event/channal'
+import { PublicEventGuildExit, PublicEventGuildJoin } from './typing/event/guild'
+import { PublicEventMemberAdd, PublicEventMemberRemove } from './typing/event/member'
+import {
+  PublicEventMessageCreate,
+  PublicEventMessageDelete,
+  PublicEventMessageReactionAdd,
+  PublicEventMessageReactionRemove,
+  PublicEventMessageUpdate
+} from './typing/event/message/message'
+
+import {
+  PrivateEventMessageCreate,
+  PrivateEventMessageDelete,
+  PrivateEventMessageUpdate
+} from './typing/event/message/private.message'
+
+import { PrivateEventRequestFriendAdd, PrivateEventRequestGuildAdd } from './typing/event/request'
+
+//
 export type LogType = string | Error | unknown
 
-/**
- *
- */
-export type AEventByMessageCreate = {
-  /**
-   * 平台
-   */
-  Platform: string
-  /**
-   * 服务器ID
-   */
-  GuildId: string
-  /**
-   * 频道ID
-   */
-  ChannelId: string
-  /**
-   * 消息类型
-   */
-  IsMaster: boolean
-  /**
-   * 消息内容
-   */
-  UserId: string
-  /**
-   * 用户名
-   */
-  UserName: string
-  /**
-   * 用户头像地址
-   */
-  UserAvatar: string
-  /**
-   * 消息ID
-   */
-  MsgId: string
-  /**
-   * 消息内容
-   */
-  Megs: any[]
-  /**
-   * 消息内容
-   */
-  OpenID: string
-  /**
-   * 创建时间
-   */
-  CreateAt: number
-  /**
-   * 标记
-   */
-  tag: string
-  /**
-   * 捕获原始消息格式
-   */
-  value: any
+// 携带有消息体的
+export type AEventsMsg = {
+  'message.create': PublicEventMessageCreate
+  'private.message.create': PrivateEventMessageCreate
 }
 
-/**
- *
- */
-export type AEventByMessageDelete = {
-  Platform: string
-  value: any
-}
-
-/**
- *
- */
-export type AEventByMessageUpdate = {
-  Platform: string
-  value: any
-}
-
-/**
- *
- */
-export type AEventByPrivateMessageCreate = {
-  /**
-   * 平台
-   */
-  Platform: string
-  /**
-   * 消息类型
-   */
-  IsMaster: boolean
-  /**
-   * 消息内容
-   */
-  UserId: string
-  /**
-   * 用户名
-   */
-  UserName: string
-  /**
-   * 用户头像地址
-   */
-  UserAvatar: string
-  /**
-   * 消息ID
-   */
-  MsgId: string
-  /**
-   * 消息内容
-   */
-  Megs: any[]
-  /**
-   * 创建时间
-   */
-  CreateAt: number
-  /**
-   * 捕获原始消息格式
-   */
-  value: any
-}
-
-/**
- *
- */
+//
 export type AEvents = {
-  /**
-   * 消息创建
-   */
-  'message.create': AEventByMessageCreate
-  'private.message.create': AEventByPrivateMessageCreate
-}
+  'message.update': PublicEventMessageUpdate
+  'message.delete': PublicEventMessageDelete
+  'message.reaction.add': PublicEventMessageReactionAdd
+  'message.reaction.remove': PublicEventMessageReactionRemove
+  'channal.create': PublicEventChannalCreate
+  'channal.delete': PublicEventChannalDelete
+  'guild.join': PublicEventGuildJoin
+  'guild.exit': PublicEventGuildExit
+  'member.add': PublicEventMemberAdd
+  'member.remove': PublicEventMemberRemove
+  'private.message.update': PrivateEventMessageUpdate
+  'private.message.delete': PrivateEventMessageDelete
+  'private.friend.add': PrivateEventRequestFriendAdd
+  'private.guild.add': PrivateEventRequestGuildAdd
+} & AEventsMsg
 
 declare global {
   var logger: {

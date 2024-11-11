@@ -5,11 +5,10 @@
  * @module processor
  * @author ningmengchongshui
  */
+import { useParse } from '../hook/use-api'
 import { AEvents } from '../env'
 import { ResStore } from './store'
-import { expendMessage } from './event-processor-body'
 import { expendMiddleware } from './event-processor-mw'
-export * from './store'
 
 type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.create']
 
@@ -18,7 +17,10 @@ type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.c
  * @param event
  * @param key
  */
-const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T) => {
+export const expendMessage = async <T extends keyof AEvents>(
+  valueEvent: EventMessageCreate,
+  key: T
+) => {
   // 如果不存在。则创建 storeoberver
   if (!global.storeoberver) global.storeoberver = {}
   // 如果不存在。则创建 storeoberver[key]
@@ -140,6 +142,12 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
         global.AppsFiles.splice(index, 1)
         ResStore[key].push(valueKey)
       }
+      const msg = useParse(event.Megs, 'Text') ?? ''
+      if (res?.reg && !res?.reg.test(msg)) {
+        // 继续
+        next()
+        return
+      }
       // 这里是否继续时 next 说了算
       res?.callback(event, { next, reg: res.reg })
     } catch (err) {
@@ -160,16 +168,30 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
       return
     }
 
+    //
+    const msg = useParse(event.Megs, 'Text') ?? ''
+
     try {
       if (!file.value) {
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
+        const reg = res?.reg
+        if (reg && !reg.test(msg)) {
+          next()
+          return
+        }
         // 这里是否继续时 next 说了算
-        res?.callback(event, { next })
+        res?.callback(event, { next, reg: reg })
       } else {
+        // 在这里，存在了 value。使用value进行。不用读取文件
+        const reg = file.value.reg
+        if (reg && !reg.test(msg)) {
+          next()
+          return
+        }
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
-        res?.callback(event, { next })
+        res?.callback(event, { next, reg: reg })
       }
     } catch (err) {
       logger.error(err)
@@ -179,29 +201,4 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
 
   // 先从观察者开始
   nextObserver()
-}
-
-/**
- * 消息处理器
- * @param value
- * @param event
- * @returns
- */
-export const OnProcessor = <T extends keyof AEvents>(value: AEvents[T], event: T) => {
-  switch (event) {
-    case 'message.create':
-      // 处理公有消息
-      expendMessage(value as EventMessageCreate, 'message.create')
-      break
-    case 'private.message.create':
-      // 处理私有消息
-      expendMessage(value as EventMessageCreate, 'private.message.create')
-      break
-    default: {
-      // 无消息体处理
-      expendEvent(value as any, event)
-      break
-    }
-  }
-  return
 }

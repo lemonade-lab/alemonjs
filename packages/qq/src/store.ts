@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
+
 export class Store {
   #valyes = null
   #dir = './data/@alemonjs/qq/bot.json'

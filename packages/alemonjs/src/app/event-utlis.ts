@@ -19,11 +19,16 @@ declare global {
  * 处理响应事件
  * @param callback 回调函数，处理事件和 API
  * @param event 事件类型
+ * @param reg
  * @returns 回调函数的执行结果
  */
 export const OnResponse: OnResponseType = (callback, event, reg) => {
-  return { callback, event, reg: reg ?? /(.*)/ }
+  if (event === 'message.create' || event === 'private.message.create') {
+    return { callback, event, reg: reg ?? (/(.*)/ as any) }
+  }
+  return { callback, event }
 }
+
 global.OnResponse = OnResponse
 /**
  *
@@ -33,7 +38,10 @@ global.OnResponse = OnResponse
  * @returns
  */
 export const OnObserver: OnObserverType = (callback, event, reg) => {
-  return { callback, event, reg: reg ?? /(.*)/ }
+  if (event === 'message.create' || event === 'private.message.create') {
+    return { callback, event, reg: reg ?? (/(.*)/ as any) }
+  }
+  return { callback, event }
 }
 global.OnObserver = OnObserver
 /**
