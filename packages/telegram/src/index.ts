@@ -1,59 +1,139 @@
+process.env.NODE_NO_WARNINGS = '1'
 import { defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import Client from 'node-telegram-bot-api'
 export default defineBot(() => {
+  //
   const cfg = getConfig()
   const config = cfg.value?.['telegram']
   if (!config) return
   //
   const client = new Client(config.token, {
     polling: true,
-    baseApiUrl: '',
+    baseApiUrl: config?.base_api_url ?? '',
     request: {
-      url: '',
-      proxy: config?.proxy ?? 'http://127.0.0.1:7890'
+      url: config?.request_url ?? '',
+      proxy: config?.proxy ?? ''
     }
-  })
-  //
-  //
-  client.on('message', event => {
-    // 定义消
-    const e = {
-      // 事件类型
-      Platform: 'telegram',
-      // 频道
-      GuildId: String(event.chat.id),
-      // 子频道
-      ChannelId: String(event.chat.id),
-      // 是否是主人
-      IsMaster: false,
-      // 用户ID
-      UserId: String(event?.sender_chat?.id),
-      // 用户名
-      UserName: event.sender_chat.username,
-      // 用户头像
-      UserAvatar: '',
-      // 格式化数据
-      MsgId: String(event.message_id),
-      // 用户消息
-      Megs: [Text(event.text ?? '')],
-      // 用户openId
-      OpenID: 'test',
-      // 创建时间
-      CreateAt: Date.now(),
-      //
-      value: null
-    }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-    // 处理消息
-    OnProcessor(e, 'private.message.create')
   })
 
-  // const eventKeys: string[] = [
+  const getUserProfilePhotosUrl = UserId => {
+    return new Promise((resolve, reject) => {
+      if (!UserId) {
+        reject(new Error('UserId 不能为空'))
+        return
+      }
+      client
+        .getUserProfilePhotos(UserId)
+        .then(profilePhotos => {
+          if (profilePhotos.total_count > 0) {
+            // 获取第一张头像的文件 ID
+            const fileId = profilePhotos.photos[0][0].file_id
+            // 获取文件信息以获取下载链接
+            client
+              .getFile(fileId)
+              .then(file => {
+                const filePath = file.file_path
+                resolve(`https://api.telegram.org/file/bot${config.token}/${filePath}`)
+              })
+              .catch(reject)
+          } else {
+            reject(new Error('用户没有头像'))
+          }
+        })
+        .catch(reject)
+    })
+  }
+
+  //
+  client.on('text', async event => {
+    let UserAvatar = ''
+
+    if (event?.chat.type == 'channel' || event?.chat.type == 'private') {
+      const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
+      if (typeof photo == 'string') UserAvatar = photo
+    }
+
+    if (event?.chat.type == 'channel' || event.chat.type == 'supergroup') {
+      // 机器人消息不处理
+      if (event.from?.is_bot) return
+      // 定义消
+      const e = {
+        // 事件类型
+        Platform: 'telegram',
+        // 频道
+        GuildId: String(event?.chat.id),
+        // 频道名称
+        GuildName: event?.chat.title,
+        // 子频道
+        ChannelId: String(event?.chat.id),
+        // 是否是主人
+        IsMaster: false,
+        // 用户ID
+        UserId: String(event?.from?.id),
+        // 用户名
+        UserName: event?.chat.username,
+        // 用户头像
+        UserAvatar: UserAvatar,
+        // 格式化数据
+        MsgId: String(event?.message_id),
+        // 用户消息
+        Megs: [Text(event?.text)],
+        // 用户openId
+        OpenID: String(event.chat?.id),
+        // 创建时间
+        CreateAt: Date.now(),
+        //
+        tag: 'txt',
+        //
+        value: null
+      }
+      // 当访问的时候获取
+      Object.defineProperty(e, 'value', {
+        get() {
+          return event
+        }
+      })
+      //
+      OnProcessor(e, 'message.create')
+      //
+    } else if (event?.chat.type == 'private') {
+      // 定义消
+      const e = {
+        // 事件类型
+        Platform: 'telegram',
+        // 是否是主人
+        IsMaster: false,
+        // 用户ID
+        UserId: String(event?.from.id),
+        // 用户名
+        UserName: event?.from?.username,
+        // 用户头像
+        UserAvatar: UserAvatar,
+        // 格式化数据
+        MsgId: String(event?.message_id),
+        // 用户消息
+        Megs: [Text(event?.text)],
+        // 用户openId
+        OpenID: String(event.chat?.id),
+        // 创建时间
+        CreateAt: Date.now(),
+        //
+        tag: 'txt',
+        //
+        value: null
+      }
+      // 当访问的时候获取
+      Object.defineProperty(e, 'value', {
+        get() {
+          return event
+        }
+      })
+      // 处理消息
+      OnProcessor(e, 'private.message.create')
+    }
+  })
+
+  // const eventKeys = [
   //   'message',
   //   'text',
   //   'animation',
@@ -114,15 +194,13 @@ export default defineBot(() => {
   //   'webhook_error',
   //   'chat_join_request'
   // ]
-
-  // 打印全部的消息
+  // // 打印全部的消息
   // for (const key of eventKeys) {
   //   client.on(key, event => {
   //     console.log(key, event)
   //   })
   // }
 
-  //
   return {
     api: {
       use: {
@@ -130,12 +208,13 @@ export default defineBot(() => {
           if (val.length < 0) return Promise.all([])
           if (val.length < 0) return Promise.all([])
           const content = useParse(val, 'Text')
+          const e = event.value
           if (content) {
-            return Promise.all([content].map(item => client.sendMessage(event.GuildId, item)))
+            return Promise.all([content].map(item => client.sendMessage(e.chat.id, item)))
           }
           const images = useParse(val, 'Image')
           if (images) {
-            return Promise.all(images.map(item => client.sendPhoto(event.GuildId, item)))
+            return Promise.all(images.map(item => client.sendPhoto(e.chat.id, item)))
           }
           return Promise.all([])
         }

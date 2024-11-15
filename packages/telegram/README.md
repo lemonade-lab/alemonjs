@@ -16,12 +16,13 @@ yarn add @alemonjs/telegram
 telegram:
   # 令牌 （必填）
   token: ''
+  # 代理地址 (推荐填)
+  proxy: 'http://127.0.0.1:7890'
   # 主人编号
   master_id: null
+  # other
   base_api_url: null
-  # 代理地址
-  # proxy: 'http://127.0.0.1:7890'
-  proxy: null
+  request_url: null
 ```
 
 ## Community

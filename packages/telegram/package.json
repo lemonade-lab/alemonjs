@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/telegram",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "telegram-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -8,7 +8,6 @@
   "main": "lib/index.js",
   "types": "lib",
   "dependencies": {
-    "chat-space": "^0.0.4",
     "grammy": "^1.30.0",
     "node-telegram-bot-api": "^0.66.0"
   },
