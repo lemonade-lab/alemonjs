@@ -1,5 +1,4 @@
-import { Channel } from 'diagnostics_channel'
-import { Guild } from '../base/guild'
+import { Guild, Channel } from '../base/guild'
 import { platform } from '../base/platform'
 import { Message } from '../base/message'
 // 公有事件-子频道创建

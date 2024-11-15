@@ -1,4 +1,3 @@
-process.env.NODE_NO_WARNINGS = '1'
 import { defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import Client from 'node-telegram-bot-api'
 export default defineBot(() => {
@@ -16,7 +15,7 @@ export default defineBot(() => {
     }
   })
 
-  const getUserProfilePhotosUrl = UserId => {
+  const getUserProfilePhotosUrl = (UserId: number) => {
     return new Promise((resolve, reject) => {
       if (!UserId) {
         reject(new Error('UserId 不能为空'))
@@ -48,14 +47,14 @@ export default defineBot(() => {
   client.on('text', async event => {
     let UserAvatar = ''
 
-    if (event?.chat.type == 'channel' || event?.chat.type == 'private') {
+    if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
       const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
       if (typeof photo == 'string') UserAvatar = photo
     }
 
-    if (event?.chat.type == 'channel' || event.chat.type == 'supergroup') {
+    if (event?.chat.type == 'channel' || event?.chat.type == 'supergroup') {
       // 机器人消息不处理
-      if (event.from?.is_bot) return
+      if (event?.from?.is_bot) return
       // 定义消
       const e = {
         // 事件类型
@@ -66,6 +65,8 @@ export default defineBot(() => {
         GuildName: event?.chat.title,
         // 子频道
         ChannelId: String(event?.chat.id),
+        GuildIdAvatar: '',
+        GuildIdName: '',
         // 是否是主人
         IsMaster: false,
         // 用户ID
@@ -79,7 +80,7 @@ export default defineBot(() => {
         // 用户消息
         Megs: [Text(event?.text)],
         // 用户openId
-        OpenID: String(event.chat?.id),
+        OpenID: String(event?.chat?.id),
         // 创建时间
         CreateAt: Date.now(),
         //
@@ -94,7 +95,7 @@ export default defineBot(() => {
         }
       })
       //
-      OnProcessor(e, 'message.create')
+      OnProcessor(e as any, 'message.create')
       //
     } else if (event?.chat.type == 'private') {
       // 定义消
@@ -114,7 +115,7 @@ export default defineBot(() => {
         // 用户消息
         Megs: [Text(event?.text)],
         // 用户openId
-        OpenID: String(event.chat?.id),
+        OpenID: String(event?.chat?.id),
         // 创建时间
         CreateAt: Date.now(),
         //
@@ -131,6 +132,58 @@ export default defineBot(() => {
       // 处理消息
       OnProcessor(e, 'private.message.create')
     }
+  })
+
+  client.on('new_chat_members', async event => {
+    // 机器人消息不处理
+    if (event?.from.is_bot) return
+
+    let UserAvatar = ''
+
+    const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
+    if (typeof photo == 'string') UserAvatar = photo
+
+    // 定义消
+    const e = {
+      // 事件类型
+      Platform: 'telegram',
+      // 频道
+      GuildId: String(event?.chat.id),
+      // 频道名称
+      GuildName: event?.chat.title,
+      // 子频道
+      ChannelId: String(event?.chat.id),
+      GuildIdAvatar: '',
+      GuildIdName: '',
+      // 是否是主人
+      IsMaster: false,
+      // 用户ID
+      UserId: String(event?.from?.id),
+      // 用户名
+      UserName: event?.chat.username,
+      // 用户头像
+      UserAvatar: UserAvatar,
+      // 格式化数据
+      MsgId: String(event?.message_id),
+      // 用户消息
+      Megs: [Text(event?.text)],
+      // 用户openId
+      OpenID: String(event?.chat?.id),
+      // 创建时间
+      CreateAt: Date.now(),
+      //
+      tag: 'txt',
+      //
+      value: null
+    }
+    // 当访问的时候获取
+    Object.defineProperty(e, 'value', {
+      get() {
+        return event
+      }
+    })
+    //
+    OnProcessor(e as any, 'member.add')
   })
 
   // const eventKeys = [
@@ -208,7 +261,7 @@ export default defineBot(() => {
           if (val.length < 0) return Promise.all([])
           if (val.length < 0) return Promise.all([])
           const content = useParse(val, 'Text')
-          const e = event.value
+          const e = event?.value
           if (content) {
             return Promise.all([content].map(item => client.sendMessage(e.chat.id, item)))
           }
