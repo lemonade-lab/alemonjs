@@ -9,6 +9,8 @@ import { AEvents } from '../env'
 import { ResStore } from './store'
 import { expendMessage } from './event-processor-body'
 import { expendMiddleware } from './event-processor-mw'
+import { useParse } from '../post'
+import { isAsyncFunction } from 'util/types'
 export * from './store'
 
 type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.create']
@@ -18,22 +20,22 @@ type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.c
  * @param event
  * @param key
  */
-const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T) => {
+const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, select: T) => {
   // 如果不存在。则创建 storeoberver
   if (!global.storeoberver) global.storeoberver = {}
   // 如果不存在。则创建 storeoberver[key]
-  if (!global.storeoberver[key]) global.storeoberver[key] = []
+  if (!global.storeoberver[select]) global.storeoberver[select] = []
   // 得到所有 apps
   const messageFiles = [...global.AppsFiles]
   // 得到对应类型的消息
-  const messages = [...ResStore[key]]
+  const messages = [...ResStore[select]]
 
   let valueI = 0
   let valueJ = 0
   let valueN = 0
 
   // 使用中间件修正 event
-  const event: EventMessageCreate = (await expendMiddleware(valueEvent as any, key)) as any
+  const event: EventMessageCreate = (await expendMiddleware(valueEvent as any, select)) as any
 
   /**
    * 下一步
@@ -60,7 +62,7 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
    */
   const nextObserver = () => {
     // i 结束了
-    if (valueN >= global.storeoberver[key].length) {
+    if (valueN >= global.storeoberver[select].length) {
       // 订阅都检查过一遍。开始 next
       next()
       return
@@ -68,7 +70,7 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
     //
     valueN++
     // 发现订阅
-    const item = global.storeoberver[key][valueN - 1]
+    const item = global.storeoberver[select][valueN - 1]
     if (!item) {
       // 继续 next
       nextObserver()
@@ -84,10 +86,10 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
       }
     }
     // 设置为 undefined
-    global.storeoberver[key][valueN - 1] = undefined
+    global.storeoberver[select][valueN - 1] = undefined
     // 放回来
     const Continue = () => {
-      global.storeoberver[key][valueN - 1] = item
+      global.storeoberver[select][valueN - 1] = item
       // 直接结束才对
     }
     // 没有调用下一步。应该删除当前的 n ？
@@ -114,34 +116,50 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
       next()
       return
     }
-
+    //
     try {
       const obj = await import(`file://${file.path}`)
       const res = obj?.default
-      if (res?.event !== key) {
-        // 继续
-        next()
-        return
-      }
-      const valueKey = {
-        dir: file?.dir,
-        path: file.path,
-        name: file.name,
-        value: {
-          reg: res?.reg,
-          event: res?.event ?? key,
-          priority: res?.priority ?? 0
+
+      if (Array.isArray(res.select)) {
+        if (!res.select.includes(select)) {
+          // 继续
+          next()
+          return
+        }
+
+        //
+      } else {
+        if (res?.select !== select) {
+          // 继续
+          next()
+          return
+        }
+
+        if (!ResStore[select].find(v => v.path === file.path)) {
+          const valueKey = {
+            dir: file?.dir,
+            path: file.path,
+            name: file.name,
+            value: {
+              reg: res?.reg,
+              select: res?.select ?? select,
+              priority: res?.priority ?? 0
+            }
+          }
+          // update files and values
+          const index = global.AppsFiles.findIndex(v => v.path === file.path)
+          global.AppsFiles.splice(index, 1)
+          ResStore[select].push(valueKey)
         }
       }
-      // 推送, 确保下次直接流向 key ，不再从头开始
-      if (!ResStore[key].find(v => v.path === file.path)) {
-        // update files and values
-        const index = global.AppsFiles.findIndex(v => v.path === file.path)
-        global.AppsFiles.splice(index, 1)
-        ResStore[key].push(valueKey)
-      }
+
       // 这里是否继续时 next 说了算
-      res?.callback(event, { next, reg: res.reg })
+      if (isAsyncFunction(res?.callback)) {
+        res?.callback(event, { next })?.catch(logger.error)
+      } else {
+        res?.callback(event, { next })
+      }
     } catch (err) {
       // 不再继续
       logger.error(err)
@@ -165,11 +183,19 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
         // 这里是否继续时 next 说了算
-        res?.callback(event, { next })
+        if (isAsyncFunction(res?.callback)) {
+          await res?.callback(event, { next })?.catch(logger.error)
+        } else {
+          res?.callback(event, { next })
+        }
       } else {
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
-        res?.callback(event, { next })
+        if (isAsyncFunction(res?.callback)) {
+          await res?.callback(event, { next })?.catch(logger.error)
+        } else {
+          res?.callback(event, { next })
+        }
       }
     } catch (err) {
       logger.error(err)
@@ -182,13 +208,38 @@ const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, key: T)
 }
 
 /**
+ *
+ * @param value
+ * @param select
+ */
+const Log = <T extends keyof AEvents>(value: AEvents[T], select: T) => {
+  const logs = [`[${select}]`]
+  if (typeof value['ChannelId'] == 'string' && value['ChannelId'] != '') {
+    logs.push(`[${value['ChannelId']}]`)
+  }
+  if (typeof value['UserId'] == 'string' && value['UserId'] != '') {
+    logs.push(`[${value['UserId']}]`)
+  }
+  if (Array.isArray(value['Megs'])) {
+    const txt = useParse(value['Megs'], 'Text')
+    if (typeof txt == 'string' && txt != '') {
+      logs.push(`[${txt}]`)
+    }
+  }
+  logger.info(logs.join(''))
+}
+
+/**
  * 消息处理器
  * @param value
  * @param event
  * @returns
  */
-export const OnProcessor = <T extends keyof AEvents>(value: AEvents[T], event: T) => {
-  switch (event) {
+export const OnProcessor = <T extends keyof AEvents>(value: AEvents[T], select: T) => {
+  // 打印
+  Log(value, select)
+  // 选择处理
+  switch (select) {
     case 'message.create':
       // 处理公有消息
       expendMessage(value as EventMessageCreate, 'message.create')
@@ -199,7 +250,7 @@ export const OnProcessor = <T extends keyof AEvents>(value: AEvents[T], event: T
       break
     default: {
       // 无消息体处理
-      expendEvent(value as any, event)
+      expendEvent(value as any, select)
       break
     }
   }

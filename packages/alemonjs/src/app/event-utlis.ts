@@ -22,14 +22,15 @@ declare global {
  * @param reg
  * @returns 回调函数的执行结果
  */
-export const OnResponse: OnResponseType = (callback, event, reg) => {
-  if (event === 'message.create' || event === 'private.message.create') {
-    return { callback, event, reg: reg ?? (/(.*)/ as any) }
+export const OnResponse: OnResponseType = (callback, select, reg) => {
+  if (select === 'message.create' || select === 'private.message.create') {
+    return { callback, select, reg: reg ?? (/(.*)/ as any) }
   }
-  return { callback, event }
+  return { callback, select }
 }
 
 global.OnResponse = OnResponse
+
 /**
  *
  * @param callback
@@ -37,11 +38,11 @@ global.OnResponse = OnResponse
  * @param reg
  * @returns
  */
-export const OnObserver: OnObserverType = (callback, event, reg) => {
-  if (event === 'message.create' || event === 'private.message.create') {
-    return { callback, event, reg: reg ?? (/(.*)/ as any) }
+export const OnObserver: OnObserverType = (callback, select, reg) => {
+  if (select === 'message.create' || select === 'private.message.create') {
+    return { callback, select, reg: reg ?? (/(.*)/ as any) }
   }
-  return { callback, event }
+  return { callback, select }
 }
 global.OnObserver = OnObserver
 /**

@@ -1,9 +1,7 @@
 /**
  * @fileoverview 中间件处理
- *
  * 在所有机制中都会生效。
  * 即使是在观察者中
- *
  * @module middleware
  * @author ningmengchongshui
  */
@@ -27,5 +25,5 @@ declare global {
  * 使用md对 event 进行增强
  *
  */
-export const OnMiddleware: OnMiddlewareType = (callback, event) => ({ event, callback })
+export const OnMiddleware: OnMiddlewareType = (callback, select) => ({ select, callback })
 global.OnMiddleware = OnMiddleware

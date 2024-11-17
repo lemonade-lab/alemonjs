@@ -7,12 +7,10 @@ type DbKey = {
   name: string
   //
   value?: {
+    // 事件
+    select: string
     // 正则
     reg: RegExp
-    // 事件
-    event: string
-    // 优先级
-    priority: number
   } | null
 }
 
@@ -26,7 +24,7 @@ type MWKey = {
   //
   value?: {
     // 事件
-    event: string
+    select: string
   } | null
 }
 
@@ -45,6 +43,7 @@ if (!global.MWFiles) {
 
 //
 export const ResStore: {
+  [key: string]: DbKey[]
   'message.create': DbKey[]
   'message.update': DbKey[]
   'message.delete': DbKey[]
@@ -82,6 +81,7 @@ export const ResStore: {
 
 // 中间件
 export const MWStore: {
+  [key: string]: MWKey[]
   'message.create': MWKey[]
   'message.update': MWKey[]
   'message.delete': MWKey[]

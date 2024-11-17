@@ -21,11 +21,9 @@
     "@alemonjs/qq": "file:packages/qq",
     "@alemonjs/qq-group-bot": "file:packages/qq-group-bot",
     "@alemonjs/qq-guild-bot": "file:packages/qq-guild-bot",
-    "@alemonjs/readline": "file:packages/readline",
     "@alemonjs/telegram": "file:packages/telegram",
     "alemonjs": "file:packages/alemonjs",
-    "chat-space": "file:packages/chat-space",
-    "create-alemonjs": "file:packages/create-alemonjs"
+    "chat-space": "file:packages/chat-space"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.7",

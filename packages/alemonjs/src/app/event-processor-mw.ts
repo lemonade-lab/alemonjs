@@ -5,19 +5,20 @@
  * @module processor
  * @author ningmengchongshui
  */
+import { isAsyncFunction } from 'util/types'
 import { AEvents } from '../env'
 import { MWStore } from './store'
 
 /**
  *
  * @param event
- * @param key
+ * @param select
  */
-export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, key: T) => {
+export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, select: T) => {
   // 得到所有 apps
   const mwFiles = [...global.MWFiles]
   // 得到对应类型的消息
-  const mws = [...MWStore[key]]
+  const mws = [...MWStore[select]]
 
   let valueI = 0
   let valueJ = 0
@@ -63,28 +64,47 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
     try {
       const obj = await import(`file://${file.path}`)
       const res = obj?.default
-      if (res?.event !== key) {
-        // 继续
-        await next()
-        return
-      }
-      const valueKey = {
-        dir: file?.dir,
-        path: file.path,
-        name: file.name,
-        value: {
-          event: res?.event ?? key
+
+      if (Array.isArray(res.select)) {
+        if (!res.select.includes(select)) {
+          // 继续
+          next()
+          return
+        }
+
+        //
+      } else {
+        if (res?.select !== select) {
+          // 继续
+          next()
+          return
+        }
+
+        //
+
+        if (!MWStore[select].find(v => v.path === file.path)) {
+          const valueKey = {
+            dir: file?.dir,
+            path: file.path,
+            name: file.name,
+            value: {
+              select: res?.select ?? select
+            }
+          }
+          // update files and values
+          const index = global.MWFiles.findIndex(v => v.path === file.path)
+          global.MWFiles.splice(index, 1)
+          //
+          MWStore[select].push(valueKey)
         }
       }
-      // 推送, 确保下次直接流向 key ，不再从头开始
-      if (!MWStore[key].find(v => v.path === file.path)) {
-        // update files and values
-        const index = global.MWFiles.findIndex(v => v.path === file.path)
-        global.MWFiles.splice(index, 1)
-        MWStore[key].push(valueKey)
-      }
+
       // 这里是否继续时 next 说了算
-      event = await res?.callback(event, { next, reg: res.reg })
+      if (isAsyncFunction(res?.callback)) {
+        event = await res?.callback(event, { next })?.catch(logger.error)
+      } else {
+        event = res?.callback(event, { next })
+      }
     } catch (err) {
       // 不再继续
       logger.error(err)
@@ -107,12 +127,20 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
         // 这里是否继续时 next 说了算
-        event = await res?.callback(event, { next })
+        if (isAsyncFunction(res?.callback)) {
+          event = await res?.callback(event, { next })
+        } else {
+          event = res?.callback(event, { next })
+        }
       } else {
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
         // 这里是否继续时 next 说了算
-        event = res?.callback(event, { next })
+        if (isAsyncFunction(res?.callback)) {
+          event = await res?.callback(event, { next })
+        } else {
+          event = res?.callback(event, { next })
+        }
       }
     } catch (err) {
       logger.error(err)

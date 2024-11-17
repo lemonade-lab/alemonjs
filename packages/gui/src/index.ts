@@ -50,8 +50,14 @@ export default defineBot(() => {
       Platform: event.Platform,
       // 频道
       GuildId: event.GuildId,
+      //
+      GuildIdName: '',
+      //
+      GuildIdAvatar: '',
       // 子频道
       ChannelId: event.ChannelId,
+      //
+      ChannelName: '',
       // 是否是主人
       IsMaster: event.IsMaster == 0 ? false : true,
       // 用户ID
@@ -83,6 +89,42 @@ export default defineBot(() => {
     OnProcessor(e, 'message.create')
   }
 
+  const onProvateMessage = event => {
+    const txt = event.MsgBody.find((item: any) => item.t == 'text')
+    const e = {
+      // 事件类型
+      Platform: event.Platform,
+      // 是否是主人
+      IsMaster: event.IsMaster == 0 ? false : true,
+      // 用户ID
+      UserId: event.UserId,
+      // 用户名
+      UserName: event.UserName,
+      // 用户头像
+      UserAvatar: event.UserAvatar,
+      // 格式化数据
+      MsgId: event.MsgId,
+      // 用户消息
+      Megs: [Text(txt.d)],
+      // 用户openId
+      OpenID: event.OpenID,
+      // 创建时间
+      CreateAt: Date.now(),
+      //
+      tag: 'MESSAGE_CREATE',
+      //
+      value: null
+    }
+    // 当访问的时候获取
+    Object.defineProperty(e, 'value', {
+      get() {
+        return event
+      }
+    })
+    // 处理消息
+    OnProcessor(e, 'private.message.create')
+  }
+
   /**
    *
    */
@@ -92,13 +134,17 @@ export default defineBot(() => {
     client = ws
     // 处理消息事件
     ws.on('message', (message: string) => {
-      const event = JSON.parse(message)
-      if (event.t == 'send_message') {
-        onMessage(event.d)
-      } else if (event.t == 'send_private_message') {
-        // onMessage(event.d)
-      } else {
-        console.log('未知消息', event)
+      try {
+        const event = JSON.parse(message)
+        if (event.t == 'send_message') {
+          onMessage(event.d)
+        } else if (event.t == 'send_private_message') {
+          onProvateMessage(event.d)
+        } else {
+          console.log('未知消息', event)
+        }
+      } catch (err) {
+        console.error('解析消息出错', err)
       }
     })
     // 处理关闭事件
