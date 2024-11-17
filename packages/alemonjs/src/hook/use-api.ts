@@ -116,4 +116,10 @@ export const useObserver = <T extends keyof AEvents>(event: any, option: T) => {
   }
 }
 
+/**
+ * @deprecated 错误命名。请使用 `useObserver` 代替此函数。
+ * @param callback
+ * @param event
+ * @returns
+ */
 export const useOberver = useObserver

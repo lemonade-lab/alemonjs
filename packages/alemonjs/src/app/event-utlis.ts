@@ -23,6 +23,12 @@ declare global {
  * @returns 回调函数的执行结果
  */
 export const OnResponse: OnResponseType = (callback, select, reg) => {
+  if (Array.isArray(select)) {
+    if (select.some(s => s === 'message.create' || s === 'private.message.create')) {
+      return { callback, select, reg: reg ?? (/(.*)/ as any) }
+    }
+    return { callback, select, reg }
+  }
   if (select === 'message.create' || select === 'private.message.create') {
     return { callback, select, reg: reg ?? (/(.*)/ as any) }
   }
@@ -35,21 +41,20 @@ global.OnResponse = OnResponse
  *
  * @param callback
  * @param event
- * @param reg
  * @returns
  */
-export const OnObserver: OnObserverType = (callback, select, reg) => {
+export const OnObserver: OnObserverType = (callback, select) => {
   if (select === 'message.create' || select === 'private.message.create') {
-    return { callback, select, reg: reg ?? (/(.*)/ as any) }
+    return { callback, select }
   }
   return { callback, select }
 }
 global.OnObserver = OnObserver
+
 /**
  * @deprecated 错误命名。请使用 `OnObserver` 代替此函数。
  * @param callback
  * @param event
- * @param reg
  * @returns
  */
 export const OnOberver = OnObserver

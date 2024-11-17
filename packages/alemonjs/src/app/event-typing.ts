@@ -45,10 +45,8 @@ export type ResponseConfigType = (options?: ResponseType) => ResponseType
  */
 export type OnObserverType = <T extends keyof AEvents>(
   callback: (event: AEvents[T], controller: ControllerType) => any,
-  select: T | T[],
-  reg?: T extends 'message.create' | 'private.message.create' ? RegExp : never
+  select: T | T[]
 ) => {
   callback: (event: AEvents[T], controller: ControllerType) => any
   select: T[] | T
-  reg?: T extends 'message.create' | 'private.message.create' ? RegExp : never // 这里也使用条件类型
 }
