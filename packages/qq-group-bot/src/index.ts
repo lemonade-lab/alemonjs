@@ -1,5 +1,7 @@
 import { Text, OnProcessor, useParse, defineBot, getConfig } from 'alemonjs'
-import { DrawingBed, QQBotGroupClient, FilesServer } from 'chat-space'
+import { QQBotGroupClient } from './sdk'
+
+//
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.['qq-group-bot']
@@ -12,7 +14,7 @@ export default defineBot(() => {
     token: config.token
   })
   // 创建文件服务
-  const ClientFile = new FilesServer()
+  // const ClientFile = new FilesServer()
   // 连接
   client.connect()
   // 监听消息
@@ -27,6 +29,9 @@ export default defineBot(() => {
       GuildId: event.group_id,
       // 子频道
       ChannelId: event.group_id,
+      GuildIdName: '',
+      GuildIdAvatar: '',
+      ChannelName: '',
       // 是否是主人
       IsMaster: isMaster,
       // 用户ID
@@ -69,18 +74,11 @@ export default defineBot(() => {
    */
   const getFileInfo = async (GuildId: string, msg: Buffer) => {
     let url = null
-    // 如果状态为true
-    if (DrawingBed.get('state')) {
-      url = await DrawingBed.get('func')(msg)
-    } else {
-      url = await ClientFile.getFileUrl(msg)
-    }
-    if (!url) return Promise.resolve(null)
     return client
       .postRichMediaByGroup(GuildId, {
-        srv_send_msg: false,
         file_type: 1,
-        url
+        url,
+        file_data: msg.toString('base64')
       })
       .then(res => res?.file_info)
   }
