@@ -1,12 +1,16 @@
 import { defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
-import Client from 'node-telegram-bot-api'
+import TelegramClient from 'node-telegram-bot-api'
+
+export type Client = typeof TelegramClient.prototype
+export const client: Client = global.client
+
 export default defineBot(() => {
   //
   const cfg = getConfig()
   const config = cfg.value?.['telegram']
   if (!config) return
   //
-  const client = new Client(config.token, {
+  const client = new TelegramClient(config.token, {
     polling: true,
     baseApiUrl: config?.base_api_url ?? '',
     request: {
@@ -78,7 +82,7 @@ export default defineBot(() => {
         // 格式化数据
         MsgId: String(event?.message_id),
         // 用户消息
-        Megs: [Text(event?.text)],
+        MessageBody: [Text(event?.text)],
         // 用户openId
         OpenID: String(event?.chat?.id),
         // 创建时间
@@ -108,12 +112,16 @@ export default defineBot(() => {
         UserId: String(event?.from.id),
         // 用户名
         UserName: event?.from?.username,
+        GuildIdName: '',
+        GuildIdAvatar: '',
+        ChannelName: '',
         // 用户头像
         UserAvatar: UserAvatar,
         // 格式化数据
         MsgId: String(event?.message_id),
         // 用户消息
-        Megs: [Text(event?.text)],
+        MessageBody: [Text(event?.text)],
+        MessageText: event?.text,
         // 用户openId
         OpenID: String(event?.chat?.id),
         // 创建时间
@@ -166,7 +174,9 @@ export default defineBot(() => {
       // 格式化数据
       MsgId: String(event?.message_id),
       // 用户消息
-      Megs: [Text(event?.text)],
+      MessageBody: [Text(event?.text)],
+      //
+      MessageText: event?.text,
       // 用户openId
       OpenID: String(event?.chat?.id),
       // 创建时间
@@ -254,18 +264,30 @@ export default defineBot(() => {
   //   })
   // }
 
+  global.client = client
+
   return {
     api: {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
           if (val.length < 0) return Promise.all([])
-          const content = useParse(val, 'Text')
+          const content = useParse(
+            {
+              MessageBody: val
+            },
+            'Text'
+          )
           const e = event?.value
           if (content) {
             return Promise.all([content].map(item => client.sendMessage(e.chat.id, item)))
           }
-          const images = useParse(val, 'Image')
+          const images = useParse(
+            {
+              MessageBody: val
+            },
+            'Image'
+          )
           if (images) {
             return Promise.all(images.map(item => client.sendPhoto(e.chat.id, item)))
           }

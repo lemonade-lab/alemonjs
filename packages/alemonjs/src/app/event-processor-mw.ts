@@ -100,10 +100,10 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
       }
 
       // 这里是否继续时 next 说了算
-      if (isAsyncFunction(res?.callback)) {
-        event = await res?.callback(event, { next })?.catch(logger.error)
+      if (isAsyncFunction(res?.current)) {
+        event = await res?.current(event, next)?.catch(logger.error)
       } else {
-        event = res?.callback(event, { next })
+        event = res?.current(event, next)
       }
     } catch (err) {
       // 不再继续
@@ -127,19 +127,19 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
         // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.callback)) {
-          event = await res?.callback(event, { next })
+        if (isAsyncFunction(res?.current)) {
+          event = await res?.current(event, next)
         } else {
-          event = res?.callback(event, { next })
+          event = res?.current(event, next)
         }
       } else {
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
         // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.callback)) {
-          event = await res?.callback(event, { next })
+        if (isAsyncFunction(res?.current)) {
+          event = await res?.current(event, next)
         } else {
-          event = res?.callback(event, { next })
+          event = res?.current(event, next)
         }
       }
     } catch (err) {

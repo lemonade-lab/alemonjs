@@ -22,7 +22,7 @@ declare global {
       event: {
         [key: string]: string
       }
-      callback: Function
+      current: Function
     }[]
   }
 }
@@ -34,10 +34,12 @@ declare global {
  * @returns 解析后的值
  */
 export const useParse = <T extends keyof DataParseType>(
-  value: DataParseType[T][] = [],
+  value: {
+    MessageBody: DataParseType[T][]
+  },
   event: T
 ): ParseType[T] | undefined => {
-  const msgs = value.filter(item => item.type === event)
+  const msgs = value.MessageBody.filter(item => item.type === event)
   if (msgs.length === 0) return undefined
   switch (event) {
     case 'Text': {
@@ -79,10 +81,7 @@ export const useSend = (event: { [key: string]: any }) => {
  * @returns
  */
 export const useObserver = <T extends keyof AEvents>(event: any, option: T) => {
-  return (
-    callback: (e: AEvents[T], { next }: { next: Function }) => any,
-    keys: (keyof AEvents[T])[]
-  ) => {
+  return (callback: (e: AEvents[T], next: Function) => any, keys: (keyof AEvents[T])[]) => {
     if (keys.length === 0) return
     // 选取key，丢弃其他值
     const v: {
@@ -99,13 +98,13 @@ export const useObserver = <T extends keyof AEvents>(event: any, option: T) => {
     const next = () => {
       if (i >= global.storeoberver[option].length) {
         // 如果不存在。则创建
-        global.storeoberver[option][i] = { event: v, callback }
+        global.storeoberver[option][i] = { event: v, current: callback }
         return
       }
       i++
       // 是空的。占据位置。
       if (!global.storeoberver[option][i]) {
-        global.storeoberver[option][i] = { event: v, callback }
+        global.storeoberver[option][i] = { event: v, current: callback }
       } else {
         // 不是空的。继续
         next()
@@ -115,11 +114,3 @@ export const useObserver = <T extends keyof AEvents>(event: any, option: T) => {
     return
   }
 }
-
-/**
- * @deprecated 错误命名。请使用 `useObserver` 代替此函数。
- * @param callback
- * @param event
- * @returns
- */
-export const useOberver = useObserver

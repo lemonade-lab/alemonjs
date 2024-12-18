@@ -1,8 +1,9 @@
 import { defineBot, Text, OnProcessor, useParse, getConfig } from 'alemonjs'
-import { Client, segment } from 'icqq'
+import { Client as ICQQClient, segment } from 'icqq'
 import { device, error, qrcode, slider } from './login'
 import { Store } from './store'
-
+export type Client = typeof ICQQClient.prototype
+export const client: Client = global.client
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.qq
@@ -10,7 +11,7 @@ export default defineBot(() => {
 
   const d = Number(config?.device)
   // 创建客户端
-  const client = new Client({
+  const client = new ICQQClient({
     // 机器人配置
     sign_api_addr: config?.sign_api_addr,
     // 默认要扫码登录
@@ -108,6 +109,9 @@ export default defineBot(() => {
       IsMaster: isMaster,
       // 用户ID
       UserId: user_id,
+      GuildIdName: '',
+      GuildIdAvatar: '',
+      ChannelName: '',
       // 用户名
       UserName: event.sender.nickname,
       // 用户头像
@@ -115,7 +119,9 @@ export default defineBot(() => {
       // 格式化数据
       MsgId: event.message_id,
       // 用户消息
-      Megs: [Text(msg)].concat(Ats),
+      MessageBody: [Text(msg)].concat(Ats),
+      //
+      MessageText: msg,
       // 用户openId
       OpenID: user_id,
       // 创建时间
@@ -135,18 +141,30 @@ export default defineBot(() => {
     OnProcessor(e, 'message.create')
   })
 
+  global.client = client
+
   return {
     api: {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(val, 'Text')
+          const content = useParse(
+            {
+              MessageBody: val
+            },
+            'Text'
+          )
           if (content) {
             return Promise.all(
               [content].map(item => client.pickGroup(event.ChannelId).sendMsg(item))
             )
           }
-          const images = useParse(val, 'Image')
+          const images = useParse(
+            {
+              MessageBody: val
+            },
+            'Image'
+          )
           if (images) {
             return Promise.all(
               images.map(async item => {

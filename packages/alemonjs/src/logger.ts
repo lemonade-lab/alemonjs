@@ -1,80 +1,83 @@
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
+
+// Logger 类型定义
+interface Logger {
+  trace: (...args: any[]) => void
+  debug: (...args: any[]) => void
+  info: (...args: any[]) => void
+  warn: (...args: any[]) => void
+  error: (...args: any[]) => void
+  fatal: (...args: any[]) => void
+  mark: (...args: any[]) => void
+}
+
 /**
  * 创建日志
- * @returns
+ * @returns {Logger}
  */
-const createLog = () => {
-  mkdirSync('./logs', { recursive: true })
+const createLog = (): Logger => {
+  const logDir = `./logs/${process.env.LOG_NAME ?? ''}`
+  console.log('logDir', logDir)
+  mkdirSync(logDir, { recursive: true })
   log4js.configure({
     appenders: {
       console: {
         type: 'console',
         layout: {
           type: 'pattern',
-          pattern: `%[[AJS][%d{hh:mm:ss.SSS}][%4.4p]%] %m`
+          pattern: `%[[%d{yyyy-MM-dd hh:mm:ss}][%5.5p]%] %m`
         }
       },
       command: {
         type: 'dateFile',
-        filename: 'logs/command',
+        filename: `${logDir}/command`,
         pattern: 'yyyy-MM-dd.log',
         numBackups: 15,
         alwaysIncludePattern: true,
         layout: {
           type: 'pattern',
-          pattern: '[%d{hh:mm:ss.SSS}][%4.4p] %m'
+          pattern: `%[[%d{yyyy-MM-dd hh:mm:ss}][%5.5p]%] %m`
         }
       },
       error: {
-        type: 'file',
-        filename: 'logs/error.log',
+        type: 'dateFile',
+        filename: `${logDir}/error`,
+        pattern: 'yyyy-MM-dd.log',
+        numBackups: 15,
         alwaysIncludePattern: true,
         layout: {
           type: 'pattern',
-          pattern: '[%d{hh:mm:ss.SSS}][%4.4p] %m'
+          pattern: `%[[%d{yyyy-MM-dd hh:mm:ss}][%5.5p]%] %m`
         }
       }
     },
     categories: {
-      default: { appenders: ['console'], level: 'info' },
-      command: { appenders: ['console', 'command'], level: 'warn' },
-      error: { appenders: ['console', 'command', 'error'], level: 'error' }
+      default: { appenders: ['console'], level: 'error' },
+      // 记录级别
+      command: { appenders: ['console', 'command'], level: 'info' },
+      error: { appenders: ['console', 'command', 'error'], level: 'warn' }
     }
   })
   const defaultLogger = log4js.getLogger('message')
   const commandLogger = log4js.getLogger('command')
   const errorLogger = log4js.getLogger('error')
-  /**
-   * 调整error日志等级
-   */
   return {
-    // 不记录级别
-    trace() {
-      defaultLogger.trace.call(defaultLogger, ...arguments)
-    },
-    // 不记录级别
-    debug() {
-      defaultLogger.debug.call(defaultLogger, ...arguments)
-    },
-    // 记录info级别
-    info() {
-      defaultLogger.info.call(defaultLogger, ...arguments)
-    },
-    warn() {
-      commandLogger.warn.call(defaultLogger, ...arguments)
-    },
-    error() {
-      errorLogger.error.call(errorLogger, ...arguments)
-    },
-    fatal() {
-      errorLogger.fatal.call(errorLogger, ...arguments)
-    },
-    mark() {
-      errorLogger.mark.call(commandLogger, ...arguments)
-    }
+    // 开发调试
+    trace: defaultLogger.trace.bind(defaultLogger),
+    debug: defaultLogger.debug.bind(defaultLogger),
+    // 日常
+    info: commandLogger.info.bind(commandLogger),
+    mark: commandLogger.mark.bind(commandLogger),
+    // 警告
+    warn: errorLogger.warn.bind(errorLogger),
+    // 错误
+    error: errorLogger.error.bind(errorLogger),
+    // 严重
+    fatal: errorLogger.fatal.bind(errorLogger)
   }
 }
+
 /**
  * 全局变量 logger
  */

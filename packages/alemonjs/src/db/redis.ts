@@ -5,19 +5,19 @@
  * @author ningmengchongshui
  */
 import redisClient, { Redis as RedisClient } from 'ioredis'
-import { getConfig } from '../config'
+import { getConfigValue } from '../config'
 
 /**
  * 创建ioredis
  * @returns
  */
 const createIoRedis = () => {
-  const cfg = getConfig()
+  const value = getConfigValue()
   const aRedis = new redisClient({
-    host: cfg.value.redis.host ?? 'localhost',
-    port: cfg.value.redis.port ?? 6379,
-    password: cfg.value.redis.password ?? '',
-    db: cfg.value.redis.db ?? 0,
+    host: value.redis.host ?? 'localhost',
+    port: value.redis.port ?? 6379,
+    password: value.redis.password ?? '',
+    db: value.redis.db ?? 0,
     maxRetriesPerRequest: null
   })
   aRedis.on('error', (err: any) => {

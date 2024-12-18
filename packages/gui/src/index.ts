@@ -69,7 +69,9 @@ export default defineBot(() => {
       // 格式化数据
       MsgId: event.MsgId,
       // 用户消息
-      Megs: [Text(txt.d)],
+      MessageBody: [Text(txt.d)],
+      MessageText: txt.d,
+      // 事件类型
       // 用户openId
       OpenID: event.OpenID,
       // 创建时间
@@ -105,7 +107,8 @@ export default defineBot(() => {
       // 格式化数据
       MsgId: event.MsgId,
       // 用户消息
-      Megs: [Text(txt.d)],
+      MessageBody: [Text(txt.d)],
+      MessageText: txt.d,
       // 用户openId
       OpenID: event.OpenID,
       // 创建时间
@@ -167,7 +170,12 @@ export default defineBot(() => {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
           console.log(event)
-          const content = useParse(val, 'Text')
+          const content = useParse(
+            {
+              MessageBody: val
+            },
+            'Text'
+          )
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -185,7 +193,12 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(val, 'Image')
+          const images = useParse(
+            {
+              MessageBody: val
+            },
+            'Image'
+          )
           if (images) {
             return Promise.all(
               images.map(async item => {

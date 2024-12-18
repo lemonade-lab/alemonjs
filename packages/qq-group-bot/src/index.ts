@@ -1,7 +1,7 @@
 import { Text, OnProcessor, useParse, defineBot, getConfig } from 'alemonjs'
 import { QQBotGroupClient } from './sdk'
-
-//
+export type Client = typeof QQBotGroupClient.prototype
+export const client: Client = global.client
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.['qq-group-bot']
@@ -43,7 +43,8 @@ export default defineBot(() => {
       // 格式化数据
       MsgId: event.id,
       // 用户消息
-      Megs: [Text(event.content.trim())],
+      MessageBody: [Text(event.content.trim())],
+      MessageText: event.content?.trim(),
       // 用户openId
       OpenID: event.author.member_openid,
       // 创建时间
@@ -83,12 +84,19 @@ export default defineBot(() => {
       .then(res => res?.file_info)
   }
 
+  global.client = client
+
   return {
     api: {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(val, 'Text')
+          const content = useParse(
+            {
+              MessageBody: val
+            },
+            'Text'
+          )
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -101,7 +109,12 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(val, 'Image')
+          const images = useParse(
+            {
+              MessageBody: val
+            },
+            'Image'
+          )
           if (images) {
             return Promise.all(
               images.map(async msg => {

@@ -1,5 +1,5 @@
 import './logger.js'
-import { getConfig } from './config'
+import { getConfigValue } from './config'
 import { pushAppsFiles, pushMWFiles } from './app/event-processor'
 import { getArgvValue } from './config'
 import { getDirFiles } from './app/event-files'
@@ -62,17 +62,17 @@ const moduleChildrenFiles = async (name: string) => {
  * @param input
  */
 export const onStart = async (input: string = 'lib/index.js') => {
-  const cfg = getConfig()
+  const value = getConfigValue()
   const skip = process.argv.includes('--skip')
-  const login = cfg.value?.login
+  const login = value?.login
   // login
   if (!login && !skip) {
     return
   }
   // module
-  if (cfg?.value?.apps) {
-    if (Array.isArray(cfg?.value?.apps)) {
-      for (const app of cfg?.value?.apps) {
+  if (value?.apps) {
+    if (Array.isArray(value?.apps)) {
+      for (const app of value?.apps) {
         moduleChildrenFiles(app)
       }
     }
@@ -98,13 +98,13 @@ export const onStart = async (input: string = 'lib/index.js') => {
   }
   await run()
   // prefix
-  const prefix = getArgvValue('--prefix') ?? '@alemonjs/'
+  const platform = getArgvValue('--platform') ?? `@alemonjs/${login}`
   if (!skip) {
-    const bot = await import(`${prefix}${login}`)
+    const bot = await import(platform)
     // 挂在全局
     global.alemonjs = bot?.default()
   }
-  await import(`${prefix}${login}`)
+  await import(platform)
 }
 
 const main = async () => {

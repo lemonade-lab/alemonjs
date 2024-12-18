@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "qq-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -32,9 +32,9 @@
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },
-  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
   }
 }

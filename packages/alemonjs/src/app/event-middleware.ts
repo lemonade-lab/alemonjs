@@ -25,5 +25,5 @@ declare global {
  * 使用md对 event 进行增强
  *
  */
-export const OnMiddleware: OnMiddlewareType = (callback, select) => ({ select, callback })
+export const OnMiddleware: OnMiddlewareType = (callback, select) => ({ select, current: callback })
 global.OnMiddleware = OnMiddleware

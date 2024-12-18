@@ -92,7 +92,7 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
     }
     // 没有调用下一步。应该删除当前的 n ？
     // 有没有可能。按key来分。
-    item.callback(event, { next: Continue })
+    item.current(event, Continue)
     //
   }
 
@@ -153,10 +153,10 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
       }
 
       // 这里是否继续时 next 说了算
-      if (isAsyncFunction(res?.callback)) {
-        res?.callback(event, { next })?.catch(logger.error)
+      if (isAsyncFunction(res?.current)) {
+        res?.current(event, next)?.catch(logger.error)
       } else {
-        res?.callback(event, { next })
+        res?.current(event, next)
       }
     } catch (err) {
       // 不再继续
@@ -181,18 +181,18 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
         // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.callback)) {
-          await res?.callback(event, { next })?.catch(logger.error)
+        if (isAsyncFunction(res?.current)) {
+          await res?.current(event, next)?.catch(logger.error)
         } else {
-          res?.callback(event, { next })
+          res?.current(event, next)
         }
       } else {
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
-        if (isAsyncFunction(res?.callback)) {
-          await res?.callback(event, { next })?.catch(logger.error)
+        if (isAsyncFunction(res?.current)) {
+          await res?.current(event, next)?.catch(logger.error)
         } else {
-          res?.callback(event, { next })
+          res?.current(event, next)
         }
       }
     } catch (err) {

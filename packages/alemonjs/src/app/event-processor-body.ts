@@ -95,7 +95,7 @@ export const expendMessage = async <T extends keyof AEvents>(
     }
     // 没有调用下一步。应该删除当前的 n ？
     // 有没有可能。按key来分。
-    item.callback(event, { next: Continue })
+    item.current(event, Continue)
     //
   }
 
@@ -154,17 +154,17 @@ export const expendMessage = async <T extends keyof AEvents>(
         }
       }
 
-      const msg = useParse(event.Megs, 'Text') ?? ''
+      const msg = useParse(event, 'Text') ?? ''
       if (reg && !reg.test(msg)) {
         // 继续
         next()
         return
       }
       // 这里是否继续时 next 说了算
-      if (isAsyncFunction(res?.callback)) {
-        res?.callback(event, { next, reg })?.catch(logger.error)
+      if (isAsyncFunction(res?.current)) {
+        res?.current(event, next)?.catch(logger.error)
       } else {
-        res?.callback(event, { next, reg })
+        res?.current(event, next)
       }
     } catch (err) {
       // 不再继续
@@ -185,7 +185,7 @@ export const expendMessage = async <T extends keyof AEvents>(
     }
 
     //
-    const msg = useParse(event.Megs, 'Text') ?? ''
+    const msg = useParse(event, 'Text') ?? ''
 
     try {
       if (!file.value) {
@@ -197,10 +197,10 @@ export const expendMessage = async <T extends keyof AEvents>(
           return
         }
         // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.callback)) {
-          res?.callback(event, { next, reg })?.catch(logger.error)
+        if (isAsyncFunction(res?.current)) {
+          res?.current(event, next)?.catch(logger.error)
         } else {
-          res?.callback(event, { next, reg })
+          res?.current(event, next)
         }
       } else {
         // 在这里，存在了 value。使用value进行。不用读取文件
@@ -212,10 +212,10 @@ export const expendMessage = async <T extends keyof AEvents>(
         const obj = await import(`file://${file.path}`)
         const res = obj?.default
         // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.callback)) {
-          res?.callback(event, { next, reg })?.catch(logger.error)
+        if (isAsyncFunction(res?.current)) {
+          res?.current(event, next)?.catch(logger.error)
         } else {
-          res?.callback(event, { next, reg })
+          res?.current(event, next)
         }
       }
     } catch (err) {

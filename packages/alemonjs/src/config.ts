@@ -118,8 +118,18 @@ class ConfigCore {
   }
 }
 
+/**
+ *
+ * @returns
+ */
 export const getConfig = (): typeof ConfigCore.prototype => {
   if (global?.config) return global.config
   global.config = new ConfigCore('alemon.config.yaml')
   return global.config
 }
+
+/**
+ *
+ * @returns
+ */
+export const getConfigValue = () => getConfig()?.value

@@ -1,5 +1,7 @@
 import { Text, OnProcessor, useParse, At, defineBot, getConfig } from 'alemonjs'
-import { QQBotGuildClient } from 'chat-space'
+import { QQBotGuildClient } from './sdk'
+export type Client = typeof QQBotGuildClient.prototype
+export const client: Client = global.client
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.['qq-guild-bot']
@@ -65,8 +67,11 @@ export default defineBot(() => {
       UserAvatar: event?.author?.avatar ?? '',
       // 格式化数据
       MsgId: event.id,
+      GuildIdName: '',
+      GuildIdAvatar: '',
+      ChannelName: '',
       // 用户消息
-      Megs: [
+      MessageBody: [
         Text(msg ?? ''),
         ...at_users.map(item =>
           At(item.name, 'user', {
@@ -76,6 +81,7 @@ export default defineBot(() => {
           })
         )
       ],
+      MessageText: msg,
       // 用户openId
       OpenID: event.guild_id,
       // 创建时间
@@ -142,6 +148,9 @@ export default defineBot(() => {
       ChannelId: event.channel_id,
       // 是否是主人
       IsMaster: isMaster,
+      GuildIdName: '',
+      GuildIdAvatar: '',
+      ChannelName: '',
       // 用户ID
       UserId: event?.author?.id ?? '',
       // 用户名
@@ -151,7 +160,7 @@ export default defineBot(() => {
       // 格式化数据
       MsgId: event.id,
       // 用户消息
-      Megs: [
+      MessageBody: [
         Text(msg ?? ''),
         ...at_users.map(item =>
           At(item.name, 'user', {
@@ -161,6 +170,7 @@ export default defineBot(() => {
           })
         )
       ],
+      MessageText: msg,
       // 用户openId
       OpenID: event.guild_id,
       // 创建时间
@@ -187,12 +197,19 @@ export default defineBot(() => {
     console.error(msg)
   })
 
+  global.client = client
+
   return {
     api: {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(val, 'Text')
+          const content = useParse(
+            {
+              MessageBody: val
+            },
+            'Text'
+          )
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -203,7 +220,12 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(val, 'Image')
+          const images = useParse(
+            {
+              MessageBody: val
+            },
+            'Image'
+          )
           if (images) {
             return Promise.all(
               images.map(item =>

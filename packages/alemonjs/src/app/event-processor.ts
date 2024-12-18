@@ -15,19 +15,19 @@ type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.c
 
 /**
  *
- * @param value
+ * @param event
  * @param select
  */
-const Log = <T extends keyof AEvents>(value: AEvents[T], select: T) => {
+const Log = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
   const logs = [`[${select}]`]
-  if (typeof value['ChannelId'] == 'string' && value['ChannelId'] != '') {
-    logs.push(`[${value['ChannelId']}]`)
+  if (typeof event['ChannelId'] == 'string' && event['ChannelId'] != '') {
+    logs.push(`[${event['ChannelId']}]`)
   }
-  if (typeof value['UserId'] == 'string' && value['UserId'] != '') {
-    logs.push(`[${value['UserId']}]`)
+  if (typeof event['UserId'] == 'string' && event['UserId'] != '') {
+    logs.push(`[${event['UserId']}]`)
   }
-  if (Array.isArray(value['Megs'])) {
-    const txt = useParse(value['Megs'], 'Text')
+  if (Array.isArray(event['MessageBody'])) {
+    const txt = useParse(event as any, 'Text')
     if (typeof txt == 'string' && txt != '') {
       logs.push(`[${txt}]`)
     }
@@ -37,26 +37,26 @@ const Log = <T extends keyof AEvents>(value: AEvents[T], select: T) => {
 
 /**
  * 消息处理器
- * @param value
  * @param event
+ * @param select
  * @returns
  */
-export const OnProcessor = <T extends keyof AEvents>(value: AEvents[T], select: T) => {
+export const OnProcessor = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
   // 打印
-  Log(value, select)
+  Log(event, select)
   // 选择处理
   switch (select) {
     case 'message.create':
       // 处理公有消息
-      expendMessage(value as EventMessageCreate, 'message.create')
+      expendMessage(event as EventMessageCreate, 'message.create')
       break
     case 'private.message.create':
       // 处理私有消息
-      expendMessage(value as EventMessageCreate, 'private.message.create')
+      expendMessage(event as EventMessageCreate, 'private.message.create')
       break
     default: {
       // 无消息体处理
-      expendEvent(value as any, select)
+      expendEvent(event as any, select)
       break
     }
   }

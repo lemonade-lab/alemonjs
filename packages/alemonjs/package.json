@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.54",
+  "version": "2.0.0-rc.60",
   "description": "alemonjs bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -36,9 +36,9 @@
     "registry": "https://registry.npmjs.org",
     "access": "public"
   },
-  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
   }
 }

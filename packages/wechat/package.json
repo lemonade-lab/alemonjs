@@ -1,0 +1,37 @@
+{
+  "name": "@alemonjs/wechat",
+  "version": "0.1.0",
+  "description": "wechat-bot",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib",
+  "dependencies": {
+    "file-box": "^1.4.15",
+    "wechaty": "^1.20.2",
+    "wechaty-puppet": "^1.20.2"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "keywords": [
+    "alemonjs",
+    "wechat",
+    "wechat-bot",
+    "bot",
+    "chat-bot"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/ningmengchongshui/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  }
+}

@@ -75,13 +75,16 @@ export default defineBot(() => {
       UserId: event.user_id,
       // 用户名
       UserName: event.sender.nickname,
+      GuildIdName: '',
+      GuildIdAvatar: '',
+      ChannelName: '',
       // 用户头像
       UserAvatar:
         event.platform == 'qq' ? `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}` : '',
       // 格式化数据
       MsgId: event.message_id,
       // 用户消息
-      Megs: [
+      MessageBody: [
         Text(msg),
         ...at_users.map(item =>
           At(item.id, 'user', {
@@ -91,6 +94,8 @@ export default defineBot(() => {
           })
         )
       ],
+      MessageText: msg,
+      // 表情
       // 用户openId
       OpenID: event.user_id,
       //
@@ -135,7 +140,12 @@ export default defineBot(() => {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(val, 'Text')
+          const content = useParse(
+            {
+              MessageBody: val
+            },
+            'Text'
+          )
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -153,7 +163,12 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(val, 'Image')
+          const images = useParse(
+            {
+              MessageBody: val
+            },
+            'Image'
+          )
           if (images) {
             return Promise.all(
               images.map(item =>

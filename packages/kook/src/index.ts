@@ -1,6 +1,7 @@
 import { defineBot, Text, OnProcessor, useParse, At, getConfig } from 'alemonjs'
-import { KOOKClient } from 'chat-space'
-
+import { KOOKClient } from './sdk/index'
+export type Client = typeof KOOKClient.prototype
+export const client: Client = global.client
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.kook
@@ -81,6 +82,9 @@ export default defineBot(() => {
       IsMaster: isMaster,
       // 用户ID
       UserId: event.author_id,
+      GuildIdName: '',
+      GuildIdAvatar: '',
+      ChannelName: '',
       // 用户名
       UserName: event.extra.author.username,
       // 用户头像
@@ -88,12 +92,13 @@ export default defineBot(() => {
       // 格式化数据
       MsgId: event.msg_id,
       // 用户消息
-      Megs: [
+      MessageBody: [
         Text(msg),
         ...at_users.map(item =>
           At(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
         )
       ],
+      MessageText: msg,
       // 用户openId
       OpenID: data?.code,
       // 创建时间
@@ -120,12 +125,20 @@ export default defineBot(() => {
     console.error(msg)
   })
 
+  // 客户端全局化。
+  global.client = client
+
   return {
     api: {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(val, 'Text')
+          const content = useParse(
+            {
+              MessageBody: val
+            },
+            'Text'
+          )
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -137,7 +150,12 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(val, 'Image')
+          const images = useParse(
+            {
+              MessageBody: val
+            },
+            'Image'
+          )
           if (images) {
             return Promise.all(
               images.map(async item => {
