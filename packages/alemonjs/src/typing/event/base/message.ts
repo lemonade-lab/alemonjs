@@ -2,7 +2,7 @@ export type Message = {
   /**
    * 消息编号
    */
-  MsgId: string
+  MessageId: string
   /**
    * 创建时间
    */

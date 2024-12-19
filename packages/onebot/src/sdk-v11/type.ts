@@ -1,5 +1,5 @@
 interface Sender {
-  // 用户ID
+  // 用户Id
   user_id: number
   // 昵称
   nickname: string

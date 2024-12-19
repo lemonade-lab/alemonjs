@@ -20,7 +20,7 @@ export class QQBotGuildClient extends QQBotGuildAPI {
   #heartbeat_interval = 30000
 
   // 鉴权
-  #IntervalID = null
+  #IntervalId = null
 
   // url
   #gatewayUrl = null
@@ -33,7 +33,7 @@ export class QQBotGuildClient extends QQBotGuildAPI {
    */
   constructor(opstion: QQOptions) {
     super()
-    config.set('appID', opstion.appID)
+    config.set('appId', opstion.appId)
     config.set('token', opstion.token)
     config.set('intents', opstion.intents)
     config.set('sandbox', opstion.sandbox)
@@ -45,14 +45,14 @@ export class QQBotGuildClient extends QQBotGuildAPI {
    * @returns
    */
   #aut() {
-    const appID = config.get('appID')
+    const appId = config.get('appId')
     const token = config.get('token')
     const intents = config.get('intents')
     const shard = config.get('shard')
     return {
       op: 2, // op = 2
       d: {
-        token: `Bot ${appID}.${token}`,
+        token: `Bot ${appId}.${token}`,
         intents: getIntentsMask(intents),
         shard,
         properties: {
@@ -104,7 +104,7 @@ export class QQBotGuildClient extends QQBotGuildAPI {
         // 重新starrt
         start()
         // 记录
-        this.#counter.getNextID()
+        this.#counter.getNextId()
       }, 5000)
     }
 
@@ -122,7 +122,7 @@ export class QQBotGuildClient extends QQBotGuildAPI {
             }
             // Ready Event，鉴权成功
             if (t === 'READY') {
-              this.#IntervalID = setInterval(() => {
+              this.#IntervalId = setInterval(() => {
                 if (this.#isConnected) {
                   this.#ws.send(
                     JSON.stringify({
@@ -149,7 +149,7 @@ export class QQBotGuildClient extends QQBotGuildAPI {
             // 执行重新连接
             console.info('[ws] reconnect', d)
             // 取消鉴权发送
-            if (this.#IntervalID) clearInterval(this.#IntervalID)
+            if (this.#IntervalId) clearInterval(this.#IntervalId)
             return
           },
           9: ({ d }) => {

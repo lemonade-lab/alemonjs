@@ -10,4 +10,4 @@ export interface GROUP_AT_MESSAGE_CREATE_TYPE {
   timestamp: string
 }
 
-// https://q.qlogo.cn/qqapp/${appID}/${event.author.id}/640
+// https://q.qlogo.cn/qqapp/${appId}/${event.author.id}/640

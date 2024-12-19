@@ -17,14 +17,14 @@ export class QQBotGuildAPI {
    * @returns
    */
   async request(opstion: AxiosRequestConfig) {
-    const appID = config.get('appID')
+    const appId = config.get('appId')
     const token = config.get('token')
     const sandbox = config.get('sandbox')
     const service = await axios.create({
       baseURL: sandbox ? this.SANDBOT_API_URL : this.API_URL,
       timeout: 20000,
       headers: {
-        Authorization: `Bot ${appID}.${token}`
+        Authorization: `Bot ${appId}.${token}`
       }
     })
     return service(opstion)

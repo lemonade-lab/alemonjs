@@ -21,7 +21,7 @@ import { PrivateEventRequestFriendAdd, PrivateEventRequestGuildAdd } from './typ
 export type LogType = string | Error | unknown
 
 // 携带有消息体的
-export type AEventsMsg = {
+export type AEventsMessage = {
   'message.create': PublicEventMessageCreate
   'private.message.create': PrivateEventMessageCreate
 }
@@ -42,7 +42,7 @@ export type AEvents = {
   'private.message.delete': PrivateEventMessageDelete
   'private.friend.add': PrivateEventRequestFriendAdd
   'private.guild.add': PrivateEventRequestGuildAdd
-} & AEventsMsg
+} & AEventsMessage
 
 declare global {
   var logger: {

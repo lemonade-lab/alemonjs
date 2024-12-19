@@ -1,4 +1,4 @@
-import { Text, OnProcessor, useParse, At, defineBot, getConfig } from 'alemonjs'
+import { Text, OnProcessor, useParse, At, defineBot, getConfig, createHash } from 'alemonjs'
 import { QQBotGuildClient } from './sdk'
 export type Client = typeof QQBotGuildClient.prototype
 export const client: Client = global.client
@@ -9,11 +9,88 @@ export default defineBot(() => {
 
   // 创建客户端
   const client = new QQBotGuildClient({
-    appID: config.app_id,
+    appId: config.app_id,
     token: config.token
   })
   // 连接
   client.connect()
+
+  client.on('DIRECT_MESSAGE_CREATE', async event => {
+    // 屏蔽其他机器人的消息
+    if (event?.author?.bot) return
+
+    const master_id = config?.master_id ?? []
+    const isMaster = master_id.includes(event.author.id)
+
+    let msg = event?.content ?? ''
+
+    // 艾特消息处理
+    const at_users: {
+      id: string
+      name: string
+      avatar: string
+      bot: boolean
+    }[] = []
+
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(event.author.avatar).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(event?.author?.avatar).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return event?.author?.avatar
+      }
+    }
+
+    const UserKey = createHash(`qq-guild-bot:${event.author.id}`)
+
+    // 定义消
+    const e = {
+      // 事件类型
+      Platform: 'qq-guild-bot',
+      GuildId: event.guild_id,
+      ChannelId: event.channel_id,
+      IsMaster: isMaster,
+      // 用户Id
+      UserId: event?.author?.id ?? '',
+      UserKey,
+      UserName: event?.author?.username ?? '',
+      UserAvatar: UserAvatar,
+      // message
+      MessageId: event.id,
+      MessageBody: [
+        Text(msg ?? ''),
+        ...at_users.map(item =>
+          At(item.name, 'user', {
+            name: item.name,
+            avatar: item.avatar,
+            bot: item.bot
+          })
+        )
+      ],
+      MessageText: msg,
+      OpenId: event.guild_id,
+      CreateAt: Date.now(),
+      //
+      tag: 'AT_MESSAGE_CREATE',
+      //
+      value: null
+    }
+
+    // 当访问的时候获取
+    Object.defineProperty(e, 'value', {
+      get() {
+        return event
+      }
+    })
+
+    // 处理消息
+    OnProcessor(e, 'private.message.create')
+  })
 
   // 监听消息
   client.on('AT_MESSAGE_CREATE', async event => {
@@ -49,28 +126,36 @@ export default defineBot(() => {
       })
     }
 
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(event.author.avatar).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(event?.author?.avatar).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return event?.author?.avatar
+      }
+    }
+
+    const UserKey = createHash(`qq-guild-bot:${event.author.id}`)
+
     // 定义消
     const e = {
       // 事件类型
       Platform: 'qq-guild-bot',
-      // 频道
       GuildId: event.guild_id,
-      // 子频道
       ChannelId: event.channel_id,
-      // 是否是主人
       IsMaster: isMaster,
-      // 用户ID
+      // 用户Id
       UserId: event?.author?.id ?? '',
-      // 用户名
+      UserKey,
       UserName: event?.author?.username ?? '',
-      // 用户头像
-      UserAvatar: event?.author?.avatar ?? '',
-      // 格式化数据
-      MsgId: event.id,
-      GuildIdName: '',
-      GuildIdAvatar: '',
-      ChannelName: '',
-      // 用户消息
+      UserAvatar: UserAvatar,
+      // message
+      MessageId: event.id,
       MessageBody: [
         Text(msg ?? ''),
         ...at_users.map(item =>
@@ -82,10 +167,9 @@ export default defineBot(() => {
         )
       ],
       MessageText: msg,
-      // 用户openId
-      OpenID: event.guild_id,
-      // 创建时间
+      OpenId: event.guild_id,
       CreateAt: Date.now(),
+      //
       tag: 'AT_MESSAGE_CREATE',
       //
       value: null
@@ -138,28 +222,36 @@ export default defineBot(() => {
       })
     }
 
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(event.author.avatar).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(event?.author?.avatar).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return event?.author?.avatar
+      }
+    }
+
+    const UserKey = createHash(`qq-guild-bot:${event.author.id}`)
+
     // 定义消
     const e = {
       // 事件类型
       Platform: 'qq-guild-bot',
-      // 频道
+      //
       GuildId: event.guild_id,
-      // 子频道
       ChannelId: event.channel_id,
-      // 是否是主人
-      IsMaster: isMaster,
-      GuildIdName: '',
-      GuildIdAvatar: '',
-      ChannelName: '',
-      // 用户ID
       UserId: event?.author?.id ?? '',
-      // 用户名
+      UserKey,
       UserName: event?.author?.username ?? '',
-      // 用户头像
-      UserAvatar: event?.author?.avatar ?? '',
-      // 格式化数据
-      MsgId: event.id,
-      // 用户消息
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      // message
+      MessageId: event.id,
       MessageBody: [
         Text(msg ?? ''),
         ...at_users.map(item =>
@@ -171,13 +263,10 @@ export default defineBot(() => {
         )
       ],
       MessageText: msg,
-      // 用户openId
-      OpenID: event.guild_id,
-      // 创建时间
+      OpenId: event.guild_id,
       CreateAt: Date.now(),
-
-      tag: 'AT_MESSAGE_CREATE',
       //
+      tag: 'AT_MESSAGE_CREATE',
       value: null
     }
 
@@ -215,7 +304,7 @@ export default defineBot(() => {
               [content].map(item =>
                 client.channelsMessagesPost(event.ChannelId, {
                   content: item,
-                  msg_id: event.MsgId
+                  msg_id: event.MessageId
                 })
               )
             )
@@ -230,7 +319,7 @@ export default defineBot(() => {
             return Promise.all(
               images.map(item =>
                 client.postImage(event.ChannelId, {
-                  msg_id: event.MsgId,
+                  msg_id: event.MessageId,
                   image: item
                 })
               )

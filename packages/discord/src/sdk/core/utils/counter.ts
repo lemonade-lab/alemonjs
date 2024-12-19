@@ -5,7 +5,7 @@ export class Counter {
     this.#counter = initialValue
     this.#val = initialValue
   }
-  public getNextID(): number {
+  public getNextId(): number {
     return ++this.#counter
   }
   public get() {

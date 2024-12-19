@@ -31,6 +31,6 @@ export default OnResponse((event, next) => {
 
   // 创建观察者
   const Observer = useObserver(event, 'message.create')
-  // 观察触发者的ID
+  // 观察触发者的Id
   Observer(Res.current, ['UserId'])
 }, 'message.create')

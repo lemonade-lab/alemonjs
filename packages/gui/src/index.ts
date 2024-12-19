@@ -1,4 +1,4 @@
-import { defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
+import { createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import { WebSocketServer } from 'ws'
 import Koa from 'koa'
 import KoaStatic from 'koa-static'
@@ -44,36 +44,48 @@ export default defineBot(() => {
   let client = null
   //
   const onMessage = event => {
-    const txt = event.MsgBody.find((item: any) => item.t == 'text')
+    const txt = event.MessageBody.find((item: any) => item.t == 'text')
+    const UserKey = createHash(`gui:${event.UserId}`)
+
+    const url = event.UserAvatar
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+
     const e = {
       // 事件类型
       Platform: event.Platform,
       // 频道
       GuildId: event.GuildId,
-      //
-      GuildIdName: '',
-      //
-      GuildIdAvatar: '',
       // 子频道
       ChannelId: event.ChannelId,
-      //
-      ChannelName: '',
       // 是否是主人
       IsMaster: event.IsMaster == 0 ? false : true,
-      // 用户ID
+      // 用户Id
       UserId: event.UserId,
+      UserKey,
       // 用户名
       UserName: event.UserName,
       // 用户头像
-      UserAvatar: event.UserAvatar,
+      UserAvatar: UserAvatar,
       // 格式化数据
-      MsgId: event.MsgId,
+      MessageId: event.MessageId,
       // 用户消息
       MessageBody: [Text(txt.d)],
       MessageText: txt.d,
       // 事件类型
       // 用户openId
-      OpenID: event.OpenID,
+      OpenId: event.OpenId,
       // 创建时间
       CreateAt: Date.now(),
       //
@@ -92,25 +104,27 @@ export default defineBot(() => {
   }
 
   const onProvateMessage = event => {
-    const txt = event.MsgBody.find((item: any) => item.t == 'text')
+    const txt = event.MessageBody.find((item: any) => item.t == 'text')
+    const UserKey = createHash(`gui:${event.UserId}`)
     const e = {
       // 事件类型
       Platform: event.Platform,
       // 是否是主人
       IsMaster: event.IsMaster == 0 ? false : true,
-      // 用户ID
+      // 用户Id
       UserId: event.UserId,
       // 用户名
       UserName: event.UserName,
+      UserKey,
       // 用户头像
       UserAvatar: event.UserAvatar,
       // 格式化数据
-      MsgId: event.MsgId,
+      MessageId: event.MessageId,
       // 用户消息
       MessageBody: [Text(txt.d)],
       MessageText: txt.d,
       // 用户openId
-      OpenID: event.OpenID,
+      OpenId: event.OpenId,
       // 创建时间
       CreateAt: Date.now(),
       //
@@ -182,7 +196,7 @@ export default defineBot(() => {
                 SendData({
                   t: 'send_message',
                   d: {
-                    MsgBody: [
+                    MessageBody: [
                       {
                         t: 'text',
                         d: item
@@ -207,7 +221,7 @@ export default defineBot(() => {
                 return SendData({
                   t: 'send_message',
                   d: {
-                    MsgBody: [
+                    MessageBody: [
                       {
                         t: 'image',
                         d: {

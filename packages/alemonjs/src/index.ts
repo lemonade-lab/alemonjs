@@ -125,3 +125,4 @@ const main = async () => {
 main()
 
 export * from './post.js'
+export * from './utils.js'

@@ -20,7 +20,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
   #heartbeat_interval = 30000
 
   // 鉴权
-  #IntervalID = null
+  #IntervalId = null
 
   // url
   #gatewayUrl = null
@@ -31,7 +31,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
    */
   constructor(opstion: NTQQOptions) {
     super()
-    config.set('appID', opstion.appID)
+    config.set('appId', opstion.appId)
     config.set('token', opstion.token)
     config.set('intents', opstion.intents)
     config.set('shard', opstion.shard)
@@ -47,14 +47,14 @@ export class QQBotGroupClient extends QQBotGroupAPI {
    */
   async #setTimeoutBotConfig() {
     const callBack = async () => {
-      const appID = config.get('appID')
+      const appId = config.get('appId')
       const secret = config.get('secret')
       // 发送请求
       const data: {
         access_token: string
         expires_in: number
         cache: boolean
-      } = await this.getAuthentication(appID, secret).then(res => res.data)
+      } = await this.getAuthentication(appId, secret).then(res => res.data)
       config.set('token', data.access_token)
       console.info('refresh', data.expires_in, 's')
       setTimeout(callBack, data.expires_in * 1000)
@@ -128,7 +128,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
         // 重新starrt
         start()
         // 记录
-        this.#counter.getNextID()
+        this.#counter.getNextId()
       }, 5000)
     }
 
@@ -146,7 +146,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
 
             // Ready Event，鉴权成功
             if (t === 'READY') {
-              this.#IntervalID = setInterval(() => {
+              this.#IntervalId = setInterval(() => {
                 if (this.#isConnected) {
                   this.#ws.send(
                     JSON.stringify({
@@ -173,7 +173,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
             // 执行重新连接
             console.info('[ws] reconnect', d)
             // 取消鉴权发送
-            if (this.#IntervalID) clearInterval(this.#IntervalID)
+            if (this.#IntervalId) clearInterval(this.#IntervalId)
             return
           },
           9: ({ d }) => {

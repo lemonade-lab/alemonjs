@@ -2,14 +2,14 @@ import { QQBotGuildIntentsEnum } from './typings.js'
 import { BaseConfig } from '../../../core/config.js'
 
 export const config = new BaseConfig<{
-  appID: string
+  appId: string
   token: string
   secret: string
   intents: QQBotGuildIntentsEnum[]
   sandbox: boolean
   shard?: number[]
 }>({
-  appID: '',
+  appId: '',
   token: '',
   secret: '',
   // default

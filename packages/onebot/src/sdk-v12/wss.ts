@@ -114,7 +114,7 @@ export class OneBotClient {
    * @param options
    * @returns
    */
-  sendGroupMsg(options: { group_id: number; message: any[] }) {
+  sendGroupMessage(options: { group_id: number; message: any[] }) {
     return this.#ws.send(
       JSON.stringify({
         action: 'send_group_msg',
@@ -128,7 +128,7 @@ export class OneBotClient {
    * @param options
    * @returns
    */
-  sendPrivateMsg(options: { user_id: number; message: any[] }) {
+  sendPrivateMessage(options: { user_id: number; message: any[] }) {
     return this.#ws.send(
       JSON.stringify({
         action: 'send_private_msg',

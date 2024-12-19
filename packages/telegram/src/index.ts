@@ -1,9 +1,7 @@
-import { defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
+import { createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import TelegramClient from 'node-telegram-bot-api'
-
 export type Client = typeof TelegramClient.prototype
 export const client: Client = global.client
-
 export default defineBot(() => {
   //
   const cfg = getConfig()
@@ -29,7 +27,7 @@ export default defineBot(() => {
         .getUserProfilePhotos(UserId)
         .then(profilePhotos => {
           if (profilePhotos.total_count > 0) {
-            // 获取第一张头像的文件 ID
+            // 获取第一张头像的文件 Id
             const fileId = profilePhotos.photos[0][0].file_id
             // 获取文件信息以获取下载链接
             client
@@ -49,11 +47,29 @@ export default defineBot(() => {
 
   //
   client.on('text', async event => {
-    let UserAvatar = ''
+    let UserAvatar = undefined
 
-    if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
-      const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-      if (typeof photo == 'string') UserAvatar = photo
+    const UserKey = createHash(`telegram:${event?.from?.id}`)
+
+    try {
+      if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
+        const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
+        if (typeof photo == 'string') {
+          UserAvatar = {
+            toBuffer: async () => {
+              const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
+              return Buffer.from(arrayBuffer)
+            },
+            toURL: Promise.resolve(photo),
+            toBase64: async () => {
+              const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
+              return Buffer.from(arrayBuffer).toString('base64')
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e)
     }
 
     if (event?.chat.type == 'channel' || event?.chat.type == 'supergroup') {
@@ -65,31 +81,21 @@ export default defineBot(() => {
         Platform: 'telegram',
         // 频道
         GuildId: String(event?.chat.id),
-        // 频道名称
         GuildName: event?.chat.title,
-        // 子频道
         ChannelId: String(event?.chat.id),
-        GuildIdAvatar: '',
-        GuildIdName: '',
-        // 是否是主人
-        IsMaster: false,
-        // 用户ID
+        // user
         UserId: String(event?.from?.id),
-        // 用户名
+        UserKey: UserKey,
         UserName: event?.chat.username,
-        // 用户头像
         UserAvatar: UserAvatar,
-        // 格式化数据
-        MsgId: String(event?.message_id),
-        // 用户消息
+        IsMaster: false,
+        // message
+        MessageId: String(event?.message_id),
         MessageBody: [Text(event?.text)],
-        // 用户openId
-        OpenID: String(event?.chat?.id),
-        // 创建时间
+        OpenId: String(event?.chat?.id),
         CreateAt: Date.now(),
-        //
+        // other
         tag: 'txt',
-        //
         value: null
       }
       // 当访问的时候获取
@@ -106,29 +112,20 @@ export default defineBot(() => {
       const e = {
         // 事件类型
         Platform: 'telegram',
-        // 是否是主人
-        IsMaster: false,
-        // 用户ID
+        // 用户Id
         UserId: String(event?.from.id),
-        // 用户名
+        UserKey: UserKey,
         UserName: event?.from?.username,
-        GuildIdName: '',
-        GuildIdAvatar: '',
-        ChannelName: '',
-        // 用户头像
         UserAvatar: UserAvatar,
-        // 格式化数据
-        MsgId: String(event?.message_id),
-        // 用户消息
+        IsMaster: false,
+        // message
+        MessageId: String(event?.message_id),
         MessageBody: [Text(event?.text)],
         MessageText: event?.text,
-        // 用户openId
-        OpenID: String(event?.chat?.id),
-        // 创建时间
+        OpenId: String(event?.chat?.id),
         CreateAt: Date.now(),
-        //
+        // other
         tag: 'txt',
-        //
         value: null
       }
       // 当访问的时候获取
@@ -146,40 +143,47 @@ export default defineBot(() => {
     // 机器人消息不处理
     if (event?.from.is_bot) return
 
-    let UserAvatar = ''
+    let UserAvatar = undefined
+    try {
+      const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
+      if (typeof photo == 'string') {
+        UserAvatar = {
+          toBuffer: async () => {
+            const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
+            return Buffer.from(arrayBuffer)
+          },
+          toURL: Promise.resolve(photo),
+          toBase64: async () => {
+            const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
+            return Buffer.from(arrayBuffer).toString('base64')
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e)
+    }
 
-    const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-    if (typeof photo == 'string') UserAvatar = photo
+    const UserKey = createHash(`telegram:${event?.from?.id}`)
 
     // 定义消
     const e = {
       // 事件类型
       Platform: 'telegram',
-      // 频道
+      // guild
       GuildId: String(event?.chat.id),
-      // 频道名称
       GuildName: event?.chat.title,
-      // 子频道
       ChannelId: String(event?.chat.id),
-      GuildIdAvatar: '',
-      GuildIdName: '',
-      // 是否是主人
-      IsMaster: false,
-      // 用户ID
+      // 用户Id
       UserId: String(event?.from?.id),
-      // 用户名
+      UserKey: UserKey,
       UserName: event?.chat.username,
-      // 用户头像
       UserAvatar: UserAvatar,
-      // 格式化数据
-      MsgId: String(event?.message_id),
-      // 用户消息
+      IsMaster: false,
+      // message
+      MessageId: String(event?.message_id),
       MessageBody: [Text(event?.text)],
-      //
       MessageText: event?.text,
-      // 用户openId
-      OpenID: String(event?.chat?.id),
-      // 创建时间
+      OpenId: String(event?.chat?.id),
       CreateAt: Date.now(),
       //
       tag: 'txt',
@@ -193,7 +197,7 @@ export default defineBot(() => {
       }
     })
     //
-    OnProcessor(e as any, 'member.add')
+    OnProcessor(e, 'member.add')
   })
 
   // const eventKeys = [

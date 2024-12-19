@@ -238,7 +238,7 @@ export class DCAPI {
 
   /**
    * 获取当前用户频道
-   * @param params :{获取该频道 ID 之前的频道,获取该频道ID后的频道,返回的最大频道数量 (1-200),在响应中包括大概的成员和存在计数 }
+   * @param params :{获取该频道 Id 之前的频道,获取该频道Id后的频道,返回的最大频道数量 (1-200),在响应中包括大概的成员和存在计数 }
    * @returns
    */
   async usersMeGuilds(

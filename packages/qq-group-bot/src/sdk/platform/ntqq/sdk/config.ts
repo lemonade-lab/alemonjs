@@ -2,7 +2,7 @@ import { BaseConfig } from '../../../core/config.js'
 import { IntentsEnum } from './intents.js'
 
 export const config = new BaseConfig<{
-  appID: string
+  appId: string
   token: string
   secret: string
   intents: IntentsEnum[]
@@ -10,7 +10,7 @@ export const config = new BaseConfig<{
   sandbox?: boolean
   shard?: number[]
 }>({
-  appID: '',
+  appId: '',
   token: '',
   secret: '',
   intents: ['GROUP_AT_MESSAGE_CREATE', 'C2C_MESSAGE_CREATE'],

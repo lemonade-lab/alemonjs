@@ -4,6 +4,7 @@ import { FileBox } from 'file-box'
 import { writeFileSync } from 'fs'
 import { WechatyInterface } from 'wechaty/impls'
 import { getStaticPath } from './static'
+import { createHash } from 'alemonjs'
 export type Client = WechatyInterface
 export const client: Client = global.client
 export default defineBot(() => {
@@ -35,7 +36,7 @@ export default defineBot(() => {
       console.log(`用户 ${user} 成功登录`)
     })
     .on('logout', user => console.log(`用户 ${user} 退出登录`))
-    .on('message', event => {
+    .on('message', async event => {
       // 自己的消息
       if (event.self()) return
       // 过时消息
@@ -50,38 +51,61 @@ export default defineBot(() => {
       const value = getConfigValue()
       const master_id = value?.wechat?.master_id ?? []
 
+      let UserAvatar = undefined
+      try {
+        UserAvatar = {
+          toBuffer: async () => {
+            const contact = event.from()
+            const avatarStream = await contact.avatar()
+            return avatarStream.toBuffer
+          },
+          toURL: async () => {
+            const contact = event.from()
+            const avatarStream = await contact.avatar()
+            const dir = getStaticPath(Date.now() + '.png')
+            await avatarStream.toFile(dir, true)
+            return dir
+          },
+          toBase64: async () => {
+            const contact = event.from()
+            const avatarStream = await contact.avatar()
+            return await avatarStream.toBase64()
+          }
+        }
+      } catch (e) {
+        console.log(e)
+      }
+
       // 文本消息
       const txt = event.payload.text
-      const MsgId = event.payload.id
+      const MessageId = event.payload.id
       const UserId = event.payload.talkerId
+
+      const UserKey = createHash(`wechat:${UserId}`)
+
       if (event.payload?.roomId) {
         const roomId = event.payload?.roomId ?? ''
         // 定义消
         const e = {
           // 事件类型
-          Platform: 'kook',
-          // 是否是主人
-          IsMaster: master_id.includes(UserId),
-          // 频道
+          Platform: 'wechat',
+          /**
+           * guild
+           */
           GuildId: roomId,
-          // 子频道
           ChannelId: roomId,
-          // 用户名
-          UserName: '',
-          // 用户头像
-          UserAvatar: '',
-          GuildIdAvatar: '',
-          GuildIdName: '',
-          ChannelName: '',
-          // 用户ID
+          /**
+           * user
+           */
           UserId: UserId,
+          UserKey: UserKey,
+          UserAvatar: UserAvatar,
+          IsMaster: master_id.includes(UserKey),
           // 格式化数据
-          MsgId: MsgId,
-          // 用户消息
+          MessageId: MessageId,
           MessageBody: [Text(txt)],
           MessageText: txt,
-          // 用户openId
-          OpenID: '',
+          OpenId: '',
           // 创建时间
           CreateAt: Date.now(),
           // 表情
@@ -97,30 +121,21 @@ export default defineBot(() => {
         // 处理消息
         OnProcessor(e, 'message.create')
       } else {
-        const OpenID = event.payload?.listenerId ?? ''
+        const OpenId = event.payload?.listenerId ?? ''
         // 定义消
         const e = {
           // 事件类型
-          Platform: 'kook',
-          // 是否是主人
-          IsMaster: false,
-          // 用户ID
+          Platform: 'wechat',
+          // 用户Id
           UserId: UserId,
-          // 用户名
-          UserName: '',
-          // 用户头像
-          UserAvatar: '',
-          GuildIdAvatar: '',
-          GuildIdName: '',
-          // 格式化数据
-          MsgId: MsgId,
-          // 用户消息
+          UserKey: UserKey,
+          UserAvatar: UserAvatar,
+          IsMaster: master_id.includes(UserKey),
+          // message
+          MessageId: MessageId,
           MessageBody: [Text(txt)],
           MessageText: txt,
-          // 用户openId
-          // 用户openId
-          OpenID: OpenID,
-          // 创建时间
+          OpenId: OpenId,
           CreateAt: Date.now(),
           // 表情
           tag: 'message',

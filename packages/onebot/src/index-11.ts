@@ -55,7 +55,7 @@ export default defineBot(() => {
       ChannelId: String(event.group_id),
       // 是否是主人
       IsMaster: uis.includes(String(event.user_id)),
-      // 用户ID
+      // 用户Id
       UserId: String(event.user_id),
       GuildIdName: '',
       GuildIdAvatar: '',
@@ -65,7 +65,7 @@ export default defineBot(() => {
       // 用户头像
       UserAvatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`,
       // 格式化数据
-      MsgId: String(event.message_id),
+      MessageId: String(event.message_id),
       // 用户消息
       MessageBody: [
         Text(msg),
@@ -80,7 +80,7 @@ export default defineBot(() => {
       MessageText: msg,
       // 用户openId
       // 用户openId
-      OpenID: String(event.user_id),
+      OpenId: String(event.user_id),
       // 创建时间
       CreateAt: Date.now(),
       // 标签
@@ -100,7 +100,7 @@ export default defineBot(() => {
 
   client.on('DIRECT_MESSAGE', () => {
     // const e = {
-    //   isMaster: event.user_id == masterID,
+    //   isMaster: event.user_id == masterId,
     //   msg_txt: event.raw_message,
     //   msg: event.raw_message.trim(),
     //   msg_id: event.message_id,
@@ -132,7 +132,7 @@ export default defineBot(() => {
           if (content) {
             return Promise.all(
               [content].map(item =>
-                client.sendGroupMsg({
+                client.sendGroupMessage({
                   group_id: event.ChannelId,
                   message: [
                     {
@@ -155,7 +155,7 @@ export default defineBot(() => {
           if (images) {
             return Promise.all(
               images.map(item =>
-                client.sendGroupMsg({
+                client.sendGroupMessage({
                   group_id: event.ChannelId,
                   message: [
                     {

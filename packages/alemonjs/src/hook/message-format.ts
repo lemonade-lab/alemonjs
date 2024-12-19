@@ -36,14 +36,14 @@ export const Image = (val: Buffer | string, typing?: 'buffer' | 'file'): DataIma
  * @param val
  */
 export const At = (
-  UserID?: string,
+  UserId?: string,
   typing?: 'user' | 'guild' | 'channel' | 'everyone',
   val?: any
 ): DataAtType => {
   return {
     type: 'At',
-    value: UserID ?? 'everyone',
-    typing: UserID ? typing : 'everyone',
+    value: UserId ?? 'everyone',
+    typing: UserId ? typing : 'everyone',
     name: val?.name ?? '',
     avatar: val?.avatar ?? '',
     bot: val?.bot ?? false

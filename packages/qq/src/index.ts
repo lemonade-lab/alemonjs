@@ -1,4 +1,4 @@
-import { defineBot, Text, OnProcessor, useParse, getConfig } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, getConfig, createHash } from 'alemonjs'
 import { Client as ICQQClient, segment } from 'icqq'
 import { device, error, qrcode, slider } from './login'
 import { Store } from './store'
@@ -97,38 +97,46 @@ export default defineBot(() => {
         }
       }
     }
+
+    const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
+
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+
+    const UserKey = createHash(`qq:${user_id}`)
+
     // 定义消
     const e = {
       // 事件类型
       Platform: 'qq',
       // 频道
       GuildId: group_id,
-      // 子频道
       ChannelId: group_id,
-      // 是否是主人
-      IsMaster: isMaster,
-      // 用户ID
+      // 用户
       UserId: user_id,
-      GuildIdName: '',
-      GuildIdAvatar: '',
-      ChannelName: '',
-      // 用户名
       UserName: event.sender.nickname,
-      // 用户头像
-      UserAvatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`,
-      // 格式化数据
-      MsgId: event.message_id,
-      // 用户消息
+      UserAvatar: UserAvatar,
+      UserKey,
+      IsMaster: isMaster,
+      // message
+      MessageId: event.message_id,
       MessageBody: [Text(msg)].concat(Ats),
-      //
       MessageText: msg,
-      // 用户openId
-      OpenID: user_id,
-      // 创建时间
+      OpenId: user_id,
       CreateAt: Date.now(),
-      // 标记
+      // other
       tag: 'message.group',
-      //
       value: null
     }
     // 当访问的时候获取
@@ -139,6 +147,61 @@ export default defineBot(() => {
     })
     // 处理消息
     OnProcessor(e, 'message.create')
+  })
+
+  // 监听消息
+  client.on('message.private', async event => {
+    const user_id = String(event.sender.user_id)
+    const isMaster = master_id.includes(user_id)
+    let msg = ''
+    const Ats = []
+
+    const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
+
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+
+    const UserKey = createHash(`qq:${user_id}`)
+
+    // 定义消
+    const e = {
+      // 事件类型
+      Platform: 'qq',
+      // 用户
+      UserId: user_id,
+      UserName: event.sender.nickname,
+      UserAvatar: UserAvatar,
+      UserKey,
+      IsMaster: isMaster,
+      // message
+      MessageId: event.message_id,
+      MessageBody: [Text(msg)].concat(Ats),
+      MessageText: msg,
+      OpenId: user_id,
+      CreateAt: Date.now(),
+      // other
+      tag: 'message.private',
+      value: null
+    }
+    // 当访问的时候获取
+    Object.defineProperty(e, 'value', {
+      get() {
+        return event
+      }
+    })
+    // 处理消息
+    OnProcessor(e, 'private.message.create')
   })
 
   global.client = client

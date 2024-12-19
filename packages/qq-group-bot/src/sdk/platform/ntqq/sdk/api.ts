@@ -1,6 +1,6 @@
 import { config } from './config.js'
 import axios, { type AxiosRequestConfig } from 'axios'
-import { FileType, MsgType } from './typings.js'
+import { FileType, MessageType } from './typings.js'
 
 interface ButtonType {
   // 编号
@@ -56,7 +56,7 @@ export interface MarkdownType {
 
 export interface ApiRequestData {
   content?: string
-  msg_type: MsgType
+  msg_type: MessageType
   markdown?: MarkdownType
   keyboard?: KeyboardType
   media?: {
@@ -102,13 +102,13 @@ export class QQBotGroupAPI {
    * @returns
    */
   async GroupService(options: AxiosRequestConfig) {
-    const appID = config.get('appID')
+    const appId = config.get('appId')
     const token = config.get('token')
     const service = await axios.create({
       baseURL: this.API_URL,
       timeout: 20000,
       headers: {
-        'X-Union-Appid': appID,
+        'X-Union-Appid': appId,
         'Authorization': `QQBot ${token}`
       }
     })
@@ -149,11 +149,11 @@ export class QQBotGroupAPI {
   // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
 
   #map: Map<string, number> = new Map()
-  getMsgSeq(MsgId: string): number {
-    let seq = this.#map.get(MsgId) || 0
+  getMessageSeq(MessageId: string): number {
+    let seq = this.#map.get(MessageId) || 0
     seq++
-    this.#map.set(MsgId, seq)
-    // 如果映射表大小超过 100，则删除最早添加的 MsgId
+    this.#map.set(MessageId, seq)
+    // 如果映射表大小超过 100，则删除最早添加的 MessageId
     if (this.#map.size > 100) {
       const firstKey = this.#map.keys().next().value
       this.#map.delete(firstKey)
@@ -238,7 +238,7 @@ export class QQBotGroupAPI {
   /**
    * 创建模板
    * *********
-   * 使用该方法,你需要申请模板ID
+   * 使用该方法,你需要申请模板Id
    * 并设置markdown源码为{{.text_0}}{{.text_1}}
    * {{.text_2}}{{.text_3}}{{.text_4}}{{.text_5}}
    * {{.text_6}}{{.text_7}}{{.text_8}}{{.text_9}}
@@ -255,7 +255,7 @@ export class QQBotGroupAPI {
   ) {
     let size = -1
     const params = []
-    const ID = custom_template_id
+    const Id = custom_template_id
 
     /**
      * 消耗一个参数
@@ -344,7 +344,7 @@ export class QQBotGroupAPI {
       return {
         msg_type: 2,
         markdown: {
-          custom_template_id: ID,
+          custom_template_id: Id,
           params
         }
       }

@@ -1,4 +1,4 @@
-import { Text, OnProcessor, useParse, defineBot, getConfig } from 'alemonjs'
+import { Text, OnProcessor, useParse, defineBot, getConfig, createHash } from 'alemonjs'
 import { QQBotGroupClient } from './sdk'
 export type Client = typeof QQBotGroupClient.prototype
 export const client: Client = global.client
@@ -9,48 +9,53 @@ export default defineBot(() => {
 
   // 创建客户端
   const client = new QQBotGroupClient({
-    appID: config.app_id,
+    appId: config.app_id,
     secret: config.secret,
     token: config.token
   })
-  // 创建文件服务
-  // const ClientFile = new FilesServer()
   // 连接
   client.connect()
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', async event => {
     const master_id = config?.master_id ?? []
     const isMaster = master_id.includes(event.author.id)
+
+    const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+    const UserKey = createHash(`qq-group-bot:${event.author.id}`)
+
     // 定义消
     const e = {
       // 事件类型
       Platform: 'qq-group-bot',
-      // 频道
+      // guild
       GuildId: event.group_id,
-      // 子频道
       ChannelId: event.group_id,
-      GuildIdName: '',
-      GuildIdAvatar: '',
-      ChannelName: '',
-      // 是否是主人
-      IsMaster: isMaster,
-      // 用户ID
+      // 用户Id
       UserId: event.author.id,
-      // 用户名
-      UserName: '',
-      // 用户头像
-      UserAvatar: `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
       // 格式化数据
-      MsgId: event.id,
-      // 用户消息
+      MessageId: event.id,
       MessageBody: [Text(event.content.trim())],
       MessageText: event.content?.trim(),
-      // 用户openId
-      OpenID: event.author.member_openid,
-      // 创建时间
+      OpenId: event.author.member_openid,
       CreateAt: Date.now(),
-      tag: 'GROUP_AT_MESSAGE_CREATE',
       //
+      tag: 'GROUP_AT_MESSAGE_CREATE',
       value: null
     }
     // 当访问的时候获取
@@ -62,6 +67,53 @@ export default defineBot(() => {
     // 处理消息
     OnProcessor(e, 'message.create')
   })
+
+  client.on('C2C_MESSAGE_CREATE', async event => {
+    const master_id = config?.master_id ?? []
+    const isMaster = master_id.includes(event.author.id)
+    const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+    const UserKey = createHash(`qq-group-bot:${event.author.id}`)
+    // 定义消
+    const e = {
+      // 事件类型
+      Platform: 'qq-group-bot',
+      // 用户Id
+      UserId: event.author.id,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      // 格式化数据
+      MessageId: event.id,
+      MessageBody: [Text(event.content.trim())],
+      MessageText: event.content?.trim(),
+      CreateAt: Date.now(),
+      //
+      tag: 'GROUP_AT_MESSAGE_CREATE',
+      value: null
+    }
+    // 当访问的时候获取
+    Object.defineProperty(e, 'value', {
+      get() {
+        return event
+      }
+    })
+    // 处理消息
+    OnProcessor(e, 'private.message.create')
+  })
+
   // 发送错误时
   client.on('ERROR', msg => {
     console.error(msg)
@@ -102,9 +154,9 @@ export default defineBot(() => {
               [content].map(item =>
                 client.groupOpenMessages(event.GuildId, {
                   content: item,
-                  msg_id: event.MsgId,
+                  msg_id: event.MessageId,
                   msg_type: 0,
-                  msg_seq: client.getMsgSeq(event.MsgId)
+                  msg_seq: client.getMessageSeq(event.MessageId)
                 })
               )
             )
@@ -125,9 +177,9 @@ export default defineBot(() => {
                   media: {
                     file_info
                   },
-                  msg_id: event.MsgId,
+                  msg_id: event.MessageId,
                   msg_type: 7,
-                  msg_seq: client.getMsgSeq(event.MsgId)
+                  msg_seq: client.getMessageSeq(event.MessageId)
                 })
               })
             )

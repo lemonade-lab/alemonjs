@@ -10,8 +10,8 @@ export class KOOKClient extends KOOKAPI {
   // 标记是否已连接
   #isConnected = false
 
-  // 存储 session ID
-  #sessionID = null
+  // 存储 session Id
+  #sessionId = null
 
   // 存储最新的消息序号
   #lastMessageSN = 0
@@ -100,7 +100,7 @@ export class KOOKClient extends KOOKAPI {
       1: ({ d }) => {
         if (d && d.code === 0) {
           console.info('[ws] ok')
-          this.#sessionID = d.session_id
+          this.#sessionId = d.session_id
           this.#isConnected = true
         } else {
           console.info('[ws] err')
@@ -127,8 +127,8 @@ export class KOOKClient extends KOOKAPI {
          * 断开当前连接并进行重新连接
          */
         this.#isConnected = false
-        this.#sessionID = null
-        console.info('[ws] sessionID', this.#sessionID)
+        this.#sessionId = null
+        console.info('[ws] sessionId', this.#sessionId)
       },
       6: () => {
         console.info('[ws] resume ack')

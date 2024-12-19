@@ -9,7 +9,7 @@ export interface QQOptions {
   /**
    * 应用编号
    */
-  appID: string
+  appId: string
   /**
    * 钥匙
    */

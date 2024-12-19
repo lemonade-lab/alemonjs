@@ -1,4 +1,4 @@
-import { defineBot, Text, OnProcessor, useParse, At, getConfig } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, At, getConfig, createHash } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 export type Client = typeof KOOKClient.prototype
 export const client: Client = global.client
@@ -14,6 +14,81 @@ export default defineBot(() => {
 
   // 连接
   client.connect()
+
+  client.on('MESSAGES_DIRECT', async event => {
+    // 过滤机器人
+    if (event.extra?.author?.bot) return false
+
+    // 主人
+    const master_id = config?.master_id ?? []
+    const isMaster = master_id.includes(event.author_id)
+
+    // 头像
+    const avatar = event.extra.author.avatar
+
+    // 获取消息
+    let msg = event.content
+
+    // 艾特消息处理
+    const at_users: {
+      id: string
+      name: string
+      avatar: string
+      bot: boolean
+    }[] = []
+
+    const url = avatar.substring(0, avatar.indexOf('?'))
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+
+    const UserKey = createHash(`qq:${event.author_id}`)
+
+    // 定义消
+    const e = {
+      // 事件类型
+      Platform: 'kook',
+      // 用户Id
+      UserId: event.author_id,
+      UserKey,
+      UserName: event.extra.author.username,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      // message
+      MessageId: event.msg_id,
+      MessageBody: [
+        Text(msg),
+        ...at_users.map(item =>
+          At(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
+        )
+      ],
+      MessageText: msg,
+      CreateAt: Date.now(),
+      //
+      tag: 'MESSAGES_PUBLIC',
+      value: null
+    }
+
+    // 当访问的时候获取
+    Object.defineProperty(e, 'value', {
+      get() {
+        return event
+      }
+    })
+
+    // 处理消息
+    OnProcessor(e, 'private.message.create')
+  })
 
   // 监听消息
   client.on('MESSAGES_PUBLIC', async event => {
@@ -70,28 +145,38 @@ export default defineBot(() => {
       msg = msg.replace(`(met)${item.id}(met)`, '').trim()
     }
 
+    const url = avatar.substring(0, avatar.indexOf('?'))
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+
+    const UserKey = createHash(`qq:${event.author_id}`)
+
     // 定义消
     const e = {
       // 事件类型
       Platform: 'kook',
-      // 频道
+      //
       GuildId: event.extra.guild_id,
-      // 子频道
       ChannelId: event.target_id,
-      // 是否是主人
-      IsMaster: isMaster,
-      // 用户ID
+      // 用户Id
       UserId: event.author_id,
-      GuildIdName: '',
-      GuildIdAvatar: '',
-      ChannelName: '',
-      // 用户名
+      UserKey,
       UserName: event.extra.author.username,
-      // 用户头像
-      UserAvatar: avatar.substring(0, avatar.indexOf('?')),
-      // 格式化数据
-      MsgId: event.msg_id,
-      // 用户消息
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      // message
+      MessageId: event.msg_id,
       MessageBody: [
         Text(msg),
         ...at_users.map(item =>
@@ -99,13 +184,10 @@ export default defineBot(() => {
         )
       ],
       MessageText: msg,
-      // 用户openId
-      OpenID: data?.code,
-      // 创建时间
+      OpenId: data?.code,
       CreateAt: Date.now(),
-      // 表情
-      tag: 'MESSAGES_PUBLIC',
       //
+      tag: 'MESSAGES_PUBLIC',
       value: null
     }
 

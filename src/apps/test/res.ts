@@ -11,9 +11,9 @@ export default OnResponse((event, next) => {
   }
 
   // 查找用户类型的 @ 提及，且不是 bot
-  const UserID = ats.find(item => item.typing === 'user' && !item.bot)?.value
-  if (!UserID) {
-    return // 未找到用户ID
+  const UserId = ats.find(item => item.typing === 'user' && !item.bot)?.value
+  if (!UserId) {
+    return // 未找到用户Id
   }
 
   // 解析用户消息。 即 得到 event.MessageText
@@ -22,7 +22,7 @@ export default OnResponse((event, next) => {
     return // 消息为空
   }
 
-  console.log('被AT的用户ID:', UserID)
+  console.log('被AT的用户Id:', UserId)
   console.log('消息内容:', text)
 
   // 处理被AT的用户...

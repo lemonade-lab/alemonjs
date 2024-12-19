@@ -1,4 +1,4 @@
-import { Text, OnProcessor, useParse, At, defineBot, getConfig } from 'alemonjs'
+import { Text, OnProcessor, useParse, At, defineBot, getConfig, createHash } from 'alemonjs'
 import { DCClient } from './sdk/index'
 export type Client = typeof DCClient.prototype
 export const client: Client = global.client
@@ -47,6 +47,32 @@ export default defineBot(() => {
       msg = msg.replace(`<@${item.id}>`, '').trim()
     }
 
+    const UserKey = createHash(`gui:${event.author.id}`)
+
+    let url: null | string = null
+    const UserAvatar = {
+      toBuffer: async () => {
+        if (!url) {
+          url = client.userAvatar(event.author.id, event.author.avatar)
+        }
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        if (!url) {
+          url = client.userAvatar(event.author.id, event.author.avatar)
+        }
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        if (!url) {
+          url = client.userAvatar(event.author.id, event.author.avatar)
+        }
+        return url
+      }
+    }
+
     // 定义消
     const e = {
       // 事件类型
@@ -57,17 +83,15 @@ export default defineBot(() => {
       ChannelId: event.channel_id,
       // 是否是主人
       IsMaster: isMaster,
-      // 用户ID
+      // 用户Id
       UserId: event.author.id,
       // 用户名
       UserName: event.author.username,
-      GuildIdName: '',
-      GuildIdAvatar: '',
-      ChannelName: '',
+      UserKey,
       // 用户头像
-      UserAvatar: client.userAvatar(event.author.id, event.author.avatar),
+      UserAvatar: UserAvatar,
       // 格式化数据
-      MsgId: event.id,
+      MessageId: event.id,
       // 用户消息
       MessageBody: [
         Text(msg),
@@ -81,7 +105,7 @@ export default defineBot(() => {
       ],
       MessageText: msg,
       // 用户openId
-      OpenID: '',
+      OpenId: '',
       // 创建时间
       CreateAt: Date.now(),
       tag: 'MESSAGE_CREATE',
