@@ -4,26 +4,23 @@
 
 ## USE
 
-- telegram
+- wechat
 
 ```sh
-yarn add @alemonjs/telegram
+yarn add @alemonjs/wechat
 ```
 
 - alemon.config.yaml
 
 ```sh
-telegram:
-  # 令牌 （必填）
-  token: ''
-  # 代理地址 (推荐填)
-  proxy: 'http://127.0.0.1:7890'
+wechat:
   # 主人编号
-  master_id: null
-  # other
-  base_api_url: null
-  request_url: null
+  master_id:
+   - 123456
+   - 654321
 ```
+
+- 扫码后登陆
 
 ## Community
 

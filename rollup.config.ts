@@ -99,6 +99,8 @@ const build = () => {
     BuildByName('chat-space')
   } else if (process.env.build == 'gui') {
     BuildByName('gui')
+  } else if (process.env.build == 'wechat') {
+    BuildByName('wechat')
   } else {
     BuildByName('alemonjs')
   }

@@ -1,56 +1,18 @@
-import { defineBot, getConfig, Text, OnProcessor, useParse } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, getConfigValue } from 'alemonjs'
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
-import {
-  mkdirSync,
-  writeFileSync,
-  existsSync,
-  readdirSync,
-  lstatSync,
-  rmdirSync,
-  unlinkSync
-} from 'fs'
+import { writeFileSync } from 'fs'
 import { WechatyInterface } from 'wechaty/impls'
-
+import { getStaticPath } from './static'
 export type Client = WechatyInterface
 export const client: Client = global.client
-
-// 获取当前模块的目录
-const __dirname = dirname(fileURLToPath(import.meta.url))
-// 静态目录地址
-const staticDir = join(__dirname, '../static')
-// 静态图片存放路径
-mkdirSync(staticDir, { recursive: true })
-// 清空目录的函数
-function clearDirectory(dirPath) {
-  if (existsSync(dirPath)) {
-    // 读取目录中的所有文件和子目录
-    const files = readdirSync(dirPath)
-    for (const file of files) {
-      const currentPath = join(dirPath, file)
-      if (lstatSync(currentPath).isDirectory()) {
-        // 如果是目录，递归清空
-        clearDirectory(currentPath)
-        rmdirSync(currentPath) // 删除空目录
-      } else {
-        // 如果是文件，删除文件
-        unlinkSync(currentPath)
-      }
-    }
-  }
-}
-// 每次重启，都要先清空 static
-clearDirectory(staticDir)
-//
-var index = defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value?.['wechat']
+export default defineBot(() => {
+  const value = getConfigValue()
+  const config = value.wechat
   const bot = WechatyBuilder.build({
     name: config?.name ?? 'alemonjs'
   })
-  //
+
   let i = 0
   bot
     .on('scan', (qrcode, status) => {
@@ -83,6 +45,11 @@ var index = defineBot(() => {
       }
       // 14 消息卡片 6 图片 7 文字 13 撤回
       if (event.payload.type != 7) return
+
+      //
+      const value = getConfigValue()
+      const master_id = value?.wechat?.master_id ?? []
+
       // 文本消息
       const txt = event.payload.text
       const MsgId = event.payload.id
@@ -94,7 +61,7 @@ var index = defineBot(() => {
           // 事件类型
           Platform: 'kook',
           // 是否是主人
-          IsMaster: false,
+          IsMaster: master_id.includes(UserId),
           // 频道
           GuildId: roomId,
           // 子频道
@@ -170,12 +137,12 @@ var index = defineBot(() => {
       }
     })
     .on('error', () => {})
+
   //
   bot.start()
 
   global.client = bot
 
-  //
   return {
     api: {
       use: {
@@ -200,7 +167,7 @@ var index = defineBot(() => {
           if (images) {
             return Promise.all(
               images.map(item => {
-                const filePath = join(staticDir, Date.now() + '.png')
+                const filePath = getStaticPath(Date.now() + '.png')
                 writeFileSync(filePath, item, 'utf-8')
                 const fileBox = FileBox.fromFile(filePath)
                 return event.say(fileBox)
@@ -213,5 +180,3 @@ var index = defineBot(() => {
     }
   }
 })
-
-export { index as default }
