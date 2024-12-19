@@ -1,21 +1,14 @@
+import crypto from 'crypto'
 /**
  * 将字符串转为定长字符串
- * @param str
- * @returns
+ * @param str 输入字符串
+ * @param options 可选项
+ * @returns 固定长度的哈希值
  */
-export function createHash(
-  str: string,
-  options?: {
-    length?: number
-    size?: number
-  }
-) {
-  const { length = 11, size = 32 } = options ?? {}
-  let hash = 5381
-  let i = str.length
-  while (i) {
-    hash = (hash * size) ^ str.charCodeAt(--i)
-  }
-  // 将哈希值转换为十六进制并截取指定长度
-  return Math.abs(hash).toString(16).slice(0, length)
+export function createHash(str: string, options: { length?: number; algorithm?: string } = {}) {
+  const { length = 11, algorithm = 'sha256' } = options
+  // 使用 crypto 生成哈希
+  const hash = crypto.createHash(algorithm).update(str).digest('hex')
+  // 截取指定长度
+  return hash.slice(0, length)
 }

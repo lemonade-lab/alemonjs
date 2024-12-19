@@ -55,21 +55,23 @@ export default defineBot(() => {
       try {
         UserAvatar = {
           toBuffer: async () => {
-            const contact = event.from()
+            const contact = event.talker()
             const avatarStream = await contact.avatar()
-            return avatarStream.toBuffer
+            return avatarStream.toBuffer()
           },
           toURL: async () => {
-            const contact = event.from()
+            const contact = event.talker()
             const avatarStream = await contact.avatar()
-            const dir = getStaticPath(Date.now() + '.png')
-            await avatarStream.toFile(dir, true)
+            const buffer = await avatarStream.toBuffer()
+            const dir = getStaticPath(Date.now() + '.jpg')
+            writeFileSync(dir, buffer)
             return dir
           },
           toBase64: async () => {
-            const contact = event.from()
+            const contact = event.talker()
             const avatarStream = await contact.avatar()
-            return await avatarStream.toBase64()
+            const buffer = await avatarStream.toBuffer()
+            return buffer.toString('base64')
           }
         }
       } catch (e) {
