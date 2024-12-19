@@ -52,7 +52,7 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`qq:${event.author_id}`)
+    const UserKey = createHash(`kook:${event.author_id}`)
 
     // 定义消
     const e = {
@@ -160,7 +160,7 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`qq:${event.author_id}`)
+    const UserKey = createHash(`kook:${event.author_id}`)
 
     // 定义消
     const e = {

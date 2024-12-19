@@ -1,4 +1,4 @@
-import { At, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
+import { At, createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import { OneBotClient } from './sdk-v11/wss'
 
 const MyBot = {
@@ -44,6 +44,24 @@ export default defineBot(() => {
     for (const item of arr) {
       msg = msg.replace(item.text, '').trim()
     }
+
+    const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`
+
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+    const UserKey = createHash(`onebot:${event.user_id}`)
+
     // 定义消
     const e = {
       // 平台类型
@@ -57,13 +75,11 @@ export default defineBot(() => {
       IsMaster: uis.includes(String(event.user_id)),
       // 用户Id
       UserId: String(event.user_id),
-      GuildIdName: '',
-      GuildIdAvatar: '',
-      ChannelName: '',
       // 用户名
       UserName: event.sender.nickname,
+      UserKey,
       // 用户头像
-      UserAvatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`,
+      UserAvatar: UserAvatar,
       // 格式化数据
       MessageId: String(event.message_id),
       // 用户消息
