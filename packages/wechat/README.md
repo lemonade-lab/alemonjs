@@ -14,8 +14,8 @@ yarn add @alemonjs/wechat
 
 ```sh
 wechat:
-  # 主人编号
-  master_id:
+  # 主人key，即可UserKey
+  master_key:
    - 123456
    - 654321
 ```

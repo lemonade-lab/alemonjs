@@ -2,6 +2,11 @@ import { defineConfig, RollupOptions } from 'rollup'
 import typescript from '@rollup/plugin-typescript'
 import dts from 'rollup-plugin-dts'
 
+const onwarn: RollupOptions['onwarn'] = (warning, warn) => {
+  if (warning.code === 'UNRESOLVED_IMPORT') return
+  warn(warning)
+}
+
 /**
  * @param {*} input
  * @param {*} dir
@@ -25,10 +30,7 @@ const buildJs = (input: string, dir: string, inc: string) => {
         include: [inc]
       })
     ],
-    onwarn: (warning, warn) => {
-      if (warning.code === 'UNRESOLVED_IMPORT') return
-      warn(warning)
-    }
+    onwarn: onwarn
   } as RollupOptions
 }
 
@@ -58,10 +60,7 @@ const buildDts = (input: string, dir: string, inc: string) => {
       }),
       dts()
     ],
-    onwarn: (warning, warn) => {
-      if (warning.code === 'UNRESOLVED_IMPORT') return
-      warn(warning)
-    }
+    onwarn: onwarn
   } as RollupOptions
 }
 
@@ -74,8 +73,16 @@ const BuildByName = (name: string) => {
   const input = `packages/${name}/src/index.ts`
   const dir = `packages/${name}/lib`
   const inc = `packages/${name}/src/**/*`
-  config.push(buildJs(input, dir, inc))
-  config.push(buildDts(input, dir, inc))
+  try {
+    config.push(buildJs(input, dir, inc))
+  } catch (e) {
+    console.log(e)
+  }
+  try {
+    config.push(buildDts(input, dir, inc))
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 const build = () => {

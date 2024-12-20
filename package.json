@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "npx lvy dev",
     "build": "npx lvy build",
-    "bundle": "NODE_OPTIONS='--import tsx' rollup --config rollup.config.js",
+    "bundle": "node bundle.js",
     "format": "prettier --write .",
     "test": "jest",
     "check-format": "git diff --exit-code",

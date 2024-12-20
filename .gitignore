@@ -10,3 +10,4 @@ logs
 log 
 *.log
 *.logs
+*.memory-card.json

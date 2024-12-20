@@ -12,3 +12,11 @@ export function createHash(str: string, options: { length?: number; algorithm?: 
   // 截取指定长度
   return hash.slice(0, length)
 }
+/**
+ *
+ * @param e
+ * @returns
+ */
+export function useUserHashKey(event: { UserId: string; Platform: string }) {
+  return createHash(`${event.Platform}:${event.UserId}`)
+}

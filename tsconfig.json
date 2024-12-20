@@ -3,8 +3,7 @@
     "strict": false,
     "baseUrl": ".",
     "paths": {
-      "@src/*": ["src/*"],
-      "@xiuxian/*": ["src/xiuxian/*"]
+      "@src/*": ["src/*"]
     }
   },
   "include": ["packages/**/*"],

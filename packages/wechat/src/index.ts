@@ -1,10 +1,10 @@
-import { defineBot, Text, OnProcessor, useParse, getConfigValue } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, getConfigValue, At } from 'alemonjs'
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
-import { writeFileSync } from 'fs'
-import { WechatyInterface } from 'wechaty/impls'
-import { getStaticPath } from './static'
-import { createHash } from 'alemonjs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { getPublicPath, getStaticPath } from './static'
+import { useUserHashKey } from 'alemonjs'
+import { type WechatyInterface } from 'wechaty/impls'
 export type Client = WechatyInterface
 export const client: Client = global.client
 export default defineBot(() => {
@@ -49,33 +49,40 @@ export default defineBot(() => {
 
       //
       const value = getConfigValue()
-      const master_id = value?.wechat?.master_id ?? []
+      const master_key = value?.wechat?.master_key ?? []
 
-      let UserAvatar = undefined
-      try {
-        UserAvatar = {
-          toBuffer: async () => {
-            const contact = event.talker()
-            const avatarStream = await contact.avatar()
-            return avatarStream.toBuffer()
-          },
-          toURL: async () => {
-            const contact = event.talker()
-            const avatarStream = await contact.avatar()
-            const buffer = await avatarStream.toBuffer()
-            const dir = getStaticPath(Date.now() + '.jpg')
-            writeFileSync(dir, buffer)
-            return dir
-          },
-          toBase64: async () => {
-            const contact = event.talker()
-            const avatarStream = await contact.avatar()
-            const buffer = await avatarStream.toBuffer()
-            return buffer.toString('base64')
+      const UserAvatar = {
+        toBuffer: async () => {
+          const contact = event.talker()
+          const avatarStream = await contact.avatar()
+          const dir = getPublicPath(avatarStream.name)
+          if (existsSync(dir)) {
+            return readFileSync(dir)
           }
+          const buffer = await avatarStream.toBuffer()
+          writeFileSync(dir, buffer)
+          return buffer
+        },
+        toURL: async () => {
+          const contact = event.talker()
+          const avatarStream = await contact.avatar()
+          const dir = getPublicPath(avatarStream.name)
+          if (existsSync(dir)) return dir
+          const buffer = await avatarStream.toBuffer()
+          writeFileSync(dir, buffer)
+          return dir
+        },
+        toBase64: async () => {
+          const contact = event.talker()
+          const avatarStream = await contact.avatar()
+          const dir = getPublicPath(avatarStream.name)
+          if (existsSync(dir)) {
+            return readFileSync(dir).toString('base64')
+          }
+          const buffer = await avatarStream.toBuffer()
+          writeFileSync(dir, buffer)
+          return buffer.toString('base64')
         }
-      } catch (e) {
-        console.log(e)
       }
 
       // 文本消息
@@ -83,10 +90,43 @@ export default defineBot(() => {
       const MessageId = event.payload.id
       const UserId = event.payload.talkerId
 
-      const UserKey = createHash(`wechat:${UserId}`)
+      const UserKey = useUserHashKey({
+        Platform: 'wechat',
+        UserId
+      })
 
       if (event.payload?.roomId) {
+        let msg = event.payload.text
+
+        try {
+          msg = await event.mentionText()
+        } catch (e) {
+          console.log(e)
+        }
+
+        let at_users: {
+          id: string
+          name: string
+          avatar: string
+          bot: boolean
+        }[] = []
+
+        try {
+          const list = await event.mentionList()
+          at_users = list.map(item => {
+            return {
+              id: item.payload.id,
+              name: item.payload.name,
+              avatar: item.payload.avatar,
+              bot: false
+            }
+          })
+        } catch (e) {
+          console.log(e)
+        }
+
         const roomId = event.payload?.roomId ?? ''
+
         // 定义消
         const e = {
           // 事件类型
@@ -102,11 +142,16 @@ export default defineBot(() => {
           UserId: UserId,
           UserKey: UserKey,
           UserAvatar: UserAvatar,
-          IsMaster: master_id.includes(UserKey),
+          IsMaster: master_key.includes(UserKey),
           // 格式化数据
           MessageId: MessageId,
-          MessageBody: [Text(txt)],
-          MessageText: txt,
+          MessageBody: [
+            Text(msg),
+            ...at_users.map(item =>
+              At(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
+            )
+          ],
+          MessageText: msg,
           OpenId: '',
           // 创建时间
           CreateAt: Date.now(),
@@ -132,7 +177,7 @@ export default defineBot(() => {
           UserId: UserId,
           UserKey: UserKey,
           UserAvatar: UserAvatar,
-          IsMaster: master_id.includes(UserKey),
+          IsMaster: master_key.includes(UserKey),
           // message
           MessageId: MessageId,
           MessageBody: [Text(txt)],
