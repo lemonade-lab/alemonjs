@@ -26,11 +26,8 @@ export type User = {
    * 是否是主人
    */
   IsMaster: boolean
-}
-
-// 机器人
-export type Bot = {
-  BotId: string
-  BotName: string
-  BotAvatar: string
+  /**
+   * 是否是机器人
+   */
+  IsBot: boolean
 }

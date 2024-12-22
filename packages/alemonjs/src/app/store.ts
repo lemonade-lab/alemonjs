@@ -1,65 +1,24 @@
-type DbKey = {
-  // 目录
-  dir: string
-  // 文件路径
-  path: string
-  // 文件名
-  name: string
-  //
-  value?: {
-    // 事件
-    select: string
-    // 正则
-    reg: RegExp
-  } | null
-}
-
-type MWKey = {
-  // 目录
-  dir: string
-  // 文件路径
-  path: string
-  // 文件名
-  name: string
-  //
-  value?: {
-    // 事件
-    select: string
-  } | null
-}
-
-declare global {
-  var AppsFiles: DbKey[]
-  var MWFiles: MWKey[]
-}
-
-if (!global.AppsFiles) {
-  global.AppsFiles = []
-}
-
-if (!global.MWFiles) {
-  global.MWFiles = []
-}
-
-//
+import { StoreMiddlewareItem, StoreResponseItem } from '../typing/store/res'
+if (!global.storeResponse) global.storeResponse = []
+if (!global.storeMiddleware) global.storeMiddleware = []
 export const ResStore: {
-  [key: string]: DbKey[]
-  'message.create': DbKey[]
-  'message.update': DbKey[]
-  'message.delete': DbKey[]
-  'message.reaction.add': DbKey[]
-  'message.reaction.remove': DbKey[]
-  'private.message.create': DbKey[]
-  'private.message.update': DbKey[]
-  'private.message.delete': DbKey[]
-  'private.friend.add': DbKey[]
-  'private.guild.add': DbKey[]
-  'channal.create': DbKey[]
-  'channal.delete': DbKey[]
-  'guild.join': DbKey[]
-  'guild.exit': DbKey[]
-  'member.add': DbKey[]
-  'member.remove': DbKey[]
+  [key: string]: StoreResponseItem[]
+  'message.create': StoreResponseItem[]
+  'message.update': StoreResponseItem[]
+  'message.delete': StoreResponseItem[]
+  'message.reaction.add': StoreResponseItem[]
+  'message.reaction.remove': StoreResponseItem[]
+  'private.message.create': StoreResponseItem[]
+  'private.message.update': StoreResponseItem[]
+  'private.message.delete': StoreResponseItem[]
+  'private.friend.add': StoreResponseItem[]
+  'private.guild.add': StoreResponseItem[]
+  'channal.create': StoreResponseItem[]
+  'channal.delete': StoreResponseItem[]
+  'guild.join': StoreResponseItem[]
+  'guild.exit': StoreResponseItem[]
+  'member.add': StoreResponseItem[]
+  'member.remove': StoreResponseItem[]
 } = {
   'message.create': [],
   'message.update': [],
@@ -78,26 +37,24 @@ export const ResStore: {
   'member.add': [],
   'member.remove': []
 }
-
-// 中间件
 export const MWStore: {
-  [key: string]: MWKey[]
-  'message.create': MWKey[]
-  'message.update': MWKey[]
-  'message.delete': MWKey[]
-  'message.reaction.add': MWKey[]
-  'message.reaction.remove': MWKey[]
-  'private.message.create': MWKey[]
-  'private.message.update': MWKey[]
-  'private.message.delete': MWKey[]
-  'private.friend.add': MWKey[]
-  'private.guild.add': MWKey[]
-  'channal.create': MWKey[]
-  'channal.delete': MWKey[]
-  'guild.join': MWKey[]
-  'guild.exit': MWKey[]
-  'member.add': MWKey[]
-  'member.remove': MWKey[]
+  [key: string]: StoreMiddlewareItem[]
+  'message.create': StoreMiddlewareItem[]
+  'message.update': StoreMiddlewareItem[]
+  'message.delete': StoreMiddlewareItem[]
+  'message.reaction.add': StoreMiddlewareItem[]
+  'message.reaction.remove': StoreMiddlewareItem[]
+  'private.message.create': StoreMiddlewareItem[]
+  'private.message.update': StoreMiddlewareItem[]
+  'private.message.delete': StoreMiddlewareItem[]
+  'private.friend.add': StoreMiddlewareItem[]
+  'private.guild.add': StoreMiddlewareItem[]
+  'channal.create': StoreMiddlewareItem[]
+  'channal.delete': StoreMiddlewareItem[]
+  'guild.join': StoreMiddlewareItem[]
+  'guild.exit': StoreMiddlewareItem[]
+  'member.add': StoreMiddlewareItem[]
+  'member.remove': StoreMiddlewareItem[]
 } = {
   'message.create': [],
   'message.update': [],
@@ -116,15 +73,12 @@ export const MWStore: {
   'member.add': [],
   'member.remove': []
 }
-
 /**
- *
  * @param val
  */
-export const pushAppsFiles = (val: DbKey) => {
-  global.AppsFiles.push(val)
+export const pushResponseFiles = (val: StoreResponseItem) => {
+  global.storeResponse.push(val)
 }
-
-export const pushMWFiles = (val: MWKey) => {
-  global.MWFiles.push(val)
+export const pushMiddlewareFiles = (val: StoreMiddlewareItem) => {
+  global.storeMiddleware.push(val)
 }

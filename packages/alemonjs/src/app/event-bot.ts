@@ -1,2 +1,2 @@
-type BotType = () => typeof global.alemonjs
-export const defineBot = (callback: BotType) => callback
+import { ClientAPI } from '../typing/global'
+export const defineBot = (callback: () => ClientAPI) => callback

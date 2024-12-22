@@ -82,6 +82,7 @@ export default defineBot(() => {
       MessageId: event.MessageId,
       // 用户消息
       MessageBody: [Text(txt.d)],
+      Mention: [],
       MessageText: txt.d,
       // 事件类型
       // 用户openId
@@ -122,6 +123,7 @@ export default defineBot(() => {
       MessageId: event.MessageId,
       // 用户消息
       MessageBody: [Text(txt.d)],
+      Mention: [],
       MessageText: txt.d,
       // 用户openId
       OpenId: event.OpenId,

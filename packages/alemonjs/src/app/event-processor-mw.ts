@@ -6,8 +6,9 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { AEvents } from '../env'
+import { AEvents } from '../typing/event/map'
 import { MWStore } from './store'
+import { OnMiddlewareValue } from '../typing/event'
 
 /**
  *
@@ -16,7 +17,7 @@ import { MWStore } from './store'
  */
 export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, select: T) => {
   // 得到所有 apps
-  const mwFiles = [...global.MWFiles]
+  const mwFiles = [...global.storeMiddleware]
   // 得到对应类型的消息
   const mws = [...MWStore[select]]
 
@@ -62,7 +63,9 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
     }
 
     try {
-      const obj = await import(`file://${file.path}`)
+      const obj: {
+        default: OnMiddlewareValue<T>
+      } = await import(`file://${file.path}`)
       const res = obj?.default
 
       if (Array.isArray(res.select)) {
@@ -92,8 +95,8 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
             }
           }
           // update files and values
-          const index = global.MWFiles.findIndex(v => v.path === file.path)
-          global.MWFiles.splice(index, 1)
+          const index = global.storeMiddleware.findIndex(v => v.path === file.path)
+          global.storeMiddleware.splice(index, 1)
           //
           MWStore[select].push(valueKey)
         }
@@ -101,9 +104,9 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
 
       // 这里是否继续时 next 说了算
       if (isAsyncFunction(res?.current)) {
-        event = await res?.current(event, next)?.catch(logger.error)
+        event = await res?.current(event as any, next)?.catch(logger.error)
       } else {
-        event = res?.current(event, next)
+        event = res?.current(event as any, next)
       }
     } catch (err) {
       // 不再继续
@@ -123,24 +126,15 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
       return
     }
     try {
-      if (!file.value) {
-        const obj = await import(`file://${file.path}`)
-        const res = obj?.default
-        // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.current)) {
-          event = await res?.current(event, next)
-        } else {
-          event = res?.current(event, next)
-        }
+      const obj: {
+        default: OnMiddlewareValue<T>
+      } = await import(`file://${file.path}`)
+      const res = obj?.default
+      // 这里是否继续时 next 说了算
+      if (isAsyncFunction(res?.current)) {
+        event = await res?.current(event as any, next)
       } else {
-        const obj = await import(`file://${file.path}`)
-        const res = obj?.default
-        // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.current)) {
-          event = await res?.current(event, next)
-        } else {
-          event = res?.current(event, next)
-        }
+        event = res?.current(event as any, next)
       }
     } catch (err) {
       logger.error(err)

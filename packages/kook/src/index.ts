@@ -1,4 +1,4 @@
-import { defineBot, Text, OnProcessor, useParse, At, getConfig, createHash } from 'alemonjs'
+import { defineBot, Text, OnProcessor, useParse, Mention, getConfig, createHash } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 export type Client = typeof KOOKClient.prototype
 export const client: Client = global.client
@@ -69,7 +69,7 @@ export default defineBot(() => {
       MessageBody: [
         Text(msg),
         ...at_users.map(item =>
-          At(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
+          Mention(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
         )
       ],
       MessageText: msg,
@@ -180,7 +180,7 @@ export default defineBot(() => {
       MessageBody: [
         Text(msg),
         ...at_users.map(item =>
-          At(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
+          Mention(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
         )
       ],
       MessageText: msg,

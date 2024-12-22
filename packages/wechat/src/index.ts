@@ -1,15 +1,15 @@
-import { defineBot, Text, OnProcessor, useParse, getConfigValue, At } from 'alemonjs'
+import { defineBot, OnProcessor, getConfigValue, User } from 'alemonjs'
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { getPublicPath, getStaticPath } from './static'
 import { useUserHashKey } from 'alemonjs'
-import { type WechatyInterface } from 'wechaty/impls'
+import { MessageInterface, type WechatyInterface } from 'wechaty/impls'
 export type Client = WechatyInterface
 export const client: Client = global.client
 export default defineBot(() => {
   const value = getConfigValue()
-  const config = value.wechat
+  const config = value?.wechat
   const bot = WechatyBuilder.build({
     name: config?.name ?? 'alemonjs'
   })
@@ -104,27 +104,6 @@ export default defineBot(() => {
           console.log(e)
         }
 
-        let at_users: {
-          id: string
-          name: string
-          avatar: string
-          bot: boolean
-        }[] = []
-
-        try {
-          const list = await event.mentionList()
-          at_users = list.map(item => {
-            return {
-              id: item.payload.id,
-              name: item.payload.name,
-              avatar: item.payload.avatar,
-              bot: false
-            }
-          })
-        } catch (e) {
-          console.log(e)
-        }
-
         const roomId = event.payload?.roomId ?? ''
 
         // 定义消
@@ -143,19 +122,13 @@ export default defineBot(() => {
           UserKey: UserKey,
           UserAvatar: UserAvatar,
           IsMaster: master_key.includes(UserKey),
-          // 格式化数据
+          IsBot: false,
+          // message
           MessageId: MessageId,
-          MessageBody: [
-            Text(msg),
-            ...at_users.map(item =>
-              At(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
-            )
-          ],
           MessageText: msg,
           OpenId: '',
-          // 创建时间
           CreateAt: Date.now(),
-          // 表情
+          //
           tag: 'message',
           value: null
         }
@@ -178,9 +151,9 @@ export default defineBot(() => {
           UserKey: UserKey,
           UserAvatar: UserAvatar,
           IsMaster: master_key.includes(UserKey),
+          IsBot: false,
           // message
           MessageId: MessageId,
-          MessageBody: [Text(txt)],
           MessageText: txt,
           OpenId: OpenId,
           CreateAt: Date.now(),
@@ -208,24 +181,17 @@ export default defineBot(() => {
   return {
     api: {
       use: {
-        send: (e, val: any[]) => {
+        send: (e, val) => {
           if (val.length < 0) return Promise.all([])
-          const event = e.value
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
-          if (content) {
+          const event: MessageInterface = e.value
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
+          if (content && content != '') {
             return Promise.all([content].map(item => event.say(item)))
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(item => {
@@ -237,6 +203,25 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async e => {
+          const event: MessageInterface = e.value
+          const list = await event.mentionList()
+          let MessageMention: User[] = list.map(item => {
+            const UserId = item.payload.id
+            return {
+              UserId: UserId,
+              UserName: item.payload.name,
+              // UserAvatar: item.payload.avatar,
+              IsBot: false,
+              IsMaster: false,
+              UserKey: useUserHashKey({
+                Platform: 'wechat',
+                UserId: UserId
+              })
+            }
+          })
+          return MessageMention
         }
       }
     }

@@ -1,11 +1,3 @@
-type callbackObjType = {
-  onCreated?: () => void
-  onMounted?: () => void
-  unMounted?: () => void
-}
-type callbackType = () => callbackObjType
-declare global {
-  var defineChildren: (callback: callbackType) => any
-}
-export const defineChildren = (callback: callbackType) => callback
+import { ChildrenCycle } from '../typing/cycle'
+export const defineChildren = (callback: () => ChildrenCycle) => callback
 global.defineChildren = defineChildren

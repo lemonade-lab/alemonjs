@@ -1,71 +1,14 @@
-import { readFileSync } from 'fs'
-import { DataEnums, DataParseType, ParseType } from './message-typing'
-import { AEvents } from '../env'
+import { DataEnums } from '../typing/message'
+import { AEvents } from '../typing/event/map'
 
 export * from './message-format'
 
-type ApiUseSend = (event: { [key: string]: any }, val: DataEnums[]) => Promise<any[]>
-
 /**
- * 全局声明
+ *
+ * @param event
+ * @returns
  */
-declare global {
-  var alemonjs: {
-    api: {
-      use: {
-        send: ApiUseSend
-      }
-    }
-  }
-  var storeoberver: {
-    [key: string]: {
-      event: {
-        [key: string]: string
-      }
-      current: Function
-    }[]
-  }
-}
-
-/**
- * 解析返回指定类型
- * @param event 事件类型
- * @param value 值数组
- * @returns 解析后的值
- */
-export const useParse = <T extends keyof DataParseType>(
-  value: {
-    MessageBody: DataParseType[T][]
-  },
-  event: T
-): ParseType[T] | undefined => {
-  const msgs = value.MessageBody.filter(item => item.type === event)
-  if (msgs.length === 0) return undefined
-  switch (event) {
-    case 'Text': {
-      return (msgs as DataParseType['Text'][]).map(item => item.value).join('')
-    }
-    case 'Image': {
-      const d: Buffer[] = []
-      for (const item of msgs as DataParseType['Image'][]) {
-        if (item.typing === 'buffer') {
-          d.push(item.value as Buffer)
-        }
-        // 如果是url。或者是本地文件
-        if (item.typing === 'file') {
-          const m = readFileSync(item.value, 'utf-8')
-          d.push(Buffer.from(readFileSync(m)))
-        }
-      }
-      return d.length > 0 ? d : undefined
-    }
-    case 'At': {
-      return msgs as DataParseType['At'][]
-    }
-    default:
-      return undefined
-  }
-}
+export const useMention = (event: { [key: string]: any }) => global.alemonjs.api.use.mention(event)
 
 /**
  * 发送消息
@@ -92,19 +35,19 @@ export const useObserver = <T extends keyof AEvents>(event: any, option: T) => {
       if (typeof key === 'string' && typeof event[key] === 'string') v[key] = event[key]
     }
     // 如果不存在。则创建
-    if (!global.storeoberver) global.storeoberver = {}
-    if (!global.storeoberver[option]) global.storeoberver[option] = []
+    if (!global.storeObserver) global.storeObserver = {}
+    if (!global.storeObserver[option]) global.storeObserver[option] = []
     let i = 0
     const next = () => {
-      if (i >= global.storeoberver[option].length) {
+      if (i >= global.storeObserver[option].length) {
         // 如果不存在。则创建
-        global.storeoberver[option][i] = { event: v, current: callback }
+        global.storeObserver[option][i] = { event: v, current: callback }
         return
       }
       i++
       // 是空的。占据位置。
-      if (!global.storeoberver[option][i]) {
-        global.storeoberver[option][i] = { event: v, current: callback }
+      if (!global.storeObserver[option][i]) {
+        global.storeObserver[option][i] = { event: v, current: callback }
       } else {
         // 不是空的。继续
         next()

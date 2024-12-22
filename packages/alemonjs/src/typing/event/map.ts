@@ -1,24 +1,21 @@
-import { PublicEventChannalCreate, PublicEventChannalDelete } from './typing/event/channal'
-import { PublicEventGuildExit, PublicEventGuildJoin } from './typing/event/guild'
-import { PublicEventMemberAdd, PublicEventMemberRemove } from './typing/event/member'
+import { PublicEventChannalCreate, PublicEventChannalDelete } from './channal'
+import { PublicEventGuildExit, PublicEventGuildJoin } from './guild'
+import { PublicEventMemberAdd, PublicEventMemberRemove } from './member'
 import {
   PublicEventMessageCreate,
   PublicEventMessageDelete,
   PublicEventMessageReactionAdd,
   PublicEventMessageReactionRemove,
   PublicEventMessageUpdate
-} from './typing/event/message/message'
+} from './message/message'
 
 import {
   PrivateEventMessageCreate,
   PrivateEventMessageDelete,
   PrivateEventMessageUpdate
-} from './typing/event/message/private.message'
+} from './message/private.message'
 
-import { PrivateEventRequestFriendAdd, PrivateEventRequestGuildAdd } from './typing/event/request'
-
-//
-export type LogType = string | Error | unknown
+import { PrivateEventRequestFriendAdd, PrivateEventRequestGuildAdd } from './request'
 
 // 携带有消息体的
 export type AEventsMessage = {
@@ -26,7 +23,8 @@ export type AEventsMessage = {
   'private.message.create': PrivateEventMessageCreate
 }
 
-//
+export type AEventsMessageEnum = PublicEventMessageCreate | PrivateEventMessageCreate
+
 export type AEvents = {
   'message.update': PublicEventMessageUpdate
   'message.delete': PublicEventMessageDelete
@@ -44,14 +42,19 @@ export type AEvents = {
   'private.guild.add': PrivateEventRequestGuildAdd
 } & AEventsMessage
 
-declare global {
-  var logger: {
-    trace: (...args: any[]) => void
-    debug: (...args: any[]) => void
-    info: (...args: any[]) => void
-    warn: (...args: any[]) => void
-    error: (...args: any[]) => void
-    fatal: (...args: any[]) => void
-    mark: (...args: any[]) => void
-  }
-}
+export type AEventsEnum =
+  | AEventsMessageEnum
+  | PublicEventMessageUpdate
+  | PublicEventMessageDelete
+  | PublicEventMessageReactionAdd
+  | PublicEventMessageReactionRemove
+  | PublicEventChannalCreate
+  | PublicEventChannalDelete
+  | PublicEventGuildJoin
+  | PublicEventGuildExit
+  | PublicEventMemberAdd
+  | PublicEventMemberRemove
+  | PrivateEventMessageUpdate
+  | PrivateEventMessageDelete
+  | PrivateEventRequestFriendAdd
+  | PrivateEventRequestGuildAdd

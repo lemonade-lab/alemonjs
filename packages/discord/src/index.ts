@@ -1,4 +1,4 @@
-import { Text, OnProcessor, useParse, At, defineBot, getConfig, createHash } from 'alemonjs'
+import { OnProcessor, defineBot, getConfig, createHash } from 'alemonjs'
 import { DCClient } from './sdk/index'
 export type Client = typeof DCClient.prototype
 export const client: Client = global.client
@@ -77,39 +77,23 @@ export default defineBot(() => {
     const e = {
       // 事件类型
       Platform: 'discord',
-      // 频道
+      // guild
       GuildId: event.guild_id,
-      // 子频道
       ChannelId: event.channel_id,
-      // 是否是主人
-      IsMaster: isMaster,
-      // 用户Id
+      // user
       UserId: event.author.id,
-      // 用户名
       UserName: event.author.username,
       UserKey,
-      // 用户头像
       UserAvatar: UserAvatar,
-      // 格式化数据
+      IsMaster: isMaster,
+      IsBot: false,
+      // message
       MessageId: event.id,
-      // 用户消息
-      MessageBody: [
-        Text(msg),
-        ...at_users.map(item =>
-          At(item.id, 'user', {
-            name: item.name,
-            avatar: item.avatar,
-            bot: item.bot
-          })
-        )
-      ],
       MessageText: msg,
-      // 用户openId
       OpenId: '',
-      // 创建时间
       CreateAt: Date.now(),
+      // other
       tag: 'MESSAGE_CREATE',
-      //
       value: null
     }
 

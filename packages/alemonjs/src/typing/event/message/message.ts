@@ -1,9 +1,9 @@
 import { Guild, Channel } from '../base/guild'
-import { Message, MessageBody } from '../base/message'
+import { Message, MessageText } from '../base/message'
 import { User } from '../base/user'
 import { platform } from '../base/platform'
 // 公有事件-消息创建
-export type PublicEventMessageCreate = {} & MessageBody &
+export type PublicEventMessageCreate = {} & MessageText &
   platform &
   Guild &
   Channel &

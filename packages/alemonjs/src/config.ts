@@ -1,7 +1,7 @@
-import { watch } from 'fs'
+import './global'
+import { readFileSync, existsSync, watch } from 'fs'
 import { join } from 'path'
 import { parse } from 'yaml'
-import { readFileSync, existsSync } from 'fs'
 
 /**
  * @param key 参数

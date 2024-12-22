@@ -22,11 +22,8 @@
       "types": "./lib/index.d.ts"
     },
     "./env": {
-      "types": "./lib/env.d.ts"
+      "types": "./lib/global.d.ts"
     }
-  },
-  "bin": {
-    "alemonjs": "bin/index.js"
   },
   "keywords": [
     "alemonjs",

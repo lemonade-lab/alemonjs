@@ -13,7 +13,6 @@ export function createHash(str: string, options: { length?: number; algorithm?: 
   return hash.slice(0, length)
 }
 /**
- *
  * @param e
  * @returns
  */

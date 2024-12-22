@@ -1,23 +1,22 @@
-import { useParse } from 'alemonjs'
-export default OnResponse((event, next) => {
+import { useMention } from 'alemonjs'
+export default OnResponse(async (event, next) => {
   if (!/^(#|\/)?test$/.test(event.MessageText)) {
     next()
     return
   }
 
-  const ats = useParse(event, 'At')
+  const ats = await useMention(event)
   if (!ats || ats.length === 0) {
     return // @ 提及为空
   }
 
   // 查找用户类型的 @ 提及，且不是 bot
-  const UserId = ats.find(item => item.typing === 'user' && !item.bot)?.value
+  const UserId = ats.find(item => !item.IsBot)
   if (!UserId) {
     return // 未找到用户Id
   }
 
-  // 解析用户消息。 即 得到 event.MessageText
-  const text = useParse(event, 'Text')
+  const text = event.MessageText
   if (!text) {
     return // 消息为空
   }

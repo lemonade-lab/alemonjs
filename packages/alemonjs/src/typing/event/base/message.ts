@@ -9,13 +9,9 @@ export type Message = {
   CreateAt: number
 }
 
-export type MessageBody = {
+export type MessageText = {
   /**
-   * 消息内容
-   */
-  MessageBody: any[]
-  /**
-   *
+   * 消息文本
    */
   MessageText: string
 }

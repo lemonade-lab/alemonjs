@@ -5,14 +5,7 @@
  * @module middleware
  * @author ningmengchongshui
  */
-import { OnMiddlewareType } from './event-typing'
-
-declare global {
-  /**
-   * 中间件
-   */
-  var OnMiddleware: OnMiddlewareType
-}
+import { OnMiddlewareType } from '../typing/event/index'
 
 /**
  * @fileoverview 关系型数据库处理模块

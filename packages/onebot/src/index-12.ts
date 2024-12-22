@@ -1,4 +1,4 @@
-import { At, createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
+import { Mention, createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import { OneBotClient } from './sdk-v12/wss'
 
 const MyBot = {
@@ -102,7 +102,7 @@ export default defineBot(() => {
       MessageBody: [
         Text(msg),
         ...at_users.map(item =>
-          At(item.id, 'user', {
+          Mention(item.id, 'user', {
             name: item.name,
             avatar: item.avatar,
             bot: item.bot

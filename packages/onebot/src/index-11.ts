@@ -1,4 +1,4 @@
-import { At, createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
+import { Mention, createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
 import { OneBotClient } from './sdk-v11/wss'
 
 const MyBot = {
@@ -73,6 +73,7 @@ export default defineBot(() => {
       ChannelId: String(event.group_id),
       // 是否是主人
       IsMaster: uis.includes(String(event.user_id)),
+      IsBot: false,
       // 用户Id
       UserId: String(event.user_id),
       // 用户名
@@ -86,7 +87,7 @@ export default defineBot(() => {
       MessageBody: [
         Text(msg),
         ...at_users.map(item =>
-          At(item.id, 'user', {
+          Mention(item.id, 'user', {
             name: item.name,
             avatar: item.avatar,
             bot: item.bot
@@ -94,6 +95,7 @@ export default defineBot(() => {
         )
       ],
       MessageText: msg,
+      MessageMention: [],
       // 用户openId
       // 用户openId
       OpenId: String(event.user_id),

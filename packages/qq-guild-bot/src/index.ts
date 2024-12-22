@@ -1,4 +1,4 @@
-import { Text, OnProcessor, useParse, At, defineBot, getConfig, createHash } from 'alemonjs'
+import { Text, OnProcessor, useParse, Mention, defineBot, getConfig, createHash } from 'alemonjs'
 import { QQBotGuildClient } from './sdk'
 export type Client = typeof QQBotGuildClient.prototype
 export const client: Client = global.client
@@ -159,7 +159,7 @@ export default defineBot(() => {
       MessageBody: [
         Text(msg ?? ''),
         ...at_users.map(item =>
-          At(item.name, 'user', {
+          Mention(item.name, 'user', {
             name: item.name,
             avatar: item.avatar,
             bot: item.bot
@@ -255,7 +255,7 @@ export default defineBot(() => {
       MessageBody: [
         Text(msg ?? ''),
         ...at_users.map(item =>
-          At(item.name, 'user', {
+          Mention(item.name, 'user', {
             name: item.name,
             avatar: item.avatar,
             bot: item.bot

@@ -5,13 +5,10 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { AEvents } from '../env'
+import { AEvents, AEventsMessageEnum } from '../typing/event/map'
 import { expendMessage } from './event-processor-body'
-import { useParse } from '../post'
 import { expendEvent } from './event-processor-event'
 export * from './store'
-
-type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.create']
 
 /**
  *
@@ -27,10 +24,9 @@ const Log = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
     logs.push(`[${event['UserId']}]`)
   }
   if (Array.isArray(event['MessageBody'])) {
-    const txt = useParse(event as any, 'Text')
-    if (typeof txt == 'string' && txt != '') {
-      logs.push(`[${txt}]`)
-    }
+    const content = event['MessageBody'].filter(item => item.type == 'Text').map(item => item.value)
+    const txt = content.join('')
+    logs.push(`[${txt}]`)
   }
   logger.info(logs.join(''))
 }
@@ -48,11 +44,11 @@ export const OnProcessor = <T extends keyof AEvents>(event: AEvents[T], select: 
   switch (select) {
     case 'message.create':
       // 处理公有消息
-      expendMessage(event as EventMessageCreate, 'message.create')
+      expendMessage(event as AEventsMessageEnum, 'message.create')
       break
     case 'private.message.create':
       // 处理私有消息
-      expendMessage(event as EventMessageCreate, 'private.message.create')
+      expendMessage(event as AEventsMessageEnum, 'private.message.create')
       break
     default: {
       // 无消息体处理

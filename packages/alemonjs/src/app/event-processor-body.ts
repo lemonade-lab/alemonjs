@@ -5,13 +5,11 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { useParse } from '../hook/use-api'
-import { AEvents } from '../env'
+import { AEvents, AEventsMessageEnum } from '../typing/event/map'
 import { ResStore } from './store'
 import { expendMiddleware } from './event-processor-mw'
 import { isAsyncFunction } from 'util/types'
-
-type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.create']
+import { OnResponseValue } from '../typing/event'
 
 /**
  * 消息体处理机制
@@ -19,15 +17,15 @@ type EventMessageCreate = AEvents['message.create'] | AEvents['private.message.c
  * @param key
  */
 export const expendMessage = async <T extends keyof AEvents>(
-  valueEvent: EventMessageCreate,
+  valueEvent: AEventsMessageEnum,
   select: T
 ) => {
-  // 如果不存在。则创建 storeoberver
-  if (!global.storeoberver) global.storeoberver = {}
-  // 如果不存在。则创建 storeoberver[key]
-  if (!global.storeoberver[select]) global.storeoberver[select] = []
+  // 如果不存在。则创建 storeObserver
+  if (!global.storeObserver) global.storeObserver = {}
+  // 如果不存在。则创建 storeObserver[key]
+  if (!global.storeObserver[select]) global.storeObserver[select] = []
   // 得到所有 apps
-  const messageFiles = [...global.AppsFiles]
+  const messageFiles = [...global.storeResponse]
   // 得到对应类型的消息
   const messages = [...ResStore[select]]
 
@@ -36,7 +34,7 @@ export const expendMessage = async <T extends keyof AEvents>(
   let valueN = 0
 
   // 使用中间件修正 event
-  const event: EventMessageCreate = (await expendMiddleware(valueEvent as any, select)) as any
+  const event: AEventsMessageEnum = (await expendMiddleware(valueEvent as any, select)) as any
 
   /**
    * 下一步
@@ -63,7 +61,7 @@ export const expendMessage = async <T extends keyof AEvents>(
    */
   const nextObserver = () => {
     // i 结束了
-    if (valueN >= global.storeoberver[select].length) {
+    if (valueN >= global.storeObserver[select].length) {
       // 订阅都检查过一遍。开始 next
       next()
       return
@@ -71,7 +69,7 @@ export const expendMessage = async <T extends keyof AEvents>(
     //
     valueN++
     // 发现订阅
-    const item = global.storeoberver[select][valueN - 1]
+    const item = global.storeObserver[select][valueN - 1]
     if (!item) {
       // 继续 next
       nextObserver()
@@ -87,10 +85,10 @@ export const expendMessage = async <T extends keyof AEvents>(
       }
     }
     // 设置为 undefined
-    global.storeoberver[select][valueN - 1] = undefined
+    global.storeObserver[select][valueN - 1] = undefined
     // 放回来
     const Continue = () => {
-      global.storeoberver[select][valueN - 1] = item
+      global.storeObserver[select][valueN - 1] = item
       // 直接结束才对
     }
     // 没有调用下一步。应该删除当前的 n ？
@@ -119,10 +117,12 @@ export const expendMessage = async <T extends keyof AEvents>(
     }
 
     try {
-      const obj = await import(`file://${file.path}`)
+      const obj: {
+        default: OnResponseValue<T>
+      } = await import(`file://${file.path}`)
       const res = obj?.default
-      const reg = res?.reg
 
+      // 如果是数组
       if (Array.isArray(res.select)) {
         if (!res.select.includes(select)) {
           // 继续
@@ -135,7 +135,6 @@ export const expendMessage = async <T extends keyof AEvents>(
           next()
           return
         }
-
         // 推送, 确保下次直接流向 key ，不再从头开始
         if (!ResStore[select].find(v => v.path === file.path)) {
           const valueKey = {
@@ -143,28 +142,20 @@ export const expendMessage = async <T extends keyof AEvents>(
             path: file.path,
             name: file.name,
             value: {
-              reg: reg,
               select: res?.select ?? select
             }
           }
           // update files and values
-          const index = global.AppsFiles.findIndex(v => v.path === file.path)
-          global.AppsFiles.splice(index, 1)
+          const index = global.storeResponse.findIndex(v => v.path === file.path)
+          global.storeResponse.splice(index, 1)
           ResStore[select].push(valueKey)
         }
       }
-
-      const msg = useParse(event, 'Text') ?? ''
-      if (reg && !reg.test(msg)) {
-        // 继续
-        next()
-        return
-      }
       // 这里是否继续时 next 说了算
       if (isAsyncFunction(res?.current)) {
-        res?.current(event, next)?.catch(logger.error)
+        res?.current(event as any, next)?.catch(logger.error)
       } else {
-        res?.current(event, next)
+        res?.current(event as any, next)
       }
     } catch (err) {
       // 不再继续
@@ -183,40 +174,16 @@ export const expendMessage = async <T extends keyof AEvents>(
       next()
       return
     }
-
-    //
-    const msg = useParse(event, 'Text') ?? ''
-
     try {
-      if (!file.value) {
-        const obj = await import(`file://${file.path}`)
-        const res = obj?.default
-        const reg = res?.reg
-        if (reg && !reg.test(msg)) {
-          next()
-          return
-        }
-        // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.current)) {
-          res?.current(event, next)?.catch(logger.error)
-        } else {
-          res?.current(event, next)
-        }
+      const obj: {
+        default: OnResponseValue<T>
+      } = await import(`file://${file.path}`)
+      const res = obj?.default
+      // 这里是否继续时 next 说了算
+      if (isAsyncFunction(res.current)) {
+        res?.current(event as any, next)?.catch(logger.error)
       } else {
-        // 在这里，存在了 value。使用value进行。不用读取文件
-        const reg = file.value.reg
-        if (reg && !reg.test(msg)) {
-          next()
-          return
-        }
-        const obj = await import(`file://${file.path}`)
-        const res = obj?.default
-        // 这里是否继续时 next 说了算
-        if (isAsyncFunction(res?.current)) {
-          res?.current(event, next)?.catch(logger.error)
-        } else {
-          res?.current(event, next)
-        }
+        res?.current(event as any, next)
       }
     } catch (err) {
       logger.error(err)

@@ -7,5 +7,5 @@
     }
   },
   "include": ["packages/**/*"],
-  "extends": "lvyjs/tsconfig.json"
+  "extends": "lvyjs/tsconfig"
 }
