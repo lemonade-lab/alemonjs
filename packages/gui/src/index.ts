@@ -1,4 +1,12 @@
-import { createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
+import {
+  createHash,
+  defineBot,
+  getConfig,
+  OnProcessor,
+  PrivateEventMessageCreate,
+  PublicEventMessageCreate,
+  useUserHashKey
+} from 'alemonjs'
 import { WebSocketServer } from 'ws'
 import Koa from 'koa'
 import KoaStatic from 'koa-static'
@@ -44,8 +52,15 @@ export default defineBot(() => {
   let client = null
   //
   const onMessage = event => {
-    const txt = event.MessageBody.find((item: any) => item.t == 'text')
-    const UserKey = createHash(`gui:${event.UserId}`)
+    //
+    const txt = event.MessageText
+
+    const Platform = 'gui'
+
+    const UserKey = useUserHashKey({
+      Platform: Platform,
+      UserId: event.UserId
+    })
 
     const url = event.UserAvatar
     const UserAvatar = {
@@ -62,29 +77,24 @@ export default defineBot(() => {
       }
     }
 
-    const e = {
+    const e: PublicEventMessageCreate = {
       // 事件类型
-      Platform: event.Platform,
+      Platform: Platform,
       // 频道
       GuildId: event.GuildId,
-      // 子频道
       ChannelId: event.ChannelId,
       // 是否是主人
-      IsMaster: event.IsMaster == 0 ? false : true,
       // 用户Id
       UserId: event.UserId,
       UserKey,
-      // 用户名
+      IsMaster: event.IsMaster == 0 ? false : true,
+      IsBot: false,
       UserName: event.UserName,
-      // 用户头像
       UserAvatar: UserAvatar,
       // 格式化数据
       MessageId: event.MessageId,
       // 用户消息
-      MessageBody: [Text(txt.d)],
-      Mention: [],
       MessageText: txt.d,
-      // 事件类型
       // 用户openId
       OpenId: event.OpenId,
       // 创建时间
@@ -107,23 +117,20 @@ export default defineBot(() => {
   const onProvateMessage = event => {
     const txt = event.MessageBody.find((item: any) => item.t == 'text')
     const UserKey = createHash(`gui:${event.UserId}`)
-    const e = {
+    const e: PrivateEventMessageCreate = {
       // 事件类型
       Platform: event.Platform,
-      // 是否是主人
-      IsMaster: event.IsMaster == 0 ? false : true,
       // 用户Id
       UserId: event.UserId,
-      // 用户名
       UserName: event.UserName,
       UserKey,
+      IsMaster: event.IsMaster == 0 ? false : true,
+      IsBot: false,
       // 用户头像
       UserAvatar: event.UserAvatar,
       // 格式化数据
       MessageId: event.MessageId,
       // 用户消息
-      MessageBody: [Text(txt.d)],
-      Mention: [],
       MessageText: txt.d,
       // 用户openId
       OpenId: event.OpenId,
@@ -186,12 +193,10 @@ export default defineBot(() => {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
           console.log(event)
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -209,12 +214,7 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(async item => {
@@ -237,6 +237,9 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async () => {
+          return []
         }
       }
     }

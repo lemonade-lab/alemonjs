@@ -1,4 +1,4 @@
-import { Mention, createHash, defineBot, getConfig, OnProcessor, Text, useParse } from 'alemonjs'
+import { createHash, defineBot, getConfig, OnProcessor } from 'alemonjs'
 import { OneBotClient } from './sdk-v12/wss'
 
 const MyBot = {
@@ -99,16 +99,6 @@ export default defineBot(() => {
       // 格式化数据
       MessageId: event.message_id,
       // 用户消息
-      MessageBody: [
-        Text(msg),
-        ...at_users.map(item =>
-          Mention(item.id, 'user', {
-            name: item.name,
-            avatar: item.avatar,
-            bot: item.bot
-          })
-        )
-      ],
       MessageText: msg,
       // 表情
       // 用户openId
@@ -155,12 +145,10 @@ export default defineBot(() => {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -178,12 +166,7 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(item =>

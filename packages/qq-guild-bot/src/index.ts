@@ -1,5 +1,6 @@
-import { Text, OnProcessor, useParse, Mention, defineBot, getConfig, createHash } from 'alemonjs'
+import { OnProcessor, defineBot, getConfig, User, useUserHashKey } from 'alemonjs'
 import { QQBotGuildClient } from './sdk'
+import { AT_MESSAGE_CREATE_TYPE } from '../lib/sdk/platform/qq/sdk/message/AT_MESSAGE_CREATE'
 export type Client = typeof QQBotGuildClient.prototype
 export const client: Client = global.client
 export default defineBot(() => {
@@ -24,14 +25,6 @@ export default defineBot(() => {
 
     let msg = event?.content ?? ''
 
-    // 艾特消息处理
-    const at_users: {
-      id: string
-      name: string
-      avatar: string
-      bot: boolean
-    }[] = []
-
     const UserAvatar = {
       toBuffer: async () => {
         const arrayBuffer = await fetch(event.author.avatar).then(res => res.arrayBuffer())
@@ -46,32 +39,28 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`qq-guild-bot:${event.author.id}`)
+    const UserId = event.author.id
+    const UserKey = useUserHashKey({
+      Platform: 'qq-guild-bot',
+      UserId: UserId
+    })
 
     // 定义消
     const e = {
       // 事件类型
       Platform: 'qq-guild-bot',
+      //
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
-      IsMaster: isMaster,
       // 用户Id
       UserId: event?.author?.id ?? '',
       UserKey,
       UserName: event?.author?.username ?? '',
       UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: event.author?.bot,
       // message
       MessageId: event.id,
-      MessageBody: [
-        Text(msg ?? ''),
-        ...at_users.map(item =>
-          At(item.name, 'user', {
-            name: item.name,
-            avatar: item.avatar,
-            bot: item.bot
-          })
-        )
-      ],
       MessageText: msg,
       OpenId: event.guild_id,
       CreateAt: Date.now(),
@@ -100,31 +89,7 @@ export default defineBot(() => {
     const master_id = config?.master_id ?? []
     const isMaster = master_id.includes(event.author.id)
 
-    let msg = event?.content ?? ''
-
-    // 艾特消息处理
-    const at_users: {
-      id: string
-      name: string
-      avatar: string
-      bot: boolean
-    }[] = []
-
-    if (event.mentions) {
-      // 去掉@ 转为纯消息
-      for await (const item of event.mentions) {
-        at_users.push({
-          id: item.id,
-          name: item.username,
-          avatar: item.avatar,
-          bot: item.bot
-        })
-      }
-      // 循环删除文本中的at信息并去除前后空格
-      at_users.forEach(item => {
-        msg = msg.replace(`<@!${item.id}>`, '').trim()
-      })
-    }
+    let msg = getMessageContent(event)
 
     const UserAvatar = {
       toBuffer: async () => {
@@ -140,7 +105,12 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`qq-guild-bot:${event.author.id}`)
+    const UserId = event.author.id
+
+    const UserKey = useUserHashKey({
+      Platform: 'qq-guild-bot',
+      UserId: UserId
+    })
 
     // 定义消
     const e = {
@@ -154,18 +124,9 @@ export default defineBot(() => {
       UserKey,
       UserName: event?.author?.username ?? '',
       UserAvatar: UserAvatar,
+      IsBot: event.author?.bot,
       // message
       MessageId: event.id,
-      MessageBody: [
-        Text(msg ?? ''),
-        ...at_users.map(item =>
-          Mention(item.name, 'user', {
-            name: item.name,
-            avatar: item.avatar,
-            bot: item.bot
-          })
-        )
-      ],
       MessageText: msg,
       OpenId: event.guild_id,
       CreateAt: Date.now(),
@@ -186,34 +147,22 @@ export default defineBot(() => {
     OnProcessor(e, 'message.create')
   })
 
-  // 私域 -
-  client.on('MESSAGE_CREATE', async event => {
-    // 屏蔽其他机器人的消息
-    if (event.author?.bot) return
-    // 撤回消息
-    if (new RegExp(/DELETE$/).test(event.eventType)) return
-
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author.id)
-
+  /**
+   *
+   * @param event
+   * @returns
+   */
+  const getMessageContent = event => {
     let msg = event?.content ?? ''
-
     // 艾特消息处理
     const at_users: {
       id: string
-      name: string
-      avatar: string
-      bot: boolean
     }[] = []
-
     if (event.mentions) {
       // 去掉@ 转为纯消息
-      for await (const item of event.mentions) {
+      for (const item of event.mentions) {
         at_users.push({
-          id: item.id,
-          name: item.username,
-          avatar: item.avatar,
-          bot: item.bot
+          id: item.id
         })
       }
       // 循环删除文本中的at信息并去除前后空格
@@ -221,6 +170,24 @@ export default defineBot(() => {
         msg = msg.replace(`<@!${item.id}>`, '').trim()
       })
     }
+    return msg
+  }
+
+  // 私域 -
+  client.on('MESSAGE_CREATE', async event => {
+    // 屏蔽其他机器人的消息
+    if (event.author?.bot) return
+
+    // 撤回消息
+    if (new RegExp(/DELETE$/).test(event.eventType)) return
+
+    const master_id = config?.master_id ?? []
+
+    const UserId = event.author.id
+
+    const isMaster = master_id.includes(UserId)
+
+    const msg = getMessageContent(event)
 
     const UserAvatar = {
       toBuffer: async () => {
@@ -236,7 +203,10 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`qq-guild-bot:${event.author.id}`)
+    const UserKey = useUserHashKey({
+      Platform: 'qq-guild-bot',
+      UserId: UserId
+    })
 
     // 定义消
     const e = {
@@ -250,18 +220,9 @@ export default defineBot(() => {
       UserName: event?.author?.username ?? '',
       UserAvatar: UserAvatar,
       IsMaster: isMaster,
+      IsBot: false,
       // message
       MessageId: event.id,
-      MessageBody: [
-        Text(msg ?? ''),
-        ...at_users.map(item =>
-          Mention(item.name, 'user', {
-            name: item.name,
-            avatar: item.avatar,
-            bot: item.bot
-          })
-        )
-      ],
       MessageText: msg,
       OpenId: event.guild_id,
       CreateAt: Date.now(),
@@ -293,12 +254,10 @@ export default defineBot(() => {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -309,12 +268,7 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(item =>
@@ -326,6 +280,24 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async e => {
+          const event: AT_MESSAGE_CREATE_TYPE = e.value
+          // 艾特消息处理
+          const MessageMention: User[] =
+            event?.mentions.map(item => {
+              return {
+                UserId: item.id,
+                IsMaster: false,
+                UserName: item.username,
+                IsBot: item.bot,
+                UserKey: useUserHashKey({
+                  Platform: 'qq-guild-bot',
+                  UserId: item.id
+                })
+              }
+            }) ?? []
+          return MessageMention
         }
       }
     }

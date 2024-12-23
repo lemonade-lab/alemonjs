@@ -67,7 +67,7 @@ const moduleChildrenFiles = async (name: string) => {
  *
  * @param input
  */
-export const onStart = async (input: string = 'lib/index.js') => {
+export const start = async (input: string = 'lib/index.js') => {
   const value = getConfigValue()
   const skip = process.argv.includes('--skip')
   const login = value?.login

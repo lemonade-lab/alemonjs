@@ -207,7 +207,7 @@ export default defineBot(() => {
         mention: async e => {
           const event: MessageInterface = e.value
           const list = await event.mentionList()
-          let MessageMention: User[] = list.map(item => {
+          const MessageMention: User[] = list.map(item => {
             const UserId = item.payload.id
             return {
               UserId: UserId,

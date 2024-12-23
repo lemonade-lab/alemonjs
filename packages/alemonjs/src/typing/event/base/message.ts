@@ -15,3 +15,10 @@ export type MessageText = {
    */
   MessageText: string
 }
+
+export type MessageOpen = {
+  /**
+   * 开放编号
+   */
+  OpenId: string
+}

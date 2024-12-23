@@ -1,4 +1,4 @@
-import { createHash, defineBot, getConfigValue, OnProcessor, Text, useUserHashKey } from 'alemonjs'
+import { defineBot, getConfigValue, OnProcessor, useUserHashKey } from 'alemonjs'
 import TelegramClient from 'node-telegram-bot-api'
 export type Client = typeof TelegramClient.prototype
 export const client: Client = global.client

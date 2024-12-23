@@ -1,4 +1,4 @@
-import { Text, OnProcessor, useParse, defineBot, getConfig, createHash } from 'alemonjs'
+import { Text, OnProcessor, defineBot, getConfig, useUserHashKey } from 'alemonjs'
 import { QQBotGroupClient } from './sdk'
 export type Client = typeof QQBotGroupClient.prototype
 export const client: Client = global.client
@@ -21,6 +21,7 @@ export default defineBot(() => {
     const isMaster = master_id.includes(event.author.id)
 
     const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
+
     const UserAvatar = {
       toBuffer: async () => {
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
@@ -34,12 +35,18 @@ export default defineBot(() => {
         return url
       }
     }
-    const UserKey = createHash(`qq-group-bot:${event.author.id}`)
+
+    const Platform = 'qq-group-bot'
+    const UserId = event.author.id
+    const UserKey = useUserHashKey({
+      Platform: Platform,
+      UserId: UserId
+    })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'qq-group-bot',
+      Platform: Platform,
       // guild
       GuildId: event.group_id,
       ChannelId: event.group_id,
@@ -48,6 +55,7 @@ export default defineBot(() => {
       UserKey,
       UserAvatar: UserAvatar,
       IsMaster: isMaster,
+      IsBot: false,
       // 格式化数据
       MessageId: event.id,
       MessageBody: [Text(event.content.trim())],
@@ -85,19 +93,26 @@ export default defineBot(() => {
         return url
       }
     }
-    const UserKey = createHash(`qq-group-bot:${event.author.id}`)
+
+    const Platform = 'qq-group-bot'
+    const UserId = event.author.id
+    const UserKey = useUserHashKey({
+      Platform: Platform,
+      UserId: UserId
+    })
+
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'qq-group-bot',
+      Platform: Platform,
       // 用户Id
       UserId: event.author.id,
       UserKey,
       UserAvatar: UserAvatar,
       IsMaster: isMaster,
+      IsBot: false,
       // 格式化数据
       MessageId: event.id,
-      MessageBody: [Text(event.content.trim())],
       MessageText: event.content?.trim(),
       CreateAt: Date.now(),
       //
@@ -143,12 +158,10 @@ export default defineBot(() => {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -161,12 +174,7 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(async msg => {
@@ -185,6 +193,10 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async () => {
+          // const event = e.value
+          return []
         }
       }
     }

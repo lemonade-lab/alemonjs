@@ -1,4 +1,12 @@
-import { defineBot, Text, OnProcessor, useParse, getConfig, createHash } from 'alemonjs'
+import {
+  defineBot,
+  Text,
+  OnProcessor,
+  getConfig,
+  createHash,
+  PrivateEventMessageCreate,
+  PublicEventMessageCreate
+} from 'alemonjs'
 import { Client as ICQQClient, segment } from 'icqq'
 import { device, error, qrcode, slider } from './login'
 import { Store } from './store'
@@ -60,8 +68,11 @@ export default defineBot(() => {
     const user_id = String(event.sender.user_id)
     const group_id = String(event.group_id)
     const isMaster = master_id.includes(user_id)
+
     let msg = ''
     const Ats = []
+
+    //
     for (const val of event.message) {
       switch (val.type) {
         case 'text': {
@@ -129,6 +140,7 @@ export default defineBot(() => {
       UserAvatar: UserAvatar,
       UserKey,
       IsMaster: isMaster,
+      IsBot: false,
       // message
       MessageId: event.message_id,
       MessageBody: [Text(msg)].concat(Ats),
@@ -138,7 +150,7 @@ export default defineBot(() => {
       // other
       tag: 'message.group',
       value: null
-    }
+    } as PublicEventMessageCreate
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
@@ -184,6 +196,7 @@ export default defineBot(() => {
       UserAvatar: UserAvatar,
       UserKey,
       IsMaster: isMaster,
+      IsBot: false,
       // message
       MessageId: event.message_id,
       MessageBody: [Text(msg)].concat(Ats),
@@ -193,7 +206,7 @@ export default defineBot(() => {
       // other
       tag: 'message.private',
       value: null
-    }
+    } as PrivateEventMessageCreate
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
@@ -211,23 +224,16 @@ export default defineBot(() => {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
           if (content) {
             return Promise.all(
               [content].map(item => client.pickGroup(event.ChannelId).sendMsg(item))
             )
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(async item => {
@@ -236,6 +242,9 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async () => {
+          return []
         }
       }
     }

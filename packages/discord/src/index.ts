@@ -1,5 +1,6 @@
-import { OnProcessor, defineBot, getConfig, createHash } from 'alemonjs'
+import { OnProcessor, User, defineBot, getConfig, useUserHashKey } from 'alemonjs'
 import { DCClient } from './sdk/index'
+import { MESSAGE_CREATE_TYPE } from '../lib/sdk/platform/discord/sdk/message/MESSAGE_CREATE'
 export type Client = typeof DCClient.prototype
 export const client: Client = global.client
 export default defineBot(() => {
@@ -11,6 +12,8 @@ export default defineBot(() => {
   const client = new DCClient({
     token: config.token
   })
+
+  const Platform = 'discord'
 
   // 连接
   client.connect()
@@ -26,18 +29,12 @@ export default defineBot(() => {
     // 艾特消息处理
     const at_users: {
       id: string
-      name: string
-      avatar: string
-      bot: boolean
     }[] = []
 
     // 获取艾特用户
     for (const item of event.mentions) {
       at_users.push({
-        id: item.id,
-        name: item.username,
-        avatar: client.userAvatar(item.id, item.avatar),
-        bot: item.bot
+        id: item.id
       })
     }
 
@@ -47,9 +44,14 @@ export default defineBot(() => {
       msg = msg.replace(`<@${item.id}>`, '').trim()
     }
 
-    const UserKey = createHash(`gui:${event.author.id}`)
+    const UserId = event.author.id
+    const UserKey = useUserHashKey({
+      Platform: Platform,
+      UserId: UserId
+    })
 
     let url: null | string = null
+
     const UserAvatar = {
       toBuffer: async () => {
         if (!url) {
@@ -76,14 +78,14 @@ export default defineBot(() => {
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'discord',
+      Platform: Platform,
       // guild
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
       // user
       UserId: event.author.id,
-      UserName: event.author.username,
       UserKey,
+      UserName: event.author.username,
       UserAvatar: UserAvatar,
       IsMaster: isMaster,
       IsBot: false,
@@ -109,9 +111,7 @@ export default defineBot(() => {
   })
 
   // 发送错误时
-  client.on('ERROR', msg => {
-    console.error(msg)
-  })
+  client.on('ERROR', console.error)
 
   global.client = client
 
@@ -120,12 +120,11 @@ export default defineBot(() => {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
+          // tudo 根据 数据格式，反馈得到discord可识别的
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -135,18 +134,29 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(item => client.channelsMessagesImage(event.ChannelId, item))
             )
           }
           return Promise.all([])
+        },
+        mention: async e => {
+          const event: MESSAGE_CREATE_TYPE = e.value
+          const MessageMention: User[] = event.mentions.map(item => {
+            return {
+              UserId: item.id,
+              IsMaster: false,
+              IsBot: item.bot,
+              // avatar: client.userAvatar(item.id, item.avatar),
+              UserKey: useUserHashKey({
+                Platform: 'discord',
+                UserId: item.id
+              })
+            }
+          })
+          return MessageMention
         }
       }
     }

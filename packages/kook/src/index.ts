@@ -1,4 +1,11 @@
-import { defineBot, Text, OnProcessor, useParse, Mention, getConfig, createHash } from 'alemonjs'
+import {
+  defineBot,
+  OnProcessor,
+  getConfig,
+  createHash,
+  PrivateEventMessageCreate,
+  PublicEventMessageCreate
+} from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 export type Client = typeof KOOKClient.prototype
 export const client: Client = global.client
@@ -29,14 +36,6 @@ export default defineBot(() => {
     // 获取消息
     let msg = event.content
 
-    // 艾特消息处理
-    const at_users: {
-      id: string
-      name: string
-      avatar: string
-      bot: boolean
-    }[] = []
-
     const url = avatar.substring(0, avatar.indexOf('?'))
     const UserAvatar = {
       toBuffer: async () => {
@@ -55,7 +54,7 @@ export default defineBot(() => {
     const UserKey = createHash(`kook:${event.author_id}`)
 
     // 定义消
-    const e = {
+    const e: PrivateEventMessageCreate = {
       // 事件类型
       Platform: 'kook',
       // 用户Id
@@ -64,15 +63,11 @@ export default defineBot(() => {
       UserName: event.extra.author.username,
       UserAvatar: UserAvatar,
       IsMaster: isMaster,
+      IsBot: false,
       // message
       MessageId: event.msg_id,
-      MessageBody: [
-        Text(msg),
-        ...at_users.map(item =>
-          Mention(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
-        )
-      ],
       MessageText: msg,
+      OpenId: '',
       CreateAt: Date.now(),
       //
       tag: 'MESSAGES_PUBLIC',
@@ -108,26 +103,12 @@ export default defineBot(() => {
     // 获取消息
     let msg = event.content
 
-    // 艾特消息处理
-    const at_users: {
-      id: string
-      name: string
-      avatar: string
-      bot: boolean
-    }[] = []
-
     /**
      * 艾特类型所得到的
      * 包括机器人在内
      */
     const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? []
     for (const item of mention_role_part) {
-      at_users.push({
-        id: item.role_id,
-        name: item.name,
-        avatar: '',
-        bot: true
-      })
       msg = msg.replace(`(rol)${item.role_id}(rol)`, '').trim()
     }
 
@@ -136,12 +117,6 @@ export default defineBot(() => {
      */
     const mention_part = event.extra.kmarkdown?.mention_part ?? []
     for (const item of mention_part) {
-      at_users.push({
-        id: item.id,
-        name: item.username,
-        avatar: item.avatar,
-        bot: false
-      })
       msg = msg.replace(`(met)${item.id}(met)`, '').trim()
     }
 
@@ -163,7 +138,7 @@ export default defineBot(() => {
     const UserKey = createHash(`kook:${event.author_id}`)
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
       // 事件类型
       Platform: 'kook',
       //
@@ -175,14 +150,9 @@ export default defineBot(() => {
       UserName: event.extra.author.username,
       UserAvatar: UserAvatar,
       IsMaster: isMaster,
+      IsBot: false,
       // message
       MessageId: event.msg_id,
-      MessageBody: [
-        Text(msg),
-        ...at_users.map(item =>
-          Mention(item.id, 'user', { name: item.name, avatar: item.avatar, bot: item.bot })
-        )
-      ],
       MessageText: msg,
       OpenId: data?.code,
       CreateAt: Date.now(),
@@ -215,12 +185,10 @@ export default defineBot(() => {
       use: {
         send: (event, val: any[]) => {
           if (val.length < 0) return Promise.all([])
-          const content = useParse(
-            {
-              MessageBody: val
-            },
-            'Text'
-          )
+          const content = val
+            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .map(item => item.value)
+            .join('')
           if (content) {
             return Promise.all(
               [content].map(item =>
@@ -232,12 +200,7 @@ export default defineBot(() => {
               )
             )
           }
-          const images = useParse(
-            {
-              MessageBody: val
-            },
-            'Image'
-          )
+          const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
             return Promise.all(
               images.map(async item => {
@@ -254,6 +217,45 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async e => {
+          const event = e.value
+          // 艾特消息处理
+          const at_users: {
+            id: string
+            name: string
+            avatar: string
+            bot: boolean
+          }[] = []
+
+          /**
+           * 艾特类型所得到的
+           * 包括机器人在内
+           */
+          const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? []
+          for (const item of mention_role_part) {
+            at_users.push({
+              id: item.role_id,
+              name: item.name,
+              avatar: '',
+              bot: true
+            })
+          }
+
+          /**
+           * 艾特用户所得到的
+           */
+          const mention_part = event.extra.kmarkdown?.mention_part ?? []
+          for (const item of mention_part) {
+            at_users.push({
+              id: item.id,
+              name: item.username,
+              avatar: item.avatar,
+              bot: false
+            })
+          }
+
+          return []
         }
       }
     }
