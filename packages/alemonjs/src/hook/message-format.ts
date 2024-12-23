@@ -12,14 +12,17 @@ import {
   DataVideoType,
   DataVoiceType
 } from '../typing/message'
-export const Text = (val: string, options?: DataTextType['options']): DataTextType => {
+export const Text = (
+  val: DataTextType['value'],
+  options?: DataTextType['options']
+): DataTextType => {
   return {
     type: 'Text',
     value: val,
     options
   }
 }
-export const Image = (val: Buffer): DataImageType => {
+export const Image = (val: DataImageType['value']): DataImageType => {
   return {
     type: 'Image',
     value: val
@@ -32,7 +35,10 @@ export const Image = (val: Buffer): DataImageType => {
  * @param options 默认 user
  * @returns
  */
-export const Mention = (UserId?: string, options?: DataMentionType['options']): DataMentionType => {
+export const Mention = (
+  UserId?: DataMentionType['value'],
+  options?: DataMentionType['options']
+): DataMentionType => {
   return {
     type: 'Mention',
     value: UserId,
@@ -43,58 +49,67 @@ export const Mention = (UserId?: string, options?: DataMentionType['options']): 
   }
 }
 
-export const Link = (value: string, options: DataLinkType['options']): DataLinkType => {
+export const Link = (
+  value: DataLinkType['value'],
+  options: DataLinkType['options']
+): DataLinkType => {
   return {
     type: 'Link',
     value,
     options
   }
 }
-export const Ark = (val: any): DataArkType => {
+export const Ark = (val: DataArkType['value']): DataArkType => {
   return {
     type: 'Ark',
     value: val
   }
 }
-export const Embed = (val: any): DataEmbedType => {
+export const Embed = (val: DataEmbedType['value']): DataEmbedType => {
   return {
     type: 'Embed',
     value: val
   }
 }
-export const Emoji = (val: 1): DataEmojiType => {
+export const Emoji = (val: DataEmojiType['value']): DataEmojiType => {
   return {
     type: 'Emoji',
     value: val
   }
 }
-export const Button = (title: string, options: DataButtonType['options']): DataButtonType => {
+export const Button = (
+  title: DataButtonType['value'],
+  options: DataButtonType['options']
+): DataButtonType => {
   return {
     type: 'Button',
     value: title,
     options
   }
 }
-export const ButtonBox = (value: any, options: DataButtonBoxType['options']): DataButtonBoxType => {
+export const ButtonBox = (
+  value: DataButtonBoxType['value'],
+  options: DataButtonBoxType['options']
+): DataButtonBoxType => {
   return {
     type: 'ButtonBox',
     value: value,
     options
   }
 }
-export const File = (val: string): DataFileType => {
+export const File = (val: DataFileType['value']): DataFileType => {
   return {
     type: 'File',
     value: val
   }
 }
-export const Video = (val: string): DataVideoType => {
+export const Video = (val: DataVideoType['value']): DataVideoType => {
   return {
     type: 'Video',
     value: val
   }
 }
-export const Voice = (val: any): DataVoiceType => {
+export const Voice = (val: DataVoiceType['value']): DataVoiceType => {
   return {
     type: 'Voice',
     value: val

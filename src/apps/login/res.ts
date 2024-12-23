@@ -9,7 +9,7 @@ const Res = OnResponse((event, next) => {
   if (text === '123456') {
     Send(Text('密码正确'))
     // 结束
-  } else if (text == 'close') {
+  } else if (text == '/close') {
     // 结束
     Send(Text('取消登录'))
   } else {
@@ -20,7 +20,7 @@ const Res = OnResponse((event, next) => {
 }, 'message.create')
 
 export default OnResponse((event, next) => {
-  if (!/^(#|\/)?登录账号$/.test(event.MessageText)) {
+  if (!/^(#|\/)?login$/.test(event.MessageText)) {
     next()
     return
   }
@@ -31,6 +31,8 @@ export default OnResponse((event, next) => {
 
   // 创建观察者
   const Observer = useObserver(event, 'message.create')
-  // 观察触发者的Id
-  Observer(Res.current, ['UserId'])
+  Observer(Res.current, [
+    // 观察条件，当前用户
+    'UserId'
+  ])
 }, 'message.create')

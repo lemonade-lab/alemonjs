@@ -5,24 +5,29 @@ export default OnResponse(async (event, next) => {
     return
   }
 
-  const ats = await useMention(event)
-  if (!ats || ats.length === 0) {
+  const Mentions = await useMention(event)
+  if (!Mentions || Mentions.length === 0) {
     return // @ 提及为空
   }
 
   // 查找用户类型的 @ 提及，且不是 bot
-  const UserId = ats.find(item => !item.IsBot)
-  if (!UserId) {
+  const User = Mentions.find(item => !item.IsBot)
+  if (!User) {
     return // 未找到用户Id
   }
 
+  console.log('User:', User)
+
+  // 使用${Platform}:${UserId}哈希所得，长度为11的字符串
+  // 这是用户的唯一标识，可用作数据库表的主键
+  // User.UserKey
+
   const text = event.MessageText
-  if (!text) {
+  if (!text || text == '') {
     return // 消息为空
   }
 
-  console.log('被AT的用户Id:', UserId)
-  console.log('消息内容:', text)
+  console.log('text:', text)
 
   // 处理被AT的用户...
 }, 'message.create')
