@@ -1,5 +1,4 @@
 import {
-  createHash,
   defineBot,
   getConfig,
   OnProcessor,
@@ -48,14 +47,14 @@ export default defineBot(() => {
   // 创建 WebSocketServer 并监听同一个端口
   const wss = new WebSocketServer({ server: server })
 
+  const Platform = 'gui'
+
   //
   let client = null
   //
   const onMessage = event => {
     //
     const txt = event.MessageText
-
-    const Platform = 'gui'
 
     const UserKey = useUserHashKey({
       Platform: Platform,
@@ -116,7 +115,11 @@ export default defineBot(() => {
 
   const onProvateMessage = event => {
     const txt = event.MessageBody.find((item: any) => item.t == 'text')
-    const UserKey = createHash(`gui:${event.UserId}`)
+    //
+    const UserKey = useUserHashKey({
+      Platform: Platform,
+      UserId: event.UserId
+    })
     const e: PrivateEventMessageCreate = {
       // 事件类型
       Platform: event.Platform,

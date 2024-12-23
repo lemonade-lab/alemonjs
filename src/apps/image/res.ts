@@ -10,7 +10,8 @@ export default OnResponse((event, next) => {
   // 发送本地图片文件
   const img = readFileSync(url)
   if (img) {
-    Send(Image(img))
+    Send(Image(img), Image(img))
+    // Send(Image(img))
   } else {
     Send(Text('图片不存在'))
   }

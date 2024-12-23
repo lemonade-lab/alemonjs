@@ -2,20 +2,23 @@ import {
   defineBot,
   Text,
   OnProcessor,
-  getConfig,
-  createHash,
   PrivateEventMessageCreate,
-  PublicEventMessageCreate
+  PublicEventMessageCreate,
+  useUserHashKey,
+  getConfigValue,
+  User
 } from 'alemonjs'
-import { Client as ICQQClient, segment } from 'icqq'
+import { Client as ICQQClient, PrivateMessageEvent, segment, Sendable } from 'icqq'
 import { device, error, qrcode, slider } from './login'
 import { Store } from './store'
 export type Client = typeof ICQQClient.prototype
 export const client: Client = global.client
 export default defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value?.qq
+  const value = getConfigValue()
+  const config = value?.qq
   if (!config) return
+
+  const Platform = 'qq'
 
   const d = Number(config?.device)
   // 创建客户端
@@ -28,8 +31,6 @@ export default defineBot(() => {
     ver: config?.ver
   })
   const qq = Number(config.qq)
-  // 主人
-  const master_key: string[] = config?.master_key ?? []
 
   // 连接
   client.login(qq, config.password)
@@ -46,6 +47,9 @@ export default defineBot(() => {
 
   // 登录
   client.on('system.online', async () => {
+    const value = getConfigValue()
+    const config = value?.qq
+    const master_key: string[] = config?.master_key ?? []
     if (master_key[0]) {
       const val = LocalStore.getItem()
       const Now = Date.now()
@@ -65,12 +69,14 @@ export default defineBot(() => {
 
   // 监听消息
   client.on('message.group', async event => {
+    const value = getConfigValue()
+    const config = value?.qq
+    const master_key: string[] = config?.master_key ?? []
     const user_id = String(event.sender.user_id)
     const group_id = String(event.group_id)
     const isMaster = master_key.includes(user_id)
 
     let msg = ''
-    const Ats = []
 
     //
     for (const val of event.message) {
@@ -80,30 +86,6 @@ export default defineBot(() => {
             .replace(/^\s*[＃井#]+\s*/, '#')
             .replace(/^\s*[\\*※＊]+\s*/, '*')
             .trim()
-          break
-        }
-        case 'at': {
-          if (val.qq == 'all') {
-            // everyone
-            Ats.push({
-              type: 'At',
-              value: 'everyone',
-              typing: 'everyone',
-              name: 'everyone',
-              avatar: 'everyone',
-              bot: false
-            })
-          } else {
-            // user
-            Ats.push({
-              type: 'At',
-              value: String(val.qq),
-              typing: 'user',
-              name: '',
-              avatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${val.qq}`,
-              bot: val.qq == qq
-            })
-          }
           break
         }
       }
@@ -125,12 +107,16 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`qq:${user_id}`)
+    const UserId = user_id
+    const UserKey = useUserHashKey({
+      Platform: Platform,
+      UserId
+    })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'qq',
+      Platform: Platform,
       // 频道
       GuildId: group_id,
       ChannelId: group_id,
@@ -143,7 +129,6 @@ export default defineBot(() => {
       IsBot: false,
       // message
       MessageId: event.message_id,
-      MessageBody: [Text(msg)].concat(Ats),
       MessageText: msg,
       OpenId: user_id,
       CreateAt: Date.now(),
@@ -163,6 +148,9 @@ export default defineBot(() => {
 
   // 监听消息
   client.on('message.private', async event => {
+    const value = getConfigValue()
+    const config = value?.qq
+    const master_key: string[] = config?.master_key ?? []
     const user_id = String(event.sender.user_id)
     const isMaster = master_key.includes(user_id)
     let msg = ''
@@ -184,12 +172,16 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`qq:${user_id}`)
+    const UserId = user_id
+    const UserKey = useUserHashKey({
+      Platform: Platform,
+      UserId
+    })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'qq',
+      Platform: Platform,
       // 用户
       UserId: user_id,
       UserName: event.sender.nickname,
@@ -222,29 +214,66 @@ export default defineBot(() => {
   return {
     api: {
       use: {
-        send: (event, val: any[]) => {
+        send: (event, val) => {
           if (val.length < 0) return Promise.all([])
-          const content = val
+          const content: Sendable = val
             .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
-            .join('')
+            .map(item => {
+              if (item.type == 'Link') {
+                return segment.share(item.value, item.options?.title ?? item.value)
+              } else if (item.type == 'Mention') {
+                if (
+                  item.value == 'everyone' ||
+                  item.value == 'all' ||
+                  item.value == '' ||
+                  typeof item.value != 'string'
+                ) {
+                  return segment.at('all')
+                }
+                if (item.options?.belong == 'user') {
+                  return segment.at(item.value)
+                }
+                return segment.text('')
+              } else if (item.type == 'Text') {
+                return segment.text(item.value)
+              }
+            })
           if (content) {
-            return Promise.all(
-              [content].map(item => client.pickGroup(event.ChannelId).sendMsg(item))
-            )
+            return Promise.all([client.pickGroup(event.ChannelId).sendMsg(content)])
           }
           const images = val.filter(item => item.type == 'Image').map(item => item.value)
           if (images) {
-            return Promise.all(
-              images.map(async item => {
-                return await client.pickGroup(event.ChannelId).sendMsg(segment.image(item))
-              })
-            )
+            return Promise.all([
+              client.pickGroup(event.ChannelId).sendMsg(images.map(item => segment.image(item)))
+            ])
           }
           return Promise.all([])
         },
-        mention: async () => {
-          return []
+        mention: async e => {
+          let event: PrivateMessageEvent = e.value
+          const value = getConfigValue()
+          const config = value?.qq
+          const master_key: string[] = config?.master_key ?? []
+          const MessageMention: User[] = []
+          for (const item of event.message) {
+            if (item.type == 'at') {
+              if (item.qq == 'all') continue
+              const UserId = String(item.qq)
+              const UserKey = useUserHashKey({
+                Platform: Platform,
+                UserId: UserId
+              })
+              MessageMention.push({
+                UserId: UserId,
+                UserName: '',
+                // UserAvatar: `https://q1.qlogo.cn/g?b=qq&s=0&nk=${item.qq}`,
+                UserKey: UserKey,
+                IsMaster: master_key.includes(UserId),
+                IsBot: item.qq == qq
+              })
+            }
+          }
+          return MessageMention
         }
       }
     }

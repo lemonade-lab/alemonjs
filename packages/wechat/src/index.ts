@@ -14,6 +14,8 @@ export default defineBot(() => {
     name: config?.name ?? 'alemonjs'
   })
 
+  const Platform = 'wechat'
+
   let i = 0
   bot
     .on('scan', (qrcode, status) => {
@@ -91,7 +93,7 @@ export default defineBot(() => {
       const UserId = event.payload.talkerId
 
       const UserKey = useUserHashKey({
-        Platform: 'wechat',
+        Platform: Platform,
         UserId
       })
 
@@ -109,7 +111,7 @@ export default defineBot(() => {
         // 定义消
         const e = {
           // 事件类型
-          Platform: 'wechat',
+          Platform: Platform,
           /**
            * guild
            */
@@ -145,7 +147,7 @@ export default defineBot(() => {
         // 定义消
         const e = {
           // 事件类型
-          Platform: 'wechat',
+          Platform: Platform,
           // 用户Id
           UserId: UserId,
           UserKey: UserKey,
@@ -209,14 +211,14 @@ export default defineBot(() => {
           const list = await event.mentionList()
           const MessageMention: User[] = list.map(item => {
             const UserId = item.payload.id
+            // const avatar = item.payload.avatar
             return {
               UserId: UserId,
               UserName: item.payload.name,
-              // UserAvatar: item.payload.avatar,
               IsBot: false,
               IsMaster: false,
               UserKey: useUserHashKey({
-                Platform: 'wechat',
+                Platform: Platform,
                 UserId: UserId
               })
             }

@@ -128,7 +128,7 @@ export default defineBot(() => {
       // 定义消
       const e = {
         // 事件类型
-        Platform: 'telegram',
+        Platform: Platform,
         // 用户Id
         UserId: String(event?.from.id),
         UserKey: UserKey,

@@ -1,4 +1,4 @@
-import { createHash, defineBot, getConfig, OnProcessor } from 'alemonjs'
+import { defineBot, getConfig, OnProcessor, useUserHashKey } from 'alemonjs'
 import { OneBotClient } from './sdk-v12/wss'
 
 const MyBot = {
@@ -19,6 +19,8 @@ export default defineBot(() => {
     // token
     access_token: config?.token ?? ''
   })
+
+  const Platform = 'onebot'
 
   //
   client.connect()
@@ -76,38 +78,36 @@ export default defineBot(() => {
         return url
       }
     }
-    const UserKey = createHash(`onebot:${event.user_id}`)
+
+    const UserId = String(event.user_id)
+    const UserKey = useUserHashKey({
+      Platform,
+      UserId
+    })
 
     // 定义消
     const e = {
       // 平台类型
-      Platform: 'onebot',
+      Platform: Platform,
       // 频道
       GuildId: event.group_id,
       // guild_name: event.group_name,
       // 子频道
       ChannelId: event.group_id,
-      // 是否是主人
+      // uyser
       IsMaster: uis.includes(String(event.user_id)),
-      // 用户Id
-      UserId: event.user_id,
+      UserId: UserId,
+      IsBot: false,
       UserKey,
-      // 用户名
       UserName: event.sender.nickname,
-      // 用户头像
       UserAvatar: UserAvatar,
-      // 格式化数据
+      // message
       MessageId: event.message_id,
-      // 用户消息
       MessageText: msg,
-      // 表情
-      // 用户openId
       OpenId: event.user_id,
-      //
-      tag: 'MESSAGES',
-      // 创建时间
       CreateAt: Date.now(),
-      //
+      // ohther
+      tag: 'MESSAGES',
       value: null
     }
     // 当访问的时候获取
@@ -185,6 +185,9 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async () => {
+          return []
         }
       }
     }

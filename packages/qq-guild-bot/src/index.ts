@@ -8,6 +8,8 @@ export default defineBot(() => {
   const config = cfg.value?.['qq-guild-bot']
   if (!config) return
 
+  const Platform = 'qq-guild-bot'
+
   // 创建客户端
   const client = new QQBotGuildClient({
     appId: config.app_id,
@@ -41,14 +43,14 @@ export default defineBot(() => {
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
-      Platform: 'qq-guild-bot',
+      Platform: Platform,
       UserId: UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'qq-guild-bot',
+      Platform: Platform,
       //
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
@@ -108,14 +110,14 @@ export default defineBot(() => {
     const UserId = event.author.id
 
     const UserKey = useUserHashKey({
-      Platform: 'qq-guild-bot',
+      Platform: Platform,
       UserId: UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'qq-guild-bot',
+      Platform: Platform,
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
       IsMaster: isMaster,
@@ -204,14 +206,14 @@ export default defineBot(() => {
     }
 
     const UserKey = useUserHashKey({
-      Platform: 'qq-guild-bot',
+      Platform: Platform,
       UserId: UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: 'qq-guild-bot',
+      Platform: Platform,
       //
       GuildId: event.guild_id,
       ChannelId: event.channel_id,

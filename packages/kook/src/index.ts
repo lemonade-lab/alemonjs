@@ -63,9 +63,9 @@ export default defineBot(() => {
     // 定义消
     const e: PrivateEventMessageCreate = {
       // 事件类型
-      Platform: 'kook',
+      Platform: Platform,
       // 用户Id
-      UserId: event.author_id,
+      UserId: UserId,
       UserKey,
       UserName: event.extra.author.username,
       UserAvatar: UserAvatar,
@@ -151,12 +151,12 @@ export default defineBot(() => {
     // 定义消
     const e: PublicEventMessageCreate = {
       // 事件类型
-      Platform: 'kook',
+      Platform: Platform,
       //
       GuildId: event.extra.guild_id,
       ChannelId: event.target_id,
       // 用户Id
-      UserId: event.author_id,
+      UserId: UserId,
       UserKey,
       UserName: event.extra.author.username,
       UserAvatar: UserAvatar,

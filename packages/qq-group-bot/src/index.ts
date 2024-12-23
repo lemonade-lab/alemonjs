@@ -14,6 +14,8 @@ export default defineBot(() => {
   const config = cfg.value?.['qq-group-bot']
   if (!config) return
 
+  const Platform = 'qq-group-bot'
+
   // 创建客户端
   const client = new QQBotGroupClient({
     appId: config.app_id,
@@ -43,7 +45,6 @@ export default defineBot(() => {
       }
     }
 
-    const Platform = 'qq-group-bot'
     const UserId = event.author.id
     const UserKey = useUserHashKey({
       Platform: Platform,
@@ -100,8 +101,8 @@ export default defineBot(() => {
       }
     }
 
-    const Platform = 'qq-group-bot'
     const UserId = event.author.id
+
     const UserKey = useUserHashKey({
       Platform: Platform,
       UserId: UserId

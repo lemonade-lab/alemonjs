@@ -1,4 +1,4 @@
-import { createHash, defineBot, getConfig, OnProcessor } from 'alemonjs'
+import { defineBot, getConfig, OnProcessor, useUserHashKey } from 'alemonjs'
 import { OneBotClient } from './sdk-v11/wss'
 
 const MyBot = {
@@ -20,6 +20,8 @@ export default defineBot(() => {
     access_token: config?.token ?? ''
   })
 
+  const Platform = 'onebot'
+
   //
   client.connect()
 
@@ -35,7 +37,7 @@ export default defineBot(() => {
     const uis = config.master_uids ?? []
     let msg = ''
     const arr = []
-    let at_users = []
+    // let at_users = []
     for (const item of event.message) {
       if (item.type == 'text') {
         msg = item.data.text
@@ -60,33 +62,31 @@ export default defineBot(() => {
         return url
       }
     }
-    const UserKey = createHash(`onebot:${event.user_id}`)
+
+    const UserId = String(event.user_id)
+    const UserKey = useUserHashKey({
+      Platform,
+      UserId
+    })
 
     // 定义消
     const e = {
       // 平台类型
-      Platform: 'onebot',
+      Platform: Platform,
       // 频道
       GuildId: String(event.group_id),
       // guild_name: event.group_name,
       // 子频道
       ChannelId: String(event.group_id),
-      // 是否是主人
       IsMaster: uis.includes(String(event.user_id)),
       IsBot: false,
-      // 用户Id
-      UserId: String(event.user_id),
-      // 用户名
+      UserId: UserId,
       UserName: event.sender.nickname,
       UserKey,
-      // 用户头像
       UserAvatar: UserAvatar,
-      // 格式化数据
+      // message
       MessageId: String(event.message_id),
-      // 用户消息
       MessageText: msg,
-      MessageMention: [],
-      // 用户openId
       // 用户openId
       OpenId: String(event.user_id),
       // 创建时间
@@ -171,6 +171,9 @@ export default defineBot(() => {
             )
           }
           return Promise.all([])
+        },
+        mention: async () => {
+          return []
         }
       }
     }

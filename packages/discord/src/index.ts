@@ -55,21 +55,21 @@ export default defineBot(() => {
     const UserAvatar = {
       toBuffer: async () => {
         if (!url) {
-          url = client.userAvatar(event.author.id, event.author.avatar)
+          url = client.userAvatar(UserId, event.author.avatar)
         }
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
         return Buffer.from(arrayBuffer)
       },
       toBase64: async () => {
         if (!url) {
-          url = client.userAvatar(event.author.id, event.author.avatar)
+          url = client.userAvatar(UserId, event.author.avatar)
         }
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
         return Buffer.from(arrayBuffer).toString('base64')
       },
       toURL: async () => {
         if (!url) {
-          url = client.userAvatar(event.author.id, event.author.avatar)
+          url = client.userAvatar(UserId, event.author.avatar)
         }
         return url
       }
@@ -83,7 +83,7 @@ export default defineBot(() => {
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
       // user
-      UserId: event.author.id,
+      UserId: UserId,
       UserKey,
       UserName: event.author.username,
       UserAvatar: UserAvatar,
