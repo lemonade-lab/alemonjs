@@ -17,7 +17,7 @@ discord:
   # 令牌
   token: ''
   # 主人
-  master_id: null
+  master_key: null
   # 前缀（非必填）
   intent: null
   # 活动 非必填）

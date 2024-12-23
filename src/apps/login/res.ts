@@ -20,7 +20,7 @@ const Res = OnResponse((event, next) => {
 }, 'message.create')
 
 export default OnResponse((event, next) => {
-  if (!/^(#|\/)?登陆账号$/.test(event.MessageText)) {
+  if (!/^(#|\/)?登录账号$/.test(event.MessageText)) {
     next()
     return
   }

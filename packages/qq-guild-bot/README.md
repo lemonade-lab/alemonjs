@@ -29,7 +29,7 @@ qq-guild-bot:
   # 令牌
   token: ''
   # 主人
-  master_id:
+  master_key:
     - ''
   # 事件订阅（有默认）
   intents: null

@@ -33,7 +33,7 @@ qq-group-bot:
   # 密钥
   secret: ''
   # 主人
-  master_id:
+  master_key:
     - ''
   # 事件订阅（有默认）
   intents: null

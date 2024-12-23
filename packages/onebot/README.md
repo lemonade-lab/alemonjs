@@ -8,6 +8,6 @@
 onebot:
   url: ''
   token: ''
-  master_id: null
+  master_key: null
   version: 'v11'
 ```

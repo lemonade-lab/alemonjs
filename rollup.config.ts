@@ -86,7 +86,23 @@ const BuildByName = (name: string) => {
 }
 
 const build = () => {
-  if (process.env.build == 'discord') {
+  const builds = [
+    'alemonjs',
+    'discord',
+    'qq',
+    'onebot',
+    'kook',
+    'qq-group-bot',
+    'qq-guild-bot',
+    'telegram',
+    'gui',
+    'wechat'
+  ]
+  if (process.env.build == 'all') {
+    builds.forEach(name => {
+      BuildByName(name)
+    })
+  } else if (process.env.build == 'discord') {
     BuildByName('discord')
   } else if (process.env.build == 'qq') {
     BuildByName('qq')
@@ -98,12 +114,8 @@ const build = () => {
     BuildByName('qq-group-bot')
   } else if (process.env.build == 'guild') {
     BuildByName('qq-guild-bot')
-  } else if (process.env.build == 'readline') {
-    BuildByName('readline')
   } else if (process.env.build == 'telegram') {
     BuildByName('telegram')
-  } else if (process.env.build == 'space') {
-    BuildByName('chat-space')
   } else if (process.env.build == 'gui') {
     BuildByName('gui')
   } else if (process.env.build == 'wechat') {

@@ -25,14 +25,21 @@ export const Image = (val: Buffer): DataImageType => {
     value: val
   }
 }
-export const Mention = (
-  UserId: string | 'everyone',
-  options?: DataMentionType['options']
-): DataMentionType => {
+
+/**
+ *
+ * @param UserId 默认 @ 所有人
+ * @param options 默认 user
+ * @returns
+ */
+export const Mention = (UserId?: string, options?: DataMentionType['options']): DataMentionType => {
   return {
     type: 'Mention',
-    value: UserId ?? 'everyone',
-    options
+    value: UserId,
+    //
+    options: options ?? {
+      belong: 'user'
+    }
   }
 }
 

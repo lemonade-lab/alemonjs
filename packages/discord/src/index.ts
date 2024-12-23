@@ -1,11 +1,11 @@
-import { OnProcessor, User, defineBot, getConfig, useUserHashKey } from 'alemonjs'
+import { OnProcessor, User, defineBot, getConfigValue, useUserHashKey } from 'alemonjs'
 import { DCClient } from './sdk/index'
 import { MESSAGE_CREATE_TYPE } from '../lib/sdk/platform/discord/sdk/message/MESSAGE_CREATE'
 export type Client = typeof DCClient.prototype
 export const client: Client = global.client
 export default defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value?.discord
+  const value = getConfigValue()
+  const config = value?.discord
   if (!config) return
 
   // 创建客户端
@@ -23,8 +23,8 @@ export default defineBot(() => {
     // 消除bot消息
     if (event.author?.bot) return
 
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author.id)
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author.id)
 
     // 艾特消息处理
     const at_users: {
@@ -118,12 +118,41 @@ export default defineBot(() => {
   return {
     api: {
       use: {
-        send: (event, val: any[]) => {
+        send: (event, val) => {
           if (val.length < 0) return Promise.all([])
-          // tudo 根据 数据格式，反馈得到discord可识别的
           const content = val
             .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
+            .map(item => {
+              if (item.type == 'Link') {
+                return `[${item.options?.title ?? item.value}](${item.value})`
+              } else if (item.type == 'Mention') {
+                if (
+                  item.value == 'everyone' ||
+                  item.value == 'all' ||
+                  item.value == '' ||
+                  typeof item.value != 'string'
+                ) {
+                  return `<@everyone>`
+                }
+                if (item.options?.belong == 'user') {
+                  return `<@${item.value}>`
+                } else if (item.options?.belong == 'channel') {
+                  return `<#${item.value}>`
+                }
+                return ''
+              } else if (item.type == 'Text') {
+                if (item.options?.style == 'block') {
+                  return `\`${item.value}\``
+                } else if (item.options?.style == 'italic') {
+                  return `*${item.value}*`
+                } else if (item.options?.style == 'bold') {
+                  return `**${item.value}**`
+                } else if (item.options?.style == 'strikethrough') {
+                  return `~~${item.value}~~`
+                }
+                return item.value
+              }
+            })
             .join('')
           if (content) {
             return Promise.all(
@@ -145,14 +174,43 @@ export default defineBot(() => {
         mention: async e => {
           const event: MESSAGE_CREATE_TYPE = e.value
           const MessageMention: User[] = event.mentions.map(item => {
+            let url = null
+            const Platform = 'discord'
+            const UserId = item.id
+            const avatar = event.author.avatar
+            const value = getConfigValue()
+            const config = value?.discord
+            const master_key = config?.master_key ?? []
+            const UserAvatar = {
+              toBuffer: async () => {
+                if (!url) {
+                  url = client.userAvatar(UserId, avatar)
+                }
+                const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+                return Buffer.from(arrayBuffer)
+              },
+              toBase64: async () => {
+                if (!url) {
+                  url = client.userAvatar(UserId, avatar)
+                }
+                const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+                return Buffer.from(arrayBuffer).toString('base64')
+              },
+              toURL: async () => {
+                if (!url) {
+                  url = client.userAvatar(UserId, avatar)
+                }
+                return url
+              }
+            }
             return {
               UserId: item.id,
-              IsMaster: false,
+              IsMaster: master_key.includes(UserId),
               IsBot: item.bot,
-              // avatar: client.userAvatar(item.id, item.avatar),
+              UserAvatar,
               UserKey: useUserHashKey({
-                Platform: 'discord',
-                UserId: item.id
+                Platform: Platform,
+                UserId: UserId
               })
             }
           })

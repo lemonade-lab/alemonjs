@@ -20,8 +20,8 @@ export default defineBot(() => {
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) return
 
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author.id)
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author.id)
 
     let msg = event?.content ?? ''
 
@@ -86,8 +86,8 @@ export default defineBot(() => {
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) return
 
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author.id)
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author.id)
 
     let msg = getMessageContent(event)
 
@@ -181,11 +181,11 @@ export default defineBot(() => {
     // 撤回消息
     if (new RegExp(/DELETE$/).test(event.eventType)) return
 
-    const master_id = config?.master_id ?? []
+    const master_key = config?.master_key ?? []
 
     const UserId = event.author.id
 
-    const isMaster = master_id.includes(UserId)
+    const isMaster = master_key.includes(UserId)
 
     const msg = getMessageContent(event)
 
@@ -252,11 +252,32 @@ export default defineBot(() => {
   return {
     api: {
       use: {
-        send: (event, val: any[]) => {
+        send: (event, val) => {
           if (val.length < 0) return Promise.all([])
           const content = val
             .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
+            .map(item => {
+              if (item.type == 'Link') {
+                return `[${item.options?.title ?? item.value}](${item.value})`
+              } else if (item.type == 'Mention') {
+                if (
+                  item.value == 'everyone' ||
+                  item.value == 'all' ||
+                  item.value == '' ||
+                  typeof item.value != 'string'
+                ) {
+                  return `@everyone`
+                }
+                if (item.options?.belong == 'user') {
+                  return `<@!${item.value}>`
+                } else if (item.options?.belong == 'channel') {
+                  return `<#${item.value}>`
+                }
+                return ''
+              } else if (item.type == 'Text') {
+                return item.value
+              }
+            })
             .join('')
           if (content) {
             return Promise.all(

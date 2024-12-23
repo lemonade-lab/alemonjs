@@ -25,7 +25,7 @@ export type DataImageType = {
  */
 export type DataMentionType = {
   type: 'Mention'
-  value: string
+  value?: string
   options?: {
     belong?: 'user' | 'guild' | 'channel' | 'everyone'
     payload?: User | Guild | Channel | 'everyone'

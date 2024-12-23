@@ -1,23 +1,26 @@
 import {
   defineBot,
   OnProcessor,
-  getConfig,
-  createHash,
   PrivateEventMessageCreate,
-  PublicEventMessageCreate
+  PublicEventMessageCreate,
+  getConfigValue,
+  useUserHashKey,
+  User
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 export type Client = typeof KOOKClient.prototype
 export const client: Client = global.client
 export default defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value?.kook
+  const value = getConfigValue()
+  const config = value?.kook
   if (!config) return
 
   // 创建客户端
   const client = new KOOKClient({
     token: config.token
   })
+
+  const Platform = 'kook'
 
   // 连接
   client.connect()
@@ -27,8 +30,8 @@ export default defineBot(() => {
     if (event.extra?.author?.bot) return false
 
     // 主人
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author_id)
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author_id)
 
     // 头像
     const avatar = event.extra.author.avatar
@@ -51,7 +54,11 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`kook:${event.author_id}`)
+    const UserId = event.author_id
+    const UserKey = useUserHashKey({
+      Platform,
+      UserId
+    })
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -94,8 +101,8 @@ export default defineBot(() => {
     const data = await client.userChatCreate(event.extra.author.id).then(res => res?.data)
 
     // 主人
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author_id)
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author_id)
 
     // 头像
     const avatar = event.extra.author.avatar
@@ -135,7 +142,11 @@ export default defineBot(() => {
       }
     }
 
-    const UserKey = createHash(`kook:${event.author_id}`)
+    const UserId = event.author_id
+    const UserKey = useUserHashKey({
+      Platform,
+      UserId
+    })
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -183,11 +194,43 @@ export default defineBot(() => {
   return {
     api: {
       use: {
-        send: (event, val: any[]) => {
+        send: (event, val) => {
           if (val.length < 0) return Promise.all([])
           const content = val
             .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
+            .map(item => {
+              if (item.type == 'Link') {
+                return `[${item.options?.title ?? item.value}](${item.value})`
+              } else if (item.type == 'Mention') {
+                if (
+                  item.value == 'everyone' ||
+                  item.value == 'all' ||
+                  item.value == '' ||
+                  typeof item.value != 'string'
+                ) {
+                  return `(met)all(met)`
+                }
+                if (item.options?.belong == 'user') {
+                  return `(met)${item.value}(met)`
+                } else if (item.options?.belong == 'channel') {
+                  return `(chn)${item.value}(chn)`
+                }
+                return ''
+              } else if (item.type == 'Text') {
+                if (item.options?.style == 'block') {
+                  return `\`${item.value}\``
+                } else if (item.options?.style == 'italic') {
+                  return `*${item.value}*`
+                } else if (item.options?.style == 'bold') {
+                  return `**${item.value}**`
+                } else if (item.options?.style == 'strikethrough') {
+                  return `~~${item.value}~~`
+                } else if (item.options?.style == 'boldItalic') {
+                  return `***${item.value}***`
+                }
+                return item.value
+              }
+            })
             .join('')
           if (content) {
             return Promise.all(
@@ -220,42 +263,41 @@ export default defineBot(() => {
         },
         mention: async e => {
           const event = e.value
-          // 艾特消息处理
-          const at_users: {
-            id: string
-            name: string
-            avatar: string
-            bot: boolean
-          }[] = []
-
+          const MessageMention: User[] = []
           /**
-           * 艾特类型所得到的
-           * 包括机器人在内
+           * 艾特类型所得到的,包括机器人在内
            */
           const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? []
           for (const item of mention_role_part) {
-            at_users.push({
-              id: item.role_id,
-              name: item.name,
-              avatar: '',
-              bot: true
+            MessageMention.push({
+              UserId: item.role_id,
+              UserName: item.name,
+              UserKey: useUserHashKey({
+                Platform,
+                UserId: item.role_id
+              }),
+              IsMaster: false,
+              IsBot: true
             })
           }
-
           /**
            * 艾特用户所得到的
            */
           const mention_part = event.extra.kmarkdown?.mention_part ?? []
           for (const item of mention_part) {
-            at_users.push({
-              id: item.id,
-              name: item.username,
-              avatar: item.avatar,
-              bot: false
+            MessageMention.push({
+              // avatar: item.avatar,
+              UserId: item.id,
+              UserName: item.username,
+              UserKey: useUserHashKey({
+                Platform,
+                UserId: item.role_id
+              }),
+              IsMaster: false,
+              IsBot: false
             })
           }
-
-          return []
+          return MessageMention
         }
       }
     }

@@ -25,7 +25,7 @@ qq:
   # 版本
   ver: ''
   # 主人
-  master_id:
+  master_key:
     - ""
 ```
 

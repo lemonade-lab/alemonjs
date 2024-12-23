@@ -29,7 +29,7 @@ export default defineBot(() => {
   })
   const qq = Number(config.qq)
   // 主人
-  const master_id: string[] = config?.master_id ?? []
+  const master_key: string[] = config?.master_key ?? []
 
   // 连接
   client.login(qq, config.password)
@@ -46,14 +46,14 @@ export default defineBot(() => {
 
   // 登录
   client.on('system.online', async () => {
-    if (master_id[0]) {
+    if (master_key[0]) {
       const val = LocalStore.getItem()
       const Now = Date.now()
       if (!val || !val.RunAt || Now > Now + 1000 * 60 * 24) {
         LocalStore.setItem({
           RunAt: Now
         })
-        const UserId = Number(master_id[0])
+        const UserId = Number(master_key[0])
         // 是否是好友
         const friend = client.fl.get(UserId)
         if (!friend) return
@@ -67,7 +67,7 @@ export default defineBot(() => {
   client.on('message.group', async event => {
     const user_id = String(event.sender.user_id)
     const group_id = String(event.group_id)
-    const isMaster = master_id.includes(user_id)
+    const isMaster = master_key.includes(user_id)
 
     let msg = ''
     const Ats = []
@@ -164,7 +164,7 @@ export default defineBot(() => {
   // 监听消息
   client.on('message.private', async event => {
     const user_id = String(event.sender.user_id)
-    const isMaster = master_id.includes(user_id)
+    const isMaster = master_key.includes(user_id)
     let msg = ''
     const Ats = []
 

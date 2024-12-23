@@ -1,4 +1,11 @@
-import { Text, OnProcessor, defineBot, getConfig, useUserHashKey } from 'alemonjs'
+import {
+  OnProcessor,
+  defineBot,
+  getConfig,
+  useUserHashKey,
+  PrivateEventMessageCreate,
+  PublicEventMessageCreate
+} from 'alemonjs'
 import { QQBotGroupClient } from './sdk'
 export type Client = typeof QQBotGroupClient.prototype
 export const client: Client = global.client
@@ -17,8 +24,8 @@ export default defineBot(() => {
   client.connect()
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', async event => {
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author.id)
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author.id)
 
     const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
 
@@ -44,7 +51,7 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
       // 事件类型
       Platform: Platform,
       // guild
@@ -58,7 +65,6 @@ export default defineBot(() => {
       IsBot: false,
       // 格式化数据
       MessageId: event.id,
-      MessageBody: [Text(event.content.trim())],
       MessageText: event.content?.trim(),
       OpenId: event.author.member_openid,
       CreateAt: Date.now(),
@@ -77,8 +83,8 @@ export default defineBot(() => {
   })
 
   client.on('C2C_MESSAGE_CREATE', async event => {
-    const master_id = config?.master_id ?? []
-    const isMaster = master_id.includes(event.author.id)
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author.id)
     const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
     const UserAvatar = {
       toBuffer: async () => {
@@ -102,7 +108,7 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PrivateEventMessageCreate = {
       // 事件类型
       Platform: Platform,
       // 用户Id
@@ -115,6 +121,7 @@ export default defineBot(() => {
       MessageId: event.id,
       MessageText: event.content?.trim(),
       CreateAt: Date.now(),
+      OpenId: '',
       //
       tag: 'GROUP_AT_MESSAGE_CREATE',
       value: null
@@ -151,16 +158,38 @@ export default defineBot(() => {
       .then(res => res?.file_info)
   }
 
+  // FRIEND_ADD
+
   global.client = client
 
   return {
     api: {
       use: {
-        send: (event, val: any[]) => {
+        send: (event, val) => {
           if (val.length < 0) return Promise.all([])
           const content = val
             .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
+            .map(item => {
+              if (item.type == 'Link') {
+                return `[${item.options?.title ?? item.value}](${item.value})`
+              } else if (item.type == 'Mention') {
+                if (
+                  item.value == 'everyone' ||
+                  item.value == 'all' ||
+                  item.value == '' ||
+                  typeof item.value != 'string'
+                ) {
+                  return ``
+                }
+                if (item.options?.belong == 'user') {
+                  return `<@${item.value}>`
+                }
+                return ''
+                // return `<qqbot-at-everyone />`
+              } else if (item.type == 'Text') {
+                return item.value
+              }
+            })
             .join('')
           if (content) {
             return Promise.all(
