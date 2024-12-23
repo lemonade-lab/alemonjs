@@ -7,7 +7,6 @@
  */
 import { isAsyncFunction } from 'util/types'
 import { AEvents } from '../typing/event/map'
-import { MWStore } from './store'
 import { OnMiddlewareValue } from '../typing/event'
 
 /**
@@ -19,7 +18,7 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
   // 得到所有 apps
   const mwFiles = [...global.storeMiddleware]
   // 得到对应类型的消息
-  const mws = [...MWStore[select]]
+  const mws = [...global.storeMiddlewareGather[select]]
 
   let valueI = 0
   let valueJ = 0
@@ -85,8 +84,9 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
 
         //
 
-        if (!MWStore[select].find(v => v.path === file.path)) {
+        if (!storeMiddlewareGather[select].find(v => v.path === file.path)) {
           const valueKey = {
+            source: file?.source,
             dir: file?.dir,
             path: file.path,
             name: file.name,
@@ -98,7 +98,7 @@ export const expendMiddleware = async <T extends keyof AEvents>(event: AEvents, 
           const index = global.storeMiddleware.findIndex(v => v.path === file.path)
           global.storeMiddleware.splice(index, 1)
           //
-          MWStore[select].push(valueKey)
+          storeMiddlewareGather[select].push(valueKey)
         }
       }
 

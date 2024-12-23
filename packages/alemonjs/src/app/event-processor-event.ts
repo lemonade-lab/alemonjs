@@ -6,11 +6,9 @@
  * @author ningmengchongshui
  */
 import { AEvents, AEventsMessageEnum } from '../typing/event/map'
-import { ResStore } from './store'
 import { expendMiddleware } from './event-processor-mw'
 import { isAsyncFunction } from 'util/types'
 import { OnResponseValue } from '../typing/event'
-export * from './store'
 
 /**
  * 消息体处理机制
@@ -18,14 +16,12 @@ export * from './store'
  * @param key
  */
 export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, select: T) => {
-  // 如果不存在。则创建 storeObserver
-  if (!global.storeObserver) global.storeObserver = {}
   // 如果不存在。则创建 storeObserver[key]
   if (!global.storeObserver[select]) global.storeObserver[select] = []
   // 得到所有 apps
   const messageFiles = [...global.storeResponse]
   // 得到对应类型的消息
-  const messages = [...ResStore[select]]
+  const messages = [...global.storeResponseGather[select]]
 
   let valueI = 0
   let valueJ = 0
@@ -135,8 +131,9 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
           return
         }
 
-        if (!ResStore[select].find(v => v.path === file.path)) {
+        if (!global.storeResponseGather[select].find(v => v.path === file.path)) {
           const valueKey = {
+            source: file?.source,
             dir: file?.dir,
             path: file.path,
             name: file.name,
@@ -147,7 +144,7 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
           // update files and values
           const index = global.storeResponse.findIndex(v => v.path === file.path)
           global.storeResponse.splice(index, 1)
-          ResStore[select].push(valueKey)
+          global.storeResponseGather[select].push(valueKey)
         }
       }
 

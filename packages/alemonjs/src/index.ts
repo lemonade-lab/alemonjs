@@ -1,8 +1,7 @@
 import './global.js'
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
-import { getConfigValue, getArgvValue } from './config'
-import { pushResponseFiles, pushMiddlewareFiles } from './app/event-processor'
+import { getConfig } from './config'
 import { getDirFiles } from './app/event-files'
 import { ChildrenCycle } from './global.js'
 
@@ -11,14 +10,43 @@ if (!global.storeMains) {
 }
 
 /**
+ * 卸载
+ * 可读取自身pkg.main
+ * @param mainDir
+ */
+export const unMount = (mainDir: string) => {
+  const storeMainsIndex = global.storeMains.indexOf(mainDir)
+  if (storeMainsIndex != -1) {
+    global.storeMains.splice(storeMainsIndex, 1)
+  }
+  global.storeResponse = global.storeResponse.filter(item => item.source != mainDir)
+  global.storeMiddleware = global.storeMiddleware.filter(item => item.source != mainDir)
+  for (const key in global.storeResponseGather) {
+    if (Array.isArray(global.storeResponseGather[key])) {
+      global.storeResponseGather[key] = global.storeResponseGather[key].filter(
+        item => item.source != mainDir
+      )
+    }
+  }
+  for (const key in global.storeMiddlewareGather) {
+    if (Array.isArray(global.storeMiddlewareGather[key])) {
+      global.storeMiddlewareGather[key] = global.storeMiddlewareGather[key].filter(
+        item => item.source != mainDir
+      )
+    }
+  }
+}
+
+/**
  * 加载文件
  * @param app
  */
-const loadChildrenFiles = (mainDir: string) => {
+const loadChildrenFiles = async (mainDir: string) => {
   const appsDir = join(mainDir, 'apps')
   const appsFiles = getDirFiles(appsDir)
   for (const file of appsFiles) {
-    pushResponseFiles({
+    global.storeResponse.push({
+      source: mainDir,
       dir: dirname(file.path),
       path: file.path,
       name: file.name
@@ -27,11 +55,42 @@ const loadChildrenFiles = (mainDir: string) => {
   const mwDir = join(mainDir, 'middleware')
   const mwFiles = getDirFiles(mwDir, item => /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name))
   for (const file of mwFiles) {
-    pushMiddlewareFiles({
+    global.storeMiddleware.push({
+      source: mainDir,
       dir: dirname(file.path),
       path: file.path,
       name: file.name
     })
+  }
+  return
+}
+
+const loadModule = async (mainPath: string) => {
+  const mainDir = dirname(mainPath)
+  const moduleApp: {
+    default: () => ChildrenCycle
+  } = await import(`file://${mainPath}`)
+  try {
+    const app = await moduleApp.default()
+    if (typeof app?.onCreated == 'function') {
+      await app?.onCreated()
+    }
+    // 加载
+    loadChildrenFiles(mainDir)
+      .then(async () => {
+        global.storeMains.push(mainDir)
+        if (typeof app?.onMounted == 'function') {
+          await app?.onMounted()
+        }
+      })
+      .catch(async () => {
+        unMount(mainDir)
+        if (typeof app?.unMounted == 'function') {
+          await app?.unMounted()
+        }
+      })
+  } catch (e) {
+    console.log(e)
   }
 }
 
@@ -51,16 +110,7 @@ const moduleChildrenFiles = async (name: string) => {
     return
   }
   // 根据main来识别apps
-  const mainDir = dirname(mainPath)
-  const obj: {
-    default: () => ChildrenCycle
-  } = await import(`file://${mainPath}`)
-  // 执行周期
-  obj.default()?.onCreated()
-  //
-  global.storeMains.push(mainDir)
-  // 加载
-  loadChildrenFiles(mainDir)
+  await loadModule(mainPath)
 }
 
 /**
@@ -68,14 +118,15 @@ const moduleChildrenFiles = async (name: string) => {
  * @param input
  */
 export const start = async (input: string = 'lib/index.js') => {
-  const value = getConfigValue()
-  const skip = process.argv.includes('--skip')
-  const login = value?.login
-  // login
-  if (!login && !skip) return
+  const cfg = getConfig()
+  const login = cfg.argv?.login
+  if (typeof login == 'boolean') return
+  const platform = cfg.argv?.platform ?? `@alemonjs/${login}`
+  // 没有参数
+  if (typeof platform == 'boolean') return
   // module
-  if (value?.apps && Array.isArray(value.apps)) {
-    for (const app of value?.apps) {
+  if (cfg.value?.apps && Array.isArray(cfg.value.apps)) {
+    for (const app of cfg.value?.apps) {
       moduleChildrenFiles(app)
     }
   }
@@ -87,26 +138,9 @@ export const start = async (input: string = 'lib/index.js') => {
     const mainPath = join(process.cwd(), input)
     if (!existsSync(mainPath)) return
     // src/apps/**/*
-    const mainDir = dirname(mainPath)
-    const obj: {
-      default: () => ChildrenCycle
-    } = await import(`file://${mainPath}`)
-    // 执行周期
-    obj.default()?.onCreated()
-    //
-    global.storeMains.push(mainDir)
-    //
-    loadChildrenFiles(mainDir)
+    await loadModule(mainPath)
   }
   await run()
-  // prefix
-  const platform = getArgvValue('--platform') ?? `@alemonjs/${login}`
-  if (!skip) {
-    const bot = await import(platform)
-    // 挂在全局
-    global.alemonjs = bot?.default()
-    return
-  }
   const bot = await import(platform)
   // 挂在全局
   global.alemonjs = bot?.default()

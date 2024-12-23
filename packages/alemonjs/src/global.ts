@@ -2,15 +2,88 @@ import { ChildrenCycle } from './typing/cycle'
 import { OnMiddlewareType, OnObserverType, OnResponseType } from './typing/event'
 import { ClientAPI, ClientObserver } from './typing/global'
 import { Logger } from './typing/logger/index'
-import { StoreMiddlewareItem, StoreResponseItem } from './typing/store/res'
+import {
+  StoreMiddleware,
+  StoreMiddlewareItem,
+  StoreResponse,
+  StoreResponseItem
+} from './typing/store/res'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 
 declare global {
   /**
-   * 打印
+   *
    */
-  var logger: Logger
+  var storeMains: string[]
+  /**
+   * 核心接口
+   */
+  var alemonjs: ClientAPI
+  /**
+   * 观察者存储池
+   */
+  var storeObserver: ClientObserver
+  /**
+   * 中间件存储池
+   */
+  var storeMiddleware: StoreMiddlewareItem[]
+  /**
+   * 响应存储池
+   */
+  var storeResponse: StoreResponseItem[]
+  /**
+   * 集成池
+   */
+  var storeMiddlewareGather: StoreMiddleware
+  /**
+   *
+   */
+  var storeResponseGather: StoreResponse
+}
+if (!global.storeMains) global.storeMains = []
+if (!global.storeObserver) global.storeObserver = {}
+if (!global.storeResponse) global.storeResponse = []
+if (!global.storeMiddleware) global.storeMiddleware = []
+if (!global.storeMiddlewareGather) {
+  global.storeMiddlewareGather = {
+    'message.create': [],
+    'message.update': [],
+    'message.delete': [],
+    'message.reaction.add': [],
+    'message.reaction.remove': [],
+    'private.message.create': [],
+    'private.message.update': [],
+    'private.message.delete': [],
+    'private.friend.add': [],
+    'private.guild.add': [],
+    'channal.create': [],
+    'channal.delete': [],
+    'guild.join': [],
+    'guild.exit': [],
+    'member.add': [],
+    'member.remove': []
+  }
+}
+if (!global.storeResponseGather) {
+  global.storeResponseGather = {
+    'message.create': [],
+    'message.update': [],
+    'message.delete': [],
+    'message.reaction.add': [],
+    'message.reaction.remove': [],
+    'private.message.create': [],
+    'private.message.update': [],
+    'private.message.delete': [],
+    'private.friend.add': [],
+    'private.guild.add': [],
+    'channal.create': [],
+    'channal.delete': [],
+    'guild.join': [],
+    'guild.exit': [],
+    'member.add': [],
+    'member.remove': []
+  }
 }
 
 declare global {
@@ -40,25 +113,9 @@ declare global {
 
 declare global {
   /**
-   * 核心接口
+   * 打印
    */
-  var alemonjs: ClientAPI
-  /**
-   * 观察者存储池
-   */
-  var storeObserver: ClientObserver
-  /**
-   * 中间件存储池
-   */
-  var storeMiddleware: StoreMiddlewareItem[]
-  /**
-   * 响应存储池
-   */
-  var storeResponse: StoreResponseItem[]
-  /**
-   *
-   */
-  var storeMains: string[]
+  var logger: Logger
 }
 
 /**

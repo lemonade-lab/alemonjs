@@ -4,23 +4,6 @@ import { join } from 'path'
 import { parse } from 'yaml'
 
 /**
- * @param key 参数
- * @returns 参数值
- */
-export const getArgvValue = (key: string) => {
-  const v = process.argv.indexOf(key)
-  if (v === -1) return null
-  const next = process.argv[v + 1]
-  if (typeof next == 'string') {
-    // 如果是参数
-    if (next.startsWith('-')) return null
-    // 如果是值
-    return next
-  }
-  return null
-}
-
-/**
  * 配置类
  */
 class ConfigCore {
@@ -37,16 +20,6 @@ class ConfigCore {
     this.#dir = dir
   }
 
-  #setLogin = () => {
-    const login = getArgvValue('--login')
-    if (!this.#value) {
-      this.#value = {}
-    }
-    if (login) {
-      this.#value.login = login
-    }
-  }
-
   /**
    *
    * @returns
@@ -58,14 +31,12 @@ class ConfigCore {
     // 如果文件不存在
     if (!existsSync(dir)) {
       // 尝试读取执行参数
-      this.#setLogin()
       return this.#value
     }
     const data = readFileSync(dir, 'utf-8')
     try {
       const d = parse(data)
       this.#value = d
-      this.#setLogin()
     } catch (err) {
       logger.error(err)
       process.cwd()
@@ -77,8 +48,6 @@ class ConfigCore {
       try {
         const d = parse(data)
         this.#value = d
-        // 尝试读取执行参数
-        this.#setLogin()
       } catch (err) {
         logger.error(err)
       }
@@ -115,6 +84,27 @@ class ConfigCore {
       logger.error(err)
     }
     return this.#package
+  }
+
+  /**
+   * 命令行参数
+   */
+  get argv() {
+    const argv: {
+      [key: string]: string | true | undefined
+    } = {}
+    process.argv.forEach((arg, index) => {
+      if (arg.startsWith('--')) {
+        const key = arg.slice(2)
+        const value = process.argv[index + 1]
+        if (value && !value.startsWith('--')) {
+          argv[key] = value
+        } else {
+          argv[key] = true
+        }
+      }
+    })
+    return argv
   }
 }
 

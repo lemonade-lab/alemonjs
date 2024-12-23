@@ -8,7 +8,6 @@
 import { AEvents, AEventsMessageEnum } from '../typing/event/map'
 import { expendMessage } from './event-processor-body'
 import { expendEvent } from './event-processor-event'
-export * from './store'
 
 /**
  *
@@ -20,8 +19,8 @@ const Log = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
   if (typeof event['ChannelId'] == 'string' && event['ChannelId'] != '') {
     logs.push(`[${event['ChannelId']}]`)
   }
-  if (typeof event['UserId'] == 'string' && event['UserId'] != '') {
-    logs.push(`[${event['UserId']}]`)
+  if (typeof event['UserKey'] == 'string' && event['UserKey'] != '') {
+    logs.push(`[${event['UserKey']}]`)
   }
   if (Array.isArray(event['MessageBody'])) {
     const content = event['MessageBody'].filter(item => item.type == 'Text').map(item => item.value)

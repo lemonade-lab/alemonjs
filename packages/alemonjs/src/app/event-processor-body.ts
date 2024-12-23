@@ -6,7 +6,6 @@
  * @author ningmengchongshui
  */
 import { AEvents, AEventsMessageEnum } from '../typing/event/map'
-import { ResStore } from './store'
 import { expendMiddleware } from './event-processor-mw'
 import { isAsyncFunction } from 'util/types'
 import { OnResponseValue } from '../typing/event'
@@ -20,14 +19,12 @@ export const expendMessage = async <T extends keyof AEvents>(
   valueEvent: AEventsMessageEnum,
   select: T
 ) => {
-  // 如果不存在。则创建 storeObserver
-  if (!global.storeObserver) global.storeObserver = {}
   // 如果不存在。则创建 storeObserver[key]
   if (!global.storeObserver[select]) global.storeObserver[select] = []
   // 得到所有 apps
   const messageFiles = [...global.storeResponse]
   // 得到对应类型的消息
-  const messages = [...ResStore[select]]
+  const messages = [...global.storeMiddlewareGather[select]]
 
   let valueI = 0
   let valueJ = 0
@@ -136,8 +133,9 @@ export const expendMessage = async <T extends keyof AEvents>(
           return
         }
         // 推送, 确保下次直接流向 key ，不再从头开始
-        if (!ResStore[select].find(v => v.path === file.path)) {
+        if (!global.storeMiddlewareGather[select].find(v => v.path === file.path)) {
           const valueKey = {
+            source: file?.source,
             dir: file?.dir,
             path: file.path,
             name: file.name,
@@ -148,7 +146,7 @@ export const expendMessage = async <T extends keyof AEvents>(
           // update files and values
           const index = global.storeResponse.findIndex(v => v.path === file.path)
           global.storeResponse.splice(index, 1)
-          ResStore[select].push(valueKey)
+          global.storeMiddlewareGather[select].push(valueKey)
         }
       }
       // 这里是否继续时 next 说了算
