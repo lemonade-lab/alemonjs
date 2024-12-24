@@ -9,7 +9,15 @@ import {
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 export type Client = typeof KOOKClient.prototype
-export const client: Client = global.client
+export const platform = 'gui'
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
 export default defineBot(() => {
   const value = getConfigValue()
   const config = value?.kook
@@ -19,8 +27,6 @@ export default defineBot(() => {
   const client = new KOOKClient({
     token: config.token
   })
-
-  const Platform = 'kook'
 
   // 连接
   client.connect()
@@ -56,14 +62,14 @@ export default defineBot(() => {
 
     const UserId = event.author_id
     const UserKey = useUserHashKey({
-      Platform,
+      Platform: platform,
       UserId
     })
 
     // 定义消
     const e: PrivateEventMessageCreate = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // 用户Id
       UserId: UserId,
       UserKey,
@@ -144,14 +150,14 @@ export default defineBot(() => {
 
     const UserId = event.author_id
     const UserKey = useUserHashKey({
-      Platform,
+      Platform: platform,
       UserId
     })
 
     // 定义消
     const e: PublicEventMessageCreate = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       //
       GuildId: event.extra.guild_id,
       ChannelId: event.target_id,
@@ -273,7 +279,7 @@ export default defineBot(() => {
               UserId: item.role_id,
               UserName: item.name,
               UserKey: useUserHashKey({
-                Platform,
+                Platform: platform,
                 UserId: item.role_id
               }),
               IsMaster: false,
@@ -290,7 +296,7 @@ export default defineBot(() => {
               UserId: item.id,
               UserName: item.username,
               UserKey: useUserHashKey({
-                Platform,
+                Platform: platform,
                 UserId: item.role_id
               }),
               IsMaster: false,

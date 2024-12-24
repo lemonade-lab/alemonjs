@@ -7,6 +7,8 @@ const MyBot = {
   avatar: ''
 }
 
+const platform = 'onebot'
+
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.onebot
@@ -19,8 +21,6 @@ export default defineBot(() => {
     // token
     access_token: config?.token ?? ''
   })
-
-  const Platform = 'onebot'
 
   //
   client.connect()
@@ -81,14 +81,14 @@ export default defineBot(() => {
 
     const UserId = String(event.user_id)
     const UserKey = useUserHashKey({
-      Platform,
+      Platform: platform,
       UserId
     })
 
     // 定义消
     const e = {
       // 平台类型
-      Platform: Platform,
+      Platform: platform,
       // 频道
       GuildId: event.group_id,
       // guild_name: event.group_name,
@@ -139,6 +139,8 @@ export default defineBot(() => {
   client.on('ERROR', event => {
     console.error(event)
   })
+
+  global.client = client
 
   return {
     api: {

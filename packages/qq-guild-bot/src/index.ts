@@ -2,13 +2,19 @@ import { OnProcessor, defineBot, getConfig, User, useUserHashKey } from 'alemonj
 import { QQBotGuildClient } from './sdk'
 import { AT_MESSAGE_CREATE_TYPE } from '../lib/sdk/platform/qq/sdk/message/AT_MESSAGE_CREATE'
 export type Client = typeof QQBotGuildClient.prototype
-export const client: Client = global.client
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+export const platform = 'qq-guild-bot'
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.['qq-guild-bot']
   if (!config) return
-
-  const Platform = 'qq-guild-bot'
 
   // 创建客户端
   const client = new QQBotGuildClient({
@@ -43,14 +49,14 @@ export default defineBot(() => {
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       //
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
@@ -110,14 +116,14 @@ export default defineBot(() => {
     const UserId = event.author.id
 
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
       IsMaster: isMaster,
@@ -206,14 +212,14 @@ export default defineBot(() => {
     }
 
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       //
       GuildId: event.guild_id,
       ChannelId: event.channel_id,

@@ -1,13 +1,19 @@
 import { defineBot, getConfigValue, OnProcessor, useUserHashKey } from 'alemonjs'
 import TelegramClient from 'node-telegram-bot-api'
 export type Client = typeof TelegramClient.prototype
-export const client: Client = global.client
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+export const platform = 'telegram'
 export default defineBot(() => {
   const value = getConfigValue()
   const config = value?.telegram
   if (!config) return
-
-  const Platform = 'telegram'
 
   //
   const client = new TelegramClient(config.token, {
@@ -54,7 +60,7 @@ export default defineBot(() => {
   client.on('text', async event => {
     const UserId = String(event?.from?.id)
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
@@ -96,7 +102,7 @@ export default defineBot(() => {
       // 定义消
       const e = {
         // 事件类型
-        Platform: Platform,
+        Platform: platform,
         // 频道
         GuildId: String(event?.chat.id),
         ChannelId: String(event?.chat.id),
@@ -128,7 +134,7 @@ export default defineBot(() => {
       // 定义消
       const e = {
         // 事件类型
-        Platform: Platform,
+        Platform: platform,
         // 用户Id
         UserId: String(event?.from.id),
         UserKey: UserKey,
@@ -162,7 +168,7 @@ export default defineBot(() => {
 
     const UserId = String(event?.from?.id)
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
@@ -195,7 +201,7 @@ export default defineBot(() => {
     // 定义消
     const e = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // guild
       GuildId: String(event?.chat.id),
       ChannelId: String(event?.chat.id),

@@ -12,13 +12,19 @@ import { Client as ICQQClient, PrivateMessageEvent, segment, Sendable } from 'ic
 import { device, error, qrcode, slider } from './login'
 import { Store } from './store'
 export type Client = typeof ICQQClient.prototype
-export const client: Client = global.client
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+export const platform = 'qq'
 export default defineBot(() => {
   const value = getConfigValue()
   const config = value?.qq
   if (!config) return
-
-  const Platform = 'qq'
 
   const d = Number(config?.device)
   // 创建客户端
@@ -109,14 +115,14 @@ export default defineBot(() => {
 
     const UserId = user_id
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // 频道
       GuildId: group_id,
       ChannelId: group_id,
@@ -174,14 +180,14 @@ export default defineBot(() => {
 
     const UserId = user_id
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId
     })
 
     // 定义消
     const e = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // 用户
       UserId: user_id,
       UserName: event.sender.nickname,
@@ -260,7 +266,7 @@ export default defineBot(() => {
               if (item.qq == 'all') continue
               const UserId = String(item.qq)
               const UserKey = useUserHashKey({
-                Platform: Platform,
+                Platform: platform,
                 UserId: UserId
               })
               MessageMention.push({

@@ -36,6 +36,19 @@ const createServer = (port: number) => {
   })
 }
 
+export const platform = 'gui'
+
+export type Client = WebSocket
+
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.gui
@@ -47,8 +60,6 @@ export default defineBot(() => {
   // 创建 WebSocketServer 并监听同一个端口
   const wss = new WebSocketServer({ server: server })
 
-  const Platform = 'gui'
-
   //
   let client = null
   //
@@ -57,7 +68,7 @@ export default defineBot(() => {
     const txt = event.MessageText
 
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: event.UserId
     })
 
@@ -78,7 +89,7 @@ export default defineBot(() => {
 
     const e: PublicEventMessageCreate = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // 频道
       GuildId: event.GuildId,
       ChannelId: event.ChannelId,
@@ -117,7 +128,7 @@ export default defineBot(() => {
     const txt = event.MessageBody.find((item: any) => item.t == 'text')
     //
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: event.UserId
     })
     const e: PrivateEventMessageCreate = {

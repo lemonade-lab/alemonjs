@@ -8,13 +8,19 @@ import {
 } from 'alemonjs'
 import { QQBotGroupClient } from './sdk'
 export type Client = typeof QQBotGroupClient.prototype
-export const client: Client = global.client
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+export const platform = 'qq-group-bot'
 export default defineBot(() => {
   const cfg = getConfig()
   const config = cfg.value?.['qq-group-bot']
   if (!config) return
-
-  const Platform = 'qq-group-bot'
 
   // 创建客户端
   const client = new QQBotGroupClient({
@@ -47,14 +53,14 @@ export default defineBot(() => {
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
     // 定义消
     const e: PublicEventMessageCreate = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // guild
       GuildId: event.group_id,
       ChannelId: event.group_id,
@@ -104,14 +110,14 @@ export default defineBot(() => {
     const UserId = event.author.id
 
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
     // 定义消
     const e: PrivateEventMessageCreate = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // 用户Id
       UserId: event.author.id,
       UserKey,

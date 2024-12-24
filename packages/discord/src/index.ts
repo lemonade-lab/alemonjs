@@ -2,7 +2,15 @@ import { OnProcessor, User, defineBot, getConfigValue, useUserHashKey } from 'al
 import { DCClient } from './sdk/index'
 import { MESSAGE_CREATE_TYPE } from '../lib/sdk/platform/discord/sdk/message/MESSAGE_CREATE'
 export type Client = typeof DCClient.prototype
-export const client: Client = global.client
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+export const platform = 'discord'
 export default defineBot(() => {
   const value = getConfigValue()
   const config = value?.discord
@@ -12,8 +20,6 @@ export default defineBot(() => {
   const client = new DCClient({
     token: config.token
   })
-
-  const Platform = 'discord'
 
   // 连接
   client.connect()
@@ -46,7 +52,7 @@ export default defineBot(() => {
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
-      Platform: Platform,
+      Platform: platform,
       UserId: UserId
     })
 
@@ -78,7 +84,7 @@ export default defineBot(() => {
     // 定义消
     const e = {
       // 事件类型
-      Platform: Platform,
+      Platform: platform,
       // guild
       GuildId: event.guild_id,
       ChannelId: event.channel_id,

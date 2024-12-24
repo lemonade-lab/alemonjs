@@ -6,15 +6,21 @@ import { getPublicPath, getStaticPath } from './static'
 import { useUserHashKey } from 'alemonjs'
 import { MessageInterface, type WechatyInterface } from 'wechaty/impls'
 export type Client = WechatyInterface
-export const client: Client = global.client
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+export const platform = 'wechat'
 export default defineBot(() => {
   const value = getConfigValue()
   const config = value?.wechat
   const bot = WechatyBuilder.build({
     name: config?.name ?? 'alemonjs'
   })
-
-  const Platform = 'wechat'
 
   let i = 0
   bot
@@ -93,7 +99,7 @@ export default defineBot(() => {
       const UserId = event.payload.talkerId
 
       const UserKey = useUserHashKey({
-        Platform: Platform,
+        Platform: platform,
         UserId
       })
 
@@ -111,7 +117,7 @@ export default defineBot(() => {
         // 定义消
         const e = {
           // 事件类型
-          Platform: Platform,
+          Platform: platform,
           /**
            * guild
            */
@@ -147,7 +153,7 @@ export default defineBot(() => {
         // 定义消
         const e = {
           // 事件类型
-          Platform: Platform,
+          Platform: platform,
           // 用户Id
           UserId: UserId,
           UserKey: UserKey,
@@ -218,7 +224,7 @@ export default defineBot(() => {
               IsBot: false,
               IsMaster: false,
               UserKey: useUserHashKey({
-                Platform: Platform,
+                Platform: platform,
                 UserId: UserId
               })
             }
