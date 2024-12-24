@@ -1,12 +1,4 @@
-/**
- * @fileoverview 消息处理快
- * 登录模块向核心模块发送数据
- * 核心模块调用模块索引
- * @module processor
- * @author ningmengchongshui
- */
-import { AEvents, AEventsMessageEnum } from '../typing/event/map'
-import { expendMessage } from './event-processor-body'
+import { AEvents } from '../typing/event/map'
 import { expendEvent } from './event-processor-event'
 
 /**
@@ -39,21 +31,7 @@ const Log = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
 export const OnProcessor = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
   // 打印
   Log(event, select)
-  // 选择处理
-  switch (select) {
-    case 'message.create':
-      // 处理公有消息
-      expendMessage(event as AEventsMessageEnum, 'message.create')
-      break
-    case 'private.message.create':
-      // 处理私有消息
-      expendMessage(event as AEventsMessageEnum, 'private.message.create')
-      break
-    default: {
-      // 无消息体处理
-      expendEvent(event as any, select)
-      break
-    }
-  }
+  // 不再消息匹配
+  expendEvent(event, select)
   return
 }

@@ -77,9 +77,13 @@ export class QQBotGroupAPI {
   BOTS_API_RUL = 'https://bots.qq.com'
 
   /**
-   * qq群
+   * qq群 沙河接口
    */
   API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com'
+
+  /**
+   * qq群
+   */
   API_URL = 'https://api.sgroup.qq.com'
 
   /**
@@ -149,6 +153,12 @@ export class QQBotGroupAPI {
   // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
 
   #map: Map<string, number> = new Map()
+
+  /**
+   * 得到消息序列
+   * @param MessageId
+   * @returns
+   */
   getMessageSeq(MessageId: string): number {
     let seq = this.#map.get(MessageId) || 0
     seq++
@@ -179,9 +189,6 @@ export class QQBotGroupAPI {
     }).then(res => res?.data)
   }
 
-  // markdown = {content}
-  //
-
   /**
    * 发送私聊富媒体文件
    * @param openid
@@ -208,6 +215,31 @@ export class QQBotGroupAPI {
   }
 
   /**
+   * 发送私聊富媒体文件
+   * @param openid
+   * @param content
+   * @param file_type
+   * @returns
+   *  1 图文 2 视频 3 语言 4 文件
+   * 图片：png/jpg，视频：mp4，语音：silk
+   */
+  async userFiles(
+    openid: string,
+    data: {
+      srv_send_msg: boolean
+      file_type: FileType
+      url: string
+      file_data?: any
+    }
+  ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
+    return this.GroupService({
+      url: `/v2/users/${openid}/files`,
+      method: 'post',
+      data: data
+    }).then(res => res?.data)
+  }
+
+  /**
    * 发送群里文件
    * @param openid
    * @param content
@@ -217,6 +249,31 @@ export class QQBotGroupAPI {
    * 图片：png/jpg，视频：mp4，语音：silk
    */
   async postRichMediaByGroup(
+    openid: string,
+    data: {
+      srv_send_msg?: boolean
+      file_type: FileType
+      url?: string
+      file_data?: any
+    }
+  ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
+    return this.GroupService({
+      url: `/v2/groups/${openid}/files`,
+      method: 'post',
+      data: {
+        srv_send_msg: false,
+        ...data
+      }
+    }).then(res => res?.data)
+  }
+
+  /**
+   *
+   * @param openid
+   * @param data
+   * @returns
+   */
+  async groupsFiles(
     openid: string,
     data: {
       srv_send_msg?: boolean
@@ -359,5 +416,31 @@ export class QQBotGroupAPI {
       code,
       getParam
     }
+  }
+
+  /**
+   *
+   * @param openid
+   * @param message_id
+   * @returns
+   */
+  userMessageDelete(openid: string, message_id: string) {
+    return this.GroupService({
+      url: `/v2/users/${openid}/messages/${message_id}`,
+      method: 'delete'
+    }).then(res => res?.data)
+  }
+
+  /**
+   *
+   * @param group_openid
+   * @param message_id
+   * @returns
+   */
+  grouMessageDelte(group_openid: string, message_id: string) {
+    return this.GroupService({
+      url: `/v2/groups/${group_openid}/messages/${message_id}`,
+      method: 'delete'
+    }).then(res => res?.data)
   }
 }

@@ -7,5 +7,3 @@ export type C2C_MESSAGE_CREATE_TYPE = {
   id: string
   timestamp: string
 }
-
-// user_avatar: `https://q.qlogo.cn/qqapp/${appId}/${event.author.id}/640`

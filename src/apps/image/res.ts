@@ -1,7 +1,8 @@
 import { useSend, Text, Image } from 'alemonjs'
 import { readFileSync } from 'fs'
-import url from '@src/assets/test.jpeg'
+import url from '@src/asstes/alemonjs.png'
 export default OnResponse((event, next) => {
+  console.log(event)
   if (!/^(#|\/)?image$/.test(event.MessageText)) {
     next()
     return

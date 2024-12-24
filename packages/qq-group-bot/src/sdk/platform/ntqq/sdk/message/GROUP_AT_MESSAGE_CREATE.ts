@@ -1,3 +1,6 @@
+/**
+ * 群消息事件 AT 事件
+ */
 export interface GROUP_AT_MESSAGE_CREATE_TYPE {
   author: {
     id: string
@@ -9,5 +12,3 @@ export interface GROUP_AT_MESSAGE_CREATE_TYPE {
   id: string
   timestamp: string
 }
-
-// https://q.qlogo.cn/qqapp/${appId}/${event.author.id}/640

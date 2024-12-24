@@ -5,30 +5,34 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { AEvents, AEventsMessageEnum } from '../typing/event/map'
-import { expendMiddleware } from './event-processor-mw'
+import { AEvents } from '../typing/event/map'
+import { expendMiddleware } from './event-processor-middleware'
 import { isAsyncFunction } from 'util/types'
 import { OnResponseValue } from '../typing/event'
+import { expendObserver } from './event-processor-observer'
 
 /**
  * 消息体处理机制
  * @param event
  * @param key
  */
-export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, select: T) => {
-  // 如果不存在。则创建 storeObserver[key]
-  if (!global.storeObserver[select]) global.storeObserver[select] = []
+export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T], select: T) => {
   // 得到所有 apps
-  const messageFiles = [...global.storeResponse]
+  const StoreResponse = [...global.storeResponse]
+
   // 得到对应类型的消息
-  const messages = [...global.storeResponseGather[select]]
+  const StoreResponseGather = [...global.storeResponseGather[select]]
 
   let valueI = 0
   let valueJ = 0
-  let valueN = 0
+
+  const nextObserver = () => {
+    // 先从观察者开始
+    expendObserver(valueEvent, select, next)
+  }
 
   // 使用中间件修正 event
-  const event: AEventsMessageEnum = (await expendMiddleware(valueEvent as any, select)) as any
+  expendMiddleware(valueEvent, select, nextObserver)
 
   /**
    * 下一步
@@ -36,9 +40,9 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
    */
   const next = () => {
     // i 结束了
-    if (valueI >= messageFiles.length) {
+    if (valueI >= StoreResponse.length) {
       // j 结束了
-      if (valueJ >= messages.length) {
+      if (valueJ >= StoreResponseGather.length) {
         return
       }
       // 走 j，检查所有分毫类型的
@@ -50,60 +54,18 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
   }
 
   /**
-   * 观察者下一步
-   * @returns
-   */
-  const nextObserver = () => {
-    // i 结束了
-    if (valueN >= global.storeObserver[select].length) {
-      // 订阅都检查过一遍。开始 next
-      next()
-      return
-    }
-    //
-    valueN++
-    // 发现订阅
-    const item = global.storeObserver[select][valueN - 1]
-    if (!item) {
-      // 继续 next
-      nextObserver()
-      return
-    }
-    //
-    for (const key in item.event) {
-      // 只要发现不符合的，就继续
-      if (item.event[key] !== event[key]) {
-        // 不符合。继续 next。
-        nextObserver()
-        return
-      }
-    }
-    // 设置为 undefined
-    global.storeObserver[select][valueN - 1] = undefined
-    // 放回来
-    const Continue = () => {
-      global.storeObserver[select][valueN - 1] = item
-      // 直接结束才对
-    }
-    // 没有调用下一步。应该删除当前的 n ？
-    // 有没有可能。按key来分。
-    item.current(event, Continue)
-    //
-  }
-
-  /**
    * 执行 i
    * @returns
    */
   const calli = async () => {
     // 调用完了
-    if (valueI >= messageFiles.length) {
+    if (valueI >= StoreResponse.length) {
       // 开始调用j
       next()
       return
     }
     valueI++
-    const file = messageFiles[valueI - 1]
+    const file = StoreResponse[valueI - 1]
     if (!file?.path) {
       // 继续
       next()
@@ -116,43 +78,46 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
       } = await import(`file://${file.path}`)
       const res = obj?.default
 
+      // 如果是数组
       if (Array.isArray(res.select)) {
+        // 没有匹配到
         if (!res.select.includes(select)) {
           // 继续
           next()
           return
         }
-
-        //
+        // 如果不是数组
       } else {
+        // 没有匹配到
         if (res?.select !== select) {
           // 继续
           next()
           return
         }
-
+        // 不是数组写法的。会触发分类
+        // 判断是否已经分类
         if (!global.storeResponseGather[select].find(v => v.path === file.path)) {
-          const valueKey = {
-            source: file?.source,
-            dir: file?.dir,
+          // 得到index
+          const index = global.storeResponse.findIndex(v => v.path === file.path)
+          // 分类
+          global.storeResponse.splice(index, 1)
+          // 转移存储
+          global.storeResponseGather[select].push({
+            source: file.source,
+            dir: file.dir,
             path: file.path,
             name: file.name,
             value: {
-              select: res?.select ?? select
+              select: res.select
             }
-          }
-          // update files and values
-          const index = global.storeResponse.findIndex(v => v.path === file.path)
-          global.storeResponse.splice(index, 1)
-          global.storeResponseGather[select].push(valueKey)
+          })
         }
       }
-
       // 这里是否继续时 next 说了算
       if (isAsyncFunction(res?.current)) {
-        res?.current(event as any, next)?.catch(logger.error)
+        res?.current(valueEvent, next)
       } else {
-        res?.current(event as any, next)
+        res?.current(valueEvent, next)
       }
     } catch (err) {
       // 不再继续
@@ -160,13 +125,17 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
     }
   }
 
+  /**
+   * 被分类好的
+   * @returns
+   */
   const callj = async () => {
     // 调用完了
-    if (valueJ >= messages.length) {
+    if (valueJ >= StoreResponseGather.length) {
       return
     }
     valueJ++
-    const file = messages[valueJ - 1]
+    const file = StoreResponseGather[valueJ - 1]
     if (!file?.path) {
       next()
       return
@@ -178,16 +147,13 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents, 
       } = await import(`file://${file.path}`)
       const res = obj?.default
       if (isAsyncFunction(res?.current)) {
-        await res?.current(event as any, next)?.catch(logger.error)
+        res?.current(valueEvent, next)
       } else {
-        res?.current(event as any, next)
+        res?.current(valueEvent, next)
       }
     } catch (err) {
       logger.error(err)
     }
     //
   }
-
-  // 先从观察者开始
-  nextObserver()
 }
