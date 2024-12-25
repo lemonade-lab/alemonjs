@@ -26,14 +26,6 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
   let valueI = 0
   let valueJ = 0
 
-  const nextObserver = () => {
-    // 先从观察者开始
-    expendObserver(valueEvent, select, next)
-  }
-
-  // 使用中间件修正 event
-  expendMiddleware(valueEvent, select, nextObserver)
-
   /**
    * 下一步
    * @returns
@@ -156,4 +148,12 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
     }
     //
   }
+
+  const nextObserver = () => {
+    // 先从观察者开始
+    expendObserver(valueEvent, select, next)
+  }
+
+  // 使用中间件修正 event
+  expendMiddleware(valueEvent, select, nextObserver)
 }

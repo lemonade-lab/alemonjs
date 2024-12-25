@@ -7,7 +7,8 @@ data
 lib
 *.log.ts
 logs
-log 
+log
 *.log
 *.logs
 *.memory-card.json
+/public

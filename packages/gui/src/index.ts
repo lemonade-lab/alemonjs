@@ -9,9 +9,57 @@ import {
 import { WebSocketServer } from 'ws'
 import Koa from 'koa'
 import KoaStatic from 'koa-static'
-// import Router from 'koa-router'
 import { mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
+import router from './api'
+import koaBody from 'koa-bodyparser'
+
+type Message = {
+  UserId: string
+  UserName: string
+  UserAvatar: string
+  MessageId: string
+  MessageText: string
+  OpenId: string
+  IsMaster: number
+  IsBot: number
+  GuildId: string
+  ChannelId: string
+}
+
+type PrivateMessage = {
+  UserId: string
+  UserName: string
+  UserAvatar: string
+  MessageId: string
+  MessageText: string
+  OpenId: string
+  IsMaster: number
+  IsBot: number
+}
+
+type Text = {
+  t: 'Text'
+  d: string
+}
+
+type Image = {
+  t: 'Image'
+  d: {
+    url_data?: string
+    url_index?: string
+  }
+}
+
+const DATA = {
+  stringify: (message: { t: 'send_message' | 'send_private_message'; d: (Text | Image)[] }) =>
+    JSON.stringify(message),
+  parse: (message: string) =>
+    JSON.parse(message) as {
+      t: 'send_message' | 'send_private_message'
+      d: Message | PrivateMessage
+    }
+}
 
 /**
  * @param port
@@ -19,18 +67,20 @@ import { join } from 'path'
  */
 const createServer = (port: number) => {
   const app = new Koa()
-  // const router = new Router()
-  // router.post('/update/user', async ctx => {
-  //   ctx.body = {
-  //     code: 200
-  //   }
-  // })
+  // 开放public文件夹
   const dir = join(process.cwd(), 'public')
   mkdirSync(join(dir, 'file'), { recursive: true })
   // 暴露public文件夹
   app.use(KoaStatic(dir))
-  // routes
-  // app.use(router.routes())
+
+  // body
+  app.use(koaBody())
+
+  // 使用路由
+  app.use(router.routes())
+  app.use(router.allowedMethods())
+
+  // 监听端口
   return app.listen(port, () => {
     console.log(`gui server start at port ${port}`)
   })
@@ -63,10 +113,7 @@ export default defineBot(() => {
   //
   let client = null
   //
-  const onMessage = event => {
-    //
-    const txt = event.MessageText
-
+  const onMessage = (event: Message) => {
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId: event.UserId
@@ -93,25 +140,20 @@ export default defineBot(() => {
       // 频道
       GuildId: event.GuildId,
       ChannelId: event.ChannelId,
-      // 是否是主人
-      // 用户Id
+      //
       UserId: event.UserId,
-      UserKey,
-      IsMaster: event.IsMaster == 0 ? false : true,
-      IsBot: false,
       UserName: event.UserName,
       UserAvatar: UserAvatar,
-      // 格式化数据
+      UserKey,
+      IsMaster: event.IsMaster == 0 ? false : true,
+      IsBot: event.IsBot == 0 ? false : true,
+      //
       MessageId: event.MessageId,
-      // 用户消息
-      MessageText: txt.d,
-      // 用户openId
+      MessageText: event.MessageText,
       OpenId: event.OpenId,
-      // 创建时间
       CreateAt: Date.now(),
       //
-      tag: 'MESSAGE_CREATE',
-      //
+      tag: 'send_message',
       value: null
     }
     // 当访问的时候获取
@@ -124,35 +166,44 @@ export default defineBot(() => {
     OnProcessor(e, 'message.create')
   }
 
-  const onProvateMessage = event => {
-    const txt = event.MessageBody.find((item: any) => item.t == 'text')
-    //
+  const onProvateMessage = (event: PrivateMessage) => {
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId: event.UserId
     })
+
+    const url = event.UserAvatar
+    const UserAvatar = {
+      toBuffer: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer)
+      },
+      toBase64: async () => {
+        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+        return Buffer.from(arrayBuffer).toString('base64')
+      },
+      toURL: async () => {
+        return url
+      }
+    }
+
     const e: PrivateEventMessageCreate = {
       // 事件类型
-      Platform: event.Platform,
+      Platform: platform,
       // 用户Id
       UserId: event.UserId,
       UserName: event.UserName,
+      UserAvatar,
       UserKey,
       IsMaster: event.IsMaster == 0 ? false : true,
-      IsBot: false,
-      // 用户头像
-      UserAvatar: event.UserAvatar,
-      // 格式化数据
+      IsBot: event.IsBot == 0 ? false : true,
+      // 消息
       MessageId: event.MessageId,
-      // 用户消息
-      MessageText: txt.d,
-      // 用户openId
+      MessageText: event.MessageText,
       OpenId: event.OpenId,
-      // 创建时间
       CreateAt: Date.now(),
       //
-      tag: 'MESSAGE_CREATE',
-      //
+      tag: 'send_private_message',
       value: null
     }
     // 当访问的时候获取
@@ -175,11 +226,12 @@ export default defineBot(() => {
     // 处理消息事件
     ws.on('message', (message: string) => {
       try {
-        const event = JSON.parse(message)
+        const event = DATA.parse(message)
+        console.log('event', event)
         if (event.t == 'send_message') {
-          onMessage(event.d)
+          onMessage(event.d as any)
         } else if (event.t == 'send_private_message') {
-          onProvateMessage(event.d)
+          onProvateMessage(event.d as any)
         } else {
           console.log('未知消息', event)
         }
@@ -193,38 +245,60 @@ export default defineBot(() => {
     })
   })
 
-  /**
-   *
-   * @param data
-   * @returns
-   */
-  const SendData = (data: any) => client.send(JSON.stringify(data))
-
   //
   return {
     api: {
       use: {
-        send: (event, val: any[]) => {
+        send: (event, val) => {
           if (val.length < 0) return Promise.all([])
-          console.log(event)
           const content = val
             .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
+            .map(item => {
+              if (item.type == 'Link') {
+                return `[${item.options?.title ?? item.value}](${item.value})`
+              } else if (item.type == 'Mention') {
+                if (
+                  item.value == 'everyone' ||
+                  item.value == 'all' ||
+                  item.value == '' ||
+                  typeof item.value != 'string'
+                ) {
+                  return `<@everyone>`
+                }
+                if (item.options?.belong == 'user') {
+                  return `<@${item.value}>`
+                } else if (item.options?.belong == 'channel') {
+                  return `<#${item.value}>`
+                }
+                return ''
+              } else if (item.type == 'Text') {
+                if (item.options?.style == 'block') {
+                  return `\`${item.value}\``
+                } else if (item.options?.style == 'italic') {
+                  return `*${item.value}*`
+                } else if (item.options?.style == 'bold') {
+                  return `**${item.value}**`
+                } else if (item.options?.style == 'strikethrough') {
+                  return `~~${item.value}~~`
+                }
+                return item.value
+              }
+            })
             .join('')
           if (content) {
             return Promise.all(
               [content].map(item =>
-                SendData({
-                  t: 'send_message',
-                  d: {
-                    MessageBody: [
+                client.send(
+                  DATA.stringify({
+                    t: event.tag,
+                    d: [
                       {
-                        t: 'text',
+                        t: 'Text',
                         d: item
                       }
                     ]
-                  }
-                })
+                  })
+                )
               )
             )
           }
@@ -234,19 +308,20 @@ export default defineBot(() => {
               images.map(async item => {
                 const url = `/file/${Date.now()}.png`
                 writeFileSync(join(process.cwd(), 'public', url), item, 'utf-8')
-                return SendData({
-                  t: 'send_message',
-                  d: {
-                    MessageBody: [
+                return client.send(
+                  DATA.stringify({
+                    t: event.tag,
+                    d: [
                       {
-                        t: 'image',
+                        t: 'Image',
                         d: {
-                          url: url
+                          // url_data: base64,
+                          url_index: url
                         }
                       }
                     ]
-                  }
-                })
+                  })
+                )
               })
             )
           }
