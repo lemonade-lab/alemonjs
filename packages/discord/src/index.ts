@@ -181,7 +181,6 @@ export default defineBot(() => {
           const event: MESSAGE_CREATE_TYPE = e.value
           const MessageMention: User[] = event.mentions.map(item => {
             let url = null
-            const Platform = 'discord'
             const UserId = item.id
             const avatar = event.author.avatar
             const value = getConfigValue()
@@ -215,7 +214,7 @@ export default defineBot(() => {
               IsBot: item.bot,
               UserAvatar,
               UserKey: useUserHashKey({
-                Platform: Platform,
+                Platform: platform,
                 UserId: UserId
               })
             }

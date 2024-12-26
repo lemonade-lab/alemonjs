@@ -1,7 +1,7 @@
 import { useMention } from 'alemonjs'
 export default OnResponse(
   async (event, next) => {
-    if (!/^(#|\/)?test$/.test(event.MessageText)) {
+    if (!/^(#|\/)?getmention$/.test(event.MessageText)) {
       next()
       return
     }

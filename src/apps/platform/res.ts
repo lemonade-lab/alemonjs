@@ -1,4 +1,4 @@
-import { Text, useSend } from 'alemonjs'
+import { Mention, Text, useSend } from 'alemonjs'
 import { client, platform } from '@alemonjs/kook'
 
 const kookResponse = OnResponse((event, next) => {
@@ -13,9 +13,15 @@ export default OnResponse((event, next) => {
   if (!/^(#|\/)?hello$/.test(event.MessageText)) {
     // 前往下一个响应
     next()
+    return
   }
   // 判断平台
   if (event.Platform == platform) {
     kookResponse.current(event, next)
+  } else {
+    // 创建
+    const Send = useSend(event)
+    // 发送文本消息
+    Send(Text('Hello Word'), Mention(event.UserId), Mention())
   }
 }, 'message.create')

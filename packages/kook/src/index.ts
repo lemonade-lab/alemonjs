@@ -9,7 +9,7 @@ import {
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 export type Client = typeof KOOKClient.prototype
-export const platform = 'gui'
+export const platform = 'kook'
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
     if (prop in global.client) {

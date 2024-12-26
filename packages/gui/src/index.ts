@@ -1,9 +1,11 @@
 import {
   defineBot,
   getConfig,
+  getConfigValue,
   OnProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
+  User,
   useUserHashKey
 } from 'alemonjs'
 import { WebSocketServer } from 'ws'
@@ -134,6 +136,16 @@ export default defineBot(() => {
       }
     }
 
+    /**
+     * Removes all mentions in the format <@xxx> or <#xxx> from the input string.
+     */
+    const removeMentions = (va: string): string => {
+      const regex = /<[@#]\w+>/g
+      return va.replace(regex, '').trim()
+    }
+
+    const msg = removeMentions(event.MessageText)
+
     const e: PublicEventMessageCreate = {
       // 事件类型
       Platform: platform,
@@ -149,7 +161,7 @@ export default defineBot(() => {
       IsBot: event.IsBot == 0 ? false : true,
       //
       MessageId: event.MessageId,
-      MessageText: event.MessageText,
+      MessageText: msg,
       OpenId: event.OpenId,
       CreateAt: Date.now(),
       //
@@ -227,7 +239,6 @@ export default defineBot(() => {
     ws.on('message', (message: string) => {
       try {
         const event = DATA.parse(message)
-        console.log('event', event)
         if (event.t == 'send_message') {
           onMessage(event.d as any)
         } else if (event.t == 'send_private_message') {
@@ -327,8 +338,30 @@ export default defineBot(() => {
           }
           return Promise.all([])
         },
-        mention: async () => {
-          return []
+        mention: async e => {
+          const event = e.value
+          const getMentions = (va: string): string[] => {
+            const regex = /<[@]\w+>/g
+            const matches = va.match(regex)
+            return matches || []
+          }
+          const mentions = getMentions(event.MessageText).filter(item => item != '<@everyone>')
+          const MessageMention: User[] = mentions.map(item => {
+            const UserId = item.slice(2, item.length - 1)
+            const value = getConfigValue()
+            const config = value?.discord
+            const master_key = config?.master_key ?? []
+            return {
+              UserId: UserId,
+              IsMaster: master_key.includes(UserId),
+              IsBot: false,
+              UserKey: useUserHashKey({
+                Platform: platform,
+                UserId: UserId
+              })
+            }
+          })
+          return MessageMention
         }
       }
     }
