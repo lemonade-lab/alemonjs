@@ -10,6 +10,5 @@ export type SubscribeMap = {
 export type Subscribe = {
   create: SubscribeMap
   mount: SubscribeMap
-  mountAfter: SubscribeMap
   unmount: SubscribeMap
 }

@@ -31,4 +31,4 @@ export type ChildrenCycle = {
  */
 export type Next = (...cns: boolean[]) => void
 
-export type EventCycle = 'create' | 'mount' | 'mountAfter' | 'unmount'
+export type EventCycle = 'create' | 'mount' | 'unmount'

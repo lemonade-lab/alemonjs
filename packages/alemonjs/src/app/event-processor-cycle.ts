@@ -12,7 +12,6 @@ import { expendMiddleware } from './event-processor-middleware'
 import {
   expendSubscribeCreate,
   expendSubscribeMount,
-  expendSubscribeMountAfter,
   expendSubscribeUnmount
 } from './event-processor-subscribe'
 
@@ -54,21 +53,13 @@ export const expendCycle = async <T extends keyof AEvents>(valueEvent: AEvents[T
     }
     expendSubscribeUnmount(valueEvent, select, nextEnd)
   }
-  // mountAfter
-  const nextMountAfter: Next = (cn, ...cns) => {
+  // event
+  const nextEvent: Next = (cn, ...cns) => {
     if (cn) {
       nextUnMount(...cns)
       return
     }
-    expendSubscribeMountAfter(valueEvent, select, nextUnMount)
-  }
-  // event
-  const nextEvent: Next = (cn, ...cns) => {
-    if (cn) {
-      nextMountAfter(...cns)
-      return
-    }
-    expendEvent(valueEvent, select, nextMountAfter)
+    expendEvent(valueEvent, select, nextUnMount)
   }
   // mount
   const nextMount: Next = (cn, ...cns) => {

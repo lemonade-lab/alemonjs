@@ -65,8 +65,18 @@ export const expendSubscribe = async <T extends keyof AEvents>(
 
     // 订阅是执行则销毁
     global.storeSubscribe[chioce][select][valueN - 1] = undefined
-    const Continue = () => {
+    const Continue: Next = (cn, ...cns) => {
+      // next() 订阅继续
       global.storeSubscribe[chioce][select][valueN - 1] = item
+      if (cn) {
+        nextObserver(...cns)
+        return
+      }
+      if (typeof cn == 'boolean') {
+        global.storeSubscribe[chioce][select][valueN - 1] = undefined
+        nextObserver(...cns)
+        return
+      }
     }
 
     item.current(valueEvent, Continue)
@@ -102,20 +112,6 @@ export const expendSubscribeMount = async <T extends keyof AEvents>(
   next: Function
 ) => {
   expendSubscribe(valueEvent, select, next, 'mount')
-}
-
-/**
- *
- * @param valueEvent
- * @param select
- * @param next
- */
-export const expendSubscribeMountAfter = async <T extends keyof AEvents>(
-  valueEvent: AEvents[T],
-  select: T,
-  next: Function
-) => {
-  expendSubscribe(valueEvent, select, next, 'mountAfter')
 }
 
 /**

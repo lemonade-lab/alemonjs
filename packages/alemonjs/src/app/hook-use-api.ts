@@ -61,19 +61,13 @@ export const useSubscribe = <T extends keyof AEvents>(event: any, select: T) => 
   ) => {
     run(callback, keys, 'mount')
   }
-  const mountAfter = (
-    callback: (e: AEvents[T], next: Function) => any,
-    keys: (keyof AEvents[T])[]
-  ) => {
-    run(callback, keys, 'mountAfter')
-  }
   const unmount = (
     callback: (e: AEvents[T], next: Function) => any,
     keys: (keyof AEvents[T])[]
   ) => {
     run(callback, keys, 'unmount')
   }
-  return [create, mountBefore, mountAfter, unmount]
+  return [create, mountBefore, unmount]
 }
 
 /**
