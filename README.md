@@ -23,17 +23,17 @@ export default OnResponse((event, next) => {
 
 > QQ Group 806943302
 
-| Project              | Status                  | Description    |
-| -------------------- | ----------------------- | -------------- |
-| 👉[alemonjs] | [![a-s]][a-p] | 核心库 |
-| 👉[@alemonjs/qq-group-bot] | [![qq-group-bot-s]][qq-group-bot-p] | QQ 群   |
-| 👉[@alemonjs/qq-guild-bot] | [![qq-guild-bot-s]][qq-guild-bot-p] | QQ 频道 |
-| 👉[@alemonjs/discord] | [![discord-s]][discord-p] | DC 公会 |
-| 👉[@alemonjs/kook] | [![kook-s]][kook-p] | KOOK    |
-| 👉[@alemonjs/telegram] | [![telegram-s]][telegram-p] | telegram  |
-| 👉[@alemonjs/onebot] | [![onebot-s]][onebot-p] | onebot V11$V12 |
-| 👉[@alemonjs/wechat] | [![wechat-s]][wechat-p] | 微信        |
-| 👉[@alemonjs/qq] | [![qq-s]][qq-p] | QQ 连接     |
+| Project                    | Status                              | Description    |
+| -------------------------- | ----------------------------------- | -------------- |
+| 👉[alemonjs]               | [![a-s]][a-p]                       | 核心库         |
+| 👉[@alemonjs/qq-group-bot] | [![qq-group-bot-s]][qq-group-bot-p] | QQ 群          |
+| 👉[@alemonjs/qq-guild-bot] | [![qq-guild-bot-s]][qq-guild-bot-p] | QQ 频道        |
+| 👉[@alemonjs/discord]      | [![discord-s]][discord-p]           | DC 公会        |
+| 👉[@alemonjs/kook]         | [![kook-s]][kook-p]                 | KOOK           |
+| 👉[@alemonjs/telegram]     | [![telegram-s]][telegram-p]         | telegram       |
+| 👉[@alemonjs/onebot]       | [![onebot-s]][onebot-p]             | onebot V11$V12 |
+| 👉[@alemonjs/wechat]       | [![wechat-s]][wechat-p]             | 微信           |
+| 👉[@alemonjs/qq]           | [![qq-s]][qq-p]                     | QQ 连接        |
 
 [alemonjs]: https://github.com/lemonade-lab/alemonjs
 [a-s]: https://img.shields.io/npm/v/alemonjs.svg
@@ -62,4 +62,3 @@ export default OnResponse((event, next) => {
 [@alemonjs/wechat]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/wechat
 [wechat-s]: https://img.shields.io/npm/v/@alemonjs/wechat.svg
 [wechat-p]: https://www.npmjs.com/package/@alemonjs/wechat
-
