@@ -12,6 +12,13 @@ import {
   DataVideoType,
   DataVoiceType
 } from '../typing/message'
+
+/**
+ *
+ * @param val
+ * @param options
+ * @returns
+ */
 export const Text = (
   val: DataTextType['value'],
   options?: DataTextType['options']
@@ -22,6 +29,12 @@ export const Text = (
     options
   }
 }
+
+/**
+ *
+ * @param val
+ * @returns
+ */
 export const Image = (val: DataImageType['value']): DataImageType => {
   return {
     type: 'Image',
@@ -49,6 +62,12 @@ export const Mention = (
   }
 }
 
+/**
+ *
+ * @param value
+ * @param options
+ * @returns
+ */
 export const Link = (
   value: DataLinkType['value'],
   options: DataLinkType['options']
@@ -59,24 +78,49 @@ export const Link = (
     options
   }
 }
+
+/**
+ *
+ * @param val
+ * @returns
+ */
 export const Ark = (val: DataArkType['value']): DataArkType => {
   return {
     type: 'Ark',
     value: val
   }
 }
+
+/**
+ *
+ * @param val
+ * @returns
+ */
 export const Embed = (val: DataEmbedType['value']): DataEmbedType => {
   return {
     type: 'Embed',
     value: val
   }
 }
+
+/**
+ *
+ * @param val
+ * @returns
+ */
 export const Emoji = (val: DataEmojiType['value']): DataEmojiType => {
   return {
     type: 'Emoji',
     value: val
   }
 }
+
+/**
+ *
+ * @param title
+ * @param options
+ * @returns
+ */
 export const Button = (
   title: DataButtonType['value'],
   options: DataButtonType['options']
@@ -87,6 +131,13 @@ export const Button = (
     options
   }
 }
+
+/**
+ *
+ * @param value
+ * @param options
+ * @returns
+ */
 export const ButtonBox = (
   value: DataButtonBoxType['value'],
   options: DataButtonBoxType['options']
@@ -97,18 +148,36 @@ export const ButtonBox = (
     options
   }
 }
+
+/**
+ *
+ * @param val
+ * @returns
+ */
 export const File = (val: DataFileType['value']): DataFileType => {
   return {
     type: 'File',
     value: val
   }
 }
+
+/**
+ *
+ * @param val
+ * @returns
+ */
 export const Video = (val: DataVideoType['value']): DataVideoType => {
   return {
     type: 'Video',
     value: val
   }
 }
+
+/**
+ *
+ * @param val
+ * @returns
+ */
 export const Voice = (val: DataVoiceType['value']): DataVoiceType => {
   return {
     type: 'Voice',

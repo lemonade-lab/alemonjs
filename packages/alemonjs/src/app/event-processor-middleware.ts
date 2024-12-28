@@ -8,6 +8,7 @@
 import { isAsyncFunction } from 'util/types'
 import { AEvents } from '../typing/event/map'
 import { OnMiddlewareValue } from '../typing/event'
+import { Next } from '../global'
 
 /**
  * @param event
@@ -30,7 +31,11 @@ export const expendMiddleware = async <T extends keyof AEvents>(
    * 下一步
    * @returns
    */
-  const nextMiddleware = async () => {
+  const nextMiddleware: Next = async isCycle => {
+    if (isCycle) {
+      next(isCycle)
+      return
+    }
     // i 结束了
     if (valueI >= mwFiles.length) {
       // j 结束了
@@ -106,6 +111,12 @@ export const expendMiddleware = async <T extends keyof AEvents>(
             }
           })
         }
+      }
+
+      if (!res.current) {
+        // 继续
+        await nextMiddleware()
+        return
       }
 
       // 这里是否继续时 next 说了算

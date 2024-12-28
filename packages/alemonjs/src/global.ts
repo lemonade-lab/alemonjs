@@ -1,6 +1,6 @@
 import { ChildrenCycle } from './typing/cycle'
 import { OnMiddlewareType, OnObserverType, OnResponseType } from './typing/event'
-import { ClientAPI, ClientObserver } from './typing/global'
+import { ClientAPI } from './typing/global'
 import { Logger } from './typing/logger/index'
 import {
   StoreMiddleware,
@@ -10,6 +10,7 @@ import {
 } from './typing/store/res'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
+import { Subscribe } from './typing/subscribe'
 
 declare global {
   /**
@@ -23,7 +24,7 @@ declare global {
   /**
    * 观察者存储池
    */
-  var storeObserver: ClientObserver
+  var storeSubscribe: Subscribe
   /**
    * 中间件存储池
    */
@@ -41,8 +42,65 @@ declare global {
    */
   var storeResponseGather: StoreResponse
 }
+
 if (!global.storeMains) global.storeMains = []
-if (!global.storeObserver) global.storeObserver = {}
+if (!global.storeSubscribe)
+  global.storeSubscribe = {
+    create: {
+      'message.create': [],
+      'message.update': [],
+      'message.delete': [],
+      'message.reaction.add': [],
+      'message.reaction.remove': [],
+      'private.message.create': [],
+      'private.message.update': [],
+      'private.message.delete': [],
+      'private.friend.add': [],
+      'private.guild.add': [],
+      'channal.create': [],
+      'channal.delete': [],
+      'guild.join': [],
+      'guild.exit': [],
+      'member.add': [],
+      'member.remove': []
+    },
+    mount: {
+      'message.create': [],
+      'message.update': [],
+      'message.delete': [],
+      'message.reaction.add': [],
+      'message.reaction.remove': [],
+      'private.message.create': [],
+      'private.message.update': [],
+      'private.message.delete': [],
+      'private.friend.add': [],
+      'private.guild.add': [],
+      'channal.create': [],
+      'channal.delete': [],
+      'guild.join': [],
+      'guild.exit': [],
+      'member.add': [],
+      'member.remove': []
+    },
+    unmount: {
+      'message.create': [],
+      'message.update': [],
+      'message.delete': [],
+      'message.reaction.add': [],
+      'message.reaction.remove': [],
+      'private.message.create': [],
+      'private.message.update': [],
+      'private.message.delete': [],
+      'private.friend.add': [],
+      'private.guild.add': [],
+      'channal.create': [],
+      'channal.delete': [],
+      'guild.join': [],
+      'guild.exit': [],
+      'member.add': [],
+      'member.remove': []
+    }
+  }
 if (!global.storeResponse) global.storeResponse = []
 if (!global.storeMiddleware) global.storeMiddleware = []
 if (!global.storeMiddlewareGather) {
@@ -188,6 +246,10 @@ const createLogger = (): Logger => {
  */
 global.logger = createLogger()
 
+/**
+ * export typing
+ */
+
 export * from './typing/cycle/index'
 export * from './typing/event/base/guild'
 export * from './typing/event/base/message'
@@ -203,3 +265,4 @@ export * from './typing/global/index'
 export * from './typing/logger/index'
 export * from './typing/message/index'
 export * from './typing/store/res'
+export * from './typing/subscribe'

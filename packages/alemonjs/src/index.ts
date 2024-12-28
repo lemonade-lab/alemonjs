@@ -5,10 +5,6 @@ import { getConfig } from './config'
 import { getDirFiles } from './app/event-files'
 import { ChildrenCycle } from './global.js'
 
-if (!global.storeMains) {
-  global.storeMains = []
-}
-
 /**
  * 卸载
  * 可读取自身pkg.main
@@ -65,6 +61,10 @@ const loadChildrenFiles = async (mainDir: string) => {
   return
 }
 
+/**
+ *
+ * @param mainPath
+ */
 const loadModule = async (mainPath: string) => {
   const mainDir = dirname(mainPath)
   const moduleApp: {

@@ -6,17 +6,22 @@
  * @author ningmengchongshui
  */
 import { AEvents } from '../typing/event/map'
-import { expendMiddleware } from './event-processor-middleware'
 import { isAsyncFunction } from 'util/types'
 import { OnResponseValue } from '../typing/event'
-import { expendObserver } from './event-processor-observer'
+import { Next } from '../global'
+
+// 直接next下个周期。而不是下同级别的
 
 /**
  * 消息体处理机制
  * @param event
  * @param key
  */
-export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T], select: T) => {
+export const expendEvent = async <T extends keyof AEvents>(
+  valueEvent: AEvents[T],
+  select: T,
+  next: Function
+) => {
   // 得到所有 apps
   const StoreResponse = [...global.storeResponse]
 
@@ -30,11 +35,16 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
    * 下一步
    * @returns
    */
-  const next = () => {
+  const nextEvent: Next = isCycle => {
+    if (isCycle) {
+      next(isCycle)
+      return
+    }
     // i 结束了
     if (valueI >= StoreResponse.length) {
       // j 结束了
       if (valueJ >= StoreResponseGather.length) {
+        next()
         return
       }
       // 走 j，检查所有分毫类型的
@@ -53,14 +63,14 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
     // 调用完了
     if (valueI >= StoreResponse.length) {
       // 开始调用j
-      next()
+      nextEvent()
       return
     }
     valueI++
     const file = StoreResponse[valueI - 1]
     if (!file?.path) {
       // 继续
-      next()
+      nextEvent()
       return
     }
     //
@@ -75,7 +85,7 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
         // 没有匹配到
         if (!res.select.includes(select)) {
           // 继续
-          next()
+          nextEvent()
           return
         }
         // 如果不是数组
@@ -83,7 +93,7 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
         // 没有匹配到
         if (res?.select !== select) {
           // 继续
-          next()
+          nextEvent()
           return
         }
         // 不是数组写法的。会触发分类
@@ -105,11 +115,16 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
           })
         }
       }
+      if (!res.current) {
+        // 继续
+        await nextEvent()
+        return
+      }
       // 这里是否继续时 next 说了算
       if (isAsyncFunction(res?.current)) {
-        res?.current(valueEvent, next)
+        res?.current(valueEvent, nextEvent)
       } else {
-        res?.current(valueEvent, next)
+        res?.current(valueEvent, nextEvent)
       }
     } catch (err) {
       // 不再继续
@@ -129,7 +144,7 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
     valueJ++
     const file = StoreResponseGather[valueJ - 1]
     if (!file?.path) {
-      next()
+      nextEvent()
       return
     }
 
@@ -138,10 +153,15 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
         default: OnResponseValue<T>
       } = await import(`file://${file.path}`)
       const res = obj?.default
+      if (!res.current) {
+        // 继续
+        await nextEvent()
+        return
+      }
       if (isAsyncFunction(res?.current)) {
-        res?.current(valueEvent, next)
+        res?.current(valueEvent, nextEvent)
       } else {
-        res?.current(valueEvent, next)
+        res?.current(valueEvent, nextEvent)
       }
     } catch (err) {
       logger.error(err)
@@ -149,11 +169,5 @@ export const expendEvent = async <T extends keyof AEvents>(valueEvent: AEvents[T
     //
   }
 
-  const nextObserver = () => {
-    // 先从观察者开始
-    expendObserver(valueEvent, select, next)
-  }
-
-  // 使用中间件修正 event
-  expendMiddleware(valueEvent, select, nextObserver)
+  nextEvent()
 }

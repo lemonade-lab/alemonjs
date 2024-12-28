@@ -15,3 +15,5 @@ export type ChildrenCycle = {
    */
   unMounted?: () => void
 }
+
+export type Next = (isCycle?: boolean) => void

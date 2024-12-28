@@ -8,11 +8,3 @@ export type ClientAPI = {
     }
   }
 }
-export type ClientObserver = {
-  [key: string]: {
-    event: {
-      [key: string]: string
-    }
-    current: Function
-  }[]
-}
