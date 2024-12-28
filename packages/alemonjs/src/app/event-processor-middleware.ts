@@ -31,9 +31,9 @@ export const expendMiddleware = async <T extends keyof AEvents>(
    * 下一步
    * @returns
    */
-  const nextMiddleware: Next = async isCycle => {
-    if (isCycle) {
-      next(isCycle)
+  const nextMiddleware: Next = async (cn, ...cns) => {
+    if (cn) {
+      next(...cns)
       return
     }
     // i 结束了

@@ -82,6 +82,24 @@ if (!global.storeSubscribe)
       'member.add': [],
       'member.remove': []
     },
+    mountAfter: {
+      'message.create': [],
+      'message.update': [],
+      'message.delete': [],
+      'message.reaction.add': [],
+      'message.reaction.remove': [],
+      'private.message.create': [],
+      'private.message.update': [],
+      'private.message.delete': [],
+      'private.friend.add': [],
+      'private.guild.add': [],
+      'channal.create': [],
+      'channal.delete': [],
+      'guild.join': [],
+      'guild.exit': [],
+      'member.add': [],
+      'member.remove': []
+    },
     unmount: {
       'message.create': [],
       'message.update': [],

@@ -5,10 +5,7 @@
  */
 import { Next } from '../global'
 import { AEvents } from '../typing/event/map'
-
-/**
- * 订阅事件的 新增、删除 有bug。
- */
+import { EventCycle } from '../typing/cycle/index'
 
 /**
  *
@@ -21,7 +18,7 @@ export const expendSubscribe = async <T extends keyof AEvents>(
   valueEvent: AEvents[T],
   select: T,
   next: Function,
-  chioce: 'create' | 'mount' | 'unmount'
+  chioce: EventCycle
 ) => {
   // 确保订阅初始化。
   if (!global.storeSubscribe[chioce][select]) global.storeSubscribe[chioce][select] = []
@@ -31,9 +28,9 @@ export const expendSubscribe = async <T extends keyof AEvents>(
    * 观察者下一步
    * @returns
    */
-  const nextObserver: Next = isCycle => {
-    if (isCycle) {
-      next(isCycle)
+  const nextObserver: Next = (cn, ...cns) => {
+    if (cn) {
+      next(...cns)
       return
     }
 
@@ -105,6 +102,20 @@ export const expendSubscribeMount = async <T extends keyof AEvents>(
   next: Function
 ) => {
   expendSubscribe(valueEvent, select, next, 'mount')
+}
+
+/**
+ *
+ * @param valueEvent
+ * @param select
+ * @param next
+ */
+export const expendSubscribeMountAfter = async <T extends keyof AEvents>(
+  valueEvent: AEvents[T],
+  select: T,
+  next: Function
+) => {
+  expendSubscribe(valueEvent, select, next, 'mountAfter')
 }
 
 /**

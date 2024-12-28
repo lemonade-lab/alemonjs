@@ -1,6 +1,6 @@
 import { DataEnums } from '../typing/message'
 import { AEvents } from '../typing/event/map'
-
+import { EventCycle } from '../typing/cycle/index'
 /**
  *
  * @param event
@@ -25,7 +25,7 @@ export const useSubscribe = <T extends keyof AEvents>(event: any, select: T) => 
   const run = (
     callback: (e: AEvents[T], next: Function) => any,
     keys: (keyof AEvents[T])[],
-    chioce: 'create' | 'mount' | 'unmount'
+    chioce: EventCycle
   ) => {
     // 如果不存在。则创建
     if (!global.storeSubscribe[chioce][select]) global.storeSubscribe[chioce][select] = []
@@ -48,34 +48,24 @@ export const useSubscribe = <T extends keyof AEvents>(event: any, select: T) => 
         values[key] = event[key]
       }
     }
-
     // 推送订阅
     global.storeSubscribe[chioce][select].push({ keys: values, current: callback })
-
-    // let i = 0
-    // const next = () => {
-    //   if (i >= global.storeSubscribe[chioce][select].length) {
-    //     // 如果不存在。则创建
-    //     global.storeSubscribe[chioce][select][i] = { keys: values, current: callback }
-    //     return
-    //   }
-    //   i++
-    //   // 是空的。占据位置。
-    //   if (!global.storeSubscribe[chioce][select][i]) {
-    //     global.storeSubscribe[chioce][select][i] = { keys: values, current: callback }
-    //   } else {
-    //     // 不是空的。继续
-    //     next()
-    //   }
-    // }
-    // next()
     return
   }
   const create = (callback: (e: AEvents[T], next: Function) => any, keys: (keyof AEvents[T])[]) => {
     run(callback, keys, 'create')
   }
-  const mount = (callback: (e: AEvents[T], next: Function) => any, keys: (keyof AEvents[T])[]) => {
+  const mountBefore = (
+    callback: (e: AEvents[T], next: Function) => any,
+    keys: (keyof AEvents[T])[]
+  ) => {
     run(callback, keys, 'mount')
+  }
+  const mountAfter = (
+    callback: (e: AEvents[T], next: Function) => any,
+    keys: (keyof AEvents[T])[]
+  ) => {
+    run(callback, keys, 'mountAfter')
   }
   const unmount = (
     callback: (e: AEvents[T], next: Function) => any,
@@ -83,7 +73,7 @@ export const useSubscribe = <T extends keyof AEvents>(event: any, select: T) => 
   ) => {
     run(callback, keys, 'unmount')
   }
-  return [create, mount, unmount]
+  return [create, mountBefore, mountAfter, unmount]
 }
 
 /**

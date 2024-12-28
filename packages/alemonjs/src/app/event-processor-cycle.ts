@@ -12,6 +12,7 @@ import { expendMiddleware } from './event-processor-middleware'
 import {
   expendSubscribeCreate,
   expendSubscribeMount,
+  expendSubscribeMountAfter,
   expendSubscribeUnmount
 } from './event-processor-subscribe'
 
@@ -42,40 +43,51 @@ const Log = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
  * @param key
  */
 export const expendCycle = async <T extends keyof AEvents>(valueEvent: AEvents[T], select: T) => {
-  const nextEnd = () => {
-    // 结束
+  const nextEnd: Next = () => {
+    return
   }
-  const nextUnMount: Next = isCycle => {
-    if (isCycle) {
-      nextEnd()
+  // unmount
+  const nextUnMount: Next = (cn, ...cns) => {
+    if (cn) {
+      nextEnd(...cns)
       return
     }
-    // 当消息被正常卸载时，说明消息没有被处理
     expendSubscribeUnmount(valueEvent, select, nextEnd)
   }
-  const nextEvent: Next = isCycle => {
-    if (isCycle) {
-      nextUnMount()
+  // mountAfter
+  const nextMountAfter: Next = (cn, ...cns) => {
+    if (cn) {
+      nextUnMount(...cns)
       return
     }
-    expendEvent(valueEvent, select, nextUnMount)
+    expendSubscribeMountAfter(valueEvent, select, nextUnMount)
   }
-  const nextMount: Next = isCycle => {
-    if (isCycle) {
-      nextEvent()
+  // event
+  const nextEvent: Next = (cn, ...cns) => {
+    if (cn) {
+      nextMountAfter(...cns)
+      return
+    }
+    expendEvent(valueEvent, select, nextMountAfter)
+  }
+  // mount
+  const nextMount: Next = (cn, ...cns) => {
+    if (cn) {
+      nextEvent(...cns)
       return
     }
     expendSubscribeMount(valueEvent, select, nextEvent)
   }
-  const nextCreate: Next = isCycle => {
-    if (isCycle) {
-      nextMount()
+  // middleware
+  const nextCreate: Next = (cn, ...cns) => {
+    if (cn) {
+      nextMount(...cns)
       return
     }
     expendMiddleware(valueEvent, select, nextMount)
   }
   const log = Log(valueEvent, select)
   logger.info(log.join(''))
-  // 开始
+  // create
   expendSubscribeCreate(valueEvent, select, nextCreate)
 }

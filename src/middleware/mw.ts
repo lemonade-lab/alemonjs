@@ -6,7 +6,14 @@
  */
 export default OnMiddleware(
   async (e, next) => {
+    // 下一个中间件
     next()
+    // 下一个周期 - 订阅mount
+    // next(true)
+    // 下下个周期 - onResponse
+    // next(true, true)
+    // 下下下个周期 - 订阅mountAfter
+    // next(true, true, true)
     return
   },
   ['message.create', 'private.message.create']

@@ -35,9 +35,9 @@ export const expendEvent = async <T extends keyof AEvents>(
    * 下一步
    * @returns
    */
-  const nextEvent: Next = isCycle => {
-    if (isCycle) {
-      next(isCycle)
+  const nextEvent: Next = (cn, ...cns) => {
+    if (cn) {
+      next(...cns)
       return
     }
     // i 结束了

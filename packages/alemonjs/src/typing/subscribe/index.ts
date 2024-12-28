@@ -6,8 +6,10 @@ export type SubscribeMap = {
     current: Function
   }[]
 }
+
 export type Subscribe = {
   create: SubscribeMap
   mount: SubscribeMap
+  mountAfter: SubscribeMap
   unmount: SubscribeMap
 }
