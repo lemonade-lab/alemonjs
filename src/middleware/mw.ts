@@ -1,3 +1,10 @@
+import { useSubscribe } from 'alemonjs'
+
+// const Res = OnResponse(async (e, next) => {
+//   next()
+//   return
+// }, 'message.create')
+
 /**
  * uid 都是邮箱
  * 不再使用平台的uid。
@@ -14,6 +21,10 @@ export default OnMiddleware(
     // next(true, true)
     // 下下下个周期 - 订阅unmount
     // next(true, true, true)
+
+    // const [Subscribe] = useSubscribe(e, 'message.create')
+    // Subscribe(Res.current, ['UserId'])
+
     return
   },
   ['message.create', 'private.message.create']

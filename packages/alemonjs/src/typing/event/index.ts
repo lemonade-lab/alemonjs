@@ -1,7 +1,7 @@
 import { Next } from '../cycle'
 import { AEvents } from './map'
 
-type Current<T extends keyof AEvents> = (event: AEvents[T], next: Next) => void
+export type Current<T extends keyof AEvents> = (event: AEvents[T], next: Next) => void
 
 export type OnResponseType = <T extends keyof AEvents>(
   current: Current<T>,

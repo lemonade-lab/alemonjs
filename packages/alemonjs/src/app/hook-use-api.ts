@@ -1,6 +1,7 @@
 import { DataEnums } from '../typing/message'
 import { AEvents } from '../typing/event/map'
-import { EventCycle } from '../typing/cycle/index'
+import { EventCycle, Next } from '../typing/cycle/index'
+import { Current } from '../typing/event'
 /**
  *
  * @param event
@@ -22,11 +23,7 @@ export const useSend = (event: { [key: string]: any }) => {
  * @returns
  */
 export const useSubscribe = <T extends keyof AEvents>(event: any, select: T) => {
-  const run = (
-    callback: (e: AEvents[T], next: Function) => any,
-    keys: (keyof AEvents[T])[],
-    chioce: EventCycle
-  ) => {
+  const run = (callback: Current<T>, keys: (keyof AEvents[T])[], chioce: EventCycle) => {
     // 如果不存在。则创建
     if (!global.storeSubscribe[chioce][select]) global.storeSubscribe[chioce][select] = []
 
@@ -52,19 +49,16 @@ export const useSubscribe = <T extends keyof AEvents>(event: any, select: T) => 
     global.storeSubscribe[chioce][select].push({ keys: values, current: callback })
     return
   }
-  const create = (callback: (e: AEvents[T], next: Function) => any, keys: (keyof AEvents[T])[]) => {
+  const create = (callback: Current<T>, keys: (keyof AEvents[T])[]) => {
     run(callback, keys, 'create')
   }
   const mountBefore = (
-    callback: (e: AEvents[T], next: Function) => any,
+    callback: (e: AEvents[T], next: Next) => any,
     keys: (keyof AEvents[T])[]
   ) => {
     run(callback, keys, 'mount')
   }
-  const unmount = (
-    callback: (e: AEvents[T], next: Function) => any,
-    keys: (keyof AEvents[T])[]
-  ) => {
+  const unmount = (callback: Current<T>, keys: (keyof AEvents[T])[]) => {
     run(callback, keys, 'unmount')
   }
   return [create, mountBefore, unmount]
