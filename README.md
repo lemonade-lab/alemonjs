@@ -5,16 +5,12 @@
 ```ts
 import { Text, useSend } from 'alemonjs'
 export default OnResponse((event, next) => {
-  // 匹配规则
-  if (!/^(#|\/)?hello$/.test(event.MessageText)) {
-    next()
-    return
-  }
-
-  // 创建
+  // 创建API
   const Send = useSend(event)
+  // 执行
   Send(Text('hello'))
-
+  // 下一个
+  next()
   // 事件类型
 }, 'message.create')
 ```

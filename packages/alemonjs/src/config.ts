@@ -6,7 +6,7 @@ import { parse } from 'yaml'
 /**
  * 配置类
  */
-class ConfigCore {
+export class ConfigCore {
   //
   #dir: string | null = null
 
