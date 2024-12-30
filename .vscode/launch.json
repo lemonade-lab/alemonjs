@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "bundle",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["bundle"],
+      "runtimeExecutable": "yarn",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "gui",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["dev", "--login", "gui"],
+      "runtimeExecutable": "yarn",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "build",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["build"],
+      "runtimeExecutable": "yarn",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

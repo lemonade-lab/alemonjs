@@ -1,0 +1,16 @@
+{
+  "name": "alemonjs",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "lemonade-x.alemonjs-gui",
+        "esbenp.prettier-vscode",
+        "christian-kohler.path-intellisense",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  },
+  "postCreateCommand": "yarn",
+  "postStartCommand": "yarn bundle",
+  "postAttachCommand": "echo 'Codespace ready! All set up.'"
+}

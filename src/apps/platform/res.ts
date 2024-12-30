@@ -1,18 +1,15 @@
-import { Mention, Text, useSend } from 'alemonjs'
+import { Text, useSend } from 'alemonjs'
 import { platform } from '@alemonjs/kook'
 
-const kookResponse = OnResponse((event, next) => {
+const kookResponse = OnResponse(event => {
   // 使用.value获取原生数据
   const e = event.value
-
   console.log('e:', e)
-
-  //   client.postMessage ....
 }, 'message.create')
 
 export default OnResponse((event, next) => {
   // 匹配规则
-  if (!/^(#|\/)?hello$/.test(event.MessageText)) {
+  if (!/^(#|\/)?platform$/.test(event.MessageText)) {
     // 前往下一个响应
     next()
     return
@@ -24,6 +21,6 @@ export default OnResponse((event, next) => {
     // 创建
     const Send = useSend(event)
     // 发送文本消息
-    Send(Text('Hello Word'), Mention(event.UserId), Mention())
+    Send(Text('该平台不支持此类消息'))
   }
 }, 'message.create')
