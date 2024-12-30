@@ -8,9 +8,9 @@ import { parse } from 'yaml'
  */
 class ConfigCore {
   //
-  #dir = null
+  #dir: string | null = null
 
-  #value = null
+  #value: any = null
 
   /**
    *
@@ -25,6 +25,7 @@ class ConfigCore {
    * @returns
    */
   #update() {
+    if (!this.#dir) return this.#value
     // 读取配置文件
     const dir = join(process.cwd(), this.#dir)
     logger.info('config read', dir)

@@ -6,6 +6,6 @@
       "@src/*": ["src/*"]
     }
   },
-  "include": ["packages/**/*"],
+  "include": ["src/**/*"],
   "extends": "lvyjs/tsconfig.json"
 }

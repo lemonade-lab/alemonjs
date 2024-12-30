@@ -125,7 +125,7 @@ export const start = async (input: string = 'lib/index.js') => {
   // 没有参数
   if (typeof platform == 'boolean') return
   // module
-  if (cfg.value?.apps && Array.isArray(cfg.value.apps)) {
+  if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
     for (const app of cfg.value?.apps) {
       moduleChildrenFiles(app)
     }

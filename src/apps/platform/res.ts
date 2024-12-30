@@ -1,9 +1,11 @@
 import { Mention, Text, useSend } from 'alemonjs'
-import { client, platform } from '@alemonjs/kook'
+import { platform } from '@alemonjs/kook'
 
 const kookResponse = OnResponse((event, next) => {
   // 使用.value获取原生数据
   const e = event.value
+
+  console.log('e:', e)
 
   //   client.postMessage ....
 }, 'message.create')

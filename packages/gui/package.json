@@ -6,6 +6,9 @@
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
+  "scripts": {
+    "build": "node bundle.js"
+  },
   "dependencies": {
     "koa": "^2.15.3",
     "koa-mount": "^4.0.0",
@@ -14,6 +17,12 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "alemonjs": "^2.0.0-rc.77",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "lvyjs": "^0.2.13",
+    "rollup": "^4.18.1",
+    "rollup-plugin-dts": "^6.1.1",
+    "tsx": "^4.19.1",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-mount": "^4.0.5",
