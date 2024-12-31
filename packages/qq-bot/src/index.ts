@@ -1,6 +1,6 @@
 import {
   defineBot,
-  getConfig,
+  getConfigValue,
   OnProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
@@ -8,18 +8,19 @@ import {
   useUserHashKey
 } from 'alemonjs'
 import { QQBotClient } from './client'
+import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE'
 export const platform = 'qq-bot'
 export default defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value['qq-bot']
-  if (!config) return
+  const value = getConfigValue()
+  const config = value['qq-bot']
   const client = new QQBotClient({
-    secret: config.secret,
-    appId: config.appId,
-    token: config.token,
-    port: config.port,
+    secret: config?.secret,
+    app_id: config?.app_id,
+    token: config?.token,
+    port: config?.port,
     ws: config?.ws
   })
+
   // 连接
   client.connect()
 
@@ -68,8 +69,7 @@ export default defineBot(() => {
       MessageText: event.content?.trim(),
       OpenId: event.author.member_openid,
       CreateAt: Date.now(),
-      //
-      tag: 'GROUP_AT_MESSAGE_CREATE',
+      tag: 'group',
       value: null
     }
     // 当访问的时候获取
@@ -123,7 +123,7 @@ export default defineBot(() => {
       CreateAt: Date.now(),
       OpenId: '',
       //
-      tag: 'GROUP_AT_MESSAGE_CREATE',
+      tag: 'group',
       value: null
     }
     // 当访问的时候获取
@@ -185,7 +185,7 @@ export default defineBot(() => {
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //
-      tag: 'AT_MESSAGE_CREATE',
+      tag: 'guild',
       //
       value: null
     }
@@ -251,7 +251,7 @@ export default defineBot(() => {
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //
-      tag: 'AT_MESSAGE_CREATE',
+      tag: 'guild',
       //
       value: null
     }
@@ -347,7 +347,7 @@ export default defineBot(() => {
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //
-      tag: 'AT_MESSAGE_CREATE',
+      tag: 'guild',
       value: null
     }
 
@@ -362,6 +362,8 @@ export default defineBot(() => {
     OnProcessor(e, 'message.create')
   })
 
+  client.on('ERROR', console.error)
+
   // FRIEND_ADD
   global.client = client
   return {
@@ -369,71 +371,147 @@ export default defineBot(() => {
       use: {
         send: (event, val) => {
           if (val.length < 0) return Promise.all([])
-          const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => {
-              if (item.type == 'Link') {
-                return `[${item.options?.title ?? item.value}](${item.value})`
-              } else if (item.type == 'Mention') {
-                if (
-                  item.value == 'everyone' ||
-                  item.value == 'all' ||
-                  item.value == '' ||
-                  typeof item.value != 'string'
-                ) {
-                  return ``
+          // 打  tag
+          const tag = event.tag
+          if (tag == 'group') {
+            const content = val
+              .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+              .map(item => {
+                if (item.type == 'Link') {
+                  return `[${item.options?.title ?? item.value}](${item.value})`
+                } else if (item.type == 'Mention') {
+                  if (
+                    item.value == 'everyone' ||
+                    item.value == 'all' ||
+                    item.value == '' ||
+                    typeof item.value != 'string'
+                  ) {
+                    return ``
+                  }
+                  if (item.options?.belong == 'user') {
+                    return `<@${item.value}>`
+                  }
+                  return ''
+                  // return `<qqbot-at-everyone />`
+                } else if (item.type == 'Text') {
+                  return item.value
                 }
-                if (item.options?.belong == 'user') {
-                  return `<@${item.value}>`
-                }
-                return ''
-                // return `<qqbot-at-everyone />`
-              } else if (item.type == 'Text') {
-                return item.value
-              }
-            })
-            .join('')
-          if (content) {
-            return Promise.all(
-              [content].map(item =>
-                client.groupOpenMessages(event.GuildId, {
-                  content: item,
-                  msg_id: event.MessageId,
-                  msg_type: 0,
-                  msg_seq: client.getMessageSeq(event.MessageId)
+              })
+              .join('')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.groupOpenMessages(event.GuildId, {
+                    content: item,
+                    msg_id: event.MessageId,
+                    msg_type: 0,
+                    msg_seq: client.getMessageSeq(event.MessageId)
+                  })
+                )
+              )
+            }
+            const images = val.filter(item => item.type == 'Image').map(item => item.value)
+            if (images) {
+              return Promise.all(
+                images.map(async msg => {
+                  const file_info = await client
+                    .postRichMediaByGroup(event.GuildId, {
+                      file_type: 1,
+                      file_data: msg.toString('base64')
+                    })
+                    .then(res => res?.file_info)
+                  if (!file_info) return Promise.resolve(null)
+                  return client.groupOpenMessages(event.GuildId, {
+                    content: '',
+                    media: {
+                      file_info
+                    },
+                    msg_id: event.MessageId,
+                    msg_type: 7,
+                    msg_seq: client.getMessageSeq(event.MessageId)
+                  })
                 })
               )
-            )
-          }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
-          if (images) {
-            return Promise.all(
-              images.map(async msg => {
-                const file_info = await client
-                  .postRichMediaByGroup(event.GuildId, {
-                    file_type: 1,
-                    file_data: msg.toString('base64')
-                  })
-                  .then(res => res?.file_info)
-                if (!file_info) return Promise.resolve(null)
-                return client.groupOpenMessages(event.GuildId, {
-                  content: '',
-                  media: {
-                    file_info
-                  },
-                  msg_id: event.MessageId,
-                  msg_type: 7,
-                  msg_seq: client.getMessageSeq(event.MessageId)
-                })
+            }
+          } else {
+            const content = val
+              .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+              .map(item => {
+                if (item.type == 'Link') {
+                  return `[${item.options?.title ?? item.value}](${item.value})`
+                } else if (item.type == 'Mention') {
+                  if (
+                    item.value == 'everyone' ||
+                    item.value == 'all' ||
+                    item.value == '' ||
+                    typeof item.value != 'string'
+                  ) {
+                    return `@everyone`
+                  }
+                  if (item.options?.belong == 'user') {
+                    return `<@!${item.value}>`
+                  } else if (item.options?.belong == 'channel') {
+                    return `<#${item.value}>`
+                  }
+                  return ''
+                } else if (item.type == 'Text') {
+                  return item.value
+                }
               })
-            )
+              .join('')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.channelsMessagesPost(event.ChannelId, {
+                    content: item,
+                    msg_id: event.MessageId
+                  })
+                )
+              )
+            }
+            const images = val.filter(item => item.type == 'Image').map(item => item.value)
+            if (images) {
+              return Promise.all(
+                images.map(item =>
+                  client.postImage(event.ChannelId, {
+                    msg_id: event.MessageId,
+                    image: item
+                  })
+                )
+              )
+            }
           }
+
           return Promise.all([])
         },
-        mention: async () => {
+        mention: async e => {
+          const event = e.value
+          const tag = e.tag
           // const event = e.value
           const Metions: User[] = []
-          return Metions
+          if (tag == 'group') {
+            return Metions
+          }
+          if (event.mentions) {
+            const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = e.value['mentions']
+            // 艾特消息处理
+            const MessageMention: User[] =
+              mentions.map(item => {
+                return {
+                  UserId: item.id,
+                  IsMaster: false,
+                  UserName: item.username,
+                  IsBot: item.bot,
+                  UserKey: useUserHashKey({
+                    Platform: 'qq-guild-bot',
+                    UserId: item.id
+                  })
+                }
+              }) ?? []
+            return MessageMention
+          } else {
+            return Metions
+          }
         }
       }
     }

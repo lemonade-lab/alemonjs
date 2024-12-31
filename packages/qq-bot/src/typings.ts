@@ -73,7 +73,7 @@ export interface ApiRequestData {
 
 export interface Options {
   secret: string
-  appId: string
+  app_id: string
   token: string
   port?: string
   ws?: string

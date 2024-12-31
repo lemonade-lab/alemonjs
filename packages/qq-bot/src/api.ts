@@ -27,30 +27,49 @@ export class QQBotAPI {
    * @param url
    * @returns
    */
-  getAuthentication(appId: string, clientSecret: string) {
+  getAuthentication(app_id: string, clientSecret: string) {
     return axios.post(`${this.BOTS_API_RUL}/app/getAppAccessToken`, {
-      appId: appId,
+      appId: app_id,
       clientSecret: clientSecret
     })
   }
 
   /**
-   * 创建axios实例
+   * group
    * @param config
    * @returns
    */
   async GroupService(options: AxiosRequestConfig) {
-    const appId = config.get('appId')
+    const app_id = config.get('app_id')
     const token = config.get('token')
     const service = await axios.create({
       baseURL: this.API_URL,
       timeout: 20000,
       headers: {
-        'X-Union-Appid': appId,
+        'X-Union-Appid': app_id,
         'Authorization': `QQBot ${token}`
       }
     })
     return service(options)
+  }
+
+  /**
+   * guild
+   * @param opstion
+   * @returns
+   */
+  async request(opstion: AxiosRequestConfig) {
+    const app_id = config.get('app_id')
+    const token = config.get('token')
+    const sandbox = config.get('sandbox')
+    const service = await axios.create({
+      baseURL: sandbox ? this.API_URL_SANDBOX : this.BOTS_API_RUL,
+      timeout: 20000,
+      headers: {
+        Authorization: `Bot ${app_id}.${token}`
+      }
+    })
+    return service(opstion)
   }
 
   /**
@@ -376,25 +395,6 @@ export class QQBotAPI {
       url: `/v2/groups/${group_openid}/messages/${message_id}`,
       method: 'delete'
     }).then(res => res?.data)
-  }
-
-  /**
-   * 基础请求
-   * @param opstion
-   * @returns
-   */
-  async request(opstion: AxiosRequestConfig) {
-    const appId = config.get('appId')
-    const token = config.get('token')
-    const sandbox = config.get('sandbox')
-    const service = await axios.create({
-      baseURL: sandbox ? this.API_URL_SANDBOX : this.API_URL,
-      timeout: 20000,
-      headers: {
-        Authorization: `Bot ${appId}.${token}`
-      }
-    })
-    return service(opstion)
   }
 
   /**
