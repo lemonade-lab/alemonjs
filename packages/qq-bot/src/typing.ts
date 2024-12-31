@@ -76,6 +76,7 @@ export interface Options {
   app_id: string
   token: string
   sandbox?: boolean
+  route?: string
   port?: string
   ws?: string
 }

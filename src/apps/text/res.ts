@@ -24,8 +24,6 @@ export default OnResponse(
         }
       )
     )
-
-    //
   },
   ['message.create', 'private.message.create']
 )

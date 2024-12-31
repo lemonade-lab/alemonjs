@@ -95,7 +95,6 @@ export class QQBotAPI {
     data: ApiRequestData,
     msg_id?: string
   ): Promise<{ id: string; timestamp: number }> {
-    console.log('msg_id', msg_id)
     return this.groupService({
       url: `/v2/users/${openid}/messages`,
       method: 'post',
@@ -154,9 +153,9 @@ export class QQBotAPI {
   async postRichMediaByUsers(
     openid: string,
     data: {
-      srv_send_msg: boolean
+      srv_send_msg?: boolean
       file_type: FileType
-      url: string
+      url?: string
       file_data?: any
     }
   ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {

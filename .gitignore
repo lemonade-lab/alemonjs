@@ -1,7 +1,5 @@
 # 依赖
 node_modules
-alemon.config.yaml
-alemon.config.json
 *.lock
 data
 lib
@@ -10,5 +8,8 @@ logs
 log
 *.log
 *.logs
-*.memory-card.json
 /public
+alemon.*.yaml
+alemon.*.json
+alemon.*.js
+*.memory-card.json

@@ -4,7 +4,6 @@ import { readFileSync } from 'fs'
 import url from '@src/asstes/alemonjs.png'
 export default OnResponse(
   (event, next) => {
-    console.log(event)
     const text = event.MessageText
     if (!/^(#|\/)?image$/.test(text)) {
       next()
@@ -19,5 +18,5 @@ export default OnResponse(
       Send(Text('图片不存在'))
     }
   },
-  ['message.create']
+  ['message.create', 'private.message.create']
 )

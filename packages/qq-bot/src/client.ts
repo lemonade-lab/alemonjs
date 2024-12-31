@@ -89,7 +89,6 @@ export class QQBotClient extends QQBotAPI {
   connect() {
     try {
       const ws = config.get('ws')
-
       if (!ws) {
         this.#setTimeoutBotConfig()
         this.#app = new Koa()
@@ -97,6 +96,7 @@ export class QQBotClient extends QQBotAPI {
         const router = new Router()
         const port = config.get('port')
         const secret = config.get('secret')
+        const route = config.get('route') ?? '/webhook'
         const cfg = {
           secret: secret ?? '',
           port: port ? Number(port) : 17157
@@ -111,7 +111,7 @@ export class QQBotClient extends QQBotAPI {
           await next()
         })
         // 启动服务
-        router.post('/webhook', async ctx => {
+        router.post(route, async ctx => {
           const sign = ctx.req.headers['x-signature-ed25519']
           const timestamp = ctx.req.headers['x-signature-timestamp']
           const rawBody = ctx.request.rawBody
@@ -150,15 +150,13 @@ export class QQBotClient extends QQBotAPI {
         })
         this.#app.use(router.routes())
         this.#app.use(router.allowedMethods())
-
         // 启动服务
         const server = this.#app.listen(cfg.port, () => {
-          console.log('Server running at http://localhost:' + cfg.port + '/webhook')
+          console.log('Server running at http://localhost:' + cfg.port + route)
         })
-
         // 创建 WebSocketServer 并监听同一个端口
         const wss = new WebSocketServer({ server: server })
-
+        console.log('Server running at wss://localhost:' + cfg.port + '/')
         // 处理客户端连接
         wss.on('connection', ws => {
           const clientId = uuidv4()
@@ -183,44 +181,42 @@ export class QQBotClient extends QQBotAPI {
             this.#client = this.#client.filter(client => client.id !== clientId)
           })
         })
-      }
-
-      const reconnect = () => {
-        if (!ws) return
-        // 使用了ws服务器
-        this.#ws = new WebSocket(ws)
-        this.#ws.on('open', () => {
-          this.#count = 0
-          console.log('ws connected')
-        })
-        this.#ws.on('message', data => {
-          try {
-            // 拿到消息
-            const body: Data = JSON.parse(data.toString())
-            const access_token = body['access_token']
-            if (access_token) config.set('access_token', access_token)
-            for (const event of this.#events[body.t] || []) {
-              event(body.d)
+      } else {
+        const reconnect = () => {
+          // 使用了ws服务器
+          this.#ws = new WebSocket(ws)
+          this.#ws.on('open', () => {
+            this.#count = 0
+            console.log('ws connected')
+          })
+          this.#ws.on('message', data => {
+            try {
+              // 拿到消息
+              const body: Data = JSON.parse(data.toString())
+              const access_token = body['access_token']
+              if (access_token) config.set('access_token', access_token)
+              for (const event of this.#events[body.t] || []) {
+                event(body.d)
+              }
+            } catch (e) {
+              this.#error(e)
             }
-          } catch (e) {
+          })
+          this.#ws.on('close', () => {
+            console.log('ws closed')
+            // 重连5次，超过5次不再重连
+            if (this.#count > 5) return
+            // 23s 后重连
+            setTimeout(() => {
+              reconnect()
+            }, 23000)
+          })
+          this.#ws.on('error', e => {
             this.#error(e)
-          }
-        })
-        this.#ws.on('close', () => {
-          console.log('ws closed')
-          // 重连5次，超过5次不再重连
-          if (this.#count > 5) return
-          // 23s 后重连
-          setTimeout(() => {
-            reconnect()
-          }, 23000)
-        })
-        this.#ws.on('error', e => {
-          this.#error(e)
-        })
+          })
+        }
+        reconnect()
       }
-
-      reconnect()
     } catch (e) {
       this.#error(e)
     }
