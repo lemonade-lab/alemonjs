@@ -12,10 +12,7 @@ export const client: Client = new Proxy({} as Client, {
 export const platform = 'telegram'
 export default defineBot(() => {
   const value = getConfigValue()
-  const config = value?.telegram
-  if (!config) return
-
-  //
+  const config = value[platform]
   const client = new TelegramClient(config.token, {
     polling: true,
     baseApiUrl: config?.base_api_url ?? '',

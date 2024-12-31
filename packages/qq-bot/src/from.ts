@@ -17,15 +17,15 @@ export async function createPicFrom(image: any, name = 'image.jpg') {
     picData = createReadStream(image)
     // 是 buffer
   } else if (Buffer.isBuffer(image)) {
-    const { ext } = await fileTypeFromBuffer(image)
-    if (!name) name = 'file.' + ext
+    const file = await fileTypeFromBuffer(image)
+    if (!name) name = 'file.' + file?.ext
     picData = new Readable()
     picData.push(image)
     picData.push(null)
     // 是 文件流
   } else if (isReadable(image)) {
-    const { ext } = await fileTypeFromStream(image)
-    if (!name) name = 'file.' + ext
+    const file = await fileTypeFromStream(image)
+    if (!name) name = 'file.' + file?.ext
     picData = image
   } else {
     return false

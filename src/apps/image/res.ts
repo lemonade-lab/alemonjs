@@ -2,13 +2,9 @@ import { useSend } from 'alemonjs'
 import { Text, Image } from 'alemonjs'
 import { readFileSync } from 'fs'
 import url from '@src/asstes/alemonjs.png'
+export const regular = /^(#|\/)?image$/
 export default OnResponse(
-  (event, next) => {
-    const text = event.MessageText
-    if (!/^(#|\/)?image$/.test(text)) {
-      next()
-      return
-    }
+  event => {
     const Send = useSend(event)
     // 发送本地图片文件
     const img = readFileSync(url)

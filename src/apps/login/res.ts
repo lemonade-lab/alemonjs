@@ -1,5 +1,4 @@
 import { Text, useObserver, useSend } from 'alemonjs'
-
 const Res = OnResponse((event, next) => {
   // 创建
   const Send = useSend(event)
@@ -18,13 +17,8 @@ const Res = OnResponse((event, next) => {
     next()
   }
 }, 'message.create')
-
-export default OnResponse((event, next) => {
-  if (!/^(#|\/)?login$/.test(event.MessageText)) {
-    next()
-    return
-  }
-
+export const regular = /^(#|\/)?login$/
+export default OnResponse(event => {
   // 创建
   const Send = useSend(event)
   Send(Text('请输入密码'))

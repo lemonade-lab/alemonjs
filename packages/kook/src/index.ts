@@ -20,8 +20,7 @@ export const client: Client = new Proxy({} as Client, {
 })
 export default defineBot(() => {
   const value = getConfigValue()
-  const config = value?.kook
-  if (!config) return
+  const config = value[platform]
 
   // 创建客户端
   const client = new KOOKClient({

@@ -1,6 +1,5 @@
 import {
   defineBot,
-  getConfig,
   getConfigValue,
   OnProcessor,
   PrivateEventMessageCreate,
@@ -103,7 +102,8 @@ export const client: Client = new Proxy({} as Client, {
 
 export default defineBot(() => {
   const value = getConfigValue()
-  const port = value?.gui?.port ?? 12127
+  const config = value[platform]
+  const port = config?.port ?? 17127
   const server = createServer(port)
   // 创建 WebSocketServer 并监听同一个端口
   const wss = new WebSocketServer({ server: server })

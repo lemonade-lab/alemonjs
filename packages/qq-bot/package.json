@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "qq-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -26,7 +26,6 @@
     "@noble/curves": "^1.7.0"
   },
   "devDependencies": {
-    "alemonjs": "^2.0.0-rc.77",
     "@rollup/plugin-typescript": "^11.1.6",
     "lvyjs": "^0.2.13",
     "rollup": "^4.18.1",

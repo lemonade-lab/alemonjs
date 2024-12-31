@@ -77,6 +77,7 @@ export const expendEvent = async <T extends keyof AEvents>(
     try {
       const obj: {
         default: OnResponseValue<T>
+        regular?: RegExp | string
       } = await import(`file://${file.path}`)
       const res = obj?.default
 
@@ -115,6 +116,19 @@ export const expendEvent = async <T extends keyof AEvents>(
           })
         }
       }
+
+      // 消息类型数据
+      if (select == 'message.create' || select == 'private.message.create') {
+        if (obj?.regular) {
+          const reg = new RegExp(obj.regular)
+          if (!reg.test(valueEvent['MessageText'])) {
+            // 继续
+            await nextEvent()
+            return
+          }
+        }
+      }
+
       if (!res.current) {
         // 继续
         await nextEvent()
@@ -151,8 +165,22 @@ export const expendEvent = async <T extends keyof AEvents>(
     try {
       const obj: {
         default: OnResponseValue<T>
+        regular?: RegExp | string
       } = await import(`file://${file.path}`)
       const res = obj?.default
+
+      // 消息类型数据
+      if (select == 'message.create' || select == 'private.message.create') {
+        if (obj?.regular) {
+          const reg = new RegExp(obj.regular)
+          if (!reg.test(valueEvent['MessageText'])) {
+            // 继续
+            await nextEvent()
+            return
+          }
+        }
+      }
+
       if (!res.current) {
         // 继续
         await nextEvent()

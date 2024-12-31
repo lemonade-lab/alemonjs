@@ -118,7 +118,7 @@ export class QQBotAPI {
     // 如果映射表大小超过 100，则删除最早添加的 MessageId
     if (this.#map.size > 100) {
       const firstKey = this.#map.keys().next().value
-      this.#map.delete(firstKey)
+      if (firstKey) this.#map.delete(firstKey)
     }
     return seq
   }
@@ -263,9 +263,8 @@ export class QQBotAPI {
     callBack = (key: string, values: string[]) => ({ key, values })
   ) {
     let size = -1
-    const params = []
+    const params: { key: string; values: string[] }[] = []
     const Id = custom_template_id
-
     /**
      * 消耗一个参数
      * @param value 值

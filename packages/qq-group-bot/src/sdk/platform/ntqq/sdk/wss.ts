@@ -89,7 +89,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
   #ws: WebSocket
 
   #events: {
-    [K in keyof QQBotGroupEventMap]?: (event: QQBotGroupEventMap[K]) => any
+    [K in keyof QQBotGroupEventMap]?: ((event: QQBotGroupEventMap[K]) => any)[]
   } = {}
 
   /**
@@ -98,7 +98,8 @@ export class QQBotGroupClient extends QQBotGroupAPI {
    * @param val 事件处理函数
    */
   on<T extends keyof QQBotGroupEventMap>(key: T, val: (event: QQBotGroupEventMap[T]) => any) {
-    this.#events[key] = val
+    if (!this.#events[key]) this.#events[key] = []
+    this.#events[key].push(val)
     return this
   }
 
@@ -140,7 +141,11 @@ export class QQBotGroupClient extends QQBotGroupAPI {
               try {
                 await this.#events[t](d)
               } catch (err) {
-                if (this.#events['ERROR']) this.#events['ERROR'](err)
+                if (this.#events['ERROR']) {
+                  for (const item of this.#events['ERROR']) {
+                    item(err)
+                  }
+                }
               }
             }
 

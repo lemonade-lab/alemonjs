@@ -201,9 +201,9 @@ export class QQBotGroupAPI {
   async postRichMediaByUsers(
     openid: string,
     data: {
-      srv_send_msg: boolean
+      srv_send_msg?: boolean
       file_type: FileType
-      url: string
+      url?: string
       file_data?: any
     }
   ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {

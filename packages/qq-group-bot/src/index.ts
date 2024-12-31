@@ -1,12 +1,13 @@
 import {
   OnProcessor,
   defineBot,
-  getConfig,
   useUserHashKey,
   PrivateEventMessageCreate,
-  PublicEventMessageCreate
+  PublicEventMessageCreate,
+  getConfigValue
 } from 'alemonjs'
 import { QQBotGroupClient } from './sdk'
+import { C2C_MESSAGE_CREATE, GROUP_AT_MESSAGE_CREATE } from './send'
 export type Client = typeof QQBotGroupClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -18,9 +19,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'qq-group-bot'
 export default defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value?.['qq-group-bot']
-  if (!config) return
+  const value = getConfigValue()
+  const config = value[platform]
 
   // 创建客户端
   const client = new QQBotGroupClient({
@@ -130,7 +130,7 @@ export default defineBot(() => {
       CreateAt: Date.now(),
       OpenId: '',
       //
-      tag: 'GROUP_AT_MESSAGE_CREATE',
+      tag: 'C2C_MESSAGE_CREATE',
       value: null
     }
     // 当访问的时候获取
@@ -148,87 +148,27 @@ export default defineBot(() => {
     console.error(msg)
   })
 
-  /**
-   *
-   * @param GuildId
-   * @param msg
-   * @returns
-   */
-  const getFileInfo = async (GuildId: string, msg: Buffer) => {
-    let url = null
-    return client
-      .postRichMediaByGroup(GuildId, {
-        file_type: 1,
-        url,
-        file_data: msg.toString('base64')
-      })
-      .then(res => res?.file_info)
-  }
-
-  // FRIEND_ADD
-
   global.client = client
 
   return {
     api: {
       use: {
-        send: (event, val) => {
-          if (val.length < 0) return Promise.all([])
-          const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => {
-              if (item.type == 'Link') {
-                return `[${item.options?.title ?? item.value}](${item.value})`
-              } else if (item.type == 'Mention') {
-                if (
-                  item.value == 'everyone' ||
-                  item.value == 'all' ||
-                  item.value == '' ||
-                  typeof item.value != 'string'
-                ) {
-                  return ``
-                }
-                if (item.options?.belong == 'user') {
-                  return `<@${item.value}>`
-                }
-                return ''
-                // return `<qqbot-at-everyone />`
-              } else if (item.type == 'Text') {
-                return item.value
-              }
-            })
-            .join('')
-          if (content) {
-            return Promise.all(
-              [content].map(item =>
-                client.groupOpenMessages(event.GuildId, {
-                  content: item,
-                  msg_id: event.MessageId,
-                  msg_type: 0,
-                  msg_seq: client.getMessageSeq(event.MessageId)
-                })
-              )
-            )
+        send: async (event, val) => {
+          if (val.length < 0) []
+          // 打  tag
+          const tag = event.tag
+          try {
+            if (tag == 'GROUP_AT_MESSAGE_CREATE') {
+              return await GROUP_AT_MESSAGE_CREATE(client, event, val)
+            }
+            if (tag == 'C2C_MESSAGE_CREATE') {
+              return await C2C_MESSAGE_CREATE(client, event, val)
+            }
+            return []
+          } catch (error) {
+            return [error]
           }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
-          if (images) {
-            return Promise.all(
-              images.map(async msg => {
-                const file_info = await getFileInfo(event.GuildId, msg)
-                if (!file_info) return Promise.resolve(null)
-                return client.groupOpenMessages(event.GuildId, {
-                  content: '',
-                  media: {
-                    file_info
-                  },
-                  msg_id: event.MessageId,
-                  msg_type: 7,
-                  msg_seq: client.getMessageSeq(event.MessageId)
-                })
-              })
-            )
-          }
-          return Promise.all([])
+          return []
         },
         mention: async () => {
           // const event = e.value

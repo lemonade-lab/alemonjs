@@ -65,7 +65,7 @@ export class QQBotGuildClient extends QQBotGuildAPI {
   }
 
   #events: {
-    [K in keyof QQBotGuildEventMap]?: (event: QQBotGuildEventMap[K]) => any
+    [K in keyof QQBotGuildEventMap]?: ((event: QQBotGuildEventMap[K]) => any)[]
   } = {}
 
   /**
@@ -74,7 +74,8 @@ export class QQBotGuildClient extends QQBotGuildAPI {
    * @param val 事件处理函数
    */
   on<T extends keyof QQBotGuildEventMap>(key: T, val: (event: QQBotGuildEventMap[T]) => any) {
-    this.#events[key] = val
+    if (!this.#events[key]) this.#events[key] = []
+    this.#events[key].push(val)
     return this
   }
 
@@ -87,7 +88,11 @@ export class QQBotGuildClient extends QQBotGuildAPI {
     this.#gatewayUrl = await this.gateway()
       .then(res => res.url)
       .catch(err => {
-        if (this.#events['ERROR']) this.#events['ERROR'](err)
+        if (this.#events['ERROR']) {
+          for (const item of this.#events['ERROR']) {
+            item(err)
+          }
+        }
       })
 
     // 请求url
@@ -117,7 +122,11 @@ export class QQBotGuildClient extends QQBotGuildAPI {
               try {
                 await this.#events[t](d)
               } catch (err) {
-                if (this.#events['ERROR']) this.#events['ERROR'](err)
+                if (this.#events['ERROR']) {
+                  for (const item of this.#events['ERROR']) {
+                    item(err)
+                  }
+                }
               }
             }
             // Ready Event，鉴权成功

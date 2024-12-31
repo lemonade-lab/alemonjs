@@ -28,7 +28,7 @@ export const client: Client = new Proxy({} as Client, {
 export const platform = 'qq-bot'
 export default defineBot(() => {
   const value = getConfigValue()
-  const config = value['qq-bot']
+  const config = value[platform]
   const client = new QQBotClient({
     secret: config?.secret,
     app_id: config?.app_id,

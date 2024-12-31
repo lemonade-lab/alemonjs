@@ -1,10 +1,12 @@
+type Value = {
+  keys: {
+    [key: string]: string | number | boolean
+  }
+  current: Function
+}
+
 export type SubscribeMap = {
-  [key: string]: {
-    keys: {
-      [key: string]: string | number | boolean
-    }
-    current: Function
-  }[]
+  [key: string]: (Value | undefined)[]
 }
 
 export type Subscribe = {

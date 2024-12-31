@@ -1,6 +1,6 @@
 import { OnProcessor, User, defineBot, getConfigValue, useUserHashKey } from 'alemonjs'
 import { DCClient } from './sdk/index'
-import { MESSAGE_CREATE_TYPE } from '../lib/sdk/platform/discord/sdk/message/MESSAGE_CREATE'
+import { MESSAGE_CREATE_TYPE } from './sdk/platform/discord/sdk/message/MESSAGE_CREATE'
 export type Client = typeof DCClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -13,8 +13,7 @@ export const client: Client = new Proxy({} as Client, {
 export const platform = 'discord'
 export default defineBot(() => {
   const value = getConfigValue()
-  const config = value?.discord
-  if (!config) return
+  const config = value[platform]
 
   // 创建客户端
   const client = new DCClient({

@@ -17,7 +17,7 @@ export const client: Client = new Proxy({} as Client, {
 export const platform = 'wechat'
 export default defineBot(() => {
   const value = getConfigValue()
-  const config = value?.wechat
+  const config = value[platform]
   const bot = WechatyBuilder.build({
     name: config?.name ?? 'alemonjs'
   })

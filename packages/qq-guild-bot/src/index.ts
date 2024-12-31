@@ -1,6 +1,7 @@
-import { OnProcessor, defineBot, getConfig, User, useUserHashKey } from 'alemonjs'
+import { OnProcessor, defineBot, User, useUserHashKey, getConfigValue } from 'alemonjs'
 import { QQBotGuildClient } from './sdk'
-import { AT_MESSAGE_CREATE_TYPE } from '../lib/sdk/platform/qq/sdk/message/AT_MESSAGE_CREATE'
+import { AT_MESSAGE_CREATE_TYPE } from './sdk/platform/qq/sdk/message/AT_MESSAGE_CREATE'
+import { AT_MESSAGE_CREATE, DIRECT_MESSAGE_CREATE, MESSAGE_CREATE } from './send'
 export type Client = typeof QQBotGuildClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -12,10 +13,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'qq-guild-bot'
 export default defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value?.['qq-guild-bot']
-  if (!config) return
-
+  const value = getConfigValue()
+  const config = value[platform]
   // 创建客户端
   const client = new QQBotGuildClient({
     appId: config.app_id,
@@ -73,7 +72,7 @@ export default defineBot(() => {
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //
-      tag: 'AT_MESSAGE_CREATE',
+      tag: 'DIRECT_MESSAGE_CREATE',
       //
       value: null
     }
@@ -235,7 +234,7 @@ export default defineBot(() => {
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //
-      tag: 'AT_MESSAGE_CREATE',
+      tag: 'MESSAGE_CREATE',
       value: null
     }
 
@@ -260,73 +259,56 @@ export default defineBot(() => {
   return {
     api: {
       use: {
-        send: (event, val) => {
-          if (val.length < 0) return Promise.all([])
-          const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => {
-              if (item.type == 'Link') {
-                return `[${item.options?.title ?? item.value}](${item.value})`
-              } else if (item.type == 'Mention') {
-                if (
-                  item.value == 'everyone' ||
-                  item.value == 'all' ||
-                  item.value == '' ||
-                  typeof item.value != 'string'
-                ) {
-                  return `@everyone`
-                }
-                if (item.options?.belong == 'user') {
-                  return `<@!${item.value}>`
-                } else if (item.options?.belong == 'channel') {
-                  return `<#${item.value}>`
-                }
-                return ''
-              } else if (item.type == 'Text') {
-                return item.value
-              }
-            })
-            .join('')
-          if (content) {
-            return Promise.all(
-              [content].map(item =>
-                client.channelsMessagesPost(event.ChannelId, {
-                  content: item,
-                  msg_id: event.MessageId
-                })
-              )
-            )
+        send: async (event, val) => {
+          if (val.length < 0) []
+          // 打  tag
+          const tag = event.tag
+          try {
+            if (tag == 'DIRECT_MESSAGE_CREATE') {
+              return await DIRECT_MESSAGE_CREATE(client, event, val)
+            }
+            if (tag == 'AT_MESSAGE_CREATE') {
+              return await AT_MESSAGE_CREATE(client, event, val)
+            }
+            if (tag == 'MESSAGE_CREATE') {
+              return await AT_MESSAGE_CREATE(client, event, val)
+            }
+            if (tag == 'MESSAGE_CREATE') {
+              return await MESSAGE_CREATE(client, event, val)
+            }
+          } catch (error) {
+            return [error]
           }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
-          if (images) {
-            return Promise.all(
-              images.map(item =>
-                client.postImage(event.ChannelId, {
-                  msg_id: event.MessageId,
-                  image: item
-                })
-              )
-            )
-          }
-          return Promise.all([])
+          return []
         },
         mention: async e => {
-          const event: AT_MESSAGE_CREATE_TYPE = e.value
-          // 艾特消息处理
-          const MessageMention: User[] =
-            event?.mentions.map(item => {
-              return {
-                UserId: item.id,
-                IsMaster: false,
-                UserName: item.username,
-                IsBot: item.bot,
-                UserKey: useUserHashKey({
-                  Platform: 'qq-guild-bot',
-                  UserId: item.id
-                })
-              }
-            }) ?? []
-          return MessageMention
+          const event = e.value
+          const tag = e.tag
+          // const event = e.value
+          const Metions: User[] = []
+          // group
+          if (tag == 'GROUP_AT_MESSAGE_CREATE' || 'C2C_MESSAGE_CREATE') return Metions
+          // guild
+          if (event.mentions) {
+            const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = e.value['mentions']
+            // 艾特消息处理
+            const MessageMention: User[] =
+              mentions.map(item => {
+                return {
+                  UserId: item.id,
+                  IsMaster: false,
+                  UserName: item.username,
+                  IsBot: item.bot,
+                  UserKey: useUserHashKey({
+                    Platform: 'qq-guild-bot',
+                    UserId: item.id
+                  })
+                }
+              }) ?? []
+            return MessageMention
+          } else {
+            return Metions
+          }
         }
       }
     }

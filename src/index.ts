@@ -1,7 +1,5 @@
-export default defineChildren(() => {
-  return {
-    async onCreated() {
-      console.info('测试启动')
-    }
+export default defineChildren(() => ({
+  async onCreated() {
+    console.info('测试启动')
   }
-})
+}))
