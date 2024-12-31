@@ -9,6 +9,14 @@ import {
 } from 'alemonjs'
 import { QQBotClient } from './client'
 import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE'
+export const client: typeof QQBotClient.prototype = new Proxy({} as typeof QQBotClient.prototype, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
 export const platform = 'qq-bot'
 export default defineBot(() => {
   const value = getConfigValue()
@@ -366,6 +374,7 @@ export default defineBot(() => {
 
   // FRIEND_ADD
   global.client = client
+
   return {
     api: {
       use: {

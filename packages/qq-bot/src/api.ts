@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { ApiRequestData, FileType } from './typings.js'
+import { ApiRequestData, FileType } from './typing.js'
 import { config } from './config.js'
 import FormData from 'form-data'
 import { createPicFrom } from './from'
@@ -39,9 +39,9 @@ export class QQBotAPI {
    * @param config
    * @returns
    */
-  async GroupService(options: AxiosRequestConfig) {
+  async groupService(options: AxiosRequestConfig) {
     const app_id = config.get('app_id')
-    const token = config.get('token')
+    const token = config.get('access_token')
     const service = await axios.create({
       baseURL: this.API_URL,
       timeout: 20000,
@@ -58,12 +58,12 @@ export class QQBotAPI {
    * @param opstion
    * @returns
    */
-  async request(opstion: AxiosRequestConfig) {
+  async guildServer(opstion: AxiosRequestConfig) {
     const app_id = config.get('app_id')
     const token = config.get('token')
     const sandbox = config.get('sandbox')
     const service = await axios.create({
-      baseURL: sandbox ? this.API_URL_SANDBOX : this.BOTS_API_RUL,
+      baseURL: sandbox ? this.API_URL_SANDBOX : this.API_URL,
       timeout: 20000,
       headers: {
         Authorization: `Bot ${app_id}.${token}`
@@ -77,7 +77,7 @@ export class QQBotAPI {
    * @returns
    */
   async gateway() {
-    return this.GroupService({
+    return this.groupService({
       url: '/gateway'
     }).then(res => res?.data)
   }
@@ -96,7 +96,7 @@ export class QQBotAPI {
     msg_id?: string
   ): Promise<{ id: string; timestamp: number }> {
     console.log('msg_id', msg_id)
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/users/${openid}/messages`,
       method: 'post',
       data: data
@@ -135,7 +135,7 @@ export class QQBotAPI {
     group_openid: string,
     data: ApiRequestData
   ): Promise<{ id: string; timestamp: number }> {
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/groups/${group_openid}/messages`,
       method: 'post',
       data: data
@@ -160,7 +160,7 @@ export class QQBotAPI {
       file_data?: any
     }
   ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/users/${openid}/files`,
       method: 'post',
       data: data
@@ -185,7 +185,7 @@ export class QQBotAPI {
       file_data?: any
     }
   ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/users/${openid}/files`,
       method: 'post',
       data: data
@@ -210,7 +210,7 @@ export class QQBotAPI {
       file_data?: any
     }
   ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/groups/${openid}/files`,
       method: 'post',
       data: {
@@ -235,7 +235,7 @@ export class QQBotAPI {
       file_data?: any
     }
   ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/groups/${openid}/files`,
       method: 'post',
       data: {
@@ -378,7 +378,7 @@ export class QQBotAPI {
    * @returns
    */
   userMessageDelete(openid: string, message_id: string) {
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/users/${openid}/messages/${message_id}`,
       method: 'delete'
     }).then(res => res?.data)
@@ -391,7 +391,7 @@ export class QQBotAPI {
    * @returns
    */
   grouMessageDelte(group_openid: string, message_id: string) {
-    return this.GroupService({
+    return this.groupService({
       url: `/v2/groups/${group_openid}/messages/${message_id}`,
       method: 'delete'
     }).then(res => res?.data)
@@ -445,7 +445,7 @@ export class QQBotAPI {
       message.name
     )
     const dary = formdata != false ? formdata.getBoundary() : ''
-    return this.request({
+    return this.guildServer({
       method: 'post',
       url: `/channels/${channel_id}/messages`,
       headers: {
@@ -477,7 +477,7 @@ export class QQBotAPI {
       message.name
     )
     const dary = formdata != false ? formdata.getBoundary() : ''
-    return this.request({
+    return this.guildServer({
       method: 'post',
       url: `/dms/${guild_id}/messages`,
       headers: {
@@ -499,7 +499,7 @@ export class QQBotAPI {
    * @returns
    */
   async usersMe() {
-    return this.request({
+    return this.guildServer({
       method: 'get',
       url: `/users/@me`
     }).then(res => res?.data)
@@ -511,7 +511,7 @@ export class QQBotAPI {
    * @returns
    */
   async usersMeGuilds(params: { before: string; after: string; limit: number }) {
-    return this.request({
+    return this.guildServer({
       method: 'get',
       url: `/users/@me/guilds`,
       params
@@ -530,7 +530,7 @@ export class QQBotAPI {
    * @returns
    */
   async guilds(guild_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'get',
       url: `/guilds/${guild_id}`
     }).then(res => res?.data)
@@ -548,7 +548,7 @@ export class QQBotAPI {
    * @returns
    */
   async guildsChannels(guild_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'get',
       url: `/guilds/${guild_id}/channels`
     }).then(res => res?.data)
@@ -560,7 +560,7 @@ export class QQBotAPI {
    * @returns
    */
   async channels(channel_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'get',
       url: `/channels/${channel_id}`
     }).then(res => res?.data)
@@ -585,7 +585,7 @@ export class QQBotAPI {
       application_id: string
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'post',
       url: `/guilds/${guild_id}/channels`,
       data
@@ -607,7 +607,7 @@ export class QQBotAPI {
       speak_permission: number
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PATCH',
       url: `/channels/${channel_id}`,
       data
@@ -630,7 +630,7 @@ export class QQBotAPI {
       speak_permission: number
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}`,
       data
@@ -643,7 +643,7 @@ export class QQBotAPI {
    * @returns
    */
   async channelsChannelOnlineNums(channel_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/online_nums`
     }).then(res => res?.data)
@@ -667,7 +667,7 @@ export class QQBotAPI {
       limit: number
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/members`,
       params
@@ -689,7 +689,7 @@ export class QQBotAPI {
       limit: number
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/roles/${role_id}/members`,
       params
@@ -703,7 +703,7 @@ export class QQBotAPI {
    * @returns
    */
   async guildsMembersMessage(guild_id: string, user_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/members/${user_id}`
     }).then(res => res?.data)
@@ -716,7 +716,7 @@ export class QQBotAPI {
    * @returns
    */
   async guildsMembersDelete(guild_id: string, user_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}`
     }).then(res => res?.data)
@@ -729,7 +729,7 @@ export class QQBotAPI {
    * @returns
    */
   async channelsMessages(channel_id: string, message_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/messages/${message_id}`
     }).then(res => res?.data)
@@ -755,7 +755,7 @@ export class QQBotAPI {
       markdown?: any
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'POST',
       url: `/channels/${channel_id}/messages`,
       data
@@ -770,7 +770,7 @@ export class QQBotAPI {
    * @returns
    */
   async channelsMessagesDelete(channel_id: string, message_id: string, hidetip: boolean = true) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/messages/${message_id}?hidetip=${hidetip}`
     }).then(res => res?.data)
@@ -788,7 +788,7 @@ export class QQBotAPI {
    * @returns
    */
   async guildsRoles(guild_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/roles`
     }).then(res => res?.data)
@@ -811,7 +811,7 @@ export class QQBotAPI {
       hoist?: 0 | 1
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'POST',
       url: `/guilds/${guild_id}/roles`,
       data
@@ -836,7 +836,7 @@ export class QQBotAPI {
       hoist?: 0 | 1
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles/${role_id}`,
       data
@@ -849,7 +849,7 @@ export class QQBotAPI {
    * @param role_id 身份组id
    */
   async guildsRolesDelete(guild_id: string, role_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/roles/${role_id}`
     }).then(res => res?.data)
@@ -870,7 +870,7 @@ export class QQBotAPI {
     user_id: string,
     role_id: string
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PUT',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`,
       data: {
@@ -896,7 +896,7 @@ export class QQBotAPI {
     user_id: string,
     role_id: string
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`,
       data: {
@@ -918,7 +918,7 @@ export class QQBotAPI {
    * @param user_id 用户id
    */
   async channelsPermissions(channel_id: string, user_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/members/${user_id}/permissions`
     }).then(res => res?.data)
@@ -931,7 +931,7 @@ export class QQBotAPI {
    * @param 参数包括add和remove两个字段分别表示授予的权限以及删除的权限。要授予用户权限即把add对应位置 1，删除用户权限即把remove对应位置 1。当两个字段同一位都为 1，表现为删除权限。
    */
   async channelsPermissionsPut(channel_id: string, user_id: string, add: string, remove: string) {
-    return this.request({
+    return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/members/${user_id}/permissions`,
       data: {
@@ -959,7 +959,7 @@ export class QQBotAPI {
    * @returns
    */
   async guildsMessageSetting(guild_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/message/setting`
     }).then(res => res?.data)
@@ -977,7 +977,7 @@ export class QQBotAPI {
    * @returns
    */
   async usersMeDms() {
-    return this.request({
+    return this.guildServer({
       method: 'POST',
       url: `/users/@me/dms`
     }).then(res => res?.data)
@@ -1001,7 +1001,7 @@ export class QQBotAPI {
       markdown?: any
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'POST',
       url: `/dms/${guild_id}/messages`,
       data
@@ -1015,7 +1015,7 @@ export class QQBotAPI {
    * @returns
    */
   async dmsMessageDelete(guild_id: string, message_id: string, hidetip: boolean = true) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/dms/${guild_id}/messages/${message_id}?hidetip=${hidetip}`
     }).then(res => res?.data)
@@ -1037,7 +1037,7 @@ export class QQBotAPI {
     guild_id: string,
     data: { mute_end_timestamp?: string; mute_seconds?: string }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PATCH',
       url: `/guilds/${guild_id}/mute`,
       data
@@ -1057,7 +1057,7 @@ export class QQBotAPI {
     user_id: string,
     data: { mute_end_timestamp?: string; mute_seconds?: string }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/${user_id}/mute`,
       data
@@ -1078,7 +1078,7 @@ export class QQBotAPI {
       user_ids: string[]
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PATCH',
       url: `/guilds/${guild_id}/mute`,
       data
@@ -1111,7 +1111,7 @@ export class QQBotAPI {
       recommend_channels?: string[]
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'POST',
       url: `/guilds/${guild_id}/announces`,
       data
@@ -1125,7 +1125,7 @@ export class QQBotAPI {
    */
 
   async guildsAnnouncesDelete(guild_id: string, message_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/announces/${message_id}`
     }).then(res => res?.data)
@@ -1145,7 +1145,7 @@ export class QQBotAPI {
    * @returns message_ids 为当前请求后子频道内所有精华消息 message_id 数组
    */
   async channelsPinsPut(channel_id: string, message_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/pins/${message_id}`
     }).then(res => res?.data)
@@ -1159,7 +1159,7 @@ export class QQBotAPI {
    */
 
   async channelsPinsDelete(channel_id: string, message_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/pins/${message_id}`
     }).then(res => res?.data)
@@ -1172,7 +1172,7 @@ export class QQBotAPI {
    * @returns message_ids 为当前请求后子频道内所有精华消息 message_id 数组
    */
   async channelsPins(channel_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/pins`
     }).then(res => res?.data)
@@ -1191,7 +1191,7 @@ export class QQBotAPI {
    */
 
   async channelsSchedules(channel_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/schedules`
     }).then(res => res?.data)
@@ -1205,7 +1205,7 @@ export class QQBotAPI {
    */
 
   async channelsSchedulesSchedule(channel_id: string, schedule_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/schedules/${schedule_id}`
     }).then(res => res?.data)
@@ -1242,7 +1242,7 @@ export class QQBotAPI {
       }
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'POST',
       url: `/channels/${channel_id}/schedules`,
       data
@@ -1281,7 +1281,7 @@ export class QQBotAPI {
       }
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PATCH',
       url: `/channels/${channel_id}/schedules/${schedule_id}`,
       data
@@ -1296,7 +1296,7 @@ export class QQBotAPI {
    */
 
   async channelsSchedulesScheduleDelete(channel_id: string, schedule_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/schedules/${schedule_id}`
     }).then(res => res?.data)
@@ -1323,7 +1323,7 @@ export class QQBotAPI {
     type: 1 | 2,
     id: string
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/messages/${message_id}/reactions/${type}/${id}`
     }).then(res => res?.data)
@@ -1344,7 +1344,7 @@ export class QQBotAPI {
     type: 1 | 2,
     id: string
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/messages/${message_id}/reactions/${type}/${id}`
     }).then(res => res?.data)
@@ -1371,7 +1371,7 @@ export class QQBotAPI {
       limit?: number
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/messages/${message_id}/reactions/${type}/${id}`,
       data
@@ -1401,7 +1401,7 @@ export class QQBotAPI {
       status: 0 | 1 | 2 | 3
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'POST',
       url: `/channels/${channel_id}/audio`,
       data
@@ -1414,7 +1414,7 @@ export class QQBotAPI {
    * @returns {}
    */
   async channelsMicPut(channel_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/mic`
     }).then(res => res?.data)
@@ -1426,7 +1426,7 @@ export class QQBotAPI {
    */
 
   async channelsMicDelete(channel_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/mic`
     }).then(res => res?.data)
@@ -1448,7 +1448,7 @@ export class QQBotAPI {
    * @returns is_finish 为 1 时，表示已拉取完 为 0 时，表示未拉取完
    */
   async channelsThreads(channel_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/threads`
     }).then(res => res?.data)
@@ -1462,7 +1462,7 @@ export class QQBotAPI {
    * 其中content字段可参考 https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/forum/model.html#RichText
    */
   async channelsThreadsThread(channel_id: string, thread_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/threads/${thread_id}`
     }).then(res => res?.data)
@@ -1485,7 +1485,7 @@ export class QQBotAPI {
       format: 1 | 2 | 3 | 4
     }
   ) {
-    return this.request({
+    return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/threads`,
       data
@@ -1499,7 +1499,7 @@ export class QQBotAPI {
    */
 
   async channelsThreadsDelete(channel_id: string, thread_id: string) {
-    return this.request({
+    return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/threads/${thread_id}`
     }).then(res => res?.data)
@@ -1516,7 +1516,7 @@ export class QQBotAPI {
    * @returns
    */
   async guildApiPermission(guild_id: string) {
-    return this.request({
+    return this.guildServer({
       url: `/guilds/${guild_id}/api_permission`
     }).then(res => res?.data)
   }
