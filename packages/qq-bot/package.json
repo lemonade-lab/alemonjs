@@ -1,7 +1,7 @@
 {
-  "name": "@alemonjs/gui",
-  "version": "0.2.4",
-  "description": "gui",
+  "name": "@alemonjs/qq-bot",
+  "version": "0.0.1",
+  "description": "qq-bot",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -10,24 +10,27 @@
     "build": "node bundle.js"
   },
   "dependencies": {
-    "koa": "^2.15.3",
-    "koa-mount": "^4.0.0",
-    "koa-static": "^5.0.0",
+    "axios": "^1.4.0",
+    "file-type": "^18.5.0",
+    "form-data": "^4.0.0",
+    "koa": "^2.14.2",
     "koa-bodyparser": "^4.4.1",
-    "ws": "^8.18.0"
+    "koa-router": "^12.0.0",
+    "koa2-cors": "^2.0.6",
+    "lodash-es": "^4.17.21",
+    "mime-types": "^2.1.35",
+    "public-ip": "^6.0.1",
+    "qrcode": "^1.5.3",
+    "ws": "^8.13.0",
+    "uuid": "^11.0.3",
+    "@noble/curves": "^1.7.0"
   },
   "devDependencies": {
     "alemonjs": "^2.0.0-rc.77",
     "@rollup/plugin-typescript": "^11.1.6",
     "lvyjs": "^0.2.13",
     "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1",
-    "tsx": "^4.19.1",
-    "@types/koa": "^2.15.0",
-    "@types/koa-bodyparser": "^4.3.12",
-    "@types/koa-mount": "^4.0.5",
-    "@types/koa-router": "^7.4.8",
-    "@types/koa-static": "^4.0.4"
+    "rollup-plugin-dts": "^6.1.1"
   },
   "types": "lib",
   "exports": {
@@ -37,7 +40,10 @@
     }
   },
   "keywords": [
-    "alemonjs"
+    "alemonjs",
+    "qq-bot",
+    "bot",
+    "chat-bot"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

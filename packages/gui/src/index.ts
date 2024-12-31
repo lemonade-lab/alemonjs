@@ -8,7 +8,7 @@ import {
   User,
   useUserHashKey
 } from 'alemonjs'
-import { WebSocketServer } from 'ws'
+import { WebSocket, WebSocketServer } from 'ws'
 import Koa from 'koa'
 import KoaStatic from 'koa-static'
 import { mkdirSync, writeFileSync } from 'fs'
@@ -102,25 +102,17 @@ export const client: Client = new Proxy({} as Client, {
 })
 
 export default defineBot(() => {
-  const cfg = getConfig()
-  const config = cfg.value?.gui
-  if (!config) return
-  const port = config?.port ?? 9601
-  //
+  const value = getConfigValue()
+  const port = value?.gui?.port ?? 12127
   const server = createServer(port)
-
   // 创建 WebSocketServer 并监听同一个端口
   const wss = new WebSocketServer({ server: server })
-
-  //
-  let client = null
-  //
+  let client: WebSocket | null = null
   const onMessage = (event: Message) => {
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId: event.UserId
     })
-
     const url = event.UserAvatar
     const UserAvatar = {
       toBuffer: async () => {
@@ -135,7 +127,6 @@ export default defineBot(() => {
         return url
       }
     }
-
     /**
      * Removes all mentions in the format <@xxx> or <#xxx> from the input string.
      */
@@ -143,9 +134,7 @@ export default defineBot(() => {
       const regex = /<[@#]\w+>/g
       return va.replace(regex, '').trim()
     }
-
     const msg = removeMentions(event.MessageText)
-
     const e: PublicEventMessageCreate = {
       // 事件类型
       Platform: platform,
