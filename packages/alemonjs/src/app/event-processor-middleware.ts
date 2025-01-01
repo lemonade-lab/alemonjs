@@ -137,15 +137,22 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
       }
 
-      if (Array.isArray(app.default?.current)) {
-        // 数组的next 也是 nextMiddleware
-        for (const item of app.default?.current) {
-          if (isAsyncFunction(item)) {
-            await item(valueEvent, nextMiddleware)
+      if (Array.isArray(app.default.current)) {
+        let i = 0
+        let T = true
+        const start = async () => {
+          if (i >= app.default.current.length) return
+          // 不是真的
+          if (!T) return
+          if (isAsyncFunction(app.default.current[i])) {
+            T = await app.default.current[i](valueEvent, nextMiddleware)
           } else {
-            item(valueEvent, nextMiddleware)
+            T = await app.default.current[i](valueEvent, nextMiddleware)
           }
+          ++i
+          await start()
         }
+        await start()
       } else {
         // 这里是否继续时 next 说了算
         if (isAsyncFunction(app.default?.current)) {
@@ -203,16 +210,22 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
       }
 
-      // 这里是否继续时 next 说了算
       if (Array.isArray(app.default.current)) {
-        // 数组的next 也是 nextMiddleware
-        for (const item of app.default.current) {
-          if (isAsyncFunction(item)) {
-            await item(valueEvent, nextMiddleware)
+        let i = 0
+        let T = true
+        const start = async () => {
+          if (i >= app.default.current.length) return
+          // 不是真的
+          if (!T) return
+          if (isAsyncFunction(app.default.current[i])) {
+            T = await app.default.current[i](valueEvent, nextMiddleware)
           } else {
-            item(valueEvent, nextMiddleware)
+            T = await app.default.current[i](valueEvent, nextMiddleware)
           }
+          ++i
+          await start()
         }
+        await start()
       } else {
         // 这里是否继续时 next 说了算
         if (isAsyncFunction(app.default?.current)) {

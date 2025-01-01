@@ -150,16 +150,22 @@ export const expendEvent = async <T extends keyof Events>(
         }
       }
 
-      // 这里是否继续时 next 说了算
-
       if (Array.isArray(app.default.current)) {
-        for (const item of app.default.current) {
-          if (isAsyncFunction(item)) {
-            await item(valueEvent, nextEvent)
+        let i = 0
+        let T = true
+        const start = async () => {
+          if (i >= app.default.current.length) return
+          // 不是真的
+          if (!T) return
+          if (isAsyncFunction(app.default.current[i])) {
+            T = await app.default.current[i](valueEvent, nextEvent)
           } else {
-            item(valueEvent, nextEvent)
+            T = await app.default.current[i](valueEvent, nextEvent)
           }
+          ++i
+          await start()
         }
+        await start()
       } else {
         // 这里是否继续时 next 说了算
         if (isAsyncFunction(app.default?.current)) {
@@ -235,13 +241,21 @@ export const expendEvent = async <T extends keyof Events>(
       }
 
       if (Array.isArray(app.default.current)) {
-        for (const item of app.default.current) {
-          if (isAsyncFunction(item)) {
-            await item(valueEvent, nextEvent)
+        let i = 0
+        let T = true
+        const start = async () => {
+          if (i >= app.default.current.length) return
+          // 不是真的事件 退出
+          if (!T) return
+          if (isAsyncFunction(app.default.current[i])) {
+            T = await app.default.current[i](valueEvent, nextEvent)
           } else {
-            item(valueEvent, nextEvent)
+            T = await app.default.current[i](valueEvent, nextEvent)
           }
+          ++i
+          await start()
         }
+        await start()
       } else {
         // 这里是否继续时 next 说了算
         if (isAsyncFunction(app.default?.current)) {

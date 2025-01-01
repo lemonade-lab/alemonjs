@@ -4,6 +4,9 @@ export default OnResponse(
   (event, next) => {
     // 可以称之为局部中间件。
     event['user_id'] = event.UserId
+
+    // 继续执行下一个响应
+    return true
   },
   ['message.create', 'private.message.create']
 )
