@@ -9,12 +9,35 @@ export type PublicEventMessageCreate = MessageText &
   Guild &
   Channel &
   Message &
-  User
+  User & {
+    name: 'message.create'
+  }
 // 公有事件-消息更新
-export type PublicEventMessageUpdate = platform & Guild & Channel & Message & User
+export type PublicEventMessageUpdate = platform &
+  Guild &
+  Channel &
+  Message &
+  User & {
+    name: 'message.update'
+  }
 // 公有事件-消息撤回
-export type PublicEventMessageDelete = platform & Guild & Channel & Message
+export type PublicEventMessageDelete = platform &
+  Guild &
+  Channel &
+  Message & {
+    name: 'message.delete'
+  }
 // 公有事件-表情添加
-export type PublicEventMessageReactionAdd = platform & Guild & Channel & Message
+export type PublicEventMessageReactionAdd = platform &
+  Guild &
+  Channel &
+  Message & {
+    name: 'message.reaction.add'
+  }
 // 公有事件-表情删除
-export type PublicEventMessageReactionRemove = platform & Guild & Channel & Message
+export type PublicEventMessageReactionRemove = platform &
+  Guild &
+  Channel &
+  Message & {
+    name: 'message.reaction.remove'
+  }

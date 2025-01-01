@@ -6,16 +6,17 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { AEvents } from '../typing/event/map'
+import { Events } from '../typing/event/map'
 import { OnMiddlewareValue } from '../typing/event'
 import { Next } from '../global'
+import { useState } from './hook-use-state'
 
 /**
  * @param event
  * @param select
  */
-export const expendMiddleware = async <T extends keyof AEvents>(
-  valueEvent: AEvents[T],
+export const expendMiddleware = async <T extends keyof Events>(
+  valueEvent: Events[T],
   select: T,
   next: Function
 ) => {
@@ -71,15 +72,38 @@ export const expendMiddleware = async <T extends keyof AEvents>(
     }
 
     try {
-      const obj: {
-        default: OnMiddlewareValue<T>
+      const app: {
+        default: OnMiddlewareValue<any, T>
+        name?: string
+        state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
-      const res = obj?.default
+
+      if (!app?.default) {
+        // 继续
+        await nextMiddleware()
+        return
+      }
+
+      if (!app.default.current) {
+        // 继续
+        await nextMiddleware()
+        return
+      }
+
+      // 检查状态
+      if (app?.name) {
+        const [state] = useState(app?.name)
+        if (state == false) {
+          // 继续
+          await nextMiddleware()
+          return
+        }
+      }
 
       // 是数组
-      if (Array.isArray(res.select)) {
+      if (Array.isArray(app.default?.select)) {
         // 不包含
-        if (!res.select.includes(select)) {
+        if (!app.default?.select.includes(select)) {
           // 继续
           nextMiddleware()
           return
@@ -88,7 +112,7 @@ export const expendMiddleware = async <T extends keyof AEvents>(
         // 不是数组
       } else {
         // 不匹配
-        if (res?.select !== select) {
+        if (app.default?.select !== select) {
           // 继续
           nextMiddleware()
           return
@@ -107,23 +131,28 @@ export const expendMiddleware = async <T extends keyof AEvents>(
             path: file.path,
             name: file.name,
             value: {
-              select: res.select ?? select
+              select: app.default?.select ?? select
             }
           })
         }
       }
 
-      if (!res.current) {
-        // 继续
-        await nextMiddleware()
-        return
-      }
-
-      // 这里是否继续时 next 说了算
-      if (isAsyncFunction(res?.current)) {
-        res?.current(valueEvent, nextMiddleware)
+      if (Array.isArray(app.default?.current)) {
+        // 数组的next 也是 nextMiddleware
+        for (const item of app.default?.current) {
+          if (isAsyncFunction(item)) {
+            await item(valueEvent, nextMiddleware)
+          } else {
+            item(valueEvent, nextMiddleware)
+          }
+        }
       } else {
-        res?.current(valueEvent, nextMiddleware)
+        // 这里是否继续时 next 说了算
+        if (isAsyncFunction(app.default?.current)) {
+          app.default?.current(valueEvent, nextMiddleware)
+        } else {
+          app.default?.current(valueEvent, nextMiddleware)
+        }
       }
     } catch (err) {
       // 不再继续
@@ -147,15 +176,50 @@ export const expendMiddleware = async <T extends keyof AEvents>(
       return
     }
     try {
-      const obj: {
-        default: OnMiddlewareValue<T>
+      const app: {
+        default: OnMiddlewareValue<any, T>
+        name?: string
+        state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
-      const res = obj?.default
+
+      if (!app?.default) {
+        // 继续
+        await nextMiddleware()
+        return
+      }
+
+      if (!app.default.current) {
+        // 继续
+        await nextMiddleware()
+        return
+      }
+
+      if (app?.name) {
+        const [state] = useState(app?.name)
+        if (state == false) {
+          // 继续
+          await nextMiddleware()
+          return
+        }
+      }
+
       // 这里是否继续时 next 说了算
-      if (isAsyncFunction(res?.current)) {
-        res?.current(valueEvent, nextMiddleware)
+      if (Array.isArray(app.default.current)) {
+        // 数组的next 也是 nextMiddleware
+        for (const item of app.default.current) {
+          if (isAsyncFunction(item)) {
+            await item(valueEvent, nextMiddleware)
+          } else {
+            item(valueEvent, nextMiddleware)
+          }
+        }
       } else {
-        res?.current(valueEvent, nextMiddleware)
+        // 这里是否继续时 next 说了算
+        if (isAsyncFunction(app.default?.current)) {
+          app.default?.current(valueEvent, nextMiddleware)
+        } else {
+          app.default?.current(valueEvent, nextMiddleware)
+        }
       }
     } catch (err) {
       logger.error(err)

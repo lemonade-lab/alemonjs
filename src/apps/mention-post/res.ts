@@ -1,4 +1,5 @@
 import { useSend, Text, Mention } from 'alemonjs'
+export const name = 'core:mention:post'
 export default OnResponse(
   (event, next) => {
     if (!/^(#|\/)?mention$/.test(event.MessageText)) {

@@ -20,11 +20,6 @@ const createIoRedis = () => {
     db: value.redis.db ?? 0,
     maxRetriesPerRequest: null
   })
-  aRedis.on('error', (err: any) => {
-    logger.error('\n[REDIS]', err)
-    logger.error('\n[REDIS]', '请检查配置')
-    process.cwd()
-  })
   return aRedis
 }
 

@@ -6,7 +6,7 @@
  * @author ningmengchongshui
  */
 import { Next } from '../global'
-import { AEvents } from '../typing/event/map'
+import { Events } from '../typing/event/map'
 import { expendEvent } from './event-processor-event'
 import { expendMiddleware } from './event-processor-middleware'
 import {
@@ -20,7 +20,7 @@ import {
  * @param event
  * @param select
  */
-const Log = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
+const Log = <T extends keyof Events>(event: Events[T], select: T) => {
   const logs = [`[${select}]`]
   if (typeof event['ChannelId'] == 'string' && event['ChannelId'] != '') {
     logs.push(`[${event['ChannelId']}]`)
@@ -41,7 +41,7 @@ const Log = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
  * @param event
  * @param key
  */
-export const expendCycle = async <T extends keyof AEvents>(valueEvent: AEvents[T], select: T) => {
+export const expendCycle = async <T extends keyof Events>(valueEvent: Events[T], select: T) => {
   const nextEnd: Next = () => {
     return
   }

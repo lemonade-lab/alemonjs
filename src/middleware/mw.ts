@@ -9,6 +9,7 @@ export default OnMiddleware(
     console.log('e.value:', e.value)
 
     next()
+
     return
   },
   ['message.create', 'private.message.create']

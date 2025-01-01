@@ -1,5 +1,5 @@
 import { ChildrenCycle } from './typing/cycle'
-import { OnMiddlewareType, OnObserverType, OnResponseType } from './typing/event'
+import { OnMiddlewareType, OnResponseType } from './typing/event'
 import { ClientAPI } from './typing/global'
 import { Logger } from './typing/logger/index'
 import {
@@ -150,13 +150,6 @@ declare global {
    */
   var OnResponse: OnResponseType
   /**
-   * 事件观察着
-   */
-  var OnObserver: OnObserverType
-}
-
-declare global {
-  /**
    * 中间件
    */
   var OnMiddleware: OnMiddlewareType
@@ -249,7 +242,6 @@ global.logger = createLogger()
 /**
  * export typing
  */
-
 export * from './typing/cycle/index'
 export * from './typing/event/base/guild'
 export * from './typing/event/base/message'
@@ -261,6 +253,8 @@ export * from './typing/event/member/index'
 export * from './typing/event/message/message'
 export * from './typing/event/message/private.message'
 export * from './typing/event/request/index'
+export * from './typing/event/index'
+export * from './typing/event/map'
 export * from './typing/global/index'
 export * from './typing/logger/index'
 export * from './typing/message/index'

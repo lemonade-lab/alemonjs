@@ -1,4 +1,4 @@
-import { OnObserverType, OnResponseType } from '../typing/event/index'
+import { OnResponseType } from '../typing/event/index'
 
 /**
  * 处理响应事件
@@ -12,14 +12,3 @@ export const OnResponse: OnResponseType = (callback, select) => {
 }
 
 global.OnResponse = OnResponse
-
-/**
- *
- * @param callback
- * @param event
- * @returns
- */
-export const OnObserver: OnObserverType = (callback, select) => {
-  return { current: callback, select }
-}
-global.OnObserver = OnObserver

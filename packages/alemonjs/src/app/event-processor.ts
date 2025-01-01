@@ -1,14 +1,15 @@
-import { AEvents } from '../typing/event/map'
+import { Events } from '../typing/event/map'
 import { expendCycle } from './event-processor-cycle'
 
 /**
  * 消息处理器
  * @param event
- * @param select
+ * @param name
  * @returns
  */
-export const OnProcessor = <T extends keyof AEvents>(event: AEvents[T], select: T) => {
+export const OnProcessor = <T extends keyof Events>(event: Events[T], name: T) => {
   // 不再消息匹配
-  expendCycle(event, select)
+  event['name'] = name
+  expendCycle(event, name)
   return
 }

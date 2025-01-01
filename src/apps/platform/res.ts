@@ -1,11 +1,13 @@
 import { Text, useSend } from 'alemonjs'
 import { platform } from '@alemonjs/kook'
 
-const kookResponse = OnResponse(event => {
+const kookResponse = OnResponse((event, next) => {
   // 使用.value获取原生数据
   const e = event.value
   console.log('e:', e)
 }, 'message.create')
+
+export const name = 'core:platfrom'
 
 export default OnResponse((event, next) => {
   // 匹配规则

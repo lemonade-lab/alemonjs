@@ -5,20 +5,19 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { AEvents } from '../typing/event/map'
+import { Events } from '../typing/event/map'
 import { isAsyncFunction } from 'util/types'
 import { OnResponseValue } from '../typing/event'
 import { Next } from '../global'
-
-// 直接next下个周期。而不是下同级别的
+import { useState } from './hook-use-state'
 
 /**
  * 消息体处理机制
  * @param event
  * @param key
  */
-export const expendEvent = async <T extends keyof AEvents>(
-  valueEvent: AEvents[T],
+export const expendEvent = async <T extends keyof Events>(
+  valueEvent: Events[T],
   select: T,
   next: Function
 ) => {
@@ -75,16 +74,38 @@ export const expendEvent = async <T extends keyof AEvents>(
     }
     //
     try {
-      const obj: {
-        default: OnResponseValue<T>
+      const app: {
+        default: OnResponseValue<any, T>
         regular?: RegExp | string
+        name?: string
       } = await import(`file://${file.path}`)
-      const res = obj?.default
+
+      if (!app?.default) {
+        // 继续
+        await nextEvent()
+        return
+      }
+
+      if (!app.default?.current) {
+        // 继续
+        await nextEvent()
+        return
+      }
+
+      // 检查状态
+      if (app?.name) {
+        const [state] = useState(app?.name)
+        if (state == false) {
+          // 继续
+          await nextEvent()
+          return
+        }
+      }
 
       // 如果是数组
-      if (Array.isArray(res.select)) {
+      if (Array.isArray(app.default?.select)) {
         // 没有匹配到
-        if (!res.select.includes(select)) {
+        if (!app.default.select.includes(select)) {
           // 继续
           nextEvent()
           return
@@ -92,7 +113,7 @@ export const expendEvent = async <T extends keyof AEvents>(
         // 如果不是数组
       } else {
         // 没有匹配到
-        if (res?.select !== select) {
+        if (app.default?.select !== select) {
           // 继续
           nextEvent()
           return
@@ -111,7 +132,7 @@ export const expendEvent = async <T extends keyof AEvents>(
             path: file.path,
             name: file.name,
             value: {
-              select: res.select
+              select: app.default.select
             }
           })
         }
@@ -119,8 +140,8 @@ export const expendEvent = async <T extends keyof AEvents>(
 
       // 消息类型数据
       if (select == 'message.create' || select == 'private.message.create') {
-        if (obj?.regular) {
-          const reg = new RegExp(obj.regular)
+        if (app?.regular) {
+          const reg = new RegExp(app.regular)
           if (!reg.test(valueEvent['MessageText'])) {
             // 继续
             await nextEvent()
@@ -129,16 +150,23 @@ export const expendEvent = async <T extends keyof AEvents>(
         }
       }
 
-      if (!res.current) {
-        // 继续
-        await nextEvent()
-        return
-      }
       // 这里是否继续时 next 说了算
-      if (isAsyncFunction(res?.current)) {
-        res?.current(valueEvent, nextEvent)
+
+      if (Array.isArray(app.default.current)) {
+        for (const item of app.default.current) {
+          if (isAsyncFunction(item)) {
+            await item(valueEvent, nextEvent)
+          } else {
+            item(valueEvent, nextEvent)
+          }
+        }
       } else {
-        res?.current(valueEvent, nextEvent)
+        // 这里是否继续时 next 说了算
+        if (isAsyncFunction(app.default?.current)) {
+          app.default?.current(valueEvent, nextEvent)
+        } else {
+          app.default?.current(valueEvent, nextEvent)
+        }
       }
     } catch (err) {
       // 不再继续
@@ -156,23 +184,48 @@ export const expendEvent = async <T extends keyof AEvents>(
       return
     }
     valueJ++
+
     const file = StoreResponseGather[valueJ - 1]
+
     if (!file?.path) {
       nextEvent()
       return
     }
 
     try {
-      const obj: {
-        default: OnResponseValue<T>
+      const app: {
+        default: OnResponseValue<any, T>
         regular?: RegExp | string
+        name?: string
+        state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
-      const res = obj?.default
+
+      if (!app?.default) {
+        // 继续
+        await nextEvent()
+        return
+      }
+
+      if (!app.default?.current) {
+        // 继续
+        await nextEvent()
+        return
+      }
+
+      // 检查状态
+      if (app?.name) {
+        const [state] = useState(app?.name)
+        if (state == false) {
+          // 继续
+          await nextEvent()
+          return
+        }
+      }
 
       // 消息类型数据
       if (select == 'message.create' || select == 'private.message.create') {
-        if (obj?.regular) {
-          const reg = new RegExp(obj.regular)
+        if (app?.regular) {
+          const reg = new RegExp(app.regular)
           if (!reg.test(valueEvent['MessageText'])) {
             // 继续
             await nextEvent()
@@ -181,16 +234,24 @@ export const expendEvent = async <T extends keyof AEvents>(
         }
       }
 
-      if (!res.current) {
-        // 继续
-        await nextEvent()
-        return
-      }
-      if (isAsyncFunction(res?.current)) {
-        res?.current(valueEvent, nextEvent)
+      if (Array.isArray(app.default.current)) {
+        for (const item of app.default.current) {
+          if (isAsyncFunction(item)) {
+            await item(valueEvent, nextEvent)
+          } else {
+            item(valueEvent, nextEvent)
+          }
+        }
       } else {
-        res?.current(valueEvent, nextEvent)
+        // 这里是否继续时 next 说了算
+        if (isAsyncFunction(app.default?.current)) {
+          app.default?.current(valueEvent, nextEvent)
+        } else {
+          app.default?.current(valueEvent, nextEvent)
+        }
       }
+
+      //
     } catch (err) {
       logger.error(err)
     }

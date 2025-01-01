@@ -4,18 +4,17 @@
  * @author ningmengchongshui
  */
 import { Next } from '../global'
-import { AEvents } from '../typing/event/map'
+import { Events } from '../typing/event/map'
 import { EventCycle } from '../typing/cycle/index'
 
 /**
- *
  * @param valueEvent
  * @param select
  * @param next
  * @param chioce
  */
-export const expendSubscribe = async <T extends keyof AEvents>(
-  valueEvent: AEvents[T],
+export const expendSubscribe = async <T extends keyof Events>(
+  valueEvent: Events[T],
   select: T,
   next: Function,
   chioce: EventCycle
@@ -92,8 +91,8 @@ export const expendSubscribe = async <T extends keyof AEvents>(
  * @param select
  * @param next
  */
-export const expendSubscribeCreate = async <T extends keyof AEvents>(
-  valueEvent: AEvents[T],
+export const expendSubscribeCreate = async <T extends keyof Events>(
+  valueEvent: Events[T],
   select: T,
   next: Function
 ) => {
@@ -106,8 +105,8 @@ export const expendSubscribeCreate = async <T extends keyof AEvents>(
  * @param select
  * @param next
  */
-export const expendSubscribeMount = async <T extends keyof AEvents>(
-  valueEvent: AEvents[T],
+export const expendSubscribeMount = async <T extends keyof Events>(
+  valueEvent: Events[T],
   select: T,
   next: Function
 ) => {
@@ -120,8 +119,8 @@ export const expendSubscribeMount = async <T extends keyof AEvents>(
  * @param select
  * @param next
  */
-export const expendSubscribeUnmount = async <T extends keyof AEvents>(
-  valueEvent: AEvents[T],
+export const expendSubscribeUnmount = async <T extends keyof Events>(
+  valueEvent: Events[T],
   select: T,
   next: Function
 ) => {
