@@ -1,7 +1,6 @@
-import { BufferData } from 'chat-space'
-const BD = new BufferData()
+import { BufferData } from './core'
 
-let ClientONE = null
+const BD = new BufferData()
 
 type Message = {
   // 行为 发送消息
@@ -41,7 +40,7 @@ export async function directController(msg, user_id) {
   // is buffer
   if (Buffer.isBuffer(msg)) {
     try {
-      ClientONE.send(
+      global.Client.send(
         JSON.stringify({
           // 行为 发送消息
           action: 'send_message',
@@ -80,7 +79,7 @@ export async function directController(msg, user_id) {
       .join('')
     try {
       const buff = msg[isBuffer]
-      ClientONE.send(
+      global.Client.send(
         JSON.stringify({
           // 行为 发送消息
           action: 'send_message',
@@ -132,7 +131,7 @@ export async function directController(msg, user_id) {
     //
     const msg = await BD.getUrl(getUrl)
     if (Buffer.isBuffer(msg)) {
-      ClientONE.send(
+      global.Client.send(
         JSON.stringify({
           // 行为 发送消息  send_group_msg
           action: 'send_message',
@@ -160,7 +159,7 @@ export async function directController(msg, user_id) {
    * 需要增加解析器
    * <@xxxx>  <@everyone>
    */
-  ClientONE.send(
+  global.Client.send(
     JSON.stringify({
       // 行为 发送消息
       action: 'send_message',

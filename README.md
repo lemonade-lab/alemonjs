@@ -22,18 +22,26 @@ export default OnResponse((event, next) => {
 | Project                    | Status                              | Description    |
 | -------------------------- | ----------------------------------- | -------------- |
 | 👉[alemonjs]               | [![a-s]][a-p]                       | 核心库         |
-| 👉[@alemonjs/qq-group-bot] | [![qq-group-bot-s]][qq-group-bot-p] | QQ 群          |
-| 👉[@alemonjs/qq-guild-bot] | [![qq-guild-bot-s]][qq-guild-bot-p] | QQ 频道        |
+| 👉[@alemonjs/gui]          | [![gui-s]][gui-p]                   | gui            |
+| 👉[@alemonjs/qq-bot]       | [![qq-bot-s]][qq-bot-p]             | QQ webhook     |
+| 👉[@alemonjs/qq-group-bot] | [![qq-group-bot-s]][qq-group-bot-p] | QQ group       |
+| 👉[@alemonjs/qq-guild-bot] | [![qq-guild-bot-s]][qq-guild-bot-p] | QQ guild       |
+| 👉[@alemonjs/qq]           | [![qq-s]][qq-p]                     | QQ 连接        |
 | 👉[@alemonjs/discord]      | [![discord-s]][discord-p]           | DC 公会        |
 | 👉[@alemonjs/kook]         | [![kook-s]][kook-p]                 | KOOK           |
 | 👉[@alemonjs/telegram]     | [![telegram-s]][telegram-p]         | telegram       |
-| 👉[@alemonjs/onebot]       | [![onebot-s]][onebot-p]             | onebot V11$V12 |
+| 👉[@alemonjs/onebot]       | [![onebot-s]][onebot-p]             | onebot V11&V12 |
 | 👉[@alemonjs/wechat]       | [![wechat-s]][wechat-p]             | 微信           |
-| 👉[@alemonjs/qq]           | [![qq-s]][qq-p]                     | QQ 连接        |
 
 [alemonjs]: https://github.com/lemonade-lab/alemonjs
 [a-s]: https://img.shields.io/npm/v/alemonjs.svg
 [a-p]: https://www.npmjs.com/package/alemonjs
+[@alemonjs/gui]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/gui
+[gui-s]: https://img.shields.io/npm/v/@alemonjs/gui.svg
+[gui-p]: https://www.npmjs.com/package/@alemonjs/gui
+[@alemonjs/qq-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-bot
+[qq-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-bot.svg
+[qq-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-bot
 [@alemonjs/qq-group-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-group-bot
 [qq-group-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-group-bot.svg
 [qq-group-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-group-bot

@@ -1,4 +1,6 @@
 import crypto from 'crypto'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
 /**
  * 将字符串转为定长字符串
  * @param str 输入字符串
@@ -18,4 +20,22 @@ export function createHash(str: string, options: { length?: number; algorithm?: 
  */
 export function useUserHashKey(event: { UserId: string; Platform: string }) {
   return createHash(`${event.Platform}:${event.UserId}`)
+}
+
+/**
+ * 创建app名称
+ * @param url
+ * @param app 模块名
+ * @param select 选择事件类型,默认apps
+ * @returns
+ */
+export const createEventName = (
+  url: string,
+  app: string,
+  select: 'apps' | 'middleware' = 'apps'
+) => {
+  const __dirname = dirname(fileURLToPath(url))
+  const dirs = __dirname.split('/').reverse()
+  const name = dirs.slice(0, dirs.indexOf(select)).join(':')
+  return `${app}:${select}:${name}`
 }

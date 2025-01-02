@@ -1,0 +1,41 @@
+{
+  "name": "@alemonjs/onebotv12",
+  "version": "0.0.1",
+  "description": "onebot",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib",
+  "scripts": {
+    "build": "node bundle.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "lvyjs": "^0.2.13",
+    "rollup": "^4.18.1",
+    "rollup-plugin-dts": "^6.1.1",
+    "tsx": "^4.19.1"
+  },
+  "keywords": [
+    "alemonjs",
+    "onebot",
+    "bot",
+    "chat-bot"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
+  }
+}

@@ -1,5 +1,5 @@
 import { defineBot, getConfigValue, OnProcessor, useUserHashKey } from 'alemonjs'
-import { OneBotClient } from './sdk-v12/wss'
+import { OneBotClient } from './sdk/wss'
 
 const MyBot = {
   id: '',
@@ -7,7 +7,7 @@ const MyBot = {
   avatar: ''
 }
 
-const platform = 'onebot'
+export const platform = 'onebot'
 
 export default defineBot(() => {
   const value = getConfigValue()

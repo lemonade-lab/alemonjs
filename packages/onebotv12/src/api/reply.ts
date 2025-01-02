@@ -1,7 +1,6 @@
-import { BufferData } from 'chat-space'
-const BD = new BufferData()
+import { BufferData } from './core'
 
-let ClientONE = null
+const BD = new BufferData()
 
 type Message = {
   // 行为 发送消息
@@ -49,7 +48,7 @@ export async function replyController(msg, guild_id) {
   // is buffer
   if (Buffer.isBuffer(msg)) {
     try {
-      ClientONE.send(
+      global.client.send(
         JSON.stringify({
           // 行为 发送消息
           action: 'send_group_msg',
@@ -85,7 +84,7 @@ export async function replyController(msg, guild_id) {
       .join('')
     try {
       const buff = msg[isBuffer]
-      ClientONE.send(
+      global.client.send(
         JSON.stringify({
           // 行为 发送消息
           action: 'send_group_msg',
@@ -133,7 +132,7 @@ export async function replyController(msg, guild_id) {
     const msg = await BD.getUrl(getUrl)
     if (Buffer.isBuffer(msg)) {
       // 群聊
-      ClientONE.send(
+      global.client.send(
         JSON.stringify({
           action: 'send_group_msg',
           params: {
@@ -194,7 +193,7 @@ export async function replyController(msg, guild_id) {
       data: {}
     })
   }
-  ClientONE.send(
+  global.client.send(
     JSON.stringify({
       action: 'send_group_msg',
       params: {
