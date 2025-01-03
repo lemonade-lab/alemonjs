@@ -10,56 +10,29 @@ import {
 import { WebSocket, WebSocketServer } from 'ws'
 import Koa from 'koa'
 import KoaStatic from 'koa-static'
-import { mkdirSync, writeFileSync } from 'fs'
+import { mkdirSync } from 'fs'
 import { join } from 'path'
-import router from './api'
 import koaBody from 'koa-bodyparser'
+import { Data, DataPrivate, DataPublic } from './typing'
+import {
+  addChat,
+  addPrivateChat,
+  delChat,
+  delPrivateChat,
+  getChats,
+  getPrivateChats
+} from './chats'
+export * from './typing'
 
-type Message = {
-  UserId: string
-  UserName: string
-  UserAvatar: string
-  MessageId: string
-  MessageText: string
-  OpenId: string
-  IsMaster: number
-  IsBot: number
-  GuildId: string
-  ChannelId: string
-}
-
-type PrivateMessage = {
-  UserId: string
-  UserName: string
-  UserAvatar: string
-  MessageId: string
-  MessageText: string
-  OpenId: string
-  IsMaster: number
-  IsBot: number
-}
-
-type Text = {
-  t: 'Text'
-  d: string
-}
-
-type Image = {
-  t: 'Image'
-  d: {
-    url_data?: string
-    url_index?: string
-  }
+const Bot = {
+  BotId: '794161769',
+  BotName: '阿柠檬',
+  BotAvatar: 'https://q1.qlogo.cn/g?b=qq&s=0&nk=794161769'
 }
 
 const DATA = {
-  stringify: (message: { t: 'send_message' | 'send_private_message'; d: (Text | Image)[] }) =>
-    JSON.stringify(message),
-  parse: (message: string) =>
-    JSON.parse(message) as {
-      t: 'send_message' | 'send_private_message'
-      d: Message | PrivateMessage
-    }
+  stringify: (data: Data) => JSON.stringify(data),
+  parse: (data: string): Data => JSON.parse(data)
 }
 
 /**
@@ -76,10 +49,6 @@ const createServer = (port: number) => {
 
   // body
   app.use(koaBody())
-
-  // 使用路由
-  app.use(router.routes())
-  app.use(router.allowedMethods())
 
   // 监听端口
   return app.listen(port, () => {
@@ -104,12 +73,20 @@ export default defineBot(() => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
+  //
   const port = config?.port ?? 17127
+  //
   const server = createServer(port)
   // 创建 WebSocketServer 并监听同一个端口
   const wss = new WebSocketServer({ server: server })
+  //
   let client: WebSocket | null = null
-  const onMessage = (event: Message) => {
+  /**
+   *
+   * @param event
+   */
+  const onMessage = (data: DataPublic) => {
+    const event = data.d
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId: event.UserId
@@ -128,14 +105,17 @@ export default defineBot(() => {
         return url
       }
     }
-    /**
-     * Removes all mentions in the format <@xxx> or <#xxx> from the input string.
-     */
-    const removeMentions = (va: string): string => {
-      const regex = /<[@#]\w+>/g
-      return va.replace(regex, '').trim()
-    }
-    const msg = removeMentions(event.MessageText)
+
+    const master_key = getConfigValue()?.gui?.master_key ?? []
+
+    // 纯文本
+    const msg = event.MessageBody.map(item => {
+      if (item.type == 'Text') {
+        return item.value
+      }
+      return ''
+    }).join('')
+
     const e: PublicEventMessageCreate = {
       name: 'message.create',
       // 事件类型
@@ -148,10 +128,9 @@ export default defineBot(() => {
       UserName: event.UserName,
       UserAvatar: UserAvatar,
       UserKey,
-      IsMaster: event.IsMaster == 0 ? false : true,
-      IsBot: event.IsBot == 0 ? false : true,
-      //
-      MessageId: event.MessageId,
+      IsMaster: master_key.includes(UserKey),
+      IsBot: event.IsBot,
+      MessageId: String(event.MessageId),
       MessageText: msg,
       OpenId: event.OpenId,
       CreateAt: Date.now(),
@@ -162,14 +141,15 @@ export default defineBot(() => {
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
-        return event
+        return data
       }
     })
     // 处理消息
     OnProcessor(e, 'message.create')
   }
 
-  const onProvateMessage = (event: PrivateMessage) => {
+  const onProvateMessage = (data: DataPrivate) => {
+    const event = data.d
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId: event.UserId
@@ -190,6 +170,16 @@ export default defineBot(() => {
       }
     }
 
+    // 纯文本
+    const msg = event.MessageBody.map(item => {
+      if (item.type == 'Text') {
+        return item.value
+      }
+      return ''
+    }).join('')
+
+    const master_key = getConfigValue()?.gui?.master_key ?? []
+
     const e: PrivateEventMessageCreate = {
       name: 'private.message.create',
       // 事件类型
@@ -199,11 +189,10 @@ export default defineBot(() => {
       UserName: event.UserName,
       UserAvatar,
       UserKey,
-      IsMaster: event.IsMaster == 0 ? false : true,
-      IsBot: event.IsBot == 0 ? false : true,
-      // 消息
-      MessageId: event.MessageId,
-      MessageText: event.MessageText,
+      IsMaster: master_key.includes(UserKey),
+      IsBot: event.IsBot,
+      MessageId: String(event.MessageId),
+      MessageText: msg,
       OpenId: event.OpenId,
       CreateAt: Date.now(),
       //
@@ -213,28 +202,54 @@ export default defineBot(() => {
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
-        return event
+        return data
       }
     })
     // 处理消息
     OnProcessor(e, 'private.message.create')
   }
 
-  /**
-   *
-   */
+  // 监听连接事件
   wss.on('connection', ws => {
     console.log('gui connection')
-    //
+
+    // 保存客户端
     client = ws
+
     // 处理消息事件
     ws.on('message', (message: string) => {
       try {
         const event = DATA.parse(message)
-        if (event.t == 'send_message') {
-          onMessage(event.d as any)
+        if (event.t == 'get_channel') {
+          const createAt = event.d.createAt
+          const chats = getChats(createAt)
+          ws.send(
+            DATA.stringify({
+              t: 'post_channel',
+              d: chats
+            })
+          )
+        } else if (event.t == 'get_private') {
+          const createAt = event.d.createAt
+          const chats = getPrivateChats(createAt)
+          ws.send(
+            DATA.stringify({
+              t: 'post_private',
+              d: chats
+            })
+          )
+        } else if (event.t == 'del_channel') {
+          delChat(event.d.createAt, event.d.MessageId)
+        } else if (event.t == 'del_private') {
+          delPrivateChat(event.d.createAt, event.d.MessageId)
+        } else if (event.t == 'send_message') {
+          // add
+          addChat(event.d.createAt, event)
+          onMessage(event)
         } else if (event.t == 'send_private_message') {
-          onProvateMessage(event.d as any)
+          // add
+          addPrivateChat(event.d.createAt, event)
+          onProvateMessage(event)
         } else {
           console.log('未知消息', event)
         }
@@ -242,10 +257,13 @@ export default defineBot(() => {
         console.error('解析消息出错', err)
       }
     })
+
     // 处理关闭事件
     ws.on('close', () => {
       console.log('gui close')
     })
+
+    //
   })
 
   //
@@ -254,111 +272,68 @@ export default defineBot(() => {
       use: {
         send: (event, val) => {
           if (val.length < 0) return Promise.all([])
-          const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => {
-              if (item.type == 'Link') {
-                return `[${item.options?.title ?? item.value}](${item.value})`
-              } else if (item.type == 'Mention') {
-                if (
-                  item.value == 'everyone' ||
-                  item.value == 'all' ||
-                  item.value == '' ||
-                  typeof item.value != 'string'
-                ) {
-                  return `<@everyone>`
-                }
-                if (item.options?.belong == 'user') {
-                  return `<@${item.value}>`
-                } else if (item.options?.belong == 'channel') {
-                  return `<#${item.value}>`
-                }
-                return ''
-              } else if (item.type == 'Text') {
-                if (item.options?.style == 'block') {
-                  return `\`${item.value}\``
-                } else if (item.options?.style == 'italic') {
-                  return `*${item.value}*`
-                } else if (item.options?.style == 'bold') {
-                  return `**${item.value}**`
-                } else if (item.options?.style == 'strikethrough') {
-                  return `~~${item.value}~~`
-                }
-                return item.value
+          const data: DataPrivate | DataPublic = event.value
+          if (data.t == 'send_message') {
+            if (client) {
+              const db = {
+                t: 'send_message' as DataPublic['t'],
+                d: {
+                  MessageBody: val,
+                  MessageId: Date.now(),
+                  createAt: Date.now(),
+                  IsBot: true,
+                  OpenId: data.d.OpenId,
+                  GuildId: data.d.GuildId,
+                  ChannelId: data.d.ChannelId
+                } as any
               }
-            })
-            .join('')
-          if (content) {
-            return Promise.all(
-              [content].map(
-                item =>
-                  client &&
-                  client.send(
-                    DATA.stringify({
-                      t: event.tag,
-                      d: [
-                        {
-                          t: 'Text',
-                          d: item
-                        }
-                      ]
-                    })
-                  )
-              )
-            )
-          }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
-          if (images) {
-            return Promise.all(
-              images.map(async item => {
-                const url = `/file/${Date.now()}.png`
-                writeFileSync(join(process.cwd(), 'public', url), item, 'utf-8')
-                return (
-                  client &&
-                  client.send(
-                    DATA.stringify({
-                      t: event.tag,
-                      d: [
-                        {
-                          t: 'Image',
-                          d: {
-                            // url_data: base64,
-                            url_index: url
-                          }
-                        }
-                      ]
-                    })
-                  )
-                )
-              })
-            )
+              addChat(db.d.createAt, db)
+              client.send(DATA.stringify(db as any))
+            }
+          } else {
+            if (client) {
+              const db = {
+                t: 'send_private_message' as DataPrivate['t'],
+                d: {
+                  MessageBody: val,
+                  MessageId: Date.now(),
+                  createAt: Date.now(),
+                  IsBot: true,
+                  OpenId: data.d.OpenId
+                } as any
+              }
+              addPrivateChat(db.d.createAt, db)
+              client.send(DATA.stringify(db as any))
+            }
           }
           return Promise.all([])
         },
         mention: async e => {
-          const event = e.value
-          const getMentions = (va: string): string[] => {
-            const regex = /<[@]\w+>/g
-            const matches = va.match(regex)
-            return matches || []
+          const event: DataPrivate | DataPublic = e.value
+          if (event.t == 'send_private_message') {
+            const arr: User[] = []
+            return arr
+          } else {
+            const mentions = event.d.MessageBody.filter(
+              item => item.type == 'Mention' && item.options?.belong == 'user'
+            ).map(item => item.value)
+            const MessageMention: User[] = mentions.map(item => {
+              const UserId = item
+              const value = getConfigValue()
+              const config = value?.discord
+              const master_key = config?.master_key ?? []
+              return {
+                UserId: UserId,
+                IsMaster: master_key.includes(UserId),
+                IsBot: item == Bot.BotId,
+                UserKey: useUserHashKey({
+                  Platform: platform,
+                  UserId: UserId
+                })
+              }
+            })
+            return MessageMention
           }
-          const mentions = getMentions(event.MessageText).filter(item => item != '<@everyone>')
-          const MessageMention: User[] = mentions.map(item => {
-            const UserId = item.slice(2, item.length - 1)
-            const value = getConfigValue()
-            const config = value?.discord
-            const master_key = config?.master_key ?? []
-            return {
-              UserId: UserId,
-              IsMaster: master_key.includes(UserId),
-              IsBot: false,
-              UserKey: useUserHashKey({
-                Platform: platform,
-                UserId: UserId
-              })
-            }
-          })
-          return MessageMention
         }
       }
     }
