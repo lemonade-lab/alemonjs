@@ -13,6 +13,7 @@ import { getConfigValue } from '../config'
  */
 const createIoRedis = () => {
   const value = getConfigValue()
+  if (!value) throw new Error('value.redis is null')
   const aRedis = new redisClient({
     host: value.redis.host ?? 'localhost',
     port: value.redis.port ?? 6379,

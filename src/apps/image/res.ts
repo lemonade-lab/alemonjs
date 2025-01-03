@@ -9,8 +9,6 @@ export default OnResponse(
   [
     Res.current,
     event => {
-      console.log('event', event)
-
       const Send = useSend(event)
       // 发送本地图片文件
       const img = readFileSync(url)

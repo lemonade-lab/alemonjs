@@ -206,10 +206,10 @@ export class QQBotClient extends QQBotAPI {
             console.log('ws closed')
             // 重连5次，超过5次不再重连
             if (this.#count > 5) return
-            // 23s 后重连
+            // 1.3s 后重连
             setTimeout(() => {
               reconnect()
-            }, 23000)
+            }, 1300)
           })
           this.#ws.on('error', e => {
             this.#error(e)

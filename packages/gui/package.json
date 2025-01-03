@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.2.5",
+  "version": "0.2.7",
   "description": "gui",
   "author": "lemonade",
   "license": "MIT",
@@ -12,6 +12,7 @@
   "dependencies": {
     "koa": "^2.15.3",
     "koa-mount": "^4.0.0",
+    "koa-router": "^13.0.1",
     "koa-static": "^5.0.0",
     "koa-bodyparser": "^4.4.1",
     "ws": "^8.18.0"

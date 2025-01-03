@@ -7,6 +7,7 @@ export default OnMiddleware(
 
     console.log('e:', e)
     console.log('e.value:', e.value)
+    console.log('url', e.UserAvatar.toURL())
 
     next()
 

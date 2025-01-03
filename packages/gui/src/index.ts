@@ -101,7 +101,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
   const port = config?.port ?? 17127
   const server = createServer(port)
@@ -136,6 +137,7 @@ export default defineBot(() => {
     }
     const msg = removeMentions(event.MessageText)
     const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       // 频道
@@ -189,6 +191,7 @@ export default defineBot(() => {
     }
 
     const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
       // 事件类型
       Platform: platform,
       // 用户Id
@@ -287,18 +290,20 @@ export default defineBot(() => {
             .join('')
           if (content) {
             return Promise.all(
-              [content].map(item =>
-                client.send(
-                  DATA.stringify({
-                    t: event.tag,
-                    d: [
-                      {
-                        t: 'Text',
-                        d: item
-                      }
-                    ]
-                  })
-                )
+              [content].map(
+                item =>
+                  client &&
+                  client.send(
+                    DATA.stringify({
+                      t: event.tag,
+                      d: [
+                        {
+                          t: 'Text',
+                          d: item
+                        }
+                      ]
+                    })
+                  )
               )
             )
           }
@@ -308,19 +313,22 @@ export default defineBot(() => {
               images.map(async item => {
                 const url = `/file/${Date.now()}.png`
                 writeFileSync(join(process.cwd(), 'public', url), item, 'utf-8')
-                return client.send(
-                  DATA.stringify({
-                    t: event.tag,
-                    d: [
-                      {
-                        t: 'Image',
-                        d: {
-                          // url_data: base64,
-                          url_index: url
+                return (
+                  client &&
+                  client.send(
+                    DATA.stringify({
+                      t: event.tag,
+                      d: [
+                        {
+                          t: 'Image',
+                          d: {
+                            // url_data: base64,
+                            url_index: url
+                          }
                         }
-                      }
-                    ]
-                  })
+                      ]
+                    })
+                  )
                 )
               })
             )

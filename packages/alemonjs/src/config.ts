@@ -3,6 +3,17 @@ import { readFileSync, existsSync, watch } from 'fs'
 import { join } from 'path'
 import { parse } from 'yaml'
 
+type Package = {
+  [key: string]: any
+  name: string | null
+  version: string | null
+  description: string | null
+  author: string | null
+  license: string | null
+  type: string | null
+  private: boolean | null
+}
+
 /**
  * 配置类
  */
@@ -59,7 +70,9 @@ export class ConfigCore {
   /**
    * 当且仅当配置文件存在时
    */
-  get value() {
+  get value(): null | {
+    [key: string]: any
+  } {
     if (!this.#value) {
       return this.#update()
     }
@@ -71,7 +84,7 @@ export class ConfigCore {
   /**
    * package.json
    */
-  get package() {
+  get package(): null | Package {
     if (this.#package) return this.#package
     const dir = process.env.PKG_DIR || join(process.cwd(), 'package.json')
     if (!existsSync(dir)) {
@@ -88,7 +101,11 @@ export class ConfigCore {
   }
 
   /**
-   * 命令行参数
+   * 命令行参数，
+   * ****
+   * 获取 --name value
+   * ****
+   * 例：argv.login == 'gui'
    */
   get argv() {
     const argv: {

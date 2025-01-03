@@ -27,7 +27,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'qq-bot'
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
   const client = new QQBotClient({
     secret: config?.secret,
@@ -77,6 +78,7 @@ export default defineBot(() => {
 
     // 定义消
     const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       // guild
@@ -133,6 +135,7 @@ export default defineBot(() => {
 
     // 定义消
     const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
       // 事件类型
       Platform: platform,
       // 用户Id
@@ -194,12 +197,13 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
       // 事件类型
       Platform: platform,
       //
-      GuildId: event.guild_id,
-      ChannelId: event.channel_id,
+      // GuildId: event.guild_id,
+      // ChannelId: event.channel_id,
       // 用户Id
       UserId: event?.author?.id ?? '',
       UserKey,
@@ -261,7 +265,8 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       GuildId: event.guild_id,
@@ -357,7 +362,8 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       //
