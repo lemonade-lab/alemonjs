@@ -11,6 +11,26 @@ import {
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 import { Subscribe } from './typing/subscribe'
+import { Events } from './typing/event/map'
+
+const events: (keyof Events)[] = [
+  'message.create',
+  'message.update',
+  'message.delete',
+  'message.reaction.add',
+  'message.reaction.remove',
+  'private.message.create',
+  'private.message.update',
+  'private.message.delete',
+  'private.friend.add',
+  'private.guild.add',
+  'channal.create',
+  'channal.delete',
+  'guild.join',
+  'guild.exit',
+  'member.add',
+  'member.remove'
+] as const
 
 declare global {
   /**
@@ -22,9 +42,9 @@ declare global {
    */
   var alemonjs: ClientAPI
   /**
-   * 观察者存储池
+   * 链
    */
-  var storeSubscribe: Subscribe
+  var storeSubscribeList: Subscribe
   /**
    * 中间件存储池
    */
@@ -44,103 +64,27 @@ declare global {
 }
 
 if (!global.storeMains) global.storeMains = []
-if (!global.storeSubscribe)
-  global.storeSubscribe = {
-    create: {
-      'message.create': [],
-      'message.update': [],
-      'message.delete': [],
-      'message.reaction.add': [],
-      'message.reaction.remove': [],
-      'private.message.create': [],
-      'private.message.update': [],
-      'private.message.delete': [],
-      'private.friend.add': [],
-      'private.guild.add': [],
-      'channal.create': [],
-      'channal.delete': [],
-      'guild.join': [],
-      'guild.exit': [],
-      'member.add': [],
-      'member.remove': []
-    },
-    mount: {
-      'message.create': [],
-      'message.update': [],
-      'message.delete': [],
-      'message.reaction.add': [],
-      'message.reaction.remove': [],
-      'private.message.create': [],
-      'private.message.update': [],
-      'private.message.delete': [],
-      'private.friend.add': [],
-      'private.guild.add': [],
-      'channal.create': [],
-      'channal.delete': [],
-      'guild.join': [],
-      'guild.exit': [],
-      'member.add': [],
-      'member.remove': []
-    },
-    unmount: {
-      'message.create': [],
-      'message.update': [],
-      'message.delete': [],
-      'message.reaction.add': [],
-      'message.reaction.remove': [],
-      'private.message.create': [],
-      'private.message.update': [],
-      'private.message.delete': [],
-      'private.friend.add': [],
-      'private.guild.add': [],
-      'channal.create': [],
-      'channal.delete': [],
-      'guild.join': [],
-      'guild.exit': [],
-      'member.add': [],
-      'member.remove': []
-    }
+
+if (!global.storeSubscribeList) {
+  global.storeSubscribeList = {
+    create: {},
+    mount: {},
+    unmount: {}
   }
+}
+
 if (!global.storeResponse) global.storeResponse = []
 if (!global.storeMiddleware) global.storeMiddleware = []
 if (!global.storeMiddlewareGather) {
-  global.storeMiddlewareGather = {
-    'message.create': [],
-    'message.update': [],
-    'message.delete': [],
-    'message.reaction.add': [],
-    'message.reaction.remove': [],
-    'private.message.create': [],
-    'private.message.update': [],
-    'private.message.delete': [],
-    'private.friend.add': [],
-    'private.guild.add': [],
-    'channal.create': [],
-    'channal.delete': [],
-    'guild.join': [],
-    'guild.exit': [],
-    'member.add': [],
-    'member.remove': []
+  global.storeMiddlewareGather = {} as never
+  for (const key of events) {
+    global.storeMiddlewareGather[key] = [] as never
   }
 }
 if (!global.storeResponseGather) {
-  global.storeResponseGather = {
-    'message.create': [],
-    'message.update': [],
-    'message.delete': [],
-    'message.reaction.add': [],
-    'message.reaction.remove': [],
-    'private.message.create': [],
-    'private.message.update': [],
-    'private.message.delete': [],
-    'private.friend.add': [],
-    'private.guild.add': [],
-    'channal.create': [],
-    'channal.delete': [],
-    'guild.join': [],
-    'guild.exit': [],
-    'member.add': [],
-    'member.remove': []
+  global.storeMiddlewareGather = {} as never
+  for (const key of events) {
+    global.storeResponseGather[key] = [] as never
   }
 }
 

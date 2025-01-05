@@ -1,4 +1,6 @@
-type Value = {
+import { SinglyLinkedList } from '../../datastructure/SinglyLinkedList'
+
+export type SubscribeValue = {
   keys: {
     [key: string]: string | number | boolean
   }
@@ -6,7 +8,7 @@ type Value = {
 }
 
 export type SubscribeMap = {
-  [key: string]: (Value | undefined)[]
+  [key: string]: SinglyLinkedList<SubscribeValue>
 }
 
 export type Subscribe = {

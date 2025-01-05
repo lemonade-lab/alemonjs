@@ -6,6 +6,7 @@
 import { Next } from '../global'
 import { Events } from '../typing/event/map'
 import { EventCycle } from '../typing/cycle/index'
+import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
 
 /**
  * @param valueEvent
@@ -19,66 +20,56 @@ export const expendSubscribe = async <T extends keyof Events>(
   next: Function,
   chioce: EventCycle
 ) => {
-  // 确保订阅初始化。
-  if (!global.storeSubscribe[chioce][select]) global.storeSubscribe[chioce][select] = []
-  //
-  let valueN = 0
+  if (!global.storeSubscribeList[chioce][select]) {
+    global.storeSubscribeList[chioce][select] = new SinglyLinkedList()
+  }
+
   /**
    * 观察者下一步
    * @returns
    */
-  const nextObserver: Next = (cn, ...cns) => {
+  const nextObserver: Next = (cn?: boolean, ...cns: any[]) => {
     if (cn) {
       next(...cns)
       return
     }
 
-    // i 结束了
-    if (valueN >= global.storeSubscribe[chioce][select].length) {
-      // 订阅都检查过一遍。开始 next
-      next()
-      return
-    }
-    //
-    valueN++
-
-    const item = global.storeSubscribe[chioce][select][valueN - 1]
+    const item = global.storeSubscribeList[chioce][select].popNext() // 弹出下一个节点
 
     // 可能是 undefined
-
-    if (!item || !item.current) {
+    if (!item || !item.data.current) {
       // 继续 next
-      nextObserver()
+      nextObserver(true)
       return
     }
 
-    // 存在
-    for (const key in item.keys) {
+    // 检查 keys
+    for (const key in item.data.keys) {
       // 只要发现不符合的，就继续
-      if (item.keys[key] !== valueEvent[key]) {
-        // 只要有一个不符合，就继续
+      if (item.data.keys[key] !== valueEvent[key]) {
         nextObserver()
         return
       }
     }
 
     // 订阅是执行则销毁
-    global.storeSubscribe[chioce][select][valueN - 1] = undefined
-    const Continue: Next = (cn, ...cns) => {
+    global.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
+
+    const Continue: Next = (cn?: boolean, ...cns: any[]) => {
       // next() 订阅继续
-      global.storeSubscribe[chioce][select][valueN - 1] = item
+      global.storeSubscribeList[chioce][select].append(item.data) // 重新连接
       if (cn) {
         nextObserver(...cns)
         return
       }
-      if (typeof cn == 'boolean') {
-        global.storeSubscribe[chioce][select][valueN - 1] = undefined
+      if (typeof cn === 'boolean') {
+        global.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
         nextObserver(...cns)
         return
       }
     }
 
-    item.current(valueEvent, Continue)
+    item.data.current(valueEvent, Continue)
   }
 
   // 先从观察者开始

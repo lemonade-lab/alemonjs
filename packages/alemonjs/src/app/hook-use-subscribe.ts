@@ -1,6 +1,7 @@
 import { Events } from '../typing/event/map'
 import { EventCycle, Next } from '../typing/cycle/index'
 import { Current } from '../typing/event'
+import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
 
 type KeyMap = {
   [key: string]: string | number | boolean
@@ -14,15 +15,13 @@ type KeyMap = {
  */
 export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
   const run = (callback: Current<T>, keys: (keyof Events[T])[], chioce: EventCycle) => {
-    // 如果不存在。则创建
-    if (!global.storeSubscribe[chioce][select]) global.storeSubscribe[chioce][select] = []
-
+    if (!global.storeSubscribeList[chioce][select]) {
+      global.storeSubscribeList[chioce][select] = new SinglyLinkedList()
+    }
     // 没有选择
     if (keys.length === 0) return
-
     // 只能选择基础数据类型的key
     const values: KeyMap = {}
-
     for (const key of keys) {
       if (
         typeof key === 'string' &&
@@ -33,8 +32,7 @@ export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
         values[key] = event[key]
       }
     }
-    // 推送订阅
-    global.storeSubscribe[chioce][select].push({ keys: values, current: callback })
+    global.storeSubscribeList[chioce][select].append({ keys: values, current: callback })
     return
   }
   const create = (callback: Current<T>, keys: (keyof Events[T])[]) => {

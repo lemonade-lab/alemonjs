@@ -18,12 +18,12 @@ import {
 import { PrivateEventRequestFriendAdd, PrivateEventRequestGuildAdd } from './request'
 
 // 携带有消息体的
-export type EventsMessage = {
+export type EventsMessageCreate = {
   'message.create': PublicEventMessageCreate
   'private.message.create': PrivateEventMessageCreate
 }
 
-export type EventsMessageEnum = Events[keyof EventsMessage]
+export type EventsMessageCreateEnum = Events[keyof EventsMessageCreate]
 
 export type Events = {
   'message.update': PublicEventMessageUpdate
@@ -40,6 +40,6 @@ export type Events = {
   'private.message.delete': PrivateEventMessageDelete
   'private.friend.add': PrivateEventRequestFriendAdd
   'private.guild.add': PrivateEventRequestGuildAdd
-} & EventsMessage
+} & EventsMessageCreate
 
 export type EventsEnum = Events[keyof Events]

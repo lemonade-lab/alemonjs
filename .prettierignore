@@ -17,3 +17,5 @@ log
 # build
 dist
 /.nx/workspace-data
+
+/public
