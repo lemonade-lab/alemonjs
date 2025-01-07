@@ -82,7 +82,7 @@ if (!global.storeMiddlewareGather) {
   }
 }
 if (!global.storeResponseGather) {
-  global.storeMiddlewareGather = {} as never
+  global.storeResponseGather = {} as never
   for (const key of events) {
     global.storeResponseGather[key] = [] as never
   }
