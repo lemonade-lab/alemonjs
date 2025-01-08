@@ -1,4 +1,4 @@
-import { defineBot, OnProcessor, getConfigValue, User } from 'alemonjs'
+import { defineBot, OnProcessor, getConfigValue, User, PrivateEventMessageCreate } from 'alemonjs'
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
@@ -151,7 +151,8 @@ export default defineBot(() => {
       } else {
         const OpenId = event.payload?.listenerId ?? ''
         // 定义消
-        const e = {
+        const e: PrivateEventMessageCreate = {
+          name: 'private.message.create',
           // 事件类型
           Platform: platform,
           // 用户Id
@@ -162,7 +163,7 @@ export default defineBot(() => {
           IsBot: false,
           // message
           MessageId: MessageId,
-          MessageText: txt,
+          MessageText: txt ?? '',
           OpenId: OpenId,
           CreateAt: Date.now(),
           // 表情

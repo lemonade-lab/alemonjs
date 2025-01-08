@@ -213,7 +213,7 @@ export default defineBot(() => {
       IsBot: event.author?.bot,
       // message
       MessageId: event.id,
-      MessageText: msg,
+      MessageText: msg?.trim(),
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //
@@ -280,7 +280,7 @@ export default defineBot(() => {
       IsBot: event.author?.bot,
       // message
       MessageId: event.id,
-      MessageText: msg,
+      MessageText: msg?.trim(),
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //
@@ -377,7 +377,7 @@ export default defineBot(() => {
       IsBot: false,
       // message
       MessageId: event.id,
-      MessageText: msg,
+      MessageText: msg?.trim(),
       OpenId: event.guild_id,
       CreateAt: Date.now(),
       //

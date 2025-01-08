@@ -1,14 +1,16 @@
-# 依赖
+# dir
 node_modules
-*.lock
-data
-lib
-*.log.ts
+/public
+/data
+/lib
 logs
 log
+
+# file
+*.lock
+*.log.ts
 *.log
 *.logs
-/public
 alemon.*.yaml
 alemon.*.json
 alemon.*.js
