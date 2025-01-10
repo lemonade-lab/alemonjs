@@ -100,15 +100,30 @@ export async function slider(client, event, uin) {
   console.log(chalk.green(event.url))
   console.log('\n--------------------------------------------------------')
   console.log(`提示：打开上面链接获取ticket,可使用${chalk.green('【滑动验证app】')}获取`)
+  console.log(
+    `【滑动验证app】下载地址：${chalk.green('https://wwp.lanzouy.com/i6w3J08um92h')} 密码:3kuu\n`
+  )
   console.log(`链接存在${chalk.green('有效期')},请尽快操作,多次操作失败可能会被冻结`)
-  console.log('滑动验证app下载地址：https://wwp.lanzouy.com/i6w3J08um92h 密码:3kuu\n')
 
   const ret = await inquirer.prompt([
     {
       type: 'list',
-      name: 'type',
+      name: 'value',
       message: '触发滑动验证,需要获取ticket通过验证,请选择获取方式:',
-      choices: ['0.自动获取ticket', '1.手动获取ticket', '2.滑动验证app请求码获取']
+      choices: [
+        // {
+        //   name: '0.自动获取ticket',
+        //   value: 0
+        // },
+        {
+          name: '1.手动获取ticket',
+          value: 1
+        },
+        {
+          name: '2.滑动验证APP获取',
+          value: 2
+        }
+      ]
     }
   ])
 
@@ -116,17 +131,11 @@ export async function slider(client, event, uin) {
 
   let ticket
 
-  if (ret.type == '0.自动获取ticket') {
-    ticket = await getTicket(event.url, uin)
-    if (!ticket) console.log('\n请求错误,返回手动获取ticket方式\n')
-  }
+  // if (ret.value == 0) ticket = await getTicket(event.url, uin)
 
-  if (ret.type == '2.滑动验证app请求码获取') {
-    ticket = await requestCode(event.url)
-    if (!ticket) console.log('\n请求错误,返回手动获取ticket方式\n')
-  }
+  if (ret.value == 2) ticket = await requestCode(event.url)
 
-  if (!ticket) {
+  if (ret.value == 1 || !ticket) {
     const res = await inquirer.prompt({
       type: 'input',
       message: '请输入ticket:',
@@ -151,30 +160,33 @@ export async function slider(client, event, uin) {
  * @param url
  * @returns
  */
-export async function getTicket(url, uin) {
-  const req = `https://hlhs-nb.cn/captcha/slider?key=${uin}`
+// async function getTicket(url, uin) {
+//   //
+//   const req = `https://127.0.0.1/captcha/slider?key=${uin}`
 
-  await fetch(req, {
-    method: 'POST',
-    body: JSON.stringify({ url })
-  })
+//   console.log('\n----请打开下方链接并在2分钟内进行验证----')
+//   console.log(`${chalk.green(req)}\n----完成后将自动进行登录----`)
 
-  console.log('\n----请打开下方链接并在2分钟内进行验证----')
-  console.log(`${chalk.green(req)}\n----完成后将自动进行登录----`)
+//   await fetch(req, {
+//     method: 'POST',
+//     // 发送 滑块地址。
+//     body: JSON.stringify({ url })
+//   })
 
-  for (let i = 0; i < 40; i++) {
-    const res: {
-      data?: {
-        ticket: null
-      }
-    } = await fetch(req, {
-      method: 'POST',
-      body: JSON.stringify({ submit: uin })
-    }).then(res => res.json())
-    if (res.data?.ticket) return res.data.ticket
-    await sleep(3000)
-  }
-}
+//   for (let i = 0; i < 40; i++) {
+//     const res: {
+//       data?: {
+//         ticket: null
+//       }
+//     } = await fetch(req, {
+//       method: 'POST',
+//       // 询问是否验证成功
+//       body: JSON.stringify({ submit: uin })
+//     }).then(res => res.json())
+//     if (res.data?.ticket) return res.data.ticket
+//     await sleep(3000)
+//   }
+// }
 
 /**
  *

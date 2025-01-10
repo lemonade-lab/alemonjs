@@ -10,6 +10,8 @@
 yarn add @alemonjs/qq
 ```
 
+> 登录时， vlyjs 环境下请增加参数 --no-watch 以关闭热重启
+
 - alemon.config.yaml
 
 ```sh

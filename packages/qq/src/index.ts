@@ -1,6 +1,5 @@
 import {
   defineBot,
-  Text,
   OnProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
@@ -22,7 +21,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'qq'
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
   const d = Number(config?.device)
   // 创建客户端
@@ -118,7 +118,8 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       // 频道
@@ -139,7 +140,7 @@ export default defineBot(() => {
       // other
       tag: 'message.group',
       value: null
-    } as PublicEventMessageCreate
+    }
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
@@ -158,10 +159,7 @@ export default defineBot(() => {
     const user_id = String(event.sender.user_id)
     const isMaster = master_key.includes(user_id)
     let msg = ''
-    const Ats = []
-
     const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
-
     const UserAvatar = {
       toBuffer: async () => {
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
@@ -183,7 +181,8 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
       // 事件类型
       Platform: platform,
       // 用户
@@ -195,14 +194,13 @@ export default defineBot(() => {
       IsBot: false,
       // message
       MessageId: event.message_id,
-      MessageBody: [Text(msg)].concat(Ats),
       MessageText: msg,
       OpenId: user_id,
       CreateAt: Date.now(),
       // other
       tag: 'message.private',
       value: null
-    } as PrivateEventMessageCreate
+    }
     // 当访问的时候获取
     Object.defineProperty(e, 'value', {
       get() {
