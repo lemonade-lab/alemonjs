@@ -1,4 +1,12 @@
-import { OnProcessor, defineBot, User, useUserHashKey, getConfigValue } from 'alemonjs'
+import {
+  OnProcessor,
+  defineBot,
+  User,
+  useUserHashKey,
+  getConfigValue,
+  PublicEventMessageCreate,
+  PrivateEventMessageCreate
+} from 'alemonjs'
 import { QQBotGuildClient } from './sdk'
 import { AT_MESSAGE_CREATE_TYPE } from './sdk/platform/qq/sdk/message/AT_MESSAGE_CREATE'
 import { AT_MESSAGE_CREATE, DIRECT_MESSAGE_CREATE, MESSAGE_CREATE } from './send'
@@ -13,7 +21,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'qq-guild-bot'
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
   // 创建客户端
   const client = new QQBotGuildClient({
@@ -53,12 +62,13 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
       // 事件类型
       Platform: platform,
       //
-      GuildId: event.guild_id,
-      ChannelId: event.channel_id,
+      // GuildId: event.guild_id,
+      // ChannelId: event.channel_id,
       // 用户Id
       UserId: event?.author?.id ?? '',
       UserKey,
@@ -120,7 +130,8 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       GuildId: event.guild_id,
@@ -216,7 +227,8 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       //

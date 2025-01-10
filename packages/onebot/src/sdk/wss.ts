@@ -34,7 +34,7 @@ export class OneBotClient {
     }
   }
 
-  #ws: ws
+  #ws: ws | null = null
 
   #events: {
     [K in keyof OneBotEventMap]?: (event: OneBotEventMap[K]) => any
@@ -126,6 +126,7 @@ export class OneBotClient {
    * @returns
    */
   sendGroupMessage(options: { group_id: number; message: any[] }) {
+    if (!this.#ws) return
     return this.#ws.send(
       JSON.stringify({
         action: 'send_group_msg',
@@ -140,6 +141,7 @@ export class OneBotClient {
    * @returns
    */
   sendPrivateMessage(options: { user_id: number; message: any[] }) {
+    if (!this.#ws) return
     return this.#ws.send(
       JSON.stringify({
         action: 'send_private_msg',

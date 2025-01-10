@@ -1,4 +1,10 @@
-import { defineBot, getConfigValue, OnProcessor, useUserHashKey } from 'alemonjs'
+import {
+  defineBot,
+  getConfigValue,
+  OnProcessor,
+  PublicEventMessageCreate,
+  useUserHashKey
+} from 'alemonjs'
 import { OneBotClient } from './sdk/wss'
 
 const MyBot = {
@@ -7,13 +13,23 @@ const MyBot = {
   avatar: ''
 }
 
+export type Client = typeof OneBotClient.prototype
+
+export const client: Client = new Proxy({} as Client, {
+  get: (_, prop: string) => {
+    if (prop in global.client) {
+      return global.client[prop]
+    }
+    return undefined
+  }
+})
+
 export const platform = 'onebot'
 
 export default defineBot(() => {
-  const value = getConfigValue()
-
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
-
   //
   const client = new OneBotClient({
     // url
@@ -36,7 +52,9 @@ export default defineBot(() => {
   client.on('MESSAGES', event => {
     const uis = config.master_uids ?? []
     let msg = ''
-    const arr = []
+    const arr: {
+      text: string
+    }[] = []
     // let at_users = []
     for (const item of event.message) {
       if (item.type == 'text') {
@@ -70,7 +88,8 @@ export default defineBot(() => {
     })
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 平台类型
       Platform: platform,
       // 频道
