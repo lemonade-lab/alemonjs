@@ -63,7 +63,9 @@ export type Client = WebSocket
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
     if (prop in global.client) {
-      return global.client[prop]
+      const original = global.client[prop]
+      // 防止函数内this丢失
+      return typeof original === 'function' ? original.bind(global.client) : original
     }
     return undefined
   }

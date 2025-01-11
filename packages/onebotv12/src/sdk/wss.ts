@@ -1,4 +1,5 @@
 import ws from 'ws'
+import { randomUUID } from 'crypto'
 import { MESSAGES_TYPE } from './type'
 
 type OneBotEventMap = {
@@ -6,6 +7,12 @@ type OneBotEventMap = {
   MESSAGES: MESSAGES_TYPE
   META: any
   ERROR: any
+}
+
+type OneBotRequest = {
+  action: string
+  params?: { [key: string]: any }
+  echo?: string
 }
 
 /**
@@ -29,11 +36,22 @@ export class OneBotClient {
     }
   }
 
-  #ws: ws
+  #ws: ws | null = null
 
   #events: {
     [K in keyof OneBotEventMap]?: (event: OneBotEventMap[K]) => any
   } = {}
+
+  #echo: {
+    [key: string]: {
+      request: OneBotRequest
+      resolve: (value?: any) => void
+      reject: (reason?: any) => void
+      timeout: NodeJS.Timeout
+    }
+  } = {}
+
+  timeout = 30000
 
   /**
    * 注册事件处理程序
@@ -89,6 +107,13 @@ export class OneBotClient {
               //
             }
           }
+          if (!event?.type && event?.echo && this.#echo[event?.echo]) {
+            /**
+             * @todo 失败逻辑
+             */
+            clearTimeout(this.#echo[event?.echo].timeout)
+            delete this.#echo[event?.echo]
+          }
         } else {
           if (event?.status != 'ok') {
             if (this.#events['ERROR']) this.#events['ERROR'](event)
@@ -115,11 +140,12 @@ export class OneBotClient {
    * @returns
    */
   sendGroupMessage(options: { group_id: number; message: any[] }) {
+    if (!this.#ws) return
     return this.#ws.send(
       JSON.stringify({
         action: 'send_group_msg',
         params: options,
-        echo: '1234'
+        echo: randomUUID()
       })
     )
   }
@@ -129,12 +155,36 @@ export class OneBotClient {
    * @returns
    */
   sendPrivateMessage(options: { user_id: number; message: any[] }) {
+    if (!this.#ws) return
     return this.#ws.send(
       JSON.stringify({
         action: 'send_private_msg',
         params: options,
-        echo: '1234'
+        echo: randomUUID()
       })
+    )
+  }
+
+  /**
+   * @param options
+   * @returns
+   */
+  sendApi(options: { action: string; params?: { [key: string]: any }; echo?: string }) {
+    if (!this.#ws) return
+    if (!options.echo) options.echo = randomUUID()
+    this.#ws.send(JSON.stringify(options))
+    return new Promise(
+      (resolve, reject) =>
+        (this.#echo[options.echo as string] = {
+          request: options,
+          resolve,
+          reject,
+          timeout: setTimeout(() => {
+            reject(Object.assign(options, { timeout: this.timeout }))
+            delete this.#echo[options.echo as string]
+            console.error('请求超时:', options)
+          }, this.timeout)
+        })
     )
   }
 }
