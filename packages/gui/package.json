@@ -31,11 +31,19 @@
     "@types/koa-static": "^4.0.4"
   },
   "types": "lib",
+  "alemonjs": {
+    "desktop": {
+      "views": {
+        "login": {}
+      }
+    }
+  },
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
-    }
+    },
+    "./package": "./package.json"
   },
   "keywords": [
     "alemonjs"

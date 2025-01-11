@@ -89,8 +89,9 @@ const loadModule = async (mainPath: string) => {
           await app?.unMounted()
         }
       })
-  } catch (e) {
-    console.log(e)
+  } catch (e: any) {
+    if (!e) return
+    logger.error(e.message)
   }
 }
 
@@ -121,9 +122,17 @@ export const start = async (input: string = 'lib/index.js') => {
   const cfg = getConfig()
   const login = cfg.argv?.login
   if (typeof login == 'boolean') return
-  const platform = cfg.argv?.platform ?? `@alemonjs/${login}`
-  // 没有参数
-  if (typeof platform == 'boolean') return
+  // 默认值
+  let platform = '@alemonjs/gui'
+  if (typeof login != 'undefined') {
+    platform = `@alemonjs/${login}`
+  } else {
+    cfg.argv.login == 'gui'
+  }
+  if (typeof cfg.argv?.platform == 'string') {
+    platform = cfg.argv?.platform
+    cfg.argv.login = platform.replace(/^(@alemonjs\/|alemonjs-)/, '')
+  }
   // module
   if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
     for (const app of cfg.value?.apps) {
@@ -141,9 +150,14 @@ export const start = async (input: string = 'lib/index.js') => {
     await loadModule(mainPath)
   }
   await run()
-  const bot = await import(platform)
-  // 挂在全局
-  global.alemonjs = bot?.default()
+  try {
+    const bot = await import(platform)
+    // 挂在全局
+    global.alemonjs = bot?.default()
+  } catch (e: any) {
+    if (!e) return
+    logger.error(e.message)
+  }
 }
 
 export * from './post.js'
