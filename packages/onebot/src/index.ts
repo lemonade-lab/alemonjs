@@ -18,7 +18,9 @@ export type Client = typeof OneBotClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
     if (prop in global.client) {
-      return global.client[prop]
+      const original = global.client[prop]
+      // 防止函数内this丢失
+      return typeof original === 'function' ? original.bind(global.client) : original
     }
     return undefined
   }
@@ -35,7 +37,11 @@ export default defineBot(() => {
     // url
     url: config?.url ?? '',
     // token
-    access_token: config?.token ?? ''
+    access_token: config?.token ?? '',
+    // 是否开启反向连接，正向连接失效
+    reverse_enable: config?.reverse_enable ?? false,
+    // 反向连接端口
+    reverse_port: config?.reverse_port ?? 17158
   })
 
   //
