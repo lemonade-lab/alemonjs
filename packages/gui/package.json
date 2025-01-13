@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "gui",
   "author": "lemonade",
   "license": "MIT",
@@ -37,6 +37,15 @@
       "types": "./lib/index.d.ts"
     },
     "./package": "./package.json"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "gui"
+        }
+      ]
+    }
   },
   "keywords": [
     "alemonjs"

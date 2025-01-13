@@ -32,6 +32,15 @@
     "rollup-plugin-dts": "^6.1.1",
     "tsx": "^4.19.1"
   },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "qq"
+        }
+      ]
+    }
+  },
   "keywords": [
     "alemonjs"
   ],

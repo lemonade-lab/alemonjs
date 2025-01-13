@@ -27,6 +27,15 @@
   "keywords": [
     "alemonjs"
   ],
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "onebot"
+        }
+      ]
+    }
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"

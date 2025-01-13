@@ -17,6 +17,16 @@
     },
     "./package": "./package.json"
   },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "kook",
+          "value": "@alemonjs/kook"
+        }
+      ]
+    }
+  },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
     "lvyjs": "^0.2.13",

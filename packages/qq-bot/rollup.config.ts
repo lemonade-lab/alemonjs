@@ -66,8 +66,7 @@ const buildDts = (input: string, dir: string, inc: string) => {
 
 const config: any[] = []
 
-const build = () => {
-  const input = `src/index.ts`
+const build = (input: string = `src/index.ts`) => {
   const dir = `lib`
   const inc = `src/**/*`
   try {
@@ -83,5 +82,7 @@ const build = () => {
 }
 
 build()
+
+build('src/desktop.ts')
 
 export default defineConfig(config.flat(Infinity))

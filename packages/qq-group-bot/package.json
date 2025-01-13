@@ -38,6 +38,15 @@
     },
     "./package": "./package.json"
   },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "qq-group-bot"
+        }
+      ]
+    }
+  },
   "keywords": [
     "alemonjs"
   ],

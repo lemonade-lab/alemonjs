@@ -29,6 +29,15 @@
     },
     "./package": "./package.json"
   },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "telegram"
+        }
+      ]
+    }
+  },
   "keywords": [
     "alemonjs"
   ],

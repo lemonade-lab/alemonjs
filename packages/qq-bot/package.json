@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "qq-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -37,7 +37,29 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "qq-bot"
+        }
+      ],
+      "commond": [
+        {
+          "name": "qq-bot",
+          "commond": "open.qq-bot"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "qq-bot",
+          "commond": "open.qq-bot"
+        }
+      ]
+    }
   },
   "keywords": [
     "alemonjs"

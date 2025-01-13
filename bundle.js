@@ -1,5 +1,5 @@
 import { spawnSync } from 'child_process';
-import { cpSync, rmSync } from 'fs';
+import { cpSync, readdirSync, rmSync } from 'fs';
 import { join } from 'path';
 
 const cmds = [
@@ -14,11 +14,15 @@ for (const cmd of cmds) {
 
   if (msg.error) {
     console.error(msg.error);
-    process.exit(1); // Exit with a non-zero status code
+    process.exit(1); 
   }
 }
 
-const input = join(process.cwd(), 'packages/db-frontend/dist');
-const output = './packages/db/dist';
-rmSync(output, { recursive: true, force: true });
-cpSync(input, output, { recursive: true });
+// 得到所有 packages 文件 目录后缀是 frontend 的目录。
+const dirs = readdirSync('./packages').filter((dir) => dir.endsWith('-frontend'));
+for(const dir of dirs) {
+  const input = join(process.cwd(), `packages/${dir}/dist`);
+  const output = `./packages/${dir.replace('-frontend', '')}/dist`;
+  rmSync(output, { recursive: true, force: true });
+  cpSync(input, output, { recursive: true });
+}
