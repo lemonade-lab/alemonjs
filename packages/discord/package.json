@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/discord",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "discord-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -10,12 +10,6 @@
   "scripts": {
     "build": "node bundle.js"
   },
-  "exports": {
-    ".": {
-      "import": "./lib/index.js",
-      "types": "./lib/index.d.ts"
-    }
-  },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
     "lvyjs": "^0.2.13",
@@ -23,11 +17,15 @@
     "rollup-plugin-dts": "^6.1.1",
     "tsx": "^4.19.1"
   },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./package": "./package.json"
+  },
   "keywords": [
-    "alemonjs",
-    "discord",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

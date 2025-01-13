@@ -1,28 +1,47 @@
 {
-  "name": "@alemonjs/onebotv12",
+  "name": "@alemonjs/db",
   "version": "0.0.1",
-  "description": "onebot",
+  "description": "alemonjs bot script",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
-  "types": "lib",
   "scripts": {
     "build": "node bundle.js"
   },
+  "types": "lib",
   "exports": {
-    ".": {
-      "import": "./lib/index.js",
-      "types": "./lib/index.d.ts"
-    },
-    "./package": "./package.json"
+    ".": "./lib/index.js",
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "desktop": {
+      "commond": [
+        {
+          "name": "DB",
+          "commond": "open.db"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "DB",
+          "commond": "open.db"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "ioredis": "^5.4.1",
+    "mysql2": "^3.6.2",
+    "sequelize": "^6.33.0",
+    "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
     "lvyjs": "^0.2.13",
     "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1",
-    "tsx": "^4.19.1"
+    "rollup-plugin-dts": "^6.1.1"
   },
   "keywords": [
     "alemonjs"

@@ -14,6 +14,5 @@ export * from './app/hook-use-state'
 export * from './app/hook-use-subscribe.js'
 //
 export * from './app/utils.js'
-export * from './db/redis.js'
 export * from './config'
 export * from './global.js'

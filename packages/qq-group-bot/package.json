@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-group-bot",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "qq-group-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -35,13 +35,11 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
-    }
+    },
+    "./package": "./package.json"
   },
   "keywords": [
-    "alemonjs",
-    "qq-group-bot",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

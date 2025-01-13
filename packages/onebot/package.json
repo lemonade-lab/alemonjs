@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/onebot",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "onebot",
   "author": "lemonade",
   "license": "MIT",
@@ -14,7 +14,8 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
-    }
+    },
+    "./package": "./package.json"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
@@ -24,10 +25,7 @@
     "tsx": "^4.19.1"
   },
   "keywords": [
-    "alemonjs",
-    "onebot",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

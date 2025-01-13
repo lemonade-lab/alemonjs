@@ -5,7 +5,7 @@
  * @author ningmengchongshui
  */
 import redisClient, { Redis as RedisClient } from 'ioredis'
-import { getConfigValue } from '../config'
+import { getConfigValue } from 'alemonjs'
 
 /**
  * 创建ioredis

@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "gui",
   "author": "lemonade",
   "license": "MIT",
@@ -31,13 +31,6 @@
     "@types/koa-static": "^4.0.4"
   },
   "types": "lib",
-  "alemonjs": {
-    "desktop": {
-      "views": {
-        "login": {}
-      }
-    }
-  },
   "exports": {
     ".": {
       "import": "./lib/index.js",

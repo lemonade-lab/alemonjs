@@ -1,7 +1,7 @@
 import './global'
-import { readFileSync, existsSync, watch } from 'fs'
+import { readFileSync, existsSync, watch, writeFileSync } from 'fs'
 import { join } from 'path'
-import { parse } from 'yaml'
+import { parse, stringify } from 'yaml'
 
 type Package = {
   [key: string]: any
@@ -77,6 +77,21 @@ export class ConfigCore {
       return this.#update()
     }
     return this.#value
+  }
+
+  /**
+   * 保存value
+   */
+  saveValue(value: { [key: string]: any }) {
+    // 立即保存当前配置
+    if (!this.#dir) return
+    // 读取配置文件
+    const dir = join(process.cwd(), this.#dir)
+    logger.info('config save', dir)
+    // 如果文件不存在
+    if (!existsSync(dir)) return
+    const data = stringify(value)
+    writeFileSync(dir, data, 'utf-8')
   }
 
   #package = null

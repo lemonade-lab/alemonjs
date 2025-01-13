@@ -1,0 +1,6 @@
+# 依赖
+node_modules
+lib
+alemonjs-*.tgz
+logs
+dist

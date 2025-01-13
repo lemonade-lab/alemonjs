@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/wechat",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "wechat-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -26,14 +26,11 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
-    }
+    },
+    "./package": "./package.json"
   },
   "keywords": [
-    "alemonjs",
-    "wechat",
-    "wechat-bot",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

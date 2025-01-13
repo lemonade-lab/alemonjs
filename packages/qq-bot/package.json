@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "qq-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -36,13 +36,11 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
-    }
+    },
+    "./package": "./package.json"
   },
   "keywords": [
-    "alemonjs",
-    "qq-bot",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
