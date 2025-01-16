@@ -20,7 +20,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
   #heartbeat_interval = 30000
 
   // 鉴权
-  #IntervalId = null
+  #IntervalId: NodeJS.Timeout | null = null
 
   // url
   #gatewayUrl = null
@@ -49,6 +49,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
     const callBack = async () => {
       const appId = config.get('appId')
       const secret = config.get('secret')
+      if (!appId || !s) return
       // 发送请求
       const data: {
         access_token: string
@@ -86,7 +87,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
     }
   }
 
-  #ws: WebSocket
+  #ws: WebSocket | null = null
 
   #events: {
     [K in keyof QQBotGroupEventMap]?: ((event: QQBotGroupEventMap[K]) => any)[]
@@ -139,17 +140,17 @@ export class QQBotGroupClient extends QQBotGroupAPI {
           0: async ({ t, d }) => {
             if (this.#events[t]) {
               try {
-                 if (typeof this.#events[t] === 'function') {
-                      await this.#events[t](d);
-                  } else {
-                      for (const event of this.#events[t]) {
-                          await event(d);
-                      }
-                  }
+                for (const event of this.#events[t]) {
+                  // 是否是函数
+                  if (typeof event != 'function') continue
+                  event(d)
+                }
               } catch (err) {
                 if (this.#events['ERROR']) {
-                  for (const item of this.#events['ERROR']) {
-                    item(err)
+                  for (const event of this.#events['ERROR']) {
+                    // 是否是函数
+                    if (typeof event != 'function') continue
+                    event(err)
                   }
                 }
               }
@@ -159,12 +160,13 @@ export class QQBotGroupClient extends QQBotGroupAPI {
             if (t === 'READY') {
               this.#IntervalId = setInterval(() => {
                 if (this.#isConnected) {
-                  this.#ws.send(
-                    JSON.stringify({
-                      op: 1, //  op = 1
-                      d: null // 如果是第一次连接，传null
-                    })
-                  )
+                  this.#ws &&
+                    this.#ws.send(
+                      JSON.stringify({
+                        op: 1, //  op = 1
+                        d: null // 如果是第一次连接，传null
+                      })
+                    )
                 }
               }, this.#heartbeat_interval)
             }
@@ -197,7 +199,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
             // 记录新循环
             this.#heartbeat_interval = d.heartbeat_interval
             // 发送鉴权
-            this.#ws.send(JSON.stringify(this.#aut()))
+            this.#ws && this.#ws.send(JSON.stringify(this.#aut()))
             return
           },
           11: () => {
