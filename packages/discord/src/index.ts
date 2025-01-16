@@ -14,7 +14,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'discord'
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
 
   // 创建客户端

@@ -1,4 +1,11 @@
-import { defineBot, OnProcessor, getConfigValue, User, PrivateEventMessageCreate } from 'alemonjs'
+import {
+  defineBot,
+  OnProcessor,
+  getConfigValue,
+  User,
+  PrivateEventMessageCreate,
+  PublicEventMessageCreate
+} from 'alemonjs'
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
@@ -18,7 +25,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'wechat'
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
   const bot = WechatyBuilder.build({
     name: config?.name ?? 'alemonjs'
@@ -117,7 +125,8 @@ export default defineBot(() => {
         const roomId = event.payload?.roomId ?? ''
 
         // 定义消
-        const e = {
+        const e: PublicEventMessageCreate = {
+          name: 'message.create',
           // 事件类型
           Platform: platform,
           /**
@@ -135,7 +144,7 @@ export default defineBot(() => {
           IsBot: false,
           // message
           MessageId: MessageId,
-          MessageText: msg,
+          MessageText: msg ?? '',
           OpenId: '',
           CreateAt: Date.now(),
           //

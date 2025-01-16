@@ -49,7 +49,7 @@ export class QQBotGroupClient extends QQBotGroupAPI {
     const callBack = async () => {
       const appId = config.get('appId')
       const secret = config.get('secret')
-      if (!appId || !s) return
+      if (!appId || !secret) return
       // 发送请求
       const data: {
         access_token: string
