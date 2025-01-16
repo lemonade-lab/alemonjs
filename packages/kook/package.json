@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/kook",
-  "version": "0.2.3",
-  "description": "kook-bot",
+  "version": "0.2.4",
+  "description": "阿柠檬kook平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -15,7 +15,8 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
     "desktop": {
@@ -23,6 +24,18 @@
         {
           "name": "kook",
           "value": "@alemonjs/kook"
+        }
+      ],
+      "commond": [
+        {
+          "name": "kook",
+          "commond": "open.kook"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "kook",
+          "commond": "open.kook"
         }
       ]
     }

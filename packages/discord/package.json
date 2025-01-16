@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/discord",
-  "version": "0.2.2",
-  "description": "discord-bot",
+  "version": "0.2.3",
+  "description": "阿柠檬discord平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -22,13 +22,26 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
     "desktop": {
       "platform": [
         {
           "name": "discord"
+        }
+      ],
+      "commond": [
+        {
+          "name": "DC",
+          "commond": "open.discord"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "DC",
+          "commond": "open.discord"
         }
       ]
     }

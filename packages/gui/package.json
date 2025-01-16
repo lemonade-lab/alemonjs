@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.3.2",
-  "description": "gui",
+  "version": "0.3.3",
+  "description": "阿柠檬gui平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -36,13 +36,26 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
     "desktop": {
       "platform": [
         {
           "name": "gui"
+        }
+      ],
+      "commond": [
+        {
+          "name": "gui",
+          "commond": "open.gui"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "gui",
+          "commond": "open.gui"
         }
       ]
     }
