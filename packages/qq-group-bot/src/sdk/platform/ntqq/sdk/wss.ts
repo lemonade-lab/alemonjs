@@ -139,7 +139,13 @@ export class QQBotGroupClient extends QQBotGroupAPI {
           0: async ({ t, d }) => {
             if (this.#events[t]) {
               try {
-                await this.#events[t](d)
+                 if (typeof this.#events[t] === 'function') {
+                      await this.#events[t](d);
+                  } else {
+                      for (const event of this.#events[t]) {
+                          await event(d);
+                      }
+                  }
               } catch (err) {
                 if (this.#events['ERROR']) {
                   for (const item of this.#events['ERROR']) {
