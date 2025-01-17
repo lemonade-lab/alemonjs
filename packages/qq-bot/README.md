@@ -1,7 +1,5 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-跨平台开发的事件驱动机器人
-
 ## USE
 
 - qq-bot
@@ -66,7 +64,3 @@ qq-bot:
         }
 }
 ```
-
-## Community
-
-QQ Group 806943302

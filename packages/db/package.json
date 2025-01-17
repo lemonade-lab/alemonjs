@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.1",
-  "description": "alemonjs bot script",
+  "version": "0.0.2",
+  "description": "阿柠檬数据库连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -19,7 +19,7 @@
     "desktop": {
       "commond": [
         {
-          "name": "DB",
+          "name": "打开数据库",
           "commond": "open.db"
         }
       ],

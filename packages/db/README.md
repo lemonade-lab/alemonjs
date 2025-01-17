@@ -1,7 +1,5 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-跨平台开发的事件驱动机器人
-
 提供 redis 和 sequelize mysql 连接
 
 ```sh

@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "0.0.10",
-  "description": "qq-bot",
+  "version": "0.0.11",
+  "description": "阿柠檬qqbot平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -24,12 +24,6 @@
     "ws": "^8.13.0",
     "uuid": "^11.0.3",
     "@noble/curves": "^1.7.0"
-  },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
-    "lvyjs": "^0.2.13",
-    "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1"
   },
   "types": "lib",
   "exports": {

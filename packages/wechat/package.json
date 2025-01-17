@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/wechat",
   "version": "0.2.3",
-  "description": "wechat-bot",
+  "description": "阿柠檬wechat平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

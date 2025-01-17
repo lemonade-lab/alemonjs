@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react'
-
+import React, { useEffect, useState } from 'react'
 export default function MySQLForm() {
   const [formData, setFormData] = useState({
     host: '127.0.0.1',
     port: 3306,
-    user: '',
+    user: 'root',
     password: '',
-    database: ''
+    database: 'alemonjs'
   })
 
   useEffect(() => {

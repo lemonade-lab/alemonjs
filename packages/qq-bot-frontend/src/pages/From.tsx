@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-export default function QQBotForm() {
+export default function From() {
   const [formData, setFormData] = useState({
     app_id: '',
     token: '',
@@ -22,7 +22,6 @@ export default function QQBotForm() {
       type: 'qq-bot.init'
     })
     API.onMessage(data => {
-      console.log('收到消息:', data)
       if (data.type === 'qq-bot.init') {
         const db = data.data
         // master_key 是数组，转换成字符串
@@ -42,7 +41,6 @@ export default function QQBotForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('保存的配置:', formData)
     window.API.postMessage({
       type: 'qq-bot.form.save',
       data: formData

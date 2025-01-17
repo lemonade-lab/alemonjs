@@ -59,9 +59,9 @@ export const activate = context => {
         value.mysql = {
           host: mysql.host ?? '127.0.0.1',
           port: mysql.port ?? 3306,
-          user: mysql.user ?? '',
+          user: mysql.user ?? 'root',
           password: mysql.password ?? '',
-          database: mysql.database ?? ''
+          database: mysql.database ?? 'alemonjs'
         }
         config.saveValue(value)
         context.notification('MySQL 配置保存成功～')

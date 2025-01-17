@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/discord",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "阿柠檬discord平台连接",
   "author": "lemonade",
   "license": "MIT",
@@ -27,13 +27,13 @@
       ],
       "commond": [
         {
-          "name": "DC",
+          "name": "打开discord",
           "commond": "open.discord"
         }
       ],
       "sidebars": [
         {
-          "name": "DC",
+          "name": "dc",
           "commond": "open.discord"
         }
       ]
