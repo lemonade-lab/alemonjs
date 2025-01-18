@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "qq-bot",
   "author": "lemonade",
   "license": "MIT",
@@ -25,19 +25,17 @@
     },
     "./package": "./package.json"
   },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
-    "lvyjs": "^0.2.13",
-    "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1",
-    "tsx": "^4.19.1"
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "qq"
+        }
+      ]
+    }
   },
   "keywords": [
-    "alemonjs",
-    "qq",
-    "qq-bot",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

@@ -1,0 +1,59 @@
+{
+  "name": "@alemonjs/db",
+  "version": "0.0.3",
+  "description": "阿柠檬数据库连接",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "node bundle.js"
+  },
+  "types": "lib",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [],
+      "commond": [
+        {
+          "name": "打开数据库",
+          "commond": "open.db"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "DB",
+          "commond": "open.db"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "ioredis": "^5.4.1",
+    "mysql2": "^3.6.2",
+    "sequelize": "^6.33.0",
+    "dayjs": "^1.11.13"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "lvyjs": "^0.2.13",
+    "rollup": "^4.18.1",
+    "rollup-plugin-dts": "^6.1.1"
+  },
+  "keywords": [
+    "alemonjs"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
+  }
+}

@@ -120,7 +120,11 @@ export class QQBotGuildClient extends QQBotGuildAPI {
             // 执行
             if (this.#events[t]) {
               try {
-                await this.#events[t](d)
+                for (const event of this.#events[t]) {
+                  // 是否是函数
+                  if (typeof event != 'function') continue
+                  event(d)
+                }
               } catch (err) {
                 if (this.#events['ERROR']) {
                   for (const item of this.#events['ERROR']) {

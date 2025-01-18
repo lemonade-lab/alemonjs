@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/kook",
-  "version": "0.2.2",
-  "description": "kook-bot",
+  "version": "0.2.6",
+  "description": "阿柠檬kook平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -14,20 +14,34 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
+    },
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "kook",
+          "value": "@alemonjs/kook"
+        }
+      ],
+      "commond": [
+        {
+          "name": "kook",
+          "commond": "open.kook"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "kook",
+          "commond": "open.kook"
+        }
+      ]
     }
   },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
-    "lvyjs": "^0.2.13",
-    "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1",
-    "tsx": "^4.19.1"
-  },
   "keywords": [
-    "alemonjs",
-    "kook",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

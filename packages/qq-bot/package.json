@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "0.0.7",
-  "description": "qq-bot",
+  "version": "0.0.12",
+  "description": "阿柠檬qqbot平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -25,24 +25,38 @@
     "uuid": "^11.0.3",
     "@noble/curves": "^1.7.0"
   },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
-    "lvyjs": "^0.2.13",
-    "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1"
-  },
   "types": "lib",
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
+    },
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "qq-bot"
+        }
+      ],
+      "commond": [
+        {
+          "name": "qq-bot",
+          "commond": "open.qq-bot"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "qq-bot",
+          "commond": "open.qq-bot"
+        }
+      ]
     }
   },
   "keywords": [
-    "alemonjs",
-    "qq-bot",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

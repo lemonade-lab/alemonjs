@@ -1,7 +1,5 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-跨平台开发的事件驱动机器人
-
 ## USE
 
 - qq-bot
@@ -31,7 +29,8 @@ qq-bot:
   port: 17157
   # 当配置ws的时候，会连接另一台hook机器人的消息。不会再启动本地端口。
   # 推荐nginx进行代理 http://localhost:17157/
-  ws: 'wss://xxxx/websocket'
+  # wss://xxxx/websocket
+  ws: ''
   # 频道沙盒
   sandbox: false
 ```
@@ -65,7 +64,3 @@ qq-bot:
         }
 }
 ```
-
-## Community
-
-QQ Group 806943302

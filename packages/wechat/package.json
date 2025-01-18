@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/wechat",
-  "version": "0.2.1",
-  "description": "wechat-bot",
+  "version": "0.2.6",
+  "description": "阿柠檬wechat平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -15,25 +15,37 @@
     "wechaty": "^1.20.2",
     "wechaty-puppet": "^1.20.2"
   },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
-    "lvyjs": "^0.2.13",
-    "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1",
-    "tsx": "^4.19.1"
-  },
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
+    },
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "wechat"
+        }
+      ],
+      "commond": [
+        {
+          "name": "打开wx配置",
+          "commond": "open.wechat"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "wx",
+          "commond": "open.wechat"
+        }
+      ]
     }
   },
   "keywords": [
-    "alemonjs",
-    "wechat",
-    "wechat-bot",
-    "bot",
-    "chat-bot"
+    "alemonjs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

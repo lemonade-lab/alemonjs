@@ -38,6 +38,13 @@ export default defineBot(() => {
   })
   const qq = Number(config.qq)
 
+  /**
+   *
+   * 内置一个ws服务器。
+   * 用于接收消息。
+   *
+   */
+
   // 连接
   client.login(qq, config.password)
   // 错误

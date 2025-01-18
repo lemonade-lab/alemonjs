@@ -1,4 +1,5 @@
-import { Next } from '../cycle'
+import { ChildrenCycle, Next } from '../cycle'
+import { ClientAPI } from '../global'
 import { Events } from './map'
 
 export type Current<T extends keyof Events> = (event: Events[T], next: Next) => void
@@ -27,3 +28,17 @@ export type OnMiddlewareValue<C, T extends keyof Events> = {
   current: C // current 类型直接使用 callback 的类型
   select: T | T[]
 }
+
+export type DefineChildrenValue = {
+  _name: 'apps'
+  callback: () => ChildrenCycle
+}
+
+export type DefineChildren = (callback: () => ChildrenCycle) => DefineChildrenValue
+
+export type DefineBotValue = {
+  _name: 'platform'
+  callback: () => ClientAPI
+}
+
+export type DefineBot = (callback: () => ClientAPI) => DefineBotValue

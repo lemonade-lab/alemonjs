@@ -1,8 +1,8 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-跨平台开发的事件驱动机器人
-
 ## USE
+
+> 该平台扫码后登录
 
 - wechat
 
@@ -19,9 +19,3 @@ wechat:
    - 123456
    - 654321
 ```
-
-- 扫码后登陆
-
-## Community
-
-QQ Group 806943302

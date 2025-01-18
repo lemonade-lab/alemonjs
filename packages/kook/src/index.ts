@@ -21,7 +21,8 @@ export const client: Client = new Proxy({} as Client, {
   }
 })
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
 
   // 创建客户端
@@ -69,6 +70,7 @@ export default defineBot(() => {
 
     // 定义消
     const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
       // 事件类型
       Platform: platform,
       // 用户Id
@@ -157,6 +159,7 @@ export default defineBot(() => {
 
     // 定义消
     const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       //

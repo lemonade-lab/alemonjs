@@ -1,4 +1,11 @@
-import { OnProcessor, User, defineBot, getConfigValue, useUserHashKey } from 'alemonjs'
+import {
+  OnProcessor,
+  PublicEventMessageCreate,
+  User,
+  defineBot,
+  getConfigValue,
+  useUserHashKey
+} from 'alemonjs'
 import { DCClient } from './sdk/index'
 import { MESSAGE_CREATE_TYPE } from './sdk/platform/discord/sdk/message/MESSAGE_CREATE'
 export type Client = typeof DCClient.prototype
@@ -14,7 +21,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'discord'
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
 
   // 创建客户端
@@ -83,7 +91,8 @@ export default defineBot(() => {
     }
 
     // 定义消
-    const e = {
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
       // 事件类型
       Platform: platform,
       // guild

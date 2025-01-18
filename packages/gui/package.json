@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.3.0",
-  "description": "gui",
+  "version": "0.3.5",
+  "description": "阿柠檬gui平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -19,10 +19,6 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.6",
-    "lvyjs": "^0.2.13",
-    "rollup": "^4.18.1",
-    "rollup-plugin-dts": "^6.1.1",
     "tsx": "^4.19.1",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
@@ -31,19 +27,34 @@
     "@types/koa-static": "^4.0.4"
   },
   "types": "lib",
-  "alemonjs": {
-    "desktop": {
-      "views": {
-        "login": {}
-      }
-    }
-  },
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [
+        {
+          "name": "gui"
+        }
+      ],
+      "commond": [
+        {
+          "name": "gui",
+          "commond": "open.gui"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "gui",
+          "commond": "open.gui"
+        }
+      ]
+    }
   },
   "keywords": [
     "alemonjs"

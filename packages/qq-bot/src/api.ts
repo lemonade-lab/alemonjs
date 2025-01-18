@@ -93,7 +93,7 @@ export class QQBotAPI {
   async usersOpenMessages(
     openid: string,
     data: ApiRequestData,
-    msg_id?: string
+    _msg_id?: string
   ): Promise<{ id: string; timestamp: number }> {
     return this.groupService({
       url: `/v2/users/${openid}/messages`,

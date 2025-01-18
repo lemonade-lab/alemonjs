@@ -1,7 +1,5 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-跨平台开发的事件驱动机器人
-
 ## USE
 
 - qq-guild-bot
@@ -11,14 +9,6 @@ yarn add @alemonjs/qq-guild-bot
 ```
 
 - alemon.config.yaml
-
-```sh
-qq-guild-bot:
-  # 编号
-  app_id: ''
-  # 令牌
-  token: ''
-```
 
 > 完整的
 
@@ -40,7 +30,3 @@ qq-guild-bot:
   # 不是沙盒环境（有默认）
   sandbox: false
 ```
-
-## Community
-
-QQ Group 806943302

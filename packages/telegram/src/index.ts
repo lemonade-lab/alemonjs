@@ -1,4 +1,11 @@
-import { defineBot, getConfigValue, OnProcessor, useUserHashKey } from 'alemonjs'
+import {
+  defineBot,
+  getConfigValue,
+  OnProcessor,
+  PrivateEventMessageCreate,
+  PublicEventMemberAdd,
+  useUserHashKey
+} from 'alemonjs'
 import TelegramClient from 'node-telegram-bot-api'
 export type Client = typeof TelegramClient.prototype
 export const client: Client = new Proxy({} as Client, {
@@ -13,7 +20,8 @@ export const client: Client = new Proxy({} as Client, {
 })
 export const platform = 'telegram'
 export default defineBot(() => {
-  const value = getConfigValue()
+  let value = getConfigValue()
+  if (!value) value = {}
   const config = value[platform]
   const client = new TelegramClient(config.token, {
     polling: true,
@@ -131,7 +139,8 @@ export default defineBot(() => {
       //
     } else if (event?.chat.type == 'private') {
       // 定义消
-      const e = {
+      const e: PrivateEventMessageCreate = {
+        name: 'private.message.create',
         // 事件类型
         Platform: platform,
         // 用户Id
@@ -198,7 +207,8 @@ export default defineBot(() => {
     }
 
     // 定义消
-    const e = {
+    const e: PublicEventMemberAdd = {
+      naem: 'member.add',
       // 事件类型
       Platform: platform,
       // guild
@@ -214,8 +224,8 @@ export default defineBot(() => {
       IsBot: false,
       // message
       MessageId: String(event?.message_id),
-      MessageText: event?.text,
-      OpenId: String(event?.chat?.id),
+      // MessageText: event?.text,
+      // OpenId: String(event?.chat?.id),
       CreateAt: Date.now(),
       // othder
       tag: 'txt',

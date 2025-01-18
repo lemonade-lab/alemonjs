@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "npx lvy dev",
     "build": "npx lvy build",
-    "bundle": "npx lerna run build",
+    "bundle": "node bundle.js",
     "test": "jest",
     "format": "prettier --write .",
     "check-format": "git diff --exit-code",
