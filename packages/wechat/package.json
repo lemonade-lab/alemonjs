@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/wechat",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "阿柠檬wechat平台连接",
   "author": "lemonade",
   "license": "MIT",
@@ -20,7 +20,8 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
     "desktop": {
