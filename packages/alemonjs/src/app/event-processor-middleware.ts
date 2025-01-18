@@ -10,6 +10,7 @@ import { Events } from '../typing/event/map'
 import { OnMiddlewareValue } from '../typing/event'
 import { Next } from '../global'
 import { useState } from './hook-use-state'
+import { ErrorModule } from './local.utils'
 
 /**
  * @param event
@@ -162,8 +163,7 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
       }
     } catch (err) {
-      // 不再继续
-      logger.error(err)
+      ErrorModule(err)
     }
   }
 
@@ -235,7 +235,7 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
       }
     } catch (err) {
-      logger.error(err)
+      ErrorModule(err)
     }
     //
   }

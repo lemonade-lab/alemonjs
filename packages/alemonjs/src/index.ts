@@ -3,6 +3,8 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 import { getConfig } from './config'
 import { loadModule, moduleChildrenFiles } from './app/load.js'
+import { DefineBotValue } from './global.js'
+import { ErrorModule } from './app/local.utils.js'
 
 /**
  * @param input
@@ -40,12 +42,16 @@ export const start = async (input: string = 'lib/index.js') => {
   }
   await run()
   try {
-    const bot = await import(platform)
+    const bot: {
+      default: DefineBotValue
+    } = await import(platform)
+    if (!bot.default?._name || bot.default?._name != 'platform') {
+      throw new Error('The platform name is not correct')
+    }
     // 挂在全局
-    global.alemonjs = bot?.default()
-  } catch (e: any) {
-    if (!e) return
-    logger.error(e.message)
+    global.alemonjs = bot?.default.callback()
+  } catch (e) {
+    ErrorModule(e)
   }
 }
 

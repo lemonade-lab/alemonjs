@@ -1,8 +1,9 @@
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
 import { getDirFiles } from './event-files'
-import { ChildrenCycle } from '../global.js'
+import { DefineChildrenValue } from '../global.js'
 import { unMount } from './hook-use-api.js'
+import { ErrorModule } from './local.utils.js'
 
 /**
  * 加载文件
@@ -38,11 +39,15 @@ const loadChildrenFiles = async (mainDir: string) => {
  */
 export const loadModule = async (mainPath: string) => {
   const mainDir = dirname(mainPath)
-  const moduleApp: {
-    default: () => ChildrenCycle
-  } = await import(`file://${mainPath}`)
   try {
-    const app = await moduleApp.default()
+    const moduleApp: {
+      default: DefineChildrenValue
+    } = await import(`file://${mainPath}`)
+    if (!moduleApp.default?._name || moduleApp.default?._name != 'apps') {
+      logger.error('The module name is not correct')
+      return
+    }
+    const app = await moduleApp.default.callback()
     if (typeof app?.onCreated == 'function') {
       await app?.onCreated()
     }
@@ -60,9 +65,8 @@ export const loadModule = async (mainPath: string) => {
           await app?.unMounted()
         }
       })
-  } catch (e: any) {
-    if (!e) return
-    logger.error(e.message)
+  } catch (e) {
+    ErrorModule(e)
   }
 }
 
@@ -71,16 +75,19 @@ export const loadModule = async (mainPath: string) => {
  * @param app
  */
 export const moduleChildrenFiles = async (name: string) => {
-  // 存在 package
-  const packageJson = JSON.parse(
-    readFileSync(join(process.cwd(), 'node_modules', name, 'package.json'), 'utf-8')
-  )
-  // main
-  const mainPath = join(process.cwd(), 'node_modules', name, packageJson.main)
-  // 不存在 main
-  if (!existsSync(mainPath)) {
-    return
+  const dir = join(process.cwd(), 'node_modules', name)
+  const pkgPath = join(dir, 'package.json')
+  if (!existsSync(pkgPath)) return
+  try {
+    // 存在 package
+    const packageJson = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+    // main
+    const mainPath = join(dir, packageJson.main)
+    // 不存在 main
+    if (!existsSync(mainPath)) return
+    // 根据main来识别apps
+    await loadModule(mainPath)
+  } catch (e) {
+    ErrorModule(e)
   }
-  // 根据main来识别apps
-  await loadModule(mainPath)
 }

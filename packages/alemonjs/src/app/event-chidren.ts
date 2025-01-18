@@ -1,8 +1,12 @@
-import { ChildrenCycle } from '../typing/cycle'
+import { DefineChildren } from '../global'
 /**
- *
  * @param callback
  * @returns
  */
-export const defineChildren = (callback: () => ChildrenCycle) => callback
+export const defineChildren: DefineChildren = callback => {
+  return {
+    _name: 'apps',
+    callback
+  }
+}
 global.defineChildren = defineChildren
