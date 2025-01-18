@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "阿柠檬数据库连接",
   "author": "lemonade",
   "license": "MIT",
@@ -17,6 +17,7 @@
   },
   "alemonjs": {
     "desktop": {
+      "platform": [],
       "commond": [
         {
           "name": "打开数据库",

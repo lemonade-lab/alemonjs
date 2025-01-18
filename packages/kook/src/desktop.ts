@@ -33,13 +33,12 @@ export const activate = context => {
   webView.onMessage(data => {
     try {
       if (data.type === 'kook.form.save') {
-        const CIG = data.data
+        const db = data.data
         const config = getConfig()
         const value = config.value ?? {}
         value['kook'] = {
-          token: CIG.token ?? '',
-          // master_key 12121,1313,1313,13 转为数组
-          master_key: CIG.master_key.split(',')
+          token: db.token ?? '',
+          master_key: db.master_key?.split(',') ?? null
         }
         config.saveValue(value)
         context.notification('KOOK 配置保存成功～')
@@ -49,7 +48,7 @@ export const activate = context => {
         // 发送消息
         webView.postMessage({
           type: 'kook.init',
-          data: config.qq_bot ?? {}
+          data: config.kook ?? {}
         })
       }
     } catch (e) {

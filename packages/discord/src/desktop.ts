@@ -33,22 +33,22 @@ export const activate = context => {
   webView.onMessage(data => {
     try {
       if (data.type === 'discord.form.save') {
-        const CIG = data.data
+        const db = data.data
         const config = getConfig()
         const value = config.value ?? {}
         value['discord'] = {
-          token: CIG.token ?? '',
-          master_key: CIG.master_key.split(',')
+          token: db.token ?? '',
+          master_key: db.master_key?.split(',') ?? null
         }
         config.saveValue(value)
-        context.notification('DC 配置保存成功～')
+        context.notification('discord 配置保存成功～')
       } else if (data.type === 'discord.init') {
         let config = getConfigValue()
         if (!config) config = {}
         // 发送消息
         webView.postMessage({
           type: 'discord.init',
-          data: config.qq_bot ?? {}
+          data: config.discord ?? {}
         })
       }
     } catch (e) {

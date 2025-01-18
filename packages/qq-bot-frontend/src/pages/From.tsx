@@ -24,9 +24,10 @@ export default function From() {
     API.onMessage(data => {
       if (data.type === 'qq-bot.init') {
         const db = data.data
-        // master_key 是数组，转换成字符串
-        db.master_key = db.master_key.join(',')
-        setFormData(db)
+        setFormData({
+          ...db,
+          master_key: Array.isArray(db?.master_key) ? db.master_key.join(',') : ''
+        })
       }
     })
   }, [])

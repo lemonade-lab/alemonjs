@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/wechat",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "阿柠檬wechat平台连接",
   "author": "lemonade",
   "license": "MIT",
@@ -27,6 +27,18 @@
       "platform": [
         {
           "name": "wechat"
+        }
+      ],
+      "commond": [
+        {
+          "name": "打开wx配置",
+          "commond": "open.wechat"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "wx",
+          "commond": "open.wechat"
         }
       ]
     }

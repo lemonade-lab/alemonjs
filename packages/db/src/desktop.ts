@@ -33,14 +33,14 @@ export const activate = context => {
   webView.onMessage(data => {
     try {
       if (data.type === 'redis.form.save') {
-        const redis = data.data
+        const db = data.data
         const config = getConfig()
         const value = config.value ?? {}
         value.redis = {
-          host: redis.host ?? '127.0.0.1',
-          port: redis.port ?? 6379,
-          password: redis.password ?? '',
-          db: redis.db ?? 0
+          host: db.host ?? '127.0.0.1',
+          port: db.port ?? 6379,
+          password: db.password ?? '',
+          db: db.db ?? 0
         }
         config.saveValue(value)
         context.notification('Redis 配置保存成功～')
@@ -53,15 +53,15 @@ export const activate = context => {
           data: config.redis ?? {}
         })
       } else if (data.type === 'mysql.form.save') {
-        const mysql = data.data
+        const db = data.data
         const config = getConfig()
         const value = config.value ?? {}
         value.mysql = {
-          host: mysql.host ?? '127.0.0.1',
-          port: mysql.port ?? 3306,
-          user: mysql.user ?? 'root',
-          password: mysql.password ?? '',
-          database: mysql.database ?? 'alemonjs'
+          host: db.host ?? '127.0.0.1',
+          port: db.port ?? 3306,
+          user: db.user ?? 'root',
+          password: db.password ?? '',
+          database: db.database ?? 'alemonjs'
         }
         config.saveValue(value)
         context.notification('MySQL 配置保存成功～')

@@ -31,12 +31,12 @@ export const activate = context => {
   webView.onMessage(data => {
     try {
       if (data.type === 'gui.form.save') {
-        const CIG = data.data
+        const db = data.data
         const config = getConfig()
         const value = config.value ?? {}
         value['gui'] = {
-          master_key: CIG.master_key.split(','),
-          port: CIG.port ?? 17127
+          master_key: db.master_key?.split(',') ?? null,
+          port: db.port ?? 17127
         }
         config.saveValue(value)
         context.notification('GUI 配置保存成功～')
@@ -46,7 +46,7 @@ export const activate = context => {
         // 发送消息
         webView.postMessage({
           type: 'gui.init',
-          data: config.qq_bot ?? {}
+          data: config.gui ?? {}
         })
       }
     } catch (e) {

@@ -10,7 +10,7 @@ export const activate = context => {
   const webView = context.createSidebarWebView(context)
 
   // 当命令被触发的时候。
-  context.onCommand('open.qq-bot', () => {
+  context.onCommand('open.wechat', () => {
     const dir = join(__dirname, '../', 'dist', 'index.html')
     const scriptReg = /<script.*?src="(.+?)".*?>/
     const styleReg = /<link.*?href="(.+?)".*?>/
@@ -32,30 +32,22 @@ export const activate = context => {
   // 监听 webview 的消息。
   webView.onMessage(data => {
     try {
-      if (data.type === 'qq-bot.form.save') {
-        const qqBot = data.data
+      if (data.type === 'wechat.form.save') {
+        const db = data.data
         const config = getConfig()
         const value = config.value ?? {}
-        value['qq-bot'] = {
-          app_id: qqBot.app_id ?? '',
-          token: qqBot.token ?? '',
-          secret: qqBot.secret ?? '',
-          // master_key 12121,1313,1313,13 转为数组
-          master_key: qqBot.master_key.split(','),
-          route: qqBot.route ?? '/webhook',
-          port: qqBot.port ?? 17157,
-          ws: qqBot.ws != '' && qqBot.ws ? qqBot.ws : null,
-          sandbox: qqBot.sandbox ?? false
+        value['wechat'] = {
+          master_key: db.master_key?.split(',') ?? null
         }
         config.saveValue(value)
-        context.notification('QQ Bot 配置保存成功～')
-      } else if (data.type === 'qq-bot.init') {
+        context.notification('wechat 配置保存成功～')
+      } else if (data.type === 'wechat.init') {
         let config = getConfigValue()
         if (!config) config = {}
         // 发送消息
         webView.postMessage({
-          type: 'qq-bot.init',
-          data: config['qq-bot'] ?? {}
+          type: 'wechat.init',
+          data: config.wechat ?? {}
         })
       }
     } catch (e) {

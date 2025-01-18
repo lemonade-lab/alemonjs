@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function Form() {
   const [formData, setFormData] = useState({
@@ -16,12 +16,12 @@ export default function Form() {
       type: 'discord.init'
     })
     API.onMessage(data => {
-      console.log('收到消息:', data)
       if (data.type === 'discord.init') {
         const db = data.data
-        // master_key 是数组，转换成字符串
-        db.master_key = db.master_key.join(',')
-        setFormData(db)
+        setFormData({
+          token: db?.token ?? '',
+          master_key: Array.isArray(db?.master_key) ? db.master_key.join(',') : ''
+        })
       }
     })
   }, [])
@@ -36,7 +36,6 @@ export default function Form() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('保存的配置:', formData)
     window.API.postMessage({
       type: 'discord.form.save',
       data: formData

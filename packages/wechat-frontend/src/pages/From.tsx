@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function Form() {
   const [formData, setFormData] = useState({
-    token: '',
     master_key: ''
   })
 
@@ -13,14 +12,12 @@ export default function Form() {
 
     // 获取消息
     API.postMessage({
-      type: 'kook.init'
+      type: 'wechat.init'
     })
     API.onMessage(data => {
-      console.log('收到消息:', data)
-      if (data.type === 'kook.init') {
+      if (data.type === 'wechat.init') {
         const db = data.data
         setFormData({
-          token: db?.token ?? '',
           master_key: Array.isArray(db?.master_key) ? db.master_key.join(',') : ''
         })
       }
@@ -39,26 +36,13 @@ export default function Form() {
     e.preventDefault()
     console.log('保存的配置:', formData)
     window.API.postMessage({
-      type: 'kook.form.save',
+      type: 'wechat.form.save',
       data: formData
     })
   }
 
   return (
     <form id="qqBotForm" onSubmit={handleSubmit} className="py-4 space-y-4">
-      <div>
-        <label htmlFor="app_id" className="block text-sm font-medium text-gray-700">
-          Token
-        </label>
-        <input
-          type="number"
-          id="token"
-          name="token"
-          value={formData.token}
-          onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-        />
-      </div>
       <div>
         <label htmlFor="master_key" className="  block text-sm font-medium text-gray-700">
           Master Key

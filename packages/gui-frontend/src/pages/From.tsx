@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function Form() {
   const [formData, setFormData] = useState({
@@ -16,12 +16,12 @@ export default function Form() {
       type: 'gui.init'
     })
     API.onMessage(data => {
-      console.log('收到消息:', data)
       if (data.type === 'gui.init') {
         const db = data.data
-        // master_key 是数组，转换成字符串
-        db.master_key = db.master_key.join(',')
-        setFormData(db)
+        setFormData({
+          port: db.port ?? 17127,
+          master_key: typeof db?.master_key == 'string' ? db?.master_key : ''
+        })
       }
     })
   }, [])
