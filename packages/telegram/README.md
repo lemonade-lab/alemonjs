@@ -1,7 +1,5 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-跨平台开发的事件驱动机器人
-
 ## USE
 
 - telegram
@@ -24,7 +22,3 @@ telegram:
   base_api_url: null
   request_url: null
 ```
-
-## Community
-
-QQ Group 806943302

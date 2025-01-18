@@ -1,7 +1,5 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-跨平台开发的事件驱动机器人
-
 ## USE
 
 - qq
@@ -10,7 +8,7 @@
 yarn add @alemonjs/qq
 ```
 
-> 登录时， vlyjs 环境下请增加参数 --no-watch 以关闭热重启
+> vlyjs 环境下登录时请增加参数 --no-watch 以关闭热重启
 
 - alemon.config.yaml
 
@@ -30,7 +28,3 @@ qq:
   master_key:
     - ""
 ```
-
-## Community
-
-QQ Group 806943302
