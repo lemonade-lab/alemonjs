@@ -1,0 +1,26 @@
+*::-webkit-scrollbar {
+  // 隐藏滚动条
+  width: 0px;
+  height: 0px;
+}
+
+$scrollbar-thumb-color: #64748b;
+$scrollbar-track-color: transparent;
+$scrollbar-thumb-radius: 1rem;
+$scrollbar-width: thin; // "auto", "thin", or "none" (for Firefox)
+$scrollbar-color: #b5b7ba6b $scrollbar-track-color; // For Firefox
+
+.scrollbar {
+  // Firefox scrollbar styling
+  scrollbar-color: $scrollbar-color;
+  scrollbar-width: $scrollbar-width;
+
+  &::-webkit-scrollbar-track {
+    background: $scrollbar-track-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $scrollbar-thumb-color;
+    border-radius: $scrollbar-thumb-radius;
+  }
+}

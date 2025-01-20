@@ -1,0 +1,41 @@
+{
+  "name": "@alemonjs/process",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "阿柠檬桌面进程通讯",
+  "main": "lib/index.js",
+  "author": {
+    "name": "ningmengchongshui",
+    "email": "ningmengchongshui@gmail.com",
+    "url": "https://github.com/ningmengchongshui"
+  },
+  "scripts": {
+    "build": "node bundle.js"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "dependencies": {
+    "alemonjs": "^2.0.0-rc.87",
+    "simple-git": "3.27.0"
+  },
+  "alemonjs": {
+    "desktop": {
+      "platform": [],
+      "commond": [
+        {
+          "name": "配置应用",
+          "commond": "open.process"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "APPS",
+          "commond": "open.process"
+        }
+      ]
+    }
+  }
+}
