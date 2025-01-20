@@ -12,7 +12,8 @@ export const activate = context => {
   context.onCommand('open.gui', () => {
     const dir = join(__dirname, '../', 'dist', 'index.html')
     const scriptReg = /<script.*?src="(.+?)".*?>/
-    const styleReg = /<link.*?href="(.+?)".*?>/
+    const styleReg = /<link.*?rel="stylesheet".*?href="(.+?)".*?>/
+    const iconReg = /<link.*?rel="icon".*?href="(.+?)".*?>/g
     // 创建 webview 路径
     const styleUri = context.createExtensionDir(
       join(__dirname, '../', 'dist', 'assets', 'index.css')
@@ -22,6 +23,7 @@ export const activate = context => {
     )
     // 确保路径存在
     const html = readFileSync(dir, 'utf-8')
+      .replace(iconReg, ``)
       .replace(scriptReg, `<script type="module" crossorigin src="${scriptUri}"></script>`)
       .replace(styleReg, `<link rel="stylesheet" crossorigin href="${styleUri}">`)
     // 立即渲染 webview
