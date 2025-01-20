@@ -4,6 +4,7 @@ import { createRequire } from 'module'
 import { storage } from './storage.js'
 import { context } from './context.js'
 import { Actions, webView } from './context-pro.js'
+import { sendNotification } from './send.js'
 const require = createRequire(import.meta.url)
 const nodeModulesDir = join(process.cwd(), 'node_modules')
 const pkgModulesDir = join(process.cwd(), 'packages')
@@ -72,7 +73,8 @@ export const addModules = (name: string, callback?: Function) => {
     }
     createDesktop()
   } catch (e) {
-    // console.error(e)
+    sendNotification(`加载package时出错: ${name}`, 'error')
+    console.error(e)
   }
 }
 

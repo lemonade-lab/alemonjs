@@ -1,7 +1,7 @@
 import { commands, storage } from './storage.js'
 import { addModules, delModules, disableModules, updateModules } from './modules.js'
 import { cloneRepo } from './git.js'
-import { sendGetExpansions, sendWebviewGetExpansions } from './send.js'
+import { sendGetExpansions, sendWebviewOnExpansionsMessage } from './send.js'
 
 /**
  *
@@ -77,7 +77,7 @@ const webviewPostMessage = (data: any) => {
 const webviewGetExpansions = (data: any) => {
   if (!storage.has(data.name)) return
   // 更新模块列表
-  sendWebviewGetExpansions({
+  sendWebviewOnExpansionsMessage({
     name: data.name,
     value: {
       type: 'get-expansions',

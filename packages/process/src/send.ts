@@ -35,7 +35,7 @@ export const sendActionApplicationSidebarLoad = (data: any) => {
  *
  * @param data
  */
-export const sendWebviewPostMessage = (data: any) => {
+export const sendWebviewOnMessage = (data: any) => {
   processSend({
     // 丢给 on message
     type: 'webview-on-message',
@@ -48,9 +48,9 @@ export const sendWebviewPostMessage = (data: any) => {
  *
  * @param data
  */
-export const sendWebviewGetExpansions = (data: any) => {
+export const sendWebviewOnExpansionsMessage = (data: any) => {
   processSend({
-    type: 'webview-get-expansions',
+    type: 'webview-on-expansions-message',
     data: data
   })
 }

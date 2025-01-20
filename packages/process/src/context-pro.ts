@@ -1,6 +1,6 @@
 import {
   sendNotification,
-  sendWebviewPostMessage,
+  sendWebviewOnMessage,
   sendActionApplicationSidebarLoad,
   processSend
 } from './send.js'
@@ -87,7 +87,7 @@ export class webView {
    * @param {*} data
    */
   postMessage(data: any) {
-    sendWebviewPostMessage({
+    sendWebviewOnMessage({
       name: this._name,
       value: data
     })

@@ -2,7 +2,7 @@
   "name": "@alemonjs/process",
   "type": "module",
   "version": "0.0.1",
-  "description": "阿柠檬桌面进程通讯",
+  "description": "阿柠檬desktop进程通讯",
   "main": "lib/index.js",
   "author": {
     "name": "ningmengchongshui",
@@ -18,7 +18,6 @@
     "./desktop": "./lib/desktop.js"
   },
   "dependencies": {
-    "alemonjs": "^2.0.0-rc.87",
     "simple-git": "3.27.0"
   },
   "alemonjs": {
@@ -37,5 +36,17 @@
         }
       ]
     }
+  },
+  "keywords": [
+    "alemonjs"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
   }
 }
