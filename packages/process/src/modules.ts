@@ -19,12 +19,16 @@ export const addModules = (name: string, callback?: Function) => {
   try {
     const pkg = require(`${name}/package`)
     if (!pkg) return
-
-    // 如果已经存在，就删除
-    storage.has(pkg.name) && storage.delete(pkg.name)
-
+    const gitDir = join(nodeModulesDir, name, '.git')
+    if (fs.existsSync(gitDir)) {
+      pkg['isGit'] = true
+    }
+    if (fs.lstatSync(join(nodeModulesDir, name)).isSymbolicLink()) {
+      pkg['isLink'] = true
+    }
+    if (storage.has(name)) return
     // 添加到 storage 中
-    storage.set(pkg.name, {
+    storage.set(name, {
       package: pkg,
       desktop: null,
       action: null,
@@ -73,6 +77,10 @@ export const addModules = (name: string, callback?: Function) => {
     }
     createDesktop()
   } catch (e) {
+    if (storage.has(name)) {
+      // 已存在的出错，删除
+      storage.delete(name)
+    }
     sendNotification(`加载package时出错: ${name}`, 'error')
     console.error(e)
   }
@@ -82,8 +90,12 @@ export const addModules = (name: string, callback?: Function) => {
  * 获取 alemonjs- 和 @alemonjs/ 下的模块
  * @returns
  */
-export const updateModules = () => {
+export const updateModules = (name?: string) => {
   if (!fs.existsSync(nodeModulesDir)) return
+  // 刷新该模块脚本
+  if (name && storage.has(name)) {
+    storage.delete(name)
+  }
   const _apps: string[] = []
   // 正则条件
   const reg = /^alemonjs-/
@@ -106,6 +118,12 @@ export const updateModules = () => {
   const apps = Array.from(new Set(_apps))
     .filter(name => typeof name == 'string')
     .filter(name => name.length > 0)
+  const keys = Array.from(storage.keys())
+  for (const key of keys) {
+    if (!apps.includes(key)) {
+      storage.delete(key)
+    }
+  }
   for (const app of apps) {
     addModules(app)
   }

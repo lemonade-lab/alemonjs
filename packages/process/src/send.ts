@@ -1,9 +1,19 @@
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+/**
+ * @param data
+ */
 export const processSend = (data: { type: string; data: any }) => {
-  process.send(data)
+  // 如果使用了ws替代了process
+  if (global.wsprocess && global.wsprocess.send) {
+    global.wsprocess.send(data)
+  } else {
+    const process = require('process')
+    process.send(data)
+  }
 }
 
 /**
- *
  * @param message
  * @param typing
  * @returns

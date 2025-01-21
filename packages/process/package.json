@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/process",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "阿柠檬desktop进程通讯",
   "main": "lib/index.js",
   "author": {
