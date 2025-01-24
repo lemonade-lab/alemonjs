@@ -1,13 +1,12 @@
-/**
- * @type {import('tailwindcss/types/config').Config}
- */
+/** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
       screens: {
-        xs: '320px' // 比 sm 小一半的尺寸
+        // // 比 sm 小一半的尺寸
+        xs: '320px'
       }
     }
   }
