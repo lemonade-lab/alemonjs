@@ -1,4 +1,4 @@
-import { PrimaryDiv, SecondaryDiv } from '@/ui/Div'
+import { PrimaryDiv, SecondaryDiv } from '@alemonjs/react-ui'
 import Table from './Table'
 export default function App() {
   return (

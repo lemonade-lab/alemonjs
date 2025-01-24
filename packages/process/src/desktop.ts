@@ -56,6 +56,7 @@ export const activate = (context: typeof Context.prototype) => {
             config.saveValue(value)
           }
         } else {
+          // 确保为数组
           value.apps = [name]
           config.saveValue(value)
         }
@@ -65,11 +66,13 @@ export const activate = (context: typeof Context.prototype) => {
         if (!value) value = {}
         const name = data.data
         if (Array.isArray(value.apps)) {
-          if (!value.apps.includes(name)) {
+          // 存在则删除
+          if (value.apps.includes(name)) {
             value.apps = value.apps.filter((item: string) => item !== name)
             config.saveValue(value)
           }
         } else {
+          // 确保为空数组
           value.apps = []
           config.saveValue(value)
         }

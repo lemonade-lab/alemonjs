@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Switch from '../ui/Switch'
+import { Switch } from '@alemonjs/react-ui'
 
 export default function Table() {
   const [expansions, setExpansions] = useState<{
@@ -104,13 +104,13 @@ export default function Table() {
                   onChange={value => {
                     if (value) {
                       window.desktopAPI.postMessage({
-                        type: 'desktop.open.apps',
+                        type: 'process.open.apps',
                         data: item.name
                       })
                       return
                     }
                     window.desktopAPI.postMessage({
-                      type: 'desktop.disable.apps',
+                      type: 'process.disable.apps',
                       data: item.name
                     })
                   }}
