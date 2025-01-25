@@ -1,9 +1,19 @@
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+/**
+ * @param data
+ */
 export const processSend = (data: { type: string; data: any }) => {
-  process.send(data)
+  // 如果使用了ws替代了process
+  if (global.wsprocess && global.wsprocess.send) {
+    global.wsprocess.send(data)
+  } else {
+    const process = require('process')
+    process.send(data)
+  }
 }
 
 /**
- *
  * @param message
  * @param typing
  * @returns
@@ -35,7 +45,7 @@ export const sendActionApplicationSidebarLoad = (data: any) => {
  *
  * @param data
  */
-export const sendWebviewPostMessage = (data: any) => {
+export const sendWebviewOnMessage = (data: any) => {
   processSend({
     // 丢给 on message
     type: 'webview-on-message',
@@ -48,9 +58,9 @@ export const sendWebviewPostMessage = (data: any) => {
  *
  * @param data
  */
-export const sendWebviewGetExpansions = (data: any) => {
+export const sendWebviewOnExpansionsMessage = (data: any) => {
   processSend({
-    type: 'webview-get-expansions',
+    type: 'webview-on-expansions-message',
     data: data
   })
 }

@@ -4,7 +4,6 @@ export const commands: {
 }[] = []
 
 // 存储扩展
-
 export const storage = new Map<
   string,
   {
@@ -24,3 +23,5 @@ export const storage = new Map<
     view: any
   }
 >()
+
+export const getPackages = () => Array.from(storage.values()).map(item => item.package)

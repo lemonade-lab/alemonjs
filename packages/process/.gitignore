@@ -1,3 +1,5 @@
-/lib
+# 依赖
 node_modules
-/dist
+lib
+dist
+alemonjs-*

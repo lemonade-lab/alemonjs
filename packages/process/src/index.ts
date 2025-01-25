@@ -1,53 +1,25 @@
-import { commands, storage } from './storage.js'
-import { addModules, delModules, disableModules, updateModules } from './modules.js'
+import { commands, getPackages, storage } from './storage.js'
+import { updateModules } from './modules.js'
 import { cloneRepo } from './git.js'
-import { sendGetExpansions, sendWebviewGetExpansions } from './send.js'
-
-/**
- *
- */
-const restoreExpansions = () => {
-  updateModules()
-}
-
-/**
- * 禁用扩展
- * @param name
- */
-const disableExpansions = (name: string) => {
-  disableModules(name)
-}
-
-/**
- * 删除扩展
- * @param name
- */
-const delExpansions = (name: string) => {
-  delModules(name, () => {
-    sendGetExpansions(Array.from(storage.values()).map(item => item.package))
-  })
-}
+import { sendGetExpansions, sendWebviewOnExpansionsMessage } from './send.js'
 
 /**
  * 立即加载扩展
  * @param name
  */
 const addExpansions = (name: string) => {
-  addModules(name, () => {
-    // 加载完毕后，更新扩展列表
-    sendGetExpansions(Array.from(storage.values()).map(item => item.package))
-  })
+  updateModules(name)
+  // 加载完毕后，更新扩展列表
+  sendGetExpansions(getPackages())
 }
 
 /**
  * 主动获取扩展列表
  */
-const getExpansions = () => {
-  if (storage.size === 0) {
-    updateModules()
-  }
+const getExpansions = async () => {
+  updateModules()
   // 更新模块列表
-  sendGetExpansions(Array.from(storage.values()).map(item => item.package))
+  sendGetExpansions(getPackages())
 }
 
 const command = (command: string) => {
@@ -76,12 +48,13 @@ const webviewPostMessage = (data: any) => {
 
 const webviewGetExpansions = (data: any) => {
   if (!storage.has(data.name)) return
+  updateModules()
   // 更新模块列表
-  sendWebviewGetExpansions({
+  sendWebviewOnExpansionsMessage({
     name: data.name,
     value: {
       type: 'get-expansions',
-      data: Array.from(storage.values()).map(item => item.package)
+      data: getPackages()
     }
   })
 }
@@ -95,12 +68,6 @@ const gitClone = (data: string) => {
 }
 
 export const events = {
-  /**
-   * 扩展
-   */
-  'restore-expansions': restoreExpansions,
-  'disable-expansions': disableExpansions,
-  'del-expansions': delExpansions,
   'add-expansions': addExpansions,
   'get-expansions': getExpansions,
   /**

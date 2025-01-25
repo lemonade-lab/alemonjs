@@ -1,10 +1,11 @@
 import {
   sendNotification,
-  sendWebviewPostMessage,
+  sendWebviewOnMessage,
   sendActionApplicationSidebarLoad,
   processSend
 } from './send.js'
 import { commands } from './storage.js'
+import HTMLSCRIPT from './script.js'
 
 export class Context {
   createExtensionDir(dir: string) {
@@ -47,23 +48,8 @@ export class webView {
    *  插入脚本
    */
   get #htmlScript() {
-    return `<script>  
-          const createDesktopAPI = ()=> {
-              const expansionsName = '${this._name}'
-              return window.appDesktopAPI.create(expansionsName)
-          }
-          window.createDesktopAPI = createDesktopAPI
-          window.appDesktopHideAPI.themeVariables('${this._name}')
-          window.appDesktopHideAPI.themeOn('${this._name}',cssVariables => {
-            try {
-               Object.keys(cssVariables).forEach(key => {
-                 document.documentElement.style.setProperty(\`--$\{key\}\`, cssVariables[key])
-              })
-            } catch (e) {
-              console.error(e)
-            }
-          })
-</script>`
+    const script = HTMLSCRIPT.replace(/<@name>/g, `'${this._name}'`)
+    return script
   }
 
   _name: string | null = null
@@ -87,7 +73,7 @@ export class webView {
    * @param {*} data
    */
   postMessage(data: any) {
-    sendWebviewPostMessage({
+    sendWebviewOnMessage({
       name: this._name,
       value: data
     })
