@@ -1,15 +1,13 @@
-import {
-  defineBot,
-  OnProcessor,
-  PrivateEventMessageCreate,
-  PublicEventMessageCreate,
-  useUserHashKey,
-  getConfigValue,
-  User
-} from 'alemonjs'
+import { defineBot, useUserHashKey, getConfigValue, User } from 'alemonjs'
 import { Client as ICQQClient, PrivateMessageEvent, segment, Sendable } from 'icqq'
+import { join } from 'path'
+import { existsSync, mkdirSync } from 'fs'
 import { device, error, qrcode, slider } from './login'
-import { Store } from './store'
+import { onDevice, onError, onQrcode, onSlider } from './login-web'
+import { platform, onOnline, onOffline, onGroupMessage, onPrivateMessage, onSend } from './listener'
+import { activate } from './desktop'
+/** tree-shaking */
+;(() => console.debug(activate))()
 export type Client = typeof ICQQClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -21,12 +19,17 @@ export const client: Client = new Proxy({} as Client, {
     return undefined
   }
 })
-export const platform = 'qq'
+
+export { platform }
+
 export default defineBot(() => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
   const d = Number(config?.device)
+  // 更改icqq目录
+  const data_dir = join(process.cwd(), 'data', 'icqq')
+  if (!existsSync(data_dir)) mkdirSync(data_dir, { recursive: true })
   // 创建客户端
   const client = new ICQQClient({
     // 机器人配置
@@ -34,9 +37,23 @@ export default defineBot(() => {
     // 默认要扫码登录
     platform: isNaN(d) ? 3 : d,
     // 默认版本
-    ver: config?.ver
+    ver: config?.ver,
+    // 日志等级，默认info
+    log_level: config?.log_level || 'info',
+    // 群聊和频道中过滤自己的消息
+    ignore_self: config?.ignore_self || true,
+    // 被风控时是否尝试用分片发送
+    resend: config?.resend || true,
+    // 触发`system.offline.network`事件后的重新登录间隔秒数
+    reconn_interval: config?.reconn_interval || 5,
+    // 是否缓存群员列表
+    cache_group_member: config?.cache_group_member || true,
+    // ffmepg路径
+    ffmpeg_path: config?.ffmpeg_path || '',
+    ffprobe_path: config?.ffprobe_path || '',
+    // icqq数据目录
+    data_dir: data_dir
   })
-  const qq = Number(config.qq)
 
   /**
    *
@@ -45,180 +62,52 @@ export default defineBot(() => {
    *
    */
 
+  const qq = Number(config?.qq)
   // 连接
   client.login(qq, config.password)
   // 错误
-  client.on('system.login.error', event => error(event))
+  client.on('system.login.error', event => (global.qqDesktopStatus ? onError(event) : error(event)))
   // 设备
-  client.on('system.login.device', event => device(client, event))
+  client.on('system.login.device', event =>
+    global.qqDesktopStatus ? onDevice(event) : device(client, event)
+  )
   // 二维码
-  client.on('system.login.qrcode', () => qrcode(client))
+  client.on('system.login.qrcode', event =>
+    global.qqDesktopStatus ? onQrcode(event) : qrcode(client)
+  )
   // 滑块
-  client.on('system.login.slider', event => slider(client, event, qq))
-
-  const LocalStore = new Store()
-
+  client.on('system.login.slider', event =>
+    global.qqDesktopStatus ? onSlider(event) : slider(client, event, qq)
+  )
+  // token过期
+  client.on(
+    'system.token.expire',
+    () =>
+      global.qqDesktopStatus &&
+      onError({ code: 1145, message: '登录token过期，请删除token重新登录~' })
+  )
+  // 内部错误
+  client.on(
+    'internal.verbose',
+    event => global.qqDesktopStatus && onError({ code: 114514, message: event })
+  )
+  // client.on('internal.error.login', (event) => console.log('登录错误internal', event));
   // 登录
-  client.on('system.online', async () => {
-    const value = getConfigValue()
-    const config = value?.qq
-    const master_key: string[] = config?.master_key ?? []
-    if (master_key[0]) {
-      const val = LocalStore.getItem()
-      const Now = Date.now()
-      if (!val || !val.RunAt || Now > Now + 1000 * 60 * 24) {
-        LocalStore.setItem({
-          RunAt: Now
-        })
-        const UserId = Number(master_key[0])
-        // 是否是好友
-        const friend = client.fl.get(UserId)
-        if (!friend) return
-        // send
-        client.pickUser(UserId).sendMsg('欢迎使用[ @AlemonJS/QQ ]')
-      }
-    }
-  })
-
+  client.on('system.online', onOnline)
+  // 监听群消息
+  client.on('message.group', onGroupMessage)
   // 监听消息
-  client.on('message.group', async event => {
-    const value = getConfigValue()
-    const config = value?.qq
-    const master_key: string[] = config?.master_key ?? []
-    const user_id = String(event.sender.user_id)
-    const group_id = String(event.group_id)
-    const isMaster = master_key.includes(user_id)
-
-    let msg = ''
-
-    //
-    for (const val of event.message) {
-      switch (val.type) {
-        case 'text': {
-          msg = (val?.text || '')
-            .replace(/^\s*[＃井#]+\s*/, '#')
-            .replace(/^\s*[\\*※＊]+\s*/, '*')
-            .trim()
-          break
-        }
-      }
-    }
-
-    const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
-
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
-
-    const UserId = user_id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId
-    })
-
-    // 定义消
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      // 事件类型
-      Platform: platform,
-      // 频道
-      GuildId: group_id,
-      ChannelId: group_id,
-      // 用户
-      UserId: user_id,
-      UserName: event.sender.nickname,
-      UserAvatar: UserAvatar,
-      UserKey,
-      IsMaster: isMaster,
-      IsBot: false,
-      // message
-      MessageId: event.message_id,
-      MessageText: msg,
-      OpenId: user_id,
-      CreateAt: Date.now(),
-      // other
-      tag: 'message.group',
-      value: null
-    }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-    // 处理消息
-    OnProcessor(e, 'message.create')
-  })
-
-  // 监听消息
-  client.on('message.private', async event => {
-    const value = getConfigValue()
-    const config = value?.qq
-    const master_key: string[] = config?.master_key ?? []
-    const user_id = String(event.sender.user_id)
-    const isMaster = master_key.includes(user_id)
-    let msg = ''
-    const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
-
-    const UserId = user_id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId
-    })
-
-    // 定义消
-    const e: PrivateEventMessageCreate = {
-      name: 'private.message.create',
-      // 事件类型
-      Platform: platform,
-      // 用户
-      UserId: user_id,
-      UserName: event.sender.nickname,
-      UserAvatar: UserAvatar,
-      UserKey,
-      IsMaster: isMaster,
-      IsBot: false,
-      // message
-      MessageId: event.message_id,
-      MessageText: msg,
-      OpenId: user_id,
-      CreateAt: Date.now(),
-      // other
-      tag: 'message.private',
-      value: null
-    }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-    // 处理消息
-    OnProcessor(e, 'private.message.create')
-  })
+  client.on('message.private', onPrivateMessage)
+  // 下线
+  client.on('system.offline', onOffline)
+  // 网络掉线
+  client.on('system.offline.network', onOffline)
+  // 服务器被踢
+  client.on('system.offline.kickoff', onOffline)
+  // 隐藏事件
+  // client.on('internal.sso', onInternalSso)
+  // 未知事件
+  client.on('send', onSend)
 
   global.client = client
 

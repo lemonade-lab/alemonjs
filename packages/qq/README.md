@@ -24,7 +24,20 @@ qq:
   sign_api_addr: ''
   # 版本
   ver: ''
-  # 主人
+  # 主人[platform:qq]哈希
   master_key:
     - ""
+  # 日志等级，默认info
+  log_level: 'info',
+  # 群聊和频道中过滤自己的消息
+  ignore_self: true,
+  # 被风控时是否尝试用分片发送
+  resend: true,
+  # 触发`system.offline.network`事件后的重新登录间隔秒数
+  reconn_interval: 5,
+  # 是否缓存群员列表
+  cache_group_member: true,
+  # ffmepg路径
+  ffmpeg_path: '',
+  ffprobe_path: ''
 ```
