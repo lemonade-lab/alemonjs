@@ -1,13 +1,5 @@
-// src/Modal.jsx
-
-import { PrimaryDiv } from './Div'
-import { Button } from './Interactive'
-
-/**
- *
- * @param param0
- * @returns
- */
+import { PrimaryDiv } from './PrimaryDiv'
+import { Button } from './Button'
 export const Modal = ({
   isOpen,
   onClose,

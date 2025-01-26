@@ -1,23 +1,20 @@
 import { useEffect, useState } from 'react'
 import classNames from 'classnames'
 
-interface SwitchProps {
+interface ToggleSwitchProps {
   value: boolean
   onChange?: (checked: boolean) => void
   hover?: boolean
   disabled?: boolean
 }
 
-/**
- *
- * @param param0
- * @returns
- */
-export const Switch = ({ value, onChange, hover = false, disabled = false }: SwitchProps) => {
+export const Switch = ({ value, onChange, hover = false, disabled = false }: ToggleSwitchProps) => {
   const [checked, setChecked] = useState(value)
+
   useEffect(() => {
     setChecked(value)
   }, [value])
+
   const handleToggle = () => {
     if (disabled) return
     const newChecked = !checked
@@ -26,6 +23,7 @@ export const Switch = ({ value, onChange, hover = false, disabled = false }: Swi
       onChange(newChecked)
     }
   }
+
   return (
     <div className="relative inline-flex items-center">
       <input
