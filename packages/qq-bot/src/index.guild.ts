@@ -7,7 +7,6 @@ import {
   User,
   useUserHashKey
 } from 'alemonjs'
-import { QQBotClient } from './sdk/client'
 import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE'
 import {
   AT_MESSAGE_CREATE,
@@ -16,163 +15,28 @@ import {
   GROUP_AT_MESSAGE_CREATE,
   MESSAGE_CREATE
 } from './send'
-import QQBotGuild from './index.group'
-import QQBotGroup from './index.guild'
-import { QQBotAPI } from './sdk/api'
-export type Client = typeof QQBotAPI.prototype
-export const client: Client = new Proxy({} as Client, {
-  get: (_, prop: string) => {
-    if (prop in global.client) {
-      const original = global.client[prop]
-      // 防止函数内this丢失
-      return typeof original === 'function' ? original.bind(global.client) : original
-    }
-    return undefined
-  }
-})
+import { QQBotGuildClient } from './sdk/websoket.guild'
 export const platform = 'qq-bot'
 export default defineBot(() => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
-  if (config.mode == 'guild') {
-    return QQBotGuild.callback()
-  } else if (config.mode == 'group') {
-    return QQBotGroup.callback()
-  }
-  const client = new QQBotClient({
-    secret: config?.secret,
+
+  const client = new QQBotGuildClient({
     app_id: config?.app_id,
-    route: config?.route,
-    token: config?.token,
-    port: config?.port,
-    ws: config?.ws
+    intents: config?.intents,
+    is_private: config?.is_private,
+    sandbox: config?.sandbox,
+    secret: config?.secret,
+    shard: config?.shard,
+    token: config?.token
   })
+
   // 连接
   client.connect()
   /**
-   * group
-   *
-   * GROUP_AT_MESSAGE_CREATE
-   * C2C_MESSAGE_CREATE
-   */
-
-  // 监听消息
-  client.on('GROUP_AT_MESSAGE_CREATE', async event => {
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-    const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
-
-    const UserId = event.author.id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
-
-    // 定义消
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      // 事件类型
-      Platform: platform,
-      // guild
-      GuildId: event.group_id,
-      ChannelId: event.group_id,
-      // 用户Id
-      UserId: event.author.id,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      // 格式化数据
-      MessageId: event.id,
-      MessageText: event.content?.trim(),
-      OpenId: event.author.member_openid,
-      CreateAt: Date.now(),
-      tag: 'GROUP_AT_MESSAGE_CREATE',
-      value: null
-    }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-    // 处理消息
-    OnProcessor(e, 'message.create')
-  })
-
-  client.on('C2C_MESSAGE_CREATE', async event => {
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-    const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
-
-    const UserId = event.author.id
-
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
-
-    // 定义消
-    const e: PrivateEventMessageCreate = {
-      name: 'private.message.create',
-      // 事件类型
-      Platform: platform,
-      // 用户Id
-      UserId: event.author.id,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      // 格式化数据
-      MessageId: event.id,
-      MessageText: event.content?.trim(),
-      CreateAt: Date.now(),
-      OpenId: event.author.user_openid,
-      //
-      tag: 'C2C_MESSAGE_CREATE',
-      value: null
-    }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-    // 处理消息
-    OnProcessor(e, 'private.message.create')
-  })
-
-  /**
    * guild
    */
-
   client.on('DIRECT_MESSAGE_CREATE', async event => {
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) return
