@@ -22,9 +22,11 @@ export default defineBot(() => {
   if (!value) value = {}
   const config = value[platform]
 
+  // intents 需要默认值
+
   const client = new QQBotGroupClient({
     app_id: config?.app_id,
-    intents: config?.intents,
+    intents: config?.intents ?? ['GROUP_AND_C2C_EVENT'],
     is_private: config?.is_private,
     sandbox: config?.sandbox,
     secret: config?.secret,

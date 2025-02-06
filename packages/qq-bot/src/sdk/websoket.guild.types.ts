@@ -1,4 +1,4 @@
-import { IntentsGuildEnum } from './intents.guild'
+import { IntentsEnum } from './intents'
 
 /**
  * ******
@@ -26,7 +26,7 @@ export interface GuildOptions {
   /**
    * 事件订阅
    */
-  intents?: IntentsGuildEnum[]
+  intents?: IntentsEnum[]
   /**
    * 是否是私域
    * false

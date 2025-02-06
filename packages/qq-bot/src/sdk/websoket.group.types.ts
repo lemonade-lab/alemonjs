@@ -1,4 +1,4 @@
-import { IntentsGroupEnum } from './intents.group.js'
+import { IntentsEnum } from './intents'
 
 /**
  * *****
@@ -26,7 +26,7 @@ export interface GroupOptions {
   /**
    * 事件订阅
    */
-  intents?: IntentsGroupEnum[]
+  intents?: IntentsEnum[]
   /**
    * 是否是私域
    */

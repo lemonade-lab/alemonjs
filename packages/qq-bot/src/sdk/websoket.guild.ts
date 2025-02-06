@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import { config } from './config.js'
-import { getIntentsMask } from './intents.group.js'
+import { getIntentsMask } from './intents.js'
 import { QQBotAPI } from './api.js'
 import { QQBotGuildEventMap } from './message.guild.js'
 import { Counter } from './counter.js'

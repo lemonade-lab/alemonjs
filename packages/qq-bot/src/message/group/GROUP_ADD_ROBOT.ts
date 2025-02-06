@@ -1,7 +1,7 @@
 /**
  * 群添加机器人
  */
-export type GROUP_ADD_ROBOT = {
+export type GROUP_ADD_ROBOT_TYPE = {
   /**
    * 操作添加机器人进群的群成员openid
    */

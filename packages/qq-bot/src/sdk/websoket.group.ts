@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 import { QQBotAPI } from './api.js'
 import { config } from './config.js'
-import { getIntentsMask } from './intents.group.js'
+import { getIntentsMask } from './intents.js'
 import { GroupOptions } from './websoket.group.types.js'
 import { Counter } from './counter.js'
 import { QQBotGroupEventMap } from './message.group.js'
