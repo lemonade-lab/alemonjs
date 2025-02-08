@@ -67,20 +67,14 @@ const gitClone = (data: string) => {
   cloneRepo(data)
 }
 
+// 事件
 export const events = {
   'add-expansions': addExpansions,
   'get-expansions': getExpansions,
-  /**
-   * 命令
-   */
   'command': command,
-  /**
-   * git
-   */
   'git-clone': gitClone,
-  /**
-   * webview
-   */
   'webview-post-message': webviewPostMessage,
   'webview-get-expansions': webviewGetExpansions
 }
+
+export * from './typing.js'

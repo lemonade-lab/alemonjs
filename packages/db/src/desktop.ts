@@ -2,10 +2,11 @@ import { readFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { getConfig, getConfigValue } from 'alemonjs'
+import { type Context } from '@alemonjs/process'
 // 当前目录
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // 被激活的时候。
-export const activate = context => {
+export const activate = (context: Context) => {
   // 创建一个 webview。
   const webView = context.createSidebarWebView(context)
 

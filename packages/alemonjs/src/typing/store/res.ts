@@ -5,15 +5,25 @@ export type StoreResponseItem = {
    * 来源
    */
   source: string
-  // 目录
+  /**
+   * 目录
+   */
   dir: string
-  // 文件路径
+  /**
+   * 文件路径
+   */
   path: string
-  // 文件名
+  /**
+   * 文件名
+   */
   name: string
-  //
+  /**
+   *
+   */
   value?: {
-    // 事件
+    /**
+     * 事件
+     */
     select: string
   } | null
 }
@@ -36,10 +46,16 @@ export type StoreMiddlewareItem = {
   } | null
 }
 
+/**
+ *
+ */
 export type StoreMiddleware = {
   [key in keyof Events]: StoreResponseItem[]
 }
 
+/**
+ *
+ */
 export type StoreResponse = {
   [key in keyof Events]: StoreMiddlewareItem[]
 }

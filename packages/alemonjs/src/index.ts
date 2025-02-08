@@ -61,6 +61,8 @@ export const start = async (input: string = 'lib/index.js', platform = '@alemonj
     }
     // 挂在全局
     global.alemonjs = bot?.default.callback()
+    // 新增环境变量
+    process.env.platform = global.alemonjs.platform
   } catch (e) {
     ErrorModule(e)
   }

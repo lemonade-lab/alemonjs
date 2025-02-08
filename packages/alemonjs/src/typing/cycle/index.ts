@@ -1,5 +1,5 @@
 /**
- *
+ * 子模块生命周期
  */
 export type ChildrenCycle = {
   /**
@@ -31,4 +31,7 @@ export type ChildrenCycle = {
  */
 export type Next = (...cns: boolean[]) => void
 
+/**
+ * 事件周期
+ */
 export type EventCycle = 'create' | 'mount' | 'unmount'
