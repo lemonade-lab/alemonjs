@@ -1,6 +1,6 @@
-import { QQBotClient } from '../client'
+import { QQBotAPI } from '../sdk/api'
 
-type Client = typeof QQBotClient.prototype
+type Client = typeof QQBotAPI.prototype
 
 export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val) => {
   const content = val

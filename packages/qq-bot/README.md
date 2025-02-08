@@ -18,21 +18,32 @@ qq-bot:
   token: ''
   # 密钥
   secret: ''
+  # 模式(可选，置空将启用webhook模式)
+  mode: 'group'
 ```
+
+> 默认使用 webhook 模式，配置 mode 可选择 websocket 模式
+
+> 配置 webhook 需 ip/域名，一旦生效官方将永久禁用 websocket 模式
 
 ```sh
 qq-bot:
   master_key:
     - ''
-  # 默认 推荐nginx进行代理 http://localhost:17157/webhook
-  route: '/webhook'
-  port: 17157
-  # 当配置ws的时候，会连接另一台hook机器人的消息。不会再启动本地端口。
-  # 推荐nginx进行代理 http://localhost:17157/
-  # wss://xxxx/websocket
-  ws: ''
-  # 频道沙盒
+  # 频道沙盒，默认false
   sandbox: false
+  # 1）webhook 模式
+  # 推荐nginx进行代理 http://localhost:17157/webhook
+  port: 17157
+  route: '/webhook'
+  # 当配置ws的时候，会连接另一台webhook机器人的消息。不会再启动本地端口。
+  # 假设代理后的地址为 https://qqbotjs.com
+  # ws: 'wss://qqbotjs.com/websocket'
+  # 2）websocket 模式
+  # 选择模式，即不采用 webhook
+  # mode: 'guild'
+  # mode: 'group'
+  # mode: 'all' # 暂未支持
 ```
 
 ```conf

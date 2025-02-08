@@ -1,7 +1,7 @@
 /**
  * 群移除机器人
  */
-export type GROUP_ADD_ROBOT = {
+export type GROUP_DEL_ROBOT_TYPE = {
   /**
    * 移除的时间戳
    */
