@@ -408,7 +408,21 @@ export default defineBot(() => {
   global.client = client
 
   return {
+    platform,
     api: {
+      active: {
+        send: {
+          // 待设计。qqbot出现了。一个包两个平台API。这个是一个问题。
+          channel: async (channel_id: string, data: any) => {
+            // return await client.sendGroupMessage(channel_id, data)
+            return []
+          },
+          user: async (user_id: string, data: any) => {
+            // return await client.sendPrivateMessage(user_id, data)
+            return []
+          }
+        }
+      },
       use: {
         send: async (event, val) => {
           if (val.length < 0) []

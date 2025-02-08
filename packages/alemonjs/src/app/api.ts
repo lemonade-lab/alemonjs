@@ -1,12 +1,19 @@
 import { DataEnums } from '../global'
 
 /**
+ * 创建数据格式。
+ * @param data
+ * @returns
+ */
+export const createDataFormat = (...data: DataEnums[]) => data
+
+/**
  * 向指定频道发送消息。
  * @param channel_id
  * @param data
  * @returns
  */
-export const sendChannel = (channel_id: string, data: DataEnums[]) =>
+export const sendChannel = (channel_id: string, ...data: DataEnums[]) =>
   global.alemonjs.api.active.send.channel(channel_id, data)
 
 /**
@@ -15,5 +22,5 @@ export const sendChannel = (channel_id: string, data: DataEnums[]) =>
  * @param data
  * @returns
  */
-export const sendUser = (user_id: string, data: DataEnums[]) =>
+export const sendUser = (user_id: string, ...data: DataEnums[]) =>
   global.alemonjs.api.active.send.user(user_id, data)

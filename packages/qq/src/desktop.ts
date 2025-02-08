@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, writeFile } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
-import { start, getConfig, getConfigValue } from 'alemonjs'
+import { getConfig, getConfigValue } from 'alemonjs'
 import { startServer, stopServer } from './server'
 import { getFilesData } from './files'
 import Yaml from 'yaml'
+import { botClose, botRun, botStatus } from './bot'
 
 // 当前目录
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -78,6 +79,15 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
 
       // 启动模块
       case 'qq.login': {
+        const status = botStatus()
+        if (status) {
+          webView.postMessage({
+            type: 'qq.error',
+            data: '已经在运行中'
+          })
+          return
+        }
+
         const qqBot = data.data
         saveConfig({
           qq: qqBot.qq ?? '',
@@ -94,8 +104,11 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
           ffmpeg_path: qqBot.ffmpeg_path || '',
           ffprobe_path: qqBot.ffprobe_path || ''
         })
+
         startServer()
-        start('lib/index.js', '@alemonjs/qq')
+
+        botRun(['--login', 'qq'])
+
         break
       }
       // 保存配置
@@ -224,7 +237,10 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
           data: '[ @AlemonJS/QQ 下线]'
         })
         // unMount('@alemonjs/qq')
-        process.exit()
+        // process.exit()
+
+        botClose()
+
         break
       }
       // 恢复普通模块加载方式
@@ -238,7 +254,8 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
       }
       // 退出进程
       case 'qq.process.exit': {
-        process.exit()
+        // process.exit()
+        botClose()
         break
       }
       default:

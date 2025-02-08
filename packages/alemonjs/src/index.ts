@@ -17,7 +17,7 @@ export const start = async (input: string = 'lib/index.js', platform = '@alemonj
   if (typeof login != 'undefined') {
     platform = `@alemonjs/${login}`
   } else {
-    cfg.argv.login == 'gui'
+    cfg.argv.login == platform.replace(/^(@alemonjs\/|alemonjs-)/, '')
   }
   if (typeof cfg.argv?.platform == 'string') {
     platform = cfg.argv?.platform
