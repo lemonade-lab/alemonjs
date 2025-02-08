@@ -136,7 +136,7 @@ const moduleChildrenFiles = async name => {
  *
  * @param input
  */
-const start = async (plat: string, input = 'lib/index.js') => {
+const start = async (input = 'lib/index.js', plat: string) => {
   const cfg = getConfig()
   const platform = plat
   // 没有参数
@@ -160,7 +160,7 @@ const start = async (plat: string, input = 'lib/index.js') => {
   await run()
   const bot = await import(platform)
   // 挂在全局
-  global.alemonjs = bot?.default()
+  global.alemonjs = bot?.default?.callback()
 }
 
 export { getConfig, getDirFiles, start, unMount }

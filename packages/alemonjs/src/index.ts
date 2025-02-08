@@ -1,6 +1,6 @@
 import './global.js'
 import { join } from 'path'
-import { existsSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { getConfig } from './config'
 import { loadModule, moduleChildrenFiles } from './app/load.js'
 import { DefineBotValue } from './global.js'
@@ -9,12 +9,11 @@ import { ErrorModule } from './app/local.utils.js'
 /**
  * @param input
  */
-export const start = async (input: string = 'lib/index.js') => {
+export const start = async (input: string = 'lib/index.js', platform = '@alemonjs/gui') => {
   const cfg = getConfig()
   const login = cfg.argv?.login
   if (typeof login == 'boolean') return
   // 默认值
-  let platform = '@alemonjs/gui'
   if (typeof login != 'undefined') {
     platform = `@alemonjs/${login}`
   } else {
@@ -33,7 +32,17 @@ export const start = async (input: string = 'lib/index.js') => {
   //  input
   const run = async () => {
     // 不存在input
-    if (!input) return
+    if (!input) {
+      let modulePath = join(process.cwd(), 'node_modules', platform)
+      if (existsSync(modulePath)) {
+        input = JSON.parse(readFileSync(modulePath, 'utf8')).main
+      } else if (existsSync((modulePath = join(process.cwd(), 'packages', platform)))) {
+        input = JSON.parse(readFileSync(modulePath, 'utf8')).main
+      } else {
+        console.log(`[${platform}]入口文件获取失败~`)
+        return
+      }
+    }
     // 路径
     const mainPath = join(process.cwd(), input)
     if (!existsSync(mainPath)) return

@@ -26,12 +26,19 @@ export default defineBot(() => {
 
   const client = new QQBotGuildClient({
     app_id: config?.app_id,
-    intents: config?.intents ?? [],
+    intents: config?.intents ?? [
+      'GUILDS', //频道进出
+      'GUILD_MEMBERS', //成员资料
+      'DIRECT_MESSAGE', //私信
+      'PUBLIC_GUILD_MESSAGES', //公域事件
+      'REACTIONS' // 表情表态
+    ],
     is_private: config?.is_private,
     sandbox: config?.sandbox,
     secret: config?.secret,
     shard: config?.shard,
-    token: config?.token
+    token: config?.token,
+    mode: config?.mode
   })
 
   // 连接

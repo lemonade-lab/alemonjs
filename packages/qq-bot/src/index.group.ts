@@ -31,7 +31,8 @@ export default defineBot(() => {
     sandbox: config?.sandbox,
     secret: config?.secret,
     shard: config?.shard,
-    token: config?.token
+    token: config?.token,
+    mode: config?.mode
   })
 
   // 连接

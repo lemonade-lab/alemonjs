@@ -73,7 +73,7 @@ function onError(event: { code: number; message: string }) {
     msg = 'QQ密码错误,运行命令重新登录'
   } else if (event?.code == 237) {
     msg = `ticket输入错误或者已失效,已停止运行,请重新登录验证`
-  } else if (event?.message.includes('冻结') || event?.code == 40) {
+  } else if (event?.code == 40 || event?.message?.includes('冻结')) {
     msg = '账号已被冻结,已停止运行'
   } else if (event?.code == 162) {
     msg = '短信发送过频繁'
@@ -83,7 +83,7 @@ function onError(event: { code: number; message: string }) {
     msg = '登录错误,已停止运行'
   }
 
-  msg = msg + ':\n' + event.message
+  msg = msg + ':\n' + event.message || ''
   global.webviewAPI.postMessage({
     type: 'qq.error',
     data: msg

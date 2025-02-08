@@ -29,7 +29,7 @@ export class QQBotGroupClient extends QQBotAPI {
    * 设置配置
    * @param opstion
    */
-  constructor(opstion: GroupOptions) {
+  constructor(opstion: GroupOptions & { mode: string }) {
     super()
     for (const key in opstion) {
       config.set(key, opstion[key])

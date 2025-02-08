@@ -16,8 +16,8 @@ import {
   GROUP_AT_MESSAGE_CREATE,
   MESSAGE_CREATE
 } from './send'
-import QQBotGuild from './index.group'
-import QQBotGroup from './index.guild'
+import QQBotGroup from './index.group'
+import QQBotGuild from './index.guild'
 import { QQBotAPI } from './sdk/api'
 export type Client = typeof QQBotAPI.prototype
 export const client: Client = new Proxy({} as Client, {

@@ -31,7 +31,7 @@ export class QQBotGuildClient extends QQBotAPI {
    *
    * @param opstion
    */
-  constructor(opstion: GuildOptions) {
+  constructor(opstion: GuildOptions & { mode: string }) {
     super()
     for (const key in opstion) {
       config.set(key, opstion[key])

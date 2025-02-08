@@ -41,7 +41,7 @@ export class QQBotAPI {
    */
   async groupService(options: AxiosRequestConfig) {
     const app_id = config.get('app_id')
-    const token = config.get('access_token')
+    const token = config.get('token')
     const service = await axios.create({
       baseURL: this.API_URL,
       timeout: 20000,
@@ -77,7 +77,18 @@ export class QQBotAPI {
    * @returns
    */
   async gateway() {
-    return this.groupService({
+    let service = ''
+    switch (config.get('mode')) {
+      case 'group':
+        service = 'groupService'
+        break
+      case 'guild':
+        service = 'guildServer'
+        break
+      default:
+        service = 'groupService'
+    }
+    return this[service]({
       url: '/gateway'
     }).then(res => res?.data)
   }

@@ -1,8 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, writeFile } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
-import { getConfig, getConfigValue } from 'alemonjs'
-import { start } from './start'
+import { start, getConfig, getConfigValue } from 'alemonjs'
 import { startServer, stopServer } from './server'
 import { getFilesData } from './files'
 import Yaml from 'yaml'
@@ -96,7 +95,7 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
           ffprobe_path: qqBot.ffprobe_path || ''
         })
         startServer()
-        start('@alemonjs/qq')
+        start('lib/index.js', '@alemonjs/qq')
         break
       }
       // 保存配置
