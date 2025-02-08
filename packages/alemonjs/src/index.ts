@@ -33,11 +33,13 @@ export const start = async (input: string = 'lib/index.js', platform = '@alemonj
   const run = async () => {
     // 不存在input
     if (!input) {
-      let modulePath = join(process.cwd(), 'node_modules', platform)
+      let modulePath = join(process.cwd(), 'node_modules', platform, 'package.json')
       if (existsSync(modulePath)) {
         input = JSON.parse(readFileSync(modulePath, 'utf8')).main
-      } else if (existsSync((modulePath = join(process.cwd(), 'packages', platform)))) {
-        input = JSON.parse(readFileSync(modulePath, 'utf8')).main
+      } else if (
+        existsSync((modulePath = join(process.cwd(), 'packages', platform, 'package.json')))
+      ) {
+        input = JSON.parse(readFileSync(join(modulePath), 'utf8')).main
       } else {
         console.log(`[${platform}]入口文件获取失败~`)
         return
