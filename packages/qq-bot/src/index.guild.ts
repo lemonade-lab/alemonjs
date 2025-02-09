@@ -16,6 +16,7 @@ import {
   MESSAGE_CREATE
 } from './send'
 import { QQBotGuildClient } from './sdk/websoket.guild'
+import { isGuild } from './utils'
 export const platform = 'qq-bot'
 export default defineBot(() => {
   let value = getConfigValue()
@@ -281,7 +282,52 @@ export default defineBot(() => {
   global.client = client
 
   return {
+    platform,
     api: {
+      // 主动消息
+      active: {
+        send: {
+          channel: async (channel_id: string, data) => {
+            if (isGuild(channel_id)) {
+              return await AT_MESSAGE_CREATE(
+                client,
+                {
+                  ChannelId: channel_id
+                },
+                data
+              )
+            } else {
+              // 需要message_id 。如果没有，则是主动消息，在group中，只能发送4条。
+              return await GROUP_AT_MESSAGE_CREATE(
+                client,
+                {
+                  GuildId: channel_id
+                },
+                data
+              )
+            }
+          },
+          user: async (user_id: string, data: any) => {
+            if (isGuild(user_id)) {
+              return await DIRECT_MESSAGE_CREATE(
+                client,
+                {
+                  OpenId: user_id
+                },
+                data
+              )
+            } else {
+              return await C2C_MESSAGE_CREATE(
+                client,
+                {
+                  OpenId: user_id
+                },
+                data
+              )
+            }
+          }
+        }
+      },
       use: {
         send: async (event, val) => {
           if (val.length < 0) []

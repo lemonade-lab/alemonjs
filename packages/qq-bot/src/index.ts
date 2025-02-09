@@ -19,6 +19,7 @@ import {
 import QQBotGroup from './index.group'
 import QQBotGuild from './index.guild'
 import { QQBotAPI } from './sdk/api'
+import { isGuild } from './utils'
 export type Client = typeof QQBotAPI.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -410,19 +411,51 @@ export default defineBot(() => {
   return {
     platform,
     api: {
+      // 主动消息
       active: {
         send: {
-          // 待设计。qqbot出现了。一个包两个平台API。这个是一个问题。
-          channel: async (channel_id: string, data: any) => {
-            // return await client.sendGroupMessage(channel_id, data)
-            return []
+          channel: async (channel_id: string, data) => {
+            if (isGuild(channel_id)) {
+              return await AT_MESSAGE_CREATE(
+                client,
+                {
+                  ChannelId: channel_id
+                },
+                data
+              )
+            } else {
+              // 需要message_id 。如果没有，则是主动消息，在group中，只能发送4条。
+              return await GROUP_AT_MESSAGE_CREATE(
+                client,
+                {
+                  GuildId: channel_id
+                },
+                data
+              )
+            }
           },
           user: async (user_id: string, data: any) => {
-            // return await client.sendPrivateMessage(user_id, data)
-            return []
+            if (isGuild(user_id)) {
+              return await DIRECT_MESSAGE_CREATE(
+                client,
+                {
+                  OpenId: user_id
+                },
+                data
+              )
+            } else {
+              return await C2C_MESSAGE_CREATE(
+                client,
+                {
+                  OpenId: user_id
+                },
+                data
+              )
+            }
           }
         }
       },
+      // 被动消息
       use: {
         send: async (event, val) => {
           if (val.length < 0) []

@@ -21,6 +21,22 @@ export type DataImageType = {
 }
 
 /**
+ * 图片链接
+ */
+export type DataImageURLType = {
+  type: 'ImageURL'
+  value: string
+}
+
+/**
+ * 图片文件
+ */
+export type DataImageFileType = {
+  type: 'ImageFile'
+  value: Buffer
+}
+
+/**
  * 提及数据
  */
 export type DataMentionType = {
@@ -94,6 +110,8 @@ export type DataButtonBoxType = {
 export type DataParseType = {
   Text: DataTextType
   Image: DataImageType
+  ImageURL: DataImageURLType
+  ImageFile: DataImageFileType
   Link: DataLinkType
   Mention: DataMentionType
   Button: DataButtonType
@@ -118,14 +136,16 @@ export type ParseType = {
 }
 
 export type DataEnums =
+  | DataTextType
+  | DataImageType
+  | DataImageURLType
+  | DataImageFileType
   | DataMentionType
   | DataEmojiType
   | DataEmbedType
   | DataArkType
   | DataLinkType
-  | DataImageType
   | DataFileType
-  | DataTextType
   | DataVideoType
   | DataVoiceType
   | DataButtonBoxType
