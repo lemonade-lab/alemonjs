@@ -10,13 +10,13 @@ let qrcodeCount = 0
  */
 function onQrcode(event: { image: Buffer }) {
   qrcodeCount++
-  global.webviewAPI.postMessage({
+  process.send({
     type: 'qq.login.qrcode',
     data: event.image?.toString('base64')
   })
   // 超时提醒
   if (qrcodeCount >= 150) {
-    global.webviewAPI.postMessage({
+    process.send({
       type: 'qq.login.qrcode.expired',
       data: '扫码刷新超时...'
     })
@@ -38,7 +38,7 @@ function onSlider(event: { url: string }) {
     `【滑动验证app】下载地址：${chalk.green('https://wwp.lanzouy.com/i6w3J08um92h')} 密码:3kuu\n`
   )
   console.log(`链接存在${chalk.green('有效期')},请尽快操作,多次操作失败可能会被冻结`)
-  global.webviewAPI.postMessage({
+  process.send({
     type: 'qq.login.slider',
     data: 'http://127.0.0.1:25660/captcha?url=' + encodeURIComponent(event.url)
   })
@@ -50,7 +50,7 @@ function onSlider(event: { url: string }) {
  */
 function onDevice(event: { url: string; phone: string }) {
   global.inputTicket = false
-  global.webviewAPI.postMessage({
+  process.send({
     type: 'qq.device.validate',
     data: {
       msg: '触发设备锁验证,请选择验证方式:',
@@ -84,7 +84,7 @@ function onError(event: { code: number; message: string }) {
   }
 
   msg = msg + ':\n' + event.message || ''
-  global.webviewAPI.postMessage({
+  process.send({
     type: 'qq.error',
     data: msg
   })
@@ -117,7 +117,7 @@ export async function requestCode(url) {
     `\n请打开滑动验证app,输入请求码${chalk.green('【' + txhelper.code + '】')},然后完成滑动验证\n`
   )
 
-  global.webviewAPI.postMessage({
+  process.send({
     type: 'qq.slider.confirm',
     data: '是否已经使用滑块验证app验证完成'
   })
@@ -138,7 +138,7 @@ export async function requestCode(url) {
   }
 
   console.log(`\n获取ticket成功：\n${txhelper.res}\n`)
-  global.webviewAPI.postMessage({
+  process.send({
     type: 'qq.slider.success',
     data: '是否已经使用滑块验证app验证完成'
   })

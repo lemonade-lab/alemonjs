@@ -4,10 +4,18 @@ import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
 import { device, error, qrcode, slider } from './login'
 import { onDevice, onError, onQrcode, onSlider } from './login-web'
-import { platform, onOnline, onOffline, onGroupMessage, onPrivateMessage, onSend } from './listener'
+import {
+  platform,
+  onOnline,
+  onOffline,
+  onGroupMessage,
+  onPrivateMessage,
+  onSend,
+  waitWeb
+} from './listener'
 import { activate } from './desktop'
 /** tree-shaking */
-;(() => console.debug(activate))()
+console.debug(activate)
 export type Client = typeof ICQQClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -22,10 +30,15 @@ export const client: Client = new Proxy({} as Client, {
 
 export { platform }
 
+// 监听父进程
+await waitWeb(2000)
+
+//@ts-ignore
 export default defineBot(() => {
   let value = getConfigValue()
   if (!value) value = {}
-  const config = value[platform]
+  let config = value[platform]
+  if (!config) config = {}
   const d = Number(config?.device)
   // 更改icqq目录
   const data_dir = join(process.cwd(), 'data', 'icqq')
@@ -112,7 +125,12 @@ export default defineBot(() => {
   global.client = client
 
   return {
+    platform,
     api: {
+      // 主动消息
+      active: {
+        send: client
+      },
       use: {
         send: async (event, val) => {
           if (val.length < 0) return []

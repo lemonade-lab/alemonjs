@@ -30,7 +30,7 @@ export const DivButton = forwardRef(
     const [wait, setWait] = useState(defaultWait)
     const timeoutRef = useRef<NodeJS.Timeout>(undefined)
 
-    const handleClick = () => {
+    const handleClick = (e: React.FormEvent<HTMLButtonElement>) => {
       if (cd) {
         if (wait.enable) {
           clearInterval(timeoutRef.current)
@@ -47,10 +47,10 @@ export const DivButton = forwardRef(
               }
             })
           }, 1000)
-          onClick()
+          onClick(e, wait)
         }
       } else {
-        onClick()
+        onClick(e, wait)
       }
     }
 
@@ -66,7 +66,7 @@ export const DivButton = forwardRef(
         disabled={wait.enable && (disabledOnWait || false)}
         type="button"
         className={`w-full flex justify-center items-center bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200`}
-        style={{ backgroundColor: wait.enable ? 'rgb(29 78 216 / 0.8' : undefined, ...style }}
+        style={{ backgroundColor: wait.enable ? 'rgb(29 78 216 / 0.8)' : undefined, ...style }}
         onClick={handleClick}
       >
         {onChildren && onChildren(wait.enable, wait.cd)}

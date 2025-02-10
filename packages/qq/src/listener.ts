@@ -17,7 +17,7 @@ const LocalStore = new Store()
  */
 export async function onOnline() {
   if (global.qqDesktopStatus) {
-    global.webviewAPI.postMessage({
+    process.send({
       type: 'qq.system.online',
       data: '已上线，欢迎使用[ @AlemonJS/QQ ]'
     })
@@ -48,7 +48,7 @@ export async function onOnline() {
  */
 export async function onOffline(event: { message: string }) {
   if (global.qqDesktopStatus) {
-    global.webviewAPI.postMessage({
+    process.send({
       type: 'qq.system.offline',
       data: event?.message || ''
     })
@@ -218,4 +218,80 @@ export async function onPrivateMessage(event: PrivateMessageEvent) {
   })
   // 处理消息
   OnProcessor(e, 'private.message.create')
+}
+
+/**
+ * 监听是否为web模式
+ * @param {*} ms 最多等待多少毫秒
+ * @returns
+ */
+export function waitWeb(ms: number) {
+  process.send({
+    type: 'process.start',
+    data: true
+  })
+  return new Promise(resolve => {
+    process.on('message', async (msg: { type: string; data: any }) => {
+      switch (msg.type) {
+        case 'process.webview.open': {
+          global.qqDesktopStatus = true
+          // console.log(msg.data)
+          resolve(true)
+          break
+        }
+        case 'process.webview.close': {
+          global.qqDesktopStatus = false
+          break
+        }
+        case 'inputTicket': {
+          global.inputTicket = msg.data
+          break
+        }
+        case 'qq.login.qrcode.scaned': {
+          const res = await client.queryQrcodeResult()
+          // 成功
+          if (res.retcode === 0) {
+            console.info('\n扫码成功,开始登录...\n')
+            client.qrcodeLogin()
+          } else {
+            process.send({
+              type: 'qq.error',
+              data: '状态码：' + res.retcode
+            })
+          }
+          break
+        }
+        case 'qq.login.ticket': {
+          await client.submitSlider(msg.data)
+          break
+        }
+        case 'qq.device.validate.choice': {
+          if (msg.data?.choice == 0) {
+            await client.login()
+          } else if (msg.data?.choice == 1) {
+            // 发送短信验证码
+            await client.sendSmsCode()
+            console.info(`验证码已发送：${msg.data?.phone}\n`)
+            process.send({
+              type: 'qq.smscode.send',
+              data: msg.data?.phone
+            })
+          }
+          break
+        }
+        case 'qq.smscode': {
+          await client.submitSmsCode(msg.data)
+          process.send({
+            type: 'qq.smscode.received',
+            data: 'ok'
+          })
+          break
+        }
+        default:
+      }
+    })
+    setTimeout(() => {
+      resolve(false)
+    }, ms)
+  })
 }

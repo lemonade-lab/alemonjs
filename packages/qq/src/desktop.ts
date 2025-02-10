@@ -1,20 +1,20 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, writeFile } from 'fs'
+import Yaml from 'yaml'
+import { readFileSync, existsSync, rmSync, mkdirSync, writeFile, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
-import { getConfig, getConfigValue } from 'alemonjs'
-import { startServer, stopServer } from './server'
-import { getFilesData } from './files'
-import Yaml from 'yaml'
-import { botClose, botRun, botStatus } from './bot'
+import { getConfigValue, getConfig } from 'alemonjs'
+import { stopServer, startServer } from './server.js'
+import { getFilesData } from './files.js'
+import { botClose, botState, botRun } from './bot.js'
+
+let webview = null
 
 // 当前目录
 const __dirname = dirname(fileURLToPath(import.meta.url))
-
 // 被激活的时候。
 const activate = context => {
   // 创建一个 webview。
   const webView = context.createSidebarWebView(context)
-
   // 当命令被触发的时候。
   context.onCommand('open.qq', () => {
     const dir = join(__dirname, '../', 'dist', 'index.html')
@@ -33,11 +33,7 @@ const activate = context => {
       .replace(styleReg, `<link rel="stylesheet" crossorigin href="${styleUri}">`)
     // 立即渲染 webview
     webView.loadWebView(html)
-    // 登录状态切换到web
-    global.qqDesktopStatus = true
-    global.webviewAPI = webView
   })
-
   // 监听 webview 的消息。
   webView.onMessage(data => {
     // console.log(data)
@@ -57,7 +53,7 @@ function saveConfig(cfg, name = 'qq') {
     writeFileSync(cfgPath, Yaml.stringify(value), 'utf-8')
   }
 }
-async function onMessage(data: { type: string; data: any }, webView, context) {
+async function onMessage(data, webView, context) {
   try {
     switch (data.type) {
       // 初始化配置
@@ -66,28 +62,46 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
         if (!config) config = {}
         webView.postMessage({
           type: 'qq.init',
-          data: config['qq'] ?? {}
+          data: config['qq'] ?? {
+            qq: '',
+            password: '',
+            device: '2',
+            sign_api_addr: '',
+            ver: '9.0.90',
+            master_key: '',
+            log_level: 'info',
+            ignore_self: true,
+            resend: true,
+            reconn_interval: 5,
+            cache_group_member: true,
+            ffmpeg_path: '',
+            ffprobe_path: ''
+          }
         })
-        if (global.client && global.client?.isOnline) {
+        if (botState.logged) {
           webView.postMessage({
             type: 'qq.online',
-            data: global.client?.isOnline
+            data: true
+          })
+        }
+        if (botState.running) {
+          webView.postMessage({
+            type: 'qq.running',
+            data: true
           })
         }
         break
       }
-
       // 启动模块
       case 'qq.login': {
-        const status = botStatus()
-        if (status) {
-          webView.postMessage({
-            type: 'qq.error',
-            data: '已经在运行中'
-          })
-          return
-        }
-
+        // const status = botStatus();
+        // if (status) {
+        //     webView.postMessage({
+        //         type: 'qq.error',
+        //         data: '已经在运行中'
+        //     });
+        //     return;
+        // }
         const qqBot = data.data
         saveConfig({
           qq: qqBot.qq ?? '',
@@ -104,10 +118,14 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
           ffmpeg_path: qqBot.ffmpeg_path || '',
           ffprobe_path: qqBot.ffprobe_path || ''
         })
-
         startServer()
-
-        botRun(['--login', 'qq'])
+        botRun(['--login', 'qq']).then(childProcess => {
+          childProcess.send({
+            type: 'process.webview.open',
+            data: true
+          })
+          webview = webView
+        })
 
         break
       }
@@ -186,67 +204,59 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
       }
       // 扫码完成
       case 'qq.login.qrcode.scaned': {
-        const res = await global.client.queryQrcodeResult()
-        // 成功
-        if (res.retcode === 0) {
-          console.info('\n扫码成功,开始登录...\n')
-          global.client.qrcodeLogin()
-        } else {
-          webView.postMessage({
-            type: 'qq.error',
-            data: '状态码：' + res.retcode
-          })
-        }
+        botState?.child?.send({
+          type: 'qq.login.qrcode.scaned',
+          data: true
+        })
         break
       }
       // 接收ticket
       case 'qq.login.ticket': {
-        global.inputTicket = true
-        await global.client.submitSlider(data.data?.trim())
+        botState?.child?.send({
+          type: 'inputTicket',
+          data: true
+        })
+        botState?.child?.send({
+          type: 'qq.login.ticket',
+          data: data.data?.trim()
+        })
         break
       }
       // 设备锁验证选项
       case 'qq.device.validate.choice': {
-        if (data.data?.choice == 0) {
-          await global.client.login()
-        } else if (data.data?.choice == 1) {
-          // 发送短信验证码
-          await global.client.sendSmsCode()
-          console.info(`验证码已发送：${data.data.phone}\n`)
-          webView.postMessage({
-            type: 'qq.smscode.send',
-            data: data.data?.phone
-          })
-        }
+        botState?.child?.send({
+          type: 'qq.login.ticket',
+          data: data.data
+        })
         break
       }
       // 收到验证码
       case 'qq.smscode': {
-        await global.client.submitSmsCode(data.data)
-        webView.postMessage({
-          type: 'qq.smscode.received',
-          data: 'ok'
+        botState?.child?.send({
+          type: 'qq.login.ticket',
+          data: data.data
         })
         break
       }
       // 登出
       case 'qq.offline': {
-        global.qqDesktopStatus = false
-        global.webviewAPI.postMessage({
+        botState?.child?.send({
+          type: 'process.webview.close',
+          data: true
+        })
+        webView.postMessage({
           type: 'qq.system.offline',
           data: '[ @AlemonJS/QQ 下线]'
         })
-        // unMount('@alemonjs/qq')
-        // process.exit()
-
         botClose()
-
         break
       }
       // 恢复普通模块加载方式
       case 'qq.desktop.unmount': {
-        global.qqDesktopStatus = false
-        global.webviewAPI = undefined
+        botState?.child?.send({
+          type: 'process.webview.close',
+          data: true
+        })
         console.info('qqDesktopState = false')
         // ticket拦截服务
         stopServer()
@@ -254,7 +264,6 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
       }
       // 退出进程
       case 'qq.process.exit': {
-        // process.exit()
         botClose()
         break
       }
@@ -270,4 +279,4 @@ async function onMessage(data: { type: string; data: any }, webView, context) {
   }
 }
 
-export { activate }
+export { activate, webview }

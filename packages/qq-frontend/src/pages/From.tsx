@@ -17,7 +17,7 @@ export default function From() {
     qq: '',
     password: '',
     device: '2',
-    sign_api_addr: 'https://qsign-guide.trpgbot.com/?key=0852369',
+    sign_api_addr: '',
     ver: '9.0.90',
     master_key: '',
     log_level: 'info',
@@ -52,6 +52,7 @@ export default function From() {
   }
   const [modal, setModal] = useState(defaultModel)
   const [botOnline, setBotline] = useState(false)
+  const [botRunning, setBotRunning] = useState(false)
 
   const frameRef = useRef(null)
   const buttonRef = useRef(null)
@@ -81,12 +82,19 @@ export default function From() {
   })
 
   // 登录
-  const handleLoginQQ = (e: React.FormEvent<HTMLButtonElement>) => {
-    if (botOnline) {
+  const handleLoginQQ = (
+    e: React.FormEvent<HTMLButtonElement>,
+    wait: {
+      enable: boolean
+      cd: number
+    }
+  ) => {
+    if (botRunning) {
       window.API.postMessage({
         type: 'qq.offline',
         data: true
       })
+      wait.enable && (buttonRef.current as any).clearInterval()
     } else {
       window.API.postMessage({
         type: 'qq.login',
@@ -176,6 +184,11 @@ export default function From() {
         // 监听是否在线
         case 'qq.online': {
           setBotline(db)
+          break
+        }
+        // 监听运行
+        case 'qq.running': {
+          setBotRunning(db)
           break
         }
         // 显示二维码
@@ -360,6 +373,15 @@ export default function From() {
             open: true
           })
           modalConfirm.current = () => {
+            setBotRunning(false)
+            setModal({
+              ...defaultModel,
+              title: `已推出进程！`,
+              type: 'text',
+              desc: db,
+              confirm_text: '',
+              open: true
+            })
             window.API.postMessage({
               type: 'qq.process.exit',
               data: ''
@@ -430,6 +452,15 @@ export default function From() {
             open: true
           })
           modalConfirm.current = () => {
+            setBotRunning(false)
+            setModal({
+              ...defaultModel,
+              title: `@AlemonJS/QQ 下线！`,
+              type: 'text',
+              confirm_text: '',
+              desc: db,
+              open: true
+            })
             window.API.postMessage({
               type: 'qq.process.exit',
               data: ''
@@ -689,16 +720,16 @@ export default function From() {
         </div>
 
         <DivButton
-          cd={20}
+          cd={10}
           ref={buttonRef}
-          disabledOnWait={true}
+          style={botOnline ? { backgroundColor: 'red' } : {}}
           onClick={handleLoginQQ}
           onChildren={(open, cd) => (
             <>
               {open ? (
-                <span className="animate-pulse">{cd} years later</span>
-              ) : botOnline ? (
-                '点击下线'
+                <span className="animate-pulse">尝试启动中 {cd} </span>
+              ) : botRunning ? (
+                `${botOnline ? '已在线' : '运行中'}，点击停止`
               ) : (
                 '登录'
               )}
