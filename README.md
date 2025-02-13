@@ -4,13 +4,11 @@
 
 ```ts
 import { Text, useSend } from 'alemonjs'
-export default OnResponse((event, next) => {
+export default OnResponse(event => {
   // 创建API
   const Send = useSend(event)
   // 执行
   Send(Text('hello'))
-  // 下一个
-  next()
   // 事件类型
 }, 'message.create')
 ```
@@ -19,19 +17,17 @@ export default OnResponse((event, next) => {
 
 > QQ Group 806943302
 
-| Project                    | Status                              | Description    |
-| -------------------------- | ----------------------------------- | -------------- |
-| 👉[alemonjs]               | [![a-s]][a-p]                       | 核心库         |
-| 👉[@alemonjs/gui]          | [![gui-s]][gui-p]                   | gui            |
-| 👉[@alemonjs/qq-bot]       | [![qq-bot-s]][qq-bot-p]             | QQ webhook     |
-| 👉[@alemonjs/qq-group-bot] | [![qq-group-bot-s]][qq-group-bot-p] | QQ group       |
-| 👉[@alemonjs/qq-guild-bot] | [![qq-guild-bot-s]][qq-guild-bot-p] | QQ guild       |
-| 👉[@alemonjs/qq]           | [![qq-s]][qq-p]                     | QQ 连接        |
-| 👉[@alemonjs/discord]      | [![discord-s]][discord-p]           | DC 公会        |
-| 👉[@alemonjs/kook]         | [![kook-s]][kook-p]                 | KOOK           |
-| 👉[@alemonjs/telegram]     | [![telegram-s]][telegram-p]         | telegram       |
-| 👉[@alemonjs/onebot]       | [![onebot-s]][onebot-p]             | onebot V11&V12 |
-| 👉[@alemonjs/wechat]       | [![wechat-s]][wechat-p]             | 微信           |
+| Project                | Status                      | Description    |
+| ---------------------- | --------------------------- | -------------- |
+| 👉[alemonjs]           | [![a-s]][a-p]               | 核心库         |
+| 👉[@alemonjs/gui]      | [![gui-s]][gui-p]           | test gui       |
+| 👉[@alemonjs/qq-bot]   | [![qq-bot-s]][qq-bot-p]     | QQbot          |
+| 👉[@alemonjs/qq]       | [![qq-s]][qq-p]             | icqq           |
+| 👉[@alemonjs/discord]  | [![discord-s]][discord-p]   | discord        |
+| 👉[@alemonjs/kook]     | [![kook-s]][kook-p]         | KOOK           |
+| 👉[@alemonjs/telegram] | [![telegram-s]][telegram-p] | telegram       |
+| 👉[@alemonjs/onebot]   | [![onebot-s]][onebot-p]     | onebot V11&V12 |
+| 👉[@alemonjs/wechat]   | [![wechat-s]][wechat-p]     | 微信           |
 
 [alemonjs]: https://github.com/lemonade-lab/alemonjs
 [a-s]: https://img.shields.io/npm/v/alemonjs.svg
@@ -42,12 +38,6 @@ export default OnResponse((event, next) => {
 [@alemonjs/qq-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-bot
 [qq-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-bot.svg
 [qq-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-bot
-[@alemonjs/qq-group-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-group-bot
-[qq-group-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-group-bot.svg
-[qq-group-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-group-bot
-[@alemonjs/qq-guild-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-guild-bot
-[qq-guild-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-guild-bot.svg
-[qq-guild-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-guild-bot
 [@alemonjs/discord]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/discord
 [discord-s]: https://img.shields.io/npm/v/@alemonjs/discord.svg
 [discord-p]: https://www.npmjs.com/package/@alemonjs/discord

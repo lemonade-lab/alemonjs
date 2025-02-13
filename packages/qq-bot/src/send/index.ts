@@ -1,8 +1,11 @@
+import { readFileSync } from 'fs'
 import { QQBotAPI } from '../sdk/api'
+import { type DataEnums } from 'alemonjs'
+import axios from 'axios'
 
 type Client = typeof QQBotAPI.prototype
 
-export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val) => {
+export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
     .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
     .map(item => {
@@ -38,14 +41,31 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val) => {
       )
     )
   }
-  const images = val.filter(item => item.type == 'Image').map(item => item.value)
+  const images = val.filter(
+    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+  )
   if (images) {
     return Promise.all(
-      images.map(async msg => {
+      images.map(async item => {
+        if (item.type == 'ImageURL') {
+          return client.groupOpenMessages(event.GuildId, {
+            content: '',
+            media: {
+              file_info: item.value
+            },
+            msg_id: event.MessageId,
+            msg_type: 7,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        const file_data =
+          item.type == 'ImageFile'
+            ? readFileSync(item.value, 'base64')
+            : item.value.toString('base64')
         const file_info = await client
           .postRichMediaByGroup(event.GuildId, {
             file_type: 1,
-            file_data: msg.toString('base64')
+            file_data: file_data
           })
           .then(res => res?.file_info)
         if (!file_info) return Promise.resolve(null)
@@ -64,7 +84,7 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val) => {
   return []
 }
 
-export const C2C_MESSAGE_CREATE = (client: Client, event, val) => {
+export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
     .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
     .map(item => {
@@ -86,14 +106,31 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val) => {
       )
     )
   }
-  const images = val.filter(item => item.type == 'Image').map(item => item.value)
+  const images = val.filter(
+    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+  )
   if (images) {
     return Promise.all(
-      images.map(async msg => {
+      images.map(async item => {
+        if (item.type == 'ImageURL') {
+          return client.usersOpenMessages(event.OpenId, {
+            content: '',
+            media: {
+              file_info: item.value
+            },
+            msg_id: event.MessageId,
+            msg_type: 7,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        const file_data =
+          item.type == 'ImageFile'
+            ? readFileSync(item.value, 'base64')
+            : item.value.toString('base64')
         const file_info = await client
           .postRichMediaByUsers(event.OpenId, {
             file_type: 1,
-            file_data: msg.toString('base64')
+            file_data: file_data
           })
           .then(res => res?.file_info)
         if (!file_info) return Promise.resolve(null)
@@ -119,7 +156,7 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val) => {
  * @param val
  * @returns
  */
-export const DIRECT_MESSAGE_CREATE = (client: Client, event, val) => {
+export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
     .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
     .map(item => {
@@ -139,21 +176,36 @@ export const DIRECT_MESSAGE_CREATE = (client: Client, event, val) => {
       )
     )
   }
-  const images = val.filter(item => item.type == 'Image').map(item => item.value)
+  const images = val.filter(
+    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+  )
   if (images) {
     return Promise.all(
-      images.map(item =>
-        client.postDirectImage(event.OpenId, {
+      images.map(async item => {
+        if (item.value == 'ImageURL') {
+          // 请求得到buffer
+          const data = await axios
+            .get(item.value, {
+              responseType: 'arraybuffer'
+            })
+            .then(res => res.data)
+          return client.postDirectImage(event.OpenId, {
+            msg_id: event.MessageId,
+            image: data
+          })
+        }
+        const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
+        return client.postDirectImage(event.OpenId, {
           msg_id: event.MessageId,
-          image: item
+          image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
         })
-      )
+      })
     )
   }
   return []
 }
 
-export const AT_MESSAGE_CREATE = (client: Client, event, val) => {
+export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
     .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
     .map(item => {
@@ -189,15 +241,30 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val) => {
       )
     )
   }
-  const images = val.filter(item => item.type == 'Image').map(item => item.value)
+  const images = val.filter(
+    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+  )
   if (images) {
     return Promise.all(
-      images.map(item =>
-        client.postImage(event.ChannelId, {
+      images.map(async item => {
+        if (item.value == 'ImageURL') {
+          // 请求得到buffer
+          const data = await axios
+            .get(item.value, {
+              responseType: 'arraybuffer'
+            })
+            .then(res => res.data)
+          return client.postImage(event.ChannelId, {
+            msg_id: event.MessageId,
+            image: data
+          })
+        }
+        const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
+        return client.postImage(event.ChannelId, {
           msg_id: event.MessageId,
-          image: item
+          image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
         })
-      )
+      })
     )
   }
   return []
@@ -209,7 +276,7 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val) => {
  * @param val
  * @returns
  */
-export const MESSAGE_CREATE = (client: Client, event, val) => {
+export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
     .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
     .map(item => {
@@ -245,15 +312,30 @@ export const MESSAGE_CREATE = (client: Client, event, val) => {
       )
     )
   }
-  const images = val.filter(item => item.type == 'Image').map(item => item.value)
+  const images = val.filter(
+    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+  )
   if (images) {
     return Promise.all(
-      images.map(item =>
-        client.postImage(event.ChannelId, {
+      images.map(async item => {
+        if (item.value == 'ImageURL') {
+          // 请求得到buffer
+          const data = await axios
+            .get(item.value, {
+              responseType: 'arraybuffer'
+            })
+            .then(res => res.data)
+          return client.postImage(event.ChannelId, {
+            msg_id: event.MessageId,
+            image: data
+          })
+        }
+        const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
+        return client.postImage(event.ChannelId, {
           msg_id: event.MessageId,
-          image: item
+          image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
         })
-      )
+      })
     )
   }
   return []
