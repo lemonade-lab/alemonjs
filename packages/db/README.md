@@ -21,3 +21,37 @@ mysql:
   password: 'Mm002580!'
   database: 'alemonjs'
 ```
+
+- use
+
+```ts
+import { getIoRedis, getSequelize } from '@alemonjs/db'
+// redis
+export const Redis = getIoRedis()
+// seuqlieze mysql
+export const sequelize = getSequelize()
+```
+
+- docker
+
+```sh
+cd node_modules/@alemonjs/db
+```
+
+start
+
+```sh
+docker-compose up -d
+```
+
+list
+
+```sh
+docker-compose ps
+```
+
+stop
+
+```sh
+docker-compose down
+```
