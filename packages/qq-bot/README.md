@@ -1,5 +1,9 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
+[平台 https://q.qq.com/#/](https://q.qq.com/#/)
+
+[文档 https://bot.q.qq.com/wiki/](https://bot.q.qq.com/wiki/)
+
 ## USE
 
 - qq-bot

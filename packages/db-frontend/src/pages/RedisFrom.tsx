@@ -10,13 +10,11 @@ export default function RedisFrom() {
 
   useEffect(() => {
     if (!window.createDesktopAPI) return
-    const API = window.createDesktopAPI()
-    window.API = API
     // 获取消息
-    API.postMessage({
+    window.API.postMessage({
       type: 'redis.init'
     })
-    API.onMessage(data => {
+    window.API.onMessage(data => {
       console.log('收到消息:', data)
       if (data.type === 'redis.init') {
         setFormData({
@@ -67,17 +65,7 @@ export default function RedisFrom() {
         <label htmlFor="port" className="block text-sm font-medium text-gray-700">
           Port
         </label>
-        <input
-          type="number"
-          id="port"
-          name="port"
-          placeholder="6379"
-          required
-          min="1"
-          value={formData.port}
-          onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-        />
+        <input className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500" />
       </div>
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">

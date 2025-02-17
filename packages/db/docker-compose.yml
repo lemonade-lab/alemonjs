@@ -3,6 +3,8 @@ services:
     image: mysql:8.0
     container_name: mysql-container
     environment:
+      # 密码 Mm002580!
+      # 用户 root
       MYSQL_ROOT_PASSWORD: 'Mm002580!'
       MYSQL_ROOT_HOST: '%'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'

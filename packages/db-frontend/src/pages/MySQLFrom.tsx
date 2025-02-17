@@ -10,14 +10,12 @@ export default function MySQLForm() {
 
   useEffect(() => {
     if (!window.createDesktopAPI) return
-    const API = window.createDesktopAPI()
-    window.API = API
 
     // 获取消息
-    API.postMessage({
+    window.API.postMessage({
       type: 'mysql.init'
     })
-    API.onMessage(data => {
+    window.API.onMessage(data => {
       console.log('收到消息:', data)
       if (data.type === 'mysql.init') {
         setFormData({

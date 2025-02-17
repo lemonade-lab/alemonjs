@@ -1,5 +1,21 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
+[文档 https://core.telegram.org/bots ](https://core.telegram.org/bots)
+
+## 创建机器人
+
+[访问 https://core.telegram.org/bots/tutorial#obtain-your-bot-token](https://core.telegram.org/bots/tutorial#obtain-your-bot-token)
+
+点击添加`@BotFather`并发送`/newbot`,并继续发送 `NameXBot` 得以生产 `token`
+
+```yaml
+79179797979:AAAAAAAAAAAAAABBBBBBCCCCCCCCCC
+```
+
+- NameXdBot 即自定义的bot名
+
+[访问 https://web.telegram.org/k/#@NameXdBot 以添加](https://web.telegram.org/k/#@NameXdBot)
+
 ## USE
 
 - telegram

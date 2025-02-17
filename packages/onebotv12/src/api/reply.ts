@@ -118,10 +118,10 @@ export async function replyController(msg, guild_id) {
   const content = Array.isArray(msg)
     ? msg.join('')
     : typeof msg === 'string'
-    ? msg
-    : typeof msg === 'number'
-    ? `${msg}`
-    : ''
+      ? msg
+      : typeof msg === 'number'
+        ? `${msg}`
+        : ''
   if (content == '') return false
   /**
    * http

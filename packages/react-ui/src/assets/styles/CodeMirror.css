@@ -1,0 +1,28 @@
+.CodeMirror {
+  height: 100%;
+  width: 100%;
+  flex: 1 1 0%;
+  background-color: var(--alemonjs-primary-bg);
+  color: var(--alemonjs-primary-text);
+}
+
+.CodeMirror-gutters {
+  background-color: var(--alemonjs-secondary-bg);
+  border: var(--alemonjs-secondary-border);
+  color: var(--alemonjs-secondary-text);
+}
+
+.cm-s-solarized.CodeMirror {
+  box-shadow: none;
+}
+
+html[class='dark'] .CodeMirror-gutters {
+  background-color: var(--alemonjs-dark-secondary-bg);
+  color: var(--alemonjs-dark-secondary-text);
+  border: var(--alemonjs-dark-secondary-border);
+}
+
+html[class='dark'] .CodeMirror {
+  background-color: var(--alemonjs-dark-primary-bg);
+  color: var(--alemonjs-dark-primary-text);
+}
