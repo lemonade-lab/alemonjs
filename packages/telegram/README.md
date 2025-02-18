@@ -12,7 +12,7 @@
 79179797979:AAAAAAAAAAAAAABBBBBBCCCCCCCCCC
 ```
 
-- NameXdBot 即自定义的bot名
+- NameXdBot 即自定义的 bot 名
 
 [访问 https://web.telegram.org/k/#@NameXdBot 以添加](https://web.telegram.org/k/#@NameXdBot)
 
