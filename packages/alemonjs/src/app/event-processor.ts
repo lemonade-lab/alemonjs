@@ -4,8 +4,8 @@ import { expendCycle } from './event-processor-cycle'
 const eventStore = new Map()
 const userStore = new Map()
 
-const EVENT_INTERVAL = Number(process.env?.ALEMONJS_EVENT_INTERVAL ?? 0) || 1000
-const USER_INTERVAL = Number(process.env?.ALEMONJS_USER_INTERVAL ?? 0) || 500
+const EVENT_INTERVAL = Number(process.env?.ALEMONJS_EVENT_INTERVAL ?? 0) || 30000
+const USER_INTERVAL = Number(process.env?.ALEMONJS_USER_INTERVAL ?? 0) || 3000
 
 /**
  * 清理旧消息

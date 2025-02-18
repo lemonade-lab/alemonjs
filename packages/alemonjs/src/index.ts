@@ -1,3 +1,4 @@
+import './env.js'
 import './global.js'
 import { join } from 'path'
 import { existsSync, readFileSync } from 'fs'
