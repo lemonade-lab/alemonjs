@@ -1,9 +1,9 @@
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
-import { getDirFiles } from './event-files'
 import { DefineChildrenValue } from '../global.js'
 import { unMount } from './hook-use-api.js'
-import { ErrorModule } from './local.utils.js'
+import { ErrorModule } from './utils.js'
+import { getRecursiveDirFiles } from './utils.js'
 
 /**
  * 加载文件
@@ -11,7 +11,7 @@ import { ErrorModule } from './local.utils.js'
  */
 const loadChildrenFiles = async (mainDir: string) => {
   const appsDir = join(mainDir, 'apps')
-  const appsFiles = getDirFiles(appsDir)
+  const appsFiles = getRecursiveDirFiles(appsDir)
   for (const file of appsFiles) {
     global.storeResponse.push({
       source: mainDir,
@@ -21,7 +21,9 @@ const loadChildrenFiles = async (mainDir: string) => {
     })
   }
   const mwDir = join(mainDir, 'middleware')
-  const mwFiles = getDirFiles(mwDir, item => /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name))
+  const mwFiles = getRecursiveDirFiles(mwDir, item =>
+    /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name)
+  )
   for (const file of mwFiles) {
     global.storeMiddleware.push({
       source: mainDir,
@@ -38,6 +40,10 @@ const loadChildrenFiles = async (mainDir: string) => {
  * @param mainPath
  */
 export const loadModule = async (mainPath: string) => {
+  if (!mainPath || typeof mainPath !== 'string') {
+    logger.error('The module path is not correct')
+    return
+  }
   const mainDir = dirname(mainPath)
   try {
     const moduleApp: {
@@ -59,11 +65,16 @@ export const loadModule = async (mainPath: string) => {
           await app?.onMounted()
         }
       })
-      .catch(async () => {
+      .catch(async e => {
         unMount(mainDir)
         if (typeof app?.unMounted == 'function') {
-          await app?.unMounted()
+          try {
+            await app?.unMounted()
+          } catch (e) {
+            ErrorModule(e)
+          }
         }
+        ErrorModule(e)
       })
   } catch (e) {
     ErrorModule(e)
@@ -75,6 +86,10 @@ export const loadModule = async (mainPath: string) => {
  * @param app
  */
 export const moduleChildrenFiles = async (name: string) => {
+  if (typeof name !== 'string') {
+    logger.error('The module name is not correct')
+    return
+  }
   const dir = join(process.cwd(), 'node_modules', name)
   const pkgPath = join(dir, 'package.json')
   if (!existsSync(pkgPath)) return

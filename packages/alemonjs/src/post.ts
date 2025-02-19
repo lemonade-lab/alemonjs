@@ -3,7 +3,6 @@
  */
 export * from './app/event-bot'
 export * from './app/event-chidren'
-export * from './app/event-files'
 export * from './app/event-middleware'
 export * from './app/event-processor'
 export * from './app/event-utlis'

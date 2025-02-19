@@ -4,12 +4,16 @@ import { existsSync, readFileSync } from 'fs'
 import { getConfig } from './config'
 import { loadModule, moduleChildrenFiles } from './app/load.js'
 import { DefineBotValue } from './global.js'
-import { ErrorModule } from './app/local.utils.js'
+import { ErrorModule } from './app/utils.js'
 
 /**
  * @param input
  */
 export const start = async (input: string = 'lib/index.js', platform = '@alemonjs/gui') => {
+  // 参数类型检查
+  if (typeof input != 'string' || typeof platform != 'string') {
+    throw new Error('The input and platform must be string')
+  }
   const cfg = getConfig()
   if (typeof cfg.argv?.login == 'boolean') return
   // 参数 优先

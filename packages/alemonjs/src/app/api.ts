@@ -21,7 +21,6 @@ export const createSendDataFormat = (...data: DataEnums[]): DataEnums[] => {
  */
 const handleError = (context: string, error: Error) => {
   logger.error(`Failed to send message to ${context}:`, error)
-  throw new Error(`Failed to send message to ${context}`)
 }
 
 /**
@@ -39,6 +38,8 @@ export const sendToChannel = async (channel_id: string, data: DataEnums[]) => {
     return await global.alemonjs.api.active.send.channel(channel_id, data)
   } catch (error) {
     handleError('channel', error)
+    // 弹出错误
+    throw error
   }
 }
 
@@ -57,5 +58,7 @@ export const sendToUser = async (user_id: string, data: DataEnums[]) => {
     return await global.alemonjs.api.active.send.user(user_id, data)
   } catch (error) {
     handleError('user', error)
+    // 弹出错误
+    throw error
   }
 }

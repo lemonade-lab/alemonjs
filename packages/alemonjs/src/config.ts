@@ -45,8 +45,8 @@ export class ConfigCore {
       // 尝试读取执行参数
       return this.#value
     }
-    const data = readFileSync(dir, 'utf-8')
     try {
+      const data = readFileSync(dir, 'utf-8')
       const d = parse(data)
       this.#value = d
     } catch (err) {
@@ -56,8 +56,8 @@ export class ConfigCore {
     // 存在配置文件 , 开始监听文件
     watch(dir, () => {
       logger.info('config update', dir)
-      const data = readFileSync(dir, 'utf-8')
       try {
+        const data = readFileSync(dir, 'utf-8')
         const d = parse(data)
         this.#value = d
       } catch (err) {

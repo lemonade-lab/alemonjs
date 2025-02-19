@@ -10,9 +10,11 @@ export const useMention = async (event: { [key: string]: any }) => {
     throw new Error('Invalid event: event must be an object')
   }
   try {
-    await global.alemonjs.api.use.mention(event)
+    return await global.alemonjs.api.use.mention(event)
   } catch (e) {
     logger.error('Failed to mention:', e)
+    // 弹出错误
+    throw e
   }
 }
 
@@ -31,9 +33,11 @@ export const useSend = (event: { [key: string]: any }) => {
       throw new Error('Invalid data: data cannot be empty')
     }
     try {
-      await global.alemonjs.api.use.send(event, val)
+      return await global.alemonjs.api.use.send(event, val)
     } catch (e) {
       logger.error('Failed to send message:', e)
+      // 弹出错误
+      throw e
     }
   }
 }

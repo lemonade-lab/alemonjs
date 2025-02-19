@@ -10,7 +10,7 @@ import { isAsyncFunction } from 'util/types'
 import { OnResponseValue } from '../typing/event'
 import { Next } from '../global'
 import { useState } from './hook-use-state'
-import { ErrorModule } from './local.utils'
+import { ErrorModule } from './utils'
 
 /**
  * 消息体处理机制

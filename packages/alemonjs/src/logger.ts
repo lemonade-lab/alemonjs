@@ -2,6 +2,18 @@ import { Logger } from './typing/logger/index'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 
+export const createInitLogger = (): Logger => {
+  return {
+    trace: console.trace,
+    debug: console.debug,
+    info: console.info,
+    mark: console.info,
+    warn: console.warn,
+    error: console.error,
+    fatal: console.error
+  }
+}
+
 /**
  * 创建日志
  * @returns {Logger}

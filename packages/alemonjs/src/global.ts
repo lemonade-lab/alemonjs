@@ -10,7 +10,7 @@ import {
 } from './typing/store/res'
 import { Subscribe } from './typing/subscribe'
 import { Events } from './typing/event/map'
-import { createLogger } from './logger'
+import { createInitLogger, createLogger } from './logger'
 
 const events: (keyof Events)[] = [
   'message.create',
@@ -117,7 +117,13 @@ declare global {
  * 不存在时创建
  */
 if (!global.logger) {
-  global.logger = createLogger()
+  try {
+    global.logger = createLogger()
+  } catch (e) {
+    console.error(e)
+    // 扩展 fatal, mark
+    global.logger = createInitLogger()
+  }
 }
 
 /**

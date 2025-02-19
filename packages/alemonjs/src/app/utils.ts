@@ -1,6 +1,8 @@
 import crypto from 'crypto'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { readdirSync, Dirent, existsSync } from 'fs'
+import { join } from 'path'
 
 /**
  * 将字符串转为定长字符串
@@ -57,4 +59,60 @@ export const stringToNumber = (str: string, size = 33) => {
    *整数。由于我们希望结果始终为正，因此转换
    *通过执行无符号位移，将带符号的int转换为无符号*/
   return hash >>> 0
+}
+
+/**
+ * 递归获取所有文件
+ * @param dir
+ * @param condition
+ * @returns
+ */
+export const getRecursiveDirFiles = (
+  dir: string,
+  condition: (func: Dirent) => boolean = item => /^res(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name)
+): {
+  path: string
+  name: string
+}[] => {
+  //
+  let results: {
+    path: string
+    name: string
+  }[] = []
+  if (!existsSync(dir)) return results
+  const list = readdirSync(dir, { withFileTypes: true })
+  list.forEach(item => {
+    const fullPath = join(dir, item.name)
+    if (item.isDirectory()) {
+      results = results.concat(getRecursiveDirFiles(fullPath, condition))
+    } else if (item.isFile() && condition(item)) {
+      results.push({
+        path: fullPath,
+        name: item.name
+      })
+    }
+  })
+  return results
+}
+
+/**
+ * 解析错误并提示缺失的模块
+ * @param e
+ * @returns
+ */
+export const ErrorModule = (e: Error) => {
+  if (!e) return
+  const moduleNotFoundRegex = /Cannot find (module|package)/
+  if (moduleNotFoundRegex.test(e?.message)) {
+    logger.error(e.message)
+    const match = e.stack?.match(/'(.+?)'/)
+    if (match) {
+      const pack = match[1]
+      logger.error(`缺少模块或依赖 ${pack} 请安装`)
+    } else {
+      logger.mark('无法提取缺失的信息，请检查')
+    }
+  } else {
+    logger.error(e?.message)
+  }
 }
