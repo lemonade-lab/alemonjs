@@ -1,4 +1,3 @@
-import './env.js'
 import './global.js'
 import { join } from 'path'
 import { existsSync, readFileSync } from 'fs'
@@ -12,17 +11,17 @@ import { ErrorModule } from './app/local.utils.js'
  */
 export const start = async (input: string = 'lib/index.js', platform = '@alemonjs/gui') => {
   const cfg = getConfig()
-  const login = cfg.argv?.login
-  if (typeof login == 'boolean') return
-  // 默认值
-  if (typeof login != 'undefined') {
-    platform = `@alemonjs/${login}`
+  if (typeof cfg.argv?.login == 'boolean') return
+  // 参数 优先
+  if (typeof cfg.argv?.login != 'undefined') {
+    platform = `@alemonjs/${cfg.argv?.login}`
   } else {
+    // 记录 login
     cfg.argv.login == platform.replace(/^(@alemonjs\/|alemonjs-)/, '')
   }
+  // 参数 优先
   if (typeof cfg.argv?.platform == 'string') {
-    platform = cfg.argv?.platform
-    cfg.argv.login = platform.replace(/^(@alemonjs\/|alemonjs-)/, '')
+    cfg.argv.login = cfg.argv?.platform.replace(/^(@alemonjs\/|alemonjs-)/, '')
   }
   // module
   if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
@@ -62,8 +61,9 @@ export const start = async (input: string = 'lib/index.js', platform = '@alemonj
     }
     // 挂在全局
     global.alemonjs = bot?.default.callback()
+    const login = typeof cfg.argv?.login == 'string' ? cfg.argv?.login : ''
     // 新增环境变量
-    process.env.platform = global.alemonjs.platform
+    process.env.platform = global.alemonjs?.platform ?? login
   } catch (e) {
     ErrorModule(e)
   }

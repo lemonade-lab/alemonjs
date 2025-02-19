@@ -1,11 +1,31 @@
 import { Events } from '../typing/event/map'
 import { expendCycle } from './event-processor-cycle'
+import { createHash } from './utils'
 
 const eventStore = new Map()
 const userStore = new Map()
 
-const EVENT_INTERVAL = Number(process.env?.ALEMONJS_EVENT_INTERVAL ?? 0) || 30000
-const USER_INTERVAL = Number(process.env?.ALEMONJS_USER_INTERVAL ?? 0) || 3000
+// 60s
+const EVENT_INTERVAL = Number(process.env?.ALEMONJS_EVENT_INTERVAL ?? 0) || 1000 * 60
+// 2s
+const USER_INTERVAL = Number(process.env?.ALEMONJS_USER_INTERVAL ?? 0) || 1000 * 2
+
+/**
+ * @param param0
+ * @param MessageId
+ * @returns
+ */
+const filter = ({ Now, store, INTERVAL }, MessageId: string) => {
+  if (store.has(MessageId)) {
+    const time = store.get(MessageId)
+    if (Now - time < INTERVAL) {
+      // 1s内重复消息
+      store.set(MessageId, Date.now())
+      return true
+    }
+  }
+  store.set(MessageId, Date.now())
+}
 
 /**
  * 清理旧消息
@@ -20,42 +40,73 @@ const cleanupStore = ({ Now, store, INTERVAL }) => {
   }
 }
 
-const filter = ({ Now, store, INTERVAL }, MessageId: string) => {
-  if (store.has(MessageId)) {
-    const time = store.get(MessageId)
-    if (Now - time < INTERVAL) {
-      // 1s内重复消息
-      store.set(MessageId, Date.now())
-      return true
+const cleanupStoreAll = () => {
+  const Now = Date.now()
+  cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: eventStore })
+  cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: userStore })
+}
+
+const MIN_TIME = 3000
+const MAX_TIME = 10000
+const CONTROL_SIZE = 37
+
+const callback = () => {
+  cleanupStoreAll()
+  // 下一次清理的时间，应该随着长度的增加而减少
+  const length = eventStore.size + userStore.size
+  // 长度控制在37个以内
+  const time = length > CONTROL_SIZE ? MIN_TIME : MAX_TIME
+  setTimeout(callback, time)
+}
+
+setTimeout(callback, MIN_TIME)
+
+/**
+ * 消息处理器
+ * @param name
+ * @param event
+ * @param data
+ * @returns
+ */
+export const onProcessor = <T extends keyof Events>(name: T, event: Events[T], data?: any) => {
+  const Now = Date.now()
+  if (event['MessageId']) {
+    // 消息过长，要减少消息的长度
+    const MessageId = createHash(event['MessageId'])
+    // 重复消息
+    if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: eventStore }, MessageId)) {
+      return
     }
   }
-  store.set(MessageId, Date.now())
-  // 清理旧消息
-  cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: eventStore })
+  if (event['UserId']) {
+    // 编号过长，要减少编号的长度
+    const UserId = createHash(event['UserId'])
+    // 频繁操作
+    if (filter({ Now, INTERVAL: USER_INTERVAL, store: userStore }, UserId)) {
+      return
+    }
+  }
+  if (data) {
+    // 当访问value的时候获取原始的data
+    Object.defineProperty(event, 'value', {
+      get() {
+        return data
+      }
+    })
+  }
+  event['name'] = name
+  expendCycle(event, name)
+  return
 }
 
 /**
  * 消息处理器
  * @param event
  * @param name
+ * @deprecated 该方法已被弃用，请使用 onProcessor() 替代。
  * @returns
  */
 export const OnProcessor = <T extends keyof Events>(event: Events[T], name: T) => {
-  // 不再消息匹配
-  event['name'] = name
-  const Now = Date.now()
-  // 同一个消息。1s内不再处理
-  if (event['MessageId']) {
-    if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: eventStore }, event.MessageId)) {
-      return
-    }
-  }
-  // 用一个用户。0.5s内不再处理
-  if (event['UserId']) {
-    if (filter({ Now, INTERVAL: USER_INTERVAL, store: userStore }, event['UserId'])) {
-      return
-    }
-  }
-  expendCycle(event, name)
+  onProcessor(name, event)
   return
 }

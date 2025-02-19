@@ -101,7 +101,7 @@ export class ConfigCore {
    */
   get package(): null | Package {
     if (this.#package) return this.#package
-    const dir = process.env.PKG_DIR || join(process.cwd(), 'package.json')
+    const dir = process.env.PKG_PATH || join(process.cwd(), 'package.json')
     if (!existsSync(dir)) {
       logger.warn('package.json not found')
       return null

@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.90",
+  "version": "2.0.0-rc.91",
   "description": "alemonjs bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -21,10 +21,8 @@
     }
   },
   "dependencies": {
-    "dotenv": "^16.4.7",
     "chalk": "^5.3.0",
     "log4js": "^6.9.1",
-    "logger": "^0.0.1",
     "yaml": "^2.5.1"
   },
   "keywords": [
