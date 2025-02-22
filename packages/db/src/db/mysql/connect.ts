@@ -8,15 +8,16 @@ export const getSequelize = () => {
   const dir = join(process.cwd(), 'logs', 'mysql')
   mkdirSync(dir, { recursive: true })
   const value = getConfigValue()
-  if (!value) {
-    throw new Error('config.json not found')
-  }
-  const mysql = value.mysql
-  if (!mysql) {
-    throw new Error('mysql is null')
+  if (!value) throw new Error('getConfigValue is null')
+  const config = {
+    host: value?.mysql?.host ?? '127.0.0.1',
+    port: value?.mysql?.port ?? 3306,
+    user: value?.mysql?.user ?? 'root',
+    password: value?.mysql?.password ?? 'Mm002580!',
+    database: value?.mysql?.database ?? 'alemonjs'
   }
   const sequelize = new Sequelize(
-    `mysql://${mysql.user}:${mysql.password}@${mysql.host}:${mysql.port}/${mysql.database}`,
+    `mysql://${config.user}:${config.password}@${config.host}:${config.port}/${config.database}`,
     {
       dialect: 'mysql',
       logging: logging

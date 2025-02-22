@@ -2,8 +2,18 @@
 
 提供 redis 和 sequelize mysql 连接
 
+```ts
+import { getIoRedis, getSequelize } from '@alemonjs/db'
+// redis
+export const Redis = getIoRedis()
+// seuqlieze mysql
+export const sequelize = getSequelize()
+```
+
+## 使用说明
+
 ```sh
-yarn add @alemonjs/db
+yarn add @alemonjs/db -W
 ```
 
 - alemon.config.yaml
@@ -12,7 +22,7 @@ yarn add @alemonjs/db
 redis:
   host: '127.0.0.1'
   port: '6379'
-  password: 'Mm002580'
+  password: ''
   db: '0'
 mysql:
   host: '127.0.0.1'
@@ -24,34 +34,54 @@ mysql:
 
 - use
 
-```ts
-import { getIoRedis, getSequelize } from '@alemonjs/db'
-// redis
-export const Redis = getIoRedis()
-// seuqlieze mysql
-export const sequelize = getSequelize()
+### docker
+
+- 添加国内镜像
+
+> Settings > Docker Engine
+
+```json
+{
+  "registry-mirrors": ["https://registry.cn-hangzhou.aliyuncs.com"]
+}
 ```
 
-- docker
+- 新增文件 docker-compose.yml
 
-```sh
-cd node_modules/@alemonjs/db
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      # 密码 Mm002580!
+      # 用户 root
+      MYSQL_ROOT_PASSWORD: 'Mm002580!'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - '3306:3306'
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/docker-dbinit.sql
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis-container
+    ports:
+      - '6379:6379'
 ```
 
-start
+- 新增文件 docker-dbinit.sql
+
+```sql
+-- 数据库名称：alemonjs
+CREATE DATABASE IF NOT EXISTS `alemonjs`
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_general_ci;
+```
+
+- 启动
 
 ```sh
 docker-compose up -d
-```
-
-list
-
-```sh
-docker-compose ps
-```
-
-stop
-
-```sh
-docker-compose down
 ```

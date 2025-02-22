@@ -13,12 +13,18 @@ import { getConfigValue } from 'alemonjs'
  */
 const createIoRedis = () => {
   const value = getConfigValue()
-  if (!value) throw new Error('value.redis is null')
+  if (!value) throw new Error('getConfigValue is null')
+  const config = {
+    host: value?.redis?.host ?? 'localhost',
+    port: value?.redis?.port ?? 6379,
+    password: value?.redis?.password ?? '',
+    db: value?.redis?.db ?? 0
+  }
   const aRedis = new redisClient({
-    host: value.redis.host ?? 'localhost',
-    port: value.redis.port ?? 6379,
-    password: value.redis.password ?? '',
-    db: value.redis.db ?? 0,
+    host: config.host,
+    port: config.port,
+    password: config.password,
+    db: config.db,
     maxRetriesPerRequest: null
   })
   return aRedis

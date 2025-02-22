@@ -1,3 +1,4 @@
+import { Button, Input } from '@alemonjs/react-ui'
 import React, { useEffect, useState } from 'react'
 export default function MySQLForm() {
   const [formData, setFormData] = useState({
@@ -10,7 +11,9 @@ export default function MySQLForm() {
 
   useEffect(() => {
     if (!window.createDesktopAPI) return
-
+    if (!window.API) {
+      window.API = window.createDesktopAPI()
+    }
     // 获取消息
     window.API.postMessage({
       type: 'mysql.init'
@@ -49,10 +52,8 @@ export default function MySQLForm() {
   return (
     <form id="mysqlForm" onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="host" className="block text-sm font-medium text-gray-700">
-          Host
-        </label>
-        <input
+        <div className="block text-sm font-medium ">Host</div>
+        <Input
           type="text"
           id="host"
           name="host"
@@ -60,14 +61,12 @@ export default function MySQLForm() {
           required
           value={formData.host}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
         />
       </div>
       <div>
-        <label htmlFor="port" className="block text-sm font-medium text-gray-700">
-          Port
-        </label>
-        <input
+        <div className="block text-sm font-medium ">Port</div>
+        <Input
           type="number"
           id="port"
           name="port"
@@ -76,14 +75,12 @@ export default function MySQLForm() {
           min="1"
           value={formData.port}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring "
         />
       </div>
       <div>
-        <label htmlFor="user" className="block text-sm font-medium text-gray-700">
-          User
-        </label>
-        <input
+        <div className="block text-sm font-medium ">User</div>
+        <Input
           type="text"
           id="user"
           name="user"
@@ -91,28 +88,24 @@ export default function MySQLForm() {
           required
           value={formData.user}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring "
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
+        <div className="block text-sm font-medium ">Password</div>
+        <Input
           type="password"
           id="password"
           name="password"
           placeholder=""
           value={formData.password}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
         />
       </div>
       <div>
-        <label htmlFor="database" className="block text-sm font-medium text-gray-700">
-          Database
-        </label>
-        <input
+        <div className="block text-sm font-medium ">Database</div>
+        <Input
           type="text"
           id="database"
           name="database"
@@ -120,15 +113,12 @@ export default function MySQLForm() {
           required
           value={formData.database}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring "
         />
       </div>
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200"
-      >
+      <Button type="submit" className="w-full  p-2 rounded-md  transition duration-200">
         保存
-      </button>
+      </Button>
     </form>
   )
 }

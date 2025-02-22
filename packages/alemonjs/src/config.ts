@@ -1,6 +1,6 @@
 import './global'
-import { readFileSync, existsSync, watch, writeFileSync } from 'fs'
-import { join } from 'path'
+import { readFileSync, existsSync, watch, writeFileSync, mkdirSync } from 'fs'
+import { dirname, join } from 'path'
 import { parse, stringify } from 'yaml'
 
 type Package = {
@@ -87,9 +87,10 @@ export class ConfigCore {
     if (!this.#dir) return
     // 读取配置文件
     const dir = join(process.cwd(), this.#dir)
+    if (!existsSync(dir)) {
+      mkdirSync(dirname(dir), { recursive: true })
+    }
     logger.info('config save', dir)
-    // 如果文件不存在
-    if (!existsSync(dir)) return
     const data = stringify(value)
     writeFileSync(dir, data, 'utf-8')
   }

@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "阿柠檬数据库连接",
   "author": "lemonade",
   "license": "MIT",
@@ -20,13 +20,15 @@
       "platform": [],
       "commond": [
         {
-          "name": "打开数据库",
+          "name": "redis&mysql",
+          "icon": "assets/logo.png",
           "commond": "open.db"
         }
       ],
       "sidebars": [
         {
           "name": "DB",
+          "icon": "assets/logo.png",
           "commond": "open.db"
         }
       ]

@@ -1,3 +1,4 @@
+import { Button, Input } from '@alemonjs/react-ui'
 import React, { useEffect, useState } from 'react'
 
 export default function RedisFrom() {
@@ -10,6 +11,9 @@ export default function RedisFrom() {
 
   useEffect(() => {
     if (!window.createDesktopAPI) return
+    if (!window.API) {
+      window.API = window.createDesktopAPI()
+    }
     // 获取消息
     window.API.postMessage({
       type: 'redis.init'
@@ -47,10 +51,10 @@ export default function RedisFrom() {
   return (
     <form id="redisForm" onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="host" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="host" className="block text-sm font-medium ">
           Host
         </label>
-        <input
+        <Input
           type="text"
           id="host"
           name="host"
@@ -58,34 +62,34 @@ export default function RedisFrom() {
           required
           value={formData.host}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring f"
         />
       </div>
       <div>
-        <label htmlFor="port" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="port" className="block text-sm font-medium ">
           Port
         </label>
-        <input className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500" />
+        <Input className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring " />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="block text-sm font-medium ">
           Password
         </label>
-        <input
+        <Input
           type="password"
           id="password"
           name="password"
           placeholder=""
           value={formData.password}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring "
         />
       </div>
       <div>
-        <label htmlFor="db" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="db" className="block text-sm font-medium ">
           Database
         </label>
-        <input
+        <Input
           type="number"
           id="db"
           name="db"
@@ -93,15 +97,12 @@ export default function RedisFrom() {
           min="0"
           value={formData.db}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring 0"
         />
       </div>
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200"
-      >
+      <Button type="submit" className="w-full  p-2 rounded-md  transition duration-200">
         保存
-      </button>
+      </Button>
     </form>
   )
 }
