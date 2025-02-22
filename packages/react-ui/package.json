@@ -3,7 +3,7 @@
   "displayName": "ALemonJS web",
   "publisher": "lemonade-x",
   "description": "阿柠檬机器人React组件库",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "main": "lib/react-ui.js",
   "module": "lib/react-ui.mjs",
   "types": "lib/index.d.ts",
@@ -13,7 +13,9 @@
       "require": "./lib/react-ui.js",
       "types": "./lib/index.d.ts"
     },
-    "./style.css": "./style.css"
+    "./style.css": "./lib/style.css",
+    "./theme": "./theme.js",
+    "./theme.json": "./theme.json"
   },
   "scripts": {
     "dev": "vite",
