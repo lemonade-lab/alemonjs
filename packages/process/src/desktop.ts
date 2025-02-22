@@ -11,6 +11,10 @@ export const activate = (context: typeof Context.prototype) => {
   // 创建一个 webview。
   const webView = context.createSidebarWebView(context)
 
+  // 注册命令
+  // const sidebar = new Sidebar()
+  // context.register(sidebar)
+
   // 当命令被触发的时候。
   context.onCommand('open.process', () => {
     const dir = join(__dirname, '../', 'dist', 'index.html')
