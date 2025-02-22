@@ -3,7 +3,7 @@
   "displayName": "ALemonJS web",
   "publisher": "lemonade-x",
   "description": "阿柠檬机器人React组件库",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "lib/react-ui.js",
   "module": "lib/react-ui.mjs",
   "types": "lib/index.d.ts",

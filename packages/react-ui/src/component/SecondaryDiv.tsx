@@ -1,6 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
-export function SecondaryDiv(props: React.HTMLProps<HTMLDivElement> & { hover?: boolean }) {
+export type SecondaryDivProps = React.HTMLProps<HTMLDivElement> & {
+  hover?: boolean
+}
+export function SecondaryDiv(props: SecondaryDivProps) {
   const { className, hover, ...prop } = props
   return (
     <div

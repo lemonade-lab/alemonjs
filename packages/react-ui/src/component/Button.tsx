@@ -1,8 +1,12 @@
 import React from 'react'
 import classNames from 'classnames'
-export function Button(
-  props: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
-) {
+
+export type ButtonProps = React.DetailedHTMLProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+>
+
+export function Button(props: ButtonProps) {
   const { className, ...prop } = props
   return (
     <button

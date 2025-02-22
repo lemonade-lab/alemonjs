@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import classNames from 'classnames'
 
-interface ToggleSwitchProps {
+export type ToggleSwitchProps = {
   value: boolean
   onChange?: (checked: boolean) => void
   hover?: boolean

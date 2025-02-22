@@ -1,12 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
 
-export function Textarea(
-  props: React.DetailedHTMLProps<
-    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-    HTMLTextAreaElement
-  >
-) {
+export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
+
+export function Textarea(props: TextareaProps) {
   const { className, ...prop } = props
   return (
     <textarea

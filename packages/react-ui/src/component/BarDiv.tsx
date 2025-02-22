@@ -1,7 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
 
-export function BarDiv(props: React.HTMLProps<HTMLDivElement>) {
+export type BarDivProps = React.HTMLProps<HTMLDivElement>
+
+export function BarDiv(props: BarDivProps) {
   const { className, ...prop } = props
   return (
     <div

@@ -1,7 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
 
-export function NavDiv(props: React.HTMLProps<HTMLDivElement>) {
+export type NavDivProps = React.HTMLProps<HTMLDivElement>
+
+export function NavDiv(props: NavDivProps) {
   const { className, ...prop } = props
   return (
     <div

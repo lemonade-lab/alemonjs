@@ -1,6 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
-export function SidebarDiv(props: React.HTMLProps<HTMLDivElement>) {
+export type SidebarDivProps = React.HTMLProps<HTMLDivElement>
+export function SidebarDiv(props: SidebarDivProps) {
   const { className, ...prop } = props
   return (
     <div

@@ -1,7 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
 
-export function HeaderDiv(props: React.HTMLProps<HTMLDivElement>) {
+export type HeaderDivProps = React.HTMLProps<HTMLDivElement>
+
+export function HeaderDiv(props: HeaderDivProps) {
   const { className, ...prop } = props
   return (
     <div

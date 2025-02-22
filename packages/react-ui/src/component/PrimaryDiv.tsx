@@ -1,14 +1,10 @@
 import React from 'react'
 import classNames from 'classnames'
 
-export const classNameBorder =
-  'border-[var(--alemonjs-primary-border)] dark:border-[var(--alemonjs-dark-primary-border)]'
-
-export function PrimaryDiv(
-  props: React.HTMLProps<HTMLDivElement> & {
-    hover?: boolean
-  }
-) {
+export type PrimaryDivProps = React.HTMLProps<HTMLDivElement> & {
+  hover?: boolean
+}
+export function PrimaryDiv(props: PrimaryDivProps) {
   const { className, hover, ...prop } = props
   return (
     <div

@@ -18,6 +18,7 @@
   "alemonjs": {
     "desktop": {
       "platform": [],
+      "logo": "assets/logo.png",
       "commond": [
         {
           "name": "redis&mysql",

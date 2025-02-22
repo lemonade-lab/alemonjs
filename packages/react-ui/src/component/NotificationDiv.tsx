@@ -1,10 +1,8 @@
 import React from 'react'
 import classNames from 'classnames'
-
-interface NotificationDivProps extends React.HTMLProps<HTMLDivElement> {
+export interface NotificationDivProps extends React.HTMLProps<HTMLDivElement> {
   type?: 'default' | 'error' | 'warning'
 }
-
 export function NotificationDiv(props: NotificationDivProps) {
   const { type, className, ...prop } = props
   return (

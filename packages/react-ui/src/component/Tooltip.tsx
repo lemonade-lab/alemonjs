@@ -1,35 +1,26 @@
-import React, { useState } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import classNames from 'classnames'
 import { PrimaryDiv } from './PrimaryDiv'
 
-interface TooltipProps {
+export type TooltipProps = PropsWithChildren<{
   text: string
-  children: React.ReactNode
   position?: 'top' | 'bottom' | 'left' | 'right'
   delay?: number
-}
+}>
 
-export const Tooltip: React.FC<TooltipProps> = ({
-  text,
-  children,
-  position = 'bottom',
-  delay = 300
-}) => {
+export const Tooltip = ({ text, children, position = 'bottom', delay = 300 }: TooltipProps) => {
   const [visible, setVisible] = useState(false)
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
-
   const handleMouseEnter = () => {
     const id = setTimeout(() => setVisible(true), delay)
     setTimeoutId(id)
   }
-
   const handleMouseLeave = () => {
     if (timeoutId) {
       clearTimeout(timeoutId)
     }
     setVisible(false)
   }
-
   return (
     <div className="relative inline-block ">
       <div

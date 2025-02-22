@@ -1,6 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
-export function TagDiv(props: React.HTMLProps<HTMLDivElement>) {
+
+export type TagDivProps = React.HTMLProps<HTMLDivElement>
+
+export function TagDiv(props: TagDivProps) {
   const { className, ...prop } = props
   return (
     <div

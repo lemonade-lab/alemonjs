@@ -30,10 +30,11 @@ export default defineConfig({
     },
     cssTarget: 'chrome61',
     rollupOptions: {
-      external: ['react'],
+      external: ['react', 'react-dom'],
       output: {
         globals: {
-          react: 'React'
+          'react': 'React',
+          'react-dom': 'ReactDOM'
         }
       }
     }

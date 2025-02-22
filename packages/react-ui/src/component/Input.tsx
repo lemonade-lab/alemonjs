@@ -1,8 +1,12 @@
 import React from 'react'
 import classNames from 'classnames'
-export function Input(
-  props: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
-) {
+
+export type InputProps = React.DetailedHTMLProps<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  HTMLInputElement
+>
+
+export function Input(props: InputProps) {
   const { className, ...prop } = props
   return (
     <input
