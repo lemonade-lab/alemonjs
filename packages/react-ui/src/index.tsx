@@ -17,3 +17,5 @@ export * from './component/Tabs'
 export * from './component/TagDiv'
 export * from './component/Textarea'
 export * from './component/Tooltip'
+
+export const AAA: string = ''

@@ -7,7 +7,11 @@ import dts from 'vite-plugin-dts'
 export default defineConfig({
   plugins: [
     react(),
-    dts({ insertTypesEntry: true }) // 生成 .d.ts 类型文件
+    dts({
+      rollupTypes: true,
+      insertTypesEntry: true,
+      tsconfigPath: './tsconfig.app.json'
+    })
   ],
   resolve: {
     alias: [
@@ -17,31 +21,19 @@ export default defineConfig({
       }
     ]
   },
-  esbuild: {
-    drop: process.env.NODE_ENV === 'development' ? [] : ['console', 'debugger']
-  },
   build: {
+    outDir: 'lib',
     lib: {
-      entry: resolve(__dirname, 'src/index.tsx'),
+      entry: resolve(__dirname, 'src/main.ts'),
       name: pkg.name,
-      formats: ['es', 'cjs']
+      formats: ['cjs', 'es']
     },
-    commonjsOptions: {
-      transformMixedEsModules: true
-    },
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    },
+    cssTarget: 'chrome61',
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: ['react'],
       output: {
         globals: {
-          'react': 'React',
-          'react-dom': 'ReactDOM'
+          react: 'React'
         }
       }
     }
