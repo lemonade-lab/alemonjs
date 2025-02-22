@@ -1,7 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
 
-export interface NotificationDivProps extends React.HTMLProps<HTMLDivElement> {
+interface NotificationDivProps extends React.HTMLProps<HTMLDivElement> {
   type?: 'default' | 'error' | 'warning'
 }
 
