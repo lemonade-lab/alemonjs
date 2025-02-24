@@ -23,3 +23,11 @@ export async function cloneRepo(repoUrl: string) {
     console.error('克隆仓库时出错:', err['message'])
   }
 }
+
+/**
+ *
+ * @param data
+ */
+export const gitClone = (data: string) => {
+  cloneRepo(data)
+}

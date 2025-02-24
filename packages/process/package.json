@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/process",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "阿柠檬desktop进程通讯",
   "main": "lib/index.js",
   "author": {
@@ -22,19 +22,19 @@
   },
   "alemonjs": {
     "desktop": {
-      "logo": "./public/logo.png",
+      "logo": "antd.AppstoreOutlined",
       "platform": [],
       "commond": [
         {
           "name": "配置应用",
-          "icon": "./public/sidebar.svg",
+          "icon": "antd.AppstoreOutlined",
           "commond": "open.process"
         }
       ],
       "sidebars": [
         {
           "name": "APPS",
-          "icon": "./public/sidebar.svg",
+          "icon": "antd.AppstoreOutlined",
           "commond": "open.process"
         }
       ]

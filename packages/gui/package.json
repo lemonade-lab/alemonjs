@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.3.5",
-  "description": "阿柠檬gui平台连接",
+  "version": "0.3.6",
+  "description": "阿柠檬GUI可视化平台",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -42,16 +42,19 @@
           "name": "gui"
         }
       ],
+      "logo": "antd.RobotOutlined",
       "commond": [
         {
           "name": "gui",
-          "commond": "open.gui"
+          "commond": "open.gui",
+          "icon": "antd.RobotOutlined"
         }
       ],
       "sidebars": [
         {
           "name": "gui",
-          "commond": "open.gui"
+          "commond": "open.gui",
+          "icon": "antd.RobotOutlined"
         }
       ]
     }
