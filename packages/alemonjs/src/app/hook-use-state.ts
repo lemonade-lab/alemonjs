@@ -1,7 +1,3 @@
-export interface ResponseState {
-  [key: string]: boolean
-}
-
 interface Subscribe {
   [key: string]: Array<(value: boolean) => void>
 }

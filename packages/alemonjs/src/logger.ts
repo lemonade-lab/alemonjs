@@ -2,6 +2,10 @@ import { Logger } from './typing/logger/index'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 
+/**
+ * 创建初始日志
+ * @returns
+ */
 export const createInitLogger = (): Logger => {
   return {
     trace: console.trace,

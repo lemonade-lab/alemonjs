@@ -11,6 +11,7 @@ import { useState } from './hook-use-state'
 import { ErrorModule } from './utils'
 
 /**
+ * 处理中间件
  * @param event
  * @param select
  */

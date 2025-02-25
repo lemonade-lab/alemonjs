@@ -7,6 +7,7 @@ import { Next, Events, EventCycle } from '../typings'
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
 
 /**
+ * 处理订阅
  * @param valueEvent
  * @param select
  * @param next

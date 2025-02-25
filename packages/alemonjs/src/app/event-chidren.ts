@@ -1,5 +1,6 @@
 import { DefineChildren } from '../typings'
 /**
+ * 定义子事件
  * @param callback
  * @returns
  */

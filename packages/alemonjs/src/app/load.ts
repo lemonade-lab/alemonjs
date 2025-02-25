@@ -65,7 +65,7 @@ const loadChildrenFiles = async (mainDir: string) => {
 }
 
 /**
- *
+ * 加载模块
  * @param mainPath
  */
 export const loadModule = async (mainPath: string) => {

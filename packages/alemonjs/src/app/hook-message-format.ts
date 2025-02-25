@@ -7,7 +7,7 @@ import {
 } from '../typings'
 
 /**
- *
+ * 文本消息
  * @param val
  * @param options
  * @returns
@@ -24,7 +24,7 @@ export const Text = (
 }
 
 /**
- *
+ * 图片消息
  * @param val
  * @returns
  */
@@ -60,6 +60,7 @@ export const ImageFile = (val: DataImageFileType['value']): DataImageFileType =>
 }
 
 /**
+ * 提及
  * @param UserId 默认 @ 所有人
  * @param options 默认 user
  * @returns

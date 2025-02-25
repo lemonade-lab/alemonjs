@@ -15,7 +15,7 @@ import {
 } from './event-processor-subscribe'
 
 /**
- *
+ * 打印日志
  * @param event
  * @param select
  */

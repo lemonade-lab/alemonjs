@@ -6,7 +6,7 @@ type KeyMap = {
 }
 
 /**
- *
+ * 使用订阅
  * @param event
  * @param option
  * @returns
@@ -46,7 +46,7 @@ export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
 }
 
 /**
- *
+ * 使用观察者
  * @param event
  * @param option
  * @returns

@@ -7,8 +7,10 @@ import {
   StoreResponseItem
 } from './typing/store/res'
 import { Subscribe } from './typing/subscribe'
-import { EventsKeyEnum, Logger, ResponseState } from './post'
+import { Logger } from './typing/logger/index'
 import { createInitLogger, createLogger } from './logger'
+import { ResponseState } from './typing/state'
+import { EventsKeyEnum } from './typing/event/map'
 declare global {
   /**
    * 打印
@@ -47,6 +49,9 @@ declare global {
      */
     storeMiddlewareGather: StoreMiddleware
   }
+  /**
+   * 客户端
+   */
   var alemonjsBot: ClientAPI
   var OnResponse: OnResponseType
   var OnMiddleware: OnMiddlewareType
@@ -84,14 +89,13 @@ const initGlobalCore = () => {
 }
 
 const initLogger = () => {
-  if (!global.logger) {
-    try {
-      global.logger = createLogger()
-    } catch (e) {
-      console.error(e)
-      // 扩展 fatal, mark
-      global.logger = createInitLogger()
-    }
+  if (global.logger) return
+  try {
+    global.logger = createLogger()
+  } catch (e) {
+    console.error(e)
+    // 扩展 fatal, mark
+    global.logger = createInitLogger()
   }
 }
 

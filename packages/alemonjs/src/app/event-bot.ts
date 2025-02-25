@@ -1,6 +1,6 @@
 import { DefineBot } from '../typings'
 /**
- *
+ * 定义机器人
  * @param callback
  * @returns
  */

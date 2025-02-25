@@ -1,16 +1,16 @@
+import { getConfigValue } from '../post'
 import { Events } from '../typings'
 import { expendCycle } from './event-processor-cycle'
 import { createHash } from './utils'
 
+const MIN_TIME = 3000
+const MAX_TIME = 10000
+const CONTROL_SIZE = 37
 const eventStore = new Map()
 const userStore = new Map()
 
-// 60s
-const EVENT_INTERVAL = Number(process.env?.ALEMONJS_EVENT_INTERVAL ?? 0) || 1000 * 60
-// 2s
-const USER_INTERVAL = Number(process.env?.ALEMONJS_USER_INTERVAL ?? 0) || 1000 * 2
-
 /**
+ * 过滤掉重复消息
  * @param param0
  * @param MessageId
  * @returns
@@ -40,16 +40,19 @@ const cleanupStore = ({ Now, store, INTERVAL }) => {
   }
 }
 
+/**
+ * 清理所有消息
+ */
 const cleanupStoreAll = () => {
   const Now = Date.now()
+  const value = getConfigValue()
+  const EVENT_INTERVAL = value?.ALEMONJS_EVENT_INTERVAL ?? 1000 * 60
+  const USER_INTERVAL = value?.ALEMONJS_USER_INTERVAL ?? 1000 * 1
   cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: eventStore })
   cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: userStore })
 }
 
-const MIN_TIME = 3000
-const MAX_TIME = 10000
-const CONTROL_SIZE = 37
-
+// 清理消息
 const callback = () => {
   cleanupStoreAll()
   // 下一次清理的时间，应该随着长度的增加而减少
@@ -70,6 +73,9 @@ setTimeout(callback, MIN_TIME)
  */
 export const onProcessor = <T extends keyof Events>(name: T, event: Events[T], data?: any) => {
   const Now = Date.now()
+  const value = getConfigValue()
+  const EVENT_INTERVAL = value?.ALEMONJS_EVENT_INTERVAL ?? 1000 * 60
+  const USER_INTERVAL = value?.ALEMONJS_USER_INTERVAL ?? 1000 * 1
   if (event['MessageId']) {
     // 消息过长，要减少消息的长度
     const MessageId = createHash(event['MessageId'])

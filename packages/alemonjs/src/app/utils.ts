@@ -19,6 +19,7 @@ export const createHash = (str: string, options: { length?: number; algorithm?: 
 }
 
 /**
+ * 使用用户的哈希键
  * @param e
  * @returns
  */
