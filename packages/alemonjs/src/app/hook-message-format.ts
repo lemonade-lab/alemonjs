@@ -4,7 +4,7 @@ import {
   DataTextType,
   DataImageURLType,
   DataImageFileType
-} from '../typing/message'
+} from '../typings'
 
 /**
  *

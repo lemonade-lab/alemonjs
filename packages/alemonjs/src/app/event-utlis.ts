@@ -1,4 +1,4 @@
-import { OnResponseType } from '../typing/event/index'
+import { OnResponseType } from '../typings'
 
 /**
  * 处理响应事件

@@ -1,14 +1,8 @@
 import { Text, useSend } from 'alemonjs'
-
+export const regular = /^(#|\/)?text$/
 export const name = 'core:text'
-
 export default OnResponse(
-  (event, next) => {
-    if (!/^(#|\/)?text$/.test(event.MessageText)) {
-      next()
-      return
-    }
-
+  event => {
     // 创建
     const Send = useSend(event)
 

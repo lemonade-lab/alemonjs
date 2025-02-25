@@ -3,9 +3,7 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Next } from '../global'
-import { Events } from '../typing/event/map'
-import { EventCycle } from '../typing/cycle/index'
+import { Next, Events, EventCycle } from '../typings'
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
 
 /**
@@ -20,8 +18,8 @@ export const expendSubscribe = async <T extends keyof Events>(
   next: Function,
   chioce: EventCycle
 ) => {
-  if (!global.storeSubscribeList[chioce][select]) {
-    global.storeSubscribeList[chioce][select] = new SinglyLinkedList()
+  if (!alemonjsCore.storeSubscribeList[chioce][select]) {
+    alemonjsCore.storeSubscribeList[chioce][select] = new SinglyLinkedList()
   }
 
   /**
@@ -34,7 +32,7 @@ export const expendSubscribe = async <T extends keyof Events>(
       return
     }
 
-    const item = global.storeSubscribeList[chioce][select].popNext() // 弹出下一个节点
+    const item = alemonjsCore.storeSubscribeList[chioce][select].popNext() // 弹出下一个节点
 
     // 可能是 undefined
     if (!item || !item.data.current) {
@@ -53,17 +51,17 @@ export const expendSubscribe = async <T extends keyof Events>(
     }
 
     // 订阅是执行则销毁
-    global.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
+    alemonjsCore.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
 
     const Continue: Next = (cn?: boolean, ...cns: any[]) => {
       // next() 订阅继续
-      global.storeSubscribeList[chioce][select].append(item.data) // 重新连接
+      alemonjsCore.storeSubscribeList[chioce][select].append(item.data) // 重新连接
       if (cn) {
         nextObserver(...cns)
         return
       }
       if (typeof cn === 'boolean') {
-        global.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
+        alemonjsCore.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
         nextObserver(...cns)
         return
       }

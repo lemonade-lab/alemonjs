@@ -14,4 +14,4 @@ export * from './app/hook-use-subscribe.js'
 //
 export * from './app/utils.js'
 export * from './config'
-export * from './global.js'
+export * from './typings.js'

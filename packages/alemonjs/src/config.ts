@@ -1,18 +1,8 @@
-import './global'
+import './typings'
 import { readFileSync, existsSync, watch, writeFileSync, mkdirSync } from 'fs'
 import { dirname, join } from 'path'
 import { parse, stringify } from 'yaml'
-
-type Package = {
-  [key: string]: any
-  name: string | null
-  version: string | null
-  description: string | null
-  author: string | null
-  license: string | null
-  type: string | null
-  private: boolean | null
-}
+import { Package } from './typing/package'
 
 /**
  * 配置类
@@ -39,10 +29,9 @@ export class ConfigCore {
     if (!this.#dir) return this.#value
     // 读取配置文件
     const dir = join(process.cwd(), this.#dir)
-    logger.info('config read', dir)
     // 如果文件不存在
     if (!existsSync(dir)) {
-      // 尝试读取执行参数
+      this.saveValue({})
       return this.#value
     }
     try {
@@ -90,7 +79,6 @@ export class ConfigCore {
     if (!existsSync(dir)) {
       mkdirSync(dirname(dir), { recursive: true })
     }
-    logger.info('config save', dir)
     const data = stringify(value)
     writeFileSync(dir, data, 'utf-8')
   }
@@ -153,7 +141,6 @@ export const getConfig = (): typeof ConfigCore.prototype => {
 }
 
 /**
- *
  * @returns
  */
 export const getConfigValue = () => getConfig()?.value

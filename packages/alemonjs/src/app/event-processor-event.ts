@@ -5,10 +5,8 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Events } from '../typing/event/map'
 import { isAsyncFunction } from 'util/types'
-import { OnResponseValue } from '../typing/event'
-import { Next } from '../global'
+import { Next, Events, OnResponseValue } from '../typings'
 import { useState } from './hook-use-state'
 import { ErrorModule } from './utils'
 
@@ -23,10 +21,10 @@ export const expendEvent = async <T extends keyof Events>(
   next: Function
 ) => {
   // 得到所有 apps
-  const StoreResponse = [...global.storeResponse]
+  const StoreResponse = [...alemonjsCore.storeResponse]
 
   // 得到对应类型的消息
-  const StoreResponseGather = [...global.storeResponseGather[select]]
+  const StoreResponseGather = [...alemonjsCore.storeResponseGather[select]]
 
   let valueI = 0
   let valueJ = 0
@@ -121,13 +119,13 @@ export const expendEvent = async <T extends keyof Events>(
         }
         // 不是数组写法的。会触发分类
         // 判断是否已经分类
-        if (!global.storeResponseGather[select].find(v => v.path === file.path)) {
+        if (!alemonjsCore.storeResponseGather[select].find(v => v.path === file.path)) {
           // 得到index
-          const index = global.storeResponse.findIndex(v => v.path === file.path)
+          const index = alemonjsCore.storeResponse.findIndex(v => v.path === file.path)
           // 分类
-          global.storeResponse.splice(index, 1)
+          alemonjsCore.storeResponse.splice(index, 1)
           // 转移存储
-          global.storeResponseGather[select].push({
+          alemonjsCore.storeResponseGather[select].push({
             source: file.source,
             dir: file.dir,
             path: file.path,

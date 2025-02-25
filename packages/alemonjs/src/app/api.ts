@@ -1,4 +1,4 @@
-import { DataEnums } from '../global'
+import { DataEnums } from '../typings'
 
 /**
  * 创建数据格式。
@@ -35,7 +35,7 @@ export const sendToChannel = async (channel_id: string, data: DataEnums[]) => {
     throw new Error('Invalid channel_id')
   }
   try {
-    return await global.alemonjs.api.active.send.channel(channel_id, data)
+    return await alemonjsBot.api.active.send.channel(channel_id, data)
   } catch (error) {
     handleError('channel', error)
     // 弹出错误
@@ -55,7 +55,7 @@ export const sendToUser = async (user_id: string, data: DataEnums[]) => {
     throw new Error('Invalid user_id')
   }
   try {
-    return await global.alemonjs.api.active.send.user(user_id, data)
+    return await alemonjsBot.api.active.send.user(user_id, data)
   } catch (error) {
     handleError('user', error)
     // 弹出错误

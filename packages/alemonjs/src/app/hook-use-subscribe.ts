@@ -1,6 +1,4 @@
-import { Events } from '../typing/event/map'
-import { EventCycle, Next } from '../typing/cycle/index'
-import { Current } from '../typing/event'
+import { EventCycle, Next, Current, Events } from '../typings'
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
 
 type KeyMap = {
@@ -15,8 +13,8 @@ type KeyMap = {
  */
 export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
   const run = (callback: Current<T>, keys: (keyof Events[T])[], chioce: EventCycle) => {
-    if (!global.storeSubscribeList[chioce][select]) {
-      global.storeSubscribeList[chioce][select] = new SinglyLinkedList()
+    if (!alemonjsCore.storeSubscribeList[chioce][select]) {
+      alemonjsCore.storeSubscribeList[chioce][select] = new SinglyLinkedList()
     }
     // 没有选择
     if (keys.length === 0) return
@@ -32,7 +30,7 @@ export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
         values[key] = event[key]
       }
     }
-    global.storeSubscribeList[chioce][select].append({ keys: values, current: callback })
+    alemonjsCore.storeSubscribeList[chioce][select].append({ keys: values, current: callback })
     return
   }
   const create = (callback: Current<T>, keys: (keyof Events[T])[]) => {

@@ -1,10 +1,13 @@
 import Res from '@src/apps/cwd'
-export const name = 'core:image'
+import { getConfigValue } from 'alemonjs'
+export const name = 'core:test'
+export const regular = /^(#|\/)?test$/
 export default OnResponse(
   [
-    Res.current,
+    // Res.current,
     event => {
-      console.log('test')
+      const config = getConfigValue()
+      console.log('test', config)
     }
   ],
   ['message.create', 'private.message.create']

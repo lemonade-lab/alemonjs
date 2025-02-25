@@ -1,3 +1,5 @@
+import { StoreMiddlewareItem, StoreResponseItem } from '../store/res'
+
 /**
  * 子模块生命周期
  */
@@ -11,12 +13,7 @@ export type ChildrenCycle = {
    * 挂载时
    * @returns
    */
-  onMounted?: () => void
-  /**
-   * 卸载时
-   * @returns
-   */
-  unMounted?: () => void
+  onMounted?: (strore: { response: StoreResponseItem[]; middleware: StoreMiddlewareItem[] }) => void
 }
 
 /**

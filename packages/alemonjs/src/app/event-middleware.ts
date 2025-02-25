@@ -3,7 +3,7 @@
  * @module middleware
  * @author ningmengchongshui
  */
-import { OnMiddlewareType } from '../typing/event/index'
+import { OnMiddlewareType } from '../typings'
 /**
  *
  * @param callback

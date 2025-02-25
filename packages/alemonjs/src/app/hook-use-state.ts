@@ -1,4 +1,4 @@
-interface State {
+export interface ResponseState {
   [key: string]: boolean
 }
 
@@ -6,15 +6,11 @@ interface Subscribe {
   [key: string]: Array<(value: boolean) => void>
 }
 
-declare global {
-  var storeState: State
-}
-
 // 存储订阅者
 const subscriptions: Subscribe = {}
 
 // 初始化全局状态
-global.storeState = new Proxy(
+alemonjsCore.storeState = new Proxy(
   {},
   {
     get(target, prop: string) {
@@ -50,16 +46,16 @@ export const useState = <T extends string>(
   defaultValue = true
 ): [boolean, (value: boolean) => void] => {
   // 如果不存在则设置默认值
-  if (!(name in global.storeState)) {
-    global.storeState[name] = defaultValue
+  if (!(name in alemonjsCore.storeState)) {
+    alemonjsCore.storeState[name] = defaultValue
   }
 
   // 设置值的函数
   const setValue = (value: boolean) => {
-    global.storeState[name] = value
+    alemonjsCore.storeState[name] = value
   }
 
-  return [global.storeState[name], setValue]
+  return [alemonjsCore.storeState[name], setValue]
 }
 
 /**

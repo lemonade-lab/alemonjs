@@ -1,12 +1,8 @@
 import { useMention } from 'alemonjs'
 export const name = 'core:mention:get'
+export const regular = /^(#|\/)?getmention$/
 export default OnResponse(
-  async (event, next) => {
-    if (!/^(#|\/)?getmention$/.test(event.MessageText)) {
-      next()
-      return
-    }
-
+  async event => {
     const Mentions = await useMention(event)
     if (!Mentions || Mentions.length === 0) {
       return // @ 提及为空

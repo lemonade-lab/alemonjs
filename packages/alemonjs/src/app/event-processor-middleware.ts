@@ -6,9 +6,7 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { Events } from '../typing/event/map'
-import { OnMiddlewareValue } from '../typing/event'
-import { Next } from '../global'
+import { Next, Events, OnMiddlewareValue } from '../typings'
 import { useState } from './hook-use-state'
 import { ErrorModule } from './utils'
 
@@ -22,9 +20,9 @@ export const expendMiddleware = async <T extends keyof Events>(
   next: Function
 ) => {
   // 得到所有 apps
-  const mwFiles = [...global.storeMiddleware]
+  const mwFiles = [...alemonjsCore.storeMiddleware]
   // 得到对应类型的消息
-  const mws = [...global.storeMiddlewareGather[select]]
+  const mws = [...alemonjsCore.storeMiddlewareGather[select]]
 
   let valueI = 0
   let valueJ = 0
@@ -120,13 +118,13 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
         // 不是数组，进行分类存储
         // 判断是否已经存储
-        if (!storeMiddlewareGather[select].find(v => v.path === file.path)) {
+        if (!alemonjsCore.storeMiddlewareGather[select].find(v => v.path === file.path)) {
           // 索引
-          const index = global.storeMiddleware.findIndex(v => v.path === file.path)
+          const index = alemonjsCore.storeMiddleware.findIndex(v => v.path === file.path)
           // 去除
-          global.storeMiddleware.splice(index, 1)
+          alemonjsCore.storeMiddleware.splice(index, 1)
           // 存储
-          storeMiddlewareGather[select].push({
+          alemonjsCore.storeMiddlewareGather[select].push({
             source: file.source,
             dir: file.dir,
             path: file.path,

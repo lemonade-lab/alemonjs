@@ -29,16 +29,17 @@ export type OnMiddlewareValue<C, T extends keyof Events> = {
   select: T | T[]
 }
 
+export type DefineChildrenCallback = (() => Promise<ChildrenCycle> | ChildrenCycle) | ChildrenCycle
 export type DefineChildrenValue = {
   _name: 'apps'
-  callback: () => ChildrenCycle
+  callback: DefineChildrenCallback
 }
-
-export type DefineChildren = (callback: () => ChildrenCycle) => DefineChildrenValue
-
+export type DefineChildren = (
+  callback: (() => ChildrenCycle) | ChildrenCycle
+) => DefineChildrenValue
+export type DefineBotCallback = (() => Promise<ClientAPI> | ClientAPI) | ClientAPI
 export type DefineBotValue = {
   _name: 'platform'
-  callback: () => ClientAPI
+  callback: DefineBotCallback
 }
-
-export type DefineBot = (callback: () => ClientAPI) => DefineBotValue
+export type DefineBot = (callback: DefineBotCallback) => DefineBotValue

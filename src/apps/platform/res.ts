@@ -9,13 +9,9 @@ const kookResponse = OnResponse((event, next) => {
 
 export const name = 'core:platfrom'
 
+export const regular = /^(#|\/)?platform$/
+
 export default OnResponse((event, next) => {
-  // 匹配规则
-  if (!/^(#|\/)?platform$/.test(event.MessageText)) {
-    // 前往下一个响应
-    next()
-    return
-  }
   // 判断平台
   if (event.Platform == platform) {
     kookResponse.current(event, next)

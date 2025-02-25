@@ -1,12 +1,8 @@
 import { useSend, Text, Mention } from 'alemonjs'
 export const name = 'core:mention:post'
+export const regular = /^(#|\/)?mention$/
 export default OnResponse(
-  (event, next) => {
-    if (!/^(#|\/)?mention$/.test(event.MessageText)) {
-      next()
-      return
-    }
-
+  event => {
     const Send = useSend(event)
 
     // 发送多种类型的消息

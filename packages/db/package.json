@@ -18,18 +18,18 @@
   "alemonjs": {
     "desktop": {
       "platform": [],
-      "logo": "assets/logo.png",
+      "logo": "antd.DatabaseOutlined",
       "commond": [
         {
           "name": "redis&mysql",
-          "icon": "assets/logo.png",
+          "icon": "antd.DatabaseOutlined",
           "commond": "open.db"
         }
       ],
       "sidebars": [
         {
           "name": "DB",
-          "icon": "assets/logo.png",
+          "icon": "antd.DatabaseOutlined",
           "commond": "open.db"
         }
       ]

@@ -1,4 +1,4 @@
-import { DefineChildren } from '../global'
+import { DefineChildren } from '../typings'
 /**
  * @param callback
  * @returns

@@ -1,4 +1,4 @@
-import { DefineBot } from '../global'
+import { DefineBot } from '../typings'
 /**
  *
  * @param callback

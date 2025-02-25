@@ -1,4 +1,4 @@
-import { Events } from '../typing/event/map'
+import { Events } from '../typings'
 import { expendCycle } from './event-processor-cycle'
 import { createHash } from './utils'
 

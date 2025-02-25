@@ -1,10 +1,25 @@
-import './global.js'
+import './typings.js'
 import { join } from 'path'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync } from 'fs'
 import { getConfig } from './config'
 import { loadModule, moduleChildrenFiles } from './app/load.js'
-import { DefineBotValue } from './global.js'
+import { DefineBotValue } from './typings.js'
 import { ErrorModule } from './app/utils.js'
+
+//  input
+const run = (input: string) => {
+  // 不存在input
+  if (!input) {
+    return
+  }
+  // 路径
+  const mainPath = join(process.cwd(), input)
+  if (!existsSync(mainPath)) {
+    logger.error(`The file ${mainPath} does not exist`)
+    return
+  }
+  loadModule(mainPath)
+}
 
 /**
  * @param input
@@ -27,50 +42,42 @@ export const start = async (input: string = 'lib/index.js', platform = '@alemonj
   if (typeof cfg.argv?.platform == 'string') {
     cfg.argv.login = cfg.argv?.platform.replace(/^(@alemonjs\/|alemonjs-)/, '')
   }
-  // module
-  if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
-    for (const app of cfg.value?.apps) {
-      moduleChildrenFiles(app)
-    }
-  }
-  //  input
-  const run = async () => {
-    // 不存在input
-    if (!input) {
-      let modulePath = join(process.cwd(), 'node_modules', platform, 'package.json')
-      if (existsSync(modulePath)) {
-        input = JSON.parse(readFileSync(modulePath, 'utf8')).main
-      } else if (
-        existsSync((modulePath = join(process.cwd(), 'packages', platform, 'package.json')))
-      ) {
-        input = JSON.parse(readFileSync(join(modulePath), 'utf8')).main
-      } else {
-        console.log(`[${platform}]入口文件获取失败~`)
-        return
-      }
-    }
-    // 路径
-    const mainPath = join(process.cwd(), input)
-    if (!existsSync(mainPath)) return
-    // src/apps/**/*
-    await loadModule(mainPath)
-  }
-  await run()
+  // 启动机器人
   try {
     const bot: {
       default: DefineBotValue
     } = await import(platform)
-    if (!bot.default?._name || bot.default?._name != 'platform') {
+    if (!bot?.default) {
+      throw new Error('The platform is not default')
+    }
+    if (!bot?.default?._name) {
       throw new Error('The platform name is not correct')
     }
-    // 挂在全局
-    global.alemonjs = bot?.default.callback()
+    if (!bot?.default?.callback) {
+      throw new Error('The platform callback is not correct')
+    }
+    if (typeof bot?.default?.callback !== 'function') {
+      global.alemonjsBot = bot?.default.callback
+    } else {
+      // 挂在全局
+      global.alemonjsBot = await bot?.default.callback()
+    }
     const login = typeof cfg.argv?.login == 'string' ? cfg.argv?.login : ''
     // 新增环境变量
-    process.env.platform = global.alemonjs?.platform ?? login
+    process.env.platform = alemonjsBot?.platform ?? login
   } catch (e) {
     ErrorModule(e)
   }
+  // module
+  if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
+    Promise.all(
+      cfg.value.apps.map(async app => {
+        moduleChildrenFiles(app)
+      })
+    )
+  }
+  // 运行本地模块
+  run(input)
 }
 
 export * from './post.js'

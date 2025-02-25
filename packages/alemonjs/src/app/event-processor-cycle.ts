@@ -5,8 +5,7 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Next } from '../global'
-import { Events } from '../typing/event/map'
+import { Next, Events } from '../typings'
 import { expendEvent } from './event-processor-event'
 import { expendMiddleware } from './event-processor-middleware'
 import {

@@ -1,10 +1,6 @@
-import { commands, getPackages, storage } from './storage.js'
+import { getPackages, storage } from './storage.js'
 import { updateModules } from './modules.js'
-import { gitClone } from './git.js'
 import { sendWebviewOnExpansionsMessage } from './send.js'
-import { addExpansions, getExpansions } from './expansions.js'
-import { command } from './command.js'
-
 /**
  *
  * @param data
@@ -20,7 +16,12 @@ export const webviewPostMessage = (data: any) => {
   })
 }
 
-const webviewGetExpansions = (data: any) => {
+/**
+ *
+ * @param data
+ * @returns
+ */
+export const webviewGetExpansions = (data: any) => {
   if (!storage.has(data.name)) return
   updateModules()
   // 更新模块列表

@@ -1,4 +1,4 @@
-import { DataEnums } from '../typing/message'
+import { DataEnums } from '../typings'
 
 /**
  * 使用提及功能。
@@ -10,7 +10,7 @@ export const useMention = async (event: { [key: string]: any }) => {
     throw new Error('Invalid event: event must be an object')
   }
   try {
-    return await global.alemonjs.api.use.mention(event)
+    return await alemonjsBot.api.use.mention(event)
   } catch (e) {
     logger.error('Failed to mention:', e)
     // 弹出错误
@@ -33,7 +33,7 @@ export const useSend = (event: { [key: string]: any }) => {
       throw new Error('Invalid data: data cannot be empty')
     }
     try {
-      return await global.alemonjs.api.use.send(event, val)
+      return await alemonjsBot.api.use.send(event, val)
     } catch (e) {
       logger.error('Failed to send message:', e)
       // 弹出错误
@@ -54,30 +54,42 @@ export const unMount = (mainDir: string) => {
   }
 
   // 从 storeMains 中移除
-  const storeMainsIndex = global.storeMains.indexOf(mainDir)
+  const storeMainsIndex = alemonjsCore.storeMains.indexOf(mainDir)
   if (storeMainsIndex !== -1) {
-    global.storeMains.splice(storeMainsIndex, 1)
+    alemonjsCore.storeMains.splice(storeMainsIndex, 1)
   }
 
   // 从 storeResponse 中移除
-  global.storeResponse = global.storeResponse.filter(item => item.source !== mainDir)
+  if (alemonjsCore.storeResponse.find(item => item.source == mainDir)) {
+    alemonjsCore.storeResponse = alemonjsCore.storeResponse.filter(item => item.source !== mainDir)
+  }
 
   // 从 storeMiddleware 中移除
-  global.storeMiddleware = global.storeMiddleware.filter(item => item.source !== mainDir)
+  if (alemonjsCore.storeMiddleware.find(item => item.source == mainDir)) {
+    alemonjsCore.storeMiddleware = alemonjsCore.storeMiddleware.filter(
+      item => item.source !== mainDir
+    )
+  }
 
   // 从 storeResponseGather 中移除
-  for (const key in global.storeResponseGather) {
-    if (Array.isArray(global.storeResponseGather[key])) {
-      global.storeResponseGather[key] = global.storeResponseGather[key].filter(
+  for (const key in alemonjsCore.storeResponseGather) {
+    if (
+      Array.isArray(alemonjsCore.storeResponseGather[key]) &&
+      alemonjsCore.storeResponseGather[key].find(item => item.source == mainDir)
+    ) {
+      alemonjsCore.storeResponseGather[key] = alemonjsCore.storeResponseGather[key].filter(
         item => item.source !== mainDir
       )
     }
   }
 
   // 从 storeMiddlewareGather 中移除
-  for (const key in global.storeMiddlewareGather) {
-    if (Array.isArray(global.storeMiddlewareGather[key])) {
-      global.storeMiddlewareGather[key] = global.storeMiddlewareGather[key].filter(
+  for (const key in alemonjsCore.storeMiddlewareGather) {
+    if (
+      Array.isArray(alemonjsCore.storeMiddlewareGather[key]) &&
+      alemonjsCore.storeMiddlewareGather[key].find(item => item.source == mainDir)
+    ) {
+      alemonjsCore.storeMiddlewareGather[key] = alemonjsCore.storeMiddlewareGather[key].filter(
         item => item.source !== mainDir
       )
     }
