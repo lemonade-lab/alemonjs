@@ -1,7 +1,7 @@
 import {
   defineBot,
   getConfigValue,
-  OnProcessor,
+  onProcessor as OnProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   User,
@@ -140,14 +140,8 @@ export default defineBot(() => {
       tag: 'send_message',
       value: null
     }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return data
-      }
-    })
     // 处理消息
-    OnProcessor(e, 'message.create')
+    OnProcessor('message.create', e, data)
   }
 
   const onProvateMessage = (data: DataPrivate) => {
@@ -201,14 +195,8 @@ export default defineBot(() => {
       tag: 'send_private_message',
       value: null
     }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return data
-      }
-    })
     // 处理消息
-    OnProcessor(e, 'private.message.create')
+    OnProcessor('private.message.create', e, data)
   }
 
   // 监听连接事件
@@ -270,7 +258,50 @@ export default defineBot(() => {
 
   //
   return {
+    platform: platform,
     api: {
+      active: {
+        send: {
+          channel: async (channel_id, val) => {
+            if (val.length < 0) return Promise.all([])
+            const db = {
+              t: 'send_message' as DataPublic['t'],
+              d: {
+                MessageBody: val,
+                MessageId: Date.now(),
+                createAt: Date.now(),
+                IsBot: true,
+                OpenId: '',
+                GuildId: '',
+                ChannelId: channel_id
+              } as any
+            }
+            addChat(db.d.createAt, db)
+            if (client) {
+              client.send(DATA.stringify(db as any))
+            }
+            return Promise.all([])
+          },
+          user: async (user_id, val) => {
+            if (val.length < 0) return Promise.all([])
+            const db = {
+              t: 'send_private_message' as DataPrivate['t'],
+              d: {
+                MessageBody: val,
+                MessageId: Date.now(),
+                createAt: Date.now(),
+                IsBot: true,
+                OpenId: user_id
+              } as any
+            }
+            addPrivateChat(db.d.createAt, db)
+            if (client) {
+              client.send(DATA.stringify(db as any))
+            }
+            return Promise.all([])
+          }
+        }
+      },
       use: {
         send: (event, val) => {
           if (val.length < 0) return Promise.all([])
@@ -316,9 +347,9 @@ export default defineBot(() => {
             const arr: User[] = []
             return arr
           } else {
-            const mentions = event.d.MessageBody.filter(
-              item => item.type == 'Mention' && item.options?.belong == 'user'
-            ).map(item => item.value)
+            const mentions = event.d.MessageBody.filter(item => item.type == 'Mention')
+              .filter(item => item.options?.belong == 'user')
+              .map(item => item.value)
             const MessageMention: User[] = mentions.map(item => {
               const UserId = item
               const value = getConfigValue()

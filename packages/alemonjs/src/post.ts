@@ -1,6 +1,7 @@
 /**
  * export module
  */
+export * from './app/api'
 export * from './app/event-bot'
 export * from './app/event-chidren'
 export * from './app/event-middleware'

@@ -74,8 +74,8 @@ setTimeout(callback, MIN_TIME)
 export const onProcessor = <T extends keyof Events>(name: T, event: Events[T], data?: any) => {
   const Now = Date.now()
   const value = getConfigValue()
-  const EVENT_INTERVAL = value?.ALEMONJS_EVENT_INTERVAL ?? 1000 * 60
-  const USER_INTERVAL = value?.ALEMONJS_USER_INTERVAL ?? 1000 * 1
+  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? 1000 * 60
+  const USER_INTERVAL = value?.processor?.repeated_user_time ?? 1000 * 1
   if (event['MessageId']) {
     // 消息过长，要减少消息的长度
     const MessageId = createHash(event['MessageId'])

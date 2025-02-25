@@ -109,7 +109,7 @@ export const ErrorModule = (e: Error) => {
     const match = e.stack?.match(/'(.+?)'/)
     if (match) {
       const pack = match[1]
-      logger.error(`缺少模块或依赖 ${pack} 请安装`)
+      logger.error(`缺少模块或依赖 ${pack},请安装`)
     } else {
       logger.mark('无法提取缺失的信息，请检查')
     }

@@ -113,7 +113,7 @@ export class ConfigCore {
    */
   get argv() {
     const argv: {
-      [key: string]: string | true | undefined
+      [key: string]: string | null | undefined
     } = {}
     process.argv.forEach((arg, index) => {
       if (arg.startsWith('--')) {
@@ -122,7 +122,8 @@ export class ConfigCore {
         if (value && !value.startsWith('--')) {
           argv[key] = value
         } else {
-          argv[key] = true
+          // 无值
+          argv[key] = null
         }
       }
     })
