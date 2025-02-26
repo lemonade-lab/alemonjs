@@ -1,0 +1,9 @@
+{
+    "tasksRunnerOptions": {
+        "default": {
+            "options": {
+                "retry": 3
+            }
+        }
+    }
+}
