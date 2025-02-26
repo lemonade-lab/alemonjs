@@ -28,7 +28,7 @@
   },
   "alemonjs": {
     "desktop": {
-      "logo": "./public/QQ.svg",
+      "logo": "antd.QqOutlined",
       "platform": [
         {
           "name": "qq"
@@ -38,14 +38,14 @@
         {
           "name": "qq",
           "commond": "open.qq",
-          "icon": "./public/QQSide.svg"
+          "icon": "antd.QqOutlined"
         }
       ],
       "sidebars": [
         {
           "name": "qq",
           "commond": "open.qq",
-          "icon": "./public/QQSide.svg"
+          "icon": "antd.QqOutlined"
         }
       ]
     }

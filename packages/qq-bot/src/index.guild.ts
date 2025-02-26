@@ -1,7 +1,7 @@
 import {
   defineBot,
   getConfigValue,
-  OnProcessor,
+  onProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   User,
@@ -102,15 +102,8 @@ export default defineBot(() => {
       value: null
     }
 
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'private.message.create')
+    onProcessor('private.message.create', e, event)
   })
 
   // 监听消息
@@ -168,16 +161,8 @@ export default defineBot(() => {
       //
       value: null
     }
-
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'message.create')
+    onProcessor('message.create', e, event)
   })
 
   /**
@@ -264,16 +249,8 @@ export default defineBot(() => {
       tag: 'MESSAGE_CREATE',
       value: null
     }
-
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'message.create')
+    onProcessor('message.create', e, event)
   })
 
   client.on('ERROR', console.error)

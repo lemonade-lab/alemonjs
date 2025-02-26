@@ -26,7 +26,8 @@
         {
           "name": "onebot"
         }
-      ]
+      ],
+      "logo": "antd.RobotOutlined"
     }
   },
   "publishConfig": {

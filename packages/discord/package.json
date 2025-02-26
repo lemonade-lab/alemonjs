@@ -25,15 +25,18 @@
           "name": "discord"
         }
       ],
+      "logo": "antd.DiscordOutlined",
       "commond": [
         {
           "name": "打开discord",
+          "icon": "antd.DiscordOutlined",
           "commond": "open.discord"
         }
       ],
       "sidebars": [
         {
           "name": "dc",
+          "icon": "antd.DiscordOutlined",
           "commond": "open.discord"
         }
       ]

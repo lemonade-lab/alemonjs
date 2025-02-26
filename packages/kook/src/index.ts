@@ -1,13 +1,14 @@
 import {
   defineBot,
-  OnProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   getConfigValue,
   useUserHashKey,
-  User
+  User,
+  onProcessor
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
+import { readFileSync } from 'fs'
 export type Client = typeof KOOKClient.prototype
 export const platform = 'kook'
 export const client: Client = new Proxy({} as Client, {
@@ -90,15 +91,8 @@ export default defineBot(() => {
       value: null
     }
 
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'private.message.create')
+    onProcessor('private.message.create', e, event)
   })
 
   // 监听消息
@@ -182,15 +176,8 @@ export default defineBot(() => {
       value: null
     }
 
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'message.create')
+    onProcessor('message.create', e, event)
   })
 
   // 发送错误时
@@ -202,16 +189,106 @@ export default defineBot(() => {
   global.client = client
 
   return {
+    platform,
     api: {
+      active: {
+        send: {
+          channel: (channel_id, val) => {
+            if (val.length < 0) return Promise.all([])
+            const content = val
+              .filter(item => item.type == 'Mention' || item.type == 'Text')
+              .map(item => {
+                // if (item.type == 'Link') {
+                //   return `[${item.options?.title ?? item.value}](${item.value})`
+                // } else
+                if (item.type == 'Mention') {
+                  if (
+                    item.value == 'everyone' ||
+                    item.value == 'all' ||
+                    item.value == '' ||
+                    typeof item.value != 'string'
+                  ) {
+                    return `(met)all(met)`
+                  }
+                  if (item.options?.belong == 'user') {
+                    return `(met)${item.value}(met)`
+                  } else if (item.options?.belong == 'channel') {
+                    return `(chn)${item.value}(chn)`
+                  }
+                  return ''
+                } else if (item.type == 'Text') {
+                  if (item.options?.style == 'block') {
+                    return `\`${item.value}\``
+                  } else if (item.options?.style == 'italic') {
+                    return `*${item.value}*`
+                  } else if (item.options?.style == 'bold') {
+                    return `**${item.value}**`
+                  } else if (item.options?.style == 'strikethrough') {
+                    return `~~${item.value}~~`
+                  } else if (item.options?.style == 'boldItalic') {
+                    return `***${item.value}***`
+                  }
+                  return item.value
+                }
+              })
+              .join('')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.createMessage({
+                    type: 9,
+                    target_id: channel_id,
+                    content: item
+                  })
+                )
+              )
+            }
+            const images = val.filter(
+              item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+            )
+            if (images) {
+              return Promise.all(
+                images.map(async item => {
+                  if (item.type == 'ImageURL') {
+                    return await client.createMessage({
+                      type: 2,
+                      target_id: channel_id,
+                      content: item.value
+                    })
+                  }
+                  let data = item.value
+                  if (item.type == 'ImageFile') {
+                    data = readFileSync(item.value)
+                  }
+                  // 上传图片
+                  const res = await client.postImage(data)
+                  if (!res) return Promise.resolve()
+                  // 发送消息
+                  return await client.createMessage({
+                    type: 2,
+                    target_id: channel_id,
+                    content: res.data.url
+                  })
+                })
+              )
+            }
+            return Promise.all([])
+          },
+          user: (channel_id, val) => {
+            return Promise.all([])
+          }
+        }
+      },
       use: {
         send: (event, val) => {
           if (val.length < 0) return Promise.all([])
           const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .filter(item => item.type == 'Mention' || item.type == 'Text')
             .map(item => {
-              if (item.type == 'Link') {
-                return `[${item.options?.title ?? item.value}](${item.value})`
-              } else if (item.type == 'Mention') {
+              // if (item.type == 'Link') {
+              //   return `[${item.options?.title ?? item.value}](${item.value})`
+              // } else
+              if (item.type == 'Mention') {
                 if (
                   item.value == 'everyone' ||
                   item.value == 'all' ||
@@ -253,12 +330,25 @@ export default defineBot(() => {
               )
             )
           }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
+          const images = val.filter(
+            item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+          )
           if (images) {
             return Promise.all(
               images.map(async item => {
+                if (item.type == 'ImageURL') {
+                  return await client.createMessage({
+                    type: 2,
+                    target_id: event.ChannelId,
+                    content: item.value
+                  })
+                }
+                let data = item.value
+                if (item.type == 'ImageFile') {
+                  data = readFileSync(item.value)
+                }
                 // 上传图片
-                const res = await client.postImage(item)
+                const res = await client.postImage(data)
                 if (!res) return Promise.resolve()
                 // 发送消息
                 return await client.createMessage({

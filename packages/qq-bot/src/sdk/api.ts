@@ -41,7 +41,8 @@ export class QQBotAPI {
    */
   async groupService(options: AxiosRequestConfig) {
     const app_id = config.get('app_id')
-    const token = config.get('token')
+    // 群聊是加密token
+    const token = config.get('access_token')
     const service = await axios.create({
       baseURL: this.API_URL,
       timeout: 20000,

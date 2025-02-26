@@ -1,9 +1,9 @@
 import {
-  OnProcessor,
   PublicEventMessageCreate,
   User,
   defineBot,
   getConfigValue,
+  onProcessor,
   useUserHashKey
 } from 'alemonjs'
 import { DCClient } from './sdk/index'
@@ -114,16 +114,8 @@ export default defineBot(() => {
       tag: 'MESSAGE_CREATE',
       value: null
     }
-
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'message.create')
+    onProcessor('message.create', e, event)
   })
 
   // 发送错误时
@@ -132,16 +124,77 @@ export default defineBot(() => {
   global.client = client
 
   return {
+    platform,
     api: {
+      active: {
+        send: {
+          channel: (channel_id, val) => {
+            if (val.length < 0) return Promise.all([])
+            const content = val
+              .filter(item => item.type == 'Mention' || item.type == 'Text')
+              .map(item => {
+                // if (item.type == 'Link') {
+                //   return `[${item.options?.title ?? item.value}](${item.value})`
+                // } else
+                if (item.type == 'Mention') {
+                  if (
+                    item.value == 'everyone' ||
+                    item.value == 'all' ||
+                    item.value == '' ||
+                    typeof item.value != 'string'
+                  ) {
+                    return `<@everyone>`
+                  }
+                  if (item.options?.belong == 'user') {
+                    return `<@${item.value}>`
+                  } else if (item.options?.belong == 'channel') {
+                    return `<#${item.value}>`
+                  }
+                  return ''
+                } else if (item.type == 'Text') {
+                  if (item.options?.style == 'block') {
+                    return `\`${item.value}\``
+                  } else if (item.options?.style == 'italic') {
+                    return `*${item.value}*`
+                  } else if (item.options?.style == 'bold') {
+                    return `**${item.value}**`
+                  } else if (item.options?.style == 'strikethrough') {
+                    return `~~${item.value}~~`
+                  }
+                  return item.value
+                }
+              })
+              .join('')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.channelsMessages(channel_id, {
+                    content: item
+                  })
+                )
+              )
+            }
+            const images = val.filter(item => item.type == 'Image').map(item => item.value)
+            if (images) {
+              return Promise.all(images.map(item => client.channelsMessagesImage(channel_id, item)))
+            }
+            return Promise.all([])
+          },
+          user: (user_id, data) => {
+            return Promise.all([])
+          }
+        }
+      },
       use: {
         send: (event, val) => {
           if (val.length < 0) return Promise.all([])
           const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .filter(item => item.type == 'Mention' || item.type == 'Text')
             .map(item => {
-              if (item.type == 'Link') {
-                return `[${item.options?.title ?? item.value}](${item.value})`
-              } else if (item.type == 'Mention') {
+              // if (item.type == 'Link') {
+              //   return `[${item.options?.title ?? item.value}](${item.value})`
+              // } else
+              if (item.type == 'Mention') {
                 if (
                   item.value == 'everyone' ||
                   item.value == 'all' ||

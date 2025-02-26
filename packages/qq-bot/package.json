@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "阿柠檬qqbot平台连接",
   "author": "lemonade",
   "license": "MIT",
@@ -41,15 +41,18 @@
           "name": "qq-bot"
         }
       ],
+      "logo": "antd.QqOutlined",
       "commond": [
         {
           "name": "qq-bot",
+          "icon": "antd.QqOutlined",
           "commond": "open.qq-bot"
         }
       ],
       "sidebars": [
         {
           "name": "qq-bot",
+          "icon": "antd.QqOutlined",
           "commond": "open.qq-bot"
         }
       ]

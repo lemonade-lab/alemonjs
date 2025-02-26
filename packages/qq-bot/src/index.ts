@@ -1,7 +1,7 @@
 import {
   defineBot,
   getConfigValue,
-  OnProcessor,
+  onProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   User,
@@ -37,9 +37,17 @@ export default defineBot(() => {
   if (!value) value = {}
   const config = value[platform]
   if (config.mode == 'guild') {
-    return QQBotGuild.callback()
+    if (typeof QQBotGuild.callback == 'function') {
+      return QQBotGuild.callback()
+    } else {
+      return QQBotGuild.callback
+    }
   } else if (config.mode == 'group') {
-    return QQBotGroup.callback()
+    if (typeof QQBotGroup.callback == 'function') {
+      return QQBotGroup.callback()
+    } else {
+      return QQBotGroup.callback
+    }
   }
   const client = new QQBotClient({
     secret: config?.secret,
@@ -105,14 +113,8 @@ export default defineBot(() => {
       tag: 'GROUP_AT_MESSAGE_CREATE',
       value: null
     }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
     // 处理消息
-    OnProcessor(e, 'message.create')
+    onProcessor('message.create', e, event)
   })
 
   client.on('C2C_MESSAGE_CREATE', async event => {
@@ -160,14 +162,8 @@ export default defineBot(() => {
       tag: 'C2C_MESSAGE_CREATE',
       value: null
     }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
     // 处理消息
-    OnProcessor(e, 'private.message.create')
+    onProcessor('private.message.create', e, event)
   })
 
   /**
@@ -229,15 +225,8 @@ export default defineBot(() => {
       value: null
     }
 
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'private.message.create')
+    onProcessor('private.message.create', e, event)
   })
 
   // 监听消息
@@ -296,15 +285,8 @@ export default defineBot(() => {
       value: null
     }
 
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'message.create')
+    onProcessor('message.create', e, event)
   })
 
   /**
@@ -391,16 +373,8 @@ export default defineBot(() => {
       tag: 'MESSAGE_CREATE',
       value: null
     }
-
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-
     // 处理消息
-    OnProcessor(e, 'message.create')
+    onProcessor('message.create', e, event)
   })
 
   client.on('ERROR', console.error)

@@ -30,15 +30,18 @@
           "name": "wechat"
         }
       ],
+      "logo": "antd.WechatOutlined",
       "commond": [
         {
           "name": "打开wx配置",
+          "icon": "antd.WechatOutlined",
           "commond": "open.wechat"
         }
       ],
       "sidebars": [
         {
           "name": "wx",
+          "icon": "antd.WechatOutlined",
           "commond": "open.wechat"
         }
       ]

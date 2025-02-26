@@ -26,15 +26,18 @@
           "value": "@alemonjs/kook"
         }
       ],
+      "logo": "antd.RobotOutlined",
       "commond": [
         {
           "name": "kook",
+          "icon": "antd.RobotOutlined",
           "commond": "open.kook"
         }
       ],
       "sidebars": [
         {
           "name": "kook",
+          "icon": "antd.RobotOutlined",
           "commond": "open.kook"
         }
       ]

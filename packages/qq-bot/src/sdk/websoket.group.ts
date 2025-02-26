@@ -52,7 +52,7 @@ export class QQBotGroupClient extends QQBotAPI {
         expires_in: number
         cache: boolean
       } = await this.getAuthentication(app_id, secret).then(res => res.data)
-      config.set('token', data.access_token)
+      config.set('access_token', data.access_token)
       console.info('refresh', data.expires_in, 's')
       setTimeout(accessToken, data.expires_in * 1000)
     }
