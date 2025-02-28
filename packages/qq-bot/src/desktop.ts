@@ -39,15 +39,9 @@ export const activate = context => {
         const config = getConfig()
         const value = config.value ?? {}
         value['qq-bot'] = {
-          app_id: qqBot.app_id ?? '',
-          token: qqBot.token ?? '',
-          secret: qqBot.secret ?? '',
+          ...qqBot,
           // master_key 12121,1313,1313,13 转为数组
-          master_key: qqBot.master_key.split(','),
-          route: qqBot.route ?? '/webhook',
-          port: qqBot.port ?? 17157,
-          ws: qqBot.ws != '' && qqBot.ws ? qqBot.ws : null,
-          sandbox: qqBot.sandbox ?? false
+          master_key: qqBot.master_key.split(',')
         }
         config.saveValue(value)
         context.notification('QQ Bot 配置保存成功～')

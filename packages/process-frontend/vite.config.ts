@@ -17,7 +17,7 @@ export default defineConfig({
     ]
   },
   esbuild: {
-    drop: process.env.NODE_ENV === 'development' ? [] : ['console', 'debugger']
+    drop: NODE_ENV ? [] : ['console', 'debugger']
   },
   build: {
     commonjsOptions: {
@@ -25,10 +25,12 @@ export default defineConfig({
     },
     minify: 'terser',
     terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
+      compress: NODE_ENV
+        ? {}
+        : {
+            drop_console: true,
+            drop_debugger: true
+          }
     },
     rollupOptions: {
       output: {

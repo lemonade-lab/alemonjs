@@ -45,7 +45,7 @@ export default function Form() {
   }
 
   return (
-    <form id="qqBotForm" onSubmit={handleSubmit} className="py-4 space-y-4">
+    <form onSubmit={handleSubmit} className="py-4 space-y-4">
       <div>
         <label htmlFor="app_id" className="block text-sm font-medium text-gray-700">
           Port
