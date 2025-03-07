@@ -10,20 +10,16 @@ import {
   ChildrenCycle
 } from '../typings'
 
-/**
- *
- * @returns
- */
-const createChildrenKey = () => {
-  // 随机一个key
-  const KEY = `${Date.now()}:${Math.random()}`
-  // 如果存在。则重新生成
-  // 把子应用挂起来
-  // if (alemonjsCore.storeChildren[KEY]) {
-  //   return createChildrenKey()
-  // }
-  //
-}
+// const createChildrenKey = () => {
+//   // 随机一个key
+//   const KEY = `${Date.now()}:${Math.random()}`
+//   // 如果存在。则重新生成
+//   // 把子应用挂起来
+//   // if (alemonjsCore.storeChildren[KEY]) {
+//   //   return createChildrenKey()
+//   // }
+//   //
+// }
 
 /**
  * 加载文件

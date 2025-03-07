@@ -1,7 +1,7 @@
 import './typings'
 import { readFileSync, existsSync, watch, writeFileSync, mkdirSync } from 'fs'
 import { dirname, join } from 'path'
-import { parse, stringify } from 'yaml'
+import YAML from 'yaml'
 import { Package } from './typing/package'
 
 /**
@@ -12,6 +12,12 @@ export class ConfigCore {
   #dir: string | null = null
 
   #value: any = null
+
+  #initValue = {
+    gui: {
+      port: 17127
+    }
+  }
 
   /**
    *
@@ -31,12 +37,12 @@ export class ConfigCore {
     const dir = join(process.cwd(), this.#dir)
     // 如果文件不存在
     if (!existsSync(dir)) {
-      this.saveValue({})
+      this.saveValue(this.#initValue)
       return this.#value
     }
     try {
       const data = readFileSync(dir, 'utf-8')
-      const d = parse(data)
+      const d = YAML.parse(data)
       this.#value = d
     } catch (err) {
       logger.error(err)
@@ -47,7 +53,7 @@ export class ConfigCore {
       logger.info('config update', dir)
       try {
         const data = readFileSync(dir, 'utf-8')
-        const d = parse(data)
+        const d = YAML.parse(data)
         this.#value = d
       } catch (err) {
         logger.error(err)
@@ -79,7 +85,7 @@ export class ConfigCore {
     if (!existsSync(dir)) {
       mkdirSync(dirname(dir), { recursive: true })
     }
-    const data = stringify(value)
+    const data = YAML.stringify(value)
     writeFileSync(dir, data, 'utf-8')
   }
 
