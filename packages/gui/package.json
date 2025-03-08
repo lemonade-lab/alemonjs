@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.3.6",
-  "description": "阿柠檬GUI可视化平台",
+  "version": "0.4.0",
+  "description": "可视化调试平台",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -15,6 +15,7 @@
     "koa-router": "^13.0.1",
     "koa-static": "^5.0.0",
     "koa-bodyparser": "^4.4.1",
+    "@koa/cors": "^5.0.0",
     "dayjs": "^1.11.13",
     "ws": "^8.18.0"
   },

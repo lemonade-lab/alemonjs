@@ -1,16 +1,20 @@
 import { mkdirSync } from 'fs'
 import { join } from 'path'
-const dir = join(process.cwd(), 'public', 'config')
-const messageDir = join(process.cwd(), 'public', 'message')
-mkdirSync(dir, { recursive: true })
-mkdirSync(messageDir, { recursive: true })
 
-/**
- * channel.json
- */
-export const channelDir = join(dir, 'channel')
+// 配置文件目录
+const guiPath = join(process.cwd(), 'gui')
+// 缓存目录
+const cachePath = join(guiPath, '.cache')
 
-/**
- * private.json
- */
-export const privateDir = join(dir, 'private')
+// 频道缓存目录
+const channelPath = join(cachePath, 'channel')
+// 私聊缓存目录
+const privatePath = join(cachePath, 'private')
+mkdirSync(channelPath, { recursive: true })
+mkdirSync(privatePath, { recursive: true })
+
+// 文件缓存目录
+// const filePath = join(cachePath, 'file')
+// mkdirSync(filePath, { recursive: true })
+
+export { guiPath, channelPath, privatePath }

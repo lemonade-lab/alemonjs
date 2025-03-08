@@ -1,0 +1,7 @@
+[
+    {
+        "name": "来张图片",
+        "type": "command",
+        "value": "/image"
+    }
+]
