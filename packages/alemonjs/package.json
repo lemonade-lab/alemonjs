@@ -1,7 +1,7 @@
 {
   "name": "alemonjs",
-  "version": "2.0.0-rc.95",
-  "description": "alemonjs bot script",
+  "version": "2.0.0-rc.96",
+  "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

@@ -5,13 +5,12 @@ import { DefineChildren } from '../typings'
  * @returns
  */
 export const defineChildren: DefineChildren = callback => {
-  // 判断是否是函数
-  if (typeof callback !== 'function') {
-    throw new Error('Invalid callback: callback must be a function')
+  if (typeof callback === 'function' || typeof callback === 'object') {
+    return {
+      _name: 'apps',
+      callback
+    }
   }
-  return {
-    _name: 'apps',
-    callback
-  }
+  throw new Error('Invalid callback: callback must be a object or function')
 }
 global.defineChildren = defineChildren
