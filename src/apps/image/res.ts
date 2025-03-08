@@ -11,8 +11,7 @@ const myRes = OnResponse(
     // 发送本地图片文件
     const img = readFileSync(url)
     if (img) {
-      // Send(Image(img))
-      Send(Text('图片不存在'), Image(img))
+      Send(Image(img))
     } else {
       Send(Text('图片不存在'))
     }
