@@ -293,10 +293,13 @@ export class DCAPI {
    * 创建DM
    * *********
    */
-  async userMeChannels() {
+  async userMeChannels(recipient_id: string) {
     return this.request({
       method: 'post',
-      url: `/user/@me/channels`
+      url: `/user/@me/channels`,
+      data: {
+        recipient_id
+      }
     }).then(res => res?.data)
   }
 

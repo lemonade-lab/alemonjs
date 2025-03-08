@@ -1,4 +1,5 @@
 import {
+  PrivateEventMessageCreate,
   PublicEventMessageCreate,
   User,
   defineBot,
@@ -75,6 +76,8 @@ export default defineBot(() => {
     // 消除bot消息
     if (event.author?.bot) return
 
+    console.log('event', event)
+
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(event.author.id)
 
@@ -104,33 +107,66 @@ export default defineBot(() => {
 
     const UserAvatar = createUserAvatar(UserId, event.author.avatar)
 
-    // 定义消
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      // 事件类型
-      Platform: platform,
-      // guild
-      GuildId: event.guild_id,
-      ChannelId: event.channel_id,
-      // user
-      UserId: UserId,
-      UserKey,
-      UserName: event.author.username,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      // message
-      MessageId: event.id,
-      MessageText: msg,
-      OpenId: '',
-      CreateAt: Date.now(),
-      // other
-      tag: 'MESSAGE_CREATE',
-      value: null
+    if (event.type == 0) {
+      // 私聊
+      const e: PrivateEventMessageCreate = {
+        name: 'private.message.create',
+        // 事件类型
+        Platform: platform,
+        // guild
+        // GuildId: event.guild_id,
+        // ChannelId: event.channel_id,
+        // user
+        UserId: UserId,
+        UserKey,
+        UserName: event.author.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        // message
+        MessageId: event.id,
+        MessageText: msg,
+        OpenId: '',
+        CreateAt: Date.now(),
+        // other
+        tag: 'private.message.create',
+        value: null
+      }
+      // 处理消息
+      onProcessor('private.message.create', e, event)
+    } else if (event.type == 8) {
+      // 群聊
+      const e: PublicEventMessageCreate = {
+        name: 'message.create',
+        // 事件类型
+        Platform: platform,
+        // guild
+        GuildId: event.guild_id,
+        ChannelId: event.channel_id,
+        // user
+        UserId: UserId,
+        UserKey,
+        UserName: event.author.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        // message
+        MessageId: event.id,
+        MessageText: msg,
+        OpenId: '',
+        CreateAt: Date.now(),
+        // other
+        tag: 'message.create',
+        value: null
+      }
+      // 处理消息
+      onProcessor('message.create', e, event)
+    } else {
+      // 未知类型
     }
-    // 处理消息
-    onProcessor('message.create', e, event)
   })
+
+  // client.on('')
 
   // 发送错误时
   client.on('ERROR', console.error)
@@ -207,14 +243,84 @@ export default defineBot(() => {
             }
             return Promise.all([])
           },
-          user: (_user_id, _data) => {
+          user: async (author_id, val) => {
+            if (val.length < 0) return Promise.all([])
+            const res = await client.userMeChannels(author_id)
+            const channel_id = res.id
+            const content = val
+              .filter(item => item.type == 'Mention' || item.type == 'Text')
+              .map(item => {
+                // if (item.type == 'Link') {
+                //   return `[${item.options?.title ?? item.value}](${item.value})`
+                // } else
+                if (item.type == 'Mention') {
+                  if (
+                    item.value == 'everyone' ||
+                    item.value == 'all' ||
+                    item.value == '' ||
+                    typeof item.value != 'string'
+                  ) {
+                    return `<@everyone>`
+                  }
+                  if (item.options?.belong == 'user') {
+                    return `<@${item.value}>`
+                  } else if (item.options?.belong == 'channel') {
+                    return `<#${item.value}>`
+                  }
+                  return ''
+                } else if (item.type == 'Text') {
+                  if (item.options?.style == 'block') {
+                    return `\`${item.value}\``
+                  } else if (item.options?.style == 'italic') {
+                    return `*${item.value}*`
+                  } else if (item.options?.style == 'bold') {
+                    return `**${item.value}**`
+                  } else if (item.options?.style == 'strikethrough') {
+                    return `~~${item.value}~~`
+                  }
+                  return item.value
+                }
+              })
+              .join('')
+            if (content) {
+              return Promise.all(
+                [content].map(item =>
+                  client.channelsMessages(channel_id, {
+                    content: item
+                  })
+                )
+              )
+            }
+            const images = val.filter(
+              item => item.type == 'Image' || item.type == 'ImageURL' || item.type == 'ImageFile'
+            )
+            if (images.length > 0) {
+              return Promise.all(
+                images.map(async item => {
+                  if (item.type == 'Image') {
+                    return client.channelsMessagesImage(channel_id, item.value)
+                  } else if (item.type == 'ImageURL') {
+                    return client.channelsMessagesImage(channel_id, ImageURLToBuffer(item.value))
+                  } else if (item.type == 'ImageFile') {
+                    const data = readFileSync(item.value)
+                    return client.channelsMessagesImage(channel_id, data)
+                  }
+                })
+              )
+            }
             return Promise.all([])
           }
         }
       },
       use: {
-        send: (event, val) => {
+        send: async (event, val) => {
           if (val.length < 0) return Promise.all([])
+          let channel_id = event.ChannelId
+          if (/private/.test(event.name)) {
+            const data = event.value
+            channel_id = data?.channel_id
+            if (!channel_id) return Promise.all([])
+          }
           const content = val
             .filter(item => item.type == 'Mention' || item.type == 'Text')
             .map(item => {
@@ -253,7 +359,7 @@ export default defineBot(() => {
           if (content) {
             return Promise.all(
               [content].map(item =>
-                client.channelsMessages(event.ChannelId, {
+                client.channelsMessages(channel_id, {
                   content: item
                 })
               )
@@ -266,12 +372,12 @@ export default defineBot(() => {
             return Promise.all(
               images.map(async item => {
                 if (item.type == 'Image') {
-                  return client.channelsMessagesImage(event.ChannelId, item.value)
+                  return client.channelsMessagesImage(channel_id, item.value)
                 } else if (item.type == 'ImageURL') {
-                  return client.channelsMessagesImage(event.ChannelId, ImageURLToBuffer(item.value))
+                  return client.channelsMessagesImage(channel_id, ImageURLToBuffer(item.value))
                 } else if (item.type == 'ImageFile') {
                   const data = readFileSync(item.value)
-                  return client.channelsMessagesImage(event.ChannelId, data)
+                  return client.channelsMessagesImage(channel_id, data)
                 }
               })
             )
@@ -287,16 +393,16 @@ export default defineBot(() => {
             const config = value?.discord
             const master_key = config?.master_key ?? []
             const UserAvatar = createUserAvatar(UserId, avatar)
-
+            const UserKey = useUserHashKey({
+              Platform: platform,
+              UserId: UserId
+            })
             return {
               UserId: item.id,
               IsMaster: master_key.includes(UserId),
               IsBot: item.bot,
               UserAvatar,
-              UserKey: useUserHashKey({
-                Platform: platform,
-                UserId: UserId
-              })
+              UserKey
             }
           })
           return MessageMention
