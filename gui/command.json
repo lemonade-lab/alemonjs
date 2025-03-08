@@ -1,7 +1,7 @@
 [
     {
-        "name": "你好呀",
+        "name": "测试文本",
         "type": "command",
-        "value": "/hello"
+        "value": "/text"
     }
 ]

@@ -8,6 +8,7 @@ import {
 } from 'alemonjs'
 import { DCClient } from './sdk/index'
 import { MESSAGE_CREATE_TYPE } from './sdk/platform/discord/sdk/message/MESSAGE_CREATE'
+import { readFileSync } from 'fs'
 export type Client = typeof DCClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -32,6 +33,42 @@ export default defineBot(() => {
 
   // 连接
   client.connect()
+
+  const ImageURLToBuffer = async (url: string) => {
+    const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
+    return Buffer.from(arrayBuffer)
+  }
+
+  /**
+   * 创建用户头像
+   * @param UserId
+   * @param avatar
+   * @returns
+   */
+  const createUserAvatar = (UserId: string, avatar: string) => {
+    let url = null
+    return {
+      toBuffer: async () => {
+        if (!url) {
+          url = client.userAvatar(UserId, avatar)
+        }
+        return ImageURLToBuffer(url)
+      },
+      toBase64: async () => {
+        if (!url) {
+          url = client.userAvatar(UserId, avatar)
+        }
+        const buffer = await ImageURLToBuffer(url)
+        return buffer?.toString('base64')
+      },
+      toURL: async () => {
+        if (!url) {
+          url = client.userAvatar(UserId, avatar)
+        }
+        return url
+      }
+    }
+  }
 
   // 监听消息
   client.on('MESSAGE_CREATE', async event => {
@@ -65,30 +102,7 @@ export default defineBot(() => {
       UserId: UserId
     })
 
-    let url: null | string = null
-
-    const UserAvatar = {
-      toBuffer: async () => {
-        if (!url) {
-          url = client.userAvatar(UserId, event.author.avatar)
-        }
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        if (!url) {
-          url = client.userAvatar(UserId, event.author.avatar)
-        }
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        if (!url) {
-          url = client.userAvatar(UserId, event.author.avatar)
-        }
-        return url
-      }
-    }
+    const UserAvatar = createUserAvatar(UserId, event.author.avatar)
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -174,13 +188,26 @@ export default defineBot(() => {
                 )
               )
             }
-            const images = val.filter(item => item.type == 'Image').map(item => item.value)
-            if (images) {
-              return Promise.all(images.map(item => client.channelsMessagesImage(channel_id, item)))
+            const images = val.filter(
+              item => item.type == 'Image' || item.type == 'ImageURL' || item.type == 'ImageFile'
+            )
+            if (images.length > 0) {
+              return Promise.all(
+                images.map(async item => {
+                  if (item.type == 'Image') {
+                    return client.channelsMessagesImage(channel_id, item.value)
+                  } else if (item.type == 'ImageURL') {
+                    return client.channelsMessagesImage(channel_id, ImageURLToBuffer(item.value))
+                  } else if (item.type == 'ImageFile') {
+                    const data = readFileSync(item.value)
+                    return client.channelsMessagesImage(channel_id, data)
+                  }
+                })
+              )
             }
             return Promise.all([])
           },
-          user: (user_id, data) => {
+          user: (_user_id, _data) => {
             return Promise.all([])
           }
         }
@@ -232,10 +259,21 @@ export default defineBot(() => {
               )
             )
           }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
-          if (images) {
+          const images = val.filter(
+            item => item.type == 'Image' || item.type == 'ImageURL' || item.type == 'ImageFile'
+          )
+          if (images.length > 0) {
             return Promise.all(
-              images.map(item => client.channelsMessagesImage(event.ChannelId, item))
+              images.map(async item => {
+                if (item.type == 'Image') {
+                  return client.channelsMessagesImage(event.ChannelId, item.value)
+                } else if (item.type == 'ImageURL') {
+                  return client.channelsMessagesImage(event.ChannelId, ImageURLToBuffer(item.value))
+                } else if (item.type == 'ImageFile') {
+                  const data = readFileSync(item.value)
+                  return client.channelsMessagesImage(event.ChannelId, data)
+                }
+              })
             )
           }
           return Promise.all([])
@@ -243,34 +281,13 @@ export default defineBot(() => {
         mention: async e => {
           const event: MESSAGE_CREATE_TYPE = e.value
           const MessageMention: User[] = event.mentions.map(item => {
-            let url = null
             const UserId = item.id
             const avatar = event.author.avatar
             const value = getConfigValue()
             const config = value?.discord
             const master_key = config?.master_key ?? []
-            const UserAvatar = {
-              toBuffer: async () => {
-                if (!url) {
-                  url = client.userAvatar(UserId, avatar)
-                }
-                const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-                return Buffer.from(arrayBuffer)
-              },
-              toBase64: async () => {
-                if (!url) {
-                  url = client.userAvatar(UserId, avatar)
-                }
-                const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-                return Buffer.from(arrayBuffer).toString('base64')
-              },
-              toURL: async () => {
-                if (!url) {
-                  url = client.userAvatar(UserId, avatar)
-                }
-                return url
-              }
-            }
+            const UserAvatar = createUserAvatar(UserId, avatar)
+
             return {
               UserId: item.id,
               IsMaster: master_key.includes(UserId),

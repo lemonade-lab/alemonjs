@@ -25,3 +25,8 @@ discord:
   # 活动 非必填）
   shard: null
 ```
+
+```sh
+# 禁用 SSL 证书验证，允许连接使用无效或自签名的证书
+env.NODE_TLS_REJECT_UNAUTHORIZED=0
+```
