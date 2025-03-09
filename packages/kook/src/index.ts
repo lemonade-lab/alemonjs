@@ -5,7 +5,8 @@ import {
   getConfigValue,
   useUserHashKey,
   User,
-  onProcessor
+  onProcessor,
+  DataEnums
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 import { readFileSync } from 'fs'
@@ -37,6 +38,9 @@ export default defineBot(() => {
   client.on('MESSAGES_DIRECT', async event => {
     // 过滤机器人
     if (event.extra?.author?.bot) return false
+
+    // 创建私聊标记
+    const data = await client.userChatCreate(event.extra.author.id).then(res => res?.data)
 
     // 主人
     const master_key = config?.master_key ?? []
@@ -84,7 +88,7 @@ export default defineBot(() => {
       // message
       MessageId: event.msg_id,
       MessageText: msg,
-      OpenId: '',
+      OpenId: data?.code,
       CreateAt: Date.now(),
       //
       tag: 'MESSAGES_PUBLIC',
@@ -188,176 +192,201 @@ export default defineBot(() => {
   // 客户端全局化。
   global.client = client
 
+  /**
+   *
+   * @param channel_id
+   * @param val
+   * @returns
+   */
+  const sendChannel = (channel_id: string, val: DataEnums[]) => {
+    if (val.length < 0) return Promise.all([])
+    const content = val
+      .filter(item => item.type == 'Mention' || item.type == 'Text')
+      .map(item => {
+        // if (item.type == 'Link') {
+        //   return `[${item.options?.title ?? item.value}](${item.value})`
+        // } else
+        if (item.type == 'Mention') {
+          if (
+            item.value == 'everyone' ||
+            item.value == 'all' ||
+            item.value == '' ||
+            typeof item.value != 'string'
+          ) {
+            return `(met)all(met)`
+          }
+          if (item.options?.belong == 'user') {
+            return `(met)${item.value}(met)`
+          } else if (item.options?.belong == 'channel') {
+            return `(chn)${item.value}(chn)`
+          }
+          return ''
+        } else if (item.type == 'Text') {
+          if (item.options?.style == 'block') {
+            return `\`${item.value}\``
+          } else if (item.options?.style == 'italic') {
+            return `*${item.value}*`
+          } else if (item.options?.style == 'bold') {
+            return `**${item.value}**`
+          } else if (item.options?.style == 'strikethrough') {
+            return `~~${item.value}~~`
+          } else if (item.options?.style == 'boldItalic') {
+            return `***${item.value}***`
+          }
+          return item.value
+        }
+      })
+      .join('')
+    if (content) {
+      return Promise.all(
+        [content].map(item =>
+          client.createMessage({
+            type: 9,
+            target_id: channel_id,
+            content: item
+          })
+        )
+      )
+    }
+    const images = val.filter(
+      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+    )
+    if (images) {
+      return Promise.all(
+        images.map(async item => {
+          if (item.type == 'ImageURL') {
+            return await client.createMessage({
+              type: 2,
+              target_id: channel_id,
+              content: item.value
+            })
+          }
+          let data = item.value
+          if (item.type == 'ImageFile') {
+            data = readFileSync(item.value)
+          }
+          // 上传图片
+          const res = await client.postImage(data)
+          if (!res) return Promise.resolve()
+          // 发送消息
+          return await client.createMessage({
+            type: 2,
+            target_id: channel_id,
+            content: res.data.url
+          })
+        })
+      )
+    }
+    return Promise.all([])
+  }
+
+  /**
+   *
+   * @param channel_id
+   * @param val
+   * @returns
+   */
+  const sendUser = async (user_id: string, val: DataEnums[]) => {
+    if (val.length < 0) return Promise.all([])
+    // 创建私聊标记
+    const data = await client.userChatCreate(user_id).then(res => res?.data)
+    const open_id = data?.code
+    const content = val
+      .filter(item => item.type == 'Mention' || item.type == 'Text')
+      .map(item => {
+        // if (item.type == 'Link') {
+        //   return `[${item.options?.title ?? item.value}](${item.value})`
+        // } else
+        if (item.type == 'Mention') {
+          if (
+            item.value == 'everyone' ||
+            item.value == 'all' ||
+            item.value == '' ||
+            typeof item.value != 'string'
+          ) {
+            return `(met)all(met)`
+          }
+          if (item.options?.belong == 'user') {
+            return `(met)${item.value}(met)`
+          } else if (item.options?.belong == 'channel') {
+            return `(chn)${item.value}(chn)`
+          }
+          return ''
+        } else if (item.type == 'Text') {
+          if (item.options?.style == 'block') {
+            return `\`${item.value}\``
+          } else if (item.options?.style == 'italic') {
+            return `*${item.value}*`
+          } else if (item.options?.style == 'bold') {
+            return `**${item.value}**`
+          } else if (item.options?.style == 'strikethrough') {
+            return `~~${item.value}~~`
+          } else if (item.options?.style == 'boldItalic') {
+            return `***${item.value}***`
+          }
+          return item.value
+        }
+      })
+      .join('')
+    if (content) {
+      return Promise.all(
+        [content].map(item =>
+          client.createDirectMessage({
+            type: 9,
+            chat_code: open_id,
+            content: item
+          })
+        )
+      )
+    }
+    const images = val.filter(
+      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+    )
+    if (images) {
+      return Promise.all(
+        images.map(async item => {
+          if (item.type == 'ImageURL') {
+            return await client.createDirectMessage({
+              type: 2,
+              chat_code: open_id,
+              content: item.value
+            })
+          }
+          let data = item.value
+          if (item.type == 'ImageFile') {
+            data = readFileSync(item.value)
+          }
+          // 上传图片
+          const res = await client.postImage(data)
+          if (!res) return Promise.resolve()
+          // 发送消息
+          return await client.createDirectMessage({
+            type: 2,
+            chat_code: open_id,
+            content: res.data.url
+          })
+        })
+      )
+    }
+    return Promise.all([])
+  }
+
   return {
     platform,
     api: {
       active: {
         send: {
-          channel: (channel_id, val) => {
-            if (val.length < 0) return Promise.all([])
-            const content = val
-              .filter(item => item.type == 'Mention' || item.type == 'Text')
-              .map(item => {
-                // if (item.type == 'Link') {
-                //   return `[${item.options?.title ?? item.value}](${item.value})`
-                // } else
-                if (item.type == 'Mention') {
-                  if (
-                    item.value == 'everyone' ||
-                    item.value == 'all' ||
-                    item.value == '' ||
-                    typeof item.value != 'string'
-                  ) {
-                    return `(met)all(met)`
-                  }
-                  if (item.options?.belong == 'user') {
-                    return `(met)${item.value}(met)`
-                  } else if (item.options?.belong == 'channel') {
-                    return `(chn)${item.value}(chn)`
-                  }
-                  return ''
-                } else if (item.type == 'Text') {
-                  if (item.options?.style == 'block') {
-                    return `\`${item.value}\``
-                  } else if (item.options?.style == 'italic') {
-                    return `*${item.value}*`
-                  } else if (item.options?.style == 'bold') {
-                    return `**${item.value}**`
-                  } else if (item.options?.style == 'strikethrough') {
-                    return `~~${item.value}~~`
-                  } else if (item.options?.style == 'boldItalic') {
-                    return `***${item.value}***`
-                  }
-                  return item.value
-                }
-              })
-              .join('')
-            if (content) {
-              return Promise.all(
-                [content].map(item =>
-                  client.createMessage({
-                    type: 9,
-                    target_id: channel_id,
-                    content: item
-                  })
-                )
-              )
-            }
-            const images = val.filter(
-              item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-            )
-            if (images) {
-              return Promise.all(
-                images.map(async item => {
-                  if (item.type == 'ImageURL') {
-                    return await client.createMessage({
-                      type: 2,
-                      target_id: channel_id,
-                      content: item.value
-                    })
-                  }
-                  let data = item.value
-                  if (item.type == 'ImageFile') {
-                    data = readFileSync(item.value)
-                  }
-                  // 上传图片
-                  const res = await client.postImage(data)
-                  if (!res) return Promise.resolve()
-                  // 发送消息
-                  return await client.createMessage({
-                    type: 2,
-                    target_id: channel_id,
-                    content: res.data.url
-                  })
-                })
-              )
-            }
-            return Promise.all([])
-          },
-          user: (channel_id, val) => {
-            return Promise.all([])
-          }
+          channel: sendChannel,
+          user: sendUser
         }
       },
       use: {
         send: (event, val) => {
           if (val.length < 0) return Promise.all([])
-          const content = val
-            .filter(item => item.type == 'Mention' || item.type == 'Text')
-            .map(item => {
-              // if (item.type == 'Link') {
-              //   return `[${item.options?.title ?? item.value}](${item.value})`
-              // } else
-              if (item.type == 'Mention') {
-                if (
-                  item.value == 'everyone' ||
-                  item.value == 'all' ||
-                  item.value == '' ||
-                  typeof item.value != 'string'
-                ) {
-                  return `(met)all(met)`
-                }
-                if (item.options?.belong == 'user') {
-                  return `(met)${item.value}(met)`
-                } else if (item.options?.belong == 'channel') {
-                  return `(chn)${item.value}(chn)`
-                }
-                return ''
-              } else if (item.type == 'Text') {
-                if (item.options?.style == 'block') {
-                  return `\`${item.value}\``
-                } else if (item.options?.style == 'italic') {
-                  return `*${item.value}*`
-                } else if (item.options?.style == 'bold') {
-                  return `**${item.value}**`
-                } else if (item.options?.style == 'strikethrough') {
-                  return `~~${item.value}~~`
-                } else if (item.options?.style == 'boldItalic') {
-                  return `***${item.value}***`
-                }
-                return item.value
-              }
-            })
-            .join('')
-          if (content) {
-            return Promise.all(
-              [content].map(item =>
-                client.createMessage({
-                  type: 9,
-                  target_id: event.ChannelId,
-                  content: item
-                })
-              )
-            )
-          }
-          const images = val.filter(
-            item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-          )
-          if (images) {
-            return Promise.all(
-              images.map(async item => {
-                if (item.type == 'ImageURL') {
-                  return await client.createMessage({
-                    type: 2,
-                    target_id: event.ChannelId,
-                    content: item.value
-                  })
-                }
-                let data = item.value
-                if (item.type == 'ImageFile') {
-                  data = readFileSync(item.value)
-                }
-                // 上传图片
-                const res = await client.postImage(data)
-                if (!res) return Promise.resolve()
-                // 发送消息
-                return await client.createMessage({
-                  type: 2,
-                  target_id: event.ChannelId,
-                  content: res.data.url
-                })
-              })
-            )
+          if (event.name == 'message.create') {
+            return sendChannel(event.ChannelId, val)
+          } else if (event.name == 'private.message.create') {
+            return sendUser(event.UserId, val)
           }
           return Promise.all([])
         },
