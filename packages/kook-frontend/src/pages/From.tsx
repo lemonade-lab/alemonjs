@@ -1,3 +1,4 @@
+import { Button, Input } from '@alemonjs/react-ui'
 import { useEffect, useState } from 'react'
 
 export default function Form() {
@@ -45,40 +46,37 @@ export default function Form() {
   }
 
   return (
-    <form id="qqBotForm" onSubmit={handleSubmit} className="py-4 space-y-4">
+    <form onSubmit={handleSubmit} className="py-4 space-y-4">
       <div>
         <label htmlFor="app_id" className="block text-sm font-medium text-gray-700">
-          Token
+          token
         </label>
-        <input
-          type="number"
+        <Input
+          type="text"
           id="token"
           name="token"
           value={formData.token}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
         />
       </div>
       <div>
         <label htmlFor="master_key" className="  block text-sm font-medium text-gray-700">
           Master Key
         </label>
-        <input
+        <Input
           type="text"
           id="master_key"
           name="master_key"
           value={formData.master_key}
           placeholder="sad12345678,kfp12345678,sgs12345678"
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
         />
       </div>
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200"
-      >
+      <Button type="submit" className="w-full  p-2 rounded-md  transition duration-200">
         保存
-      </button>
+      </Button>
     </form>
   )
 }
