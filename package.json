@@ -6,9 +6,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "npx lvy dev",
+    "dev": "yarn --cwd packages/template dev",
     "build": "lerna run build",
-    "bundle": "node bundle.js",
     "test": "jest",
     "format": "prettier --write .",
     "check-format": "git diff --exit-code",

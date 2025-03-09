@@ -1,0 +1,21 @@
+{
+  "name": "alemonjs-template",
+  "version": "2.0.0",
+  "description": "alemonjs",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "npx lvy dev",
+    "build": "npx lvy build"
+  },
+  "devDependencies": {
+    "@types/node": "^18",
+    "@types/ws": "^8.5.12",
+    "lvyjs": "^0.2.14"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}

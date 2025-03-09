@@ -1,2 +1,2 @@
 import { start } from 'alemonjs'
-start()
+start('./lib/index.js')

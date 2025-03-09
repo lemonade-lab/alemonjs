@@ -11,4 +11,8 @@ log
 *.log.ts
 *.log
 *.logs
+alemon.*.yaml
+alemon.*.json
+alemon.*.js
+*.memory-card.json
 .nx

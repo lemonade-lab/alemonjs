@@ -2,7 +2,7 @@
     "tasksRunnerOptions": {
         "default": {
             "options": {
-                "retry": 3
+                "retry": 1
             }
         }
     }
