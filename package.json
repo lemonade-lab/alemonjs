@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "npx lvy dev",
-    "build": "npx lvy build",
+    "build": "lerna run build",
     "bundle": "node bundle.js",
     "test": "jest",
     "format": "prettier --write .",
@@ -32,8 +32,5 @@
   "private": true,
   "workspaces": [
     "packages/*"
-  ],
-  "dependencies": {
-    "dotenv": "^16.4.7"
-  }
+  ]
 }

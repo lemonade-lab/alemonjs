@@ -29,6 +29,7 @@
     "qs": "^6.13.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "@types/react-dom": "^19.0.4",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.1",
     "rehype-attr": "^3.0.3",
