@@ -91,7 +91,7 @@ export default function Table() {
       <tbody>
         {expansions.package.map(item => (
           <tr key={item.name} className="">
-            <td className="py-3 px-4 ">{item?.name}</td>
+            <td className="py-3 px-4 ">{item?.name.replace(/^(@alemonjs\/|alemonjs-)/, '')}</td>
             <td className="py-3 px-4 ">{item?.description}</td>
             <td className="py-3 px-4 ">{item?.version}</td>
             <td className="py-3 px-4 ">
