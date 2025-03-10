@@ -1,10 +1,10 @@
 import {
   defineBot,
-  OnProcessor,
   getConfigValue,
   User,
   PrivateEventMessageCreate,
-  PublicEventMessageCreate
+  PublicEventMessageCreate,
+  onProcessor
 } from 'alemonjs'
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
@@ -158,7 +158,7 @@ export default defineBot(() => {
           }
         })
         // 处理消息
-        OnProcessor(e, 'message.create')
+        onProcessor('message.create', e, event)
       } else {
         const OpenId = event.payload?.listenerId ?? ''
         // 定义消
@@ -181,14 +181,8 @@ export default defineBot(() => {
           tag: 'message',
           value: null
         }
-        // 当访问的时候获取
-        Object.defineProperty(e, 'value', {
-          get() {
-            return event
-          }
-        })
         // 处理消息
-        OnProcessor(e, 'private.message.create')
+        onProcessor('private.message.create', e, event)
       }
     })
     .on('error', () => {})
@@ -199,24 +193,47 @@ export default defineBot(() => {
   global.client = bot
 
   return {
+    platform: platform,
     api: {
+      active: {
+        send: {
+          channel: () => {
+            return Promise.all([])
+          },
+          user: () => {
+            return Promise.all([])
+          }
+        }
+      },
       use: {
         send: (e, val) => {
           if (val.length < 0) return Promise.all([])
           const event: MessageInterface = e.value
           const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+            .filter(item => item.type == 'Mention' || item.type == 'Text')
             .map(item => item.value)
             .join('')
           if (content && content != '') {
             return Promise.all([content].map(item => event.say(item)))
           }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
+          const images = val.filter(
+            item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+          )
           if (images) {
             return Promise.all(
               images.map(item => {
+                if (item.type == 'ImageFile') {
+                  const filePath = getStaticPath(Date.now() + '.png')
+                  const data = readFileSync(item.value)
+                  writeFileSync(filePath, data, 'utf-8')
+                  const fileBox = FileBox.fromFile(filePath)
+                  return event.say(fileBox)
+                } else if (item.type == 'ImageURL') {
+                  const fileBox = FileBox.fromUrl(item.value)
+                  return event.say(fileBox)
+                }
                 const filePath = getStaticPath(Date.now() + '.png')
-                writeFileSync(filePath, item, 'utf-8')
+                writeFileSync(filePath, item.value, 'utf-8')
                 const fileBox = FileBox.fromFile(filePath)
                 return event.say(fileBox)
               })
