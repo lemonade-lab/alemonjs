@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Select2 } from '@/components/select'
+import { SelectAndDesc } from '@/components/select'
 import { Modal } from '@/components/modal'
 import { Password } from '@/components/password'
 import { DivButton } from '@/components/button'
@@ -7,6 +7,7 @@ import { DivSwitch } from '@/components/switch'
 import { RadioGroup } from '@/components/radios'
 import { ExclamationTriangleIcon, RocketLaunchIcon } from '@heroicons/react/24/outline'
 import FileProcess from '@/utils/file'
+import { Button, Input } from '@alemonjs/react-ui'
 
 export default function From() {
   const logLevel = ['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'mark', 'off']
@@ -512,28 +513,28 @@ export default function From() {
           />
         )}
         {/input/.test(modal.type) && (
-          <input
+          <Input
             type="text"
             name="sms"
             value={modal.value as string}
             onChange={e => setModal({ ...modal, value: e.target.value })}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         )}
       </Modal>
 
-      <form id="qqForm" onSubmit={handleSubmit} className="py-4 space-y-4">
+      <form onSubmit={handleSubmit} className="py-4 space-y-4">
         <div>
           <label htmlFor="qq" className="block text-sm font-semibold text-gray-700">
             QQ
           </label>
-          <input
+          <Input
             type="text"
             id="qq"
             name="qq"
             value={formData.qq}
             onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
         <div>
@@ -552,7 +553,7 @@ export default function From() {
           <label htmlFor="device" className="block text-sm font-semibold text-gray-700">
             登录设备
           </label>
-          <Select2
+          <SelectAndDesc
             name="device"
             value={platForm[Number(formData.device) - 1]}
             options={platForm}
@@ -571,47 +572,47 @@ export default function From() {
           <label htmlFor="master_key" className="block text-sm font-semibold text-gray-700">
             Master Key
           </label>
-          <input
+          <Input
             type="text"
             id="master_key"
             name="master_key"
             value={formData.master_key}
             placeholder="12345,12345,1212121"
             onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
         <div>
           <label htmlFor="sign_api_addr" className="block text-sm font-semibold text-gray-700">
             签名地址
           </label>
-          <input
+          <Input
             type="text"
             id="sign_api_addr"
             name="sign_api_addr"
             value={formData.sign_api_addr}
             onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
         <div>
           <label htmlFor="ver" className="block text-sm font-semibold text-gray-700">
             签名版本
           </label>
-          <input
+          <Input
             type="text"
             id="ver"
             name="ver"
             value={formData.ver}
             onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
         <div>
           <label htmlFor="log_level" className="block text-sm font-semibold text-gray-700">
             日志等级
           </label>
-          <Select2
+          <SelectAndDesc
             name="log_level"
             desc="越靠前越详细"
             value={formData.log_level}
@@ -660,7 +661,7 @@ export default function From() {
           <label htmlFor="reconn_interval" className="block text-sm font-semibold text-gray-700">
             掉线后的重新登录间隔秒数
           </label>
-          <input
+          <Input
             type="number"
             id="reconn_interval"
             min={0}
@@ -670,7 +671,7 @@ export default function From() {
             onChange={e =>
               handleChange({ target: { name: 'reconn_interval', value: Number(e.target.value) } })
             }
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
 
@@ -678,14 +679,14 @@ export default function From() {
           <label htmlFor="ffmpeg_path" className="block text-sm font-semibold text-gray-700">
             ffmepg路径
           </label>
-          <input
+          <Input
             type="text"
             id="ffmpeg_path"
             name="ffmpeg_path"
             placeholder="绝对路径"
             value={formData.ffmpeg_path}
             onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
 
@@ -693,14 +694,14 @@ export default function From() {
           <label htmlFor="ffprobe_path" className="block text-sm font-semibold text-gray-700">
             ffprobe路径
           </label>
-          <input
+          <Input
             type="text"
             id="ffprobe_path"
             placeholder="绝对路径"
             name="ffprobe_path"
             value={formData.ffprobe_path}
             onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
 
@@ -709,11 +710,11 @@ export default function From() {
             上传Device和token
           </label>
           <div className="mt-1 relative flex justify-center items-center w-full border border-gray-300 rounded-md has-[input:focus-within]:outline-none has-[input:focus-within]:ring has-[input:focus-within]:ring-blue-500">
-            <input
+            <Input
               type="file"
               multiple
               onChange={handleUpload}
-              className="w-full p-1 border border-gray-300 opacity-0"
+              className="w-full p-1 border opacity-0"
             />
             <span className="absolute text-gray-400 -z-10">如果已有，则会覆盖</span>
           </div>
@@ -739,20 +740,17 @@ export default function From() {
         ></DivButton>
 
         <div className="flex justify-between items-center">
-          <button
-            type="submit"
-            className="w-full mr-1 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200"
-          >
+          <Button type="submit" className="w-full mr-1  p-2 rounded-md  transition duration-200">
             保存配置
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
-            className="w-full ml-1 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200"
+            className="w-full ml-1 p-2 rounded-md  transition duration-200"
             onClick={handleDeleteIcqq}
           >
             删除device和token
-          </button>
+          </Button>
         </div>
       </form>
     </>

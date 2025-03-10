@@ -136,11 +136,12 @@ export default defineBot(() => {
           if (val.length < 0) return []
           try {
             const content: Sendable = val
-              .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+              .filter(item => item.type == 'Mention' || item.type == 'Text')
               .map(item => {
-                if (item.type == 'Link') {
-                  return segment.share(item.value, item.options?.title ?? item.value)
-                } else if (item.type == 'Mention') {
+                // if (item.type == 'Link') {
+                //   return segment.share(item.value, item.options?.title ?? item.value)
+                // } else
+                if (item.type == 'Mention') {
                   if (
                     item.value == 'everyone' ||
                     item.value == 'all' ||

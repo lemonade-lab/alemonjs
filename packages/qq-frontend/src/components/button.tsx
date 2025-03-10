@@ -1,3 +1,4 @@
+import { Button } from '@alemonjs/react-ui'
 import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 
 export const DivButton = forwardRef(
@@ -62,7 +63,7 @@ export const DivButton = forwardRef(
     }))
 
     return (
-      <button
+      <Button
         disabled={wait.enable && (disabledOnWait || false)}
         type="button"
         className={`w-full flex justify-center items-center bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200`}
@@ -71,7 +72,7 @@ export const DivButton = forwardRef(
       >
         {onChildren && onChildren(wait.enable, wait.cd)}
         {children}
-      </button>
+      </Button>
     )
   }
 )

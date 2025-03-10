@@ -1,7 +1,7 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { CheckIcon } from '@heroicons/react/20/solid'
-
+import { Select as ASelect } from '@alemonjs/react-ui'
 export function Select({
   name,
   value,
@@ -24,7 +24,7 @@ export function Select({
           disabled
         ></input>
         <div className="ml-auto grid shrink-0 grid-cols-1 focus-within:relative w-fit">
-          <select
+          <ASelect
             name={name}
             value={value}
             onChange={onChange}
@@ -35,14 +35,14 @@ export function Select({
                 {opt}
               </option>
             ))}
-          </select>
+          </ASelect>
         </div>
       </div>
     </div>
   )
 }
 
-export function Select2({
+export function SelectAndDesc({
   name,
   value,
   options,

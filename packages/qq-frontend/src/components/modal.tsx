@@ -1,5 +1,6 @@
 import React from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import { Button } from '@alemonjs/react-ui'
 
 export function Modal({
   visible,
@@ -50,22 +51,22 @@ export function Modal({
             </div>
             <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
               {conformText && (
-                <button
+                <Button
                   type="button"
                   onClick={onConfirm}
-                  className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                  className="inline-flex w-full justify-center rounded-md  px-3 py-2 text-sm font-semibold  shadow-sm  sm:ml-3 sm:w-auto"
                 >
                   {conformText}
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 type="button"
                 data-autofocus
                 onClick={onClose}
-                className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                className="mt-3 inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset  sm:mt-0 sm:w-auto"
               >
                 关闭
-              </button>
+              </Button>
             </div>
           </DialogPanel>
         </div>

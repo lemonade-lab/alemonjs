@@ -1,3 +1,4 @@
+import { Input } from '@alemonjs/react-ui'
 import { useState } from 'react'
 export function RadioGroup({
   name,
@@ -15,7 +16,7 @@ export function RadioGroup({
     <div className="flex flex-col">
       {options.map((opt, index) => (
         <label className="inline-flex items-center" key={opt}>
-          <input
+          <Input
             type="radio"
             name={name}
             checked={valueIndex == index}

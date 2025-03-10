@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import { Input } from '@alemonjs/react-ui'
 export function Password({
   name,
   placeholder,
@@ -16,7 +17,7 @@ export function Password({
     <div
       className={`mt-1 flex items-center rounded-md w-full border border-gray-300 has-[input:focus-within]:outline-none has-[input:focus-within]:ring has-[input:focus-within]:ring-blue-500`}
     >
-      <input
+      <Input
         id={name}
         name={name}
         type={visible ? 'text' : 'password'}
