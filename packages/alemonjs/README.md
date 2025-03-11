@@ -3,10 +3,12 @@
 聊天机器人开发框架
 
 ```sh
-yarn add alemonjs -W
+yarn add alemonjs @alemonjs/gui -W
 ```
 
 - 启动
+
+> src/index.ts
 
 ```ts
 import { start } from 'alemonjs'
@@ -27,3 +29,5 @@ export default OnResponse(event => {
   // 事件类型
 }, 'message.create')
 ```
+
+[配置编辑器](./bin/README.md)
