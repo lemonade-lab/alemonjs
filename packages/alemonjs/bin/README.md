@@ -2,9 +2,17 @@
 
 使用指令来编辑 alemon.config.yaml
 
+- help
+
+```sh
+npx alemonc -h
+```
+
 - add
 
-lemonc add apps alemonjs-xianyu alemonjs-openai
+```sh
+alemonc add apps alemonjs-xianyu alemonjs-openai
+```
 
 ```yaml
 apps:
@@ -14,7 +22,9 @@ apps:
 
 - remove
 
-lemonc remove apps alemonjs-openai
+```sh
+alemonc remove apps alemonjs-openai
+```
 
 ```yaml
 apps:
@@ -23,7 +33,9 @@ apps:
 
 - set
 
-lemonc set login qq
+```sh
+alemonc set login qq
+```
 
 ```yaml
 apps:
@@ -31,7 +43,9 @@ apps:
 login: 'qq'
 ```
 
-lemonc set discord.token 123456
+```sh
+alemonc set discord.token 123456
+```
 
 ```yaml
 apps:
@@ -43,7 +57,9 @@ discord:
 
 - del
 
-lemonc del discord
+```sh
+alemonc del discord
+```
 
 ```yaml
 apps:

@@ -4,6 +4,7 @@
   "description": "alemonjs",
   "author": "lemonade",
   "license": "MIT",
+  "main": "lib/index.js",
   "type": "module",
   "scripts": {
     "dev": "npx lvy dev",

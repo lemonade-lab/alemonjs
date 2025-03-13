@@ -1,7 +1,7 @@
 import { DataEnums } from '../typings'
 
 /**
- * 使用提及功能。
+ * 使用提及。
  * @param {Object} event - 事件对象，包含触发提及的相关信息。
  * @returns {any} - 返回提及操作的结果。
  */
@@ -19,7 +19,7 @@ export const useMention = async (event: { [key: string]: any }) => {
 }
 
 /**
- * 发送消息。
+ * 使用发送消息。
  * @param {Object} event - 事件对象，包含触发发送的相关信息。
  * @returns {Function} - 返回一个异步函数，用于发送消息。
  * @throws {Error} - 如果 event 无效，抛出错误。

@@ -1,5 +1,6 @@
 import { User } from '../event/base/user'
 import { DataEnums } from '../message'
+
 export type ClientAPI = {
   /**
    * alemonjs接口
