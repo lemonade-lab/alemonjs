@@ -1,33 +1,32 @@
-import { useMention } from 'alemonjs'
-export const name = 'core:mention:get'
+import { useMention, createSelects } from 'alemonjs'
 export const regular = /^(#|\/)?getmention$/
-export default OnResponse(
-  async event => {
-    const Mentions = await useMention(event)
-    if (!Mentions || Mentions.length === 0) {
-      return // @ 提及为空
-    }
 
-    // 查找用户类型的 @ 提及，且不是 bot
-    const User = Mentions.find(item => !item.IsBot)
-    if (!User) {
-      return // 未找到用户Id
-    }
+const selects = createSelects(['message.create', 'private.message.create'])
 
-    console.log('User:', User)
+export default onResponse(selects, async event => {
+  const Mentions = await useMention(event)
+  if (!Mentions || Mentions.length === 0) {
+    return // @ 提及为空
+  }
 
-    // 使用${Platform}:${UserId}哈希所得，长度为11的字符串
-    // 这是用户的唯一标识，可用作数据库表的主键
-    // User.UserKey
+  // 查找用户类型的 @ 提及，且不是 bot
+  const User = Mentions.find(item => !item.IsBot)
+  if (!User) {
+    return // 未找到用户Id
+  }
 
-    const text = event.MessageText
-    if (!text || text == '') {
-      return // 消息为空
-    }
+  console.log('User:', User)
 
-    console.log('text:', text)
+  // 使用${Platform}:${UserId}哈希所得，长度为11的字符串
+  // 这是用户的唯一标识，可用作数据库表的主键
+  // User.UserKey
 
-    // 处理被AT的用户...
-  },
-  ['message.create', 'private.message.create']
-)
+  const text = event.MessageText
+  if (!text || text == '') {
+    return // 消息为空
+  }
+
+  console.log('text:', text)
+
+  // 处理被AT的用户...
+})

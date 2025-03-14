@@ -33,7 +33,7 @@ export type DataImageURLType = {
  */
 export type DataImageFileType = {
   type: 'ImageFile'
-  value: Buffer
+  value: string
 }
 
 /**

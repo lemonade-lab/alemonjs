@@ -1,4 +1,4 @@
-import { DataEnums } from '../typings'
+import { DataEnums, Events } from '../typings'
 
 /**
  * 使用提及。
@@ -30,7 +30,8 @@ export const useSend = (event: { [key: string]: any }) => {
   }
   return async (...val: DataEnums[]) => {
     if (!val || val.length === 0) {
-      throw new Error('Invalid data: data cannot be empty')
+      logger.error('Invalid val: val must be a non-empty array')
+      return
     }
     try {
       return await alemonjsBot.api.use.send(event, val)
@@ -48,7 +49,7 @@ export const useSend = (event: { [key: string]: any }) => {
  * @param {string} mainDir - 模块的主目录路径。
  * @throws {Error} - 如果 mainDir 无效，抛出错误。
  */
-export const unMount = (mainDir: string) => {
+export const unChildren = (mainDir: string) => {
   if (!mainDir || typeof mainDir !== 'string') {
     throw new Error('Invalid mainDir: mainDir must be a non-empty string')
   }
@@ -95,3 +96,16 @@ export const unMount = (mainDir: string) => {
     }
   }
 }
+
+/**
+ * 废弃,请使用unChildren
+ * @deprecated
+ */
+export const unMount = unChildren
+
+/**
+ *
+ * @param values
+ * @returns
+ */
+export const createSelects = <T extends (keyof Events)[] | keyof Events>(values: T) => values

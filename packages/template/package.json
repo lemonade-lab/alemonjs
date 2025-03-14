@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/node": "^18",
     "@types/ws": "^8.5.12",
-    "lvyjs": "^0.2.14"
+    "lvyjs": "^0.2.16"
   },
   "private": true,
   "workspaces": [

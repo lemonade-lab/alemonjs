@@ -19,7 +19,7 @@ import {
  * @param event
  * @param select
  */
-const Log = <T extends keyof Events>(event: Events[T], select: T) => {
+const showLog = <T extends keyof Events>(event: Events[T], select: T) => {
   const logs = [`[${select}]`]
   if (typeof event['ChannelId'] == 'string' && event['ChannelId'] != '') {
     logs.push(`[${event['ChannelId']}]`)
@@ -76,7 +76,7 @@ export const expendCycle = async <T extends keyof Events>(valueEvent: Events[T],
     }
     expendMiddleware(valueEvent, select, nextMount)
   }
-  const log = Log(valueEvent, select)
+  const log = showLog(valueEvent, select)
   logger.info(log.join(''))
   // create
   expendSubscribeCreate(valueEvent, select, nextCreate)

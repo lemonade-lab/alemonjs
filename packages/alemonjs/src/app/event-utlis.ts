@@ -1,4 +1,4 @@
-import { OnResponseType } from '../typings'
+import { OnResponseReversalType, OnResponseType } from '../typings'
 
 /**
  * 处理响应事件
@@ -12,3 +12,13 @@ export const OnResponse: OnResponseType = (callback, select) => {
 }
 
 global.OnResponse = OnResponse
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export const onResponse: OnResponseReversalType = (select, callback) => {
+  return { current: callback, select }
+}
+
+global.onResponse = onResponse

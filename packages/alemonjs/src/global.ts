@@ -1,4 +1,11 @@
-import { DefineBot, DefineChildren, OnMiddlewareType, OnResponseType } from './typing/event'
+import {
+  DefinePlatform,
+  DefineChildren,
+  OnMiddlewareType,
+  OnResponseType,
+  OnResponseReversalType,
+  OnMiddlewareReversalType
+} from './typing/event'
 import { ClientAPI } from './typing/global'
 import {
   StoreMiddleware,
@@ -11,6 +18,7 @@ import { Logger } from './typing/logger/index'
 import { createInitLogger, createLogger } from './logger'
 import { ResponseState } from './typing/state'
 import { EventsKeyEnum } from './typing/event/map'
+
 declare global {
   /**
    * 打印
@@ -53,10 +61,37 @@ declare global {
    * 客户端
    */
   var alemonjsBot: ClientAPI
+  /**
+   * 废弃
+   * @deprecated
+   */
   var OnResponse: OnResponseType
+  /**
+   * 定义响应体
+   */
+  var onResponse: OnResponseReversalType
+  /**
+   * 废弃,请使用 onMiddleware
+   * @deprecated
+   */
   var OnMiddleware: OnMiddlewareType
+  /**
+   * 定义中间件
+   */
+  var onMiddleware: OnMiddlewareReversalType
+  /**
+   * 定义一个子模块
+   */
   var defineChildren: DefineChildren
-  var defineBot: DefineBot
+  /**
+   * 废弃，请使用 definePlatform
+   * @deprecated
+   */
+  var defineBot: DefinePlatform
+  /**
+   * 定义一个平台
+   */
+  var definePlatform: DefinePlatform
 }
 
 /**

@@ -2,9 +2,9 @@ import './typings.js'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { getConfig } from './config'
-import { loadModule, moduleChildrenFiles } from './app/load.js'
-import { DefineBotValue } from './typings.js'
-import { ErrorModule } from './app/utils.js'
+import { loadChildren, loadChildrenFile } from './app/load.js'
+import { DefinePlatformValue } from './typings.js'
+import { showErrorModule } from './app/utils.js'
 
 /**
  * 运行指定 main
@@ -22,7 +22,8 @@ export const run = (input: string) => {
     logger.error(`The file ${mainPath} does not exist`)
     return
   }
-  loadModule(mainPath)
+  // 指定运行的，name识别为 'main:apps:xxx'
+  loadChildren(mainPath, 'main')
 }
 
 /**
@@ -39,7 +40,7 @@ export const start = async (input?: string, pm?: string) => {
   // 启动机器人
   try {
     const bot: {
-      default: DefineBotValue
+      default: DefinePlatformValue
     } = await import(platform)
     if (!bot?.default) {
       throw new Error('The platform is not default')
@@ -61,13 +62,13 @@ export const start = async (input?: string, pm?: string) => {
     process.env.platform = alemonjsBot?.platform ?? login
   } catch (e) {
     logger.error('启动', login, '失败')
-    ErrorModule(e)
+    showErrorModule(e)
   }
   // module
   if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
     Promise.all(
       cfg.value.apps.map(async app => {
-        moduleChildrenFiles(app)
+        loadChildrenFile(app)
       })
     )
   }

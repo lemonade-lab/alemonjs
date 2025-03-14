@@ -1,4 +1,4 @@
-import { getConfigValue } from '../post'
+import { getConfigValue } from '../config'
 import { Events } from '../typings'
 import { expendCycle } from './event-processor-cycle'
 import { createHash } from './utils'

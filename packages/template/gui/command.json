@@ -1,7 +1,12 @@
 [
   {
-    "name": "测试文本",
+    "name": "文本",
     "type": "command",
     "value": "/text"
+  },
+  {
+    "name": "组件",
+    "type": "command",
+    "value": "/jsx"
   }
 ]

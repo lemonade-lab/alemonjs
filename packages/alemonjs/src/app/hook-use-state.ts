@@ -5,10 +5,9 @@ interface Subscribe {
 // 存储订阅者
 const subscriptions: Subscribe = {}
 
-// 初始化全局状态
-alemonjsCore.storeState = new Proxy(
-  {},
-  {
+if (!alemonjsCore.storeState) {
+  // 初始化全局状态
+  alemonjsCore.storeState = new Proxy({} as Record<string, boolean>, {
     get(target, prop: string) {
       return prop in target ? target[prop] : false
     },
@@ -22,8 +21,8 @@ alemonjsCore.storeState = new Proxy(
       }
       return true // 表示设置成功
     }
-  }
-)
+  })
+}
 
 /**
  * 获取指定功能是启动还是关闭
@@ -45,12 +44,10 @@ export const useState = <T extends string>(
   if (!(name in alemonjsCore.storeState)) {
     alemonjsCore.storeState[name] = defaultValue
   }
-
   // 设置值的函数
   const setValue = (value: boolean) => {
     alemonjsCore.storeState[name] = value
   }
-
   return [alemonjsCore.storeState[name], setValue]
 }
 
@@ -59,25 +56,35 @@ export const useState = <T extends string>(
  * @param name 功能名
  * @param callback 回调函数
  */
-export const eventState = <T extends string>(name: T, callback: (value: boolean) => void) => {
+export const onState = <T extends string>(name: T, callback: (value: boolean) => void) => {
   if (typeof callback !== 'function') {
     throw new Error('Callback must be a function')
   }
-
   if (!subscriptions[name]) {
     subscriptions[name] = []
   }
-
   subscriptions[name].push(callback)
 }
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export const eventState = onState
 
 /**
  * 取消订阅状态变化
  * @param name 功能名
  * @param callback 回调函数
  */
-export const unEventState = <T extends string>(name: T, callback: (value: boolean) => void) => {
+export const unState = <T extends string>(name: T, callback: (value: boolean) => void) => {
   if (subscriptions[name]) {
     subscriptions[name] = subscriptions[name].filter(cb => cb !== callback)
   }
 }
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export const unEventState = unState

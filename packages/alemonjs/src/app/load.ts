@@ -1,7 +1,7 @@
 import { dirname, join } from 'path'
 import { existsSync, readFileSync } from 'fs'
-import { unMount } from './hook-use-api.js'
-import { ErrorModule } from './utils.js'
+import { unChildren } from './hook-use-api.js'
+import { createEventName, showErrorModule } from './utils.js'
 import { getRecursiveDirFiles } from './utils.js'
 import {
   StoreMiddlewareItem,
@@ -9,6 +9,7 @@ import {
   DefineChildrenValue,
   ChildrenCycle
 } from '../typings'
+// import { createRequire } from 'module'
 
 // const createChildrenKey = () => {
 //   // 随机一个key
@@ -21,35 +22,43 @@ import {
 //   //
 // }
 
+// const require = createRequire(import.meta.url)
+
+const mwReg = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/
+
 /**
  * 加载文件
  * @param app
  */
-const loadChildrenFiles = async (mainDir: string) => {
+const loadChildrenFiles = async (mainDir: string, node: string) => {
   const appsDir = join(mainDir, 'apps')
   const appsFiles = getRecursiveDirFiles(appsDir)
   const data: StoreResponseItem[] = []
   for (const file of appsFiles) {
+    const state = createEventName(file.path, node)
     const reesponse = {
       source: mainDir,
       dir: dirname(file.path),
       path: file.path,
-      name: file.name
+      name: file.name,
+      state,
+      node
     }
     data.push(reesponse)
     alemonjsCore.storeResponse.push(reesponse)
   }
   const mwDir = join(mainDir, 'middleware')
-  const mwFiles = getRecursiveDirFiles(mwDir, item =>
-    /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name)
-  )
+  const mwFiles = getRecursiveDirFiles(mwDir, item => mwReg.test(item.name))
   const mwData: StoreMiddlewareItem[] = []
   for (const file of mwFiles) {
+    const state = createEventName(file.path, node, 'mw')
     const middleware = {
       source: mainDir,
       dir: dirname(file.path),
       path: file.path,
-      name: file.name
+      name: file.name,
+      state,
+      node
     }
     mwData.push(middleware)
     alemonjsCore.storeMiddleware.push(middleware)
@@ -64,12 +73,19 @@ const loadChildrenFiles = async (mainDir: string) => {
  * 加载模块
  * @param mainPath
  */
-export const loadModule = async (mainPath: string) => {
+export const loadChildren = async (mainPath: string, node: string) => {
   if (!mainPath || typeof mainPath !== 'string') {
     logger.error('The module path is not correct')
     return
   }
   const mainDir = dirname(mainPath)
+
+  const show = e => {
+    showErrorModule(e)
+    // 卸载索引
+    unChildren(mainDir)
+  }
+
   try {
     const moduleApp: {
       default: DefineChildrenValue
@@ -95,45 +111,71 @@ export const loadModule = async (mainPath: string) => {
       app = await moduleApp.default.callback()
     }
 
+    const unMounted = async e => {
+      show(e)
+      try {
+        await app?.unMounted(e)
+      } catch (e) {
+        show(e)
+      }
+    }
+
     // onCreated 创建
     if (typeof app?.onCreated == 'function') {
       try {
         await app?.onCreated()
       } catch (e) {
-        ErrorModule(e)
+        unMounted(e)
+        // 出错了，结束后续的操作。
+        return
       }
     }
 
-    // 加载
-    await loadChildrenFiles(mainDir).then(async res => {
-      alemonjsCore.storeMains.push(mainDir)
+    // onMounted 加载
+    try {
+      // 加载
+      const res = await loadChildrenFiles(mainDir, node)
+
       // onMounted 完成索引识别
       if (typeof app?.onMounted == 'function') {
         try {
           await app?.onMounted(res)
         } catch (e) {
-          ErrorModule(e)
+          unMounted(e)
+          return
         }
       }
-    })
+
+      // 记录 main
+      alemonjsCore.storeMains.push(mainDir)
+    } catch (e) {
+      unMounted(e)
+    }
+
+    // unMounted 卸载
   } catch (e) {
-    // 卸载索引
-    unMount(mainDir)
-    ErrorModule(e)
+    show(e)
   }
 }
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export const loadModule = loadChildren
 
 /**
  * 模块文件
  * @param app
  */
-export const moduleChildrenFiles = async (name: string) => {
-  if (typeof name !== 'string') {
+export const loadChildrenFile = async (node: string) => {
+  if (typeof node !== 'string') {
     logger.error('The module name is not correct')
     return
   }
-  const dir = join(process.cwd(), 'node_modules', name)
+  const dir = join(process.cwd(), 'node_modules', node)
   const pkgPath = join(dir, 'package.json')
+
   if (!existsSync(pkgPath)) {
     logger.error('The package.json does not exist', pkgPath)
     return
@@ -149,8 +191,14 @@ export const moduleChildrenFiles = async (name: string) => {
       return
     }
     // 根据main来识别apps
-    loadModule(mainPath)
+    loadChildren(mainPath, node)
   } catch (e) {
-    ErrorModule(e)
+    showErrorModule(e)
   }
 }
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export const moduleChildrenFiles = loadChildrenFile

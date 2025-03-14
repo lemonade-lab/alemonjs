@@ -1,0 +1,14 @@
+{
+  "apps": {
+    "./apps/channel": {
+      "regular": " /^(#|/)?channel$/"
+    },
+    "./apps/image": {},
+    "./apps/login": {},
+    "./apps/mention-get": {},
+    "./apps/platform": {},
+    "./apps/test": {},
+    "./apps": {},
+    "./apps/text": {}
+  }
+}

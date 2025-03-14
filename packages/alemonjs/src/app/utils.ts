@@ -1,6 +1,4 @@
 import crypto from 'crypto'
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
 import { readdirSync, Dirent, existsSync } from 'fs'
 import { join } from 'path'
 
@@ -34,15 +32,16 @@ export const useUserHashKey = (event: { UserId: string; Platform: string }) => {
  * @param select 选择事件类型,默认apps
  * @returns
  */
-export const createEventName = (
-  url: string,
-  app: string,
-  select: 'apps' | 'middleware' = 'apps'
-) => {
-  const __dirname = dirname(fileURLToPath(url))
-  const dirs = __dirname.split('/').reverse()
-  const name = dirs.slice(0, dirs.indexOf(select)).join(':')
-  return `${app}:${select}:${name}`
+export const createEventName = (url: string, app: string, select: 'apps' | 'mw' = 'apps') => {
+  const names = url.replace(process.cwd(), '').split('/')
+  const index = names.findIndex(v => v === select)
+  const cur = names.slice(index)
+  if (/.(ts.js)/.test(cur[cur.length])) {
+    const name = `${app}:${cur.slice(0, -1).join(':')}`
+    return name
+  }
+  const name = `${app}:${cur.join(':')}`
+  return name
 }
 
 /**
@@ -62,6 +61,8 @@ export const stringToNumber = (str: string, size = 33) => {
   return hash >>> 0
 }
 
+const appsReg = /^res(\.|\..*\.)(js|ts|jsx|tsx)$/
+
 /**
  * 递归获取所有文件
  * @param dir
@@ -70,7 +71,7 @@ export const stringToNumber = (str: string, size = 33) => {
  */
 export const getRecursiveDirFiles = (
   dir: string,
-  condition: (func: Dirent) => boolean = item => /^res(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name)
+  condition: (func: Dirent) => boolean = item => appsReg.test(item.name)
 ): {
   path: string
   name: string
@@ -101,7 +102,7 @@ export const getRecursiveDirFiles = (
  * @param e
  * @returns
  */
-export const ErrorModule = (e: Error) => {
+export const showErrorModule = (e: Error) => {
   if (!e) return
   const moduleNotFoundRegex = /Cannot find (module|package)/
   if (moduleNotFoundRegex.test(e?.message)) {
@@ -117,3 +118,9 @@ export const ErrorModule = (e: Error) => {
     logger.error(e?.message)
   }
 }
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export const ErrorModule = showErrorModule

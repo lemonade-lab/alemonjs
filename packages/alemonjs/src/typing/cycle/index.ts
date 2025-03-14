@@ -10,10 +10,15 @@ export type ChildrenCycle = {
    */
   onCreated?: () => void
   /**
-   * 挂载时
+   * 挂载时。得到属于自己的 store
    * @returns
    */
   onMounted?: (strore: { response: StoreResponseItem[]; middleware: StoreMiddlewareItem[] }) => void
+  /**
+   * 卸载时
+   * @returns
+   */
+  unMounted?: (error: any) => void
 }
 
 /**

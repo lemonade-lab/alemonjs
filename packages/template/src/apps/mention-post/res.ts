@@ -1,18 +1,18 @@
-import { useSend, Text, Mention } from 'alemonjs'
-export const name = 'core:mention:post'
+import { useSend, Text, Mention, createSelects } from 'alemonjs'
 export const regular = /^(#|\/)?mention$/
-export default OnResponse(
-  event => {
-    const Send = useSend(event)
 
-    // 发送多种类型的消息
-    Send(Text('Hello '), Mention(event.UserId), Text(', How are things going?'))
+const selects = createSelects(['message.create', 'private.message.create'])
 
-    // @ 所有人
-    // Send(Mention())
+export default onResponse(selects, event => {
+  const Send = useSend(event)
 
-    // @ channel
-    // Send(Mention(event.ChannelId, { belong: 'channel' }))
-  },
-  ['message.create', 'private.message.create']
-)
+  console.log('mention')
+  // 发送多种类型的消息
+  Send(Text('Hello '), Mention(event.UserId), Text(', How are things going?'))
+
+  // @ 所有人
+  // Send(Mention())
+
+  // @ channel
+  // Send(Mention(event.ChannelId, { belong: 'channel' }))
+})

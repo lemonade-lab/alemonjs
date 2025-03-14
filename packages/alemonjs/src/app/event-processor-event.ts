@@ -8,7 +8,7 @@
 import { isAsyncFunction } from 'util/types'
 import { Next, Events, OnResponseValue } from '../typings'
 import { useState } from './hook-use-state'
-import { ErrorModule } from './utils'
+import { showErrorModule } from './utils'
 
 /**
  * 消息体处理机制
@@ -76,7 +76,6 @@ export const expendEvent = async <T extends keyof Events>(
       const app: {
         default: OnResponseValue<any, T>
         regular?: RegExp | string
-        name?: string
       } = await import(`file://${file.path}`)
 
       if (!app?.default) {
@@ -92,8 +91,8 @@ export const expendEvent = async <T extends keyof Events>(
       }
 
       // 检查状态
-      if (app?.name) {
-        const [state] = useState(app?.name)
+      if (file?.state) {
+        const [state] = useState(file?.state)
         if (state == false) {
           // 继续
           await nextEvent()
@@ -130,6 +129,7 @@ export const expendEvent = async <T extends keyof Events>(
             dir: file.dir,
             path: file.path,
             name: file.name,
+            node: file.node,
             value: {
               select: app.default.select
             }
@@ -174,7 +174,7 @@ export const expendEvent = async <T extends keyof Events>(
         }
       }
     } catch (err) {
-      ErrorModule(err)
+      showErrorModule(err)
     }
   }
 
@@ -200,7 +200,6 @@ export const expendEvent = async <T extends keyof Events>(
       const app: {
         default: OnResponseValue<any, T>
         regular?: RegExp | string
-        name?: string
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
 
@@ -217,8 +216,8 @@ export const expendEvent = async <T extends keyof Events>(
       }
 
       // 检查状态
-      if (app?.name) {
-        const [state] = useState(app?.name)
+      if (file?.state) {
+        const [state] = useState(file?.state)
         if (state == false) {
           // 继续
           await nextEvent()
@@ -265,7 +264,7 @@ export const expendEvent = async <T extends keyof Events>(
 
       //
     } catch (err) {
-      ErrorModule(err)
+      showErrorModule(err)
     }
     //
   }

@@ -18,6 +18,14 @@ export type StoreResponseItem = {
    */
   name: string
   /**
+   * 节点
+   */
+  node: string
+  /**
+   *
+   */
+  state?: string
+  /**
    *
    */
   value?: {
@@ -39,6 +47,10 @@ export type StoreMiddlewareItem = {
   path: string
   // 文件名
   name: string
+  // 节点
+  node: string
+  // 状态
+  state?: string
   //
   value?: {
     // 事件

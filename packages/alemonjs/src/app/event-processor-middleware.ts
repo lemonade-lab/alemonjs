@@ -8,7 +8,7 @@
 import { isAsyncFunction } from 'util/types'
 import { Next, Events, OnMiddlewareValue } from '../typings'
 import { useState } from './hook-use-state'
-import { ErrorModule } from './utils'
+import { showErrorModule } from './utils'
 
 /**
  * 处理中间件
@@ -91,8 +91,8 @@ export const expendMiddleware = async <T extends keyof Events>(
       }
 
       // 检查状态
-      if (app?.name) {
-        const [state] = useState(app?.name)
+      if (file?.state) {
+        const [state] = useState(file?.state)
         if (state == false) {
           // 继续
           await nextMiddleware()
@@ -130,6 +130,7 @@ export const expendMiddleware = async <T extends keyof Events>(
             dir: file.dir,
             path: file.path,
             name: file.name,
+            node: file.node,
             value: {
               select: app.default?.select ?? select
             }
@@ -162,7 +163,7 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
       }
     } catch (err) {
-      ErrorModule(err)
+      showErrorModule(err)
     }
   }
 
@@ -184,7 +185,6 @@ export const expendMiddleware = async <T extends keyof Events>(
     try {
       const app: {
         default: OnMiddlewareValue<any, T>
-        name?: string
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
 
@@ -200,8 +200,8 @@ export const expendMiddleware = async <T extends keyof Events>(
         return
       }
 
-      if (app?.name) {
-        const [state] = useState(app?.name)
+      if (file?.state) {
+        const [state] = useState(file?.state)
         if (state == false) {
           // 继续
           await nextMiddleware()
@@ -234,7 +234,7 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
       }
     } catch (err) {
-      ErrorModule(err)
+      showErrorModule(err)
     }
     //
   }
