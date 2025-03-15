@@ -1,5 +1,5 @@
 import { join, dirname } from 'path'
-import { readFileSync, existsSync, readdirSync } from 'fs'
+import { existsSync, readdirSync } from 'fs'
 import { getConfig } from 'alemonjs'
 
 /**
@@ -118,13 +118,9 @@ const loadModule = async mainPath => {
  * 模块文件
  * @param app
  */
-const moduleChildrenFiles = async name => {
-  // 存在 package
-  const packageJson = JSON.parse(
-    readFileSync(join(process.cwd(), 'node_modules', name, 'package.json'), 'utf-8')
-  )
-  // main
-  const mainPath = join(process.cwd(), 'node_modules', name, packageJson.main)
+const moduleChildrenFiles = async (node: string) => {
+  const nodeFileDir = require.resolve(node)
+  const mainPath = dirname(nodeFileDir)
   // 不存在 main
   if (!existsSync(mainPath)) {
     return

@@ -1,5 +1,5 @@
 import { dirname, join } from 'path'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync } from 'fs'
 import { unChildren } from './hook-use-api.js'
 import { createEventName, showErrorModule } from './utils.js'
 import { getRecursiveDirFiles } from './utils.js'
@@ -9,23 +9,9 @@ import {
   DefineChildrenValue,
   ChildrenCycle
 } from '../typings'
-// import { createRequire } from 'module'
-
-// const createChildrenKey = () => {
-//   // 随机一个key
-//   const KEY = `${Date.now()}:${Math.random()}`
-//   // 如果存在。则重新生成
-//   // 把子应用挂起来
-//   // if (alemonjsCore.storeChildren[KEY]) {
-//   //   return createChildrenKey()
-//   // }
-//   //
-// }
-
-// const require = createRequire(import.meta.url)
-
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 const mwReg = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/
-
 /**
  * 加载文件
  * @param app
@@ -80,7 +66,7 @@ export const loadChildren = async (mainPath: string, node: string) => {
   }
   const mainDir = dirname(mainPath)
 
-  const show = e => {
+  const show = (e: any) => {
     showErrorModule(e)
     // 卸载索引
     unChildren(mainDir)
@@ -173,18 +159,8 @@ export const loadChildrenFile = async (node: string) => {
     logger.error('The module name is not correct')
     return
   }
-  const dir = join(process.cwd(), 'node_modules', node)
-  const pkgPath = join(dir, 'package.json')
-
-  if (!existsSync(pkgPath)) {
-    logger.error('The package.json does not exist', pkgPath)
-    return
-  }
   try {
-    // 存在 package
-    const packageJson = JSON.parse(readFileSync(pkgPath, 'utf-8'))
-    // main
-    const mainPath = join(dir, packageJson.main)
+    const mainPath = require.resolve(node)
     // 不存在 main
     if (!existsSync(mainPath)) {
       logger.error('The main file does not exist', mainPath)
