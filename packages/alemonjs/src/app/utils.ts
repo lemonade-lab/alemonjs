@@ -1,6 +1,10 @@
 import crypto from 'crypto'
 import { readdirSync, Dirent, existsSync } from 'fs'
 import { join } from 'path'
+import path from 'path'
+import fs from 'fs'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 
 /**
  * 将字符串转为定长字符串
@@ -124,3 +128,24 @@ export const showErrorModule = (e: Error) => {
  * @deprecated
  */
 export const ErrorModule = showErrorModule
+
+const createExports = (packageJson: any) => {
+  if (packageJson?.exports) {
+    if (typeof packageJson.exports === 'string') {
+      return packageJson.exports
+    } else if (typeof packageJson.exports === 'object') {
+      return packageJson.exports['.'] || packageJson.exports['./index.js']
+    }
+  }
+}
+
+export const getInputExportPath = (input?: string) => {
+  const packageJsonPath = path.join(input ?? process.cwd(), 'package.json')
+  if (fs.existsSync(packageJsonPath)) {
+    const packageJson = require(packageJsonPath)
+    const main = packageJson?.main || createExports(packageJson)
+    if (main) {
+      return main
+    }
+  }
+}

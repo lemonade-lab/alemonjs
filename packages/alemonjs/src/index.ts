@@ -4,22 +4,19 @@ import { existsSync } from 'fs'
 import { getConfig } from './config'
 import { loadChildren, loadChildrenFile } from './app/load.js'
 import { DefinePlatformValue } from './typings.js'
-import { showErrorModule } from './app/utils.js'
+import { getInputExportPath, showErrorModule } from './app/utils.js'
 
 /**
  * 运行指定 main
- * @param input
+ * @param input 入口地址
  * @returns
  */
 export const run = (input: string) => {
-  if (!input) {
-    // 抛出错误
-    throw new Error('The input is not correct')
-  }
+  if (!input || input == '') return
+  let mainPath = join(process.cwd(), input)
   // 路径
-  const mainPath = join(process.cwd(), input)
-  if (!existsSync(mainPath)) {
-    logger.error(`The file ${mainPath} does not exist`)
+  if (!existsSync(input)) {
+    logger.error('未找到主要入口文件', mainPath)
     return
   }
   // 指定运行的，name识别为 'main:apps:xxx'
@@ -28,7 +25,8 @@ export const run = (input: string) => {
 
 /**
  * 启动
- * @param input
+ * @param input (可选)main入口地址，默认选择 package.json 中的 main
+ * @param pm (可选)平台名称，默认@alemonjs/gui。
  */
 export const start = async (input?: string, pm?: string) => {
   const cfg = getConfig()
@@ -74,10 +72,8 @@ export const start = async (input?: string, pm?: string) => {
   }
   // 运行本地模块
   try {
-    const dir = input ?? cfg.argv?.main ?? cfg.value?.main
-    if (dir) {
-      run(dir)
-    }
+    const dir = input ?? cfg.argv?.main ?? cfg.value?.main ?? getInputExportPath()
+    run(dir)
   } catch (e) {
     logger.error(e)
   }
