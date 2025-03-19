@@ -78,20 +78,21 @@ export class QQBotAPI {
    * @returns
    */
   async gateway() {
-    let service = ''
-    switch (config.get('mode')) {
-      case 'group':
-        service = 'groupService'
-        break
-      case 'guild':
-        service = 'guildServer'
-        break
-      default:
-        service = 'groupService'
+    const mode = config.get('mode')
+    if (mode === 'group') {
+      return this.groupService({
+        url: '/gateway'
+      }).then(res => res?.data)
+    } else if (mode === 'guild') {
+      return this.guildServer({
+        url: '/gateway'
+      }).then(res => res?.data)
+    } else {
+      // 默认group
+      return this.groupService({
+        url: '/gateway'
+      }).then(res => res?.data)
     }
-    return this[service]({
-      url: '/gateway'
-    }).then(res => res?.data)
   }
 
   /**

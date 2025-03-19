@@ -65,7 +65,7 @@ export class QQBotGroupClient extends QQBotAPI {
    * @returns
    */
   #aut() {
-    const token = config.get('token')
+    const token = config.get('access_token')
     const intents = config.get('intents')
     const shard = config.get('shard')
     return {

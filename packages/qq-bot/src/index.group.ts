@@ -28,10 +28,10 @@ export default defineBot(() => {
   const client = new QQBotGroupClient({
     app_id: config?.app_id,
     intents: config?.intents ?? ['GROUP_AND_C2C_EVENT'],
-    is_private: config?.is_private,
-    sandbox: config?.sandbox,
+    is_private: config?.is_private ?? false,
+    sandbox: config?.sandbox ?? false,
     secret: config?.secret,
-    shard: config?.shard,
+    shard: config?.shard ?? [0, 1],
     token: config?.token,
     mode: config?.mode
   })

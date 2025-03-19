@@ -34,10 +34,10 @@ export default defineBot(() => {
       'PUBLIC_GUILD_MESSAGES', //公域事件
       'REACTIONS' // 表情表态
     ],
-    is_private: config?.is_private,
-    sandbox: config?.sandbox,
+    is_private: config?.is_private ?? false,
+    sandbox: config?.sandbox ?? false,
     secret: config?.secret,
-    shard: config?.shard,
+    shard: config?.shard ?? [0, 1],
     token: config?.token,
     mode: config?.mode
   })
