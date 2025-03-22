@@ -3,7 +3,7 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Next, Events, EventCycle } from '../typings'
+import { Next, Events, EventCycleEnum, EventKeys } from '../typings'
 import { SubscribeList } from './store'
 
 /**
@@ -13,11 +13,11 @@ import { SubscribeList } from './store'
  * @param next
  * @param chioce
  */
-export const expendSubscribe = async <T extends keyof Events>(
+export const expendSubscribe = async <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
   next: Function,
-  chioce: EventCycle
+  chioce: EventCycleEnum
 ) => {
   const subList = new SubscribeList(chioce, select)
   /**
@@ -78,7 +78,7 @@ export const expendSubscribe = async <T extends keyof Events>(
  * @param select
  * @param next
  */
-export const expendSubscribeCreate = async <T extends keyof Events>(
+export const expendSubscribeCreate = async <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
   next: Function
@@ -92,7 +92,7 @@ export const expendSubscribeCreate = async <T extends keyof Events>(
  * @param select
  * @param next
  */
-export const expendSubscribeMount = async <T extends keyof Events>(
+export const expendSubscribeMount = async <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
   next: Function
@@ -106,7 +106,7 @@ export const expendSubscribeMount = async <T extends keyof Events>(
  * @param select
  * @param next
  */
-export const expendSubscribeUnmount = async <T extends keyof Events>(
+export const expendSubscribeUnmount = async <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
   next: Function

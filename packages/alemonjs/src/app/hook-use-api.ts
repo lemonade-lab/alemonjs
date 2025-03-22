@@ -1,10 +1,10 @@
-import { DataEnums, Events } from '../typings'
+import { DataEnums, EventKeys, Events } from '../typings'
 
 /**
  * 使用提及。
  * @param {Object} event - 事件对象，包含触发提及的相关信息。
  */
-export const useMention = async (event: Events[keyof Events]) => {
+export const useMention = async <T extends EventKeys>(event: Events[T]) => {
   if (!event || typeof event !== 'object') {
     throw new Error('Invalid event: event must be an object')
   }
@@ -23,7 +23,7 @@ export const useMention = async (event: Events[keyof Events]) => {
  * @returns {Function} - 返回一个异步函数，用于发送消息。
  * @throws {Error} - 如果 event 无效，抛出错误。
  */
-export const useSend = (event: Events[keyof Events]) => {
+export const useSend = <T extends EventKeys>(event: Events[T]) => {
   if (!event || typeof event !== 'object') {
     throw new Error('Invalid event: event must be an object')
   }
@@ -107,4 +107,4 @@ export const unMount = unChildren
  * @param values
  * @returns
  */
-export const createSelects = <T extends (keyof Events)[] | keyof Events>(values: T) => values
+export const createSelects = <T extends EventKeys[] | EventKeys>(values: T) => values

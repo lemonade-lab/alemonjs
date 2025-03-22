@@ -6,7 +6,7 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { Next, Events, OnMiddlewareValue, Current } from '../typings'
+import { Next, Events, OnMiddlewareValue, Current, EventKeys } from '../typings'
 import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Middleware, MiddlewareGather } from './store'
@@ -17,7 +17,7 @@ import { useSend } from './hook-use-api'
  * @param event
  * @param select
  */
-export const expendMiddleware = async <T extends keyof Events>(
+export const expendMiddleware = async <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
   next: Function
@@ -78,7 +78,7 @@ export const expendMiddleware = async <T extends keyof Events>(
 
     try {
       const app: {
-        default: OnMiddlewareValue<Current<keyof Events>, T>
+        default: OnMiddlewareValue<Current<EventKeys>, T>
         name?: string
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
@@ -217,7 +217,7 @@ export const expendMiddleware = async <T extends keyof Events>(
     }
     try {
       const app: {
-        default: OnMiddlewareValue<Current<keyof Events>, T>
+        default: OnMiddlewareValue<Current<EventKeys>, T>
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
 

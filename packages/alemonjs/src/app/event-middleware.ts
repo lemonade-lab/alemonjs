@@ -6,8 +6,8 @@
 import { OnMiddlewareReversalFunc, OnMiddlewareFunc } from '../typings'
 /**
  * 中间件
- * @param callback
- * @param select
+ * @param select 事件选择
+ * @param callback 回调函数，处理事件和 API
  * @returns
  */
 export const onMiddleware: OnMiddlewareReversalFunc = (select, callback) => ({

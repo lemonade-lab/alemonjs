@@ -36,4 +36,4 @@ export type Next = (...cns: boolean[]) => void
 /**
  * 事件周期
  */
-export type EventCycle = 'create' | 'mount' | 'unmount'
+export type EventCycleEnum = 'create' | 'mount' | 'unmount'

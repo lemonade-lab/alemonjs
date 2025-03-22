@@ -5,7 +5,7 @@
  * @description 存储器
  */
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
-import { ActionsEventEnum, EventCycle, Events, EventsKeyEnum } from '../typings'
+import { ActionsEventEnum, EventCycleEnum, EventKeys, Events, EventsKeyEnum } from '../typings'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 
@@ -75,7 +75,7 @@ const createLogger = () => {
 }
 
 export class Logger {
-  #logger = createLogger()
+  #logger = null
 
   /**
    * 创建一个 logger，如果未存在全局变量则赋值
@@ -133,7 +133,7 @@ export class Response {
   }
 }
 
-export class ResponseGather<T extends keyof Events> {
+export class ResponseGather<T extends EventKeys> {
   #select: T
 
   constructor(select: T) {
@@ -154,7 +154,7 @@ export class Middleware {
   }
 }
 
-export class MiddlewareGather<T extends keyof Events> {
+export class MiddlewareGather<T extends EventKeys> {
   #select: T
 
   constructor(select: T) {
@@ -170,10 +170,10 @@ export class MiddlewareGather<T extends keyof Events> {
   }
 }
 
-export class SubscribeList<T extends keyof Events> {
+export class SubscribeList<T extends EventKeys> {
   #select: T
-  #chioce: EventCycle
-  constructor(chioce: EventCycle, select: T) {
+  #chioce: EventCycleEnum
+  constructor(chioce: EventCycleEnum, select: T) {
     this.#select = select
     this.#chioce = chioce
     if (!alemonjsCore.storeSubscribeList[this.#chioce][this.#select]) {
@@ -254,23 +254,31 @@ export class ActionsBus {
   }
 
   /**
-   *
-   * @param ActionsEventEnum
+   * @param actions
    * @param callback
    */
-  subscribe(ActionsEventEnum: ActionsEventEnum, callback: (data?: any) => void) {
-    if (!alemonjsCore.storeActionsBus[ActionsEventEnum]) {
-      alemonjsCore.storeActionsBus[ActionsEventEnum] = []
+  subscribe<T extends EventKeys>(
+    actions: ActionsEventEnum,
+    callback: (event: Events[T], data?: any) => void
+  ) {
+    if (!alemonjsCore.storeActionsBus[actions]) {
+      alemonjsCore.storeActionsBus[actions] = []
     }
-    alemonjsCore.storeActionsBus[ActionsEventEnum].push(callback)
+    alemonjsCore.storeActionsBus[actions].push(callback)
   }
 
   /**
    *
    */
-  publish(ActionsEventEnum: ActionsEventEnum, data?: any) {
-    if (alemonjsCore.storeActionsBus[ActionsEventEnum]) {
-      alemonjsCore.storeActionsBus[ActionsEventEnum].forEach(callback => callback(data))
+  publish<T extends EventKeys>(actions: ActionsEventEnum, event: Events[T], data?: any) {
+    if (alemonjsCore.storeActionsBus[actions]) {
+      return Promise.all(
+        alemonjsCore.storeActionsBus[actions].map(callback => callback(event, data))
+      )
     }
+  }
+
+  get value() {
+    return alemonjsCore.storeActionsBus
   }
 }

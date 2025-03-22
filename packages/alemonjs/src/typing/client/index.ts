@@ -1,4 +1,5 @@
 import { User } from '../event/base/user'
+import { EventKeys, Events } from '../event/map'
 import { DataEnums } from '../message'
 
 export type ClientAPI = {
@@ -16,13 +17,13 @@ export type ClientAPI = {
        * @param val
        * @returns
        */
-      send: (event: { [key: string]: any }, val: DataEnums[]) => Promise<any[]>
+      send: <T extends EventKeys>(event: Events[T], val: DataEnums[]) => Promise<any[]>
       /**
        * 获取提及信息
        * @param event
        * @returns
        */
-      mention: (event: { [key: string]: any }) => Promise<User[]>
+      mention: <T extends EventKeys>(event: Events[T]) => Promise<User[]>
     }
     /**
      * 主动接口

@@ -1,4 +1,4 @@
-import { EventCycle, Current, Events } from '../typings'
+import { EventCycleEnum, Current, Events, EventKeys } from '../typings'
 import { SubscribeList } from './store'
 
 type KeyMap = {
@@ -11,8 +11,9 @@ type KeyMap = {
  * @param option
  * @returns
  */
-export const useSubscribe = <T extends keyof Events>(event: Events[T], select: T) => {
-  const run = (callback: Current<T>, keys: (keyof Events[T])[], chioce: EventCycle) => {
+export const useSubscribe = <T extends EventKeys>(event: Events[T], select: T) => {
+  type Keys = keyof Events[T]
+  const run = (callback: Current<T>, keys: Keys[], chioce: EventCycleEnum) => {
     const subList = new SubscribeList(chioce, select)
     // 没有选择
     if (keys.length === 0) return
@@ -31,13 +32,13 @@ export const useSubscribe = <T extends keyof Events>(event: Events[T], select: T
     subList.value.append({ keys: values, current: callback })
     return
   }
-  const create = (callback: Current<T>, keys: (keyof Events[T])[]) => {
+  const create = (callback: Current<T>, keys: Keys[]) => {
     run(callback, keys, 'create')
   }
-  const mountBefore = (callback: Current<T>, keys: (keyof Events[T])[]) => {
+  const mountBefore = (callback: Current<T>, keys: Keys[]) => {
     run(callback, keys, 'mount')
   }
-  const unmount = (callback: Current<T>, keys: (keyof Events[T])[]) => {
+  const unmount = (callback: Current<T>, keys: Keys[]) => {
     run(callback, keys, 'unmount')
   }
   return [create, mountBefore, unmount]
@@ -49,7 +50,7 @@ export const useSubscribe = <T extends keyof Events>(event: Events[T], select: T
  * @param option
  * @returns
  */
-export const useObserver = <T extends keyof Events>(event: Events[T], option: T) => {
+export const useObserver = <T extends EventKeys>(event: Events[T], option: T) => {
   const [_, mount] = useSubscribe(event, option)
   return mount
 }

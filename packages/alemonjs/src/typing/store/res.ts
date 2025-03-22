@@ -1,4 +1,4 @@
-import { Events } from '../event/map'
+import { EventKeys } from '../event/map'
 
 export type StoreResponseItem = {
   /**
@@ -62,12 +62,12 @@ export type StoreMiddlewareItem = {
  *
  */
 export type StoreMiddleware = {
-  [key in keyof Events]: StoreResponseItem[]
+  [key in EventKeys]: StoreResponseItem[]
 }
 
 /**
  *
  */
 export type StoreResponse = {
-  [key in keyof Events]: StoreMiddlewareItem[]
+  [key in EventKeys]: StoreMiddlewareItem[]
 }

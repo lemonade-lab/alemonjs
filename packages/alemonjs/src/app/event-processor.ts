@@ -1,5 +1,5 @@
 import { getConfigValue } from '../config'
-import { Events } from '../typings'
+import { EventKeys, Events } from '../typings'
 import { expendCycle } from './event-processor-cycle'
 import { createHash } from './utils'
 
@@ -71,7 +71,7 @@ setTimeout(callback, MIN_TIME)
  * @param data
  * @returns
  */
-export const onProcessor = <T extends keyof Events>(name: T, event: Events[T], data?: any) => {
+export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
   const Now = Date.now()
   const value = getConfigValue()
   const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? 1000 * 60
@@ -112,7 +112,7 @@ export const onProcessor = <T extends keyof Events>(name: T, event: Events[T], d
  * @deprecated 该方法已被弃用，请使用 onProcessor() 替代。
  * @returns
  */
-export const OnProcessor = <T extends keyof Events>(event: Events[T], name: T) => {
+export const OnProcessor = <T extends EventKeys>(event: Events[T], name: T) => {
   onProcessor(name, event)
   return
 }

@@ -6,7 +6,7 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { Next, Events, OnResponseValue, Current } from '../typings'
+import { Next, Events, OnResponseValue, Current, EventKeys } from '../typings'
 import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Response, ResponseGather } from './store'
@@ -17,7 +17,7 @@ import { useSend } from './hook-use-api'
  * @param event
  * @param key
  */
-export const expendEvent = async <T extends keyof Events>(
+export const expendEvent = async <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
   next: Function
@@ -80,7 +80,7 @@ export const expendEvent = async <T extends keyof Events>(
     //
     try {
       const app: {
-        default: OnResponseValue<Current<keyof Events>, T>
+        default: OnResponseValue<Current<EventKeys>, T>
         regular?: RegExp | string
       } = await import(`file://${file.path}`)
 
@@ -232,7 +232,7 @@ export const expendEvent = async <T extends keyof Events>(
 
     try {
       const app: {
-        default: OnResponseValue<Current<keyof Events>, T>
+        default: OnResponseValue<Current<EventKeys>, T>
         regular?: RegExp | string
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)

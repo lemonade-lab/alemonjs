@@ -7,7 +7,8 @@ import {
   DataImageURL,
   DataMention,
   DataText,
-  Events
+  Events,
+  EventKeys
 } from './typings'
 import { sendToChannel as toChannel, sendToUser as toUser, useSend as useS } from './post'
 
@@ -136,7 +137,7 @@ export function JSX(...arg: React.JSX.Element[]) {
  * @param e
  * @returns
  */
-export const useSend = (e: Events[keyof Events]) => {
+export const useSend = <T extends EventKeys>(e: Events[T]) => {
   const Send = useS(e)
   return (...arg: React.JSX.Element[]) => Send(...JSX(...arg))
 }

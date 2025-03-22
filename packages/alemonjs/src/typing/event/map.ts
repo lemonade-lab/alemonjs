@@ -23,7 +23,9 @@ export type EventsMessageCreate = {
   'private.message.create': PrivateEventMessageCreate
 }
 
-export type EventsMessageCreateEnum = Events[keyof EventsMessageCreate]
+export type EventsMessageCreateKeys = keyof EventsMessageCreate
+
+export type EventsMessageCreateEnum = Events[EventsMessageCreateKeys]
 
 export type Events = {
   'message.update': PublicEventMessageUpdate
@@ -42,9 +44,11 @@ export type Events = {
   'private.guild.add': PrivateEventRequestGuildAdd
 } & EventsMessageCreate
 
-export type EventsEnum = Events[keyof Events]
+export type EventKeys = keyof Events
 
-export const EventsKeyEnum: (keyof Events)[] = [
+export type EventsEnum = Events[EventKeys]
+
+export const EventsKeyEnum: EventKeys[] = [
   'message.create',
   'message.update',
   'message.delete',
