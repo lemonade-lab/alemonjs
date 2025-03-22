@@ -4,7 +4,7 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventCycle } from '../typings'
-import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
+import { SubscribeList } from './store'
 
 /**
  * 处理订阅
@@ -19,21 +19,18 @@ export const expendSubscribe = async <T extends keyof Events>(
   next: Function,
   chioce: EventCycle
 ) => {
-  if (!alemonjsCore.storeSubscribeList[chioce][select]) {
-    alemonjsCore.storeSubscribeList[chioce][select] = new SinglyLinkedList()
-  }
-
+  const subList = new SubscribeList(chioce, select)
   /**
    * 观察者下一步
    * @returns
    */
-  const nextObserver: Next = (cn?: boolean, ...cns: any[]) => {
+  const nextObserver: Next = (cn?: boolean, ...cns: boolean[]) => {
     if (cn) {
       next(...cns)
       return
     }
 
-    const item = alemonjsCore.storeSubscribeList[chioce][select].popNext() // 弹出下一个节点
+    const item = subList.value.popNext() // 弹出下一个节点
 
     // 可能是 undefined
     if (!item || !item.data.current) {
@@ -52,17 +49,17 @@ export const expendSubscribe = async <T extends keyof Events>(
     }
 
     // 订阅是执行则销毁
-    alemonjsCore.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
+    subList.value.removeCurrent() // 移除当前节点
 
-    const Continue: Next = (cn?: boolean, ...cns: any[]) => {
+    const Continue: Next = (cn?: boolean, ...cns: boolean[]) => {
       // next() 订阅继续
-      alemonjsCore.storeSubscribeList[chioce][select].append(item.data) // 重新连接
+      subList.value.append(item.data) // 重新连接
       if (cn) {
         nextObserver(...cns)
         return
       }
       if (typeof cn === 'boolean') {
-        alemonjsCore.storeSubscribeList[chioce][select].removeCurrent() // 移除当前节点
+        subList.value.removeCurrent() // 移除当前节点
         nextObserver(...cns)
         return
       }

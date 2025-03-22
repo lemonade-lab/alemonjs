@@ -1,7 +1,3 @@
-import './global'
-/**
- * export typing
- */
 export * from './typing/cycle/index'
 export * from './typing/event/base/guild'
 export * from './typing/event/base/message'
@@ -13,10 +9,11 @@ export * from './typing/event/member/index'
 export * from './typing/event/message/message'
 export * from './typing/event/message/private.message'
 export * from './typing/event/request/index'
+export * from './typing/event/actions'
 export * from './typing/event/index'
 export * from './typing/event/map'
-export * from './typing/global/index'
 export * from './typing/logger/index'
+export * from './typing/client/index'
 export * from './typing/message/index'
 export * from './typing/store/res'
 export * from './typing/subscribe'

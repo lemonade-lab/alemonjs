@@ -133,7 +133,7 @@ export const loadChildren = async (mainPath: string, node: string) => {
       }
 
       // 记录 main
-      alemonjsCore.storeMains.push(mainDir)
+      // alemonjsCore.storeMains.push(mainDir)
     } catch (e) {
       unMounted(e)
     }
@@ -145,7 +145,7 @@ export const loadChildren = async (mainPath: string, node: string) => {
 }
 
 /**
- * 废弃
+ * 废弃，请使用 loadChildren
  * @deprecated
  */
 export const loadModule = loadChildren
@@ -174,7 +174,7 @@ export const loadChildrenFile = async (node: string) => {
 }
 
 /**
- * 废弃
+ * 废弃，请使用 loadChildrenFile
  * @deprecated
  */
 export const moduleChildrenFiles = loadChildrenFile

@@ -1,7 +1,7 @@
 /**
  * Logger interface
  */
-export interface Logger {
+export type LoggerUtils = {
   /**
    *  trace
    * @param args

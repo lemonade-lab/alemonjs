@@ -12,5 +12,7 @@ export default onMiddleware(selects, async (e, next) => {
   // const config = getConfigValue()
   // console.log('test', config)
 
+  // 在中间件响应之前，观察该用户
+
   next()
 })

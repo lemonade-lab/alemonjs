@@ -1,10 +1,10 @@
-import { DefineChildren } from '../typings'
+import { DefineChildrenFunc } from '../typings'
 /**
  * 定义子事件
  * @param callback
  * @returns
  */
-export const defineChildren: DefineChildren = callback => {
+export const defineChildren: DefineChildrenFunc = callback => {
   if (typeof callback === 'function' || typeof callback === 'object') {
     return {
       _name: 'apps',

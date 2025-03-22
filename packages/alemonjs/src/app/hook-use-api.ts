@@ -3,9 +3,8 @@ import { DataEnums, Events } from '../typings'
 /**
  * 使用提及。
  * @param {Object} event - 事件对象，包含触发提及的相关信息。
- * @returns {any} - 返回提及操作的结果。
  */
-export const useMention = async (event: { [key: string]: any }) => {
+export const useMention = async (event: Events[keyof Events]) => {
   if (!event || typeof event !== 'object') {
     throw new Error('Invalid event: event must be an object')
   }
@@ -24,7 +23,7 @@ export const useMention = async (event: { [key: string]: any }) => {
  * @returns {Function} - 返回一个异步函数，用于发送消息。
  * @throws {Error} - 如果 event 无效，抛出错误。
  */
-export const useSend = (event: { [key: string]: any }) => {
+export const useSend = (event: Events[keyof Events]) => {
   if (!event || typeof event !== 'object') {
     throw new Error('Invalid event: event must be an object')
   }
@@ -55,10 +54,10 @@ export const unChildren = (mainDir: string) => {
   }
 
   // 从 storeMains 中移除
-  const storeMainsIndex = alemonjsCore.storeMains.indexOf(mainDir)
-  if (storeMainsIndex !== -1) {
-    alemonjsCore.storeMains.splice(storeMainsIndex, 1)
-  }
+  // const storeMainsIndex = alemonjsCore.storeMains.indexOf(mainDir)
+  // if (storeMainsIndex !== -1) {
+  //   alemonjsCore.storeMains.splice(storeMainsIndex, 1)
+  // }
 
   // 从 storeResponse 中移除
   if (alemonjsCore.storeResponse.find(item => item.source == mainDir)) {

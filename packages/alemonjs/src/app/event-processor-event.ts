@@ -6,9 +6,11 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { Next, Events, OnResponseValue } from '../typings'
+import { Next, Events, OnResponseValue, Current } from '../typings'
 import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
+import { Response, ResponseGather } from './store'
+import { useSend } from './hook-use-api'
 
 /**
  * 消息体处理机制
@@ -20,11 +22,15 @@ export const expendEvent = async <T extends keyof Events>(
   select: T,
   next: Function
 ) => {
+  const res = new Response()
+  const resGather = new ResponseGather(select)
+  const Send = useSend(valueEvent)
+
   // 得到所有 apps
-  const StoreResponse = [...alemonjsCore.storeResponse]
+  const StoreResponse = res.value
 
   // 得到对应类型的消息
-  const StoreResponseGather = [...alemonjsCore.storeResponseGather[select]]
+  const StoreResponseGather = resGather.value
 
   let valueI = 0
   let valueJ = 0
@@ -74,7 +80,7 @@ export const expendEvent = async <T extends keyof Events>(
     //
     try {
       const app: {
-        default: OnResponseValue<any, T>
+        default: OnResponseValue<Current<keyof Events>, T>
         regular?: RegExp | string
       } = await import(`file://${file.path}`)
 
@@ -118,13 +124,13 @@ export const expendEvent = async <T extends keyof Events>(
         }
         // 不是数组写法的。会触发分类
         // 判断是否已经分类
-        if (!alemonjsCore.storeResponseGather[select].find(v => v.path === file.path)) {
+        if (!resGather.value.find(v => v.path === file.path)) {
           // 得到index
-          const index = alemonjsCore.storeResponse.findIndex(v => v.path === file.path)
+          const index = res.value.findIndex(v => v.path === file.path)
           // 分类
-          alemonjsCore.storeResponse.splice(index, 1)
+          res.value.splice(index, 1)
           // 转移存储
-          alemonjsCore.storeResponseGather[select].push({
+          resGather.value.push({
             source: file.source,
             dir: file.dir,
             path: file.path,
@@ -157,9 +163,37 @@ export const expendEvent = async <T extends keyof Events>(
           // 不是真的
           if (!T) return
           if (isAsyncFunction(app.default.current[i])) {
-            T = await app.default.current[i](valueEvent, nextEvent)
+            const res = await app.default.current[i](valueEvent, nextEvent)
+            if (typeof res === 'boolean') {
+              T = res
+            } else if (Array.isArray(res) && res.length > 0) {
+              // 发送数据
+              await Send(...res)
+            } else if (typeof res === 'object') {
+              if (typeof res.allowGrouping === 'boolean') {
+                T = res.allowGrouping
+              }
+              if (Array.isArray(res.data)) {
+                // 发送数据
+                await Send(...res)
+              }
+            }
           } else {
-            T = await app.default.current[i](valueEvent, nextEvent)
+            const res = app.default.current[i](valueEvent, nextEvent)
+            if (typeof res === 'boolean') {
+              T = res
+            } else if (Array.isArray(res) && res.length > 0) {
+              // 发送数据
+              await Send(...res)
+            } else if (typeof res === 'object') {
+              if (typeof res.allowGrouping === 'boolean') {
+                T = res.allowGrouping
+              }
+              if (Array.isArray(res.data)) {
+                // 发送数据
+                await Send(...res)
+              }
+            }
           }
           ++i
           await start()
@@ -198,7 +232,7 @@ export const expendEvent = async <T extends keyof Events>(
 
     try {
       const app: {
-        default: OnResponseValue<any, T>
+        default: OnResponseValue<Current<keyof Events>, T>
         regular?: RegExp | string
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)

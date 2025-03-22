@@ -4,7 +4,7 @@ import { Guild, Channel } from '../event/base/guild'
 /**
  * 文本数据
  */
-export type DataTextType = {
+export type DataText = {
   type: 'Text'
   value: string
   options?: {
@@ -15,7 +15,7 @@ export type DataTextType = {
 /**
  * 图片数据
  */
-export type DataImageType = {
+export type DataImage = {
   type: 'Image'
   value: Buffer
 }
@@ -23,7 +23,7 @@ export type DataImageType = {
 /**
  * 图片链接
  */
-export type DataImageURLType = {
+export type DataImageURL = {
   type: 'ImageURL'
   value: string
 }
@@ -31,7 +31,7 @@ export type DataImageURLType = {
 /**
  * 图片文件
  */
-export type DataImageFileType = {
+export type DataImageFile = {
   type: 'ImageFile'
   value: string
 }
@@ -39,7 +39,7 @@ export type DataImageFileType = {
 /**
  * 提及数据
  */
-export type DataMentionType = {
+export type DataMention = {
   type: 'Mention'
   value?: string
   options?: {
@@ -48,15 +48,15 @@ export type DataMentionType = {
   }
 }
 
-export type DataParseType = {
-  Text: DataTextType
-  Image: DataImageType
-  ImageURL: DataImageURLType
-  ImageFile: DataImageFileType
-  Mention: DataMentionType
+export type DataMap = {
+  Text: DataText
+  Image: DataImage
+  ImageURL: DataImageURL
+  ImageFile: DataImageFile
+  Mention: DataMention
 }
 
-export type ParseType = {
+export type ParseKeys = {
   Text: string | undefined
   Image: Buffer[] | undefined
   Link: any
@@ -70,11 +70,6 @@ export type ParseType = {
   ButtonBox: any
 }
 
-export type DataEnums =
-  | DataTextType
-  | DataImageType
-  | DataImageURLType
-  | DataImageFileType
-  | DataMentionType
+export type DataEnums = DataText | DataImage | DataImageURL | DataImageFile | DataMention
 
 export type MessageDataFormat = DataEnums[]

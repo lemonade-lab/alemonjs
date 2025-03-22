@@ -1,6 +1,6 @@
-class Node<T> {
+class ListNode<T> {
   data: T // 节点数据
-  next: Node<T> | null // 指向下一个节点的指针
+  next: ListNode<T> | null // 指向下一个节点的指针
 
   constructor(data: T) {
     this.data = data
@@ -9,9 +9,9 @@ class Node<T> {
 }
 
 export class SinglyLinkedList<T> {
-  private head: Node<T> | null // 链表的头节点
+  private head: ListNode<T> | null // 链表的头节点
   private size: number // 链表的大小
-  private current: Node<T> | null // 当前节点指针
+  private current: ListNode<T> | null // 当前节点指针
 
   constructor(initialValues?: T[]) {
     this.head = null
@@ -25,7 +25,7 @@ export class SinglyLinkedList<T> {
 
   // 在链表末尾添加新节点
   append(data: T): void {
-    const newNode = new Node(data)
+    const newNode = new ListNode(data)
     if (!this.head) {
       this.head = newNode
     } else {
@@ -39,7 +39,7 @@ export class SinglyLinkedList<T> {
   }
 
   // 获取下一个节点并移动指针
-  popNext(): Node<T> | null {
+  popNext(): ListNode<T> | null {
     if (!this.current) {
       this.current = this.head // 如果当前节点为 null，从头节点开始
     } else {
@@ -60,7 +60,7 @@ export class SinglyLinkedList<T> {
       return
     }
 
-    let previous: Node<T> | null = this.head
+    let previous: ListNode<T> | null = this.head
     while (previous && previous.next !== this.current) {
       previous = previous.next
     }

@@ -1,5 +1,5 @@
-import { EventCycle, Next, Current, Events } from '../typings'
-import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
+import { EventCycle, Current, Events } from '../typings'
+import { SubscribeList } from './store'
 
 type KeyMap = {
   [key: string]: string | number | boolean
@@ -11,11 +11,9 @@ type KeyMap = {
  * @param option
  * @returns
  */
-export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
+export const useSubscribe = <T extends keyof Events>(event: Events[T], select: T) => {
   const run = (callback: Current<T>, keys: (keyof Events[T])[], chioce: EventCycle) => {
-    if (!alemonjsCore.storeSubscribeList[chioce][select]) {
-      alemonjsCore.storeSubscribeList[chioce][select] = new SinglyLinkedList()
-    }
+    const subList = new SubscribeList(chioce, select)
     // 没有选择
     if (keys.length === 0) return
     // 只能选择基础数据类型的key
@@ -30,13 +28,13 @@ export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
         values[key] = event[key]
       }
     }
-    alemonjsCore.storeSubscribeList[chioce][select].append({ keys: values, current: callback })
+    subList.value.append({ keys: values, current: callback })
     return
   }
   const create = (callback: Current<T>, keys: (keyof Events[T])[]) => {
     run(callback, keys, 'create')
   }
-  const mountBefore = (callback: (e: Events[T], next: Next) => any, keys: (keyof Events[T])[]) => {
+  const mountBefore = (callback: Current<T>, keys: (keyof Events[T])[]) => {
     run(callback, keys, 'mount')
   }
   const unmount = (callback: Current<T>, keys: (keyof Events[T])[]) => {
@@ -51,7 +49,7 @@ export const useSubscribe = <T extends keyof Events>(event: any, select: T) => {
  * @param option
  * @returns
  */
-export const useObserver = <T extends keyof Events>(event: any, option: T) => {
+export const useObserver = <T extends keyof Events>(event: Events[T], option: T) => {
   const [_, mount] = useSubscribe(event, option)
   return mount
 }

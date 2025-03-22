@@ -1,11 +1,13 @@
 import React from 'react'
+import { logger } from './global.js'
 import {
   DataEnums,
-  DataImageFileType,
-  DataImageType,
-  DataImageURLType,
-  DataMentionType,
-  DataTextType
+  DataImageFile,
+  DataImage,
+  DataImageURL,
+  DataMention,
+  DataText,
+  Events
 } from './typings'
 import { sendToChannel as toChannel, sendToUser as toUser, useSend as useS } from './post'
 
@@ -23,8 +25,8 @@ import {
  * @returns
  */
 export function Text(_props: {
-  children: DataTextType['value'] | DataTextType['value'][]
-  style?: DataTextType['options']['style']
+  children: DataText['value'] | DataText['value'][]
+  style?: DataText['options']['style']
 }) {
   return React.createElement('div', {
     dataType: 'Text'
@@ -36,7 +38,7 @@ export function Text(_props: {
  * @param _props
  * @returns
  */
-export function ImageURL(_props: { src: DataImageURLType['value'] }) {
+export function ImageURL(_props: { src: DataImageURL['value'] }) {
   return React.createElement('div', {
     dataType: 'ImageURL'
   })
@@ -47,7 +49,7 @@ export function ImageURL(_props: { src: DataImageURLType['value'] }) {
  * @param _props
  * @returns
  */
-export function ImageFile(_props: { src: DataImageFileType['value'] }) {
+export function ImageFile(_props: { src: DataImageFile['value'] }) {
   return React.createElement('div', {
     dataType: 'ImageFile'
   })
@@ -58,7 +60,7 @@ export function ImageFile(_props: { src: DataImageFileType['value'] }) {
  * @param _props
  * @returns
  */
-export function Image(_props: { value: DataImageType['value'] }) {
+export function Image(_props: { value: DataImage['value'] }) {
   return React.createElement('div', {
     dataType: 'Image'
   })
@@ -70,8 +72,8 @@ export function Image(_props: { value: DataImageType['value'] }) {
  * @returns
  */
 export function Mention(_props: {
-  belong?: DataMentionType['options']['belong']
-  value: DataMentionType['value']
+  belong?: DataMention['options']['belong']
+  value: DataMention['value']
 }) {
   return React.createElement('div', {
     dataType: 'Mention'
@@ -134,7 +136,7 @@ export function JSX(...arg: React.JSX.Element[]) {
  * @param e
  * @returns
  */
-export const useSend = (e: { [key: string]: any }) => {
+export const useSend = (e: Events[keyof Events]) => {
   const Send = useS(e)
   return (...arg: React.JSX.Element[]) => Send(...JSX(...arg))
 }

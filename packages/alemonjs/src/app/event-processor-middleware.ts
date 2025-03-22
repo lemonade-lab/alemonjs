@@ -6,9 +6,11 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { Next, Events, OnMiddlewareValue } from '../typings'
+import { Next, Events, OnMiddlewareValue, Current } from '../typings'
 import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
+import { Middleware, MiddlewareGather } from './store'
+import { useSend } from './hook-use-api'
 
 /**
  * 处理中间件
@@ -20,10 +22,13 @@ export const expendMiddleware = async <T extends keyof Events>(
   select: T,
   next: Function
 ) => {
+  const mw = new Middleware()
+  const mwGather = new MiddlewareGather(select)
+  const Send = useSend(valueEvent)
   // 得到所有 apps
-  const mwFiles = [...alemonjsCore.storeMiddleware]
+  const mwFiles = mw.value
   // 得到对应类型的消息
-  const mws = [...alemonjsCore.storeMiddlewareGather[select]]
+  const mws = mwGather.value
 
   let valueI = 0
   let valueJ = 0
@@ -73,7 +78,7 @@ export const expendMiddleware = async <T extends keyof Events>(
 
     try {
       const app: {
-        default: OnMiddlewareValue<any, T>
+        default: OnMiddlewareValue<Current<keyof Events>, T>
         name?: string
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
@@ -119,13 +124,13 @@ export const expendMiddleware = async <T extends keyof Events>(
         }
         // 不是数组，进行分类存储
         // 判断是否已经存储
-        if (!alemonjsCore.storeMiddlewareGather[select].find(v => v.path === file.path)) {
+        if (!mwGather.value.find(v => v.path === file.path)) {
           // 索引
-          const index = alemonjsCore.storeMiddleware.findIndex(v => v.path === file.path)
+          const index = mw.value.findIndex(v => v.path === file.path)
           // 去除
-          alemonjsCore.storeMiddleware.splice(index, 1)
+          mw.value.splice(index, 1)
           // 存储
-          alemonjsCore.storeMiddlewareGather[select].push({
+          mwGather.value.push({
             source: file.source,
             dir: file.dir,
             path: file.path,
@@ -146,9 +151,37 @@ export const expendMiddleware = async <T extends keyof Events>(
           // 不是真的
           if (!T) return
           if (isAsyncFunction(app.default.current[i])) {
-            T = await app.default.current[i](valueEvent, nextMiddleware)
+            const res = await app.default.current[i](valueEvent, nextMiddleware)
+            if (typeof res === 'boolean') {
+              T = res
+            } else if (Array.isArray(res) && res.length > 0) {
+              // 发送数据
+              await Send(...res)
+            } else if (typeof res === 'object') {
+              if (typeof res.allowGrouping === 'boolean') {
+                T = res.allowGrouping
+              }
+              if (Array.isArray(res.data)) {
+                // 发送数据
+                await Send(...res)
+              }
+            }
           } else {
-            T = await app.default.current[i](valueEvent, nextMiddleware)
+            const res = await app.default.current[i](valueEvent, nextMiddleware)
+            if (typeof res === 'boolean') {
+              T = res
+            } else if (Array.isArray(res) && res.length > 0) {
+              // 发送数据
+              await Send(...res)
+            } else if (typeof res === 'object') {
+              if (typeof res.allowGrouping === 'boolean') {
+                T = res.allowGrouping
+              }
+              if (Array.isArray(res.data)) {
+                // 发送数据
+                await Send(...res)
+              }
+            }
           }
           ++i
           await start()
@@ -184,7 +217,7 @@ export const expendMiddleware = async <T extends keyof Events>(
     }
     try {
       const app: {
-        default: OnMiddlewareValue<any, T>
+        default: OnMiddlewareValue<Current<keyof Events>, T>
         state?: [boolean, (value: boolean) => void]
       } = await import(`file://${file.path}`)
 
@@ -217,9 +250,37 @@ export const expendMiddleware = async <T extends keyof Events>(
           // 不是真的
           if (!T) return
           if (isAsyncFunction(app.default.current[i])) {
-            T = await app.default.current[i](valueEvent, nextMiddleware)
+            const res = await app.default.current[i](valueEvent, nextMiddleware)
+            if (typeof res === 'boolean') {
+              T = res
+            } else if (Array.isArray(res) && res.length > 0) {
+              // 发送数据
+              await Send(...res)
+            } else if (typeof res === 'object') {
+              if (typeof res.allowGrouping === 'boolean') {
+                T = res.allowGrouping
+              }
+              if (Array.isArray(res.data)) {
+                // 发送数据
+                await Send(...res)
+              }
+            }
           } else {
-            T = await app.default.current[i](valueEvent, nextMiddleware)
+            const res = await app.default.current[i](valueEvent, nextMiddleware)
+            if (typeof res === 'boolean') {
+              T = res
+            } else if (Array.isArray(res) && res.length > 0) {
+              // 发送数据
+              await Send(...res)
+            } else if (typeof res === 'object') {
+              if (typeof res.allowGrouping === 'boolean') {
+                T = res.allowGrouping
+              }
+              if (Array.isArray(res.data)) {
+                // 发送数据
+                await Send(...res)
+              }
+            }
           }
           ++i
           await start()

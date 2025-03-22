@@ -1,29 +1,28 @@
 import {
-  DefinePlatform,
-  DefineChildren,
-  OnMiddlewareType,
-  OnResponseType,
-  OnResponseReversalType,
-  OnMiddlewareReversalType
+  DefinePlatformFunc,
+  DefineChildrenFunc,
+  OnMiddlewareFunc,
+  OnResponseFunc,
+  OnResponseReversalFunc,
+  OnMiddlewareReversalFunc
 } from './typing/event'
-import { ClientAPI } from './typing/global'
+import { ClientAPI } from './typing/client'
 import {
   StoreMiddleware,
   StoreMiddlewareItem,
   StoreResponse,
   StoreResponseItem
 } from './typing/store/res'
-import { Subscribe } from './typing/subscribe'
-import { Logger } from './typing/logger/index'
-import { createInitLogger, createLogger } from './logger'
+import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
+import { LoggerUtils } from './typing/logger/index'
 import { ResponseState } from './typing/state'
-import { EventsKeyEnum } from './typing/event/map'
+import { Core, Logger } from './app/store'
 
 declare global {
   /**
    * 打印
    */
-  var logger: Logger
+  var logger: LoggerUtils
   /**
    * 核心
    */
@@ -33,13 +32,17 @@ declare global {
      */
     storeState: ResponseState
     /**
-     * 主函数
+     * 状态订阅
      */
-    storeMains: string[]
+    storeStateSubscribe: StateSubscribeMap
+    // /**
+    //  * 主函数
+    //  */
+    // storeMains: string[]
     /**
      * 订阅列表
      */
-    storeSubscribeList: Subscribe
+    storeSubscribeList: SubscribeKeysMap
     /**
      * 中间件
      */
@@ -56,85 +59,50 @@ declare global {
      * 中间件收集
      */
     storeMiddlewareGather: StoreMiddleware
+    /**
+     *
+     */
+    storeActionsBus: any
   }
   /**
    * 客户端
    */
   var alemonjsBot: ClientAPI
   /**
-   * 废弃
+   * 废弃，请使用 onResponse
    * @deprecated
    */
-  var OnResponse: OnResponseType
+  var OnResponse: OnResponseFunc
   /**
    * 定义响应体
    */
-  var onResponse: OnResponseReversalType
+  var onResponse: OnResponseReversalFunc
   /**
    * 废弃,请使用 onMiddleware
    * @deprecated
    */
-  var OnMiddleware: OnMiddlewareType
+  var OnMiddleware: OnMiddlewareFunc
   /**
    * 定义中间件
    */
-  var onMiddleware: OnMiddlewareReversalType
+  var onMiddleware: OnMiddlewareReversalFunc
   /**
    * 定义一个子模块
    */
-  var defineChildren: DefineChildren
+  var defineChildren: DefineChildrenFunc
   /**
    * 废弃，请使用 definePlatform
    * @deprecated
    */
-  var defineBot: DefinePlatform
+  var defineBot: DefinePlatformFunc
   /**
    * 定义一个平台
    */
-  var definePlatform: DefinePlatform
-}
-
-/**
- * 初始化全局变量
- * @returns
- */
-const initGlobalCore = () => {
-  if (global.alemonjsCore) return
-  if (!global.alemonjsCore) {
-    global.alemonjsCore = {
-      storeState: {},
-      storeMains: [],
-      storeSubscribeList: {
-        create: {},
-        mount: {},
-        unmount: {}
-      },
-      storeMiddleware: [],
-      storeResponse: [],
-      storeMiddlewareGather: {} as never,
-      storeResponseGather: {} as never
-    }
-  }
-  for (const key of EventsKeyEnum) {
-    global.alemonjsCore.storeMiddlewareGather[key] = [] as never
-  }
-  for (const key of EventsKeyEnum) {
-    global.alemonjsCore.storeResponseGather[key] = [] as never
-  }
-}
-
-const initLogger = () => {
-  if (global.logger) return
-  try {
-    global.logger = createLogger()
-  } catch (e) {
-    console.error(e)
-    // 扩展 fatal, mark
-    global.logger = createInitLogger()
-  }
+  var definePlatform: DefinePlatformFunc
 }
 
 // 初始化日志
-initLogger()
-// 开始初始化
-initGlobalCore()
+export const logger = new Logger().value
+
+// 初始化核心数据
+export const core = new Core().value

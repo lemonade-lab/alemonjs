@@ -1,18 +1,35 @@
 import { ChildrenCycle, Next } from '../cycle'
-import { ClientAPI } from '../global'
+import { ClientAPI } from '../client'
 import { Events } from './map'
+import { DataEnums } from '../message'
 
-export type Current<T extends keyof Events> = (event: Events[T], next: Next) => void
+export type Current<T extends keyof Events> = (
+  event: Events[T],
+  next: Next
+) =>
+  | {
+      /**
+       * 是否允许分组，默认为 false
+       */
+      allowGrouping?: boolean
+      /**
+       * 要发送的数据
+       */
+      data?: DataEnums[]
+      [key: string]: any
+    }
+  | boolean
+  | DataEnums[]
 
 /**
  * 定义一个响应
  */
-export type OnResponseType = <T extends keyof Events, C extends Current<T> | Current<T>[]>(
+export type OnResponseFunc = <T extends keyof Events, C extends Current<T> | Current<T>[]>(
   callback: C,
   select: T | T[]
 ) => OnResponseValue<C, T>
 
-export type OnResponseReversalType = <T extends keyof Events, C extends Current<T> | Current<T>[]>(
+export type OnResponseReversalFunc = <T extends keyof Events, C extends Current<T> | Current<T>[]>(
   select: T | T[],
   callback: C
 ) => OnResponseValue<C, T>
@@ -26,12 +43,12 @@ export type OnResponseValue<C, T extends keyof Events> = {
 /**
  * 定义一个中间件
  */
-export type OnMiddlewareType = <T extends keyof Events, C extends Current<T> | Current<T>[]>(
+export type OnMiddlewareFunc = <T extends keyof Events, C extends Current<T> | Current<T>[]>(
   callback: C,
   select: T | T[]
 ) => OnMiddlewareValue<C, T>
 
-export type OnMiddlewareReversalType = <
+export type OnMiddlewareReversalFunc = <
   T extends keyof Events,
   C extends Current<T> | Current<T>[]
 >(
@@ -49,27 +66,9 @@ export type DefineChildrenValue = {
   _name: 'apps'
   callback: DefineChildrenCallback
 }
-export type DefineChildren = (
+export type DefineChildrenFunc = (
   callback: (() => ChildrenCycle) | ChildrenCycle
 ) => DefineChildrenValue
-/**
- * 废弃
- * @deprecated
- */
-export type DefineBotCallback = (() => Promise<ClientAPI> | ClientAPI) | ClientAPI
-/**
- * 废弃
- * @deprecated
- */
-export type DefineBotValue = {
-  _name: 'platform'
-  callback: DefineBotCallback
-}
-/**
- * 废弃
- * @deprecated
- */
-export type DefineBot = (callback: DefineBotCallback) => DefineBotValue
 
 /**
  * 定义一个平台
@@ -85,4 +84,20 @@ export type DefinePlatformValue = {
 /**
  * 定义一个平台
  */
-export type DefinePlatform = (callback: DefinePlatformCallback) => DefinePlatformValue
+export type DefinePlatformFunc = (callback: DefinePlatformCallback) => DefinePlatformValue
+
+/**
+ * 废弃，请使用 DefinePlatformCallback
+ * @deprecated
+ */
+export type DefineBotCallback = DefinePlatformCallback
+/**
+ * 废弃，请使用 DefinePlatformValue
+ * @deprecated
+ */
+export type DefineBotValue = DefinePlatformValue
+/**
+ * 废弃，请使用 DefinePlatform
+ * @deprecated
+ */
+export type DefineBot = DefinePlatformFunc

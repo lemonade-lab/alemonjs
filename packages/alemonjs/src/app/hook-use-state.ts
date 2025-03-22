@@ -1,28 +1,4 @@
-interface Subscribe {
-  [key: string]: Array<(value: boolean) => void>
-}
-
-// 存储订阅者
-const subscriptions: Subscribe = {}
-
-if (!alemonjsCore.storeState) {
-  // 初始化全局状态
-  alemonjsCore.storeState = new Proxy({} as Record<string, boolean>, {
-    get(target, prop: string) {
-      return prop in target ? target[prop] : false
-    },
-    set(target, prop: string, value: boolean) {
-      target[prop] = value
-      // 通知所有订阅者
-      if (subscriptions[prop]) {
-        for (const callback of subscriptions[prop]) {
-          callback(value)
-        }
-      }
-      return true // 表示设置成功
-    }
-  })
-}
+import { State, StateSubscribe } from './store'
 
 /**
  * 获取指定功能是启动还是关闭
@@ -40,15 +16,12 @@ export const useState = <T extends string>(
   name: T,
   defaultValue = true
 ): [boolean, (value: boolean) => void] => {
-  // 如果不存在则设置默认值
-  if (!(name in alemonjsCore.storeState)) {
-    alemonjsCore.storeState[name] = defaultValue
-  }
+  const state = new State(name, defaultValue)
   // 设置值的函数
   const setValue = (value: boolean) => {
-    alemonjsCore.storeState[name] = value
+    state.value = value
   }
-  return [alemonjsCore.storeState[name], setValue]
+  return [state.value, setValue]
 }
 
 /**
@@ -60,14 +33,12 @@ export const onState = <T extends string>(name: T, callback: (value: boolean) =>
   if (typeof callback !== 'function') {
     throw new Error('Callback must be a function')
   }
-  if (!subscriptions[name]) {
-    subscriptions[name] = []
-  }
-  subscriptions[name].push(callback)
+  const sub = new StateSubscribe(name)
+  sub.on(callback)
 }
 
 /**
- * 废弃
+ * 废弃，请使用 onState
  * @deprecated
  */
 export const eventState = onState
@@ -78,13 +49,12 @@ export const eventState = onState
  * @param callback 回调函数
  */
 export const unState = <T extends string>(name: T, callback: (value: boolean) => void) => {
-  if (subscriptions[name]) {
-    subscriptions[name] = subscriptions[name].filter(cb => cb !== callback)
-  }
+  const sub = new StateSubscribe(name)
+  sub.un(callback)
 }
 
 /**
- * 废弃
+ * 废弃，请使用 unState
  * @deprecated
  */
 export const unEventState = unState

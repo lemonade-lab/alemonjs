@@ -124,7 +124,7 @@ export const showErrorModule = (e: Error) => {
 }
 
 /**
- * 废弃
+ * 废弃，请使用 showErrorModule
  * @deprecated
  */
 export const ErrorModule = showErrorModule

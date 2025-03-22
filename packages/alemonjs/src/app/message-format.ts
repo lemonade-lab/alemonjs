@@ -1,10 +1,4 @@
-import {
-  DataMentionType,
-  DataImageType,
-  DataTextType,
-  DataImageURLType,
-  DataImageFileType
-} from '../typings'
+import { DataMention, DataImage, DataText, DataImageURL, DataImageFile } from '../typings'
 
 /**
  * 文本消息
@@ -12,10 +6,7 @@ import {
  * @param options
  * @returns
  */
-export const Text = (
-  val: DataTextType['value'],
-  options?: DataTextType['options']
-): DataTextType => {
+export const Text = (val: DataText['value'], options?: DataText['options']): DataText => {
   return {
     type: 'Text',
     value: val,
@@ -28,7 +19,7 @@ export const Text = (
  * @param val
  * @returns
  */
-export const Image = (val: DataImageType['value']): DataImageType => {
+export const Image = (val: DataImage['value']): DataImage => {
   return {
     type: 'Image',
     value: val
@@ -40,7 +31,7 @@ export const Image = (val: DataImageType['value']): DataImageType => {
  * @param val
  * @returns
  */
-export const ImageURL = (val: DataImageURLType['value']): DataImageURLType => {
+export const ImageURL = (val: DataImageURL['value']): DataImageURL => {
   return {
     type: 'ImageURL',
     value: val
@@ -52,7 +43,7 @@ export const ImageURL = (val: DataImageURLType['value']): DataImageURLType => {
  * @param val
  * @returns
  */
-export const ImageFile = (val: DataImageFileType['value']): DataImageFileType => {
+export const ImageFile = (val: DataImageFile['value']): DataImageFile => {
   return {
     type: 'ImageFile',
     value: val
@@ -66,9 +57,9 @@ export const ImageFile = (val: DataImageFileType['value']): DataImageFileType =>
  * @returns
  */
 export const Mention = (
-  UserId?: DataMentionType['value'],
-  options?: DataMentionType['options']
-): DataMentionType => {
+  UserId?: DataMention['value'],
+  options?: DataMention['options']
+): DataMention => {
   return {
     type: 'Mention',
     value: UserId,
