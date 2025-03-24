@@ -5,7 +5,8 @@
  * @description 存储器
  */
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
-import { ActionsEventEnum, EventCycleEnum, EventKeys, Events, EventsKeyEnum } from '../typings'
+// import { ActionsEventEnum, EventCycleEnum, EventKeys, Events } from '../typings'
+import { EventCycleEnum, EventKeys } from '../typings'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 
@@ -101,7 +102,7 @@ export class Core {
       global.alemonjsCore = {
         storeState: {},
         storeStateSubscribe: {},
-        storeActionsBus: {},
+        // storeActionsBus: {},
         // storeMains: [],
         storeSubscribeList: {
           create: {},
@@ -109,16 +110,8 @@ export class Core {
           unmount: {}
         },
         storeMiddleware: [],
-        storeResponse: [],
-        storeMiddlewareGather: {} as never,
-        storeResponseGather: {} as never
+        storeResponse: []
       }
-    }
-    for (const key of EventsKeyEnum) {
-      global.alemonjsCore.storeMiddlewareGather[key] = [] as never
-    }
-    for (const key of EventsKeyEnum) {
-      global.alemonjsCore.storeResponseGather[key] = [] as never
     }
   }
 
@@ -133,40 +126,9 @@ export class Response {
   }
 }
 
-export class ResponseGather<T extends EventKeys> {
-  #select: T
-
-  constructor(select: T) {
-    this.#select = select
-    if (!alemonjsCore.storeResponseGather[this.#select]) {
-      alemonjsCore.storeResponseGather[this.#select] = []
-    }
-  }
-
-  get value() {
-    return alemonjsCore.storeResponseGather[this.#select]
-  }
-}
-
 export class Middleware {
   get value() {
     return alemonjsCore.storeMiddleware
-  }
-}
-
-export class MiddlewareGather<T extends EventKeys> {
-  #select: T
-
-  constructor(select: T) {
-    this.#select = select
-    // 如果没有这个属性，就创建一个
-    if (!alemonjsCore.storeMiddlewareGather[this.#select]) {
-      alemonjsCore.storeMiddlewareGather[this.#select] = []
-    }
-  }
-
-  get value() {
-    return alemonjsCore.storeMiddlewareGather[this.#select]
   }
 }
 
@@ -246,39 +208,39 @@ export class State {
   }
 }
 
-export class ActionsBus {
-  constructor() {
-    if (!alemonjsCore.storeActionsBus) {
-      alemonjsCore.storeActionsBus = {}
-    }
-  }
+// export class ActionsBus {
+//   constructor() {
+//     if (!alemonjsCore.storeActionsBus) {
+//       alemonjsCore.storeActionsBus = {}
+//     }
+//   }
 
-  /**
-   * @param actions
-   * @param callback
-   */
-  subscribe<T extends EventKeys>(
-    actions: ActionsEventEnum,
-    callback: (event: Events[T], data?: any) => void
-  ) {
-    if (!alemonjsCore.storeActionsBus[actions]) {
-      alemonjsCore.storeActionsBus[actions] = []
-    }
-    alemonjsCore.storeActionsBus[actions].push(callback)
-  }
+//   /**
+//    * @param actions
+//    * @param callback
+//    */
+//   subscribe<T extends EventKeys>(
+//     actions: ActionsEventEnum,
+//     callback: (event: Events[T], data?: any) => void
+//   ) {
+//     if (!alemonjsCore.storeActionsBus[actions]) {
+//       alemonjsCore.storeActionsBus[actions] = []
+//     }
+//     alemonjsCore.storeActionsBus[actions].push(callback)
+//   }
 
-  /**
-   *
-   */
-  publish<T extends EventKeys>(actions: ActionsEventEnum, event: Events[T], data?: any) {
-    if (alemonjsCore.storeActionsBus[actions]) {
-      return Promise.all(
-        alemonjsCore.storeActionsBus[actions].map(callback => callback(event, data))
-      )
-    }
-  }
+//   /**
+//    *
+//    */
+//   publish<T extends EventKeys>(actions: ActionsEventEnum, event: Events[T], data?: any) {
+//     if (alemonjsCore.storeActionsBus[actions]) {
+//       return Promise.all(
+//         alemonjsCore.storeActionsBus[actions].map(callback => callback(event, data))
+//       )
+//     }
+//   }
 
-  get value() {
-    return alemonjsCore.storeActionsBus
-  }
-}
+//   get value() {
+//     return alemonjsCore.storeActionsBus
+//   }
+// }

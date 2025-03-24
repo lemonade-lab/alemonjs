@@ -7,12 +7,7 @@ import {
   OnMiddlewareReversalFunc
 } from './typing/event'
 import { ClientAPI } from './typing/client'
-import {
-  StoreMiddleware,
-  StoreMiddlewareItem,
-  StoreResponse,
-  StoreResponseItem
-} from './typing/store/res'
+import { StoreMiddlewareItem, StoreResponseItem } from './typing/store/res'
 import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
 import { LoggerUtils } from './typing/logger/index'
 import { ResponseState } from './typing/state'
@@ -35,10 +30,6 @@ declare global {
      * 状态订阅
      */
     storeStateSubscribe: StateSubscribeMap
-    // /**
-    //  * 主函数
-    //  */
-    // storeMains: string[]
     /**
      * 订阅列表
      */
@@ -48,21 +39,13 @@ declare global {
      */
     storeMiddleware: StoreMiddlewareItem[]
     /**
-     * 响应收集
-     */
-    storeResponseGather: StoreResponse
-    /**
      * 响应
      */
     storeResponse: StoreResponseItem[]
     /**
-     * 中间件收集
+     * 行为总线
      */
-    storeMiddlewareGather: StoreMiddleware
-    /**
-     *
-     */
-    storeActionsBus: any
+    // storeActionsBus: any
   }
   /**
    * 客户端

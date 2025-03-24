@@ -9,7 +9,7 @@ import { getConfig } from 'alemonjs'
  * @returns
  */
 const getDirFiles = (
-  dir,
+  dir: string,
   condition = item => /^res(\.|\..*\.)(js|ts|jsx|tsx)$/.test(item.name)
 ) => {
   //
@@ -35,33 +35,19 @@ const getDirFiles = (
  * 可读取自身pkg.main
  * @param mainDir
  */
-const unMount = mainDir => {
+const unMount = (mainDir: string) => {
   const storeMainsIndex = global.storeMains.indexOf(mainDir)
   if (storeMainsIndex != -1) {
     global.storeMains.splice(storeMainsIndex, 1)
   }
   global.storeResponse = global.storeResponse.filter(item => item.source != mainDir)
   global.storeMiddleware = global.storeMiddleware.filter(item => item.source != mainDir)
-  for (const key in global.storeResponseGather) {
-    if (Array.isArray(global.storeResponseGather[key])) {
-      global.storeResponseGather[key] = global.storeResponseGather[key].filter(
-        item => item.source != mainDir
-      )
-    }
-  }
-  for (const key in global.storeMiddlewareGather) {
-    if (Array.isArray(global.storeMiddlewareGather[key])) {
-      global.storeMiddlewareGather[key] = global.storeMiddlewareGather[key].filter(
-        item => item.source != mainDir
-      )
-    }
-  }
 }
 /**
  * 加载文件
  * @param app
  */
-const loadChildrenFiles = async mainDir => {
+const loadChildrenFiles = async (mainDir: string) => {
   const appsDir = join(mainDir, 'apps')
   const appsFiles = getDirFiles(appsDir)
   for (const file of appsFiles) {
@@ -88,7 +74,7 @@ const loadChildrenFiles = async mainDir => {
  *
  * @param mainPath
  */
-const loadModule = async mainPath => {
+const loadModule = async (mainPath: string) => {
   const mainDir = dirname(mainPath)
   const moduleApp = await import(`file://${mainPath}`)
   try {

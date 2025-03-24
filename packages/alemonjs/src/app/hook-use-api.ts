@@ -70,30 +70,6 @@ export const unChildren = (mainDir: string) => {
       item => item.source !== mainDir
     )
   }
-
-  // 从 storeResponseGather 中移除
-  for (const key in alemonjsCore.storeResponseGather) {
-    if (
-      Array.isArray(alemonjsCore.storeResponseGather[key]) &&
-      alemonjsCore.storeResponseGather[key].find(item => item.source == mainDir)
-    ) {
-      alemonjsCore.storeResponseGather[key] = alemonjsCore.storeResponseGather[key].filter(
-        item => item.source !== mainDir
-      )
-    }
-  }
-
-  // 从 storeMiddlewareGather 中移除
-  for (const key in alemonjsCore.storeMiddlewareGather) {
-    if (
-      Array.isArray(alemonjsCore.storeMiddlewareGather[key]) &&
-      alemonjsCore.storeMiddlewareGather[key].find(item => item.source == mainDir)
-    ) {
-      alemonjsCore.storeMiddlewareGather[key] = alemonjsCore.storeMiddlewareGather[key].filter(
-        item => item.source !== mainDir
-      )
-    }
-  }
 }
 
 /**
