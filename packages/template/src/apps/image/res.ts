@@ -5,6 +5,8 @@ export const regular = /^(#|\/)?image$/
 const selects = createSelects(['message.create', 'private.message.create'])
 const response = onResponse(selects, () => {
   // 发送本地图片文件
-  return [ImageFile(url)]
+  return {
+    data: [ImageFile(url)]
+  }
 })
 export default onResponse(selects, [frontResponse.current, response.current])

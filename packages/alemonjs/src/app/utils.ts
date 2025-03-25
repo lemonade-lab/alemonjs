@@ -37,8 +37,12 @@ export const useUserHashKey = (event: { UserId: string; Platform: string }) => {
  * @returns
  */
 export const createEventName = (url: string, appKey: string) => {
+  let uri = url
+  if (process.platform === 'win32') {
+    uri = uri.replace(/\\/g, '/')
+  }
   // 去掉空字符串
-  const names = url.split('/').filter(item => item !== '')
+  const names = uri.split('/').filter(item => item !== '')
   // 去掉最后一个文件名
   names.pop()
   const name = `${appKey}:${names.join(':')}`
