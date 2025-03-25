@@ -88,8 +88,8 @@ export const expendMiddleware = async <T extends EventKeys>(
       }
 
       // 检查状态
-      if (file?.state) {
-        const [state] = useState(file?.state)
+      if (file?.stateKey) {
+        const [state] = useState(file?.stateKey)
         if (state == false) {
           // 继续
           nextMiddleware()

@@ -1,10 +1,11 @@
+import { ChildrenCycle } from '../cycle'
 import { EventKeys } from '../event/map'
 
 export type StoreResponseItem = {
   /**
    * 来源
    */
-  source: string
+  input: string
   /**
    * 目录
    */
@@ -20,11 +21,11 @@ export type StoreResponseItem = {
   /**
    * 节点
    */
-  node: string
+  appName: string
   /**
    *
    */
-  state?: string
+  stateKey?: string
   /**
    *
    */
@@ -40,7 +41,7 @@ export type StoreMiddlewareItem = {
   /**
    * 来源
    */
-  source: string
+  input: string
   // 目录
   dir: string
   // 文件路径
@@ -48,9 +49,9 @@ export type StoreMiddlewareItem = {
   // 文件名
   name: string
   // 节点
-  node: string
+  appName: string
   // 状态
-  state?: string
+  stateKey?: string
   //
   value?: {
     // 事件
@@ -79,4 +80,5 @@ export type StoreChildrenApp = {
   name: string
   middleware: StoreMiddlewareItem[]
   response: StoreResponseItem[]
+  cycle: ChildrenCycle
 }

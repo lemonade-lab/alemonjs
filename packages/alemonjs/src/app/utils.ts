@@ -36,15 +36,12 @@ export const useUserHashKey = (event: { UserId: string; Platform: string }) => {
  * @param select 选择事件类型,默认 res
  * @returns
  */
-export const createEventName = (url: string, app: string, select: 'res' | 'mw' = 'res') => {
-  const names = url.replace(process.cwd(), '').split('/')
-  const index = names.findIndex(v => v === select)
-  const cur = names.slice(index)
-  if (/.(ts.js)/.test(cur[cur.length])) {
-    const name = `${app}:${cur.slice(0, -1).join(':')}`
-    return name
-  }
-  const name = `${app}:${cur.join(':')}`
+export const createEventName = (url: string, appKey: string) => {
+  // 去掉空字符串
+  const names = url.split('/').filter(item => item !== '')
+  // 去掉最后一个文件名
+  names.pop()
+  const name = `${appKey}:${names.join(':')}`
   return name
 }
 

@@ -6,7 +6,13 @@
  */
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
 // import { ActionsEventEnum, EventCycleEnum, EventKeys, Events } from '../typings'
-import { EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem } from '../typings'
+import {
+  ChildrenCycle,
+  EventCycleEnum,
+  EventKeys,
+  StoreMiddlewareItem,
+  StoreResponseItem
+} from '../typings'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 
@@ -179,28 +185,39 @@ export class StateSubscribe {
   }
 }
 
+class StateProxy {
+  create(value: Record<string, boolean> = {}) {
+    return new Proxy(value, {
+      get(target, prop: string) {
+        return prop in target ? target[prop] : false
+      },
+      set(target, prop: string, value: boolean) {
+        target[prop] = value
+        // 通知所有订阅者
+        if (alemonjsCore.storeStateSubscribe[prop]) {
+          for (const callback of alemonjsCore.storeStateSubscribe[prop]) {
+            callback(value)
+          }
+        }
+        return true // 表示设置成功
+      }
+    })
+  }
+}
+
 export class State {
   #name: string = null
+  /**
+   *
+   * @param name
+   * @param defaultValue 默认，允许匹配
+   */
   constructor(name: string, defaultValue = true) {
     this.#name = name
     // 不存在，需要初始化
     if (!alemonjsCore.storeState) {
       // 初始化全局状态
-      alemonjsCore.storeState = new Proxy({} as Record<string, boolean>, {
-        get(target, prop: string) {
-          return prop in target ? target[prop] : false
-        },
-        set(target, prop: string, value: boolean) {
-          target[prop] = value
-          // 通知所有订阅者
-          if (alemonjsCore.storeStateSubscribe[prop]) {
-            for (const callback of alemonjsCore.storeStateSubscribe[prop]) {
-              callback(value)
-            }
-          }
-          return true // 表示设置成功
-        }
-      })
+      alemonjsCore.storeState = new StateProxy().create()
     }
     // 如果不存在则设置默认值
     if (!(name in alemonjsCore.storeState)) {
@@ -215,43 +232,6 @@ export class State {
   }
 }
 
-// export class ActionsBus {
-//   constructor() {
-//     if (!alemonjsCore.storeActionsBus) {
-//       alemonjsCore.storeActionsBus = {}
-//     }
-//   }
-
-//   /**
-//    * @param actions
-//    * @param callback
-//    */
-//   subscribe<T extends EventKeys>(
-//     actions: ActionsEventEnum,
-//     callback: (event: Events[T], data?: any) => void
-//   ) {
-//     if (!alemonjsCore.storeActionsBus[actions]) {
-//       alemonjsCore.storeActionsBus[actions] = []
-//     }
-//     alemonjsCore.storeActionsBus[actions].push(callback)
-//   }
-
-//   /**
-//    *
-//    */
-//   publish<T extends EventKeys>(actions: ActionsEventEnum, event: Events[T], data?: any) {
-//     if (alemonjsCore.storeActionsBus[actions]) {
-//       return Promise.all(
-//         alemonjsCore.storeActionsBus[actions].map(callback => callback(event, data))
-//       )
-//     }
-//   }
-
-//   get value() {
-//     return alemonjsCore.storeActionsBus
-//   }
-// }
-
 export class ChildrenApp {
   // 名字
   #name = null
@@ -259,6 +239,8 @@ export class ChildrenApp {
   #middleware: StoreMiddlewareItem[] = []
   // 响应体
   #response: StoreResponseItem[] = []
+  // 周期
+  #cycle: ChildrenCycle = null
 
   // create
   constructor(name: string = 'main') {
@@ -282,13 +264,22 @@ export class ChildrenApp {
   }
 
   /**
+   * 推送周期
+   * @param data
+   */
+  pushSycle(data: ChildrenCycle) {
+    this.#cycle = data
+  }
+
+  /**
    * 挂载
    */
   on() {
     alemonjsCore.storeChildrenApp[this.#name] = {
       name: this.#name,
       middleware: this.#middleware,
-      response: this.#response
+      response: this.#response,
+      cycle: this.#cycle
     }
   }
 
@@ -298,5 +289,15 @@ export class ChildrenApp {
   un() {
     // 清理
     delete alemonjsCore.storeChildrenApp[this.#name]
+  }
+
+  /**
+   * 获取
+   */
+  get value() {
+    if (!alemonjsCore.storeChildrenApp[this.#name]) {
+      this.on()
+    }
+    return alemonjsCore.storeChildrenApp[this.#name]
   }
 }

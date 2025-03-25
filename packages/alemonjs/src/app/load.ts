@@ -1,6 +1,5 @@
 import { dirname, join } from 'path'
 import { existsSync } from 'fs'
-import { unChildren } from './hook-use-api.js'
 import { createEventName, showErrorModule } from './utils.js'
 import { getRecursiveDirFiles } from './utils.js'
 import {
@@ -13,72 +12,24 @@ import { createRequire } from 'module'
 import { ChildrenApp } from './store.js'
 const require = createRequire(import.meta.url)
 const mwReg = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/
-/**
- * 加载文件
- * @param app
- */
-const loadChildrenFiles = async (mainDir: string, node: string) => {
-  const appsDir = join(mainDir, 'apps')
-  const appsFiles = getRecursiveDirFiles(appsDir)
-  // 使用 新 目录 response
-  const responseDir = join(mainDir, 'response')
-  const responseFiles = getRecursiveDirFiles(responseDir)
-  const files = [...appsFiles, ...responseFiles]
-  const app = new ChildrenApp(node)
-  const data: StoreResponseItem[] = []
-  for (const file of files) {
-    const state = createEventName(file.path, node)
-    const reesponse = {
-      source: mainDir,
-      dir: dirname(file.path),
-      path: file.path,
-      name: file.name,
-      state,
-      node
-    }
-    data.push(reesponse)
-    // alemonjsCore.storeResponse.push(reesponse)
-    app.pushResponse(data)
-  }
-  const mwDir = join(mainDir, 'middleware')
-  const mwFiles = getRecursiveDirFiles(mwDir, item => mwReg.test(item.name))
-  const mwData: StoreMiddlewareItem[] = []
-  for (const file of mwFiles) {
-    const state = createEventName(file.path, node, 'mw')
-    const middleware = {
-      source: mainDir,
-      dir: dirname(file.path),
-      path: file.path,
-      name: file.name,
-      state,
-      node
-    }
-    mwData.push(middleware)
-    // alemonjsCore.storeMiddleware.push(middleware)
-    app.pushMiddleware(mwData)
-  }
-  app.on()
-  return {
-    response: data,
-    middleware: mwData
-  }
-}
 
 /**
  * 加载模块
  * @param mainPath
  */
-export const loadChildren = async (mainPath: string, node: string) => {
+export const loadChildren = async (mainPath: string, appName: string) => {
   if (!mainPath || typeof mainPath !== 'string') {
     logger.error('The module path is not correct')
     return
   }
   const mainDir = dirname(mainPath)
 
+  const App = new ChildrenApp(appName)
+
   const show = (e: any) => {
     showErrorModule(e)
-    // 卸载索引
-    unChildren(mainDir)
+    // 卸载
+    App.un()
   }
 
   try {
@@ -106,12 +57,15 @@ export const loadChildren = async (mainPath: string, node: string) => {
       app = await moduleApp.default.callback()
     }
 
+    App.pushSycle(app)
+
     const unMounted = async e => {
       show(e)
       try {
         await app?.unMounted(e)
       } catch (e) {
-        show(e)
+        // 卸载周期出意外，不需要进行卸载
+        showErrorModule(e)
       }
     }
 
@@ -128,21 +82,65 @@ export const loadChildren = async (mainPath: string, node: string) => {
 
     // onMounted 加载
     try {
-      // 加载
-      const res = await loadChildrenFiles(mainDir, node)
+      /**
+       * load response files
+       */
+      const appsDir = join(mainDir, 'apps')
+      const appsFiles = getRecursiveDirFiles(appsDir)
+      // 使用 新 目录 response
+      const responseDir = join(mainDir, 'response')
+      const responseFiles = getRecursiveDirFiles(responseDir)
+      const files = [...appsFiles, ...responseFiles]
+      const resData: StoreResponseItem[] = []
+      for (const file of files) {
+        // 切掉 mainDir
+        const url = file.path.replace(mainDir, '')
+        const stateKey = createEventName(url, appName)
+        const reesponse: StoreResponseItem = {
+          input: mainDir,
+          dir: dirname(file.path),
+          path: file.path,
+          name: file.name,
+          stateKey,
+          appName: appName
+        }
+        resData.push(reesponse)
+      }
+      App.pushResponse(resData)
+      /**
+       * load middleware files
+       */
+      const mwDir = join(mainDir, 'middleware')
+      const mwFiles = getRecursiveDirFiles(mwDir, item => mwReg.test(item.name))
+      const mwData: StoreMiddlewareItem[] = []
+      for (const file of mwFiles) {
+        // 切掉 mainDir
+        const url = file.path.replace(mainDir, '')
+        const stateKey = createEventName(url, appName)
+        const middleware: StoreMiddlewareItem = {
+          input: mainDir,
+          dir: dirname(file.path),
+          path: file.path,
+          name: file.name,
+          stateKey,
+          appName: appName
+        }
+        mwData.push(middleware)
+      }
+      App.pushMiddleware(mwData)
 
       // onMounted 完成索引识别
       if (typeof app?.onMounted == 'function') {
         try {
-          await app?.onMounted(res)
+          await app?.onMounted({ response: resData, middleware: mwData })
+          // 校验完周期后，再进行挂载。
+          // 防止校验过程中，出现初始化完周期，就执行匹配
+          App.on()
         } catch (e) {
           unMounted(e)
           return
         }
       }
-
-      // 记录 main
-      // alemonjsCore.storeMains.push(mainDir)
     } catch (e) {
       unMounted(e)
     }
@@ -163,20 +161,19 @@ export const loadModule = loadChildren
  * 模块文件
  * @param app
  */
-export const loadChildrenFile = async (node: string) => {
-  if (typeof node !== 'string') {
+export const loadChildrenFile = async (appName: string) => {
+  if (typeof appName !== 'string') {
     logger.error('The module name is not correct')
     return
   }
   try {
-    const mainPath = require.resolve(node)
+    const mainPath = require.resolve(appName)
     // 不存在 main
     if (!existsSync(mainPath)) {
       logger.error('The main file does not exist', mainPath)
       return
     }
-    // 根据main来识别res
-    loadChildren(mainPath, node)
+    loadChildren(mainPath, appName)
   } catch (e) {
     showErrorModule(e)
   }
