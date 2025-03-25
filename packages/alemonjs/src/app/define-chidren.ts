@@ -7,7 +7,7 @@ import { DefineChildrenFunc } from '../typings'
 export const defineChildren: DefineChildrenFunc = callback => {
   if (typeof callback === 'function' || typeof callback === 'object') {
     return {
-      _name: 'apps',
+      _name: 'app',
       callback
     }
   }

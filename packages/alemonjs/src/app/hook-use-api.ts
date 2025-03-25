@@ -1,4 +1,5 @@
 import { DataEnums, EventKeys, Events } from '../typings'
+import { ChildrenApp } from './store'
 
 /**
  * 使用提及。
@@ -43,40 +44,22 @@ export const useSend = <T extends EventKeys>(event: Events[T]) => {
 }
 
 /**
- * 卸载模块。
- * 从全局存储中移除与指定模块相关的数据。
- * @param {string} mainDir - 模块的主目录路径。
- * @throws {Error} - 如果 mainDir 无效，抛出错误。
+ * 卸载模块
+ * @param name
  */
-export const unChildren = (mainDir: string) => {
-  if (!mainDir || typeof mainDir !== 'string') {
-    throw new Error('Invalid mainDir: mainDir must be a non-empty string')
-  }
-
-  // 从 storeMains 中移除
-  // const storeMainsIndex = alemonjsCore.storeMains.indexOf(mainDir)
-  // if (storeMainsIndex !== -1) {
-  //   alemonjsCore.storeMains.splice(storeMainsIndex, 1)
-  // }
-
-  // 从 storeResponse 中移除
-  if (alemonjsCore.storeResponse.find(item => item.source == mainDir)) {
-    alemonjsCore.storeResponse = alemonjsCore.storeResponse.filter(item => item.source !== mainDir)
-  }
-
-  // 从 storeMiddleware 中移除
-  if (alemonjsCore.storeMiddleware.find(item => item.source == mainDir)) {
-    alemonjsCore.storeMiddleware = alemonjsCore.storeMiddleware.filter(
-      item => item.source !== mainDir
-    )
-  }
+export const unChildren = (name: string = 'main') => {
+  const app = new ChildrenApp(name)
+  app.un()
 }
 
 /**
  * 废弃,请使用unChildren
  * @deprecated
  */
-export const unMount = unChildren
+export const unMount = () => {
+  // 警告，已废弃。
+  console.warn('unMount 已废弃，请使用 unChildren')
+}
 
 /**
  *

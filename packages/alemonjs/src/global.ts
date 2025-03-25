@@ -7,7 +7,7 @@ import {
   OnMiddlewareReversalFunc
 } from './typing/event'
 import { ClientAPI } from './typing/client'
-import { StoreMiddlewareItem, StoreResponseItem } from './typing/store/res'
+import { StoreChildrenApp } from './typing/store/res'
 import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
 import { LoggerUtils } from './typing/logger/index'
 import { ResponseState } from './typing/state'
@@ -35,17 +35,11 @@ declare global {
      */
     storeSubscribeList: SubscribeKeysMap
     /**
-     * 中间件
+     * 子模块
      */
-    storeMiddleware: StoreMiddlewareItem[]
-    /**
-     * 响应
-     */
-    storeResponse: StoreResponseItem[]
-    /**
-     * 行为总线
-     */
-    // storeActionsBus: any
+    storeChildrenApp: {
+      [key: string]: StoreChildrenApp
+    }
   }
   /**
    * 客户端

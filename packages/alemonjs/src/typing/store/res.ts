@@ -71,3 +71,12 @@ export type StoreMiddleware = {
 export type StoreResponse = {
   [key in EventKeys]: StoreMiddlewareItem[]
 }
+
+/**
+ *
+ */
+export type StoreChildrenApp = {
+  name: string
+  middleware: StoreMiddlewareItem[]
+  response: StoreResponseItem[]
+}

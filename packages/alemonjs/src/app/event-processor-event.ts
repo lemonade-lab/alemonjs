@@ -25,7 +25,7 @@ export const expendEvent = async <T extends EventKeys>(
   const res = new Response()
   const Send = useSend(valueEvent)
 
-  // 得到所有 apps
+  // 得到所有 res
   const StoreResponse = res.value
 
   let valueI = 0

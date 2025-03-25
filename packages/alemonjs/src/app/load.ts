@@ -10,6 +10,7 @@ import {
   ChildrenCycle
 } from '../typings'
 import { createRequire } from 'module'
+import { ChildrenApp } from './store.js'
 const require = createRequire(import.meta.url)
 const mwReg = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/
 /**
@@ -19,8 +20,13 @@ const mwReg = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/
 const loadChildrenFiles = async (mainDir: string, node: string) => {
   const appsDir = join(mainDir, 'apps')
   const appsFiles = getRecursiveDirFiles(appsDir)
+  // 使用 新 目录 response
+  const responseDir = join(mainDir, 'response')
+  const responseFiles = getRecursiveDirFiles(responseDir)
+  const files = [...appsFiles, ...responseFiles]
+  const app = new ChildrenApp(node)
   const data: StoreResponseItem[] = []
-  for (const file of appsFiles) {
+  for (const file of files) {
     const state = createEventName(file.path, node)
     const reesponse = {
       source: mainDir,
@@ -31,7 +37,8 @@ const loadChildrenFiles = async (mainDir: string, node: string) => {
       node
     }
     data.push(reesponse)
-    alemonjsCore.storeResponse.push(reesponse)
+    // alemonjsCore.storeResponse.push(reesponse)
+    app.pushResponse(data)
   }
   const mwDir = join(mainDir, 'middleware')
   const mwFiles = getRecursiveDirFiles(mwDir, item => mwReg.test(item.name))
@@ -47,8 +54,10 @@ const loadChildrenFiles = async (mainDir: string, node: string) => {
       node
     }
     mwData.push(middleware)
-    alemonjsCore.storeMiddleware.push(middleware)
+    // alemonjsCore.storeMiddleware.push(middleware)
+    app.pushMiddleware(mwData)
   }
+  app.on()
   return {
     response: data,
     middleware: mwData
@@ -83,7 +92,7 @@ export const loadChildren = async (mainPath: string, node: string) => {
     if (!moduleApp?.default?._name) {
       throw new Error('The Children name is not correct')
     }
-    if (moduleApp.default._name !== 'apps') {
+    if (moduleApp.default._name !== 'app') {
       throw new Error('The Children name is not correct')
     }
     if (!moduleApp?.default?.callback) {
@@ -166,7 +175,7 @@ export const loadChildrenFile = async (node: string) => {
       logger.error('The main file does not exist', mainPath)
       return
     }
-    // 根据main来识别apps
+    // 根据main来识别res
     loadChildren(mainPath, node)
   } catch (e) {
     showErrorModule(e)

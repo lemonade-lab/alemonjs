@@ -6,7 +6,7 @@
  */
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
 // import { ActionsEventEnum, EventCycleEnum, EventKeys, Events } from '../typings'
-import { EventCycleEnum, EventKeys } from '../typings'
+import { EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem } from '../typings'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
 
@@ -109,8 +109,7 @@ export class Core {
           mount: {},
           unmount: {}
         },
-        storeMiddleware: [],
-        storeResponse: []
+        storeChildrenApp: {}
       }
     }
   }
@@ -122,13 +121,21 @@ export class Core {
 
 export class Response {
   get value() {
-    return alemonjsCore.storeResponse
+    // 得到所有 app，得到所有 res
+    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
+      return alemonjsCore.storeChildrenApp[key].response
+    })
+    return data.flat()
   }
 }
 
 export class Middleware {
   get value() {
-    return alemonjsCore.storeMiddleware
+    // 得到所有 app，得到所有 res
+    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
+      return alemonjsCore.storeChildrenApp[key].middleware
+    })
+    return data.flat()
   }
 }
 
@@ -244,3 +251,52 @@ export class State {
 //     return alemonjsCore.storeActionsBus
 //   }
 // }
+
+export class ChildrenApp {
+  // 名字
+  #name = null
+  // 中间件
+  #middleware: StoreMiddlewareItem[] = []
+  // 响应体
+  #response: StoreResponseItem[] = []
+
+  // create
+  constructor(name: string = 'main') {
+    this.#name = name
+  }
+
+  /**
+   * 推送响应体
+   * @param data
+   */
+  pushResponse(data: StoreResponseItem[]) {
+    this.#response = this.#response.concat(data)
+  }
+
+  /**
+   * 推送中间件
+   * @param data
+   */
+  pushMiddleware(data: StoreMiddlewareItem[]) {
+    this.#middleware = this.#middleware.concat(data)
+  }
+
+  /**
+   * 挂载
+   */
+  on() {
+    alemonjsCore.storeChildrenApp[this.#name] = {
+      name: this.#name,
+      middleware: this.#middleware,
+      response: this.#response
+    }
+  }
+
+  /**
+   * 卸载
+   */
+  un() {
+    // 清理
+    delete alemonjsCore.storeChildrenApp[this.#name]
+  }
+}

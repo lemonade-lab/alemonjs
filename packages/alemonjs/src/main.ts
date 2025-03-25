@@ -18,7 +18,7 @@ export const run = (input: string) => {
     logger.error('未找到主要入口文件', mainPath)
     return
   }
-  // 指定运行的，name识别为 'main:apps:xxx'
+  // 指定运行的，name识别为 'main:res:xxx'
   loadChildren(mainPath, 'main')
 }
 

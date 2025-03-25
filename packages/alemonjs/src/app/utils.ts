@@ -33,10 +33,10 @@ export const useUserHashKey = (event: { UserId: string; Platform: string }) => {
  * 创建app名称
  * @param url
  * @param app 模块名
- * @param select 选择事件类型,默认apps
+ * @param select 选择事件类型,默认 res
  * @returns
  */
-export const createEventName = (url: string, app: string, select: 'apps' | 'mw' = 'apps') => {
+export const createEventName = (url: string, app: string, select: 'res' | 'mw' = 'res') => {
   const names = url.replace(process.cwd(), '').split('/')
   const index = names.findIndex(v => v === select)
   const cur = names.slice(index)
@@ -65,7 +65,7 @@ export const stringToNumber = (str: string, size = 33) => {
   return hash >>> 0
 }
 
-const appsReg = /^res(\.|\..*\.)(js|ts|jsx|tsx)$/
+const resReg = /^res(\.|\..*\.)(js|ts|jsx|tsx)$/
 
 /**
  * 递归获取所有文件
@@ -75,7 +75,7 @@ const appsReg = /^res(\.|\..*\.)(js|ts|jsx|tsx)$/
  */
 export const getRecursiveDirFiles = (
   dir: string,
-  condition: (func: Dirent) => boolean = item => appsReg.test(item.name)
+  condition: (func: Dirent) => boolean = item => resReg.test(item.name)
 ): {
   path: string
   name: string

@@ -24,7 +24,7 @@ export const expendMiddleware = async <T extends EventKeys>(
 ) => {
   const mw = new Middleware()
   const Send = useSend(valueEvent)
-  // 得到所有 apps
+  // 得到所有 mws
   const mwFiles = mw.value
 
   let valueI = 0

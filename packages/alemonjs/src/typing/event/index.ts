@@ -72,7 +72,7 @@ export type DefineChildrenCallback = (() => Promise<ChildrenCycle> | ChildrenCyc
  * 定义子模块
  */
 export type DefineChildrenValue = {
-  _name: 'apps'
+  _name: 'app'
   callback: DefineChildrenCallback
 }
 
