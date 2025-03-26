@@ -1,17 +1,59 @@
 import { readFileSync } from 'fs'
 import { QQBotAPI } from '../sdk/api'
-import { type DataEnums } from 'alemonjs'
+import { ButtonRow, type DataEnums } from 'alemonjs'
 import axios from 'axios'
 
 type Client = typeof QQBotAPI.prototype
 
+const createButtonsData = (rows: ButtonRow[]) => {
+  let id = 0
+  const data = {
+    rows: rows.map(row => {
+      const val = row.value
+      return {
+        buttons: val.map(button => {
+          const value = button.value
+          const options = button.options
+          id++
+          return {
+            id: String(id),
+            render_data: {
+              label: typeof value == 'object' ? value.title : value,
+              visited_label: typeof value == 'object' ? value.label : value,
+              // tudo
+              style: 0
+            },
+            action: {
+              // 0 link 1 callback , 2 command
+              type: typeof options.data === 'object' ? 1 : options?.isLink ? 0 : 2,
+              permission: {
+                // 所有人
+                type: 2
+                // "specify_role_ids": ["1", "2", "3"]
+              },
+              // "click_limit": 10,
+              unsupport_tips: options?.toolTip ?? '',
+              data: options?.data ?? '',
+              // reply: true,
+              at_bot_show_channel_list: options.showList ?? false,
+              enter: options?.autoEnter ?? false
+            }
+          }
+        })
+      }
+    })
+  }
+  return data
+}
+
 export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text')
     .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.options?.title ?? item.value}](${item.value})`
-      } else if (item.type == 'Mention') {
+      // if (item.type == 'Link') {
+      //   return `[${item.options?.title ?? item.value}](${item.value})`
+      // } else
+      if (item.type == 'Mention') {
         if (
           item.value == 'everyone' ||
           item.value == 'all' ||
@@ -44,7 +86,7 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
   )
-  if (images) {
+  if (images && images.length > 0) {
     return Promise.all(
       images.map(async item => {
         if (item.type == 'ImageURL') {
@@ -81,12 +123,44 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
       })
     )
   }
-  return []
+  // buttons
+  const buttons = val.filter(item => item.type == 'BT.group')
+  if (buttons && buttons.length > 0) {
+    return Promise.all(
+      buttons.map(async item => {
+        const template_id = item?.options?.template_id
+        if (template_id) {
+          return client.groupOpenMessages(event.GuildId, {
+            content: '',
+            msg_id: event.MessageId,
+            keyboard: {
+              id: template_id
+            },
+            msg_type: 2,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        const rows = item.value
+        // 构造成按钮
+        const data = createButtonsData(rows)
+        return client.groupOpenMessages(event.GuildId, {
+          content: '',
+          msg_id: event.MessageId,
+          keyboard: {
+            content: data
+          },
+          msg_type: 2,
+          msg_seq: client.getMessageSeq(event.MessageId)
+        })
+      })
+    )
+  }
+  return Promise.all([])
 }
 
 export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text')
     .map(item => {
       if (item.type == 'Text') {
         return item.value
@@ -109,7 +183,7 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
   )
-  if (images) {
+  if (images && images.length > 0) {
     return Promise.all(
       images.map(async item => {
         if (item.type == 'ImageURL') {
@@ -146,7 +220,43 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
       })
     )
   }
-  return []
+  // buttons
+  const buttons = val.filter(item => item.type == 'BT.group')
+  if (buttons && buttons.length > 0) {
+    return Promise.all(
+      buttons.map(async item => {
+        const template_id = item?.options?.template_id
+        if (template_id) {
+          return client.groupOpenMessages(event.GuildId, {
+            content: '',
+            msg_id: event.MessageId,
+            keyboard: {
+              id: template_id
+            },
+            msg_type: 2,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        const rows = item.value
+        // 看看是否是模板id的
+        rows.map(row => {
+          return row
+        })
+        // 构造成按钮
+        const data = createButtonsData(rows)
+        return client.groupOpenMessages(event.GuildId, {
+          content: '',
+          msg_id: event.MessageId,
+          keyboard: {
+            content: data
+          },
+          msg_type: 2,
+          msg_seq: client.getMessageSeq(event.MessageId)
+        })
+      })
+    )
+  }
+  return Promise.all([])
 }
 
 /**
@@ -158,7 +268,7 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
  */
 export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text')
     .map(item => {
       if (item.type == 'Text') {
         return item.value
@@ -207,11 +317,12 @@ export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) =
 
 export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text')
     .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.options?.title ?? item.value}](${item.value})`
-      } else if (item.type == 'Mention') {
+      // if (item.type == 'Link') {
+      //   return `[${item.options?.title ?? item.value}](${item.value})`
+      // } else
+      if (item.type == 'Mention') {
         if (
           item.value == 'everyone' ||
           item.value == 'all' ||
@@ -244,7 +355,7 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
   )
-  if (images) {
+  if (images && images.length > 0) {
     return Promise.all(
       images.map(async item => {
         if (item.value == 'ImageURL') {
@@ -267,7 +378,7 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
       })
     )
   }
-  return []
+  return Promise.all([])
 }
 
 /**
@@ -278,11 +389,12 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
  */
 export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text')
     .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.options?.title ?? item.value}](${item.value})`
-      } else if (item.type == 'Mention') {
+      // if (item.type == 'Link') {
+      //   return `[${item.options?.title ?? item.value}](${item.value})`
+      // } else
+      if (item.type == 'Mention') {
         if (
           item.value == 'everyone' ||
           item.value == 'all' ||
@@ -315,7 +427,7 @@ export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
   )
-  if (images) {
+  if (images && images.length > 0) {
     return Promise.all(
       images.map(async item => {
         if (item.value == 'ImageURL') {
@@ -338,5 +450,5 @@ export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
       })
     )
   }
-  return []
+  return Promise.all([])
 }

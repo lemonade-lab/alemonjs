@@ -1,5 +1,4 @@
 import {
-  defineBot,
   getConfigValue,
   onProcessor,
   PrivateEventMessageCreate,
@@ -32,7 +31,7 @@ export const client: Client = new Proxy({} as Client, {
   }
 })
 export const platform = 'qq-bot'
-export default defineBot(() => {
+export default definePlatform(() => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -66,11 +65,15 @@ export default defineBot(() => {
    * C2C_MESSAGE_CREATE
    */
 
+  const createUserAvatarURL = (author_id: string) => {
+    return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/ 640`
+  }
+
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', async event => {
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(event.author.id)
-    const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
+    const url = createUserAvatarURL(event.author.id)
     const UserAvatar = {
       toBuffer: async () => {
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
@@ -120,7 +123,7 @@ export default defineBot(() => {
   client.on('C2C_MESSAGE_CREATE', async event => {
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(event.author.id)
-    const url = `https://q.qlogo.cn/qqapp/${config.app_id}/${event.author.id}/640`
+    const url = createUserAvatarURL(event.author.id)
     const UserAvatar = {
       toBuffer: async () => {
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
@@ -436,21 +439,23 @@ export default defineBot(() => {
           // 打  tag
           const tag = event.tag
           try {
+            // 群at
             if (tag == 'GROUP_AT_MESSAGE_CREATE') {
               return await GROUP_AT_MESSAGE_CREATE(client, event, val)
             }
+            // 私聊
             if (tag == 'C2C_MESSAGE_CREATE') {
               return await C2C_MESSAGE_CREATE(client, event, val)
             }
+            // 频道私聊
             if (tag == 'DIRECT_MESSAGE_CREATE') {
               return await DIRECT_MESSAGE_CREATE(client, event, val)
             }
+            // 频道at
             if (tag == 'AT_MESSAGE_CREATE') {
               return await AT_MESSAGE_CREATE(client, event, val)
             }
-            if (tag == 'MESSAGE_CREATE') {
-              return await AT_MESSAGE_CREATE(client, event, val)
-            }
+            // 频道消息
             if (tag == 'MESSAGE_CREATE') {
               return await MESSAGE_CREATE(client, event, val)
             }

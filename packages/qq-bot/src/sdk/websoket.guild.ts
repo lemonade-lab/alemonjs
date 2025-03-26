@@ -81,17 +81,19 @@ export class QQBotGuildClient extends QQBotAPI {
    *
    * @param cfg
    */
-  async connect() {
+  async connect(gatewayURL?: string) {
     //
-    this.#gatewayUrl = await this.gateway()
-      .then(res => res.url)
-      .catch(err => {
-        if (this.#events['ERROR']) {
-          for (const item of this.#events['ERROR']) {
-            item(err)
+    this.#gatewayUrl =
+      gatewayURL ??
+      (await this.gateway()
+        .then(res => res.url)
+        .catch(err => {
+          if (this.#events['ERROR']) {
+            for (const item of this.#events['ERROR']) {
+              item(err)
+            }
           }
-        }
-      })
+        }))
 
     // 请求url
     if (!this.#gatewayUrl) return this

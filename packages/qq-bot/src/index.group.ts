@@ -37,7 +37,7 @@ export default defineBot(() => {
   })
 
   // 连接
-  client.connect()
+  client.connect(config?.gatewayURL)
 
   /**
    * group

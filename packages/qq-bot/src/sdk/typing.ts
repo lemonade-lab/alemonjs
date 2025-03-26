@@ -14,7 +14,7 @@ export interface ButtonType {
     // 0 灰色
     // 1 蓝色
     // 风格
-    style: number
+    style?: number
   }
   action: {
     // 0 跳转按钮：http 或 小程序 客户端识别 scheme
@@ -33,9 +33,11 @@ export interface ButtonType {
     // 自动发送
     enter?: boolean
     // 兼容性提示文本
-    unsupport_tips: string
+    unsupport_tips?: string
     // 内容
-    data: string
+    data: string | { click: string; confirm: string; cancel: string }
+    //
+    at_bot_show_channel_list?: boolean
   }
 }
 

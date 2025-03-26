@@ -48,6 +48,8 @@ qq-bot:
   # 假设代理后的地址为 https://qqbotjs.com
   # ws: 'wss://qqbotjs.com/websocket'
   # ws: 'ws://[your ip]:17157/websocket'
+  # 3) 自定义模式 (用于连接类官网连接方式的指定服务端)
+  # gatewayURL: 'ws://[your ip]:8080'
 ```
 
 ```conf

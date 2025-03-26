@@ -105,13 +105,13 @@ export class QQBotGroupClient extends QQBotAPI {
    * @param cfg
    * @param conversation
    */
-  async connect() {
+  async connect(gatewayURL?: string) {
     // 定时模式
     await this.#setTimeoutBotConfig()
 
     // 请求url
     if (!this.#gatewayUrl) {
-      this.#gatewayUrl = await this.gateway().then(res => res?.url)
+      this.#gatewayUrl = gatewayURL ?? (await this.gateway().then(res => res?.url))
     }
     if (!this.#gatewayUrl) return
 

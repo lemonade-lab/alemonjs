@@ -182,7 +182,7 @@ export class QQBotClient extends QQBotAPI {
           })
         })
       } else {
-        const reconnect = () => {
+        const reConnect = () => {
           // 使用了ws服务器
           this.#ws = new WebSocket(ws)
           this.#ws.on('open', () => {
@@ -208,14 +208,14 @@ export class QQBotClient extends QQBotAPI {
             if (this.#count > 5) return
             // 1.3s 后重连
             setTimeout(() => {
-              reconnect()
+              reConnect()
             }, 1300)
           })
           this.#ws.on('error', e => {
             this.#error(e)
           })
         }
-        reconnect()
+        reConnect()
       }
     } catch (e) {
       this.#error(e)
