@@ -1,21 +1,79 @@
-import { DataEnums, EventKeys, Events } from '../typings'
+import { DataEnums, EventKeys, Events, User } from '../typings'
 import { ChildrenApp } from './store'
 
 /**
  * 使用提及。
  * @param {Object} event - 事件对象，包含触发提及的相关信息。
  */
-export const useMention = async <T extends EventKeys>(event: Events[T]) => {
+export const useMention = <T extends EventKeys>(event: Events[T]) => {
   if (!event || typeof event !== 'object') {
     throw new Error('Invalid event: event must be an object')
   }
-  try {
-    return await alemonjsBot.api.use.mention(event)
-  } catch (e) {
-    logger.error('Failed to mention:', e)
-    // 弹出错误
-    throw e
+  let res: User[] = null
+  type Options = {
+    UserId?: string
+    UserKey?: string
+    UserName?: string
+    IsMaster?: boolean
+    IsBot?: boolean
   }
+  const mention = {
+    find: async (options: Options) => {
+      if (!res) {
+        res = await alemonjsBot.api.use.mention(event)
+      }
+      // 过滤出符合条件的数据
+      const data = res.filter(item => {
+        if (options.UserId && item.UserId !== options.UserId) {
+          return false
+        }
+        if (options.UserKey && item.UserKey !== options.UserKey) {
+          return false
+        }
+        if (options.UserName && item.UserName !== options.UserName) {
+          return false
+        }
+        if (options.IsMaster && item.IsMaster !== options.IsMaster) {
+          return false
+        }
+        if (options.IsBot && item.IsBot !== options.IsBot) {
+          return false
+        }
+        return true
+      })
+      return data
+    },
+    findOne: async (
+      options: Options = {
+        IsBot: false
+      }
+    ) => {
+      if (!res) {
+        res = await alemonjsBot.api.use.mention(event)
+      }
+      // 根据条件查找
+      const data = res.find(item => {
+        if (options.UserId && item.UserId !== options.UserId) {
+          return false
+        }
+        if (options.UserKey && item.UserKey !== options.UserKey) {
+          return false
+        }
+        if (options.UserName && item.UserName !== options.UserName) {
+          return false
+        }
+        if (options.IsMaster && item.IsMaster !== options.IsMaster) {
+          return false
+        }
+        if (options.IsBot && item.IsBot !== options.IsBot) {
+          return false
+        }
+        return true
+      })
+      return data
+    }
+  }
+  return [mention]
 }
 
 /**

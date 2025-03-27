@@ -1,3 +1,4 @@
+import { getConfig } from '../config'
 import { State, StateSubscribe } from './store'
 
 /**
@@ -19,7 +20,28 @@ export const useState = <T extends string>(
   const state = new State(name, defaultValue)
   // 设置值的函数
   const setValue = (value: boolean) => {
+    if (state.value == value) {
+      return
+    }
     state.value = value
+    // 更新config
+    const cfg = getConfig()
+    if (!cfg.value.core) {
+      cfg.value.core = {}
+    }
+    if (!cfg.value.core.state) {
+      cfg.value.core.state = []
+    }
+    const cfgState = cfg.value.core.state
+    const cur = cfgState.find((i: string) => i === name)
+    if (cur !== value) {
+      if (value) {
+        cfg.value.core.state = cfg.value.core.state.filter((i: string) => i !== name)
+      } else {
+        cfg.value.core.state.push(name)
+      }
+    }
+    cfg.saveValue(cfg.value)
   }
   return [state.value, setValue]
 }
@@ -58,3 +80,24 @@ export const unState = <T extends string>(name: T, callback: (value: boolean) =>
  * @deprecated
  */
 export const unEventState = unState
+
+// let lastDependencies;
+// let lastValue;
+
+// export const useMemo = (create, dependencies) => {
+//   if (lastDependencies) {
+//     // 检查依赖项是否变化
+//     const hasChanged = dependencies.some((dep, i) =>
+//       !Object.is(dep, lastDependencies[i])
+//     );
+
+//     if (!hasChanged) {
+//       // 依赖未变化，返回缓存值
+//       return lastValue;
+//     }
+//   }
+//   // 依赖变化，重新计算
+//   lastValue = create();
+//   lastDependencies = dependencies;
+//   return lastValue;
+// }

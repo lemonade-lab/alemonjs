@@ -1,9 +1,19 @@
 import { join } from 'path'
 import { existsSync } from 'fs'
-import { getConfig } from './config'
+import { getConfig, getConfigValue } from './config'
 import { loadChildren, loadChildrenFile } from './app/load.js'
 import { DefinePlatformValue } from './typings.js'
 import { getInputExportPath, showErrorModule } from './app/utils.js'
+import { useState } from './post.js'
+
+const loadConfig = () => {
+  const value = getConfigValue() ?? {}
+  // 注入配置。
+  const state = value?.core?.state ?? []
+  for (const name of state) {
+    useState(name, false)
+  }
+}
 
 /**
  * 运行指定 main
@@ -61,6 +71,10 @@ export const start = async (input?: string, pm?: string) => {
     logger.error('启动', login, '失败')
     showErrorModule(e)
   }
+
+  // 注入配置。
+  loadConfig()
+
   // module
   if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
     Promise.all(

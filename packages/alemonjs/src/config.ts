@@ -121,19 +121,20 @@ export class ConfigCore {
     const argv: {
       [key: string]: string | null | undefined
     } = {}
-    process.argv.forEach((arg, index) => {
-      if (arg.startsWith('--')) {
-        const key = arg.slice(2)
-        const value = process.argv[index + 1]
-        if (value && !value.startsWith('--')) {
-          argv[key] = value
-        } else {
-          // 无值
-          argv[key] = null
+    return new Proxy(argv, {
+      get(_target, key) {
+        if (typeof key === 'symbol') return undefined
+        const index$0 = process.argv.indexOf(key)
+        if (index$0 != -1) {
+          return process.argv[index$0 + 1]
         }
+        const index = process.argv.indexOf(`--${key}`)
+        if (index != -1) {
+          return process.argv[index + 1]
+        }
+        return null
       }
     })
-    return argv
   }
 }
 
