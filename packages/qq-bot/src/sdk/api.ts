@@ -22,9 +22,8 @@ export class QQBotAPI {
 
   /**
    * 得到鉴权
-   * @param appId
+   * @param app_id
    * @param clientSecret
-   * @param url
    * @returns
    */
   getAuthentication(app_id: string, clientSecret: string) {
@@ -139,8 +138,7 @@ export class QQBotAPI {
   /**
    * 发送群聊消息
    * @param group_openid
-   * @param content
-   * @param msg_id
+   * @param data
    * @returns
    */
   async groupOpenMessages(
@@ -157,8 +155,7 @@ export class QQBotAPI {
   /**
    * 发送私聊富媒体文件
    * @param openid
-   * @param content
-   * @param file_type
+   * @param data
    * @returns
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk
@@ -182,8 +179,7 @@ export class QQBotAPI {
   /**
    * 发送私聊富媒体文件
    * @param openid
-   * @param content
-   * @param file_type
+   * @param data
    * @returns
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk
@@ -207,8 +203,7 @@ export class QQBotAPI {
   /**
    * 发送群里文件
    * @param openid
-   * @param content
-   * @param file_type
+   * @param data
    * @returns
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk

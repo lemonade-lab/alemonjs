@@ -69,17 +69,17 @@ PUBLIC_GUILD_MESSAGES (1 << 30) // 消息事件，此为公域的消息事件
  * 订阅枚举
  */
 export const AvailableIntentsEventsEnum = [
-  'GUILDS',
-  'GUILD_MEMBERS',
+  'GUILDS', // base
+  'GUILD_MEMBERS', // base
   'GUILD_MESSAGES',
   'GUILD_MESSAGE_REACTIONS',
   'DIRECT_MESSAGE',
-  'GROUP_AND_C2C_EVENT',
   'INTERACTION',
   'MESSAGE_AUDIT',
   'FORUMS_EVENT',
   'AUDIO_ACTION',
-  'PUBLIC_GUILD_MESSAGES'
+  'PUBLIC_GUILD_MESSAGES',
+  'GROUP_AND_C2C_EVENT'
 ] as const
 
 /**
@@ -91,29 +91,18 @@ export type IntentsEnum = (typeof AvailableIntentsEventsEnum)[number]
  * 订阅事件集合
  */
 const intentsMap = {
-  GUILDS: 1 << 0,
-  GUILD_MEMBERS: 1 << 1,
-  GUILD_MESSAGES: 1 << 9,
-  GUILD_MESSAGE_REACTIONS: 1 << 10,
-  DIRECT_MESSAGE: 1 << 12,
-  INTERACTION: 1 << 26,
-  MESSAGE_AUDIT: 1 << 27,
-  FORUMS_EVENT: 1 << 28,
-  AUDIO_ACTION: 1 << 29,
-  PUBLIC_GUILD_MESSAGES: 1 << 30,
-  INTERACTION_CREATE: 1 << 26,
-  // group
-  GROUP_AND_C2C_EVENT: 1 << 25,
-  C2C_MESSAGE_CREATE: 1 << 25,
-  FRIEND_ADD: 1 << 25,
-  FRIEND_DEL: 1 << 25,
-  C2C_MSG_REJECT: 1 << 25,
-  C2C_MSG_RECEIVE: 1 << 25,
-  GROUP_AT_MESSAGE_CREATE: 1 << 25,
-  GROUP_ADD_ROBOT: 1 << 25,
-  GROUP_DEL_ROBOT: 1 << 25,
-  GROUP_MSG_REJECT: 1 << 25,
-  GROUP_MSG_RECEIVE: 1 << 25
+  GUILDS: 1 << 0, // 频道事件
+  GUILD_MEMBERS: 1 << 1, // 成员
+  GUILD_MESSAGES: 1 << 9, // 消息事件，仅 *私域*
+  GUILD_MESSAGE_REACTIONS: 1 << 10, // 消息表情表态
+  DIRECT_MESSAGE: 1 << 12, // 私信消息
+  INTERACTION: 1 << 26, // 互动事件
+  // INTERACTION_CREATE: 1 << 26,
+  MESSAGE_AUDIT: 1 << 27, // 消息审核
+  FORUMS_EVENT: 1 << 28, // 论坛事件，仅 *私域*
+  AUDIO_ACTION: 1 << 29, // 音频
+  PUBLIC_GUILD_MESSAGES: 1 << 30, //  消息事件，此为公域的消息事件
+  GROUP_AND_C2C_EVENT: 1 << 25 // group all
 }
 
 /**
