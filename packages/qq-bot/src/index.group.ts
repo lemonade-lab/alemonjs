@@ -1,5 +1,4 @@
 import {
-  defineBot,
   getConfigValue,
   onProcessor,
   PrivateEventMessageCreate,
@@ -18,7 +17,7 @@ import {
 import { QQBotGroupClient } from './sdk/websoket.group'
 import { isGuild } from './utils'
 export const platform = 'qq-bot'
-export default defineBot(() => {
+export default definePlatform(() => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]

@@ -31,6 +31,7 @@ export const client: Client = new Proxy({} as Client, {
   }
 })
 export const platform = 'qq-bot'
+export * from './hook'
 export default definePlatform(() => {
   let value = getConfigValue()
   if (!value) value = {}

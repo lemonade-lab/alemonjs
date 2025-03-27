@@ -24,18 +24,6 @@ export const Text = (val: DataText['value'], options?: DataText['options']): Dat
 }
 
 /**
- * 图片消息
- * @param val
- * @returns
- */
-export const Image = (val: DataImage['value']): DataImage => {
-  return {
-    type: 'Image',
-    value: val
-  }
-}
-
-/**
  * 图片链接，http 或 https 开头
  * @param val
  * @returns
@@ -58,6 +46,23 @@ export const ImageFile = (val: DataImageFile['value']): DataImageFile => {
     value: val
   }
 }
+
+/**
+ * 图片消息
+ * @param val
+ * @returns
+ */
+const Image = (val: DataImage['value']): DataImage => {
+  return {
+    type: 'Image',
+    value: val
+  }
+}
+
+Image.url = ImageURL
+Image.file = ImageFile
+
+export { Image }
 
 /**
  * 提及

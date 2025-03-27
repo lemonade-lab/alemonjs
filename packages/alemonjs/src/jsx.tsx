@@ -9,7 +9,8 @@ import {
   DataText,
   Events,
   EventKeys,
-  DataButton
+  DataButton,
+  ButtonRow
 } from './typings.js'
 import { sendToChannel as toChannel, sendToUser as toUser, useSend as useS } from './post.js'
 
@@ -18,7 +19,8 @@ import {
   ImageURL as AImageURL,
   ImageFile as AImageFile,
   Image as AImage,
-  Mention as AMention
+  Mention as AMention,
+  BT as ABT
 } from './post.js'
 
 /**
@@ -26,25 +28,45 @@ import {
  * @param _props
  * @returns
  */
-export function Text(_props: {
-  children: DataText['value'] | DataText['value'][]
-  style?: DataText['options']['style']
-}) {
+export function Text(
+  _props:
+    | {
+        children?: DataText['value'] | DataText['value'][]
+        style?: DataText['options']['style']
+      }
+    | {
+        value?: DataText['value'] | DataText['value'][]
+        style?: DataText['options']['style']
+      }
+) {
   return React.createElement('div', {
     dataType: 'Text'
   })
 }
 
-/**
- *
- * @param _props
- * @returns
- */
-export function ImageURL(_props: { src: DataImageURL['value'] }) {
+const Image: React.FC<{ value: DataImage['value'] }> & {
+  url: React.FC<{ src: DataImageURL['value'] }>
+  file: React.FC<{ src: DataImageURL['value'] }>
+} = _props => {
+  return React.createElement('div', {
+    dataType: 'Image'
+  })
+}
+
+// BT.group 子组件
+Image.url = _props => {
   return React.createElement('div', {
     dataType: 'ImageURL'
   })
 }
+
+Image.file = _props => {
+  return React.createElement('div', {
+    dataType: 'ImageFile'
+  })
+}
+
+export { Image }
 
 /**
  *
@@ -62,9 +84,9 @@ export function ImageFile(_props: { src: DataImageFile['value'] }) {
  * @param _props
  * @returns
  */
-export function Image(_props: { value: DataImage['value'] }) {
+export function ImageURL(_props: { src: DataImageURL['value'] }) {
   return React.createElement('div', {
-    dataType: 'Image'
+    dataType: 'ImageURL'
   })
 }
 
@@ -102,25 +124,30 @@ const BT: React.FC<BTProps> & {
   })
 }
 
-// BT.group 子组件
-BT.group = _props => {
+function ButtonGroup(_props: { children: React.ReactNode }) {
   return React.createElement('div', {
     dataType: 'BT.group'
   })
 }
 
-BT.template = _props => {
-  return React.createElement('div', {
-    dataType: 'BT.group'
-  })
-}
-
-// BT.row 子组件
-BT.row = _props => {
+function ButtonRows(_props: { children: React.ReactNode }) {
   return React.createElement('div', {
     dataType: 'BT.row'
   })
 }
+
+function ButtonTemplate(_props: { id: string }) {
+  return React.createElement('div', {
+    dataType: 'BT.group'
+  })
+}
+
+// BT.group 子组件
+BT.group = ButtonGroup
+// BT.template 子组件
+BT.template = ButtonTemplate
+// BT.row 子组件
+BT.row = ButtonRows
 
 export { BT }
 
@@ -142,12 +169,19 @@ export function JSX(...arg: React.JSX.Element[]) {
     const props = item.props
     const dataType = item.type()?.props?.dataType
     if (dataType === 'Text') {
-      if (!props?.children) continue
-      data.push(
-        AText(Array.isArray(props.children) ? props.children.join('') : props.children, {
-          style: props?.style
-        })
-      )
+      if (props?.value) {
+        data.push(
+          AText(props.value, {
+            style: props?.style
+          })
+        )
+      } else if (props?.children) {
+        data.push(
+          AText(Array.isArray(props.children) ? props.children.join('') : props.children, {
+            style: props?.style
+          })
+        )
+      }
     } else if (dataType === 'ImageURL') {
       data.push(AImageURL(props.src))
     } else if (dataType === 'ImageFile') {
@@ -167,7 +201,42 @@ export function JSX(...arg: React.JSX.Element[]) {
         )
       )
     } else if (dataType === 'BT.group') {
-      console.log('Button', props, item.type())
+      const id = props?.id
+      if (id) {
+        data.push(ABT.template(id))
+      } else {
+        console.log('Button', props, item.type())
+        if (Array.isArray(props?.children)) {
+          const rows: ButtonRow[] = []
+          for (const child of props?.children) {
+            // 拿到每个子组件
+            const bts: DataButton[] = []
+            if (Array.isArray(child.children)) {
+              for (const chi of child.children) {
+                // const type = chi.children
+                const value = chi.props?.text
+                const data = chi.props?.data
+                const options = {}
+                if (chi.props?.autoEnter) {
+                  options['autoEnter'] = chi.props?.autoEnter ? true : false
+                }
+                if (chi.props?.toolTip) {
+                  options['toolTip'] = chi.props?.toolTip ?? ''
+                }
+                if (chi.props?.showList) {
+                  options['showList'] = chi.props?.showList ? true : false
+                }
+                if (chi.props?.isLink) {
+                  options['isLink'] = chi.props?.isLink ? true : false
+                }
+                bts.push(ABT(value, data, options))
+              }
+            }
+            rows.push(ABT.row(...bts))
+          }
+          data.push(ABT.group(...rows))
+        }
+      }
     }
   }
   if (data.length === 0) {
@@ -212,6 +281,10 @@ export const sendToUser = async (user_id: string, data: React.JSX.Element[]) => 
 // }
 
 // Send(
+//   <Text value="" />,
+//   <Text >xxxx</Text>,
+//   <Image.url src="" />,
+//   <Image.file src="" />,
 //   <BT.template id="12121" />,
 //   <BT.group>
 //     <BT.row><BT text="登录" data="/登录游戏" /><BT text="退出" data="/退出游戏" /></BT.row>
