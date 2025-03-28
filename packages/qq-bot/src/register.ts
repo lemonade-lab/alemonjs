@@ -15,7 +15,7 @@ import {
   DIRECT_MESSAGE_CREATE,
   GROUP_AT_MESSAGE_CREATE,
   MESSAGE_CREATE
-} from './send'
+} from './sends'
 import { isGuild } from './utils'
 export const platform = 'qq-bot'
 export const register = (client: QQBotClients) => {

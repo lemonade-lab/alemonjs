@@ -1,110 +1,45 @@
-import { User } from '../event/base/user'
-import { Guild, Channel } from '../event/base/guild'
+import { DataButtonGroup } from './button'
+import { DataArkBigCard, DataArkCard, DataArkList } from './ark'
+import { DataMarkDown, DataMarkdownTemplate } from './markdown'
+import { DataImage, DataImageFile, DataImageURL } from './image'
+import { DataText } from './text'
+import { DataMention } from './mention'
+import { DataLink } from './link'
 
-/**
- * 文本数据
- */
-export type DataText = {
-  type: 'Text'
-  value: string
-  options?: {
-    style?: 'none' | 'bold' | 'block' | 'strikethrough' | 'boldItalic' | 'italic'
-  }
-}
+// text
+export * from './text'
 
-/**
- * 图片数据
- */
-export type DataImage = {
-  type: 'Image'
-  value: Buffer
-}
+export * from './link'
 
-/**
- * 图片链接
- */
-export type DataImageURL = {
-  type: 'ImageURL'
-  value: string
-}
+// mention
+export * from './mention'
 
-/**
- * 图片文件
- */
-export type DataImageFile = {
-  type: 'ImageFile'
-  value: string
-}
+// image
+export * from './image'
 
-/**
- * 提及数据
- */
-export type DataMention = {
-  type: 'Mention'
-  value?: string
-  options?: {
-    belong?: 'user' | 'guild' | 'channel' | 'everyone'
-    payload?: User | Guild | Channel | 'everyone'
-  }
-}
+// button
+export * from './button'
 
-export type DataButton = {
-  type: 'Button'
-  // 显示的文字
-  value:
-    | string
-    | {
-        title: string
-        // 被点击后要显示的
-        label: string
-      }
-  options?: {
-    // 禁止提示
-    toolTip?: string
-    // 自动回车
-    autoEnter?: boolean
-    // 显示列表
-    showList?: boolean
-    // 数据
-    data?:
-      | string
-      | {
-          click: string
-          confirm: string
-          cancel: string
-        }
-    //
-    isLink?: boolean
-  }
-}
+// ark
+export * from './ark'
 
-export type ButtonRow = {
-  type: 'BT.row'
-  value: DataButton[]
-}
+// md
+export * from './markdown'
 
-export type DataButtonGroup = {
-  type: 'BT.group'
-  value: ButtonRow[]
-  options?: {
-    template_id?: string
-  }
-}
-
-export type DataMap = {
-  Text: DataText
-  Image: DataImage
-  ImageURL: DataImageURL
-  ImageFile: DataImageFile
-  Mention: DataMention
-  ButtonGroup: DataButtonGroup
-}
-
+// enums
 export type DataEnums =
   | DataText
+  | DataLink
   | DataImage
   | DataImageURL
   | DataImageFile
   | DataMention
   | DataButtonGroup
+  | DataArkList
+  | DataArkCard
+  | DataArkBigCard
+  | DataMarkDown
+  | DataMarkdownTemplate
+
+// 消息数据格式
 export type MessageDataFormat = DataEnums[]

@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
-import { QQBotAPI } from '../sdk/api'
-import { ButtonRow, type DataEnums } from 'alemonjs'
+import { QQBotAPI } from './sdk/api'
+import { ButtonRow, DataArkBigCard, DataArkCard, DataArkList, type DataEnums } from 'alemonjs'
 import axios from 'axios'
 
 type Client = typeof QQBotAPI.prototype
@@ -46,14 +46,122 @@ const createButtonsData = (rows: ButtonRow[]) => {
   return data
 }
 
+const createArkCardData = (value: DataArkCard['value']) => {
+  return {
+    template_id: 24,
+    kv: [
+      {
+        key: '#DESC#',
+        value: value.decs
+      },
+      {
+        key: '#PROMPT#',
+        value: value.prompt
+      },
+      {
+        key: '#TITLE#',
+        value: value.title
+      },
+      {
+        key: '#METADESC#',
+        value: value.metadecs
+      },
+      {
+        key: '#IMG#',
+        value: value.cover
+      },
+      {
+        key: '#LINK#',
+        value: value.link
+      },
+      {
+        key: '#SUBTITLE#',
+        value: value.subtitle
+      }
+    ]
+  }
+}
+
+const createArkBigCardData = (value: DataArkBigCard['value']) => {
+  return {
+    template_id: 37,
+    kv: [
+      {
+        key: '#PROMPT#',
+        value: value.prompt
+      },
+      {
+        key: '#METATITLE#',
+        value: value.title
+      },
+      {
+        key: '#METASUBTITLE#',
+        value: value.subtitle
+      },
+      {
+        key: '#METACOVER#',
+        value: value.cover
+      },
+      {
+        key: '#METAURL#',
+        value: value.link
+      }
+    ]
+  }
+}
+
+const createArkList = (value: DataArkList['value']) => {
+  const [tip, data] = value
+  return {
+    template_id: 23,
+    kv: [
+      {
+        key: '#DESC#',
+        value: tip.value.desc
+      },
+      {
+        key: '#PROMPT#',
+        value: tip.value.prompt
+      },
+      {
+        key: '#LIST#',
+        obj: data.value.map(item => {
+          const value = item.value
+          if (typeof value === 'string') {
+            return {
+              obj_kv: [
+                {
+                  key: 'desc',
+                  value: value
+                }
+              ]
+            }
+          }
+          return {
+            obj_kv: [
+              {
+                key: 'desc',
+                value: value.title
+              },
+              {
+                key: 'link',
+                value: value.link
+              }
+            ]
+          }
+        })
+      }
+    ]
+  }
+}
+
 export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
-      // if (item.type == 'Link') {
-      //   return `[${item.options?.title ?? item.value}](${item.value})`
-      // } else
-      if (item.type == 'Mention') {
+      if (item.type == 'Link') {
+        return `[${item.value}](${item?.options?.link})`
+      } else if (item.type == 'Mention') {
         if (
           item.value == 'everyone' ||
           item.value == 'all' ||
@@ -155,14 +263,51 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
       })
     )
   }
+  // ark
+  const ark = val.filter(
+    item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
+  )
+  if (ark && ark.length > 0) {
+    return Promise.all(
+      ark.map(async item => {
+        if (item.type === 'Ark.Card') {
+          const arkData = createArkCardData(item.value)
+          return client.groupOpenMessages(event.GuildId, {
+            msg_id: event.MessageId,
+            ark: arkData,
+            msg_type: 3,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        if (item.type === 'Ark.BigCard') {
+          const arkData = createArkBigCardData(item.value)
+          return client.groupOpenMessages(event.GuildId, {
+            msg_id: event.MessageId,
+            ark: arkData,
+            msg_type: 3,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        const arkData = createArkList(item.value)
+        return client.groupOpenMessages(event.GuildId, {
+          msg_id: event.MessageId,
+          ark: arkData,
+          msg_type: 3,
+          msg_seq: client.getMessageSeq(event.MessageId)
+        })
+      })
+    )
+  }
   return Promise.all([])
 }
 
 export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
-      if (item.type == 'Text') {
+      if (item.type == 'Link') {
+        return `[${item.value}](${item?.options?.link})`
+      } else if (item.type == 'Text') {
         return item.value
       }
       return ''
@@ -227,7 +372,7 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
       buttons.map(async item => {
         const template_id = item?.options?.template_id
         if (template_id) {
-          return client.groupOpenMessages(event.GuildId, {
+          return client.usersOpenMessages(event.GuildId, {
             content: '',
             msg_id: event.MessageId,
             keyboard: {
@@ -244,13 +389,48 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
         })
         // 构造成按钮
         const data = createButtonsData(rows)
-        return client.groupOpenMessages(event.GuildId, {
+        return client.usersOpenMessages(event.GuildId, {
           content: '',
           msg_id: event.MessageId,
           keyboard: {
             content: data
           },
           msg_type: 2,
+          msg_seq: client.getMessageSeq(event.MessageId)
+        })
+      })
+    )
+  }
+  // ark
+  const ark = val.filter(
+    item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
+  )
+  if (ark && ark.length > 0) {
+    return Promise.all(
+      ark.map(async item => {
+        if (item.type === 'Ark.Card') {
+          const arkData = createArkCardData(item.value)
+          return client.usersOpenMessages(event.GuildId, {
+            msg_id: event.MessageId,
+            ark: arkData,
+            msg_type: 3,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        if (item.type === 'Ark.BigCard') {
+          const arkData = createArkBigCardData(item.value)
+          return client.usersOpenMessages(event.GuildId, {
+            msg_id: event.MessageId,
+            ark: arkData,
+            msg_type: 3,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+        }
+        const arkData = createArkList(item.value)
+        return client.usersOpenMessages(event.GuildId, {
+          msg_id: event.MessageId,
+          ark: arkData,
+          msg_type: 3,
           msg_seq: client.getMessageSeq(event.MessageId)
         })
       })
@@ -268,8 +448,11 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
  */
 export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
+      if (item.type == 'Link') {
+        return `[${item.value}](${item?.options?.link})`
+      }
       if (item.type == 'Text') {
         return item.value
       }
@@ -317,11 +500,11 @@ export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) =
 
 export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
-      // if (item.type == 'Link') {
-      //   return `[${item.options?.title ?? item.value}](${item.value})`
-      // } else
+      if (item.type == 'Link') {
+        return `[${item.value}](${item?.options?.link})`
+      }
       if (item.type == 'Mention') {
         if (
           item.value == 'everyone' ||
@@ -389,11 +572,11 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
  */
 export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
   const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text')
+    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
-      // if (item.type == 'Link') {
-      //   return `[${item.options?.title ?? item.value}](${item.value})`
-      // } else
+      if (item.type == 'Link') {
+        return `[${item.value}](${item?.options?.link})`
+      }
       if (item.type == 'Mention') {
         if (
           item.value == 'everyone' ||

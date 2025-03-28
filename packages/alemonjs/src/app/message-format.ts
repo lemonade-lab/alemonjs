@@ -6,7 +6,30 @@ import {
   DataImageFile,
   ButtonRow,
   DataButtonGroup,
-  DataButton
+  DataButton,
+  DataArkList,
+  DataArkListTip,
+  DataArkListContent,
+  DataArkListItem,
+  DataArkCard,
+  DataArkBigCard,
+  DataMarkdownTemplate,
+  DataMarkDown,
+  DataMarkdownTitle,
+  DataMarkdownSubtitle,
+  DataMarkdownBold,
+  DataMarkdownItalic,
+  DataMarkdownItalicStar,
+  DataMarkdownStrikethrough,
+  DataMarkdownLink,
+  DataMarkdownImage,
+  DataMarkdownList,
+  DataMarkdownListItem,
+  DataMarkdownBlockquote,
+  DataMarkdownDivider,
+  DataMarkdownNewline,
+  DataLink,
+  DataMarkdownText
 } from '../typings'
 
 /**
@@ -16,6 +39,20 @@ import {
  * @returns
  */
 export const Text = (val: DataText['value'], options?: DataText['options']): DataText => {
+  return {
+    type: 'Text',
+    value: val,
+    options
+  }
+}
+
+/**
+ * 链接消息
+ * @param val 要显示的文本
+ * @param options 内容选项
+ * @returns
+ */
+export const Link = (val: DataLink['value'], options?: DataText['options']): DataText => {
   return {
     type: 'Text',
     value: val,
@@ -58,10 +95,8 @@ const Image = (val: DataImage['value']): DataImage => {
     value: val
   }
 }
-
 Image.url = ImageURL
 Image.file = ImageFile
-
 export { Image }
 
 /**
@@ -124,11 +159,341 @@ BT.row = function Row(...buttons: DataButton[]): ButtonRow {
 
 export { BT }
 
-// const Send = (...x: DataButtonGroup[]) => {
+// Ark 函数
+export const Ark = {
+  /**
+   *
+   * @param values 要显示的文本
+   * @returns
+   */
+  list: (...values: DataArkList['value']): DataArkList => {
+    return {
+      type: 'Ark.list',
+      value: values
+    }
+  },
+  /**
+   *
+   * @param options 提示信息
+   * @returns
+   */
+  listTip: (options: DataArkListTip['value']): DataArkListTip => {
+    return {
+      type: 'Ark.listTip',
+      value: options
+    }
+  },
+  /**
+   *
+   * @param values 实际内容
+   * @returns
+   */
+  listContent: (...values: DataArkListContent['value']): DataArkListContent => {
+    return {
+      type: 'Ark.listContent',
+      value: values
+    }
+  },
+  /**
+   *
+   * @param value 列表项内容
+   * @returns
+   */
+  listItem: (value: DataArkListItem['value']): DataArkListItem => {
+    return {
+      type: 'Ark.listItem',
+      value: value
+    }
+  },
+  /**
+   * @param value 卡片内容
+   * @returns
+   */
+  Card: (value: DataArkCard['value']): DataArkCard => {
+    return {
+      type: 'Ark.Card',
+      value: value
+    }
+  },
+  /**
+   * @param value 大卡片内容
+   * @returns
+   */
+  BigCard: (value: DataArkBigCard['value']): DataArkBigCard => {
+    return {
+      type: 'Ark.BigCard',
+      value
+    }
+  }
+}
+
+/**
+ *
+ * @param values 要显示的文本
+ * @returns
+ */
+const MD = (...values: DataMarkDown['value']): DataMarkDown => {
+  return {
+    type: 'Markdown',
+    value: values
+  }
+}
+
+/**
+ *
+ * @param templateId 模板 ID
+ * @param params 模板参数
+ * @returns
+ */
+MD.template = (
+  templateId: DataMarkdownTemplate['value'],
+  params?: DataMarkdownTemplate['options']['params']
+) => {
+  return {
+    type: 'MD.template',
+    value: templateId,
+    options: {
+      params
+    }
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @returns
+ */
+MD.text = (text: string): DataMarkdownText => {
+  return {
+    type: 'MD.text',
+    value: text
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @returns
+ */
+MD.title = (text: string): DataMarkdownTitle => {
+  return {
+    type: 'MD.title',
+    value: text
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @returns
+ */
+MD.subtitle = (text: string): DataMarkdownSubtitle => {
+  return {
+    type: 'MD.subtitle',
+    value: text
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @returns
+ */
+MD.bold = (text: string): DataMarkdownBold => {
+  return {
+    type: 'MD.bold',
+    value: text
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @returns
+ */
+MD.italic = (text: string): DataMarkdownItalic => {
+  return {
+    type: 'MD.italic',
+    value: text
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @returns
+ */
+MD.italicStar = (text: string): DataMarkdownItalicStar => {
+  return {
+    type: 'MD.italicStar',
+    value: text
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @returns
+ */
+MD.strikethrough = (text: string): DataMarkdownStrikethrough => {
+  return {
+    type: 'MD.strikethrough',
+    value: text
+  }
+}
+
+/**
+ *
+ * @param text 要显示的文本
+ * @param url  链接地址
+ * @returns
+ */
+MD.link = (text: string, url: string): DataMarkdownLink => {
+  return {
+    type: 'MD.link',
+    value: { text, url }
+  }
+}
+
+/**
+ *
+ * @param url 图片地址
+ * @param options 图片选项
+ * @returns
+ */
+MD.image = (url: string, options?: { width?: number; height?: number }): DataMarkdownImage => {
+  return {
+    type: 'MD.image',
+    value: url,
+    options
+  }
+}
+
+/**
+ *
+ * @param items
+ * @returns
+ */
+MD.list = (...items: any[]): DataMarkdownList => {
+  return {
+    type: 'MD.list',
+    value: items
+  }
+}
+
+/**
+ *
+ * @param indexOrText
+ * @param text
+ * @returns
+ */
+MD.listItem = (indexOrText: number | string, text?: string): DataMarkdownListItem => {
+  return {
+    type: 'MD.listItem',
+    value: typeof indexOrText === 'number' ? { index: indexOrText, text } : indexOrText
+  }
+}
+
+/**
+ *
+ * @param text 块引用的文本内容
+ * @returns
+ */
+MD.blockquote = (text: string): DataMarkdownBlockquote => {
+  return {
+    type: 'MD.blockquote',
+    value: text
+  }
+}
+
+/**
+ *
+ * @returns
+ */
+MD.divider = (): DataMarkdownDivider => {
+  return {
+    type: 'MD.divider'
+  }
+}
+
+/**
+ * @param value 是否换多行
+ * @returns
+ */
+MD.newline = (value: boolean = false): DataMarkdownNewline => {
+  return {
+    type: 'MD.newline',
+    value: value
+  }
+}
+
+export { MD }
+
+// const Send = (...x: any[]) => {
 //   return x;
 // };
 
 // Send(
+//   Ark.list(
+//     Ark.listTip({ desc: "选择卡", prompt: "选择卡片" }),
+//     Ark.listContent(
+//     )
+//   ),
+//   Ark.Card({
+//     title: "标题标题标题标题标题标题标题标题",
+//     cover: "图片地址",
+//     jump_url: "要跳转的链接",
+//     subtitle: "子标题",
+//     decs: "备注",
+//     prompt: "提示",
+//     metadecs: "描述描述描述风好大换热",
+//   }),
+//   Ark.BigCard({
+//     title: '标题标题标题标题标题标题标题标题',
+//     subtitle: '子标题',
+//     cover: 'https://www.baidu.com/img/bd_logo1.png',
+//     jump_url: 'https://www.baidu.com',
+//   }),
+//   MD(
+//     MD.title("标题标题标题标题标题标题标题标题"),
+//     // 副标题
+//     MD.subtitle("子标题"),
+//     // 加粗
+//     MD.bold("加粗"),
+//     // 斜体
+//     MD.italic("斜体"),
+//     // 星号斜体
+//     MD.italicStar("星号斜体"),
+//     // 删除线
+//     MD.strikethrough("删除线"),
+//     // 链接
+//     MD.link("链接", "https://www.baidu.com"),
+//     // 图片
+//     MD.image("https://www.baidu.com/img/bd_logo1.png", { width: 100, height: 100 }),
+//     // 有序列表
+//     MD.list(
+//       MD.listItem(1, "有序列表"),
+//       MD.listItem(2, "有序列表"),
+//       MD.listItem(3, "有序列表"),
+//     ),
+//     // 无序列表
+//     MD.list(
+//       MD.listItem("无序列表"),
+//       MD.listItem("无序列表"),
+//       MD.listItem("无序列表"),
+//     ),
+//     // 块引用
+//     MD.blockquote("块引用"),
+//     // 水平分割线
+//     MD.divider(),
+//     // 换行
+//     MD.newline(),
+//   ),
+//   MD.template('123', {
+//     "title": "123",
+//     "image": "https://www.baidu.com/img/bd_logo1.png",
+//     "para1": "123",
+//   }),
 //   BT.template('123'),
 //   BT.group(
 //     BT.row(BT("开始", "/开始游戏")),
