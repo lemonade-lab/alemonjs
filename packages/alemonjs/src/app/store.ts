@@ -90,7 +90,6 @@ export class Logger {
    */
   constructor() {
     this.#logger = createLogger()
-    // logger.error('error')
     // 如果已经存在，就返回内部 logger
     if (!global.logger) {
       global.logger = this.#logger

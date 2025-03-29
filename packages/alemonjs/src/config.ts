@@ -3,6 +3,7 @@ import { readFileSync, existsSync, watch, writeFileSync, mkdirSync } from 'fs'
 import { dirname, join } from 'path'
 import YAML from 'yaml'
 import { Package } from './typing/package'
+import { ResultCode } from './code'
 
 /**
  * 配置类
@@ -45,18 +46,26 @@ export class ConfigCore {
       const d = YAML.parse(data)
       this.#value = d
     } catch (err) {
-      logger.error(err)
+      logger.error({
+        code: ResultCode.FailInternal,
+        message: 'Config file parse error',
+        data: null
+      })
       process.cwd()
     }
     // 存在配置文件 , 开始监听文件
     watch(dir, () => {
-      logger.info('config update', dir)
       try {
         const data = readFileSync(dir, 'utf-8')
         const d = YAML.parse(data)
         this.#value = d
       } catch (err) {
-        logger.error(err)
+        logger.error({
+          code: ResultCode.FailInternal,
+          message: 'Config file parse error',
+          data: null
+        })
+        process.cwd()
       }
     })
     return this.#value
@@ -98,14 +107,23 @@ export class ConfigCore {
     if (this.#package) return this.#package
     const dir = process.env.PKG_PATH || join(process.cwd(), 'package.json')
     if (!existsSync(dir)) {
-      logger.warn('package.json not found')
+      logger.warn({
+        code: ResultCode.FailInternal,
+        message: 'package.json not found',
+        data: null
+      })
       return null
     }
     const data = readFileSync(dir, 'utf-8')
     try {
       this.#package = JSON.parse(data)
     } catch (err) {
-      logger.error(err)
+      logger.error({
+        code: ResultCode.FailInternal,
+        message: 'package.json parse error',
+        data: null
+      })
+      return null
     }
     return this.#package
   }

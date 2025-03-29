@@ -6,6 +6,7 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventKeys } from '../typings'
+import { ResultCode } from '../code'
 import { expendEvent } from './event-processor-event'
 import { expendMiddleware } from './event-processor-middleware'
 import {
@@ -20,19 +21,31 @@ import {
  * @param select
  */
 const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
-  const logs = [`[${select}]`]
+  const log = {
+    Name: select
+  }
   if (typeof event['ChannelId'] == 'string' && event['ChannelId'] != '') {
-    logs.push(`[${event['ChannelId']}]`)
+    log['ChannelId'] = event['ChannelId']
   }
   if (typeof event['UserKey'] == 'string' && event['UserKey'] != '') {
-    logs.push(`[${event['UserKey']}]`)
+    log['UserKey'] = event['UserKey']
+  }
+  if (typeof event['UserId'] == 'string' && event['UserId'] != '') {
+    log['UserId'] = event['UserId']
+  }
+  if (typeof event['MessageId'] == 'string' && event['MessageId'] != '') {
+    log['MessageId'] = event['MessageId']
   }
   if (Array.isArray(event['MessageBody'])) {
     const content = event['MessageBody'].filter(item => item.type == 'Text').map(item => item.value)
     const txt = content.join('')
-    logs.push(`[${txt}]`)
+    log['text'] = txt
   }
-  return logs
+  logger.info({
+    code: ResultCode.Ok,
+    message: 'new event',
+    data: log
+  })
 }
 
 /**
@@ -76,8 +89,7 @@ export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], se
     }
     expendMiddleware(valueEvent, select, nextMount)
   }
-  const log = showLog(valueEvent, select)
-  logger.info(log.join(''))
+  showLog(valueEvent, select)
   // create
   expendSubscribeCreate(valueEvent, select, nextCreate)
 }

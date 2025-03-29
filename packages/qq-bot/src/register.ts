@@ -398,34 +398,30 @@ export const createClientAPI = (client: QQBotClients): ClientAPI => {
       // 被动消息
       use: {
         send: async (event, val) => {
-          if (val.length < 0) []
+          if (val.length < 0) Promise.all([])
           // 打  tag
           const tag = event.tag
-          try {
-            // 群at
-            if (tag == 'GROUP_AT_MESSAGE_CREATE') {
-              return await GROUP_AT_MESSAGE_CREATE(client, event, val)
-            }
-            // 私聊
-            if (tag == 'C2C_MESSAGE_CREATE') {
-              return await C2C_MESSAGE_CREATE(client, event, val)
-            }
-            // 频道私聊
-            if (tag == 'DIRECT_MESSAGE_CREATE') {
-              return await DIRECT_MESSAGE_CREATE(client, event, val)
-            }
-            // 频道at
-            if (tag == 'AT_MESSAGE_CREATE') {
-              return await AT_MESSAGE_CREATE(client, event, val)
-            }
-            // 频道消息
-            if (tag == 'MESSAGE_CREATE') {
-              return await MESSAGE_CREATE(client, event, val)
-            }
-          } catch (error) {
-            return [error]
+          // 群at
+          if (tag == 'GROUP_AT_MESSAGE_CREATE') {
+            return await GROUP_AT_MESSAGE_CREATE(client, event, val)
           }
-          return []
+          // 私聊
+          if (tag == 'C2C_MESSAGE_CREATE') {
+            return await C2C_MESSAGE_CREATE(client, event, val)
+          }
+          // 频道私聊
+          if (tag == 'DIRECT_MESSAGE_CREATE') {
+            return await DIRECT_MESSAGE_CREATE(client, event, val)
+          }
+          // 频道at
+          if (tag == 'AT_MESSAGE_CREATE') {
+            return await AT_MESSAGE_CREATE(client, event, val)
+          }
+          // 频道消息
+          if (tag == 'MESSAGE_CREATE') {
+            return await MESSAGE_CREATE(client, event, val)
+          }
+          return Promise.all([])
         },
         mention: async e => {
           const event = e.value

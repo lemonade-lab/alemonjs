@@ -4,6 +4,7 @@ import { join } from 'path'
 import path from 'path'
 import fs from 'fs'
 import { createRequire } from 'module'
+import { ResultCode } from '../code'
 const require = createRequire(import.meta.url)
 
 /**
@@ -110,8 +111,13 @@ export const getRecursiveDirFiles = (
 export const showErrorModule = (e: Error) => {
   if (!e) return
   const moduleNotFoundRegex = /Cannot find (module|package)/
+  // 处理模块未找到的错误
   if (moduleNotFoundRegex.test(e?.message)) {
-    logger.error(e.message)
+    logger.error({
+      code: ResultCode.FailInternal,
+      message: e.message,
+      data: null
+    })
     const match = e.stack?.match(/'(.+?)'/)
     if (match) {
       const pack = match[1]
@@ -120,7 +126,12 @@ export const showErrorModule = (e: Error) => {
       logger.mark('无法提取缺失的信息，请检查')
     }
   } else {
-    logger.error(e?.message)
+    // 处理其他错误
+    logger.error({
+      code: ResultCode.FailInternal,
+      message: e?.message ?? e,
+      data: null
+    })
   }
 }
 
@@ -148,5 +159,43 @@ export const getInputExportPath = (input?: string) => {
     if (main) {
       return main
     }
+  }
+}
+
+/**
+ * 属于直接调用的函数
+ * 参数错误直接抛出错误
+ * 如果函数内部有错误，则使用 Result 进行返回
+ */
+
+/**
+ * 异步方法。且需要读取返回值的进行判断的，
+ * 都要以 Result 作为返回值
+ */
+export type Result = {
+  code: ResultCode
+  message: string | Object
+  data: any
+}
+
+/**
+ * 创建结果
+ * @param code
+ * @param message
+ * @returns
+ */
+export const createResult = (code: ResultCode, message: string | Object, data?: any): Result => {
+  // 如果不是 2000。则logger
+  if (code !== ResultCode.Ok) {
+    logger.error({
+      code,
+      message,
+      data: data
+    })
+  }
+  return {
+    code,
+    message,
+    data: data
   }
 }

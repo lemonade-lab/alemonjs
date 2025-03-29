@@ -1,4 +1,5 @@
 import { getConfig } from '../config'
+import { ResultCode } from '../code'
 import { State, StateSubscribe } from './store'
 
 /**
@@ -11,12 +12,30 @@ import { State, StateSubscribe } from './store'
  * 将会同时改变，因为状态是全局的
  * @param name 功能名
  * @param defaultValue 默认值，默认为 true
- * @returns 当前状态和设置函数
+ * @throws {Error} - 如果 name 不是字符串，或者 defaultValue 不是布尔值，抛出错误。
  */
 export const useState = <T extends string>(
   name: T,
   defaultValue = true
 ): [boolean, (value: boolean) => void] => {
+  // 检查参数
+  if (typeof name !== 'string') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid name: name must be a string',
+      data: null
+    })
+    throw new Error('Invalid name: name must be a string')
+  }
+  if (typeof defaultValue !== 'boolean') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid defaultValue: defaultValue must be a boolean',
+      data: null
+    })
+    throw new Error('Invalid defaultValue: defaultValue must be a boolean')
+  }
+
   const state = new State(name, defaultValue)
   // 设置值的函数
   const setValue = (value: boolean) => {
@@ -50,9 +69,15 @@ export const useState = <T extends string>(
  * 订阅状态变化
  * @param name 功能名
  * @param callback 回调函数
+ * @throws {Error} - 如果 callback 无效，抛出错误。
  */
 export const onState = <T extends string>(name: T, callback: (value: boolean) => void) => {
   if (typeof callback !== 'function') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Callback must be a function',
+      data: null
+    })
     throw new Error('Callback must be a function')
   }
   const sub = new StateSubscribe(name)
@@ -63,14 +88,32 @@ export const onState = <T extends string>(name: T, callback: (value: boolean) =>
  * 废弃，请使用 onState
  * @deprecated
  */
-export const eventState = onState
+export const eventState = <T extends string>(name: T, callback: (value: boolean) => void) => {
+  // 废弃警告
+  logger.warn({
+    code: ResultCode.Warn,
+    message: 'eventState is deprecated, please use onState',
+    data: null
+  })
+  return onState(name, callback)
+}
 
 /**
  * 取消订阅状态变化
  * @param name 功能名
  * @param callback 回调函数
+ * @throws {Error} - 如果 callback 无效，抛出错误。
  */
 export const unState = <T extends string>(name: T, callback: (value: boolean) => void) => {
+  if (typeof callback !== 'function') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Callback must be a function',
+      data: null
+    })
+    throw new Error('Callback must be a function')
+  }
+  // 取消订阅
   const sub = new StateSubscribe(name)
   sub.un(callback)
 }
@@ -79,25 +122,12 @@ export const unState = <T extends string>(name: T, callback: (value: boolean) =>
  * 废弃，请使用 unState
  * @deprecated
  */
-export const unEventState = unState
-
-// let lastDependencies;
-// let lastValue;
-
-// export const useMemo = (create, dependencies) => {
-//   if (lastDependencies) {
-//     // 检查依赖项是否变化
-//     const hasChanged = dependencies.some((dep, i) =>
-//       !Object.is(dep, lastDependencies[i])
-//     );
-
-//     if (!hasChanged) {
-//       // 依赖未变化，返回缓存值
-//       return lastValue;
-//     }
-//   }
-//   // 依赖变化，重新计算
-//   lastValue = create();
-//   lastDependencies = dependencies;
-//   return lastValue;
-// }
+export const unEventState = <T extends string>(name: T, callback: (value: boolean) => void) => {
+  // 废弃警告
+  logger.warn({
+    code: ResultCode.Warn,
+    message: 'unEventState is deprecated, please use unState',
+    data: null
+  })
+  return unState(name, callback)
+}

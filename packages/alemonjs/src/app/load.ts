@@ -10,16 +10,23 @@ import {
 } from '../typings'
 import { createRequire } from 'module'
 import { ChildrenApp } from './store.js'
+import { ResultCode } from '../code.js'
 const require = createRequire(import.meta.url)
 const mwReg = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/
 
 /**
- * 加载模块
+ * 加载子模块
  * @param mainPath
+ * @param appName
+ * @throws {Error} - 如果 mainPath 无效，抛出错误。
  */
 export const loadChildren = async (mainPath: string, appName: string) => {
   if (!mainPath || typeof mainPath !== 'string') {
-    logger.error('The module path is not correct')
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'The module path is not correct',
+      data: null
+    })
     return
   }
   const mainDir = dirname(mainPath)
@@ -155,22 +162,37 @@ export const loadChildren = async (mainPath: string, appName: string) => {
  * 废弃，请使用 loadChildren
  * @deprecated
  */
-export const loadModule = loadChildren
-
+export const loadModule = (mainPath: string, appName: string) => {
+  // 废弃警告
+  logger.warn({
+    code: ResultCode.Warn,
+    message: 'loadModule is deprecated, please use loadChildren',
+    data: null
+  })
+  return loadChildren(mainPath, appName)
+}
 /**
  * 模块文件
  * @param app
  */
 export const loadChildrenFile = async (appName: string) => {
   if (typeof appName !== 'string') {
-    logger.error('The module name is not correct')
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'The module name is not correct',
+      data: null
+    })
     return
   }
   try {
     const mainPath = require.resolve(appName)
     // 不存在 main
     if (!existsSync(mainPath)) {
-      logger.error('The main file does not exist', mainPath)
+      logger.error({
+        code: ResultCode.FailParams,
+        message: 'The main file does not exist,' + mainPath,
+        data: null
+      })
       return
     }
     loadChildren(mainPath, appName)
@@ -183,4 +205,12 @@ export const loadChildrenFile = async (appName: string) => {
  * 废弃，请使用 loadChildrenFile
  * @deprecated
  */
-export const moduleChildrenFiles = loadChildrenFile
+export const moduleChildrenFiles = async (appName: string) => {
+  // 废弃警告
+  logger.warn({
+    code: ResultCode.Warn,
+    message: 'moduleChildrenFiles is deprecated, please use loadChildrenFile',
+    data: null
+  })
+  return loadChildrenFile(appName)
+}

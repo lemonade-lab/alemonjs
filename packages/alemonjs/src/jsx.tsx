@@ -22,6 +22,7 @@ import {
   Mention as AMention,
   BT as ABT
 } from './post.js'
+import { ResultCode } from './code.js'
 
 /**
  *
@@ -205,7 +206,6 @@ export function JSX(...arg: React.JSX.Element[]) {
       if (id) {
         data.push(ABT.template(id))
       } else {
-        console.log('Button', props, item.type())
         if (Array.isArray(props?.children)) {
           const rows: ButtonRow[] = []
           for (const child of props?.children) {
@@ -240,8 +240,11 @@ export function JSX(...arg: React.JSX.Element[]) {
     }
   }
   if (data.length === 0) {
-    logger.error('Invalid data: data must be a non-empty array')
-    return
+    logger.warn({
+      code: ResultCode.FailParams,
+      message: 'Invalid data: data must be a non-empty array',
+      data: null
+    })
   }
   return data
 }
@@ -275,22 +278,3 @@ export const sendToChannel = async (channel_id: string, data: React.JSX.Element[
 export const sendToUser = async (user_id: string, data: React.JSX.Element[]) => {
   return toUser(user_id, JSX(...data))
 }
-
-// const Send = (..._x: any[]) => {
-//   //
-// }
-
-// Send(
-//   <Text value="" />,
-//   <Text >xxxx</Text>,
-//   <Image.url src="" />,
-//   <Image.file src="" />,
-//   <BT.template id="12121" />,
-//   <BT.group>
-//     <BT.row><BT text="登录" data="/登录游戏" /><BT text="退出" data="/退出游戏" /></BT.row>
-//     <BT.row><BT text="是否同意" data={{ "click": "/点击", "confirm": "/同意", "cancel": "/不同意" }} /></BT.row>
-//     <BT.row><BT text="百度一下" data="htts://baidu.com" isLink /></BT.row>
-//     <BT.row><BT text="自动" data="/自动发出" autoEnter /></BT.row>
-//     <BT.row><BT text="禁用的" data="/点不了" toolTip="不支持点击" /></BT.row>
-//   </BT.group>
-// )

@@ -5,6 +5,7 @@ import { loadChildren, loadChildrenFile } from './app/load.js'
 import { DefinePlatformValue } from './typings.js'
 import { getInputExportPath, showErrorModule } from './app/utils.js'
 import { useState } from './post.js'
+import { ResultCode } from './code.js'
 
 const loadConfig = () => {
   const value = getConfigValue() ?? {}
@@ -25,7 +26,11 @@ export const run = (input: string) => {
   let mainPath = join(process.cwd(), input)
   // 路径
   if (!existsSync(input)) {
-    logger.error('未找到主要入口文件', mainPath)
+    logger.warn({
+      code: ResultCode.Warn,
+      message: '未找到主要入口文件',
+      data: null
+    })
     return
   }
   // 指定运行的，name识别为 'main:res:xxx'
@@ -68,7 +73,6 @@ export const start = async (input?: string, pm?: string) => {
     // 新增环境变量
     process.env.platform = alemonjsBot?.platform ?? login
   } catch (e) {
-    logger.error('启动', login, '失败')
     showErrorModule(e)
   }
 
@@ -83,11 +87,7 @@ export const start = async (input?: string, pm?: string) => {
       })
     )
   }
+
   // 运行本地模块
-  try {
-    const dir = input ?? cfg.argv?.main ?? cfg.value?.main ?? getInputExportPath()
-    run(dir)
-  } catch (e) {
-    logger.error(e)
-  }
+  run(input ?? cfg.argv?.main ?? cfg.value?.main ?? getInputExportPath())
 }

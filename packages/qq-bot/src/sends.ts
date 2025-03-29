@@ -1,6 +1,16 @@
 import { readFileSync } from 'fs'
 import { QQBotAPI } from './sdk/api'
-import { ButtonRow, DataArkBigCard, DataArkCard, DataArkList, type DataEnums } from 'alemonjs'
+import {
+  ButtonRow,
+  ClientAPIMessageResult,
+  createResult,
+  DataArkBigCard,
+  DataArkCard,
+  DataArkList,
+  ResultCode,
+  type DataEnums,
+  type Result
+} from 'alemonjs'
 import axios from 'axios'
 
 type Client = typeof QQBotAPI.prototype
@@ -155,7 +165,18 @@ const createArkList = (value: DataArkList['value']) => {
   }
 }
 
-export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
+/**
+ * 群组消息
+ * @param client
+ * @param event
+ * @param val
+ * @returns
+ */
+export const GROUP_AT_MESSAGE_CREATE = async (
+  client: Client,
+  event,
+  val: DataEnums[]
+): Promise<ClientAPIMessageResult[]> => {
   const content = val
     .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
@@ -180,16 +201,22 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
     })
     .join('')
   if (content) {
-    return Promise.all(
-      [content].map(item =>
-        client.groupOpenMessages(event.GuildId, {
+    const res = await Promise.all(
+      [content].map(async item => {
+        const res = await client.groupOpenMessages(event.GuildId, {
           content: item,
           msg_id: event.MessageId,
           msg_type: 0,
           msg_seq: client.getMessageSeq(event.MessageId)
         })
-      )
-    )
+        return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+          id: res.id
+        })
+      })
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
+    return res
   }
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
@@ -198,7 +225,7 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
     return Promise.all(
       images.map(async item => {
         if (item.type == 'ImageURL') {
-          return client.groupOpenMessages(event.GuildId, {
+          const res = await client.groupOpenMessages(event.GuildId, {
             content: '',
             media: {
               file_info: item.value
@@ -207,29 +234,47 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
             msg_type: 7,
             msg_seq: client.getMessageSeq(event.MessageId)
           })
-        }
-        const file_data =
-          item.type == 'ImageFile'
-            ? readFileSync(item.value, 'base64')
-            : item.value.toString('base64')
-        const file_info = await client
-          .postRichMediaByGroup(event.GuildId, {
-            file_type: 1,
-            file_data: file_data
+          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+            id: res.id
           })
-          .then(res => res?.file_info)
-        if (!file_info) return Promise.resolve(null)
-        return client.groupOpenMessages(event.GuildId, {
-          content: '',
-          media: {
-            file_info
-          },
-          msg_id: event.MessageId,
-          msg_type: 7,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
+        }
+        try {
+          const file_data =
+            item.type == 'ImageFile'
+              ? readFileSync(item.value, 'base64')
+              : item.value.toString('base64')
+          const file_info = await client
+            .postRichMediaByGroup(event.GuildId, {
+              file_type: 1,
+              file_data: file_data
+            })
+            .then(res => res?.file_info)
+          if (!file_info) {
+            return createResult(ResultCode.Fail, 'client.postRichMediaByGroup', null)
+          }
+          const res = await client.groupOpenMessages(event.GuildId, {
+            content: '',
+            media: {
+              file_info
+            },
+            msg_id: event.MessageId,
+            msg_type: 7,
+            msg_seq: client.getMessageSeq(event.MessageId)
+          })
+          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+            id: res.id
+          })
+        } catch (error) {
+          return createResult(
+            ResultCode.Fail,
+            error ? error?.message ?? error : 'client.groupOpenMessages',
+            null
+          )
+        }
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   // buttons
   const buttons = val.filter(item => item.type == 'BT.group')
@@ -238,7 +283,7 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
       buttons.map(async item => {
         const template_id = item?.options?.template_id
         if (template_id) {
-          return client.groupOpenMessages(event.GuildId, {
+          const res = await client.groupOpenMessages(event.GuildId, {
             content: '',
             msg_id: event.MessageId,
             keyboard: {
@@ -247,11 +292,14 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
             msg_type: 2,
             msg_seq: client.getMessageSeq(event.MessageId)
           })
+          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+            id: res.id
+          })
         }
         const rows = item.value
         // 构造成按钮
         const data = createButtonsData(rows)
-        return client.groupOpenMessages(event.GuildId, {
+        const res = await client.groupOpenMessages(event.GuildId, {
           content: '',
           msg_id: event.MessageId,
           keyboard: {
@@ -260,8 +308,13 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
           msg_type: 2,
           msg_seq: client.getMessageSeq(event.MessageId)
         })
+        return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+          id: res.id
+        })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   // ark
   const ark = val.filter(
@@ -272,36 +325,54 @@ export const GROUP_AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[])
       ark.map(async item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value)
-          return client.groupOpenMessages(event.GuildId, {
+          const res = await client.groupOpenMessages(event.GuildId, {
             msg_id: event.MessageId,
             ark: arkData,
             msg_type: 3,
             msg_seq: client.getMessageSeq(event.MessageId)
+          })
+          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+            id: res.id
           })
         }
         if (item.type === 'Ark.BigCard') {
           const arkData = createArkBigCardData(item.value)
-          return client.groupOpenMessages(event.GuildId, {
+          const res = await client.groupOpenMessages(event.GuildId, {
             msg_id: event.MessageId,
             ark: arkData,
             msg_type: 3,
             msg_seq: client.getMessageSeq(event.MessageId)
           })
+          return createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })
         }
         const arkData = createArkList(item.value)
-        return client.groupOpenMessages(event.GuildId, {
+        const res = await client.groupOpenMessages(event.GuildId, {
           msg_id: event.MessageId,
           ark: arkData,
           msg_type: 3,
           msg_seq: client.getMessageSeq(event.MessageId)
         })
+        return createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   return Promise.all([])
 }
 
-export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
+/**
+ * 私聊消息
+ * @param client
+ * @param event
+ * @param val
+ * @returns
+ */
+export const C2C_MESSAGE_CREATE = (
+  client: Client,
+  event,
+  val: DataEnums[]
+): Promise<ClientAPIMessageResult[]> => {
   const content = val
     .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
@@ -315,15 +386,20 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
     .join('')
   if (content) {
     return Promise.all(
-      [content].map(item =>
-        client.usersOpenMessages(event.OpenId, {
+      [content].map(async item => {
+        const res = await client.usersOpenMessages(event.OpenId, {
           content: item,
           msg_id: event.MessageId,
           msg_type: 0,
           msg_seq: client.getMessageSeq(event.MessageId)
         })
-      )
-    )
+        return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
+          id: res.id
+        })
+      })
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
@@ -332,7 +408,7 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
     return Promise.all(
       images.map(async item => {
         if (item.type == 'ImageURL') {
-          return client.usersOpenMessages(event.OpenId, {
+          const res = await client.usersOpenMessages(event.OpenId, {
             content: '',
             media: {
               file_info: item.value
@@ -340,6 +416,9 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
             msg_id: event.MessageId,
             msg_type: 7,
             msg_seq: client.getMessageSeq(event.MessageId)
+          })
+          return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
+            id: res.id
           })
         }
         const file_data =
@@ -363,7 +442,9 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
           msg_seq: client.getMessageSeq(event.MessageId)
         })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   // buttons
   const buttons = val.filter(item => item.type == 'BT.group')
@@ -372,7 +453,7 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
       buttons.map(async item => {
         const template_id = item?.options?.template_id
         if (template_id) {
-          return client.usersOpenMessages(event.GuildId, {
+          const res = await client.usersOpenMessages(event.GuildId, {
             content: '',
             msg_id: event.MessageId,
             keyboard: {
@@ -381,15 +462,14 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
             msg_type: 2,
             msg_seq: client.getMessageSeq(event.MessageId)
           })
+          return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
+            id: res.id
+          })
         }
         const rows = item.value
-        // 看看是否是模板id的
-        rows.map(row => {
-          return row
-        })
         // 构造成按钮
         const data = createButtonsData(rows)
-        return client.usersOpenMessages(event.GuildId, {
+        const res = await client.usersOpenMessages(event.GuildId, {
           content: '',
           msg_id: event.MessageId,
           keyboard: {
@@ -398,8 +478,13 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
           msg_type: 2,
           msg_seq: client.getMessageSeq(event.MessageId)
         })
+        return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
+          id: res.id
+        })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   // ark
   const ark = val.filter(
@@ -410,31 +495,36 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
       ark.map(async item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value)
-          return client.usersOpenMessages(event.GuildId, {
+          const res = await client.usersOpenMessages(event.GuildId, {
             msg_id: event.MessageId,
             ark: arkData,
             msg_type: 3,
             msg_seq: client.getMessageSeq(event.MessageId)
           })
+          return createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })
         }
         if (item.type === 'Ark.BigCard') {
           const arkData = createArkBigCardData(item.value)
-          return client.usersOpenMessages(event.GuildId, {
+          const res = await client.usersOpenMessages(event.GuildId, {
             msg_id: event.MessageId,
             ark: arkData,
             msg_type: 3,
             msg_seq: client.getMessageSeq(event.MessageId)
           })
+          return createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })
         }
         const arkData = createArkList(item.value)
-        return client.usersOpenMessages(event.GuildId, {
+        const res = await client.usersOpenMessages(event.GuildId, {
           msg_id: event.MessageId,
           ark: arkData,
           msg_type: 3,
           msg_seq: client.getMessageSeq(event.MessageId)
         })
+        return createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   return Promise.all([])
 }
@@ -446,7 +536,11 @@ export const C2C_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
  * @param val
  * @returns
  */
-export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
+export const DIRECT_MESSAGE_CREATE = (
+  client: Client,
+  event,
+  val: DataEnums[]
+): Promise<ClientAPIMessageResult[]> => {
   const content = val
     .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
@@ -461,18 +555,21 @@ export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) =
     .join('')
   if (content) {
     return Promise.all(
-      [content].map(item =>
-        client.dmsMessage(event.OpenId, {
+      [content].map(async item => {
+        const res = await client.dmsMessage(event.OpenId, {
           content: item,
           msg_id: event.MessageId
         })
-      )
-    )
+        return createResult(ResultCode.Ok, 'client.dmsMessage', { id: res?.id })
+      })
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
   )
-  if (images) {
+  if (images && images.length > 0) {
     return Promise.all(
       images.map(async item => {
         if (item.value == 'ImageURL') {
@@ -481,24 +578,32 @@ export const DIRECT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) =
             .get(item.value, {
               responseType: 'arraybuffer'
             })
-            .then(res => res.data)
-          return client.postDirectImage(event.OpenId, {
+            .then(res => res?.data)
+          const res = await client.postDirectImage(event.OpenId, {
             msg_id: event.MessageId,
             image: data
           })
+          return createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })
         }
         const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
-        return client.postDirectImage(event.OpenId, {
+        const res = await client.postDirectImage(event.OpenId, {
           msg_id: event.MessageId,
           image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
         })
+        return createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
-  return []
+  return Promise.all([])
 }
 
-export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
+export const AT_MESSAGE_CREATE = (
+  client: Client,
+  event,
+  val: DataEnums[]
+): Promise<ClientAPIMessageResult[]> => {
   const content = val
     .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
@@ -527,13 +632,16 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
     .join('')
   if (content) {
     return Promise.all(
-      [content].map(item =>
-        client.channelsMessagesPost(event.ChannelId, {
+      [content].map(async item => {
+        const res = await client.channelsMessagesPost(event.ChannelId, {
           content: item,
           msg_id: event.MessageId
         })
-      )
-    )
+        return createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res?.id })
+      })
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
@@ -548,18 +656,22 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
               responseType: 'arraybuffer'
             })
             .then(res => res.data)
-          return client.postImage(event.ChannelId, {
+          const res = await client.postImage(event.ChannelId, {
             msg_id: event.MessageId,
             image: data
           })
+          return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
         }
         const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
-        return client.postImage(event.ChannelId, {
+        const res = await client.postImage(event.ChannelId, {
           msg_id: event.MessageId,
           image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
         })
+        return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   return Promise.all([])
 }
@@ -570,7 +682,11 @@ export const AT_MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
  * @param val
  * @returns
  */
-export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
+export const MESSAGE_CREATE = (
+  client: Client,
+  event,
+  val: DataEnums[]
+): Promise<ClientAPIMessageResult[]> => {
   const content = val
     .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
@@ -599,13 +715,16 @@ export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
     .join('')
   if (content) {
     return Promise.all(
-      [content].map(item =>
-        client.channelsMessagesPost(event.ChannelId, {
+      [content].map(async item => {
+        const res = await client.channelsMessagesPost(event.ChannelId, {
           content: item,
           msg_id: event.MessageId
         })
-      )
-    )
+        return createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res?.id })
+      })
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   const images = val.filter(
     item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
@@ -620,18 +739,22 @@ export const MESSAGE_CREATE = (client: Client, event, val: DataEnums[]) => {
               responseType: 'arraybuffer'
             })
             .then(res => res.data)
-          return client.postImage(event.ChannelId, {
+          const res = await client.postImage(event.ChannelId, {
             msg_id: event.MessageId,
             image: data
           })
+          return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
         }
         const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
-        return client.postImage(event.ChannelId, {
+        const res = await client.postImage(event.ChannelId, {
           msg_id: event.MessageId,
           image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
         })
+        return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
       })
-    )
+    ).catch(err => [
+      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    ])
   }
   return Promise.all([])
 }

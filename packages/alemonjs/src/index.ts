@@ -8,3 +8,5 @@ export * from './config.js'
 export * from './post.js'
 // 5. 导出主要模块
 export * from './main.js'
+// 6. code
+export * from './code.js'

@@ -1,4 +1,5 @@
 import { EventCycleEnum, Current, Events, EventKeys } from '../typings'
+import { ResultCode } from '../code'
 import { SubscribeList } from './store'
 
 type KeyMap = {
@@ -9,9 +10,27 @@ type KeyMap = {
  * 使用订阅
  * @param event
  * @param option
- * @returns
+ * @throws {Error} - 如果 event 不是对象，或者 select 不是字符串，抛出错误。
  */
 export const useSubscribe = <T extends EventKeys>(event: Events[T], select: T) => {
+  // 检查参数
+  if (typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'event is not object',
+      data: null
+    })
+    throw new Error('event is not object')
+  }
+  if (typeof select !== 'string') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'select is not string',
+      data: null
+    })
+    throw new Error('select is not string')
+  }
+
   type Keys = keyof Events[T]
   const run = (callback: Current<T>, keys: Keys[], chioce: EventCycleEnum) => {
     const subList = new SubscribeList(chioce, select)
