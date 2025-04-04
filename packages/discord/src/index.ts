@@ -1,13 +1,5 @@
 import './env'
-import {
-  PrivateEventMessageCreate,
-  PublicEventMessageCreate,
-  User,
-  definePlatform,
-  getConfigValue,
-  onProcessor,
-  useUserHashKey
-} from 'alemonjs'
+import { User, definePlatform, getConfigValue, onProcessor, useUserHashKey } from 'alemonjs'
 import { sendchannel, senduser } from './send'
 import { DCClient } from './sdk/wss'
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
@@ -81,9 +73,6 @@ export default definePlatform(() => {
     // 消除bot消息
     if (event.author?.bot) return
 
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-
     // 艾特消息处理
     const at_users: {
       id: string
@@ -107,13 +96,93 @@ export default definePlatform(() => {
       Platform: platform,
       UserId: UserId
     })
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(UserKey)
 
     const UserAvatar = createUserAvatar(UserId, event.author.avatar)
 
     if (event.type == 0 && event.member) {
-      // 群聊
-      const e: PublicEventMessageCreate = {
-        name: 'message.create',
+      // 处理消息
+      onProcessor(
+        'message.create',
+        {
+          name: 'message.create',
+          // 事件类型
+          Platform: platform,
+          // guild
+          GuildId: event.guild_id,
+          ChannelId: event.channel_id,
+          // user
+          UserId: UserId,
+          UserKey,
+          UserName: event.author.username,
+          UserAvatar: UserAvatar,
+          IsMaster: isMaster,
+          IsBot: false,
+          // message
+          MessageId: event.id,
+          MessageText: msg,
+          OpenId: '',
+          CreateAt: Date.now(),
+          // other
+          tag: 'MESSAGE_CREATE',
+          value: null
+        },
+        event
+      )
+    } else if (event.type == 0 && !event.member) {
+      // 处理消息
+      onProcessor(
+        'private.message.create',
+        {
+          name: 'private.message.create',
+          // 事件类型
+          Platform: platform,
+          // guild
+          // GuildId: event.guild_id,
+          // ChannelId: event.channel_id,
+          // user
+          UserId: UserId,
+          UserKey,
+          UserName: event.author.username,
+          UserAvatar: UserAvatar,
+          IsMaster: isMaster,
+          IsBot: false,
+          // message
+          MessageId: event.id,
+          MessageText: msg,
+          OpenId: '',
+          CreateAt: Date.now(),
+          // other
+          tag: 'MESSAGE_CREATE_PRIVATE',
+          value: null
+        },
+        event
+      )
+    } else {
+      // 未知类型
+    }
+  })
+
+  client.on('INTERACTION_CREATE', event => {
+    console.log('event', event)
+    const user = event.member.user
+
+    const UserId = user.id
+    const UserKey = useUserHashKey({
+      Platform: platform,
+      UserId: UserId
+    })
+    const UserAvatar = createUserAvatar(UserId, user.avatar)
+    const UserName = user.username
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(UserKey)
+    const MessageText = event.data.custom_id
+    // 处理消息
+    onProcessor(
+      'interaction.create',
+      {
+        name: 'interaction.create',
         // 事件类型
         Platform: platform,
         // guild
@@ -122,51 +191,22 @@ export default definePlatform(() => {
         // user
         UserId: UserId,
         UserKey,
-        UserName: event.author.username,
+        UserName: UserName,
         UserAvatar: UserAvatar,
         IsMaster: isMaster,
         IsBot: false,
         // message
         MessageId: event.id,
-        MessageText: msg,
+        MessageText: MessageText,
         OpenId: '',
         CreateAt: Date.now(),
         // other
-        tag: 'MESSAGE_CREATE',
+        tag: 'INTERACTION_CREATE',
         value: null
-      }
-      // 处理消息
-      onProcessor('message.create', e, event)
-    } else if (event.type == 0 && !event.member) {
-      // 私聊
-      const e: PrivateEventMessageCreate = {
-        name: 'private.message.create',
-        // 事件类型
-        Platform: platform,
-        // guild
-        // GuildId: event.guild_id,
-        // ChannelId: event.channel_id,
-        // user
-        UserId: UserId,
-        UserKey,
-        UserName: event.author.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // message
-        MessageId: event.id,
-        MessageText: msg,
-        OpenId: '',
-        CreateAt: Date.now(),
-        // other
-        tag: 'MESSAGE_CREATE_PRIVATE',
-        value: null
-      }
-      // 处理消息
-      onProcessor('private.message.create', e, event)
-    } else {
-      // 未知类型
-    }
+      },
+      event
+    )
+    client.interactionsCallback(event.id, event.token, MessageText)
   })
 
   // 发送错误时
@@ -189,14 +229,19 @@ export default definePlatform(() => {
       },
       use: {
         send: async (event, val) => {
-          if (val.length < 0) return Promise.all([])
+          if (val.length < 0) {
+            return Promise.all([])
+          }
           const tag = event.tag
           if (tag == 'MESSAGE_CREATE') {
-            const channel_id = event.value?.channel_id
-            return sendchannel(client, channel_id, val)
+            const ChannelId = event.value.channel_id
+            return sendchannel(client, ChannelId, val)
           } else if (tag == 'MESSAGE_CREATE_PRIVATE') {
-            const author_id = event.value?.author.id
-            return senduser(client, author_id, val)
+            const UserId = event.value.author.id
+            return senduser(client, UserId, val)
+          } else if (tag == 'INTERACTION_CREATE') {
+            const ChannelId = event.value.channel_id
+            return sendchannel(client, ChannelId, val)
           }
           return Promise.all([])
         },

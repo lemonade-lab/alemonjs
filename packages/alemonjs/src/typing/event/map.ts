@@ -1,5 +1,6 @@
 import { PublicEventChannalCreate, PublicEventChannalDelete } from './channal'
 import { PublicEventGuildExit, PublicEventGuildJoin } from './guild'
+import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from './interaction'
 import { PublicEventMemberAdd, PublicEventMemberRemove } from './member'
 import {
   PublicEventMessageCreate,
@@ -21,6 +22,8 @@ import { PrivateEventRequestFriendAdd, PrivateEventRequestGuildAdd } from './req
 export type EventsMessageCreate = {
   'message.create': PublicEventMessageCreate
   'private.message.create': PrivateEventMessageCreate
+  'interaction.create': PublicEventInteractionCreate
+  'private.interaction.create': PrivateEventInteractionCreate
 }
 
 export type EventsMessageCreateKeys = keyof EventsMessageCreate

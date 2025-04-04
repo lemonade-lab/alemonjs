@@ -8,8 +8,7 @@ import {
   DataArkCard,
   DataArkList,
   ResultCode,
-  type DataEnums,
-  type Result
+  type DataEnums
 } from 'alemonjs'
 import axios from 'axios'
 

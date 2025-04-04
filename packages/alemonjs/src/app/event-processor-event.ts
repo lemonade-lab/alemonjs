@@ -11,6 +11,7 @@ import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Response } from './store'
 import { useSend } from './hook-use-api'
+import { EventMessageText } from './config'
 
 /**
  * 消息体处理机制
@@ -114,7 +115,7 @@ export const expendEvent = async <T extends EventKeys>(
       }
 
       // 消息类型数据
-      if (['message.create', 'private.message.create'].includes(select)) {
+      if (EventMessageText.includes(select)) {
         if (app?.regular) {
           const reg = new RegExp(app.regular)
           if (!reg.test(valueEvent['MessageText'])) {

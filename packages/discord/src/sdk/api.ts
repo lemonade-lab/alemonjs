@@ -1681,4 +1681,21 @@ export class DCAPI {
       url: '/gateway'
     }).then(res => res?.data)
   }
+
+  /**
+   *
+   */
+  async interactionsCallback(id: string, token: string, content: string) {
+    return this.request({
+      method: 'POST',
+      url: `/interactions/${id}/${token}/callback`,
+      data: {
+        type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
+        data: {
+          content: content,
+          flags: 64 // EPHEMERAL（仅发送者可见）
+        }
+      }
+    }).then(res => res.data)
+  }
 }

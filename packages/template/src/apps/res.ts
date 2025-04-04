@@ -5,7 +5,12 @@ const close = /^(#|\/)?close:/
 // 使用方法合并成一个
 export const regular = new RegExp(open.source + '|' + close.source)
 
-const selects = createSelects(['message.create', 'private.message.create'])
+const selects = createSelects([
+  'message.create',
+  'private.message.create',
+  'interaction.create',
+  'private.interaction.create'
+])
 
 export default onResponse(selects, (event, next) => {
   const name = event.MessageText.replace(regular, '')

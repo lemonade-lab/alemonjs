@@ -1,5 +1,10 @@
 import { createSelects } from 'alemonjs'
-const selects = createSelects(['message.create', 'private.message.create'])
+const selects = createSelects([
+  'message.create',
+  'private.message.create',
+  'interaction.create',
+  'private.interaction.create'
+])
 export default onMiddleware(selects, async (e, next) => {
   // send
   // const Send = useSend(e)

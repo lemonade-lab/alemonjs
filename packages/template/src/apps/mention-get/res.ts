@@ -1,6 +1,12 @@
 import { useMention, createSelects } from 'alemonjs'
 export const regular = /^(#|\/)?getmention$/
-const selects = createSelects(['message.create', 'private.message.create'])
+const selects = createSelects([
+  'message.create',
+  'private.message.create',
+  'interaction.create',
+  'private.interaction.create'
+])
+
 export default onResponse(selects, async event => {
   const [mention] = useMention(event)
   // 查找用户类型的 @ 提及，且不是 bot

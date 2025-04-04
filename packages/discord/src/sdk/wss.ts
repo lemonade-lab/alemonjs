@@ -150,6 +150,11 @@ export class DCClient extends DCAPI {
             console.log('[ws] session_id', this.#session_id)
           }
         }
+        // const events = ['PRESENCE_UPDATE','TYPING_START']
+        // if (!events.includes(t)) {
+        //     console.log("t", t)
+        //     console.log("d", d)
+        // }
         // 事件处理
         if (this.#events[t]) {
           try {

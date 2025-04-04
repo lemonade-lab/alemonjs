@@ -10,18 +10,21 @@ const ImageURLToBuffer = async (url: string) => {
 }
 
 const createButtonsData = (rows: ButtonRow[]) => {
-  let id = 0
   return rows.map(row => {
     const val = row.value
     return {
       type: 1,
       components: val.map(button => {
         const value = button.value
-        // const options = button.options
-        id++
+        let text = ''
+        if (typeof button.options?.data === 'object') {
+          text = button.options?.data.click
+        } else {
+          text = button.options.data
+        }
         return {
           type: 2,
-          custom_id: String(id),
+          custom_id: text,
           style: 1,
           label: typeof value == 'object' ? value.title : value
           // action: {
@@ -193,6 +196,7 @@ export const senduser = async (client: Client, author_id: string, val: DataEnums
         const rows = item.value
         // 构造成按钮
         const data = createButtonsData(rows)
+        // console.log("data", data)
         const res = await client.channelsMessages(channel_id, {
           content: '',
           components: data

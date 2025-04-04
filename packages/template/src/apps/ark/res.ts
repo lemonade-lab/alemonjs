@@ -1,7 +1,12 @@
 import { Ark, createSelects, Text, useSend } from 'alemonjs'
 import { useMode, platform } from '@alemonjs/qq-bot'
 export const regular = /^(#|\/)?ark$/
-const selects = createSelects(['message.create'])
+const selects = createSelects([
+  'message.create',
+  'private.message.create',
+  'interaction.create',
+  'private.interaction.create'
+])
 const response = onResponse(selects, event => {
   const Send = useSend(event)
   const isMode = useMode(event)
@@ -27,7 +32,7 @@ const response = onResponse(selects, event => {
       })
     )
   } else {
-    Send(Text('暂为支持'))
+    Send(Text('暂未支持'))
   }
 })
 export default response

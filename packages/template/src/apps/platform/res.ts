@@ -1,7 +1,12 @@
 import { Text, createSelects, useSend } from 'alemonjs'
 import { platform } from '@alemonjs/kook'
 
-const selects = createSelects(['message.create', 'private.message.create'])
+const selects = createSelects([
+  'message.create',
+  'private.message.create',
+  'interaction.create',
+  'private.interaction.create'
+])
 
 const response = onResponse(selects, (event, next) => {
   // 使用.value获取原生数据

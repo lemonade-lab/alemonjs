@@ -15,7 +15,7 @@ export type PrivateEventMessageUpdate = platform &
   User & {
     name: 'private.message.update'
   }
-// 公有事件-消息撤回
+// 私有消息-消息撤回
 export type PrivateEventMessageDelete = platform &
   Message & {
     name: 'private.message.delete'

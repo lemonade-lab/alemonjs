@@ -1,5 +1,4 @@
 import {
-  defineBot,
   getConfigValue,
   OnProcessor,
   PrivateEventMessageCreate,
@@ -19,7 +18,7 @@ export const client: Client = new Proxy({} as Client, {
   }
 })
 export const platform = 'telegram'
-export default defineBot(() => {
+export default definePlatform(() => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]

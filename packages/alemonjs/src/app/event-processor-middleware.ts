@@ -11,6 +11,7 @@ import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Middleware } from './store'
 import { useSend } from './hook-use-api'
+import { EventMessageText } from './config'
 
 /**
  * 处理中间件
@@ -97,7 +98,7 @@ export const expendMiddleware = async <T extends EventKeys>(
         }
       }
 
-      if (['message.create', 'private.message.create'].includes(select)) {
+      if (EventMessageText.includes(select)) {
         if (app?.regular) {
           const reg = new RegExp(app.regular)
           if (!reg.test(valueEvent['MessageText'])) {
