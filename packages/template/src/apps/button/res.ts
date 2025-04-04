@@ -1,4 +1,4 @@
-import { BT, createSelects, useSend } from 'alemonjs'
+import { BT, createSelects, Text, useSend } from 'alemonjs'
 import { platform, useMode } from '@alemonjs/qq-bot'
 export const regular = /^(#|\/)?buttonx$/
 const selects = createSelects([
@@ -7,7 +7,6 @@ const selects = createSelects([
   'interaction.create',
   'private.interaction.create'
 ])
-
 const response = onResponse(selects, event => {
   const Send = useSend(event)
   // 暂时仅支持qq，group发送按钮。更多支持待更新
@@ -16,6 +15,7 @@ const response = onResponse(selects, event => {
     Send(BT.template('appid_1742790363'))
   } else {
     Send(
+      Text('控制板'),
       BT.group(
         BT.row(BT('image', '/image'), BT('text', '/text'))
         // BT.row(BT('百度一下', 'https://baidu.com', { isLink: true })),
