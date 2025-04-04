@@ -125,7 +125,7 @@ export default definePlatform(() => {
           OpenId: '',
           CreateAt: Date.now(),
           // other
-          tag: 'MESSAGE_CREATE',
+          tag: 'message.create',
           value: null
         },
         event
@@ -154,7 +154,7 @@ export default definePlatform(() => {
           OpenId: '',
           CreateAt: Date.now(),
           // other
-          tag: 'MESSAGE_CREATE_PRIVATE',
+          tag: 'private.message.create',
           value: null
         },
         event
@@ -166,7 +166,9 @@ export default definePlatform(() => {
 
   client.on('INTERACTION_CREATE', event => {
     console.log('event', event)
-    const user = event.member.user
+
+    const isPrivate = typeof event['user'] === 'object' ? true : false
+    const user = isPrivate ? event['user'] : event['member'].user
 
     const UserId = user.id
     const UserKey = useUserHashKey({
@@ -178,34 +180,66 @@ export default definePlatform(() => {
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(UserKey)
     const MessageText = event.data.custom_id
-    // 处理消息
-    onProcessor(
-      'interaction.create',
-      {
-        name: 'interaction.create',
-        // 事件类型
-        Platform: platform,
-        // guild
-        GuildId: event.guild_id,
-        ChannelId: event.channel_id,
-        // user
-        UserId: UserId,
-        UserKey,
-        UserName: UserName,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // message
-        MessageId: event.id,
-        MessageText: MessageText,
-        OpenId: '',
-        CreateAt: Date.now(),
-        // other
-        tag: 'INTERACTION_CREATE',
-        value: null
-      },
-      event
-    )
+    if (isPrivate) {
+      // 处理消息
+      onProcessor(
+        'private.interaction.create',
+        {
+          name: 'private.interaction.create',
+          // 事件类型
+          Platform: platform,
+          // guild
+          // GuildId: event['guild_id'],
+          // ChannelId: event.channel_id,
+          // user
+          UserId: UserId,
+          UserKey,
+          UserName: UserName,
+          UserAvatar: UserAvatar,
+          IsMaster: isMaster,
+          IsBot: false,
+          // message
+          MessageId: event.id,
+          MessageText: MessageText,
+          OpenId: '',
+          CreateAt: Date.now(),
+          // other
+          tag: 'private.interaction.create',
+          value: null
+        },
+        event
+      )
+    } else {
+      // 处理消息
+      onProcessor(
+        'interaction.create',
+        {
+          name: 'interaction.create',
+          // 事件类型
+          Platform: platform,
+          // guild
+          GuildId: event['guild_id'],
+          ChannelId: event.channel_id,
+          // user
+          UserId: UserId,
+          UserKey,
+          UserName: UserName,
+          UserAvatar: UserAvatar,
+          IsMaster: isMaster,
+          IsBot: false,
+          // message
+          MessageId: event.id,
+          MessageText: MessageText,
+          OpenId: '',
+          CreateAt: Date.now(),
+          // other
+          tag: 'interaction.create',
+          value: null
+        },
+        event
+      )
+    }
+
     client.interactionsCallback(event.id, event.token, MessageText)
   })
 
@@ -220,10 +254,10 @@ export default definePlatform(() => {
       active: {
         send: {
           channel: (channel_id, val) => {
-            return sendchannel(client, channel_id, val)
+            return sendchannel(client, { channel_id }, val)
           },
           user: async (author_id, val) => {
-            return senduser(client, author_id, val)
+            return senduser(client, { author_id: author_id }, val)
           }
         }
       },
@@ -233,15 +267,34 @@ export default definePlatform(() => {
             return Promise.all([])
           }
           const tag = event.tag
-          if (tag == 'MESSAGE_CREATE') {
+          if (tag == 'message.create') {
             const ChannelId = event.value.channel_id
-            return sendchannel(client, ChannelId, val)
-          } else if (tag == 'MESSAGE_CREATE_PRIVATE') {
+            return sendchannel(client, { channel_id: ChannelId }, val)
+          } else if (tag == 'private.message.create') {
             const UserId = event.value.author.id
-            return senduser(client, UserId, val)
-          } else if (tag == 'INTERACTION_CREATE') {
             const ChannelId = event.value.channel_id
-            return sendchannel(client, ChannelId, val)
+            return senduser(
+              client,
+              {
+                channel_id: ChannelId,
+                author_id: UserId
+              },
+              val
+            )
+          } else if (tag == 'interaction.create') {
+            const ChannelId = event.value.channel_id
+            return sendchannel(client, { channel_id: ChannelId }, val)
+          } else if (tag == 'private.interaction.create') {
+            const UserId = event.value.user.id
+            const ChannelId = event.value.channel_id
+            return senduser(
+              client,
+              {
+                channel_id: ChannelId,
+                author_id: UserId
+              },
+              val
+            )
           }
           return Promise.all([])
         },

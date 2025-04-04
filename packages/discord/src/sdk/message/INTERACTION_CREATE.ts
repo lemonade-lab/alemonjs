@@ -1,4 +1,17 @@
-type DiscordMessage = {
+interface User {
+  username: string
+  public_flags: number
+  primary_guild: null
+  id: string
+  global_name: string | null
+  discriminator: string
+  collectibles: null
+  clan: null
+  avatar_decoration_data: null
+  avatar: string
+}
+
+type Message = {
   type: number
   tts: boolean
   timestamp: string
@@ -13,12 +26,12 @@ type DiscordMessage = {
   content: string
   components: unknown[]
   channel_id: string
-  author: DiscordUser
+  author: User
   attachments: unknown[]
 }
 
-type DiscordMember = {
-  user: DiscordUser
+type Member = {
+  user: User
   unusual_dm_activity_until: string | null
   roles: string[]
   premium_since: string | null
@@ -34,27 +47,13 @@ type DiscordMember = {
   avatar: string | null
 }
 
-type DiscordUser = {
-  username: string
-  public_flags: number
-  primary_guild: string | null
-  id: string
-  global_name: string | null
-  discriminator: string
-  collectibles: unknown | null
-  clan: unknown | null
-  bot: boolean
-  avatar_decoration_data: unknown | null
-  avatar: string
-}
-
 type DiscordGuild = {
   locale: string
   id: string
   features: string[]
 }
 
-type DiscordChannel = {
+type PublicChannel = {
   type: number
   topic: string | null
   theme_color: number | null
@@ -74,29 +73,61 @@ type DiscordChannel = {
   flags: number
 }
 
-export type INTERACTION_CREATE_TYPE = {
+interface Channel {
+  type: number
+  recipients: any[]
+  recipient_flags: number
+  last_message_id: string
+  id: string
+  flags: number
+}
+
+interface Data {
+  id: number
+  custom_id: string
+  component_type: number
+}
+
+type Public = {
   version: number
   type: number
   token: string
-  message: DiscordMessage
-  member: DiscordMember
+  member: Member
+  message: Message
   locale: string
   id: string
   guild_locale: string
   guild_id: string
   guild: DiscordGuild
-  entitlements: unknown[]
-  entitlement_sku_ids: unknown[]
-  data: {
-    id: number
-    custom_id: string
-    component_type: number
-  }
+  entitlement_sku_ids: any[]
+  entitlements: any[]
+  data: Data
   context: number
   channel_id: string
-  channel: DiscordChannel
+  channel: PublicChannel
   authorizing_integration_owners: Record<string, string>
   attachment_size_limit: number
   application_id: string
   app_permissions: string
 }
+
+type Private = {
+  version: number
+  type: number
+  token: string
+  user: User
+  message: Message
+  locale: string
+  id: string
+  entitlements: any[]
+  data: Data
+  context: number
+  channel_id: string
+  channel: Channel
+  authorizing_integration_owners: Record<string, string>
+  attachment_size_limit: number
+  application_id: string
+  app_permissions: string
+}
+
+export type INTERACTION_CREATE_TYPE = Public | Private

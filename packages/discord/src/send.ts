@@ -39,8 +39,15 @@ const createButtonsData = (rows: ButtonRow[]) => {
   })
 }
 
-export const sendchannel = (client: Client, channel_id: string, val: DataEnums[]) => {
+export const sendchannel = (
+  client: Client,
+  param: {
+    channel_id: string
+  },
+  val: DataEnums[]
+) => {
   if (val.length < 0) return Promise.all([])
+  const channel_id = param?.channel_id ?? ''
   const content = val
     .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
@@ -124,10 +131,16 @@ export const sendchannel = (client: Client, channel_id: string, val: DataEnums[]
   return Promise.all([])
 }
 
-export const senduser = async (client: Client, author_id: string, val: DataEnums[]) => {
+export const senduser = async (
+  client: Client,
+  param: {
+    author_id?: string
+    channel_id?: string
+  },
+  val: DataEnums[]
+) => {
   if (val.length < 0) return Promise.all([])
-  const res = await client.userMeChannels(author_id)
-  const channel_id = res.id
+  const channel_id = param?.channel_id ?? (await client.userMeChannels(param.author_id))?.id
   const content = val
     .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
     .map(item => {
