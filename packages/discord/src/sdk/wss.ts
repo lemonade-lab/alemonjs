@@ -27,6 +27,7 @@ export class DCClient extends DCAPI {
     config.set('intent', opstion.intent)
     config.set('shard', opstion.shard)
     config.set('token', opstion.token)
+    config.set('gatewayURL', opstion.gatewayURL)
     return this
   }
 
@@ -93,17 +94,19 @@ export class DCClient extends DCAPI {
    * @param shard
    * @returns
    */
-  async connect() {
+  async connect(gatewayURL?: string) {
     // 清除序列号
     this.#seq = null
     // 清除心跳
     clearTimeout(this.#timeout_id)
     // 获取网关
-    const url = await this.gateway()
-      .then(res => res?.url)
-      .catch(err => {
-        if (this.#events['ERROR']) this.#events['ERROR'](err)
-      })
+    const url =
+      gatewayURL ??
+      (await this.gateway()
+        .then(res => res?.url)
+        .catch(err => {
+          if (this.#events['ERROR']) this.#events['ERROR'](err?.message ?? err)
+        }))
     // 没有网关
     if (!url) {
       console.error('[ws] 无法获取网关')

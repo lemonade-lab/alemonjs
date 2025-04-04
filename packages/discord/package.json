@@ -18,6 +18,9 @@
     "./package": "./package.json",
     "./desktop": "./lib/desktop.js"
   },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5"
+  },
   "alemonjs": {
     "desktop": {
       "platform": [

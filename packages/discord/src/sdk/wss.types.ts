@@ -7,6 +7,10 @@ import { DCIntentsEnum } from './types.js'
  */
 export interface DISOCRDOptions {
   /**
+   * 网关地址
+   */
+  gatewayURL?: string
+  /**
    * 钥匙
    */
   token: string

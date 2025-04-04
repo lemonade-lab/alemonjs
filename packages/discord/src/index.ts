@@ -1,15 +1,17 @@
+import './env'
 import {
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   User,
-  defineBot,
+  definePlatform,
   getConfigValue,
   onProcessor,
   useUserHashKey
 } from 'alemonjs'
-import { DCClient } from './sdk/index'
-import { MESSAGE_CREATE_TYPE } from './sdk/platform/discord/sdk/message/MESSAGE_CREATE'
-import { readFileSync } from 'fs'
+import { sendchannel, senduser } from './send'
+import { DCClient } from './sdk/wss'
+import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
+import { AvailableIntentsEventsEnum } from './sdk/types'
 export type Client = typeof DCClient.prototype
 export const client: Client = new Proxy({} as Client, {
   get: (_, prop: string) => {
@@ -22,18 +24,21 @@ export const client: Client = new Proxy({} as Client, {
   }
 })
 export const platform = 'discord'
-export default defineBot(() => {
+export default definePlatform(() => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
 
   // 创建客户端
   const client = new DCClient({
-    token: config.token
+    gatewayURL: config?.gatewayURL,
+    token: config.token,
+    shard: config?.shard ?? [0, 1],
+    intent: config?.intent ?? AvailableIntentsEventsEnum
   })
 
   // 连接
-  client.connect()
+  client.connect(config?.gatewayURL)
 
   const ImageURLToBuffer = async (url: string) => {
     const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
@@ -76,8 +81,6 @@ export default defineBot(() => {
     // 消除bot消息
     if (event.author?.bot) return
 
-    console.log('event', event)
-
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(event.author.id)
 
@@ -107,34 +110,7 @@ export default defineBot(() => {
 
     const UserAvatar = createUserAvatar(UserId, event.author.avatar)
 
-    if (event.type == 0) {
-      // 私聊
-      const e: PrivateEventMessageCreate = {
-        name: 'private.message.create',
-        // 事件类型
-        Platform: platform,
-        // guild
-        // GuildId: event.guild_id,
-        // ChannelId: event.channel_id,
-        // user
-        UserId: UserId,
-        UserKey,
-        UserName: event.author.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // message
-        MessageId: event.id,
-        MessageText: msg,
-        OpenId: '',
-        CreateAt: Date.now(),
-        // other
-        tag: 'private.message.create',
-        value: null
-      }
-      // 处理消息
-      onProcessor('private.message.create', e, event)
-    } else if (event.type == 8) {
+    if (event.type == 0 && event.member) {
       // 群聊
       const e: PublicEventMessageCreate = {
         name: 'message.create',
@@ -156,17 +132,42 @@ export default defineBot(() => {
         OpenId: '',
         CreateAt: Date.now(),
         // other
-        tag: 'message.create',
+        tag: 'MESSAGE_CREATE',
         value: null
       }
       // 处理消息
       onProcessor('message.create', e, event)
+    } else if (event.type == 0 && !event.member) {
+      // 私聊
+      const e: PrivateEventMessageCreate = {
+        name: 'private.message.create',
+        // 事件类型
+        Platform: platform,
+        // guild
+        // GuildId: event.guild_id,
+        // ChannelId: event.channel_id,
+        // user
+        UserId: UserId,
+        UserKey,
+        UserName: event.author.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        // message
+        MessageId: event.id,
+        MessageText: msg,
+        OpenId: '',
+        CreateAt: Date.now(),
+        // other
+        tag: 'MESSAGE_CREATE_PRIVATE',
+        value: null
+      }
+      // 处理消息
+      onProcessor('private.message.create', e, event)
     } else {
       // 未知类型
     }
   })
-
-  // client.on('')
 
   // 发送错误时
   client.on('ERROR', console.error)
@@ -179,208 +180,23 @@ export default defineBot(() => {
       active: {
         send: {
           channel: (channel_id, val) => {
-            if (val.length < 0) return Promise.all([])
-            const content = val
-              .filter(item => item.type == 'Mention' || item.type == 'Text')
-              .map(item => {
-                // if (item.type == 'Link') {
-                //   return `[${item.options?.title ?? item.value}](${item.value})`
-                // } else
-                if (item.type == 'Mention') {
-                  if (
-                    item.value == 'everyone' ||
-                    item.value == 'all' ||
-                    item.value == '' ||
-                    typeof item.value != 'string'
-                  ) {
-                    return `<@everyone>`
-                  }
-                  if (item.options?.belong == 'user') {
-                    return `<@${item.value}>`
-                  } else if (item.options?.belong == 'channel') {
-                    return `<#${item.value}>`
-                  }
-                  return ''
-                } else if (item.type == 'Text') {
-                  if (item.options?.style == 'block') {
-                    return `\`${item.value}\``
-                  } else if (item.options?.style == 'italic') {
-                    return `*${item.value}*`
-                  } else if (item.options?.style == 'bold') {
-                    return `**${item.value}**`
-                  } else if (item.options?.style == 'strikethrough') {
-                    return `~~${item.value}~~`
-                  }
-                  return item.value
-                }
-              })
-              .join('')
-            if (content) {
-              return Promise.all(
-                [content].map(item =>
-                  client.channelsMessages(channel_id, {
-                    content: item
-                  })
-                )
-              )
-            }
-            const images = val.filter(
-              item => item.type == 'Image' || item.type == 'ImageURL' || item.type == 'ImageFile'
-            )
-            if (images.length > 0) {
-              return Promise.all(
-                images.map(async item => {
-                  if (item.type == 'Image') {
-                    return client.channelsMessagesImage(channel_id, item.value)
-                  } else if (item.type == 'ImageURL') {
-                    return client.channelsMessagesImage(channel_id, ImageURLToBuffer(item.value))
-                  } else if (item.type == 'ImageFile') {
-                    const data = readFileSync(item.value)
-                    return client.channelsMessagesImage(channel_id, data)
-                  }
-                })
-              )
-            }
-            return Promise.all([])
+            return sendchannel(client, channel_id, val)
           },
           user: async (author_id, val) => {
-            if (val.length < 0) return Promise.all([])
-            const res = await client.userMeChannels(author_id)
-            const channel_id = res.id
-            const content = val
-              .filter(item => item.type == 'Mention' || item.type == 'Text')
-              .map(item => {
-                // if (item.type == 'Link') {
-                //   return `[${item.options?.title ?? item.value}](${item.value})`
-                // } else
-                if (item.type == 'Mention') {
-                  if (
-                    item.value == 'everyone' ||
-                    item.value == 'all' ||
-                    item.value == '' ||
-                    typeof item.value != 'string'
-                  ) {
-                    return `<@everyone>`
-                  }
-                  if (item.options?.belong == 'user') {
-                    return `<@${item.value}>`
-                  } else if (item.options?.belong == 'channel') {
-                    return `<#${item.value}>`
-                  }
-                  return ''
-                } else if (item.type == 'Text') {
-                  if (item.options?.style == 'block') {
-                    return `\`${item.value}\``
-                  } else if (item.options?.style == 'italic') {
-                    return `*${item.value}*`
-                  } else if (item.options?.style == 'bold') {
-                    return `**${item.value}**`
-                  } else if (item.options?.style == 'strikethrough') {
-                    return `~~${item.value}~~`
-                  }
-                  return item.value
-                }
-              })
-              .join('')
-            if (content) {
-              return Promise.all(
-                [content].map(item =>
-                  client.channelsMessages(channel_id, {
-                    content: item
-                  })
-                )
-              )
-            }
-            const images = val.filter(
-              item => item.type == 'Image' || item.type == 'ImageURL' || item.type == 'ImageFile'
-            )
-            if (images.length > 0) {
-              return Promise.all(
-                images.map(async item => {
-                  if (item.type == 'Image') {
-                    return client.channelsMessagesImage(channel_id, item.value)
-                  } else if (item.type == 'ImageURL') {
-                    return client.channelsMessagesImage(channel_id, ImageURLToBuffer(item.value))
-                  } else if (item.type == 'ImageFile') {
-                    const data = readFileSync(item.value)
-                    return client.channelsMessagesImage(channel_id, data)
-                  }
-                })
-              )
-            }
-            return Promise.all([])
+            return senduser(client, author_id, val)
           }
         }
       },
       use: {
         send: async (event, val) => {
           if (val.length < 0) return Promise.all([])
-          let channel_id = event.ChannelId
-          if (/private/.test(event.name)) {
-            const data = event.value
-            channel_id = data?.channel_id
-            if (!channel_id) return Promise.all([])
-          }
-          const content = val
-            .filter(item => item.type == 'Mention' || item.type == 'Text')
-            .map(item => {
-              // if (item.type == 'Link') {
-              //   return `[${item.options?.title ?? item.value}](${item.value})`
-              // } else
-              if (item.type == 'Mention') {
-                if (
-                  item.value == 'everyone' ||
-                  item.value == 'all' ||
-                  item.value == '' ||
-                  typeof item.value != 'string'
-                ) {
-                  return `<@everyone>`
-                }
-                if (item.options?.belong == 'user') {
-                  return `<@${item.value}>`
-                } else if (item.options?.belong == 'channel') {
-                  return `<#${item.value}>`
-                }
-                return ''
-              } else if (item.type == 'Text') {
-                if (item.options?.style == 'block') {
-                  return `\`${item.value}\``
-                } else if (item.options?.style == 'italic') {
-                  return `*${item.value}*`
-                } else if (item.options?.style == 'bold') {
-                  return `**${item.value}**`
-                } else if (item.options?.style == 'strikethrough') {
-                  return `~~${item.value}~~`
-                }
-                return item.value
-              }
-            })
-            .join('')
-          if (content) {
-            return Promise.all(
-              [content].map(item =>
-                client.channelsMessages(channel_id, {
-                  content: item
-                })
-              )
-            )
-          }
-          const images = val.filter(
-            item => item.type == 'Image' || item.type == 'ImageURL' || item.type == 'ImageFile'
-          )
-          if (images.length > 0) {
-            return Promise.all(
-              images.map(async item => {
-                if (item.type == 'Image') {
-                  return client.channelsMessagesImage(channel_id, item.value)
-                } else if (item.type == 'ImageURL') {
-                  return client.channelsMessagesImage(channel_id, ImageURLToBuffer(item.value))
-                } else if (item.type == 'ImageFile') {
-                  const data = readFileSync(item.value)
-                  return client.channelsMessagesImage(channel_id, data)
-                }
-              })
-            )
+          const tag = event.tag
+          if (tag == 'MESSAGE_CREATE') {
+            const channel_id = event.value?.channel_id
+            return sendchannel(client, channel_id, val)
+          } else if (tag == 'MESSAGE_CREATE_PRIVATE') {
+            const author_id = event.value?.author.id
+            return senduser(client, author_id, val)
           }
           return Promise.all([])
         },

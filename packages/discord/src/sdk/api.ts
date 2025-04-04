@@ -1,8 +1,8 @@
 import FormData from 'form-data'
-import { createPicFrom } from '../../../core/utils.js'
 import axios from 'axios'
 import { type AxiosRequestConfig } from 'axios'
 import { config } from './config.js'
+import { createPicFrom } from './core/from.js'
 
 /**
  * api接口
@@ -74,8 +74,9 @@ export class DCAPI {
 
   /**
    *
-   * @param user_id
-   * @param avatar_hash
+   * @param channel_id
+   * @param data
+   * @param headers
    * @returns
    */
   async channelsMessages(
@@ -86,6 +87,58 @@ export class DCAPI {
       embeds?: {
         title?: string
         description?: string
+      }[]
+      components?: {
+        type: number
+        components:
+          | {
+              type: number
+              style: number
+              label?: string
+              emoji?: any
+              custom_id?: string // 非高级按钮所必要的
+              sku_id?: any // 和所有的互斥（高级按钮）
+              url?: string // 和 custom_id 互斥
+              disabled?: boolean
+            }[]
+          | {
+              type: number
+              // style: number
+              custom_id?: string // 非高级按钮所必要的
+              options?: {
+                label: string
+                value: string
+                description?: string
+                emoji?: {
+                  name?: string
+                  id?: string
+                }
+              }[]
+            }[]
+          | {
+              custom_id: string
+              max_values: number
+              min_values: number
+              options: {
+                description?: string
+                emoji?: {
+                  name?: string
+                  id?: string
+                }
+                label: string
+                value: string
+              }[]
+            }[]
+          | {
+              type: number
+              custom_id: string
+              label: string
+              style: number
+              min_length: number
+              max_length: number
+              placeholder: string
+              required: boolean
+            }[]
       }[]
       files?: any[]
     },
