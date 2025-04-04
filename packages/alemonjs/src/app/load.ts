@@ -135,18 +135,14 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         mwData.push(middleware)
       }
       App.pushMiddleware(mwData)
-
-      // onMounted 完成索引识别
-      if (typeof app?.onMounted == 'function') {
-        try {
+      App.on()
+      try {
+        if (typeof app?.onMounted == 'function') {
           await app?.onMounted({ response: resData, middleware: mwData })
-          // 校验完周期后，再进行挂载。
-          // 防止校验过程中，出现初始化完周期，就执行匹配
-          App.on()
-        } catch (e) {
-          unMounted(e)
-          return
         }
+      } catch (e) {
+        unMounted(e)
+        return
       }
     } catch (e) {
       unMounted(e)

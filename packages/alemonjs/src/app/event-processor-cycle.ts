@@ -36,10 +36,8 @@ const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
   if (typeof event['MessageId'] == 'string' && event['MessageId'] != '') {
     log['MessageId'] = event['MessageId']
   }
-  if (Array.isArray(event['MessageBody'])) {
-    const content = event['MessageBody'].filter(item => item.type == 'Text').map(item => item.value)
-    const txt = content.join('')
-    log['text'] = txt
+  if (typeof event['MessageText'] == 'string' && event['MessageText'] != '') {
+    log['MessageText'] = event['MessageText']
   }
   logger.info({
     code: ResultCode.Ok,

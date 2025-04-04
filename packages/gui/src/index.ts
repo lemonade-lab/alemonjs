@@ -1,8 +1,8 @@
 import {
   DataEnums,
-  defineBot,
   getConfigValue,
   onProcessor,
+  definePlatform,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   User,
@@ -112,7 +112,7 @@ export const client: Client = new Proxy({} as Client, {
   }
 })
 
-export default defineBot(() => {
+export default definePlatform(() => {
   let value = getConfigValue()
   if (!value) value = {}
   // 获取配置
