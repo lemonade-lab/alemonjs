@@ -30,7 +30,7 @@ export const register = (client: QQBotClients) => {
    */
 
   const createUserAvatarURL = (author_id: string) => {
-    return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/ 640`
+    return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/640`
   }
 
   // 监听消息

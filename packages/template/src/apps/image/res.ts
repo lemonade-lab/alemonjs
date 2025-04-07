@@ -12,7 +12,7 @@ const response = onResponse(selects, () => {
   console.log(regular)
   // 发送本地图片文件
   return {
-    data: [Image.file(url)]
+    data: [Image.file(decodeURIComponent(url))]
   }
 })
 export default onResponse(selects, [frontResponse.current, response.current])

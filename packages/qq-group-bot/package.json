@@ -21,7 +21,7 @@
     "mime-types": "^2.1.35",
     "public-ip": "^6.0.1",
     "qrcode": "^1.5.3",
-    "ws": "^8.13.0"
+    "ws": "^8.18.1"
   },
   "types": "lib",
   "exports": {

@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/onebot",
-  "version": "0.2.2",
+  "version": "0.2.5",
   "description": "onebot",
   "author": "lemonade",
   "license": "MIT",
@@ -20,6 +20,9 @@
   "keywords": [
     "alemonjs"
   ],
+  "dependencies": {
+    "ws": "^8.18.1"
+  },
   "alemonjs": {
     "desktop": {
       "platform": [

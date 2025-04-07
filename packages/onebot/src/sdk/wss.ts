@@ -1,4 +1,4 @@
-import ws from 'ws'
+import WebSocket, { WebSocketServer } from 'ws'
 import { randomUUID } from 'crypto'
 import {
   MESSAGES_TYPE,
@@ -11,6 +11,10 @@ type OneBotEventMap = {
   DIRECT_MESSAGE: DIRECT_MESSAGE_TYPE
   MESSAGES: MESSAGES_TYPE
   META: meta_event_lifecycle | meta_event_heartbeat
+  REQUEST_ADD_FRIEND: any
+  REQUEST_ADD_GROUP: any
+  NOTICE_GROUP_MEMBER_INCREASE: any
+  NOTICE_GROUP_MEMBER_REDUCE: any
   ERROR: any
 }
 
@@ -48,7 +52,7 @@ export class OneBotClient {
     }
   }
 
-  #ws: ws | null = null
+  #ws: WebSocket | null = null
 
   #events: {
     [K in keyof OneBotEventMap]?: (event: OneBotEventMap[K]) => any
@@ -106,18 +110,36 @@ export class OneBotClient {
             if (this.#events['MESSAGES']) this.#events['MESSAGES'](event)
           } else if (event?.message_type == 'private') {
             if (this.#events['DIRECT_MESSAGE']) this.#events['DIRECT_MESSAGE'](event)
-          } else {
-            console.info('未知消息类型', event)
           }
           return
         } else if (event?.post_type == 'notice') {
-          console.info('暂未处理事件', event)
+          if (event?.notice_type == 'group_increase') {
+            // 群成员增加
+            if (this.#events['NOTICE_GROUP_MEMBER_INCREASE'])
+              this.#events['NOTICE_GROUP_MEMBER_INCREASE'](event)
+          } else if (event?.notice_type == 'group_decrease') {
+            // 群成员减少
+            if (this.#events['NOTICE_GROUP_MEMBER_REDUCE'])
+              this.#events['NOTICE_GROUP_MEMBER_REDUCE'](event)
+          }
           return
         } else if (event?.post_type == 'request') {
-          console.info('暂未处理事件', event)
+          // 收到加群 或 加好友的请求。
+          if (event?.request_type == 'friend') {
+            if (this.#events['REQUEST_ADD_FRIEND']) this.#events['REQUEST_ADD_FRIEND'](event)
+          } else if (event?.request_type == 'group') {
+            if (this.#events['REQUEST_ADD_GROUP']) this.#events['REQUEST_ADD_GROUP'](event)
+          }
           return
-        } else {
-          console.info('未知事件', event)
+        } else if (
+          event?.echo === 'get_friend_list' ||
+          event?.echo === 'get_group_list' ||
+          event?.echo === 'get_group_member_list'
+        ) {
+          // 处理获取好友列表和群列表的响应
+          // if (this.#events['META']) this.#events['META'](event)
+          // console.debug('响应', event)
+          return
         }
 
         if (!event?.post_type && event?.echo && this.#echo[event?.echo]) {
@@ -152,7 +174,7 @@ export class OneBotClient {
     if (!this.#ws) {
       if (reverse_enable) {
         // reverse_open
-        const server = new ws.Server({ port: reverse_port ?? 17158 })
+        const server = new WebSocketServer({ port: reverse_port ?? 17158 })
         server.on('connection', ws => {
           this.#ws = ws
           // message
@@ -163,7 +185,7 @@ export class OneBotClient {
         })
       } else {
         // forward_open
-        this.#ws = new ws(url, c)
+        this.#ws = new WebSocket(url, c)
         this.#ws.on('open', () => {
           console.debug(`open:${url}`)
         })
@@ -176,7 +198,23 @@ export class OneBotClient {
   }
 
   /**
-   *
+   * 发送私聊消息
+   * @param options
+   * @returns
+   */
+  sendPrivateMessage(options: { user_id: number; message: any[] }) {
+    if (!this.#ws) return
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'send_private_msg',
+        params: options,
+        echo: randomUUID()
+      })
+    )
+  }
+
+  /**
+   * 发送群消息
    * @param options
    * @returns
    */
@@ -192,14 +230,101 @@ export class OneBotClient {
   }
 
   /**
+   * 发送消息
    * @param options
    * @returns
    */
-  sendPrivateMessage(options: { user_id: number; message: any[] }) {
+  sendMessage(options: {
+    message_type: 'private' | 'group'
+    group_id?: number
+    user_id?: number
+    message: any[]
+  }) {
     if (!this.#ws) return
     return this.#ws.send(
       JSON.stringify({
-        action: 'send_private_msg',
+        action: 'send_msg',
+        params: options,
+        echo: randomUUID()
+      })
+    )
+  }
+
+  /**
+   * 好友列表
+   */
+  getFriendList() {
+    if (!this.#ws) return
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'get_friend_list',
+        params: {},
+        echo: 'get_friend_list'
+      })
+    )
+  }
+
+  /**
+   * 群列表
+   */
+  getGroupList() {
+    if (!this.#ws) return
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'get_group_list',
+        params: {},
+        echo: 'get_group_list'
+      })
+    )
+  }
+
+  /**
+   * 群成员列表
+   * @param options
+   * @returns
+   */
+  getGroupMemberList(options: { group_id: number }) {
+    if (!this.#ws) return
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'get_group_member_list',
+        params: options,
+        echo: 'get_group_member_list'
+      })
+    )
+  }
+
+  /**
+   * 处理好友请求
+   * @param options
+   * @returns
+   */
+  setFriendAddRequest(options: { flag: string; approve: boolean; remark?: string }) {
+    if (!this.#ws) return
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'set_friend_add_request',
+        params: options,
+        echo: randomUUID()
+      })
+    )
+  }
+
+  /**
+   * 处理群请求
+   * @param options
+   * @returns
+   */
+  setGroupAddRequest(options: {
+    flag: string
+    sub_type: string
+    approve: boolean
+    reason?: string
+  }) {
+    if (!this.#ws) return
+    return this.#ws.send(
+      JSON.stringify({
+        action: 'set_group_add_request',
         params: options,
         echo: randomUUID()
       })
@@ -228,6 +353,4 @@ export class OneBotClient {
         })
     )
   }
-
-  //
 }
