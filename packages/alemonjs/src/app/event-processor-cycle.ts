@@ -14,6 +14,7 @@ import {
   expendSubscribeMount,
   expendSubscribeUnmount
 } from './event-processor-subscribe'
+import { getConfigValue } from '../config'
 
 /**
  * 打印日志
@@ -87,7 +88,15 @@ export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], se
     }
     expendMiddleware(valueEvent, select, nextMount)
   }
-  showLog(valueEvent, select)
+  const value = getConfigValue() ?? {}
+  if (Array.isArray(value?.logs?.channel_id)) {
+    const channelIds = value?.logs?.channel_id
+    if (channelIds && channelIds.length > 0 && channelIds.includes(valueEvent['ChannelId'])) {
+      showLog(valueEvent, select)
+    }
+  } else {
+    showLog(valueEvent, select)
+  }
   // create
   expendSubscribeCreate(valueEvent, select, nextCreate)
 }

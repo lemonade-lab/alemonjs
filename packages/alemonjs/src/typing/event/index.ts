@@ -12,13 +12,16 @@ export type CurrentResult = {
   [key: string]: any
 }
 
+export type CurrentResultValue =
+  | void
+  | CurrentResult['allowGrouping']
+  | CurrentResult
+  | CurrentResult['data']
+
 /**
  * 当前事件
  */
-export type Current<T extends EventKeys> = (
-  event: Events[T],
-  next: Next
-) => void | CurrentResult['allowGrouping'] | CurrentResult | CurrentResult['data']
+export type Current<T extends EventKeys> = (event: Events[T], next: Next) => CurrentResultValue
 
 /**
  * 定义一个响应

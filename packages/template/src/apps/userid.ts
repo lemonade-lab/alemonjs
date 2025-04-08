@@ -2,7 +2,7 @@
 // 用于自由插入前置逻辑
 import { createSelects } from 'alemonjs'
 const selects = createSelects(['message.create', 'private.message.create'])
-export default onResponse(selects, event => {
+export default onResponse(selects, (event, next, end) => {
   // 可以称之为局部中间件。
   event['user_id'] = event.UserId
 
@@ -16,7 +16,7 @@ export default onResponse(selects, event => {
   // 允许继承
   return {
     // 事件响应
-    allowGrouping: true
+    // allowGrouping: true
     // data: [Text('userid' + event.UserId)]
   }
 })

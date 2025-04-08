@@ -6,6 +6,7 @@ import {
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   ResultCode,
+  User,
   useUserHashKey
 } from 'alemonjs'
 import { OneBotClient } from './sdk/wss'
@@ -60,7 +61,7 @@ export default definePlatform(() => {
   })
 
   client.on('MESSAGES', event => {
-    const uis = config.master_uids ?? []
+    const uis = config?.master_id ?? []
     let msg = ''
     const arr: {
       text: string
@@ -128,7 +129,7 @@ export default definePlatform(() => {
   })
 
   client.on('DIRECT_MESSAGE', event => {
-    const uis = config.master_uids ?? []
+    const uis = config?.master_id ?? []
     let msg = ''
     const arr: {
       text: string
@@ -359,7 +360,48 @@ export default definePlatform(() => {
           }
           return Promise.all([])
         },
-        mention: async () => {
+        mention: async event => {
+          const uis = config?.master_id ?? []
+          const e = event.value
+          if (event['name'] == 'message.create' || event['name'] == 'private.message.create') {
+            const Metions: User[] = []
+            for (const item of e.message) {
+              if (item.type == 'at') {
+                let isBot = false
+                if (item.data.qq == 'all') {
+                  continue
+                }
+                if (item.data.qq == MyBot.id) {
+                  isBot = true
+                }
+                const avatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${item.data.qq}`
+                Metions.push({
+                  UserId: item.data.qq,
+                  UserKey: useUserHashKey({
+                    Platform: platform,
+                    UserId: item.data.qq
+                  }),
+                  UserName: item.data?.nickname,
+                  UserAvatar: {
+                    toBuffer: async () => {
+                      const arrayBuffer = await fetch(avatar).then(res => res.arrayBuffer())
+                      return Buffer.from(arrayBuffer)
+                    },
+                    toBase64: async () => {
+                      const arrayBuffer = await fetch(avatar).then(res => res.arrayBuffer())
+                      return Buffer.from(arrayBuffer).toString('base64')
+                    },
+                    toURL: async () => {
+                      return avatar
+                    }
+                  },
+                  IsMaster: uis.includes(item.data.qq),
+                  IsBot: isBot
+                })
+              }
+            }
+            return Metions
+          }
           return []
         }
       }

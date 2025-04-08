@@ -6,7 +6,15 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import { Next, Events, OnResponseValue, Current, EventKeys } from '../typings'
+import {
+  Next,
+  Events,
+  OnResponseValue,
+  Current,
+  EventKeys,
+  CurrentResult,
+  CurrentResultValue
+} from '../typings'
 import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Response } from './store'
@@ -74,13 +82,7 @@ export const expendEvent = async <T extends EventKeys>(
         regular?: string | RegExp
       } = await import(`file://${file.path}`)
 
-      if (!app?.default) {
-        // 继续
-        nextEvent()
-        return
-      }
-
-      if (!app.default?.current) {
+      if (!app?.default || !app?.default?.current || !app?.default?.select) {
         // 继续
         nextEvent()
         return
@@ -96,22 +98,13 @@ export const expendEvent = async <T extends EventKeys>(
         }
       }
 
-      // 如果是数组
-      if (Array.isArray(app.default?.select)) {
-        // 没有匹配到
-        if (!app.default.select.includes(select)) {
-          // 继续
-          nextEvent()
-          return
-        }
-        // 如果不是数组
-      } else {
-        // 没有匹配到
-        if (app.default?.select !== select) {
-          // 继续
-          nextEvent()
-          return
-        }
+      const selects = Array.isArray(app.default.select) ? app.default.select : [app.default.select]
+
+      // 没有匹配到
+      if (!selects.includes(select)) {
+        // 继续
+        nextEvent()
+        return
       }
 
       // 消息类型数据
@@ -126,94 +119,54 @@ export const expendEvent = async <T extends EventKeys>(
         }
       }
 
-      if (Array.isArray(app.default.current)) {
-        let i = 0
-        let T = true
-        let isNext = false
-
-        const onRes = (res: any) => {
-          if (isNext) {
-            // 内部调用了next
-            return
+      const currents = Array.isArray(app.default.current)
+        ? app.default.current
+        : [app.default.current]
+      let index = 0
+      let isClose = false
+      let isNext = false
+      const onRes = (res: CurrentResultValue) => {
+        if (!res) {
+          isClose = true
+          return
+        }
+        if (Array.isArray(res)) {
+          if (res.length > 0) {
+            // 发送数据
+            Send(...res)
           }
-          if (typeof res === 'boolean') {
-            T = res
-          } else if (Array.isArray(res)) {
-            if (res.length > 0) {
-              // 发送数据
-              Send(...res)
-            }
-          } else if (typeof res === 'object') {
-            if (typeof res?.allowGrouping === 'boolean') {
-              T = res.allowGrouping
-            }
-            if (Array.isArray(res.data)) {
-              // 发送数据
-              Send(...res.data)
-            }
+          isClose = true
+        } else if (typeof res === 'object') {
+          if (Array.isArray(res.data)) {
+            // 发送数据
+            Send(...res.data)
+          }
+          if (!res.allowGrouping) {
+            isClose = true
           }
         }
-
-        const start = async () => {
-          if (i >= app.default.current.length) return
-          // 不是真的
-          if (!T) return
-          if (isAsyncFunction(app.default.current[i])) {
-            const res = await app.default.current[i](valueEvent, (...cns: boolean[]) => {
-              isNext = true
-              nextEvent(...cns)
-            })
-            onRes(res)
-          } else {
-            const res = app.default.current[i](valueEvent, (...cns: boolean[]) => {
-              isNext = true
-              nextEvent(...cns)
-            })
-            onRes(res)
-          }
-          ++i
-          await start()
-        }
-        await start()
-      } else {
-        let isNext = false
-        const onRes = (res: any) => {
-          if (isNext) {
-            // 内部调用了next
-            return
-          }
-          if (typeof res === 'boolean') {
-            // T = res
-          } else if (Array.isArray(res)) {
-            if (res.length > 0) {
-              // 发送数据
-              Send(...res)
-            }
-          } else if (typeof res === 'object') {
-            if (typeof res?.allowGrouping === 'boolean') {
-              // T = res.allowGrouping
-            }
-            if (Array.isArray(res.data)) {
-              // 发送数据
-              Send(...res.data)
-            }
-          }
-        }
-        // 这里是否继续时 next 说了算
-        if (isAsyncFunction(app.default?.current)) {
-          const res = await app.default?.current(valueEvent, (...cns: boolean[]) => {
+      }
+      const start = async () => {
+        if (index >= currents.length) return
+        if (isNext) return
+        if (isClose) return
+        if (isAsyncFunction(currents[index])) {
+          const res = await currents[index](valueEvent, (...cns: boolean[]) => {
             isNext = true
             nextEvent(...cns)
           })
           onRes(res)
         } else {
-          const res = app.default?.current(valueEvent, (...cns: boolean[]) => {
+          const res = currents[index](valueEvent, (...cns: boolean[]) => {
             isNext = true
             nextEvent(...cns)
           })
           onRes(res)
         }
+        ++index
+        start()
       }
+      start()
     } catch (err) {
       showErrorModule(err)
     }
