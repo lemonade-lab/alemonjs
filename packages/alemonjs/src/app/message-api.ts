@@ -1,5 +1,5 @@
 import { DataEnums } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 
 /**
  * 创建数据格式。

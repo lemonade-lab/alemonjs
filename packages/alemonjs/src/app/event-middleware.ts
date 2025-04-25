@@ -4,7 +4,7 @@
  * @author ningmengchongshui
  */
 import { OnMiddlewareReversalFunc, OnMiddlewareFunc } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 /**
  * 中间件
  * @param select 事件选择

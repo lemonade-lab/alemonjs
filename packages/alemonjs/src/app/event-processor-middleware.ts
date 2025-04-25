@@ -11,7 +11,7 @@ import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Middleware } from './store'
 import { useSend } from './hook-use-api'
-import { EventMessageText } from './config'
+import { EventMessageText } from '../core/variable'
 
 /**
  * 处理中间件

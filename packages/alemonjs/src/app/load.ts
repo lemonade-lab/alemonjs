@@ -10,9 +10,9 @@ import {
 } from '../typings'
 import { createRequire } from 'module'
 import { ChildrenApp } from './store.js'
-import { ResultCode } from '../code.js'
+import { ResultCode } from '../core/code.js'
+import { file_suffix_middleware } from '../core/variable.js'
 const require = createRequire(import.meta.url)
-const mwReg = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/
 
 /**
  * 加载子模块
@@ -118,7 +118,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
        * load middleware files
        */
       const mwDir = join(mainDir, 'middleware')
-      const mwFiles = getRecursiveDirFiles(mwDir, item => mwReg.test(item.name))
+      const mwFiles = getRecursiveDirFiles(mwDir, item => file_suffix_middleware.test(item.name))
       const mwData: StoreMiddlewareItem[] = []
       for (const file of mwFiles) {
         // 切掉 mainDir

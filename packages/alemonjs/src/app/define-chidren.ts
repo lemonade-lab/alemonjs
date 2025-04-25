@@ -1,5 +1,5 @@
 import { DefineChildrenFunc } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 /**
  * 定义子事件
  * @param callback

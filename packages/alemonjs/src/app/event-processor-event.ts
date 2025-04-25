@@ -6,20 +6,12 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types'
-import {
-  Next,
-  Events,
-  OnResponseValue,
-  Current,
-  EventKeys,
-  CurrentResult,
-  CurrentResultValue
-} from '../typings'
+import { Next, Events, OnResponseValue, Current, EventKeys, CurrentResultValue } from '../typings'
 import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Response } from './store'
 import { useSend } from './hook-use-api'
-import { EventMessageText } from './config'
+import { EventMessageText } from '../core/variable'
 
 /**
  * 消息体处理机制

@@ -6,7 +6,7 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventKeys } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 import { expendEvent } from './event-processor-event'
 import { expendMiddleware } from './event-processor-middleware'
 import {
@@ -14,7 +14,7 @@ import {
   expendSubscribeMount,
   expendSubscribeUnmount
 } from './event-processor-subscribe'
-import { getConfigValue } from '../config'
+import { getConfigValue } from '../core/config'
 
 /**
  * 打印日志

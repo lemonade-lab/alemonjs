@@ -1,13 +1,15 @@
-import { getConfigValue } from '../config'
+import { getConfigValue } from '../core/config'
+import {
+  processor_repeated_clear_size,
+  processor_repeated_clear_time_max,
+  processor_repeated_clear_time_min,
+  processor_repeated_event_time,
+  processor_repeated_user_time
+} from '../core/variable'
 import { EventKeys, Events } from '../typings'
 import { expendCycle } from './event-processor-cycle'
+import { ProcessorEventAutoClearMap, ProcessorEventUserAudoClearMap } from './store'
 import { createHash } from './utils'
-
-const MIN_TIME = 3000
-const MAX_TIME = 10000
-const CONTROL_SIZE = 37
-const eventStore = new Map()
-const userStore = new Map()
 
 /**
  * 过滤掉重复消息
@@ -46,23 +48,26 @@ const cleanupStore = ({ Now, store, INTERVAL }) => {
 const cleanupStoreAll = () => {
   const Now = Date.now()
   const value = getConfigValue()
-  const EVENT_INTERVAL = value?.ALEMONJS_EVENT_INTERVAL ?? 1000 * 60
-  const USER_INTERVAL = value?.ALEMONJS_USER_INTERVAL ?? 1000 * 1
-  cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: eventStore })
-  cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: userStore })
+  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processor_repeated_event_time
+  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processor_repeated_user_time
+  cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap })
+  cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAudoClearMap })
 }
 
 // 清理消息
 const callback = () => {
   cleanupStoreAll()
   // 下一次清理的时间，应该随着长度的增加而减少
-  const length = eventStore.size + userStore.size
+  const length = ProcessorEventAutoClearMap.size + ProcessorEventUserAudoClearMap.size
   // 长度控制在37个以内
-  const time = length > CONTROL_SIZE ? MIN_TIME : MAX_TIME
+  const time =
+    length > processor_repeated_clear_size
+      ? processor_repeated_clear_time_min
+      : processor_repeated_clear_time_max
   setTimeout(callback, time)
 }
 
-setTimeout(callback, MIN_TIME)
+setTimeout(callback, processor_repeated_clear_time_min)
 
 /**
  * 消息处理器
@@ -74,13 +79,13 @@ setTimeout(callback, MIN_TIME)
 export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
   const Now = Date.now()
   const value = getConfigValue()
-  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? 1000 * 60
-  const USER_INTERVAL = value?.processor?.repeated_user_time ?? 1000 * 1
+  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processor_repeated_event_time
+  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processor_repeated_user_time
   if (event['MessageId']) {
     // 消息过长，要减少消息的长度
     const MessageId = createHash(event['MessageId'])
     // 重复消息
-    if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: eventStore }, MessageId)) {
+    if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
       return
     }
   }
@@ -88,7 +93,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     // 编号过长，要减少编号的长度
     const UserId = createHash(event['UserId'])
     // 频繁操作
-    if (filter({ Now, INTERVAL: USER_INTERVAL, store: userStore }, UserId)) {
+    if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAudoClearMap }, UserId)) {
       return
     }
   }

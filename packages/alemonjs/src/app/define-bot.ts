@@ -1,5 +1,5 @@
 import { DefinePlatformFunc } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 /**
  * 定义机器人
  * @param callback

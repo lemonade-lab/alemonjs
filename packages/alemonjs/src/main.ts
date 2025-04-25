@@ -1,11 +1,18 @@
 import { join } from 'path'
 import { existsSync } from 'fs'
-import { getConfig, getConfigValue } from './config'
+import { getConfig, getConfigValue } from './core/config.js'
 import { loadChildren, loadChildrenFile } from './app/load.js'
 import { DefinePlatformValue } from './typings.js'
 import { getInputExportPath, showErrorModule } from './app/utils.js'
 import { useState } from './post.js'
-import { ResultCode } from './code.js'
+import { ResultCode } from './core/code.js'
+import {
+  default_login,
+  default_platform_common_prefix,
+  default_platform_prefix,
+  file_prefix_common,
+  file_prefix_framework
+} from './core/variable.js'
 
 const loadConfig = () => {
   const value = getConfigValue() ?? {}
@@ -45,9 +52,12 @@ export const run = (input: string) => {
 export const start = async (input?: string, pm?: string) => {
   const cfg = getConfig()
   const platform$1 = pm ?? cfg.argv?.platform ?? cfg.value?.platform
-  const login$1 = platform$1 ? platform$1.replace(/^(@alemonjs\/|alemonjs-)/, '') : null
-  const login = login$1 ?? cfg.argv?.login ?? cfg.value?.login ?? 'gui'
-  const prefix = platform$1 && /^alemonjs-/.test(platform$1) ? `alemonjs-` : `@alemonjs/`
+  const login$1 = platform$1 ? platform$1.replace(file_prefix_common, '') : null
+  const login = login$1 ?? cfg.argv?.login ?? cfg.value?.login ?? default_login
+  const prefix =
+    platform$1 && file_prefix_framework.test(platform$1)
+      ? default_platform_prefix
+      : default_platform_common_prefix
   const platform = `${prefix}${login}`
   // 启动机器人
   try {

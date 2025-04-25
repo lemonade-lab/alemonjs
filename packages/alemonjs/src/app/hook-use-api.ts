@@ -1,5 +1,5 @@
 import { DataEnums, EventKeys, Events, User } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 import { ChildrenApp } from './store'
 import { createResult } from './utils'
 

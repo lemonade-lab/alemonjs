@@ -1,5 +1,5 @@
 import { EventCycleEnum, Current, Events, EventKeys } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 import { SubscribeList } from './store'
 
 type KeyMap = {

@@ -4,7 +4,8 @@ import { join } from 'path'
 import path from 'path'
 import fs from 'fs'
 import { createRequire } from 'module'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
+import { file_suffix_response } from '../core/variable'
 const require = createRequire(import.meta.url)
 
 /**
@@ -67,8 +68,6 @@ export const stringToNumber = (str: string, size = 33) => {
   return hash >>> 0
 }
 
-const resReg = /^res(\.|\..*\.)(js|ts|jsx|tsx)$/
-
 /**
  * 递归获取所有文件
  * @param dir
@@ -77,7 +76,7 @@ const resReg = /^res(\.|\..*\.)(js|ts|jsx|tsx)$/
  */
 export const getRecursiveDirFiles = (
   dir: string,
-  condition: (func: Dirent) => boolean = item => resReg.test(item.name)
+  condition: (func: Dirent) => boolean = item => file_suffix_response.test(item.name)
 ): {
   path: string
   name: string

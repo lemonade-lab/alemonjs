@@ -368,18 +368,19 @@ export default definePlatform(() => {
             for (const item of e.message) {
               if (item.type == 'at') {
                 let isBot = false
-                if (item.data.qq == 'all') {
+                const uid = String(item.data.qq)
+                if (uid == 'all') {
                   continue
                 }
-                if (item.data.qq == MyBot.id) {
+                if (uid == MyBot.id) {
                   isBot = true
                 }
-                const avatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${item.data.qq}`
+                const avatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${uid}`
                 Metions.push({
-                  UserId: item.data.qq,
+                  UserId: uid,
                   UserKey: useUserHashKey({
                     Platform: platform,
-                    UserId: item.data.qq
+                    UserId: uid
                   }),
                   UserName: item.data?.nickname,
                   UserAvatar: {
@@ -395,7 +396,7 @@ export default definePlatform(() => {
                       return avatar
                     }
                   },
-                  IsMaster: uis.includes(item.data.qq),
+                  IsMaster: uis.includes(uid),
                   IsBot: isBot
                 })
               }

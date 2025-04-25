@@ -22,7 +22,7 @@ import {
   Mention as AMention,
   BT as ABT
 } from './post.js'
-import { ResultCode } from './code.js'
+import { ResultCode } from './core/code.js'
 
 /**
  *

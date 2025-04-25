@@ -5,7 +5,6 @@
  * @description 存储器
  */
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
-// import { ActionsEventEnum, EventCycleEnum, EventKeys, Events } from '../typings'
 import {
   ChildrenCycle,
   EventCycleEnum,
@@ -300,3 +299,6 @@ export class ChildrenApp {
     return alemonjsCore.storeChildrenApp[this.#name]
   }
 }
+
+export const ProcessorEventAutoClearMap = new Map()
+export const ProcessorEventUserAudoClearMap = new Map()

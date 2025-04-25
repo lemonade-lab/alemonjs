@@ -1,5 +1,5 @@
 import { OnResponseReversalFunc, OnResponseFunc } from '../typings'
-import { ResultCode } from '../code'
+import { ResultCode } from '../core/code'
 
 /**
  * 处理响应事件
