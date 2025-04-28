@@ -1,6 +1,6 @@
-# [https://alemonjs.com/](https://alemonjs.com/)
+# ALemonJS
 
-聊天机器人开发框架
+基于javascript所构建的，聊天机器人开发框架
 
 ```ts
 import { Text, useSend } from 'alemonjs'
@@ -13,21 +13,20 @@ export default OnResponse(event => {
 }, 'message.create')
 ```
 
-> VSCode 插件 [alemonjs-gui](https://marketplace.visualstudio.com/items?itemName=lemonade-x.alemonjs-gui)
 
-> QQ Group 806943302
+
+## 平台支持情况
 
 | Project                | Status                      | Description    |
 | ---------------------- | --------------------------- | -------------- |
-| 👉[alemonjs]           | [![a-s]][a-p]               | 核心库         |
-| 👉[@alemonjs/gui]      | [![gui-s]][gui-p]           | test gui       |
+| 👉[@alemonjs/gui]      | [![gui-s]][gui-p]           | 测试平台       |
 | 👉[@alemonjs/qq-bot]   | [![qq-bot-s]][qq-bot-p]     | QQbot          |
-| 👉[@alemonjs/qq]       | [![qq-s]][qq-p]             | icqq           |
 | 👉[@alemonjs/discord]  | [![discord-s]][discord-p]   | discord        |
 | 👉[@alemonjs/kook]     | [![kook-s]][kook-p]         | KOOK           |
 | 👉[@alemonjs/telegram] | [![telegram-s]][telegram-p] | telegram       |
-| 👉[@alemonjs/onebot]   | [![onebot-s]][onebot-p]     | onebot V11&V12 |
-| 👉[@alemonjs/wechat]   | [![wechat-s]][wechat-p]     | 微信           |
+| 👉[@alemonjs/qq]       | [![qq-s]][qq-p]             | icqq           |
+| 👉[@alemonjs/onebot]   | [![onebot-s]][onebot-p]     | onebot     |
+| 👉[@alemonjs/wechat]   | [![wechat-s]][wechat-p]     | wechat           |
 
 [alemonjs]: https://github.com/lemonade-lab/alemonjs
 [a-s]: https://img.shields.io/npm/v/alemonjs.svg
@@ -56,3 +55,60 @@ export default OnResponse(event => {
 [@alemonjs/wechat]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/wechat
 [wechat-s]: https://img.shields.io/npm/v/@alemonjs/wechat.svg
 [wechat-p]: https://www.npmjs.com/package/@alemonjs/wechat
+
+## 生态列表
+
+| Project                | Status                      | Description    |
+| ---------------------- | --------------------------- | -------------- |
+| 👉[gui]            |        |  VsCode 扩展：可视化测试环境     |
+| 👉[dev]            |        |  开发环境     |
+| 👉[desktop]            |        |  桌面版    |
+| 👉[web]            |        |  WEB一站式面板    |
+
+[gui]: https://marketplace.visualstudio.com/items?itemName=lemonade-x.alemonjs-gui
+[dev]: https://github.com/lemonade-lab/lvyjs
+[desktop]: https://github.com/lemonade-lab/alemonjs-desktop
+[web]: https://github.com/lemonade-lab/alemongo
+
+
+## 开放应用
+
+### recreation
+
+| 项目名            | 类型                    | 说明          |
+| ----------------- | ----------------------- | ------------- |
+| [alemonjs-cheese] | [![cheese-s]][cheese-p] | AI+今日运势等 |
+
+[alemonjs-cheese]: https://github.com/V2233/alemonjs-cheese
+[cheese-s]: https://img.shields.io/npm/v/alemonjs-cheese.svg
+[cheese-p]: https://www.npmjs.com/package/alemonjs-cheese
+
+### game
+
+| 项目名             | 类型                    | 说明         |
+| ------------------ | ----------------------- | ------------ |
+| [alemonjs-xianyu]  | [![xianyu-s]][xianyu-p] | 扫雷等小游戏 |
+
+[alemonjs-xianyu]: https://gitee.com/suancaixianyu/xianyu-plugin/tree/alemonjs/
+[xianyu-s]: https://img.shields.io/npm/v/alemonjs-xianyu.svg
+[xianyu-p]: https://www.npmjs.com/package/alemonjs-xianyu
+
+### AI
+
+| 项目名            | 类型                    | 说明                 |
+| ----------------- | ----------------------- | -------------------- |
+| [alemonjs-openai] | [![openai-s]][openai-p] | 连接符合openAI的模型 |
+
+[alemonjs-openai]: https://github.com/xiuxianjs/ollama
+[openai-s]: https://img.shields.io/npm/v/alemonjs-openai.svg
+[openai-p]: https://www.npmjs.com/package/alemonjs-openai
+
+## 贡献
+
+<a href="https://github.com/lemonade-lab/docs/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=lemonade-lab/alemonjs" />
+</a>
+
+## 联系方式
+
+> QQ Group 806943302
