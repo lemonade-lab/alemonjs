@@ -152,6 +152,12 @@ BT.row = ButtonRows
 
 export { BT }
 
+export function Format(_props: { children?: React.ReactNode }) {
+  return React.createElement('div', {
+    dataType: 'Format'
+  })
+}
+
 /**
  *  转换数据
  * ***
@@ -237,6 +243,22 @@ export function JSX(...arg: React.JSX.Element[]) {
           data.push(ABT.group(...rows))
         }
       }
+    } else if (dataType === 'Format') {
+      // Format 的 children 就是直接复用 JSX
+      let children = []
+      if (Array.isArray(props?.children)) {
+        children = props?.children
+      } else {
+        children = [props?.children]
+      }
+      if (children.length > 0) {
+        const format = JSX(...children)
+        format.forEach(item => {
+          if (item) {
+            data.push(item)
+          }
+        })
+      }
     }
   }
   if (data.length === 0) {
@@ -257,6 +279,18 @@ export function JSX(...arg: React.JSX.Element[]) {
 export const useSend = <T extends EventKeys>(e: Events[T]) => {
   const Send = useS(e)
   return (...arg: React.JSX.Element[]) => Send(...JSX(...arg))
+}
+
+/**
+ * 发送消息
+ * @param e
+ * @returns
+ */
+export const useSends = <T extends EventKeys>(e: Events[T]) => {
+  const Send = useS(e)
+  // 要求arg只能是 Format
+  const send = (arg: React.JSX.Element) => Send(...JSX(arg))
+  return [send]
 }
 
 /**

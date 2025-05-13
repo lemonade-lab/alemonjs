@@ -1,7 +1,7 @@
-import { createSendDataFormat, createSelects, Text, sendToChannel } from 'alemonjs'
+import { createSendDataFormat, Text, sendToChannel } from 'alemonjs'
 export const regular = /^(#|\/)?channel$/
 let id = null
-const selects = createSelects('message.create')
+const selects = onSelects('message.create')
 export default onResponse(selects, event => {
   if (id) {
     clearInterval(id)

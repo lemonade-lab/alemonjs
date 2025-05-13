@@ -1,8 +1,8 @@
-import { createSelects, Image } from 'alemonjs'
+import { Image } from 'alemonjs'
 import url from '@src/asstes/alemonjs.png'
 import frontResponse from '@src/apps/userid'
 export const regular = /^(#|\/)?image$/
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',

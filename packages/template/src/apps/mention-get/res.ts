@@ -1,6 +1,6 @@
-import { useMention, createSelects } from 'alemonjs'
+import { useMention } from 'alemonjs'
 export const regular = /^(#|\/)?getmention$/
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',

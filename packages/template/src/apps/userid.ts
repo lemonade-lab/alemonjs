@@ -1,8 +1,7 @@
 // 一组响应事件。共用一个 next。
 // 用于自由插入前置逻辑
-import { createSelects } from 'alemonjs'
-const selects = createSelects(['message.create', 'private.message.create'])
-export default onResponse(selects, (event, next, end) => {
+const selects = onSelects(['message.create', 'private.message.create'])
+export default onResponse(selects, (event, next) => {
   // 可以称之为局部中间件。
   event['user_id'] = event.UserId
 

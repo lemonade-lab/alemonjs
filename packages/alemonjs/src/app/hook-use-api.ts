@@ -123,6 +123,24 @@ export const useSend = <T extends EventKeys>(event: Events[T]) => {
   }
 }
 
+export const useSends = <T extends EventKeys>(event: Events[T]) => {
+  if (!event || typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid event: event must be an object',
+      data: null
+    })
+    throw new Error('Invalid event: event must be an object')
+  }
+  const send = async (val: DataEnums[]) => {
+    if (!val || val.length === 0) {
+      return createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)
+    }
+    return await alemonjsBot.api.use.send(event, val)
+  }
+  return [send]
+}
+
 /**
  * 卸载模块
  * @param name
@@ -158,4 +176,11 @@ export const unMount = () => {
  * @param values
  * @returns
  */
-export const createSelects = <T extends EventKeys[] | EventKeys>(values: T) => values
+export const onSelects = <T extends EventKeys[] | EventKeys>(values: T) => values
+global.onSelects = onSelects
+
+/**
+ * 废弃,请使用onSelects
+ * @deprecated
+ */
+export const createSelects = onSelects

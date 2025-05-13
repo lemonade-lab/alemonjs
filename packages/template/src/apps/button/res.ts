@@ -1,7 +1,7 @@
-import { BT, createSelects, Text, useSend } from 'alemonjs'
+import { BT, Text, useSend } from 'alemonjs'
 import { platform, useMode } from '@alemonjs/qq-bot'
 export const regular = /^(#|\/)?buttonx$/
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',

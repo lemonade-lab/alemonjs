@@ -1,7 +1,7 @@
-import { Text, createSelects, useSend } from 'alemonjs'
+import { Text, useSend } from 'alemonjs'
 import { platform } from '@alemonjs/kook'
 
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',

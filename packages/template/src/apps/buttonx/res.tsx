@@ -1,19 +1,22 @@
 import React from 'react'
-import { createSelects } from 'alemonjs'
-import { BT, useSend } from 'alemonjs/jsx'
+import { BT, Format, useSends } from 'alemonjs/jsx'
 import { platform, useMode } from '@alemonjs/qq-bot'
 export const regular = /^(#|\/)?button-jsx$/
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',
   'private.interaction.create'
 ])
 const response = onResponse(selects, event => {
-  const Send = useSend(event)
+  const [send] = useSends(event)
   const isMode = useMode(event)
   if (event.Platform == platform && isMode('group')) {
-    Send(<BT.template id="appid_1742790363" />)
+    send(
+      <Format>
+        <BT.template id="appid_1742790363" />
+      </Format>
+    )
   }
 })
 export default response

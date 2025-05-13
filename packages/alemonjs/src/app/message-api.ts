@@ -1,4 +1,4 @@
-import { DataEnums } from '../typings'
+import { DataEnums, OnDataFormatFunc } from '../typings'
 import { ResultCode } from '../core/code'
 
 /**
@@ -7,7 +7,7 @@ import { ResultCode } from '../core/code'
  * @returns {DataEnums[]} - 返回格式化后的数据数组。
  * @throws {Error} - 如果 data 无效，抛出错误。
  */
-export const createSendDataFormat = (...data: DataEnums[]): DataEnums[] => {
+export const format: OnDataFormatFunc = (...data) => {
   if (!data || data.length === 0) {
     logger.error({
       code: ResultCode.FailParams,
@@ -18,6 +18,14 @@ export const createSendDataFormat = (...data: DataEnums[]): DataEnums[] => {
   }
   return data
 }
+
+global.format = format
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export const createSendDataFormat = format
 
 /**
  * 向指定频道发送消息。

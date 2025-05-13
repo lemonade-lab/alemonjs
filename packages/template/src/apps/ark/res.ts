@@ -1,7 +1,7 @@
-import { Ark, createSelects, Text, useSend } from 'alemonjs'
+import { Ark, Text, useSend } from 'alemonjs'
 import { useMode, platform } from '@alemonjs/qq-bot'
 export const regular = /^(#|\/)?ark$/
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',

@@ -1,5 +1,4 @@
-import { createSelects } from 'alemonjs'
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',

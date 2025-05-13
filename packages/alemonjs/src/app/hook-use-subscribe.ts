@@ -64,12 +64,17 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], select: T) =
 }
 
 /**
- * 使用观察者
- * @param event
- * @param option
- * @returns
+ * 废弃，请使用
+ * ***
+ * const [_, observer] = useSubscribe(event, option)
+ * ***
+ * observer()
+ * ***
+ * @deprecated
  */
 export const useObserver = <T extends EventKeys>(event: Events[T], option: T) => {
   const [_, mount] = useSubscribe(event, option)
   return mount
 }
+
+useObserver

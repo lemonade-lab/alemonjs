@@ -1,10 +1,9 @@
 import React from 'react'
-import { createSelects } from 'alemonjs'
 import { Text, useSend, ImageFile, ImageURL, Image, Mention } from 'alemonjs/jsx'
 import url from '@src/asstes/alemonjs.png'
 import { readFileSync } from 'fs'
 export const regular = /^(#|\/)?jsx$/
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',

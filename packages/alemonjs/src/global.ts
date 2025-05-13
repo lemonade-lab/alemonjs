@@ -4,7 +4,9 @@ import {
   OnMiddlewareFunc,
   OnResponseFunc,
   OnResponseReversalFunc,
-  OnMiddlewareReversalFunc
+  OnMiddlewareReversalFunc,
+  OnSelectsFunc,
+  OnDataFormatFunc
 } from './typing/event'
 import { ClientAPI } from './typing/client'
 import { StoreChildrenApp } from './typing/store/res'
@@ -76,6 +78,14 @@ declare global {
    * 定义一个平台
    */
   var definePlatform: DefinePlatformFunc
+  /**
+   * 定义选择器
+   */
+  var onSelects: OnSelectsFunc
+  /**
+   * 定义数据格式
+   */
+  var format: OnDataFormatFunc
 }
 
 // 初始化日志

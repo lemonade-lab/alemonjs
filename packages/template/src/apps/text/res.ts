@@ -1,6 +1,6 @@
-import { Text, createSelects, useSend } from 'alemonjs'
+import { Text, useSend } from 'alemonjs'
 export const regular = /^(#|\/)?text$/
-const selects = createSelects([
+const selects = onSelects([
   'message.create',
   'private.message.create',
   'interaction.create',
