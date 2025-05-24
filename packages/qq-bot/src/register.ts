@@ -15,7 +15,6 @@ import {
   GROUP_AT_MESSAGE_CREATE,
   MESSAGE_CREATE
 } from './sends'
-import { isGuild } from './utils'
 export const platform = 'qq-bot'
 
 export const getQQBotConfig = () => {
@@ -33,7 +32,6 @@ export const register = (client: QQBotClients) => {
    */
   const port = process.env?.port || config?.port || 17117
   const url = `ws://127.0.0.1:${port}`
-
   const cbp = cbpPlatform(url)
 
   /**
@@ -357,6 +355,32 @@ export const register = (client: QQBotClients) => {
     }
   }
 
+  const sendMessageChannel = async (channel_id: string, data) => {
+    if (!channel_id || typeof channel_id !== 'string') {
+      throw new Error('Invalid channel_id: channel_id must be a string')
+    }
+    return await AT_MESSAGE_CREATE(
+      client,
+      {
+        ChannelId: channel_id
+      },
+      data
+    )
+  }
+
+  const sendMessageUser = async (user_id: string, data: any) => {
+    if (!user_id || typeof user_id !== 'string') {
+      throw new Error('Invalid user_id: user_id must be a string')
+    }
+    return await C2C_MESSAGE_CREATE(
+      client,
+      {
+        OpenId: user_id
+      },
+      data
+    )
+  }
+
   // 处理行为
   cbp.onactions(async (data, consume) => {
     if (data.action === 'message.send') {
@@ -369,60 +393,21 @@ export const register = (client: QQBotClients) => {
     } else if (data.action === 'mention.get') {
       const event = data.payload.event
       // 获取提及
-      const Metions = await getMesion(event)
+      const metions = await getMesion(event)
       // 消费
-      consume(Metions)
+      consume(metions)
+    } else if (data.action === 'message.send.channel') {
+      // 主动发送消息到频道
+      const channel_id = data.payload.ChannelId
+      const paramFormat = data.payload.params.format
+      const res = await sendMessageChannel(channel_id, paramFormat)
+      consume(res)
+    } else if (data.action === 'message.send.user') {
+      // 主动发送消息到用户
+      const user_id = data.payload.UserId
+      const paramFormat = data.payload.params.format
+      const res = await sendMessageUser(user_id, paramFormat)
+      consume(res)
     }
   })
-}
-
-export const createClientAPI = (client: QQBotClients) => {
-  return {
-    api: {
-      // 主动消息
-      active: {
-        send: {
-          channel: async (channel_id: string, data) => {
-            if (isGuild(channel_id)) {
-              return await AT_MESSAGE_CREATE(
-                client,
-                {
-                  ChannelId: channel_id
-                },
-                data
-              )
-            } else {
-              // 需要message_id 。如果没有，则是主动消息，在group中，只能发送4条。
-              return await GROUP_AT_MESSAGE_CREATE(
-                client,
-                {
-                  GuildId: channel_id
-                },
-                data
-              )
-            }
-          },
-          user: async (user_id: string, data: any) => {
-            if (isGuild(user_id)) {
-              return await DIRECT_MESSAGE_CREATE(
-                client,
-                {
-                  OpenId: user_id
-                },
-                data
-              )
-            } else {
-              return await C2C_MESSAGE_CREATE(
-                client,
-                {
-                  OpenId: user_id
-                },
-                data
-              )
-            }
-          }
-        }
-      }
-    }
-  }
 }

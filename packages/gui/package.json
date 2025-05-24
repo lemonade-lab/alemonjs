@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.4.1",
+  "version": "2.1.0-alpha.0",
   "description": "可视化调试平台",
   "author": "lemonade",
   "license": "MIT",

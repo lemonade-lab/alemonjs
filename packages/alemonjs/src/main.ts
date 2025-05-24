@@ -82,7 +82,7 @@ export const start = async (options: StartOptions = {}) => {
     // 设置环境变量
     process.env.port = port
     cbpServer(port, async () => {
-      console.log(`cbp://127.0.0.1:${port}`)
+      console.log(`ws://127.0.0.1:${port}`)
       const url = `ws://127.0.0.1:${port}`
       cbpClient(url)
       // 加载平台服务
@@ -113,7 +113,6 @@ export const start = async (options: StartOptions = {}) => {
       if (login) {
         process.env.login = login
       }
-      console.log(`import/${process.env.platform}`)
       import(process.env.platform)
     })
   }

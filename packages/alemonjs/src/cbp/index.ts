@@ -12,15 +12,14 @@ import { v4 as uuidv4 } from 'uuid'
 import MessageRouter from './router'
 import { onProcessor } from '../post'
 import { Actions } from '../typing/actions'
-
-const client: {
-  [key: string]: WebSocket | undefined
-} = {}
-
-const platformClient: {
-  [key: string]: WebSocket | undefined
-} = {}
-
+import koaStatic from 'koa-static'
+import koaCors from '@koa/cors'
+import { ResultCode } from '../core/code'
+const platformClient = new Map<string, WebSocket>()
+const childrenClient = new Map<string, WebSocket>()
+const deviceId = uuidv4()
+const USER_AGENT_HEADER = 'user-agent'
+const DEVICE_ID_HEADER = 'x-device-id'
 // 行为回调
 const actionResolves = new Map<string, (data: Actions) => void>()
 // 超时器
@@ -31,9 +30,60 @@ const generateUniqueId = () => {
 }
 // 超时时间
 const timeoutTime = 1000 * 12 // 12秒
-
 // 失败重连
 const reconnectInterval = 6000 // 6秒
+// 映射关系
+const idClientMap: { [id: string]: string } = {}
+
+/**
+ * 分流消息到对应客户端
+ * @param Id 目标 id
+ * @param data 消息体
+ */
+function dispatchToClients(Id: string, data: any) {
+  // 先查找是否有绑定的客户端
+  const bindClientKey = idClientMap[Id]
+  if (
+    bindClientKey &&
+    childrenClient.has(bindClientKey) &&
+    childrenClient.get(bindClientKey).readyState === WebSocket.OPEN
+  ) {
+    childrenClient.get(bindClientKey).send(JSON.stringify(data))
+    return
+  }
+
+  // 没有绑定则分派给绑定数最少的可用客户端
+  const availableClients = Array.from(childrenClient.entries()).filter(
+    ([key, ws]) => key !== deviceId && ws && ws.readyState === WebSocket.OPEN
+  )
+
+  if (availableClients.length > 0) {
+    // 统计每个客户端已绑定的 id 数量
+    const clientBindCount: { [key: string]: number } = {}
+    for (const [key] of availableClients) {
+      clientBindCount[key] = Object.values(idClientMap).filter(v => v === key).length
+    }
+    // 找到绑定数最少的客户端
+    let minCount = Infinity
+    let minClients: string[] = []
+    for (const [key] of availableClients) {
+      if (clientBindCount[key] < minCount) {
+        minCount = clientBindCount[key]
+        minClients = [key]
+      } else if (clientBindCount[key] === minCount) {
+        minClients.push(key)
+      }
+    }
+    // 多个最少绑定，随机选一个
+    const selectedKey = minClients[Math.floor(Math.random() * minClients.length)]
+    const selectedWs = childrenClient.get(selectedKey)
+    if (selectedWs && selectedWs.readyState === WebSocket.OPEN) {
+      selectedWs.send(JSON.stringify(data))
+      // 建立绑定关系
+      idClientMap[Id] = selectedKey
+    }
+  }
+}
 
 /**
  * cbp server
@@ -48,54 +98,98 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
   const app = new Koa()
   app.use(MessageRouter.routes())
   app.use(MessageRouter.allowedMethods())
+  // 读取静态文件夹 gui
+  app.use(koaStatic('/gui'))
+  // 允许跨域
+  app.use(
+    koaCors({
+      origin: '*', // 允许所有来源
+      allowMethods: ['GET', 'POST', 'PUT', 'DELETE'] // 允许的 HTTP 方法
+    })
+  )
   const server = app.listen(port, listeningListener)
   // 创建 WebSocketServer 并监听同一个端口
   global.server = new WebSocketServer({ server })
   // 处理客户端连接
   global.server.on('connection', (ws, request) => {
-    // 分配一个唯一的 clientId 给每个连接
-    const clientId = uuidv4()
-    if (typeof clientId !== 'string') {
-      return
-    }
     // 读取请求头中的 来源
     const headers = request.headers
     const origin = headers['user-agent'] || 'client' // 默认值为 'client'
+    // 来源id
+    const originId = headers['x-origin-id'] as string
+    logger.debug({
+      code: ResultCode.Ok,
+      message: `Client ${originId} connected`,
+      data: null
+    })
     // 根据来源进行分类
     if (origin === 'platform') {
-      platformClient[clientId] = ws
+      platformClient.set(originId, ws)
     } else {
-      client[clientId] = ws
+      childrenClient.set(originId, ws)
     }
     // 处理消息事件
     ws.on('message', (message: string) => {
       // 平台的消息，广播给所有客户端
-      // tudo 需要进行负载均衡计算
       if (origin === 'platform') {
-        for (const key in client) {
-          // 检查状态 并检查状态
-          if (client[key] && client[key].readyState === WebSocket.OPEN) {
-            client[key]?.send(message)
+        // 得到客户端数量
+        const clientCount = Object.keys(client).length
+        try {
+          const parsedMessage = JSON.parse(message.toString())
+          // 如果消息中有 actionID，说明是一个行为请求
+          if (parsedMessage?.actionID || (parsedMessage?.name && clientCount <= 1)) {
+            // 请求行为的结果。不进行分流。
+            // 连接数量小于等于1时，直接发送给客户端
+            childrenClient.forEach((clientWs, clientId) => {
+              // 检查状态 并检查状态
+              if (clientWs.readyState === WebSocket.OPEN) {
+                clientWs.send(message)
+              } else {
+                // 如果连接已关闭，删除该客户端
+                childrenClient.delete(clientId)
+              }
+            })
+          } else if (parsedMessage?.name) {
+            const id =
+              parsedMessage.userId ||
+              parsedMessage.userID ||
+              parsedMessage.channelId ||
+              parsedMessage.channelID
+            dispatchToClients(id, parsedMessage)
           }
+        } catch (error) {
+          logger.error({
+            code: ResultCode.Fail,
+            message: '解析平台消息失败',
+            data: error
+          })
+          return
         }
       } else {
         // 客户端的消息，广播给所有平台
-        for (const key in platformClient) {
+        platformClient.forEach((clientWs, clientId) => {
           // 检查状态 并检查状态
-          if (platformClient[key] && platformClient[key].readyState === WebSocket.OPEN) {
-            platformClient[key]?.send(message)
+          if (clientWs.readyState === WebSocket.OPEN) {
+            clientWs.send(message)
+          } else {
+            // 如果连接已关闭，删除该客户端
+            platformClient.delete(clientId)
           }
-        }
+        })
       }
     })
     // 处理关闭事件
     ws.on('close', () => {
       if (origin === 'platform') {
-        delete platformClient[clientId]
+        delete platformClient[originId]
       } else {
-        delete client[clientId]
+        delete client[originId]
       }
-      console.log(clientId, 'disconnected')
+      logger.debug({
+        code: ResultCode.Fail,
+        message: `Client ${originId} disconnected`,
+        data: null
+      })
     })
   })
 }
@@ -109,6 +203,8 @@ export const sendAction = (data: Actions): Promise<any> => {
   return new Promise(resolve => {
     actionResolves.set(actionId, resolve)
     data.actionID = actionId // 设置唯一标识符
+    // 设置设备 ID
+    data.DeviceId = deviceId
     global.client.send(JSON.stringify(data))
     // 12 秒后超时
     const timeout = setTimeout(() => {
@@ -142,7 +238,8 @@ export const cbpClient = (url: string, open = () => {}) => {
   const start = () => {
     global.client = new WebSocket(url, {
       headers: {
-        'User-Agent': 'client'
+        [USER_AGENT_HEADER]: 'platform',
+        [DEVICE_ID_HEADER]: deviceId
       }
     })
     global.client.on('open', open)
@@ -150,10 +247,14 @@ export const cbpClient = (url: string, open = () => {}) => {
     global.client.on('message', message => {
       try {
         const parsedMessage = JSON.parse(message.toString())
-        if (parsedMessage.actionID) {
+        logger.debug({
+          code: ResultCode.Ok,
+          message: '接收到消息',
+          data: parsedMessage
+        })
+        if (parsedMessage?.actionID) {
           // 如果有 id，说明是一个行为请求
           const resolve = actionResolves.get(parsedMessage.actionID)
-          console.log(parsedMessage.actionID, resolve)
           if (resolve) {
             // 清除超时器
             const timeout = actionTimeouts.get(parsedMessage.actionID)
@@ -162,19 +263,27 @@ export const cbpClient = (url: string, open = () => {}) => {
               actionTimeouts.delete(parsedMessage.actionID)
             }
             // 调用回调函数
-            resolve(parsedMessage)
+            resolve(parsedMessage.payload)
             actionResolves.delete(parsedMessage.actionID)
           }
           return
+        } else if (parsedMessage.name) {
+          onProcessor(parsedMessage.name, parsedMessage, parsedMessage.value)
         }
-        onProcessor(parsedMessage.name, parsedMessage, parsedMessage.value)
       } catch (error) {
-        console.error('解析消息失败', error)
+        logger.error({
+          code: ResultCode.Fail,
+          message: '解析消息失败',
+          data: error
+        })
       }
     })
     global.client.on('close', () => {
-      console.log('连接关闭')
-      console.log('尝试重新连接...')
+      logger.debug({
+        code: ResultCode.Fail,
+        message: '连接关闭，尝试重新连接...',
+        data: null
+      })
       delete global.client
       // 重新连接逻辑
       setTimeout(() => {
@@ -214,7 +323,8 @@ export const cbpPlatform = (url: string, open = () => {}) => {
         JSON.stringify({
           action: data.action,
           payload: resov,
-          actionID: data.actionID // 保留原始的 actionID
+          actionID: data.actionID,
+          DeviceId: deviceId
         })
       )
     }
@@ -234,13 +344,19 @@ export const cbpPlatform = (url: string, open = () => {}) => {
   const start = () => {
     ws = new WebSocket(url, {
       headers: {
-        'User-Agent': 'platform'
+        [USER_AGENT_HEADER]: 'platform',
+        [DEVICE_ID_HEADER]: deviceId
       }
     })
     ws.on('open', open)
     ws.on('message', message => {
       try {
         const data = JSON.parse(message.toString())
+        logger.debug({
+          code: ResultCode.Ok,
+          message: '平台接收消息',
+          data: data
+        })
         for (const cb of msg) {
           cb(
             data,
@@ -249,12 +365,19 @@ export const cbpPlatform = (url: string, open = () => {}) => {
           )
         }
       } catch (error) {
-        console.error('解析消息失败', error)
+        logger.error({
+          code: ResultCode.Fail,
+          message: '解析消息失败',
+          data: error
+        })
       }
     })
     ws.on('close', () => {
-      console.log('连接关闭')
-      console.log('尝试重新连接...')
+      logger.debug({
+        code: ResultCode.Fail,
+        message: '平台连接关闭，尝试重新连接...',
+        data: null
+      })
       ws = null
       // 重新连接逻辑
       setTimeout(() => {

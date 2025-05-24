@@ -1,5 +1,6 @@
 import { DataEnums, OnDataFormatFunc } from '../typings'
 import { ResultCode } from '../core/code'
+import { sendAction } from '../cbp'
 
 /**
  * 创建数据格式。
@@ -27,7 +28,7 @@ global.format = format
  * @param {DataEnums[]} data - 要发送的数据。
  * @throws {Error} - 如果 channel_id 无效或发送失败，抛出错误。
  */
-export const sendToChannel = (channel_id: string, data: DataEnums[]) => {
+export const sendToChannel = async (channel_id: string, data: DataEnums[]) => {
   if (!channel_id || typeof channel_id !== 'string') {
     logger.error({
       code: ResultCode.FailParams,
@@ -36,7 +37,15 @@ export const sendToChannel = (channel_id: string, data: DataEnums[]) => {
     })
     throw new Error('Invalid channel_id: channel_id must be a string')
   }
-  // return await alemonjsBot.api.active.send.channel(channel_id, data)
+  return await sendAction({
+    action: 'message.send.channel',
+    payload: {
+      ChannelId: channel_id,
+      params: {
+        format: data
+      }
+    }
+  })
 }
 
 /**
@@ -54,5 +63,13 @@ export const sendToUser = async (user_id: string, data: DataEnums[]) => {
     })
     throw new Error('Invalid user_id: user_id must be a string')
   }
-  // return await alemonjsBot.api.active.send.user(user_id, data)
+  return await sendAction({
+    action: 'message.send.user',
+    payload: {
+      UserId: user_id,
+      params: {
+        format: data
+      }
+    }
+  })
 }

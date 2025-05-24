@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/telegram",
-  "version": "0.2.3",
+  "version": "2.1.0-alpha.0",
   "description": "阿柠檬telegram平台连接",
   "author": "lemonade",
   "license": "MIT",

@@ -12,7 +12,35 @@ export type ActionMessageSend = {
       format?: DataEnums[]
     }
   }
-  actionID?: string
+}
+
+// 主动消息
+export type ActionMessageSendChannel = {
+  // 主动发送消息
+  action: 'message.send.channel'
+  // 负载
+  payload: {
+    // 频道ID
+    ChannelId: string
+    // 参数
+    params: {
+      format?: DataEnums[]
+    }
+  }
+}
+
+export type ActionMessageSendUser = {
+  // 主动发送消息
+  action: 'message.send.user'
+  // 负载
+  payload: {
+    // 用户ID
+    UserId: string
+    // 参数
+    params: {
+      format?: DataEnums[]
+    }
+  }
 }
 
 export type ActionMentionGet = {
@@ -22,7 +50,19 @@ export type ActionMentionGet = {
   payload: {
     event: any
   }
-  actionID?: string
 }
 
-export type Actions = ActionMessageSend | ActionMentionGet
+type base = {
+  // 动作ID
+  actionID?: string
+  // 来源设备编号
+  DeviceId?: string
+}
+
+export type Actions = (
+  | ActionMessageSend
+  | ActionMentionGet
+  | ActionMessageSendChannel
+  | ActionMessageSendUser
+) &
+  base

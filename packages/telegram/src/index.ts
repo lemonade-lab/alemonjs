@@ -1,24 +1,13 @@
 import {
+  cbpPlatform,
   getConfigValue,
-  OnProcessor,
   PrivateEventMessageCreate,
   PublicEventMemberAdd,
   useUserHashKey
 } from 'alemonjs'
 import TelegramClient from 'node-telegram-bot-api'
-export type Client = typeof TelegramClient.prototype
-export const client: Client = new Proxy({} as Client, {
-  get: (_, prop: string) => {
-    if (prop in global.client) {
-      const original = global.client[prop]
-      // 防止函数内this丢失
-      return typeof original === 'function' ? original.bind(global.client) : original
-    }
-    return undefined
-  }
-})
 export const platform = 'telegram'
-export default definePlatform(() => {
+const main = () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -30,6 +19,9 @@ export default definePlatform(() => {
       proxy: config?.proxy ?? ''
     }
   })
+  const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
+  const cbp = cbpPlatform(url)
+
   /**
    *
    * @param UserId
@@ -125,16 +117,11 @@ export default definePlatform(() => {
         CreateAt: Date.now(),
         // other
         tag: 'txt',
-        value: null
+        value: event
       }
-      // 当访问的时候获取
-      Object.defineProperty(e, 'value', {
-        get() {
-          return event
-        }
-      })
-      //
-      OnProcessor(e as any, 'message.create')
+      // 发送消息
+      cbp.send(e)
+
       //
     } else if (event?.chat.type == 'private') {
       // 定义消
@@ -156,16 +143,9 @@ export default definePlatform(() => {
         CreateAt: Date.now(),
         // other
         tag: 'txt',
-        value: null
+        value: event
       }
-      // 当访问的时候获取
-      Object.defineProperty(e, 'value', {
-        get() {
-          return event
-        }
-      })
-      // 处理消息
-      OnProcessor(e, 'private.message.create')
+      cbp.send(e)
     }
   })
 
@@ -228,44 +208,58 @@ export default definePlatform(() => {
       CreateAt: Date.now(),
       // othder
       tag: 'txt',
-      value: null
+      value: event
     }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-    //
-    OnProcessor(e, 'member.add')
+    cbp.send(e)
   })
 
-  global.client = client
-
-  return {
-    api: {
-      use: {
-        send: (event, val: any[]) => {
-          if (val.length < 0) return Promise.all([])
-          const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
-            .join('')
-          const e = event?.value
-          if (content) {
-            return Promise.all([content].map(item => client.sendMessage(e.chat.id, item)))
-          }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
-          if (images) {
-            return Promise.all(images.map(item => client.sendPhoto(e.chat.id, item)))
-          }
-          return Promise.all([])
-        },
-        mention: async () => {
-          // const event: TelegramClient.Message = e.value
-          return []
+  const api = {
+    use: {
+      send: (event, val: any[]) => {
+        if (val.length < 0) return Promise.all([])
+        const content = val
+          .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+          .map(item => item.value)
+          .join('')
+        const e = event?.value
+        if (content) {
+          return Promise.all([content].map(item => client.sendMessage(e.chat.id, item)))
         }
+        const images = val.filter(item => item.type == 'Image').map(item => item.value)
+        if (images) {
+          return Promise.all(images.map(item => client.sendPhoto(e.chat.id, item)))
+        }
+        return Promise.all([])
+      },
+      mention: async () => {
+        // const event: TelegramClient.Message = e.value
+        return []
       }
     }
   }
-})
+
+  cbp.onactions(async (data, consume) => {
+    if (data.action === 'message.send') {
+      const event = data.payload.event
+      const paramFormat = data.payload.params.format
+      const res = await api.use.send(event, paramFormat)
+      consume(res)
+    } else if (data.action === 'message.send.channel') {
+      // const channel_id = data.payload.ChannelId
+      // const val = data.payload.params.format
+      // const res = await api.active.send.channel(channel_id, val)
+      // consume(res)
+    } else if (data.action === 'message.send.user') {
+      // const user_id = data.payload.UserId
+      // const val = data.payload.params.format
+      // const res = await api.active.send.user(user_id, val)
+      // consume(res)
+    } else if (data.action === 'mention.get') {
+      // const event = data.payload.event
+      // const res = await api.use.mention(event)
+      // consume(res)
+    }
+  })
+}
+
+main()
