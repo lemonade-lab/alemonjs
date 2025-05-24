@@ -111,19 +111,3 @@ export type OnSelectsFunc = <T extends EventKeys[] | EventKeys>(values: T) => T
  * 定义数据格式
  */
 export type OnDataFormatFunc = (...data: DataEnums[]) => DataEnums[]
-
-/**
- * 废弃，请使用 DefinePlatformCallback
- * @deprecated
- */
-export type DefineBotCallback = DefinePlatformCallback
-/**
- * 废弃，请使用 DefinePlatformValue
- * @deprecated
- */
-export type DefineBotValue = DefinePlatformValue
-/**
- * 废弃，请使用 DefinePlatform
- * @deprecated
- */
-export type DefineBot = DefinePlatformFunc

@@ -156,7 +156,7 @@ export class QQBotClient extends QQBotAPI {
         })
         // 创建 WebSocketServer 并监听同一个端口
         const wss = new WebSocketServer({ server: server })
-        console.log('Server running at wss://localhost:' + cfg.port + '/')
+        console.log('Server running at ws://localhost:' + cfg.port + '/')
         // 处理客户端连接
         wss.on('connection', ws => {
           const clientId = uuidv4()

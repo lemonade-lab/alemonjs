@@ -1,5 +1,4 @@
-import { OnResponseReversalFunc, OnResponseFunc } from '../typings'
-import { ResultCode } from '../core/code'
+import { OnResponseReversalFunc } from '../typings'
 
 /**
  * 处理响应事件
@@ -12,18 +11,3 @@ export const onResponse: OnResponseReversalFunc = (select, callback) => {
 }
 
 global.onResponse = onResponse
-
-/**
- * 废弃，请使用 onResponse
- * @deprecated
- */
-export const OnResponse: OnResponseFunc = (callback, select) => {
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'OnResponse is deprecated, please use onResponse',
-    data: null
-  })
-  return { current: callback, select }
-}
-
-global.OnResponse = OnResponse

@@ -134,12 +134,6 @@ export const showErrorModule = (e: Error) => {
   }
 }
 
-/**
- * 废弃，请使用 showErrorModule
- * @deprecated
- */
-export const ErrorModule = showErrorModule
-
 const createExports = (packageJson: any) => {
   if (packageJson?.exports) {
     if (typeof packageJson.exports === 'string') {

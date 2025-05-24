@@ -85,20 +85,6 @@ export const onState = <T extends string>(name: T, callback: (value: boolean) =>
 }
 
 /**
- * 废弃，请使用 onState
- * @deprecated
- */
-export const eventState = <T extends string>(name: T, callback: (value: boolean) => void) => {
-  // 废弃警告
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'eventState is deprecated, please use onState',
-    data: null
-  })
-  return onState(name, callback)
-}
-
-/**
  * 取消订阅状态变化
  * @param name 功能名
  * @param callback 回调函数
@@ -116,18 +102,4 @@ export const unState = <T extends string>(name: T, callback: (value: boolean) =>
   // 取消订阅
   const sub = new StateSubscribe(name)
   sub.un(callback)
-}
-
-/**
- * 废弃，请使用 unState
- * @deprecated
- */
-export const unEventState = <T extends string>(name: T, callback: (value: boolean) => void) => {
-  // 废弃警告
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'unEventState is deprecated, please use unState',
-    data: null
-  })
-  return unState(name, callback)
 }

@@ -155,19 +155,6 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 }
 
 /**
- * 废弃，请使用 loadChildren
- * @deprecated
- */
-export const loadModule = (mainPath: string, appName: string) => {
-  // 废弃警告
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'loadModule is deprecated, please use loadChildren',
-    data: null
-  })
-  return loadChildren(mainPath, appName)
-}
-/**
  * 模块文件
  * @param app
  */
@@ -195,18 +182,4 @@ export const loadChildrenFile = async (appName: string) => {
   } catch (e) {
     showErrorModule(e)
   }
-}
-
-/**
- * 废弃，请使用 loadChildrenFile
- * @deprecated
- */
-export const moduleChildrenFiles = async (appName: string) => {
-  // 废弃警告
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'moduleChildrenFiles is deprecated, please use loadChildrenFile',
-    data: null
-  })
-  return loadChildrenFile(appName)
 }

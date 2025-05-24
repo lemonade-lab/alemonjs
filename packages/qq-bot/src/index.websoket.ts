@@ -1,9 +1,8 @@
-import { getQQBotConfig, register } from './register'
-import { QQBotGuildClient } from './sdk/client.websoket.guild'
+import { QQBotClients } from './sdk/client.websoket'
+import { register, getQQBotConfig } from './register'
 export const start = () => {
   const config = getQQBotConfig()
-  // intents 需要默认值
-  const client = new QQBotGuildClient({
+  const client = new QQBotClients({
     app_id: config?.app_id,
     intents:
       config?.intents ?? config?.is_private
@@ -22,14 +21,15 @@ export const start = () => {
             'GUILD_MESSAGE_REACTIONS',
             'DIRECT_MESSAGE',
             'INTERACTION',
-            'PUBLIC_GUILD_MESSAGES'
+            'PUBLIC_GUILD_MESSAGES',
+            'GROUP_AND_C2C_EVENT'
           ],
     is_private: config?.is_private ?? false,
     sandbox: config?.sandbox ?? false,
     secret: config?.secret,
     shard: config?.shard ?? [0, 1],
     token: config?.token,
-    mode: config?.mode
+    mode: config?.mode ?? 'group'
   })
   // 连接
   client.connect(config?.gatewayURL)

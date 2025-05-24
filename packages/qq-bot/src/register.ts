@@ -1,7 +1,6 @@
 import {
-  ClientAPI,
+  cbpPlatform,
   getConfigValue,
-  onProcessor,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   useUserHashKey
@@ -18,10 +17,25 @@ import {
 } from './sends'
 import { isGuild } from './utils'
 export const platform = 'qq-bot'
-export const register = (client: QQBotClients) => {
+
+export const getQQBotConfig = () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
+  return config || {}
+}
+
+export const register = (client: QQBotClients) => {
+  const config = getQQBotConfig()
+  /**
+   * 连接 alemonjs 服务器。
+   * 向 alemonjs 推送标准信息
+   */
+  const port = process.env?.port || config?.port || 17117
+  const url = `ws://127.0.0.1:${port}`
+
+  const cbp = cbpPlatform(url)
+
   /**
    * group
    *
@@ -33,12 +47,8 @@ export const register = (client: QQBotClients) => {
     return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/640`
   }
 
-  // 监听消息
-  client.on('GROUP_AT_MESSAGE_CREATE', async event => {
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-    const url = createUserAvatarURL(event.author.id)
-    const UserAvatar = {
+  const createUserAvatar = (url: string) => {
+    return {
       toBuffer: async () => {
         const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
         return Buffer.from(arrayBuffer)
@@ -51,6 +61,14 @@ export const register = (client: QQBotClients) => {
         return url
       }
     }
+  }
+
+  // 监听消息
+  client.on('GROUP_AT_MESSAGE_CREATE', async event => {
+    const master_key = config?.master_key ?? []
+    const isMaster = master_key.includes(event.author.id)
+    const url = createUserAvatarURL(event.author.id)
+    const UserAvatar = createUserAvatar(url)
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
@@ -78,29 +96,16 @@ export const register = (client: QQBotClients) => {
       OpenId: event.author.member_openid,
       CreateAt: Date.now(),
       tag: 'GROUP_AT_MESSAGE_CREATE',
-      value: null
+      value: event
     }
-    // 处理消息
-    onProcessor('message.create', e, event)
+    cbp.send(e)
   })
 
   client.on('C2C_MESSAGE_CREATE', async event => {
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(event.author.id)
     const url = createUserAvatarURL(event.author.id)
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
+    const UserAvatar = createUserAvatar(url)
 
     const UserId = event.author.id
 
@@ -127,10 +132,9 @@ export const register = (client: QQBotClients) => {
       OpenId: event.author.user_openid,
       //
       tag: 'C2C_MESSAGE_CREATE',
-      value: null
+      value: event
     }
-    // 处理消息
-    onProcessor('private.message.create', e, event)
+    cbp.send(e)
   })
 
   /**
@@ -146,19 +150,7 @@ export const register = (client: QQBotClients) => {
 
     let msg = event?.content ?? ''
 
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(event.author.avatar).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(event?.author?.avatar).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return event?.author?.avatar
-      }
-    }
+    const UserAvatar = createUserAvatar(event?.author?.avatar)
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
@@ -188,12 +180,9 @@ export const register = (client: QQBotClients) => {
       CreateAt: Date.now(),
       //
       tag: 'DIRECT_MESSAGE_CREATE',
-      //
-      value: null
+      value: event
     }
-
-    // 处理消息
-    onProcessor('private.message.create', e, event)
+    cbp.send(e)
   })
 
   // 监听消息
@@ -206,19 +195,7 @@ export const register = (client: QQBotClients) => {
 
     let msg = getMessageContent(event)
 
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(event.author.avatar).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(event?.author?.avatar).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return event?.author?.avatar
-      }
-    }
+    const UserAvatar = createUserAvatar(event?.author?.avatar)
 
     const UserId = event.author.id
 
@@ -248,12 +225,9 @@ export const register = (client: QQBotClients) => {
       CreateAt: Date.now(),
       //
       tag: 'AT_MESSAGE_CREATE',
-      //
-      value: null
+      value: event
     }
-
-    // 处理消息
-    onProcessor('message.create', e, event)
+    cbp.send(e)
   })
 
   /**
@@ -289,34 +263,15 @@ export const register = (client: QQBotClients) => {
 
     // 撤回消息
     if (new RegExp(/DELETE$/).test(event.eventType)) return
-
     const master_key = config?.master_key ?? []
-
     const UserId = event.author.id
-
     const isMaster = master_key.includes(UserId)
-
     const msg = getMessageContent(event)
-
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(event.author.avatar).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(event?.author?.avatar).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return event?.author?.avatar
-      }
-    }
-
+    const UserAvatar = createUserAvatar(event?.author?.avatar)
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId: UserId
     })
-
     // 定义消
     const e: PublicEventMessageCreate = {
       name: 'message.create',
@@ -338,18 +293,91 @@ export const register = (client: QQBotClients) => {
       CreateAt: Date.now(),
       //
       tag: 'MESSAGE_CREATE',
-      value: null
+      value: event
     }
-    // 处理消息
-    onProcessor('message.create', e, event)
+    cbp.send(e)
   })
 
   client.on('ERROR', console.error)
+
+  const sendMesage = async (event, val) => {
+    if (val.length < 0) Promise.all([])
+    // 打  tag
+    const tag = event.tag
+    // 群at
+    if (tag == 'GROUP_AT_MESSAGE_CREATE') {
+      return await GROUP_AT_MESSAGE_CREATE(client, event, val)
+    }
+    // 私聊
+    if (tag == 'C2C_MESSAGE_CREATE') {
+      return await C2C_MESSAGE_CREATE(client, event, val)
+    }
+    // 频道私聊
+    if (tag == 'DIRECT_MESSAGE_CREATE') {
+      return await DIRECT_MESSAGE_CREATE(client, event, val)
+    }
+    // 频道at
+    if (tag == 'AT_MESSAGE_CREATE') {
+      return await AT_MESSAGE_CREATE(client, event, val)
+    }
+    // 频道消息
+    if (tag == 'MESSAGE_CREATE') {
+      return await MESSAGE_CREATE(client, event, val)
+    }
+    return Promise.all([])
+  }
+
+  const getMesion = async event => {
+    const value = event.value
+    const tag = event.tag
+    // const event = e.value
+    const Metions: User[] = []
+    // group
+    if (tag == 'GROUP_AT_MESSAGE_CREATE' || 'C2C_MESSAGE_CREATE') return Metions
+    // guild
+    if (value.mentions) {
+      const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = event.value['mentions']
+      // 艾特消息处理
+      const MessageMention: User[] =
+        mentions.map(item => {
+          return {
+            UserId: item.id,
+            IsMaster: false,
+            UserName: item.username,
+            IsBot: item.bot,
+            UserKey: useUserHashKey({
+              Platform: 'qq-guild-bot',
+              UserId: item.id
+            })
+          }
+        }) ?? []
+      return MessageMention
+    } else {
+      return Metions
+    }
+  }
+
+  // 处理行为
+  cbp.onactions(async (data, consume) => {
+    if (data.action === 'message.send') {
+      // 消息发送
+      const event = data.payload.event
+      const paramFormat = data.payload.params.format
+      // 消费
+      const res = await sendMesage(event, paramFormat)
+      consume(res)
+    } else if (data.action === 'mention.get') {
+      const event = data.payload.event
+      // 获取提及
+      const Metions = await getMesion(event)
+      // 消费
+      consume(Metions)
+    }
+  })
 }
 
-export const createClientAPI = (client: QQBotClients): ClientAPI => {
+export const createClientAPI = (client: QQBotClients) => {
   return {
-    platform,
     api: {
       // 主动消息
       active: {
@@ -392,64 +420,6 @@ export const createClientAPI = (client: QQBotClients): ClientAPI => {
                 data
               )
             }
-          }
-        }
-      },
-      // 被动消息
-      use: {
-        send: async (event, val) => {
-          if (val.length < 0) Promise.all([])
-          // 打  tag
-          const tag = event.tag
-          // 群at
-          if (tag == 'GROUP_AT_MESSAGE_CREATE') {
-            return await GROUP_AT_MESSAGE_CREATE(client, event, val)
-          }
-          // 私聊
-          if (tag == 'C2C_MESSAGE_CREATE') {
-            return await C2C_MESSAGE_CREATE(client, event, val)
-          }
-          // 频道私聊
-          if (tag == 'DIRECT_MESSAGE_CREATE') {
-            return await DIRECT_MESSAGE_CREATE(client, event, val)
-          }
-          // 频道at
-          if (tag == 'AT_MESSAGE_CREATE') {
-            return await AT_MESSAGE_CREATE(client, event, val)
-          }
-          // 频道消息
-          if (tag == 'MESSAGE_CREATE') {
-            return await MESSAGE_CREATE(client, event, val)
-          }
-          return Promise.all([])
-        },
-        mention: async e => {
-          const event = e.value
-          const tag = e.tag
-          // const event = e.value
-          const Metions: User[] = []
-          // group
-          if (tag == 'GROUP_AT_MESSAGE_CREATE' || 'C2C_MESSAGE_CREATE') return Metions
-          // guild
-          if (event.mentions) {
-            const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = e.value['mentions']
-            // 艾特消息处理
-            const MessageMention: User[] =
-              mentions.map(item => {
-                return {
-                  UserId: item.id,
-                  IsMaster: false,
-                  UserName: item.username,
-                  IsBot: item.bot,
-                  UserKey: useUserHashKey({
-                    Platform: 'qq-guild-bot',
-                    UserId: item.id
-                  })
-                }
-              }) ?? []
-            return MessageMention
-          } else {
-            return Metions
           }
         }
       }

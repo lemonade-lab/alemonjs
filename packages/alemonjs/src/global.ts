@@ -1,19 +1,17 @@
 import {
-  DefinePlatformFunc,
   DefineChildrenFunc,
-  OnMiddlewareFunc,
-  OnResponseFunc,
   OnResponseReversalFunc,
   OnMiddlewareReversalFunc,
   OnSelectsFunc,
   OnDataFormatFunc
 } from './typing/event'
-import { ClientAPI } from './typing/client'
 import { StoreChildrenApp } from './typing/store/res'
 import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
 import { LoggerUtils } from './typing/logger/index'
 import { ResponseState } from './typing/state'
 import { Core, Logger } from './app/store'
+import WebSocket, { Server } from 'ws'
+import { IncomingMessage } from 'http'
 
 declare global {
   /**
@@ -44,23 +42,17 @@ declare global {
     }
   }
   /**
+   * 服务器
+   */
+  var server: Server<typeof WebSocket, typeof IncomingMessage>
+  /**
    * 客户端
    */
-  var alemonjsBot: ClientAPI
-  /**
-   * 废弃，请使用 onResponse
-   * @deprecated
-   */
-  var OnResponse: OnResponseFunc
+  var client: WebSocket
   /**
    * 定义响应体
    */
   var onResponse: OnResponseReversalFunc
-  /**
-   * 废弃,请使用 onMiddleware
-   * @deprecated
-   */
-  var OnMiddleware: OnMiddlewareFunc
   /**
    * 定义中间件
    */
@@ -69,15 +61,6 @@ declare global {
    * 定义一个子模块
    */
   var defineChildren: DefineChildrenFunc
-  /**
-   * 废弃，请使用 definePlatform
-   * @deprecated
-   */
-  var defineBot: DefinePlatformFunc
-  /**
-   * 定义一个平台
-   */
-  var definePlatform: DefinePlatformFunc
   /**
    * 定义选择器
    */

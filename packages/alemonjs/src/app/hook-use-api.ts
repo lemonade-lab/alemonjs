@@ -2,6 +2,7 @@ import { DataEnums, EventKeys, Events, User } from '../typings'
 import { ResultCode } from '../core/code'
 import { ChildrenApp } from './store'
 import { createResult } from './utils'
+import { sendAction } from '../cbp'
 
 /**
  * 使用提及。
@@ -29,7 +30,12 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
     find: async (options: Options) => {
       try {
         if (!res) {
-          res = await alemonjsBot.api.use.mention(event)
+          res = await sendAction({
+            action: 'mention.get',
+            payload: {
+              event
+            }
+          })
         }
       } catch (err) {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
@@ -65,7 +71,12 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
     ) => {
       try {
         if (!res) {
-          res = await alemonjsBot.api.use.mention(event)
+          res = await sendAction({
+            action: 'mention.get',
+            payload: {
+              event
+            }
+          })
         }
       } catch (err) {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
@@ -119,7 +130,15 @@ export const useSend = <T extends EventKeys>(event: Events[T]) => {
     if (!val || val.length === 0) {
       return createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)
     }
-    return await alemonjsBot.api.use.send(event, val)
+    return sendAction({
+      action: 'message.send',
+      payload: {
+        event,
+        params: {
+          format: val
+        }
+      }
+    })
   }
 }
 
@@ -136,7 +155,15 @@ export const useSends = <T extends EventKeys>(event: Events[T]) => {
     if (!val || val.length === 0) {
       return createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)
     }
-    return await alemonjsBot.api.use.send(event, val)
+    return sendAction({
+      action: 'message.send',
+      payload: {
+        event,
+        params: {
+          format: val
+        }
+      }
+    })
   }
   return [send]
 }
@@ -157,18 +184,6 @@ export const unChildren = (name: string = 'main') => {
   }
   const app = new ChildrenApp(name)
   app.un()
-}
-
-/**
- * 废弃,请使用unChildren
- * @deprecated
- */
-export const unMount = () => {
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'unMount is deprecated, please use unChildren',
-    data: null
-  })
 }
 
 /**

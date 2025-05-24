@@ -1,10 +1,7 @@
-import { getConfigValue } from 'alemonjs'
 import { QQBotGroupClient } from './sdk/client.websoket.group'
-import { createClientAPI, register, platform } from './register'
-export default definePlatform(() => {
-  let value = getConfigValue()
-  if (!value) value = {}
-  const config = value[platform]
+import { register, getQQBotConfig } from './register'
+export const start = () => {
+  const config = getQQBotConfig()
   // intents 需要默认值
   const client = new QQBotGroupClient({
     app_id: config?.app_id,
@@ -19,7 +16,4 @@ export default definePlatform(() => {
   // 连接
   client.connect(config?.gatewayURL)
   register(client as any)
-  // FRIEND_ADD
-  global.client = client
-  return createClientAPI(client as any)
-})
+}
