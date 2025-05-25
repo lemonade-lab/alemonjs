@@ -15,6 +15,7 @@ import { Actions } from '../typing/actions'
 import koaStatic from 'koa-static'
 import koaCors from '@koa/cors'
 import { ResultCode } from '../core/code'
+import { EventsEnum } from '../typings'
 const platformClient = new Map<string, WebSocket>()
 const childrenClient = new Map<string, WebSocket>()
 const deviceId = uuidv4()
@@ -32,58 +33,6 @@ const generateUniqueId = () => {
 const timeoutTime = 1000 * 12 // 12秒
 // 失败重连
 const reconnectInterval = 6000 // 6秒
-// 映射关系
-const idClientMap: { [id: string]: string } = {}
-
-/**
- * 分流消息到对应客户端
- * @param Id 目标 id
- * @param data 消息体
- */
-function dispatchToClients(Id: string, data: any) {
-  // 先查找是否有绑定的客户端
-  const bindClientKey = idClientMap[Id]
-  if (
-    bindClientKey &&
-    childrenClient.has(bindClientKey) &&
-    childrenClient.get(bindClientKey).readyState === WebSocket.OPEN
-  ) {
-    childrenClient.get(bindClientKey).send(JSON.stringify(data))
-    return
-  }
-
-  // 没有绑定则分派给绑定数最少的可用客户端
-  const availableClients = Array.from(childrenClient.entries()).filter(
-    ([key, ws]) => key !== deviceId && ws && ws.readyState === WebSocket.OPEN
-  )
-
-  if (availableClients.length > 0) {
-    // 统计每个客户端已绑定的 id 数量
-    const clientBindCount: { [key: string]: number } = {}
-    for (const [key] of availableClients) {
-      clientBindCount[key] = Object.values(idClientMap).filter(v => v === key).length
-    }
-    // 找到绑定数最少的客户端
-    let minCount = Infinity
-    let minClients: string[] = []
-    for (const [key] of availableClients) {
-      if (clientBindCount[key] < minCount) {
-        minCount = clientBindCount[key]
-        minClients = [key]
-      } else if (clientBindCount[key] === minCount) {
-        minClients.push(key)
-      }
-    }
-    // 多个最少绑定，随机选一个
-    const selectedKey = minClients[Math.floor(Math.random() * minClients.length)]
-    const selectedWs = childrenClient.get(selectedKey)
-    if (selectedWs && selectedWs.readyState === WebSocket.OPEN) {
-      selectedWs.send(JSON.stringify(data))
-      // 建立绑定关系
-      idClientMap[Id] = selectedKey
-    }
-  }
-}
 
 /**
  * cbp server
@@ -92,8 +41,8 @@ function dispatchToClients(Id: string, data: any) {
  * @param port 端口号
  */
 export const cbpServer = (port: number, listeningListener?: () => void) => {
-  if (global.server) {
-    delete global.server
+  if (global.chatbotServer) {
+    delete global.chatbotServer
   }
   const app = new Koa()
   app.use(MessageRouter.routes())
@@ -109,9 +58,107 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
   )
   const server = app.listen(port, listeningListener)
   // 创建 WebSocketServer 并监听同一个端口
-  global.server = new WebSocketServer({ server })
+  global.chatbotServer = new WebSocketServer({ server })
+
+  /**
+   *
+   * @param originId
+   * @param ws
+   */
+  const setPlatformClient = (originId: string, ws: WebSocket) => {
+    // 处理消息事件
+    ws.on('message', (message: string) => {
+      // 平台的消息，广播给所有客户端
+      const clientCount = Object.keys(childrenClient).length
+      try {
+        const parsedMessage = JSON.parse(message.toString())
+        // 如果消息中有 actionID，说明是一个行为请求
+        if (parsedMessage?.actionID || (parsedMessage?.name && clientCount <= 1)) {
+          // 请求行为的结果。不进行分流。
+          // 连接数量小于等于1时，直接发送给客户端
+          childrenClient.forEach((clientWs, clientId) => {
+            // 检查状态 并检查状态
+            if (clientWs.readyState === WebSocket.OPEN) {
+              clientWs.send(message)
+            } else {
+              // 如果连接已关闭，删除该客户端
+              childrenClient.delete(clientId)
+            }
+          })
+        } else if (parsedMessage?.name) {
+          // 如果消息中有 name，说明是一个事件请求
+          childrenClient.forEach((clientWs, clientId) => {
+            // 检查状态 并检查状态
+            if (clientWs.readyState === WebSocket.OPEN) {
+              clientWs.send(message)
+            } else {
+              // 如果连接已关闭，删除该客户端
+              childrenClient.delete(clientId)
+            }
+          })
+        }
+      } catch (error) {
+        logger.error({
+          code: ResultCode.Fail,
+          message: '解析平台消息失败',
+          data: error
+        })
+        return
+      }
+    })
+
+    // 处理关闭事件
+    ws.on('close', () => {
+      delete platformClient[originId]
+      logger.debug({
+        code: ResultCode.Fail,
+        message: `Client ${originId} disconnected`,
+        data: null
+      })
+    })
+  }
+
+  /**
+   *
+   * @param originId
+   * @param ws
+   */
+  const setChildrenClient = (originId: string, ws: WebSocket) => {
+    // 处理消息事件
+    ws.on('message', (message: string) => {
+      const parsedMessage = JSON.parse(message.toString())
+
+      // 发送者 actino 不一样。识别不了吧？
+
+      const DeviceId = parsedMessage.DeviceId
+      if (!platformClient.has(DeviceId)) {
+        // 转发给平台客户端
+        const platformWs = platformClient.get(DeviceId)
+        if (platformWs.readyState === WebSocket.OPEN) {
+          platformWs.send(message)
+        } else {
+          // 如果连接已关闭，删除该平台客户端
+          platformClient.delete(DeviceId)
+        }
+      }
+
+      // 收到了这个平台的消息。
+      // 意味着。设备 和 平台进行了绑定。
+      // 客户端不能再处理别的消息。
+    })
+    // 处理关闭事件
+    ws.on('close', () => {
+      delete childrenClient[originId]
+      logger.debug({
+        code: ResultCode.Fail,
+        message: `Client ${originId} disconnected`,
+        data: null
+      })
+    })
+  }
+
   // 处理客户端连接
-  global.server.on('connection', (ws, request) => {
+  global.chatbotServer.on('connection', (ws, request) => {
     // 读取请求头中的 来源
     const headers = request.headers
     const origin = headers['user-agent'] || 'client' // 默认值为 'client'
@@ -125,72 +172,11 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
     // 根据来源进行分类
     if (origin === 'platform') {
       platformClient.set(originId, ws)
-    } else {
-      childrenClient.set(originId, ws)
+      setPlatformClient(originId, ws)
+      return
     }
-    // 处理消息事件
-    ws.on('message', (message: string) => {
-      // 平台的消息，广播给所有客户端
-      if (origin === 'platform') {
-        // 得到客户端数量
-        const clientCount = Object.keys(client).length
-        try {
-          const parsedMessage = JSON.parse(message.toString())
-          // 如果消息中有 actionID，说明是一个行为请求
-          if (parsedMessage?.actionID || (parsedMessage?.name && clientCount <= 1)) {
-            // 请求行为的结果。不进行分流。
-            // 连接数量小于等于1时，直接发送给客户端
-            childrenClient.forEach((clientWs, clientId) => {
-              // 检查状态 并检查状态
-              if (clientWs.readyState === WebSocket.OPEN) {
-                clientWs.send(message)
-              } else {
-                // 如果连接已关闭，删除该客户端
-                childrenClient.delete(clientId)
-              }
-            })
-          } else if (parsedMessage?.name) {
-            const id =
-              parsedMessage.userId ||
-              parsedMessage.userID ||
-              parsedMessage.channelId ||
-              parsedMessage.channelID
-            dispatchToClients(id, parsedMessage)
-          }
-        } catch (error) {
-          logger.error({
-            code: ResultCode.Fail,
-            message: '解析平台消息失败',
-            data: error
-          })
-          return
-        }
-      } else {
-        // 客户端的消息，广播给所有平台
-        platformClient.forEach((clientWs, clientId) => {
-          // 检查状态 并检查状态
-          if (clientWs.readyState === WebSocket.OPEN) {
-            clientWs.send(message)
-          } else {
-            // 如果连接已关闭，删除该客户端
-            platformClient.delete(clientId)
-          }
-        })
-      }
-    })
-    // 处理关闭事件
-    ws.on('close', () => {
-      if (origin === 'platform') {
-        delete platformClient[originId]
-      } else {
-        delete client[originId]
-      }
-      logger.debug({
-        code: ResultCode.Fail,
-        message: `Client ${originId} disconnected`,
-        data: null
-      })
-    })
+    childrenClient.set(originId, ws)
+    setChildrenClient(originId, ws)
   })
 }
 
@@ -205,7 +191,7 @@ export const sendAction = (data: Actions): Promise<any> => {
     data.actionID = actionId // 设置唯一标识符
     // 设置设备 ID
     data.DeviceId = deviceId
-    global.client.send(JSON.stringify(data))
+    global.chatbotClient.send(JSON.stringify(data))
     // 12 秒后超时
     const timeout = setTimeout(() => {
       // 不会当错误进行处理
@@ -223,7 +209,6 @@ export const sendAction = (data: Actions): Promise<any> => {
 
 /**
  * CBP 客户端
- * 一个nodejs应用，只允许存在一个客户端连接。
  * @param url
  * @param onopen
  */
@@ -232,19 +217,19 @@ export const cbpClient = (url: string, open = () => {}) => {
    * 纯 cbpClient 连接，会没有 一些 全局变量。
    * 需要在此处进行判断并设置
    */
-  if (!global.client) {
-    delete global.client
+  if (!global.chatbotClient) {
+    delete global.chatbotClient
   }
   const start = () => {
-    global.client = new WebSocket(url, {
+    global.chatbotClient = new WebSocket(url, {
       headers: {
         [USER_AGENT_HEADER]: 'platform',
         [DEVICE_ID_HEADER]: deviceId
       }
     })
-    global.client.on('open', open)
+    global.chatbotClient.on('open', open)
     // 接收标准化消息
-    global.client.on('message', message => {
+    global.chatbotClient.on('message', message => {
       try {
         const parsedMessage = JSON.parse(message.toString())
         logger.debug({
@@ -278,13 +263,13 @@ export const cbpClient = (url: string, open = () => {}) => {
         })
       }
     })
-    global.client.on('close', () => {
+    global.chatbotClient.on('close', () => {
       logger.debug({
         code: ResultCode.Fail,
         message: '连接关闭，尝试重新连接...',
         data: null
       })
-      delete global.client
+      delete global.chatbotClient
       // 重新连接逻辑
       setTimeout(() => {
         start() // 重新连接
@@ -294,7 +279,7 @@ export const cbpClient = (url: string, open = () => {}) => {
   start()
 }
 
-type CallbackType = (data: Actions, consume: (data: any) => void) => void
+type ReplyFunc = (data: Actions, consume: (payload: any) => void) => void
 
 /**
  * CBP 平台
@@ -304,27 +289,35 @@ type CallbackType = (data: Actions, consume: (data: any) => void) => void
  * @returns
  */
 export const cbpPlatform = (url: string, open = () => {}) => {
-  let ws: WebSocket
+  if (!global.chatbotPlatform) {
+    delete global.chatbotPlatform
+  }
+
   /**
    * 发送数据
    * @param data
    */
-  const send = (data: any) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(data))
+  const send = (data: EventsEnum) => {
+    if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
+      data.DeviceId = deviceId // 设置设备 ID
+      global.chatbotPlatform.send(JSON.stringify(data))
     }
   }
-  const msg: CallbackType[] = []
+  const msg: ReplyFunc[] = []
 
-  // 消费行为
-  const consume = (data: Actions, resov: any) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(
+  /**
+   * 消费数据
+   * @param data
+   * @param payload
+   */
+  const reply = (data: Actions, payload: any) => {
+    if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
+      global.chatbotPlatform.send(
         JSON.stringify({
           action: data.action,
-          payload: resov,
+          payload: payload,
           actionID: data.actionID,
-          DeviceId: deviceId
+          DeviceId: data.DeviceId
         })
       )
     }
@@ -332,24 +325,24 @@ export const cbpPlatform = (url: string, open = () => {}) => {
 
   /**
    * 接收行为
-   * @param callBack
+   * @param reply
    */
-  const onactions = (callBack: CallbackType) => {
-    msg.push(callBack)
+  const onactions = (reply: ReplyFunc) => {
+    msg.push(reply)
   }
 
   /**
    * 启动 WebSocket 连接
    */
   const start = () => {
-    ws = new WebSocket(url, {
+    global.chatbotPlatform = new WebSocket(url, {
       headers: {
         [USER_AGENT_HEADER]: 'platform',
         [DEVICE_ID_HEADER]: deviceId
       }
     })
-    ws.on('open', open)
-    ws.on('message', message => {
+    global.chatbotPlatform.on('open', open)
+    global.chatbotPlatform.on('message', message => {
       try {
         const data = JSON.parse(message.toString())
         logger.debug({
@@ -361,7 +354,7 @@ export const cbpPlatform = (url: string, open = () => {}) => {
           cb(
             data,
             // 传入一个消费函数
-            val => consume(data, val)
+            val => reply(data, val)
           )
         }
       } catch (error) {
@@ -372,13 +365,13 @@ export const cbpPlatform = (url: string, open = () => {}) => {
         })
       }
     })
-    ws.on('close', () => {
+    global.chatbotPlatform.on('close', () => {
       logger.debug({
         code: ResultCode.Fail,
         message: '平台连接关闭，尝试重新连接...',
         data: null
       })
-      ws = null
+      delete global.chatbotPlatform
       // 重新连接逻辑
       setTimeout(() => {
         start() // 重新连接

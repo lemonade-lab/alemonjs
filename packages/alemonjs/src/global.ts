@@ -42,13 +42,11 @@ declare global {
     }
   }
   /**
-   * 服务器
+   * 聊天机器人
    */
-  var server: Server<typeof WebSocket, typeof IncomingMessage>
-  /**
-   * 客户端
-   */
-  var client: WebSocket
+  var chatbotServer: Server<typeof WebSocket, typeof IncomingMessage>
+  var chatbotPlatform: WebSocket
+  var chatbotClient: WebSocket
   /**
    * 定义响应体
    */

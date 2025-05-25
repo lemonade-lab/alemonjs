@@ -3,26 +3,40 @@ import { join } from 'path'
 import { Sequelize } from 'sequelize'
 import { getConfigValue } from 'alemonjs'
 import { logging } from './utils'
-export const getSequelize = () => {
+
+type Config = {
+  host?: string
+  port?: number
+  user?: string
+  password?: string
+  database?: string
+}
+
+/**
+ * @fileoverview MySQL 数据库连接模块
+ * @module mysql
+ * @returns
+ */
+export const getSequelize = (conifg: Config = {}) => {
   if (global.sequelize) return global.sequelize
   const dir = join(process.cwd(), 'logs', 'mysql')
   mkdirSync(dir, { recursive: true })
-  const value = getConfigValue()
-  if (!value) throw new Error('getConfigValue is null')
-  const config = {
-    host: value?.mysql?.host ?? '127.0.0.1',
-    port: value?.mysql?.port ?? 3306,
-    user: value?.mysql?.user ?? 'root',
-    password: value?.mysql?.password ?? 'Mm002580!',
-    database: value?.mysql?.database ?? 'alemonjs'
+  const value = getConfigValue() || {}
+  const { host, port, user, password, database } = conifg
+  const mysql = value?.mysql || {}
+  const connectConfig = {
+    host: host || mysql?.host || '127.0.0.1',
+    port: port || mysql?.port || 3306,
+    user: user || mysql?.user || 'root',
+    password: password || mysql?.password || '',
+    database: database || mysql?.database || 'alemonjs'
   }
-  const sequelize = new Sequelize(
-    `mysql://${config.user}:${config.password}@${config.host}:${config.port}/${config.database}`,
+  global.sequelize = new Sequelize(
+    `mysql://${connectConfig.user}:${connectConfig.password}@${connectConfig.host}:${connectConfig.port}/${connectConfig.database}`,
     {
       dialect: 'mysql',
       logging: logging
     }
   )
-  global.sequelize = sequelize
   return global.sequelize
 }
