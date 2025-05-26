@@ -94,7 +94,9 @@ export const sendchannel = (
         }
         isText = true
         if (item.type == 'Image') {
-          return client.channelsMessagesImage(channel_id, item.value, { content: text })
+          return client.channelsMessagesImage(channel_id, Buffer.from(item.value, 'base64'), {
+            content: text
+          })
         } else if (item.type == 'ImageURL') {
           return client.channelsMessagesImage(channel_id, await ImageURLToBuffer(item.value), {
             content: text

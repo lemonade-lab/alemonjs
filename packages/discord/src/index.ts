@@ -1,5 +1,6 @@
 import './env'
 import {
+  DataEnums,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   User,
@@ -214,16 +215,16 @@ export default () => {
   const api = {
     active: {
       send: {
-        channel: (channel_id, val) => {
+        channel: (channel_id, val: DataEnums[]) => {
           return sendchannel(client, { channel_id }, val)
         },
-        user: async (author_id, val) => {
+        user: async (author_id, val: DataEnums[]) => {
           return senduser(client, { author_id: author_id }, val)
         }
       }
     },
     use: {
-      send: async (event, val) => {
+      send: async (event, val: DataEnums[]) => {
         if (val.length < 0) {
           return Promise.all([])
         }

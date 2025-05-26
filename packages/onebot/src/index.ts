@@ -203,7 +203,8 @@ export default () => {
             const db = await ImageURLToBuffer(item.value)
             data = db
           } else {
-            data = item.value
+            // data = item.value
+            data = Buffer.from(item.value, 'base64')
           }
           client.sendGroupMessage({
             group_id: event.ChannelId,
@@ -273,7 +274,8 @@ export default () => {
             const db = await ImageURLToBuffer(item.value)
             data = db
           } else {
-            data = item.value
+            // data = item.value
+            data = Buffer.from(item.value, 'base64')
           }
           client.sendGroupMessage({
             group_id: event.ChannelId,

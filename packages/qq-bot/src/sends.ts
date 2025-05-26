@@ -238,9 +238,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         }
         try {
           const file_data =
-            item.type == 'ImageFile'
-              ? readFileSync(item.value, 'base64')
-              : item.value.toString('base64')
+            item.type == 'ImageFile' ? readFileSync(item.value, 'base64') : item.value
           const file_info = await client
             .postRichMediaByGroup(event.GuildId, {
               file_type: 1,
@@ -419,10 +417,7 @@ export const C2C_MESSAGE_CREATE = (
             id: res.id
           })
         }
-        const file_data =
-          item.type == 'ImageFile'
-            ? readFileSync(item.value, 'base64')
-            : item.value.toString('base64')
+        const file_data = item.type == 'ImageFile' ? readFileSync(item.value, 'base64') : item.value
         const file_info = await client
           .postRichMediaByUsers(event.OpenId, {
             file_type: 1,

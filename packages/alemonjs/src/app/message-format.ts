@@ -89,10 +89,10 @@ export const ImageFile = (val: DataImageFile['value']): DataImageFile => {
  * @param val
  * @returns
  */
-const Image = (val: DataImage['value']): DataImage => {
+const Image = (val: Buffer): DataImage => {
   return {
     type: 'Image',
-    value: val
+    value: val.toString('base64')
   }
 }
 Image.url = ImageURL

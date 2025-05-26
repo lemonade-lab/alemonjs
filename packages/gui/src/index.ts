@@ -295,7 +295,7 @@ export default () => {
       // 发送消息
       send: {
         // 向频道发送消息
-        channel: async (channel_id, val) => {
+        channel: async (channel_id, val: DataEnums[]) => {
           if (val.length < 0) return Promise.all([])
           const MessageBody = await getMessageBody(val)
           const db = {
@@ -317,7 +317,7 @@ export default () => {
           return Promise.all([])
         },
         // 向用户发送消息
-        user: async (user_id, val) => {
+        user: async (user_id, val: DataEnums[]) => {
           if (val.length < 0) return Promise.all([])
           const MessageBody = await getMessageBody(val)
           const db = {
@@ -341,7 +341,7 @@ export default () => {
     // 被动的
     use: {
       // 发送消息
-      send: async (event, val) => {
+      send: async (event, val: DataEnums[]) => {
         if (val.length < 0) return Promise.all([])
         if (!client) return Promise.all([])
         const data: DataPrivate | DataPublic = event.value
