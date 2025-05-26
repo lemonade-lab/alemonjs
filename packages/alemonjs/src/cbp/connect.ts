@@ -53,9 +53,18 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
           message: '接收到消息',
           data: parsedMessage
         })
-        // 如果有 actionID，说明要消费掉本地的行为请求
-        if (parsedMessage?.actionID) {
-          // 如果有 id，说明是一个行为请求
+        if (parsedMessage?.activeId) {
+          // 主端端主动消息。
+          if (parsedMessage.active === 'sync') {
+            const configs = parsedMessage.payload
+            // env 同步
+            const env = configs.env || {}
+            for (const key in env) {
+              process.env[key] = env[key]
+            }
+          }
+        } else if (parsedMessage?.actionID) {
+          // 如果有 actionID，说明要消费掉本地的行为请求
           const resolve = actionResolves.get(parsedMessage.actionID)
           if (resolve) {
             // 清除超时器

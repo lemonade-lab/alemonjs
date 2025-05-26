@@ -13,6 +13,7 @@ import {
   platformClient,
   USER_AGENT_HEADER
 } from './config'
+import { getConfig } from '../core/config'
 
 export const cbpServer = (port: number, listeningListener?: () => void) => {
   if (global.chatbotServer) {
@@ -274,6 +275,26 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       setPlatformClient(originId, ws)
       return
     }
+    // 连接时，需要给客户端发送主动消息
+    ws.send(
+      JSON.stringify({
+        active: 'sync',
+        payload: {
+          value: getConfig().value,
+          args: getConfig().argv,
+          package: {
+            version: getConfig().package?.version
+          },
+          env: {
+            login: process.env.login,
+            platform: process.env.platform,
+            port: process.env.port
+          }
+        },
+        // 主动消息
+        activeId: originId
+      })
+    )
     const isFullReceive = headers[FULL_RECEIVE_HEADER] === '1'
     // 如果是全量接收
     if (isFullReceive) {

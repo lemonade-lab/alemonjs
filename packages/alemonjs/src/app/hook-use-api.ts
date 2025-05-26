@@ -1,7 +1,7 @@
 import { DataEnums, EventKeys, Events, User } from '../typings'
 import { ResultCode } from '../core/code'
 import { ChildrenApp } from './store'
-import { createResult } from './utils'
+import { createResult, Result } from './utils'
 import { sendAction } from '../cbp/actions'
 
 /**
@@ -30,12 +30,20 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
     find: async (options: Options) => {
       try {
         if (!res) {
-          res = await sendAction({
+          const result = await sendAction({
             action: 'mention.get',
             payload: {
               event
             }
           })
+          // mention 不能是 数组
+          if (Array.isArray(result)) {
+            return createResult(ResultCode.Ok, 'Successfully retrieved mention data', null)
+          }
+          if (result.code !== ResultCode.Ok) {
+            return createResult(result.code, result.message, null)
+          }
+          res = result.data as User[]
         }
       } catch (err) {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
@@ -71,12 +79,20 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
     ) => {
       try {
         if (!res) {
-          res = await sendAction({
+          const result = await sendAction({
             action: 'mention.get',
             payload: {
               event
             }
           })
+          // mention 不能是 数组
+          if (Array.isArray(result)) {
+            return createResult(ResultCode.Ok, 'Successfully retrieved mention data', null)
+          }
+          if (result.code !== ResultCode.Ok) {
+            return createResult(result.code, result.message, null)
+          }
+          res = result.data as User[]
         }
       } catch (err) {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
@@ -126,11 +142,19 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
     })
     throw new Error('Invalid event: event must be an object')
   }
-  const send = async (val: DataEnums[]) => {
+
+  /**
+   * 发送消息
+   * @param val
+   * @returns
+   */
+  const send = async (val: DataEnums[]): Promise<Result[]> => {
     if (!val || val.length === 0) {
-      return createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)
+      return [
+        createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)
+      ]
     }
-    return sendAction({
+    const result = await sendAction({
       action: 'message.send',
       payload: {
         event,
@@ -139,11 +163,166 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
         }
       }
     })
+    return Array.isArray(result) ? result : [result]
   }
+
+  /**
+   * 撤回消息
+   */
+  const withdraw = async (message_id?: string) => {
+    return [createResult(ResultCode.Warn, '暂未支持', message_id)]
+  }
+
+  /**
+   * 转发消息
+   */
+  const forward = async (message_id?: string) => {
+    return [createResult(ResultCode.Warn, '暂未支持', message_id)]
+  }
+
+  /**
+   * 回复 quote
+   * ***
+   * 和send区别在于，
+   * 如果对应的平台支持引用时，进行引用回复
+   */
+  const reply = async (message_id?: string) => {
+    return [createResult(ResultCode.Warn, '暂未支持', message_id)]
+  }
+
+  /**
+   * 更新消息
+   */
+  const update = async (message_id?: string) => {
+    return [createResult(ResultCode.Warn, '暂未支持', message_id)]
+  }
+
+  /**
+   * 置顶消息
+   */
+  const pinning = async (message_id?: string) => {
+    return [createResult(ResultCode.Warn, '暂未支持', message_id)]
+  }
+
+  /**
+   * 警告消息
+   */
+  const horn = async (message_id?: string) => {
+    return [createResult(ResultCode.Warn, '暂未支持', message_id)]
+  }
+
+  /**
+   * 表态
+   */
+  const reaction = async (message_id?: string) => {
+    return [createResult(ResultCode.Warn, '暂未支持', message_id)]
+  }
+
   const message = {
-    send
+    send,
+    withdraw,
+    forward,
+    reply,
+    update,
+    pinning,
+    horn,
+    reaction
   }
   return [message]
+}
+
+/**
+ * 用户处理
+ * @deprecated 待支持
+ * @param event
+ * @returns
+ */
+export const useMenber = <T extends EventKeys>(event: Events[T]) => {
+  if (!event || typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid event: event must be an object',
+      data: null
+    })
+    throw new Error('Invalid event: event must be an object')
+  }
+
+  /**
+   * 获取用户信息
+   * @param user_id
+   * @returns
+   */
+  const information = async (user_id?: string) => {
+    return createResult(ResultCode.Warn, '暂未支持', user_id)
+  }
+
+  /**
+   * 禁言
+   * @param all 是否是全体
+   * @returns
+   */
+  const mute = async (all: boolean = false) => {
+    return createResult(ResultCode.Warn, '暂未支持', all)
+  }
+
+  /**
+   * 解除禁言
+   * @param all 是否是全体
+   * @returns
+   */
+  const unmute = async (all: boolean = false) => {
+    return createResult(ResultCode.Warn, '暂未支持', all)
+  }
+
+  /**
+   * 移除用户
+   * @param user_id
+   * @returns
+   */
+  const remove = async (user_id?: string) => {
+    return createResult(ResultCode.Warn, '暂未支持', user_id)
+  }
+
+  const member = {
+    information,
+    mute,
+    unmute,
+    remove
+  }
+  return [member]
+}
+
+/**
+ * 频道处理
+ * @deprecated 待支持
+ * @param event
+ * @returns
+ */
+export const useChannel = <T extends EventKeys>(event: Events[T]) => {
+  if (!event || typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid event: event must be an object',
+      data: null
+    })
+    throw new Error('Invalid event: event must be an object')
+  }
+
+  // 退出
+  const exit = async (channel_id?: string) => {
+    return createResult(ResultCode.Warn, '暂未支持', channel_id)
+  }
+
+  // 加入
+  const join = async (channel_id?: string) => {
+    return createResult(ResultCode.Warn, '暂未支持', channel_id)
+  }
+
+  const channel = {
+    exit,
+    join
+  }
+  return [channel]
 }
 
 /**

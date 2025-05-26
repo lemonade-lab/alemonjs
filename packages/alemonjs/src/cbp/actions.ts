@@ -1,21 +1,13 @@
+import { ResultCode } from '../core/code'
+import { createResult, Result } from '../post'
 import { Actions } from '../typing/actions'
-import {
-  actionResolves,
-  actionTimeouts,
-  DEVICE_ID_HEADER,
-  deviceId,
-  FULL_RECEIVE_HEADER,
-  generateUniqueId,
-  reconnectInterval,
-  timeoutTime,
-  USER_AGENT_HEADER
-} from './config'
+import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config'
 
 /**
  * 发送行为
  * @param data
  */
-export const sendAction = (data: Actions): Promise<any> => {
+export const sendAction = (data: Actions): Promise<Result | Result[]> => {
   const actionId = generateUniqueId()
   return new Promise(resolve => {
     actionResolves.set(actionId, resolve)
@@ -27,7 +19,7 @@ export const sendAction = (data: Actions): Promise<any> => {
     // 12 秒后超时
     const timeout = setTimeout(() => {
       // 不会当错误进行处理
-      resolve(null)
+      resolve(createResult(ResultCode.Fail, '请求超时', null))
       // 手动清理
       clearTimeout(timeout)
       // 删除回调
