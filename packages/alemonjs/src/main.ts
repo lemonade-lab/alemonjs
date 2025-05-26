@@ -29,19 +29,37 @@ const loadApps = () => {
 }
 
 type ServerOptions = {
+  /**
+   * @description 服务器端口
+   */
   port?: number
 }
 
 type ClientOptions = {
+  /**
+   * @description 连接到 CBP 服务器的 URL
+   */
   url?: string
-  origin?: 'client' | 'platform'
 }
 
 type StartOptions = ServerOptions &
   ClientOptions & {
+    /**
+     * @description 入口文件路径
+     */
     input?: string
+    /**
+     * @description 平台名称
+     */
     platform?: string
+    /**
+     * @description 登录名
+     */
     login?: string
+    /**
+     * @description 是否全量接收
+     */
+    is_full_receive?: boolean
   }
 
 /**
@@ -68,26 +86,32 @@ export const run = (input: string) => {
 /**
  * @param input
  */
-export const start = async (options: StartOptions = {}) => {
+export const start = async (options: StartOptions | string = {}) => {
+  if (typeof options === 'string') {
+    // 如果是字符串，则认为是入口文件路径
+    options = { input: options }
+  }
   // 注入配置。
   loadState()
   const cfg = getConfig()
-  const url = options?.url ?? cfg.argv?.url ?? cfg.value?.url
+  const url = options?.url || cfg.argv?.url || cfg.value?.url
   // 连接到 CBP 服务器
   if (url) {
     cbpClient(url)
   } else {
     // 创建 cbp 服务器
-    const port = options?.port ?? cfg.argv?.port ?? cfg.value?.port ?? defaultPort
+    const port = options?.port || cfg.argv?.port || cfg.value?.port || defaultPort
     // 设置环境变量
     process.env.port = port
     cbpServer(port, async () => {
       console.log(`ws://127.0.0.1:${port}`)
       const url = `ws://127.0.0.1:${port}`
-      cbpClient(url)
+      const isFullReceive =
+        options?.is_full_receive || cfg.argv?.is_full_receive || cfg.value?.is_full_receive || true
+      cbpClient(url, { isFullReceive })
       // 加载平台服务
-      const platform = options?.platform ?? cfg.argv?.platform ?? cfg.value?.platform
-      const login = options?.login ?? cfg.argv?.login ?? cfg.value?.login
+      const platform = options?.platform || cfg.argv?.platform || cfg.value?.platform
+      const login = options?.login || cfg.argv?.login || cfg.value?.login
       // 不登录平台
       if (!platform && !login) {
         return
@@ -116,8 +140,8 @@ export const start = async (options: StartOptions = {}) => {
       import(process.env.platform)
     })
   }
-
-  const input = options.input ?? cfg.argv?.main ?? cfg.value?.main ?? getInputExportPath()
+  // 获取入口文件
+  const input = options.input || cfg.argv?.input || cfg.value?.input || getInputExportPath()
   // 运行本地模块
   run(input)
   // load module

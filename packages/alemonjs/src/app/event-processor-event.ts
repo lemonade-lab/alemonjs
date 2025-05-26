@@ -10,7 +10,7 @@ import { Next, Events, OnResponseValue, Current, EventKeys, CurrentResultValue }
 import { useState } from './hook-use-state'
 import { showErrorModule } from './utils'
 import { Response } from './store'
-import { useSend } from './hook-use-api'
+import { useMessage } from './hook-use-api'
 import { EventMessageText } from '../core/variable'
 
 /**
@@ -24,7 +24,7 @@ export const expendEvent = async <T extends EventKeys>(
   next: Function
 ) => {
   const res = new Response()
-  const Send = useSend(valueEvent)
+  const [message] = useMessage(valueEvent)
 
   // 得到所有 res
   const StoreResponse = res.value
@@ -125,13 +125,13 @@ export const expendEvent = async <T extends EventKeys>(
         if (Array.isArray(res)) {
           if (res.length > 0) {
             // 发送数据
-            Send(...res)
+            message.send(res)
           }
           isClose = true
         } else if (typeof res === 'object') {
           if (Array.isArray(res.data)) {
             // 发送数据
-            Send(...res.data)
+            message.send(res.data)
           }
           if (!res.allowGrouping) {
             isClose = true

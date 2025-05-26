@@ -113,36 +113,11 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
 }
 
 /**
- * 使用发送消息。
- * @param {Object} event - 事件对象，包含触发发送的相关信息。
- * @throws {Error} - 如果 event 无效，抛出错误。
+ * 消息处理
+ * @param event
+ * @returns
  */
-export const useSend = <T extends EventKeys>(event: Events[T]) => {
-  if (!event || typeof event !== 'object') {
-    logger.error({
-      code: ResultCode.FailParams,
-      message: 'Invalid event: event must be an object',
-      data: null
-    })
-    throw new Error('Invalid event: event must be an object')
-  }
-  return async (...val: DataEnums[]) => {
-    if (!val || val.length === 0) {
-      return createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)
-    }
-    return sendAction({
-      action: 'message.send',
-      payload: {
-        event,
-        params: {
-          format: val
-        }
-      }
-    })
-  }
-}
-
-export const useSends = <T extends EventKeys>(event: Events[T]) => {
+export const useMessage = <T extends EventKeys>(event: Events[T]) => {
   if (!event || typeof event !== 'object') {
     logger.error({
       code: ResultCode.FailParams,
@@ -165,7 +140,34 @@ export const useSends = <T extends EventKeys>(event: Events[T]) => {
       }
     })
   }
-  return [send]
+  const message = {
+    send
+  }
+  return [message]
+}
+
+/**
+ * 废弃，请使用 useMessage
+ * @deprecated
+ * @param event
+ * @returns
+ */
+export const useSend = <T extends EventKeys>(event: Events[T]) => {
+  const [message] = useMessage(event)
+  const send = async (...val: DataEnums[]) => {
+    return message.send(val)
+  }
+  return send
+}
+
+/**
+ * 废弃，请使用 useMessage
+ * @param event
+ * @returns
+ */
+export const useSends = <T extends EventKeys>(event: Events[T]) => {
+  const [message] = useMessage(event)
+  return message.send
 }
 
 /**

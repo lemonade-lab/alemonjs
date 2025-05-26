@@ -29,7 +29,6 @@ const createButtonsData = (rows: ButtonRow[]) => {
             render_data: {
               label: typeof value == 'object' ? value.title : value,
               visited_label: typeof value == 'object' ? value.label : value,
-              // tudo
               style: 0
             },
             action: {

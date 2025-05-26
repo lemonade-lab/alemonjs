@@ -112,26 +112,23 @@ export const showErrorModule = (e: Error) => {
   const moduleNotFoundRegex = /Cannot find (module|package)/
   // 处理模块未找到的错误
   if (moduleNotFoundRegex.test(e?.message)) {
-    logger.error({
-      code: ResultCode.FailInternal,
-      message: e.message,
-      data: null
-    })
     const match = e.stack?.match(/'(.+?)'/)
     if (match) {
       const pack = match[1]
-      logger.error(`缺少模块或依赖 ${pack},请安装`)
-    } else {
-      logger.mark('无法提取缺失的信息，请检查')
+      logger.error({
+        code: ResultCode.FailInternal,
+        message: `缺少模块或依赖 ${pack},请安装`,
+        data: null
+      })
+      return
     }
-  } else {
-    // 处理其他错误
-    logger.error({
-      code: ResultCode.FailInternal,
-      message: e?.message ?? e,
-      data: null
-    })
   }
+  // 处理其他错误
+  logger.error({
+    code: ResultCode.FailInternal,
+    message: e?.message,
+    data: e
+  })
 }
 
 const createExports = (packageJson: any) => {

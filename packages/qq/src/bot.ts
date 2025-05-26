@@ -30,10 +30,6 @@ export const botState: {
  */
 export const botRun = (args: string[]): Promise<ChildProcess> => {
   return new Promise(resolve => {
-    // if (botState.child && botState.child?.connected) {
-    //   logger.info('Bot is running');
-    //   return;
-    // }
     const MyJS = join(runjsPath, 'index.js')
     botState.child = fork(MyJS, args, {
       // cwd: runjsPath,
@@ -41,15 +37,15 @@ export const botRun = (args: string[]): Promise<ChildProcess> => {
     })
     // 监听子进程的标准输出
     botState.child.stdout?.on('data', data => {
-      logger.info(`bot output:`, data.toString())
+      console.info(`bot output:`, data.toString())
     })
     // 监听子进程的错误输出
     botState.child.stderr?.on('data', data => {
-      logger.error(`bot error:`, data.toString())
+      console.error(`bot error:`, data.toString())
     })
     // 监听子进程退出
     botState.child.on('exit', code => {
-      logger.info(`bot exit ${code}`)
+      console.info(`bot exit ${code}`)
     })
     // 监听消息事件
     botState.child.on('message', (msg: { type: string; data: any }) => {

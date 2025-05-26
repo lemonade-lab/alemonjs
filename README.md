@@ -3,15 +3,15 @@
 基于 javascript 所构建的，聊天机器人开发框架
 
 ```ts
-import { Text, useSends } from 'alemonjs'
+import { Text, useMessage } from 'alemonjs'
 // 创建事件类型
 export const selects = onSelects(['message.create'])
 // 导出响应
 export default onResponse(selects, event => {
   // 使用发送函数
-  const [send] = useSends(event)
+  const [message] = useMessage(event)
   // 发送文本
-  send(format(Text('Hello Word!')))
+  message.send(format(Text('Hello Word!')))
 })
 ```
 

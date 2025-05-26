@@ -30,14 +30,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     return
   }
   const mainDir = dirname(mainPath)
-
   const App = new ChildrenApp(appName)
-
-  const show = (e: any) => {
-    showErrorModule(e)
-    // 卸载
-    App.un()
-  }
 
   try {
     const moduleApp: {
@@ -67,7 +60,9 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     App.pushSycle(app)
 
     const unMounted = async e => {
-      show(e)
+      showErrorModule(e)
+      // 卸载
+      App.un()
       try {
         await app?.unMounted(e)
       } catch (e) {
@@ -150,7 +145,9 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     // unMounted 卸载
   } catch (e) {
-    show(e)
+    showErrorModule(e)
+    // 卸载
+    App.un()
   }
 }
 

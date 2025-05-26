@@ -4,7 +4,7 @@ export const start = () => {
   const config = getQQBotConfig()
   // intents 需要默认值
   const client = new QQBotGuildClient({
-    app_id: config?.app_id,
+    ...config,
     intents:
       config?.intents ?? config?.is_private
         ? [
@@ -26,10 +26,7 @@ export const start = () => {
           ],
     is_private: config?.is_private ?? false,
     sandbox: config?.sandbox ?? false,
-    secret: config?.secret,
-    shard: config?.shard ?? [0, 1],
-    token: config?.token,
-    mode: config?.mode
+    shard: config?.shard ?? [0, 1]
   })
   // 连接
   client.connect(config?.gatewayURL)

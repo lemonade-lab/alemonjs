@@ -49,7 +49,7 @@ export class ConfigCore {
       logger.error({
         code: ResultCode.FailInternal,
         message: 'Config file parse error',
-        data: null
+        data: err
       })
       process.cwd()
     }
@@ -63,7 +63,7 @@ export class ConfigCore {
         logger.error({
           code: ResultCode.FailInternal,
           message: 'Config file parse error',
-          data: null
+          data: err
         })
         process.cwd()
       }
@@ -121,7 +121,7 @@ export class ConfigCore {
       logger.error({
         code: ResultCode.FailInternal,
         message: 'package.json parse error',
-        data: null
+        data: err
       })
       return null
     }

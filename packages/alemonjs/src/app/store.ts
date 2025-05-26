@@ -148,7 +148,9 @@ export class SubscribeList<T extends EventKeys> {
   constructor(chioce: EventCycleEnum, select: T) {
     this.#select = select
     this.#chioce = chioce
+    // 如果不存在，则初始化
     if (!alemonjsCore.storeSubscribeList[this.#chioce][this.#select]) {
+      // 创建链表
       alemonjsCore.storeSubscribeList[this.#chioce][this.#select] = new SinglyLinkedList()
     }
   }

@@ -37,11 +37,9 @@ export class QQBotClient extends QQBotAPI {
    */
   constructor(opstion: Options) {
     super()
-    if (opstion.secret) config.set('secret', opstion.secret)
-    if (opstion.app_id) config.set('app_id', opstion.app_id)
-    if (opstion.token) config.set('token', opstion.token)
-    if (opstion.port) config.set('port', opstion.port)
-    if (opstion.ws) config.set('ws', opstion.ws)
+    for (const key in opstion) {
+      config.set(key, opstion[key])
+    }
   }
 
   /**

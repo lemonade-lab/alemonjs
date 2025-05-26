@@ -20,14 +20,14 @@ start('src/index.js')
 > src/response/res.js
 
 ```js
-import { onSelects, onResponse, Text, useSend } from 'alemonjs'
+import { Text, useMessage } from 'alemonjs'
 // 创建事件类型
 export const selects = onSelects(['message.create'])
 // 导出响应
 export default onResponse(selects, event => {
   // 使用发送函数
-  const send = useSend(event)
+  const [message] = useMessage(event)
   // 发送文本
-  send(Text('Hello Word!'))
+  message.send(format(Text('Hello Word!')))
 })
 ```

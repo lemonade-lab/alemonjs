@@ -20,8 +20,7 @@ export const platform = 'qq-bot'
 export const getQQBotConfig = () => {
   let value = getConfigValue()
   if (!value) value = {}
-  const config = value[platform]
-  return config || {}
+  return value[platform] || {}
 }
 
 export const register = (client: QQBotClients) => {
