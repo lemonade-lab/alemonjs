@@ -67,19 +67,7 @@ export default () => {
 
     const url = event.platform == 'qq' ? `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}` : ''
 
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
+    const UserAvatar = url
 
     const UserId = String(event.user_id)
     const UserKey = useUserHashKey({

@@ -17,23 +17,7 @@ export type User = {
   /**
    * 用户头像地址
    */
-  UserAvatar?: {
-    /**
-     * 头像地址
-     * @returns
-     */
-    toURL: () => Promise<string>
-    /**
-     * 头像base64
-     * @returns
-     */
-    toBase64: () => Promise<string>
-    /**
-     * 头像Buffer
-     * @returns
-     */
-    toBuffer: () => Promise<Buffer>
-  }
+  UserAvatar?: string
   /**
    * 是否是主人
    */

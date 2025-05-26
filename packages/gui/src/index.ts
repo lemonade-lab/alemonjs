@@ -124,21 +124,8 @@ export default () => {
       Platform: platform,
       UserId: event.UserId
     })
-    const url = event.UserAvatar
     // 用户头像
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
+    const UserAvatar = event.UserAvatar
     // 管理员
     const master_key = getConfigValue()?.gui?.master_key ?? []
     // 纯文本
@@ -183,20 +170,7 @@ export default () => {
       UserId: event.UserId
     })
 
-    const url = event.UserAvatar
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
+    const UserAvatar = event.UserAvatar
 
     // 纯文本
     const msg = event.MessageBody.map(item => {

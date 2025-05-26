@@ -63,37 +63,7 @@ export default () => {
       UserId: UserId
     })
 
-    const UserAvatar = {
-      toBuffer: async () => {
-        if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
-          const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-          if (typeof photo == 'string') {
-            const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-            return Buffer.from(arrayBuffer)
-          }
-        }
-        return
-      },
-      toURL: async () => {
-        if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
-          const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-          if (typeof photo == 'string') {
-            return photo
-          }
-        }
-        return
-      },
-      toBase64: async () => {
-        if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
-          const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-          if (typeof photo == 'string') {
-            const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-            return Buffer.from(arrayBuffer).toString('base64')
-          }
-        }
-        return
-      }
-    }
+    const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string
 
     if (event?.chat.type == 'channel' || event?.chat.type == 'supergroup') {
       // 机器人消息不处理
@@ -162,31 +132,7 @@ export default () => {
       UserId: UserId
     })
 
-    const UserAvatar = {
-      toBuffer: async () => {
-        const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-        if (typeof photo == 'string') {
-          const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-          return Buffer.from(arrayBuffer)
-        }
-        return
-      },
-      toURL: async () => {
-        const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-        if (typeof photo == 'string') {
-          return photo
-        }
-        return
-      },
-      toBase64: async () => {
-        const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-        if (typeof photo == 'string') {
-          const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-          return Buffer.from(arrayBuffer).toString('base64')
-        }
-        return
-      }
-    }
+    const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string
 
     // 定义消
     const e: PublicEventMemberAdd = {

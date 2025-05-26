@@ -37,11 +37,6 @@ export default () => {
   // 连接
   client.connect(config?.gatewayURL)
 
-  const ImageURLToBuffer = async (url: string) => {
-    const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-    return Buffer.from(arrayBuffer)
-  }
-
   /**
    * 创建用户头像
    * @param UserId
@@ -49,28 +44,7 @@ export default () => {
    * @returns
    */
   const createUserAvatar = (UserId: string, avatar: string) => {
-    let url = null
-    return {
-      toBuffer: async () => {
-        if (!url) {
-          url = client.userAvatar(UserId, avatar)
-        }
-        return ImageURLToBuffer(url)
-      },
-      toBase64: async () => {
-        if (!url) {
-          url = client.userAvatar(UserId, avatar)
-        }
-        const buffer = await ImageURLToBuffer(url)
-        return buffer?.toString('base64')
-      },
-      toURL: async () => {
-        if (!url) {
-          url = client.userAvatar(UserId, avatar)
-        }
-        return url
-      }
-    }
+    return client.userAvatar(UserId, avatar)
   }
 
   // 监听消息

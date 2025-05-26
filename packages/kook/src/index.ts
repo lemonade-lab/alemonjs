@@ -45,19 +45,7 @@ export default () => {
     let msg = event.content
 
     const url = avatar.substring(0, avatar.indexOf('?'))
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
+    const UserAvatar = url
 
     const UserId = event.author_id
     const UserKey = useUserHashKey({
@@ -125,19 +113,7 @@ export default () => {
     }
 
     const url = avatar.substring(0, avatar.indexOf('?'))
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
+    const UserAvatar = url
 
     const UserId = event.author_id
     const UserKey = useUserHashKey({

@@ -157,18 +157,7 @@ export default async () => {
           if (item.type == 'at') {
             if (item.qq == 'all') continue
             const UserId = String(item.qq)
-            const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${item.qq}`
-            const UserAvatar = {
-              toBuffer: async () => {
-                const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-                return Buffer.from(arrayBuffer)
-              },
-              toBase64: async () => {
-                const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-                return Buffer.from(arrayBuffer).toString('base64')
-              },
-              toURL: async () => url
-            }
+            const UserAvatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${item.qq}`
             const UserKey = useUserHashKey({
               Platform: platform,
               UserId: UserId

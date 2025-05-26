@@ -44,28 +44,11 @@ export const register = (client: QQBotClients) => {
     return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/640`
   }
 
-  const createUserAvatar = (url: string) => {
-    return {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
-  }
-
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', async event => {
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(event.author.id)
-    const url = createUserAvatarURL(event.author.id)
-    const UserAvatar = createUserAvatar(url)
+    const UserAvatar = createUserAvatarURL(event.author.id)
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
@@ -101,8 +84,7 @@ export const register = (client: QQBotClients) => {
   client.on('C2C_MESSAGE_CREATE', async event => {
     const master_key = config?.master_key ?? []
     const isMaster = master_key.includes(event.author.id)
-    const url = createUserAvatarURL(event.author.id)
-    const UserAvatar = createUserAvatar(url)
+    const UserAvatar = createUserAvatarURL(event.author.id)
 
     const UserId = event.author.id
 
@@ -147,7 +129,7 @@ export const register = (client: QQBotClients) => {
 
     let msg = event?.content ?? ''
 
-    const UserAvatar = createUserAvatar(event?.author?.avatar)
+    const UserAvatar = event?.author?.avatar
 
     const UserId = event.author.id
     const UserKey = useUserHashKey({
@@ -192,7 +174,7 @@ export const register = (client: QQBotClients) => {
 
     let msg = getMessageContent(event)
 
-    const UserAvatar = createUserAvatar(event?.author?.avatar)
+    const UserAvatar = event?.author?.avatar
 
     const UserId = event.author.id
 
@@ -264,7 +246,7 @@ export const register = (client: QQBotClients) => {
     const UserId = event.author.id
     const isMaster = master_key.includes(UserId)
     const msg = getMessageContent(event)
-    const UserAvatar = createUserAvatar(event?.author?.avatar)
+    const UserAvatar = event?.author?.avatar
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId: UserId

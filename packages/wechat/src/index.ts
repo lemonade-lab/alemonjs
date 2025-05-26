@@ -7,7 +7,7 @@ import {
 } from 'alemonjs'
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { getPublicPath, getStaticPath } from './static'
 import { useUserHashKey } from 'alemonjs'
 import { MessageInterface } from 'wechaty/impls'
@@ -60,39 +60,14 @@ export default () => {
       const value = getConfigValue()
       const master_key = value?.wechat?.master_key ?? []
 
-      const UserAvatar = {
-        toBuffer: async () => {
-          const contact = event.talker()
-          const avatarStream = await contact.avatar()
-          const dir = getPublicPath(avatarStream.name)
-          if (existsSync(dir)) {
-            return readFileSync(dir)
-          }
-          const buffer = await avatarStream.toBuffer()
-          writeFileSync(dir, buffer)
-          return buffer
-        },
-        toURL: async () => {
-          const contact = event.talker()
-          const avatarStream = await contact.avatar()
-          const dir = getPublicPath(avatarStream.name)
-          if (existsSync(dir)) return dir
-          const buffer = await avatarStream.toBuffer()
-          writeFileSync(dir, buffer)
-          return dir
-        },
-        toBase64: async () => {
-          const contact = event.talker()
-          const avatarStream = await contact.avatar()
-          const dir = getPublicPath(avatarStream.name)
-          if (existsSync(dir)) {
-            return readFileSync(dir).toString('base64')
-          }
-          const buffer = await avatarStream.toBuffer()
-          writeFileSync(dir, buffer)
-          return buffer.toString('base64')
-        }
-      }
+      // 修复。如何获取用户头像 url。而不是先存储到本地。
+      const contact = event.talker()
+      const avatarStream = await contact.avatar()
+      const buffer = await avatarStream.toBuffer()
+      const dir = getPublicPath(avatarStream.name)
+      writeFileSync(dir, buffer)
+
+      const UserAvatar = dir
 
       // 文本消息
       const txt = event.payload.text

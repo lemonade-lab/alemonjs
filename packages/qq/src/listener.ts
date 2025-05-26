@@ -105,21 +105,7 @@ export async function onGroupMessage(event: GroupMessageEvent) {
     }
   }
 
-  const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
-
-  const UserAvatar = {
-    toBuffer: async () => {
-      const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-      return Buffer.from(arrayBuffer)
-    },
-    toBase64: async () => {
-      const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-      return Buffer.from(arrayBuffer).toString('base64')
-    },
-    toURL: async () => {
-      return url
-    }
-  }
+  const UserAvatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
 
   const UserId = user_id
   const UserKey = useUserHashKey({
@@ -168,20 +154,7 @@ export async function onPrivateMessage(event: PrivateMessageEvent) {
   const user_id = String(event.sender.user_id)
   const isMaster = master_key.includes(user_id)
   let msg = ''
-  const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
-  const UserAvatar = {
-    toBuffer: async () => {
-      const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-      return Buffer.from(arrayBuffer)
-    },
-    toBase64: async () => {
-      const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-      return Buffer.from(arrayBuffer).toString('base64')
-    },
-    toURL: async () => {
-      return url
-    }
-  }
+  const UserAvatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${user_id}`
 
   const UserId = user_id
   const UserKey = useUserHashKey({
