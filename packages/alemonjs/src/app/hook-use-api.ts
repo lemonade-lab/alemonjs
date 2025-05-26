@@ -2,7 +2,7 @@ import { DataEnums, EventKeys, Events, User } from '../typings'
 import { ResultCode } from '../core/code'
 import { ChildrenApp } from './store'
 import { createResult } from './utils'
-import { sendAction } from '../cbp'
+import { sendAction } from '../cbp/actions'
 
 /**
  * 使用提及。
@@ -167,7 +167,7 @@ export const useSend = <T extends EventKeys>(event: Events[T]) => {
  */
 export const useSends = <T extends EventKeys>(event: Events[T]) => {
   const [message] = useMessage(event)
-  return message.send
+  return [message.send]
 }
 
 /**

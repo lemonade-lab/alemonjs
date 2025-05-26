@@ -7,7 +7,7 @@ import { platform } from './register'
 export { platform }
 export * from './hook'
 
-const main = () => {
+export default () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -24,5 +24,3 @@ const main = () => {
     startWebsocket()
   }
 }
-
-main()

@@ -98,7 +98,7 @@ export * from './typing'
 
 export const platform = 'gui'
 
-const main = () => {
+export default () => {
   let value = getConfigValue()
   if (!value) value = {}
   // 获取配置
@@ -459,5 +459,3 @@ const main = () => {
     }
   })
 }
-
-main()

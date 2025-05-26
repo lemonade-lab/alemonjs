@@ -1,6 +1,6 @@
 import { DataEnums, OnDataFormatFunc } from '../typings'
 import { ResultCode } from '../core/code'
-import { sendAction } from '../cbp'
+import { sendAction } from '../cbp/actions'
 
 /**
  * 创建数据格式。

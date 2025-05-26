@@ -10,7 +10,8 @@ import {
   EventCycleEnum,
   EventKeys,
   StoreMiddlewareItem,
-  StoreResponseItem
+  StoreResponseItem,
+  SubscribeValue
 } from '../typings'
 import { mkdirSync } from 'node:fs'
 import log4js from 'log4js'
@@ -108,9 +109,9 @@ export class Core {
         // storeActionsBus: {},
         // storeMains: [],
         storeSubscribeList: {
-          create: {},
-          mount: {},
-          unmount: {}
+          create: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>(),
+          mount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>(),
+          unmount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>()
         },
         storeChildrenApp: {}
       }
@@ -149,14 +150,13 @@ export class SubscribeList<T extends EventKeys> {
     this.#select = select
     this.#chioce = chioce
     // 如果不存在，则初始化
-    if (!alemonjsCore.storeSubscribeList[this.#chioce][this.#select]) {
-      // 创建链表
-      alemonjsCore.storeSubscribeList[this.#chioce][this.#select] = new SinglyLinkedList()
+    if (!alemonjsCore.storeSubscribeList[this.#chioce].has(this.#select)) {
+      alemonjsCore.storeSubscribeList[this.#chioce].set(this.#select, new SinglyLinkedList())
     }
   }
 
   get value() {
-    return alemonjsCore.storeSubscribeList[this.#chioce][this.#select]
+    return alemonjsCore.storeSubscribeList[this.#chioce].get(this.#select)
   }
 }
 

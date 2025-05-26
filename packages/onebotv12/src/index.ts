@@ -9,7 +9,7 @@ const MyBot = {
 
 export const platform = 'onebot'
 
-const main = () => {
+export default () => {
   const value = getConfigValue()
   const config = value[platform]
 
@@ -210,5 +210,3 @@ const main = () => {
     }
   })
 }
-
-main()

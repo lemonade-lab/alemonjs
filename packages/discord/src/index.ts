@@ -1,12 +1,20 @@
 import './env'
-import { User, cbpPlatform, getConfigValue, useUserHashKey } from 'alemonjs'
+import {
+  PrivateEventMessageCreate,
+  PublicEventMessageCreate,
+  User,
+  cbpPlatform,
+  getConfigValue,
+  useUserHashKey
+} from 'alemonjs'
 import { sendchannel, senduser } from './send'
 import { DCClient } from './sdk/wss'
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
 import { AvailableIntentsEventsEnum } from './sdk/types'
+import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from 'alemonjs'
 export const platform = 'discord'
 
-const main = () => {
+export default () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -99,7 +107,7 @@ const main = () => {
     const UserAvatar = createUserAvatar(UserId, event.author.avatar)
 
     if (event.type == 0 && event.member) {
-      const e = {
+      const e: PublicEventMessageCreate = {
         name: 'message.create',
         // 事件类型
         Platform: platform,
@@ -125,7 +133,7 @@ const main = () => {
       cbp.send(e)
     } else if (event.type == 0 && !event.member) {
       // 处理消息
-      const e = {
+      const e: PrivateEventMessageCreate = {
         name: 'private.message.create',
         // 事件类型
         Platform: platform,
@@ -172,7 +180,7 @@ const main = () => {
     const MessageText = event.data.custom_id
     if (isPrivate) {
       // 处理消息
-      const e = {
+      const e: PrivateEventInteractionCreate = {
         name: 'private.interaction.create',
         // 事件类型
         Platform: platform,
@@ -197,7 +205,7 @@ const main = () => {
       }
       cbp.send(e)
     } else {
-      const e = {
+      const e: PublicEventInteractionCreate = {
         name: 'interaction.create',
         // 事件类型
         Platform: platform,
@@ -326,5 +334,3 @@ const main = () => {
     }
   })
 }
-
-main()

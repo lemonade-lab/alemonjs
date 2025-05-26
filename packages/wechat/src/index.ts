@@ -12,7 +12,7 @@ import { getPublicPath, getStaticPath } from './static'
 import { useUserHashKey } from 'alemonjs'
 import { MessageInterface } from 'wechaty/impls'
 export const platform = 'wechat'
-const main = () => {
+export default () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -265,5 +265,3 @@ const main = () => {
     }
   })
 }
-
-main()

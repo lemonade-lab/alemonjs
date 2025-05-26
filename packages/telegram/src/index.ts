@@ -3,11 +3,12 @@ import {
   getConfigValue,
   PrivateEventMessageCreate,
   PublicEventMemberAdd,
+  PublicEventMessageCreate,
   useUserHashKey
 } from 'alemonjs'
 import TelegramClient from 'node-telegram-bot-api'
 export const platform = 'telegram'
-const main = () => {
+export default () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -98,9 +99,10 @@ const main = () => {
       // 机器人消息不处理
       if (event?.from?.is_bot) return
       // 定义消
-      const e = {
+      const e: PublicEventMessageCreate = {
         // 事件类型
         Platform: platform,
+        name: 'message.create',
         // 频道
         GuildId: String(event?.chat.id),
         ChannelId: String(event?.chat.id),
@@ -113,6 +115,7 @@ const main = () => {
         IsBot: false,
         // message
         MessageId: String(event?.message_id),
+        MessageText: event?.text,
         OpenId: String(event?.chat?.id),
         CreateAt: Date.now(),
         // other
@@ -261,5 +264,3 @@ const main = () => {
     }
   })
 }
-
-main()

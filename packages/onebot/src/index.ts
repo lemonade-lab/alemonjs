@@ -25,7 +25,7 @@ const ImageURLToBuffer = async (url: string) => {
 
 export const platform = 'onebot'
 
-const main = () => {
+export default () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -412,5 +412,3 @@ const main = () => {
     }
   })
 }
-
-main()

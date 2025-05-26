@@ -42,11 +42,10 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
    */
   const register = (callback: Current<T>, keys: Keys[], choose: EventCycleEnum) => {
     const curSelects = Array.isArray(selects) ? selects : [selects]
+    // 分配id
+    const ID = Date.now().toString(36) + Math.random().toString(36).substring(2, 15)
+    // 创建 订阅 列表
     for (const select of curSelects) {
-      // 1. 必得得返回 一个id。好随时卸载。同时内部也能卸载所有的。
-      // 2. tudo 待完善。
-
-      // 创建 订阅 列表
       const subList = new SubscribeList(choose, select)
       // 没有选择
       if (keys.length === 0) return
@@ -68,9 +67,19 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
           })
         }
       }
-      subList.value.append({ keys: values, current: callback })
+      subList.value.append({
+        choose,
+        selects: curSelects,
+        keys: values,
+        current: callback,
+        id: ID
+      })
     }
-    return ''
+    return {
+      selects: curSelects,
+      choose,
+      id: ID
+    }
   }
 
   /**
@@ -100,15 +109,33 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
     return register(callback, keys, 'unmount')
   }
 
-  const clear = (id: string) => {
-    //
+  /**
+   * 清除订阅
+   * @param id
+   */
+  const cancel = (value: { id: string; selects: T[]; choose: EventCycleEnum }) => {
+    const selects = value.selects
+    const ID = value.id // 订阅的 ID
+    for (const select of selects) {
+      const subList = new SubscribeList(value.choose, select)
+      const remove = () => {
+        const item = subList.value.popNext() // 弹出下一个节点
+        if (!item || item.data.id !== ID) {
+          remove()
+          return
+        }
+        subList.value.removeCurrent() // 移除当前节点
+        return
+      }
+      remove()
+    }
   }
 
   const subscribe = {
     create,
     mount: mountBefore,
     unmount,
-    clear
+    cancel
   }
 
   return [subscribe]

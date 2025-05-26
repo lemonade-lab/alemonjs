@@ -22,7 +22,7 @@ export { platform }
 // 监听父进程
 await waitWeb(2000)
 
-const main = async () => {
+export default async () => {
   let value = getConfigValue()
   if (!value) value = {}
   let config = value[platform]
@@ -211,5 +211,3 @@ const main = async () => {
     }
   })
 }
-
-main()

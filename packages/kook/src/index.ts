@@ -4,7 +4,6 @@ import {
   getConfigValue,
   useUserHashKey,
   User,
-  onProcessor,
   DataEnums,
   cbpPlatform
 } from 'alemonjs'
@@ -12,7 +11,7 @@ import { KOOKClient } from './sdk/index'
 import { readFileSync } from 'fs'
 export const platform = 'kook'
 
-const main = () => {
+export default () => {
   let value = getConfigValue()
   if (!value) value = {}
   const config = value[platform]
@@ -438,5 +437,3 @@ const main = () => {
     }
   })
 }
-
-main()

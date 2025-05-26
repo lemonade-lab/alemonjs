@@ -5,7 +5,8 @@ import { useState } from './post.js'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { ResultCode } from './core/code.js'
-import { cbpClient, cbpServer } from './cbp/index.js'
+import { cbpServer } from './cbp/index.js'
+import { cbpClient } from './cbp/connect.js'
 
 const defaultPort = 17117
 
@@ -137,7 +138,7 @@ export const start = async (options: StartOptions | string = {}) => {
       if (login) {
         process.env.login = login
       }
-      import(process.env.platform)
+      import(process.env.platform).then(res => res?.default())
     })
   }
   // 获取入口文件
