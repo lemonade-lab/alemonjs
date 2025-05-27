@@ -374,7 +374,7 @@ export default () => {
     } else if (data.action === 'mention.get') {
       const event = data.payload.event
       const res = await api.use.mention(event)
-      consume(res)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
 }

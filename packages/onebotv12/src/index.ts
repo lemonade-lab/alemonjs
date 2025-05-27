@@ -1,4 +1,11 @@
-import { cbpPlatform, getConfigValue, PublicEventMessageCreate, useUserHashKey } from 'alemonjs'
+import {
+  cbpPlatform,
+  createResult,
+  getConfigValue,
+  PublicEventMessageCreate,
+  ResultCode,
+  useUserHashKey
+} from 'alemonjs'
 import { OneBotClient } from './sdk/wss'
 
 const MyBot = {
@@ -180,7 +187,7 @@ export default () => {
       const event = data.payload.event
       const paramFormat = data.payload.params.format
       const res = await api.use.send(event, paramFormat)
-      consume(res)
+      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)))
     } else if (data.action === 'message.send.channel') {
       // const channel_id = data.payload.ChannelId
       // const val = data.payload.params.format

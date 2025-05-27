@@ -3,8 +3,10 @@ import {
   DataEnums,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
+  ResultCode,
   User,
   cbpPlatform,
+  createResult,
   getConfigValue,
   useUserHashKey
 } from 'alemonjs'
@@ -215,11 +217,13 @@ export default () => {
   const api = {
     active: {
       send: {
-        channel: (channel_id, val: DataEnums[]) => {
-          return sendchannel(client, { channel_id }, val)
+        channel: async (channel_id, val: DataEnums[]) => {
+          const res = await sendchannel(client, { channel_id }, val)
+          return [createResult(ResultCode.Ok, '请求完成', res)]
         },
         user: async (author_id, val: DataEnums[]) => {
-          return senduser(client, { author_id: author_id }, val)
+          const res = await senduser(client, { author_id: author_id }, val)
+          return [createResult(ResultCode.Ok, '请求完成', res)]
         }
       }
     },
@@ -231,11 +235,12 @@ export default () => {
         const tag = event.tag
         if (tag == 'message.create') {
           const ChannelId = event.value.channel_id
-          return sendchannel(client, { channel_id: ChannelId }, val)
+          const res = await sendchannel(client, { channel_id: ChannelId }, val)
+          return [createResult(ResultCode.Ok, '请求完成', res)]
         } else if (tag == 'private.message.create') {
           const UserId = event.value.author.id
           const ChannelId = event.value.channel_id
-          return senduser(
+          const res = await senduser(
             client,
             {
               channel_id: ChannelId,
@@ -243,13 +248,15 @@ export default () => {
             },
             val
           )
+          return [createResult(ResultCode.Ok, '请求完成', res)]
         } else if (tag == 'interaction.create') {
           const ChannelId = event.value.channel_id
-          return sendchannel(client, { channel_id: ChannelId }, val)
+          const res = await sendchannel(client, { channel_id: ChannelId }, val)
+          return [createResult(ResultCode.Ok, '请求完成', res)]
         } else if (tag == 'private.interaction.create') {
           const UserId = event.value.user.id
           const ChannelId = event.value.channel_id
-          return senduser(
+          const res = await senduser(
             client,
             {
               channel_id: ChannelId,
@@ -257,6 +264,7 @@ export default () => {
             },
             val
           )
+          return [createResult(ResultCode.Ok, '请求完成', res)]
         }
         return Promise.all([])
       },
@@ -305,7 +313,7 @@ export default () => {
     } else if (data.action === 'mention.get') {
       const event = data.payload.event
       const res = await api.use.mention(event)
-      consume(res)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
 }

@@ -9,11 +9,10 @@ import {
   DEVICE_ID_HEADER,
   deviceId,
   FULL_RECEIVE_HEADER,
-  generateUniqueId,
   reconnectInterval,
-  timeoutTime,
   USER_AGENT_HEADER
 } from './config'
+import { createResult, Result } from '../post'
 
 type CBPClientOptions = {
   open?: () => void
@@ -74,7 +73,12 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
               actionTimeouts.delete(parsedMessage.actionID)
             }
             // 调用回调函数
-            resolve(parsedMessage.payload)
+            if (Array.isArray(parsedMessage.payload)) {
+              resolve(parsedMessage.payload)
+            } else {
+              // 错误处理
+              resolve([createResult(ResultCode.Fail, '消费处理错误', null)])
+            }
             actionResolves.delete(parsedMessage.actionID)
           }
         } else if (parsedMessage.name) {
@@ -105,7 +109,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
   start()
 }
 
-type ReplyFunc = (data: Actions, consume: (payload: any) => void) => void
+type ReplyFunc = (data: Actions, consume: (payload: Result[]) => void) => void
 
 export const cbpPlatform = (
   url: string,
@@ -135,7 +139,7 @@ export const cbpPlatform = (
    * @param data
    * @param payload
    */
-  const reply = (data: Actions, payload: any) => {
+  const reply = (data: Actions, payload: Result[]) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
       global.chatbotPlatform.send(
         JSON.stringify({

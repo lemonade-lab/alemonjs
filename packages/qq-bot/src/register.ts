@@ -1,8 +1,10 @@
 import {
   cbpPlatform,
+  createResult,
   getConfigValue,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
+  ResultCode,
   useUserHashKey
 } from 'alemonjs'
 import { QQBotClients } from './sdk/client.websoket'
@@ -376,7 +378,7 @@ export const register = (client: QQBotClients) => {
       // 获取提及
       const metions = await getMesion(event)
       // 消费
-      consume(metions)
+      consume([createResult(ResultCode.Ok, '请求完成', metions)])
     } else if (data.action === 'message.send.channel') {
       // 主动发送消息到频道
       const channel_id = data.payload.ChannelId

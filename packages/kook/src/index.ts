@@ -5,7 +5,9 @@ import {
   useUserHashKey,
   User,
   DataEnums,
-  cbpPlatform
+  cbpPlatform,
+  createResult,
+  ResultCode
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 import { readFileSync } from 'fs'
@@ -222,7 +224,7 @@ export default () => {
               content: item.value
             })
           }
-          let data = item.value
+          let data = Buffer.from(item.value, 'base64')
           if (item.type == 'ImageFile') {
             data = readFileSync(item.value)
           }
@@ -313,7 +315,7 @@ export default () => {
               content: item.value
             })
           }
-          let data = item.value
+          let data = Buffer.from(item.value, 'base64')
           if (item.type == 'ImageFile') {
             data = readFileSync(item.value)
           }
@@ -395,21 +397,33 @@ export default () => {
       const event = data.payload.event
       const paramFormat = data.payload.params.format
       const res = await api.use.send(event, paramFormat)
-      consume(res)
+      if (!res) {
+        consume([createResult(ResultCode.Ok, '请求完成', null)])
+        return
+      }
+      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)))
     } else if (data.action === 'message.send.channel') {
       const channel_id = data.payload.ChannelId
       const val = data.payload.params.format
       const res = await api.active.send.channel(channel_id, val)
-      consume(res)
+      if (!res) {
+        consume([createResult(ResultCode.Ok, '请求完成', null)])
+        return
+      }
+      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)))
     } else if (data.action === 'message.send.user') {
       const user_id = data.payload.UserId
       const val = data.payload.params.format
       const res = await api.active.send.user(user_id, val)
-      consume(res)
+      if (!res) {
+        consume([createResult(ResultCode.Ok, '请求完成', null)])
+        return
+      }
+      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)))
     } else if (data.action === 'mention.get') {
       const event = data.payload.event
       const res = await api.use.mention(event)
-      consume(res)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
 }

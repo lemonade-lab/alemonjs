@@ -30,20 +30,16 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
     find: async (options: Options) => {
       try {
         if (!res) {
-          const result = await sendAction({
+          const results = await sendAction({
             action: 'mention.get',
             payload: {
               event
             }
           })
-          // mention 不能是 数组
-          if (Array.isArray(result)) {
-            return createResult(ResultCode.Ok, 'Successfully retrieved mention data', null)
+          const result = results.find(item => item.code === ResultCode.Ok)
+          if (result) {
+            res = result.data as User[]
           }
-          if (result.code !== ResultCode.Ok) {
-            return createResult(result.code, result.message, null)
-          }
-          res = result.data as User[]
         }
       } catch (err) {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
@@ -79,20 +75,16 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
     ) => {
       try {
         if (!res) {
-          const result = await sendAction({
+          const results = await sendAction({
             action: 'mention.get',
             payload: {
               event
             }
           })
-          // mention 不能是 数组
-          if (Array.isArray(result)) {
-            return createResult(ResultCode.Ok, 'Successfully retrieved mention data', null)
+          const result = results.find(item => item.code === ResultCode.Ok)
+          if (result) {
+            res = result.data as User[]
           }
-          if (result.code !== ResultCode.Ok) {
-            return createResult(result.code, result.message, null)
-          }
-          res = result.data as User[]
         }
       } catch (err) {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)

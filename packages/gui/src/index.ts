@@ -1,9 +1,11 @@
 import {
   cbpPlatform,
+  createResult,
   DataEnums,
   getConfigValue,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
+  ResultCode,
   User,
   useUserHashKey
 } from 'alemonjs'
@@ -317,8 +319,8 @@ export default () => {
           return Promise.all([])
         },
         // 向用户发送消息
-        user: async (user_id, val: DataEnums[]) => {
-          if (val.length < 0) return Promise.all([])
+        user: async (user_id: string, val: DataEnums[]) => {
+          if (val.length < 0) return []
           const MessageBody = await getMessageBody(val)
           const db = {
             t: 'send_private_message' as DataPrivate['t'],
@@ -361,7 +363,8 @@ export default () => {
             } as any
           }
           addChat(db.d.createAt, db)
-          return Promise.all([client.send(DATA.stringify(db))])
+          client.send(DATA.stringify(db))
+          return []
         } else {
           // 私聊消息
           const db = {
@@ -375,7 +378,8 @@ export default () => {
             } as any
           }
           addPrivateChat(db.d.createAt, db)
-          return Promise.all([client.send(DATA.stringify(db))])
+          client.send(DATA.stringify(db))
+          return Promise.all([])
         }
       },
       mention: async e => {
@@ -429,7 +433,7 @@ export default () => {
     } else if (data.action === 'mention.get') {
       const event = data.payload.event
       const res = await api.use.mention(event)
-      consume(res)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
 }

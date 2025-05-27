@@ -27,7 +27,7 @@ export const DEVICE_ID_HEADER = 'x-device-id'
 // 是否全量接收
 export const FULL_RECEIVE_HEADER = 'x-full-receive'
 // 行为回调
-export const actionResolves = new Map<string, (value: Result | PromiseLike<Result>) => void>()
+export const actionResolves = new Map<string, (value: Result[] | PromiseLike<Result[]>) => void>()
 // 超时器
 export const actionTimeouts = new Map<string, NodeJS.Timeout>()
 // 分配绑定记录

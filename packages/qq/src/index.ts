@@ -1,4 +1,11 @@
-import { useUserHashKey, getConfigValue, User, cbpPlatform } from 'alemonjs'
+import {
+  useUserHashKey,
+  getConfigValue,
+  User,
+  cbpPlatform,
+  ResultCode,
+  createResult
+} from 'alemonjs'
 import { Client as ICQQClient, PrivateMessageEvent, segment, Sendable } from 'icqq'
 import { join } from 'path'
 import { existsSync, mkdirSync } from 'fs'
@@ -182,7 +189,7 @@ export default async () => {
       const event = data.payload.event
       const paramFormat = data.payload.params.format
       const res = await api.use.send(event, paramFormat)
-      consume(res)
+      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)))
     } else if (data.action === 'message.send.channel') {
       // const channel_id = data.payload.ChannelId
       // const val = data.payload.params.format
@@ -196,7 +203,7 @@ export default async () => {
     } else if (data.action === 'mention.get') {
       const event = data.payload.event
       const res = await api.use.mention(event)
-      consume(res)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
 }
