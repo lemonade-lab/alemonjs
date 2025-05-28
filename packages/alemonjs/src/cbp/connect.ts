@@ -49,7 +49,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
         const parsedMessage = JSON.parse(message.toString())
         logger.debug({
           code: ResultCode.Ok,
-          message: '接收到消息',
+          message: '客户端接收到消息',
           data: parsedMessage
         })
         if (parsedMessage?.activeId) {
@@ -88,7 +88,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
       } catch (error) {
         logger.error({
           code: ResultCode.Fail,
-          message: '解析消息失败',
+          message: '客户端解析消息失败',
           data: error
         })
       }
@@ -104,6 +104,13 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
       setTimeout(() => {
         start() // 重新连接
       }, reconnectInterval) // 6秒后重连
+    })
+    global.chatbotClient.on('error', err => {
+      logger.error({
+        code: ResultCode.Fail,
+        message: '客户端错误',
+        data: err
+      })
     })
   }
   start()
@@ -177,7 +184,7 @@ export const cbpPlatform = (
         const data = JSON.parse(message.toString())
         logger.debug({
           code: ResultCode.Ok,
-          message: '平台接收消息',
+          message: '平台端接收消息',
           data: data
         })
         for (const cb of msg) {
@@ -198,7 +205,7 @@ export const cbpPlatform = (
     global.chatbotPlatform.on('close', err => {
       logger.debug({
         code: ResultCode.Fail,
-        message: '平台连接关闭，尝试重新连接...',
+        message: '平台端连接关闭，尝试重新连接...',
         data: err
       })
       delete global.chatbotPlatform
@@ -206,6 +213,13 @@ export const cbpPlatform = (
       setTimeout(() => {
         start() // 重新连接
       }, reconnectInterval) // 6秒后重连
+    })
+    global.chatbotPlatform.on('error', err => {
+      logger.error({
+        code: ResultCode.Fail,
+        message: '平台端错误',
+        data: err
+      })
     })
   }
 

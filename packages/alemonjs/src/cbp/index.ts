@@ -60,6 +60,11 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         const parsedMessage = JSON.parse(message.toString())
         // 1. 解析得到 actionID ，说明是消费行为请求。要广播告诉所有客户端。
         // 2. 解析得到 name ，说明是一个事件请求。
+        logger.debug({
+          code: ResultCode.Ok,
+          message: '服务端接收到消息',
+          data: parsedMessage
+        })
         if (parsedMessage?.actionID) {
           // 指定的设备 处理消费。终端有记录每个客户端是谁
           const DeviceId = parsedMessage.DeviceId
@@ -142,7 +147,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
             } else {
               logger.error({
                 code: ResultCode.Fail,
-                message: '出现意外，无法绑定客户端',
+                message: '服务端出现意外，无法绑定客户端',
                 data: null
               })
             }
@@ -173,7 +178,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       } catch (error) {
         logger.error({
           code: ResultCode.Fail,
-          message: '解析平台消息失败',
+          message: '服务端解析平台消息失败',
           data: error
         })
         return
@@ -187,6 +192,14 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         code: ResultCode.Fail,
         message: `Client ${originId} disconnected`,
         data: null
+      })
+    })
+
+    ws.on('error', err => {
+      logger.error({
+        code: ResultCode.Fail,
+        message: `Client ${originId} error`,
+        data: err
       })
     })
   }
@@ -218,6 +231,13 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         code: ResultCode.Fail,
         message: `Client ${originId} disconnected`,
         data: null
+      })
+    })
+    ws.on('error', err => {
+      logger.error({
+        code: ResultCode.Fail,
+        message: `Client ${originId} error`,
+        data: err
       })
     })
   }

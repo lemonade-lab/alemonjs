@@ -8,8 +8,12 @@ const App = () =>
       input: 'src/index.ts'
     })
   )
+
 export default defineConfig({
   plugins: [() => App],
+  env: {
+    NODE_ENV: 'development'
+  },
   alias: {
     entries: [{ find: '@src', replacement: join(__dirname, 'src') }]
   },

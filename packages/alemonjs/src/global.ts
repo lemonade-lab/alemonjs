@@ -67,6 +67,14 @@ declare global {
    * 定义数据格式
    */
   var format: OnDataFormatFunc
+  namespace NodeJS {
+    interface ProcessEnv {
+      login?: string
+      platform?: string
+      port?: string
+      NODE_ENV?: 'development' | 'production'
+    }
+  }
 }
 
 // 初始化日志

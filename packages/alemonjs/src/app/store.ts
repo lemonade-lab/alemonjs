@@ -22,6 +22,8 @@ import log4js from 'log4js'
 const createLogger = () => {
   const logDir = process.env?.LOG_PATH ?? `./logs/${process.env.LOG_NAME ?? ''}`
   mkdirSync(logDir, { recursive: true })
+  // 当环境被设置为 development 时。被视为 trace
+  const level = process.env.NODE_ENV === 'development' ? 'trace' : 'info'
   log4js.configure({
     appenders: {
       console: {
@@ -55,13 +57,12 @@ const createLogger = () => {
       }
     },
     categories: {
-      default: { appenders: ['console'], level: 'error' },
-      // 记录级别
+      default: { appenders: ['console'], level: level },
       command: { appenders: ['console', 'command'], level: 'info' },
       error: { appenders: ['console', 'command', 'error'], level: 'warn' }
     }
   })
-  const defaultLogger = log4js.getLogger('message')
+  const defaultLogger = log4js.getLogger('default')
   const commandLogger = log4js.getLogger('command')
   const errorLogger = log4js.getLogger('error')
   return {
