@@ -94,7 +94,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
       }
     })
     global.chatbotClient.on('close', () => {
-      logger.debug({
+      logger.warn({
         code: ResultCode.Fail,
         message: '连接关闭，尝试重新连接...',
         data: null
@@ -203,7 +203,7 @@ export const cbpPlatform = (
       }
     })
     global.chatbotPlatform.on('close', err => {
-      logger.debug({
+      logger.warn({
         code: ResultCode.Fail,
         message: '平台端连接关闭，尝试重新连接...',
         data: err

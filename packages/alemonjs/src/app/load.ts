@@ -64,7 +64,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       // 卸载
       App.un()
       try {
-        await app?.unMounted(e)
+        app?.unMounted && (await app.unMounted(e))
       } catch (e) {
         // 卸载周期出意外，不需要进行卸载
         showErrorModule(e)
@@ -72,14 +72,12 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     }
 
     // onCreated 创建
-    if (typeof app?.onCreated == 'function') {
-      try {
-        await app?.onCreated()
-      } catch (e) {
-        unMounted(e)
-        // 出错了，结束后续的操作。
-        return
-      }
+    try {
+      app?.onCreated && (await app?.onCreated())
+    } catch (e) {
+      unMounted(e)
+      // 出错了，结束后续的操作。
+      return
     }
 
     // onMounted 加载
@@ -132,9 +130,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       App.pushMiddleware(mwData)
       App.on()
       try {
-        if (typeof app?.onMounted == 'function') {
-          await app?.onMounted({ response: resData, middleware: mwData })
-        }
+        app?.onMounted && (await app.onMounted({ response: resData, middleware: mwData }))
       } catch (e) {
         unMounted(e)
         return
