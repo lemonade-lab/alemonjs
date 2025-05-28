@@ -17,7 +17,7 @@ type Config = {
  * @module mysql
  * @returns
  */
-export const getSequelize = (conifg: Config = {}) => {
+export const getSequelize = (conifg: Config = {}): Sequelize => {
   if (global.sequelize) return global.sequelize
   const dir = join(process.cwd(), 'logs', 'mysql')
   mkdirSync(dir, { recursive: true })

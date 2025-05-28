@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "数据库连接",
   "author": "lemonade",
   "license": "MIT",
@@ -39,8 +39,7 @@
     "ioredis": "^5.4.1",
     "mysql2": "^3.6.2",
     "sequelize": "^6.33.0",
-    "dayjs": "^1.11.13",
-    "mongoose": "^8.15.0"
+    "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
