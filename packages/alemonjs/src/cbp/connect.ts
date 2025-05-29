@@ -9,6 +9,7 @@ import {
   DEVICE_ID_HEADER,
   deviceId,
   FULL_RECEIVE_HEADER,
+  HEARTBEAT_INTERVAL,
   reconnectInterval,
   USER_AGENT_HEADER
 } from './config'
@@ -17,6 +18,65 @@ import { createResult, Result } from '../post'
 type CBPClientOptions = {
   open?: () => void
   isFullReceive?: boolean // 是否全量接收
+}
+
+// 心跳
+const useHeartbeat = ({ ping, isConnected, terminate }) => {
+  let heartbeatTimer: NodeJS.Timeout | null = null
+  let lastPong = Date.now()
+  const stopHeartbeat = () => {
+    if (heartbeatTimer) {
+      clearInterval(heartbeatTimer)
+      heartbeatTimer = null
+    }
+  }
+  const callback = () => {
+    if (isConnected()) {
+      const diff = Date.now() - lastPong
+      const max = HEARTBEAT_INTERVAL * 2 // 最大心跳间隔
+      // 检查上次 pong 是否超时
+      if (diff > max) {
+        logger.debug({
+          code: ResultCode.Fail,
+          message: '心跳超时，断开重连',
+          data: null
+        })
+        terminate() // 强制断开
+        return
+      }
+      ping()
+      logger.debug({
+        code: ResultCode.Ok,
+        message: `发送 ping`,
+        data: null
+      })
+      heartbeatTimer = setTimeout(callback, HEARTBEAT_INTERVAL)
+    } else {
+      stopHeartbeat() // 如果连接已关闭，停止心跳
+      terminate() // 强制断开
+    }
+  }
+
+  const startHeartbeat = () => {
+    lastPong = Date.now()
+    stopHeartbeat()
+    callback()
+  }
+
+  const control = {
+    start: startHeartbeat,
+    stop: stopHeartbeat,
+    pong: () => {
+      // 收到 pong，说明连接正常
+      lastPong = Date.now()
+      logger.debug({
+        code: ResultCode.Ok,
+        message: `收到 pong`,
+        data: null
+      })
+    }
+  }
+  return [control]
 }
 
 /**
@@ -33,6 +93,28 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
     delete global.chatbotClient
   }
   const { open = () => {}, isFullReceive = true } = options
+
+  const [heartbeatControl] = useHeartbeat({
+    ping: () => {
+      global?.chatbotClient?.ping?.()
+    },
+    isConnected: () => {
+      return global?.chatbotClient && global?.chatbotClient?.readyState === WebSocket.OPEN
+    },
+    terminate: () => {
+      try {
+        // 强制断开连接
+        global?.chatbotClient?.terminate?.()
+      } catch (error) {
+        logger.debug({
+          code: ResultCode.Fail,
+          message: '强制断开连接失败',
+          data: error
+        })
+      }
+    }
+  })
+
   const start = () => {
     global.chatbotClient = new WebSocket(url, {
       headers: {
@@ -41,7 +123,15 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
         [FULL_RECEIVE_HEADER]: isFullReceive ? '1' : '0'
       }
     })
-    global.chatbotClient.on('open', open)
+    global.chatbotClient.on('open', () => {
+      open()
+      heartbeatControl.start() // 启动心跳
+    })
+
+    global.chatbotClient.on('pong', () => {
+      heartbeatControl.pong() // 更新 pong 时间
+    })
+
     // 客户端接收，被标准化的平台消息
     global.chatbotClient.on('message', message => {
       try {
@@ -94,6 +184,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
       }
     })
     global.chatbotClient.on('close', () => {
+      heartbeatControl.stop() // 停止心跳
       logger.warn({
         code: ResultCode.Fail,
         message: '连接关闭，尝试重新连接...',
@@ -128,6 +219,26 @@ export const cbpPlatform = (
     delete global.chatbotPlatform
   }
   const { open = () => {} } = options
+
+  const [heartbeatControl] = useHeartbeat({
+    ping: () => {
+      global?.chatbotPlatform?.ping?.()
+    },
+    isConnected: () => {
+      return global?.chatbotPlatform && global?.chatbotPlatform?.readyState === WebSocket.OPEN
+    },
+    terminate: () => {
+      try {
+        global?.chatbotPlatform?.terminate?.()
+      } catch (error) {
+        logger.debug({
+          code: ResultCode.Fail,
+          message: '强制断开连接失败',
+          data: error
+        })
+      }
+    }
+  })
 
   /**
    * 发送数据
@@ -178,7 +289,15 @@ export const cbpPlatform = (
         [DEVICE_ID_HEADER]: deviceId
       }
     })
-    global.chatbotPlatform.on('open', open)
+    global.chatbotPlatform.on('open', () => {
+      open()
+      heartbeatControl.start() // 启动心跳
+    })
+
+    global.chatbotPlatform.on('pong', () => {
+      heartbeatControl.pong() // 更新 pong 时间
+    })
+
     global.chatbotPlatform.on('message', message => {
       try {
         const data = JSON.parse(message.toString())
@@ -203,6 +322,7 @@ export const cbpPlatform = (
       }
     })
     global.chatbotPlatform.on('close', err => {
+      heartbeatControl.stop() // 停止心跳
       logger.warn({
         code: ResultCode.Fail,
         message: '平台端连接关闭，尝试重新连接...',

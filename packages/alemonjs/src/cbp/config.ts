@@ -39,4 +39,6 @@ export const generateUniqueId = () => {
 // 超时时间
 export const timeoutTime = 1000 * 12 // 12秒
 // 失败重连
-export const reconnectInterval = 6000 // 6秒
+export const reconnectInterval = 1000 * 6 // 6秒
+// 心跳间隔
+export const HEARTBEAT_INTERVAL = 1000 * 18 // 18秒

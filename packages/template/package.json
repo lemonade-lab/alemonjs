@@ -12,6 +12,6 @@
   },
   "devDependencies": {
     "@types/node": "^18",
-    "lvyjs": "^0.2.19"
+    "lvyjs": "^0.2.20"
   }
 }
