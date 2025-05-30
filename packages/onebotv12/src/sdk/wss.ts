@@ -182,7 +182,6 @@ export class OneBotClient {
           timeout: setTimeout(() => {
             reject(Object.assign(options, { timeout: this.timeout }))
             delete this.#echo[options.echo as string]
-            console.error('请求超时:', options)
           }, this.timeout)
         })
     )

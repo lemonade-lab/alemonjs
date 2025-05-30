@@ -237,8 +237,8 @@ export const GROUP_AT_MESSAGE_CREATE = async (
           })
         }
         try {
-          const file_data =
-            item.type == 'ImageFile' ? readFileSync(item.value, 'base64') : item.value
+          const getFileBase64 = (): string => readFileSync(item.value, 'base64')
+          const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value
           const file_info = await client
             .postRichMediaByGroup(event.GuildId, {
               file_type: 1,
@@ -417,7 +417,8 @@ export const C2C_MESSAGE_CREATE = (
             id: res.id
           })
         }
-        const file_data = item.type == 'ImageFile' ? readFileSync(item.value, 'base64') : item.value
+        const getFileBase64 = (): string => readFileSync(item.value, 'base64')
+        const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value
         const file_info = await client
           .postRichMediaByUsers(event.OpenId, {
             file_type: 1,
@@ -578,10 +579,11 @@ export const DIRECT_MESSAGE_CREATE = (
           })
           return createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })
         }
-        const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
+        const file_data =
+          item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
         const res = await client.postDirectImage(event.OpenId, {
           msg_id: event.MessageId,
-          image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
+          image: file_data
         })
         return createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })
       })
@@ -655,10 +657,11 @@ export const AT_MESSAGE_CREATE = (
           })
           return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
         }
-        const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
+        const file_data =
+          item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
         const res = await client.postImage(event.ChannelId, {
           msg_id: event.MessageId,
-          image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
+          image: file_data
         })
         return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
       })
@@ -738,10 +741,11 @@ export const MESSAGE_CREATE = (
           })
           return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
         }
-        const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : item.value
+        const file_data =
+          item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
         const res = await client.postImage(event.ChannelId, {
           msg_id: event.MessageId,
-          image: Buffer.isBuffer(file_data) ? file_data : Buffer.from(file_data)
+          image: file_data
         })
         return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
       })

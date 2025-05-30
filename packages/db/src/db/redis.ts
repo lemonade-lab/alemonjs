@@ -4,7 +4,7 @@
  * @module ioredis
  * @author ningmengchongshui
  */
-import redisClient, { Redis as RedisClient } from 'ioredis'
+import redisClient, { Redis as RedisClient, RedisOptions } from 'ioredis'
 import { getConfigValue } from 'alemonjs'
 
 type Config = {
@@ -18,11 +18,11 @@ type Config = {
  * 获得ioredis客户端
  * @returns
  */
-export const getIoRedis = (config: Config = {}): RedisClient => {
+export const getIoRedis = (config: Config & RedisOptions = {}): RedisClient => {
   if (global.ioRedis) return global.ioRedis
   const value = getConfigValue() || {}
   const redis = value?.redis || {}
-  const { host, port, password, db } = config
+  const { host, port, password, db, ...options } = config
   const connectConfig = {
     host: host || redis?.host || '127.0.0.1',
     port: port || redis?.port || 6379,
@@ -34,7 +34,8 @@ export const getIoRedis = (config: Config = {}): RedisClient => {
     port: connectConfig.port,
     password: connectConfig.password,
     db: connectConfig.db,
-    maxRetriesPerRequest: null
+    maxRetriesPerRequest: null,
+    ...options
   })
   return global.ioRedis
 }

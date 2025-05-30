@@ -54,7 +54,7 @@ export type ActionMentionGet = {
 
 type base = {
   // 动作ID
-  actionID?: string
+  actionId?: string
   // 来源设备编号
   DeviceId?: string
 }

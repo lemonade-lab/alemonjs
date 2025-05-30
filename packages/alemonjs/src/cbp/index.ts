@@ -58,14 +58,14 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       try {
         // 解析消息
         const parsedMessage = JSON.parse(message.toString())
-        // 1. 解析得到 actionID ，说明是消费行为请求。要广播告诉所有客户端。
+        // 1. 解析得到 actionId ，说明是消费行为请求。要广播告诉所有客户端。
         // 2. 解析得到 name ，说明是一个事件请求。
         logger.debug({
           code: ResultCode.Ok,
           message: '服务端接收到消息',
           data: parsedMessage
         })
-        if (parsedMessage?.actionID) {
+        if (parsedMessage?.actionId) {
           // 指定的设备 处理消费。终端有记录每个客户端是谁
           const DeviceId = parsedMessage.DeviceId
           if (childrenClient.has(DeviceId)) {

@@ -12,20 +12,23 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
   return new Promise(resolve => {
     actionResolves.set(actionId, resolve)
     // 设置唯一标识符
-    data.actionID = actionId
+    data.actionId = actionId
     // 设置设备 ID
     data.DeviceId = deviceId
+    // 发送消息
     global.chatbotClient.send(JSON.stringify(data))
     // 12 秒后超时
     const timeout = setTimeout(() => {
-      // 不会当错误进行处理
-      resolve([createResult(ResultCode.Fail, '请求超时', null)])
-      // 手动清理
-      clearTimeout(timeout)
+      // 被清理了
+      if (!actionResolves.has(actionId) || !actionTimeouts.has(actionId)) {
+        return
+      }
       // 删除回调
       actionResolves.delete(actionId)
       // 删除超时器
       actionTimeouts.delete(actionId)
+      // 不会当错误进行处理。而是传入错误码
+      resolve([createResult(ResultCode.Fail, '行为超时', null)])
     }, timeoutTime)
     actionTimeouts.set(actionId, timeout)
   })

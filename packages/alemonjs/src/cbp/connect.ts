@@ -152,15 +152,16 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
               process.env[key] = env[key]
             }
           }
-        } else if (parsedMessage?.actionID) {
-          // 如果有 actionID，说明要消费掉本地的行为请求
-          const resolve = actionResolves.get(parsedMessage.actionID)
+        } else if (parsedMessage?.actionId) {
+          // 如果有 actionId
+          const resolve = actionResolves.get(parsedMessage.actionId)
           if (resolve) {
+            actionResolves.delete(parsedMessage.actionId)
             // 清除超时器
-            const timeout = actionTimeouts.get(parsedMessage.actionID)
+            const timeout = actionTimeouts.get(parsedMessage.actionId)
             if (timeout) {
+              actionTimeouts.delete(parsedMessage.actionId)
               clearTimeout(timeout)
-              actionTimeouts.delete(parsedMessage.actionID)
             }
             // 调用回调函数
             if (Array.isArray(parsedMessage.payload)) {
@@ -169,7 +170,6 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
               // 错误处理
               resolve([createResult(ResultCode.Fail, '消费处理错误', null)])
             }
-            actionResolves.delete(parsedMessage.actionID)
           }
         } else if (parsedMessage.name) {
           // 如果有 name，说明是一个事件请求。要进行处理
@@ -263,7 +263,7 @@ export const cbpPlatform = (
         JSON.stringify({
           action: data.action,
           payload: payload,
-          actionID: data.actionID,
+          actionId: data.actionId,
           // 透传消费。也就是对应的设备进行处理消费。
           DeviceId: data.DeviceId
         })
