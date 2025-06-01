@@ -230,7 +230,7 @@ export default () => {
     use: {
       send: async (event, val: DataEnums[]) => {
         if (val.length < 0) {
-          return Promise.all([])
+          return []
         }
         const tag = event.tag
         if (tag == 'message.create') {
@@ -266,7 +266,7 @@ export default () => {
           )
           return [createResult(ResultCode.Ok, '请求完成', res)]
         }
-        return Promise.all([])
+        return []
       },
       mention: async e => {
         const event: MESSAGE_CREATE_TYPE = e.value

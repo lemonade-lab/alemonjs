@@ -185,7 +185,7 @@ export class DCAPI {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    })
+    }).then(res => res.data)
   }
 
   /**

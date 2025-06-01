@@ -1,4 +1,4 @@
-import { ButtonRow, createResult, DataEnums, ResultCode } from 'alemonjs'
+import { ButtonRow, DataEnums } from 'alemonjs'
 import { readFileSync } from 'fs'
 import { DCClient } from './sdk/wss'
 
@@ -33,14 +33,14 @@ const createButtonsData = (rows: ButtonRow[]) => {
   })
 }
 
-export const sendchannel = (
+export const sendchannel = async (
   client: Client,
   param: {
     channel_id: string
   },
   val: DataEnums[]
 ) => {
-  if (val.length < 0) return Promise.all([])
+  if (val.length < 0) return []
   const channel_id = param?.channel_id ?? ''
   // images
   const images = val.filter(
@@ -125,13 +125,11 @@ export const sendchannel = (
           content: content,
           components: data
         })
-        return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+        return {
           id: res.id
-        })
+        }
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
+    )
   }
   if (content) {
     return Promise.all(
