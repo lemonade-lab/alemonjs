@@ -10,7 +10,7 @@ import {
 import { WechatyBuilder } from 'wechaty'
 import { FileBox } from 'file-box'
 import { readFileSync, writeFileSync } from 'fs'
-import { getPublicPath, getStaticPath } from './static'
+import { getStaticPath } from './static'
 import { useUserHashKey } from 'alemonjs'
 import { MessageInterface } from 'wechaty/impls'
 export const platform = 'wechat'
@@ -65,11 +65,7 @@ export default () => {
       // 修复。如何获取用户头像 url。而不是先存储到本地。
       const contact = event.talker()
       const avatarStream = await contact.avatar()
-      const buffer = await avatarStream.toBuffer()
-      const dir = getPublicPath(avatarStream.name)
-      writeFileSync(dir, buffer)
-
-      const UserAvatar = dir
+      const UserAvatar = await avatarStream.toBase64()
 
       // 文本消息
       const txt = event.payload.text
@@ -189,7 +185,7 @@ export default () => {
                 return event.say(fileBox)
               }
               const filePath = getStaticPath(Date.now() + '.png')
-              writeFileSync(filePath, item.value, 'utf-8')
+              writeFileSync(filePath, Buffer.from(item.value, 'base64'), 'utf-8')
               const fileBox = FileBox.fromFile(filePath)
               return event.say(fileBox)
             })

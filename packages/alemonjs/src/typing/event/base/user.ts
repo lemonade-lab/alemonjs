@@ -16,6 +16,10 @@ export type User = {
   UserName?: string
   /**
    * 用户头像地址
+   * https://
+   * http://
+   * base64://
+   * file://
    */
   UserAvatar?: string
   /**
