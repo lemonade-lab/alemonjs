@@ -224,10 +224,8 @@ export default () => {
               content: item.value
             })
           }
-          let data = Buffer.from(item.value, 'base64')
-          if (item.type == 'ImageFile') {
-            data = readFileSync(item.value)
-          }
+          const data =
+            item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
           // 上传图片
           const res = await client.postImage(data)
           if (!res) return Promise.resolve()
@@ -315,10 +313,8 @@ export default () => {
               content: item.value
             })
           }
-          let data = Buffer.from(item.value, 'base64')
-          if (item.type == 'ImageFile') {
-            data = readFileSync(item.value)
-          }
+          const data =
+            item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
           // 上传图片
           const res = await client.postImage(data)
           if (!res) return Promise.resolve()

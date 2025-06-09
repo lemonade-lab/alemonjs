@@ -256,9 +256,7 @@ export default () => {
             id: null
           })
         })
-      ).catch(err => [
-        createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-      ])
+      )
     }
     const images = val.filter(
       item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
@@ -292,9 +290,7 @@ export default () => {
             id: null
           })
         })
-      ).catch(err => [
-        createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-      ])
+      )
     }
     return Promise.all([])
   }

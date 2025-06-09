@@ -50,7 +50,7 @@ export interface KeyboardType {
 
 export interface MarkdownType {
   /** markdown 模版id，申请模版后获得 */
-  custom_template_id: string
+  custom_template_id?: string
   /** 原生 markdown 文本内容（内邀使用） */
   content?: string
   /** 模版内变量与填充值的kv映射 */

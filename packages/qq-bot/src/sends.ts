@@ -7,6 +7,7 @@ import {
   DataArkBigCard,
   DataArkCard,
   DataArkList,
+  DataMarkDown,
   ResultCode,
   type DataEnums
 } from 'alemonjs'
@@ -163,6 +164,65 @@ const createArkList = (value: DataArkList['value']) => {
   }
 }
 
+// 数据md转为文本
+const createMarkdownText = (data: DataMarkDown['value']) => {
+  const content = data
+    .map(mdItem => {
+      if (mdItem.type === 'MD.title') {
+        // \n
+        return `# ${mdItem.value}\n`
+      } else if (mdItem.type === 'MD.subtitle') {
+        // \n
+        return `## ${mdItem.value}\n`
+      } else if (mdItem.type === 'MD.text') {
+        // 正文
+        return `${mdItem.value} `
+      } else if (mdItem.type === 'MD.bold') {
+        // 加粗
+        return `**${mdItem.value}** `
+      } else if (mdItem.type === 'MD.divider') {
+        // 分割线
+        return '\n————————\n'
+      } else if (mdItem.type === 'MD.italic') {
+        // 斜体
+        return `_${mdItem.value}_ `
+      } else if (mdItem.type === 'MD.italicStar') {
+        // 星号斜体
+        return `*${mdItem.value}* `
+      } else if (mdItem.type === 'MD.strikethrough') {
+        // 删除线
+        return `~~${mdItem.value}~~ `
+      } else if (mdItem.type === 'MD.blockquote') {
+        // \n
+        return `> ${mdItem.value}\n`
+      } else if (mdItem.type === 'MD.newline') {
+        // 换行
+        return '\n'
+      } else if (mdItem.type === 'MD.link') {
+        //
+        return `[🔗${mdItem.value.text}](${mdItem.value.url}) `
+      } else if (mdItem.type === 'MD.image') {
+        //
+        return `![text #${mdItem.options?.width || 208}px #${mdItem.options?.height || 320}px](${
+          mdItem.value
+        }) `
+      } else if (mdItem.type === 'MD.list') {
+        const listStr = mdItem.value.map(listItem => {
+          // 有序
+          if (typeof listItem.value === 'object') {
+            return `\n${listItem.value.index}. ${listItem.value.text}`
+          }
+          // 无序
+          return `\n- ${listItem.value}`
+        })
+        return `${listStr}\n`
+      }
+      return
+    })
+    .join('')
+  return content
+}
+
 /**
  * 群组消息
  * @param client
@@ -175,68 +235,54 @@ export const GROUP_AT_MESSAGE_CREATE = async (
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
-    .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.value}](${item?.options?.link})`
-      } else if (item.type == 'Mention') {
-        if (
-          item.value == 'everyone' ||
-          item.value == 'all' ||
-          item.value == '' ||
-          typeof item.value != 'string'
-        ) {
-          return ``
+  try {
+    const content = val
+      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .map(item => {
+        if (item.type == 'Link') {
+          return `[${item.value}](${item?.options?.link})`
+        } else if (item.type == 'Mention') {
+          if (
+            item.value == 'everyone' ||
+            item.value == 'all' ||
+            item.value == '' ||
+            typeof item.value != 'string'
+          ) {
+            return ``
+          }
+          if (item.options?.belong == 'user') {
+            return `<@${item.value}>`
+          }
+          return ''
+        } else if (item.type == 'Text') {
+          return item.value
         }
-        if (item.options?.belong == 'user') {
-          return `<@${item.value}>`
-        }
-        return ''
-      } else if (item.type == 'Text') {
-        return item.value
-      }
-    })
-    .join('')
-  if (content) {
-    const res = await Promise.all(
-      [content].map(async item => {
-        const res = await client.groupOpenMessages(event.GuildId, {
-          content: item,
-          msg_id: event.MessageId,
-          msg_type: 0,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
-        return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+      })
+      .join('')
+    if (content) {
+      const res = await client.groupOpenMessages(event.GuildId, {
+        content: content,
+        msg_id: event.MessageId,
+        msg_type: 0,
+        msg_seq: client.getMessageSeq(event.MessageId)
+      })
+      return [
+        createResult(ResultCode.Ok, 'client.groupOpenMessages', {
           id: res.id
         })
-      })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-    return res
-  }
-  const images = val.filter(
-    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-  )
-  if (images && images.length > 0) {
-    return Promise.all(
-      images.map(async item => {
+      ]
+    }
+    const images = val.filter(
+      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+    )
+    if (images && images.length > 0) {
+      let url = ''
+      images.filter(async item => {
+        // 已经处理。
+        if (url) return
         if (item.type == 'ImageURL') {
-          const res = await client.groupOpenMessages(event.GuildId, {
-            content: '',
-            media: {
-              file_info: item.value
-            },
-            msg_id: event.MessageId,
-            msg_type: 7,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: res.id
-          })
-        }
-        try {
+          url = item.value
+        } else if (item.type === 'ImageFile' || item.type === 'Image') {
           const getFileBase64 = (): string => readFileSync(item.value, 'base64')
           const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value
           const file_info = await client
@@ -245,116 +291,97 @@ export const GROUP_AT_MESSAGE_CREATE = async (
               file_data: file_data
             })
             .then(res => res?.file_info)
-          if (!file_info) {
-            return createResult(ResultCode.Fail, 'client.postRichMediaByGroup', null)
+          if (file_info) {
+            url = file_info
           }
-          const res = await client.groupOpenMessages(event.GuildId, {
-            content: '',
-            media: {
-              file_info
-            },
-            msg_id: event.MessageId,
-            msg_type: 7,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: res.id
-          })
-        } catch (error) {
-          return createResult(
-            ResultCode.Fail,
-            error ? error?.message ?? error : 'client.groupOpenMessages',
-            null
-          )
         }
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  // buttons
-  const buttons = val.filter(item => item.type == 'BT.group')
-  if (buttons && buttons.length > 0) {
-    return Promise.all(
-      buttons.map(async item => {
-        const template_id = item?.options?.template_id
-        if (template_id) {
-          const res = await client.groupOpenMessages(event.GuildId, {
-            content: '',
-            msg_id: event.MessageId,
-            keyboard: {
-              id: template_id
-            },
-            msg_type: 2,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: res.id
-          })
-        }
-        const rows = item.value
-        // 构造成按钮
-        const data = createButtonsData(rows)
-        const res = await client.groupOpenMessages(event.GuildId, {
-          content: '',
-          msg_id: event.MessageId,
-          keyboard: {
-            content: data
-          },
-          msg_type: 2,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
-        return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+      const res = await client.groupOpenMessages(event.GuildId, {
+        content: '',
+        media: {
+          file_info: url
+        },
+        msg_id: event.MessageId,
+        msg_type: 7,
+        msg_seq: client.getMessageSeq(event.MessageId)
+      })
+      return [
+        createResult(ResultCode.Ok, 'client.groupOpenMessages', {
           id: res.id
         })
+      ]
+    }
+    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    if (mdAndButtons && mdAndButtons.length > 0) {
+      const params = {}
+      mdAndButtons.forEach(async item => {
+        if (item.type === 'BT.group') {
+          // 如果是按钮，获取参数
+          const template_id = item?.options?.template_id
+          if (template_id) {
+            params['keyboard'] = {
+              id: template_id
+            }
+          } else {
+            const rows = item.value
+            // 构造成按钮
+            const content = createButtonsData(rows)
+            params['keyboard'] = {
+              content: content
+            }
+          }
+        } else if (item.type === 'Markdown') {
+          // 如果是markdown，获取内容
+          const content = createMarkdownText(item.value)
+          if (content) {
+            params['markdown'] = {
+              content: content
+            }
+          }
+        }
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  // ark
-  const ark = val.filter(
-    item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
-  )
-  if (ark && ark.length > 0) {
-    return Promise.all(
-      ark.map(async item => {
+      const res = await client.groupOpenMessages(event.GuildId, {
+        content: '',
+        markdown: {
+          content: content
+        },
+        msg_id: event.MessageId,
+        msg_type: 2,
+        msg_seq: client.getMessageSeq(event.MessageId),
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })]
+    }
+    // ark
+    const ark = val.filter(
+      item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
+    )
+    if (ark && ark.length > 0) {
+      const params = {}
+      ark.forEach(async item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value)
-          const res = await client.groupOpenMessages(event.GuildId, {
-            msg_id: event.MessageId,
-            ark: arkData,
-            msg_type: 3,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: res.id
-          })
-        }
-        if (item.type === 'Ark.BigCard') {
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.BigCard') {
           const arkData = createArkBigCardData(item.value)
-          const res = await client.groupOpenMessages(event.GuildId, {
-            msg_id: event.MessageId,
-            ark: arkData,
-            msg_type: 3,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.list') {
+          const arkData = createArkList(item.value)
+          params['ark'] = arkData
         }
-        const arkData = createArkList(item.value)
-        const res = await client.groupOpenMessages(event.GuildId, {
-          msg_id: event.MessageId,
-          ark: arkData,
-          msg_type: 3,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
-        return createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
+      const res = await client.groupOpenMessages(event.GuildId, {
+        msg_id: event.MessageId,
+        msg_type: 3,
+        msg_seq: client.getMessageSeq(event.MessageId),
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })]
+    }
+  } catch (err) {
+    return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
   }
-  return Promise.all([])
+  return []
 }
 
 /**
@@ -364,163 +391,155 @@ export const GROUP_AT_MESSAGE_CREATE = async (
  * @param val
  * @returns
  */
-export const C2C_MESSAGE_CREATE = (
+export const C2C_MESSAGE_CREATE = async (
   client: Client,
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
-    .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.value}](${item?.options?.link})`
-      } else if (item.type == 'Text') {
-        return item.value
-      }
-      return ''
-    })
-    .join('')
-  if (content) {
-    return Promise.all(
-      [content].map(async item => {
-        const res = await client.usersOpenMessages(event.OpenId, {
-          content: item,
-          msg_id: event.MessageId,
-          msg_type: 0,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
-        return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
+  try {
+    const content = val
+      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .map(item => {
+        if (item.type == 'Link') {
+          return `[${item.value}](${item?.options?.link})`
+        } else if (item.type == 'Mention') {
+          if (
+            item.value == 'everyone' ||
+            item.value == 'all' ||
+            item.value == '' ||
+            typeof item.value != 'string'
+          ) {
+            return ``
+          }
+          if (item.options?.belong == 'user') {
+            return `<@${item.value}>`
+          }
+          return ''
+        } else if (item.type == 'Text') {
+          return item.value
+        }
+      })
+      .join('')
+    if (content) {
+      const res = await client.usersOpenMessages(event.OpenId, {
+        content: content,
+        msg_id: event.MessageId,
+        msg_type: 0,
+        msg_seq: client.getMessageSeq(event.MessageId)
+      })
+      return [
+        createResult(ResultCode.Ok, 'client.usersOpenMessages', {
           id: res.id
         })
-      })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  const images = val.filter(
-    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-  )
-  if (images && images.length > 0) {
-    return Promise.all(
-      images.map(async item => {
+      ]
+    }
+    const images = val.filter(
+      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+    )
+    if (images && images.length > 0) {
+      let url = ''
+      images.filter(async item => {
+        // 已经处理。
+        if (url) return
         if (item.type == 'ImageURL') {
-          const res = await client.usersOpenMessages(event.OpenId, {
-            content: '',
-            media: {
-              file_info: item.value
-            },
-            msg_id: event.MessageId,
-            msg_type: 7,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
-            id: res.id
-          })
+          url = item.value
+        } else if (item.type === 'ImageFile' || item.type === 'Image') {
+          const getFileBase64 = (): string => readFileSync(item.value, 'base64')
+          const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value
+          const file_info = await client
+            .postRichMediaByGroup(event.GuildId, {
+              file_type: 1,
+              file_data: file_data
+            })
+            .then(res => res?.file_info)
+          if (file_info) {
+            url = file_info
+          }
         }
-        const getFileBase64 = (): string => readFileSync(item.value, 'base64')
-        const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value
-        const file_info = await client
-          .postRichMediaByUsers(event.OpenId, {
-            file_type: 1,
-            file_data: file_data
-          })
-          .then(res => res?.file_info)
-        if (!file_info) return Promise.resolve(null)
-        return client.usersOpenMessages(event.OpenId, {
-          content: '',
-          media: {
-            file_info
-          },
-          msg_id: event.MessageId,
-          msg_type: 7,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  // buttons
-  const buttons = val.filter(item => item.type == 'BT.group')
-  if (buttons && buttons.length > 0) {
-    return Promise.all(
-      buttons.map(async item => {
-        const template_id = item?.options?.template_id
-        if (template_id) {
-          const res = await client.usersOpenMessages(event.GuildId, {
-            content: '',
-            msg_id: event.MessageId,
-            keyboard: {
-              id: template_id
-            },
-            msg_type: 2,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
-            id: res.id
-          })
-        }
-        const rows = item.value
-        // 构造成按钮
-        const data = createButtonsData(rows)
-        const res = await client.usersOpenMessages(event.GuildId, {
-          content: '',
-          msg_id: event.MessageId,
-          keyboard: {
-            content: data
-          },
-          msg_type: 2,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
-        return createResult(ResultCode.Ok, 'client.usersOpenMessages', {
+      const res = await client.usersOpenMessages(event.OpenId, {
+        content: '',
+        media: {
+          file_info: url
+        },
+        msg_id: event.MessageId,
+        msg_type: 7,
+        msg_seq: client.getMessageSeq(event.MessageId)
+      })
+      return [
+        createResult(ResultCode.Ok, 'client.usersOpenMessages', {
           id: res.id
         })
+      ]
+    }
+    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    if (mdAndButtons && mdAndButtons.length > 0) {
+      const params = {}
+      mdAndButtons.forEach(async item => {
+        if (item.type === 'BT.group') {
+          // 如果是按钮，获取参数
+          const template_id = item?.options?.template_id
+          if (template_id) {
+            params['keyboard'] = {
+              id: template_id
+            }
+          } else {
+            const rows = item.value
+            // 构造成按钮
+            const content = createButtonsData(rows)
+            params['keyboard'] = {
+              content: content
+            }
+          }
+        } else if (item.type === 'Markdown') {
+          // 如果是markdown，获取内容
+          const content = createMarkdownText(item.value)
+          if (content) {
+            params['markdown'] = {
+              content: content
+            }
+          }
+        }
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  // ark
-  const ark = val.filter(
-    item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
-  )
-  if (ark && ark.length > 0) {
-    return Promise.all(
-      ark.map(async item => {
+      const res = await client.usersOpenMessages(event.OpenId, {
+        content: '',
+        msg_id: event.MessageId,
+        msg_type: 2,
+        msg_seq: client.getMessageSeq(event.MessageId),
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })]
+    }
+    // ark
+    const ark = val.filter(
+      item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
+    )
+    if (ark && ark.length > 0) {
+      const params = {}
+      ark.forEach(async item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value)
-          const res = await client.usersOpenMessages(event.GuildId, {
-            msg_id: event.MessageId,
-            ark: arkData,
-            msg_type: 3,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })
-        }
-        if (item.type === 'Ark.BigCard') {
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.BigCard') {
           const arkData = createArkBigCardData(item.value)
-          const res = await client.usersOpenMessages(event.GuildId, {
-            msg_id: event.MessageId,
-            ark: arkData,
-            msg_type: 3,
-            msg_seq: client.getMessageSeq(event.MessageId)
-          })
-          return createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.list') {
+          const arkData = createArkList(item.value)
+          params['ark'] = arkData
         }
-        const arkData = createArkList(item.value)
-        const res = await client.usersOpenMessages(event.GuildId, {
-          msg_id: event.MessageId,
-          ark: arkData,
-          msg_type: 3,
-          msg_seq: client.getMessageSeq(event.MessageId)
-        })
-        return createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
+      const res = await client.usersOpenMessages(event.OpenId, {
+        msg_id: event.MessageId,
+        msg_type: 3,
+        msg_seq: client.getMessageSeq(event.MessageId),
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })]
+    }
+  } catch (err) {
+    return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
   }
-  return Promise.all([])
+  return []
 }
 
 /**
