@@ -259,19 +259,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         }
       })
       .join('')
-    if (content) {
-      const res = await client.groupOpenMessages(event.GuildId, {
-        content: content,
-        msg_id: event.MessageId,
-        msg_type: 0,
-        msg_seq: client.getMessageSeq(event.MessageId)
-      })
-      return [
-        createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-          id: res.id
-        })
-      ]
-    }
     const images = val.filter(
       item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
     )
@@ -297,7 +284,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         }
       })
       const res = await client.groupOpenMessages(event.GuildId, {
-        content: '',
+        content: content,
         media: {
           file_info: url
         },
@@ -341,10 +328,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         }
       })
       const res = await client.groupOpenMessages(event.GuildId, {
-        content: '',
-        markdown: {
-          content: content
-        },
+        content: content,
         msg_id: event.MessageId,
         msg_type: 2,
         msg_seq: client.getMessageSeq(event.MessageId),
@@ -371,12 +355,26 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         }
       })
       const res = await client.groupOpenMessages(event.GuildId, {
+        content: content,
         msg_id: event.MessageId,
         msg_type: 3,
         msg_seq: client.getMessageSeq(event.MessageId),
         ...params
       })
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })]
+    }
+    if (content) {
+      const res = await client.groupOpenMessages(event.GuildId, {
+        content: content,
+        msg_id: event.MessageId,
+        msg_type: 0,
+        msg_seq: client.getMessageSeq(event.MessageId)
+      })
+      return [
+        createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+          id: res.id
+        })
+      ]
     }
   } catch (err) {
     return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
@@ -420,19 +418,6 @@ export const C2C_MESSAGE_CREATE = async (
         }
       })
       .join('')
-    if (content) {
-      const res = await client.usersOpenMessages(event.OpenId, {
-        content: content,
-        msg_id: event.MessageId,
-        msg_type: 0,
-        msg_seq: client.getMessageSeq(event.MessageId)
-      })
-      return [
-        createResult(ResultCode.Ok, 'client.usersOpenMessages', {
-          id: res.id
-        })
-      ]
-    }
     const images = val.filter(
       item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
     )
@@ -458,7 +443,7 @@ export const C2C_MESSAGE_CREATE = async (
         }
       })
       const res = await client.usersOpenMessages(event.OpenId, {
-        content: '',
+        content: content,
         media: {
           file_info: url
         },
@@ -502,7 +487,7 @@ export const C2C_MESSAGE_CREATE = async (
         }
       })
       const res = await client.usersOpenMessages(event.OpenId, {
-        content: '',
+        content: content,
         msg_id: event.MessageId,
         msg_type: 2,
         msg_seq: client.getMessageSeq(event.MessageId),
@@ -529,12 +514,26 @@ export const C2C_MESSAGE_CREATE = async (
         }
       })
       const res = await client.usersOpenMessages(event.OpenId, {
+        content: content,
         msg_id: event.MessageId,
         msg_type: 3,
         msg_seq: client.getMessageSeq(event.MessageId),
         ...params
       })
       return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })]
+    }
+    if (content) {
+      const res = await client.usersOpenMessages(event.OpenId, {
+        content: content,
+        msg_id: event.MessageId,
+        msg_type: 0,
+        msg_seq: client.getMessageSeq(event.MessageId)
+      })
+      return [
+        createResult(ResultCode.Ok, 'client.usersOpenMessages', {
+          id: res.id
+        })
+      ]
     }
   } catch (err) {
     return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
@@ -549,42 +548,32 @@ export const C2C_MESSAGE_CREATE = async (
  * @param val
  * @returns
  */
-export const DIRECT_MESSAGE_CREATE = (
+export const DIRECT_MESSAGE_CREATE = async (
   client: Client,
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
-    .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.value}](${item?.options?.link})`
-      }
-      if (item.type == 'Text') {
-        return item.value
-      }
-      return ''
-    })
-    .join('')
-  if (content) {
-    return Promise.all(
-      [content].map(async item => {
-        const res = await client.dmsMessage(event.OpenId, {
-          content: item,
-          msg_id: event.MessageId
-        })
-        return createResult(ResultCode.Ok, 'client.dmsMessage', { id: res?.id })
+  try {
+    const content = val
+      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .map(item => {
+        if (item.type == 'Link') {
+          return `[${item.value}](${item?.options?.link})`
+        }
+        if (item.type == 'Text') {
+          return item.value
+        }
+        return ''
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  const images = val.filter(
-    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-  )
-  if (images && images.length > 0) {
-    return Promise.all(
-      images.map(async item => {
+      .join('')
+    const images = val.filter(
+      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+    )
+    if (images && images.length > 0) {
+      let imageBuffer: Buffer = null
+      images.forEach(async item => {
+        // 已经处理。
+        if (imageBuffer) return
         if (item.value == 'ImageURL') {
           // 请求得到buffer
           const data = await axios
@@ -592,185 +581,245 @@ export const DIRECT_MESSAGE_CREATE = (
               responseType: 'arraybuffer'
             })
             .then(res => res?.data)
-          const res = await client.postDirectImage(event.OpenId, {
-            msg_id: event.MessageId,
-            image: data
-          })
-          return createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })
+          imageBuffer = data
+        } else {
+          const file_data =
+            item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
+          imageBuffer = file_data
         }
-        const file_data =
-          item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
-        const res = await client.postDirectImage(event.OpenId, {
-          msg_id: event.MessageId,
-          image: file_data
-        })
-        return createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })
       })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
+      const res = await client.postDirectImage(event.OpenId, {
+        msg_id: event.MessageId,
+        content: content,
+        image: imageBuffer
+      })
+      return [createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })]
+    }
+    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    if (mdAndButtons && mdAndButtons.length > 0) {
+      const params = {}
+      mdAndButtons.forEach(async item => {
+        if (item.type === 'BT.group') {
+          // 如果是按钮，获取参数
+          const template_id = item?.options?.template_id
+          if (template_id) {
+            params['keyboard'] = {
+              id: template_id
+            }
+          } else {
+            const rows = item.value
+            // 构造成按钮
+            const content = createButtonsData(rows)
+            params['keyboard'] = {
+              content: content
+            }
+          }
+        } else if (item.type === 'Markdown') {
+          // 如果是markdown，获取内容
+          const content = createMarkdownText(item.value)
+          if (content) {
+            params['markdown'] = {
+              content: content
+            }
+          }
+        }
+      })
+      const res = await client.dmsMessage(event.OpenId, {
+        content: '',
+        msg_id: event.MessageId,
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.dmsMessage', { id: res.id })]
+    }
+    // ark
+    const ark = val.filter(
+      item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
+    )
+    if (ark && ark.length > 0) {
+      const params = {}
+      ark.forEach(async item => {
+        if (item.type === 'Ark.Card') {
+          const arkData = createArkCardData(item.value)
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.BigCard') {
+          const arkData = createArkBigCardData(item.value)
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.list') {
+          const arkData = createArkList(item.value)
+          params['ark'] = arkData
+        }
+      })
+      const res = await client.dmsMessage(event.OpenId, {
+        content: content,
+        msg_id: event.MessageId,
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.dmsMessage', { id: res.id })]
+    }
+    if (content) {
+      const res = await client.dmsMessage(event.OpenId, {
+        content: content,
+        msg_id: event.MessageId
+      })
+      return [createResult(ResultCode.Ok, 'client.dmsMessage', { id: res?.id })]
+    }
+    return []
+  } catch (err) {
+    return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
   }
-  return Promise.all([])
 }
 
+/**
+ * 频道公聊
+ * @param event
+ * @param val
+ * @returns
+ */
+export const MESSAGE_CREATE = async (
+  client: Client,
+  event,
+  val: DataEnums[]
+): Promise<ClientAPIMessageResult[]> => {
+  try {
+    const content = val
+      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .map(item => {
+        if (item.type == 'Link') {
+          return `[${item.value}](${item?.options?.link})`
+        }
+        if (item.type == 'Mention') {
+          if (
+            item.value == 'everyone' ||
+            item.value == 'all' ||
+            item.value == '' ||
+            typeof item.value != 'string'
+          ) {
+            return `@everyone`
+          }
+          if (item.options?.belong == 'user') {
+            return `<@!${item.value}>`
+          } else if (item.options?.belong == 'channel') {
+            return `<#${item.value}>`
+          }
+          return ''
+        } else if (item.type == 'Text') {
+          return item.value
+        }
+      })
+      .join('')
+    const images = val.filter(
+      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+    )
+    if (images && images.length > 0) {
+      let dataBuffer: Buffer = null
+      images.forEach(async item => {
+        if (dataBuffer) return // 已经处理。
+        if (item.value == 'ImageURL') {
+          // 请求得到buffer
+          const data = await axios
+            .get(item.value, {
+              responseType: 'arraybuffer'
+            })
+            .then(res => res.data)
+          dataBuffer = data
+        } else {
+          const file_data =
+            item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
+          dataBuffer = file_data
+        }
+      })
+      const res = await client.postImage(event.ChannelId, {
+        msg_id: event.MessageId,
+        content: content,
+        image: dataBuffer
+      })
+      return [createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })]
+    }
+    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    if (mdAndButtons && mdAndButtons.length > 0) {
+      const params = {}
+      mdAndButtons.forEach(async item => {
+        if (item.type === 'BT.group') {
+          // 如果是按钮，获取参数
+          const template_id = item?.options?.template_id
+          if (template_id) {
+            params['keyboard'] = {
+              id: template_id
+            }
+          } else {
+            const rows = item.value
+            // 构造成按钮
+            const content = createButtonsData(rows)
+            params['keyboard'] = {
+              content: content
+            }
+          }
+        } else if (item.type === 'Markdown') {
+          // 如果是markdown，获取内容
+          const content = createMarkdownText(item.value)
+          if (content) {
+            params['markdown'] = {
+              content: content
+            }
+          }
+        }
+      })
+      const res = await client.channelsMessagesPost(event.ChannelId, {
+        content: '',
+        msg_id: event.MessageId,
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res.id })]
+    }
+    // ark
+    const ark = val.filter(
+      item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list'
+    )
+    if (ark && ark.length > 0) {
+      const params = {}
+      ark.forEach(async item => {
+        if (item.type === 'Ark.Card') {
+          const arkData = createArkCardData(item.value)
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.BigCard') {
+          const arkData = createArkBigCardData(item.value)
+          params['ark'] = arkData
+        } else if (item.type === 'Ark.list') {
+          const arkData = createArkList(item.value)
+          params['ark'] = arkData
+        }
+      })
+      const res = await client.channelsMessagesPost(event.GuildId, {
+        content: content,
+        msg_id: event.MessageId,
+        ...params
+      })
+      return [createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res.id })]
+    }
+    if (content) {
+      const res = await client.channelsMessagesPost(event.ChannelId, {
+        content: content,
+        msg_id: event.MessageId
+      })
+      return [createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res?.id })]
+    }
+    return []
+  } catch (err) {
+    return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
+  }
+}
+
+/**
+ * 频道公聊 @
+ * @param client
+ * @param event
+ * @param val
+ * @returns
+ */
 export const AT_MESSAGE_CREATE = (
   client: Client,
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
-    .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.value}](${item?.options?.link})`
-      }
-      if (item.type == 'Mention') {
-        if (
-          item.value == 'everyone' ||
-          item.value == 'all' ||
-          item.value == '' ||
-          typeof item.value != 'string'
-        ) {
-          return `@everyone`
-        }
-        if (item.options?.belong == 'user') {
-          return `<@!${item.value}>`
-        } else if (item.options?.belong == 'channel') {
-          return `<#${item.value}>`
-        }
-        return ''
-      } else if (item.type == 'Text') {
-        return item.value
-      }
-    })
-    .join('')
-  if (content) {
-    return Promise.all(
-      [content].map(async item => {
-        const res = await client.channelsMessagesPost(event.ChannelId, {
-          content: item,
-          msg_id: event.MessageId
-        })
-        return createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res?.id })
-      })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  const images = val.filter(
-    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-  )
-  if (images && images.length > 0) {
-    return Promise.all(
-      images.map(async item => {
-        if (item.value == 'ImageURL') {
-          // 请求得到buffer
-          const data = await axios
-            .get(item.value, {
-              responseType: 'arraybuffer'
-            })
-            .then(res => res.data)
-          const res = await client.postImage(event.ChannelId, {
-            msg_id: event.MessageId,
-            image: data
-          })
-          return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
-        }
-        const file_data =
-          item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
-        const res = await client.postImage(event.ChannelId, {
-          msg_id: event.MessageId,
-          image: file_data
-        })
-        return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
-      })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  return Promise.all([])
-}
-
-/**
- *
- * @param event
- * @param val
- * @returns
- */
-export const MESSAGE_CREATE = (
-  client: Client,
-  event,
-  val: DataEnums[]
-): Promise<ClientAPIMessageResult[]> => {
-  const content = val
-    .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
-    .map(item => {
-      if (item.type == 'Link') {
-        return `[${item.value}](${item?.options?.link})`
-      }
-      if (item.type == 'Mention') {
-        if (
-          item.value == 'everyone' ||
-          item.value == 'all' ||
-          item.value == '' ||
-          typeof item.value != 'string'
-        ) {
-          return `@everyone`
-        }
-        if (item.options?.belong == 'user') {
-          return `<@!${item.value}>`
-        } else if (item.options?.belong == 'channel') {
-          return `<#${item.value}>`
-        }
-        return ''
-      } else if (item.type == 'Text') {
-        return item.value
-      }
-    })
-    .join('')
-  if (content) {
-    return Promise.all(
-      [content].map(async item => {
-        const res = await client.channelsMessagesPost(event.ChannelId, {
-          content: item,
-          msg_id: event.MessageId
-        })
-        return createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res?.id })
-      })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  const images = val.filter(
-    item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-  )
-  if (images && images.length > 0) {
-    return Promise.all(
-      images.map(async item => {
-        if (item.value == 'ImageURL') {
-          // 请求得到buffer
-          const data = await axios
-            .get(item.value, {
-              responseType: 'arraybuffer'
-            })
-            .then(res => res.data)
-          const res = await client.postImage(event.ChannelId, {
-            msg_id: event.MessageId,
-            image: data
-          })
-          return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
-        }
-        const file_data =
-          item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
-        const res = await client.postImage(event.ChannelId, {
-          msg_id: event.MessageId,
-          image: file_data
-        })
-        return createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })
-      })
-    ).catch(err => [
-      createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
-    ])
-  }
-  return Promise.all([])
+  return MESSAGE_CREATE(client, event, val)
 }
