@@ -5,6 +5,7 @@
  *              转发&格式化               格式化                   原始
  * AL Clinet  <---------> CBP(server) <---------> AL Platform  <---------> Platform(server)
  *               行为                    转发&行为                行为API
+ *               请求                    转发&请求                请求API
  *
  * CBP server 只允许 AL Platform 存在一个连接。允许 多个 AL Client 连接。
  * AL Client 默认全量接收消息。也可以进行进入分流模式
@@ -28,8 +29,12 @@ export const DEVICE_ID_HEADER = 'x-device-id'
 export const FULL_RECEIVE_HEADER = 'x-full-receive'
 // 行为回调
 export const actionResolves = new Map<string, (value: Result[] | PromiseLike<Result[]>) => void>()
+// 接口回调
+export const apiResolves = new Map<string, (value: Result[] | PromiseLike<Result[]>) => void>()
 // 超时器
 export const actionTimeouts = new Map<string, NodeJS.Timeout>()
+// 接口超时器
+export const apiTimeouts = new Map<string, NodeJS.Timeout>()
 // 分配绑定记录
 export const childrenBind = new Map<string, string>()
 // 生成唯一标识符

@@ -67,14 +67,13 @@ type MessageData = {
   files?: any[]
 }
 
+export const API_URL = 'https://discord.com/api/v10'
+export const CDB_URL = 'https://cdn.discordapp.com'
+
 /**
  * api接口
  */
 export class DCAPI {
-  API_URL = 'https://discord.com/api/v10'
-
-  CDB_URL = 'https://cdn.discordapp.com'
-
   /**
    * 基础请求
    * @param opstion
@@ -83,7 +82,7 @@ export class DCAPI {
   request(options: AxiosRequestConfig) {
     const token = config.get('token')
     const service = axios.create({
-      baseURL: this.API_URL,
+      baseURL: API_URL,
       timeout: 6000,
       headers: {
         'Content-Type': 'application/json',
@@ -101,7 +100,7 @@ export class DCAPI {
   requestCDN(options: AxiosRequestConfig) {
     const token = config.get('token')
     const service = axios.create({
-      baseURL: this.CDB_URL,
+      baseURL: CDB_URL,
       timeout: 6000,
       headers: {
         'Content-Type': 'application/json',
@@ -118,7 +117,7 @@ export class DCAPI {
    * @returns
    */
   userAvatar(user_id: string, avatar_hash: string) {
-    return `${this.CDB_URL}/avatars/${user_id}/${avatar_hash}.png`
+    return `${CDB_URL}/avatars/${user_id}/${avatar_hash}.png`
   }
 
   /**

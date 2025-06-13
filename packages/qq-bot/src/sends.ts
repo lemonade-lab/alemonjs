@@ -264,9 +264,11 @@ export const GROUP_AT_MESSAGE_CREATE = async (
     )
     if (images && images.length > 0) {
       let url = ''
-      images.filter(async item => {
+
+      for (let i = 0; i < images.length; i++) {
         // 已经处理。
-        if (url) return
+        if (url) break
+        const item = images[i]
         if (item.type == 'ImageURL') {
           url = item.value
         } else if (item.type === 'ImageFile' || item.type === 'Image') {
@@ -282,15 +284,14 @@ export const GROUP_AT_MESSAGE_CREATE = async (
             url = file_info
           }
         }
-      })
+      }
       const res = await client.groupOpenMessages(event.GuildId, {
         content: content,
         media: {
           file_info: url
         },
         msg_id: event.MessageId,
-        msg_type: 7,
-        msg_seq: client.getMessageSeq(event.MessageId)
+        msg_type: 7
       })
       return [
         createResult(ResultCode.Ok, 'client.groupOpenMessages', {
@@ -331,7 +332,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         content: content,
         msg_id: event.MessageId,
         msg_type: 2,
-        msg_seq: client.getMessageSeq(event.MessageId),
         ...params
       })
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })]
@@ -358,7 +358,6 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         content: content,
         msg_id: event.MessageId,
         msg_type: 3,
-        msg_seq: client.getMessageSeq(event.MessageId),
         ...params
       })
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })]
@@ -367,8 +366,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (
       const res = await client.groupOpenMessages(event.GuildId, {
         content: content,
         msg_id: event.MessageId,
-        msg_type: 0,
-        msg_seq: client.getMessageSeq(event.MessageId)
+        msg_type: 0
       })
       return [
         createResult(ResultCode.Ok, 'client.groupOpenMessages', {
@@ -423,9 +421,11 @@ export const C2C_MESSAGE_CREATE = async (
     )
     if (images && images.length > 0) {
       let url = ''
-      images.filter(async item => {
+
+      for (let i = 0; i < images.length; i++) {
         // 已经处理。
-        if (url) return
+        if (url) break
+        const item = images[i]
         if (item.type == 'ImageURL') {
           url = item.value
         } else if (item.type === 'ImageFile' || item.type === 'Image') {
@@ -441,15 +441,15 @@ export const C2C_MESSAGE_CREATE = async (
             url = file_info
           }
         }
-      })
+      }
+
       const res = await client.usersOpenMessages(event.OpenId, {
         content: content,
         media: {
           file_info: url
         },
         msg_id: event.MessageId,
-        msg_type: 7,
-        msg_seq: client.getMessageSeq(event.MessageId)
+        msg_type: 7
       })
       return [
         createResult(ResultCode.Ok, 'client.usersOpenMessages', {
@@ -490,7 +490,6 @@ export const C2C_MESSAGE_CREATE = async (
         content: content,
         msg_id: event.MessageId,
         msg_type: 2,
-        msg_seq: client.getMessageSeq(event.MessageId),
         ...params
       })
       return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })]
@@ -517,7 +516,6 @@ export const C2C_MESSAGE_CREATE = async (
         content: content,
         msg_id: event.MessageId,
         msg_type: 3,
-        msg_seq: client.getMessageSeq(event.MessageId),
         ...params
       })
       return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })]
@@ -526,8 +524,7 @@ export const C2C_MESSAGE_CREATE = async (
       const res = await client.usersOpenMessages(event.OpenId, {
         content: content,
         msg_id: event.MessageId,
-        msg_type: 0,
-        msg_seq: client.getMessageSeq(event.MessageId)
+        msg_type: 0
       })
       return [
         createResult(ResultCode.Ok, 'client.usersOpenMessages', {
@@ -571,9 +568,11 @@ export const DIRECT_MESSAGE_CREATE = async (
     )
     if (images && images.length > 0) {
       let imageBuffer: Buffer = null
-      images.forEach(async item => {
+
+      for (let i = 0; i < images.length; i++) {
         // 已经处理。
-        if (imageBuffer) return
+        if (imageBuffer) break
+        const item = images[i]
         if (item.value == 'ImageURL') {
           // 请求得到buffer
           const data = await axios
@@ -587,7 +586,8 @@ export const DIRECT_MESSAGE_CREATE = async (
             item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
           imageBuffer = file_data
         }
-      })
+      }
+
       const res = await client.postDirectImage(event.OpenId, {
         msg_id: event.MessageId,
         content: content,
@@ -711,27 +711,29 @@ export const MESSAGE_CREATE = async (
       item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
     )
     if (images && images.length > 0) {
-      let dataBuffer: Buffer = null
-      images.forEach(async item => {
-        if (dataBuffer) return // 已经处理。
+      let imageBuffer: Buffer = null
+      for (let i = 0; i < images.length; i++) {
+        // 已经处理。
+        if (imageBuffer) break
+        const item = images[i]
         if (item.value == 'ImageURL') {
           // 请求得到buffer
           const data = await axios
             .get(item.value, {
               responseType: 'arraybuffer'
             })
-            .then(res => res.data)
-          dataBuffer = data
+            .then(res => res?.data)
+          imageBuffer = data
         } else {
           const file_data =
             item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
-          dataBuffer = file_data
+          imageBuffer = file_data
         }
-      })
+      }
       const res = await client.postImage(event.ChannelId, {
         msg_id: event.MessageId,
         content: content,
-        image: dataBuffer
+        image: imageBuffer
       })
       return [createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })]
     }

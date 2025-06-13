@@ -4,9 +4,13 @@ import { start as startGuild } from './index.guild'
 import { start as startWebhook } from './index.webhook'
 import { start as startWebsocket } from './index.websoket'
 import { platform } from './register'
+// 平台
 export { platform }
-export * from './hook'
-
+// hook
+export { useMode } from './hook'
+// api
+export { QQBotAPI as API } from './sdk/api'
+// main
 export default () => {
   let value = getConfigValue()
   if (!value) value = {}

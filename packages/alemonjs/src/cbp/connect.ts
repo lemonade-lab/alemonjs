@@ -6,6 +6,8 @@ import { EventsEnum } from '../typings'
 import {
   actionResolves,
   actionTimeouts,
+  apiResolves,
+  apiTimeouts,
   DEVICE_ID_HEADER,
   deviceId,
   FULL_RECEIVE_HEADER,
@@ -14,6 +16,7 @@ import {
   USER_AGENT_HEADER
 } from './config'
 import { createResult, Result } from '../post'
+import { Apis } from '../typing/apis'
 
 type CBPClientOptions = {
   open?: () => void
@@ -152,6 +155,25 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
               process.env[key] = env[key]
             }
           }
+        } else if (parsedMessage?.apiId) {
+          // 如果有 apiId，说明是一个接口请求。要进行处理
+          const resolve = apiResolves.get(parsedMessage.apiId)
+          if (resolve) {
+            apiResolves.delete(parsedMessage.apiId)
+            // 清除超时器
+            const timeout = apiTimeouts.get(parsedMessage.apiId)
+            if (timeout) {
+              apiTimeouts.delete(parsedMessage.apiId)
+              clearTimeout(timeout)
+            }
+            // 调用回调函数
+            if (Array.isArray(parsedMessage.payload)) {
+              resolve(parsedMessage.payload)
+            } else {
+              // 错误处理
+              resolve([createResult(ResultCode.Fail, '接口处理错误', null)])
+            }
+          }
         } else if (parsedMessage?.actionId) {
           // 如果有 actionId
           const resolve = actionResolves.get(parsedMessage.actionId)
@@ -207,7 +229,9 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
   start()
 }
 
-type ReplyFunc = (data: Actions, consume: (payload: Result[]) => void) => void
+type ActionReplyFunc = (data: Actions, consume: (payload: Result[]) => void) => void
+
+type ApiReplyFunc = (data: Apis, consume: (payload: Result[]) => void) => void
 
 export const cbpPlatform = (
   url: string,
@@ -250,22 +274,37 @@ export const cbpPlatform = (
       global.chatbotPlatform.send(JSON.stringify(data))
     }
   }
-  const msg: ReplyFunc[] = []
+  const actionReplys: ActionReplyFunc[] = []
+  const apiReplys: ApiReplyFunc[] = []
 
   /**
    * 消费数据
    * @param data
    * @param payload
    */
-  const reply = (data: Actions, payload: Result[]) => {
+  const replyAction = (data: Actions, payload: Result[]) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
+      // 透传消费。也就是对应的设备进行处理消费。
       global.chatbotPlatform.send(
         JSON.stringify({
           action: data.action,
           payload: payload,
           actionId: data.actionId,
-          // 透传消费。也就是对应的设备进行处理消费。
           DeviceId: data.DeviceId
+        })
+      )
+    }
+  }
+
+  const replyApi = (data: Apis, payload: Result[]) => {
+    if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
+      // 透传消费。也就是对应的设备进行处理消费。
+      global.chatbotPlatform.send(
+        JSON.stringify({
+          action: data.action,
+          apiId: data.apiId,
+          DeviceId: data.DeviceId,
+          payload: payload
         })
       )
     }
@@ -275,8 +314,15 @@ export const cbpPlatform = (
    * 接收行为
    * @param reply
    */
-  const onactions = (reply: ReplyFunc) => {
-    msg.push(reply)
+  const onactions = (reply: ActionReplyFunc) => {
+    actionReplys.push(reply)
+  }
+
+  /**
+   * 接收接口
+   */
+  const onapis = (reply: ApiReplyFunc) => {
+    apiReplys.push(reply)
   }
 
   /**
@@ -306,12 +352,22 @@ export const cbpPlatform = (
           message: '平台端接收消息',
           data: data
         })
-        for (const cb of msg) {
-          cb(
-            data,
-            // 传入一个消费函数
-            val => reply(data, val)
-          )
+        if (data.apiId) {
+          for (const cb of apiReplys) {
+            cb(
+              data,
+              // 传入一个消费函数
+              val => replyApi(data, val)
+            )
+          }
+        } else if (data.actionId) {
+          for (const cb of actionReplys) {
+            cb(
+              data,
+              // 传入一个消费函数
+              val => replyAction(data, val)
+            )
+          }
         }
       } catch (error) {
         logger.error({
@@ -347,7 +403,8 @@ export const cbpPlatform = (
 
   const client = {
     send,
-    onactions
+    onactions,
+    onapis
   }
   return client
 }

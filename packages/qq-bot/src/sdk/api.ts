@@ -4,21 +4,14 @@ import { config } from './config.js'
 import FormData from 'form-data'
 import { createPicFrom } from './from'
 
+export const BOTS_API_RUL = 'https://bots.qq.com'
+export const API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com'
+export const API_URL = 'https://api.sgroup.qq.com'
+
+const msgMap = new Map<string, number>()
+
 export class QQBotAPI {
-  /**
-   * qq机器人
-   */
-  BOTS_API_RUL = 'https://bots.qq.com'
-
-  /**
-   * qq群 沙河接口
-   */
-  API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com'
-
-  /**
-   * qq群
-   */
-  API_URL = 'https://api.sgroup.qq.com'
+  // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
 
   /**
    * 得到鉴权
@@ -27,7 +20,7 @@ export class QQBotAPI {
    * @returns
    */
   getAuthentication(app_id: string, clientSecret: string) {
-    return axios.post(`${this.BOTS_API_RUL}/app/getAppAccessToken`, {
+    return axios.post(`${BOTS_API_RUL}/app/getAppAccessToken`, {
       appId: app_id,
       clientSecret: clientSecret
     })
@@ -38,12 +31,12 @@ export class QQBotAPI {
    * @param config
    * @returns
    */
-  async groupService(options: AxiosRequestConfig) {
+  groupService(options: AxiosRequestConfig) {
     const app_id = config.get('app_id')
     // 群聊是加密token
     const token = config.get('access_token')
-    const service = await axios.create({
-      baseURL: this.API_URL,
+    const service = axios.create({
+      baseURL: API_URL,
       timeout: 20000,
       headers: {
         'X-Union-Appid': app_id,
@@ -58,12 +51,12 @@ export class QQBotAPI {
    * @param opstion
    * @returns
    */
-  async guildServer(opstion: AxiosRequestConfig) {
+  guildServer(opstion: AxiosRequestConfig) {
     const app_id = config.get('app_id')
     const token = config.get('token')
     const sandbox = config.get('sandbox')
-    const service = await axios.create({
-      baseURL: sandbox ? this.API_URL_SANDBOX : this.API_URL,
+    const service = axios.create({
+      baseURL: sandbox ? API_URL_SANDBOX : API_URL,
       timeout: 20000,
       headers: {
         Authorization: `Bot ${app_id}.${token}`
@@ -104,19 +97,17 @@ export class QQBotAPI {
    */
   async usersOpenMessages(
     openid: string,
-    data: ApiRequestData,
-    _msg_id?: string
+    data: ApiRequestData
   ): Promise<{ id: string; timestamp: number }> {
     return this.groupService({
       url: `/v2/users/${openid}/messages`,
       method: 'post',
-      data: data
+      data: {
+        msg_seq: this.getMessageSeq(data.msg_id || ''),
+        ...data
+      }
     }).then(res => res?.data)
   }
-
-  // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
-
-  #map: Map<string, number> = new Map()
 
   /**
    * 得到消息序列
@@ -124,13 +115,13 @@ export class QQBotAPI {
    * @returns
    */
   getMessageSeq(MessageId: string): number {
-    let seq = this.#map.get(MessageId) || 0
+    let seq = msgMap.get(MessageId) || 0
     seq++
-    this.#map.set(MessageId, seq)
+    msgMap.set(MessageId, seq)
     // 如果映射表大小超过 100，则删除最早添加的 MessageId
-    if (this.#map.size > 100) {
-      const firstKey = this.#map.keys().next().value
-      if (firstKey) this.#map.delete(firstKey)
+    if (msgMap.size > 100) {
+      const firstKey = msgMap.keys().next().value
+      if (firstKey) msgMap.delete(firstKey)
     }
     return seq
   }
@@ -148,7 +139,10 @@ export class QQBotAPI {
     return this.groupService({
       url: `/v2/groups/${group_openid}/messages`,
       method: 'post',
-      data: data
+      data: {
+        msg_seq: this.getMessageSeq(data.msg_id || ''),
+        ...data
+      }
     }).then(res => res?.data)
   }
 
@@ -253,137 +247,12 @@ export class QQBotAPI {
   }
 
   /**
-   * 创建模板
-   * *********
-   * 使用该方法,你需要申请模板Id
-   * 并设置markdown源码为{{.text_0}}{{.text_1}}
-   * {{.text_2}}{{.text_3}}{{.text_4}}{{.text_5}}
-   * {{.text_6}}{{.text_7}}{{.text_8}}{{.text_9}}
-   * 当前,你也可以传递回调对key和values进行休整
-   * @param custom_template_id
-   * @param mac 默认 9
-   * @param callBack 默认 (key,values)=>({key,values})
-   * @returns
-   */
-  createTemplate(
-    custom_template_id: string,
-    mac = 10,
-    callBack = (key: string, values: string[]) => ({ key, values })
-  ) {
-    let size = -1
-    const params: { key: string; values: string[] }[] = []
-    const Id = custom_template_id
-    /**
-     * 消耗一个参数
-     * @param value 值
-     * @param change 是否换行
-     * @returns
-     */
-    const text = (value: string, change = false) => {
-      // 仅限push
-      if (size > mac - 1) return
-      size++
-      params.push(callBack(`text_${size}`, [`${value}${change ? '\r' : ''}`]))
-    }
-
-    /**
-     * 消耗一个参数
-     * @param start  开始的值
-     * @param change 是否换行
-     * @returns
-     */
-    const prefix = (start: string, label: string) => {
-      text(`${start}[${label}]`)
-    }
-
-    /**
-     * 消耗一个参数
-     * @param param0.value 发送的值
-     * @param param0.enter 是否自动发送
-     * @param param0.reply 是否回复
-     * @param param0.change 是否换行
-     * @param param0.end 尾部字符串
-     */
-    const suffix = ({ value, enter = true, reply = false, change = false, end = '' }) => {
-      text(
-        `(mqqapi://aio/inlinecmd?command=${value}&enter=${enter}&reply=${reply})${end}${
-          change ? '\r' : ''
-        }`
-      )
-    }
-
-    /**
-     * 消耗2个参数
-     * @param param0.label 显示的值
-     * @param param0.value 发送的值
-     * @param param0.enter 是否自动发送
-     * @param param0.reply 是否回复
-     * @param param0.change 是否换行
-     * @param param0.start 头部字符串
-     * @param param0.end 尾部字符串
-     */
-    const button = ({
-      label,
-      value,
-      start = '',
-      end = '',
-      enter = true,
-      reply = false,
-      change = false
-    }) => {
-      // size 只少留两个
-      if (size > mac - 1 - 2) return
-      prefix(start, label)
-      suffix({ value, enter, reply, change, end })
-    }
-
-    /**
-     * **********
-     * 代码块
-     * **********
-     * 跟在后面
-     * 前面需要设置换行
-     * 消耗4个参数
-     * @param val
-     * @returns
-     */
-    const code = (val: string) => {
-      // size 至少留4个
-      if (size > mac - 1 - 4) return
-      text('``')
-      text('`javascript\r' + val)
-      text('\r`')
-      text('``\r')
-    }
-
-    const getParam = () => {
-      return {
-        msg_type: 2,
-        markdown: {
-          custom_template_id: Id,
-          params
-        }
-      }
-    }
-
-    return {
-      size,
-      text,
-      prefix,
-      suffix,
-      button,
-      code,
-      getParam
-    }
-  }
-
-  /**
    *
    * @param openid
    * @param message_id
    * @returns
    */
-  userMessageDelete(openid: string, message_id: string) {
+  async userMessageDelete(openid: string, message_id: string) {
     return this.groupService({
       url: `/v2/users/${openid}/messages/${message_id}`,
       method: 'delete'
@@ -396,7 +265,7 @@ export class QQBotAPI {
    * @param message_id
    * @returns
    */
-  grouMessageDelte(group_openid: string, message_id: string) {
+  async grouMessageDelte(group_openid: string, message_id: string) {
     return this.groupService({
       url: `/v2/groups/${group_openid}/messages/${message_id}`,
       method: 'delete'

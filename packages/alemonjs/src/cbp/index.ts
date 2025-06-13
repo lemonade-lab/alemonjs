@@ -60,12 +60,35 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         const parsedMessage = JSON.parse(message.toString())
         // 1. 解析得到 actionId ，说明是消费行为请求。要广播告诉所有客户端。
         // 2. 解析得到 name ，说明是一个事件请求。
+        // 3. 解析得到 apiId ，说明是一个接口请求。
         logger.debug({
           code: ResultCode.Ok,
           message: '服务端接收到消息',
           data: parsedMessage
         })
-        if (parsedMessage?.actionId) {
+        if (!parsedMessage.apiId) {
+          // 指定的设备 处理消费。终端有记录每个客户端是谁
+          const DeviceId = parsedMessage.DeviceId
+          if (childrenClient.has(DeviceId)) {
+            const clientWs = childrenClient.get(DeviceId)
+            if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+              // 发送消息到指定的子客户端
+              clientWs.send(message)
+            } else {
+              // 如果连接已关闭，删除该客户端
+              childrenClient.delete(DeviceId)
+            }
+          } else if (fullClient.has(DeviceId)) {
+            const clientWs = fullClient.get(DeviceId)
+            if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+              // 发送消息到指定的全量客户端
+              clientWs.send(message)
+            } else {
+              // 如果连接已关闭，删除该客户端
+              fullClient.delete(DeviceId)
+            }
+          }
+        } else if (parsedMessage?.actionId) {
           // 指定的设备 处理消费。终端有记录每个客户端是谁
           const DeviceId = parsedMessage.DeviceId
           if (childrenClient.has(DeviceId)) {

@@ -15,8 +15,13 @@ import { DCClient } from './sdk/wss'
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
 import { AvailableIntentsEventsEnum } from './sdk/types'
 import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from 'alemonjs'
+
+// 平台
 export const platform = 'discord'
 
+export { DCAPI as API } from './sdk/api'
+
+// main
 export default () => {
   let value = getConfigValue()
   if (!value) value = {}
@@ -30,11 +35,13 @@ export default () => {
     intent: config?.intent ?? AvailableIntentsEventsEnum
   })
 
+  const port = process.env?.port || config?.port || 17117
+
   /**
    * 连接 alemonjs 服务器。
    * 向 alemonjs 推送标准信息
    */
-  const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
+  const url = `ws://127.0.0.1:${port}`
   const cbp = cbpPlatform(url)
 
   // 连接
@@ -313,6 +320,17 @@ export default () => {
     } else if (data.action === 'mention.get') {
       const event = data.payload.event
       const res = await api.use.mention(event)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
+    }
+  })
+
+  // 处理 api 调用
+  cbp.onapis(async (data, consume) => {
+    const key = data.payload?.key
+    if (client[key]) {
+      // 如果 client 上有对应的 key，直接调用。
+      const params = data.payload.params
+      const res = await client[key](...params)
       consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
