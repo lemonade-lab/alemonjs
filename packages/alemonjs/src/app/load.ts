@@ -1,7 +1,7 @@
 import { dirname, join } from 'path'
 import { existsSync } from 'fs'
-import { createEventName, showErrorModule } from './utils.js'
-import { getRecursiveDirFiles } from './utils.js'
+import { createEventName, showErrorModule } from '../core/utils.js'
+import { getRecursiveDirFiles } from '../core/utils.js'
 import {
   StoreMiddlewareItem,
   StoreResponseItem,

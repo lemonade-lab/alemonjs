@@ -7,36 +7,24 @@ import {
   User,
   cbpPlatform,
   createResult,
-  getConfigValue,
   useUserHashKey
 } from 'alemonjs'
 import { sendchannel, senduser } from './send'
 import { DCClient } from './sdk/wss'
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
-import { AvailableIntentsEventsEnum } from './sdk/types'
 import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from 'alemonjs'
+import { getDiscordConfigValue, platform } from './config'
 
-// 平台
-export const platform = 'discord'
+// pf
+export { platform } from './config'
 
+// api
 export { DCAPI as API } from './sdk/api'
 
 // main
 export default () => {
-  let value = getConfigValue()
-  if (!value) value = {}
-  const config = value[platform]
-
-  // 创建客户端
-  const client = new DCClient({
-    gatewayURL: config?.gatewayURL,
-    token: config.token,
-    shard: config?.shard ?? [0, 1],
-    intent: config?.intent ?? AvailableIntentsEventsEnum
-  })
-
-  const port = process.env?.port || config?.port || 17117
-
+  const value = getDiscordConfigValue()
+  const port = process.env?.port || value?.port || 17117
   /**
    * 连接 alemonjs 服务器。
    * 向 alemonjs 推送标准信息
@@ -44,8 +32,10 @@ export default () => {
   const url = `ws://127.0.0.1:${port}`
   const cbp = cbpPlatform(url)
 
+  // 创建客户端
+  const client = new DCClient()
   // 连接
-  client.connect(config?.gatewayURL)
+  client.connect()
 
   /**
    * 创建用户头像
@@ -85,7 +75,9 @@ export default () => {
       Platform: platform,
       UserId: UserId
     })
-    const master_key = config?.master_key ?? []
+
+    const value = getDiscordConfigValue()
+    const master_key = value?.master_key ?? []
     const isMaster = master_key.includes(UserKey)
 
     const UserAvatar = createUserAvatar(UserId, event.author.avatar)
@@ -147,8 +139,6 @@ export default () => {
   })
 
   client.on('INTERACTION_CREATE', event => {
-    console.log('event', event)
-
     const isPrivate = typeof event['user'] === 'object' ? true : false
     const user = isPrivate ? event['user'] : event['member'].user
 
@@ -159,7 +149,8 @@ export default () => {
     })
     const UserAvatar = createUserAvatar(UserId, user.avatar)
     const UserName = user.username
-    const master_key = config?.master_key ?? []
+    const value = getDiscordConfigValue()
+    const master_key = value?.master_key ?? []
     const isMaster = master_key.includes(UserKey)
     const MessageText = event.data.custom_id
     if (isPrivate) {
@@ -280,9 +271,8 @@ export default () => {
         const MessageMention: User[] = event.mentions.map(item => {
           const UserId = item.id
           const avatar = event.author.avatar
-          const value = getConfigValue()
-          const config = value?.discord
-          const master_key = config?.master_key ?? []
+          const value = getDiscordConfigValue()
+          const master_key = value?.master_key ?? []
           const UserAvatar = createUserAvatar(UserId, avatar)
           const UserKey = useUserHashKey({
             Platform: platform,
@@ -325,13 +315,14 @@ export default () => {
   })
 
   // 处理 api 调用
-  cbp.onapis(async (data, consume) => {
-    const key = data.payload?.key
-    if (client[key]) {
-      // 如果 client 上有对应的 key，直接调用。
-      const params = data.payload.params
-      const res = await client[key](...params)
-      consume([createResult(ResultCode.Ok, '请求完成', res)])
-    }
-  })
+  cbp?.onapis &&
+    cbp.onapis(async (data, consume) => {
+      const key = data.payload?.key
+      if (client[key]) {
+        // 如果 client 上有对应的 key，直接调用。
+        const params = data.payload.params
+        const res = await client[key](...params)
+        consume([createResult(ResultCode.Ok, '请求完成', res)])
+      }
+    })
 }

@@ -15,7 +15,7 @@ import {
   reconnectInterval,
   USER_AGENT_HEADER
 } from './config'
-import { createResult, Result } from '../post'
+import { createResult, Result } from '../core/utils'
 import { Apis } from '../typing/apis'
 
 type CBPClientOptions = {

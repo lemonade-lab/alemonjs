@@ -3,7 +3,9 @@ import {
   createResult,
   DataEnums,
   getConfigValue,
+  PrivateEventInteractionCreate,
   PrivateEventMessageCreate,
+  PublicEventInteractionCreate,
   PublicEventMessageCreate,
   ResultCode,
   useUserHashKey
@@ -18,6 +20,8 @@ import {
   GROUP_AT_MESSAGE_CREATE,
   MESSAGE_CREATE
 } from './sends'
+// import dayjs from 'dayjs'
+
 export const platform = 'qq-bot'
 
 export const getQQBotConfig = () => {
@@ -62,7 +66,6 @@ export const register = (client: QQBotClients) => {
     // 定义消
     const e: PublicEventMessageCreate = {
       name: 'message.create',
-      // 事件类型
       Platform: platform,
       // guild
       GuildId: event.group_id,
@@ -280,6 +283,80 @@ export const register = (client: QQBotClients) => {
     cbp.send(e)
   })
 
+  client.on('INTERACTION_CREATE', async event => {
+    if (event.scene === 'group') {
+      const master_key = config?.master_key ?? []
+      const isMaster = master_key.includes(event.group_member_openid)
+      const UserAvatar = createUserAvatarURL(event.group_member_openid)
+
+      const UserId = event.group_member_openid
+      const UserKey = useUserHashKey({
+        Platform: platform,
+        UserId: UserId
+      })
+
+      const MessageText = event.data.resolved.button_data?.trim() || ''
+
+      const e: PublicEventInteractionCreate = {
+        name: 'interaction.create',
+        Platform: platform,
+        // guild
+        GuildId: event.group_openid,
+        ChannelId: event.group_openid,
+        // 用户Id
+        UserId: event.group_member_openid,
+        UserKey,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        // 格式化数据
+        MessageId: event.id,
+        MessageText: MessageText,
+        OpenId: event.group_member_openid,
+        tag: 'GROUP_AT_MESSAGE_CREATE',
+        CreateAt: Date.now(),
+        value: event
+      }
+
+      cbp.send(e)
+    } else if (event.scene === 'c2c') {
+      const master_key = config?.master_key ?? []
+      const isMaster = master_key.includes(event.user_openid)
+      const UserAvatar = createUserAvatarURL(event.user_openid)
+
+      const UserId = event.user_openid
+      const UserKey = useUserHashKey({
+        Platform: platform,
+        UserId: UserId
+      })
+
+      const MessageText = event.data.resolved.button_data?.trim() || ''
+
+      // 处理消息
+      const e: PrivateEventInteractionCreate = {
+        name: 'private.interaction.create',
+        Platform: platform,
+        // guild
+        // GuildId: event.group_openid,
+        // ChannelId: event.group_openid,
+        // 用户Id
+        UserId: event.user_openid,
+        UserKey,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        // 格式化数据
+        MessageId: event.id,
+        MessageText: MessageText,
+        OpenId: event.user_openid,
+        CreateAt: Date.now(),
+        tag: 'C2C_MESSAGE_CREATE',
+        value: event
+      }
+      cbp.send(e)
+    }
+  })
+
   client.on('ERROR', console.error)
 
   const api = {
@@ -339,7 +416,7 @@ export const register = (client: QQBotClients) => {
         return Promise.all([])
       },
       mention: async event => {
-        const value = event.value
+        const value = event.value || {}
         const tag = event.tag
         // const event = e.value
         const Metions: User[] = []
@@ -401,13 +478,14 @@ export const register = (client: QQBotClients) => {
   })
 
   // 处理 api 调用
-  cbp.onapis(async (data, consume) => {
-    const key = data.payload?.key
-    if (client[key]) {
-      // 如果 client 上有对应的 key，直接调用。
-      const params = data.payload.params
-      const res = await client[key](...params)
-      consume([createResult(ResultCode.Ok, '请求完成', res)])
-    }
-  })
+  cbp?.onapis &&
+    cbp.onapis(async (data, consume) => {
+      const key = data.payload?.key
+      if (client[key]) {
+        // 如果 client 上有对应的 key，直接调用。
+        const params = data.payload.params
+        const res = await client[key](...params)
+        consume([createResult(ResultCode.Ok, '请求完成', res)])
+      }
+    })
 }

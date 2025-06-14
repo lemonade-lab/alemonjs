@@ -1,7 +1,7 @@
 import { DataEnums, EventKeys, Events, User } from '../typings'
 import { ResultCode } from '../core/code'
 import { ChildrenApp } from './store'
-import { createResult, Result } from './utils'
+import { createResult, Result } from '../core/utils'
 import { sendAction } from '../cbp/actions'
 import { sendAPI } from '../cbp/api'
 

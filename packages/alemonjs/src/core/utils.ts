@@ -4,8 +4,8 @@ import { join } from 'path'
 import path from 'path'
 import fs from 'fs'
 import { createRequire } from 'module'
-import { ResultCode } from '../core/code'
-import { file_suffix_response } from '../core/variable'
+import { ResultCode } from './code'
+import { file_suffix_response } from './variable'
 const require = createRequire(import.meta.url)
 
 /**

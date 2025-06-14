@@ -8,7 +8,7 @@
 import { isAsyncFunction } from 'util/types'
 import { Next, Events, OnMiddlewareValue, Current, EventKeys, CurrentResultValue } from '../typings'
 import { useState } from './hook-use-state'
-import { showErrorModule } from './utils'
+import { showErrorModule } from '../core/utils'
 import { Middleware } from './store'
 import { useMessage } from './hook-use-api'
 import { EventMessageText } from '../core/variable'

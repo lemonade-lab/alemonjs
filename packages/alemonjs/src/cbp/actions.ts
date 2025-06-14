@@ -1,5 +1,5 @@
 import { ResultCode } from '../core/code'
-import { createResult, Result } from '../app/utils'
+import { createResult, Result } from '../core/utils'
 import { Actions } from '../typing/actions'
 import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config'
 

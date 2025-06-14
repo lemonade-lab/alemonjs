@@ -1,6 +1,6 @@
 import { getConfig, getConfigValue } from './core/config.js'
 import { loadChildren, loadChildrenFile } from './app/load.js'
-import { getInputExportPath } from './app/utils.js'
+import { getInputExportPath } from './core/utils.js'
 import { useState } from './post.js'
 import { join } from 'path'
 import { existsSync } from 'fs'

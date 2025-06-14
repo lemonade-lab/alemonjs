@@ -98,7 +98,13 @@ export const sendchannel = async (
           bufferData = readFileSync(item.value)
         }
       }
-      const res = client.channelsMessagesImage(channel_id, bufferData, { content: content })
+      const res = await client.channelsMessagesForm(
+        channel_id,
+        {
+          content: content
+        },
+        bufferData
+      )
       return [createResult(ResultCode.Ok, '完成', {})]
     }
     if (buttons && buttons.length > 0) {
@@ -109,14 +115,14 @@ export const sendchannel = async (
         // 构造成按钮
         components = createButtonsData(rows)
       })
-      const res = await client.channelsMessages(channel_id, {
+      const res = await client.channelsMessagesForm(channel_id, {
         content: content,
         components: components
       })
       return [createResult(ResultCode.Ok, '完成', {})]
     }
     if (content) {
-      const res = client.channelsMessages(channel_id, {
+      const res = await client.channelsMessagesForm(channel_id, {
         content: content
       })
       return [createResult(ResultCode.Ok, '完成', {})]

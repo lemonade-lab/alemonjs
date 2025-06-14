@@ -9,7 +9,7 @@ import {
 import { EventKeys, Events } from '../typings'
 import { expendCycle } from './event-processor-cycle'
 import { ProcessorEventAutoClearMap, ProcessorEventUserAudoClearMap } from './store'
-import { createHash } from './utils'
+import { createHash } from '../core/utils'
 
 /**
  * 过滤掉重复消息

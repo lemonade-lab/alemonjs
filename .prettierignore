@@ -10,3 +10,8 @@
 !README.md
 !lerne.json
 !jest.config.js
+.cache
+logs
+node_modules
+lib
+dist

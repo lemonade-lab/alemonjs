@@ -25,6 +25,12 @@ const createButtonsData = (rows: ButtonRow[]) => {
           const value = button.value
           const options = button.options
           id++
+          const typing = options?.type ?? 'command'
+          const map = {
+            command: 2,
+            link: 0,
+            call: 1
+          }
           return {
             id: String(id),
             render_data: {
@@ -34,7 +40,7 @@ const createButtonsData = (rows: ButtonRow[]) => {
             },
             action: {
               // 0 link 1 callback , 2 command
-              type: typeof options.data === 'object' ? 1 : options?.isLink ? 0 : 2,
+              type: map[typing],
               permission: {
                 // 所有人
                 type: 2

@@ -1,9 +1,8 @@
 import WebSocket from 'ws'
 import { DCAPI } from './api.js'
-import { config } from './config.js'
 import { getIntents } from './intents.js'
-import { DISOCRDOptions } from './wss.types.js'
 import { DCEventMap } from './message.js'
+import { getDiscordConfigValue } from '../config.js'
 
 export class DCClient extends DCAPI {
   #heartbeat_interval = 0
@@ -18,16 +17,8 @@ export class DCClient extends DCAPI {
 
   #ws: WebSocket
 
-  /**
-   * 设置配置
-   * @param opstion
-   */
-  constructor(opstion: DISOCRDOptions) {
+  constructor() {
     super()
-    config.set('intent', opstion.intent)
-    config.set('shard', opstion.shard)
-    config.set('token', opstion.token)
-    config.set('gatewayURL', opstion.gatewayURL)
     return this
   }
 
@@ -36,9 +27,10 @@ export class DCClient extends DCAPI {
    * @returns
    */
   #aut() {
-    const token = config.get('token')
-    const intent = config.get('intent')
-    const shard = config.get('shard')
+    const value = getDiscordConfigValue()
+    const token = value.token
+    const intent = value.intent || []
+    const shard = value.shard || [0, 1]
     return {
       op: 2,
       d: {
@@ -54,25 +46,6 @@ export class DCClient extends DCAPI {
       }
     }
   }
-
-  /**
-   * 重新确认
-   */
-  // #reAut() {
-  //   const token = config.get('token')
-  //   const c = {
-  //     op: 6,
-  //     d: {
-  //       // 会话token
-  //       token: token,
-  //       session_id: this.#session_id,
-  //       // 收到的最后一个序列号
-  //       seq: this.#seq
-  //     }
-  //   }
-  //   console.log('[ws] c', c)
-  //   return c
-  // }
 
   #events: {
     [K in keyof DCEventMap]?: (event: DCEventMap[K]) => any
@@ -94,7 +67,10 @@ export class DCClient extends DCAPI {
    * @param shard
    * @returns
    */
-  async connect(gatewayURL?: string) {
+  async connect() {
+    const value = getDiscordConfigValue()
+    const gatewayURL = value.gatewayURL
+
     // 清除序列号
     this.#seq = null
     // 清除心跳
@@ -150,11 +126,6 @@ export class DCClient extends DCAPI {
             console.log('[ws] session_id', this.#session_id)
           }
         }
-        // const events = ['PRESENCE_UPDATE','TYPING_START']
-        // if (!events.includes(t)) {
-        //     console.log("t", t)
-        //     console.log("d", d)
-        // }
         // 事件处理
         if (this.#events[t]) {
           try {

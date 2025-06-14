@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.1.0-alpha.7",
+  "version": "2.1.0-alpha.8",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -16,6 +16,10 @@
       "types": "./lib/index.d.ts"
     },
     "./package": "./package.json",
+    "./utils": {
+      "import": "./lib/utils.js",
+      "types": "./lib/utils.d.ts"
+    },
     "./env": {
       "types": "./lib/global.d.ts"
     }
