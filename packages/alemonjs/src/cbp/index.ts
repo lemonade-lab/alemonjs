@@ -66,7 +66,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
           message: '服务端接收到消息',
           data: parsedMessage
         })
-        if (!parsedMessage.apiId) {
+        if (parsedMessage.apiId) {
           // 指定的设备 处理消费。终端有记录每个客户端是谁
           const DeviceId = parsedMessage.DeviceId
           if (childrenClient.has(DeviceId)) {

@@ -24,7 +24,8 @@ export type DataButton = {
           cancel: string
         }
     //
-    isLink?: boolean
+    // isLink?: boolean
+    type?: 'command' | 'link' | 'call'
   }
 }
 

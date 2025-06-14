@@ -241,6 +241,12 @@ export const GROUP_AT_MESSAGE_CREATE = async (
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
+  const baseParams = {}
+  if (event.tag === 'INTERACTION_CREATE_GROUP') {
+    baseParams['event_id'] = event.MessageId
+  } else {
+    baseParams['msg_id'] = event.MessageId
+  }
   try {
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
@@ -291,13 +297,14 @@ export const GROUP_AT_MESSAGE_CREATE = async (
           }
         }
       }
+
       const res = await client.groupOpenMessages(event.GuildId, {
         content: content,
         media: {
           file_info: url
         },
-        msg_id: event.MessageId,
-        msg_type: 7
+        msg_type: 7,
+        ...baseParams
       })
       return [
         createResult(ResultCode.Ok, 'client.groupOpenMessages', {
@@ -336,9 +343,9 @@ export const GROUP_AT_MESSAGE_CREATE = async (
       })
       const res = await client.groupOpenMessages(event.GuildId, {
         content: content,
-        msg_id: event.MessageId,
         msg_type: 2,
-        ...params
+        ...params,
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })]
     }
@@ -362,17 +369,17 @@ export const GROUP_AT_MESSAGE_CREATE = async (
       })
       const res = await client.groupOpenMessages(event.GuildId, {
         content: content,
-        msg_id: event.MessageId,
         msg_type: 3,
-        ...params
+        ...params,
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })]
     }
     if (content) {
       const res = await client.groupOpenMessages(event.GuildId, {
         content: content,
-        msg_id: event.MessageId,
-        msg_type: 0
+        msg_type: 0,
+        ...baseParams
       })
       return [
         createResult(ResultCode.Ok, 'client.groupOpenMessages', {
@@ -398,6 +405,12 @@ export const C2C_MESSAGE_CREATE = async (
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
+  const baseParams = {}
+  if (event.tag === 'INTERACTION_CREATE_C2C') {
+    baseParams['event_id'] = event.MessageId
+  } else {
+    baseParams['msg_id'] = event.MessageId
+  }
   try {
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
@@ -454,8 +467,8 @@ export const C2C_MESSAGE_CREATE = async (
         media: {
           file_info: url
         },
-        msg_id: event.MessageId,
-        msg_type: 7
+        msg_type: 7,
+        ...baseParams
       })
       return [
         createResult(ResultCode.Ok, 'client.usersOpenMessages', {
@@ -494,9 +507,9 @@ export const C2C_MESSAGE_CREATE = async (
       })
       const res = await client.usersOpenMessages(event.OpenId, {
         content: content,
-        msg_id: event.MessageId,
         msg_type: 2,
-        ...params
+        ...params,
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })]
     }
@@ -520,17 +533,17 @@ export const C2C_MESSAGE_CREATE = async (
       })
       const res = await client.usersOpenMessages(event.OpenId, {
         content: content,
-        msg_id: event.MessageId,
         msg_type: 3,
-        ...params
+        ...params,
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })]
     }
     if (content) {
       const res = await client.usersOpenMessages(event.OpenId, {
         content: content,
-        msg_id: event.MessageId,
-        msg_type: 0
+        msg_type: 0,
+        ...baseParams
       })
       return [
         createResult(ResultCode.Ok, 'client.usersOpenMessages', {
@@ -556,6 +569,12 @@ export const DIRECT_MESSAGE_CREATE = async (
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
+  const baseParams = {}
+  if (event.tag === 'INTERACTION_CREATE_GUILD') {
+    baseParams['event_id'] = event.MessageId
+  } else {
+    baseParams['msg_id'] = event.MessageId
+  }
   try {
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
@@ -593,12 +612,14 @@ export const DIRECT_MESSAGE_CREATE = async (
           imageBuffer = file_data
         }
       }
-
-      const res = await client.postDirectImage(event.OpenId, {
-        msg_id: event.MessageId,
-        content: content,
-        image: imageBuffer
-      })
+      const res = await client.dmsMessages(
+        event.OpenId,
+        {
+          content: content,
+          ...baseParams
+        },
+        imageBuffer
+      )
       return [createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })]
     }
     const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
@@ -630,10 +651,10 @@ export const DIRECT_MESSAGE_CREATE = async (
           }
         }
       })
-      const res = await client.dmsMessage(event.OpenId, {
+      const res = await client.dmsMessages(event.OpenId, {
         content: '',
-        msg_id: event.MessageId,
-        ...params
+        ...params,
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.dmsMessage', { id: res.id })]
     }
@@ -655,17 +676,17 @@ export const DIRECT_MESSAGE_CREATE = async (
           params['ark'] = arkData
         }
       })
-      const res = await client.dmsMessage(event.OpenId, {
+      const res = await client.dmsMessages(event.OpenId, {
         content: content,
-        msg_id: event.MessageId,
-        ...params
+        ...params,
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.dmsMessage', { id: res.id })]
     }
     if (content) {
-      const res = await client.dmsMessage(event.OpenId, {
+      const res = await client.dmsMessages(event.OpenId, {
         content: content,
-        msg_id: event.MessageId
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.dmsMessage', { id: res?.id })]
     }
@@ -686,6 +707,12 @@ export const MESSAGE_CREATE = async (
   event,
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
+  const baseParams = {}
+  if (event.tag === 'INTERACTION_CREATE_GUILD') {
+    baseParams['event_id'] = event.MessageId
+  } else {
+    baseParams['msg_id'] = event.MessageId
+  }
   try {
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
@@ -736,11 +763,14 @@ export const MESSAGE_CREATE = async (
           imageBuffer = file_data
         }
       }
-      const res = await client.postImage(event.ChannelId, {
-        msg_id: event.MessageId,
-        content: content,
-        image: imageBuffer
-      })
+      const res = await client.channelsMessages(
+        event.ChannelId,
+        {
+          content: content,
+          ...baseParams
+        },
+        imageBuffer
+      )
       return [createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })]
     }
     const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
@@ -772,10 +802,10 @@ export const MESSAGE_CREATE = async (
           }
         }
       })
-      const res = await client.channelsMessagesPost(event.ChannelId, {
+      const res = await client.channelsMessages(event.ChannelId, {
         content: '',
-        msg_id: event.MessageId,
-        ...params
+        ...params,
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res.id })]
     }
@@ -797,7 +827,7 @@ export const MESSAGE_CREATE = async (
           params['ark'] = arkData
         }
       })
-      const res = await client.channelsMessagesPost(event.GuildId, {
+      const res = await client.channelsMessages(event.GuildId, {
         content: content,
         msg_id: event.MessageId,
         ...params
@@ -805,9 +835,9 @@ export const MESSAGE_CREATE = async (
       return [createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res.id })]
     }
     if (content) {
-      const res = await client.channelsMessagesPost(event.ChannelId, {
+      const res = await client.channelsMessages(event.ChannelId, {
         content: content,
-        msg_id: event.MessageId
+        ...baseParams
       })
       return [createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res?.id })]
     }

@@ -7,3 +7,5 @@
 `LOG_PATH`:`string` log 地址
 
 `PKG_PATH`:`string` package.json 地址
+
+`NODE_ENV`:`string` 'development'

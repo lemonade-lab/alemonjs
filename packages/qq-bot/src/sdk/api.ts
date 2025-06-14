@@ -99,13 +99,18 @@ export class QQBotAPI {
     openid: string,
     data: ApiRequestData
   ): Promise<{ id: string; timestamp: number }> {
+    const db = {
+      ...(data.event_id
+        ? { event_id: data.event_id }
+        : {
+            msg_seq: this.getMessageSeq(data.msg_id || '')
+          }),
+      ...data
+    }
     return this.groupService({
       url: `/v2/users/${openid}/messages`,
       method: 'post',
-      data: {
-        msg_seq: this.getMessageSeq(data.msg_id || ''),
-        ...data
-      }
+      data: db
     }).then(res => res?.data)
   }
 
@@ -136,13 +141,18 @@ export class QQBotAPI {
     group_openid: string,
     data: ApiRequestData
   ): Promise<{ id: string; timestamp: number }> {
+    const db = {
+      ...(data.event_id
+        ? { event_id: data.event_id }
+        : {
+            msg_seq: this.getMessageSeq(data.msg_id || '')
+          }),
+      ...data
+    }
     return this.groupService({
       url: `/v2/groups/${group_openid}/messages`,
       method: 'post',
-      data: {
-        msg_seq: this.getMessageSeq(data.msg_id || ''),
-        ...data
-      }
+      data: db
     }).then(res => res?.data)
   }
 
@@ -273,53 +283,46 @@ export class QQBotAPI {
   }
 
   /**
-   * 创建form
-   * @param image
-   * @param msg_id
-   * @param content
-   * @param name
-   * @returns
-   */
-  async createFrom(image: Buffer, msg_id: string, content: any, Name = 'image.jpg') {
-    const from = await createPicFrom(image, Name)
-    if (!from) return false
-    const { picData, name } = from
-    const formdata = new FormData()
-    formdata.append('msg_id', msg_id)
-    if (typeof content === 'string') formdata.append('content', content)
-    formdata.append('file_image', picData, name)
-    return formdata
-  }
-
-  /**
    * ************
    * 消息-图片接口
    * ***********
    */
 
   /**
-   * 发送buffer图片
-   * @param id 私信传频道id,公信传子频道id
-   * @param message {消息编号,图片,内容}
-   * @param isGroup 是否是群聊
+   *
+   * @param channel_id
+   * @param message
+   * @param image
    * @returns
    */
-  async postImage(
+  async channelsMessages(
     channel_id: string,
     message: {
-      msg_id: string
-      image: Buffer
       content?: string
-      name?: string
-    }
+      embed?: any
+      ark?: any
+      message_reference?: any
+      image?: string
+      msg_id?: string
+      event_id?: string
+      markdown?: any
+    },
+    image?: Buffer
   ): Promise<any> {
-    const formdata = await this.createFrom(
-      message.image,
-      message.msg_id,
-      message.content,
-      message.name
-    )
-    const dary = formdata != false ? formdata.getBoundary() : ''
+    const formdata = new FormData()
+    for (const key in message) {
+      if (message[key] !== undefined) {
+        formdata.append(key, message[key])
+      }
+    }
+    if (image) {
+      const from = await createPicFrom(image)
+      if (from) {
+        const { picData, name } = from
+        formdata.append('file_image', picData, name)
+      }
+    }
+    const dary = formdata.getBoundary()
     return this.guildServer({
       method: 'post',
       url: `/channels/${channel_id}/messages`,
@@ -331,27 +334,39 @@ export class QQBotAPI {
   }
 
   /**
-   * 私聊发送buffer图片
+   * 私聊发送
    * @param id 私信传频道id,公信传子频道id
    * @param message {消息编号,图片,内容}
    * @returns
    */
-  async postDirectImage(
+  async dmsMessages(
     guild_id: string,
     message: {
-      msg_id: string
-      image: Buffer
       content?: string
-      name?: string
-    }
+      embed?: any
+      ark?: any
+      message_reference?: any
+      image?: string
+      msg_id?: string
+      event_id?: string
+      markdown?: any
+    },
+    image?: Buffer
   ): Promise<any> {
-    const formdata = await this.createFrom(
-      message.image,
-      message.msg_id,
-      message.content,
-      message.name
-    )
-    const dary = formdata != false ? formdata.getBoundary() : ''
+    const formdata = new FormData()
+    for (const key in message) {
+      if (message[key] !== undefined) {
+        formdata.append(key, message[key])
+      }
+    }
+    if (image) {
+      const from = await createPicFrom(image)
+      if (from) {
+        const { picData, name } = from
+        formdata.append('file_image', picData, name)
+      }
+    }
+    const dary = formdata.getBoundary()
     return this.guildServer({
       method: 'post',
       url: `/dms/${guild_id}/messages`,
@@ -603,37 +618,10 @@ export class QQBotAPI {
    * @param message_id
    * @returns
    */
-  async channelsMessages(channel_id: string, message_id: string) {
+  async channelsMessagesById(channel_id: string, message_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/messages/${message_id}`
-    }).then(res => res?.data)
-  }
-
-  /**
-   * 发送消息
-   * @param channel_id
-   * @param message_id
-   * @param data
-   * @returns
-   */
-  async channelsMessagesPost(
-    channel_id: string,
-    data: {
-      content?: string
-      embed?: any
-      ark?: any
-      message_reference?: any
-      image?: string
-      msg_id?: string
-      event_id?: string
-      markdown?: any
-    }
-  ) {
-    return this.guildServer({
-      method: 'POST',
-      url: `/channels/${channel_id}/messages`,
-      data
     }).then(res => res?.data)
   }
 
@@ -855,31 +843,6 @@ export class QQBotAPI {
     return this.guildServer({
       method: 'POST',
       url: `/users/@me/dms`
-    }).then(res => res?.data)
-  }
-
-  /**
-   * 发送私信
-   * @param guild_id
-   * @returns
-   */
-  async dmsMessage(
-    guild_id: string,
-    data: {
-      content?: string
-      embed?: any
-      ark?: any
-      message_reference?: any
-      image?: string
-      msg_id?: string
-      event_id?: string
-      markdown?: any
-    }
-  ) {
-    return this.guildServer({
-      method: 'POST',
-      url: `/dms/${guild_id}/messages`,
-      data
     }).then(res => res?.data)
   }
 
@@ -1394,5 +1357,31 @@ export class QQBotAPI {
     return this.guildServer({
       url: `/guilds/${guild_id}/api_permission`
     }).then(res => res?.data)
+  }
+
+  /**
+   * 交互事件回应
+   * @param interaction_id
+   * @param code
+   * @returns
+   */
+  async interactionResponse(mode: 'group' | 'guild', interaction_id: string, code?: number) {
+    if (mode === 'group') {
+      return this.groupService({
+        method: 'PUT',
+        url: `/interactions/${interaction_id}`,
+        data: {
+          code: code || 0
+        }
+      }).then(res => res?.data)
+    } else {
+      return this.guildServer({
+        method: 'PUT',
+        url: `/interactions/${interaction_id}`,
+        data: {
+          code: code || 0
+        }
+      }).then(res => res?.data)
+    }
   }
 }

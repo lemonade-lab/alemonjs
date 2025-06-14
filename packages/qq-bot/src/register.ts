@@ -284,6 +284,17 @@ export const register = (client: QQBotClients) => {
   })
 
   client.on('INTERACTION_CREATE', async event => {
+    // try {
+    //   if (event.scene === 'group' || event.scene === 'c2c') {
+    //     await client.interactionResponse('group', event.id)
+    //   }
+    //   else if (event.scene === 'guild') {
+    //     await client.interactionResponse('guild', event.id)
+    //   }
+    // } catch (err) {
+    //   createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
+    // }
+
     if (event.scene === 'group') {
       const master_key = config?.master_key ?? []
       const isMaster = master_key.includes(event.group_member_openid)
@@ -313,7 +324,7 @@ export const register = (client: QQBotClients) => {
         MessageId: event.id,
         MessageText: MessageText,
         OpenId: event.group_member_openid,
-        tag: 'GROUP_AT_MESSAGE_CREATE',
+        tag: 'INTERACTION_CREATE_GROUP',
         CreateAt: Date.now(),
         value: event
       }
@@ -336,9 +347,6 @@ export const register = (client: QQBotClients) => {
       const e: PrivateEventInteractionCreate = {
         name: 'private.interaction.create',
         Platform: platform,
-        // guild
-        // GuildId: event.group_openid,
-        // ChannelId: event.group_openid,
         // 用户Id
         UserId: event.user_openid,
         UserKey,
@@ -350,10 +358,48 @@ export const register = (client: QQBotClients) => {
         MessageText: MessageText,
         OpenId: event.user_openid,
         CreateAt: Date.now(),
-        tag: 'C2C_MESSAGE_CREATE',
+        tag: 'INTERACTION_CREATE_C2C',
         value: event
       }
       cbp.send(e)
+    } else if (event.scene === 'guild') {
+      const master_key = config?.master_key ?? []
+      const isMaster = master_key.includes(event.data.resolved.user_id)
+      const UserAvatar = createUserAvatarURL(event.data.resolved.user_id)
+      const UserId = event.data.resolved.user_id
+      const UserKey = useUserHashKey({
+        Platform: platform,
+        UserId: UserId
+      })
+      const MessageText = event.data.resolved.button_data?.trim() || ''
+      // 处理消息
+      const e: PublicEventInteractionCreate = {
+        name: 'interaction.create',
+        Platform: platform,
+        // guild
+        GuildId: event.guild_id,
+        ChannelId: event.channel_id,
+        // 用户Id
+        UserId: event.data.resolved.user_id,
+        UserKey,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        // 格式化数据
+        MessageId: event.data.resolved.message_id,
+        MessageText: MessageText,
+        OpenId: event.guild_id,
+        CreateAt: Date.now(),
+        tag: 'INTERACTION_CREATE_GUILD',
+        value: event
+      }
+      cbp.send(e)
+    } else {
+      logger.warn({
+        code: ResultCode.Fail,
+        message: '暂未更新支持此类型的交互事件',
+        data: event
+      })
     }
   })
 
@@ -412,6 +458,16 @@ export const register = (client: QQBotClients) => {
         // 频道消息
         if (tag == 'MESSAGE_CREATE') {
           return await MESSAGE_CREATE(client, event, val)
+        }
+        // 交互
+        if (tag == 'INTERACTION_CREATE_GROUP') {
+          return await GROUP_AT_MESSAGE_CREATE(client, event, val)
+        }
+        if (tag == 'INTERACTION_CREATE_C2C') {
+          return await C2C_MESSAGE_CREATE(client, event, val)
+        }
+        if (tag == 'INTERACTION_CREATE_GUILD') {
+          return await AT_MESSAGE_CREATE(client, event, val)
         }
         return Promise.all([])
       },
