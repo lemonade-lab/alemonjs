@@ -34,7 +34,7 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        dir: '../gui/dist',
+        dir: '../../packages/discord/dist',
         entryFileNames: `assets/index.js`,
         assetFileNames: `assets/[name].[ext]`
       }

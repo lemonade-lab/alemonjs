@@ -34,7 +34,7 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        dir: '../db/dist',
+        dir: '../../packages/wechat/dist',
         entryFileNames: `assets/index.js`,
         assetFileNames: `assets/[name].[ext]`
       }

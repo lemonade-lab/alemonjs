@@ -34,7 +34,7 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        dir: '../kook/dist',
+        dir: '../../packages/qq-bot/dist',
         entryFileNames: `assets/index.js`,
         assetFileNames: `assets/[name].[ext]`
       }

@@ -30,6 +30,8 @@
   },
   "private": true,
   "workspaces": [
+    "clis/*",
+    "frontends/*",
     "packages/*"
   ]
 }
