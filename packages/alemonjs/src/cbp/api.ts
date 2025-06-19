@@ -2,6 +2,7 @@ import { ResultCode } from '../core/code'
 import { createResult, Result } from '../core/utils'
 import { apiTimeouts, apiResolves, deviceId, generateUniqueId, timeoutTime } from './config'
 import { Apis } from '../typing/apis'
+import * as JSON from 'flatted'
 
 /**
  * 发送行为

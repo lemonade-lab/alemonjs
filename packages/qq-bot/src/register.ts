@@ -321,7 +321,7 @@ export const register = (client: QQBotClients) => {
         IsMaster: isMaster,
         IsBot: false,
         // 格式化数据
-        MessageId: event.id,
+        MessageId: `INTERACTION_CREATE:${event.id}`,
         MessageText: MessageText,
         OpenId: event.group_member_openid,
         tag: 'INTERACTION_CREATE_GROUP',

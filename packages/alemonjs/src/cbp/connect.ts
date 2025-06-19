@@ -17,6 +17,7 @@ import {
 } from './config'
 import { createResult, Result } from '../core/utils'
 import { Apis } from '../typing/apis'
+import * as JSON from 'flatted'
 
 type CBPClientOptions = {
   open?: () => void

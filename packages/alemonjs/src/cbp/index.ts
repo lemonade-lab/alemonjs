@@ -14,6 +14,7 @@ import {
   USER_AGENT_HEADER
 } from './config'
 import { getConfig } from '../core/config'
+import * as JSON from 'flatted'
 
 export const cbpServer = (port: number, listeningListener?: () => void) => {
   if (global.chatbotServer) {

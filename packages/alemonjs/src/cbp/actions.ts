@@ -2,7 +2,7 @@ import { ResultCode } from '../core/code'
 import { createResult, Result } from '../core/utils'
 import { Actions } from '../typing/actions'
 import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config'
-
+import * as JSON from 'flatted'
 /**
  * 发送行为
  * @param data
