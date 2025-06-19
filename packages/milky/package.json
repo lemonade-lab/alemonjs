@@ -1,7 +1,7 @@
 {
-  "name": "@alemonjs/onebot",
+  "name": "@alemonjs/milky",
   "version": "2.1.0-alpha.0",
-  "description": "onebot v11",
+  "description": "阿柠檬milky平台连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -15,24 +15,12 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
   },
   "keywords": [
     "alemonjs"
   ],
-  "dependencies": {
-    "ws": "^8.18.1"
-  },
-  "alemonjs": {
-    "desktop": {
-      "platform": [
-        {
-          "name": "onebot"
-        }
-      ],
-      "logo": "antd.RobotOutlined"
-    }
-  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
