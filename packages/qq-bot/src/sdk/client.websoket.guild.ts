@@ -5,7 +5,6 @@ import { QQBotAPI } from './api.js'
 import { QQBotGuildEventMap } from './message.guild.js'
 import { Counter } from './counter.js'
 import { GuildOptions } from './websoket.guild.types.js'
-
 /**
  * 连接
  */

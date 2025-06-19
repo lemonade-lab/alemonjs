@@ -17,7 +17,7 @@ import {
 } from './config'
 import { createResult, Result } from '../core/utils'
 import { Apis } from '../typing/apis'
-import * as JSON from 'flatted'
+import * as flattedJSON from 'flatted'
 
 type CBPClientOptions = {
   open?: () => void
@@ -140,7 +140,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
     global.chatbotClient.on('message', message => {
       try {
         // 解析消息
-        const parsedMessage = JSON.parse(message.toString())
+        const parsedMessage = flattedJSON.parse(message.toString())
         logger.debug({
           code: ResultCode.Ok,
           message: '客户端接收到消息',
@@ -272,7 +272,7 @@ export const cbpPlatform = (
   const send = (data: EventsEnum) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
       data.DeviceId = deviceId // 设置设备 ID
-      global.chatbotPlatform.send(JSON.stringify(data))
+      global.chatbotPlatform.send(flattedJSON.stringify(data))
     }
   }
   const actionReplys: ActionReplyFunc[] = []
@@ -287,7 +287,7 @@ export const cbpPlatform = (
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
       // 透传消费。也就是对应的设备进行处理消费。
       global.chatbotPlatform.send(
-        JSON.stringify({
+        flattedJSON.stringify({
           action: data.action,
           payload: payload,
           actionId: data.actionId,
@@ -301,7 +301,7 @@ export const cbpPlatform = (
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
       // 透传消费。也就是对应的设备进行处理消费。
       global.chatbotPlatform.send(
-        JSON.stringify({
+        flattedJSON.stringify({
           action: data.action,
           apiId: data.apiId,
           DeviceId: data.DeviceId,
@@ -347,7 +347,7 @@ export const cbpPlatform = (
 
     global.chatbotPlatform.on('message', message => {
       try {
-        const data = JSON.parse(message.toString())
+        const data = flattedJSON.parse(message.toString())
         logger.debug({
           code: ResultCode.Ok,
           message: '平台端接收消息',

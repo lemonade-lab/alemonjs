@@ -4,7 +4,6 @@ import { dirname, join } from 'path'
 import YAML from 'yaml'
 import { Package } from '../typing/package'
 import { ResultCode } from './code'
-import * as JSON from 'flatted'
 
 /**
  * 配置类

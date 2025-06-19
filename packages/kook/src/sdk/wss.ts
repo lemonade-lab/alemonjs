@@ -5,7 +5,6 @@ import { KOOKOptions } from './wss.types.js'
 import { KOOKAPI } from './api.js'
 import { KOOKEventMap } from './message.js'
 import { ConversationMap } from './conversation.js'
-
 export class KOOKClient extends KOOKAPI {
   // 标记是否已连接
   #isConnected = false

@@ -2,7 +2,7 @@ import { ResultCode } from '../core/code'
 import { createResult, Result } from '../core/utils'
 import { Actions } from '../typing/actions'
 import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config'
-import * as JSON from 'flatted'
+import * as flattedJSON from 'flatted'
 /**
  * 发送行为
  * @param data
@@ -16,7 +16,7 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
     // 设置设备 ID
     data.DeviceId = deviceId
     // 发送消息
-    global.chatbotClient.send(JSON.stringify(data))
+    global.chatbotClient.send(flattedJSON.stringify(data))
     // 12 秒后超时
     const timeout = setTimeout(() => {
       // 被清理了
