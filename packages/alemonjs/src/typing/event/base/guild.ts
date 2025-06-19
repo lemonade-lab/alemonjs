@@ -3,6 +3,10 @@ export type Guild = {
    * 频道Id
    */
   GuildId: string
+  /**
+   * 空间Id
+   */
+  SpaceID: string
 }
 
 export type Channel = {

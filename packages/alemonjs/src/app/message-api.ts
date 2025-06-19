@@ -2,6 +2,19 @@ import { DataEnums, OnDataFormatFunc } from '../typings'
 import { ResultCode } from '../core/code'
 import { sendAction } from '../cbp/actions'
 
+type BaseMap = {
+  [key: string]: any
+}
+
+/**
+ * 创建原生value映射
+ * @param event
+ * @returns
+ */
+export const createEventValue = <T extends keyof R, R extends BaseMap>(event: { value: R[T] }) => {
+  return event.value as R[T] | undefined
+}
+
 /**
  * 创建数据格式。
  * @param {...DataEnums[]} data - 要格式化的数据。

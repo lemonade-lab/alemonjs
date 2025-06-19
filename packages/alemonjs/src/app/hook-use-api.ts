@@ -221,7 +221,7 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
     horn,
     reaction
   }
-  return [message]
+  return [message] as const
 }
 
 /**
@@ -282,7 +282,7 @@ export const useMenber = <T extends EventKeys>(event: Events[T]) => {
     unmute,
     remove
   }
-  return [member]
+  return [member] as const
 }
 
 /**
@@ -315,7 +315,7 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
     exit,
     join
   }
-  return [channel]
+  return [channel] as const
 }
 
 /**
@@ -339,7 +339,7 @@ export const useSend = <T extends EventKeys>(event: Events[T]) => {
  */
 export const useSends = <T extends EventKeys>(event: Events[T]) => {
   const [message] = useMessage(event)
-  return [message.send]
+  return [message.send] as const
 }
 
 /**

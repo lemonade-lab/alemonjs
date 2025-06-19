@@ -7,7 +7,7 @@ import { platform } from './register'
 // 平台
 export { platform }
 // hook
-export { useMode } from './hook'
+export { useMode, useValue, useClient } from './hook'
 // api
 export { QQBotAPI as API } from './sdk/api'
 // main

@@ -1,14 +1,12 @@
-import { platform as qqbot, API as qqbotAPI } from '@alemonjs/qq-bot'
-import { useClient } from 'alemonjs'
+import { platform as qqbot, useClient } from '@alemonjs/qq-bot'
 
-const selects = onSelects(['message.create', 'message.reaction.add'])
+const selects = onSelects(['message.create'])
 
 export default onResponse(selects, async event => {
   if (event.Platform === qqbot) {
-    // 拿到一个可使用的客户端
-    const [client] = useClient(event, qqbotAPI)
-    const res = await client.channels(event.value.channel_id)
-  } else {
-    //
+    // [客户端，原生值]
+    const [client, value] = useClient(event)
+
+    const res = await client.channels(value.group_openid)
   }
 })
