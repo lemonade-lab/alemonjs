@@ -3,29 +3,29 @@ import FormData from 'form-data'
 import { Readable } from 'stream'
 import { ApiEnum, SendMessageParams, SendDirectMessageParams } from './typings.js'
 import { config } from './config.js'
-import { createPicFrom } from '../../../core/utils.js'
+import { createPicFrom } from 'alemonjs/utils'
+
+export const API_URL = 'https://www.kookapp.cn'
 
 /**
  * api接口
  */
 export class KOOKAPI {
-  API_URL = 'https://www.kookapp.cn'
-
   /**
    * KOOK服务
    * @param config
    * @returns
    */
-  kookService(opstoin: AxiosRequestConfig) {
+  service(opstoin: AxiosRequestConfig) {
     const token = config.get('token')
-    const service = axios.create({
-      baseURL: this.API_URL,
+    const req = axios.create({
+      baseURL: API_URL,
       timeout: 30000,
       headers: {
         Authorization: `Bot ${token}`
       }
     })
-    return service(opstoin)
+    return req(opstoin)
   }
 
   /**
@@ -33,7 +33,7 @@ export class KOOKAPI {
    * @returns
    */
   async gateway() {
-    return this.kookService({
+    return this.service({
       baseURL: 'https://www.kookapp.cn/api/v3/gateway/index',
       method: 'get',
       params: {
@@ -55,7 +55,10 @@ export class KOOKAPI {
    * @returns
    */
   async postImage(file: string | Buffer | Readable, Name = 'image.jpg') {
-    const from = await createPicFrom(file, Name)
+    const from = await createPicFrom({
+      image: file,
+      name: Name
+    })
     if (!from) return false
     const { picData, name } = from
     const formdata = new FormData()
@@ -87,7 +90,7 @@ export class KOOKAPI {
   async createUrl(formdata): Promise<{
     data: { url: string }
   }> {
-    return await this.kookService({
+    return await this.service({
       method: 'post',
       url: ApiEnum.AssetCreate,
       data: formdata,
@@ -113,7 +116,7 @@ export class KOOKAPI {
       nonce: string
     }
   }> {
-    return await this.kookService({
+    return await this.service({
       method: 'post',
       url: ApiEnum.MessageCreate,
       data
@@ -146,7 +149,7 @@ export class KOOKAPI {
       }
     }
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.UserChatCreate,
       data: {
@@ -167,7 +170,7 @@ export class KOOKAPI {
       nonce: string
     }
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.DirectMessageCreate,
       data
@@ -186,7 +189,7 @@ export class KOOKAPI {
       data: any[]
     }
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.MessageDelete,
       data: {
@@ -212,7 +215,7 @@ export class KOOKAPI {
       data: any[]
     }
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.MessageUpdate,
       data
@@ -229,7 +232,7 @@ export class KOOKAPI {
     message: string
     data: any[]
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.MessageDeleteReaction,
       data
@@ -246,7 +249,7 @@ export class KOOKAPI {
     message: string
     data: any[]
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.MessageAddReaction,
       data
@@ -277,7 +280,7 @@ export class KOOKAPI {
       reaction_time: number
     }
   }> {
-    return this.kookService({
+    return this.service({
       method: 'get',
       url: ApiEnum.MessageReactionList,
       params
@@ -316,7 +319,7 @@ export class KOOKAPI {
       invited_count: number
     }
   }> {
-    return this.kookService({
+    return this.service({
       method: 'get',
       url: ApiEnum.UserMe
     }).then(res => res?.data)
@@ -349,7 +352,7 @@ export class KOOKAPI {
       active_time: number
     }
   }> {
-    return this.kookService({
+    return this.service({
       method: 'get',
       url: ApiEnum.UserView,
       params: {
@@ -373,7 +376,7 @@ export class KOOKAPI {
     message: string
     data: any
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.GuildKickout,
       data: {
@@ -399,7 +402,7 @@ export class KOOKAPI {
     message: string
     data: any
   }> {
-    return this.kookService({
+    return this.service({
       method: 'post',
       url: ApiEnum.ChannelRoleCreate,
       data: {

@@ -1,9 +1,13 @@
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, PathLike, readFileSync } from 'fs'
 import axios from 'axios'
 import { join } from 'path'
 import { toDataURL } from 'qrcode'
 import { writeFile } from 'fs'
-
+import { createReadStream } from 'fs'
+import { Readable, isReadable } from 'stream'
+import { basename } from 'path'
+import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
+import { publicIp, Options } from 'public-ip'
 /**
  * 通过URL获取Buffer
  * @param url
@@ -109,4 +113,89 @@ export class Counter {
       this.#counter = this.#val
     }
   }
+}
+
+/**
+ * 创建form
+ * @param options.url
+ * @param options.image
+ * @param options.name
+ * @description 支持以下几种方式创建图片数据：
+ * 1. 通过url获取图片数据
+ * 2. 通过图片路径获取图片数据
+ * 3. 通过base64字符串获取图片数据
+ * 4. 通过Buffer获取图片数据
+ * 5. 通过Readable流获取图片数据
+ * @returns
+ */
+export async function createPicFrom(options: {
+  url?: PathLike
+  image?: string | Buffer | Readable
+  name?: string
+}) {
+  let { url, image, name } = options
+  let picData: Readable
+
+  const pushBuffer = (buffer: Buffer) => {
+    picData = new Readable()
+    picData.push(buffer)
+    // end
+    picData.push(null)
+  }
+
+  if (url) {
+    if (!existsSync(url)) return
+    if (!name) name = basename(url.toString())
+    picData = createReadStream(url)
+  } else if (typeof image === 'string') {
+    // base64
+    if (image.startsWith('data:')) {
+      const base64Data = image.split(',')[1]
+      const buffer = Buffer.from(base64Data, 'base64')
+      const type = await fileTypeFromBuffer(buffer)
+      name = 'file.' + (type?.ext || 'jpg')
+      pushBuffer(buffer)
+    }
+    // file path
+    else if (existsSync(image)) {
+      if (!name) name = basename(image)
+      picData = createReadStream(image)
+    }
+    // invalid string
+    else {
+      return
+    }
+  } else if (Buffer.isBuffer(image)) {
+    if (!name) {
+      const type = await fileTypeFromBuffer(image)
+      name = 'file.' + (type?.ext || 'jpg')
+    }
+    pushBuffer(image)
+  } else if (isReadable(image)) {
+    if (!name) {
+      const img = Readable.toWeb(image)
+      const type = await fileTypeFromStream(img)
+      name = 'file.' + (type?.ext || 'jpg')
+    }
+    picData = image
+  } else {
+    return
+  }
+  return { picData, name }
+}
+
+/**
+ *
+ * @param options
+ * @returns
+ */
+export const getPublicIP = async (options: Options = {}): Promise<string> => {
+  if (global.publicip) return global.publicip
+  return await publicIp({
+    onlyHttps: true,
+    ...options
+  }).then(ip => {
+    global.publicip = ip
+    return global.publicip
+  })
 }

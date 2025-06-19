@@ -1,6 +1,4 @@
-import { BufferData } from './core'
-
-const BD = new BufferData()
+import { getBufferByURL } from 'alemonjs/utils'
 
 type Message = {
   // 行为 发送消息
@@ -129,7 +127,7 @@ export async function replyController(msg, guild_id) {
   const match = content.match(/<http>(.*?)<\/http>/)
   if (match) {
     const getUrl = match[1]
-    const msg = await BD.getUrl(getUrl)
+    const msg = await getBufferByURL(getUrl)
     if (Buffer.isBuffer(msg)) {
       // 群聊
       global.client.send(

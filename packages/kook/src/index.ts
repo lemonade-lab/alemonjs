@@ -13,6 +13,8 @@ import { KOOKClient } from './sdk/index'
 import { readFileSync } from 'fs'
 export const platform = 'kook'
 
+export { KOOKAPI as API } from './sdk/api.js'
+
 export default () => {
   let value = getConfigValue()
   if (!value) value = {}

@@ -1,4 +1,4 @@
-import { type SystemData } from '../../sdk/typings.js'
+import { type SystemData } from '../typings.js'
 
 /**
  *

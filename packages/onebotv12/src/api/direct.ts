@@ -1,6 +1,4 @@
-import { BufferData } from './core'
-
-const BD = new BufferData()
+import { getBufferByURL } from 'alemonjs/utils'
 
 type Message = {
   // 行为 发送消息
@@ -129,7 +127,7 @@ export async function directController(msg, user_id) {
     const getUrl = match[1]
     // url
     //
-    const msg = await BD.getUrl(getUrl)
+    const msg = await getBufferByURL(getUrl)
     if (Buffer.isBuffer(msg)) {
       global.Client.send(
         JSON.stringify({
