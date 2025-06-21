@@ -70,6 +70,7 @@ export const register = (client: QQBotClients) => {
       // guild
       GuildId: event.group_id,
       ChannelId: event.group_id,
+      SpaceID: event.group_id,
       // 用户Id
       UserId: event.author.id,
       UserKey,
@@ -196,6 +197,7 @@ export const register = (client: QQBotClients) => {
       Platform: platform,
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
+      SpaceID: event.channel_id,
       IsMaster: isMaster,
       // 用户Id
       UserId: event?.author?.id ?? '',
@@ -265,6 +267,7 @@ export const register = (client: QQBotClients) => {
       //
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
+      SpaceID: event.channel_id,
       UserId: event?.author?.id ?? '',
       UserKey,
       UserName: event?.author?.username ?? '',
@@ -314,6 +317,7 @@ export const register = (client: QQBotClients) => {
         // guild
         GuildId: event.group_openid,
         ChannelId: event.group_openid,
+        SpaceID: event.group_openid,
         // 用户Id
         UserId: event.group_member_openid,
         UserKey,
@@ -379,6 +383,7 @@ export const register = (client: QQBotClients) => {
         // guild
         GuildId: event.guild_id,
         ChannelId: event.channel_id,
+        SpaceID: event.channel_id,
         // 用户Id
         UserId: event.data.resolved.user_id,
         UserKey,

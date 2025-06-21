@@ -133,6 +133,7 @@ export default () => {
       //
       GuildId: event.extra.guild_id,
       ChannelId: event.target_id,
+      SpaceID: event.target_id,
       // 用户Id
       UserId: UserId,
       UserKey,
@@ -424,4 +425,16 @@ export default () => {
       consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
+
+  // 处理 api 调用
+  cbp?.onapis &&
+    cbp.onapis(async (data, consume) => {
+      const key = data.payload?.key
+      if (client[key]) {
+        // 如果 client 上有对应的 key，直接调用。
+        const params = data.payload.params
+        const res = await client[key](...params)
+        consume([createResult(ResultCode.Ok, '请求完成', res)])
+      }
+    })
 }

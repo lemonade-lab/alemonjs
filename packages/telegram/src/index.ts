@@ -1,17 +1,21 @@
 import {
   cbpPlatform,
-  getConfigValue,
+  createResult,
+  DataEnums,
   PrivateEventMessageCreate,
   PublicEventMemberAdd,
   PublicEventMessageCreate,
+  ResultCode,
   useUserHashKey
 } from 'alemonjs'
+import { getBufferByURL } from 'alemonjs/utils'
 import TelegramClient from 'node-telegram-bot-api'
-export const platform = 'telegram'
+import { platform, getOneBotConfig } from './config'
+import { readFileSync } from 'fs'
+export { platform } from './config'
+export const API = TelegramClient
 export default () => {
-  let value = getConfigValue()
-  if (!value) value = {}
-  const config = value[platform]
+  const config = getOneBotConfig()
   const client = new TelegramClient(config.token, {
     polling: true,
     baseApiUrl: config?.base_api_url ?? '',
@@ -76,6 +80,7 @@ export default () => {
         // 频道
         GuildId: String(event?.chat.id),
         ChannelId: String(event?.chat.id),
+        SpaceID: String(event?.chat.id),
         // user
         UserId: UserId,
         UserKey: UserKey,
@@ -142,7 +147,7 @@ export default () => {
       // guild
       GuildId: String(event?.chat.id),
       ChannelId: String(event?.chat.id),
-      // GuildName: event?.chat.title,
+      SpaceID: String(event?.chat.id),
       // user
       UserId: UserId,
       UserKey: UserKey,
@@ -150,10 +155,7 @@ export default () => {
       UserAvatar: UserAvatar,
       IsMaster: false,
       IsBot: false,
-      // message
       MessageId: String(event?.message_id),
-      // MessageText: event?.text,
-      // OpenId: String(event?.chat?.id),
       CreateAt: Date.now(),
       // othder
       tag: 'txt',
@@ -164,21 +166,41 @@ export default () => {
 
   const api = {
     use: {
-      send: (event, val: any[]) => {
-        if (val.length < 0) return Promise.all([])
+      send: async (event, val: DataEnums[]) => {
+        if (val.length < 0) return []
         const content = val
           .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
           .map(item => item.value)
           .join('')
         const e = event?.value
-        if (content) {
-          return Promise.all([content].map(item => client.sendMessage(e.chat.id, item)))
+        try {
+          if (content) {
+            const res = await client.sendMessage(e.chat.id, content)
+            return [createResult(ResultCode.Ok, 'message.send', res)]
+          }
+          const images = val.filter(
+            item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+          )
+          if (images.length > 1) {
+            let data = null
+            for (let i = 0; i < images.length; i++) {
+              if (data) break
+              const item = images[i]
+              if (item.type === 'Image') {
+                data = item.value
+              } else if (item.type === 'ImageFile') {
+                data = readFileSync(item.value)
+              } else if (item.type === 'ImageURL') {
+                data = await getBufferByURL(item.value)
+              }
+            }
+            const res = await client.sendPhoto(e.chat.id, data)
+            return [createResult(ResultCode.Ok, 'message.send', res)]
+          }
+        } catch (err) {
+          return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
         }
-        const images = val.filter(item => item.type == 'Image').map(item => item.value)
-        if (images) {
-          return Promise.all(images.map(item => client.sendPhoto(e.chat.id, item)))
-        }
-        return Promise.all([])
+        return []
       },
       mention: async () => {
         // const event: TelegramClient.Message = e.value
@@ -197,16 +219,28 @@ export default () => {
       // const channel_id = data.payload.ChannelId
       // const val = data.payload.params.format
       // const res = await api.active.send.channel(channel_id, val)
-      // consume(res)
+      consume([])
     } else if (data.action === 'message.send.user') {
       // const user_id = data.payload.UserId
       // const val = data.payload.params.format
       // const res = await api.active.send.user(user_id, val)
-      // consume(res)
+      consume([])
     } else if (data.action === 'mention.get') {
       // const event = data.payload.event
       // const res = await api.use.mention(event)
-      // consume(res)
+      consume([])
     }
   })
+
+  // 处理 api 调用
+  cbp?.onapis &&
+    cbp.onapis(async (data, consume) => {
+      const key = data.payload?.key
+      if (client[key]) {
+        // 如果 client 上有对应的 key，直接调用。
+        const params = data.payload.params
+        const res = await client[key](...params)
+        consume([createResult(ResultCode.Ok, '请求完成', res)])
+      }
+    })
 }

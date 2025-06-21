@@ -2,15 +2,16 @@ import {
   cbpPlatform,
   createResult,
   DataEnums,
-  getConfigValue,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   ResultCode,
   User,
   useUserHashKey
 } from 'alemonjs'
+import { getBufferByURL } from 'alemonjs/utils'
 import { OneBotClient } from './sdk/wss'
 import { readFileSync } from 'fs'
+import { platform, getOneBotConfig } from './config'
 
 const MyBot = {
   id: '',
@@ -18,17 +19,12 @@ const MyBot = {
   avatar: ''
 }
 
-const ImageURLToBuffer = async (url: string) => {
-  const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-  return Buffer.from(arrayBuffer)
-}
+export { platform } from './config'
 
-export const platform = 'onebot'
+export { OneBotApi as API } from './sdk/api'
 
 export default () => {
-  let value = getConfigValue()
-  if (!value) value = {}
-  const config = value[platform]
+  const config = getOneBotConfig()
   const client = new OneBotClient({
     // url
     url: config?.url ?? '',
@@ -44,6 +40,20 @@ export default () => {
   const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
   const cbp = cbpPlatform(url)
 
+  const createUserAvatar = (id: string) => {
+    return `https://q1.qlogo.cn/g?b=qq&s=0&nk=${id}`
+  }
+
+  const getMessageText = (message: any[]) => {
+    let msg = ''
+    for (const item of message) {
+      if (item.type == 'text') {
+        msg += item.data.text
+      }
+    }
+    return msg.trim()
+  }
+
   client.on('META', event => {
     if (event?.self_id) {
       MyBot.id = String(event.self_id)
@@ -52,52 +62,32 @@ export default () => {
 
   client.on('MESSAGES', event => {
     const uis = config?.master_id ?? []
-    let msg = ''
-    const arr: {
-      text: string
-    }[] = []
-    for (const item of event.message) {
-      if (item.type == 'text') {
-        msg = item.data.text
-      }
-    }
-    for (const item of arr) {
-      msg = msg.replace(item.text, '').trim()
-    }
-
-    const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`
-
-    const UserAvatar = url
-
+    const msg = getMessageText(event.message)
     const UserId = String(event.user_id)
+    const UserAvatar = createUserAvatar(UserId)
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId
     })
+    const groupId = String(event.group_id)
 
     // 定义消
     const e: PublicEventMessageCreate = {
       name: 'message.create',
-      // 平台类型
       Platform: platform,
-      // 频道
-      GuildId: String(event.group_id),
-      // 子频道
-      ChannelId: String(event.group_id),
-      IsMaster: uis.includes(String(event.user_id)),
+      GuildId: groupId,
+      ChannelId: groupId,
+      IsMaster: uis.includes(UserId),
+      SpaceID: groupId,
       IsBot: false,
       UserId: UserId,
       UserName: event.sender.nickname,
       UserKey,
       UserAvatar: UserAvatar,
-      // message
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
-      // 用户openId
-      OpenId: String(event.user_id),
-      // 创建时间
+      OpenId: UserId,
       CreateAt: Date.now(),
-      // 标签
       tag: 'message.create',
       value: event
     }
@@ -106,52 +96,27 @@ export default () => {
 
   client.on('DIRECT_MESSAGE', event => {
     const uis = config?.master_id ?? []
-    let msg = ''
-    const arr: {
-      text: string
-    }[] = []
-    for (const item of event.message) {
-      if (item.type == 'text') {
-        msg = item.data.text
-      }
-    }
-    for (const item of arr) {
-      msg = msg.replace(item.text, '').trim()
-    }
-
-    const url = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${event.user_id}`
-
-    const UserAvatar = url
-
+    const msg = getMessageText(event.message)
     const UserId = String(event.user_id)
+    const UserAvatar = createUserAvatar(UserId)
     const UserKey = useUserHashKey({
       Platform: platform,
       UserId
     })
-
     // 定义消
     const e: PrivateEventMessageCreate = {
       name: 'private.message.create',
-      // 平台类型
       Platform: platform,
-      // 频道
-      // GuildId: String(event.group_id),
-      // 子频道
-      // ChannelId: String(event.group_id),
       IsMaster: uis.includes(String(event.user_id)),
       IsBot: false,
       UserId: UserId,
       UserName: event.sender.nickname,
       UserKey,
       UserAvatar: UserAvatar,
-      // message
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
-      // 用户openId
       OpenId: String(event.user_id),
-      // 创建时间
       CreateAt: Date.now(),
-      // 标签
       tag: 'private.message.create',
       value: event
     }
@@ -200,7 +165,7 @@ export default () => {
             const db = readFileSync(item.value)
             data = db
           } else if (item.type === 'ImageURL') {
-            const db = await ImageURLToBuffer(item.value)
+            const db = await getBufferByURL(item.value)
             data = db
           } else {
             // data = item.value
@@ -269,7 +234,7 @@ export default () => {
             const db = readFileSync(item.value)
             data = db
           } else if (item.type === 'ImageURL') {
-            const db = await ImageURLToBuffer(item.value)
+            const db = await getBufferByURL(item.value)
             data = db
           } else {
             // data = item.value
@@ -331,7 +296,7 @@ export default () => {
               if (uid == MyBot.id) {
                 isBot = true
               }
-              const avatar = `https://q1.qlogo.cn/g?b=qq&s=0&nk=${uid}`
+              const avatar = createUserAvatar(uid)
               Metions.push({
                 UserId: uid,
                 UserKey: useUserHashKey({
@@ -373,4 +338,16 @@ export default () => {
       consume([createResult(ResultCode.Ok, '请求完成', res)])
     }
   })
+
+  // 处理 api 调用
+  cbp?.onapis &&
+    cbp.onapis(async (data, consume) => {
+      const key = data.payload?.key
+      if (client[key]) {
+        // 如果 client 上有对应的 key，直接调用。
+        const params = data.payload.params
+        const res = await client[key](...params)
+        consume([createResult(ResultCode.Ok, '请求完成', res)])
+      }
+    })
 }

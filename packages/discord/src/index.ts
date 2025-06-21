@@ -90,6 +90,7 @@ export default () => {
         // guild
         GuildId: event.guild_id,
         ChannelId: event.channel_id,
+        SpaceID: event.channel_id,
         // user
         UserId: UserId,
         UserKey,
@@ -187,6 +188,7 @@ export default () => {
         // guild
         GuildId: event['guild_id'],
         ChannelId: event.channel_id,
+        SpaceID: event.channel_id,
         // user
         UserId: UserId,
         UserKey,

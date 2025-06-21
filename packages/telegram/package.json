@@ -11,6 +11,7 @@
     "build": "node bundle.js"
   },
   "dependencies": {
+    "@types/node-telegram-bot-api": "^0.64.9",
     "grammy": "^1.30.0",
     "node-telegram-bot-api": "^0.66.0"
   },
