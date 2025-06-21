@@ -128,7 +128,7 @@ export default () => {
     logger.error(event)
   })
 
-  const sendGroup = async (event, val: DataEnums[]) => {
+  const sendGroup = async (ChannelId: number, val: DataEnums[]) => {
     if (val.length < 0) return []
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text')
@@ -137,7 +137,7 @@ export default () => {
     try {
       if (content) {
         const res = await client.sendGroupMessage({
-          group_id: event.ChannelId,
+          group_id: ChannelId,
           message: [
             {
               type: 'text',
@@ -167,7 +167,7 @@ export default () => {
               data = Buffer.from(item.value, 'base64')
             }
             client.sendGroupMessage({
-              group_id: event.ChannelId,
+              group_id: ChannelId,
               message: [
                 {
                   type: 'image',
@@ -191,11 +191,11 @@ export default () => {
 
   /**
    *
-   * @param event
+   * @param UserId
    * @param val
    * @returns
    */
-  const sendPrivate = async (event, val: DataEnums[]) => {
+  const sendPrivate = async (UserId: number, val: DataEnums[]) => {
     if (val.length < 0) return Promise.all([])
     const content = val
       .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
@@ -204,7 +204,7 @@ export default () => {
     try {
       if (content) {
         const res = await client.sendPrivateMessage({
-          user_id: event.UserId,
+          user_id: UserId,
           message: [
             {
               type: 'text',
@@ -234,7 +234,7 @@ export default () => {
               data = Buffer.from(item.value, 'base64')
             }
             client.sendPrivateMessage({
-              user_id: event.UserId,
+              user_id: UserId,
               message: [
                 {
                   type: 'image',
@@ -259,21 +259,30 @@ export default () => {
   const api = {
     active: {
       send: {
-        channel: (event, val) => {
-          return sendGroup(event, val)
+        channel: async (SpaceId: string, val: DataEnums[]) => {
+          return sendGroup(Number(SpaceId), val)
         },
-        user: (event, val) => {
-          return sendPrivate(event, val)
+        user: async (OpenId: string, val: DataEnums[]) => {
+          return sendPrivate(Number(OpenId), val)
         }
       }
     },
     use: {
-      send: (event, val) => {
+      send: (
+        event: {
+          name: string
+          UserId?: string
+          ChannelId?: string
+        },
+        val: DataEnums[]
+      ) => {
         if (val.length < 0) return Promise.all([])
         if (event['name'] == 'private.message.create') {
-          return sendPrivate(event, val)
+          const UserId = Number(event.UserId)
+          return sendPrivate(UserId, val)
         } else if (event['name'] == 'message.create') {
-          return sendGroup(event, val)
+          const GroupId = Number(event.ChannelId)
+          return sendGroup(GroupId, val)
         }
         return Promise.all([])
       },

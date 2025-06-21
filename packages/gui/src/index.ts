@@ -298,8 +298,8 @@ export default () => {
       // 发送消息
       send: {
         // 向频道发送消息
-        channel: async (channel_id, val: DataEnums[]) => {
-          if (val.length < 0) return Promise.all([])
+        channel: async (SpaceId: string, val: DataEnums[]) => {
+          if (val.length < 0) return []
           const MessageBody = await getMessageBody(val)
           const db = {
             t: 'send_message' as DataPublic['t'],
@@ -310,17 +310,18 @@ export default () => {
               IsBot: true,
               OpenId: '',
               GuildId: '',
-              ChannelId: channel_id
+              ChannelId: SpaceId,
+              SpaceId
             } as any
           }
           addChat(db.d.createAt, db)
           if (client) {
             client.send(DATA.stringify(db))
           }
-          return Promise.all([])
+          return []
         },
         // 向用户发送消息
-        user: async (user_id: string, val: DataEnums[]) => {
+        user: async (OpenId: string, val: DataEnums[]) => {
           if (val.length < 0) return []
           const MessageBody = await getMessageBody(val)
           const db = {
@@ -330,14 +331,14 @@ export default () => {
               MessageId: Date.now(),
               createAt: Date.now(),
               IsBot: true,
-              OpenId: user_id
+              OpenId: OpenId
             } as any
           }
           addPrivateChat(db.d.createAt, db)
           if (client) {
             client.send(DATA.stringify(db))
           }
-          return Promise.all([])
+          return []
         }
       }
     },
