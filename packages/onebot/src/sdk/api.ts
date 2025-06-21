@@ -1,6 +1,5 @@
 import WebSocket from 'ws'
 import { actionResolves, actionTimeouts, generateUniqueId, timeoutTime } from './config'
-import * as flattedJSON from 'flatted'
 
 /**
  *
@@ -21,7 +20,7 @@ const send = (
   return new Promise((resolve, reject) => {
     actionResolves.set(id, { resolve, reject })
     // 发送消息
-    ws.send(flattedJSON.stringify(data))
+    ws.send(JSON.stringify(data))
     // 30 秒后超时
     const timeout = setTimeout(() => {
       // 被清理了

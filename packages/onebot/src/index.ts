@@ -125,70 +125,68 @@ export default () => {
 
   // 错误处理
   client.on('ERROR', event => {
-    console.error('ERROR', event)
+    logger.error(event)
   })
 
   const sendGroup = async (event, val: DataEnums[]) => {
-    if (val.length < 0) return Promise.all([])
+    if (val.length < 0) return []
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text')
       .map(item => item.value)
       .join('')
-    if (content) {
-      return Promise.all(
-        [content].map(item => {
-          client.sendGroupMessage({
-            group_id: event.ChannelId,
-            message: [
-              {
-                type: 'text',
-                data: {
-                  text: item
-                }
+    try {
+      if (content) {
+        const res = await client.sendGroupMessage({
+          group_id: event.ChannelId,
+          message: [
+            {
+              type: 'text',
+              data: {
+                text: content
               }
-            ]
-          })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: null
-          })
+            }
+          ]
         })
+        return [createResult(ResultCode.Ok, 'client.groupOpenMessages', res)]
+      }
+      const images = val.filter(
+        item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
       )
-    }
-    const images = val.filter(
-      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-    )
-    if (images) {
-      return Promise.all(
-        images.map(async item => {
-          let data: Buffer = null
-          if (item.type === 'ImageFile') {
-            const db = readFileSync(item.value)
-            data = db
-          } else if (item.type === 'ImageURL') {
-            const db = await getBufferByURL(item.value)
-            data = db
-          } else {
-            // data = item.value
-            data = Buffer.from(item.value, 'base64')
-          }
-          client.sendGroupMessage({
-            group_id: event.ChannelId,
-            message: [
-              {
-                type: 'image',
-                data: {
-                  file: `base64://${data.toString('base64')}`
+      if (images) {
+        return Promise.all(
+          images.map(async item => {
+            let data: Buffer = null
+            if (item.type === 'ImageFile') {
+              const db = readFileSync(item.value)
+              data = db
+            } else if (item.type === 'ImageURL') {
+              const db = await getBufferByURL(item.value)
+              data = db
+            } else {
+              // data = item.value
+              data = Buffer.from(item.value, 'base64')
+            }
+            client.sendGroupMessage({
+              group_id: event.ChannelId,
+              message: [
+                {
+                  type: 'image',
+                  data: {
+                    file: `base64://${data.toString('base64')}`
+                  }
                 }
-              }
-            ]
+              ]
+            })
+            return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
+              id: null
+            })
           })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: null
-          })
-        })
-      )
+        )
+      }
+    } catch (error) {
+      return [createResult(ResultCode.Fail, 'client.groupOpenMessages', error)]
     }
-    return Promise.all([])
+    return []
   }
 
   /**
@@ -203,61 +201,59 @@ export default () => {
       .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
       .map(item => item.value)
       .join('')
-    if (content) {
-      return Promise.all(
-        [content].map(item => {
-          client.sendGroupMessage({
-            group_id: event.ChannelId,
-            message: [
-              {
-                type: 'text',
-                data: {
-                  text: item
-                }
+    try {
+      if (content) {
+        const res = await client.sendPrivateMessage({
+          user_id: event.UserId,
+          message: [
+            {
+              type: 'text',
+              data: {
+                text: content
               }
-            ]
-          })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: null
-          })
+            }
+          ]
         })
+        return [createResult(ResultCode.Ok, 'client.sendPrivateMessage', res)]
+      }
+      const images = val.filter(
+        item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
       )
-    }
-    const images = val.filter(
-      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-    )
-    if (images) {
-      return Promise.all(
-        images.map(async item => {
-          let data: Buffer = null
-          if (item.type === 'ImageFile') {
-            const db = readFileSync(item.value)
-            data = db
-          } else if (item.type === 'ImageURL') {
-            const db = await getBufferByURL(item.value)
-            data = db
-          } else {
-            // data = item.value
-            data = Buffer.from(item.value, 'base64')
-          }
-          client.sendGroupMessage({
-            group_id: event.ChannelId,
-            message: [
-              {
-                type: 'image',
-                data: {
-                  file: `base64://${data.toString('base64')}`
+      if (images) {
+        return Promise.all(
+          images.map(async item => {
+            let data: Buffer = null
+            if (item.type === 'ImageFile') {
+              const db = readFileSync(item.value)
+              data = db
+            } else if (item.type === 'ImageURL') {
+              const db = await getBufferByURL(item.value)
+              data = db
+            } else {
+              // data = item.value
+              data = Buffer.from(item.value, 'base64')
+            }
+            client.sendPrivateMessage({
+              user_id: event.UserId,
+              message: [
+                {
+                  type: 'image',
+                  data: {
+                    file: `base64://${data.toString('base64')}`
+                  }
                 }
-              }
-            ]
+              ]
+            })
+            return createResult(ResultCode.Ok, 'client.sendPrivateMessage', {
+              id: null
+            })
           })
-          return createResult(ResultCode.Ok, 'client.groupOpenMessages', {
-            id: null
-          })
-        })
-      )
+        )
+      }
+    } catch (error) {
+      return [createResult(ResultCode.Fail, 'client.sendPrivateMessage', error)]
     }
-    return Promise.all([])
+    return []
   }
 
   const api = {
