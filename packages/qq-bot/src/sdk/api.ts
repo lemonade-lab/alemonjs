@@ -206,13 +206,13 @@ export class QQBotAPI {
 
   /**
    * 发送群里文件
-   * @param openid
+   * @param openid GuildID / UserId
    * @param data
    * @returns
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk
    */
-  async postRichMediaByGroup(
+  async postRichMediaById(
     openid: string,
     data: {
       srv_send_msg?: boolean

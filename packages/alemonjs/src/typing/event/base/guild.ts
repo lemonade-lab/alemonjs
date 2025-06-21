@@ -6,7 +6,7 @@ export type Guild = {
   /**
    * 空间Id
    */
-  SpaceID: string
+  SpaceId: string
 }
 
 export type Channel = {

@@ -21,7 +21,7 @@ const MyBot = {
 
 export { platform } from './config'
 
-export { OneBotApi as API } from './sdk/api'
+export { OneBotAPI as API } from './sdk/api'
 
 export default () => {
   const config = getOneBotConfig()
@@ -78,7 +78,7 @@ export default () => {
       GuildId: groupId,
       ChannelId: groupId,
       IsMaster: uis.includes(UserId),
-      SpaceID: groupId,
+      SpaceId: groupId,
       IsBot: false,
       UserId: UserId,
       UserName: event.sender.nickname,
@@ -340,14 +340,12 @@ export default () => {
   })
 
   // 处理 api 调用
-  cbp?.onapis &&
-    cbp.onapis(async (data, consume) => {
-      const key = data.payload?.key
-      if (client[key]) {
-        // 如果 client 上有对应的 key，直接调用。
-        const params = data.payload.params
-        const res = await client[key](...params)
-        consume([createResult(ResultCode.Ok, '请求完成', res)])
-      }
-    })
+  cbp.onapis(async (data, consume) => {
+    const key = data.payload?.key
+    if (client[key]) {
+      const params = data.payload.params
+      const res = await client[key](...params)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
+    }
+  })
 }

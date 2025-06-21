@@ -1,4 +1,5 @@
-import { getQQBotConfig, register } from './register'
+import { getQQBotConfig } from './config'
+import { register } from './register'
 import { QQBotGuildClient } from './sdk/client.websoket.guild'
 export const start = () => {
   const config = getQQBotConfig()

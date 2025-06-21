@@ -2,7 +2,6 @@ import {
   cbpPlatform,
   createResult,
   DataEnums,
-  getConfigValue,
   PrivateEventInteractionCreate,
   PrivateEventMessageCreate,
   PublicEventInteractionCreate,
@@ -20,15 +19,8 @@ import {
   GROUP_AT_MESSAGE_CREATE,
   MESSAGE_CREATE
 } from './sends'
-// import dayjs from 'dayjs'
-
-export const platform = 'qq-bot'
-
-export const getQQBotConfig = () => {
-  let value = getConfigValue()
-  if (!value) value = {}
-  return value[platform] || {}
-}
+import { getQQBotConfig } from './config'
+import { platform } from './config'
 
 export const register = (client: QQBotClients) => {
   const config = getQQBotConfig()
@@ -70,7 +62,7 @@ export const register = (client: QQBotClients) => {
       // guild
       GuildId: event.group_id,
       ChannelId: event.group_id,
-      SpaceID: event.group_id,
+      SpaceId: `GROUP:${event.group_id}`,
       // 用户Id
       UserId: event.author.id,
       UserKey,
@@ -80,7 +72,7 @@ export const register = (client: QQBotClients) => {
       // 格式化数据
       MessageId: event.id,
       MessageText: event.content?.trim(),
-      OpenId: event.author.member_openid,
+      OpenId: `C2C:${event.author.member_openid}`,
       CreateAt: Date.now(),
       tag: 'GROUP_AT_MESSAGE_CREATE',
       value: event
@@ -115,7 +107,7 @@ export const register = (client: QQBotClients) => {
       MessageId: event.id,
       MessageText: event.content?.trim(),
       CreateAt: Date.now(),
-      OpenId: event.author.user_openid,
+      OpenId: `C2C:${event.author.user_openid}`,
       //
       tag: 'C2C_MESSAGE_CREATE',
       value: event
@@ -149,9 +141,6 @@ export const register = (client: QQBotClients) => {
       name: 'private.message.create',
       // 事件类型
       Platform: platform,
-      //
-      // GuildId: event.guild_id,
-      // ChannelId: event.channel_id,
       // 用户Id
       UserId: event?.author?.id ?? '',
       UserKey,
@@ -162,7 +151,7 @@ export const register = (client: QQBotClients) => {
       // message
       MessageId: event.id,
       MessageText: msg?.trim(),
-      OpenId: event.guild_id,
+      OpenId: `DIRECT:${event.guild_id}`,
       CreateAt: Date.now(),
       //
       tag: 'DIRECT_MESSAGE_CREATE',
@@ -197,7 +186,7 @@ export const register = (client: QQBotClients) => {
       Platform: platform,
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
-      SpaceID: event.channel_id,
+      SpaceId: `GUILD:${event.channel_id}`,
       IsMaster: isMaster,
       // 用户Id
       UserId: event?.author?.id ?? '',
@@ -208,7 +197,7 @@ export const register = (client: QQBotClients) => {
       // message
       MessageId: event.id,
       MessageText: msg?.trim(),
-      OpenId: event.guild_id,
+      OpenId: `DIRECT:${event.guild_id}`,
       CreateAt: Date.now(),
       //
       tag: 'AT_MESSAGE_CREATE',
@@ -267,7 +256,7 @@ export const register = (client: QQBotClients) => {
       //
       GuildId: event.guild_id,
       ChannelId: event.channel_id,
-      SpaceID: event.channel_id,
+      SpaceId: `GUILD:${event.channel_id}`,
       UserId: event?.author?.id ?? '',
       UserKey,
       UserName: event?.author?.username ?? '',
@@ -277,7 +266,7 @@ export const register = (client: QQBotClients) => {
       // message
       MessageId: event.id,
       MessageText: msg?.trim(),
-      OpenId: event.guild_id,
+      OpenId: `DIRECT:${event.guild_id}`,
       CreateAt: Date.now(),
       //
       tag: 'MESSAGE_CREATE',
@@ -298,6 +287,8 @@ export const register = (client: QQBotClients) => {
     //   createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
     // }
 
+    // 如何区分私聊/群聊
+
     if (event.scene === 'group') {
       const master_key = config?.master_key ?? []
       const isMaster = master_key.includes(event.group_member_openid)
@@ -317,7 +308,7 @@ export const register = (client: QQBotClients) => {
         // guild
         GuildId: event.group_openid,
         ChannelId: event.group_openid,
-        SpaceID: event.group_openid,
+        SpaceId: `GROUP:${event.group_openid}`,
         // 用户Id
         UserId: event.group_member_openid,
         UserKey,
@@ -327,7 +318,7 @@ export const register = (client: QQBotClients) => {
         // 格式化数据
         MessageId: `INTERACTION_CREATE:${event.id}`,
         MessageText: MessageText,
-        OpenId: event.group_member_openid,
+        OpenId: `C2C:${event.group_member_openid}`,
         tag: 'INTERACTION_CREATE_GROUP',
         CreateAt: Date.now(),
         value: event
@@ -360,7 +351,7 @@ export const register = (client: QQBotClients) => {
         // 格式化数据
         MessageId: event.id,
         MessageText: MessageText,
-        OpenId: event.user_openid,
+        OpenId: `C2C:${event.user_openid}`,
         CreateAt: Date.now(),
         tag: 'INTERACTION_CREATE_C2C',
         value: event
@@ -383,7 +374,7 @@ export const register = (client: QQBotClients) => {
         // guild
         GuildId: event.guild_id,
         ChannelId: event.channel_id,
-        SpaceID: event.channel_id,
+        SpaceId: `GUILD:${event.channel_id}`,
         // 用户Id
         UserId: event.data.resolved.user_id,
         UserKey,
@@ -393,7 +384,7 @@ export const register = (client: QQBotClients) => {
         // 格式化数据
         MessageId: event.data.resolved.message_id,
         MessageText: MessageText,
-        OpenId: event.guild_id,
+        OpenId: `DIRECT:${event.guild_id}`,
         CreateAt: Date.now(),
         tag: 'INTERACTION_CREATE_GUILD',
         value: event
@@ -413,35 +404,73 @@ export const register = (client: QQBotClients) => {
   const api = {
     active: {
       send: {
-        channel: async (channel_id, val: DataEnums[]) => {
-          if (!channel_id || typeof channel_id !== 'string') {
-            throw new Error('Invalid channel_id: channel_id must be a string')
+        channel: async (SpaceId: string, val: DataEnums[]) => {
+          if (/^GUILD:/.test(SpaceId)) {
+            const id = SpaceId.replace('GUILD:', '')
+            return await AT_MESSAGE_CREATE(
+              client,
+              {
+                ChannelId: id
+              },
+              val
+            )
           }
-          return await AT_MESSAGE_CREATE(
-            client,
-            {
-              ChannelId: channel_id
-            },
-            val
-          )
+          if (/^GROUP:/.test(SpaceId)) {
+            const id = SpaceId.replace('GROUP:', '')
+            return await GROUP_AT_MESSAGE_CREATE(
+              client,
+              {
+                ChannelId: id
+              },
+              val
+            )
+          }
+          return []
         },
-        user: async (user_id, val: DataEnums[]) => {
-          if (!user_id || typeof user_id !== 'string') {
-            throw new Error('Invalid user_id: user_id must be a string')
+        user: async (OpenId: string, val: DataEnums[]) => {
+          if (/^C2C:/.test(OpenId)) {
+            const id = OpenId.replace('C2C:', '')
+            return await C2C_MESSAGE_CREATE(
+              client,
+              {
+                UserId: id
+              },
+              val
+            )
+          } else if (/^DIRECT:/.test(OpenId)) {
+            const id = OpenId.replace('DIRECT:', '')
+            return await DIRECT_MESSAGE_CREATE(
+              client,
+              {
+                UserId: id
+              },
+              val
+            )
+          } else if (/^GUILD:/.test(OpenId)) {
+            const id = OpenId.replace('GUILD:', '')
+            return await AT_MESSAGE_CREATE(
+              client,
+              {
+                ChannelId: id
+              },
+              val
+            )
           }
-          return await C2C_MESSAGE_CREATE(
-            client,
-            {
-              OpenId: user_id
-            },
-            val
-          )
+          return []
         }
       }
     },
     use: {
-      send: async (event, val: DataEnums[]) => {
-        if (val.length < 0) Promise.all([])
+      send: async (
+        event: {
+          tag: string
+          ChannelId: string
+          UserId: string
+          MessageId?: string
+        },
+        val: DataEnums[]
+      ) => {
+        if (val.length < 0) return []
         // 打  tag
         const tag = event.tag
         // 群at
@@ -474,7 +503,7 @@ export const register = (client: QQBotClients) => {
         if (tag == 'INTERACTION_CREATE_GUILD') {
           return await AT_MESSAGE_CREATE(client, event, val)
         }
-        return Promise.all([])
+        return []
       },
       mention: async event => {
         const value = event.value || {}
@@ -539,14 +568,13 @@ export const register = (client: QQBotClients) => {
   })
 
   // 处理 api 调用
-  cbp?.onapis &&
-    cbp.onapis(async (data, consume) => {
-      const key = data.payload?.key
-      if (client[key]) {
-        // 如果 client 上有对应的 key，直接调用。
-        const params = data.payload.params
-        const res = await client[key](...params)
-        consume([createResult(ResultCode.Ok, '请求完成', res)])
-      }
-    })
+  cbp.onapis(async (data, consume) => {
+    const key = data.payload?.key
+    if (client[key]) {
+      // 如果 client 上有对应的 key，直接调用。
+      const params = data.payload.params
+      const res = await client[key](...params)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
+    }
+  })
 }

@@ -1,5 +1,6 @@
 import { QQBotGroupClient } from './sdk/client.websoket.group'
-import { register, getQQBotConfig } from './register'
+import { register } from './register'
+import { getQQBotConfig } from './config'
 export const start = () => {
   const config = getQQBotConfig()
   // intents 需要默认值

@@ -1,5 +1,6 @@
 import { QQBotClients } from './sdk/client.websoket'
-import { register, getQQBotConfig } from './register'
+import { register } from './register'
+import { getQQBotConfig } from './config'
 export const start = () => {
   const config = getQQBotConfig()
   const client = new QQBotClients({

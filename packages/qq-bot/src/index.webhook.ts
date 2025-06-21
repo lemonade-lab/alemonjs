@@ -1,5 +1,6 @@
 import { QQBotClient } from './sdk/client'
-import { getQQBotConfig, register } from './register'
+import { register } from './register'
+import { getQQBotConfig } from './config'
 
 export const start = () => {
   const config = getQQBotConfig()

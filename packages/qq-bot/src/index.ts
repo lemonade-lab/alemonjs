@@ -3,9 +3,9 @@ import { start as startGroup } from './index.group'
 import { start as startGuild } from './index.guild'
 import { start as startWebhook } from './index.webhook'
 import { start as startWebsocket } from './index.websoket'
-import { platform } from './register'
+import { platform } from './config'
 // 平台
-export { platform }
+export { platform } from './config'
 // hook
 export { useMode, useValue, useClient } from './hook'
 // api

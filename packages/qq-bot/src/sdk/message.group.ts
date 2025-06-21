@@ -21,5 +21,4 @@ export type QQBotGroupEventMap = {
   FRIEND_ADD: FRIEND_ADD_TYPE
   FRIEND_DEL: FRIEND_DEL_TYPE
   ERROR: ERROR_TYPE
-  // more events...
 }

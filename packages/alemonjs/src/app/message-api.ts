@@ -37,23 +37,23 @@ global.format = format
 
 /**
  * 向指定频道发送消息。
- * @param {string} channel_id - 目标频道的 ID。
+ * @param {string} SpaceId - 空间ID，可能是服务器ID、频道ID、群ID、聊天ID，或者是复合ID。总之，是框架给指定空间的唯一标识。也就是说，不能使用ChannelId作为该参数。
  * @param {DataEnums[]} data - 要发送的数据。
- * @throws {Error} - 如果 channel_id 无效或发送失败，抛出错误。
+ * @throws {Error} - 如果 SpaceId 无效或发送失败，抛出错误。
  */
-export const sendToChannel = async (channel_id: string, data: DataEnums[]) => {
-  if (!channel_id || typeof channel_id !== 'string') {
+export const sendToChannel = async (SpaceId: string, data: DataEnums[]) => {
+  if (!SpaceId || typeof SpaceId !== 'string') {
     logger.error({
       code: ResultCode.FailParams,
-      message: 'Invalid channel_id: channel_id must be a string',
+      message: 'Invalid SpaceId: SpaceId must be a string',
       data: null
     })
-    throw new Error('Invalid channel_id: channel_id must be a string')
+    throw new Error('Invalid SpaceId: SpaceId must be a string')
   }
   return await sendAction({
     action: 'message.send.channel',
     payload: {
-      ChannelId: channel_id,
+      ChannelId: SpaceId,
       params: {
         format: data
       }
@@ -63,23 +63,23 @@ export const sendToChannel = async (channel_id: string, data: DataEnums[]) => {
 
 /**
  * 向指定用户发送消息。
- * @param {string} user_id - 目标用户的 ID。
+ * @param {string} OpenID - 开放ID，可能是用户ID、聊天ID，或是复合ID。总之，是框架给指定用户的唯一标识。也就说，不能使用UserId作为该参数。
  * @param {DataEnums[]} data - 要发送的数据。
  * @throws {Error} - 如果 user_id 无效或发送失败，抛出错误。
  */
-export const sendToUser = async (user_id: string, data: DataEnums[]) => {
-  if (!user_id || typeof user_id !== 'string') {
+export const sendToUser = async (OpenID: string, data: DataEnums[]) => {
+  if (!OpenID || typeof OpenID !== 'string') {
     logger.error({
       code: ResultCode.FailParams,
-      message: 'Invalid user_id: user_id must be a string',
+      message: 'Invalid OpenID: OpenID must be a string',
       data: null
     })
-    throw new Error('Invalid user_id: user_id must be a string')
+    throw new Error('Invalid OpenID: OpenID must be a string')
   }
   return await sendAction({
     action: 'message.send.user',
     payload: {
-      UserId: user_id,
+      UserId: OpenID,
       params: {
         format: data
       }
