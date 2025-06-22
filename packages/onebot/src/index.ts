@@ -5,13 +5,12 @@ import {
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   ResultCode,
-  User,
-  useUserHashKey
+  User
 } from 'alemonjs'
 import { getBufferByURL } from 'alemonjs/utils'
 import { OneBotClient } from './sdk/wss'
 import { readFileSync } from 'fs'
-import { platform, getOneBotConfig } from './config'
+import { platform, getOneBotConfig, getMaster } from './config'
 
 const MyBot = {
   id: '',
@@ -61,14 +60,12 @@ export default () => {
   })
 
   client.on('MESSAGES', event => {
-    const uis = config?.master_id ?? []
     const msg = getMessageText(event.message)
     const UserId = String(event.user_id)
     const UserAvatar = createUserAvatar(UserId)
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId
-    })
+
+    const [isMaster, UserKey] = getMaster(UserId)
+
     const groupId = String(event.group_id)
 
     // 定义消
@@ -77,7 +74,7 @@ export default () => {
       Platform: platform,
       GuildId: groupId,
       ChannelId: groupId,
-      IsMaster: uis.includes(UserId),
+      IsMaster: isMaster,
       SpaceId: groupId,
       IsBot: false,
       UserId: UserId,
@@ -95,19 +92,17 @@ export default () => {
   })
 
   client.on('DIRECT_MESSAGE', event => {
-    const uis = config?.master_id ?? []
     const msg = getMessageText(event.message)
     const UserId = String(event.user_id)
     const UserAvatar = createUserAvatar(UserId)
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId
-    })
+
+    const [isMaster, UserKey] = getMaster(UserId)
+
     // 定义消
     const e: PrivateEventMessageCreate = {
       name: 'private.message.create',
       Platform: platform,
-      IsMaster: uis.includes(String(event.user_id)),
+      IsMaster: isMaster,
       IsBot: false,
       UserId: UserId,
       UserName: event.sender.nickname,
@@ -287,30 +282,28 @@ export default () => {
         return Promise.all([])
       },
       mention: async event => {
-        const uis = config?.master_id ?? []
         const e = event.value
-        if (event['name'] == 'message.create' || event['name'] == 'private.message.create') {
+        const names = ['message.create', 'private.message.create']
+        if (names.includes(event.name)) {
           const Metions: User[] = []
           for (const item of e.message) {
             if (item.type == 'at') {
               let isBot = false
-              const uid = String(item.data.qq)
-              if (uid == 'all') {
+              const UserId = String(item.data.qq)
+              if (UserId == 'all') {
                 continue
               }
-              if (uid == MyBot.id) {
+              if (UserId == MyBot.id) {
                 isBot = true
               }
-              const avatar = createUserAvatar(uid)
+              const [isMaster, UserKey] = getMaster(UserId)
+              const avatar = createUserAvatar(UserId)
               Metions.push({
-                UserId: uid,
-                UserKey: useUserHashKey({
-                  Platform: platform,
-                  UserId: uid
-                }),
+                UserId: UserId,
+                IsMaster: isMaster,
+                UserKey: UserKey,
                 UserName: item.data?.nickname,
                 UserAvatar: avatar,
-                IsMaster: uis.includes(uid),
                 IsBot: isBot
               })
             }
