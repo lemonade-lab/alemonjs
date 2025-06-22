@@ -6,8 +6,7 @@ import {
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   ResultCode,
-  User,
-  useUserHashKey
+  User
 } from 'alemonjs'
 import { WebSocket, WebSocketServer } from 'ws'
 import Koa from 'koa'
@@ -23,13 +22,12 @@ import {
   getPrivateChats
 } from './chats'
 import { guiPath } from './file'
-
 import * as filesPath from './file'
-
 import koaRouter from 'koa-router'
 // 跨域
 import cors from '@koa/cors'
 import { readFileSync } from 'node:fs'
+import { getGUIConfig, getMaster, platform } from './config'
 
 // 机器人信息
 const Bot = {
@@ -98,13 +96,11 @@ const createServer = (port: number) => {
 
 export * from './typing'
 
-export const platform = 'gui'
+export { platform } from './config'
 
 export default () => {
-  let value = getConfigValue()
-  if (!value) value = {}
   // 获取配置
-  const config = value[platform]
+  const config = getGUIConfig()
   // 端口
   const port = config?.port ?? 17127
   // 创建服务器
@@ -122,14 +118,11 @@ export default () => {
    */
   const onMessage = (data: DataPublic) => {
     const event = data.d
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: event.UserId
-    })
+
+    const [isMaster, UserKey] = getMaster(event.UserId)
+
     // 用户头像
     const UserAvatar = event.UserAvatar
-    // 管理员
-    const master_key = getConfigValue()?.gui?.master_key ?? []
     // 纯文本
     const msg = event.MessageBody.map(item => {
       if (item.type == 'Text') {
@@ -152,7 +145,7 @@ export default () => {
       UserAvatar: UserAvatar,
       UserKey,
       // 属性
-      IsMaster: master_key.includes(UserKey),
+      IsMaster: isMaster,
       IsBot: event.IsBot,
       OpenId: event.OpenId,
       // 消息
@@ -168,10 +161,8 @@ export default () => {
 
   const onProvateMessage = (data: DataPrivate) => {
     const event = data.d
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: event.UserId
-    })
+
+    const [isMaster, UserKey] = getMaster(event.UserId)
 
     const UserAvatar = event.UserAvatar
 
@@ -183,8 +174,6 @@ export default () => {
       return ''
     }).join('')
 
-    const master_key = getConfigValue()?.gui?.master_key ?? []
-
     const e: PrivateEventMessageCreate = {
       name: 'private.message.create',
       // 事件类型
@@ -194,7 +183,7 @@ export default () => {
       UserName: event.UserName,
       UserAvatar,
       UserKey,
-      IsMaster: master_key.includes(UserKey),
+      IsMaster: isMaster,
       IsBot: event.IsBot,
       MessageId: String(event.MessageId),
       MessageText: msg,
@@ -397,17 +386,12 @@ export default () => {
             .map(item => item.value)
           const MessageMention: User[] = mentions.map(item => {
             const UserId = item
-            const value = getConfigValue()
-            const config = value?.discord
-            const master_key = config?.master_key ?? []
+            const [isMaster, UserKey] = getMaster(UserId)
             return {
               UserId: UserId,
-              IsMaster: master_key.includes(UserId),
+              IsMaster: isMaster,
               IsBot: item == Bot.BotId,
-              UserKey: useUserHashKey({
-                Platform: platform,
-                UserId: UserId
-              })
+              UserKey: UserKey
             }
           })
           return MessageMention

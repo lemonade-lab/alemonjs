@@ -14,4 +14,10 @@ yarn add @alemonjs/gui
 gui:
   # 默认
   port: '17127'
+  # 使用 user_key
+  master_key:
+     - 'xxx'
+  # 使用 user_id
+  master_id:
+     - 'yyy'
 ```
