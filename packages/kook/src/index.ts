@@ -2,7 +2,6 @@ import {
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
   getConfigValue,
-  useUserHashKey,
   User,
   DataEnums,
   cbpPlatform,
@@ -11,8 +10,11 @@ import {
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 import { readFileSync } from 'fs'
+import { getMaster } from './config.js'
+import { getBufferByURL } from 'alemonjs/utils'
 export const platform = 'kook'
 
+export * from './hook.js'
 export { KOOKAPI as API } from './sdk/api.js'
 
 export default () => {
@@ -38,10 +40,6 @@ export default () => {
     // 创建私聊标记
     const data = await client.userChatCreate(event.extra.author.id).then(res => res?.data)
 
-    // 主人
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author_id)
-
     // 头像
     const avatar = event.extra.author.avatar
 
@@ -52,10 +50,8 @@ export default () => {
     const UserAvatar = url
 
     const UserId = event.author_id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId
-    })
+
+    const [isMaster, UserKey] = getMaster(UserId)
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -89,10 +85,6 @@ export default () => {
     // 创建私聊标记
     const data = await client.userChatCreate(event.extra.author.id).then(res => res?.data)
 
-    // 主人
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author_id)
-
     // 头像
     const avatar = event.extra.author.avatar
 
@@ -116,14 +108,9 @@ export default () => {
       msg = msg.replace(`(met)${item.id}(met)`, '').trim()
     }
 
-    const url = avatar.substring(0, avatar.indexOf('?'))
-    const UserAvatar = url
-
+    const UserAvatar = avatar.substring(0, avatar.indexOf('?'))
     const UserId = event.author_id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId
-    })
+    const [isMaster, UserKey] = getMaster(UserId)
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -164,14 +151,11 @@ export default () => {
    * @param val
    * @returns
    */
-  const sendChannel = (channel_id: string, val: DataEnums[]) => {
+  const sendChannel = async (target_id: string, val: DataEnums[]) => {
     if (val.length < 0) return Promise.all([])
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text')
       .map(item => {
-        // if (item.type == 'Link') {
-        //   return `[${item.options?.title ?? item.value}](${item.value})`
-        // } else
         if (item.type == 'Mention') {
           if (
             item.value == 'everyone' ||
@@ -203,45 +187,50 @@ export default () => {
         }
       })
       .join('')
-    if (content) {
-      return Promise.all(
-        [content].map(item =>
-          client.createMessage({
-            type: 9,
-            target_id: channel_id,
-            content: item
-          })
-        )
-      )
-    }
-    const images = val.filter(
-      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-    )
-    if (images) {
-      return Promise.all(
-        images.map(async item => {
-          if (item.type == 'ImageURL') {
-            return await client.createMessage({
-              type: 2,
-              target_id: channel_id,
-              content: item.value
-            })
-          }
-          const data =
-            item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
-          // 上传图片
-          const res = await client.postImage(data)
-          if (!res) return Promise.resolve()
-          // 发送消息
-          return await client.createMessage({
-            type: 2,
-            target_id: channel_id,
-            content: res.data.url
-          })
+
+    try {
+      if (content) {
+        const res = await client.createMessage({
+          type: 9,
+          target_id: target_id,
+          content: content
         })
+        return [createResult(ResultCode.Ok, 'client.createMessage', res)]
+      }
+      const images = val.filter(
+        item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
       )
+      if (images.length > 0) {
+        let bufferData = null
+        for (let i = 0; i < images.length; i++) {
+          if (bufferData) break
+          const item = images[i]
+          if (item.type == 'Image') {
+            bufferData = Buffer.from(item.value, 'base64')
+          } else if (item.type == 'ImageURL') {
+            bufferData = await getBufferByURL(item.value)
+          } else if (item.type == 'ImageFile') {
+            bufferData = readFileSync(item.value)
+          }
+        }
+        if (!bufferData) return []
+        // 上传图片
+        const imageRes = await client.postImage(bufferData)
+        if (!imageRes) return []
+        const url = imageRes.data?.url
+        if (!url) return []
+        // 发送消息
+        const res = await client.createMessage({
+          type: 2,
+          target_id: target_id,
+          content: url
+        })
+        return [createResult(ResultCode.Ok, 'client.createMessage', res)]
+      }
+      return []
+    } catch (error) {
+      return [createResult(ResultCode.Fail, 'client.createMessage', error)]
     }
-    return Promise.all([])
   }
 
   /**
@@ -250,17 +239,11 @@ export default () => {
    * @param val
    * @returns
    */
-  const sendUser = async (user_id: string, val: DataEnums[]) => {
-    if (val.length < 0) return Promise.all([])
-    // 创建私聊标记
-    const data = await client.userChatCreate(user_id).then(res => res?.data)
-    const open_id = data?.code
+  const sendUser = async (open_id: string, val: DataEnums[]) => {
+    if (val.length < 0) return []
     const content = val
       .filter(item => item.type == 'Mention' || item.type == 'Text')
       .map(item => {
-        // if (item.type == 'Link') {
-        //   return `[${item.options?.title ?? item.value}](${item.value})`
-        // } else
         if (item.type == 'Mention') {
           if (
             item.value == 'everyone' ||
@@ -292,46 +275,63 @@ export default () => {
         }
       })
       .join('')
-    if (content) {
-      return Promise.all(
-        [content].map(item =>
-          client.createDirectMessage({
-            type: 9,
-            chat_code: open_id,
-            content: item
-          })
-        )
-      )
-    }
-    const images = val.filter(
-      item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
-    )
-    if (images) {
-      return Promise.all(
-        images.map(async item => {
-          if (item.type == 'ImageURL') {
-            return await client.createDirectMessage({
-              type: 2,
-              chat_code: open_id,
-              content: item.value
-            })
-          }
-          const data =
-            item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64')
-          // 上传图片
-          const res = await client.postImage(data)
-          if (!res) return Promise.resolve()
-          // 发送消息
-          return await client.createDirectMessage({
-            type: 2,
-            chat_code: open_id,
-            content: res.data.url
-          })
+    try {
+      if (content) {
+        const res = await client.createDirectMessage({
+          type: 9,
+          chat_code: open_id,
+          content: content
         })
+        return [createResult(ResultCode.Ok, 'client.createDirectMessage', res)]
+      }
+      const images = val.filter(
+        item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
       )
+      if (images.length > 0) {
+        let bufferData = null
+        for (let i = 0; i < images.length; i++) {
+          if (bufferData) break
+          const item = images[i]
+          if (item.type == 'Image') {
+            bufferData = Buffer.from(item.value, 'base64')
+          } else if (item.type == 'ImageURL') {
+            bufferData = await getBufferByURL(item.value)
+          } else if (item.type == 'ImageFile') {
+            bufferData = readFileSync(item.value)
+          }
+        }
+        if (!bufferData) return []
+        // 上传图片
+        const imageRes = await client.postImage(bufferData)
+        if (!imageRes) return []
+        const url = imageRes.data?.url
+        if (!url) return []
+        const res = await client.createDirectMessage({
+          type: 2,
+          chat_code: open_id,
+          content: url
+        })
+        return [createResult(ResultCode.Ok, 'client.createDirectMessage', res)]
+      }
+      return []
+    } catch (error) {
+      return [createResult(ResultCode.Fail, 'client.createDirectMessage', error)]
     }
-    return Promise.all([])
   }
+
+  /**
+   *
+   * @param user_id
+   * @param val
+   * @returns
+   */
+  // const sendUserByUserId = async (user_id: string, val: DataEnums[]) => {
+  //   if (val.length < 0) return []
+  //   // 创建私聊标记
+  //   const data = await client.userChatCreate(user_id).then(res => res?.data)
+  //   const open_id = data?.code
+  //   return await sendUser(open_id, val)
+  // }
 
   const api = {
     active: {
@@ -341,48 +341,39 @@ export default () => {
       }
     },
     use: {
-      send: (event, val) => {
-        if (val.length < 0) return Promise.all([])
+      send: async (event, val: DataEnums[]) => {
+        if (val.length < 0) return []
         if (event.name == 'message.create') {
-          return sendChannel(event.ChannelId, val)
+          return await sendChannel(event.ChannelId, val)
         } else if (event.name == 'private.message.create') {
-          return sendUser(event.UserId, val)
+          return await sendUser(event.OpenId, val)
         }
-        return Promise.all([])
+        return []
       },
       mention: async e => {
         const event = e.value
         const MessageMention: User[] = []
-        /**
-         * 艾特类型所得到的,包括机器人在内
-         */
         const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? []
         for (const item of mention_role_part) {
+          const UserId = item.role_id
+          const [isMaster, UserKey] = getMaster(UserId)
           MessageMention.push({
-            UserId: item.role_id,
+            UserId: UserId,
             UserName: item.name,
-            UserKey: useUserHashKey({
-              Platform: platform,
-              UserId: item.role_id
-            }),
-            IsMaster: false,
+            UserKey: UserKey,
+            IsMaster: isMaster,
             IsBot: true
           })
         }
-        /**
-         * 艾特用户所得到的
-         */
         const mention_part = event.extra.kmarkdown?.mention_part ?? []
         for (const item of mention_part) {
+          const UserId = item.id
+          const [isMaster, UserKey] = getMaster(UserId)
           MessageMention.push({
-            // avatar: item.avatar,
-            UserId: item.id,
+            UserId: UserId,
             UserName: item.username,
-            UserKey: useUserHashKey({
-              Platform: platform,
-              UserId: item.role_id
-            }),
-            IsMaster: false,
+            UserKey: UserKey,
+            IsMaster: isMaster,
             IsBot: false
           })
         }

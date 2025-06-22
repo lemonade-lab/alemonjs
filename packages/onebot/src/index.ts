@@ -123,6 +123,14 @@ export default () => {
    * @returns
    */
   const DataToMessage = async (val: DataEnums[] = []) => {
+    // 空元素
+    const empty = {
+      type: 'text',
+      data: {
+        text: ''
+      }
+    }
+
     const message = await Promise.all(
       val.map(async item => {
         if (item.type == 'Text') {
@@ -150,12 +158,7 @@ export default () => {
               }
             }
           }
-          return {
-            type: 'text',
-            data: {
-              text: ''
-            }
-          }
+          return empty
         } else if (item.type == 'Image') {
           return {
             type: 'image',
@@ -180,6 +183,7 @@ export default () => {
             }
           }
         }
+        return empty
       })
     )
     return message

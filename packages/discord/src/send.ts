@@ -105,8 +105,9 @@ export const sendchannel = async (
         },
         bufferData
       )
-      return [createResult(ResultCode.Ok, '完成', {})]
+      return [createResult(ResultCode.Ok, '完成', res)]
     }
+    // tudo。支持md。
     if (buttons && buttons.length > 0) {
       let components = null
       buttons.forEach(item => {
@@ -119,13 +120,13 @@ export const sendchannel = async (
         content: content,
         components: components
       })
-      return [createResult(ResultCode.Ok, '完成', {})]
+      return [createResult(ResultCode.Ok, '完成', res)]
     }
     if (content) {
       const res = await client.channelsMessagesForm(channel_id, {
         content: content
       })
-      return [createResult(ResultCode.Ok, '完成', {})]
+      return [createResult(ResultCode.Ok, '完成', res)]
     }
     return []
   } catch (err) {

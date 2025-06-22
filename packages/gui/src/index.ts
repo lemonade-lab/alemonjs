@@ -98,6 +98,8 @@ export * from './typing'
 
 export { platform } from './config'
 
+export const API = WebSocketServer
+
 export default () => {
   // 获取配置
   const config = getGUIConfig()

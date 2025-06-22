@@ -5,17 +5,17 @@ import {
   PrivateEventMessageCreate,
   PublicEventMemberAdd,
   PublicEventMessageCreate,
-  ResultCode,
-  useUserHashKey
+  ResultCode
 } from 'alemonjs'
 import { getBufferByURL } from 'alemonjs/utils'
 import TelegramClient from 'node-telegram-bot-api'
-import { platform, getOneBotConfig } from './config'
+import { platform, getTGConfig, getMaster } from './config'
 import { readFileSync } from 'fs'
 export { platform } from './config'
 export const API = TelegramClient
+export * from './hook'
 export default () => {
-  const config = getOneBotConfig()
+  const config = getTGConfig()
   const client = new TelegramClient(config.token, {
     polling: true,
     baseApiUrl: config?.base_api_url ?? '',
@@ -62,11 +62,7 @@ export default () => {
 
   client.on('text', async event => {
     const UserId = String(event?.from?.id)
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
-
+    const [isMaster, UserKey] = getMaster(UserId)
     const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string
 
     if (event?.chat.type == 'channel' || event?.chat.type == 'supergroup') {
@@ -86,7 +82,7 @@ export default () => {
         UserKey: UserKey,
         UserName: event?.chat.username,
         UserAvatar: UserAvatar,
-        IsMaster: false,
+        IsMaster: isMaster,
         IsBot: false,
         // message
         MessageId: String(event?.message_id),
@@ -112,7 +108,7 @@ export default () => {
         UserKey: UserKey,
         UserName: event?.from?.username,
         UserAvatar: UserAvatar,
-        IsMaster: false,
+        IsMaster: isMaster,
         IsBot: false,
         // message
         MessageId: String(event?.message_id),
@@ -132,11 +128,7 @@ export default () => {
     if (event?.from.is_bot) return
 
     const UserId = String(event?.from?.id)
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
-
+    const [isMaster, UserKey] = getMaster(UserId)
     const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string
 
     // 定义消
@@ -153,7 +145,7 @@ export default () => {
       UserKey: UserKey,
       UserName: event?.chat.username,
       UserAvatar: UserAvatar,
-      IsMaster: false,
+      IsMaster: isMaster,
       IsBot: false,
       MessageId: String(event?.message_id),
       CreateAt: Date.now(),
@@ -203,7 +195,6 @@ export default () => {
         return []
       },
       mention: async () => {
-        // const event: TelegramClient.Message = e.value
         return []
       }
     }
@@ -216,18 +207,10 @@ export default () => {
       const res = await api.use.send(event, paramFormat)
       consume(res)
     } else if (data.action === 'message.send.channel') {
-      // const channel_id = data.payload.ChannelId
-      // const val = data.payload.params.format
-      // const res = await api.active.send.channel(channel_id, val)
       consume([])
     } else if (data.action === 'message.send.user') {
-      // const user_id = data.payload.UserId
-      // const val = data.payload.params.format
-      // const res = await api.active.send.user(user_id, val)
       consume([])
     } else if (data.action === 'mention.get') {
-      // const event = data.payload.event
-      // const res = await api.use.mention(event)
       consume([])
     }
   })
@@ -235,7 +218,6 @@ export default () => {
   cbp.onapis(async (data, consume) => {
     const key = data.payload?.key
     if (client[key]) {
-      // 如果 client 上有对应的 key，直接调用。
       const params = data.payload.params
       const res = await client[key](...params)
       consume([createResult(ResultCode.Ok, '请求完成', res)])

@@ -73,9 +73,7 @@ export default () => {
     }
 
     const UserId = event.author.id
-
     const [isMaster, UserKey] = getMaster(UserId)
-
     const UserAvatar = createUserAvatar(UserId, event.author.avatar)
 
     if (event.type == 0 && event.member) {
@@ -94,10 +92,10 @@ export default () => {
         UserAvatar: UserAvatar,
         IsMaster: isMaster,
         IsBot: false,
+        OpenId: UserId,
         // message
         MessageId: event.id,
         MessageText: msg,
-        OpenId: '',
         CreateAt: Date.now(),
         // other
         tag: 'message.create',
@@ -117,10 +115,10 @@ export default () => {
         UserAvatar: UserAvatar,
         IsMaster: isMaster,
         IsBot: false,
+        OpenId: UserId,
         // message
         MessageId: event.id,
         MessageText: msg,
-        OpenId: '',
         CreateAt: Date.now(),
         // other
         tag: 'private.message.create',
@@ -135,14 +133,10 @@ export default () => {
   client.on('INTERACTION_CREATE', event => {
     const isPrivate = typeof event['user'] === 'object' ? true : false
     const user = isPrivate ? event['user'] : event['member'].user
-
     const UserId = user.id
-
     const UserAvatar = createUserAvatar(UserId, user.avatar)
     const UserName = user.username
-
     const [isMaster, UserKey] = getMaster(UserId)
-
     const MessageText = event.data.custom_id
     if (isPrivate) {
       // 处理消息
@@ -150,9 +144,6 @@ export default () => {
         name: 'private.interaction.create',
         // 事件类型
         Platform: platform,
-        // guild
-        // GuildId: event['guild_id'],
-        // ChannelId: event.channel_id,
         // user
         UserId: UserId,
         UserKey,
@@ -160,10 +151,10 @@ export default () => {
         UserAvatar: UserAvatar,
         IsMaster: isMaster,
         IsBot: false,
+        OpenId: UserId,
         // message
         MessageId: event.id,
         MessageText: MessageText,
-        OpenId: '',
         CreateAt: Date.now(),
         // other
         tag: 'private.interaction.create',
@@ -189,7 +180,7 @@ export default () => {
         // message
         MessageId: event.id,
         MessageText: MessageText,
-        OpenId: '',
+        OpenId: UserId,
         CreateAt: Date.now(),
         // other
         tag: 'interaction.create',
@@ -207,12 +198,12 @@ export default () => {
   const api = {
     active: {
       send: {
-        channel: async (channel_id, val: DataEnums[]) => {
-          const res = await sendchannel(client, { channel_id }, val)
+        channel: async (UserId: string, val: DataEnums[]) => {
+          const res = await sendchannel(client, { channel_id: UserId }, val)
           return [createResult(ResultCode.Ok, '请求完成', res)]
         },
-        user: async (author_id, val: DataEnums[]) => {
-          const res = await senduser(client, { author_id: author_id }, val)
+        user: async (OpenId: string, val: DataEnums[]) => {
+          const res = await senduser(client, { author_id: OpenId }, val)
           return [createResult(ResultCode.Ok, '请求完成', res)]
         }
       }
@@ -264,9 +255,7 @@ export default () => {
           const UserId = item.id
           const avatar = event.author.avatar
           const UserAvatar = createUserAvatar(UserId, avatar)
-
           const [isMaster, UserKey] = getMaster(UserId)
-
           return {
             UserId: item.id,
             IsMaster: isMaster,

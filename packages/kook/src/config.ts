@@ -1,14 +1,11 @@
 import { getConfigValue, useUserHashKey } from 'alemonjs'
-
-export const platform = 'gui'
-
-export const getGUIConfig = () => {
+export const platform = 'telegram'
+export const getKOOKConfig = () => {
   const value = getConfigValue() || {}
   return value[platform] || {}
 }
-
 export const getMaster = (UserId: string) => {
-  const config = getGUIConfig()
+  const config = getKOOKConfig()
   const master_key = config.master_key || []
   const master_id = config.master_id || []
   const UserKey = useUserHashKey({
