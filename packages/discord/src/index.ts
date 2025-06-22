@@ -6,14 +6,13 @@ import {
   ResultCode,
   User,
   cbpPlatform,
-  createResult,
-  useUserHashKey
+  createResult
 } from 'alemonjs'
 import { sendchannel, senduser } from './send'
 import { DCClient } from './sdk/wss'
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
 import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from 'alemonjs'
-import { getDiscordConfigValue, getMaster, platform } from './config'
+import { getDiscordConfig, getMaster, platform } from './config'
 
 // pf
 export { platform } from './config'
@@ -21,9 +20,12 @@ export { platform } from './config'
 // api
 export { DCAPI as API } from './sdk/api'
 
+// hook
+export * from './hook'
+
 // main
 export default () => {
-  const value = getDiscordConfigValue()
+  const value = getDiscordConfig()
   const port = process.env?.port || value?.port || 17117
   /**
    * 连接 alemonjs 服务器。

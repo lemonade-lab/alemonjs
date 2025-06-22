@@ -6,7 +6,7 @@ import { Readable, isReadable } from 'stream'
 import { basename } from 'path'
 import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
 import { MessageData } from './typings.js'
-import { getDiscordConfigValue } from '../config.js'
+import { getDiscordConfig } from '../config.js'
 
 /**
  * 创建form
@@ -50,7 +50,7 @@ export class DCAPI {
    * @returns
    */
   request(options: AxiosRequestConfig) {
-    const value = getDiscordConfigValue()
+    const value = getDiscordConfig()
     const token = value.token
     const service = axios.create({
       baseURL: API_URL,
@@ -69,7 +69,7 @@ export class DCAPI {
    * @returns
    */
   requestCDN(options: AxiosRequestConfig) {
-    const value = getDiscordConfigValue()
+    const value = getDiscordConfig()
     const token = value.token
     const service = axios.create({
       baseURL: CDB_URL,

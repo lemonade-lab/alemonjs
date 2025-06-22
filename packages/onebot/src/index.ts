@@ -22,6 +22,8 @@ export { platform } from './config'
 
 export { OneBotAPI as API } from './sdk/api'
 
+export * from './hook'
+
 export default () => {
   const config = getOneBotConfig()
   const client = new OneBotClient({

@@ -4,7 +4,7 @@ import { DISOCRDOptions } from './sdk/wss.types'
 // 平台
 export const platform = 'discord'
 
-export const getDiscordConfigValue = (): DISOCRDOptions & {
+export const getDiscordConfig = (): DISOCRDOptions & {
   [key: string]: any
 } => {
   const value = getConfigValue() || {}
@@ -13,7 +13,7 @@ export const getDiscordConfigValue = (): DISOCRDOptions & {
 }
 
 export const getMaster = (UserId: string) => {
-  const config = getDiscordConfigValue()
+  const config = getDiscordConfig()
   const master_key = config.master_key || []
   const master_id = config.master_id || []
   const UserKey = useUserHashKey({

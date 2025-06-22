@@ -2,7 +2,7 @@ import WebSocket from 'ws'
 import { DCAPI } from './api.js'
 import { getIntents } from './intents.js'
 import { DCEventMap } from './message.js'
-import { getDiscordConfigValue } from '../config.js'
+import { getDiscordConfig } from '../config.js'
 
 export class DCClient extends DCAPI {
   #heartbeat_interval = 0
@@ -27,7 +27,7 @@ export class DCClient extends DCAPI {
    * @returns
    */
   #aut() {
-    const value = getDiscordConfigValue()
+    const value = getDiscordConfig()
     const token = value.token
     const intent = value.intent || []
     const shard = value.shard || [0, 1]
@@ -68,7 +68,7 @@ export class DCClient extends DCAPI {
    * @returns
    */
   async connect() {
-    const value = getDiscordConfigValue()
+    const value = getDiscordConfig()
     const gatewayURL = value.gatewayURL
 
     // 清除序列号
