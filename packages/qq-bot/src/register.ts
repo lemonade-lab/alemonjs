@@ -6,8 +6,7 @@ import {
   PrivateEventMessageCreate,
   PublicEventInteractionCreate,
   PublicEventMessageCreate,
-  ResultCode,
-  useUserHashKey
+  ResultCode
 } from 'alemonjs'
 import { QQBotClients } from './sdk/client.websoket'
 import { User } from 'alemonjs'
@@ -19,7 +18,7 @@ import {
   GROUP_AT_MESSAGE_CREATE,
   MESSAGE_CREATE
 } from './sends'
-import { getQQBotConfig } from './config'
+import { getMaster, getQQBotConfig } from './config'
 import { platform } from './config'
 
 export const register = (client: QQBotClients) => {
@@ -45,15 +44,9 @@ export const register = (client: QQBotClients) => {
 
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', async event => {
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-    const UserAvatar = createUserAvatarURL(event.author.id)
-
     const UserId = event.author.id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
+    const [isMaster, UserKey] = getMaster(UserId)
+    const UserAvatar = createUserAvatarURL(event.author.id)
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -81,16 +74,9 @@ export const register = (client: QQBotClients) => {
   })
 
   client.on('C2C_MESSAGE_CREATE', async event => {
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-    const UserAvatar = createUserAvatarURL(event.author.id)
-
     const UserId = event.author.id
-
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
+    const [isMaster, UserKey] = getMaster(UserId)
+    const UserAvatar = createUserAvatarURL(event.author.id)
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -123,18 +109,13 @@ export const register = (client: QQBotClients) => {
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) return
 
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-
     let msg = event?.content ?? ''
 
     const UserAvatar = event?.author?.avatar
 
     const UserId = event.author.id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
+
+    const [isMaster, UserKey] = getMaster(UserId)
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -165,19 +146,13 @@ export const register = (client: QQBotClients) => {
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) return
 
-    const master_key = config?.master_key ?? []
-    const isMaster = master_key.includes(event.author.id)
-
     let msg = getMessageContent(event)
 
     const UserAvatar = event?.author?.avatar
 
     const UserId = event.author.id
 
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
+    const [isMaster, UserKey] = getMaster(UserId)
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -239,15 +214,12 @@ export const register = (client: QQBotClients) => {
 
     // 撤回消息
     if (new RegExp(/DELETE$/).test(event.eventType)) return
-    const master_key = config?.master_key ?? []
     const UserId = event.author.id
-    const isMaster = master_key.includes(UserId)
     const msg = getMessageContent(event)
     const UserAvatar = event?.author?.avatar
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
+
+    const [isMaster, UserKey] = getMaster(UserId)
+
     // 定义消
     const e: PublicEventMessageCreate = {
       name: 'message.create',
@@ -287,18 +259,12 @@ export const register = (client: QQBotClients) => {
     //   createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)
     // }
 
-    // 如何区分私聊/群聊
-
     if (event.scene === 'group') {
-      const master_key = config?.master_key ?? []
-      const isMaster = master_key.includes(event.group_member_openid)
       const UserAvatar = createUserAvatarURL(event.group_member_openid)
 
       const UserId = event.group_member_openid
-      const UserKey = useUserHashKey({
-        Platform: platform,
-        UserId: UserId
-      })
+
+      const [isMaster, UserKey] = getMaster(UserId)
 
       const MessageText = event.data.resolved.button_data?.trim() || ''
 
@@ -326,15 +292,11 @@ export const register = (client: QQBotClients) => {
 
       cbp.send(e)
     } else if (event.scene === 'c2c') {
-      const master_key = config?.master_key ?? []
-      const isMaster = master_key.includes(event.user_openid)
       const UserAvatar = createUserAvatarURL(event.user_openid)
 
       const UserId = event.user_openid
-      const UserKey = useUserHashKey({
-        Platform: platform,
-        UserId: UserId
-      })
+
+      const [isMaster, UserKey] = getMaster(UserId)
 
       const MessageText = event.data.resolved.button_data?.trim() || ''
 
@@ -358,14 +320,11 @@ export const register = (client: QQBotClients) => {
       }
       cbp.send(e)
     } else if (event.scene === 'guild') {
-      const master_key = config?.master_key ?? []
-      const isMaster = master_key.includes(event.data.resolved.user_id)
       const UserAvatar = createUserAvatarURL(event.data.resolved.user_id)
       const UserId = event.data.resolved.user_id
-      const UserKey = useUserHashKey({
-        Platform: platform,
-        UserId: UserId
-      })
+
+      const [isMaster, UserKey] = getMaster(UserId)
+
       const MessageText = event.data.resolved.button_data?.trim() || ''
       // 处理消息
       const e: PublicEventInteractionCreate = {
@@ -518,15 +477,14 @@ export const register = (client: QQBotClients) => {
           // 艾特消息处理
           const MessageMention: User[] =
             mentions.map(item => {
+              const UserId = item.id
+              const [isMaster, UserKey] = getMaster(UserId)
               return {
                 UserId: item.id,
-                IsMaster: false,
+                IsMaster: isMaster,
                 UserName: item.username,
                 IsBot: item.bot,
-                UserKey: useUserHashKey({
-                  Platform: 'qq-guild-bot',
-                  UserId: item.id
-                })
+                UserKey: UserKey
               }
             }) ?? []
           return MessageMention

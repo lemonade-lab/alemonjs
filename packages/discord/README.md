@@ -18,12 +18,16 @@ yarn add @alemonjs/discord
 discord:
   # 令牌
   token: ''
-  # 主人
-  master_key: null
   # 前缀（非必填）
   intent: null
   # 活动 非必填）
   shard: null
+  # 使用 user_key
+  master_key:
+     - 'xxx'
+  # 使用 user_id
+  master_id:
+     - 'yyy'
 ```
 
 ```sh

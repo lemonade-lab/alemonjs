@@ -46,6 +46,13 @@ qq-bot:
   # ws: 'ws://[your ip]:17157/websocket'
   # 3) 自定义模式 (用于连接类官网连接方式的指定服务端)
   # gatewayURL: 'ws://[your ip]:8080'
+  # 其他
+  # 使用 user_key
+  master_key:
+     - 'xxx'
+  # 使用 user_id
+  master_id:
+     - 'yyy'
 ```
 
 ```conf

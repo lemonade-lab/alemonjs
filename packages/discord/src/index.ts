@@ -13,7 +13,7 @@ import { sendchannel, senduser } from './send'
 import { DCClient } from './sdk/wss'
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
 import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from 'alemonjs'
-import { getDiscordConfigValue, platform } from './config'
+import { getDiscordConfigValue, getMaster, platform } from './config'
 
 // pf
 export { platform } from './config'
@@ -71,14 +71,8 @@ export default () => {
     }
 
     const UserId = event.author.id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
 
-    const value = getDiscordConfigValue()
-    const master_key = value?.master_key ?? []
-    const isMaster = master_key.includes(UserKey)
+    const [isMaster, UserKey] = getMaster(UserId)
 
     const UserAvatar = createUserAvatar(UserId, event.author.avatar)
 
@@ -114,9 +108,6 @@ export default () => {
         name: 'private.message.create',
         // 事件类型
         Platform: platform,
-        // guild
-        // GuildId: event.guild_id,
-        // ChannelId: event.channel_id,
         // user
         UserId: UserId,
         UserKey,
@@ -144,15 +135,12 @@ export default () => {
     const user = isPrivate ? event['user'] : event['member'].user
 
     const UserId = user.id
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
+
     const UserAvatar = createUserAvatar(UserId, user.avatar)
     const UserName = user.username
-    const value = getDiscordConfigValue()
-    const master_key = value?.master_key ?? []
-    const isMaster = master_key.includes(UserKey)
+
+    const [isMaster, UserKey] = getMaster(UserId)
+
     const MessageText = event.data.custom_id
     if (isPrivate) {
       // 处理消息
@@ -273,16 +261,13 @@ export default () => {
         const MessageMention: User[] = event.mentions.map(item => {
           const UserId = item.id
           const avatar = event.author.avatar
-          const value = getDiscordConfigValue()
-          const master_key = value?.master_key ?? []
           const UserAvatar = createUserAvatar(UserId, avatar)
-          const UserKey = useUserHashKey({
-            Platform: platform,
-            UserId: UserId
-          })
+
+          const [isMaster, UserKey] = getMaster(UserId)
+
           return {
             UserId: item.id,
-            IsMaster: master_key.includes(UserId),
+            IsMaster: isMaster,
             IsBot: item.bot,
             UserAvatar,
             UserKey
