@@ -12,6 +12,7 @@ import TelegramClient from 'node-telegram-bot-api'
 import { platform, getTGConfig, getMaster } from './config'
 import { readFileSync } from 'fs'
 export { platform } from './config'
+export { type Options } from './config'
 export const API = TelegramClient
 export * from './hook'
 export default () => {
@@ -24,7 +25,7 @@ export default () => {
       proxy: config?.proxy ?? ''
     }
   })
-  const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
+  const url = `ws://127.0.0.1:${process.env?.port || 17117}`
   const cbp = cbpPlatform(url)
 
   /**

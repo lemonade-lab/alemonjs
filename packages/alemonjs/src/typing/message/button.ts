@@ -37,7 +37,9 @@ export type ButtonRow = {
 export type DataButtonGroup = {
   type: 'BT.group'
   value: ButtonRow[]
-  options?: {
-    template_id?: string
-  }
+}
+
+export type DataButtonTemplate = {
+  type: 'ButtonTemplate'
+  value: string
 }

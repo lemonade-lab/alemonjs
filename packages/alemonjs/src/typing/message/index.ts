@@ -1,4 +1,4 @@
-import { DataButtonGroup } from './button'
+import { DataButtonGroup, DataButtonTemplate } from './button'
 import { DataArkBigCard, DataArkCard, DataArkList } from './ark'
 import { DataMarkDown, DataMarkdownTemplate } from './markdown'
 import { DataImage, DataImageFile, DataImageURL } from './image'
@@ -35,6 +35,7 @@ export type DataEnums =
   | DataImageFile
   | DataMention
   | DataButtonGroup
+  | DataButtonTemplate
   | DataArkList
   | DataArkCard
   | DataArkBigCard

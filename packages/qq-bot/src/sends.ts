@@ -316,24 +316,25 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         })
       ]
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    const mdAndButtons = val.filter(
+      item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate'
+    )
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {}
       mdAndButtons.forEach(async item => {
-        if (item.type === 'BT.group') {
-          // 如果是按钮，获取参数
-          const template_id = item?.options?.template_id
+        if (item.type === 'ButtonTemplate') {
+          const template_id = item?.value
           if (template_id) {
             params['keyboard'] = {
               id: template_id
             }
-          } else {
-            const rows = item.value
-            // 构造成按钮
-            const content = createButtonsData(rows)
-            params['keyboard'] = {
-              content: content
-            }
+          }
+        } else if (item.type === 'BT.group') {
+          const rows = item.value
+          // 构造按钮
+          const content = createButtonsData(rows)
+          params['keyboard'] = {
+            content: content
           }
         } else if (item.type === 'Markdown') {
           // 如果是markdown，获取内容
@@ -484,24 +485,25 @@ export const C2C_MESSAGE_CREATE = async (
         })
       ]
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    const mdAndButtons = val.filter(
+      item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate'
+    )
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {}
       mdAndButtons.forEach(async item => {
-        if (item.type === 'BT.group') {
-          // 如果是按钮，获取参数
-          const template_id = item?.options?.template_id
+        if (item.type === 'ButtonTemplate') {
+          const template_id = item?.value
           if (template_id) {
             params['keyboard'] = {
               id: template_id
             }
-          } else {
-            const rows = item.value
-            // 构造成按钮
-            const content = createButtonsData(rows)
-            params['keyboard'] = {
-              content: content
-            }
+          }
+        } else if (item.type === 'BT.group') {
+          const rows = item.value
+          // 构造成按钮
+          const content = createButtonsData(rows)
+          params['keyboard'] = {
+            content: content
           }
         } else if (item.type === 'Markdown') {
           // 如果是markdown，获取内容
@@ -634,24 +636,25 @@ export const DIRECT_MESSAGE_CREATE = async (
       )
       return [createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })]
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    const mdAndButtons = val.filter(
+      item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate'
+    )
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {}
       mdAndButtons.forEach(async item => {
-        if (item.type === 'BT.group') {
-          // 如果是按钮，获取参数
-          const template_id = item?.options?.template_id
+        if (item.type === 'ButtonTemplate') {
+          const template_id = item?.value
           if (template_id) {
             params['keyboard'] = {
               id: template_id
             }
-          } else {
-            const rows = item.value
-            // 构造成按钮
-            const content = createButtonsData(rows)
-            params['keyboard'] = {
-              content: content
-            }
+          }
+        } else if (item.type === 'BT.group') {
+          const rows = item.value
+          // 构造成按钮
+          const content = createButtonsData(rows)
+          params['keyboard'] = {
+            content: content
           }
         } else if (item.type === 'Markdown') {
           // 如果是markdown，获取内容
@@ -789,24 +792,25 @@ export const MESSAGE_CREATE = async (
       )
       return [createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })]
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group')
+    const mdAndButtons = val.filter(
+      item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate'
+    )
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {}
       mdAndButtons.forEach(async item => {
-        if (item.type === 'BT.group') {
-          // 如果是按钮，获取参数
-          const template_id = item?.options?.template_id
+        if (item.type === 'ButtonTemplate') {
+          const template_id = item?.value
           if (template_id) {
             params['keyboard'] = {
               id: template_id
             }
-          } else {
-            const rows = item.value
-            // 构造成按钮
-            const content = createButtonsData(rows)
-            params['keyboard'] = {
-              content: content
-            }
+          }
+        } else if (item.type === 'BT.group') {
+          const rows = item.value
+          // 构造成按钮
+          const content = createButtonsData(rows)
+          params['keyboard'] = {
+            content: content
           }
         } else if (item.type === 'Markdown') {
           // 如果是markdown，获取内容
