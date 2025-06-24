@@ -31,7 +31,7 @@ export default () => {
   })
   client.connect()
 
-  const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
+  const url = `ws://127.0.0.1:${process.env?.port || 17117}`
   const cbp = cbpPlatform(url)
 
   const createUserAvatar = (id: string) => {
