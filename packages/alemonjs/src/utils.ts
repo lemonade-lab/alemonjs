@@ -199,3 +199,34 @@ export const getPublicIP = async (options: Options = {}): Promise<string> => {
     return global.publicip
   })
 }
+
+/**
+ * 正则表达式工具类
+ */
+export class Regular extends RegExp {
+  constructor(pattern: string, flags?: string) {
+    super(pattern, flags)
+  }
+
+  public static or(...regs: RegExp[]): Regular {
+    return new Regular(
+      `(${regs.map(reg => reg.source).join('|')})`,
+      regs.map(reg => reg.flags).join('')
+    )
+  }
+
+  public static and(...regs: RegExp[]): Regular {
+    return new Regular(
+      regs.map(reg => `(?=${reg.source})`).join('') + '.*',
+      regs.map(reg => reg.flags).join('')
+    )
+  }
+
+  or(...regs: RegExp[]): Regular {
+    return Regular.or(this, ...regs)
+  }
+
+  and(...regs: RegExp[]): Regular {
+    return Regular.and(this, ...regs)
+  }
+}

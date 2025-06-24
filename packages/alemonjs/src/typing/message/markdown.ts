@@ -99,7 +99,6 @@ type DataMarkDownBalue =
   | DataMarkdownLink
   | DataMarkdownImage
   | DataMarkdownList
-  | DataMarkdownListItem
   | DataMarkdownBlockquote
   | DataMarkdownDivider
   | DataMarkdownNewline

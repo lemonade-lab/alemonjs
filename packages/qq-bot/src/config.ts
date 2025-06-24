@@ -74,5 +74,5 @@ export const getMaster = (UserId: string) => {
     UserId: UserId
   })
   const is = master_key.includes(UserKey) || master_id.includes(UserId)
-  return [is, UserKey]
+  return [is, UserKey] as const
 }
