@@ -7,8 +7,11 @@ import { existsSync } from 'fs'
 import { ResultCode } from './core/code.js'
 import { cbpServer } from './cbp/index.js'
 import { cbpClient } from './cbp/connect.js'
-
-const defaultPort = 17117
+import {
+  default_platform_common_prefix,
+  default_port,
+  file_prefix_common
+} from './core/variable.js'
 
 const loadState = () => {
   const value = getConfigValue() ?? {}
@@ -101,7 +104,7 @@ export const start = async (options: StartOptions | string = {}) => {
     cbpClient(url)
   } else {
     // 创建 cbp 服务器
-    const port = options?.port || cfg.argv?.port || cfg.value?.port || defaultPort
+    const port = options?.port || cfg.argv?.port || cfg.value?.port || default_port
     // 设置环境变量
     process.env.port = port
     cbpServer(port, async () => {
@@ -119,7 +122,7 @@ export const start = async (options: StartOptions | string = {}) => {
       }
       // 如果存在
       if (platform) {
-        const reg = /^(@alemonjs\/|alemonjs-)/
+        const reg = file_prefix_common
         if (reg.test(platform)) {
           process.env.platform = platform
           // 剪切
@@ -131,7 +134,7 @@ export const start = async (options: StartOptions | string = {}) => {
         }
       } else {
         // 如果没有指定平台，则使用登录名作为平台
-        process.env.platform = `@alemonjs/${login}`
+        process.env.platform = `${default_platform_common_prefix}${login}`
         process.env.login = login
       }
       // 设置了 login。强制指定

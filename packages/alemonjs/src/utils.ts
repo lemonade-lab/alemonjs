@@ -1,6 +1,5 @@
-import { existsSync, PathLike, readFileSync } from 'fs'
+import { existsSync, PathLike } from 'fs'
 import axios from 'axios'
-import { join } from 'path'
 import { toDataURL } from 'qrcode'
 import { writeFile } from 'fs'
 import { createReadStream } from 'fs'
@@ -22,25 +21,12 @@ export const getBufferByURL = async (url: string): Promise<Buffer> => {
 }
 
 /**
- * 通过路径获取Buffer
- * @param val
- * @returns
- */
-export const getBufferByPath = (val: string): Buffer | undefined => {
-  const add = join(process.cwd(), val)
-  // 绝对路径
-  if (existsSync(add)) return Buffer.from(readFileSync(add))
-  // 相对路径
-  if (existsSync(val)) return Buffer.from(readFileSync(val))
-}
-
-/**
  * 生成二维码
  * @param text
- * @param localpath
+ * @param targetPath
  * @returns
  */
-export const createQRCode = async (text: string, localpath?: string): Promise<Buffer | false> => {
+export const createQRCode = async (text: string, targetPath?: string): Promise<Buffer | false> => {
   try {
     const qrDataURL = await new Promise<string>((resolve, reject) => {
       toDataURL(
@@ -60,10 +46,10 @@ export const createQRCode = async (text: string, localpath?: string): Promise<Bu
       )
     })
     const bufferData = Buffer.from(qrDataURL.split(',')[1], 'base64')
-    if (localpath != undefined) {
-      writeFile(localpath, bufferData, (err: NodeJS.ErrnoException | null) => {
+    if (targetPath) {
+      writeFile(targetPath, bufferData, (err: NodeJS.ErrnoException | null) => {
         if (err) throw err
-        console.info('buffer set', localpath)
+        console.info(targetPath)
       })
     }
     return bufferData
@@ -189,13 +175,50 @@ export async function createPicFrom(options: {
  * @param options
  * @returns
  */
-export const getPublicIP = async (options: Options = {}): Promise<string> => {
-  if (global.publicip) return global.publicip
+export const getPublicIP = async (
+  options: Options & {
+    // 重新获取
+    force?: boolean
+  } = {}
+): Promise<string> => {
+  const { force, ...config } = options
+  if (global.publicip && !force) return global.publicip
   return await publicIp({
     onlyHttps: true,
-    ...options
+    ...config
   }).then(ip => {
     global.publicip = ip
     return global.publicip
   })
+}
+
+/**
+ * 正则表达式工具类
+ */
+export class Regular extends RegExp {
+  constructor(pattern: string, flags?: string) {
+    super(pattern, flags)
+  }
+
+  public static or(...regs: RegExp[]): Regular {
+    return new Regular(
+      `(${regs.map(reg => reg.source).join('|')})`,
+      regs.map(reg => reg.flags).join('')
+    )
+  }
+
+  public static and(...regs: RegExp[]): Regular {
+    return new Regular(
+      regs.map(reg => `(?=${reg.source})`).join('') + '.*',
+      regs.map(reg => reg.flags).join('')
+    )
+  }
+
+  or(...regs: RegExp[]): Regular {
+    return Regular.or(this, ...regs)
+  }
+
+  and(...regs: RegExp[]): Regular {
+    return Regular.and(this, ...regs)
+  }
 }

@@ -222,6 +222,12 @@ const createMarkdownText = (data: DataMarkDown['value']) => {
           return `\n- ${listItem.value}`
         })
         return `${listStr}\n`
+      } else if (mdItem.type === 'MD.code') {
+        const language = mdItem?.options?.language || ''
+        return `\`\`\`${language}\n${mdItem.value}\n\`\`\`\n`
+      } else {
+        const value = mdItem['value'] || ''
+        return String(value)
       }
       return
     })
