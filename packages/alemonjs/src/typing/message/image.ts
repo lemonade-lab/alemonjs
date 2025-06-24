@@ -3,7 +3,7 @@
  */
 export type DataImage = {
   type: 'Image'
-  value: Buffer
+  value: string
 }
 
 /**

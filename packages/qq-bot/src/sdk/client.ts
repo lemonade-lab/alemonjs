@@ -37,11 +37,9 @@ export class QQBotClient extends QQBotAPI {
    */
   constructor(opstion: Options) {
     super()
-    if (opstion.secret) config.set('secret', opstion.secret)
-    if (opstion.app_id) config.set('app_id', opstion.app_id)
-    if (opstion.token) config.set('token', opstion.token)
-    if (opstion.port) config.set('port', opstion.port)
-    if (opstion.ws) config.set('ws', opstion.ws)
+    for (const key in opstion) {
+      config.set(key, opstion[key])
+    }
   }
 
   /**
@@ -156,7 +154,7 @@ export class QQBotClient extends QQBotAPI {
         })
         // 创建 WebSocketServer 并监听同一个端口
         const wss = new WebSocketServer({ server: server })
-        console.log('Server running at wss://localhost:' + cfg.port + '/')
+        console.log('Server running at ws://localhost:' + cfg.port + '/')
         // 处理客户端连接
         wss.on('connection', ws => {
           const clientId = uuidv4()

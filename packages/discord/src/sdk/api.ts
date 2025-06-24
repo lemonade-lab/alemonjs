@@ -1,89 +1,59 @@
 import FormData from 'form-data'
 import axios from 'axios'
 import { type AxiosRequestConfig } from 'axios'
-import { config } from './config.js'
-import { createPicFrom } from './core/from.js'
-import { Readable } from 'stream'
+import { existsSync, createReadStream } from 'fs'
+import { Readable, isReadable } from 'stream'
+import { basename } from 'path'
+import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
+import { MessageData } from './typings.js'
+import { getDiscordConfig } from '../config.js'
 
-type MessageData = {
-  content?: string
-  tts?: boolean
-  embeds?: {
-    title?: string
-    description?: string
-  }[]
-  components?: {
-    type: number
-    components:
-      | {
-          type: number
-          style: number
-          label?: string
-          emoji?: any
-          custom_id?: string // 非高级按钮所必要的
-          sku_id?: any // 和所有的互斥（高级按钮）
-          url?: string // 和 custom_id 互斥
-          disabled?: boolean
-        }[]
-      | {
-          type: number
-          // style: number
-          custom_id?: string // 非高级按钮所必要的
-          options?: {
-            label: string
-            value: string
-            description?: string
-            emoji?: {
-              name?: string
-              id?: string
-            }
-          }[]
-        }[]
-      | {
-          custom_id: string
-          max_values: number
-          min_values: number
-          options: {
-            description?: string
-            emoji?: {
-              name?: string
-              id?: string
-            }
-            label: string
-            value: string
-          }[]
-        }[]
-      | {
-          type: number
-          custom_id: string
-          label: string
-          style: number
-          min_length: number
-          max_length: number
-          placeholder: string
-          required: boolean
-        }[]
-  }[]
-  files?: any[]
+/**
+ * 创建form
+ * @param image
+ * @param name
+ * @returns
+ */
+async function createPicFrom(image: string | Buffer | Readable, name = 'image.jpg') {
+  let picData: Readable | Buffer[]
+  // 是 string
+  if (typeof image === 'string') {
+    if (!existsSync(image)) return false
+    if (!name) name = basename(image)
+    picData = createReadStream(image)
+    // 是 buffer
+  } else if (Buffer.isBuffer(image)) {
+    if (!name) name = 'file.' + (await fileTypeFromBuffer(image)).ext
+    picData = new Readable()
+    picData.push(image)
+    picData.push(null)
+    // 是 文件流
+  } else if (isReadable(image)) {
+    if (!name) name = 'file.' + (await fileTypeFromStream(image as any)).ext
+    picData = image
+  } else {
+    return false
+  }
+  return { picData, image, name }
 }
+
+export const API_URL = 'https://discord.com/api/v10'
+export const CDB_URL = 'https://cdn.discordapp.com'
 
 /**
  * api接口
  */
 export class DCAPI {
-  API_URL = 'https://discord.com/api/v10'
-
-  CDB_URL = 'https://cdn.discordapp.com'
-
   /**
    * 基础请求
    * @param opstion
    * @returns
    */
   request(options: AxiosRequestConfig) {
-    const token = config.get('token')
+    const value = getDiscordConfig()
+    const token = value.token
     const service = axios.create({
-      baseURL: this.API_URL,
+      baseURL: API_URL,
       timeout: 6000,
       headers: {
         'Content-Type': 'application/json',
@@ -99,9 +69,10 @@ export class DCAPI {
    * @returns
    */
   requestCDN(options: AxiosRequestConfig) {
-    const token = config.get('token')
+    const value = getDiscordConfig()
+    const token = value.token
     const service = axios.create({
-      baseURL: this.CDB_URL,
+      baseURL: CDB_URL,
       timeout: 6000,
       headers: {
         'Content-Type': 'application/json',
@@ -118,7 +89,7 @@ export class DCAPI {
    * @returns
    */
   userAvatar(user_id: string, avatar_hash: string) {
-    return `${this.CDB_URL}/avatars/${user_id}/${avatar_hash}.png`
+    return `${CDB_URL}/avatars/${user_id}/${avatar_hash}.png`
   }
 
   /**
@@ -142,42 +113,24 @@ export class DCAPI {
    * @param headers
    * @returns
    */
-  async channelsMessages(
+  async channelsMessagesForm(
     channel_id: string,
-    data: MessageData,
-    headers?: AxiosRequestConfig['headers']
+    param: MessageData = {},
+    img?: string | Buffer | Readable
   ) {
-    return this.request({
-      url: `channels/${channel_id}/messages`,
-      method: 'post',
-      headers: headers,
-      data
-    }).then(res => res?.data)
-  }
-
-  /**
-   *
-   * @param channel_id
-   * @param img
-   * @returns
-   */
-  async channelsMessagesImage(
-    channel_id: string,
-    img: string | Buffer | Readable,
-    param?: MessageData
-  ) {
-    const from = await createPicFrom(img)
-    if (!from) return
-    const { picData, name } = from
     const formData = new FormData()
-    if (param) {
-      for (const key in param) {
-        if (param[key]) {
-          formData.append(key, param[key])
-        }
+    for (const key in param) {
+      if (param[key]) {
+        formData.append(key, param[key])
       }
     }
-    formData.append('file', picData, name)
+    if (img) {
+      const from = await createPicFrom(img)
+      if (from) {
+        const { picData, name } = from
+        formData.append('file', picData, name)
+      }
+    }
     return this.request({
       method: 'post',
       url: `channels/${channel_id}/messages`,
@@ -185,7 +138,7 @@ export class DCAPI {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    })
+    }).then(res => res.data)
   }
 
   /**

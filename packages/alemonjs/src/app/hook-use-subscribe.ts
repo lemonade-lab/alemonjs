@@ -7,12 +7,12 @@ type KeyMap = {
 }
 
 /**
- * 使用订阅
+ * 订阅事件
  * @param event
- * @param option
- * @throws {Error} - 如果 event 不是对象，或者 select 不是字符串，抛出错误。
+ * @param select
+ * @returns
  */
-export const useSubscribe = <T extends EventKeys>(event: Events[T], select: T) => {
+export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T | T[]) => {
   // 检查参数
   if (typeof event !== 'object') {
     logger.error({
@@ -22,59 +22,121 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], select: T) =
     })
     throw new Error('event is not object')
   }
-  if (typeof select !== 'string') {
+  if (typeof selects !== 'string' && !Array.isArray(selects)) {
     logger.error({
       code: ResultCode.FailParams,
-      message: 'select is not string',
+      message: 'select is not string or array',
       data: null
     })
-    throw new Error('select is not string')
+    throw new Error('select is not string or array')
   }
 
   type Keys = keyof Events[T]
-  const run = (callback: Current<T>, keys: Keys[], chioce: EventCycleEnum) => {
-    const subList = new SubscribeList(chioce, select)
-    // 没有选择
-    if (keys.length === 0) return
-    // 只能选择基础数据类型的key
-    const values: KeyMap = {}
-    for (const key of keys) {
-      if (
-        typeof key === 'string' &&
-        (typeof event[key] == 'string' ||
-          typeof event[key] == 'number' ||
-          typeof event[key] == 'boolean')
-      ) {
-        values[key] = event[key]
+
+  /**
+   * 运行订阅
+   * @param callback
+   * @param keys
+   * @param choose
+   * @returns
+   */
+  const register = (callback: Current<T>, keys: Keys[], choose: EventCycleEnum) => {
+    const curSelects = Array.isArray(selects) ? selects : [selects]
+    // 分配id
+    const ID = Date.now().toString(36) + Math.random().toString(36).substring(2, 15)
+    // 创建 订阅 列表
+    for (const select of curSelects) {
+      const subList = new SubscribeList(choose, select)
+      // 没有选择
+      if (keys.length === 0) return
+      // 只能选择基础数据类型的key
+      const values: KeyMap = {}
+      for (const key of keys) {
+        if (
+          typeof key === 'string' &&
+          (typeof event[key] == 'string' ||
+            typeof event[key] == 'number' ||
+            typeof event[key] == 'boolean')
+        ) {
+          values[key] = event[key]
+        } else {
+          logger.warn({
+            code: ResultCode.FailParams,
+            message: `Invalid key: ${key?.toString()} must be a string, number or boolean`,
+            data: null
+          })
+        }
       }
+      subList.value.append({
+        choose,
+        selects: curSelects,
+        keys: values,
+        current: callback,
+        id: ID
+      })
     }
-    subList.value.append({ keys: values, current: callback })
-    return
+    return {
+      selects: curSelects,
+      choose,
+      id: ID
+    }
   }
+
+  /**
+   * res 创建时 运行订阅
+   * @param callback
+   * @param keys
+   */
   const create = (callback: Current<T>, keys: Keys[]) => {
-    run(callback, keys, 'create')
+    return register(callback, keys, 'create')
   }
+
+  /**
+   * res 挂载时 运行订阅
+   * @param callback
+   * @param keys
+   */
   const mountBefore = (callback: Current<T>, keys: Keys[]) => {
-    run(callback, keys, 'mount')
+    return register(callback, keys, 'mount')
   }
+
+  /**
+   * res 卸载时 运行订阅
+   * @param callback
+   * @param keys
+   */
   const unmount = (callback: Current<T>, keys: Keys[]) => {
-    run(callback, keys, 'unmount')
+    return register(callback, keys, 'unmount')
   }
-  return [create, mountBefore, unmount]
-}
 
-/**
- * 废弃，请使用
- * ***
- * const [_, observer] = useSubscribe(event, option)
- * ***
- * observer()
- * ***
- * @deprecated
- */
-export const useObserver = <T extends EventKeys>(event: Events[T], option: T) => {
-  const [_, mount] = useSubscribe(event, option)
-  return mount
-}
+  /**
+   * 清除订阅
+   * @param id
+   */
+  const cancel = (value: { id: string; selects: T[]; choose: EventCycleEnum }) => {
+    const selects = value.selects
+    const ID = value.id // 订阅的 ID
+    for (const select of selects) {
+      const subList = new SubscribeList(value.choose, select)
+      const remove = () => {
+        const item = subList.value.popNext() // 弹出下一个节点
+        if (!item || item.data.id !== ID) {
+          remove()
+          return
+        }
+        subList.value.removeCurrent() // 移除当前节点
+        return
+      }
+      remove()
+    }
+  }
 
-useObserver
+  const subscribe = {
+    create,
+    mount: mountBefore,
+    unmount,
+    cancel
+  }
+
+  return [subscribe]
+}

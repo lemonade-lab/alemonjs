@@ -1,12 +1,12 @@
 import {
+  cbpPlatform,
+  createResult,
   DataEnums,
   getConfigValue,
-  onProcessor,
-  definePlatform,
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
-  User,
-  useUserHashKey
+  ResultCode,
+  User
 } from 'alemonjs'
 import { WebSocket, WebSocketServer } from 'ws'
 import Koa from 'koa'
@@ -22,13 +22,12 @@ import {
   getPrivateChats
 } from './chats'
 import { guiPath } from './file'
-
 import * as filesPath from './file'
-
 import koaRouter from 'koa-router'
 // 跨域
 import cors from '@koa/cors'
 import { readFileSync } from 'node:fs'
+import { getGUIConfig, getMaster, platform } from './config'
 
 // 机器人信息
 const Bot = {
@@ -97,26 +96,13 @@ const createServer = (port: number) => {
 
 export * from './typing'
 
-export const platform = 'gui'
+export { platform } from './config'
 
-export type Client = WebSocket
+export const API = WebSocketServer
 
-export const client: Client = new Proxy({} as Client, {
-  get: (_, prop: string) => {
-    if (prop in global.client) {
-      const original = global.client[prop]
-      // 防止函数内this丢失
-      return typeof original === 'function' ? original.bind(global.client) : original
-    }
-    return undefined
-  }
-})
-
-export default definePlatform(() => {
-  let value = getConfigValue()
-  if (!value) value = {}
+export default () => {
   // 获取配置
-  const config = value[platform]
+  const config = getGUIConfig()
   // 端口
   const port = config?.port ?? 17127
   // 创建服务器
@@ -125,33 +111,20 @@ export default definePlatform(() => {
   const wss = new WebSocketServer({ server: server })
   // 客户端
   let client: WebSocket | null = null
+  const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
+  const cbp = cbpPlatform(url)
+
   /**
    * 处理消息
    * @param event
    */
   const onMessage = (data: DataPublic) => {
     const event = data.d
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: event.UserId
-    })
-    const url = event.UserAvatar
+
+    const [isMaster, UserKey] = getMaster(event.UserId)
+
     // 用户头像
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
-    // 管理员
-    const master_key = getConfigValue()?.gui?.master_key ?? []
+    const UserAvatar = event.UserAvatar
     // 纯文本
     const msg = event.MessageBody.map(item => {
       if (item.type == 'Text') {
@@ -167,13 +140,14 @@ export default definePlatform(() => {
       // 频道
       GuildId: event.GuildId,
       ChannelId: event.ChannelId,
+      SpaceId: event.ChannelId,
       // 用户
       UserId: event.UserId,
       UserName: event.UserName,
       UserAvatar: UserAvatar,
       UserKey,
       // 属性
-      IsMaster: master_key.includes(UserKey),
+      IsMaster: isMaster,
       IsBot: event.IsBot,
       OpenId: event.OpenId,
       // 消息
@@ -182,34 +156,17 @@ export default definePlatform(() => {
       CreateAt: Date.now(),
       // 标记
       tag: 'send_message',
-      // 原始数据
-      value: null
+      value: data
     }
-    // 处理消息
-    onProcessor('message.create', e, data)
+    cbp.send(e)
   }
 
   const onProvateMessage = (data: DataPrivate) => {
     const event = data.d
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: event.UserId
-    })
 
-    const url = event.UserAvatar
-    const UserAvatar = {
-      toBuffer: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer)
-      },
-      toBase64: async () => {
-        const arrayBuffer = await fetch(url).then(res => res.arrayBuffer())
-        return Buffer.from(arrayBuffer).toString('base64')
-      },
-      toURL: async () => {
-        return url
-      }
-    }
+    const [isMaster, UserKey] = getMaster(event.UserId)
+
+    const UserAvatar = event.UserAvatar
 
     // 纯文本
     const msg = event.MessageBody.map(item => {
@@ -218,8 +175,6 @@ export default definePlatform(() => {
       }
       return ''
     }).join('')
-
-    const master_key = getConfigValue()?.gui?.master_key ?? []
 
     const e: PrivateEventMessageCreate = {
       name: 'private.message.create',
@@ -230,17 +185,16 @@ export default definePlatform(() => {
       UserName: event.UserName,
       UserAvatar,
       UserKey,
-      IsMaster: master_key.includes(UserKey),
+      IsMaster: isMaster,
       IsBot: event.IsBot,
       MessageId: String(event.MessageId),
       MessageText: msg,
       OpenId: event.OpenId,
       CreateAt: Date.now(),
       tag: 'send_private_message',
-      value: null
+      value: data
     }
-    // 处理消息
-    onProcessor('private.message.create', e, data)
+    cbp.send(e)
   }
 
   // 监听连接事件
@@ -329,130 +283,155 @@ export default definePlatform(() => {
     return MessageBody
   }
 
-  //
-  return {
-    // 平台
-    platform: platform,
-    // 接口
-    api: {
-      // 主动的
-      active: {
-        // 发送消息
-        send: {
-          // 向频道发送消息
-          channel: async (channel_id, val) => {
-            if (val.length < 0) return Promise.all([])
-            const MessageBody = await getMessageBody(val)
-            const db = {
-              t: 'send_message' as DataPublic['t'],
-              d: {
-                MessageBody: MessageBody,
-                MessageId: Date.now(),
-                createAt: Date.now(),
-                IsBot: true,
-                OpenId: '',
-                GuildId: '',
-                ChannelId: channel_id
-              } as any
-            }
-            addChat(db.d.createAt, db)
-            if (client) {
-              client.send(DATA.stringify(db))
-            }
-            return Promise.all([])
-          },
-          // 向用户发送消息
-          user: async (user_id, val) => {
-            if (val.length < 0) return Promise.all([])
-            const MessageBody = await getMessageBody(val)
-            const db = {
-              t: 'send_private_message' as DataPrivate['t'],
-              d: {
-                MessageBody: MessageBody,
-                MessageId: Date.now(),
-                createAt: Date.now(),
-                IsBot: true,
-                OpenId: user_id
-              } as any
-            }
-            addPrivateChat(db.d.createAt, db)
-            if (client) {
-              client.send(DATA.stringify(db))
-            }
-            return Promise.all([])
+  const api = {
+    // 主动的
+    active: {
+      // 发送消息
+      send: {
+        // 向频道发送消息
+        channel: async (SpaceId: string, val: DataEnums[]) => {
+          if (val.length < 0) return []
+          const MessageBody = await getMessageBody(val)
+          const db = {
+            t: 'send_message' as DataPublic['t'],
+            d: {
+              MessageBody: MessageBody,
+              MessageId: Date.now(),
+              createAt: Date.now(),
+              IsBot: true,
+              OpenId: '',
+              GuildId: '',
+              ChannelId: SpaceId,
+              SpaceId
+            } as any
           }
+          addChat(db.d.createAt, db)
+          if (client) {
+            client.send(DATA.stringify(db))
+          }
+          return []
+        },
+        // 向用户发送消息
+        user: async (OpenId: string, val: DataEnums[]) => {
+          if (val.length < 0) return []
+          const MessageBody = await getMessageBody(val)
+          const db = {
+            t: 'send_private_message' as DataPrivate['t'],
+            d: {
+              MessageBody: MessageBody,
+              MessageId: Date.now(),
+              createAt: Date.now(),
+              IsBot: true,
+              OpenId: OpenId
+            } as any
+          }
+          addPrivateChat(db.d.createAt, db)
+          if (client) {
+            client.send(DATA.stringify(db))
+          }
+          return []
+        }
+      }
+    },
+    // 被动的
+    use: {
+      // 发送消息
+      send: async (event, val: DataEnums[]) => {
+        if (val.length < 0) return Promise.all([])
+        if (!client) return Promise.all([])
+        const data: DataPrivate | DataPublic = event.value
+        const MessageBody = await getMessageBody(val)
+        if (data.t == 'send_message') {
+          // 频道消息
+          const db = {
+            t: 'send_message' as DataPublic['t'],
+            d: {
+              MessageBody: MessageBody,
+              MessageId: Date.now(),
+              createAt: Date.now(),
+              IsBot: true,
+              OpenId: data.d.OpenId,
+              GuildId: data.d.GuildId,
+              ChannelId: data.d.ChannelId
+            } as any
+          }
+          addChat(db.d.createAt, db)
+          client.send(DATA.stringify(db))
+          return []
+        } else {
+          // 私聊消息
+          const db = {
+            t: 'send_private_message' as DataPrivate['t'],
+            d: {
+              MessageBody: MessageBody,
+              MessageId: Date.now(),
+              createAt: Date.now(),
+              IsBot: true,
+              OpenId: data.d.OpenId
+            } as any
+          }
+          addPrivateChat(db.d.createAt, db)
+          client.send(DATA.stringify(db))
+          return Promise.all([])
         }
       },
-      // 被动的
-      use: {
-        // 发送消息
-        send: async (event, val) => {
-          if (val.length < 0) return Promise.all([])
-          if (!client) return Promise.all([])
-          const data: DataPrivate | DataPublic = event.value
-          const MessageBody = await getMessageBody(val)
-          if (data.t == 'send_message') {
-            // 频道消息
-            const db = {
-              t: 'send_message' as DataPublic['t'],
-              d: {
-                MessageBody: MessageBody,
-                MessageId: Date.now(),
-                createAt: Date.now(),
-                IsBot: true,
-                OpenId: data.d.OpenId,
-                GuildId: data.d.GuildId,
-                ChannelId: data.d.ChannelId
-              } as any
+      mention: async e => {
+        const event: DataPrivate | DataPublic = e.value
+        if (event.t == 'send_private_message') {
+          // 私聊消息
+          const arr: User[] = []
+          return arr
+        } else {
+          // 频道消息
+          const mentions = event.d.MessageBody.filter(item => item.type == 'Mention')
+            .filter(item => item.options?.belong == 'user')
+            .map(item => item.value)
+          const MessageMention: User[] = mentions.map(item => {
+            const UserId = item
+            const [isMaster, UserKey] = getMaster(UserId)
+            return {
+              UserId: UserId,
+              IsMaster: isMaster,
+              IsBot: item == Bot.BotId,
+              UserKey: UserKey
             }
-            addChat(db.d.createAt, db)
-            return Promise.all([client.send(DATA.stringify(db))])
-          } else {
-            // 私聊消息
-            const db = {
-              t: 'send_private_message' as DataPrivate['t'],
-              d: {
-                MessageBody: MessageBody,
-                MessageId: Date.now(),
-                createAt: Date.now(),
-                IsBot: true,
-                OpenId: data.d.OpenId
-              } as any
-            }
-            addPrivateChat(db.d.createAt, db)
-            return Promise.all([client.send(DATA.stringify(db))])
-          }
-        },
-        mention: async e => {
-          const event: DataPrivate | DataPublic = e.value
-          if (event.t == 'send_private_message') {
-            // 私聊消息
-            const arr: User[] = []
-            return arr
-          } else {
-            // 频道消息
-            const mentions = event.d.MessageBody.filter(item => item.type == 'Mention')
-              .filter(item => item.options?.belong == 'user')
-              .map(item => item.value)
-            const MessageMention: User[] = mentions.map(item => {
-              const UserId = item
-              const value = getConfigValue()
-              const config = value?.discord
-              const master_key = config?.master_key ?? []
-              return {
-                UserId: UserId,
-                IsMaster: master_key.includes(UserId),
-                IsBot: item == Bot.BotId,
-                UserKey: useUserHashKey({
-                  Platform: platform,
-                  UserId: UserId
-                })
-              }
-            })
-            return MessageMention
-          }
+          })
+          return MessageMention
         }
       }
     }
   }
-})
+
+  cbp.onactions(async (data, consume) => {
+    if (data.action === 'message.send') {
+      const event = data.payload.event
+      const paramFormat = data.payload.params.format
+      const res = await api.use.send(event, paramFormat)
+      consume(res)
+    } else if (data.action === 'message.send.channel') {
+      const channel_id = data.payload.ChannelId
+      const val = data.payload.params.format
+      const res = await api.active.send.channel(channel_id, val)
+      consume(res)
+    } else if (data.action === 'message.send.user') {
+      const user_id = data.payload.UserId
+      const val = data.payload.params.format
+      const res = await api.active.send.user(user_id, val)
+      consume(res)
+    } else if (data.action === 'mention.get') {
+      const event = data.payload.event
+      const res = await api.use.mention(event)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
+    }
+  })
+
+  cbp.onapis(async (data, consume) => {
+    const key = data.payload?.key
+    if (client[key]) {
+      // 如果 client 上有对应的 key，直接调用。
+      const params = data.payload.params
+      const res = await client[key](...params)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
+    }
+  })
+}

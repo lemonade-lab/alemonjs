@@ -4,37 +4,38 @@
  * @module ioredis
  * @author ningmengchongshui
  */
-import redisClient, { Redis as RedisClient } from 'ioredis'
+import redisClient, { Redis as RedisClient, RedisOptions } from 'ioredis'
 import { getConfigValue } from 'alemonjs'
 
-/**
- * 创建ioredis
- * @returns
- */
-const createIoRedis = () => {
-  const value = getConfigValue()
-  if (!value) throw new Error('getConfigValue is null')
-  const config = {
-    host: value?.redis?.host ?? 'localhost',
-    port: value?.redis?.port ?? 6379,
-    password: value?.redis?.password ?? '',
-    db: value?.redis?.db ?? 0
-  }
-  const aRedis = new redisClient({
-    host: config.host,
-    port: config.port,
-    password: config.password,
-    db: config.db,
-    maxRetriesPerRequest: null
-  })
-  return aRedis
+type Config = {
+  host?: string
+  port?: number
+  password?: string
+  db?: number
 }
 
 /**
  * 获得ioredis客户端
  * @returns
  */
-export const getIoRedis = (): RedisClient => {
-  if (!global.ioRedis) global.ioRedis = createIoRedis()
+export const getIoRedis = (config: Config & RedisOptions = {}): RedisClient => {
+  if (global.ioRedis) return global.ioRedis
+  const value = getConfigValue() || {}
+  const redis = value?.redis || {}
+  const { host, port, password, db, ...options } = config
+  const connectConfig = {
+    host: host || redis?.host || '127.0.0.1',
+    port: port || redis?.port || 6379,
+    password: password || redis?.password || '',
+    db: db || redis?.db || 0
+  }
+  global.ioRedis = new redisClient({
+    host: connectConfig.host,
+    port: connectConfig.port,
+    password: connectConfig.password,
+    db: connectConfig.db,
+    maxRetriesPerRequest: null,
+    ...options
+  })
   return global.ioRedis
 }

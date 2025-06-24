@@ -1,6 +1,9 @@
+/**
+ *
+ */
 export type DataMarkdownTemplate = {
-  type: 'MD.template'
-  value: string
+  type: 'MarkdownTemplate'
+  value: string // template_id
   options: {
     params: {
       [key: string]: string
@@ -90,7 +93,6 @@ type DataMarkDownBalue =
   | DataMarkdownTitle
   | DataMarkdownSubtitle
   | DataMarkdownBold
-  | DataMarkdownTemplate
   | DataMarkdownItalic
   | DataMarkdownItalicStar
   | DataMarkdownStrikethrough

@@ -29,7 +29,8 @@ import {
   DataMarkdownDivider,
   DataMarkdownNewline,
   DataLink,
-  DataMarkdownText
+  DataMarkdownText,
+  DataButtonTemplate
 } from '../typings'
 
 /**
@@ -89,10 +90,10 @@ export const ImageFile = (val: DataImageFile['value']): DataImageFile => {
  * @param val
  * @returns
  */
-const Image = (val: DataImage['value']): DataImage => {
+const Image = (val: Buffer): DataImage => {
   return {
     type: 'Image',
-    value: val
+    value: val.toString('base64')
   }
 }
 Image.url = ImageURL
@@ -140,13 +141,15 @@ BT.group = function Group(...rows: ButtonRow[]): DataButtonGroup {
   }
 }
 
-BT.template = function Template(value: DataButtonGroup['options']['template_id']): DataButtonGroup {
+/**
+ * 创建一个按钮模板
+ * @param templateId  模板 ID
+ * @returns
+ */
+BT.template = function Template(templateId: DataButtonTemplate['value']): DataButtonTemplate {
   return {
-    type: 'BT.group',
-    value: [],
-    options: {
-      template_id: value
-    }
+    type: 'ButtonTemplate',
+    value: templateId
   }
 }
 
@@ -248,9 +251,9 @@ const MD = (...values: DataMarkDown['value']): DataMarkDown => {
 MD.template = (
   templateId: DataMarkdownTemplate['value'],
   params?: DataMarkdownTemplate['options']['params']
-) => {
+): DataMarkdownTemplate => {
   return {
-    type: 'MD.template',
+    type: 'MarkdownTemplate',
     value: templateId,
     options: {
       params

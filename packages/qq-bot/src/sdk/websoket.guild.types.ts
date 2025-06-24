@@ -37,4 +37,8 @@ export interface GuildOptions {
    * false
    */
   sandbox?: boolean
+  /**
+   *
+   */
+  mode?: 'guild' | 'group' | ''
 }

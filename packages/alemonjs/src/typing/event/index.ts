@@ -23,6 +23,12 @@ export type CurrentResultValue =
  */
 export type Current<T extends EventKeys> = (event: Events[T], next: Next) => CurrentResultValue
 
+// 返回值类型
+export type OnResponseValue<C, T extends EventKeys> = {
+  current: C // current 类型直接使用 callback 的类型
+  select: T | T[]
+}
+
 /**
  * 定义一个响应
  */
@@ -35,12 +41,6 @@ export type OnResponseReversalFunc = <T extends EventKeys, C extends Current<T> 
   select: T | T[],
   callback: C
 ) => OnResponseValue<C, T>
-
-// 返回值类型
-export type OnResponseValue<C, T extends EventKeys> = {
-  current: C // current 类型直接使用 callback 的类型
-  select: T | T[]
-}
 
 /**
  * 定义一个中间件
@@ -111,19 +111,3 @@ export type OnSelectsFunc = <T extends EventKeys[] | EventKeys>(values: T) => T
  * 定义数据格式
  */
 export type OnDataFormatFunc = (...data: DataEnums[]) => DataEnums[]
-
-/**
- * 废弃，请使用 DefinePlatformCallback
- * @deprecated
- */
-export type DefineBotCallback = DefinePlatformCallback
-/**
- * 废弃，请使用 DefinePlatformValue
- * @deprecated
- */
-export type DefineBotValue = DefinePlatformValue
-/**
- * 废弃，请使用 DefinePlatform
- * @deprecated
- */
-export type DefineBot = DefinePlatformFunc

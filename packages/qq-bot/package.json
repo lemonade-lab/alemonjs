@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "0.0.23",
+  "version": "2.1.0-alpha.14",
   "description": "阿柠檬qqbot平台连接",
   "author": "lemonade",
   "license": "MIT",
@@ -24,6 +24,9 @@
     "ws": "^8.13.0",
     "uuid": "^11.0.3",
     "@noble/curves": "^1.7.0"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
   },
   "types": "lib",
   "exports": {

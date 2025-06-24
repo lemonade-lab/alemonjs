@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/onebot",
-  "version": "0.2.8",
-  "description": "onebot",
+  "version": "2.1.0-alpha.6",
+  "description": "onebot v11",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -22,6 +22,9 @@
   ],
   "dependencies": {
     "ws": "^8.18.1"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
   },
   "alemonjs": {
     "desktop": {

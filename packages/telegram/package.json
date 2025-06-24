@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/telegram",
-  "version": "0.2.3",
-  "description": "阿柠檬telegram平台连接",
+  "version": "2.1.0-alpha.0",
+  "description": "telegram platform connection",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -11,8 +11,12 @@
     "build": "node bundle.js"
   },
   "dependencies": {
+    "@types/node-telegram-bot-api": "^0.64.9",
     "grammy": "^1.30.0",
     "node-telegram-bot-api": "^0.66.0"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
   },
   "exports": {
     ".": {

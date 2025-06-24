@@ -1,4 +1,6 @@
 /*
+!clis
+!frontends
 !packages
 !src
 !.vscode
@@ -10,3 +12,8 @@
 !README.md
 !lerne.json
 !jest.config.js
+.cache
+logs
+node_modules
+lib
+dist

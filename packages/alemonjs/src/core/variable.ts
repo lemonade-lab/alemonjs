@@ -35,10 +35,13 @@ export const Ok = 2000 // 成功
 // 警惕码
 export const Warn = 2100 // 任意警告
 
-// 失败码
+// 结果码
 export const Fail = 4000 // 未知错误
-export const FailParams = 4001 // 参数错误
-export const FailAuth = 4002 // 权限不足
+// 参数错误
+export const FailParams = 4001
+// 参数错误
+export const FailAuth = 4002
+// 授权错误
 export const FailInternal = 5000 // 内部错误
 
 export const EventMessageText: EventKeys[] = [

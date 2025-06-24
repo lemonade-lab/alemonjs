@@ -1,27 +1,22 @@
 import {
-  getConfigValue,
-  OnProcessor,
+  cbpPlatform,
+  createResult,
+  DataEnums,
   PrivateEventMessageCreate,
   PublicEventMemberAdd,
-  useUserHashKey
+  PublicEventMessageCreate,
+  ResultCode
 } from 'alemonjs'
+import { getBufferByURL } from 'alemonjs/utils'
 import TelegramClient from 'node-telegram-bot-api'
-export type Client = typeof TelegramClient.prototype
-export const client: Client = new Proxy({} as Client, {
-  get: (_, prop: string) => {
-    if (prop in global.client) {
-      const original = global.client[prop]
-      // 防止函数内this丢失
-      return typeof original === 'function' ? original.bind(global.client) : original
-    }
-    return undefined
-  }
-})
-export const platform = 'telegram'
-export default definePlatform(() => {
-  let value = getConfigValue()
-  if (!value) value = {}
-  const config = value[platform]
+import { platform, getTGConfig, getMaster } from './config'
+import { readFileSync } from 'fs'
+export { platform } from './config'
+export { type Options } from './config'
+export const API = TelegramClient
+export * from './hook'
+export default () => {
+  const config = getTGConfig()
   const client = new TelegramClient(config.token, {
     polling: true,
     baseApiUrl: config?.base_api_url ?? '',
@@ -30,6 +25,9 @@ export default definePlatform(() => {
       proxy: config?.proxy ?? ''
     }
   })
+  const url = `ws://127.0.0.1:${process.env?.port || 17117}`
+  const cbp = cbpPlatform(url)
+
   /**
    *
    * @param UserId
@@ -65,76 +63,40 @@ export default definePlatform(() => {
 
   client.on('text', async event => {
     const UserId = String(event?.from?.id)
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
-
-    const UserAvatar = {
-      toBuffer: async () => {
-        if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
-          const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-          if (typeof photo == 'string') {
-            const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-            return Buffer.from(arrayBuffer)
-          }
-        }
-        return
-      },
-      toURL: async () => {
-        if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
-          const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-          if (typeof photo == 'string') {
-            return photo
-          }
-        }
-        return
-      },
-      toBase64: async () => {
-        if (event?.chat.type == 'supergroup' || event?.chat.type == 'private') {
-          const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-          if (typeof photo == 'string') {
-            const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-            return Buffer.from(arrayBuffer).toString('base64')
-          }
-        }
-        return
-      }
-    }
+    const [isMaster, UserKey] = getMaster(UserId)
+    const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string
 
     if (event?.chat.type == 'channel' || event?.chat.type == 'supergroup') {
       // 机器人消息不处理
       if (event?.from?.is_bot) return
       // 定义消
-      const e = {
+      const e: PublicEventMessageCreate = {
         // 事件类型
         Platform: platform,
+        name: 'message.create',
         // 频道
         GuildId: String(event?.chat.id),
         ChannelId: String(event?.chat.id),
+        SpaceId: String(event?.chat.id),
         // user
         UserId: UserId,
         UserKey: UserKey,
         UserName: event?.chat.username,
         UserAvatar: UserAvatar,
-        IsMaster: false,
+        IsMaster: isMaster,
         IsBot: false,
         // message
         MessageId: String(event?.message_id),
+        MessageText: event?.text,
         OpenId: String(event?.chat?.id),
         CreateAt: Date.now(),
         // other
         tag: 'txt',
-        value: null
+        value: event
       }
-      // 当访问的时候获取
-      Object.defineProperty(e, 'value', {
-        get() {
-          return event
-        }
-      })
-      //
-      OnProcessor(e as any, 'message.create')
+      // 发送消息
+      cbp.send(e)
+
       //
     } else if (event?.chat.type == 'private') {
       // 定义消
@@ -147,7 +109,7 @@ export default definePlatform(() => {
         UserKey: UserKey,
         UserName: event?.from?.username,
         UserAvatar: UserAvatar,
-        IsMaster: false,
+        IsMaster: isMaster,
         IsBot: false,
         // message
         MessageId: String(event?.message_id),
@@ -156,16 +118,9 @@ export default definePlatform(() => {
         CreateAt: Date.now(),
         // other
         tag: 'txt',
-        value: null
+        value: event
       }
-      // 当访问的时候获取
-      Object.defineProperty(e, 'value', {
-        get() {
-          return event
-        }
-      })
-      // 处理消息
-      OnProcessor(e, 'private.message.create')
+      cbp.send(e)
     }
   })
 
@@ -174,36 +129,8 @@ export default definePlatform(() => {
     if (event?.from.is_bot) return
 
     const UserId = String(event?.from?.id)
-    const UserKey = useUserHashKey({
-      Platform: platform,
-      UserId: UserId
-    })
-
-    const UserAvatar = {
-      toBuffer: async () => {
-        const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-        if (typeof photo == 'string') {
-          const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-          return Buffer.from(arrayBuffer)
-        }
-        return
-      },
-      toURL: async () => {
-        const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-        if (typeof photo == 'string') {
-          return photo
-        }
-        return
-      },
-      toBase64: async () => {
-        const photo = await getUserProfilePhotosUrl(event?.from?.id).catch(console.error)
-        if (typeof photo == 'string') {
-          const arrayBuffer = await fetch(photo).then(res => res.arrayBuffer())
-          return Buffer.from(arrayBuffer).toString('base64')
-        }
-        return
-      }
-    }
+    const [isMaster, UserKey] = getMaster(UserId)
+    const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string
 
     // 定义消
     const e: PublicEventMemberAdd = {
@@ -213,59 +140,88 @@ export default definePlatform(() => {
       // guild
       GuildId: String(event?.chat.id),
       ChannelId: String(event?.chat.id),
-      // GuildName: event?.chat.title,
+      SpaceId: String(event?.chat.id),
       // user
       UserId: UserId,
       UserKey: UserKey,
       UserName: event?.chat.username,
       UserAvatar: UserAvatar,
-      IsMaster: false,
+      IsMaster: isMaster,
       IsBot: false,
-      // message
       MessageId: String(event?.message_id),
-      // MessageText: event?.text,
-      // OpenId: String(event?.chat?.id),
       CreateAt: Date.now(),
       // othder
       tag: 'txt',
-      value: null
+      value: event
     }
-    // 当访问的时候获取
-    Object.defineProperty(e, 'value', {
-      get() {
-        return event
-      }
-    })
-    //
-    OnProcessor(e, 'member.add')
+    cbp.send(e)
   })
 
-  global.client = client
-
-  return {
-    api: {
-      use: {
-        send: (event, val: any[]) => {
-          if (val.length < 0) return Promise.all([])
-          const content = val
-            .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
-            .map(item => item.value)
-            .join('')
-          const e = event?.value
+  const api = {
+    use: {
+      send: async (event, val: DataEnums[]) => {
+        if (val.length < 0) return []
+        const content = val
+          .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+          .map(item => item.value)
+          .join('')
+        const e = event?.value
+        try {
           if (content) {
-            return Promise.all([content].map(item => client.sendMessage(e.chat.id, item)))
+            const res = await client.sendMessage(e.chat.id, content)
+            return [createResult(ResultCode.Ok, 'message.send', res)]
           }
-          const images = val.filter(item => item.type == 'Image').map(item => item.value)
-          if (images) {
-            return Promise.all(images.map(item => client.sendPhoto(e.chat.id, item)))
+          const images = val.filter(
+            item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL'
+          )
+          if (images.length > 1) {
+            let data = null
+            for (let i = 0; i < images.length; i++) {
+              if (data) break
+              const item = images[i]
+              if (item.type === 'Image') {
+                data = item.value
+              } else if (item.type === 'ImageFile') {
+                data = readFileSync(item.value)
+              } else if (item.type === 'ImageURL') {
+                data = await getBufferByURL(item.value)
+              }
+            }
+            const res = await client.sendPhoto(e.chat.id, data)
+            return [createResult(ResultCode.Ok, 'message.send', res)]
           }
-          return Promise.all([])
-        },
-        mention: async () => {
-          // const event: TelegramClient.Message = e.value
-          return []
+        } catch (err) {
+          return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)]
         }
+        return []
+      },
+      mention: async () => {
+        return []
       }
     }
   }
-})
+
+  cbp.onactions(async (data, consume) => {
+    if (data.action === 'message.send') {
+      const event = data.payload.event
+      const paramFormat = data.payload.params.format
+      const res = await api.use.send(event, paramFormat)
+      consume(res)
+    } else if (data.action === 'message.send.channel') {
+      consume([])
+    } else if (data.action === 'message.send.user') {
+      consume([])
+    } else if (data.action === 'mention.get') {
+      consume([])
+    }
+  })
+
+  cbp.onapis(async (data, consume) => {
+    const key = data.payload?.key
+    if (client[key]) {
+      const params = data.payload.params
+      const res = await client[key](...params)
+      consume([createResult(ResultCode.Ok, '请求完成', res)])
+    }
+  })
+}

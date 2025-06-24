@@ -33,7 +33,7 @@ export const expendSubscribe = async <T extends EventKeys>(
     const item = subList.value.popNext() // 弹出下一个节点
 
     // 可能是 undefined
-    if (!item || !item.data.current) {
+    if (!item) {
       // 继续 next
       nextObserver(true)
       return
@@ -48,18 +48,48 @@ export const expendSubscribe = async <T extends EventKeys>(
       }
     }
 
+    const clear = () => {
+      const selects = item.data.selects
+      const ID = item.data.id // 订阅的 ID
+      for (const select of selects) {
+        const subList = new SubscribeList(chioce, select)
+        const remove = () => {
+          const item = subList.value.popNext() // 弹出下一个节点
+          if (!item || item.data.id !== ID) {
+            remove()
+            return
+          }
+          subList.value.removeCurrent() // 移除当前节点
+          return
+        }
+        remove()
+      }
+    }
+
+    // 恢复
+    const restore = () => {
+      const selects = item.data.selects
+      for (const select of selects) {
+        const subList = new SubscribeList(chioce, select)
+        subList.value.append(item.data)
+      }
+    }
+
     // 订阅是执行则销毁
-    subList.value.removeCurrent() // 移除当前节点
+    clear()
 
     const Continue: Next = (cn?: boolean, ...cns: boolean[]) => {
       // next() 订阅继续
-      subList.value.append(item.data) // 重新连接
+      // 重新注册。
+      restore()
+      // true
       if (cn) {
         nextObserver(...cns)
         return
       }
+      // false
       if (typeof cn === 'boolean') {
-        subList.value.removeCurrent() // 移除当前节点
+        clear()
         nextObserver(...cns)
         return
       }

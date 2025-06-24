@@ -35,4 +35,8 @@ export interface GroupOptions {
    * 是否是沙盒环境
    */
   sandbox?: boolean
+  /**
+   *
+   */
+  mode?: 'guild' | 'group' | ''
 }

@@ -1,7 +1,7 @@
 import { dirname, join } from 'path'
 import { existsSync } from 'fs'
-import { createEventName, showErrorModule } from './utils.js'
-import { getRecursiveDirFiles } from './utils.js'
+import { createEventName, showErrorModule } from '../core/utils.js'
+import { getRecursiveDirFiles } from '../core/utils.js'
 import {
   StoreMiddlewareItem,
   StoreResponseItem,
@@ -30,14 +30,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     return
   }
   const mainDir = dirname(mainPath)
-
   const App = new ChildrenApp(appName)
-
-  const show = (e: any) => {
-    showErrorModule(e)
-    // 卸载
-    App.un()
-  }
 
   try {
     const moduleApp: {
@@ -67,9 +60,11 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     App.pushSycle(app)
 
     const unMounted = async e => {
-      show(e)
+      showErrorModule(e)
+      // 卸载
+      App.un()
       try {
-        await app?.unMounted(e)
+        app?.unMounted && (await app.unMounted(e))
       } catch (e) {
         // 卸载周期出意外，不需要进行卸载
         showErrorModule(e)
@@ -77,14 +72,12 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     }
 
     // onCreated 创建
-    if (typeof app?.onCreated == 'function') {
-      try {
-        await app?.onCreated()
-      } catch (e) {
-        unMounted(e)
-        // 出错了，结束后续的操作。
-        return
-      }
+    try {
+      app?.onCreated && (await app?.onCreated())
+    } catch (e) {
+      unMounted(e)
+      // 出错了，结束后续的操作。
+      return
     }
 
     // onMounted 加载
@@ -137,9 +130,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       App.pushMiddleware(mwData)
       App.on()
       try {
-        if (typeof app?.onMounted == 'function') {
-          await app?.onMounted({ response: resData, middleware: mwData })
-        }
+        app?.onMounted && (await app.onMounted({ response: resData, middleware: mwData }))
       } catch (e) {
         unMounted(e)
         return
@@ -150,23 +141,12 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     // unMounted 卸载
   } catch (e) {
-    show(e)
+    showErrorModule(e)
+    // 卸载
+    App.un()
   }
 }
 
-/**
- * 废弃，请使用 loadChildren
- * @deprecated
- */
-export const loadModule = (mainPath: string, appName: string) => {
-  // 废弃警告
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'loadModule is deprecated, please use loadChildren',
-    data: null
-  })
-  return loadChildren(mainPath, appName)
-}
 /**
  * 模块文件
  * @param app
@@ -195,18 +175,4 @@ export const loadChildrenFile = async (appName: string) => {
   } catch (e) {
     showErrorModule(e)
   }
-}
-
-/**
- * 废弃，请使用 loadChildrenFile
- * @deprecated
- */
-export const moduleChildrenFiles = async (appName: string) => {
-  // 废弃警告
-  logger.warn({
-    code: ResultCode.Warn,
-    message: 'moduleChildrenFiles is deprecated, please use loadChildrenFile',
-    data: null
-  })
-  return loadChildrenFile(appName)
 }

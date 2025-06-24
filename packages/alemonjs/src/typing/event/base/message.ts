@@ -7,6 +7,10 @@ export type Message = {
    * 创建时间
    */
   CreateAt: number
+  /**
+   * 来源设备编号
+   */
+  DeviceId?: string
 }
 
 export type MessageText = {

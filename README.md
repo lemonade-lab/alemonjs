@@ -3,15 +3,15 @@
 基于 javascript 所构建的，聊天机器人开发框架
 
 ```ts
-import { Text, useSends } from 'alemonjs'
+import { Text, useMessage } from 'alemonjs'
 // 创建事件类型
 export const selects = onSelects(['message.create'])
 // 导出响应
 export default onResponse(selects, event => {
   // 使用发送函数
-  const [send] = useSends(event)
+  const [message] = useMessage(event)
   // 发送文本
-  send(format(Text('Hello Word!')))
+  message.send(format(Text('Hello Word!')))
 })
 ```
 
@@ -24,7 +24,6 @@ export default onResponse(selects, event => {
 | 👉[@alemonjs/discord]  | [![discord-s]][discord-p]   | discord     |
 | 👉[@alemonjs/kook]     | [![kook-s]][kook-p]         | KOOK        |
 | 👉[@alemonjs/telegram] | [![telegram-s]][telegram-p] | telegram    |
-| 👉[@alemonjs/qq]       | [![qq-s]][qq-p]             | icqq        |
 | 👉[@alemonjs/onebot]   | [![onebot-s]][onebot-p]     | onebot      |
 | 👉[@alemonjs/wechat]   | [![wechat-s]][wechat-p]     | wechat      |
 
@@ -69,38 +68,6 @@ export default onResponse(selects, event => {
 [dev]: https://github.com/lemonade-lab/lvyjs
 [desktop]: https://github.com/lemonade-lab/alemonjs-desktop
 [web]: https://github.com/lemonade-lab/alemongo
-
-## 开放应用
-
-### recreation
-
-| 项目名            | 类型                    | 说明          |
-| ----------------- | ----------------------- | ------------- |
-| [alemonjs-cheese] | [![cheese-s]][cheese-p] | AI+今日运势等 |
-
-[alemonjs-cheese]: https://github.com/V2233/alemonjs-cheese
-[cheese-s]: https://img.shields.io/npm/v/alemonjs-cheese.svg
-[cheese-p]: https://www.npmjs.com/package/alemonjs-cheese
-
-### game
-
-| 项目名            | 类型                    | 说明         |
-| ----------------- | ----------------------- | ------------ |
-| [alemonjs-xianyu] | [![xianyu-s]][xianyu-p] | 扫雷等小游戏 |
-
-[alemonjs-xianyu]: https://gitee.com/suancaixianyu/xianyu-plugin/tree/alemonjs/
-[xianyu-s]: https://img.shields.io/npm/v/alemonjs-xianyu.svg
-[xianyu-p]: https://www.npmjs.com/package/alemonjs-xianyu
-
-### AI
-
-| 项目名            | 类型                    | 说明                   |
-| ----------------- | ----------------------- | ---------------------- |
-| [alemonjs-openai] | [![openai-s]][openai-p] | 连接符合 openAI 的模型 |
-
-[alemonjs-openai]: https://github.com/xiuxianjs/ollama
-[openai-s]: https://img.shields.io/npm/v/alemonjs-openai.svg
-[openai-p]: https://www.npmjs.com/package/alemonjs-openai
 
 ## 贡献
 

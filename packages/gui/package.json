@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/gui",
-  "version": "0.4.1",
+  "version": "2.1.0-alpha.5",
   "description": "可视化调试平台",
   "author": "lemonade",
   "license": "MIT",
@@ -20,12 +20,14 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.1",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-mount": "^4.0.5",
     "@types/koa-router": "^7.4.8",
     "@types/koa-static": "^4.0.4"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
   },
   "types": "lib",
   "exports": {

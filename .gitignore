@@ -7,7 +7,6 @@ logs
 log
 
 # file
-*.lock
 *.log.ts
 *.log
 *.logs

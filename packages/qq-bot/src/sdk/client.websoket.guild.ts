@@ -5,7 +5,6 @@ import { QQBotAPI } from './api.js'
 import { QQBotGuildEventMap } from './message.guild.js'
 import { Counter } from './counter.js'
 import { GuildOptions } from './websoket.guild.types.js'
-
 /**
  * 连接
  */
@@ -31,7 +30,7 @@ export class QQBotGuildClient extends QQBotAPI {
    *
    * @param opstion
    */
-  constructor(opstion: GuildOptions & { mode: string }) {
+  constructor(opstion: GuildOptions) {
     super()
     for (const key in opstion) {
       config.set(key, opstion[key])

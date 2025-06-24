@@ -4,11 +4,8 @@ import { config } from './config.js'
 import { getIntentsMask } from './intents.js'
 import { GroupOptions } from './websoket.group.types.js'
 import { Counter } from './counter.js'
-import { QQBotGroupEventMap } from './message.group.js'
 import { GuildOptions } from './websoket.guild.types.js'
-import { QQBotGuildEventMap } from './message.guild.js'
-
-type QQBotEventMap = QQBotGroupEventMap & QQBotGuildEventMap
+import { QQBotEventMap } from './message.js'
 
 /**
  * 连接

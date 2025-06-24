@@ -1,31 +1,71 @@
-import { join } from 'path'
-import { existsSync } from 'fs'
 import { getConfig, getConfigValue } from './core/config.js'
 import { loadChildren, loadChildrenFile } from './app/load.js'
-import { DefinePlatformValue } from './typings.js'
-import { getInputExportPath, showErrorModule } from './app/utils.js'
+import { getInputExportPath } from './core/utils.js'
 import { useState } from './post.js'
+import { join } from 'path'
+import { existsSync } from 'fs'
 import { ResultCode } from './core/code.js'
-import {
-  default_login,
-  default_platform_common_prefix,
-  default_platform_prefix,
-  file_prefix_common,
-  file_prefix_framework
-} from './core/variable.js'
+import { cbpServer } from './cbp/index.js'
+import { cbpClient } from './cbp/connect.js'
 
-const loadConfig = () => {
+const defaultPort = 17117
+
+const loadState = () => {
   const value = getConfigValue() ?? {}
-  // 注入配置。
   const state = value?.core?.state ?? []
   for (const name of state) {
     useState(name, false)
   }
 }
 
+const loadApps = () => {
+  const cfg = getConfig()
+  if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
+    Promise.all(
+      cfg.value.apps.map(async app => {
+        loadChildrenFile(app)
+      })
+    )
+  }
+}
+
+type ServerOptions = {
+  /**
+   * @description 服务器端口
+   */
+  port?: number
+}
+
+type ClientOptions = {
+  /**
+   * @description 连接到 CBP 服务器的 URL
+   */
+  url?: string
+}
+
+type StartOptions = ServerOptions &
+  ClientOptions & {
+    /**
+     * @description 入口文件路径
+     */
+    input?: string
+    /**
+     * @description 平台名称
+     */
+    platform?: string
+    /**
+     * @description 登录名
+     */
+    login?: string
+    /**
+     * @description 是否全量接收
+     */
+    is_full_receive?: boolean
+  }
+
 /**
- * 运行指定 main
- * @param input 入口地址
+ * @description 运行本地模块
+ * @param input
  * @returns
  */
 export const run = (input: string) => {
@@ -45,59 +85,66 @@ export const run = (input: string) => {
 }
 
 /**
- * 启动
- * @param input (可选)main入口地址，默认选择 package.json 中的 main
- * @param pm (可选)平台名称，默认@alemonjs/gui。
+ * @param input
  */
-export const start = async (input?: string, pm?: string) => {
-  const cfg = getConfig()
-  const platform$1 = pm ?? cfg.argv?.platform ?? cfg.value?.platform
-  const login$1 = platform$1 ? platform$1.replace(file_prefix_common, '') : null
-  const login = login$1 ?? cfg.argv?.login ?? cfg.value?.login ?? default_login
-  const prefix =
-    platform$1 && file_prefix_framework.test(platform$1)
-      ? default_platform_prefix
-      : default_platform_common_prefix
-  const platform = `${prefix}${login}`
-  // 启动机器人
-  try {
-    const bot: {
-      default: DefinePlatformValue
-    } = await import(platform)
-    if (!bot?.default) {
-      throw new Error('The platform is not default')
-    }
-    if (!bot?.default?._name) {
-      throw new Error('The platform name is not correct')
-    }
-    if (!bot?.default?.callback) {
-      throw new Error('The platform callback is not correct')
-    }
-    if (typeof bot?.default?.callback !== 'function') {
-      global.alemonjsBot = bot?.default.callback
-    } else {
-      // 挂在全局
-      global.alemonjsBot = await bot?.default.callback()
-    }
-    const login = typeof cfg.argv?.login == 'string' ? cfg.argv?.login : ''
-    // 新增环境变量
-    process.env.platform = alemonjsBot?.platform ?? login
-  } catch (e) {
-    showErrorModule(e)
+export const start = async (options: StartOptions | string = {}) => {
+  if (typeof options === 'string') {
+    // 如果是字符串，则认为是入口文件路径
+    options = { input: options }
   }
-
   // 注入配置。
-  loadConfig()
-
-  // module
-  if (cfg.value && cfg.value?.apps && Array.isArray(cfg.value.apps)) {
-    Promise.all(
-      cfg.value.apps.map(async app => {
-        loadChildrenFile(app)
-      })
-    )
+  loadState()
+  const cfg = getConfig()
+  const url = options?.url || cfg.argv?.url || cfg.value?.url
+  // 连接到 CBP 服务器
+  if (url) {
+    cbpClient(url)
+  } else {
+    // 创建 cbp 服务器
+    const port = options?.port || cfg.argv?.port || cfg.value?.port || defaultPort
+    // 设置环境变量
+    process.env.port = port
+    cbpServer(port, async () => {
+      console.log(`ws://127.0.0.1:${port}`)
+      const url = `ws://127.0.0.1:${port}`
+      const isFullReceive =
+        options?.is_full_receive || cfg.argv?.is_full_receive || cfg.value?.is_full_receive || true
+      cbpClient(url, { isFullReceive })
+      // 加载平台服务
+      const platform = options?.platform || cfg.argv?.platform || cfg.value?.platform
+      const login = options?.login || cfg.argv?.login || cfg.value?.login
+      // 不登录平台
+      if (!platform && !login) {
+        return
+      }
+      // 如果存在
+      if (platform) {
+        const reg = /^(@alemonjs\/|alemonjs-)/
+        if (reg.test(platform)) {
+          process.env.platform = platform
+          // 剪切
+          process.env.login = platform.replace(reg, '')
+        } else {
+          process.env.platform = platform
+          // 不是执行前缀。则platform 和 login 相同。
+          process.env.login = platform
+        }
+      } else {
+        // 如果没有指定平台，则使用登录名作为平台
+        process.env.platform = `@alemonjs/${login}`
+        process.env.login = login
+      }
+      // 设置了 login。强制指定
+      if (login) {
+        process.env.login = login
+      }
+      import(process.env.platform).then(res => res?.default())
+    })
   }
-
+  // 获取入口文件
+  const input = options.input || cfg.argv?.input || cfg.value?.input || getInputExportPath()
   // 运行本地模块
-  run(input ?? cfg.argv?.main ?? cfg.value?.main ?? getInputExportPath())
+  run(input)
+  // load module
+  loadApps()
 }

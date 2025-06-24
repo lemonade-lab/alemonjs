@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.5",
-  "description": "阿柠檬数据库连接",
+  "version": "0.0.9",
+  "description": "数据库连接",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

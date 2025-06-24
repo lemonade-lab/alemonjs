@@ -1,19 +1,17 @@
 import {
-  DefinePlatformFunc,
   DefineChildrenFunc,
-  OnMiddlewareFunc,
-  OnResponseFunc,
   OnResponseReversalFunc,
   OnMiddlewareReversalFunc,
   OnSelectsFunc,
   OnDataFormatFunc
 } from './typing/event'
-import { ClientAPI } from './typing/client'
 import { StoreChildrenApp } from './typing/store/res'
 import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
 import { LoggerUtils } from './typing/logger/index'
 import { ResponseState } from './typing/state'
 import { Core, Logger } from './app/store'
+import WebSocket, { Server } from 'ws'
+import { IncomingMessage } from 'http'
 
 declare global {
   /**
@@ -44,23 +42,15 @@ declare global {
     }
   }
   /**
-   * 客户端
+   * 聊天机器人
    */
-  var alemonjsBot: ClientAPI
-  /**
-   * 废弃，请使用 onResponse
-   * @deprecated
-   */
-  var OnResponse: OnResponseFunc
+  var chatbotServer: Server<typeof WebSocket, typeof IncomingMessage>
+  var chatbotPlatform: WebSocket
+  var chatbotClient: WebSocket
   /**
    * 定义响应体
    */
   var onResponse: OnResponseReversalFunc
-  /**
-   * 废弃,请使用 onMiddleware
-   * @deprecated
-   */
-  var OnMiddleware: OnMiddlewareFunc
   /**
    * 定义中间件
    */
@@ -70,15 +60,6 @@ declare global {
    */
   var defineChildren: DefineChildrenFunc
   /**
-   * 废弃，请使用 definePlatform
-   * @deprecated
-   */
-  var defineBot: DefinePlatformFunc
-  /**
-   * 定义一个平台
-   */
-  var definePlatform: DefinePlatformFunc
-  /**
    * 定义选择器
    */
   var onSelects: OnSelectsFunc
@@ -86,6 +67,14 @@ declare global {
    * 定义数据格式
    */
   var format: OnDataFormatFunc
+  namespace NodeJS {
+    interface ProcessEnv {
+      login?: string
+      platform?: string
+      port?: string
+      NODE_ENV?: 'development' | 'production'
+    }
+  }
 }
 
 // 初始化日志
