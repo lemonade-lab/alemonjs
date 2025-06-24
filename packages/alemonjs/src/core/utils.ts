@@ -53,8 +53,7 @@ export const createEventName = (url: string, appKey: string) => {
 
 /**
  * 将字符串转为数字
- * @param str
- * @returns
+ * @deprecated 已废弃
  */
 export const stringToNumber = (str: string, size = 33) => {
   let hash = 5381

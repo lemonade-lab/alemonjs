@@ -104,14 +104,15 @@ export default () => {
   // 获取配置
   const config = getGUIConfig()
   // 端口
-  const port = config?.port ?? 17127
+  const port = process?.env?.port ?? 17117
+  const serverPort = config.port || 17127
   // 创建服务器
-  const server = createServer(port)
+  const server = createServer(serverPort)
   // 创建 WebSocketServer 并监听同一个端口
   const wss = new WebSocketServer({ server: server })
   // 客户端
   let client: WebSocket | null = null
-  const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
+  const url = `ws://127.0.0.1:${port}`
   const cbp = cbpPlatform(url)
 
   /**

@@ -161,6 +161,13 @@ export const sendchannel = async (
             } else if (line.type === 'MD.title') {
               // 标题
               contentMd += `# ${line.value}\n`
+            } else if (line.type === 'MD.code') {
+              // 代码块
+              const language = line?.options?.language || ''
+              contentMd += `\`\`\`${language}\n${line.value}\n\`\`\`\n`
+            } else {
+              const value = line['value'] || ''
+              contentMd += String(value)
             }
           })
         }
