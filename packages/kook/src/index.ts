@@ -1,7 +1,6 @@
 import {
   PrivateEventMessageCreate,
   PublicEventMessageCreate,
-  getConfigValue,
   User,
   DataEnums,
   cbpPlatform,
@@ -10,17 +9,20 @@ import {
 } from 'alemonjs'
 import { KOOKClient } from './sdk/index'
 import { readFileSync } from 'fs'
-import { getMaster } from './config.js'
+import { getKOOKConfig, getMaster } from './config.js'
 import { getBufferByURL } from 'alemonjs/utils'
-export const platform = 'kook'
+import { platform } from './config.js'
 
 export * from './hook.js'
+
+export { platform } from './config.js'
+
 export { KOOKAPI as API } from './sdk/api.js'
 
+export { type Options } from './config.js'
+
 export default () => {
-  let value = getConfigValue()
-  if (!value) value = {}
-  const config = value[platform]
+  const config = getKOOKConfig()
 
   // 创建客户端
   const client = new KOOKClient({
@@ -30,7 +32,8 @@ export default () => {
   // 连接
   client.connect()
 
-  const url = `ws://127.0.0.1:${process.env?.port || config?.port || 17117}`
+  const port = process.env?.port || 17117
+  const url = `ws://127.0.0.1:${port}`
   const cbp = cbpPlatform(url)
 
   client.on('MESSAGES_DIRECT', async event => {

@@ -1,8 +1,8 @@
 {
-  "name": "alemonjs-template",
+  "name": "alemonjs-docs",
   "version": "2.0.0",
-  "description": "",
-  "author": "",
+  "description": "alemonjs",
+  "author": "lemonade",
   "license": "MIT",
   "main": "lib/index.js",
   "type": "module",

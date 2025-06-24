@@ -88,6 +88,14 @@ export type DataMarkdownNewline = {
   value: boolean
 }
 
+export type DataMarkdownCode = {
+  type: 'MD.code'
+  value: string
+  options?: {
+    language?: string // 代码语言
+  }
+}
+
 type DataMarkDownBalue =
   | DataMarkdownText
   | DataMarkdownTitle
@@ -99,10 +107,10 @@ type DataMarkDownBalue =
   | DataMarkdownLink
   | DataMarkdownImage
   | DataMarkdownList
-  | DataMarkdownListItem
   | DataMarkdownBlockquote
   | DataMarkdownDivider
   | DataMarkdownNewline
+  | DataMarkdownCode
 
 export type DataMarkDown = {
   type: 'Markdown'

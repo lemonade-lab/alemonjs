@@ -30,7 +30,8 @@ import {
   DataMarkdownNewline,
   DataLink,
   DataMarkdownText,
-  DataButtonTemplate
+  DataButtonTemplate,
+  DataMarkdownCode
 } from '../typings'
 
 /**
@@ -427,6 +428,17 @@ MD.newline = (value: boolean = false): DataMarkdownNewline => {
   return {
     type: 'MD.newline',
     value: value
+  }
+}
+
+MD.code = (
+  value: DataMarkdownCode['value'],
+  options?: DataMarkdownCode['options']
+): DataMarkdownCode => {
+  return {
+    type: 'MD.code',
+    value: value,
+    options: options
   }
 }
 

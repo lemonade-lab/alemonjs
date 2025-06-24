@@ -12,7 +12,7 @@ import { sendchannel, senduser } from './send'
 import { DCClient } from './sdk/wss'
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE'
 import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from 'alemonjs'
-import { getDiscordConfig, getMaster, platform } from './config'
+import { getMaster, platform } from './config'
 
 // pf
 export { platform } from './config'
@@ -23,10 +23,11 @@ export { DCAPI as API } from './sdk/api'
 // hook
 export * from './hook'
 
+export { type Options } from './config'
+
 // main
 export default () => {
-  const value = getDiscordConfig()
-  const port = process.env?.port || value?.port || 17117
+  const port = process.env?.port || 17117
   /**
    * 连接 alemonjs 服务器。
    * 向 alemonjs 推送标准信息
