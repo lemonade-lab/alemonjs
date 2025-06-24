@@ -10,6 +10,9 @@
   "scripts": {
     "build": "node bundle.js"
   },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
+  },
   "exports": {
     ".": {
       "import": "./lib/index.js",

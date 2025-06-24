@@ -37,7 +37,6 @@
     "flatted": "^3.3.3"
   },
   "devDependencies": {
-    "tsx": "^4.19.1",
     "@types/uuid": "^10.0.0",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",

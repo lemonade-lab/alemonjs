@@ -15,6 +15,9 @@
     "grammy": "^1.30.0",
     "node-telegram-bot-api": "^0.66.0"
   },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
+  },
   "exports": {
     ".": {
       "import": "./lib/index.js",

@@ -23,6 +23,9 @@
   "dependencies": {
     "ws": "^8.18.1"
   },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
+  },
   "alemonjs": {
     "desktop": {
       "platform": [

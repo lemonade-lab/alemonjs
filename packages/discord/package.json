@@ -21,6 +21,9 @@
   "devDependencies": {
     "@types/qrcode": "^1.5.5"
   },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
+  },
   "alemonjs": {
     "desktop": {
       "platform": [

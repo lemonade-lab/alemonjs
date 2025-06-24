@@ -18,6 +18,9 @@
     "./package": "./package.json",
     "./desktop": "./lib/desktop.js"
   },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
+  },
   "alemonjs": {
     "desktop": {
       "platform": [
