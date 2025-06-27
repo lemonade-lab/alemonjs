@@ -11,7 +11,10 @@
     "build": "npx lvy build"
   },
   "devDependencies": {
-    "@types/node": "^18",
+    "alemonjs": "^2.1.0-alpha.17",
+    "@alemonjs/gui": "^2.1.0-alpha.5",
+    "@types/node": "^22",
+    "jsxp": "1.2.2",
     "lvyjs": "^0.2.20"
   }
 }
