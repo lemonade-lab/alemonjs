@@ -1,4 +1,4 @@
-import { Text, useMessage, useSubscribe } from 'alemonjs'
+import { Text, useMessage, useObserver, useSubscribe } from 'alemonjs'
 export const regular = /^(#|\/)?login$/
 export const selects = onSelects(['message.create', 'private.message.create'])
 export default onResponse(selects, event => {

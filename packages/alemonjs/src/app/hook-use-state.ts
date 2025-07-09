@@ -62,7 +62,7 @@ export const useState = <T extends string>(
     }
     cfg.saveValue(cfg.value)
   }
-  return [state.value, setValue]
+  return [state.value, setValue] as const
 }
 
 /**

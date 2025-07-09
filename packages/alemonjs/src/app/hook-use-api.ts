@@ -118,7 +118,7 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
       return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data)
     }
   }
-  return [mention]
+  return [mention] as const
 }
 
 /**
@@ -398,5 +398,5 @@ export const useClient = <T extends object>(event: any, _ApiClass: new (...args:
       }
     }
   })
-  return [client]
+  return [client] as const
 }

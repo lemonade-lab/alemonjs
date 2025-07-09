@@ -138,7 +138,7 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
     cancel
   }
 
-  return [subscribe]
+  return [subscribe] as const
 }
 
 /**
@@ -150,6 +150,6 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
  * @deprecated
  */
 export const useObserver = <T extends EventKeys>(event: Events[T], selects: T | T[]) => {
-  const [sub] = useSubscribe(event, selects)
-  return [sub.mount, sub.cancel]
+  const [subscribe] = useSubscribe(event, selects)
+  return [subscribe.mount, subscribe.cancel] as const
 }

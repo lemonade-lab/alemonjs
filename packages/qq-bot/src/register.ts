@@ -4,6 +4,8 @@ import {
   DataEnums,
   PrivateEventInteractionCreate,
   PrivateEventMessageCreate,
+  PublicEventGuildExit,
+  PublicEventGuildJoin,
   PublicEventInteractionCreate,
   PublicEventMessageCreate,
   ResultCode
@@ -41,6 +43,50 @@ export const register = (client: QQBotClients) => {
   const createUserAvatarURL = (author_id: string) => {
     return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/640`
   }
+
+  client.on('GROUP_ADD_ROBOT', async event => {
+    // 机器人加入群组
+    const e: PublicEventGuildJoin = {
+      name: 'guild.join',
+      Platform: platform,
+      GuildId: event.group_openid,
+      ChannelId: event.group_openid,
+      SpaceId: `GROUP:${event.group_openid}`,
+      UserId: event.op_member_openid,
+      UserKey: event.op_member_openid,
+      UserAvatar: createUserAvatarURL(event.op_member_openid),
+      IsMaster: false,
+      IsBot: false,
+      OpenId: `C2C:${event.op_member_openid}`,
+      MessageId: '',
+      CreateAt: Date.now(),
+      tag: 'GROUP_DEL_ROBOT',
+      value: event
+    }
+    cbp.send(e)
+  })
+
+  client.on('GROUP_DEL_ROBOT', async event => {
+    // 机器人离开群组
+    const e: PublicEventGuildExit = {
+      name: 'guild.exit',
+      Platform: platform,
+      GuildId: event.group_openid,
+      ChannelId: event.group_openid,
+      SpaceId: `GROUP:${event.group_openid}`,
+      UserId: event.op_member_openid,
+      UserKey: event.op_member_openid,
+      UserAvatar: createUserAvatarURL(event.op_member_openid),
+      IsMaster: false,
+      IsBot: false,
+      OpenId: `C2C:${event.op_member_openid}`,
+      MessageId: '',
+      CreateAt: Date.now(),
+      tag: 'GROUP_DEL_ROBOT',
+      value: event
+    }
+    cbp.send(e)
+  })
 
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', async event => {
