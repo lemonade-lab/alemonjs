@@ -36,6 +36,16 @@ export const format: OnDataFormatFunc = (...data) => {
 global.format = format
 
 /**
+ * 创建数据格式。
+ * @param {...DataEnums[]} data - 要格式化的数据。
+ * @returns {DataEnums[]} - 返回格式化后的数据数组。
+ * @throws {Error} - 如果 data 无效，抛出错误。
+ * 废弃，请使用 format
+ * @deprecated
+ */
+export const createDataFormat = format
+
+/**
  * 向指定频道发送消息。
  * @param {string} SpaceId - 空间ID，可能是服务器ID、频道ID、群ID、聊天ID，或者是复合ID。总之，是框架给指定空间的唯一标识。也就是说，不能使用ChannelId作为该参数。
  * @param {DataEnums[]} data - 要发送的数据。

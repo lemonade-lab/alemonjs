@@ -334,6 +334,7 @@ export const useSend = <T extends EventKeys>(event: Events[T]) => {
 
 /**
  * 废弃，请使用 useMessage
+ * @deprecated
  * @param event
  * @returns
  */
@@ -371,6 +372,8 @@ global.onSelects = onSelects
 /**
  * 废弃,请使用onSelects
  * @deprecated
+ * @param values
+ * @returns
  */
 export const createSelects = onSelects
 

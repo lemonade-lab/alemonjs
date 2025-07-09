@@ -43,6 +43,15 @@ export type OnResponseReversalFunc = <T extends EventKeys, C extends Current<T> 
 ) => OnResponseValue<C, T>
 
 /**
+ * 废弃
+ * @deprecated
+ */
+export type OnResponseReversalFuncBack = <T extends EventKeys, C extends Current<T> | Current<T>[]>(
+  callback: C,
+  select: T | T[]
+) => OnResponseValue<C, T>
+
+/**
  * 定义一个中间件
  */
 export type OnMiddlewareFunc = <T extends EventKeys, C extends Current<T> | Current<T>[]>(
@@ -56,6 +65,18 @@ export type OnMiddlewareFunc = <T extends EventKeys, C extends Current<T> | Curr
 export type OnMiddlewareReversalFunc = <T extends EventKeys, C extends Current<T> | Current<T>[]>(
   select: T | T[],
   callback: C
+) => OnMiddlewareValue<C, T>
+
+/**
+ * 废弃
+ * @deprecated
+ */
+export type OnMiddlewareReversalFuncBack = <
+  T extends EventKeys,
+  C extends Current<T> | Current<T>[]
+>(
+  callback: C,
+  select: T | T[]
 ) => OnMiddlewareValue<C, T>
 
 /**

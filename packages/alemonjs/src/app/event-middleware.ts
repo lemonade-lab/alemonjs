@@ -3,7 +3,7 @@
  * @module middleware
  * @author ningmengchongshui
  */
-import { OnMiddlewareReversalFunc } from '../typings'
+import { OnMiddlewareReversalFunc, OnMiddlewareReversalFuncBack } from '../typings'
 import { ResultCode } from '../core/code'
 /**
  * 中间件
@@ -34,3 +34,14 @@ export const onMiddleware: OnMiddlewareReversalFunc = (select, callback) => {
   throw new Error('Invalid select: select must be a string or object')
 }
 global.onMiddleware = onMiddleware
+
+/**
+ * 废弃，请使用 onMiddleware
+ * @deprecated
+ * @param select
+ * @param callback
+ * @returns
+ */
+export const OnMiddleware: OnMiddlewareReversalFuncBack = (select, callback) => {
+  return onMiddleware(callback, select)
+}

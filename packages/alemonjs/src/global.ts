@@ -3,7 +3,8 @@ import {
   OnResponseReversalFunc,
   OnMiddlewareReversalFunc,
   OnSelectsFunc,
-  OnDataFormatFunc
+  OnDataFormatFunc,
+  OnResponseReversalFuncBack
 } from './typing/event'
 import { StoreChildrenApp } from './typing/store/res'
 import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
@@ -51,6 +52,11 @@ declare global {
    * 定义响应体
    */
   var onResponse: OnResponseReversalFunc
+  /**
+   * 废弃，请使用 onResponse
+   * @deprecated
+   */
+  var OnResponse: OnResponseReversalFuncBack
   /**
    * 定义中间件
    */

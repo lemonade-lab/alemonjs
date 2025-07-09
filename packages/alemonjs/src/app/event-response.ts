@@ -1,4 +1,4 @@
-import { OnResponseReversalFunc } from '../typings'
+import { OnResponseReversalFunc, OnResponseReversalFuncBack } from '../typings'
 
 /**
  * 处理响应事件
@@ -11,3 +11,16 @@ export const onResponse: OnResponseReversalFunc = (select, callback) => {
 }
 
 global.onResponse = onResponse
+
+/**
+ * 废弃，请使用 onResponse
+ * @deprecated
+ * @param callback
+ * @param select
+ * @returns
+ */
+export const OnResponse: OnResponseReversalFuncBack = (callback, select) => {
+  return onResponse(select, callback)
+}
+
+global.OnResponse = OnResponse

@@ -140,3 +140,16 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
 
   return [subscribe]
 }
+
+/**
+ * 使用观察者模式订阅事件
+ * @param event
+ * @param selects
+ * @returns
+ * 废弃，请使用 useSubscribe
+ * @deprecated
+ */
+export const useObserver = <T extends EventKeys>(event: Events[T], selects: T | T[]) => {
+  const [sub] = useSubscribe(event, selects)
+  return [sub.mount, sub.cancel]
+}
