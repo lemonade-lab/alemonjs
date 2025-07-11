@@ -2,7 +2,7 @@ import axios, { type AxiosRequestConfig } from 'axios'
 import { ApiRequestData, FileType } from './typing.js'
 import { config } from './config.js'
 import FormData from 'form-data'
-import { createPicFrom } from './from'
+import { createPicFrom } from 'alemonjs/utils'
 
 export const BOTS_API_RUL = 'https://bots.qq.com'
 export const API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com'
@@ -316,7 +316,7 @@ export class QQBotAPI {
       }
     }
     if (image) {
-      const from = await createPicFrom(image)
+      const from = await createPicFrom({ image })
       if (from) {
         const { picData, name } = from
         formdata.append('file_image', picData, name)
@@ -360,7 +360,7 @@ export class QQBotAPI {
       }
     }
     if (image) {
-      const from = await createPicFrom(image)
+      const from = await createPicFrom({ image })
       if (from) {
         const { picData, name } = from
         formdata.append('file_image', picData, name)

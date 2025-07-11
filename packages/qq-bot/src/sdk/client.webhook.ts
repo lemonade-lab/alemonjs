@@ -7,7 +7,7 @@ import Koa from 'koa'
 import { config } from './config.js'
 import { v4 as uuidv4 } from 'uuid'
 import { WebSocket, WebSocketServer } from 'ws'
-import { Options } from './typing.js'
+import { Options } from '../config.js'
 
 type Data = {
   op: number

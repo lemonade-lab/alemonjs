@@ -2,10 +2,9 @@ import WebSocket from 'ws'
 import { QQBotAPI } from './api.js'
 import { config } from './config.js'
 import { getIntentsMask } from './intents.js'
-import { GroupOptions } from './websoket.group.types.js'
-import { Counter } from './counter.js'
-import { GuildOptions } from './websoket.guild.types.js'
+import { Counter } from 'alemonjs/utils'
 import { QQBotEventMap } from './message.js'
+import { Options } from './typing.js'
 
 /**
  * 连接
@@ -30,7 +29,7 @@ export class QQBotClients extends QQBotAPI {
    * 设置配置
    * @param opstion
    */
-  constructor(opstion: GroupOptions & GuildOptions & { mode: string }) {
+  constructor(opstion: Options) {
     super()
     for (const key in opstion) {
       config.set(key, opstion[key])
@@ -118,7 +117,7 @@ export class QQBotClients extends QQBotAPI {
 
     // 重新连接的逻辑
     const reconnect = async () => {
-      if (this.#counter.get() >= 5) {
+      if (this.#counter.value >= 5) {
         console.info('The maximum number of reconnections has been reached, cancel reconnection')
         return
       }
@@ -127,7 +126,7 @@ export class QQBotClients extends QQBotAPI {
         // 重新starrt
         start()
         // 记录
-        this.#counter.getNextId()
+        this.#counter.next()
       }, 5000)
     }
 

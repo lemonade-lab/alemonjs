@@ -1,3 +1,5 @@
+import { IntentsEnum } from './intents'
+
 //  0 文本  1 图文 2 md 3 ark 4 embed 7 图片
 export type MessageType = 0 | 1 | 2 | 3 | 4 | 7
 //    1 图文 2 视频 3 语言 4 文件
@@ -74,11 +76,55 @@ export interface ApiRequestData {
 }
 
 export interface Options {
-  secret: string
+  /**
+   * 应用编号
+   */
   app_id: string
+  /**
+   * 钥匙
+   */
   token: string
+  /**
+   * 密钥
+   */
+  secret: string
+  /**
+   * 分片
+   * [0, 1]
+   */
+  shard?: number[]
+  /**
+   * 事件订阅
+   */
+  intents?: IntentsEnum[]
+  /**
+   * 是否是私域
+   * false
+   */
+  is_private?: boolean
+  /**
+   * 是否是沙盒环境
+   * false
+   */
   sandbox?: boolean
+  /**
+   *
+   */
+  mode?: 'guild' | 'group' | ''
+  /**
+   * 路由
+   */
   route?: string
+  /**
+   * 端口
+   */
   port?: string
+  /**
+   * WebSocket 地址
+   */
   ws?: string
+  /**
+   * WebSocket 网关地址
+   */
+  gatewayURL?: string
 }
