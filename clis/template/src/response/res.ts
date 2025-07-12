@@ -22,6 +22,7 @@ const helpResponse = onResponse(selects, (event, _next) => {
 const tipResponse = onResponse(selects, (event, _next) => {
   const [message] = useMessage(event)
   message.send(format(Text('💡 小提示：你可以尝试输入其他指令来体验更多功能！')))
+  return true // 修复：保持与其他响应相同的返回类型
 })
 
 // 👇 演示：故意使用错误的selects，TypeScript会显示类型错误
@@ -30,9 +31,13 @@ const wrongResponse = onResponse(['channal.create'], (event, _next) => {
   message.send(format(Text('这个响应使用了错误的selects')))
 })
 
-export default onGroup(
+const group = onGroup(
   greetingResponse,
   helpResponse,
   tipResponse
   // wrongResponse
 )
+
+console.log('响应组已创建:', group)
+
+export default group
