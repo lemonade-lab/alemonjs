@@ -4,7 +4,8 @@ import {
   OnMiddlewareReversalFunc,
   OnSelectsFunc,
   OnDataFormatFunc,
-  OnResponseReversalFuncBack
+  OnResponseReversalFuncBack,
+  OnGroupFunc
 } from './typing/event'
 import { StoreChildrenApp } from './typing/store/res'
 import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
@@ -73,6 +74,10 @@ declare global {
    * 定义数据格式
    */
   var format: OnDataFormatFunc
+  /**
+   * 定义一组标准执行
+   */
+  var onGroup: OnGroupFunc
   namespace NodeJS {
     interface ProcessEnv {
       login?: string

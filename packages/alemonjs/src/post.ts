@@ -1,4 +1,5 @@
 export * from './app/define-chidren.js'
+export * from './app/event-group.js'
 export * from './app/event-middleware'
 export * from './app/event-processor'
 export * from './app/event-response.js'

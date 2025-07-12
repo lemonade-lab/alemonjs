@@ -132,3 +132,11 @@ export type OnSelectsFunc = <T extends EventKeys[] | EventKeys>(values: T) => T
  * 定义数据格式
  */
 export type OnDataFormatFunc = (...data: DataEnums[]) => DataEnums[]
+
+export type OnGroupItem<C = any, T extends EventKeys = EventKeys> =
+  | OnResponseValue<C, T>
+  | OnMiddlewareValue<C, T>
+
+export type OnGroupFunc = <C, T extends EventKeys, TFirst extends OnGroupItem<C, T>>(
+  ...calls: [TFirst, ...Array<TFirst>]
+) => TFirst
