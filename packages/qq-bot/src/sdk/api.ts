@@ -164,36 +164,12 @@ export class QQBotAPI {
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk
    */
-  async postRichMediaByUsers(
+  async postRichMediaByUser(
     openid: string,
     data: {
       srv_send_msg?: boolean
       file_type: FileType
       url?: string
-      file_data?: any
-    }
-  ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
-    return this.groupService({
-      url: `/v2/users/${openid}/files`,
-      method: 'post',
-      data: data
-    }).then(res => res?.data)
-  }
-
-  /**
-   * 发送私聊富媒体文件
-   * @param openid
-   * @param data
-   * @returns
-   *  1 图文 2 视频 3 语言 4 文件
-   * 图片：png/jpg，视频：mp4，语音：silk
-   */
-  async userFiles(
-    openid: string,
-    data: {
-      srv_send_msg: boolean
-      file_type: FileType
-      url: string
       file_data?: any
     }
   ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
@@ -206,38 +182,13 @@ export class QQBotAPI {
 
   /**
    * 发送群里文件
-   * @param openid GuildID / UserId
+   * @param openid
    * @param data
    * @returns
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk
    */
-  async postRichMediaById(
-    openid: string,
-    data: {
-      srv_send_msg?: boolean
-      file_type: FileType
-      url?: string
-      file_data?: any
-    }
-  ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
-    return this.groupService({
-      url: `/v2/groups/${openid}/files`,
-      method: 'post',
-      data: {
-        srv_send_msg: false,
-        ...data
-      }
-    }).then(res => res?.data)
-  }
-
-  /**
-   *
-   * @param openid
-   * @param data
-   * @returns
-   */
-  async groupsFiles(
+  async postRichMediaByGroup(
     openid: string,
     data: {
       srv_send_msg?: boolean

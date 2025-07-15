@@ -297,7 +297,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (
           const getFileBase64 = (): string => readFileSync(item.value, 'base64')
           const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value
           const file_info = await client
-            .postRichMediaById(event.ChannelId, {
+            .postRichMediaByGroup(event.ChannelId, {
               file_type: 1,
               file_data: file_data
             })
@@ -466,7 +466,7 @@ export const C2C_MESSAGE_CREATE = async (
           const getFileBase64 = (): string => readFileSync(item.value, 'base64')
           const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value
           const file_info = await client
-            .postRichMediaById(event.UserId, {
+            .postRichMediaByUser(event.UserId, {
               file_type: 1,
               file_data: file_data
             })
