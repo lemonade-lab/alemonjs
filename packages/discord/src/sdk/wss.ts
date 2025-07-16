@@ -4,6 +4,7 @@ import { getIntents } from './intents.js'
 import { DCEventMap } from './message.js'
 import { getDiscordConfig } from '../config.js'
 import { HttpsProxyAgent } from 'https-proxy-agent'
+import { AvailableIntentsEventsEnum } from './types.js'
 export class DCClient extends DCAPI {
   #heartbeat_interval = 0
 
@@ -29,7 +30,7 @@ export class DCClient extends DCAPI {
   #aut() {
     const value = getDiscordConfig()
     const token = value.token
-    const intent = value.intent || []
+    const intent = value.intent || AvailableIntentsEventsEnum
     const shard = value.shard || [0, 1]
     return {
       op: 2,
