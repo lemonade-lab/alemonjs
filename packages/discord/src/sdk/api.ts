@@ -1,41 +1,11 @@
 import FormData from 'form-data'
 import axios from 'axios'
 import { type AxiosRequestConfig } from 'axios'
-import { existsSync, createReadStream } from 'fs'
-import { Readable, isReadable } from 'stream'
-import { basename } from 'path'
-import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
+import { Readable } from 'stream'
 import { MessageData } from './typings.js'
 import { getDiscordConfig } from '../config.js'
-
-/**
- * 创建form
- * @param image
- * @param name
- * @returns
- */
-async function createPicFrom(image: string | Buffer | Readable, name = 'image.jpg') {
-  let picData: Readable | Buffer[]
-  // 是 string
-  if (typeof image === 'string') {
-    if (!existsSync(image)) return false
-    if (!name) name = basename(image)
-    picData = createReadStream(image)
-    // 是 buffer
-  } else if (Buffer.isBuffer(image)) {
-    if (!name) name = 'file.' + (await fileTypeFromBuffer(image)).ext
-    picData = new Readable()
-    picData.push(image)
-    picData.push(null)
-    // 是 文件流
-  } else if (isReadable(image)) {
-    if (!name) name = 'file.' + (await fileTypeFromStream(image as any)).ext
-    picData = image
-  } else {
-    return false
-  }
-  return { picData, image, name }
-}
+import { HttpsProxyAgent } from 'https-proxy-agent'
+import { createPicFrom } from './createPicFrom.js'
 
 export const API_URL = 'https://discord.com/api/v10'
 export const CDB_URL = 'https://cdn.discordapp.com'
@@ -52,7 +22,12 @@ export class DCAPI {
   request(options: AxiosRequestConfig) {
     const value = getDiscordConfig()
     const token = value.token
+    const requestConfig = value.request_config || {}
+    if (value.request_proxy) {
+      requestConfig.httpsAgent = new HttpsProxyAgent(value.request_proxy)
+    }
     const service = axios.create({
+      ...requestConfig,
       baseURL: API_URL,
       timeout: 6000,
       headers: {
@@ -69,17 +44,10 @@ export class DCAPI {
    * @returns
    */
   requestCDN(options: AxiosRequestConfig) {
-    const value = getDiscordConfig()
-    const token = value.token
-    const service = axios.create({
+    return this.request({
       baseURL: CDB_URL,
-      timeout: 6000,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bot ${token}`
-      }
+      ...options
     })
-    return service(options)
   }
 
   /**

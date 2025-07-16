@@ -28,6 +28,16 @@ discord:
   # 使用 user_id
   master_id:
      - 'yyy'
+  # 请求代理（推荐使用）配置参考 axios
+  request_config:
+    proxy:
+      protocol: 'http'
+      host: 'localhost'
+      port: 7890
+  # ws 代理
+  websocket_proxy: 'http://localhost:7890'
+  # request_proxy: 'http://localhost:7890'
+
 ```
 
 ```sh

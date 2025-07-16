@@ -3,7 +3,7 @@ import { DCAPI } from './api.js'
 import { getIntents } from './intents.js'
 import { DCEventMap } from './message.js'
 import { getDiscordConfig } from '../config.js'
-
+import { HttpsProxyAgent } from 'https-proxy-agent'
 export class DCClient extends DCAPI {
   #heartbeat_interval = 0
 
@@ -173,7 +173,12 @@ export class DCClient extends DCAPI {
       }
     }
 
-    this.#ws = new WebSocket(`${url}?v=10&encoding=json`)
+    const ClientOptions = value.websocket_options || {}
+    if (value.websocket_proxy) {
+      ClientOptions.agent = new HttpsProxyAgent(value.websocket_proxy)
+    }
+
+    this.#ws = new WebSocket(`${url}?v=10&encoding=json`, ClientOptions)
 
     this.#ws.on('open', async () => {
       console.info('[ws] open')
