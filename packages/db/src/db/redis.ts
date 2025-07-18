@@ -5,7 +5,7 @@
  * @author ningmengchongshui
  */
 import redisClient, { Redis as RedisClient, RedisOptions } from 'ioredis'
-import { getConfigValue } from 'alemonjs'
+import { getRedisConfig } from '../config'
 
 type Config = {
   host?: string
@@ -20,14 +20,19 @@ type Config = {
  */
 export const getIoRedis = (config: Config & RedisOptions = {}): RedisClient => {
   if (global.ioRedis) return global.ioRedis
-  const value = getConfigValue() || {}
-  const redis = value?.redis || {}
+  const redis = getRedisConfig()
   const { host, port, password, db, ...options } = config
+  const baseConfig = {
+    host: '127.0.1',
+    port: 6379,
+    password: '',
+    db: 0
+  }
   const connectConfig = {
-    host: host || redis?.host || '127.0.0.1',
-    port: port || redis?.port || 6379,
-    password: password || redis?.password || '',
-    db: db || redis?.db || 0
+    host: host || redis?.host || baseConfig.host,
+    port: port || redis?.port || baseConfig.port,
+    password: password || redis?.password || baseConfig.password,
+    db: db || redis?.db || baseConfig.db
   }
   global.ioRedis = new redisClient({
     host: connectConfig.host,
