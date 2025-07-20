@@ -181,7 +181,7 @@ export const sendchannel = async (
         // 构造成按钮
         components = createButtonsData(rows)
       })
-      const res = await client.channelsMessagesForm(channel_id, {
+      const res = await client.channelsMessages(channel_id, {
         content: contentMd || content,
         components: components
       })

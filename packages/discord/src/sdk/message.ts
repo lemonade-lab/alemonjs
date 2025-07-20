@@ -138,7 +138,5 @@ export type DCEventMap = {
 
   // 其他通用事件
   READY: READY_TYPE
-  ERROR: any
   INTERACTION_CREATE: INTERACTION_CREATE_TYPE
-  RESUMED: any
 }

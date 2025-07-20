@@ -6,10 +6,8 @@ import { MessageData } from './typings.js'
 import { getDiscordConfig } from '../config.js'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import { createPicFrom } from './createPicFrom.js'
-
 export const API_URL = 'https://discord.com/api/v10'
-export const CDB_URL = 'https://cdn.discordapp.com'
-
+export const CDN_URL = 'https://cdn.discordapp.com'
 /**
  * api接口
  */
@@ -19,7 +17,7 @@ export class DCAPI {
    * @param opstion
    * @returns
    */
-  request(options: AxiosRequestConfig) {
+  request(options: AxiosRequestConfig): Promise<any> {
     const value = getDiscordConfig()
     const token = value.token
     const requestConfig = value.request_config || {}
@@ -35,7 +33,30 @@ export class DCAPI {
         'Authorization': `Bot ${token}`
       }
     })
-    return service(options)
+    return new Promise((resolve, reject) => {
+      service(options)
+        .then(res => resolve(res?.data || {}))
+        .catch(err => {
+          logger.error(err)
+          // 错误时的请求头
+          logger.error('[axios] error', {
+            config: {
+              // headers: err?.config?.headers,
+              // 如果存在 token 要隐藏调。
+              headers: {
+                ...err?.config?.headers,
+                Authorization: `Bot ${value.token ? '******' : value.token}`
+              },
+              params: err?.config?.params,
+              data: err?.config?.data
+            },
+            response: err?.response,
+            message: err?.message
+          })
+          // 丢出错误中携带的响应数据
+          reject(err?.response?.data)
+        })
+    })
   }
 
   /**
@@ -45,7 +66,7 @@ export class DCAPI {
    */
   requestCDN(options: AxiosRequestConfig) {
     return this.request({
-      baseURL: CDB_URL,
+      baseURL: CDN_URL,
       ...options
     })
   }
@@ -57,7 +78,7 @@ export class DCAPI {
    * @returns
    */
   userAvatar(user_id: string, avatar_hash: string) {
-    return `${CDB_URL}/avatars/${user_id}/${avatar_hash}.png`
+    return `${CDN_URL}/avatars/${user_id}/${avatar_hash}.png`
   }
 
   /**
@@ -71,7 +92,7 @@ export class DCAPI {
     return this.requestCDN({
       url: url,
       method: 'get'
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -106,7 +127,22 @@ export class DCAPI {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    }).then(res => res.data)
+    })
+  }
+
+  /**
+   *
+   * @param channel_id
+   * @param data
+   * @param headers
+   * @returns
+   */
+  async channelsMessages(channel_id: string, data: MessageData = {}) {
+    return this.request({
+      method: 'post',
+      url: `channels/${channel_id}/messages`,
+      data: data
+    })
   }
 
   /**
@@ -162,7 +198,7 @@ export class DCAPI {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -178,7 +214,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/applications/${application_id}/role-connections/metadata`
-    }).then(res => res?.data)
+    })
   }
   /**
    *
@@ -188,7 +224,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/applications/${application_id}/role-connections/metadata`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -206,7 +242,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/users/@me`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -218,7 +254,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/users/${user_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -238,7 +274,7 @@ export class DCAPI {
       method: 'get',
       url: `/users/@me/guilds`,
       params
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -249,7 +285,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/users/@me/guilds/${guild_id}/member`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -260,7 +296,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/member`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -271,7 +307,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/users/@me/guilds/${guild_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -285,7 +321,7 @@ export class DCAPI {
       data: {
         recipient_id
       }
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -303,7 +339,7 @@ export class DCAPI {
     return this.request({
       method: 'GET',
       url: `/applications/@me`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -315,7 +351,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/applications/@me`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -327,7 +363,7 @@ export class DCAPI {
     return this.request({
       method: 'GET',
       url: `/users/@me/connections`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -338,7 +374,7 @@ export class DCAPI {
     return this.request({
       method: 'GET',
       url: `/users/@me/applications/${application_id}/role-connection`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -349,7 +385,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/users/@me/applications/${application_id}/role-connection`
-    }).then(res => res?.data)
+    })
   }
   /**
    * **********
@@ -366,7 +402,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -377,7 +413,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -388,7 +424,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/preview`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -399,7 +435,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -411,7 +447,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -422,7 +458,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/threads/active`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -433,7 +469,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -444,7 +480,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -455,7 +491,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members/search`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -466,7 +502,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -478,7 +514,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/${user_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -490,7 +526,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -501,7 +537,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -512,7 +548,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/roles`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -523,7 +559,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/roles`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -534,7 +570,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -545,7 +581,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles/${role_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -556,7 +592,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -567,7 +603,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -578,7 +614,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/roles/${role_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -589,7 +625,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -600,7 +636,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/bans`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -611,7 +647,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -623,7 +659,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/bans/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -634,7 +670,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -645,7 +681,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/mfa`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -656,7 +692,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/prune`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -667,7 +703,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/prune`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -678,7 +714,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/invites`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -689,7 +725,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/integrations`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -700,7 +736,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/${integration_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -711,7 +747,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -722,7 +758,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/widget`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -733,7 +769,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.json`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -744,7 +780,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/vanity-url`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -755,7 +791,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.png`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -766,7 +802,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/welcome-screen`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -777,7 +813,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/welcome-screen`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -788,7 +824,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/onboarding`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -799,7 +835,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/onboarding`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -810,7 +846,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/audit-logs`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -821,7 +857,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -832,7 +868,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/guilds/${guild_id}/auto-moderation/rules`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -843,7 +879,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -854,7 +890,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * ************
@@ -871,7 +907,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/channels`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -882,7 +918,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -893,7 +929,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -904,7 +940,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/${channel_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -915,7 +951,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/channels`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -926,7 +962,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/channels`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -938,7 +974,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id} /invites`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -949,7 +985,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /invites`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -960,7 +996,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /invites`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -972,7 +1008,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /typing`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -984,7 +1020,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/channels/ ${channel_id} /recipients/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -995,7 +1031,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id} /recipients/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1006,7 +1042,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id} /messages/${message_id} /threads`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1017,7 +1053,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/threads`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1028,7 +1064,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/threads`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1039,7 +1075,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/channels/${channel_id}/thread-members/@me`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1050,7 +1086,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/channels/${channel_id}/thread-members/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1061,7 +1097,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/${channel_id}/thread-members/@me`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1072,7 +1108,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/${channel_id}/thread-members/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1083,7 +1119,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/thread-members/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1094,7 +1130,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/thread-members`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1105,7 +1141,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/threads/archived/public`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1116,7 +1152,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/threads/archived/private`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1127,7 +1163,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/users/@me/threads/archived/private`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1151,7 +1187,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1162,7 +1198,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *******
@@ -1179,7 +1215,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/messages`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1190,7 +1226,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/messages/${message_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1201,7 +1237,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/messages`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1212,7 +1248,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /crosspost`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1224,7 +1260,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1235,7 +1271,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1246,7 +1282,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/${user_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1257,7 +1293,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1268,7 +1304,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1279,7 +1315,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1290,7 +1326,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}/messages/${message_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1301,7 +1337,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}/messages/${message_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1312,7 +1348,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/messages/bulk-delete`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1347,7 +1383,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /followers`
-    }).then(res => res?.data)
+    })
   }
   /**
    * **********
@@ -1364,7 +1400,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id}/pins`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1376,7 +1412,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/channels/ ${channel_id}/${message_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1387,7 +1423,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id}/${message_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1411,7 +1447,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/stickers/${sticker_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1422,7 +1458,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/stickers`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1433,7 +1469,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/stickers/${sticker_id}/stickers`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1444,7 +1480,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1455,7 +1491,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/stickers`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1466,7 +1502,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1477,7 +1513,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1488,7 +1524,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/ ${guild_id} /emojis`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1499,7 +1535,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1510,7 +1546,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/ ${guild_id} /emojis`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1521,7 +1557,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1532,7 +1568,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1550,7 +1586,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/voice/regions`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1562,7 +1598,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/regions`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1573,7 +1609,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/@me`
-    }).then(res => res?.data)
+    })
   }
   /**
    * *********
@@ -1584,7 +1620,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/${user_id}`
-    }).then(res => res?.data)
+    })
   }
 
   /**
@@ -1605,13 +1641,13 @@ export class DCAPI {
    * *********
    */
 
-  async gateway(): Promise<{
-    url: string
-  }> {
+  async gateway() {
     return this.request({
       method: 'get',
       url: '/gateway'
-    }).then(res => res?.data)
+    }) as Promise<{
+      url: string
+    }>
   }
 
   /**
@@ -1628,6 +1664,6 @@ export class DCAPI {
           flags: 64 // EPHEMERAL（仅发送者可见）
         }
       }
-    }).then(res => res.data)
+    })
   }
 }

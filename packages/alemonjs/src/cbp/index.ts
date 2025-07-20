@@ -1,7 +1,6 @@
 import Koa from 'koa'
 import { WebSocketServer, WebSocket } from 'ws'
 import MessageRouter from './router'
-import koaStatic from 'koa-static'
 import koaCors from '@koa/cors'
 import { ResultCode } from '../core/code'
 import {
@@ -11,21 +10,24 @@ import {
   FULL_RECEIVE_HEADER,
   fullClient,
   platformClient,
-  USER_AGENT_HEADER
+  USER_AGENT_HEADER,
+  USER_AGENT_HEADER_VALUE_MAP
 } from './config'
 import { getConfig } from '../core/config'
 import * as JSON from 'flatted'
+import { ParsedMessage } from './typings'
+import { connectionTestOne } from './testone'
 
 export const cbpServer = (port: number, listeningListener?: () => void) => {
   if (global.chatbotServer) {
     delete global.chatbotServer
   }
+  // create
   const app = new Koa()
+  // MessageRouter
   app.use(MessageRouter.routes())
   app.use(MessageRouter.allowedMethods())
-  // 读取静态文件夹 gui
-  app.use(koaStatic('/gui'))
-  // 允许跨域
+  // Cors
   app.use(
     koaCors({
       origin: '*', // 允许所有来源
@@ -54,14 +56,152 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
     }
     // 设置平台客户端
     platformClient.set(originId, ws)
+
+    // 处理api
+    const handleApi = (DeviceId: string, message: string) => {
+      // 指定的设备 处理消费。终端有记录每个客户端是谁
+      if (childrenClient.has(DeviceId)) {
+        const clientWs = childrenClient.get(DeviceId)
+        if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+          // 发送消息到指定的子客户端
+          clientWs.send(message)
+        } else {
+          // 如果连接已关闭，删除该客户端
+          childrenClient.delete(DeviceId)
+        }
+      } else if (fullClient.has(DeviceId)) {
+        const clientWs = fullClient.get(DeviceId)
+        if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+          // 发送消息到指定的全量客户端
+          clientWs.send(message)
+        } else {
+          // 如果连接已关闭，删除该客户端
+          fullClient.delete(DeviceId)
+        }
+      }
+    }
+
+    // 处理 action
+    const handleAction = (DeviceId: string, message: string) => {
+      if (childrenClient.has(DeviceId)) {
+        const clientWs = childrenClient.get(DeviceId)
+        if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+          // 发送消息到指定的子客户端
+          clientWs.send(message)
+        } else {
+          // 如果连接已关闭，删除该客户端
+          childrenClient.delete(DeviceId)
+        }
+      } else if (fullClient.has(DeviceId)) {
+        const clientWs = fullClient.get(DeviceId)
+        if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+          // 发送消息到指定的全量客户端
+          clientWs.send(message)
+        } else {
+          // 如果连接已关闭，删除该客户端
+          fullClient.delete(DeviceId)
+        }
+      }
+    }
+
+    // 处理事件
+    const handleEvent = (message: string, ID: string) => {
+      // 全量客户端
+      fullClient.forEach((clientWs, clientId) => {
+        // 检查状态 并检查状态
+        if (clientWs.readyState === WebSocket.OPEN) {
+          clientWs.send(message)
+        } else {
+          // 如果连接已关闭，删除该客户端
+          childrenClient.delete(clientId)
+        }
+      })
+      // 根据所在群进行分流。
+      // 确保同一个频道的消息。都流向同一个客户端。
+      if (!ID) {
+        logger.error({
+          code: ResultCode.Fail,
+          message: '消息缺少标识符 ID',
+          data: null
+        })
+        return
+      }
+      // 重新绑定并发送消息
+      const reBind = () => {
+        if (childrenClient.size === 0) {
+          return
+        } else if (childrenClient.size === 1) {
+          // 只有一个客户端，直接绑定
+          const [bindId, clientWs] = childrenClient.entries().next().value
+          childrenBind.set(ID, bindId)
+          clientWs.send(message)
+          return
+        }
+        // 有多个客户端，找到绑定最少的那个。
+        // 如果大家都一样。就拿最近的第一个直接绑定。
+        let minBindCount = Infinity
+        let bindId: string | null = null
+        childrenClient.forEach((_, id) => {
+          const count = Array.from(childrenBind.values()).filter(v => v === id).length
+          if (count < minBindCount) {
+            minBindCount = count
+            bindId = id
+          }
+        })
+        if (bindId) {
+          const clientWs = childrenClient.get(bindId)
+          if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+            // 进行绑定
+            childrenBind.set(ID, bindId)
+            // 发送消息到绑定的客户端
+            clientWs.send(message)
+          } else {
+            // 如果连接已关闭，删除该客户端
+            childrenClient.delete(bindId)
+            // 重新进行绑定
+            reBind()
+          }
+        } else {
+          logger.error({
+            code: ResultCode.Fail,
+            message: '服务端出现意外，无法绑定客户端',
+            data: null
+          })
+        }
+      }
+      // 判断该id是否被分配过
+      if (!childrenBind.has(ID)) {
+        // 进行绑定
+        reBind()
+        return
+      }
+      const bindId = childrenBind.get(ID)
+      if (!childrenClient.has(bindId)) {
+        // 出现意外。
+        // 重新进行绑定。
+        reBind()
+        return
+      }
+      const clientWs = childrenClient.get(bindId)
+      if (!clientWs || clientWs.readyState !== WebSocket.OPEN) {
+        // 如果连接已关闭，删除该客户端
+        childrenClient.delete(bindId)
+        // 重新进行绑定
+        reBind()
+        return
+      }
+      clientWs.send(message)
+    }
+
     // 得到平台客户端的消息
     ws.on('message', (message: string) => {
       try {
         // 解析消息
-        const parsedMessage = JSON.parse(message.toString())
+        const parsedMessage: ParsedMessage = JSON.parse(message.toString())
         // 1. 解析得到 actionId ，说明是消费行为请求。要广播告诉所有客户端。
         // 2. 解析得到 name ，说明是一个事件请求。
         // 3. 解析得到 apiId ，说明是一个接口请求。
+        // 4. 解析得到 testID ，说明是一个测试请求。
         logger.debug({
           code: ResultCode.Ok,
           message: '服务端接收到消息',
@@ -70,134 +210,16 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         if (parsedMessage.apiId) {
           // 指定的设备 处理消费。终端有记录每个客户端是谁
           const DeviceId = parsedMessage.DeviceId
-          if (childrenClient.has(DeviceId)) {
-            const clientWs = childrenClient.get(DeviceId)
-            if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-              // 发送消息到指定的子客户端
-              clientWs.send(message)
-            } else {
-              // 如果连接已关闭，删除该客户端
-              childrenClient.delete(DeviceId)
-            }
-          } else if (fullClient.has(DeviceId)) {
-            const clientWs = fullClient.get(DeviceId)
-            if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-              // 发送消息到指定的全量客户端
-              clientWs.send(message)
-            } else {
-              // 如果连接已关闭，删除该客户端
-              fullClient.delete(DeviceId)
-            }
-          }
+          handleApi(DeviceId, message)
         } else if (parsedMessage?.actionId) {
           // 指定的设备 处理消费。终端有记录每个客户端是谁
           const DeviceId = parsedMessage.DeviceId
-          if (childrenClient.has(DeviceId)) {
-            const clientWs = childrenClient.get(DeviceId)
-            if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-              // 发送消息到指定的子客户端
-              clientWs.send(message)
-            } else {
-              // 如果连接已关闭，删除该客户端
-              childrenClient.delete(DeviceId)
-            }
-          } else if (fullClient.has(DeviceId)) {
-            const clientWs = fullClient.get(DeviceId)
-            if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-              // 发送消息到指定的全量客户端
-              clientWs.send(message)
-            } else {
-              // 如果连接已关闭，删除该客户端
-              fullClient.delete(DeviceId)
-            }
-          }
+          handleAction(DeviceId, message)
         } else if (parsedMessage?.name) {
-          // 全量客户端
-          fullClient.forEach((clientWs, clientId) => {
-            // 检查状态 并检查状态
-            if (clientWs.readyState === WebSocket.OPEN) {
-              clientWs.send(message)
-            } else {
-              // 如果连接已关闭，删除该客户端
-              childrenClient.delete(clientId)
-            }
-          })
-          // 根据所在群进行分流。
-          // 确保同一个频道的消息。都流向同一个客户端。
           const ID = parsedMessage.ChannelId || parsedMessage.GuildId || parsedMessage.DeviceId
-          if (!ID) {
-            logger.error({
-              code: ResultCode.Fail,
-              message: '消息缺少标识符 ID',
-              data: null
-            })
-            return
-          }
-          // 重新绑定并发送消息
-          const reBind = () => {
-            if (childrenClient.size === 0) {
-              return
-            } else if (childrenClient.size === 1) {
-              // 只有一个客户端，直接绑定
-              const [bindId, clientWs] = childrenClient.entries().next().value
-              childrenBind.set(ID, bindId)
-              clientWs.send(message)
-              return
-            }
-            // 有多个客户端，找到绑定最少的那个。
-            // 如果大家都一样。就拿最近的第一个直接绑定。
-            let minBindCount = Infinity
-            let bindId: string | null = null
-            childrenClient.forEach((_, id) => {
-              const count = Array.from(childrenBind.values()).filter(v => v === id).length
-              if (count < minBindCount) {
-                minBindCount = count
-                bindId = id
-              }
-            })
-            if (bindId) {
-              const clientWs = childrenClient.get(bindId)
-              if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-                // 进行绑定
-                childrenBind.set(ID, bindId)
-                // 发送消息到绑定的客户端
-                clientWs.send(message)
-              } else {
-                // 如果连接已关闭，删除该客户端
-                childrenClient.delete(bindId)
-                // 重新进行绑定
-                reBind()
-              }
-            } else {
-              logger.error({
-                code: ResultCode.Fail,
-                message: '服务端出现意外，无法绑定客户端',
-                data: null
-              })
-            }
-          }
-          // 判断该id是否被分配过
-          if (!childrenBind.has(ID)) {
-            // 进行绑定
-            reBind()
-            return
-          }
-          const bindId = childrenBind.get(ID)
-          if (!childrenClient.has(bindId)) {
-            // 出现意外。
-            // 重新进行绑定。
-            reBind()
-            return
-          }
-          const clientWs = childrenClient.get(bindId)
-          if (!clientWs || clientWs.readyState !== WebSocket.OPEN) {
-            // 如果连接已关闭，删除该客户端
-            childrenClient.delete(bindId)
-            // 重新进行绑定
-            reBind()
-            return
-          }
-          clientWs.send(message)
+          handleEvent(message, ID)
+        } else if (parsedMessage?.testID) {
+          // 继续解析数据。测试请求。
         }
       } catch (error) {
         logger.error({
@@ -299,9 +321,14 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
 
   // 处理客户端连接
   global.chatbotServer.on('connection', (ws, request) => {
+    // 测试平台的连接
+    if (request.url === '/testone') {
+      connectionTestOne(ws, request)
+      return
+    }
     // 读取请求头中的 来源
     const headers = request.headers
-    const origin = headers[USER_AGENT_HEADER] || 'client'
+    const origin = headers[USER_AGENT_HEADER] || USER_AGENT_HEADER_VALUE_MAP.client
     // 来源id
     const originId = headers[DEVICE_ID_HEADER] as string
     if (!originId) {
@@ -315,30 +342,31 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       data: null
     })
     // 根据来源进行分类
-    if (origin === 'platform') {
+    if (origin === USER_AGENT_HEADER_VALUE_MAP.platform) {
       setPlatformClient(originId, ws)
       return
-    }
-    // 连接时，需要给客户端发送主动消息
-    ws.send(
-      JSON.stringify({
-        active: 'sync',
-        payload: {
-          value: getConfig().value,
-          args: getConfig().argv,
-          package: {
-            version: getConfig().package?.version
+    } else if (origin === USER_AGENT_HEADER_VALUE_MAP.client) {
+      // 连接时，需要给客户端发送主动消息
+      ws.send(
+        JSON.stringify({
+          active: 'sync',
+          payload: {
+            value: getConfig().value,
+            args: getConfig().argv,
+            package: {
+              version: getConfig().package?.version
+            },
+            env: {
+              login: process.env.login,
+              platform: process.env.platform,
+              port: process.env.port
+            }
           },
-          env: {
-            login: process.env.login,
-            platform: process.env.platform,
-            port: process.env.port
-          }
-        },
-        // 主动消息
-        activeId: originId
-      })
-    )
+          // 主动消息
+          activeId: originId
+        })
+      )
+    }
     const isFullReceive = headers[FULL_RECEIVE_HEADER] === '1'
     // 如果是全量接收
     if (isFullReceive) {

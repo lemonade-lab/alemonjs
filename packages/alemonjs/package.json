@@ -25,29 +25,30 @@
     }
   },
   "dependencies": {
+    "@koa/cors": "^5.0.0",
+    "axios": "^1.10.0",
     "chalk": "^5.3.0",
     "commander": "^13.1.0",
-    "log4js": "^6.9.1",
-    "yaml": "^2.5.1",
+    "file-type": "21.0.0",
+    "flatted": "^3.3.3",
     "koa": "^2.15.3",
     "koa-router": "^13.0.1",
     "koa-static": "^5.0.0",
-    "@koa/cors": "^5.0.0",
-    "ws": "^8.18.0",
-    "flatted": "^3.3.3",
-    "uuid": "11.1.0",
+    "log4js": "^6.9.1",
     "public-ip": "^7.0.1",
-    "axios": "^1.10.0",
-    "file-type": "21.0.0",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "uuid": "11.1.0",
+    "ws": "^8.18.0",
+    "yaml": "^2.5.1"
   },
   "devDependencies": {
-    "@types/uuid": "^10.0.0",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-mount": "^4.0.5",
     "@types/koa-router": "^7.4.8",
-    "@types/koa-static": "^4.0.4"
+    "@types/koa-static": "^4.0.4",
+    "@types/koa__cors": "^5.0.0",
+    "@types/uuid": "^10.0.0"
   },
   "bin": {
     "alemonc": "./bin/alemonc.js"

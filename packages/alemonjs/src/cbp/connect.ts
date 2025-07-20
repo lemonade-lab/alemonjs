@@ -18,6 +18,7 @@ import {
 import { createResult, Result } from '../core/utils'
 import { Apis } from '../typing/apis'
 import * as flattedJSON from 'flatted'
+import { ParsedMessage } from './typings'
 
 type CBPClientOptions = {
   open?: () => void
@@ -140,7 +141,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
     global.chatbotClient.on('message', message => {
       try {
         // 解析消息
-        const parsedMessage = flattedJSON.parse(message.toString())
+        const parsedMessage: ParsedMessage = flattedJSON.parse(message.toString())
         logger.debug({
           code: ResultCode.Ok,
           message: '客户端接收到消息',
@@ -196,7 +197,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
           }
         } else if (parsedMessage.name) {
           // 如果有 name，说明是一个事件请求。要进行处理
-          onProcessor(parsedMessage.name, parsedMessage, parsedMessage.value)
+          onProcessor(parsedMessage.name, parsedMessage as any, parsedMessage.value as any)
         }
       } catch (error) {
         logger.error({

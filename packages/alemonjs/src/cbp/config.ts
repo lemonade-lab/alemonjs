@@ -23,6 +23,12 @@ export const fullClient = new Map<string, WebSocket>()
 export const deviceId = uuidv4()
 // 连接类型
 export const USER_AGENT_HEADER = 'user-agent'
+//
+export const USER_AGENT_HEADER_VALUE_MAP = {
+  platform: 'platform',
+  client: 'client',
+  testone: 'testone'
+}
 // 设备 ID
 export const DEVICE_ID_HEADER = 'x-device-id'
 // 是否全量接收

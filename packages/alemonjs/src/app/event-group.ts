@@ -12,16 +12,13 @@ const onGroup: OnGroupFunc = (...calls) => {
   const firstItem = calls[0]
   const baseSelects = firstItem.select
   // 把如果item是数组的，豆扁平起来。
-  const currents = calls.reduce(
-    (acc, item) => {
-      if (Array.isArray(item.current)) {
-        return acc.concat(item.current)
-      } else {
-        return acc.concat(item.current)
-      }
-    },
-    [] as (typeof firstItem.current)[]
-  )
+  const currents = calls.reduce((acc, item) => {
+    if (Array.isArray(item.current)) {
+      return acc.concat(item.current)
+    } else {
+      return acc.concat(item.current)
+    }
+  }, [] as (typeof firstItem.current)[])
   return {
     select: baseSelects,
     current: currents

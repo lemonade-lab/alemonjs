@@ -169,4 +169,4 @@ export const getConfig = (): typeof ConfigCore.prototype => {
 /**
  * @returns
  */
-export const getConfigValue = () => getConfig()?.value
+export const getConfigValue = () => getConfig()?.value || {}

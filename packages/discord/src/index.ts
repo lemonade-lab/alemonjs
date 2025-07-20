@@ -192,9 +192,6 @@ export default () => {
     client.interactionsCallback(event.id, event.token, MessageText)
   })
 
-  // 发送错误时
-  client.on('ERROR', console.error)
-
   const api = {
     active: {
       send: {
