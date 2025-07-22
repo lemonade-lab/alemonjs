@@ -5,7 +5,8 @@ import {
   OnSelectsFunc,
   OnDataFormatFunc,
   OnResponseReversalFuncBack,
-  OnGroupFunc
+  OnGroupFunc,
+  OnMiddlewareReversalFuncBack
 } from './typing/event'
 import { StoreChildrenApp } from './typing/store/res'
 import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe'
@@ -62,6 +63,11 @@ declare global {
    * 定义中间件
    */
   var onMiddleware: OnMiddlewareReversalFunc
+  /**
+   * 定义中间件
+   * @deprecated
+   */
+  var OnMiddleware: OnMiddlewareReversalFuncBack
   /**
    * 定义一个子模块
    */

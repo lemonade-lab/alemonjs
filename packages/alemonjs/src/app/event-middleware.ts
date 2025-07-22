@@ -42,6 +42,8 @@ global.onMiddleware = onMiddleware
  * @param callback
  * @returns
  */
-export const OnMiddleware: OnMiddlewareReversalFuncBack = (select, callback) => {
-  return onMiddleware(callback, select)
+export const OnMiddleware: OnMiddlewareReversalFuncBack = (callback, select) => {
+  return onMiddleware(select, callback)
 }
+
+global.OnMiddleware = OnMiddleware

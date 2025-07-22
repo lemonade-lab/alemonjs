@@ -72,8 +72,8 @@ export type OnMiddlewareReversalFunc = <T extends EventKeys, C extends Current<T
  * @deprecated
  */
 export type OnMiddlewareReversalFuncBack = <
-  T extends EventKeys,
-  C extends Current<T> | Current<T>[]
+  C extends Current<T> | Current<T>[],
+  T extends EventKeys
 >(
   callback: C,
   select: T | T[]
