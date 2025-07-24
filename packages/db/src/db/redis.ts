@@ -23,7 +23,7 @@ export const getIoRedis = (config: Config & RedisOptions = {}): RedisClient => {
   const redis = getRedisConfig()
   const { host, port, password, db, ...options } = config
   const baseConfig = {
-    host: '127.0.1',
+    host: '127.0.0.1',
     port: 6379,
     password: '',
     db: 0
