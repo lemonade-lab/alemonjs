@@ -1,7 +1,5 @@
 export default defineChildren({
   onCreated() {
-    logger.info({
-      message: '测试启动'
-    })
+    logger.info(`[测试机器人启动]`)
   }
 })

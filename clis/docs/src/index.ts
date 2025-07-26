@@ -1,14 +1,8 @@
 export default defineChildren({
   onMounted({ response, middleware }) {
-    logger.info({
-      message: '测试启动',
-      data: {
-        response,
-        middleware
-      }
-    })
+    logger.info(`[测试机器人启动]`, { response, middleware })
   },
   unMounted() {
-    console.info('测试卸载')
+    logger.info(`[测试机器人卸载]`)
   }
 })

@@ -22,29 +22,41 @@ import { getConfigValue } from '../core/config'
  * @param select
  */
 const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
-  const log = {
-    Name: select
+  if (process.env.NODE_ENV === 'development') {
+    const log: {
+      [key: string]: string | number | boolean
+    } = {
+      Name: select
+    }
+    for (const key in event) {
+      if (Object.prototype.hasOwnProperty.call(event, key)) {
+        const value = event[key]
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+          log[key] = value
+        }
+      }
+    }
+    logger.debug({
+      code: ResultCode.Ok,
+      message: 'new event',
+      data: log
+    })
+  } else {
+    let baseLog = `[${ResultCode.Ok}][Name: ${select}]`
+    if (typeof event['ChannelId'] === 'string' && event['ChannelId'] !== '') {
+      baseLog += `[ChannelId: ${event['ChannelId']}]`
+    }
+    if (typeof event['UserId'] === 'string' && event['UserId'] !== '') {
+      baseLog += `[UserId: ${event['UserId']}]`
+    }
+    if (typeof event['MessageId'] === 'string' && event['MessageId'] !== '') {
+      baseLog += `[MessageId: ${event['MessageId']}]`
+    }
+    if (typeof event['MessageText'] === 'string' && event['MessageText'] !== '') {
+      baseLog += `[MessageText: ${event['MessageText']}]`
+    }
+    logger.info(baseLog)
   }
-  if (typeof event['ChannelId'] == 'string' && event['ChannelId'] != '') {
-    log['ChannelId'] = event['ChannelId']
-  }
-  if (typeof event['UserKey'] == 'string' && event['UserKey'] != '') {
-    log['UserKey'] = event['UserKey']
-  }
-  if (typeof event['UserId'] == 'string' && event['UserId'] != '') {
-    log['UserId'] = event['UserId']
-  }
-  if (typeof event['MessageId'] == 'string' && event['MessageId'] != '') {
-    log['MessageId'] = event['MessageId']
-  }
-  if (typeof event['MessageText'] == 'string' && event['MessageText'] != '') {
-    log['MessageText'] = event['MessageText']
-  }
-  logger.info({
-    code: ResultCode.Ok,
-    message: 'new event',
-    data: log
-  })
 }
 
 /**

@@ -66,7 +66,7 @@ export class OneBotClient extends OneBotAPI {
       try {
         const event = JSON.parse(data.toString())
         if (!event) {
-          if (this.#events['ERROR']) this.#events['ERROR'](event)
+          logger.error('[OneBot] WebSocket message is empty')
           return
         } else if (event?.post_type == 'meta_event') {
           if (this.#events['META']) this.#events['META'](event)
@@ -102,16 +102,12 @@ export class OneBotClient extends OneBotAPI {
           consume(event)
         }
       } catch (err) {
-        if (this.#events['ERROR']) this.#events['ERROR'](err)
+        logger.error('[OneBot] WebSocket error: ', err)
       }
     }
 
     const onClose = (code, reason) => {
-      if (this.#events['ERROR'])
-        this.#events['ERROR']({
-          de: code,
-          reason: reason.toString('utf8')
-        })
+      logger.error(`[OneBot] WebSocket closed: ${code} - ${reason.toString('utf8')}`)
     }
 
     if (!this.ws) {
@@ -124,13 +120,13 @@ export class OneBotClient extends OneBotAPI {
           this.ws.on('message', onMessage)
           // close
           this.ws.on('close', onClose)
-          console.info('connected: ws://127.0.0.1:' + reverse_port)
+          logger.info(`[OneBot] connected: ws://127.0.0.1:${reverse_port}`)
         })
       } else {
         // forward_open
         this.ws = new WebSocket(url, c)
         this.ws.on('open', () => {
-          console.debug(`open:${url}`)
+          logger.info(`[OneBot] connected: ${url}`)
         })
         // message
         this.ws.on('message', onMessage)

@@ -13,5 +13,4 @@ export type OneBotEventMap = {
   REQUEST_ADD_GROUP: any
   NOTICE_GROUP_MEMBER_INCREASE: any
   NOTICE_GROUP_MEMBER_REDUCE: any
-  ERROR: any
 }

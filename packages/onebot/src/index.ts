@@ -113,11 +113,6 @@ export default () => {
     cbp.send(e)
   })
 
-  // 错误处理
-  client.on('ERROR', event => {
-    logger.error(event)
-  })
-
   /**
    * @param val
    * @returns
