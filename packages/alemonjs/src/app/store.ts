@@ -24,13 +24,25 @@ const createLogger = () => {
   mkdirSync(logDir, { recursive: true })
   // 当环境被设置为 development 时。被视为 trace
   const level = process.env.NODE_ENV === 'development' ? 'trace' : 'info'
+  const hideTime = process.env.LOGGER_TIME === 'false' ? true : false
+  const hideLevel = process.env.LOGGER_LEVEL === 'false' ? true : false
+  let pattern = ''
+  if (hideTime && hideLevel) {
+    pattern = `%m`
+  } else if (hideTime && !hideLevel) {
+    pattern = `[%p] %m`
+  } else if (!hideTime && hideLevel) {
+    pattern = `[%d{yyyy-MM-dd hh:mm:ss}] %m`
+  } else {
+    pattern = `[%d{yyyy-MM-dd hh:mm:ss}][%p] %m`
+  }
   log4js.configure({
     appenders: {
       console: {
         type: 'console',
         layout: {
           type: 'pattern',
-          pattern: `%[[%d{yyyy-MM-dd hh:mm:ss}][%5.5p]%] %m`
+          pattern: pattern
         }
       },
       command: {
@@ -41,7 +53,7 @@ const createLogger = () => {
         alwaysIncludePattern: true,
         layout: {
           type: 'pattern',
-          pattern: `%[[%d{yyyy-MM-dd hh:mm:ss}][%5.5p]%] %m`
+          pattern: pattern
         }
       },
       error: {
@@ -52,7 +64,7 @@ const createLogger = () => {
         alwaysIncludePattern: true,
         layout: {
           type: 'pattern',
-          pattern: `%[[%d{yyyy-MM-dd hh:mm:ss}][%5.5p]%] %m`
+          pattern: pattern
         }
       }
     },
