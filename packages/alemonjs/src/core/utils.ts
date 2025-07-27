@@ -161,10 +161,10 @@ export const getInputExportPath = (input?: string) => {
  * 异步方法。且需要读取返回值的进行判断的，
  * 都要以 Result 作为返回值
  */
-export type Result = {
+export type Result<T = any> = {
   code: ResultCode
   message: string | Object
-  data: any
+  data: T
 }
 
 /**
@@ -173,7 +173,11 @@ export type Result = {
  * @param message
  * @returns
  */
-export const createResult = (code: ResultCode, message: string | Object, data?: any): Result => {
+export const createResult = <T>(
+  code: ResultCode,
+  message: string | Object,
+  data?: T
+): Result<T> => {
   // 如果不是 2000。则logger
   if (code !== ResultCode.Ok) {
     logger.error({

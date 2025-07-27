@@ -5,12 +5,27 @@ import { createResult, Result } from '../core/utils'
 import { sendAction } from '../cbp/actions'
 import { sendAPI } from '../cbp/api'
 
+type Options = {
+  UserId?: string
+  UserKey?: string
+  UserName?: string
+  IsMaster?: boolean
+  IsBot?: boolean
+}
+
 /**
  * 使用提及。
  * @param {Object} event - 事件对象，包含触发提及的相关信息。
  * @throws {Error} - 如果 event 无效，抛出错误。
  */
-export const useMention = <T extends EventKeys>(event: Events[T]) => {
+export const useMention = <T extends EventKeys>(
+  event: Events[T]
+): [
+  {
+    find: (options: Options) => Promise<Result<User[]>>
+    findOne: (options?: Options) => Promise<Result<User | null>>
+  }
+] => {
   if (!event || typeof event !== 'object') {
     logger.error({
       code: ResultCode.FailParams,
@@ -20,13 +35,6 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
     throw new Error('Invalid event: event must be an object')
   }
   let res: User[] = null
-  type Options = {
-    UserId?: string
-    UserKey?: string
-    UserName?: string
-    IsMaster?: boolean
-    IsBot?: boolean
-  }
   const mention = {
     find: async (options: Options) => {
       try {
@@ -46,7 +54,7 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
       }
       if (!Array.isArray(res)) {
-        return createResult(ResultCode.Fail, 'No mention data found', null)
+        return createResult(ResultCode.Warn, 'No mention data found', null)
       }
       // 过滤出符合条件的数据
       const data = res.filter(item => {
@@ -91,7 +99,7 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
         return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
       }
       if (!Array.isArray(res)) {
-        return createResult(ResultCode.Fail, 'No mention data found', null)
+        return createResult(ResultCode.Warn, 'No mention data found', null)
       }
       // 根据条件查找
       const data = res.find(item => {
@@ -113,7 +121,7 @@ export const useMention = <T extends EventKeys>(event: Events[T]) => {
         return true
       })
       if (!data) {
-        return createResult(ResultCode.Fail, 'No mention data found', null)
+        return createResult(ResultCode.Warn, 'No mention data found', null)
       }
       return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data)
     }
