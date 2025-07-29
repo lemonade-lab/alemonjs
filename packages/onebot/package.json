@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/onebot",
-  "version": "2.1.0-alpha.7",
+  "version": "2.1.0-alpha.8",
   "description": "onebot v11",
   "author": "lemonade",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "alemonjs"
   ],
   "dependencies": {
+    "dayjs": "^1.11.13",
     "ws": "^8.18.1"
   },
   "peerDependencies": {
