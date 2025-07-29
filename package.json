@@ -6,10 +6,10 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "yarn --cwd packages/template dev",
+    "dev": "yarn --cwd clis/template dev",
     "build": "lerna run build",
     "test": "jest",
-    "format": "prettier --write .",
+    "format": "prettier --write --list-different .",
     "check-format": "git diff --exit-code",
     "prepare": "husky"
   },

@@ -1,6 +1,7 @@
 import WebSocket, { WebSocketServer } from 'ws'
 import { consume, OneBotAPI } from './api'
 import { OneBotEventMap } from './typing'
+import dayjs from 'dayjs'
 
 /**
  * 连接
@@ -34,6 +35,16 @@ export class OneBotClient extends OneBotAPI {
   #events: {
     [K in keyof OneBotEventMap]?: (event: OneBotEventMap[K]) => any
   } = {}
+
+  // 重连次数
+  #count = 0
+  #getReConnectTime() {
+    const time = this.#count > 3 ? 1000 * 6 : 1000 * 1
+    const curTime = this.#count > 6 ? 1000 * this.#count * 2 : time
+    logger.info(`[OneBot] 等待 ${dayjs(curTime).format('mm:ss')} 后重新连接`)
+    this.#count++
+    return curTime
+  }
 
   /**
    * 注册事件处理程序
@@ -108,6 +119,11 @@ export class OneBotClient extends OneBotAPI {
 
     const onClose = (code, reason) => {
       logger.error(`[OneBot] WebSocket closed: ${code} - ${reason.toString('utf8')}`)
+      if (reverse_enable) return
+      const curTime = this.#getReConnectTime()
+      setTimeout(() => {
+        this.connect()
+      }, curTime)
     }
 
     if (!this.ws) {
@@ -127,6 +143,7 @@ export class OneBotClient extends OneBotAPI {
         this.ws = new WebSocket(url, c)
         this.ws.on('open', () => {
           logger.info(`[OneBot] connected: ${url}`)
+          this.#count = 0
         })
         // message
         this.ws.on('message', onMessage)
