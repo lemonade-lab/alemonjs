@@ -52,6 +52,47 @@ export type ActionMentionGet = {
   }
 }
 
+export type ActionMessageDelete = {
+  // 删除消息
+  action: 'message.delete'
+  // 负载
+  payload: {
+    // 消息ID
+    MessageId: string
+  }
+}
+
+export type ActionFileSendChannel = {
+  // 发送文件
+  action: 'file.send.channel'
+  // 负载
+  payload: {
+    // 频道ID
+    ChannelId: string
+    // 参数
+    params: {
+      file: string
+      name?: string
+      folder?: string
+    }
+  }
+}
+
+export type ActionFileSendUser = {
+  // 发送文件
+  action: 'file.send.user'
+  // 负载
+  payload: {
+    // 用户ID
+    UserId: string
+    // 参数
+    params: {
+      file: string
+      name?: string
+    }
+  }
+}
+
 type base = {
   // 动作ID
   actionId?: string
@@ -64,5 +105,8 @@ export type Actions = (
   | ActionMentionGet
   | ActionMessageSendChannel
   | ActionMessageSendUser
+  | ActionMessageDelete
+  | ActionFileSendChannel
+  | ActionFileSendUser
 ) &
   base

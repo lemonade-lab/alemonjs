@@ -284,29 +284,62 @@ export default () => {
           return Metions
         }
         return []
+      },
+      delete(message_id: string) {
+        return client.deleteMsg({ message_id: Number(message_id) })
+      },
+      file: {
+        channel: client.uploadGroupFile.bind(client),
+        user: client.uploadPrivateFile.bind(client)
       }
     }
   }
   cbp.onactions(async (data, consume) => {
-    if (data.action === 'message.send') {
-      const event = data.payload.event
-      const paramFormat = data.payload.params.format
-      const res = await api.use.send(event, paramFormat)
-      consume(res)
-    } else if (data.action === 'message.send.channel') {
-      const channel_id = data.payload.ChannelId
-      const val = data.payload.params.format
-      const res = await api.active.send.channel(channel_id, val)
-      consume(res)
-    } else if (data.action === 'message.send.user') {
-      const user_id = data.payload.UserId
-      const val = data.payload.params.format
-      const res = await api.active.send.user(user_id, val)
-      consume(res)
-    } else if (data.action === 'mention.get') {
-      const event = data.payload.event
-      const res = await api.use.mention(event)
-      consume([createResult(ResultCode.Ok, '请求完成', res)])
+    switch (data.action) {
+      case 'message.send': {
+        const event = data.payload.event
+        const paramFormat = data.payload.params.format
+        const res = await api.use.send(event, paramFormat)
+        return consume(res)
+      }
+      case 'message.send.channel': {
+        const channel_id = data.payload.ChannelId
+        const val = data.payload.params.format
+        const res = await api.active.send.channel(channel_id, val)
+        return consume(res)
+      }
+      case 'message.send.user': {
+        const user_id = data.payload.UserId
+        const val = data.payload.params.format
+        const res = await api.active.send.user(user_id, val)
+        return consume(res)
+      }
+      case 'mention.get': {
+        const event = data.payload.event
+        const res = await api.use.mention(event)
+        return consume([createResult(ResultCode.Ok, '请求完成', res)])
+      }
+      case 'message.delete': {
+        const res = await api.use
+          .delete(data.payload.MessageId)
+          .then(res => createResult(ResultCode.Ok, data.action, res))
+          .catch(err => createResult(ResultCode.Fail, data.action, err))
+        return consume([res])
+      }
+      case 'file.send.channel': {
+        const res = await api.use.file
+          .channel(data.payload.ChannelId, data.payload.params)
+          .then(res => createResult(ResultCode.Ok, data.action, res))
+          .catch(err => createResult(ResultCode.Fail, data.action, err))
+        return consume([res])
+      }
+      case 'file.send.user': {
+        const res = await api.use.file
+          .user(data.payload.UserId, data.payload.params)
+          .then(res => createResult(ResultCode.Ok, data.action, res))
+          .catch(err => createResult(ResultCode.Fail, data.action, err))
+        return consume([res])
+      }
     }
   })
 
