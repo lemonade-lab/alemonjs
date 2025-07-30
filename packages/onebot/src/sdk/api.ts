@@ -171,4 +171,49 @@ export class OneBotAPI {
       params: options
     })
   }
+
+  /** 撤回消息 */
+  deleteMsg(options: { message_id: number }) {
+    if (!this.ws) return
+    return send(this.ws, {
+      action: 'delete_msg',
+      params: options
+    })
+  }
+
+  /** 上传私聊文件 */
+  uploadPrivateFile(options: { user_id: number; file: string; name?: string }) {
+    if (!this.ws) return
+    return send(this.ws, {
+      action: 'upload_private_file',
+      params: options
+    })
+  }
+
+  /** 上传群文件 */
+  uploadGroupFile(options: { group_id: number; file: string; name?: string; folder?: string }) {
+    if (!this.ws) return
+    return send(this.ws, {
+      action: 'upload_group_file',
+      params: options
+    })
+  }
+
+  /** 发送私聊转发 */
+  sendPrivateForward(options: { user_id: number; messages: any[] }) {
+    if (!this.ws) return
+    return send(this.ws, {
+      action: 'send_private_forward_msg',
+      params: options
+    })
+  }
+
+  /** 发送群转发 */
+  sendGroupForward(options: { group_id: number; messages: any[] }) {
+    if (!this.ws) return
+    return send(this.ws, {
+      action: 'send_group_forward_msg',
+      params: options
+    })
+  }
 }
