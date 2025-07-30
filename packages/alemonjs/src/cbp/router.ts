@@ -2,11 +2,12 @@ import KoaRouter from 'koa-router'
 const router = new KoaRouter({
   prefix: '/'
 })
-// 测试服务是否存在
-router.get('/cbp', ctx => {
+// 响应服务在线
+router.get('/online', ctx => {
+  ctx.status = 200
   ctx.body = {
     code: 200,
-    message: 'Message API is working',
+    message: 'service online',
     data: null
   }
 })
