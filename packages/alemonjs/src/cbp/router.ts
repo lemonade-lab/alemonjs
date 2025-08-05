@@ -1,6 +1,6 @@
 import KoaRouter from 'koa-router'
 const router = new KoaRouter({
-  prefix: '/'
+  prefix: '/api'
 })
 // 响应服务在线
 router.get('/online', ctx => {

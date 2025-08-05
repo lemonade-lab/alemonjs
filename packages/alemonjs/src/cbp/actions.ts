@@ -10,13 +10,20 @@ import * as flattedJSON from 'flatted'
 export const sendAction = (data: Actions): Promise<Result[]> => {
   const actionId = generateUniqueId()
   return new Promise(resolve => {
-    actionResolves.set(actionId, resolve)
     // 设置唯一标识符
     data.actionId = actionId
     // 设置设备 ID
     data.DeviceId = deviceId
-    // 发送消息
-    global.chatbotClient.send(flattedJSON.stringify(data))
+    // 沙盒模式
+    if (global.sandbox) {
+      if (!global.testoneClient) {
+        return resolve([createResult(ResultCode.Fail, '未连接到客户端', null)])
+      }
+      // 发送消息
+      global.testoneClient.send(flattedJSON.stringify(data))
+      return resolve([createResult(ResultCode.Ok, '沙盒模式下发送行为成功', null)])
+    }
+    actionResolves.set(actionId, resolve)
     // 12 秒后超时
     const timeout = setTimeout(() => {
       // 被清理了

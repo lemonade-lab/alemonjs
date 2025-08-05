@@ -94,7 +94,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
    * 纯 cbpClient 连接，会没有 一些 全局变量。
    * 需要在此处进行判断并设置
    */
-  if (!global.chatbotClient) {
+  if (global.chatbotClient) {
     delete global.chatbotClient
   }
   const { open = () => {}, isFullReceive = true } = options
@@ -241,7 +241,7 @@ export const cbpPlatform = (
     open: () => {}
   }
 ) => {
-  if (!global.chatbotPlatform) {
+  if (global.chatbotPlatform) {
     delete global.chatbotPlatform
   }
   const { open = () => {} } = options

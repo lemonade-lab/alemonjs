@@ -118,6 +118,8 @@ export const start = async (options: StartOptions | string = {}) => {
       const login = options?.login || cfg.argv?.login || cfg.value?.login
       // 不登录平台
       if (!platform && !login) {
+        // 没有指定平台和登录名，则启动 sandbox 模式
+        global.sandbox = true
         return
       }
       // 如果存在
