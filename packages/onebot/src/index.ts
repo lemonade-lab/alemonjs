@@ -291,6 +291,10 @@ export default () => {
       file: {
         channel: client.uploadGroupFile.bind(client),
         user: client.uploadPrivateFile.bind(client)
+      },
+      forward: {
+        channel: client.sendGroupForward.bind(client),
+        user: client.sendPrivateForward.bind(client)
       }
     }
   }
@@ -336,6 +340,32 @@ export default () => {
       case 'file.send.user': {
         const res = await api.use.file
           .user(data.payload.UserId, data.payload.params)
+          .then(res => createResult(ResultCode.Ok, data.action, res))
+          .catch(err => createResult(ResultCode.Fail, data.action, err))
+        return consume([res])
+      }
+      case 'message.forward.channel': {
+        const res = await api.use.forward
+          .channel(
+            data.payload.ChannelId,
+            data.payload.params.map(i => ({
+              ...i,
+              content: DataToMessage(i.content)
+            }))
+          )
+          .then(res => createResult(ResultCode.Ok, data.action, res))
+          .catch(err => createResult(ResultCode.Fail, data.action, err))
+        return consume([res])
+      }
+      case 'message.forward.user': {
+        const res = await api.use.forward
+          .user(
+            data.payload.UserId,
+            data.payload.params.map(i => ({
+              ...i,
+              content: DataToMessage(i.content)
+            }))
+          )
           .then(res => createResult(ResultCode.Ok, data.action, res))
           .catch(err => createResult(ResultCode.Fail, data.action, err))
         return consume([res])

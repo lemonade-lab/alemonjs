@@ -93,6 +93,48 @@ export type ActionFileSendUser = {
   }
 }
 
+export type ActionMessageForwardUser = {
+  // 发送合并转发消息
+  action: 'message.forward.user'
+  // 负载
+  payload: {
+    // 用户ID
+    UserId: string
+    // 参数
+    params: {
+      // 时间
+      time?: number
+      // 消息
+      content: DataEnums[]
+      // 用户ID
+      user_id?: string
+      // 昵称
+      nickname?: string
+    }[]
+  }
+}
+
+export type ActionMessageForwardChannel = {
+  // 发送合并转发消息
+  action: 'message.forward.channel'
+  // 负载
+  payload: {
+    // 频道ID
+    ChannelId: string
+    // 参数
+    params: {
+      // 时间
+      time?: number
+      // 消息
+      content: DataEnums[]
+      // 用户ID
+      user_id?: string
+      // 昵称
+      nickname?: string
+    }[]
+  }
+}
+
 type base = {
   // 动作ID
   actionId?: string
@@ -108,5 +150,7 @@ export type Actions = (
   | ActionMessageDelete
   | ActionFileSendChannel
   | ActionFileSendUser
+  | ActionMessageForwardUser
+  | ActionMessageForwardChannel
 ) &
   base

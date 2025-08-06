@@ -200,20 +200,46 @@ export class OneBotAPI {
   }
 
   /** 发送私聊转发 */
-  sendPrivateForward(options: { user_id: number; messages: any[] }) {
+  sendPrivateForward(options: {
+    user_id: number
+    messages: {
+      time?: number
+      content: any[]
+      user_id?: string
+      nickname?: string
+    }[]
+  }) {
     if (!this.ws) return
     return send(this.ws, {
       action: 'send_private_forward_msg',
-      params: options
+      params: {
+        user_id: 80000000,
+        nickname: '匿名消息',
+        ...options,
+        messages: options.messages.map(data => ({ data, type: 'node' }))
+      }
     })
   }
 
   /** 发送群转发 */
-  sendGroupForward(options: { group_id: number; messages: any[] }) {
+  sendGroupForward(options: {
+    group_id: number
+    messages: {
+      time?: number
+      content: any[]
+      user_id?: string
+      nickname?: string
+    }[]
+  }) {
     if (!this.ws) return
     return send(this.ws, {
       action: 'send_group_forward_msg',
-      params: options
+      params: {
+        user_id: 80000000,
+        nickname: '匿名消息',
+        ...options,
+        messages: options.messages.map(data => ({ data, type: 'node' }))
+      }
     })
   }
 }
