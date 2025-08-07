@@ -27,40 +27,21 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
     mkdirSync(testonePath, { recursive: true })
   }
 
-  const fileWatchers = new Map<string, any>()
-
-  // 通用的文件监听函数
-  const watchFile = (filePath: string, _type: string, handler: () => void) => {
-    try {
-      // 如果文件存在，直接监听
-      if (existsSync(filePath)) {
-        const watcher = watch(filePath, { persistent: true }, (eventType, filename) => {
-          if (eventType === 'change' && filename) {
-            handler()
-          }
-        })
-        fileWatchers.set(filePath, watcher)
-      }
-    } catch (error) {
-      logger.error(`监听文件失败: ${filePath}`, error)
-    }
-  }
-
   // 监听整个目录，捕获新文件创建
   const dirWatcher = watch(testonePath, { persistent: true }, (eventType, filename) => {
     if (!filename) return
-    const filePath = join(testonePath, filename)
     // 如果是新创建的文件，开始监听它
-    if (eventType === 'rename' && existsSync(filePath) && !fileWatchers.has(filePath)) {
+    if (eventType === 'change') {
       if (filename === 'commands.json') {
-        watchFile(filePath, 'commands', onCommands)
         onCommands() // 立即触发一次
       } else if (filename === 'users.json') {
-        watchFile(filePath, 'users', onUsers)
         onUsers()
       } else if (filename === 'channels.json') {
-        watchFile(filePath, 'channels', onChannels)
         onChannels()
+      } else if (filename === 'user.json') {
+        onUser()
+      } else if (filename === 'bot.json') {
+        onBot()
       }
     }
   })
@@ -119,13 +100,44 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       })
   }, 1000)
 
-  // 初始化时监听已存在的文件
-  watchFile(commandsPath, 'commands', onCommands)
-  watchFile(usersPath, 'users', onUsers)
-  watchFile(channelsPath, 'channels', onChannels)
-
   const userPath = join(testonePath, 'user.json')
+
+  const onUser = _.debounce(() => {
+    if (!existsSync(userPath)) return
+    readFile(userPath, 'utf-8')
+      .then(data => {
+        const user = JSON.parse(data)
+        global.testoneClient?.send(
+          flattedJSON.stringify({
+            type: 'user',
+            payload: user
+          })
+        )
+      })
+      .catch(error => {
+        logger.error('读取 user.json 失败:', error)
+      })
+  }, 1000)
+
   const botPath = join(testonePath, 'bot.json')
+
+  const onBot = _.debounce(() => {
+    if (!existsSync(botPath)) return
+    readFile(botPath, 'utf-8')
+      .then(data => {
+        const bot = JSON.parse(data)
+        global.testoneClient?.send(
+          flattedJSON.stringify({
+            type: 'bot',
+            payload: bot
+          })
+        )
+      })
+      .catch(error => {
+        logger.error('读取 bot.json 失败:', error)
+      })
+  }, 1000)
+
   const privateMessagePath = join(testonePath, '.cache', 'private.message.json')
   const publicMessagePath = join(testonePath, '.cache', 'public.message.json')
 
@@ -248,11 +260,15 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       } else if (parsedMessage.type === 'init.data') {
         initData()
       } else if (parsedMessage.type === 'commands') {
-        onChannels()
+        onCommands()
       } else if (parsedMessage.type === 'users') {
         onUsers()
       } else if (parsedMessage.type === 'channels') {
         onChannels()
+      } else if (parsedMessage.type === 'user') {
+        onUser()
+      } else if (parsedMessage.type === 'bot') {
+        onBot()
       } else if (parsedMessage.type === 'private.message.delete') {
         const CreateAt = parsedMessage.payload.CreateAt
         onDeleteMessage('private', CreateAt)
@@ -272,9 +288,6 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
   // 处理关闭事件
   global.testoneClient.on('close', () => {
     logger.info('WebSocket connection closed')
-    // 清理所有文件监听器
-    fileWatchers.forEach(watcher => watcher.close())
-    fileWatchers.clear()
     dirWatcher.close()
   })
 }
