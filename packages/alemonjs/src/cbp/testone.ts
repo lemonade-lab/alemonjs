@@ -4,7 +4,7 @@ import * as flattedJSON from 'flatted'
 import { ParsedMessage } from './typings'
 import { onProcessor } from '../app/event-processor'
 import { dirname, join } from 'path'
-import { existsSync, readFileSync, watch, mkdirSync } from 'fs'
+import { existsSync, readFileSync, watch, mkdirSync, writeFile } from 'fs'
 import _ from 'lodash'
 import { readFile } from 'fs/promises'
 import { actionResolves, actionTimeouts, apiResolves, apiTimeouts } from './config'
@@ -42,7 +42,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
         fileWatchers.set(filePath, watcher)
       }
     } catch (error) {
-      console.error(`监听文件失败: ${filePath}`, error)
+      logger.error(`监听文件失败: ${filePath}`, error)
     }
   }
 
@@ -79,7 +79,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
         )
       })
       .catch(error => {
-        console.error('读取 commands.json 失败:', error)
+        logger.error('读取 commands.json 失败:', error)
       })
   }, 1000)
 
@@ -97,7 +97,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
         )
       })
       .catch(error => {
-        console.error('读取 users.json 失败:', error)
+        logger.error('读取 users.json 失败:', error)
       })
   }, 1000)
 
@@ -115,7 +115,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
         )
       })
       .catch(error => {
-        console.error('读取 channels.json 失败:', error)
+        logger.error('读取 channels.json 失败:', error)
       })
   }, 1000)
 
@@ -164,8 +164,37 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
         })
       )
     } catch (error) {
-      console.error('初始化数据失败:', error)
+      logger.error('初始化数据失败:', error)
     }
+  }
+
+  const onDeleteMessage = (type: 'private' | 'public', CreateAt: number) => {
+    const messagePath = type === 'private' ? privateMessagePath : publicMessagePath
+    if (existsSync(messagePath)) {
+      try {
+        const messages = JSON.parse(readFileSync(messagePath, 'utf-8'))
+        const updatedMessages = messages.filter((msg: any) => msg.CreateAt !== CreateAt)
+        console.log('updatedMessages', updatedMessages)
+        writeFile(messagePath, JSON.stringify(updatedMessages, null, 2), error => {
+          if (error) {
+            logger.error(`写入 ${type} 消息失败:`, error)
+          }
+        })
+      } catch (error) {
+        logger.error(`读取 ${type} 消息失败:`, error)
+      }
+    }
+  }
+
+  const onSaveMessage = (type: 'private' | 'public', message: any) => {
+    const messagePath = type === 'private' ? privateMessagePath : publicMessagePath
+    const messages = existsSync(messagePath) ? JSON.parse(readFileSync(messagePath, 'utf-8')) : []
+    messages.push(message)
+    writeFile(messagePath, JSON.stringify(messages, null, 2), error => {
+      if (error) {
+        logger.error(`写入 ${type} 消息失败:`, error)
+      }
+    })
   }
 
   // 处理消息事件
@@ -177,6 +206,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       if (parsedMessage.name) {
         // 如果有 name，说明是一个事件请求。要进行处理
         onProcessor(parsedMessage.name, parsedMessage as any, parsedMessage.value as any)
+        // 消息写入
       } else if (parsedMessage?.actionId) {
         // 如果有 actionId
         const resolve = actionResolves.get(parsedMessage.actionId)
@@ -223,15 +253,25 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
         onUsers()
       } else if (parsedMessage.type === 'channels') {
         onChannels()
+      } else if (parsedMessage.type === 'private.message.delete') {
+        const CreateAt = parsedMessage.payload.CreateAt
+        onDeleteMessage('private', CreateAt)
+      } else if (parsedMessage.type === 'public.message.delete') {
+        const CreateAt = parsedMessage.payload.CreateAt
+        onDeleteMessage('public', CreateAt)
+      } else if (parsedMessage.type === 'private.message.save') {
+        onSaveMessage('private', parsedMessage.payload)
+      } else if (parsedMessage.type === 'public.message.save') {
+        onSaveMessage('public', parsedMessage.payload)
       }
     } catch (error) {
-      console.error('客户端解析消息失败:', error)
+      logger.error('客户端解析消息失败:', error)
     }
   })
 
   // 处理关闭事件
   global.testoneClient.on('close', () => {
-    console.log('WebSocket connection closed')
+    logger.info('WebSocket connection closed')
     // 清理所有文件监听器
     fileWatchers.forEach(watcher => watcher.close())
     fileWatchers.clear()
