@@ -5,13 +5,13 @@ import { useState } from './post.js'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { ResultCode } from './core/code.js'
-import { cbpServer } from './cbp/index.js'
-import { cbpClient } from './cbp/connect.js'
+import { cbpServer } from './cbp/server.js'
 import {
   default_platform_common_prefix,
   default_port,
   file_prefix_common
 } from './core/variable.js'
+import { cbpClient } from './cbp/client.js'
 
 const loadState = () => {
   const value = getConfigValue() ?? {}

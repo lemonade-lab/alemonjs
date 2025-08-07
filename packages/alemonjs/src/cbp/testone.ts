@@ -3,10 +3,13 @@ import { WebSocket } from 'ws'
 import * as flattedJSON from 'flatted'
 import { ParsedMessage } from './typings'
 import { onProcessor } from '../app/event-processor'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import { existsSync, readFileSync, watch, mkdirSync } from 'fs'
 import _ from 'lodash'
 import { readFile } from 'fs/promises'
+import { actionResolves, actionTimeouts, apiResolves, apiTimeouts } from './config'
+import { createResult } from '../post'
+import { ResultCode } from '../core/code'
 
 /**
  * @param ws
@@ -27,7 +30,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
   const fileWatchers = new Map<string, any>()
 
   // 通用的文件监听函数
-  const watchFile = (filePath: string, type: string, handler: () => void) => {
+  const watchFile = (filePath: string, _type: string, handler: () => void) => {
     try {
       // 如果文件存在，直接监听
       if (existsSync(filePath)) {
@@ -123,8 +126,11 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
 
   const userPath = join(testonePath, 'user.json')
   const botPath = join(testonePath, 'bot.json')
-  const privateMessagePath = join(testonePath, 'private.message.json')
-  const publicMessagePath = join(testonePath, 'public.message.json')
+  const privateMessagePath = join(testonePath, '.cache', 'private.message.json')
+  const publicMessagePath = join(testonePath, '.cache', 'public.message.json')
+
+  const cacheDir = dirname(privateMessagePath)
+  mkdirSync(cacheDir, { recursive: true })
 
   const initData = () => {
     try {
@@ -171,14 +177,52 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       if (parsedMessage.name) {
         // 如果有 name，说明是一个事件请求。要进行处理
         onProcessor(parsedMessage.name, parsedMessage as any, parsedMessage.value as any)
+      } else if (parsedMessage?.actionId) {
+        // 如果有 actionId
+        const resolve = actionResolves.get(parsedMessage.actionId)
+        if (resolve) {
+          actionResolves.delete(parsedMessage.actionId)
+          // 清除超时器
+          const timeout = actionTimeouts.get(parsedMessage.actionId)
+          if (timeout) {
+            actionTimeouts.delete(parsedMessage.actionId)
+            clearTimeout(timeout)
+          }
+          // 调用回调函数
+          if (Array.isArray(parsedMessage.payload)) {
+            resolve(parsedMessage.payload)
+          } else {
+            // 错误处理
+            resolve([createResult(ResultCode.Fail, '消费处理错误', null)])
+          }
+        }
+      } else if (parsedMessage?.apiId) {
+        // 如果有 apiId，说明是一个接口请求。要进行处理
+        const resolve = apiResolves.get(parsedMessage.apiId)
+        if (resolve) {
+          apiResolves.delete(parsedMessage.apiId)
+          // 清除超时器
+          const timeout = apiTimeouts.get(parsedMessage.apiId)
+          if (timeout) {
+            apiTimeouts.delete(parsedMessage.apiId)
+            clearTimeout(timeout)
+          }
+          // 调用回调函数
+          if (Array.isArray(parsedMessage.payload)) {
+            resolve(parsedMessage.payload)
+          } else {
+            // 错误处理
+            resolve([createResult(ResultCode.Fail, '接口处理错误', null)])
+          }
+        }
       } else if (parsedMessage.type === 'init.data') {
         initData()
       } else if (parsedMessage.type === 'commands') {
-        // 发送消息
-      } else if (parsedMessage.actionId) {
-        // 消费 actionId
-      } else if (parsedMessage.apiId) {
-        // 消费 apiId
+        onChannels()
+      } else if (parsedMessage.type === 'users') {
+        onUsers()
+      } else if (parsedMessage.type === 'channels') {
+        onChannels()
       }
     } catch (error) {
       console.error('客户端解析消息失败:', error)

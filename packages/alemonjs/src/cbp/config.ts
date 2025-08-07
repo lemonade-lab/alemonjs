@@ -1,16 +1,3 @@
-/**
- * CBP: Chatbot Protocol
- * @description 聊天机器人协议
- *
- *              转发&格式化               格式化                   原始
- * AL Clinet  <---------> CBP(server) <---------> AL Platform  <---------> Platform(server)
- *               行为                    转发&行为                行为API
- *               请求                    转发&请求                请求API
- *
- * CBP server 只允许 AL Platform 存在一个连接。允许 多个 AL Client 连接。
- * AL Client 默认全量接收消息。也可以进行进入分流模式
- *
- */
 import { WebSocket } from 'ws'
 import { v4 as uuidv4 } from 'uuid'
 import { Result } from '../post'
@@ -48,7 +35,7 @@ export const generateUniqueId = () => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2)
 }
 // 超时时间
-export const timeoutTime = 1000 * 12 // 12秒
+export const timeoutTime = 1000 * 60 * 3 // 3分钟
 // 失败重连
 export const reconnectInterval = 1000 * 6 // 6秒
 // 心跳间隔

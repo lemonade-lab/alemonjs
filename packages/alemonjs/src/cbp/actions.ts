@@ -21,10 +21,12 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
       }
       // 发送消息
       global.testoneClient.send(flattedJSON.stringify(data))
-      return resolve([createResult(ResultCode.Ok, '沙盒模式下发送行为成功', null)])
+    } else {
+      global.chatbotClient.send(flattedJSON.stringify(data))
     }
+    // 设置回调函数
     actionResolves.set(actionId, resolve)
-    // 12 秒后超时
+    // 超时
     const timeout = setTimeout(() => {
       // 被清理了
       if (!actionResolves.has(actionId) || !actionTimeouts.has(actionId)) {
@@ -37,6 +39,7 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
       // 不会当错误进行处理。而是传入错误码
       resolve([createResult(ResultCode.Fail, '行为超时', null)])
     }, timeoutTime)
+    // 设置超时
     actionTimeouts.set(actionId, timeout)
   })
 }

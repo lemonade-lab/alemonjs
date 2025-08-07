@@ -23,14 +23,14 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
       }
       // 发送消息
       global.testoneClient.send(flattedJSON.stringify(data))
-      return resolve([createResult(ResultCode.Ok, '沙盒模式下调用api成功', null)])
+    } else {
+      // 发送消息
+      global.chatbotClient.send(flattedJSON.stringify(data))
     }
 
     apiResolves.set(ApiId, resolve)
 
-    // 发送消息
-    global.chatbotClient.send(flattedJSON.stringify(data))
-    // 12 秒后超时
+    // 超时
     const timeout = setTimeout(() => {
       // 被清理了
       if (!apiResolves.has(ApiId) || !apiTimeouts.has(ApiId)) {
@@ -43,6 +43,8 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
       // 不会当错误进行处理。而是传入错误码
       resolve([createResult(ResultCode.Fail, '接口超时', null)])
     }, timeoutTime)
+
+    // 设置超时
     apiTimeouts.set(ApiId, timeout)
   })
 }
