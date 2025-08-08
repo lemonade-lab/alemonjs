@@ -1,8 +1,8 @@
-import { BT, MD, Text, useMessage } from 'alemonjs'
+import { BT, MD, useMessage } from 'alemonjs'
 
 export const regular = /^(#|\/)?按钮测试$/
 
-const selects = onSelects(['message.create'])
+const selects = onSelects(['message.create', 'private.message.create'])
 const response = onResponse(selects, event => {
   const [message] = useMessage(event)
 
@@ -56,7 +56,7 @@ const response = onResponse(selects, event => {
         MD.bold(`const res = onResponse(event,aynsc (event) => {})`)
       ),
       BT.group(
-        BT.row(BT('开始', '/开始游戏'), BT('结束', '/结束游戏')),
+        BT.row(BT('开始', '/开始游戏', { autoEnter: true }), BT('结束', '/结束游戏')),
         BT.row(BT('退出', '/退出游戏'), BT('注销', '/注销账户'))
       )
     )

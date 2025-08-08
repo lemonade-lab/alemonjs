@@ -38,6 +38,4 @@ const group = onGroup(
   // wrongResponse
 )
 
-console.log('响应组已创建:', group)
-
 export default group

@@ -36,7 +36,7 @@ export const useMention = <T extends EventKeys>(
   }
   let res: User[] = null
   const mention = {
-    find: async (options: Options) => {
+    find: async (options: Options = {}) => {
       try {
         if (!res) {
           const results = await sendAction({
@@ -58,30 +58,26 @@ export const useMention = <T extends EventKeys>(
       }
       // 过滤出符合条件的数据
       const data = res.filter(item => {
-        if (options.UserId && item.UserId !== options.UserId) {
+        if (options.UserId !== undefined && item.UserId !== options.UserId) {
           return false
         }
-        if (options.UserKey && item.UserKey !== options.UserKey) {
+        if (options.UserKey !== undefined && item.UserKey !== options.UserKey) {
           return false
         }
-        if (options.UserName && item.UserName !== options.UserName) {
+        if (options.UserName !== undefined && item.UserName !== options.UserName) {
           return false
         }
-        if (options.IsMaster && item.IsMaster !== options.IsMaster) {
+        if (options.IsMaster !== undefined && item.IsMaster !== options.IsMaster) {
           return false
         }
-        if (options.IsBot && item.IsBot !== options.IsBot) {
+        if (options.IsBot !== undefined && item.IsBot !== options.IsBot) {
           return false
         }
         return true
       })
       return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data)
     },
-    findOne: async (
-      options: Options = {
-        IsBot: false
-      }
-    ) => {
+    findOne: async (options: Options = {}) => {
       try {
         if (!res) {
           const results = await sendAction({
@@ -103,20 +99,23 @@ export const useMention = <T extends EventKeys>(
       }
       // 根据条件查找
       const data = res.find(item => {
-        if (options.UserId && item.UserId !== options.UserId) {
+        if (options.UserId !== undefined && item.UserId !== options.UserId) {
           return false
         }
-        if (options.UserKey && item.UserKey !== options.UserKey) {
+        if (options.UserKey !== undefined && item.UserKey !== options.UserKey) {
           return false
         }
-        if (options.UserName && item.UserName !== options.UserName) {
+        if (options.UserName !== undefined && item.UserName !== options.UserName) {
           return false
         }
-        if (options.IsMaster && item.IsMaster !== options.IsMaster) {
+        if (options.IsMaster !== undefined && item.IsMaster !== options.IsMaster) {
           return false
         }
-        if (options.IsBot && item.IsBot !== options.IsBot) {
+        if (options.IsBot !== undefined && item.IsBot !== options.IsBot) {
           return false
+        }
+        if (item.IsBot) {
+          return false // 如果是 bot，则不返回
         }
         return true
       })
