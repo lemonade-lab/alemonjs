@@ -108,7 +108,6 @@ export const start = async (options: StartOptions | string = {}) => {
     // 设置环境变量
     process.env.port = port
     cbpServer(port, async () => {
-      console.log(`ws://127.0.0.1:${port}`)
       const url = `ws://127.0.0.1:${port}`
       const isFullReceive =
         options?.is_full_receive || cfg.argv?.is_full_receive || cfg.value?.is_full_receive || true

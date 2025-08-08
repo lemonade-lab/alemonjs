@@ -186,7 +186,6 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       try {
         const messages = JSON.parse(readFileSync(messagePath, 'utf-8'))
         const updatedMessages = messages.filter((msg: any) => msg.CreateAt !== CreateAt)
-        console.log('updatedMessages', updatedMessages)
         writeFile(messagePath, JSON.stringify(updatedMessages, null, 2), error => {
           if (error) {
             logger.error(`写入 ${type} 消息失败:`, error)
