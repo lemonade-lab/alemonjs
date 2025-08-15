@@ -239,8 +239,8 @@ router.all('apps/:app/{*path}', async ctx => {
     ctx.status = 405
     return
   }
-
-  const rootPath = path.join(process.cwd(), 'packages', appName)
+  // 不是 packages，而是 node_modules。需要是模块化
+  const rootPath = path.join(process.cwd(), 'node_modules', appName)
   const resourcePath = formatPath(ctx.params?.path)
   let root = ''
   try {

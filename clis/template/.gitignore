@@ -3,6 +3,7 @@ node_modules
 /public
 /data
 /lib
+/packages
 logs
 log
 
@@ -13,5 +14,6 @@ log
 *.logs
 alemon.*.json
 alemon.*.js
+alemon.*.yaml
 *.memory-card.json
 .nx
