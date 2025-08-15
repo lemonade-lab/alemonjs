@@ -1,13 +1,14 @@
 import KoaRouter from 'koa-router'
 import fs, { existsSync } from 'fs'
-import path, { dirname, join } from 'path'
+import path, { join, dirname } from 'path'
 import mime from 'mime-types'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
-
-const mainDirMap = new Map<string, string>()
-
-const formatPath = path => {
+const mainDirMap = new Map()
+const formatPath = (path: string) => {
+  if (!path || path === '/') {
+    return '/index.html'
+  }
   const pates = path.split('/')
   const lastPath = pates[pates.length - 1]
   if (lastPath.includes('.')) {
@@ -16,10 +17,9 @@ const formatPath = path => {
   path += '.html'
   return path
 }
-
 // 输入一个文件路径。
 const getModuelFile = (dir: string) => {
-  const dirMap = {
+  const dirMap: Record<string, string> = {
     '.js': `${dir}.js`,
     '.jsx': `${dir}.jsx`,
     '.mjs': `${dir}.mjs`,
@@ -34,7 +34,7 @@ const getModuelFile = (dir: string) => {
     '/index.tsx': `${dir}/index.tsx`
   }
   for (const key in dirMap) {
-    const filePath = dirMap[key as keyof typeof dirMap]
+    const filePath = dirMap[key]
     if (existsSync(filePath) && fs.statSync(filePath)) {
       return filePath
     }
@@ -56,7 +56,7 @@ router.get('api/online', ctx => {
   }
 })
 
-router.get('app/{*path}', async ctx => {
+router.all('app/{*path}', async ctx => {
   if (!process.env.input) {
     ctx.status = 400
     ctx.body = {
@@ -67,7 +67,8 @@ router.get('app/{*path}', async ctx => {
     return
   }
   const rootPath = process.cwd()
-  if (ctx.path.startsWith(`/app/api`)) {
+  const apiPath = `/app/api`
+  if (ctx.path.startsWith(apiPath)) {
     let mainPath = join(rootPath, process.env.input)
     // 路径
     if (!existsSync(mainPath)) {
@@ -75,30 +76,21 @@ router.get('app/{*path}', async ctx => {
       ctx.body = {
         code: 400,
         message: '未找到主要入口文件',
-        data: null
+        data: 'existsSync input'
       }
       return
     }
     const mainDir = dirname(mainPath)
     try {
-      const dir = join(mainDir, 'route', ctx.path)
-      if (!existsSync(dir)) {
-        ctx.status = 404
-        ctx.body = {
-          code: 404,
-          message: `API 'route/${ctx.path}' 未找到。`,
-          data: null
-        }
-        return
-      }
+      const dir = join(mainDir, 'route', ctx.path?.replace(apiPath, '/api') || '')
       const dirs = dir.split('/')
       const fileName = dirs[dirs.length - 1]
       if (fileName.includes('.')) {
         ctx.status = 404
         ctx.body = {
           code: 404,
-          message: `API 'route/${ctx.path}' 未找到。`,
-          data: null
+          message: `API '${ctx.path}' 未找到。`,
+          data: 'existsSync route filename'
         }
         return
       }
@@ -107,15 +99,19 @@ router.get('app/{*path}', async ctx => {
         ctx.status = 404
         ctx.body = {
           code: 404,
-          message: `API 'route/${ctx.path}' 未找到。`,
-          data: null
+          message: `API '${ctx.path}' 未找到。`,
+          data: 'existsSync modulePath'
         }
         return
       }
       const apiModule = await import(modulePath)
-      await apiModule.default(ctx)
+      if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
+        ctx.status = 405
+        return
+      }
+      await apiModule[ctx.method](ctx)
     } catch (err) {
-      console.error(`Error handling API request ${ctx.path}:`, err)
+      console.error(`Error handling API request ${ctx.path}`)
       ctx.status = 500
       ctx.body = {
         code: 500,
@@ -125,8 +121,28 @@ router.get('app/{*path}', async ctx => {
     }
     return
   }
-  const resourcePath = formatPath(ctx.params?.path || 'index.html')
-  const fullPath = path.join(rootPath, resourcePath)
+  // 如果不是 get请求。即不响应
+  if (ctx.method !== 'GET') {
+    ctx.status = 405
+    return
+  }
+  let root = ''
+  const resourcePath = formatPath(ctx.params?.path)
+  try {
+    const pkg = require(path.join(rootPath, 'package.json')) || {}
+    root = pkg.alemonjs?.web?.root || ''
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = {
+      code: 500,
+      message: `加载 package.json 时发生错误。`,
+      error: err.message
+    }
+    return
+  }
+  const fullPath = root
+    ? path.join(rootPath, root, resourcePath)
+    : path.join(rootPath, resourcePath)
   try {
     // 返回文件
     const file = await fs.promises.readFile(fullPath)
@@ -135,7 +151,7 @@ router.get('app/{*path}', async ctx => {
     ctx.body = file
     ctx.status = 200
   } catch (err) {
-    if (err.status === 404) {
+    if (err?.status === 404) {
       ctx.status = 404
       ctx.body = {
         code: 404,
@@ -153,11 +169,15 @@ router.get('app/{*path}', async ctx => {
   }
 })
 
-router.get('apps/:app/{*path}', async ctx => {
+router.all('app', async ctx => {
+  ctx.redirect('/app/')
+  return
+})
+
+router.all('apps/:app/{*path}', async ctx => {
   const appName = ctx.params.app
-  const rootPath = process.cwd()
-  const apiDir = `/apps/${appName}/api`
-  if (ctx.path.startsWith(apiDir)) {
+  const apiPath = `/apps/${appName}/api`
+  if (ctx.path.startsWith(apiPath)) {
     try {
       if (!mainDirMap.has(appName)) {
         const mainPath = require.resolve(appName)
@@ -174,7 +194,7 @@ router.get('apps/:app/{*path}', async ctx => {
         const mainDir = dirname(mainPath)
         mainDirMap.set(appName, mainDir)
       }
-      const dir = join(mainDirMap.get(appName), 'route', ctx.path?.replace(apiDir, '/api') || '')
+      const dir = join(mainDirMap.get(appName), 'route', ctx.path?.replace(apiPath, '/api') || '')
       const dirs = dir.split('/')
       const fileName = dirs[dirs.length - 1]
       if (fileName.includes('.')) {
@@ -197,9 +217,13 @@ router.get('apps/:app/{*path}', async ctx => {
         return
       }
       const apiModule = await import(modulePath)
-      await apiModule.default(ctx)
+      if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
+        ctx.status = 405
+        return
+      }
+      await apiModule[ctx.method](ctx)
     } catch (err) {
-      logger.warn(`Error handling API request ${ctx.path}:`, err?.message || '')
+      logger.warn(`Error request ${ctx.path}:`, err?.message || '')
       ctx.status = 500
       ctx.body = {
         code: 500,
@@ -209,8 +233,31 @@ router.get('apps/:app/{*path}', async ctx => {
     }
     return
   }
-  const resourcePath = formatPath(ctx.params?.path || 'index.html')
-  const fullPath = path.join(rootPath, 'packages', appName, resourcePath)
+
+  // 如果不是 get请求。即不响应
+  if (ctx.method !== 'GET') {
+    ctx.status = 405
+    return
+  }
+
+  const rootPath = path.join(process.cwd(), 'packages', appName)
+  const resourcePath = formatPath(ctx.params?.path)
+  let root = ''
+  try {
+    const pkg = require(`${appName}/package`) || {}
+    root = pkg?.alemonjs?.web?.root || ''
+  } catch (err) {
+    ctx.status = 500
+    ctx.body = {
+      code: 500,
+      message: `加载 package.json 时发生错误。`,
+      error: err.message
+    }
+    return
+  }
+  const fullPath = root
+    ? path.join(rootPath, root, resourcePath)
+    : path.join(rootPath, resourcePath)
   try {
     // 返回文件
     const file = await fs.promises.readFile(fullPath)
@@ -219,7 +266,7 @@ router.get('apps/:app/{*path}', async ctx => {
     ctx.body = file
     ctx.status = 200
   } catch (err) {
-    if (err.status === 404) {
+    if (err?.status === 404) {
       ctx.status = 404
       ctx.body = {
         code: 404,
@@ -227,15 +274,21 @@ router.get('apps/:app/{*path}', async ctx => {
         data: null
       }
     } else {
+      logger.warn(`Error request ${ctx.path}:`, err?.message || '')
       ctx.status = 500
       ctx.body = {
         code: 500,
         message: `加载子应用 '${appName}' 资源时发生服务器错误。`,
         error: err.message
       }
-      logger.warn(`Error handling API request ${ctx.path}:`, err?.message || '')
     }
   }
 })
+router.all('apps/:name', async ctx => {
+  if (ctx.path === `/apps/${ctx.params.name}`) {
+    ctx.redirect(`/apps/${ctx.params.name}/`)
+    return
+  }
+})
 
-export default router
+export { router as default }
