@@ -89,6 +89,7 @@ declare global {
       login?: string
       platform?: string
       port?: string
+      input?: string
       NODE_ENV?: 'development' | 'production'
     }
   }

@@ -109,6 +109,7 @@ export const start = async (options: StartOptions | string = {}) => {
     process.env.port = port
     cbpServer(port, async () => {
       const url = `ws://127.0.0.1:${port}`
+      logger.info(`[CBP server started at ${url}]`)
       const isFullReceive =
         options?.is_full_receive || cfg.argv?.is_full_receive || cfg.value?.is_full_receive || true
       cbpClient(url, { isFullReceive })
@@ -147,6 +148,7 @@ export const start = async (options: StartOptions | string = {}) => {
   }
   // 获取入口文件
   const input = options.input || cfg.argv?.input || cfg.value?.input || getInputExportPath()
+  process.env.input = input
   // 运行本地模块
   run(input)
   // load module
