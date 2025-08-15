@@ -116,8 +116,5 @@ export function findOrCreateValue<M extends Model>(
 /**
  * 获取模型的属性类型
  */
-export type AttributesModel<T extends ModelCtor<Model>> = T extends ModelCtor<infer M>
-  ? M extends Model<infer U, object>
-    ? U
-    : never
-  : never
+export type AttributesModel<T extends ModelCtor<Model>> =
+  T extends ModelCtor<infer M> ? (M extends Model<infer U, object> ? U : never) : never
