@@ -104,7 +104,7 @@ router.all('app/{*path}', async ctx => {
         }
         return
       }
-      const apiModule = await import(modulePath)
+      const apiModule = await import(`file://${modulePath}`)
       if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
         ctx.status = 405
         return
@@ -216,7 +216,7 @@ router.all('apps/:app/{*path}', async ctx => {
         }
         return
       }
-      const apiModule = await import(modulePath)
+      const apiModule = await import(`file://${modulePath}`)
       if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
         ctx.status = 405
         return
