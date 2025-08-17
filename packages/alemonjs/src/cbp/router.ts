@@ -3,6 +3,7 @@ import fs, { existsSync } from 'fs'
 import path, { join, dirname } from 'path'
 import mime from 'mime-types'
 import { createRequire } from 'module'
+import { html } from './hello.html'
 const require = createRequire(import.meta.url)
 const mainDirMap = new Map()
 const formatPath = (path: string) => {
@@ -44,6 +45,12 @@ const getModuelFile = (dir: string) => {
 
 const router = new KoaRouter({
   prefix: '/'
+})
+
+router.get('/', ctx => {
+  ctx.status = 200
+  ctx.set('Content-Type', 'text/html; charset=utf-8')
+  ctx.body = html
 })
 
 // 响应服务在线
