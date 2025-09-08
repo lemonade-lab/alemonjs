@@ -1,10 +1,10 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 export interface NotificationDivProps extends React.HTMLProps<HTMLDivElement> {
-  type?: 'default' | 'error' | 'warning'
+  type?: 'default' | 'error' | 'warning';
 }
 export function NotificationDiv(props: NotificationDivProps) {
-  const { type, className, ...prop } = props
+  const { type, className, ...prop } = props;
   return (
     <div
       className={classNames(className, {
@@ -40,5 +40,5 @@ export function NotificationDiv(props: NotificationDivProps) {
       })}
       {...prop}
     />
-  )
+  );
 }

@@ -1,10 +1,10 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 
-export type HeaderDivProps = React.HTMLProps<HTMLDivElement>
+export type HeaderDivProps = React.HTMLProps<HTMLDivElement>;
 
 export function HeaderDiv(props: HeaderDivProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <div
       className={classNames(
@@ -14,5 +14,5 @@ export function HeaderDiv(props: HeaderDivProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

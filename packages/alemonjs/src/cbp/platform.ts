@@ -1,13 +1,13 @@
-import { WebSocket } from 'ws'
-import { Actions } from '../typing/actions'
-import { ResultCode } from '../core/code'
-import { EventsEnum } from '../typings'
-import { DEVICE_ID_HEADER, deviceId, reconnectInterval, USER_AGENT_HEADER } from './config'
-import { Result } from '../core/utils'
-import { Apis } from '../typing/apis'
-import * as flattedJSON from 'flatted'
-import { useHeartbeat } from './connect'
-import { ActionReplyFunc, ApiReplyFunc } from './typings'
+import { WebSocket } from 'ws';
+import { Actions } from '../typing/actions';
+import { ResultCode } from '../core/code';
+import { EventsEnum } from '../typings';
+import { DEVICE_ID_HEADER, deviceId, reconnectInterval, USER_AGENT_HEADER } from './config';
+import { Result } from '../core/utils';
+import { Apis } from '../typing/apis';
+import * as flattedJSON from 'flatted';
+import { useHeartbeat } from './connect';
+import { ActionReplyFunc, ApiReplyFunc } from './typings';
 
 /**
  * CBP 平台端
@@ -22,29 +22,29 @@ export const cbpPlatform = (
   }
 ) => {
   if (global.chatbotPlatform) {
-    delete global.chatbotPlatform
+    delete global.chatbotPlatform;
   }
-  const { open = () => {} } = options
+  const { open = () => {} } = options;
 
   const [heartbeatControl] = useHeartbeat({
     ping: () => {
-      global?.chatbotPlatform?.ping?.()
+      global?.chatbotPlatform?.ping?.();
     },
     isConnected: () => {
-      return global?.chatbotPlatform && global?.chatbotPlatform?.readyState === WebSocket.OPEN
+      return global?.chatbotPlatform && global?.chatbotPlatform?.readyState === WebSocket.OPEN;
     },
     terminate: () => {
       try {
-        global?.chatbotPlatform?.terminate?.()
+        global?.chatbotPlatform?.terminate?.();
       } catch (error) {
         logger.debug({
           code: ResultCode.Fail,
           message: '强制断开连接失败',
           data: error
-        })
+        });
       }
     }
-  })
+  });
 
   /**
    * 发送数据
@@ -52,12 +52,12 @@ export const cbpPlatform = (
    */
   const send = (data: EventsEnum) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
-      data.DeviceId = deviceId // 设置设备 ID
-      global.chatbotPlatform.send(flattedJSON.stringify(data))
+      data.DeviceId = deviceId; // 设置设备 ID
+      global.chatbotPlatform.send(flattedJSON.stringify(data));
     }
-  }
-  const actionReplys: ActionReplyFunc[] = []
-  const apiReplys: ApiReplyFunc[] = []
+  };
+  const actionReplys: ActionReplyFunc[] = [];
+  const apiReplys: ApiReplyFunc[] = [];
 
   /**
    * 消费数据
@@ -74,9 +74,9 @@ export const cbpPlatform = (
           actionId: data.actionId,
           DeviceId: data.DeviceId
         })
-      )
+      );
     }
-  }
+  };
 
   const replyApi = (data: Apis, payload: Result[]) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
@@ -88,24 +88,24 @@ export const cbpPlatform = (
           DeviceId: data.DeviceId,
           payload: payload
         })
-      )
+      );
     }
-  }
+  };
 
   /**
    * 接收行为
    * @param reply
    */
   const onactions = (reply: ActionReplyFunc) => {
-    actionReplys.push(reply)
-  }
+    actionReplys.push(reply);
+  };
 
   /**
    * 接收接口
    */
   const onapis = (reply: ApiReplyFunc) => {
-    apiReplys.push(reply)
-  }
+    apiReplys.push(reply);
+  };
 
   /**
    * 启动 WebSocket 连接
@@ -116,31 +116,32 @@ export const cbpPlatform = (
         [USER_AGENT_HEADER]: 'platform',
         [DEVICE_ID_HEADER]: deviceId
       }
-    })
+    });
     global.chatbotPlatform.on('open', () => {
-      open()
-      heartbeatControl.start() // 启动心跳
-    })
+      open();
+      heartbeatControl.start(); // 启动心跳
+    });
 
     global.chatbotPlatform.on('pong', () => {
-      heartbeatControl.pong() // 更新 pong 时间
-    })
+      heartbeatControl.pong(); // 更新 pong 时间
+    });
 
     global.chatbotPlatform.on('message', message => {
       try {
-        const data = flattedJSON.parse(message.toString())
+        const data = flattedJSON.parse(message.toString());
+
         logger.debug({
           code: ResultCode.Ok,
           message: '平台端接收消息',
           data: data
-        })
+        });
         if (data.apiId) {
           for (const cb of apiReplys) {
             cb(
               data,
               // 传入一个消费函数
               val => replyApi(data, val)
-            )
+            );
           }
         } else if (data.actionId) {
           for (const cb of actionReplys) {
@@ -148,7 +149,7 @@ export const cbpPlatform = (
               data,
               // 传入一个消费函数
               val => replyAction(data, val)
-            )
+            );
           }
         }
       } catch (error) {
@@ -156,37 +157,38 @@ export const cbpPlatform = (
           code: ResultCode.Fail,
           message: '解析消息失败',
           data: error
-        })
+        });
       }
-    })
+    });
     global.chatbotPlatform.on('close', err => {
-      heartbeatControl.stop() // 停止心跳
+      heartbeatControl.stop(); // 停止心跳
       logger.warn({
         code: ResultCode.Fail,
         message: '平台端连接关闭，尝试重新连接...',
         data: err
-      })
-      delete global.chatbotPlatform
+      });
+      delete global.chatbotPlatform;
       // 重新连接逻辑
       setTimeout(() => {
-        start() // 重新连接
-      }, reconnectInterval) // 6秒后重连
-    })
+        start(); // 重新连接
+      }, reconnectInterval); // 6秒后重连
+    });
     global.chatbotPlatform.on('error', err => {
       logger.error({
         code: ResultCode.Fail,
         message: '平台端错误',
         data: err
-      })
-    })
-  }
+      });
+    });
+  };
 
-  start()
+  start();
 
   const client = {
     send,
     onactions,
     onapis
-  }
-  return client
-}
+  };
+
+  return client;
+};

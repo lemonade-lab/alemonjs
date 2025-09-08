@@ -7,4 +7,4 @@
  * @param event
  * @returns
  */
-export type MESSAGE_CREATE_TYPE = any
+export type MESSAGE_CREATE_TYPE = any;

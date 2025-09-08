@@ -2,16 +2,16 @@ export type Guild = {
   /**
    * 频道Id
    */
-  GuildId: string
+  GuildId: string;
   /**
    * 空间Id
    */
-  SpaceId: string
-}
+  SpaceId: string;
+};
 
 export type Channel = {
   /**
    * 子频道Id
    */
-  ChannelId: string
-}
+  ChannelId: string;
+};

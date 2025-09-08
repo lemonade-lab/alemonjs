@@ -1,25 +1,18 @@
-import {
-  sendNotification,
-  sendWebviewOnMessage,
-  sendActionApplicationSidebarLoad,
-  processSend
-} from './send.js'
-import { commands } from './storage.js'
-import HTMLSCRIPT from './script.js'
+import { sendNotification, sendWebviewOnMessage, sendActionApplicationSidebarLoad, processSend } from './send.js';
+import { commands } from './storage.js';
+import HTMLSCRIPT from './script.js';
 
 export class Context {
   createExtensionDir(dir: string) {
-    return `resource://-/${dir.replace(/^file:\/\//, '')}`
+    return `resource://-/${dir.replace(/^file:\/\//, '')}`;
   }
 
   createAction(_context: typeof this): typeof Actions.prototype {
     // @ts-ignore
-    return
   }
 
   createSidebarWebView(_context: typeof this): typeof webView.prototype {
     // @ts-ignore
-    return
   }
 
   /**
@@ -27,7 +20,7 @@ export class Context {
    * @param message
    */
   notification(message: string, typing: 'error' | 'warning' | 'default' = 'default') {
-    sendNotification(message, typing)
+    sendNotification(message, typing);
   }
 
   /**
@@ -39,7 +32,7 @@ export class Context {
     commands.push({
       command: command,
       callback
-    })
+    });
   }
 }
 
@@ -48,16 +41,17 @@ export class webView {
    *  插入脚本
    */
   get #htmlScript() {
-    const script = HTMLSCRIPT.replace(/<@name>/g, `'${this._name}'`)
-    return script
+    const script = HTMLSCRIPT.replace(/<@name>/g, `'${this._name}'`);
+
+    return script;
   }
 
-  _name: string | null = null
+  _name: string | null = null;
 
-  __messages: Function[] = []
+  __messages: Function[] = [];
 
   constructor(_ctx: typeof Context.prototype, _name: string) {
-    this._name = _name
+    this._name = _name;
   }
 
   /**
@@ -65,7 +59,7 @@ export class webView {
    * @param {*} callback
    */
   onMessage(callback: Function) {
-    this.__messages.push(callback)
+    this.__messages.push(callback);
   }
 
   /**
@@ -76,7 +70,7 @@ export class webView {
     sendWebviewOnMessage({
       name: this._name,
       value: data
-    })
+    });
   }
 
   /**
@@ -85,67 +79,69 @@ export class webView {
    */
   loadWebView(html: string) {
     // 插入脚本
-    const data = html.replace('<head>', `<head> ${this.#htmlScript} `)
-    sendActionApplicationSidebarLoad(data)
+    const data = html.replace('<head>', `<head> ${this.#htmlScript} `);
+
+    sendActionApplicationSidebarLoad(data);
   }
 }
 
 class Click {
-  #event = ''
+  #event = '';
 
   constructor(event: string) {
-    this.#event = event
+    this.#event = event;
   }
 
   // 点击logo
   onClickLogo() {
     // 点击logo
-    this.#event = `${this.#event}:logo`
+    this.#event = `${this.#event}:logo`;
     processSend({
       type: this.#event,
       data: ''
-    })
+    });
   }
 
   // 点击组件
   onClickComponent() {
-    this.#event = `${this.#event}:home`
+    this.#event = `${this.#event}:home`;
     processSend({
       type: this.#event,
       data: ''
-    })
+    });
   }
 
   // 点击扩展
   onClickApplication() {
-    this.#event = `${this.#event}:application`
+    this.#event = `${this.#event}:application`;
+
     return {
       loadWebView: (html: string) => {
-        this.#event = `${this.#event}:sidebar:load`
+        this.#event = `${this.#event}:sidebar:load`;
         processSend({
           type: this.#event,
           data: html
-        })
+        });
       }
-    }
+    };
   }
 
   // 点击扩展商场
   onClickExtensions() {
-    this.#event = `${this.#event}:extensions`
+    this.#event = `${this.#event}:extensions`;
     processSend({
       type: this.#event,
       data: ''
-    })
+    });
   }
 
   // 点击设置
   onClickSetting() {
-    this.#event = `${this.#event}:setting`
+    this.#event = `${this.#event}:setting`;
     processSend({
       type: this.#event,
       data: ''
-    })
+    });
   }
 }
 
@@ -154,9 +150,9 @@ class Click {
  */
 export class Actions {
   // 一组行为，使用:分开
-  #event = ''
+  #event = '';
 
-  _name: string | null
+  _name: string | null;
 
   /**
    *
@@ -164,7 +160,7 @@ export class Actions {
    * @param _name
    */
   constructor(_ctx: typeof Context.prototype, _name: string) {
-    this._name = _name
+    this._name = _name;
   }
 
   /**
@@ -173,7 +169,8 @@ export class Actions {
    */
   create() {
     // 创建 行为
-    this.#event = 'action'
-    return new Click(this.#event)
+    this.#event = 'action';
+
+    return new Click(this.#event);
   }
 }

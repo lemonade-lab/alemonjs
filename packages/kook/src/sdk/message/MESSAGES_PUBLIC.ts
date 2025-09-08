@@ -1,8 +1,8 @@
-import { type EventData } from '../typings.js'
+import { type EventData } from '../typings.js';
 
 /**
  * 群聊消息
  * @param event
  * @returns
  */
-export type MESSAGES_PUBLIC_TYPE = EventData
+export type MESSAGES_PUBLIC_TYPE = EventData;

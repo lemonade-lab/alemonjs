@@ -1,1 +1,1 @@
-export type ERROR_TYPE = any
+export type ERROR_TYPE = any;

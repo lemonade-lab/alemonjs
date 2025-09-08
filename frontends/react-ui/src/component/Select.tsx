@@ -1,8 +1,8 @@
-import React from 'react'
-import classNames from 'classnames'
-export type SelectProps = React.HTMLProps<HTMLSelectElement>
+import React from 'react';
+import classNames from 'classnames';
+export type SelectProps = React.HTMLProps<HTMLSelectElement>;
 export function Select(props: SelectProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <select
       className={classNames(
@@ -18,5 +18,5 @@ export function Select(props: SelectProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

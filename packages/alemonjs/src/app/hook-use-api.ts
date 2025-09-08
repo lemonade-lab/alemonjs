@@ -1,17 +1,17 @@
-import { DataEnums, EventKeys, Events, User } from '../typings'
-import { ResultCode } from '../core/code'
-import { ChildrenApp } from './store'
-import { createResult, Result } from '../core/utils'
-import { sendAction } from '../cbp/actions'
-import { sendAPI } from '../cbp/api'
+import { DataEnums, EventKeys, Events, User } from '../typings';
+import { ResultCode } from '../core/code';
+import { ChildrenApp } from './store';
+import { createResult, Result } from '../core/utils';
+import { sendAction } from '../cbp/actions';
+import { sendAPI } from '../cbp/api';
 
 type Options = {
-  UserId?: string
-  UserKey?: string
-  UserName?: string
-  IsMaster?: boolean
-  IsBot?: boolean
-}
+  UserId?: string;
+  UserKey?: string;
+  UserName?: string;
+  IsMaster?: boolean;
+  IsBot?: boolean;
+};
 
 /**
  * 使用提及。
@@ -22,8 +22,8 @@ export const useMention = <T extends EventKeys>(
   event: Events[T]
 ): [
   {
-    find: (options: Options) => Promise<Result<User[]>>
-    findOne: (options?: Options) => Promise<Result<User | null>>
+    find: (options: Options) => Promise<Result<User[]>>;
+    findOne: (options?: Options) => Promise<Result<User | null>>;
   }
 ] => {
   if (!event || typeof event !== 'object') {
@@ -31,10 +31,10 @@ export const useMention = <T extends EventKeys>(
       code: ResultCode.FailParams,
       message: 'Invalid event: event must be an object',
       data: null
-    })
-    throw new Error('Invalid event: event must be an object')
+    });
+    throw new Error('Invalid event: event must be an object');
   }
-  let res: User[] = null
+  let res: User[] = null;
   const mention = {
     find: async (options: Options = {}) => {
       try {
@@ -44,38 +44,41 @@ export const useMention = <T extends EventKeys>(
             payload: {
               event
             }
-          })
-          const result = results.find(item => item.code === ResultCode.Ok)
+          });
+          const result = results.find(item => item.code === ResultCode.Ok);
+
           if (result) {
-            res = result.data as User[]
+            res = result.data as User[];
           }
         }
       } catch (err) {
-        return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
+        return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null);
       }
       if (!Array.isArray(res)) {
-        return createResult(ResultCode.Warn, 'No mention data found', null)
+        return createResult(ResultCode.Warn, 'No mention data found', null);
       }
       // 过滤出符合条件的数据
       const data = res.filter(item => {
         if (options.UserId !== undefined && item.UserId !== options.UserId) {
-          return false
+          return false;
         }
         if (options.UserKey !== undefined && item.UserKey !== options.UserKey) {
-          return false
+          return false;
         }
         if (options.UserName !== undefined && item.UserName !== options.UserName) {
-          return false
+          return false;
         }
         if (options.IsMaster !== undefined && item.IsMaster !== options.IsMaster) {
-          return false
+          return false;
         }
         if (options.IsBot !== undefined && item.IsBot !== options.IsBot) {
-          return false
+          return false;
         }
-        return true
-      })
-      return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data)
+
+        return true;
+      });
+
+      return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data);
     },
     findOne: async (options: Options = {}) => {
       try {
@@ -85,48 +88,53 @@ export const useMention = <T extends EventKeys>(
             payload: {
               event
             }
-          })
-          const result = results.find(item => item.code === ResultCode.Ok)
+          });
+          const result = results.find(item => item.code === ResultCode.Ok);
+
           if (result) {
-            res = result.data as User[]
+            res = result.data as User[];
           }
         }
       } catch (err) {
-        return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null)
+        return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null);
       }
       if (!Array.isArray(res)) {
-        return createResult(ResultCode.Warn, 'No mention data found', null)
+        return createResult(ResultCode.Warn, 'No mention data found', null);
       }
       // 根据条件查找
       const data = res.find(item => {
         if (options.UserId !== undefined && item.UserId !== options.UserId) {
-          return false
+          return false;
         }
         if (options.UserKey !== undefined && item.UserKey !== options.UserKey) {
-          return false
+          return false;
         }
         if (options.UserName !== undefined && item.UserName !== options.UserName) {
-          return false
+          return false;
         }
         if (options.IsMaster !== undefined && item.IsMaster !== options.IsMaster) {
-          return false
+          return false;
         }
         if (options.IsBot !== undefined && item.IsBot !== options.IsBot) {
-          return false
+          return false;
         }
         if (item.IsBot) {
-          return false // 如果是 bot，则不返回
+          return false; // 如果是 bot，则不返回
         }
-        return true
-      })
+
+        return true;
+      });
+
       if (!data) {
-        return createResult(ResultCode.Warn, 'No mention data found', null)
+        return createResult(ResultCode.Warn, 'No mention data found', null);
       }
-      return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data)
+
+      return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data);
     }
-  }
-  return [mention] as const
-}
+  };
+
+  return [mention] as const;
+};
 
 /**
  * 消息处理
@@ -139,8 +147,8 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
       code: ResultCode.FailParams,
       message: 'Invalid event: event must be an object',
       data: null
-    })
-    throw new Error('Invalid event: event must be an object')
+    });
+    throw new Error('Invalid event: event must be an object');
   }
 
   /**
@@ -150,9 +158,7 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
    */
   const send = async (val: DataEnums[]): Promise<Result[]> => {
     if (!val || val.length === 0) {
-      return [
-        createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)
-      ]
+      return [createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)];
     }
     const result = await sendAction({
       action: 'message.send',
@@ -162,9 +168,10 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
           format: val
         }
       }
-    })
-    return Array.isArray(result) ? result : [result]
-  }
+    });
+
+    return Array.isArray(result) ? result : [result];
+  };
 
   // /**
   //  * 撤回消息
@@ -227,9 +234,10 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
     // pinning,
     // horn,
     // reaction
-  }
-  return [message] as const
-}
+  };
+
+  return [message] as const;
+};
 
 /**
  * 用户处理
@@ -243,8 +251,8 @@ export const useMenber = <T extends EventKeys>(event: Events[T]) => {
       code: ResultCode.FailParams,
       message: 'Invalid event: event must be an object',
       data: null
-    })
-    throw new Error('Invalid event: event must be an object')
+    });
+    throw new Error('Invalid event: event must be an object');
   }
 
   // /**
@@ -288,9 +296,10 @@ export const useMenber = <T extends EventKeys>(event: Events[T]) => {
     // mute,
     // unmute,
     // remove
-  }
-  return [member] as const
-}
+  };
+
+  return [member] as const;
+};
 
 /**
  * 频道处理
@@ -304,8 +313,8 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
       code: ResultCode.FailParams,
       message: 'Invalid event: event must be an object',
       data: null
-    })
-    throw new Error('Invalid event: event must be an object')
+    });
+    throw new Error('Invalid event: event must be an object');
   }
 
   // // 退出
@@ -321,9 +330,10 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
   const channel = {
     // exit,
     // join
-  }
-  return [channel] as const
-}
+  };
+
+  return [channel] as const;
+};
 
 /**
  * 废弃，请使用 useMessage
@@ -332,12 +342,13 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
  * @returns
  */
 export const useSend = <T extends EventKeys>(event: Events[T]) => {
-  const [message] = useMessage(event)
+  const [message] = useMessage(event);
   const send = async (...val: DataEnums[]) => {
-    return message.send(val)
-  }
-  return send
-}
+    return message.send(val);
+  };
+
+  return send;
+};
 
 /**
  * 废弃，请使用 useMessage
@@ -346,35 +357,37 @@ export const useSend = <T extends EventKeys>(event: Events[T]) => {
  * @returns
  */
 export const useSends = <T extends EventKeys>(event: Events[T]) => {
-  const [message] = useMessage(event)
-  return [message.send] as const
-}
+  const [message] = useMessage(event);
+
+  return [message.send] as const;
+};
 
 /**
  * 卸载模块
  * @param name
  * @throws {Error} - 如果 name 无效，抛出错误。
  */
-export const unChildren = (name: string = 'main') => {
+export const unChildren = (name = 'main') => {
   if (!name || typeof name !== 'string') {
     logger.error({
       code: ResultCode.FailParams,
       message: 'Invalid name: name must be a string',
       data: null
-    })
-    throw new Error('Invalid name: name must be a string')
+    });
+    throw new Error('Invalid name: name must be a string');
   }
-  const app = new ChildrenApp(name)
-  app.un()
-}
+  const app = new ChildrenApp(name);
+
+  app.un();
+};
 
 /**
  * 创建选择器
  * @param values
  * @returns
  */
-export const onSelects = <T extends EventKeys[] | EventKeys>(values: T) => values
-global.onSelects = onSelects
+export const onSelects = <T extends EventKeys[] | EventKeys>(values: T) => values;
+global.onSelects = onSelects;
 
 /**
  * 废弃,请使用onSelects
@@ -382,7 +395,7 @@ global.onSelects = onSelects
  * @param values
  * @returns
  */
-export const createSelects = onSelects
+export const createSelects = onSelects;
 
 /**
  * 使用客户端
@@ -401,9 +414,10 @@ export const useClient = <T extends object>(event: any, _ApiClass: new (...args:
             key: String(prop),
             params: args
           }
-        })
-      }
+        });
+      };
     }
-  })
-  return [client] as const
-}
+  });
+
+  return [client] as const;
+};

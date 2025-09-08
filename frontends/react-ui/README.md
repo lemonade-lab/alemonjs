@@ -9,5 +9,5 @@ yarn add @alemonjs/react
 ```
 
 ```ts
-import { Button } from '@alemonjs/react'
+import { Button } from '@alemonjs/react';
 ```

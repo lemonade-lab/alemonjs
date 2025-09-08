@@ -1,11 +1,11 @@
-import axios, { type AxiosRequestConfig } from 'axios'
-import FormData from 'form-data'
-import { Readable } from 'stream'
-import { ApiEnum, SendMessageParams, SendDirectMessageParams } from './typings.js'
-import { config } from './config.js'
-import { createPicFrom } from 'alemonjs/utils'
+import axios, { type AxiosRequestConfig } from 'axios';
+import FormData from 'form-data';
+import { Readable } from 'stream';
+import { ApiEnum, SendMessageParams, SendDirectMessageParams } from './typings.js';
+import { config } from './config.js';
+import { createPicFrom } from 'alemonjs/utils';
 
-export const API_URL = 'https://www.kookapp.cn'
+export const API_URL = 'https://www.kookapp.cn';
 
 /**
  * api接口
@@ -17,15 +17,16 @@ export class KOOKAPI {
    * @returns
    */
   service(opstoin: AxiosRequestConfig) {
-    const token = config.get('token')
+    const token = config.get('token');
     const req = axios.create({
       baseURL: API_URL,
       timeout: 30000,
       headers: {
         Authorization: `Bot ${token}`
       }
-    })
-    return req(opstoin)
+    });
+
+    return req(opstoin);
   }
 
   /**
@@ -39,7 +40,7 @@ export class KOOKAPI {
       params: {
         compress: 0
       }
-    }).then(res => res.data)
+    }).then(res => res.data);
   }
 
   /**
@@ -58,14 +59,22 @@ export class KOOKAPI {
     const from = await createPicFrom({
       image: file,
       name: Name
-    })
-    if (!from) return false
-    const { picData, name } = from
-    const formdata = new FormData()
-    formdata.append('file', picData, name)
-    const url = await this.createUrl(formdata)
-    if (url) return url
-    return false
+    });
+
+    if (!from) {
+      return false;
+    }
+    const { picData, name } = from;
+    const formdata = new FormData();
+
+    formdata.append('file', picData, name);
+    const url = await this.createUrl(formdata);
+
+    if (url) {
+      return url;
+    }
+
+    return false;
   }
 
   /**
@@ -75,11 +84,16 @@ export class KOOKAPI {
    * @returns
    */
   async postFile(file: Buffer, Name = 'image.jpg') {
-    const formdata = new FormData()
-    formdata.append('file', [file], Name)
-    const url = await this.createUrl(formdata)
-    if (url) return url
-    return false
+    const formdata = new FormData();
+
+    formdata.append('file', [file], Name);
+    const url = await this.createUrl(formdata);
+
+    if (url) {
+      return url;
+    }
+
+    return false;
   }
 
   /**
@@ -88,14 +102,14 @@ export class KOOKAPI {
    * @returns
    */
   async createUrl(formdata): Promise<{
-    data: { url: string }
+    data: { url: string };
   }> {
     return await this.service({
       method: 'post',
       url: ApiEnum.AssetCreate,
       data: formdata,
       headers: formdata.getHeaders()
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -111,16 +125,16 @@ export class KOOKAPI {
    */
   async createMessage(data: SendMessageParams): Promise<{
     data: {
-      msg_id: string
-      msg_timestamp: number
-      nonce: string
-    }
+      msg_id: string;
+      msg_timestamp: number;
+      nonce: string;
+    };
   }> {
     return await this.service({
       method: 'post',
       url: ApiEnum.MessageCreate,
       data
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -134,20 +148,20 @@ export class KOOKAPI {
    */
   async userChatCreate(target_id: string): Promise<{
     data: {
-      code: string
-      last_read_time: number
-      latest_msg_time: number
-      unread_count: number
-      is_friend: boolean
-      is_blocked: boolean
-      is_target_blocked: boolean
+      code: string;
+      last_read_time: number;
+      latest_msg_time: number;
+      unread_count: number;
+      is_friend: boolean;
+      is_blocked: boolean;
+      is_target_blocked: boolean;
       target_info: {
-        id: string
-        username: string
-        online: boolean
-        avatar: string
-      }
-    }
+        id: string;
+        username: string;
+        online: boolean;
+        avatar: string;
+      };
+    };
   }> {
     return this.service({
       method: 'post',
@@ -155,7 +169,7 @@ export class KOOKAPI {
       data: {
         target_id
       }
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -165,16 +179,16 @@ export class KOOKAPI {
    */
   async createDirectMessage(data: SendDirectMessageParams): Promise<{
     data: {
-      msg_id: string
-      msg_timestamp: number
-      nonce: string
-    }
+      msg_id: string;
+      msg_timestamp: number;
+      nonce: string;
+    };
   }> {
     return this.service({
       method: 'post',
       url: ApiEnum.DirectMessageCreate,
       data
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -184,10 +198,10 @@ export class KOOKAPI {
    */
   async messageDelete(msg_id: string): Promise<{
     data: {
-      code: number
-      message: string
-      data: any[]
-    }
+      code: number;
+      message: string;
+      data: any[];
+    };
   }> {
     return this.service({
       method: 'post',
@@ -195,7 +209,7 @@ export class KOOKAPI {
       data: {
         msg_id
       }
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -203,23 +217,18 @@ export class KOOKAPI {
    * @param data
    * @returns
    */
-  async messageUpdate(data: {
-    msg_id: string
-    content: any
-    quote?: string
-    temp_target_id?: string
-  }): Promise<{
+  async messageUpdate(data: { msg_id: string; content: any; quote?: string; temp_target_id?: string }): Promise<{
     data: {
-      code: number
-      message: string
-      data: any[]
-    }
+      code: number;
+      message: string;
+      data: any[];
+    };
   }> {
     return this.service({
       method: 'post',
       url: ApiEnum.MessageUpdate,
       data
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -228,15 +237,15 @@ export class KOOKAPI {
    * @returns
    */
   async messageDeleteReaction(data: { msg_id: string; emoji: string; user_id: string }): Promise<{
-    code: number
-    message: string
-    data: any[]
+    code: number;
+    message: string;
+    data: any[];
   }> {
     return this.service({
       method: 'post',
       url: ApiEnum.MessageDeleteReaction,
       data
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -245,15 +254,15 @@ export class KOOKAPI {
    * @returns
    */
   async messageAddReaction(data: { msg_id: string; emoji: string }): Promise<{
-    code: number
-    message: string
-    data: any[]
+    code: number;
+    message: string;
+    data: any[];
   }> {
     return this.service({
       method: 'post',
       url: ApiEnum.MessageAddReaction,
       data
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -262,29 +271,29 @@ export class KOOKAPI {
    * @returns
    */
   async messageReactionList(params: { msg_id: string; emoji: string }): Promise<{
-    code: number
-    message: string
+    code: number;
+    message: string;
     data: {
-      id: string
-      username: string
-      identify_num: string
-      online: boolean
-      status: number
-      avatar: string
-      bot: boolean
+      id: string;
+      username: string;
+      identify_num: string;
+      online: boolean;
+      status: number;
+      avatar: string;
+      bot: boolean;
       tag_info: {
-        color: string
-        text: string
-      }
-      nickname: string
-      reaction_time: number
-    }
+        color: string;
+        text: string;
+      };
+      nickname: string;
+      reaction_time: number;
+    };
   }> {
     return this.service({
       method: 'get',
       url: ApiEnum.MessageReactionList,
       params
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -300,29 +309,29 @@ export class KOOKAPI {
    * @returns
    */
   async userMe(): Promise<{
-    code: number
-    message: string
+    code: number;
+    message: string;
     data: {
-      id: string
-      username: string
-      identify_num: string
-      online: false
-      os: string
-      status: number
-      avatar: string
-      banner: string
-      bot: true
-      mobile_verified: true
-      client_id: string
-      mobile_prefix: string
-      mobile: string
-      invited_count: number
-    }
+      id: string;
+      username: string;
+      identify_num: string;
+      online: false;
+      os: string;
+      status: number;
+      avatar: string;
+      banner: string;
+      bot: true;
+      mobile_verified: true;
+      client_id: string;
+      mobile_prefix: string;
+      mobile: string;
+      invited_count: number;
+    };
   }> {
     return this.service({
       method: 'get',
       url: ApiEnum.UserMe
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -335,22 +344,22 @@ export class KOOKAPI {
     guild_id: string,
     user_id: string
   ): Promise<{
-    code: number
-    message: string
+    code: number;
+    message: string;
     data: {
-      id: string
-      username: string
-      identify_num: string
-      online: false
-      status: 0
-      bot: true
-      avatar: string
-      vip_avatar: string
-      mobile_verified: true
-      roles: number[]
-      joined_at: number
-      active_time: number
-    }
+      id: string;
+      username: string;
+      identify_num: string;
+      online: false;
+      status: 0;
+      bot: true;
+      avatar: string;
+      vip_avatar: string;
+      mobile_verified: true;
+      roles: number[];
+      joined_at: number;
+      active_time: number;
+    };
   }> {
     return this.service({
       method: 'get',
@@ -359,7 +368,7 @@ export class KOOKAPI {
         guild_id,
         user_id
       }
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -372,9 +381,9 @@ export class KOOKAPI {
     guild_id: string,
     user_id: string
   ): Promise<{
-    code: number
-    message: string
-    data: any
+    code: number;
+    message: string;
+    data: any;
   }> {
     return this.service({
       method: 'post',
@@ -383,7 +392,7 @@ export class KOOKAPI {
         guild_id,
         target_id: user_id
       }
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 
   /**
@@ -398,9 +407,9 @@ export class KOOKAPI {
     type: string,
     value: string
   ): Promise<{
-    code: number
-    message: string
-    data: any
+    code: number;
+    message: string;
+    data: any;
   }> {
     return this.service({
       method: 'post',
@@ -410,6 +419,6 @@ export class KOOKAPI {
         type,
         value
       }
-    }).then(res => res?.data)
+    }).then(res => res?.data);
   }
 }

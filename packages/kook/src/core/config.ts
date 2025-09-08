@@ -2,9 +2,9 @@
  * 基础配置结构
  */
 export class BaseConfig<D> {
-  #data: D = null
+  #data: D = null;
   constructor(val: D) {
-    this.#data = val
+    this.#data = val;
   }
   /**
    * 设置配置
@@ -12,8 +12,11 @@ export class BaseConfig<D> {
    * @param val
    */
   set<T extends keyof D>(key: T, val: D[T]) {
-    if (val !== undefined) this.#data[key] = val
-    return this
+    if (val !== undefined) {
+      this.#data[key] = val;
+    }
+
+    return this;
   }
   /**
    *
@@ -22,9 +25,10 @@ export class BaseConfig<D> {
    */
   has(key: string) {
     if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
-      true
+      true;
     }
-    return false
+
+    return false;
   }
   /**
    * 读取配置
@@ -32,7 +36,7 @@ export class BaseConfig<D> {
    * @returns
    */
   all(): D {
-    return this.#data
+    return this.#data;
   }
   /**
    * 读取配置
@@ -40,6 +44,6 @@ export class BaseConfig<D> {
    * @returns
    */
   get<T extends keyof D>(key: T): D[T] | undefined {
-    return this.#data[key]
+    return this.#data[key];
   }
 }

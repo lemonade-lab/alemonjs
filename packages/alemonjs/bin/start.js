@@ -1,30 +1,30 @@
 #!/usr/bin/env node
 
-import path from 'path'
-import fs from 'fs'
-import { createRequire } from 'module'
-const require = createRequire(import.meta.url)
+import path from 'path';
+import fs from 'fs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
 const createExports = packageJson => {
   if (packageJson?.exports) {
     if (typeof packageJson.exports === 'string') {
-      return packageJson.exports
+      return packageJson.exports;
     } else if (typeof packageJson.exports === 'object') {
-      return packageJson.exports['.'] || packageJson.exports['./index.js']
+      return packageJson.exports['.'] || packageJson.exports['./index.js'];
     }
   }
-}
+};
 
 const getInputExportPath = input => {
-  const packageJsonPath = path.join(input ?? process.cwd(), 'package.json')
+  const packageJsonPath = path.join(input ?? process.cwd(), 'package.json');
   if (fs.existsSync(packageJsonPath)) {
-    const packageJson = require(packageJsonPath)
-    const main = packageJson?.main || createExports(packageJson)
+    const packageJson = require(packageJsonPath);
+    const main = packageJson?.main || createExports(packageJson);
     if (main) {
-      return main
+      return main;
     }
   }
-}
+};
 
 /**
  *
@@ -32,8 +32,8 @@ const getInputExportPath = input => {
  */
 export const start = () => {
   // 读取配置文件
-  const main = getInputExportPath()
+  const main = getInputExportPath();
   import('../lib/index.js').then(res => {
-    res.start(main)
-  })
-}
+    res.start(main);
+  });
+};

@@ -1,5 +1,5 @@
-import { Button, Input } from '@alemonjs/react-ui'
-import React, { useEffect, useState } from 'react'
+import { Button, Input } from '@alemonjs/react-ui';
+import React, { useEffect, useState } from 'react';
 
 export default function WebhookForm() {
   const [formData, setFormData] = useState({
@@ -10,20 +10,20 @@ export default function WebhookForm() {
     route: '/webhook',
     port: 17157,
     sandbox: false
-  })
+  });
 
   useEffect(() => {
-    if (!window.createDesktopAPI) return
-    const API = window.createDesktopAPI()
-    window.API = API
+    if (!window.createDesktopAPI) return;
+    const API = window.createDesktopAPI();
+    window.API = API;
 
     // 获取消息
     API.postMessage({
       type: 'qq-bot.init'
-    })
+    });
     API.onMessage(data => {
       if (data.type === 'qq-bot.init') {
-        const db = data.data
+        const db = data.data;
         setFormData({
           app_id: db.app_id || '',
           token: db.token || '',
@@ -32,113 +32,106 @@ export default function WebhookForm() {
           port: db.port || 17157,
           sandbox: db.sandbox || false,
           master_key: Array.isArray(db?.master_key) ? db.master_key.join(',') : ''
-        })
+        });
       }
-    })
-  }, [])
+    });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
+    const { name, value, type } = e.target;
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? e.target.checked : value
-    })
-  }
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     window.API.postMessage({
       type: 'qq-bot.form.save',
       data: formData
-    })
-  }
+    });
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="py-4 space-y-4">
+    <form onSubmit={handleSubmit} className='py-4 space-y-4'>
       <div>
-        <label className="block text-sm font-medium ">App ID</label>
+        <label className='block text-sm font-medium '>App ID</label>
         <Input
-          type="text"
-          id="app_id"
-          name="app_id"
+          type='text'
+          id='app_id'
+          name='app_id'
           value={formData.app_id}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
+          className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring '
         />
       </div>
       <div>
-        <label className="block text-sm font-medium ">Token</label>
+        <label className='block text-sm font-medium '>Token</label>
         <Input
-          type="text"
-          id="token"
-          name="token"
+          type='text'
+          id='token'
+          name='token'
           value={formData.token}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
+          className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring '
         />
       </div>
       <div>
-        <label className="block text-sm font-medium ">Secret</label>
+        <label className='block text-sm font-medium '>Secret</label>
         <Input
-          type="text"
-          id="secret"
-          name="secret"
+          type='text'
+          id='secret'
+          name='secret'
           value={formData.secret}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
+          className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring '
         />
       </div>
       <div>
-        <label className="block text-sm font-medium ">Master Key</label>
+        <label className='block text-sm font-medium '>Master Key</label>
         <Input
-          type="text"
-          id="master_key"
-          name="master_key"
+          type='text'
+          id='master_key'
+          name='master_key'
           value={formData.master_key}
-          placeholder="123456,456789,345678"
+          placeholder='123456,456789,345678'
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
+          className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring '
         />
       </div>
       <div>
-        <label className="block text-sm font-medium ">Route</label>
+        <label className='block text-sm font-medium '>Route</label>
         <Input
-          type="text"
-          id="route"
-          name="route"
+          type='text'
+          id='route'
+          name='route'
           value={formData.route}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
+          className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring '
         />
       </div>
       <div>
-        <label className="block text-sm font-medium ">Port</label>
+        <label className='block text-sm font-medium '>Port</label>
         <Input
-          type="number"
-          id="port"
-          name="port"
-          min="1"
+          type='number'
+          id='port'
+          name='port'
+          min='1'
           value={formData.port}
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring "
+          className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring '
         />
       </div>
       <div>
-        <label className="inline-flex items-center">
-          <Input
-            type="checkbox"
-            id="sandbox"
-            name="sandbox"
-            checked={formData.sandbox}
-            onChange={handleChange}
-            className="mr-2"
-          />
+        <label className='inline-flex items-center'>
+          <Input type='checkbox' id='sandbox' name='sandbox' checked={formData.sandbox} onChange={handleChange} className='mr-2' />
           Sandbox
         </label>
       </div>
-      <Button type="submit" className="w-full  p-2 rounded-md  transition duration-200">
+      <Button type='submit' className='w-full  p-2 rounded-md  transition duration-200'>
         保存
       </Button>
     </form>
-  )
+  );
 }

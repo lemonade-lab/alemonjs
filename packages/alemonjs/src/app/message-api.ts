@@ -1,10 +1,10 @@
-import { DataEnums, OnDataFormatFunc } from '../typings'
-import { ResultCode } from '../core/code'
-import { sendAction } from '../cbp/actions'
+import { DataEnums, OnDataFormatFunc } from '../typings';
+import { ResultCode } from '../core/code';
+import { sendAction } from '../cbp/actions';
 
 type BaseMap = {
-  [key: string]: any
-}
+  [key: string]: any;
+};
 
 /**
  * 创建原生value映射
@@ -12,8 +12,8 @@ type BaseMap = {
  * @returns
  */
 export const createEventValue = <T extends keyof R, R extends BaseMap>(event: { value: R[T] }) => {
-  return event.value as R[T] | undefined
-}
+  return event.value;
+};
 
 /**
  * 创建数据格式。
@@ -27,13 +27,14 @@ export const format: OnDataFormatFunc = (...data) => {
       code: ResultCode.FailParams,
       message: 'Invalid data: data cannot be empty',
       data: null
-    })
-    throw new Error('Invalid data: data cannot be empty')
+    });
+    throw new Error('Invalid data: data cannot be empty');
   }
-  return data
-}
 
-global.format = format
+  return data;
+};
+
+global.format = format;
 
 /**
  * 创建数据格式。
@@ -43,7 +44,7 @@ global.format = format
  * 废弃，请使用 format
  * @deprecated
  */
-export const createDataFormat = format
+export const createDataFormat = format;
 
 /**
  * 向指定频道发送消息。
@@ -57,9 +58,10 @@ export const sendToChannel = async (SpaceId: string, data: DataEnums[]) => {
       code: ResultCode.FailParams,
       message: 'Invalid SpaceId: SpaceId must be a string',
       data: null
-    })
-    throw new Error('Invalid SpaceId: SpaceId must be a string')
+    });
+    throw new Error('Invalid SpaceId: SpaceId must be a string');
   }
+
   return await sendAction({
     action: 'message.send.channel',
     payload: {
@@ -68,8 +70,8 @@ export const sendToChannel = async (SpaceId: string, data: DataEnums[]) => {
         format: data
       }
     }
-  })
-}
+  });
+};
 
 /**
  * 向指定用户发送消息。
@@ -83,9 +85,10 @@ export const sendToUser = async (OpenID: string, data: DataEnums[]) => {
       code: ResultCode.FailParams,
       message: 'Invalid OpenID: OpenID must be a string',
       data: null
-    })
-    throw new Error('Invalid OpenID: OpenID must be a string')
+    });
+    throw new Error('Invalid OpenID: OpenID must be a string');
   }
+
   return await sendAction({
     action: 'message.send.user',
     payload: {
@@ -94,5 +97,5 @@ export const sendToUser = async (OpenID: string, data: DataEnums[]) => {
         format: data
       }
     }
-  })
-}
+  });
+};

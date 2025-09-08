@@ -1,5 +1,5 @@
-import { KOOKEventKey } from './message.js'
-import { SystemData } from './typings.js'
+import { KOOKEventKey } from './message.js';
+import { SystemData } from './typings.js';
 
 /**
  * 事件处理集
@@ -61,28 +61,33 @@ export const ConversationMap = {
   [255]: {
     public: (event: SystemData) => {
       if (event.extra.type == 'added_reaction' || event.extra.type == 'deleted_reaction') {
-        return KOOKEventKey['REACTIONS']
+        return KOOKEventKey['REACTIONS'];
       } else if (event.extra.type == 'joined_channel') {
-        console.info('joined_channel')
-        return ''
+        console.info('joined_channel');
+
+        return '';
       } else if (event.extra.type == 'exited_channel') {
-        console.info('111exited_channel')
-        return ''
+        console.info('111exited_channel');
+
+        return '';
       } else if (event.extra.type == 'updated_channel') {
         // ChannelData
-        console.info('updated_channel')
-        return ''
+        console.info('updated_channel');
+
+        return '';
         /**
          * ***********
          * 频道进出
          * *******
          */
       } else if (event.extra.type == 'joined_guild') {
-        console.info('joined_guild')
-        return KOOKEventKey['MEMBER_ADD']
+        console.info('joined_guild');
+
+        return KOOKEventKey['MEMBER_ADD'];
       } else if (event.extra.type == 'exited_guild') {
-        console.info('exited_guild')
-        return KOOKEventKey['MEMBER_REMOVE']
+        console.info('exited_guild');
+
+        return KOOKEventKey['MEMBER_REMOVE'];
         /**
          * **********
          * 消息变动
@@ -91,25 +96,29 @@ export const ConversationMap = {
       } else if (event.extra.type == 'updated_message') {
         // 消息更新
         // EditingData
-        console.info('updated_message')
-        return ''
+        console.info('updated_message');
+
+        return '';
       } else if (event.extra.type == 'pinned_message') {
         // 顶置消息
         // overheadData
-        console.info('pinned_message')
-        return ''
+        console.info('pinned_message');
+
+        return '';
       }
     },
     direct: (event: SystemData) => {
       if (event.extra.type == 'guild_member_online') {
-        //OnLineData
-        console.info('exited_guild')
-        return ''
+        // OnLineData
+        console.info('exited_guild');
+
+        return '';
       } else if (event.extra.type == 'message_btn_click') {
-        //按钮事件
-        console.info('message_btn_click')
-        return KOOKEventKey['INTERACTION']
+        // 按钮事件
+        console.info('message_btn_click');
+
+        return KOOKEventKey['INTERACTION'];
       }
     }
   }
-}
+};

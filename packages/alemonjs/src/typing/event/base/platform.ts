@@ -2,13 +2,13 @@ export type platform = {
   /**
    * 平台
    */
-  Platform: string
+  Platform: string;
   /**
    * 标记
    */
-  tag: string
+  tag: string;
   /**
    * 原始消息
    */
-  value: any
-}
+  value: any;
+};

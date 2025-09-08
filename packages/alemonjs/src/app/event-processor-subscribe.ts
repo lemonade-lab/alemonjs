@@ -3,8 +3,8 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Next, Events, EventCycleEnum, EventKeys } from '../typings'
-import { SubscribeList } from './store'
+import { Next, Events, EventCycleEnum, EventKeys } from '../typings';
+import { SubscribeList } from './store';
 
 /**
  * 处理订阅
@@ -13,94 +13,97 @@ import { SubscribeList } from './store'
  * @param next
  * @param chioce
  */
-export const expendSubscribe = async <T extends EventKeys>(
-  valueEvent: Events[T],
-  select: T,
-  next: Function,
-  chioce: EventCycleEnum
-) => {
-  const subList = new SubscribeList(chioce, select)
+export const expendSubscribe = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function, chioce: EventCycleEnum) => {
+  const subList = new SubscribeList(chioce, select);
   /**
    * 观察者下一步
    * @returns
    */
   const nextObserver: Next = (cn?: boolean, ...cns: boolean[]) => {
     if (cn) {
-      next(...cns)
-      return
+      next(...cns);
+
+      return;
     }
 
-    const item = subList.value.popNext() // 弹出下一个节点
+    const item = subList.value.popNext(); // 弹出下一个节点
 
     // 可能是 undefined
     if (!item) {
       // 继续 next
-      nextObserver(true)
-      return
+      nextObserver(true);
+
+      return;
     }
 
     // 检查 keys
     for (const key in item.data.keys) {
       // 只要发现不符合的，就继续
       if (item.data.keys[key] !== valueEvent[key]) {
-        nextObserver()
-        return
+        nextObserver();
+
+        return;
       }
     }
 
     const clear = () => {
-      const selects = item.data.selects
-      const ID = item.data.id // 订阅的 ID
+      const selects = item.data.selects;
+      const ID = item.data.id; // 订阅的 ID
+
       for (const select of selects) {
-        const subList = new SubscribeList(chioce, select)
+        const subList = new SubscribeList(chioce, select);
         const remove = () => {
-          const item = subList.value.popNext() // 弹出下一个节点
+          const item = subList.value.popNext(); // 弹出下一个节点
+
           if (!item || item.data.id !== ID) {
-            remove()
-            return
+            remove();
+
+            return;
           }
-          subList.value.removeCurrent() // 移除当前节点
-          return
-        }
-        remove()
+          subList.value.removeCurrent(); // 移除当前节点
+        };
+
+        remove();
       }
-    }
+    };
 
     // 恢复
     const restore = () => {
-      const selects = item.data.selects
+      const selects = item.data.selects;
+
       for (const select of selects) {
-        const subList = new SubscribeList(chioce, select)
-        subList.value.append(item.data)
+        const subList = new SubscribeList(chioce, select);
+
+        subList.value.append(item.data);
       }
-    }
+    };
 
     // 订阅是执行则销毁
-    clear()
+    clear();
 
     const Continue: Next = (cn?: boolean, ...cns: boolean[]) => {
       // next() 订阅继续
       // 重新注册。
-      restore()
+      restore();
       // true
       if (cn) {
-        nextObserver(...cns)
-        return
+        nextObserver(...cns);
+
+        return;
       }
       // false
       if (typeof cn === 'boolean') {
-        clear()
-        nextObserver(...cns)
-        return
+        clear();
+        nextObserver(...cns);
       }
-    }
+    };
 
-    item.data.current(valueEvent, Continue)
-  }
+    item.data.current(valueEvent, Continue);
+  };
 
   // 先从观察者开始
-  nextObserver()
-}
+  nextObserver();
+};
 
 /**
  *
@@ -108,13 +111,9 @@ export const expendSubscribe = async <T extends EventKeys>(
  * @param select
  * @param next
  */
-export const expendSubscribeCreate = async <T extends EventKeys>(
-  valueEvent: Events[T],
-  select: T,
-  next: Function
-) => {
-  expendSubscribe(valueEvent, select, next, 'create')
-}
+export const expendSubscribeCreate = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+  expendSubscribe(valueEvent, select, next, 'create');
+};
 
 /**
  *
@@ -122,13 +121,9 @@ export const expendSubscribeCreate = async <T extends EventKeys>(
  * @param select
  * @param next
  */
-export const expendSubscribeMount = async <T extends EventKeys>(
-  valueEvent: Events[T],
-  select: T,
-  next: Function
-) => {
-  expendSubscribe(valueEvent, select, next, 'mount')
-}
+export const expendSubscribeMount = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+  expendSubscribe(valueEvent, select, next, 'mount');
+};
 
 /**
  *
@@ -136,10 +131,6 @@ export const expendSubscribeMount = async <T extends EventKeys>(
  * @param select
  * @param next
  */
-export const expendSubscribeUnmount = async <T extends EventKeys>(
-  valueEvent: Events[T],
-  select: T,
-  next: Function
-) => {
-  expendSubscribe(valueEvent, select, next, 'unmount')
-}
+export const expendSubscribeUnmount = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+  expendSubscribe(valueEvent, select, next, 'unmount');
+};

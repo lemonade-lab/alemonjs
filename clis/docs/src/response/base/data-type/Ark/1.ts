@@ -1,7 +1,7 @@
-import { Ark, useMessage } from 'alemonjs'
-export const selects = onSelects(['message.create'])
+import { Ark, useMessage } from 'alemonjs';
+export const selects = onSelects(['message.create']);
 export default onResponse(selects, event => {
-  const [message] = useMessage(event)
+  const [message] = useMessage(event);
 
   // 普通卡片
   message.send(
@@ -11,13 +11,12 @@ export default onResponse(selects, event => {
         title: '收你来啦',
         prompt: '通知信息！！',
         metadecs: '阿柠檬2正式版发送',
-        cover:
-          'https://pub.idqqimg.com/pc/misc/files/20190820/2f4e70ae3355ece23d161cf5334d4fc1jzjfmtep.png',
+        cover: 'https://pub.idqqimg.com/pc/misc/files/20190820/2f4e70ae3355ece23d161cf5334d4fc1jzjfmtep.png',
         link: '',
         subtitle: '赞赞赞'
       })
     )
-  )
+  );
 
   // 大图卡片
   message.send(
@@ -25,13 +24,12 @@ export default onResponse(selects, event => {
       Ark.BigCard({
         title: '收你来啦',
         prompt: '通知信息！！',
-        cover:
-          'https://pub.idqqimg.com/pc/misc/files/20190820/2f4e70ae3355ece23d161cf5334d4fc1jzjfmtep.png',
+        cover: 'https://pub.idqqimg.com/pc/misc/files/20190820/2f4e70ae3355ece23d161cf5334d4fc1jzjfmtep.png',
         link: '',
         subtitle: '赞赞赞'
       })
     )
-  )
+  );
 
   // 列表
   message.send(
@@ -56,5 +54,5 @@ export default onResponse(selects, event => {
         )
       )
     )
-  )
-})
+  );
+});

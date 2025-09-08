@@ -1,31 +1,31 @@
-import { ChildrenCycle } from '../cycle'
-import { EventKeys } from '../event/map'
+import { ChildrenCycle } from '../cycle';
+import { EventKeys } from '../event/map';
 
 export type StoreResponseItem = {
   /**
    * 来源
    */
-  input: string
+  input: string;
   /**
    * 目录
    */
-  dir: string
+  dir: string;
   /**
    * 文件路径
    */
-  path: string
+  path: string;
   /**
    * 文件名
    */
-  name: string
+  name: string;
   /**
    * 节点
    */
-  appName: string
+  appName: string;
   /**
    *
    */
-  stateKey?: string
+  stateKey?: string;
   /**
    *
    */
@@ -33,52 +33,52 @@ export type StoreResponseItem = {
     /**
      * 事件
      */
-    select: string
-  } | null
-}
+    select: string;
+  } | null;
+};
 
 export type StoreMiddlewareItem = {
   /**
    * 来源
    */
-  input: string
+  input: string;
   // 目录
-  dir: string
+  dir: string;
   // 文件路径
-  path: string
+  path: string;
   // 文件名
-  name: string
+  name: string;
   // 节点
-  appName: string
+  appName: string;
   // 状态
-  stateKey?: string
+  stateKey?: string;
   //
   value?: {
     // 事件
-    select: string
-  } | null
-}
+    select: string;
+  } | null;
+};
 
 /**
  *
  */
 export type StoreMiddleware = {
-  [key in EventKeys]: StoreResponseItem[]
-}
+  [key in EventKeys]: StoreResponseItem[];
+};
 
 /**
  *
  */
 export type StoreResponse = {
-  [key in EventKeys]: StoreMiddlewareItem[]
-}
+  [key in EventKeys]: StoreMiddlewareItem[];
+};
 
 /**
  *
  */
 export type StoreChildrenApp = {
-  name: string
-  middleware: StoreMiddlewareItem[]
-  response: StoreResponseItem[]
-  cycle: ChildrenCycle
-}
+  name: string;
+  middleware: StoreMiddlewareItem[];
+  response: StoreResponseItem[];
+  cycle: ChildrenCycle;
+};

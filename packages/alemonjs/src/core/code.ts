@@ -1,4 +1,4 @@
-import { Fail, FailAuth, FailInternal, FailParams, Ok, Warn } from './variable'
+import { Fail, FailAuth, FailInternal, FailParams, Ok, Warn } from './variable';
 
 /**
  * 结果反馈码
@@ -12,7 +12,7 @@ export const ResultCode = {
   Warn,
   FailAuth,
   FailInternal
-} as const
+} as const;
 
 // 结果反馈码类型
-export type ResultCode = (typeof ResultCode)[keyof typeof ResultCode]
+export type ResultCode = (typeof ResultCode)[keyof typeof ResultCode];

@@ -1,16 +1,13 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 
-export type ButtonProps = React.DetailedHTMLProps<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  HTMLButtonElement
->
+export type ButtonProps = React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
 
 export function Button(props: ButtonProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <button
-      type="button"
+      type='button'
       className={classNames(
         className,
         'bg-[var(--alemonjs-button-bg)] border-[var(--alemonjs-button-border)] text-[var(--alemonjs-button-text)]',
@@ -21,5 +18,5 @@ export function Button(props: ButtonProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

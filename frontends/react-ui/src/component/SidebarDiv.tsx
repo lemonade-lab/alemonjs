@@ -1,8 +1,8 @@
-import React from 'react'
-import classNames from 'classnames'
-export type SidebarDivProps = React.HTMLProps<HTMLDivElement>
+import React from 'react';
+import classNames from 'classnames';
+export type SidebarDivProps = React.HTMLProps<HTMLDivElement>;
 export function SidebarDiv(props: SidebarDivProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <div
       className={classNames(
@@ -12,5 +12,5 @@ export function SidebarDiv(props: SidebarDivProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

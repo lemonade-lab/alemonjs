@@ -7,41 +7,41 @@ export type LoggerUtils = {
    * @param args
    * @returns
    */
-  trace: (...args: any[]) => void
+  trace: (...args: any[]) => void;
   /**
    *  debug
    * @param args
    * @returns
    */
-  debug: (...args: any[]) => void
+  debug: (...args: any[]) => void;
   /**
    *  info
    * @param args
    * @returns
    */
-  info: (...args: any[]) => void
+  info: (...args: any[]) => void;
   /**
    *  warn
    * @param args
    * @returns
    */
-  warn: (...args: any[]) => void
+  warn: (...args: any[]) => void;
   /**
    *  error
    * @param args
    * @returns
    */
-  error: (...args: any[]) => void
+  error: (...args: any[]) => void;
   /**
    *  fatal
    * @param args
    * @returns
    */
-  fatal: (...args: any[]) => void
+  fatal: (...args: any[]) => void;
   /**
    *  mark
    * @param args
    * @returns
    */
-  mark: (...args: any[]) => void
-}
+  mark: (...args: any[]) => void;
+};

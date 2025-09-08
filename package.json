@@ -9,6 +9,7 @@
     "dev": "yarn --cwd clis/template dev",
     "build": "lerna run build",
     "build-core": "yarn --cwd packages/alemonjs build",
+    "fix:code": "eslint packages --ext .ts,.tsx,.js --fix --quiet",
     "test": "jest",
     "format": "prettier --write --list-different .",
     "check-format": "git diff --exit-code",
@@ -27,7 +28,15 @@
     "prettier": "^2.8.8",
     "ts-jest": "^29.2.5",
     "tsx": "^4.19.1",
-    "ws": "^8.18.1"
+    "ws": "^8.18.1",
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.3",
+    "globals": "^16",
+    "lint-staged": "^16.1.5",
+    "lvyjs": "0.2.20",
+    "typescript-eslint": "^8.19.1"
   },
   "private": true,
   "workspaces": [

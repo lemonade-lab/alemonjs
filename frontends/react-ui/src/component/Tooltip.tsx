@@ -1,34 +1,29 @@
-import { PropsWithChildren, useState } from 'react'
-import classNames from 'classnames'
-import { PrimaryDiv } from './PrimaryDiv'
+import { PropsWithChildren, useState } from 'react';
+import classNames from 'classnames';
+import { PrimaryDiv } from './PrimaryDiv';
 
 export type TooltipProps = PropsWithChildren<{
-  text: string
-  position?: 'top' | 'bottom' | 'left' | 'right'
-  delay?: number
-}>
+  text: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
+  delay?: number;
+}>;
 
 export const Tooltip = ({ text, children, position = 'bottom', delay = 300 }: TooltipProps) => {
-  const [visible, setVisible] = useState(false)
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
+  const [visible, setVisible] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const handleMouseEnter = () => {
-    const id = setTimeout(() => setVisible(true), delay)
-    setTimeoutId(id)
-  }
+    const id = setTimeout(() => setVisible(true), delay);
+    setTimeoutId(id);
+  };
   const handleMouseLeave = () => {
     if (timeoutId) {
-      clearTimeout(timeoutId)
+      clearTimeout(timeoutId);
     }
-    setVisible(false)
-  }
+    setVisible(false);
+  };
   return (
-    <div className="relative inline-block ">
-      <div
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className="cursor-pointer"
-        aria-describedby="tooltip"
-      >
+    <div className='relative inline-block '>
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className='cursor-pointer' aria-describedby='tooltip'>
         {children}
       </div>
       {visible && (
@@ -39,11 +34,11 @@ export const Tooltip = ({ text, children, position = 'bottom', delay = 300 }: To
             'right-full top-1/2 transform -translate-y-1/2 mr-2': position === 'left',
             'left-full top-1/2 transform -translate-y-1/2 ml-2': position === 'right'
           })}
-          role="tooltip"
+          role='tooltip'
         >
           {text}
         </PrimaryDiv>
       )}
     </div>
-  )
-}
+  );
+};

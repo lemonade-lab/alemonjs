@@ -1,7 +1,7 @@
 export type READY_TYPE = {
   user: {
-    id: any
-    avatar: string
-    username: string
-  }
-}
+    id: any;
+    avatar: string;
+    username: string;
+  };
+};

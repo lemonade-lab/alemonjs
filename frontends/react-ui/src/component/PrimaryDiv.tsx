@@ -1,11 +1,11 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 
 export type PrimaryDivProps = React.HTMLProps<HTMLDivElement> & {
-  hover?: boolean
-}
+  hover?: boolean;
+};
 export function PrimaryDiv(props: PrimaryDivProps) {
-  const { className, hover, ...prop } = props
+  const { className, hover, ...prop } = props;
   return (
     <div
       className={classNames(
@@ -23,5 +23,5 @@ export function PrimaryDiv(props: PrimaryDivProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

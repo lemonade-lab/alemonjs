@@ -1,10 +1,10 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 
-export type BarDivProps = React.HTMLProps<HTMLDivElement>
+export type BarDivProps = React.HTMLProps<HTMLDivElement>;
 
 export function BarDiv(props: BarDivProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <div
       className={classNames(
@@ -16,5 +16,5 @@ export function BarDiv(props: BarDivProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import { MD, useMessage } from 'alemonjs'
-const selects = onSelects(['message.create'])
+import { MD, useMessage } from 'alemonjs';
+const selects = onSelects(['message.create']);
 const response = onResponse(selects, event => {
-  const [message] = useMessage(event)
+  const [message] = useMessage(event);
   message.send(
     format(
       MD(
@@ -26,20 +26,9 @@ const response = onResponse(selects, event => {
           height: 100
         }),
         // 有序列表
-        MD.list(
-          MD.listItem(1, '有序列表'),
-          MD.listItem(2, '有序列表'),
-          MD.listItem(3, '有序列表'),
-          MD.listItem(4, '有序列表')
-        ),
+        MD.list(MD.listItem(1, '有序列表'), MD.listItem(2, '有序列表'), MD.listItem(3, '有序列表'), MD.listItem(4, '有序列表')),
         // 无序列表
-        MD.list(
-          MD.listItem('无序列表'),
-          MD.listItem('无序列表'),
-          MD.listItem('无序列表'),
-          MD.listItem('无序列表'),
-          MD.listItem('无序列表')
-        ),
+        MD.list(MD.listItem('无序列表'), MD.listItem('无序列表'), MD.listItem('无序列表'), MD.listItem('无序列表'), MD.listItem('无序列表')),
         // 块引用
         MD.blockquote('块引用'),
         // 水平分割线
@@ -50,9 +39,9 @@ const response = onResponse(selects, event => {
         MD.newline(true)
       )
     )
-  )
+  );
 
   // 向申请的模板注入参数
-  message.send(format(MD.template('template_id', { title: '你好' })))
-})
-export default response
+  message.send(format(MD.template('template_id', { title: '你好' })));
+});
+export default response;

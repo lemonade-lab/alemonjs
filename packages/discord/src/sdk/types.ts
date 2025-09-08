@@ -20,6 +20,6 @@ export const AvailableIntentsEventsEnum = [
   'AUTO_MODERATION_EXECUTION',
   'GUILD_MESSAGE_POLLS',
   'DIRECT_MESSAGE_POLLS'
-]
+];
 
-export type DCIntentsEnum = (typeof AvailableIntentsEventsEnum)[number]
+export type DCIntentsEnum = (typeof AvailableIntentsEventsEnum)[number];

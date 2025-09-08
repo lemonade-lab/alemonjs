@@ -1,4 +1,4 @@
-import { type DCIntentsEnum } from './types.js'
+import { type DCIntentsEnum } from './types.js';
 
 /**
  * GUILDS (1 << 0)
@@ -117,7 +117,7 @@ DIRECT_MESSAGE_POLLS (1 << 25)
   - MESSAGE_POLL_VOTE_REMOVE
  */
 const DCIntentsMap: {
-  [key: string]: number
+  [key: string]: number;
 } = {
   GUILDS: 1 << 0,
   GUILD_MEMBERS: 1 << 1,
@@ -140,7 +140,7 @@ const DCIntentsMap: {
   AUTO_MODERATION_EXECUTION: 1 << 21,
   GUILD_MESSAGE_POLLS: 1 << 24,
   DIRECT_MESSAGE_POLLS: 1 << 25
-}
+};
 
 /**
  *
@@ -148,10 +148,13 @@ const DCIntentsMap: {
  * @returns
  */
 export function getIntents(intents: DCIntentsEnum[]) {
-  let result = 0
+  let result = 0;
+
   for (const intent of intents) {
-    const i = DCIntentsMap[intent]
-    result |= i
+    const i = DCIntentsMap[intent];
+
+    result |= i;
   }
-  return result
+
+  return result;
 }

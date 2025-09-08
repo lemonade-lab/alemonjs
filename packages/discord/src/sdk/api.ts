@@ -1,13 +1,13 @@
-import FormData from 'form-data'
-import axios from 'axios'
-import { type AxiosRequestConfig } from 'axios'
-import { Readable } from 'stream'
-import { MessageData } from './typings.js'
-import { getDiscordConfig } from '../config.js'
-import { HttpsProxyAgent } from 'https-proxy-agent'
-import { createPicFrom } from './createPicFrom.js'
-export const API_URL = 'https://discord.com/api/v10'
-export const CDN_URL = 'https://cdn.discordapp.com'
+import FormData from 'form-data';
+import axios from 'axios';
+import { type AxiosRequestConfig } from 'axios';
+import { Readable } from 'stream';
+import { MessageData } from './typings.js';
+import { getDiscordConfig } from '../config.js';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { createPicFrom } from './createPicFrom.js';
+export const API_URL = 'https://discord.com/api/v10';
+export const CDN_URL = 'https://cdn.discordapp.com';
 /**
  * api接口
  */
@@ -18,11 +18,12 @@ export class DCAPI {
    * @returns
    */
   request(options: AxiosRequestConfig): Promise<any> {
-    const value = getDiscordConfig()
-    const token = value.token
-    const requestConfig = value.request_config || {}
+    const value = getDiscordConfig();
+    const token = value.token;
+    const requestConfig = value.request_config || {};
+
     if (value.request_proxy) {
-      requestConfig.httpsAgent = new HttpsProxyAgent(value.request_proxy)
+      requestConfig.httpsAgent = new HttpsProxyAgent(value.request_proxy);
     }
     const service = axios.create({
       ...requestConfig,
@@ -30,14 +31,15 @@ export class DCAPI {
       timeout: 6000,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bot ${token}`
+        Authorization: `Bot ${token}`
       }
-    })
+    });
+
     return new Promise((resolve, reject) => {
       service(options)
         .then(res => resolve(res?.data || {}))
         .catch(err => {
-          logger.error(err)
+          logger.error(err);
           // 错误时的请求头
           logger.error('[axios] error', {
             config: {
@@ -52,11 +54,11 @@ export class DCAPI {
             },
             response: err?.response,
             message: err?.message
-          })
+          });
           // 丢出错误中携带的响应数据
-          reject(err?.response?.data)
-        })
-    })
+          reject(err?.response?.data);
+        });
+    });
   }
 
   /**
@@ -68,7 +70,7 @@ export class DCAPI {
     return this.request({
       baseURL: CDN_URL,
       ...options
-    })
+    });
   }
 
   /**
@@ -78,7 +80,7 @@ export class DCAPI {
    * @returns
    */
   userAvatar(user_id: string, avatar_hash: string) {
-    return `${CDN_URL}/avatars/${user_id}/${avatar_hash}.png`
+    return `${CDN_URL}/avatars/${user_id}/${avatar_hash}.png`;
   }
 
   /**
@@ -88,11 +90,12 @@ export class DCAPI {
    * @returns
    */
   async getUserUrl(user_id: string, avatar_hash: string) {
-    const url = `/avatars/${user_id}/${avatar_hash}.png`
+    const url = `/avatars/${user_id}/${avatar_hash}.png`;
+
     return this.requestCDN({
       url: url,
       method: 'get'
-    })
+    });
   }
 
   /**
@@ -102,24 +105,24 @@ export class DCAPI {
    * @param headers
    * @returns
    */
-  async channelsMessagesForm(
-    channel_id: string,
-    param: MessageData = {},
-    img?: string | Buffer | Readable
-  ) {
-    const formData = new FormData()
+  async channelsMessagesForm(channel_id: string, param: MessageData = {}, img?: string | Buffer | Readable) {
+    const formData = new FormData();
+
     for (const key in param) {
       if (param[key]) {
-        formData.append(key, param[key])
+        formData.append(key, param[key]);
       }
     }
     if (img) {
-      const from = await createPicFrom(img)
+      const from = await createPicFrom(img);
+
       if (from) {
-        const { picData, name } = from
-        formData.append('file', picData, name)
+        const { picData, name } = from;
+
+        formData.append('file', picData, name);
       }
     }
+
     return this.request({
       method: 'post',
       url: `channels/${channel_id}/messages`,
@@ -127,7 +130,7 @@ export class DCAPI {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    })
+    });
   }
 
   /**
@@ -142,7 +145,7 @@ export class DCAPI {
       method: 'post',
       url: `channels/${channel_id}/messages`,
       data: data
-    })
+    });
   }
 
   /**
@@ -159,14 +162,21 @@ export class DCAPI {
    * @returns
    */
   async createFrom(image: Buffer, msg_id: string, content: any, Name = 'image.jpg') {
-    const from = await createPicFrom(image, Name)
-    if (!from) return false
-    const { picData, name } = from
-    const formdata = new FormData()
-    formdata.append('msg_id', msg_id)
-    if (typeof content === 'string') formdata.append('content', content)
-    formdata.append('file_image', picData, name)
-    return formdata
+    const from = await createPicFrom(image, Name);
+
+    if (!from) {
+      return false;
+    }
+    const { picData, name } = from;
+    const formdata = new FormData();
+
+    formdata.append('msg_id', msg_id);
+    if (typeof content === 'string') {
+      formdata.append('content', content);
+    }
+    formdata.append('file_image', picData, name);
+
+    return formdata;
   }
 
   /**
@@ -178,19 +188,15 @@ export class DCAPI {
   async postImage(
     channel_id: string,
     message: {
-      msg_id: string
-      image: Buffer
-      content?: string
-      name?: string
+      msg_id: string;
+      image: Buffer;
+      content?: string;
+      name?: string;
     }
   ): Promise<any> {
-    const formdata = await this.createFrom(
-      message.image,
-      message.msg_id,
-      message.content,
-      message.name
-    )
-    const dary = formdata != false ? formdata.getBoundary() : ''
+    const formdata = await this.createFrom(message.image, message.msg_id, message.content, message.name);
+    const dary = formdata != false ? formdata.getBoundary() : '';
+
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/messages`,
@@ -198,7 +204,7 @@ export class DCAPI {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    })
+    });
   }
 
   /**
@@ -214,7 +220,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/applications/${application_id}/role-connections/metadata`
-    })
+    });
   }
   /**
    *
@@ -224,7 +230,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/applications/${application_id}/role-connections/metadata`
-    })
+    });
   }
 
   /**
@@ -241,8 +247,8 @@ export class DCAPI {
   async usersMe() {
     return this.request({
       method: 'get',
-      url: `/users/@me`
-    })
+      url: '/users/@me'
+    });
   }
 
   /**
@@ -254,7 +260,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/users/${user_id}`
-    })
+    });
   }
 
   /**
@@ -264,17 +270,17 @@ export class DCAPI {
    */
   async usersMeGuilds(
     params: {
-      before: string
-      after: string
-      limit: number
-      with_counts: boolean
+      before: string;
+      after: string;
+      limit: number;
+      with_counts: boolean;
     } | null
   ) {
     return this.request({
       method: 'get',
-      url: `/users/@me/guilds`,
+      url: '/users/@me/guilds',
       params
-    })
+    });
   }
   /**
    * *********
@@ -285,7 +291,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/users/@me/guilds/${guild_id}/member`
-    })
+    });
   }
   /**
    * *********
@@ -296,7 +302,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/member`
-    })
+    });
   }
   /**
    * *********
@@ -307,7 +313,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/users/@me/guilds/${guild_id}`
-    })
+    });
   }
   /**
    * *********
@@ -317,11 +323,11 @@ export class DCAPI {
   async userMeChannels(recipient_id: string) {
     return this.request({
       method: 'post',
-      url: `/user/@me/channels`,
+      url: '/user/@me/channels',
       data: {
         recipient_id
       }
-    })
+    });
   }
 
   /**
@@ -338,8 +344,8 @@ export class DCAPI {
   async applicationsMe() {
     return this.request({
       method: 'GET',
-      url: `/applications/@me`
-    })
+      url: '/applications/@me'
+    });
   }
 
   /**
@@ -350,8 +356,8 @@ export class DCAPI {
   async applicationsMeUpdate() {
     return this.request({
       method: 'PATCH',
-      url: `/applications/@me`
-    })
+      url: '/applications/@me'
+    });
   }
 
   /**
@@ -362,8 +368,8 @@ export class DCAPI {
   async usersMeConnections() {
     return this.request({
       method: 'GET',
-      url: `/users/@me/connections`
-    })
+      url: '/users/@me/connections'
+    });
   }
   /**
    * *********
@@ -374,7 +380,7 @@ export class DCAPI {
     return this.request({
       method: 'GET',
       url: `/users/@me/applications/${application_id}/role-connection`
-    })
+    });
   }
   /**
    * *********
@@ -385,7 +391,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/users/@me/applications/${application_id}/role-connection`
-    })
+    });
   }
   /**
    * **********
@@ -401,8 +407,8 @@ export class DCAPI {
   async guildsCreate() {
     return this.request({
       method: 'post',
-      url: `/guilds`
-    })
+      url: '/guilds'
+    });
   }
   /**
    * *********
@@ -413,7 +419,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}`
-    })
+    });
   }
   /**
    * *********
@@ -424,7 +430,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/preview`
-    })
+    });
   }
   /**
    * *********
@@ -435,7 +441,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}`
-    })
+    });
   }
 
   /**
@@ -447,7 +453,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}`
-    })
+    });
   }
   /**
    * *********
@@ -458,7 +464,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/threads/active`
-    })
+    });
   }
   /**
    * *********
@@ -469,7 +475,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -480,7 +486,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members`
-    })
+    });
   }
   /**
    * *********
@@ -491,7 +497,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members/search`
-    })
+    });
   }
   /**
    * *********
@@ -502,7 +508,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}`
-    })
+    });
   }
 
   /**
@@ -514,7 +520,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/${user_id}`
-    })
+    });
   }
 
   /**
@@ -526,7 +532,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
-    })
+    });
   }
   /**
    * *********
@@ -537,7 +543,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
-    })
+    });
   }
   /**
    * *********
@@ -548,7 +554,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/roles`
-    })
+    });
   }
   /**
    * *********
@@ -559,7 +565,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/roles`
-    })
+    });
   }
   /**
    * *********
@@ -570,7 +576,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles`
-    })
+    });
   }
   /**
    * *********
@@ -581,7 +587,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles/${role_id}`
-    })
+    });
   }
   /**
    * *********
@@ -592,7 +598,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
-    })
+    });
   }
   /**
    * *********
@@ -603,7 +609,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
-    })
+    });
   }
   /**
    * *********
@@ -614,7 +620,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/roles/${role_id}`
-    })
+    });
   }
   /**
    * *********
@@ -625,7 +631,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -636,7 +642,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/bans`
-    })
+    });
   }
   /**
    * *********
@@ -647,7 +653,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
-    })
+    });
   }
 
   /**
@@ -659,7 +665,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/bans/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -670,7 +676,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -681,7 +687,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/mfa`
-    })
+    });
   }
   /**
    * *********
@@ -692,7 +698,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/prune`
-    })
+    });
   }
   /**
    * *********
@@ -703,7 +709,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/prune`
-    })
+    });
   }
   /**
    * *********
@@ -714,7 +720,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/invites`
-    })
+    });
   }
   /**
    * *********
@@ -725,7 +731,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/integrations`
-    })
+    });
   }
   /**
    * *********
@@ -736,7 +742,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/${integration_id}`
-    })
+    });
   }
   /**
    * *********
@@ -747,7 +753,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget`
-    })
+    });
   }
   /**
    * *********
@@ -758,7 +764,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/widget`
-    })
+    });
   }
   /**
    * *********
@@ -769,7 +775,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.json`
-    })
+    });
   }
   /**
    * *********
@@ -780,7 +786,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/vanity-url`
-    })
+    });
   }
   /**
    * *********
@@ -791,7 +797,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.png`
-    })
+    });
   }
   /**
    * *********
@@ -802,7 +808,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/welcome-screen`
-    })
+    });
   }
   /**
    * *********
@@ -813,7 +819,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/welcome-screen`
-    })
+    });
   }
   /**
    * *********
@@ -824,7 +830,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/onboarding`
-    })
+    });
   }
   /**
    * *********
@@ -835,7 +841,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/onboarding`
-    })
+    });
   }
   /**
    * *********
@@ -846,7 +852,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/audit-logs`
-    })
+    });
   }
   /**
    * *********
@@ -857,7 +863,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
-    })
+    });
   }
   /**
    * *********
@@ -868,7 +874,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/guilds/${guild_id}/auto-moderation/rules`
-    })
+    });
   }
   /**
    * *********
@@ -879,7 +885,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
-    })
+    });
   }
   /**
    * *********
@@ -890,7 +896,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
-    })
+    });
   }
   /**
    * ************
@@ -907,7 +913,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/channels`
-    })
+    });
   }
   /**
    * *********
@@ -918,7 +924,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}`
-    })
+    });
   }
   /**
    * *********
@@ -929,7 +935,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}`
-    })
+    });
   }
   /**
    * *********
@@ -940,7 +946,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/${channel_id}`
-    })
+    });
   }
   /**
    * *********
@@ -951,7 +957,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/channels`
-    })
+    });
   }
   /**
    * *********
@@ -962,7 +968,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/channels`
-    })
+    });
   }
 
   /**
@@ -974,7 +980,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id} /invites`
-    })
+    });
   }
   /**
    * *********
@@ -985,7 +991,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /invites`
-    })
+    });
   }
   /**
    * *********
@@ -996,7 +1002,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /invites`
-    })
+    });
   }
 
   /**
@@ -1008,7 +1014,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /typing`
-    })
+    });
   }
 
   /**
@@ -1020,7 +1026,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/channels/ ${channel_id} /recipients/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1031,7 +1037,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id} /recipients/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1042,7 +1048,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id} /messages/${message_id} /threads`
-    })
+    });
   }
   /**
    * *********
@@ -1053,7 +1059,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/threads`
-    })
+    });
   }
   /**
    * *********
@@ -1064,7 +1070,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/threads`
-    })
+    });
   }
   /**
    * *********
@@ -1075,7 +1081,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/channels/${channel_id}/thread-members/@me`
-    })
+    });
   }
   /**
    * *********
@@ -1086,7 +1092,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/channels/${channel_id}/thread-members/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1097,7 +1103,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/${channel_id}/thread-members/@me`
-    })
+    });
   }
   /**
    * *********
@@ -1108,7 +1114,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/${channel_id}/thread-members/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1119,7 +1125,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/thread-members/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1130,7 +1136,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/thread-members`
-    })
+    });
   }
   /**
    * *********
@@ -1141,7 +1147,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/threads/archived/public`
-    })
+    });
   }
   /**
    * *********
@@ -1152,7 +1158,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/threads/archived/private`
-    })
+    });
   }
   /**
    * *********
@@ -1163,7 +1169,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/users/@me/threads/archived/private`
-    })
+    });
   }
 
   /**
@@ -1187,7 +1193,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1198,7 +1204,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
-    })
+    });
   }
   /**
    * *******
@@ -1215,7 +1221,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/messages`
-    })
+    });
   }
   /**
    * *********
@@ -1226,7 +1232,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/messages/${message_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1237,7 +1243,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/messages`
-    })
+    });
   }
   /**
    * *********
@@ -1248,7 +1254,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /crosspost`
-    })
+    });
   }
 
   /**
@@ -1260,7 +1266,7 @@ export class DCAPI {
     return this.request({
       method: 'PUT',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
-    })
+    });
   }
   /**
    * *********
@@ -1271,7 +1277,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
-    })
+    });
   }
   /**
    * *********
@@ -1282,7 +1288,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/${user_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1293,7 +1299,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
-    })
+    });
   }
   /**
    * *********
@@ -1304,7 +1310,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions`
-    })
+    });
   }
   /**
    * *********
@@ -1315,7 +1321,7 @@ export class DCAPI {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
-    })
+    });
   }
   /**
    * *********
@@ -1326,7 +1332,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}/messages/${message_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1337,7 +1343,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}/messages/${message_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1348,7 +1354,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/messages/bulk-delete`
-    })
+    });
   }
 
   /**
@@ -1383,7 +1389,7 @@ export class DCAPI {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /followers`
-    })
+    });
   }
   /**
    * **********
@@ -1400,7 +1406,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id}/pins`
-    })
+    });
   }
 
   /**
@@ -1412,7 +1418,7 @@ export class DCAPI {
     return this.request({
       method: 'put',
       url: `/channels/ ${channel_id}/${message_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1423,7 +1429,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id}/${message_id}`
-    })
+    });
   }
 
   /**
@@ -1447,7 +1453,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/stickers/${sticker_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1457,8 +1463,8 @@ export class DCAPI {
   async listStickerPacks() {
     return this.request({
       method: 'get',
-      url: `/stickers`
-    })
+      url: '/stickers'
+    });
   }
   /**
    * *********
@@ -1469,7 +1475,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/stickers/${sticker_id}/stickers`
-    })
+    });
   }
   /**
    * *********
@@ -1480,7 +1486,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1491,7 +1497,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/stickers`
-    })
+    });
   }
   /**
    * *********
@@ -1502,7 +1508,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1513,7 +1519,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1524,7 +1530,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/ ${guild_id} /emojis`
-    })
+    });
   }
   /**
    * *********
@@ -1535,7 +1541,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1546,7 +1552,7 @@ export class DCAPI {
     return this.request({
       method: 'post',
       url: `/guilds/ ${guild_id} /emojis`
-    })
+    });
   }
   /**
    * *********
@@ -1557,7 +1563,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
-    })
+    });
   }
   /**
    * *********
@@ -1568,7 +1574,7 @@ export class DCAPI {
     return this.request({
       method: 'delete',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
-    })
+    });
   }
 
   /**
@@ -1585,8 +1591,8 @@ export class DCAPI {
   async listVoiceRegions() {
     return this.request({
       method: 'get',
-      url: `/voice/regions`
-    })
+      url: '/voice/regions'
+    });
   }
 
   /**
@@ -1598,7 +1604,7 @@ export class DCAPI {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/regions`
-    })
+    });
   }
   /**
    * *********
@@ -1609,7 +1615,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/@me`
-    })
+    });
   }
   /**
    * *********
@@ -1620,7 +1626,7 @@ export class DCAPI {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/${user_id}`
-    })
+    });
   }
 
   /**
@@ -1646,8 +1652,8 @@ export class DCAPI {
       method: 'get',
       url: '/gateway'
     }) as Promise<{
-      url: string
-    }>
+      url: string;
+    }>;
   }
 
   /**
@@ -1664,6 +1670,6 @@ export class DCAPI {
           flags: 64 // EPHEMERAL（仅发送者可见）
         }
       }
-    })
+    });
   }
 }

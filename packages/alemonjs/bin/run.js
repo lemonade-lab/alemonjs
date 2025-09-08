@@ -6,6 +6,6 @@
  */
 export const run = dir => {
   import('../lib/index.js').then(res => {
-    res.start(dir)
-  })
-}
+    res.start(dir);
+  });
+};

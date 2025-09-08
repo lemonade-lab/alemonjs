@@ -1,10 +1,10 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 
-export type TagDivProps = React.HTMLProps<HTMLDivElement>
+export type TagDivProps = React.HTMLProps<HTMLDivElement>;
 
 export function TagDiv(props: TagDivProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <div
       className={classNames(
@@ -14,5 +14,5 @@ export function TagDiv(props: TagDivProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

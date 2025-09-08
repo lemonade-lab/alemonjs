@@ -5,13 +5,13 @@ export type GROUP_DEL_ROBOT_TYPE = {
   /**
    * 移除的时间戳
    */
-  group_openid: string
+  group_openid: string;
   /**
    * 移除群的群openid
    */
-  op_member_openid: string
+  op_member_openid: string;
   /**
    * 操作移除机器人退群的群成员openid
    */
-  timestamp: number
-}
+  timestamp: number;
+};

@@ -181,28 +181,28 @@ export enum ApiEnum {
   GatewayIndex = '/api/v3/gateway/index'
 }
 
-export type MessageType = 1 | 2 | 3 | 4 | 8 | 9 | 10 | 255
+export type MessageType = 1 | 2 | 3 | 4 | 8 | 9 | 10 | 255;
 
 /**
  * 	消息通道类型, GROUP 为组播消息, PERSON 为单播消息, BROADCAST 为广播消息
  */
 
-export type MessageChannelType = 'GROUP' | 'PERSON' | 'BROADCAST'
+export type MessageChannelType = 'GROUP' | 'PERSON' | 'BROADCAST';
 
 /**
  * 会话数据
  */
 export interface EventData {
-  channel_type: MessageChannelType
-  type: MessageType
-  target_id: string // 频道id
-  author_id: string
-  content: string
-  extra: Extra
-  msg_id: string
-  msg_timestamp: number
-  nonce: string
-  from_type: number
+  channel_type: MessageChannelType;
+  type: MessageType;
+  target_id: string; // 频道id
+  author_id: string;
+  content: string;
+  extra: Extra;
+  msg_id: string;
+  msg_timestamp: number;
+  nonce: string;
+  from_type: number;
 }
 
 /**
@@ -212,108 +212,108 @@ export interface SendMessageParams {
   /**
    * 消息类型
    */
-  type?: number
+  type?: number;
   /**
    * 频道编号
    */
-  target_id: string
+  target_id: string;
   /**
    * 消息内容
    */
-  content: string
+  content: string;
   /**
    * 引用--消息id
    */
-  quote?: string
-  nonce?: string
-  temp_target_id?: string
+  quote?: string;
+  nonce?: string;
+  temp_target_id?: string;
 }
 
 /**
  * 机器人信息
  */
 export interface BotInformation {
-  id: string
-  username: string
-  identify_num: string
-  online: boolean
-  os: string
-  status: number
-  avatar: string
-  banner: string
-  bot: boolean
-  mobile_verified: boolean
-  client_id: string
-  mobile_prefix: string
-  mobile: string
-  invited_count: number
+  id: string;
+  username: string;
+  identify_num: string;
+  online: boolean;
+  os: string;
+  status: number;
+  avatar: string;
+  banner: string;
+  bot: boolean;
+  mobile_verified: boolean;
+  client_id: string;
+  mobile_prefix: string;
+  mobile: string;
+  invited_count: number;
 }
 
 /**
  * 作者信息
  */
 export interface Author {
-  id: string
-  username: string
-  identify_num: string
-  online: boolean
-  os: string
-  status: number
-  avatar: string
-  vip_avatar: string
-  banner: string
-  nickname: string
-  roles: string[]
-  is_vip: boolean
-  vip_amp: boolean
-  is_ai_reduce_noise: boolean
-  is_personal_card_bg: boolean
-  bot: boolean
-  decorations_id_map: null | unknown // 根据实际情况调整类型
-  is_sys: boolean
+  id: string;
+  username: string;
+  identify_num: string;
+  online: boolean;
+  os: string;
+  status: number;
+  avatar: string;
+  vip_avatar: string;
+  banner: string;
+  nickname: string;
+  roles: string[];
+  is_vip: boolean;
+  vip_amp: boolean;
+  is_ai_reduce_noise: boolean;
+  is_personal_card_bg: boolean;
+  bot: boolean;
+  decorations_id_map: null | unknown; // 根据实际情况调整类型
+  is_sys: boolean;
 }
 
 /**
  * mk接口
  */
 export interface KMarkdown {
-  raw_content: string
-  mention_part: any[] // 根据实际情况调整类型
-  mention_role_part: any[] // 根据实际情况调整类型
-  channel_part: any[] // 根据实际情况调整类型
+  raw_content: string;
+  mention_part: any[]; // 根据实际情况调整类型
+  mention_role_part: any[]; // 根据实际情况调整类型
+  channel_part: any[]; // 根据实际情况调整类型
 }
 
 /**
  * 数据包
  */
 export interface Extra {
-  type: number
-  code: string
-  guild_id: string
-  guild_type: number
-  channel_name: string
-  author: Author
-  visible_only: null // 根据实际情况调整类型
-  mention: any[] // 根据实际情况调整类型
-  mention_all: boolean
-  mention_roles: any[] // 根据实际情况调整类型
-  mention_here: boolean
-  nav_channels: any[] // 根据实际情况调整类型
-  kmarkdown: KMarkdown
-  emoji: any[] // 根据实际情况调整类型
-  last_msg_content: string
-  send_msg_device: number
+  type: number;
+  code: string;
+  guild_id: string;
+  guild_type: number;
+  channel_name: string;
+  author: Author;
+  visible_only: null; // 根据实际情况调整类型
+  mention: any[]; // 根据实际情况调整类型
+  mention_all: boolean;
+  mention_roles: any[]; // 根据实际情况调整类型
+  mention_here: boolean;
+  nav_channels: any[]; // 根据实际情况调整类型
+  kmarkdown: KMarkdown;
+  emoji: any[]; // 根据实际情况调整类型
+  last_msg_content: string;
+  send_msg_device: number;
 }
 /**
  * 私聊消息
  */
 export interface SendDirectMessageParams {
-  type?: MessageType
-  target_id?: string
-  chat_code?: string
-  content: string
-  quote?: string
-  nonce?: string
+  type?: MessageType;
+  target_id?: string;
+  chat_code?: string;
+  content: string;
+  quote?: string;
+  nonce?: string;
 }
 
 /**
@@ -321,16 +321,16 @@ export interface SendDirectMessageParams {
  */
 export interface SystemData {
   // 频道类型
-  channel_type: MessageChannelType
-  type: number
-  target_id: string
-  author_id: string
-  content: string
+  channel_type: MessageChannelType;
+  type: number;
+  target_id: string;
+  author_id: string;
+  content: string;
   // 不同的都不同
   extra: {
     // 退频道、进频道
     // 用户进出频道事件
-    type: (typeof SystemDataEnum)[number]
+    type: (typeof SystemDataEnum)[number];
     body: // 消息顶置
     | overheadData
       // 成员信息
@@ -342,97 +342,97 @@ export interface SystemData {
       // 消息编辑
       | EditingData
       // 用户上线
-      | OnLineData
-  }
-  msg_id: string
-  msg_timestamp: number
-  nonce: string
-  from_type: number
+      | OnLineData;
+  };
+  msg_id: string;
+  msg_timestamp: number;
+  nonce: string;
+  from_type: number;
 }
 
 export interface OnLineData {
-  user_id: string
-  event_time: number
-  guilds: any[]
+  user_id: string;
+  event_time: number;
+  guilds: any[];
 }
 
 export interface overheadData {
-  channel_id: string // 子频道
-  operator_id: string
-  msg_id: string
+  channel_id: string; // 子频道
+  operator_id: string;
+  msg_id: string;
 }
 
 export interface memberData {
-  user_id: string
-  exited_at: number
+  user_id: string;
+  exited_at: number;
 }
 
 export interface ChannelData {
-  id: string
-  name: string
-  user_id: string
-  guild_id: string
-  guild_type: number
-  limit_amount: number
-  is_category: number
-  parent_id: string
-  level: number
-  slow_mode: number
-  topic: string
-  type: number
-  permission_overwrites: any[] // 权限
-  permission_users: any[] // 权限
-  permission_sync: number // 权限
-  mode: number
-  has_password: boolean
-  last_msg_content: string // 频道最后的消息
-  last_msg_id: string // 频道最后消息的编号
-  sync_guild_region: number
-  region: string
-  joined_at: number
+  id: string;
+  name: string;
+  user_id: string;
+  guild_id: string;
+  guild_type: number;
+  limit_amount: number;
+  is_category: number;
+  parent_id: string;
+  level: number;
+  slow_mode: number;
+  topic: string;
+  type: number;
+  permission_overwrites: any[]; // 权限
+  permission_users: any[]; // 权限
+  permission_sync: number; // 权限
+  mode: number;
+  has_password: boolean;
+  last_msg_content: string; // 频道最后的消息
+  last_msg_id: string; // 频道最后消息的编号
+  sync_guild_region: number;
+  region: string;
+  joined_at: number;
 }
 
 export interface StatementData {
-  channel_id: string // 子频道
+  channel_id: string; // 子频道
   emoji: {
     // 根据实际情况提供Emoji对象的属性和类型
-    [key: string]: any
-  }
-  user_id: string
-  msg_id: string
+    [key: string]: any;
+  };
+  user_id: string;
+  msg_id: string;
 }
 
 export interface ButtonData {
-  channel_id: string // 子频道
-  target_id: string //按钮子频道
+  channel_id: string; // 子频道
+  target_id: string; // 按钮子频道
   emoji: {
     // 根据实际情况提供Emoji对象的属性和类型
-    [key: string]: any
-  }
-  user_id: string
-  msg_id: string
-  value: string
+    [key: string]: any;
+  };
+  user_id: string;
+  msg_id: string;
+  value: string;
 }
 
 export interface joinedData {
-  user_id: string
-  joined_at: number //加入时间
+  user_id: string;
+  joined_at: number; // 加入时间
 }
 
 export interface EditingData {
-  version_id: string
-  channel_id: string // 子频道
-  target_id: string //按钮子频道
-  content: string
-  mention: string[]
-  mention_all: boolean
-  mention_here: boolean
-  mention_roles: string[]
-  updated_at: number
-  kmarkdown: any // 这里的类型可能需要根据实际情况进行调整
-  last_msg_content: string
-  embeds: any[] // 这里的类型可能需要根据实际情况进行调整
-  msg_id: string
+  version_id: string;
+  channel_id: string; // 子频道
+  target_id: string; // 按钮子频道
+  content: string;
+  mention: string[];
+  mention_all: boolean;
+  mention_here: boolean;
+  mention_roles: string[];
+  updated_at: number;
+  kmarkdown: any; // 这里的类型可能需要根据实际情况进行调整
+  last_msg_content: string;
+  embeds: any[]; // 这里的类型可能需要根据实际情况进行调整
+  msg_id: string;
 }
 
 /**
@@ -452,7 +452,7 @@ export const SystemDataEnum = [
    * 成员上麦事件
    */
 
-  //进入子频道
+  // 进入子频道
   'joined_channel',
   // 退出子频道 --- 多半是音频频道
   'exited_channel',
@@ -496,4 +496,4 @@ export const SystemDataEnum = [
    * 按钮点击事件
    */
   'message_btn_click'
-] as const
+] as const;

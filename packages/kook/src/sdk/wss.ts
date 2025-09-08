@@ -1,34 +1,34 @@
-import WebSocket from 'ws'
-import { config } from './config.js'
-import { EventData, SystemData } from './typings.js'
-import { KOOKOptions } from './wss.types.js'
-import { KOOKAPI } from './api.js'
-import { KOOKEventMap } from './message.js'
-import { ConversationMap } from './conversation.js'
+import WebSocket from 'ws';
+import { config } from './config.js';
+import { EventData, SystemData } from './typings.js';
+import { KOOKOptions } from './wss.types.js';
+import { KOOKAPI } from './api.js';
+import { KOOKEventMap } from './message.js';
+import { ConversationMap } from './conversation.js';
 export class KOOKClient extends KOOKAPI {
   // 标记是否已连接
-  #isConnected = false
+  #isConnected = false;
 
   // 存储 session Id
-  #sessionId = null
+  #sessionId = null;
 
   // 存储最新的消息序号
-  #lastMessageSN = 0
+  #lastMessageSN = 0;
 
   /**
    *
    * @param opstion
    */
   constructor(opstion: KOOKOptions) {
-    super()
-    config.set('token', opstion.token)
+    super();
+    config.set('token', opstion.token);
   }
 
-  #ws: WebSocket
+  #ws: WebSocket;
 
   #events: {
-    [K in keyof KOOKEventMap]?: (event: KOOKEventMap[K]) => any
-  } = {}
+    [K in keyof KOOKEventMap]?: (event: KOOKEventMap[K]) => any;
+  } = {};
 
   /**
    * 注册事件处理程序
@@ -36,8 +36,9 @@ export class KOOKClient extends KOOKAPI {
    * @param val 事件处理函数
    */
   on<T extends keyof KOOKEventMap>(key: T, val: (event: KOOKEventMap[T]) => any) {
-    this.#events[key] = val
-    return this
+    this.#events[key] = val;
+
+    return this;
   }
 
   /**
@@ -50,10 +51,14 @@ export class KOOKClient extends KOOKAPI {
     const gatewayUrl = await this.gateway()
       .then(res => res?.data?.url)
       .catch(err => {
-        if (this.#events['ERROR']) this.#events['ERROR'](err)
-      })
+        if (this.#events['ERROR']) {
+          this.#events['ERROR'](err);
+        }
+      });
 
-    if (!gatewayUrl && gatewayUrl == '') return
+    if (!gatewayUrl && gatewayUrl == '') {
+      return;
+    }
 
     // 建立连接
 
@@ -69,17 +74,25 @@ export class KOOKClient extends KOOKAPI {
              * 消息序号正确
              * 按序处理消息
              */
-            this.#lastMessageSN = sn
+            this.#lastMessageSN = sn;
             try {
               if (d.channel_type == 'GROUP') {
-                const t = ConversationMap[d.type]['public'](d)
-                if (this.#events[t]) await this.#events[t](d)
+                const t = ConversationMap[d.type]['public'](d);
+
+                if (this.#events[t]) {
+                  await this.#events[t](d);
+                }
               } else {
-                const t = ConversationMap[d.type]['direct'](d)
-                if (this.#events[t]) await this.#events[t](d)
+                const t = ConversationMap[d.type]['direct'](d);
+
+                if (this.#events[t]) {
+                  await this.#events[t](d);
+                }
               }
             } catch (err) {
-              if (this.#events['ERROR']) this.#events['ERROR'](err)
+              if (this.#events['ERROR']) {
+                this.#events['ERROR'](err);
+              }
             }
 
             //
@@ -98,53 +111,58 @@ export class KOOKClient extends KOOKAPI {
       },
       1: ({ d }) => {
         if (d && d.code === 0) {
-          console.info('[ws] ok')
-          this.#sessionId = d.session_id
-          this.#isConnected = true
+          console.info('[ws] ok');
+          this.#sessionId = d.session_id;
+          this.#isConnected = true;
         } else {
-          console.info('[ws] err')
+          console.info('[ws] err');
         }
       },
       2: () => {
-        console.info('[ws] ping')
+        console.info('[ws] ping');
         this.#ws.send(
           JSON.stringify({
             s: 3
           })
-        )
+        );
       },
       3: () => {
-        console.info('[ws] pong')
+        console.info('[ws] pong');
       },
       4: () => {
-        console.info('[ws] resume')
+        console.info('[ws] resume');
       },
       5: () => {
-        console.info('[ws] Connection failed, reconnect')
+        console.info('[ws] Connection failed, reconnect');
         /**
          * 处理 RECONNECT 信令
          * 断开当前连接并进行重新连接
          */
-        this.#isConnected = false
-        this.#sessionId = null
-        console.info('[ws] sessionId', this.#sessionId)
+        this.#isConnected = false;
+        this.#sessionId = null;
+        console.info('[ws] sessionId', this.#sessionId);
       },
       6: () => {
-        console.info('[ws] resume ack')
+        console.info('[ws] resume ack');
       }
-    }
+    };
 
-    this.#ws = new WebSocket(gatewayUrl)
+    this.#ws = new WebSocket(gatewayUrl);
 
     this.#ws.on('open', () => {
-      console.info('[ws] open')
-    })
+      console.info('[ws] open');
+    });
 
     this.#ws.on('message', async msg => {
-      const message = JSON.parse(msg.toString('utf8'))
-      if (process.env.KOOK_WS == 'dev') console.info('message', message)
-      if (map[message.s]) map[message.s](message)
-    })
+      const message = JSON.parse(msg.toString('utf8'));
+
+      if (process.env.KOOK_WS == 'dev') {
+        console.info('message', message);
+      }
+      if (map[message.s]) {
+        map[message.s](message);
+      }
+    });
 
     // 心跳定时发送
     setInterval(() => {
@@ -154,16 +172,16 @@ export class KOOKClient extends KOOKAPI {
             s: 2,
             sn: this.#lastMessageSN
           })
-        )
+        );
       }
-    }, 30000)
+    }, 30000);
 
     this.#ws.on('close', () => {
-      console.error('[ws] close')
-    })
+      console.error('[ws] close');
+    });
 
     this.#ws.on('error', err => {
-      console.error('[ws] error', err)
-    })
+      console.error('[ws] error', err);
+    });
   }
 }

@@ -1,10 +1,10 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 
-export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
+export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export function Textarea(props: TextareaProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <textarea
       className={classNames(
@@ -20,5 +20,5 @@ export function Textarea(props: TextareaProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

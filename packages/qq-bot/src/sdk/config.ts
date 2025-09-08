@@ -1,1 +1,1 @@
-export const config = new Map<string, any>()
+export const config = new Map<string, any>();

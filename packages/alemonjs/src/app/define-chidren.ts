@@ -1,5 +1,5 @@
-import { DefineChildrenFunc } from '../typings'
-import { ResultCode } from '../core/code'
+import { DefineChildrenFunc } from '../typings';
+import { ResultCode } from '../core/code';
 /**
  * 定义子事件
  * @param callback
@@ -11,13 +11,13 @@ export const defineChildren: DefineChildrenFunc = callback => {
     return {
       _name: 'app',
       callback
-    }
+    };
   }
   logger.error({
     code: ResultCode.FailParams,
     message: 'Invalid callback: callback must be a object or function',
     data: null
-  })
-  throw new Error('Invalid callback: callback must be a object or function')
-}
-global.defineChildren = defineChildren
+  });
+  throw new Error('Invalid callback: callback must be a object or function');
+};
+global.defineChildren = defineChildren;

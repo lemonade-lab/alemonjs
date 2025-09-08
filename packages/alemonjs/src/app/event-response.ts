@@ -1,4 +1,4 @@
-import { OnResponseReversalFunc, OnResponseReversalFuncBack } from '../typings'
+import { OnResponseReversalFunc, OnResponseReversalFuncBack } from '../typings';
 
 /**
  * 处理响应事件
@@ -7,10 +7,10 @@ import { OnResponseReversalFunc, OnResponseReversalFuncBack } from '../typings'
  * @returns 回调函数的执行结果
  */
 export const onResponse: OnResponseReversalFunc = (select, callback) => {
-  return { current: callback, select }
-}
+  return { current: callback, select };
+};
 
-global.onResponse = onResponse
+global.onResponse = onResponse;
 
 /**
  * 废弃，请使用 onResponse
@@ -20,7 +20,7 @@ global.onResponse = onResponse
  * @returns
  */
 export const OnResponse: OnResponseReversalFuncBack = (callback, select) => {
-  return onResponse(select, callback)
-}
+  return onResponse(select, callback);
+};
 
-global.OnResponse = OnResponse
+global.OnResponse = OnResponse;

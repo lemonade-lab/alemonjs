@@ -1,20 +1,25 @@
-import { getPackages, storage } from './storage.js'
-import { updateModules } from './modules.js'
-import { sendWebviewOnExpansionsMessage } from './send.js'
+import { getPackages, storage } from './storage.js';
+import { updateModules } from './modules.js';
+import { sendWebviewOnExpansionsMessage } from './send.js';
 /**
  *
  * @param data
  * @returns
  */
 export const webviewPostMessage = (data: any) => {
-  if (!storage.has(data.name)) return
-  const pkg = storage.get(data.name)
-  if (!pkg || !pkg.view) return
+  if (!storage.has(data.name)) {
+    return;
+  }
+  const pkg = storage.get(data.name);
+
+  if (!pkg?.view) {
+    return;
+  }
   // 执行回调函数。
   pkg.view.__messages.forEach(callback => {
-    callback(data.value)
-  })
-}
+    callback(data.value);
+  });
+};
 
 /**
  *
@@ -22,8 +27,10 @@ export const webviewPostMessage = (data: any) => {
  * @returns
  */
 export const webviewGetExpansions = (data: any) => {
-  if (!storage.has(data.name)) return
-  updateModules()
+  if (!storage.has(data.name)) {
+    return;
+  }
+  updateModules();
   // 更新模块列表
   sendWebviewOnExpansionsMessage({
     name: data.name,
@@ -31,5 +38,5 @@ export const webviewGetExpansions = (data: any) => {
       type: 'get-expansions',
       data: getPackages()
     }
-  })
-}
+  });
+};

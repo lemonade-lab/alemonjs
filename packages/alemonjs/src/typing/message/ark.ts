@@ -1,46 +1,46 @@
 export type DataArkListTip = {
-  type: 'Ark.listTip'
+  type: 'Ark.listTip';
   value: {
-    desc: string
-    prompt: string
-  }
-}
+    desc: string;
+    prompt: string;
+  };
+};
 
 export type DataArkListItem = {
-  type: 'Ark.listItem'
-  value: string | { title: string; link: string }
-}
+  type: 'Ark.listItem';
+  value: string | { title: string; link: string };
+};
 
 export type DataArkListContent = {
-  type: 'Ark.listContent'
-  value: DataArkListItem[]
-}
+  type: 'Ark.listContent';
+  value: DataArkListItem[];
+};
 
 export type DataArkList = {
-  type: 'Ark.list'
-  value: [DataArkListTip, DataArkListContent]
-}
+  type: 'Ark.list';
+  value: [DataArkListTip, DataArkListContent];
+};
 
 export type DataArkCard = {
-  type: 'Ark.Card'
+  type: 'Ark.Card';
   value: {
-    title: string
-    cover: string
-    link: string
-    subtitle: string
-    decs: string
-    prompt: string
-    metadecs: string
-  }
-}
+    title: string;
+    cover: string;
+    link: string;
+    subtitle: string;
+    decs: string;
+    prompt: string;
+    metadecs: string;
+  };
+};
 
 export type DataArkBigCard = {
-  type: 'Ark.BigCard'
+  type: 'Ark.BigCard';
   value: {
-    title: string
-    subtitle: string
-    cover: string
-    link: string
-    prompt: string
-  }
-}
+    title: string;
+    subtitle: string;
+    cover: string;
+    link: string;
+    prompt: string;
+  };
+};

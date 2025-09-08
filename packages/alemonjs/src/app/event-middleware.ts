@@ -3,8 +3,8 @@
  * @module middleware
  * @author ningmengchongshui
  */
-import { OnMiddlewareReversalFunc, OnMiddlewareReversalFuncBack } from '../typings'
-import { ResultCode } from '../core/code'
+import { OnMiddlewareReversalFunc, OnMiddlewareReversalFuncBack } from '../typings';
+import { ResultCode } from '../core/code';
 /**
  * 中间件
  * @param select 事件选择
@@ -20,20 +20,20 @@ export const onMiddleware: OnMiddlewareReversalFunc = (select, callback) => {
       code: ResultCode.FailParams,
       message: 'Invalid callback: callback must be a function',
       data: null
-    })
-    throw new Error('Invalid callback: callback must be a function')
+    });
+    throw new Error('Invalid callback: callback must be a function');
   }
   if (typeof select === 'string' || typeof select === 'object') {
-    return { current: callback, select }
+    return { current: callback, select };
   }
   logger.error({
     code: ResultCode.FailParams,
     message: 'Invalid select: select must be a string or object',
     data: null
-  })
-  throw new Error('Invalid select: select must be a string or object')
-}
-global.onMiddleware = onMiddleware
+  });
+  throw new Error('Invalid select: select must be a string or object');
+};
+global.onMiddleware = onMiddleware;
 
 /**
  * 废弃，请使用 onMiddleware
@@ -43,7 +43,7 @@ global.onMiddleware = onMiddleware
  * @returns
  */
 export const OnMiddleware: OnMiddlewareReversalFuncBack = (callback, select) => {
-  return onMiddleware(select, callback)
-}
+  return onMiddleware(select, callback);
+};
 
-global.OnMiddleware = OnMiddleware
+global.OnMiddleware = OnMiddleware;

@@ -1,2 +1,2 @@
-import { start } from 'alemonjs'
-start()
+import { start } from 'alemonjs';
+start();

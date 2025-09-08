@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite'
-import { fileURLToPath, URL } from 'url'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
-import pkg from './package.json'
-import dts from 'vite-plugin-dts'
+import { defineConfig } from 'vite';
+import { fileURLToPath, URL } from 'url';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+import pkg from './package.json';
+import dts from 'vite-plugin-dts';
 export default defineConfig({
   plugins: [
     react(),
@@ -33,10 +33,10 @@ export default defineConfig({
       external: ['react', 'react-dom'],
       output: {
         globals: {
-          'react': 'React',
+          react: 'React',
           'react-dom': 'ReactDOM'
         }
       }
     }
   }
-})
+});

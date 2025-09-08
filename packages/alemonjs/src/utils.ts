@@ -1,12 +1,12 @@
-import { existsSync, PathLike } from 'fs'
-import axios from 'axios'
-import { toDataURL } from 'qrcode'
-import { writeFile } from 'fs'
-import { createReadStream } from 'fs'
-import { Readable, isReadable } from 'node:stream'
-import { basename } from 'path'
-import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type'
-import { publicIp, Options } from 'public-ip'
+import { existsSync, PathLike } from 'fs';
+import axios from 'axios';
+import { toDataURL } from 'qrcode';
+import { writeFile } from 'fs';
+import { createReadStream } from 'fs';
+import { Readable, isReadable } from 'node:stream';
+import { basename } from 'path';
+import { fileTypeFromBuffer, fileTypeFromStream } from 'file-type';
+import { publicIp, Options } from 'public-ip';
 /**
  * 通过URL获取Buffer
  * @param url
@@ -17,8 +17,8 @@ export const getBufferByURL = async (url: string): Promise<Buffer> => {
     .get(url, {
       responseType: 'arraybuffer'
     })
-    .then(res => Buffer.from(res.data, 'binary'))
-}
+    .then(res => Buffer.from(res.data, 'binary'));
+};
 
 /**
  * 生成二维码
@@ -37,46 +37,51 @@ export const createQRCode = async (text: string, targetPath?: string): Promise<B
         },
         (err: any, qrDataURL: any) => {
           if (err) {
-            console.error(err)
-            reject(err)
+            console.error(err);
+            reject(err);
           } else {
-            resolve(qrDataURL)
+            resolve(qrDataURL);
           }
         }
-      )
-    })
-    const bufferData = Buffer.from(qrDataURL.split(',')[1], 'base64')
+      );
+    });
+    const bufferData = Buffer.from(qrDataURL.split(',')[1], 'base64');
+
     if (targetPath) {
       writeFile(targetPath, bufferData, (err: NodeJS.ErrnoException | null) => {
-        if (err) throw err
-        console.info(targetPath)
-      })
+        if (err) {
+          throw err;
+        }
+        console.info(targetPath);
+      });
     }
-    return bufferData
+
+    return bufferData;
   } catch (err) {
-    console.error(err)
-    return false
+    console.error(err);
+
+    return false;
   }
-}
+};
 
 export class Counter {
-  #counter = 1
-  #val = 0
+  #counter = 1;
+  #val = 0;
 
   /**
    * 计数器
    * @param initialValue
    */
   constructor(initialValue: number) {
-    this.#counter = initialValue
-    this.#val = initialValue
+    this.#counter = initialValue;
+    this.#val = initialValue;
   }
 
   /**
    * 获取当前计数值
    */
   get value(): number {
-    return this.#counter
+    return this.#counter;
   }
 
   /**
@@ -84,7 +89,7 @@ export class Counter {
    * @returns
    */
   public next(): number {
-    return ++this.#counter
+    return ++this.#counter;
   }
 
   /**
@@ -93,10 +98,10 @@ export class Counter {
    */
   public reStart(initialValue?: number) {
     if (initialValue !== undefined) {
-      this.#val = initialValue
-      this.#counter = initialValue
+      this.#val = initialValue;
+      this.#counter = initialValue;
     } else {
-      this.#counter = this.#val
+      this.#counter = this.#val;
     }
   }
 }
@@ -114,60 +119,66 @@ export class Counter {
  * 5. 通过Readable流获取图片数据
  * @returns
  */
-export async function createPicFrom(options: {
-  url?: PathLike
-  image?: string | Buffer | Readable
-  name?: string
-}) {
-  let { url, image, name } = options
-  let picData: Readable
+export async function createPicFrom(options: { url?: PathLike; image?: string | Buffer | Readable; name?: string }) {
+  let { url, image, name } = options;
+  let picData: Readable;
 
   const pushBuffer = (buffer: Buffer) => {
-    picData = new Readable()
-    picData.push(buffer)
+    picData = new Readable();
+    picData.push(buffer);
     // end
-    picData.push(null)
-  }
+    picData.push(null);
+  };
 
   if (url) {
-    if (!existsSync(url)) return
-    if (!name) name = basename(url.toString())
-    picData = createReadStream(url)
+    if (!existsSync(url)) {
+      return;
+    }
+    if (!name) {
+      name = basename(url.toString());
+    }
+    picData = createReadStream(url);
   } else if (typeof image === 'string') {
     // base64
     if (image.startsWith('data:')) {
-      const base64Data = image.split(',')[1]
-      const buffer = Buffer.from(base64Data, 'base64')
-      const type = await fileTypeFromBuffer(buffer)
-      name = 'file.' + (type?.ext || 'jpg')
-      pushBuffer(buffer)
+      const base64Data = image.split(',')[1];
+      const buffer = Buffer.from(base64Data, 'base64');
+      const type = await fileTypeFromBuffer(buffer);
+
+      name = 'file.' + (type?.ext || 'jpg');
+      pushBuffer(buffer);
     }
     // file path
     else if (existsSync(image)) {
-      if (!name) name = basename(image)
-      picData = createReadStream(image)
+      if (!name) {
+        name = basename(image);
+      }
+      picData = createReadStream(image);
     }
     // invalid string
     else {
-      return
+      return;
     }
   } else if (Buffer.isBuffer(image)) {
     if (!name) {
-      const type = await fileTypeFromBuffer(image)
-      name = 'file.' + (type?.ext || 'jpg')
+      const type = await fileTypeFromBuffer(image);
+
+      name = 'file.' + (type?.ext || 'jpg');
     }
-    pushBuffer(image)
+    pushBuffer(image);
   } else if (isReadable(image)) {
     if (!name) {
-      const img = Readable.toWeb(image)
-      const type = await fileTypeFromStream(img)
-      name = 'file.' + (type?.ext || 'jpg')
+      const img = Readable.toWeb(image);
+      const type = await fileTypeFromStream(img);
+
+      name = 'file.' + (type?.ext || 'jpg');
     }
-    picData = image
+    picData = image;
   } else {
-    return
+    return;
   }
-  return { picData, name }
+
+  return { picData, name };
 }
 
 /**
@@ -178,47 +189,46 @@ export async function createPicFrom(options: {
 export const getPublicIP = async (
   options: Options & {
     // 重新获取
-    force?: boolean
+    force?: boolean;
   } = {}
 ): Promise<string> => {
-  const { force, ...config } = options
-  if (global.publicip && !force) return global.publicip
+  const { force, ...config } = options;
+
+  if (global.publicip && !force) {
+    return global.publicip;
+  }
+
   return await publicIp({
     onlyHttps: true,
     ...config
   }).then(ip => {
-    global.publicip = ip
-    return global.publicip
-  })
-}
+    global.publicip = ip;
+
+    return global.publicip;
+  });
+};
 
 /**
  * 正则表达式工具类
  */
 export class Regular extends RegExp {
   constructor(pattern: string, flags?: string) {
-    super(pattern, flags)
+    super(pattern, flags);
   }
 
   public static or(...regs: RegExp[]): Regular {
-    return new Regular(
-      `(${regs.map(reg => reg.source).join('|')})`,
-      regs.map(reg => reg.flags).join('')
-    )
+    return new Regular(`(${regs.map(reg => reg.source).join('|')})`, regs.map(reg => reg.flags).join(''));
   }
 
   public static and(...regs: RegExp[]): Regular {
-    return new Regular(
-      regs.map(reg => `(?=${reg.source})`).join('') + '.*',
-      regs.map(reg => reg.flags).join('')
-    )
+    return new Regular(regs.map(reg => `(?=${reg.source})`).join('') + '.*', regs.map(reg => reg.flags).join(''));
   }
 
   or(...regs: RegExp[]): Regular {
-    return Regular.or(this, ...regs)
+    return Regular.or(this, ...regs);
   }
 
   and(...regs: RegExp[]): Regular {
-    return Regular.and(this, ...regs)
+    return Regular.and(this, ...regs);
   }
 }

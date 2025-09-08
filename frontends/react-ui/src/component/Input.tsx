@@ -1,16 +1,13 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from 'react';
+import classNames from 'classnames';
 
-export type InputProps = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->
+export type InputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export function Input(props: InputProps) {
-  const { className, ...prop } = props
+  const { className, ...prop } = props;
   return (
     <input
-      type="text"
+      type='text'
       className={classNames(
         className,
         'bg-[var(--alemonjs-input-bg)] border-[var(--alemonjs-input-border)] text-[var(--alemonjs-input-text)] placeholder:[var(--alemonjs-input-placeholder)]',
@@ -24,5 +21,5 @@ export function Input(props: InputProps) {
       )}
       {...prop}
     />
-  )
+  );
 }

@@ -4,37 +4,32 @@
  * 出现不同位置的模块也读取同一个数据
  * @description 存储器
  */
-import { SinglyLinkedList } from '../datastructure/SinglyLinkedList'
-import {
-  ChildrenCycle,
-  EventCycleEnum,
-  EventKeys,
-  StoreMiddlewareItem,
-  StoreResponseItem,
-  SubscribeValue
-} from '../typings'
-import { mkdirSync } from 'node:fs'
-import log4js from 'log4js'
+import { SinglyLinkedList } from '../datastructure/SinglyLinkedList';
+import { ChildrenCycle, EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../typings';
+import { mkdirSync } from 'node:fs';
+import log4js from 'log4js';
 /**
  *
  * @returns
  */
 const createLogger = () => {
-  const logDir = process.env?.LOG_PATH ?? `./logs/${process.env.LOG_NAME ?? ''}`
-  mkdirSync(logDir, { recursive: true })
+  const logDir = process.env?.LOG_PATH ?? `./logs/${process.env.LOG_NAME ?? ''}`;
+
+  mkdirSync(logDir, { recursive: true });
   // 当环境被设置为 development 时。被视为 trace
-  const level = process.env.NODE_ENV === 'development' ? 'trace' : 'info'
-  const hideTime = process.env.LOGGER_TIME === 'false' ? true : false
-  const hideLevel = process.env.LOGGER_LEVEL === 'false' ? true : false
-  let pattern = ''
+  const level = process.env.NODE_ENV === 'development' ? 'trace' : 'info';
+  const hideTime = process.env.LOGGER_TIME === 'false' ? true : false;
+  const hideLevel = process.env.LOGGER_LEVEL === 'false' ? true : false;
+  let pattern = '';
+
   if (hideTime && hideLevel) {
-    pattern = `%m`
+    pattern = '%m';
   } else if (hideTime && !hideLevel) {
-    pattern = `[%p] %m`
+    pattern = '[%p] %m';
   } else if (!hideTime && hideLevel) {
-    pattern = `[%d{yyyy-MM-dd hh:mm:ss}] %m`
+    pattern = '[%d{yyyy-MM-dd hh:mm:ss}] %m';
   } else {
-    pattern = `[%d{yyyy-MM-dd hh:mm:ss}][%p] %m`
+    pattern = '[%d{yyyy-MM-dd hh:mm:ss}][%p] %m';
   }
   log4js.configure({
     appenders: {
@@ -73,10 +68,11 @@ const createLogger = () => {
       command: { appenders: ['console', 'command'], level: 'info' },
       error: { appenders: ['console', 'command', 'error'], level: 'warn' }
     }
-  })
-  const defaultLogger = log4js.getLogger('default')
-  const commandLogger = log4js.getLogger('command')
-  const errorLogger = log4js.getLogger('error')
+  });
+  const defaultLogger = log4js.getLogger('default');
+  const commandLogger = log4js.getLogger('command');
+  const errorLogger = log4js.getLogger('error');
+
   return {
     // 开发调试
     trace: defaultLogger.trace.bind(defaultLogger),
@@ -90,26 +86,26 @@ const createLogger = () => {
     error: errorLogger.error.bind(errorLogger),
     // 严重
     fatal: errorLogger.fatal.bind(errorLogger)
-  }
-}
+  };
+};
 
 export class Logger {
-  #logger = null
+  #logger = null;
 
   /**
    * 创建一个 logger，如果未存在全局变量则赋值
    * @returns
    */
   constructor() {
-    this.#logger = createLogger()
+    this.#logger = createLogger();
     // 如果已经存在，就返回内部 logger
     if (!global.logger) {
-      global.logger = this.#logger
+      global.logger = this.#logger;
     }
   }
 
   get value() {
-    return this.#logger
+    return this.#logger;
   }
 }
 
@@ -127,12 +123,12 @@ export class Core {
           unmount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>()
         },
         storeChildrenApp: {}
-      }
+      };
     }
   }
 
   get value() {
-    return global.alemonjsCore
+    return global.alemonjsCore;
   }
 }
 
@@ -140,9 +136,10 @@ export class Response {
   get value() {
     // 得到所有 app，得到所有 res
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
-      return alemonjsCore.storeChildrenApp[key].response
-    })
-    return data.flat()
+      return alemonjsCore.storeChildrenApp[key].response;
+    });
+
+    return data.flat();
   }
 }
 
@@ -150,50 +147,49 @@ export class Middleware {
   get value() {
     // 得到所有 app，得到所有 res
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
-      return alemonjsCore.storeChildrenApp[key].middleware
-    })
-    return data.flat()
+      return alemonjsCore.storeChildrenApp[key].middleware;
+    });
+
+    return data.flat();
   }
 }
 
 export class SubscribeList<T extends EventKeys> {
-  #select: T
-  #chioce: EventCycleEnum
+  #select: T;
+  #chioce: EventCycleEnum;
   constructor(chioce: EventCycleEnum, select: T) {
-    this.#select = select
-    this.#chioce = chioce
+    this.#select = select;
+    this.#chioce = chioce;
     // 如果不存在，则初始化
     if (!alemonjsCore.storeSubscribeList[this.#chioce].has(this.#select)) {
-      alemonjsCore.storeSubscribeList[this.#chioce].set(this.#select, new SinglyLinkedList())
+      alemonjsCore.storeSubscribeList[this.#chioce].set(this.#select, new SinglyLinkedList());
     }
   }
 
   get value() {
-    return alemonjsCore.storeSubscribeList[this.#chioce].get(this.#select)
+    return alemonjsCore.storeSubscribeList[this.#chioce].get(this.#select);
   }
 }
 
 export class StateSubscribe {
-  #name: string = null
+  #name: string = null;
   constructor(name: string) {
-    this.#name = name
+    this.#name = name;
     if (!alemonjsCore.storeStateSubscribe[name]) {
-      alemonjsCore.storeStateSubscribe[name] = []
+      alemonjsCore.storeStateSubscribe[name] = [];
     }
   }
 
   on(callback: (value: boolean) => void) {
-    alemonjsCore.storeStateSubscribe[this.#name].push(callback)
+    alemonjsCore.storeStateSubscribe[this.#name].push(callback);
   }
 
   un(callback: (value: boolean) => void) {
-    alemonjsCore.storeStateSubscribe[this.#name] = alemonjsCore.storeStateSubscribe[
-      this.#name
-    ].filter(cb => cb !== callback)
+    alemonjsCore.storeStateSubscribe[this.#name] = alemonjsCore.storeStateSubscribe[this.#name].filter(cb => cb !== callback);
   }
 
   get value() {
-    return alemonjsCore.storeStateSubscribe[this.#name]
+    return alemonjsCore.storeStateSubscribe[this.#name];
   }
 }
 
@@ -201,62 +197,63 @@ class StateProxy {
   create(value: Record<string, boolean> = {}) {
     return new Proxy(value, {
       get(target, prop: string) {
-        return prop in target ? target[prop] : false
+        return prop in target ? target[prop] : false;
       },
       set(target, prop: string, value: boolean) {
-        target[prop] = value
+        target[prop] = value;
         // 通知所有订阅者
         if (alemonjsCore.storeStateSubscribe[prop]) {
           for (const callback of alemonjsCore.storeStateSubscribe[prop]) {
-            callback(value)
+            callback(value);
           }
         }
-        return true // 表示设置成功
+
+        return true; // 表示设置成功
       }
-    })
+    });
   }
 }
 
 export class State {
-  #name: string = null
+  #name: string = null;
   /**
    *
    * @param name
    * @param defaultValue 默认，允许匹配
    */
   constructor(name: string, defaultValue = true) {
-    this.#name = name
+    this.#name = name;
     // 不存在，需要初始化
     if (!alemonjsCore.storeState) {
       // 初始化全局状态
-      alemonjsCore.storeState = new StateProxy().create()
+      alemonjsCore.storeState = new StateProxy().create();
     }
     // 如果不存在则设置默认值
     if (!(name in alemonjsCore.storeState)) {
-      alemonjsCore.storeState[name] = defaultValue
+      alemonjsCore.storeState[name] = defaultValue;
     }
   }
   get value() {
-    return alemonjsCore.storeState[this.#name]
+    return alemonjsCore.storeState[this.#name];
   }
   set value(value: boolean) {
-    alemonjsCore.storeState[this.#name] = value
+    alemonjsCore.storeState[this.#name] = value;
   }
 }
 
 export class ChildrenApp {
   // 名字
-  #name = null
+  #name = null;
   // 中间件
-  #middleware: StoreMiddlewareItem[] = []
+  #middleware: StoreMiddlewareItem[] = [];
   // 响应体
-  #response: StoreResponseItem[] = []
+  #response: StoreResponseItem[] = [];
   // 周期
-  #cycle: ChildrenCycle = null
+  #cycle: ChildrenCycle = null;
 
   // create
-  constructor(name: string = 'main') {
-    this.#name = name
+  constructor(name = 'main') {
+    this.#name = name;
   }
 
   /**
@@ -264,7 +261,7 @@ export class ChildrenApp {
    * @param data
    */
   pushResponse(data: StoreResponseItem[]) {
-    this.#response = this.#response.concat(data)
+    this.#response = this.#response.concat(data);
   }
 
   /**
@@ -272,7 +269,7 @@ export class ChildrenApp {
    * @param data
    */
   pushMiddleware(data: StoreMiddlewareItem[]) {
-    this.#middleware = this.#middleware.concat(data)
+    this.#middleware = this.#middleware.concat(data);
   }
 
   /**
@@ -280,7 +277,7 @@ export class ChildrenApp {
    * @param data
    */
   pushSycle(data: ChildrenCycle) {
-    this.#cycle = data
+    this.#cycle = data;
   }
 
   /**
@@ -292,7 +289,7 @@ export class ChildrenApp {
       middleware: this.#middleware,
       response: this.#response,
       cycle: this.#cycle
-    }
+    };
   }
 
   /**
@@ -300,7 +297,7 @@ export class ChildrenApp {
    */
   un() {
     // 清理
-    delete alemonjsCore.storeChildrenApp[this.#name]
+    delete alemonjsCore.storeChildrenApp[this.#name];
   }
 
   /**
@@ -308,11 +305,12 @@ export class ChildrenApp {
    */
   get value() {
     if (!alemonjsCore.storeChildrenApp[this.#name]) {
-      this.on()
+      this.on();
     }
-    return alemonjsCore.storeChildrenApp[this.#name]
+
+    return alemonjsCore.storeChildrenApp[this.#name];
   }
 }
 
-export const ProcessorEventAutoClearMap = new Map()
-export const ProcessorEventUserAudoClearMap = new Map()
+export const ProcessorEventAutoClearMap = new Map();
+export const ProcessorEventUserAudoClearMap = new Map();

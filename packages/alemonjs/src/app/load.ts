@@ -1,18 +1,13 @@
-import { dirname, join } from 'path'
-import { existsSync } from 'fs'
-import { createEventName, showErrorModule } from '../core/utils.js'
-import { getRecursiveDirFiles } from '../core/utils.js'
-import {
-  StoreMiddlewareItem,
-  StoreResponseItem,
-  DefineChildrenValue,
-  ChildrenCycle
-} from '../typings'
-import { createRequire } from 'module'
-import { ChildrenApp } from './store.js'
-import { ResultCode } from '../core/code.js'
-import { file_suffix_middleware } from '../core/variable.js'
-const require = createRequire(import.meta.url)
+import { dirname, join } from 'path';
+import { existsSync } from 'fs';
+import { createEventName, showErrorModule } from '../core/utils.js';
+import { getRecursiveDirFiles } from '../core/utils.js';
+import { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, ChildrenCycle } from '../typings';
+import { createRequire } from 'module';
+import { ChildrenApp } from './store.js';
+import { ResultCode } from '../core/code.js';
+import { file_suffix_middleware } from '../core/variable.js';
+const require = createRequire(import.meta.url);
 
 /**
  * 加载子模块
@@ -26,58 +21,61 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       code: ResultCode.FailParams,
       message: 'The module path is not correct',
       data: null
-    })
-    return
+    });
+
+    return;
   }
-  const mainDir = dirname(mainPath)
-  const App = new ChildrenApp(appName)
+  const mainDir = dirname(mainPath);
+  const App = new ChildrenApp(appName);
 
   try {
     const moduleApp: {
-      default: DefineChildrenValue
-    } = await import(`file://${mainPath}`)
+      default: DefineChildrenValue;
+    } = await import(`file://${mainPath}`);
 
     if (!moduleApp?.default) {
-      throw new Error('The Children is not default')
+      throw new Error('The Children is not default');
     }
     if (!moduleApp?.default?._name) {
-      throw new Error('The Children name is not correct')
+      throw new Error('The Children name is not correct');
     }
     if (moduleApp.default._name !== 'app') {
-      throw new Error('The Children name is not correct')
+      throw new Error('The Children name is not correct');
     }
     if (!moduleApp?.default?.callback) {
-      throw new Error('The Children callback is not correct')
+      throw new Error('The Children callback is not correct');
     }
 
-    let app: ChildrenCycle = null
+    let app: ChildrenCycle = null;
+
     if (typeof moduleApp?.default?.callback !== 'function') {
-      app = moduleApp?.default.callback
+      app = moduleApp?.default.callback;
     } else {
-      app = await moduleApp.default.callback()
+      app = await moduleApp.default.callback();
     }
 
-    App.pushSycle(app)
+    App.pushSycle(app);
 
     const unMounted = async e => {
-      showErrorModule(e)
+      showErrorModule(e);
       // 卸载
-      App.un()
+      App.un();
       try {
-        app?.unMounted && (await app.unMounted(e))
+        app?.unMounted && (await app.unMounted(e));
       } catch (e) {
         // 卸载周期出意外，不需要进行卸载
-        showErrorModule(e)
+        showErrorModule(e);
       }
-    }
+    };
 
     // onCreated 创建
     try {
-      app?.onCreated && (await app?.onCreated())
+      app?.onCreated && (await app?.onCreated());
     } catch (e) {
-      unMounted(e)
+      unMounted(e);
+
       // 出错了，结束后续的操作。
-      return
+      return;
     }
 
     // onMounted 加载
@@ -85,17 +83,18 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       /**
        * load response files
        */
-      const appsDir = join(mainDir, 'apps')
-      const appsFiles = getRecursiveDirFiles(appsDir)
+      const appsDir = join(mainDir, 'apps');
+      const appsFiles = getRecursiveDirFiles(appsDir);
       // 使用 新 目录 response
-      const responseDir = join(mainDir, 'response')
-      const responseFiles = getRecursiveDirFiles(responseDir)
-      const files = [...appsFiles, ...responseFiles]
-      const resData: StoreResponseItem[] = []
+      const responseDir = join(mainDir, 'response');
+      const responseFiles = getRecursiveDirFiles(responseDir);
+      const files = [...appsFiles, ...responseFiles];
+      const resData: StoreResponseItem[] = [];
+
       for (const file of files) {
         // 切掉 mainDir
-        const url = file.path.replace(mainDir, '')
-        const stateKey = createEventName(url, appName)
+        const url = file.path.replace(mainDir, '');
+        const stateKey = createEventName(url, appName);
         const reesponse: StoreResponseItem = {
           input: mainDir,
           dir: dirname(file.path),
@@ -103,20 +102,22 @@ export const loadChildren = async (mainPath: string, appName: string) => {
           name: file.name,
           stateKey,
           appName: appName
-        }
-        resData.push(reesponse)
+        };
+
+        resData.push(reesponse);
       }
-      App.pushResponse(resData)
+      App.pushResponse(resData);
       /**
        * load middleware files
        */
-      const mwDir = join(mainDir, 'middleware')
-      const mwFiles = getRecursiveDirFiles(mwDir, item => file_suffix_middleware.test(item.name))
-      const mwData: StoreMiddlewareItem[] = []
+      const mwDir = join(mainDir, 'middleware');
+      const mwFiles = getRecursiveDirFiles(mwDir, item => file_suffix_middleware.test(item.name));
+      const mwData: StoreMiddlewareItem[] = [];
+
       for (const file of mwFiles) {
         // 切掉 mainDir
-        const url = file.path.replace(mainDir, '')
-        const stateKey = createEventName(url, appName)
+        const url = file.path.replace(mainDir, '');
+        const stateKey = createEventName(url, appName);
         const middleware: StoreMiddlewareItem = {
           input: mainDir,
           dir: dirname(file.path),
@@ -124,28 +125,28 @@ export const loadChildren = async (mainPath: string, appName: string) => {
           name: file.name,
           stateKey,
           appName: appName
-        }
-        mwData.push(middleware)
+        };
+
+        mwData.push(middleware);
       }
-      App.pushMiddleware(mwData)
-      App.on()
+      App.pushMiddleware(mwData);
+      App.on();
       try {
-        app?.onMounted && (await app.onMounted({ response: resData, middleware: mwData }))
+        app?.onMounted && (await app.onMounted({ response: resData, middleware: mwData }));
       } catch (e) {
-        unMounted(e)
-        return
+        unMounted(e);
       }
     } catch (e) {
-      unMounted(e)
+      unMounted(e);
     }
 
     // unMounted 卸载
   } catch (e) {
-    showErrorModule(e)
+    showErrorModule(e);
     // 卸载
-    App.un()
+    App.un();
   }
-}
+};
 
 /**
  * 模块文件
@@ -157,22 +158,25 @@ export const loadChildrenFile = async (appName: string) => {
       code: ResultCode.FailParams,
       message: 'The module name is not correct',
       data: null
-    })
-    return
+    });
+
+    return;
   }
   try {
-    const mainPath = require.resolve(appName)
+    const mainPath = require.resolve(appName);
+
     // 不存在 main
     if (!existsSync(mainPath)) {
       logger.error({
         code: ResultCode.FailParams,
         message: 'The main file does not exist,' + mainPath,
         data: null
-      })
-      return
+      });
+
+      return;
     }
-    loadChildren(mainPath, appName)
+    loadChildren(mainPath, appName);
   } catch (e) {
-    showErrorModule(e)
+    showErrorModule(e);
   }
-}
+};

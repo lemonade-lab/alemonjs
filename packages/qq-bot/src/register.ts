@@ -9,29 +9,23 @@ import {
   PublicEventInteractionCreate,
   PublicEventMessageCreate,
   ResultCode
-} from 'alemonjs'
-import { QQBotClients } from './sdk/client.websoket'
-import { User } from 'alemonjs'
-import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE'
-import {
-  AT_MESSAGE_CREATE,
-  C2C_MESSAGE_CREATE,
-  DIRECT_MESSAGE_CREATE,
-  GROUP_AT_MESSAGE_CREATE,
-  MESSAGE_CREATE
-} from './sends'
-import { getMaster, getQQBotConfig } from './config'
-import { platform } from './config'
+} from 'alemonjs';
+import { QQBotClients } from './sdk/client.websoket';
+import { User } from 'alemonjs';
+import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE';
+import { AT_MESSAGE_CREATE, C2C_MESSAGE_CREATE, DIRECT_MESSAGE_CREATE, GROUP_AT_MESSAGE_CREATE, MESSAGE_CREATE } from './sends';
+import { getMaster, getQQBotConfig } from './config';
+import { platform } from './config';
 
 export const register = (client: QQBotClients) => {
-  const config = getQQBotConfig()
+  const config = getQQBotConfig();
   /**
    * 连接 alemonjs 服务器。
    * 向 alemonjs 推送标准信息
    */
-  const port = process.env?.port || config?.port || 17117
-  const url = `ws://127.0.0.1:${port}`
-  const cbp = cbpPlatform(url)
+  const port = process.env?.port || config?.port || 17117;
+  const url = `ws://127.0.0.1:${port}`;
+  const cbp = cbpPlatform(url);
 
   /**
    * group
@@ -41,8 +35,8 @@ export const register = (client: QQBotClients) => {
    */
 
   const createUserAvatarURL = (author_id: string) => {
-    return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/640`
-  }
+    return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/640`;
+  };
 
   client.on('GROUP_ADD_ROBOT', async event => {
     // 机器人加入群组
@@ -62,9 +56,10 @@ export const register = (client: QQBotClients) => {
       CreateAt: Date.now(),
       tag: 'GROUP_DEL_ROBOT',
       value: event
-    }
-    cbp.send(e)
-  })
+    };
+
+    cbp.send(e);
+  });
 
   client.on('GROUP_DEL_ROBOT', async event => {
     // 机器人离开群组
@@ -84,15 +79,16 @@ export const register = (client: QQBotClients) => {
       CreateAt: Date.now(),
       tag: 'GROUP_DEL_ROBOT',
       value: event
-    }
-    cbp.send(e)
-  })
+    };
+
+    cbp.send(e);
+  });
 
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', async event => {
-    const UserId = event.author.id
-    const [isMaster, UserKey] = getMaster(UserId)
-    const UserAvatar = createUserAvatarURL(event.author.id)
+    const UserId = event.author.id;
+    const [isMaster, UserKey] = getMaster(UserId);
+    const UserAvatar = createUserAvatarURL(event.author.id);
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -115,14 +111,15 @@ export const register = (client: QQBotClients) => {
       CreateAt: Date.now(),
       tag: 'GROUP_AT_MESSAGE_CREATE',
       value: event
-    }
-    cbp.send(e)
-  })
+    };
+
+    cbp.send(e);
+  });
 
   client.on('C2C_MESSAGE_CREATE', async event => {
-    const UserId = event.author.id
-    const [isMaster, UserKey] = getMaster(UserId)
-    const UserAvatar = createUserAvatarURL(event.author.id)
+    const UserId = event.author.id;
+    const [isMaster, UserKey] = getMaster(UserId);
+    const UserAvatar = createUserAvatarURL(event.author.id);
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -143,9 +140,10 @@ export const register = (client: QQBotClients) => {
       //
       tag: 'C2C_MESSAGE_CREATE',
       value: event
-    }
-    cbp.send(e)
-  })
+    };
+
+    cbp.send(e);
+  });
 
   /**
    * guild
@@ -153,15 +151,17 @@ export const register = (client: QQBotClients) => {
 
   client.on('DIRECT_MESSAGE_CREATE', async event => {
     // 屏蔽其他机器人的消息
-    if (event?.author?.bot) return
+    if (event?.author?.bot) {
+      return;
+    }
 
-    let msg = event?.content ?? ''
+    const msg = event?.content ?? '';
 
-    const UserAvatar = event?.author?.avatar
+    const UserAvatar = event?.author?.avatar;
 
-    const UserId = event.author.id
+    const UserId = event.author.id;
 
-    const [isMaster, UserKey] = getMaster(UserId)
+    const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -183,22 +183,25 @@ export const register = (client: QQBotClients) => {
       //
       tag: 'DIRECT_MESSAGE_CREATE',
       value: event
-    }
-    cbp.send(e)
-  })
+    };
+
+    cbp.send(e);
+  });
 
   // 监听消息
   client.on('AT_MESSAGE_CREATE', async event => {
     // 屏蔽其他机器人的消息
-    if (event?.author?.bot) return
+    if (event?.author?.bot) {
+      return;
+    }
 
-    let msg = getMessageContent(event)
+    const msg = getMessageContent(event);
 
-    const UserAvatar = event?.author?.avatar
+    const UserAvatar = event?.author?.avatar;
 
-    const UserId = event.author.id
+    const UserId = event.author.id;
 
-    const [isMaster, UserKey] = getMaster(UserId)
+    const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -223,9 +226,10 @@ export const register = (client: QQBotClients) => {
       //
       tag: 'AT_MESSAGE_CREATE',
       value: event
-    }
-    cbp.send(e)
-  })
+    };
+
+    cbp.send(e);
+  });
 
   /**
    *
@@ -233,38 +237,44 @@ export const register = (client: QQBotClients) => {
    * @returns
    */
   const getMessageContent = event => {
-    let msg = event?.content ?? ''
+    let msg = event?.content ?? '';
     // 艾特消息处理
     const at_users: {
-      id: string
-    }[] = []
+      id: string;
+    }[] = [];
+
     if (event.mentions) {
       // 去掉@ 转为纯消息
       for (const item of event.mentions) {
         at_users.push({
           id: item.id
-        })
+        });
       }
       // 循环删除文本中的at信息并去除前后空格
       at_users.forEach(item => {
-        msg = msg.replace(`<@!${item.id}>`, '').trim()
-      })
+        msg = msg.replace(`<@!${item.id}>`, '').trim();
+      });
     }
-    return msg
-  }
+
+    return msg;
+  };
 
   // 私域 -
   client.on('MESSAGE_CREATE', async event => {
     // 屏蔽其他机器人的消息
-    if (event.author?.bot) return
+    if (event.author?.bot) {
+      return;
+    }
 
     // 撤回消息
-    if (new RegExp(/DELETE$/).test(event.eventType)) return
-    const UserId = event.author.id
-    const msg = getMessageContent(event)
-    const UserAvatar = event?.author?.avatar
+    if (new RegExp(/DELETE$/).test(event.eventType)) {
+      return;
+    }
+    const UserId = event.author.id;
+    const msg = getMessageContent(event);
+    const UserAvatar = event?.author?.avatar;
 
-    const [isMaster, UserKey] = getMaster(UserId)
+    const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -289,9 +299,10 @@ export const register = (client: QQBotClients) => {
       //
       tag: 'MESSAGE_CREATE',
       value: event
-    }
-    cbp.send(e)
-  })
+    };
+
+    cbp.send(e);
+  });
 
   client.on('INTERACTION_CREATE', async event => {
     // try {
@@ -306,13 +317,13 @@ export const register = (client: QQBotClients) => {
     // }
 
     if (event.scene === 'group') {
-      const UserAvatar = createUserAvatarURL(event.group_member_openid)
+      const UserAvatar = createUserAvatarURL(event.group_member_openid);
 
-      const UserId = event.group_member_openid
+      const UserId = event.group_member_openid;
 
-      const [isMaster, UserKey] = getMaster(UserId)
+      const [isMaster, UserKey] = getMaster(UserId);
 
-      const MessageText = event.data.resolved.button_data?.trim() || ''
+      const MessageText = event.data.resolved.button_data?.trim() || '';
 
       const e: PublicEventInteractionCreate = {
         name: 'interaction.create',
@@ -334,17 +345,17 @@ export const register = (client: QQBotClients) => {
         tag: 'INTERACTION_CREATE_GROUP',
         CreateAt: Date.now(),
         value: event
-      }
+      };
 
-      cbp.send(e)
+      cbp.send(e);
     } else if (event.scene === 'c2c') {
-      const UserAvatar = createUserAvatarURL(event.user_openid)
+      const UserAvatar = createUserAvatarURL(event.user_openid);
 
-      const UserId = event.user_openid
+      const UserId = event.user_openid;
 
-      const [isMaster, UserKey] = getMaster(UserId)
+      const [isMaster, UserKey] = getMaster(UserId);
 
-      const MessageText = event.data.resolved.button_data?.trim() || ''
+      const MessageText = event.data.resolved.button_data?.trim() || '';
 
       // 处理消息
       const e: PrivateEventInteractionCreate = {
@@ -363,15 +374,16 @@ export const register = (client: QQBotClients) => {
         CreateAt: Date.now(),
         tag: 'INTERACTION_CREATE_C2C',
         value: event
-      }
-      cbp.send(e)
+      };
+
+      cbp.send(e);
     } else if (event.scene === 'guild') {
-      const UserAvatar = createUserAvatarURL(event.data.resolved.user_id)
-      const UserId = event.data.resolved.user_id
+      const UserAvatar = createUserAvatarURL(event.data.resolved.user_id);
+      const UserId = event.data.resolved.user_id;
 
-      const [isMaster, UserKey] = getMaster(UserId)
+      const [isMaster, UserKey] = getMaster(UserId);
 
-      const MessageText = event.data.resolved.button_data?.trim() || ''
+      const MessageText = event.data.resolved.button_data?.trim() || '';
       // 处理消息
       const e: PublicEventInteractionCreate = {
         name: 'interaction.create',
@@ -393,192 +405,215 @@ export const register = (client: QQBotClients) => {
         CreateAt: Date.now(),
         tag: 'INTERACTION_CREATE_GUILD',
         value: event
-      }
-      cbp.send(e)
+      };
+
+      cbp.send(e);
     } else {
       logger.warn({
         code: ResultCode.Fail,
         message: '暂未更新支持此类型的交互事件',
         data: event
-      })
+      });
     }
-  })
+  });
 
-  client.on('ERROR', console.error)
+  client.on('ERROR', console.error);
 
   const api = {
     active: {
       send: {
         channel: async (SpaceId: string, val: DataEnums[]) => {
           if (/^GUILD:/.test(SpaceId)) {
-            const id = SpaceId.replace('GUILD:', '')
+            const id = SpaceId.replace('GUILD:', '');
+
             return await AT_MESSAGE_CREATE(
               client,
               {
                 ChannelId: id
               },
               val
-            )
+            );
           }
           if (/^GROUP:/.test(SpaceId)) {
-            const id = SpaceId.replace('GROUP:', '')
+            const id = SpaceId.replace('GROUP:', '');
+
             return await GROUP_AT_MESSAGE_CREATE(
               client,
               {
                 ChannelId: id
               },
               val
-            )
+            );
           }
-          return []
+
+          return [];
         },
         user: async (OpenId: string, val: DataEnums[]) => {
           if (/^C2C:/.test(OpenId)) {
-            const id = OpenId.replace('C2C:', '')
+            const id = OpenId.replace('C2C:', '');
+
             return await C2C_MESSAGE_CREATE(
               client,
               {
                 UserId: id
               },
               val
-            )
+            );
           } else if (/^DIRECT:/.test(OpenId)) {
-            const id = OpenId.replace('DIRECT:', '')
+            const id = OpenId.replace('DIRECT:', '');
+
             return await DIRECT_MESSAGE_CREATE(
               client,
               {
                 UserId: id
               },
               val
-            )
+            );
           } else if (/^GUILD:/.test(OpenId)) {
-            const id = OpenId.replace('GUILD:', '')
+            const id = OpenId.replace('GUILD:', '');
+
             return await AT_MESSAGE_CREATE(
               client,
               {
                 ChannelId: id
               },
               val
-            )
+            );
           }
-          return []
+
+          return [];
         }
       }
     },
     use: {
       send: async (
         event: {
-          tag: string
-          ChannelId: string
-          UserId: string
-          MessageId?: string
+          tag: string;
+          ChannelId: string;
+          UserId: string;
+          MessageId?: string;
         },
         val: DataEnums[]
       ) => {
-        if (val.length < 0) return []
+        if (val.length < 0) {
+          return [];
+        }
         // 打  tag
-        const tag = event.tag
+        const tag = event.tag;
+
         // 群at
         if (tag == 'GROUP_AT_MESSAGE_CREATE') {
-          return await GROUP_AT_MESSAGE_CREATE(client, event, val)
+          return await GROUP_AT_MESSAGE_CREATE(client, event, val);
         }
         // 私聊
         if (tag == 'C2C_MESSAGE_CREATE') {
-          return await C2C_MESSAGE_CREATE(client, event, val)
+          return await C2C_MESSAGE_CREATE(client, event, val);
         }
         // 频道私聊
         if (tag == 'DIRECT_MESSAGE_CREATE') {
-          return await DIRECT_MESSAGE_CREATE(client, event, val)
+          return await DIRECT_MESSAGE_CREATE(client, event, val);
         }
         // 频道at
         if (tag == 'AT_MESSAGE_CREATE') {
-          return await AT_MESSAGE_CREATE(client, event, val)
+          return await AT_MESSAGE_CREATE(client, event, val);
         }
         // 频道消息
         if (tag == 'MESSAGE_CREATE') {
-          return await MESSAGE_CREATE(client, event, val)
+          return await MESSAGE_CREATE(client, event, val);
         }
         // 交互
         if (tag == 'INTERACTION_CREATE_GROUP') {
-          return await GROUP_AT_MESSAGE_CREATE(client, event, val)
+          return await GROUP_AT_MESSAGE_CREATE(client, event, val);
         }
         if (tag == 'INTERACTION_CREATE_C2C') {
-          return await C2C_MESSAGE_CREATE(client, event, val)
+          return await C2C_MESSAGE_CREATE(client, event, val);
         }
         if (tag == 'INTERACTION_CREATE_GUILD') {
-          return await AT_MESSAGE_CREATE(client, event, val)
+          return await AT_MESSAGE_CREATE(client, event, val);
         }
-        return []
+
+        return [];
       },
       mention: async event => {
-        const value = event.value || {}
-        const tag = event.tag
+        const value = event.value || {};
+        const tag = event.tag;
         // const event = e.value
-        const Metions: User[] = []
+        const Metions: User[] = [];
+
         // group
-        if (tag == 'GROUP_AT_MESSAGE_CREATE' || 'C2C_MESSAGE_CREATE') return Metions
+        if (tag == 'GROUP_AT_MESSAGE_CREATE' || 'C2C_MESSAGE_CREATE') {
+          return Metions;
+        }
         // guild
         if (value.mentions) {
-          const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = event.value['mentions']
+          const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = event.value['mentions'];
           // 艾特消息处理
           const MessageMention: User[] =
             mentions.map(item => {
-              const UserId = item.id
-              const [isMaster, UserKey] = getMaster(UserId)
+              const UserId = item.id;
+              const [isMaster, UserKey] = getMaster(UserId);
+
               return {
                 UserId: item.id,
                 IsMaster: isMaster,
                 UserName: item.username,
                 IsBot: item.bot,
                 UserKey: UserKey
-              }
-            }) ?? []
-          return MessageMention
+              };
+            }) ?? [];
+
+          return MessageMention;
         } else {
-          return Metions
+          return Metions;
         }
       }
     }
-  }
+  };
 
   // 处理行为
   cbp.onactions(async (data, consume) => {
     if (data.action === 'message.send') {
       // 消息发送
-      const event = data.payload.event
-      const paramFormat = data.payload.params.format
+      const event = data.payload.event;
+      const paramFormat = data.payload.params.format;
       // 消费
-      const res = await api.use.send(event, paramFormat)
-      consume(res)
+      const res = await api.use.send(event, paramFormat);
+
+      consume(res);
     } else if (data.action === 'mention.get') {
-      const event = data.payload.event
+      const event = data.payload.event;
       // 获取提及
-      const metions = await api.use.mention(event)
+      const metions = await api.use.mention(event);
+
       // 消费
-      consume([createResult(ResultCode.Ok, '请求完成', metions)])
+      consume([createResult(ResultCode.Ok, '请求完成', metions)]);
     } else if (data.action === 'message.send.channel') {
       // 主动发送消息到频道
-      const channel_id = data.payload.ChannelId
-      const paramFormat = data.payload.params.format
-      const res = await api.active.send.channel(channel_id, paramFormat)
-      consume(res)
+      const channel_id = data.payload.ChannelId;
+      const paramFormat = data.payload.params.format;
+      const res = await api.active.send.channel(channel_id, paramFormat);
+
+      consume(res);
     } else if (data.action === 'message.send.user') {
       // 主动发送消息到用户
-      const user_id = data.payload.UserId
-      const paramFormat = data.payload.params.format
-      const res = await api.active.send.user(user_id, paramFormat)
-      consume(res)
+      const user_id = data.payload.UserId;
+      const paramFormat = data.payload.params.format;
+      const res = await api.active.send.user(user_id, paramFormat);
+
+      consume(res);
     }
-  })
+  });
 
   // 处理 api 调用
   cbp.onapis(async (data, consume) => {
-    const key = data.payload?.key
+    const key = data.payload?.key;
+
     if (client[key]) {
       // 如果 client 上有对应的 key，直接调用。
-      const params = data.payload.params
-      const res = await client[key](...params)
-      consume([createResult(ResultCode.Ok, '请求完成', res)])
+      const params = data.payload.params;
+      const res = await client[key](...params);
+
+      consume([createResult(ResultCode.Ok, '请求完成', res)]);
     }
-  })
-}
+  });
+};

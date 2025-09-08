@@ -80,12 +80,12 @@ export const AvailableIntentsEventsEnum = [
   'AUDIO_ACTION',
   'PUBLIC_GUILD_MESSAGES',
   'GROUP_AND_C2C_EVENT'
-] as const
+] as const;
 
 /**
  * 订阅枚举
  */
-export type IntentsEnum = (typeof AvailableIntentsEventsEnum)[number]
+export type IntentsEnum = (typeof AvailableIntentsEventsEnum)[number];
 
 /**
  * 订阅事件集合
@@ -103,7 +103,7 @@ const intentsMap = {
   AUDIO_ACTION: 1 << 29, // 音频
   PUBLIC_GUILD_MESSAGES: 1 << 30, //  消息事件，此为公域的消息事件
   GROUP_AND_C2C_EVENT: 1 << 25 // group all
-}
+};
 
 /**
  *
@@ -111,12 +111,15 @@ const intentsMap = {
  * @returns
  */
 export function getIntentsMask(intents: IntentsEnum[]) {
-  let intentsMask = 0
+  let intentsMask = 0;
+
   for (const item of intents) {
-    const mask = intentsMap[item]
+    const mask = intentsMap[item];
+
     if (mask) {
-      intentsMask |= mask
+      intentsMask |= mask;
     }
   }
-  return intentsMask
+
+  return intentsMask;
 }

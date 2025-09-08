@@ -3,11 +3,11 @@
 提供 redis 和 sequelize mysql 连接
 
 ```ts
-import { getIoRedis, getSequelize } from '@alemonjs/db'
+import { getIoRedis, getSequelize } from '@alemonjs/db';
 // redis
-export const Redis = getIoRedis()
+export const Redis = getIoRedis();
 // seuqlieze mysql
-export const sequelize = getSequelize()
+export const sequelize = getSequelize();
 ```
 
 ## 使用说明

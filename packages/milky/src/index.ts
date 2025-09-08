@@ -1,3 +1,3 @@
-export const platform = 'feishu'
+export const platform = 'feishu';
 
-export default () => {}
+export default () => {};
