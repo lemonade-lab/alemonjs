@@ -18,7 +18,7 @@ import { EventMessageText } from '../core/variable';
  * @param event
  * @param select
  */
-export const expendMiddleware = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
   const mw = new Middleware();
   const [message] = useMessage(valueEvent);
   // 得到所有 mws
@@ -31,7 +31,7 @@ export const expendMiddleware = async <T extends EventKeys>(valueEvent: Events[T
    * 下一步
    * @returns
    */
-  const nextMiddleware: Next = async (cn, ...cns) => {
+  const nextMiddleware: Next = (cn, ...cns) => {
     if (cn) {
       next(...cns);
 
@@ -44,7 +44,7 @@ export const expendMiddleware = async <T extends EventKeys>(valueEvent: Events[T
       return;
     }
     // 检查所有
-    calli();
+    void calli();
   };
 
   /**
@@ -88,7 +88,7 @@ export const expendMiddleware = async <T extends EventKeys>(valueEvent: Events[T
       if (file?.stateKey) {
         const [state] = useState(file?.stateKey);
 
-        if (state == false) {
+        if (state === false) {
           // 继续
           nextMiddleware();
 
@@ -134,13 +134,13 @@ export const expendMiddleware = async <T extends EventKeys>(valueEvent: Events[T
         } else if (Array.isArray(res)) {
           if (res.length > 0) {
             // 发送数据
-            message.send(res);
+            void message.send(res);
           }
           isClose = true;
         } else if (typeof res === 'object') {
           if (Array.isArray(res.data)) {
             // 发送数据
-            message.send(res.data);
+            void message.send(res.data);
           }
           if (!res.allowGrouping) {
             isClose = true;
@@ -173,10 +173,10 @@ export const expendMiddleware = async <T extends EventKeys>(valueEvent: Events[T
           onRes(res);
         }
         ++index;
-        start();
+        void start();
       };
 
-      start();
+      void start();
     } catch (err) {
       showErrorModule(err);
     }

@@ -166,12 +166,12 @@ export class ConfigCore {
         }
         const index$0 = process.argv.indexOf(key);
 
-        if (index$0 != -1) {
+        if (index$0 !== -1) {
           return process.argv[index$0 + 1];
         }
         const index = process.argv.indexOf(`--${key}`);
 
-        if (index != -1) {
+        if (index !== -1) {
           return process.argv[index + 1];
         }
 
@@ -189,7 +189,9 @@ export const getConfig = (): typeof ConfigCore.prototype => {
   if (global?.config) {
     return global.config;
   }
-  global.config = new ConfigCore('alemon.config.yaml');
+  const configDir = process.env.CFG_PATH || 'alemon.config.yaml';
+
+  global.config = new ConfigCore(configDir);
 
   return global.config;
 };

@@ -22,11 +22,7 @@ const loadApps = () => {
   const cfg = getConfig();
 
   if (cfg.value?.apps && Array.isArray(cfg.value.apps)) {
-    Promise.all(
-      cfg.value.apps.map(async app => {
-        loadChildrenFile(app);
-      })
-    );
+    void Promise.all(cfg.value.apps.map(app => loadChildrenFile(app)));
   }
 };
 
@@ -70,7 +66,7 @@ type StartOptions = ServerOptions &
  * @returns
  */
 export const run = (input: string) => {
-  if (!input || input == '') {
+  if (!input) {
     return;
   }
   const mainPath = join(process.cwd(), input);
@@ -86,13 +82,13 @@ export const run = (input: string) => {
     return;
   }
   // 指定运行的，name识别为 'main:res:xxx'
-  loadChildren(mainPath, 'main');
+  void loadChildren(mainPath, 'main');
 };
 
 /**
  * @param input
  */
-export const start = async (options: StartOptions | string = {}) => {
+export const start = (options: StartOptions | string = {}) => {
   if (typeof options === 'string') {
     // 如果是字符串，则认为是入口文件路径
     options = { input: options };
@@ -108,16 +104,18 @@ export const start = async (options: StartOptions | string = {}) => {
     cbpClient(url);
   } else {
     // 创建 cbp 服务器
-    const port = options?.port || cfg.argv?.port || cfg.value?.port || default_port;
+    const port = options?.port ?? cfg.argv?.port ?? cfg.value?.port ?? default_port;
 
     // 设置环境变量
     process.env.port = port;
-    cbpServer(port, async () => {
+    cbpServer(port, () => {
       const httpURL = `http://127.0.0.1:${port}`;
       const wsURL = `ws://127.0.0.1:${port}`;
+
       logger.info(`[CBP server started at ${httpURL}]`);
       logger.info(`[CBP server started at ${wsURL}]`);
       const isFullReceive = options?.is_full_receive || cfg.argv?.is_full_receive || cfg.value?.is_full_receive || true;
+
       cbpClient(httpURL, { isFullReceive });
       // 加载平台服务
       const platform = options?.platform || cfg.argv?.platform || cfg.value?.platform;
@@ -152,7 +150,7 @@ export const start = async (options: StartOptions | string = {}) => {
       if (login) {
         process.env.login = login;
       }
-      import(process.env.platform).then(res => res?.default());
+      void import(process.env.platform).then(res => res?.default());
     });
   }
   // 获取入口文件

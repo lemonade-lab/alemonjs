@@ -30,7 +30,7 @@ export default () => {
   const client = new DCClient();
 
   // 连接
-  client.connect();
+  void client.connect();
 
   /**
    * 创建用户头像
@@ -43,7 +43,7 @@ export default () => {
   };
 
   // 监听消息
-  client.on('MESSAGE_CREATE', async event => {
+  client.on('MESSAGE_CREATE', event => {
     // 消除bot消息
     if (event.author?.bot) {
       return;
@@ -64,7 +64,7 @@ export default () => {
     // 清除 @ 相关的消息
     let msg = event.content;
 
-    for await (const item of at_users) {
+    for (const item of at_users) {
       msg = msg.replace(`<@${item.id}>`, '').trim();
     }
 
@@ -72,7 +72,7 @@ export default () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = createUserAvatar(UserId, event.author.avatar);
 
-    if (event.type == 0 && event.member) {
+    if (event.type === 0 && event.member) {
       const e: PublicEventMessageCreate = {
         name: 'message.create',
         // 事件类型
@@ -99,7 +99,7 @@ export default () => {
       };
 
       cbp.send(e);
-    } else if (event.type == 0 && !event.member) {
+    } else if (event.type === 0 && !event.member) {
       // 处理消息
       const e: PrivateEventMessageCreate = {
         name: 'private.message.create',
@@ -190,7 +190,7 @@ export default () => {
       cbp.send(e);
     }
 
-    client.interactionsCallback(event.id, event.token, MessageText);
+    void client.interactionsCallback(event.id, event.token, MessageText);
   });
 
   const api = {
@@ -215,12 +215,12 @@ export default () => {
         }
         const tag = event.tag;
 
-        if (tag == 'message.create') {
+        if (tag === 'message.create') {
           const ChannelId = event.value.channel_id;
           const res = await sendchannel(client, { channel_id: ChannelId }, val);
 
           return [createResult(ResultCode.Ok, '请求完成', res)];
-        } else if (tag == 'private.message.create') {
+        } else if (tag === 'private.message.create') {
           const UserId = event.value.author.id;
           const ChannelId = event.value.channel_id;
           const res = await senduser(
@@ -233,12 +233,12 @@ export default () => {
           );
 
           return [createResult(ResultCode.Ok, '请求完成', res)];
-        } else if (tag == 'interaction.create') {
+        } else if (tag === 'interaction.create') {
           const ChannelId = event.value.channel_id;
           const res = await sendchannel(client, { channel_id: ChannelId }, val);
 
           return [createResult(ResultCode.Ok, '请求完成', res)];
-        } else if (tag == 'private.interaction.create') {
+        } else if (tag === 'private.interaction.create') {
           const UserId = event.value.user.id;
           const ChannelId = event.value.channel_id;
           const res = await senduser(
@@ -255,7 +255,7 @@ export default () => {
 
         return [];
       },
-      mention: async e => {
+      mention: e => {
         const event: MESSAGE_CREATE_TYPE = e.value;
         const MessageMention: User[] = event.mentions.map(item => {
           const UserId = item.id;
@@ -272,12 +272,14 @@ export default () => {
           };
         });
 
-        return MessageMention;
+        return new Promise<User[]>(resolve => {
+          resolve(MessageMention);
+        });
       }
     }
   };
 
-  cbp.onactions(async (data, consume) => {
+  const onactions = async (data, consume) => {
     if (data.action === 'message.send') {
       const event = data.payload.event;
       const paramFormat = data.payload.params.format;
@@ -302,9 +304,11 @@ export default () => {
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     }
-  });
+  };
 
-  cbp.onapis(async (data, consume) => {
+  cbp.onactions((data, consume) => void onactions(data, consume));
+
+  const onapis = async (data, consume) => {
     const key = data.payload?.key;
 
     if (client[key]) {
@@ -314,5 +318,7 @@ export default () => {
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     }
-  });
+  };
+
+  cbp.onapis((data, consume) => void onapis(data, consume));
 };

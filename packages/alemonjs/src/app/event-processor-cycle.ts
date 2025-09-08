@@ -63,7 +63,7 @@ const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
  * @param event
  * @param key
  */
-export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], select: T) => {
+export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: T) => {
   const nextEnd: Next = () => {};
   // unmount
   const nextUnMount: Next = (cn, ...cns) => {
@@ -72,7 +72,7 @@ export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], se
 
       return;
     }
-    expendSubscribeUnmount(valueEvent, select, nextEnd);
+    void expendSubscribeUnmount(valueEvent, select, nextEnd);
   };
   // event
   const nextEvent: Next = (cn, ...cns) => {
@@ -81,7 +81,7 @@ export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], se
 
       return;
     }
-    expendEvent(valueEvent, select, nextUnMount);
+    void expendEvent(valueEvent, select, nextUnMount);
   };
   // mount
   const nextMount: Next = (cn, ...cns) => {
@@ -90,7 +90,7 @@ export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], se
 
       return;
     }
-    expendSubscribeMount(valueEvent, select, nextEvent);
+    void expendSubscribeMount(valueEvent, select, nextEvent);
   };
   // middleware
   const nextCreate: Next = (cn, ...cns) => {
@@ -99,7 +99,7 @@ export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], se
 
       return;
     }
-    expendMiddleware(valueEvent, select, nextMount);
+    void expendMiddleware(valueEvent, select, nextMount);
   };
   const value = getConfigValue() ?? {};
 
@@ -113,5 +113,5 @@ export const expendCycle = async <T extends EventKeys>(valueEvent: Events[T], se
     showLog(valueEvent, select);
   }
   // create
-  expendSubscribeCreate(valueEvent, select, nextCreate);
+  void expendSubscribeCreate(valueEvent, select, nextCreate);
 };

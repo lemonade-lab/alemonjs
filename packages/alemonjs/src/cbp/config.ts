@@ -20,10 +20,15 @@ export const USER_AGENT_HEADER_VALUE_MAP = {
 export const DEVICE_ID_HEADER = 'x-device-id';
 // 是否全量接收
 export const FULL_RECEIVE_HEADER = 'x-full-receive';
+
+type actionResolvesValue = Result[] | PromiseLike<Result[]>;
+
+type actionResolvesValueFunc = (value: actionResolvesValue) => void;
+
 // 行为回调
-export const actionResolves = new Map<string, (value: Result[] | PromiseLike<Result[]>) => void>();
+export const actionResolves = new Map<string, actionResolvesValueFunc>();
 // 接口回调
-export const apiResolves = new Map<string, (value: Result[] | PromiseLike<Result[]>) => void>();
+export const apiResolves = new Map<string, actionResolvesValueFunc>();
 // 超时器
 export const actionTimeouts = new Map<string, NodeJS.Timeout>();
 // 接口超时器

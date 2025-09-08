@@ -124,7 +124,7 @@ export class DCClient extends DCAPI {
         const curTime = this.#getReConnectTime();
 
         setTimeout(() => {
-          this.connect();
+          void this.connect();
           // 等待重连
         }, curTime);
 
@@ -134,7 +134,7 @@ export class DCClient extends DCAPI {
       /**
        * 心跳恢复
        */
-      const call = async () => {
+      const call = () => {
         this.#ws.send(
           JSON.stringify({
             op: 1, //  op = 1
@@ -152,13 +152,13 @@ export class DCClient extends DCAPI {
          * 事件接收到
          * @param param0
          */
-        0: async ({ d, t, s }) => {
+        0: ({ d, t, s }) => {
           if (s) {
             // 序列号
             this.#seq = s;
           }
           // 准备
-          if (t == 'READY') {
+          if (t === 'READY') {
             if (d?.resume_gateway_url) {
               this.#gateway_url = d?.resume_gateway_url;
               logger.info('[ws-discord] gateway_url', this.#gateway_url);
@@ -222,7 +222,7 @@ export class DCClient extends DCAPI {
 
       this.#ws = new WebSocket(`${url}?v=10&encoding=json`, ClientOptions);
 
-      this.#ws.on('open', async () => {
+      this.#ws.on('open', () => {
         logger.info('[ws-discord] 打开连接');
         // 连接成功
         this.#count = 0;
@@ -243,7 +243,7 @@ export class DCClient extends DCAPI {
         const curTime = this.#getReConnectTime();
 
         setTimeout(() => {
-          this.connect();
+          void this.connect();
         }, curTime);
       });
 

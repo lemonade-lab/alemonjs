@@ -50,36 +50,36 @@ export const sendchannel = async (
     }
     const channel_id = param?.channel_id ?? '';
     // images
-    const images = val.filter(item => item.type == 'Image' || item.type == 'ImageURL' || item.type == 'ImageFile');
+    const images = val.filter(item => item.type === 'Image' || item.type === 'ImageURL' || item.type === 'ImageFile');
     // buttons
-    const buttons = val.filter(item => item.type == 'BT.group');
+    const buttons = val.filter(item => item.type === 'BT.group');
     // markdown
-    const mds = val.filter(item => item.type == 'Markdown');
+    const mds = val.filter(item => item.type === 'Markdown');
     // text
     const content = val
-      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
       .map(item => {
-        if (item.type == 'Link') {
+        if (item.type === 'Link') {
           return `[${item.value}](${item?.options?.link ?? item.value})`;
-        } else if (item.type == 'Mention') {
-          if (item.value == 'everyone' || item.value == 'all' || item.value == '' || typeof item.value !== 'string') {
+        } else if (item.type === 'Mention') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return '<@everyone>';
           }
-          if (item.options?.belong == 'user') {
+          if (item.options?.belong === 'user') {
             return `<@${item.value}>`;
-          } else if (item.options?.belong == 'channel') {
+          } else if (item.options?.belong === 'channel') {
             return `<#${item.value}>`;
           }
 
           return '';
-        } else if (item.type == 'Text') {
-          if (item.options?.style == 'block') {
+        } else if (item.type === 'Text') {
+          if (item.options?.style === 'block') {
             return `\`${item.value}\``;
-          } else if (item.options?.style == 'italic') {
+          } else if (item.options?.style === 'italic') {
             return `*${item.value}*`;
-          } else if (item.options?.style == 'bold') {
+          } else if (item.options?.style === 'bold') {
             return `**${item.value}**`;
-          } else if (item.options?.style == 'strikethrough') {
+          } else if (item.options?.style === 'strikethrough') {
             return `~~${item.value}~~`;
           }
 
@@ -97,13 +97,13 @@ export const sendchannel = async (
         }
         const item = images[i];
 
-        if (item.type == 'Image') {
+        if (item.type === 'Image') {
           bufferData = Buffer.from(item.value, 'base64');
-        } else if (item.type == 'ImageURL') {
+        } else if (item.type === 'ImageURL') {
           const res = await ImageURLToBuffer(item.value);
 
           bufferData = res;
-        } else if (item.type == 'ImageFile') {
+        } else if (item.type === 'ImageFile') {
           bufferData = readFileSync(item.value);
         }
       }
@@ -122,11 +122,11 @@ export const sendchannel = async (
 
     if (mds && mds.length > 0) {
       mds.forEach(item => {
-        if (item.type == 'Markdown') {
+        if (item.type === 'Markdown') {
           const md = item.value;
 
           md.forEach(line => {
-            if (line.type == 'MD.text') {
+            if (line.type === 'MD.text') {
               // 普通文本
               contentMd += line.value;
             } else if (line.type === 'MD.blockquote') {
@@ -231,7 +231,7 @@ export const senduser = async (
   if (val.length < 0) {
     return Promise.all([]);
   }
-  const channel_id = param?.channel_id ?? (await client.userMeChannels(param.author_id))?.id;
+  const channelId = param?.channel_id ?? (await client.userMeChannels(param.author_id))?.id;
 
-  return sendchannel(client, { channel_id }, val);
+  return sendchannel(client, { channel_id: channelId }, val);
 };

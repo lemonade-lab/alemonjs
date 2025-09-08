@@ -12,10 +12,12 @@ const formatPath = (path: string) => {
   }
   const pates = path.split('/');
   const lastPath = pates[pates.length - 1];
+
   if (lastPath.includes('.')) {
     return path;
   }
   path += '.html';
+
   return path;
 };
 // 输入一个文件路径。
@@ -37,6 +39,7 @@ const getModuelFile = (dir: string) => {
 
   for (const key in dirMap) {
     const filePath = dirMap[key];
+
     if (existsSync(filePath) && fs.statSync(filePath)) {
       return filePath;
     }
@@ -77,9 +80,12 @@ router.all('app/{*path}', async ctx => {
     return;
   }
   const rootPath = process.cwd();
-  const apiPath = `/app/api`;
+
+  const apiPath = '/app/api';
+
   if (ctx.path.startsWith(apiPath)) {
-    let mainPath = join(rootPath, process.env.input);
+    const mainPath = join(rootPath, process.env.input);
+
     // 路径
     if (!existsSync(mainPath)) {
       ctx.status = 400;
@@ -88,6 +94,7 @@ router.all('app/{*path}', async ctx => {
         message: '未找到主要入口文件',
         data: 'existsSync input'
       };
+
       return;
     }
     const mainDir = dirname(mainPath);
@@ -96,6 +103,7 @@ router.all('app/{*path}', async ctx => {
       const dir = join(mainDir, 'route', ctx.path?.replace(apiPath, '/api') || '');
       const dirs = dir.split('/');
       const fileName = dirs[dirs.length - 1];
+
       if (fileName.includes('.')) {
         ctx.status = 404;
         ctx.body = {
@@ -103,6 +111,7 @@ router.all('app/{*path}', async ctx => {
           message: `API '${ctx.path}' 未找到。`,
           data: 'existsSync route filename'
         };
+
         return;
       }
       const modulePath = getModuelFile(dir);
@@ -114,11 +123,14 @@ router.all('app/{*path}', async ctx => {
           message: `API '${ctx.path}' 未找到。`,
           data: 'existsSync modulePath'
         };
+
         return;
       }
       const apiModule = await import(`file://${modulePath}`);
+
       if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
         ctx.status = 405;
+
         return;
       }
       await apiModule[ctx.method](ctx);
@@ -137,23 +149,28 @@ router.all('app/{*path}', async ctx => {
   // 如果不是 get请求。即不响应
   if (ctx.method !== 'GET') {
     ctx.status = 405;
+
     return;
   }
   let root = '';
   const resourcePath = formatPath(ctx.params?.path);
+
   try {
-    const pkg = require(path.join(rootPath, 'package.json')) || {};
-    root = pkg.alemonjs?.web?.root || '';
+    const pkg = require(path.join(rootPath, 'package.json')) ?? {};
+
+    root = pkg.alemonjs?.web?.root ?? '';
   } catch (err) {
     ctx.status = 500;
     ctx.body = {
       code: 500,
-      message: `加载 package.json 时发生错误。`,
+      message: '加载 package.json 时发生错误。',
       error: err.message
     };
+
     return;
   }
   const fullPath = root ? path.join(rootPath, root, resourcePath) : path.join(rootPath, resourcePath);
+
   try {
     // 返回文件
     const file = await fs.promises.readFile(fullPath);
@@ -181,14 +198,14 @@ router.all('app/{*path}', async ctx => {
   }
 });
 
-router.all('app', async ctx => {
+router.all('app', ctx => {
   ctx.redirect('/app/');
-  return;
 });
 
 router.all('apps/:app/{*path}', async ctx => {
   const appName = ctx.params.app;
   const apiPath = `/apps/${appName}/api`;
+
   if (ctx.path.startsWith(apiPath)) {
     try {
       if (!mainDirMap.has(appName)) {
@@ -212,6 +229,7 @@ router.all('apps/:app/{*path}', async ctx => {
       const dir = join(mainDirMap.get(appName), 'route', ctx.path?.replace(apiPath, '/api') || '');
       const dirs = dir.split('/');
       const fileName = dirs[dirs.length - 1];
+
       if (fileName.includes('.')) {
         ctx.status = 404;
         ctx.body = {
@@ -235,8 +253,10 @@ router.all('apps/:app/{*path}', async ctx => {
         return;
       }
       const apiModule = await import(`file://${modulePath}`);
+
       if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
         ctx.status = 405;
+
         return;
       }
       await apiModule[ctx.method](ctx);
@@ -256,25 +276,30 @@ router.all('apps/:app/{*path}', async ctx => {
   // 如果不是 get请求。即不响应
   if (ctx.method !== 'GET') {
     ctx.status = 405;
+
     return;
   }
   // 不是 packages，而是 node_modules。需要是模块化
   const rootPath = path.join(process.cwd(), 'node_modules', appName);
   const resourcePath = formatPath(ctx.params?.path);
   let root = '';
+
   try {
-    const pkg = require(`${appName}/package`) || {};
-    root = pkg?.alemonjs?.web?.root || '';
+    const pkg = require(`${appName}/package`) ?? {};
+
+    root = pkg?.alemonjs?.web?.root ?? '';
   } catch (err) {
     ctx.status = 500;
     ctx.body = {
       code: 500,
-      message: `加载 package.json 时发生错误。`,
+      message: '加载 package.json 时发生错误。',
       error: err.message
     };
+
     return;
   }
   const fullPath = root ? path.join(rootPath, root, resourcePath) : path.join(rootPath, resourcePath);
+
   try {
     // 返回文件
     const file = await fs.promises.readFile(fullPath);
@@ -302,10 +327,9 @@ router.all('apps/:app/{*path}', async ctx => {
     }
   }
 });
-router.all('apps/:name', async ctx => {
+router.all('apps/:name', ctx => {
   if (ctx.path === `/apps/${ctx.params.name}`) {
     ctx.redirect(`/apps/${ctx.params.name}/`);
-    return;
   }
 });
 

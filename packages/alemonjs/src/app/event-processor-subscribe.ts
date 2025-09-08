@@ -13,7 +13,7 @@ import { SubscribeList } from './store';
  * @param next
  * @param chioce
  */
-export const expendSubscribe = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function, chioce: EventCycleEnum) => {
+export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next, chioce: EventCycleEnum) => {
   const subList = new SubscribeList(chioce, select);
   /**
    * 观察者下一步
@@ -111,7 +111,7 @@ export const expendSubscribe = async <T extends EventKeys>(valueEvent: Events[T]
  * @param select
  * @param next
  */
-export const expendSubscribeCreate = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+export const expendSubscribeCreate = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
   expendSubscribe(valueEvent, select, next, 'create');
 };
 
@@ -121,7 +121,7 @@ export const expendSubscribeCreate = async <T extends EventKeys>(valueEvent: Eve
  * @param select
  * @param next
  */
-export const expendSubscribeMount = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+export const expendSubscribeMount = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
   expendSubscribe(valueEvent, select, next, 'mount');
 };
 
@@ -131,6 +131,6 @@ export const expendSubscribeMount = async <T extends EventKeys>(valueEvent: Even
  * @param select
  * @param next
  */
-export const expendSubscribeUnmount = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+export const expendSubscribeUnmount = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
   expendSubscribe(valueEvent, select, next, 'unmount');
 };

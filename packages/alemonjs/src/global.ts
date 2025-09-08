@@ -84,6 +84,7 @@ declare global {
    * 定义一组标准执行
    */
   var onGroup: OnGroupFunc;
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface ProcessEnv {
       login?: string;

@@ -89,7 +89,7 @@ export class DCAPI {
    * @param avatar_hash
    * @returns
    */
-  async getUserUrl(user_id: string, avatar_hash: string) {
+  getUserUrl(user_id: string, avatar_hash: string) {
     const url = `/avatars/${user_id}/${avatar_hash}.png`;
 
     return this.requestCDN({
@@ -140,7 +140,7 @@ export class DCAPI {
    * @param headers
    * @returns
    */
-  async channelsMessages(channel_id: string, data: MessageData = {}) {
+  channelsMessages(channel_id: string, data: MessageData = {}) {
     return this.request({
       method: 'post',
       url: `channels/${channel_id}/messages`,
@@ -195,7 +195,7 @@ export class DCAPI {
     }
   ): Promise<any> {
     const formdata = await this.createFrom(message.image, message.msg_id, message.content, message.name);
-    const dary = formdata != false ? formdata.getBoundary() : '';
+    const dary = formdata !== false ? formdata.getBoundary() : '';
 
     return this.request({
       method: 'post',
@@ -216,7 +216,7 @@ export class DCAPI {
    *
    * 获取应用程序角色连接元数据记录
    */
-  async applicationRoleConnectionsMetadata(application_id: string) {
+  applicationRoleConnectionsMetadata(application_id: string) {
     return this.request({
       method: 'get',
       url: `/applications/${application_id}/role-connections/metadata`
@@ -226,7 +226,7 @@ export class DCAPI {
    *
    * 更新应用程序角色连接元数据记录
    */
-  async applicationRoleConnectionsMetadataUpdate(application_id: string) {
+  applicationRoleConnectionsMetadataUpdate(application_id: string) {
     return this.request({
       method: 'put',
       url: `/applications/${application_id}/role-connections/metadata`
@@ -244,7 +244,7 @@ export class DCAPI {
    * @param message
    * @returns
    */
-  async usersMe() {
+  usersMe() {
     return this.request({
       method: 'get',
       url: '/users/@me'
@@ -256,7 +256,7 @@ export class DCAPI {
    * @param message
    * @returns
    */
-  async userMessage(user_id: string) {
+  userMessage(user_id: string) {
     return this.request({
       method: 'get',
       url: `/users/${user_id}`
@@ -268,7 +268,7 @@ export class DCAPI {
    * @param params :{获取该频道 Id 之前的频道,获取该频道Id后的频道,返回的最大频道数量 (1-200),在响应中包括大概的成员和存在计数 }
    * @returns
    */
-  async usersMeGuilds(
+  usersMeGuilds(
     params: {
       before: string;
       after: string;
@@ -287,7 +287,7 @@ export class DCAPI {
    * 获取当前用户频道成员
    * *********
    */
-  async usersMeGuildsMember(guild_id: string) {
+  usersMeGuildsMember(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/users/@me/guilds/${guild_id}/member`
@@ -298,7 +298,7 @@ export class DCAPI {
    * 获取频道成员
    * *********
    */
-  async guildsMember(guild_id: string) {
+  guildsMember(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/member`
@@ -309,7 +309,7 @@ export class DCAPI {
    * 离开频道
    * *********
    */
-  async usersMeGuildsDelete(guild_id: string) {
+  usersMeGuildsDelete(guild_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/users/@me/guilds/${guild_id}`
@@ -320,7 +320,7 @@ export class DCAPI {
    * 创建DM
    * *********
    */
-  async userMeChannels(recipient_id: string) {
+  userMeChannels(recipient_id: string) {
     return this.request({
       method: 'post',
       url: '/user/@me/channels',
@@ -341,7 +341,7 @@ export class DCAPI {
    * 获取当前应用程序
    * *********
    */
-  async applicationsMe() {
+  applicationsMe() {
     return this.request({
       method: 'GET',
       url: '/applications/@me'
@@ -353,7 +353,7 @@ export class DCAPI {
    * 编辑当前应用程序
    * *********
    */
-  async applicationsMeUpdate() {
+  applicationsMeUpdate() {
     return this.request({
       method: 'PATCH',
       url: '/applications/@me'
@@ -365,7 +365,7 @@ export class DCAPI {
    * 获取当前用户连接
    * *********
    */
-  async usersMeConnections() {
+  usersMeConnections() {
     return this.request({
       method: 'GET',
       url: '/users/@me/connections'
@@ -376,7 +376,7 @@ export class DCAPI {
    * 获取当前用户应用程序角色连接
    * *********
    */
-  async usersMeApplicationsRoleConnection(application_id: string) {
+  usersMeApplicationsRoleConnection(application_id: string) {
     return this.request({
       method: 'GET',
       url: `/users/@me/applications/${application_id}/role-connection`
@@ -387,7 +387,7 @@ export class DCAPI {
    * 更新当前用户应用程序角色连接
    * *********
    */
-  async usersMeApplicationsRoleConnectionUpdate(application_id: string) {
+  usersMeApplicationsRoleConnectionUpdate(application_id: string) {
     return this.request({
       method: 'PUT',
       url: `/users/@me/applications/${application_id}/role-connection`
@@ -404,7 +404,7 @@ export class DCAPI {
    * 创建频道
    * *********
    */
-  async guildsCreate() {
+  guildsCreate() {
     return this.request({
       method: 'post',
       url: '/guilds'
@@ -415,7 +415,7 @@ export class DCAPI {
    * 获取频道
    * *********
    */
-  async guild(guild_id: string) {
+  guild(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}`
@@ -426,7 +426,7 @@ export class DCAPI {
    * 获取频道预览
    * *********
    */
-  async guildsPreview(guild_id: string) {
+  guildsPreview(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/preview`
@@ -437,7 +437,7 @@ export class DCAPI {
    * 修改频道
    * *********
    */
-  async guildsUpdate(guild_id: string) {
+  guildsUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}`
@@ -449,7 +449,7 @@ export class DCAPI {
    * 删除频道
    * *********
    */
-  async guildsDelete(guild_id: string) {
+  guildsDelete(guild_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}`
@@ -460,7 +460,7 @@ export class DCAPI {
    * 列出活跃的频道线程
    * *********
    */
-  async guildsThreadsActive(guild_id: string) {
+  guildsThreadsActive(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/threads/active`
@@ -471,7 +471,7 @@ export class DCAPI {
    * 获取频道成员消息
    * *********
    */
-  async getGuildMember(guild_id: string, user_id: string) {
+  getGuildMember(guild_id: string, user_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members/${user_id}`
@@ -482,7 +482,7 @@ export class DCAPI {
    * 列出频道成员
    * *********
    */
-  async guildsMembers(guild_id: string) {
+  guildsMembers(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members`
@@ -493,7 +493,7 @@ export class DCAPI {
    * 搜索频道成员
    * *********
    */
-  async guildsMembersSearch(guild_id: string) {
+  guildsMembersSearch(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/members/search`
@@ -504,7 +504,7 @@ export class DCAPI {
    * 添加频道成员
    * *********
    */
-  async guildsMembersAdd(guild_id: string, user_id: string) {
+  guildsMembersAdd(guild_id: string, user_id: string) {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}`
@@ -516,7 +516,7 @@ export class DCAPI {
    * 修改频道成员
    * *********
    */
-  async guildsMembersUpdate(guild_id: string, user_id: string) {
+  guildsMembersUpdate(guild_id: string, user_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/${user_id}`
@@ -528,7 +528,7 @@ export class DCAPI {
    * 修改当前成员
    * *********
    */
-  async guildsMembersMeNick(guild_id: string) {
+  guildsMembersMeNick(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
@@ -539,7 +539,7 @@ export class DCAPI {
    * 修改当前用户昵称
    * *********
    */
-  async guildsMembersMeNickUpdate(guild_id: string) {
+  guildsMembersMeNickUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/@me/nick`
@@ -550,7 +550,7 @@ export class DCAPI {
    * 获取频道角色
    * *********
    */
-  async guildsRoles(guild_id: string) {
+  guildsRoles(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/roles`
@@ -561,7 +561,7 @@ export class DCAPI {
    * 创建频道角色
    * *********
    */
-  async guildsRolesCreate(guild_id: string) {
+  guildsRolesCreate(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/roles`
@@ -572,7 +572,7 @@ export class DCAPI {
    * 修改频道角色位置
    * *********
    */
-  async guildsRolesUpdate(guild_id: string) {
+  guildsRolesUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles`
@@ -583,7 +583,7 @@ export class DCAPI {
    * 修改频道角色
    * *********
    */
-  async guildsRolesUpdateById(guild_id: string, role_id: string) {
+  guildsRolesUpdateById(guild_id: string, role_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles/${role_id}`
@@ -594,7 +594,7 @@ export class DCAPI {
    * 添加频道成员角色
    * *********
    */
-  async guildsMEmbersRolesAdd(guild_id: string, user_id: string, role_id: string) {
+  guildsMEmbersRolesAdd(guild_id: string, user_id: string, role_id: string) {
     return this.request({
       method: 'put',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
@@ -605,7 +605,7 @@ export class DCAPI {
    * 删除频道成员角色
    * *********
    */
-  async guildsMembersRolesDelete(guild_id: string, user_id: string, role_id: string) {
+  guildsMembersRolesDelete(guild_id: string, user_id: string, role_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`
@@ -616,7 +616,7 @@ export class DCAPI {
    * 删除频道角色
    * *********
    */
-  async guildsRolesDelete(guild_id: string, role_id: string) {
+  guildsRolesDelete(guild_id: string, role_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/roles/${role_id}`
@@ -627,7 +627,7 @@ export class DCAPI {
    * 删除频道成员
    * *********
    */
-  async guildsMembersDelete(guild_id: string, user_id: string) {
+  guildsMembersDelete(guild_id: string, user_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}`
@@ -638,7 +638,7 @@ export class DCAPI {
    * 获取频道禁令
    * *********
    */
-  async guildsBans(guild_id: string) {
+  guildsBans(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/bans`
@@ -649,7 +649,7 @@ export class DCAPI {
    * 获得频道禁令
    * *********
    */
-  async guildsBansDelete(guild_id: string, user_id: string) {
+  guildsBansDelete(guild_id: string, user_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
@@ -661,7 +661,7 @@ export class DCAPI {
    * 创建频道禁令
    * *********
    */
-  async guildsBansCreateByUserId(guild_id: string, user_id: string) {
+  guildsBansCreateByUserId(guild_id: string, user_id: string) {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/bans/${user_id}`
@@ -672,7 +672,7 @@ export class DCAPI {
    * 解除频道禁令
    * *********
    */
-  async guildsBansDeleteByUserId(guild_id: string, user_id: string) {
+  guildsBansDeleteByUserId(guild_id: string, user_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/bans/${user_id}`
@@ -683,7 +683,7 @@ export class DCAPI {
    * 修改频道MFA级别
    * *********
    */
-  async guildsMfa(guild_id: string) {
+  guildsMfa(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/mfa`
@@ -694,7 +694,7 @@ export class DCAPI {
    * 获取频道修剪数量
    * *********
    */
-  async guildsPrune(guild_id: string) {
+  guildsPrune(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/prune`
@@ -705,7 +705,7 @@ export class DCAPI {
    * 开始频道修剪
    * *********
    */
-  async guildsPruneUpdate(guild_id: string) {
+  guildsPruneUpdate(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/prune`
@@ -716,7 +716,7 @@ export class DCAPI {
    * 获取频道邀请
    * *********
    */
-  async guildsInvites(guild_id: string) {
+  guildsInvites(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/invites`
@@ -727,7 +727,7 @@ export class DCAPI {
    * 获取频道集成
    * *********
    */
-  async guildsIntegrations(guild_id: string) {
+  guildsIntegrations(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/integrations`
@@ -738,7 +738,7 @@ export class DCAPI {
    * 删除频道集成
    * *********
    */
-  async guildsDeleteByIntegrationsId(guild_id: string, integration_id: string) {
+  guildsDeleteByIntegrationsId(guild_id: string, integration_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/${integration_id}`
@@ -749,7 +749,7 @@ export class DCAPI {
    * 获取频道小部件设置
    * *********
    */
-  async guildsWidget(guild_id: string) {
+  guildsWidget(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget`
@@ -760,7 +760,7 @@ export class DCAPI {
    * 修改频道小部件
    * *********
    */
-  async guildsWidgetUpdate(guild_id: string) {
+  guildsWidgetUpdate(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/widget`
@@ -771,7 +771,7 @@ export class DCAPI {
    * 获取频道小部件
    * *********
    */
-  async guildsWidgetJSON(guild_id: string) {
+  guildsWidgetJSON(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.json`
@@ -782,7 +782,7 @@ export class DCAPI {
    * 获取频道个性网址
    * *********
    */
-  async guildVanityUrl(guild_id: string) {
+  guildVanityUrl(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/vanity-url`
@@ -793,7 +793,7 @@ export class DCAPI {
    * 获取频道小部件图像
    * *********
    */
-  async guildsWidgetPNG(guild_id: string) {
+  guildsWidgetPNG(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/widget.png`
@@ -804,7 +804,7 @@ export class DCAPI {
    * 获取频道欢迎屏幕
    * *********
    */
-  async guildsWelconScreen(guild_id: string) {
+  guildsWelconScreen(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/welcome-screen`
@@ -815,7 +815,7 @@ export class DCAPI {
    * 修改频道欢迎界面
    * *********
    */
-  async guildsWelconmeScreen(guild_id: string) {
+  guildsWelconmeScreen(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/welcome-screen`
@@ -826,7 +826,7 @@ export class DCAPI {
    * 获取频道入职
    * *********
    */
-  async guildsOnboarding(guild_id: string) {
+  guildsOnboarding(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/onboarding`
@@ -837,7 +837,7 @@ export class DCAPI {
    * 修改频道入职
    * *********
    */
-  async guildsOnboardingUpdate(guild_id: string) {
+  guildsOnboardingUpdate(guild_id: string) {
     return this.request({
       method: 'PUT',
       url: `/guilds/${guild_id}/onboarding`
@@ -848,7 +848,7 @@ export class DCAPI {
    * 获取公会审核日志
    * *********
    */
-  async guildsAuditLogs(guild_id: string) {
+  guildsAuditLogs(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/audit-logs`
@@ -859,7 +859,7 @@ export class DCAPI {
    * 获取自动审核规则
    * *********
    */
-  async guildsAutoModerationsRules(guild_id: string, auto_moderation_rule_id: string) {
+  guildsAutoModerationsRules(guild_id: string, auto_moderation_rule_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
@@ -870,7 +870,7 @@ export class DCAPI {
    * 创建自动审核规则
    * *********
    */
-  async guildsAutoModerationRulesCreate(guild_id: string) {
+  guildsAutoModerationRulesCreate(guild_id: string) {
     return this.request({
       method: 'POST',
       url: `/guilds/${guild_id}/auto-moderation/rules`
@@ -881,7 +881,7 @@ export class DCAPI {
    * 修改自动审核规则
    * *********
    */
-  async guildsAutoModerationsRulesUpdate(guild_id: string, auto_moderation_rule_id: string) {
+  guildsAutoModerationsRulesUpdate(guild_id: string, auto_moderation_rule_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
@@ -892,7 +892,7 @@ export class DCAPI {
    * 删除自动审核规则
    * *********
    */
-  async guildsAutoModerationsRulesDelete(guild_id: string, auto_moderation_rule_id: string) {
+  guildsAutoModerationsRulesDelete(guild_id: string, auto_moderation_rule_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/guilds/${guild_id}/auto-moderation/rules/${auto_moderation_rule_id}`
@@ -909,7 +909,7 @@ export class DCAPI {
    * 获取所有子频道
    * *********
    */
-  async guildsanyChannels(guild_id: string) {
+  guildsanyChannels(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/channels`
@@ -920,7 +920,7 @@ export class DCAPI {
    * 获取子频道
    * *********
    */
-  async guildsChannels(channel_id: string) {
+  guildsChannels(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}`
@@ -931,7 +931,7 @@ export class DCAPI {
    * 修改子频道
    * *********
    */
-  async guildsChannelsUpdate(channel_id: string) {
+  guildsChannelsUpdate(channel_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}`
@@ -942,7 +942,7 @@ export class DCAPI {
    * 删除子频道
    * *********
    */
-  async guildsChannelsDELETE(channel_id: string) {
+  guildsChannelsDELETE(channel_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/channels/${channel_id}`
@@ -953,7 +953,7 @@ export class DCAPI {
    * 创建子频道
    * *********
    */
-  async guildsChannelsCreate(guild_id: string) {
+  guildsChannelsCreate(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/channels`
@@ -964,7 +964,7 @@ export class DCAPI {
    * 修改子频道位置
    * *********
    */
-  async guildsChannelsUpdateposi(guild_id: string) {
+  guildsChannelsUpdateposi(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/channels`
@@ -976,7 +976,7 @@ export class DCAPI {
    * 获取频道邀请
    * *********
    */
-  async getChannelInvites(channel_id: string) {
+  getChannelInvites(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id} /invites`
@@ -987,7 +987,7 @@ export class DCAPI {
    * 创建频道邀请
    * *********
    */
-  async createChannelInvites(channel_id: string) {
+  createChannelInvites(channel_id: string) {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /invites`
@@ -998,7 +998,7 @@ export class DCAPI {
    * 删除频道邀请
    * *********
    */
-  async deleteChannelInvites(channel_id: string) {
+  deleteChannelInvites(channel_id: string) {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /invites`
@@ -1010,7 +1010,7 @@ export class DCAPI {
    *触发输入指示器
    * *********
    */
-  async triggerTypingIndicator(channel_id: string) {
+  triggerTypingIndicator(channel_id: string) {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /typing`
@@ -1022,7 +1022,7 @@ export class DCAPI {
    *群组 DM 添加收件人
    * *********
    */
-  async groupDMAddRecipient(channel_id: string, user_id: string) {
+  groupDMAddRecipient(channel_id: string, user_id: string) {
     return this.request({
       method: 'put',
       url: `/channels/ ${channel_id} /recipients/${user_id}`
@@ -1033,7 +1033,7 @@ export class DCAPI {
    *群组DM删除收件人
    * *********
    */
-  async groupDMdeleteRecipient(channel_id: string, user_id: string) {
+  groupDMdeleteRecipient(channel_id: string, user_id: string) {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id} /recipients/${user_id}`
@@ -1044,7 +1044,7 @@ export class DCAPI {
    *启动消息开始线程
    * *********
    */
-  async startThreadfromMessage(channel_id: string, message_id: string) {
+  startThreadfromMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id} /messages/${message_id} /threads`
@@ -1055,7 +1055,7 @@ export class DCAPI {
    *启动没有消息的线程
    * *********
    */
-  async startThreadwithoutMessag(channel_id: string) {
+  startThreadwithoutMessag(channel_id: string) {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/threads`
@@ -1066,7 +1066,7 @@ export class DCAPI {
    *在论坛或媒体频道中启动话题
    * *********
    */
-  async startThreadinForum(channel_id: string) {
+  startThreadinForum(channel_id: string) {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/threads`
@@ -1077,7 +1077,7 @@ export class DCAPI {
    *加入话题
    * *********
    */
-  async joinThread(channel_id: string) {
+  joinThread(channel_id: string) {
     return this.request({
       method: 'PUT',
       url: `/channels/${channel_id}/thread-members/@me`
@@ -1088,7 +1088,7 @@ export class DCAPI {
    *添加话题成员
    * *********
    */
-  async addThreadMember(channel_id: string, user_id: string) {
+  addThreadMember(channel_id: string, user_id: string) {
     return this.request({
       method: 'PUT',
       url: `/channels/${channel_id}/thread-members/${user_id}`
@@ -1099,7 +1099,7 @@ export class DCAPI {
    *删除话题
    * *********
    */
-  async leavethread(channel_id: string) {
+  leavethread(channel_id: string) {
     return this.request({
       method: 'delete',
       url: `/channels/${channel_id}/thread-members/@me`
@@ -1110,7 +1110,7 @@ export class DCAPI {
    *删除线程成员
    * *********
    */
-  async removeThreadMember(channel_id: string, user_id: string) {
+  removeThreadMember(channel_id: string, user_id: string) {
     return this.request({
       method: 'delete',
       url: `/channels/${channel_id}/thread-members/${user_id}`
@@ -1121,7 +1121,7 @@ export class DCAPI {
    *获取线程成员
    * *********
    */
-  async getThreadMember(channel_id: string, user_id: string) {
+  getThreadMember(channel_id: string, user_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/thread-members/${user_id}`
@@ -1132,7 +1132,7 @@ export class DCAPI {
    *列出线程成员
    * *********
    */
-  async listThreadMembers(channel_id: string) {
+  listThreadMembers(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/thread-members`
@@ -1143,7 +1143,7 @@ export class DCAPI {
    *列出公共存档主题
    * *********
    */
-  async listPublicArchivedThread(channel_id: string) {
+  listPublicArchivedThread(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/threads/archived/public`
@@ -1154,7 +1154,7 @@ export class DCAPI {
    *列出私有存档线程
    * *********
    */
-  async listPrivateArchivedThreads(channel_id: string) {
+  listPrivateArchivedThreads(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/threads/archived/private`
@@ -1165,7 +1165,7 @@ export class DCAPI {
    *列出已加入的私人存档主题
    * *********
    */
-  async listoinedPrivateThreads(channel_id: string) {
+  listoinedPrivateThreads(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/users/@me/threads/archived/private`
@@ -1189,7 +1189,7 @@ export class DCAPI {
    * 编辑频道权限
    * *********
    */
-  async editChannelPermissions(channel_id: string, overwrite_id: string) {
+  editChannelPermissions(channel_id: string, overwrite_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
@@ -1200,7 +1200,7 @@ export class DCAPI {
    * 删除频道权限
    * *********
    */
-  async deleteChannelPermissions(channel_id: string, overwrite_id: string) {
+  deleteChannelPermissions(channel_id: string, overwrite_id: string) {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
@@ -1217,7 +1217,7 @@ export class DCAPI {
    * 获取子频道消息
    * *********
    */
-  async guildsChannelsanymessages(channel_id: string) {
+  guildsChannelsanymessages(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/messages`
@@ -1228,7 +1228,7 @@ export class DCAPI {
    * 获取单条子频道消息
    * *********
    */
-  async guildsChannelsmessages(channel_id: string, message_id: string) {
+  guildsChannelsmessages(channel_id: string, message_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/${channel_id}/messages/${message_id}`
@@ -1239,7 +1239,7 @@ export class DCAPI {
    * 创建子频道消息
    * *********
    */
-  async guildsChannelscreatmess(channel_id: string) {
+  guildsChannelscreatmess(channel_id: string) {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/messages`
@@ -1250,7 +1250,7 @@ export class DCAPI {
    * 交叉发布消息
    * *********
    */
-  async crosspostmessages(channel_id: string, message_id: string) {
+  crosspostmessages(channel_id: string, message_id: string) {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /crosspost`
@@ -1262,7 +1262,7 @@ export class DCAPI {
    * 创造反应
    * *********
    */
-  async createareaction(channel_id: string, message_id: string, emoji: string) {
+  createareaction(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'PUT',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
@@ -1273,7 +1273,7 @@ export class DCAPI {
    * 删除自己的反应
    * *********
    */
-  async deleteownreaction(channel_id: string, message_id: string, emoji: string) {
+  deleteownreaction(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
@@ -1284,7 +1284,7 @@ export class DCAPI {
    * 删除别人的反应
    * *********
    */
-  async deleteareuserction(channel_id: string, message_id: string, emoji: string, user_id: string) {
+  deleteareuserction(channel_id: string, message_id: string, emoji: string, user_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/${user_id}`
@@ -1295,7 +1295,7 @@ export class DCAPI {
    * 获取反应
    * *********
    */
-  async getownreaction(channel_id: string, message_id: string, emoji: string) {
+  getownreaction(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
@@ -1306,7 +1306,7 @@ export class DCAPI {
    * 删除所有反应
    * *********
    */
-  async deleteAllreaction(channel_id: string, message_id: string) {
+  deleteAllreaction(channel_id: string, message_id: string) {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions`
@@ -1317,7 +1317,7 @@ export class DCAPI {
    * 删除表情符号的所有反应
    * *********
    */
-  async deleteAllreactionforEmoji(channel_id: string, message_id: string, emoji: string) {
+  deleteAllreactionforEmoji(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'DELETE',
       url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
@@ -1328,7 +1328,7 @@ export class DCAPI {
    * 编辑消息
    * *********
    */
-  async editMessage(channel_id: string, message_id: string) {
+  editMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}/messages/${message_id}`
@@ -1339,7 +1339,7 @@ export class DCAPI {
    * 撤回消息
    * *********
    */
-  async deleteMessage(channel_id: string, message_id: string) {
+  deleteMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/channels/${channel_id}/messages/${message_id}`
@@ -1350,7 +1350,7 @@ export class DCAPI {
    * 批量删除消息
    * *********
    */
-  async bulkdeleteMessage(channel_id: string) {
+  bulkdeleteMessage(channel_id: string) {
     return this.request({
       method: 'post',
       url: `/channels/${channel_id}/messages/bulk-delete`
@@ -1385,7 +1385,7 @@ export class DCAPI {
    * 关注公告频道
    * *********
    */
-  async followAnnouncementChannel(channel_id: string) {
+  followAnnouncementChannel(channel_id: string) {
     return this.request({
       method: 'POST',
       url: `/channels/ ${channel_id} /followers`
@@ -1402,7 +1402,7 @@ export class DCAPI {
    *获取置顶消息
    * *********
    */
-  async getPinnedMessages(channel_id: string) {
+  getPinnedMessages(channel_id: string) {
     return this.request({
       method: 'get',
       url: `/channels/ ${channel_id}/pins`
@@ -1414,7 +1414,7 @@ export class DCAPI {
    *置顶消息
    * *********
    */
-  async pinMessage(channel_id: string, message_id: string) {
+  pinMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'put',
       url: `/channels/ ${channel_id}/${message_id}`
@@ -1425,7 +1425,7 @@ export class DCAPI {
    *取消置顶消息
    * *********
    */
-  async deletepinMessage(channel_id: string, message_id: string) {
+  deletepinMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'delete',
       url: `/channels/ ${channel_id}/${message_id}`
@@ -1449,7 +1449,7 @@ export class DCAPI {
    *获取贴纸
    * *********
    */
-  async getsticker(sticker_id: string) {
+  getsticker(sticker_id: string) {
     return this.request({
       method: 'get',
       url: `/stickers/${sticker_id}`
@@ -1460,7 +1460,7 @@ export class DCAPI {
    *列出贴纸包
    * *********
    */
-  async listStickerPacks() {
+  listStickerPacks() {
     return this.request({
       method: 'get',
       url: '/stickers'
@@ -1471,7 +1471,7 @@ export class DCAPI {
    *列出公会贴纸
    * *********
    */
-  async listGuildStickers(sticker_id: string) {
+  listGuildStickers(sticker_id: string) {
     return this.request({
       method: 'get',
       url: `/stickers/${sticker_id}/stickers`
@@ -1482,7 +1482,7 @@ export class DCAPI {
    *获取公会贴纸
    * *********
    */
-  async getGuildSticker(guild_id: string, sticker_id: string) {
+  getGuildSticker(guild_id: string, sticker_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
@@ -1493,7 +1493,7 @@ export class DCAPI {
    *创建公会贴纸
    * *********
    */
-  async createGuildSticker(guild_id: string) {
+  createGuildSticker(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/${guild_id}/stickers`
@@ -1504,7 +1504,7 @@ export class DCAPI {
    *修改公会贴纸
    * *********
    */
-  async modifyGuildSticker(guild_id: string, sticker_id: string) {
+  modifyGuildSticker(guild_id: string, sticker_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
@@ -1515,7 +1515,7 @@ export class DCAPI {
    *删除公会贴纸
    * *********
    */
-  async deleteGuildSticker(guild_id: string, sticker_id: string) {
+  deleteGuildSticker(guild_id: string, sticker_id: string) {
     return this.request({
       method: 'delete',
       url: `/guilds/${guild_id}/stickers/${sticker_id}`
@@ -1526,7 +1526,7 @@ export class DCAPI {
    *列出公会表情符号
    * *********
    */
-  async listGuildEmojis(guild_id: string) {
+  listGuildEmojis(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/ ${guild_id} /emojis`
@@ -1537,7 +1537,7 @@ export class DCAPI {
    *获取公会表情符号
    * *********
    */
-  async getGuildEmoji(guild_id: string, emoji_id: string) {
+  getGuildEmoji(guild_id: string, emoji_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
@@ -1548,7 +1548,7 @@ export class DCAPI {
    *创建公会表情符号
    * *********
    */
-  async createGuildEmoji(guild_id: string) {
+  createGuildEmoji(guild_id: string) {
     return this.request({
       method: 'post',
       url: `/guilds/ ${guild_id} /emojis`
@@ -1559,7 +1559,7 @@ export class DCAPI {
    *修改公会表情
    * *********
    */
-  async modifyGuildEmoji(guild_id: string, emoji_id: string) {
+  modifyGuildEmoji(guild_id: string, emoji_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
@@ -1570,7 +1570,7 @@ export class DCAPI {
    *删除公会表情符号
    * *********
    */
-  async deleteGuildEmoji(guild_id: string, emoji_id: string) {
+  deleteGuildEmoji(guild_id: string, emoji_id: string) {
     return this.request({
       method: 'delete',
       url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
@@ -1588,7 +1588,7 @@ export class DCAPI {
    * 列出语音区域
    * *********
    */
-  async listVoiceRegions() {
+  listVoiceRegions() {
     return this.request({
       method: 'get',
       url: '/voice/regions'
@@ -1600,7 +1600,7 @@ export class DCAPI {
    * 获取频道语音区域
    * *********
    */
-  async guildsRegions(guild_id: string) {
+  guildsRegions(guild_id: string) {
     return this.request({
       method: 'get',
       url: `/guilds/${guild_id}/regions`
@@ -1611,7 +1611,7 @@ export class DCAPI {
    * 修改当前用户语音状态
    * *********
    */
-  async guildsVoiveStatesMe(guild_id: string) {
+  guildsVoiveStatesMe(guild_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/@me`
@@ -1622,7 +1622,7 @@ export class DCAPI {
    * 修改用户语音状态
    * *********
    */
-  async guildsVoiceStatesUpdate(guild_id: string, user_id: string) {
+  guildsVoiceStatesUpdate(guild_id: string, user_id: string) {
     return this.request({
       method: 'PATCH',
       url: `/guilds/${guild_id}/voice-states/${user_id}`
@@ -1647,7 +1647,7 @@ export class DCAPI {
    * *********
    */
 
-  async gateway() {
+  gateway() {
     return this.request({
       method: 'get',
       url: '/gateway'
@@ -1659,7 +1659,7 @@ export class DCAPI {
   /**
    *
    */
-  async interactionsCallback(id: string, token: string, content: string) {
+  interactionsCallback(id: string, token: string, content: string) {
     return this.request({
       method: 'POST',
       url: `/interactions/${id}/${token}/callback`,

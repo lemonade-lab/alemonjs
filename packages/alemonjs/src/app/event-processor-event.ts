@@ -18,7 +18,7 @@ import { EventMessageText } from '../core/variable';
  * @param event
  * @param key
  */
-export const expendEvent = async <T extends EventKeys>(valueEvent: Events[T], select: T, next: Function) => {
+export const expendEvent = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
   const res = new Response();
   const [message] = useMessage(valueEvent);
 
@@ -44,7 +44,7 @@ export const expendEvent = async <T extends EventKeys>(valueEvent: Events[T], se
       return;
     }
     // 检查所有
-    calli();
+    void calli();
   };
 
   /**
@@ -86,7 +86,7 @@ export const expendEvent = async <T extends EventKeys>(valueEvent: Events[T], se
       if (file?.stateKey) {
         const [state] = useState(file?.stateKey);
 
-        if (state == false) {
+        if (state === false) {
           // 继续
           nextEvent();
 
@@ -131,13 +131,13 @@ export const expendEvent = async <T extends EventKeys>(valueEvent: Events[T], se
         if (Array.isArray(res)) {
           if (res.length > 0) {
             // 发送数据
-            message.send(res);
+            void message.send(res);
           }
           isClose = true;
         } else if (typeof res === 'object') {
           if (Array.isArray(res.data)) {
             // 发送数据
-            message.send(res.data);
+            void message.send(res.data);
           }
           if (!res.allowGrouping) {
             isClose = true;
@@ -170,10 +170,10 @@ export const expendEvent = async <T extends EventKeys>(valueEvent: Events[T], se
           onRes(res);
         }
         ++index;
-        start();
+        void start();
       };
 
-      start();
+      void start();
     } catch (err) {
       showErrorModule(err);
     }
