@@ -6,15 +6,12 @@
   "license": "MIT",
   "main": "lib/index.js",
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "npx lvy dev",
     "build": "npx lvy build"
   },
-  "devDependencies": {
-    "alemonjs": "^2.1.0-alpha.17",
-    "@alemonjs/gui": "^2.1.0-alpha.5",
-    "@types/node": "^22",
-    "jsxp": "1.2.2",
-    "lvyjs": "^0.2.20"
-  }
+  "workspaces": [
+    "packages/*"
+  ]
 }

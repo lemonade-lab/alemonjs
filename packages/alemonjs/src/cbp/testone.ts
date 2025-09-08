@@ -8,8 +8,8 @@ import { existsSync, readFileSync, watch, mkdirSync, writeFile } from 'fs';
 import _ from 'lodash';
 import { readFile } from 'fs/promises';
 import { actionResolves, actionTimeouts, apiResolves, apiTimeouts } from './config';
-import { createResult } from '../post';
 import { ResultCode } from '../core/code';
+import { createResult } from '../core/utils';
 
 /**
  * @param ws

@@ -104,6 +104,7 @@ export const start = async (options: StartOptions | string = {}) => {
 
   // 连接到 CBP 服务器
   if (url) {
+    logger.info(`[Connecting to CBP server at ${url}]`);
     cbpClient(url);
   } else {
     // 创建 cbp 服务器
@@ -112,12 +113,12 @@ export const start = async (options: StartOptions | string = {}) => {
     // 设置环境变量
     process.env.port = port;
     cbpServer(port, async () => {
-      const url = `ws://127.0.0.1:${port}`;
-
-      logger.info(`[CBP server started at ${url}]`);
+      const httpURL = `http://127.0.0.1:${port}`;
+      const wsURL = `ws://127.0.0.1:${port}`;
+      logger.info(`[CBP server started at ${httpURL}]`);
+      logger.info(`[CBP server started at ${wsURL}]`);
       const isFullReceive = options?.is_full_receive || cfg.argv?.is_full_receive || cfg.value?.is_full_receive || true;
-
-      cbpClient(url, { isFullReceive });
+      cbpClient(httpURL, { isFullReceive });
       // 加载平台服务
       const platform = options?.platform || cfg.argv?.platform || cfg.value?.platform;
       const login = options?.login || cfg.argv?.login || cfg.value?.login;
