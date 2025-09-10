@@ -8,6 +8,29 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createPicFrom } from './createPicFrom.js';
 export const API_URL = 'https://discord.com/api/v10';
 export const CDN_URL = 'https://cdn.discordapp.com';
+
+function filterHeaders(headers) {
+  if (!headers) {
+    return headers;
+  }
+  const filtered = {};
+  const sensitiveKeys = [/^authorization$/i, /^cookie$/i, /^set-cookie$/i, /token/i, /key/i, /jwt/i, /^session[-_]id$/i, /^uid$/i, /^user[-_]id$/i];
+
+  for (const key in headers) {
+    if (/^_/.test(key)) {
+      continue; // 跳过 _ 开头
+    }
+    // 如果是敏感字段全部替换为 ******
+    if (sensitiveKeys.some(re => re.test(key))) {
+      filtered[key] = '******';
+    } else {
+      filtered[key] = headers[key];
+    }
+  }
+
+  return filtered;
+}
+
 /**
  * api接口
  */
@@ -37,18 +60,12 @@ export class DCAPI {
 
     return new Promise((resolve, reject) => {
       service(options)
-        .then(res => resolve(res?.data || {}))
+        .then(res => resolve(res?.data ?? {}))
         .catch(err => {
-          logger.error(err);
           // 错误时的请求头
           logger.error('[axios] error', {
             config: {
-              // headers: err?.config?.headers,
-              // 如果存在 token 要隐藏调。
-              headers: {
-                ...err?.config?.headers,
-                Authorization: `Bot ${value.token ? '******' : value.token}`
-              },
+              headers: filterHeaders(err?.config?.headers),
               params: err?.config?.params,
               data: err?.config?.data
             },
@@ -979,7 +996,7 @@ export class DCAPI {
   getChannelInvites(channel_id: string) {
     return this.request({
       method: 'get',
-      url: `/channels/ ${channel_id} /invites`
+      url: `/channels/${channel_id}/invites`
     });
   }
   /**
@@ -990,7 +1007,7 @@ export class DCAPI {
   createChannelInvites(channel_id: string) {
     return this.request({
       method: 'POST',
-      url: `/channels/ ${channel_id} /invites`
+      url: `/channels/${channel_id}/invites`
     });
   }
   /**
@@ -1001,7 +1018,7 @@ export class DCAPI {
   deleteChannelInvites(channel_id: string) {
     return this.request({
       method: 'POST',
-      url: `/channels/ ${channel_id} /invites`
+      url: `/channels/${channel_id}/invites`
     });
   }
 
@@ -1013,7 +1030,7 @@ export class DCAPI {
   triggerTypingIndicator(channel_id: string) {
     return this.request({
       method: 'POST',
-      url: `/channels/ ${channel_id} /typing`
+      url: `/channels/${channel_id}/typing`
     });
   }
 
@@ -1025,7 +1042,7 @@ export class DCAPI {
   groupDMAddRecipient(channel_id: string, user_id: string) {
     return this.request({
       method: 'put',
-      url: `/channels/ ${channel_id} /recipients/${user_id}`
+      url: `/channels/${channel_id}/recipients/${user_id}`
     });
   }
   /**
@@ -1036,7 +1053,7 @@ export class DCAPI {
   groupDMdeleteRecipient(channel_id: string, user_id: string) {
     return this.request({
       method: 'delete',
-      url: `/channels/ ${channel_id} /recipients/${user_id}`
+      url: `/channels/${channel_id}/recipients/${user_id}`
     });
   }
   /**
@@ -1047,7 +1064,7 @@ export class DCAPI {
   startThreadfromMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'post',
-      url: `/channels/${channel_id} /messages/${message_id} /threads`
+      url: `/channels/${channel_id}/messages/${message_id}/threads`
     });
   }
   /**
@@ -1192,7 +1209,7 @@ export class DCAPI {
   editChannelPermissions(channel_id: string, overwrite_id: string) {
     return this.request({
       method: 'PATCH',
-      url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
+      url: `/channels/${channel_id}/permissions/${overwrite_id}`
     });
   }
   /**
@@ -1203,7 +1220,7 @@ export class DCAPI {
   deleteChannelPermissions(channel_id: string, overwrite_id: string) {
     return this.request({
       method: 'delete',
-      url: `/channels/ ${channel_id} /permissions/ ${overwrite_id}`
+      url: `/channels/${channel_id}/permissions/${overwrite_id}`
     });
   }
   /**
@@ -1253,7 +1270,7 @@ export class DCAPI {
   crosspostmessages(channel_id: string, message_id: string) {
     return this.request({
       method: 'POST',
-      url: `/channels/ ${channel_id} /messages/ ${message_id} /crosspost`
+      url: `/channels/${channel_id}/messages/${message_id}/crosspost`
     });
   }
 
@@ -1265,7 +1282,7 @@ export class DCAPI {
   createareaction(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'PUT',
-      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
+      url: `/channels/${channel_id}/messages/${message_id}/reactions/${emoji}/@me`
     });
   }
   /**
@@ -1276,7 +1293,7 @@ export class DCAPI {
   deleteownreaction(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'DELETE',
-      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/@me`
+      url: `/channels/${channel_id}/messages/${message_id}/reactions/${emoji}/@me`
     });
   }
   /**
@@ -1287,7 +1304,7 @@ export class DCAPI {
   deleteareuserction(channel_id: string, message_id: string, emoji: string, user_id: string) {
     return this.request({
       method: 'DELETE',
-      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}/${user_id}`
+      url: `/channels/${channel_id}/messages/${message_id}/reactions/${emoji}/${user_id}`
     });
   }
   /**
@@ -1298,7 +1315,7 @@ export class DCAPI {
   getownreaction(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'get',
-      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
+      url: `/channels/${channel_id}/messages/${message_id}/reactions/${emoji}`
     });
   }
   /**
@@ -1309,7 +1326,7 @@ export class DCAPI {
   deleteAllreaction(channel_id: string, message_id: string) {
     return this.request({
       method: 'DELETE',
-      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions`
+      url: `/channels/${channel_id}/messages/${message_id}/reactions`
     });
   }
   /**
@@ -1320,7 +1337,7 @@ export class DCAPI {
   deleteAllreactionforEmoji(channel_id: string, message_id: string, emoji: string) {
     return this.request({
       method: 'DELETE',
-      url: `/channels/ ${channel_id} /messages/ ${message_id} /reactions/${emoji}`
+      url: `/channels/${channel_id}/messages/${message_id}/reactions/${emoji}`
     });
   }
   /**
@@ -1388,7 +1405,7 @@ export class DCAPI {
   followAnnouncementChannel(channel_id: string) {
     return this.request({
       method: 'POST',
-      url: `/channels/ ${channel_id} /followers`
+      url: `/channels/${channel_id}/followers`
     });
   }
   /**
@@ -1405,7 +1422,7 @@ export class DCAPI {
   getPinnedMessages(channel_id: string) {
     return this.request({
       method: 'get',
-      url: `/channels/ ${channel_id}/pins`
+      url: `/channels/${channel_id}/pins`
     });
   }
 
@@ -1417,7 +1434,7 @@ export class DCAPI {
   pinMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'put',
-      url: `/channels/ ${channel_id}/${message_id}`
+      url: `/channels/${channel_id}/${message_id}`
     });
   }
   /**
@@ -1428,7 +1445,7 @@ export class DCAPI {
   deletepinMessage(channel_id: string, message_id: string) {
     return this.request({
       method: 'delete',
-      url: `/channels/ ${channel_id}/${message_id}`
+      url: `/channels/${channel_id}/${message_id}`
     });
   }
 
@@ -1529,7 +1546,7 @@ export class DCAPI {
   listGuildEmojis(guild_id: string) {
     return this.request({
       method: 'get',
-      url: `/guilds/ ${guild_id} /emojis`
+      url: `/guilds/${guild_id}/emojis`
     });
   }
   /**
@@ -1540,7 +1557,7 @@ export class DCAPI {
   getGuildEmoji(guild_id: string, emoji_id: string) {
     return this.request({
       method: 'get',
-      url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
+      url: `/guilds/${guild_id}/emojis/${emoji_id}`
     });
   }
   /**
@@ -1551,7 +1568,7 @@ export class DCAPI {
   createGuildEmoji(guild_id: string) {
     return this.request({
       method: 'post',
-      url: `/guilds/ ${guild_id} /emojis`
+      url: `/guilds/${guild_id}/emojis`
     });
   }
   /**
@@ -1562,7 +1579,7 @@ export class DCAPI {
   modifyGuildEmoji(guild_id: string, emoji_id: string) {
     return this.request({
       method: 'PATCH',
-      url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
+      url: `/guilds/${guild_id}/emojis/${emoji_id}`
     });
   }
   /**
@@ -1573,7 +1590,7 @@ export class DCAPI {
   deleteGuildEmoji(guild_id: string, emoji_id: string) {
     return this.request({
       method: 'delete',
-      url: `/guilds/ ${guild_id} /emojis/ ${emoji_id}`
+      url: `/guilds/${guild_id}/emojis/${emoji_id}`
     });
   }
 

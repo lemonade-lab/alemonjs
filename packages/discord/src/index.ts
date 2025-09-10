@@ -343,6 +343,17 @@ const mainProcess = () => {
   if (process.send) {
     process.send(JSON.stringify({ type: 'ready' }));
   }
+  process.on('message', msg => {
+    try {
+      const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
+
+      if (data?.type === 'start') {
+        main();
+      } else if (data?.type === 'stop') {
+        process.exit(0);
+      }
+    } catch {}
+  });
 };
 
 mainProcess();
