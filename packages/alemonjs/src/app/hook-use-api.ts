@@ -1,5 +1,5 @@
-import { DataEnums, EventKeys, Events, User } from '../typings';
-import { ResultCode } from '../core/code';
+import { DataEnums, EventKeys, Events, User } from '../types';
+import { ResultCode } from '../core/variable';
 import { ChildrenApp } from './store';
 import { createResult, Result } from '../core/utils';
 import { sendAction } from '../cbp/actions';

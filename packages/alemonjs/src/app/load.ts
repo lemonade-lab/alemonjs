@@ -2,11 +2,11 @@ import { dirname, join } from 'path';
 import { existsSync } from 'fs';
 import { createEventName, showErrorModule } from '../core/utils.js';
 import { getRecursiveDirFiles } from '../core/utils.js';
-import { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, ChildrenCycle } from '../typings';
+import { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, ChildrenCycle } from '../types/index.js';
 import { createRequire } from 'module';
 import { ChildrenApp } from './store.js';
-import { ResultCode } from '../core/code.js';
-import { file_suffix_middleware } from '../core/variable.js';
+import { ResultCode } from '../core/variable.js';
+import { fileSuffixMiddleware } from '../core/variable.js';
 const require = createRequire(import.meta.url);
 
 /**
@@ -111,7 +111,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
        * load middleware files
        */
       const mwDir = join(mainDir, 'middleware');
-      const mwFiles = getRecursiveDirFiles(mwDir, item => file_suffix_middleware.test(item.name));
+      const mwFiles = getRecursiveDirFiles(mwDir, item => fileSuffixMiddleware.test(item.name));
       const mwData: StoreMiddlewareItem[] = [];
 
       for (const file of mwFiles) {
@@ -134,10 +134,10 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       try {
         app?.onMounted && (await app.onMounted({ response: resData, middleware: mwData }));
       } catch (e) {
-        unMounted(e);
+        void unMounted(e);
       }
     } catch (e) {
-      unMounted(e);
+      void unMounted(e);
     }
 
     // unMounted 卸载
@@ -175,7 +175,7 @@ export const loadChildrenFile = async (appName: string) => {
 
       return;
     }
-    loadChildren(mainPath, appName);
+    void loadChildren(mainPath, appName);
   } catch (e) {
     showErrorModule(e);
   }

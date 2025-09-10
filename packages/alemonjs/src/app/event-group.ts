@@ -1,4 +1,4 @@
-import { OnGroupFunc } from '../typings';
+import { OnGroupFunc } from '../types';
 
 /**
  * 定义一组标准执行导出

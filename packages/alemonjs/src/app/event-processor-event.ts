@@ -6,7 +6,7 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types';
-import { Next, Events, OnResponseValue, Current, EventKeys, CurrentResultValue } from '../typings';
+import { Next, Events, OnResponseValue, Current, EventKeys, CurrentResultValue } from '../types';
 import { useState } from './hook-use-state';
 import { showErrorModule } from '../core/utils';
 import { Response } from './store';

@@ -4,8 +4,7 @@ import { join } from 'path';
 import path from 'path';
 import fs from 'fs';
 import { createRequire } from 'module';
-import { ResultCode } from './code';
-import { file_suffix_response } from './variable';
+import { fileSuffixResponse, ResultCode } from './variable';
 const require = createRequire(import.meta.url);
 
 /**
@@ -81,7 +80,7 @@ export const stringToNumber = (str: string, size = 33) => {
  */
 export const getRecursiveDirFiles = (
   dir: string,
-  condition: (func: Dirent) => boolean = item => file_suffix_response.test(item.name)
+  condition: (func: Dirent) => boolean = item => fileSuffixResponse.test(item.name)
 ): {
   path: string;
   name: string;

@@ -2,7 +2,7 @@ import Koa from 'koa';
 import { WebSocketServer, WebSocket } from 'ws';
 import MessageRouter from './router';
 import koaCors from '@koa/cors';
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
 import {
   childrenBind,
   childrenClient,

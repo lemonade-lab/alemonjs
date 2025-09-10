@@ -1,10 +1,10 @@
 import { WebSocket } from 'ws';
-import { Actions } from '../typing/actions';
-import { ResultCode } from '../core/code';
-import { EventsEnum } from '../typings';
+import { Actions } from '../types/actions';
+import { ResultCode } from '../core/variable';
+import { EventsEnum } from '../types';
 import { DEVICE_ID_HEADER, deviceId, reconnectInterval, USER_AGENT_HEADER } from './config';
 import { Result } from '../core/utils';
-import { Apis } from '../typing/apis';
+import { Apis } from '../types/apis';
 import * as flattedJSON from 'flatted';
 import { useHeartbeat } from './connect';
 import { ActionReplyFunc, ApiReplyFunc } from './typings';

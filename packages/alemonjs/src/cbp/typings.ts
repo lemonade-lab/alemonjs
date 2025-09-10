@@ -1,7 +1,7 @@
-import { EventKeys } from '../typings';
-import { Actions } from '../typing/actions';
+import { EventKeys } from '../types';
+import { Actions } from '../types/actions';
 import { Result } from '../core/utils';
-import { Apis } from '../typing/apis';
+import { Apis } from '../types/apis';
 export type ParsedMessage = {
   apiId?: string;
   actionId?: string;

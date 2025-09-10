@@ -1,7 +1,7 @@
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
 import { createResult, Result } from '../core/utils';
 import { apiTimeouts, apiResolves, deviceId, generateUniqueId, timeoutTime } from './config';
-import { Apis } from '../typing/apis';
+import { Apis } from '../types/apis';
 import * as flattedJSON from 'flatted';
 
 /**

@@ -1,4 +1,4 @@
-import { OnResponseReversalFunc, OnResponseReversalFuncBack } from '../typings';
+import { OnResponseReversalFunc, OnResponseReversalFuncBack } from '../types';
 
 /**
  * 处理响应事件

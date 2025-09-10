@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 import { onProcessor } from '../app/event-processor';
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
 import {
   actionResolves,
   actionTimeouts,

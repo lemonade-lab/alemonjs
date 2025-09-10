@@ -1,14 +1,13 @@
 import { getConfig, getConfigValue } from './core/config.js';
 import { loadChildren, loadChildrenFile } from './app/load.js';
 import { getInputExportPath } from './core/utils.js';
-import { useState } from './post.js';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { ResultCode } from './core/code.js';
 import { cbpServer } from './cbp/server.js';
-import { defaultPlatformCommonPrefix, defaultPort, filePrefixCommon } from './core/variable.js';
+import { defaultPlatformCommonPrefix, defaultPort, filePrefixCommon, ResultCode } from './core/variable.js';
 import { cbpClient } from './cbp/client.js';
 import { startAdapterWithFallback } from './adapter.js';
+import { useState } from './app/hook-use-state.js';
 
 const loadState = () => {
   const value = getConfigValue() ?? {};

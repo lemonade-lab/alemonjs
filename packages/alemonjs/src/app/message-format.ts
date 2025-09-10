@@ -32,7 +32,7 @@ import {
   DataMarkdownText,
   DataButtonTemplate,
   DataMarkdownCode
-} from '../typings';
+} from '../types';
 
 /**
  * 文本消息

@@ -1,9 +1,8 @@
-import '../typings';
 import { readFileSync, existsSync, watch, writeFileSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 import YAML from 'yaml';
-import { Package } from '../typing/package';
-import { ResultCode } from './code';
+import { Package } from '../types/package';
+import { ResultCode } from './variable';
 
 /**
  * 配置类

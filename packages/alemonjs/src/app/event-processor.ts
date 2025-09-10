@@ -6,7 +6,7 @@ import {
   processor_repeated_event_time,
   processor_repeated_user_time
 } from '../core/variable';
-import { EventKeys, Events } from '../typings';
+import { EventKeys, Events } from '../types';
 import { expendCycle } from './event-processor-cycle';
 import { ProcessorEventAutoClearMap, ProcessorEventUserAudoClearMap } from './store';
 import { createHash } from '../core/utils';

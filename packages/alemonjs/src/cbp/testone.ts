@@ -8,7 +8,7 @@ import { existsSync, readFileSync, watch, mkdirSync, writeFile } from 'fs';
 import _ from 'lodash';
 import { readFile } from 'fs/promises';
 import { actionResolves, actionTimeouts, apiResolves, apiTimeouts } from './config';
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
 import { createResult } from '../core/utils';
 
 /**

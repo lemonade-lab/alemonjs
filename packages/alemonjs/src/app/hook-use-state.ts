@@ -1,5 +1,5 @@
 import { getConfig } from '../core/config';
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
 import { State, StateSubscribe } from './store';
 
 /**

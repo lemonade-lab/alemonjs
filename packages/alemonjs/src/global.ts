@@ -7,11 +7,11 @@ import {
   OnResponseReversalFuncBack,
   OnGroupFunc,
   OnMiddlewareReversalFuncBack
-} from './typing/event';
-import { StoreChildrenApp } from './typing/store/res';
-import { StateSubscribeMap, SubscribeKeysMap } from './typing/subscribe';
-import { LoggerUtils } from './typing/logger/index';
-import { ResponseState } from './typing/state';
+} from './types/event';
+import { StoreChildrenApp } from './types/store/res';
+import { StateSubscribeMap, SubscribeKeysMap } from './types/subscribe';
+import { LoggerUtils } from './types/logger/index';
+import { ResponseState } from './types/state';
 import { Core, Logger } from './app/store';
 import WebSocket, { Server } from 'ws';
 import { IncomingMessage } from 'http';

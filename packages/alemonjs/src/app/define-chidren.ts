@@ -1,5 +1,5 @@
-import { DefineChildrenFunc } from '../typings';
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
+import { DefineChildrenFunc } from '../types';
 /**
  * 定义子事件
  * @param callback

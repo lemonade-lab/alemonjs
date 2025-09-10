@@ -5,8 +5,8 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Next, Events, EventKeys } from '../typings';
-import { ResultCode } from '../core/code';
+import { Next, Events, EventKeys } from '../types';
+import { ResultCode } from '../core/variable';
 import { expendEvent } from './event-processor-event';
 import { expendMiddleware } from './event-processor-middleware';
 import { expendSubscribeCreate, expendSubscribeMount, expendSubscribeUnmount } from './event-processor-subscribe';

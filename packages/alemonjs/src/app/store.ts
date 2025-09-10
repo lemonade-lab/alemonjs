@@ -5,7 +5,7 @@
  * @description 存储器
  */
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList';
-import { ChildrenCycle, EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../typings';
+import { ChildrenCycle, EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
 /**

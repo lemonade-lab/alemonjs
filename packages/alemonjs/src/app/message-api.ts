@@ -1,5 +1,5 @@
-import { DataEnums, OnDataFormatFunc } from '../typings';
-import { ResultCode } from '../core/code';
+import { DataEnums, OnDataFormatFunc } from '../types';
+import { ResultCode } from '../core/variable';
 import { sendAction } from '../cbp/actions';
 
 type BaseMap = {

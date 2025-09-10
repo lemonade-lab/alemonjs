@@ -1,4 +1,4 @@
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
 import { HEARTBEAT_INTERVAL } from './config';
 
 // 心跳

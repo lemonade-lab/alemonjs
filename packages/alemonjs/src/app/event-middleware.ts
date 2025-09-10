@@ -3,8 +3,8 @@
  * @module middleware
  * @author ningmengchongshui
  */
-import { OnMiddlewareReversalFunc, OnMiddlewareReversalFuncBack } from '../typings';
-import { ResultCode } from '../core/code';
+import { OnMiddlewareReversalFunc, OnMiddlewareReversalFuncBack } from '../types';
+import { ResultCode } from '../core/variable';
 /**
  * 中间件
  * @param select 事件选择

@@ -1,6 +1,6 @@
-import { ResultCode } from '../core/code';
+import { ResultCode } from '../core/variable';
 import { createResult, Result } from '../core/utils';
-import { Actions } from '../typing/actions';
+import { Actions } from '../types/actions';
 import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config';
 import * as flattedJSON from 'flatted';
 /**

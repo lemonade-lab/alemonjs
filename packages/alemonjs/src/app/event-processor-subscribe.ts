@@ -3,7 +3,7 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Next, Events, EventCycleEnum, EventKeys } from '../typings';
+import { Next, Events, EventCycleEnum, EventKeys } from '../types';
 import { SubscribeList } from './store';
 
 /**

@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
-import { Result } from '../post';
+import { Result } from '../core/utils';
 // 子客户端
 export const childrenClient = new Map<string, WebSocket>();
 // 平台客户端
