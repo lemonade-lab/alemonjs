@@ -6,8 +6,9 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 import { ResultCode } from './core/code.js';
 import { cbpServer } from './cbp/server.js';
-import { default_platform_common_prefix, default_port, file_prefix_common } from './core/variable.js';
+import { defaultPlatformCommonPrefix, defaultPort, filePrefixCommon } from './core/variable.js';
 import { cbpClient } from './cbp/client.js';
+import { startAdapterWithFallback } from './adapter.js';
 
 const loadState = () => {
   const value = getConfigValue() ?? {};
@@ -96,7 +97,7 @@ export const start = (options: StartOptions | string = {}) => {
   // 注入配置。
   loadState();
   const cfg = getConfig();
-  const url = options?.url || cfg.argv?.url || cfg.value?.url;
+  const url = options?.url ?? cfg.argv?.url ?? cfg.value?.url;
 
   // 连接到 CBP 服务器
   if (url) {
@@ -104,7 +105,7 @@ export const start = (options: StartOptions | string = {}) => {
     cbpClient(url);
   } else {
     // 创建 cbp 服务器
-    const port = options?.port ?? cfg.argv?.port ?? cfg.value?.port ?? default_port;
+    const port = options?.port ?? cfg.argv?.port ?? cfg.value?.port ?? defaultPort;
 
     // 设置环境变量
     process.env.port = port;
@@ -114,12 +115,12 @@ export const start = (options: StartOptions | string = {}) => {
 
       logger.info(`[CBP server started at ${httpURL}]`);
       logger.info(`[CBP server started at ${wsURL}]`);
-      const isFullReceive = options?.is_full_receive || cfg.argv?.is_full_receive || cfg.value?.is_full_receive || true;
+      const isFullReceive = options?.is_full_receive ?? cfg.argv?.is_full_receive ?? cfg.value?.is_full_receive ?? true;
 
       cbpClient(httpURL, { isFullReceive });
       // 加载平台服务
-      const platform = options?.platform || cfg.argv?.platform || cfg.value?.platform;
-      const login = options?.login || cfg.argv?.login || cfg.value?.login;
+      const platform = options?.platform ?? cfg.argv?.platform ?? cfg.value?.platform;
+      const login = options?.login ?? cfg.argv?.login ?? cfg.value?.login;
 
       // 不登录平台
       if (!platform && !login) {
@@ -130,7 +131,7 @@ export const start = (options: StartOptions | string = {}) => {
       }
       // 如果存在
       if (platform) {
-        const reg = file_prefix_common;
+        const reg = filePrefixCommon;
 
         if (reg.test(platform)) {
           process.env.platform = platform;
@@ -143,18 +144,19 @@ export const start = (options: StartOptions | string = {}) => {
         }
       } else {
         // 如果没有指定平台，则使用登录名作为平台
-        process.env.platform = `${default_platform_common_prefix}${login}`;
+        process.env.platform = `${defaultPlatformCommonPrefix}${login}`;
         process.env.login = login;
       }
       // 设置了 login。强制指定
       if (login) {
         process.env.login = login;
       }
-      void import(process.env.platform).then(res => res?.default());
+
+      startAdapterWithFallback();
     });
   }
   // 获取入口文件
-  const input = options.input || cfg.argv?.input || cfg.value?.input || getInputExportPath();
+  const input = options.input ?? cfg.argv?.input ?? cfg.value?.input ?? getInputExportPath();
 
   process.env.input = input;
   // 运行本地模块

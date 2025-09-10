@@ -1,8 +1,15 @@
-import { DataEnums, PrivateEventMessageCreate, PublicEventMessageCreate, ResultCode, User, cbpPlatform, createResult } from 'alemonjs';
 import { sendchannel, senduser } from './send';
 import { DCClient } from './sdk/wss';
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE';
-import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from 'alemonjs';
+import type {
+  User,
+  PublicEventMessageCreate,
+  PrivateEventMessageCreate,
+  DataEnums,
+  PrivateEventInteractionCreate,
+  PublicEventInteractionCreate
+} from 'alemonjs';
+import { ResultCode, cbpPlatform, createResult } from 'alemonjs';
 import { getMaster, platform } from './config';
 
 // pf
@@ -17,7 +24,7 @@ export * from './hook';
 export { type Options } from './config';
 
 // main
-export default () => {
+const main = () => {
   const port = process.env?.port || 17117;
   /**
    * 连接 alemonjs 服务器。
@@ -50,13 +57,13 @@ export default () => {
     }
 
     // 艾特消息处理
-    const at_users: {
+    const atUsers: {
       id: string;
     }[] = [];
 
     // 获取艾特用户
     for (const item of event.mentions) {
-      at_users.push({
+      atUsers.push({
         id: item.id
       });
     }
@@ -64,7 +71,7 @@ export default () => {
     // 清除 @ 相关的消息
     let msg = event.content;
 
-    for (const item of at_users) {
+    for (const item of atUsers) {
       msg = msg.replace(`<@${item.id}>`, '').trim();
     }
 
@@ -280,29 +287,33 @@ export default () => {
   };
 
   const onactions = async (data, consume) => {
-    if (data.action === 'message.send') {
-      const event = data.payload.event;
-      const paramFormat = data.payload.params.format;
-      const res = await api.use.send(event, paramFormat);
+    try {
+      if (data.action === 'message.send') {
+        const event = data.payload.event;
+        const paramFormat = data.payload.params.format;
+        const res = await api.use.send(event, paramFormat);
 
-      consume(res);
-    } else if (data.action === 'message.send.channel') {
-      const channel_id = data.payload.ChannelId;
-      const val = data.payload.params.format;
-      const res = await api.active.send.channel(channel_id, val);
+        consume(res);
+      } else if (data.action === 'message.send.channel') {
+        const channelId = data.payload.ChannelId;
+        const val = data.payload.params.format;
+        const res = await api.active.send.channel(channelId, val);
 
-      consume(res);
-    } else if (data.action === 'message.send.user') {
-      const user_id = data.payload.UserId;
-      const val = data.payload.params.format;
-      const res = await api.active.send.user(user_id, val);
+        consume(res);
+      } else if (data.action === 'message.send.user') {
+        const userId = data.payload.UserId;
+        const val = data.payload.params.format;
+        const res = await api.active.send.user(userId, val);
 
-      consume(res);
-    } else if (data.action === 'mention.get') {
-      const event = data.payload.event;
-      const res = await api.use.mention(event);
+        consume(res);
+      } else if (data.action === 'mention.get') {
+        const event = data.payload.event;
+        const res = await api.use.mention(event);
 
-      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      }
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 
@@ -314,11 +325,26 @@ export default () => {
     if (client[key]) {
       // 如果 client 上有对应的 key，直接调用。
       const params = data.payload.params;
-      const res = await client[key](...params);
 
-      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      try {
+        const res = await client[key](...params);
+
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } catch (error) {
+        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+      }
     }
   };
 
   cbp.onapis((data, consume) => void onapis(data, consume));
 };
+
+const mainProcess = () => {
+  if (process.send) {
+    process.send(JSON.stringify({ type: 'ready' }));
+  }
+};
+
+mainProcess();
+
+export default main;

@@ -145,25 +145,21 @@ export async function createPicFrom(options: { url?: PathLike; image?: string | 
       const buffer = Buffer.from(base64Data, 'base64');
       const type = await fileTypeFromBuffer(buffer);
 
-      name = 'file.' + (type?.ext || 'jpg');
+      name = 'file.' + (type?.ext ?? 'jpg');
       pushBuffer(buffer);
-    }
-    // file path
-    else if (existsSync(image)) {
+    } else if (existsSync(image)) {
       if (!name) {
         name = basename(image);
       }
       picData = createReadStream(image);
-    }
-    // invalid string
-    else {
+    } else {
       return;
     }
   } else if (Buffer.isBuffer(image)) {
     if (!name) {
       const type = await fileTypeFromBuffer(image);
 
-      name = 'file.' + (type?.ext || 'jpg');
+      name = 'file.' + (type?.ext ?? 'jpg');
     }
     pushBuffer(image);
   } else if (isReadable(image)) {
@@ -171,7 +167,7 @@ export async function createPicFrom(options: { url?: PathLike; image?: string | 
       const img = Readable.toWeb(image);
       const type = await fileTypeFromStream(img);
 
-      name = 'file.' + (type?.ext || 'jpg');
+      name = 'file.' + (type?.ext ?? 'jpg');
     }
     picData = image;
   } else {
@@ -212,10 +208,6 @@ export const getPublicIP = async (
  * 正则表达式工具类
  */
 export class Regular extends RegExp {
-  constructor(pattern: string, flags?: string) {
-    super(pattern, flags);
-  }
-
   public static or(...regs: RegExp[]): Regular {
     return new Regular(`(${regs.map(reg => reg.source).join('|')})`, regs.map(reg => reg.flags).join(''));
   }

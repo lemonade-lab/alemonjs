@@ -13,10 +13,10 @@ export const file_suffix_middleware = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/;
 export const file_suffix_response = /^res(\.|\..*\.)(js|ts|jsx|tsx)$/;
 
 // 通用框架前缀正则
-export const file_prefix_common = /^(@alemonjs\/|alemonjs-)/;
+export const filePrefixCommon = /^(@alemonjs\/|alemonjs-)/;
 
 // 默认端口
-export const default_port = 17117;
+export const defaultPort = 17117;
 
 // 默认登录
 export const default_login = 'gui';
@@ -25,7 +25,7 @@ export const default_login = 'gui';
 export const default_platform_prefix = 'alemonjs-';
 
 // 默认平台通用前缀
-export const default_platform_common_prefix = '@alemonjs/';
+export const defaultPlatformCommonPrefix = '@alemonjs/';
 
 /**
  * 结果反馈码

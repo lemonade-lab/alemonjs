@@ -137,7 +137,7 @@ export const cbpPlatform = (
         });
         if (data.apiId) {
           for (const cb of apiReplys) {
-            cb(
+            void cb(
               data,
               // 传入一个消费函数
               val => replyApi(data, val)
@@ -145,7 +145,7 @@ export const cbpPlatform = (
           }
         } else if (data.actionId) {
           for (const cb of actionReplys) {
-            cb(
+            void cb(
               data,
               // 传入一个消费函数
               val => replyAction(data, val)
