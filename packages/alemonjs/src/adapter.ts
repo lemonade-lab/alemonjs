@@ -17,6 +17,7 @@ export function startAdapterWithFallback() {
     modulePath = require.resolve(process.env.platform);
   } catch {
     void import(process.env.platform).then(res => res?.default());
+    logger?.warn?.('平台连接包未支持 require，降级为 import 加载, 请升级对应的平台连接包以提高进程稳定性');
 
     return;
   }
@@ -53,7 +54,7 @@ export function startAdapterWithFallback() {
       // 超时
       const checkTimeout = async () => {
         if (!ready && !imported) {
-          logger?.warn?.('平台连接未及时响应（未发送 ready 消息），降级为 import 加载');
+          logger?.warn?.('平台连接未及时响应（未发送 ready 消息），降级为 import 加载, 请升级对应的平台连接包以提高进程稳定性');
           try {
             child?.kill();
           } catch {}
@@ -78,7 +79,7 @@ export function startAdapterWithFallback() {
           if (data?.type === 'ready') {
             ready = true;
             clearTimeout(timer);
-            logger?.info?.('平台连接已就绪（子进程 fork 模式）');
+            logger?.debug?.('平台连接已就绪（子进程 fork 模式）');
           }
         } catch (err) {
           logger?.error?.('平台连接进程通信数据格式错误', err);
@@ -105,7 +106,7 @@ export function startAdapterWithFallback() {
 
       if (typeof mod.default === 'function') {
         await mod.default();
-        logger?.info?.('通过 import 启动平台连接完成');
+        logger?.debug?.('通过 import 启动平台连接完成');
       } else {
         logger?.warn?.('通过 import 启动平台连接，但未找到默认导出函数');
       }

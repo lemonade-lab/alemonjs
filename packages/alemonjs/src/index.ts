@@ -1,10 +1,8 @@
-// 1. 导出类型
+// 导出类型
 export * from './types/index.js';
-// 2.导出全局变量
+// 导出全局变量
 export * from './global.js';
-// 3. 导出配置系统
-export * from './core/config.js';
-// 4. 导出内部模块
+// 导出内部模块
 export * from './app/define-chidren.js';
 export * from './app/event-group.js';
 export * from './app/event-middleware';
@@ -21,7 +19,9 @@ export * from './app/load.js';
 export * from './app/message-api.js';
 export * from './app/message-format.js';
 export * from './app/store.js';
-export * from './core/utils.js';
+// core
+export * from './core/index.js';
+// cbp
 export * from './cbp/index.js';
-// 5. 导出主要模块
+// 导出主要模块
 export * from './main.js';

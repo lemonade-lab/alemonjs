@@ -40,19 +40,25 @@ const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
       data: log
     });
   } else {
-    let baseLog = `[${ResultCode.Ok}][Name: ${select}]`;
+    let baseLog = `[Name: ${select}]`;
 
+    if (typeof event['GuildId'] === 'string' && event['GuildId'] !== '') {
+      baseLog += `[GuildId:${event['GuildId']}]`;
+    }
     if (typeof event['ChannelId'] === 'string' && event['ChannelId'] !== '') {
-      baseLog += `[ChannelId: ${event['ChannelId']}]`;
+      baseLog += `[ChannelId:${event['ChannelId']}]`;
+    }
+    if (typeof event['UserKey'] === 'string' && event['UserKey'] !== '') {
+      baseLog += `[UserKey:${event['UserKey']}]`;
     }
     if (typeof event['UserId'] === 'string' && event['UserId'] !== '') {
-      baseLog += `[UserId: ${event['UserId']}]`;
+      baseLog += `[UserId:${event['UserId']}]`;
     }
     if (typeof event['MessageId'] === 'string' && event['MessageId'] !== '') {
-      baseLog += `[MessageId: ${event['MessageId']}]`;
+      baseLog += `[MessageId:${event['MessageId']}]`;
     }
     if (typeof event['MessageText'] === 'string' && event['MessageText'] !== '') {
-      baseLog += `[MessageText: ${event['MessageText']}]`;
+      baseLog += `[MessageText:${event['MessageText']}]`;
     }
     logger.info(baseLog);
   }
