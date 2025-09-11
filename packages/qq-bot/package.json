@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "2.1.0-alpha.18",
+  "version": "2.1.0-alpha.19",
   "description": "阿柠檬qqbot平台连接",
   "author": "lemonade",
   "license": "MIT",
@@ -32,7 +32,8 @@
   "exports": {
     ".": {
       "import": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.js"
     },
     "./package": "./package.json",
     "./desktop": "./lib/desktop.js"

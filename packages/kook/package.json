@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/kook",
-  "version": "2.1.0-alpha.2",
+  "version": "2.1.0-alpha.3",
   "description": "kook platform connection",
   "author": "lemonade",
   "license": "MIT",
@@ -13,7 +13,8 @@
   "exports": {
     ".": {
       "import": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.js"
     },
     "./package": "./package.json",
     "./desktop": "./lib/desktop.js"
