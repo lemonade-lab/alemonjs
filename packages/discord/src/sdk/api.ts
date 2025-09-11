@@ -6,30 +6,9 @@ import { MessageData } from './typings.js';
 import { getDiscordConfig } from '../config.js';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createPicFrom } from './createPicFrom.js';
+import { createAxiosInstance } from './instance.js';
 export const API_URL = 'https://discord.com/api/v10';
 export const CDN_URL = 'https://cdn.discordapp.com';
-
-function filterHeaders(headers) {
-  if (!headers) {
-    return headers;
-  }
-  const filtered = {};
-  const sensitiveKeys = [/^authorization$/i, /^cookie$/i, /^set-cookie$/i, /token/i, /key/i, /jwt/i, /^session[-_]id$/i, /^uid$/i, /^user[-_]id$/i];
-
-  for (const key in headers) {
-    if (/^_/.test(key)) {
-      continue; // 跳过 _ 开头
-    }
-    // 如果是敏感字段全部替换为 ******
-    if (sensitiveKeys.some(re => re.test(key))) {
-      filtered[key] = '******';
-    } else {
-      filtered[key] = headers[key];
-    }
-  }
-
-  return filtered;
-}
 
 /**
  * api接口
@@ -43,7 +22,7 @@ export class DCAPI {
   request(options: AxiosRequestConfig): Promise<any> {
     const value = getDiscordConfig();
     const token = value.token;
-    const requestConfig = value.request_config || {};
+    const requestConfig = value.request_config ?? {};
 
     if (value.request_proxy) {
       requestConfig.httpsAgent = new HttpsProxyAgent(value.request_proxy);
@@ -58,24 +37,7 @@ export class DCAPI {
       }
     });
 
-    return new Promise((resolve, reject) => {
-      service(options)
-        .then(res => resolve(res?.data ?? {}))
-        .catch(err => {
-          // 错误时的请求头
-          logger.error('[axios] error', {
-            config: {
-              headers: filterHeaders(err?.config?.headers),
-              params: err?.config?.params,
-              data: err?.config?.data
-            },
-            response: err?.response,
-            message: err?.message
-          });
-          // 丢出错误中携带的响应数据
-          reject(err?.response?.data);
-        });
-    });
+    return createAxiosInstance(service, options);
   }
 
   /**

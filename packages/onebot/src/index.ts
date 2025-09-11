@@ -9,7 +9,7 @@ export { platform } from './config';
 export { OneBotAPI as API } from './sdk/api';
 export * from './hook';
 
-export default () => {
+const main = () => {
   const config = getOneBotConfig();
   const client = new OneBotClient({
     // url
@@ -22,7 +22,7 @@ export default () => {
     reverse_port: config?.reverse_port ?? 17158
   });
 
-  client.connect();
+  void client.connect();
 
   const url = `ws://127.0.0.1:${process.env?.port || 17117}`;
   const cbp = cbpPlatform(url);
@@ -35,7 +35,7 @@ export default () => {
     let msg = '';
 
     for (const item of message) {
-      if (item.type == 'text') {
+      if (item.type === 'text') {
         msg += item.data.text;
       }
     }
@@ -125,14 +125,14 @@ export default () => {
 
     const message = await Promise.all(
       val.map(async item => {
-        if (item.type == 'Text') {
+        if (item.type === 'Text') {
           return {
             type: 'text',
             data: {
               text: item.value
             }
           };
-        } else if (item.type == 'Mention') {
+        } else if (item.type === 'Mention') {
           const options = item.options || {};
 
           if (options.belong === 'everyone') {
@@ -153,14 +153,14 @@ export default () => {
           }
 
           return empty;
-        } else if (item.type == 'Image') {
+        } else if (item.type === 'Image') {
           return {
             type: 'image',
             data: {
               file: `base64://${item.value}`
             }
           };
-        } else if (item.type == 'ImageFile') {
+        } else if (item.type === 'ImageFile') {
           const db = readFileSync(item.value);
 
           return {
@@ -169,7 +169,7 @@ export default () => {
               file: `base64://${db.toString('base64')}`
             }
           };
-        } else if (item.type == 'ImageURL') {
+        } else if (item.type === 'ImageURL') {
           const db = await getBufferByURL(item.value);
 
           return {
@@ -236,10 +236,10 @@ export default () => {
   const api = {
     active: {
       send: {
-        channel: async (SpaceId: string, val: DataEnums[]) => {
+        channel: (SpaceId: string, val: DataEnums[]) => {
           return sendGroup(Number(SpaceId), val);
         },
-        user: async (OpenId: string, val: DataEnums[]) => {
+        user: (OpenId: string, val: DataEnums[]) => {
           return sendPrivate(Number(OpenId), val);
         }
       }
@@ -256,11 +256,11 @@ export default () => {
         if (val.length < 0) {
           return Promise.all([]);
         }
-        if (event['name'] == 'private.message.create') {
+        if (event['name'] === 'private.message.create') {
           const UserId = Number(event.UserId);
 
           return sendPrivate(UserId, val);
-        } else if (event['name'] == 'message.create') {
+        } else if (event['name'] === 'message.create') {
           const GroupId = Number(event.ChannelId);
 
           return sendGroup(GroupId, val);
@@ -268,28 +268,28 @@ export default () => {
 
         return Promise.all([]);
       },
-      mention: async event => {
+      mention: event => {
         const e = event.value;
         const names = ['message.create', 'private.message.create'];
 
         if (names.includes(event.name)) {
-          const Metions: User[] = [];
+          const Mentions: User[] = [];
 
           for (const item of e.message) {
-            if (item.type == 'at') {
+            if (item.type === 'at') {
               let isBot = false;
               const UserId = String(item.data.qq);
 
-              if (UserId == 'all') {
+              if (UserId === 'all') {
                 continue;
               }
-              if (UserId == BotMe.id) {
+              if (UserId === BotMe.id) {
                 isBot = true;
               }
               const [isMaster, UserKey] = getMaster(UserId);
               const avatar = createUserAvatar(UserId);
 
-              Metions.push({
+              Mentions.push({
                 UserId: UserId,
                 IsMaster: isMaster,
                 UserKey: UserKey,
@@ -300,13 +300,13 @@ export default () => {
             }
           }
 
-          return Metions;
+          return new Promise<User[]>(resolve => resolve(Mentions));
         }
 
-        return [];
+        return new Promise<User[]>(resolve => resolve([]));
       },
-      delete(message_id: string) {
-        return client.deleteMsg({ message_id: Number(message_id) });
+      delete(messageId: string) {
+        return client.deleteMsg({ message_id: Number(messageId) });
       },
       file: {
         channel: client.uploadGroupFile.bind(client),
@@ -319,7 +319,7 @@ export default () => {
     }
   };
 
-  cbp.onactions(async (data, consume) => {
+  const onactions = async (data, consume) => {
     switch (data.action) {
       case 'message.send': {
         const event = data.payload.event;
@@ -401,10 +401,11 @@ export default () => {
         return consume([res]);
       }
     }
-  });
+  };
 
-  // 处理 api 调用
-  cbp.onapis(async (data, consume) => {
+  cbp.onactions((data, consume) => void onactions(data, consume));
+
+  const onapis = async (data, consume) => {
     const key = data.payload?.key;
 
     if (client[key]) {
@@ -413,5 +414,43 @@ export default () => {
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     }
-  });
+  };
+
+  // 处理 api 调用
+  cbp.onapis((data, consume) => void onapis(data, consume));
 };
+
+const mainProcess = () => {
+  ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
+    process?.on?.(sig, () => {
+      logger?.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
+      setImmediate(() => process.exit(0));
+    });
+  });
+
+  process?.on?.('exit', code => {
+    logger?.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
+  });
+
+  // 监听主进程消息
+  process.on('message', msg => {
+    try {
+      const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
+
+      if (data?.type === 'start') {
+        main();
+      } else if (data?.type === 'stop') {
+        process.exit(0);
+      }
+    } catch {}
+  });
+
+  // 主动发送 ready 消息
+  if (process.send) {
+    process.send(JSON.stringify({ type: 'ready' }));
+  }
+};
+
+mainProcess();
+
+export default main;

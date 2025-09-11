@@ -82,7 +82,7 @@ export class QQBotClient extends QQBotAPI {
 
       config.set('access_token', data.access_token);
       console.info('refresh', data.expires_in, 's');
-      setTimeout(callBack, data.expires_in * 1000);
+      setTimeout(() => void callBack(), data.expires_in * 1000);
     };
 
     await callBack();
@@ -98,7 +98,7 @@ export class QQBotClient extends QQBotAPI {
       const ws = config.get('ws');
 
       if (!ws) {
-        this.#setTimeoutBotConfig();
+        void this.#setTimeoutBotConfig();
         this.#app = new Koa();
         this.#app.use(bodyParser());
         const router = new Router();
@@ -121,7 +121,7 @@ export class QQBotClient extends QQBotAPI {
           await next();
         });
         // 启动服务
-        router.post(route, async ctx => {
+        router.post(route, ctx => {
           const sign = ctx.req.headers['x-signature-ed25519'];
           const timestamp = ctx.req.headers['x-signature-timestamp'];
           const rawBody = ctx.request.rawBody;
@@ -135,7 +135,7 @@ export class QQBotClient extends QQBotAPI {
           }
           const body = ctx.request.body as Data;
 
-          if (body.op == 13) {
+          if (+body.op === 13) {
             ctx.status = 200;
             ctx.body = {
               // 返回明文 token
@@ -143,19 +143,19 @@ export class QQBotClient extends QQBotAPI {
               // 生成签名
               signature: ntqqWebhook.getSign(body.d.event_ts, body.d.plain_token)
             };
-          } else if (body.op == 0) {
+          } else if (+body.op === 0) {
             ctx.status = 204;
             // 根据事件类型，处理事件
             for (const event of this.#events[body.t] || []) {
               event(body.d);
             }
-            const access_token = config.get('access_token');
+            const accessToken = config.get('access_token');
 
             // 也可以分法到客户端。 发送失败需要处理 或清理调
             for (const client of this.#client) {
               try {
-                if (access_token) {
-                  body['access_token'] = access_token;
+                if (accessToken) {
+                  body['access_token'] = accessToken;
                 }
                 client.ws.send(JSON.stringify(body));
               } catch (e) {
@@ -212,10 +212,10 @@ export class QQBotClient extends QQBotAPI {
             try {
               // 拿到消息
               const body: Data = JSON.parse(data.toString());
-              const access_token = body['access_token'];
+              const accessToken = body['access_token'];
 
-              if (access_token) {
-                config.set('access_token', access_token);
+              if (accessToken) {
+                config.set('access_token', accessToken);
               }
               for (const event of this.#events[body.t] || []) {
                 event(body.d);

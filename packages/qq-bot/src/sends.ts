@@ -261,25 +261,25 @@ export const GROUP_AT_MESSAGE_CREATE = async (
   }
   try {
     const content = val
-      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
       .map(item => {
-        if (item.type == 'Link') {
+        if (item.type === 'Link') {
           return `[${item.value}](${item?.options?.link})`;
-        } else if (item.type == 'Mention') {
-          if (item.value == 'everyone' || item.value == 'all' || item.value == '' || typeof item.value !== 'string') {
+        } else if (item.type === 'Mention') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return '';
           }
-          if (item.options?.belong == 'user') {
+          if (item.options?.belong === 'user') {
             return `<@${item.value}>`;
           }
 
           return '';
-        } else if (item.type == 'Text') {
+        } else if (item.type === 'Text') {
           return item.value;
         }
       })
       .join('');
-    const images = val.filter(item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL');
+    const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
     if (images && images.length > 0) {
       let url = '';
@@ -291,11 +291,11 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         }
         const item = images[i];
 
-        if (item.type == 'ImageURL') {
+        if (item.type === 'ImageURL') {
           url = item.value;
         } else if (item.type === 'ImageFile' || item.type === 'Image') {
           const getFileBase64 = (): string => readFileSync(item.value, 'base64');
-          const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value;
+          const file_data = item.type === 'ImageFile' ? getFileBase64() : item.value;
           const file_info = await client
             .postRichMediaByGroup(event.ChannelId, {
               file_type: 1,
@@ -324,12 +324,12 @@ export const GROUP_AT_MESSAGE_CREATE = async (
         })
       ];
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate');
+    const mdAndButtons = val.filter(item => item.type === 'Markdown' || item.type === 'BT.group' || item.type === 'ButtonTemplate');
 
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {};
 
-      mdAndButtons.forEach(async item => {
+      mdAndButtons.forEach(item => {
         if (item.type === 'ButtonTemplate') {
           const template_id = item?.value;
 
@@ -367,12 +367,12 @@ export const GROUP_AT_MESSAGE_CREATE = async (
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', { id: res.id })];
     }
     // ark
-    const ark = val.filter(item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list');
+    const ark = val.filter(item => item.type === 'Ark.BigCard' || item.type === 'Ark.Card' || item.type === 'Ark.list');
 
     if (ark && ark.length > 0) {
       const params = {};
 
-      ark.forEach(async item => {
+      ark.forEach(item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value);
 
@@ -441,25 +441,25 @@ export const C2C_MESSAGE_CREATE = async (
   }
   try {
     const content = val
-      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
       .map(item => {
-        if (item.type == 'Link') {
+        if (item.type === 'Link') {
           return `[${item.value}](${item?.options?.link})`;
-        } else if (item.type == 'Mention') {
-          if (item.value == 'everyone' || item.value == 'all' || item.value == '' || typeof item.value !== 'string') {
+        } else if (item.type === 'Mention') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return '';
           }
-          if (item.options?.belong == 'user') {
+          if (item.options?.belong === 'user') {
             return `<@${item.value}>`;
           }
 
           return '';
-        } else if (item.type == 'Text') {
+        } else if (item.type === 'Text') {
           return item.value;
         }
       })
       .join('');
-    const images = val.filter(item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL');
+    const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
     if (images && images.length > 0) {
       let url = '';
@@ -471,11 +471,11 @@ export const C2C_MESSAGE_CREATE = async (
         }
         const item = images[i];
 
-        if (item.type == 'ImageURL') {
+        if (item.type === 'ImageURL') {
           url = item.value;
         } else if (item.type === 'ImageFile' || item.type === 'Image') {
           const getFileBase64 = (): string => readFileSync(item.value, 'base64');
-          const file_data = item.type == 'ImageFile' ? getFileBase64() : item.value;
+          const file_data = item.type === 'ImageFile' ? getFileBase64() : item.value;
           const file_info = await client
             .postRichMediaByUser(event.UserId, {
               file_type: 1,
@@ -504,12 +504,12 @@ export const C2C_MESSAGE_CREATE = async (
         })
       ];
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate');
+    const mdAndButtons = val.filter(item => item.type === 'Markdown' || item.type === 'BT.group' || item.type === 'ButtonTemplate');
 
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {};
 
-      mdAndButtons.forEach(async item => {
+      mdAndButtons.forEach(item => {
         if (item.type === 'ButtonTemplate') {
           const template_id = item?.value;
 
@@ -547,12 +547,12 @@ export const C2C_MESSAGE_CREATE = async (
       return [createResult(ResultCode.Ok, 'client.usersOpenMessages', { id: res.id })];
     }
     // ark
-    const ark = val.filter(item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list');
+    const ark = val.filter(item => item.type === 'Ark.BigCard' || item.type === 'Ark.Card' || item.type === 'Ark.list');
 
     if (ark && ark.length > 0) {
       const params = {};
 
-      ark.forEach(async item => {
+      ark.forEach(item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value);
 
@@ -621,19 +621,19 @@ export const DIRECT_MESSAGE_CREATE = async (
   }
   try {
     const content = val
-      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
       .map(item => {
-        if (item.type == 'Link') {
+        if (item.type === 'Link') {
           return `[${item.value}](${item?.options?.link})`;
         }
-        if (item.type == 'Text') {
+        if (item.type === 'Text') {
           return item.value;
         }
 
         return '';
       })
       .join('');
-    const images = val.filter(item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL');
+    const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
     if (images && images.length > 0) {
       let imageBuffer: Buffer = null;
@@ -645,7 +645,7 @@ export const DIRECT_MESSAGE_CREATE = async (
         }
         const item = images[i];
 
-        if (item.value == 'ImageURL') {
+        if (item.value === 'ImageURL') {
           // 请求得到buffer
           const data = await axios
             .get(item.value, {
@@ -655,7 +655,7 @@ export const DIRECT_MESSAGE_CREATE = async (
 
           imageBuffer = data;
         } else {
-          const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64');
+          const file_data = item.type === 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64');
 
           imageBuffer = file_data;
         }
@@ -671,12 +671,12 @@ export const DIRECT_MESSAGE_CREATE = async (
 
       return [createResult(ResultCode.Ok, 'client.postDirectImage', { id: res?.id })];
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate');
+    const mdAndButtons = val.filter(item => item.type === 'Markdown' || item.type === 'BT.group' || item.type === 'ButtonTemplate');
 
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {};
 
-      mdAndButtons.forEach(async item => {
+      mdAndButtons.forEach(item => {
         if (item.type === 'ButtonTemplate') {
           const template_id = item?.value;
 
@@ -713,12 +713,12 @@ export const DIRECT_MESSAGE_CREATE = async (
       return [createResult(ResultCode.Ok, 'client.dmsMessage', { id: res.id })];
     }
     // ark
-    const ark = val.filter(item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list');
+    const ark = val.filter(item => item.type === 'Ark.BigCard' || item.type === 'Ark.Card' || item.type === 'Ark.list');
 
     if (ark && ark.length > 0) {
       const params = {};
 
-      ark.forEach(async item => {
+      ark.forEach(item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value);
 
@@ -780,28 +780,28 @@ export const MESSAGE_CREATE = async (
   }
   try {
     const content = val
-      .filter(item => item.type == 'Mention' || item.type == 'Text' || item.type == 'Link')
+      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
       .map(item => {
-        if (item.type == 'Link') {
+        if (item.type === 'Link') {
           return `[${item.value}](${item?.options?.link})`;
         }
-        if (item.type == 'Mention') {
-          if (item.value == 'everyone' || item.value == 'all' || item.value == '' || typeof item.value !== 'string') {
+        if (item.type === 'Mention') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return '@everyone';
           }
-          if (item.options?.belong == 'user') {
+          if (item.options?.belong === 'user') {
             return `<@!${item.value}>`;
-          } else if (item.options?.belong == 'channel') {
+          } else if (item.options?.belong === 'channel') {
             return `<#${item.value}>`;
           }
 
           return '';
-        } else if (item.type == 'Text') {
+        } else if (item.type === 'Text') {
           return item.value;
         }
       })
       .join('');
-    const images = val.filter(item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL');
+    const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
     if (images && images.length > 0) {
       let imageBuffer: Buffer = null;
@@ -813,7 +813,7 @@ export const MESSAGE_CREATE = async (
         }
         const item = images[i];
 
-        if (item.value == 'ImageURL') {
+        if (item.value === 'ImageURL') {
           // 请求得到buffer
           const data = await axios
             .get(item.value, {
@@ -823,7 +823,7 @@ export const MESSAGE_CREATE = async (
 
           imageBuffer = data;
         } else {
-          const file_data = item.type == 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64');
+          const file_data = item.type === 'ImageFile' ? readFileSync(item.value) : Buffer.from(item.value, 'base64');
 
           imageBuffer = file_data;
         }
@@ -839,12 +839,12 @@ export const MESSAGE_CREATE = async (
 
       return [createResult(ResultCode.Ok, 'client.postImage', { id: res?.id })];
     }
-    const mdAndButtons = val.filter(item => item.type == 'Markdown' || item.type == 'BT.group' || item.type === 'ButtonTemplate');
+    const mdAndButtons = val.filter(item => item.type === 'Markdown' || item.type === 'BT.group' || item.type === 'ButtonTemplate');
 
     if (mdAndButtons && mdAndButtons.length > 0) {
       const params = {};
 
-      mdAndButtons.forEach(async item => {
+      mdAndButtons.forEach(item => {
         if (item.type === 'ButtonTemplate') {
           const template_id = item?.value;
 
@@ -881,12 +881,12 @@ export const MESSAGE_CREATE = async (
       return [createResult(ResultCode.Ok, 'client.channelsMessagesPost', { id: res.id })];
     }
     // ark
-    const ark = val.filter(item => item.type == 'Ark.BigCard' || item.type == 'Ark.Card' || item.type == 'Ark.list');
+    const ark = val.filter(item => item.type === 'Ark.BigCard' || item.type === 'Ark.Card' || item.type === 'Ark.list');
 
     if (ark && ark.length > 0) {
       const params = {};
 
-      ark.forEach(async item => {
+      ark.forEach(item => {
         if (item.type === 'Ark.Card') {
           const arkData = createArkCardData(item.value);
 

@@ -38,7 +38,7 @@ export const register = (client: QQBotClients) => {
     return `https://q.qlogo.cn/qqapp/${config.app_id}/${author_id}/640`;
   };
 
-  client.on('GROUP_ADD_ROBOT', async event => {
+  client.on('GROUP_ADD_ROBOT', event => {
     // 机器人加入群组
     const e: PublicEventGuildJoin = {
       name: 'guild.join',
@@ -61,7 +61,7 @@ export const register = (client: QQBotClients) => {
     cbp.send(e);
   });
 
-  client.on('GROUP_DEL_ROBOT', async event => {
+  client.on('GROUP_DEL_ROBOT', event => {
     // 机器人离开群组
     const e: PublicEventGuildExit = {
       name: 'guild.exit',
@@ -85,7 +85,7 @@ export const register = (client: QQBotClients) => {
   });
 
   // 监听消息
-  client.on('GROUP_AT_MESSAGE_CREATE', async event => {
+  client.on('GROUP_AT_MESSAGE_CREATE', event => {
     const UserId = event.author.id;
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = createUserAvatarURL(event.author.id);
@@ -116,7 +116,7 @@ export const register = (client: QQBotClients) => {
     cbp.send(e);
   });
 
-  client.on('C2C_MESSAGE_CREATE', async event => {
+  client.on('C2C_MESSAGE_CREATE', event => {
     const UserId = event.author.id;
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = createUserAvatarURL(event.author.id);
@@ -149,7 +149,7 @@ export const register = (client: QQBotClients) => {
    * guild
    */
 
-  client.on('DIRECT_MESSAGE_CREATE', async event => {
+  client.on('DIRECT_MESSAGE_CREATE', event => {
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) {
       return;
@@ -189,7 +189,7 @@ export const register = (client: QQBotClients) => {
   });
 
   // 监听消息
-  client.on('AT_MESSAGE_CREATE', async event => {
+  client.on('AT_MESSAGE_CREATE', event => {
     // 屏蔽其他机器人的消息
     if (event?.author?.bot) {
       return;
@@ -239,19 +239,19 @@ export const register = (client: QQBotClients) => {
   const getMessageContent = event => {
     let msg = event?.content ?? '';
     // 艾特消息处理
-    const at_users: {
+    const atUsers: {
       id: string;
     }[] = [];
 
     if (event.mentions) {
       // 去掉@ 转为纯消息
       for (const item of event.mentions) {
-        at_users.push({
+        atUsers.push({
           id: item.id
         });
       }
       // 循环删除文本中的at信息并去除前后空格
-      at_users.forEach(item => {
+      atUsers.forEach(item => {
         msg = msg.replace(`<@!${item.id}>`, '').trim();
       });
     }
@@ -260,7 +260,7 @@ export const register = (client: QQBotClients) => {
   };
 
   // 私域 -
-  client.on('MESSAGE_CREATE', async event => {
+  client.on('MESSAGE_CREATE', event => {
     // 屏蔽其他机器人的消息
     if (event.author?.bot) {
       return;
@@ -304,7 +304,7 @@ export const register = (client: QQBotClients) => {
     cbp.send(e);
   });
 
-  client.on('INTERACTION_CREATE', async event => {
+  client.on('INTERACTION_CREATE', event => {
     // try {
     //   if (event.scene === 'group' || event.scene === 'c2c') {
     //     await client.interactionResponse('group', event.id)
@@ -502,76 +502,77 @@ export const register = (client: QQBotClients) => {
         const tag = event.tag;
 
         // 群at
-        if (tag == 'GROUP_AT_MESSAGE_CREATE') {
+        if (tag === 'GROUP_AT_MESSAGE_CREATE') {
           return await GROUP_AT_MESSAGE_CREATE(client, event, val);
         }
         // 私聊
-        if (tag == 'C2C_MESSAGE_CREATE') {
+        if (tag === 'C2C_MESSAGE_CREATE') {
           return await C2C_MESSAGE_CREATE(client, event, val);
         }
         // 频道私聊
-        if (tag == 'DIRECT_MESSAGE_CREATE') {
+        if (tag === 'DIRECT_MESSAGE_CREATE') {
           return await DIRECT_MESSAGE_CREATE(client, event, val);
         }
         // 频道at
-        if (tag == 'AT_MESSAGE_CREATE') {
+        if (tag === 'AT_MESSAGE_CREATE') {
           return await AT_MESSAGE_CREATE(client, event, val);
         }
         // 频道消息
-        if (tag == 'MESSAGE_CREATE') {
+        if (tag === 'MESSAGE_CREATE') {
           return await MESSAGE_CREATE(client, event, val);
         }
         // 交互
-        if (tag == 'INTERACTION_CREATE_GROUP') {
+        if (tag === 'INTERACTION_CREATE_GROUP') {
           return await GROUP_AT_MESSAGE_CREATE(client, event, val);
         }
-        if (tag == 'INTERACTION_CREATE_C2C') {
+        if (tag === 'INTERACTION_CREATE_C2C') {
           return await C2C_MESSAGE_CREATE(client, event, val);
         }
-        if (tag == 'INTERACTION_CREATE_GUILD') {
+        if (tag === 'INTERACTION_CREATE_GUILD') {
           return await AT_MESSAGE_CREATE(client, event, val);
         }
 
         return [];
       },
-      mention: async event => {
+      mention: event => {
         const value = event.value || {};
         const tag = event.tag;
         // const event = e.value
         const Metions: User[] = [];
 
         // group
-        if (tag == 'GROUP_AT_MESSAGE_CREATE' || 'C2C_MESSAGE_CREATE') {
-          return Metions;
+        if (tag === 'GROUP_AT_MESSAGE_CREATE' || tag === 'C2C_MESSAGE_CREATE') {
+          // return Metions;
+          return new Promise<User[]>(resolve => resolve(Metions));
         }
         // guild
         if (value.mentions) {
           const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = event.value['mentions'];
           // 艾特消息处理
-          const MessageMention: User[] =
-            mentions.map(item => {
-              const UserId = item.id;
-              const [isMaster, UserKey] = getMaster(UserId);
+          const MessageMention: User[] = mentions.map(item => {
+            const UserId = item.id;
+            const [isMaster, UserKey] = getMaster(UserId);
 
-              return {
-                UserId: item.id,
-                IsMaster: isMaster,
-                UserName: item.username,
-                IsBot: item.bot,
-                UserKey: UserKey
-              };
-            }) ?? [];
+            return {
+              UserId: item.id,
+              IsMaster: isMaster,
+              UserName: item.username,
+              IsBot: item.bot,
+              UserKey: UserKey
+            };
+          });
 
-          return MessageMention;
+          // return MessageMention;
+          return new Promise<User[]>(resolve => resolve(MessageMention));
         } else {
-          return Metions;
+          // return Metions;
+          return new Promise<User[]>(resolve => resolve(Metions));
         }
       }
     }
   };
 
-  // 处理行为
-  cbp.onactions(async (data, consume) => {
+  const onactions = async (data, consume) => {
     if (data.action === 'message.send') {
       // 消息发送
       const event = data.payload.event;
@@ -602,10 +603,12 @@ export const register = (client: QQBotClients) => {
 
       consume(res);
     }
-  });
+  };
 
-  // 处理 api 调用
-  cbp.onapis(async (data, consume) => {
+  // 处理行为
+  cbp.onactions((data, consume) => void onactions(data, consume));
+
+  const onapis = async (data, consume) => {
     const key = data.payload?.key;
 
     if (client[key]) {
@@ -615,5 +618,8 @@ export const register = (client: QQBotClients) => {
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     }
-  });
+  };
+
+  // 处理 api 调用
+  cbp.onapis((data, consume) => void onapis(data, consume));
 };

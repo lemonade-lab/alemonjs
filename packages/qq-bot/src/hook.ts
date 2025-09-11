@@ -60,27 +60,27 @@ export const useMode = <T extends EventKeys>(event: Events[T]) => {
   let currentMode = 'group';
 
   // 群at
-  if (tag == 'GROUP_AT_MESSAGE_CREATE') {
+  if (tag === 'GROUP_AT_MESSAGE_CREATE') {
     currentMode = 'group';
   }
   // 私聊
-  if (tag == 'C2C_MESSAGE_CREATE') {
+  if (tag === 'C2C_MESSAGE_CREATE') {
     currentMode = 'group';
   }
   // 频道私聊
-  if (tag == 'DIRECT_MESSAGE_CREATE') {
+  if (tag === 'DIRECT_MESSAGE_CREATE') {
     currentMode = 'guild';
   }
   // 频道at
-  if (tag == 'AT_MESSAGE_CREATE') {
+  if (tag === 'AT_MESSAGE_CREATE') {
     currentMode = 'guild';
   }
   // 频道消息
-  if (tag == 'MESSAGE_CREATE') {
+  if (tag === 'MESSAGE_CREATE') {
     currentMode = 'guild';
   }
   const isMode = (mode: 'guild' | 'group') => {
-    return currentMode == mode;
+    return currentMode === mode;
   };
 
   return isMode;

@@ -206,8 +206,10 @@ export default () => {
 
         return [];
       },
-      mention: async () => {
-        return [];
+      mention: () => {
+        return new Promise(resolve => {
+          resolve([]);
+        });
       }
     }
   };

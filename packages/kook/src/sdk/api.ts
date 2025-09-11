@@ -4,6 +4,7 @@ import { Readable } from 'stream';
 import { ApiEnum, SendMessageParams, SendDirectMessageParams } from './typings.js';
 import { config } from './config.js';
 import { createPicFrom } from 'alemonjs/utils';
+import { createAxiosInstance } from './instance.js';
 
 export const API_URL = 'https://www.kookapp.cn';
 
@@ -26,21 +27,21 @@ export class KOOKAPI {
       }
     });
 
-    return req(opstoin);
+    return createAxiosInstance(req, opstoin);
   }
 
   /**
    *
    * @returns
    */
-  async gateway() {
+  gateway() {
     return this.service({
       baseURL: 'https://www.kookapp.cn/api/v3/gateway/index',
       method: 'get',
       params: {
         compress: 0
       }
-    }).then(res => res.data);
+    });
   }
 
   /**
@@ -109,7 +110,7 @@ export class KOOKAPI {
       url: ApiEnum.AssetCreate,
       data: formdata,
       headers: formdata.getHeaders()
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -134,7 +135,7 @@ export class KOOKAPI {
       method: 'post',
       url: ApiEnum.MessageCreate,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -146,7 +147,7 @@ export class KOOKAPI {
    * @param target_id
    * @returns
    */
-  async userChatCreate(target_id: string): Promise<{
+  userChatCreate(target_id: string): Promise<{
     data: {
       code: string;
       last_read_time: number;
@@ -169,7 +170,7 @@ export class KOOKAPI {
       data: {
         target_id
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -177,7 +178,7 @@ export class KOOKAPI {
    * @param data
    * @returns
    */
-  async createDirectMessage(data: SendDirectMessageParams): Promise<{
+  createDirectMessage(data: SendDirectMessageParams): Promise<{
     data: {
       msg_id: string;
       msg_timestamp: number;
@@ -188,7 +189,7 @@ export class KOOKAPI {
       method: 'post',
       url: ApiEnum.DirectMessageCreate,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -196,7 +197,7 @@ export class KOOKAPI {
    * @param msg_id
    * @returns
    */
-  async messageDelete(msg_id: string): Promise<{
+  messageDelete(msg_id: string): Promise<{
     data: {
       code: number;
       message: string;
@@ -209,7 +210,7 @@ export class KOOKAPI {
       data: {
         msg_id
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -217,7 +218,7 @@ export class KOOKAPI {
    * @param data
    * @returns
    */
-  async messageUpdate(data: { msg_id: string; content: any; quote?: string; temp_target_id?: string }): Promise<{
+  messageUpdate(data: { msg_id: string; content: any; quote?: string; temp_target_id?: string }): Promise<{
     data: {
       code: number;
       message: string;
@@ -228,7 +229,7 @@ export class KOOKAPI {
       method: 'post',
       url: ApiEnum.MessageUpdate,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -236,7 +237,7 @@ export class KOOKAPI {
    * @param data
    * @returns
    */
-  async messageDeleteReaction(data: { msg_id: string; emoji: string; user_id: string }): Promise<{
+  messageDeleteReaction(data: { msg_id: string; emoji: string; user_id: string }): Promise<{
     code: number;
     message: string;
     data: any[];
@@ -245,7 +246,7 @@ export class KOOKAPI {
       method: 'post',
       url: ApiEnum.MessageDeleteReaction,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -253,7 +254,7 @@ export class KOOKAPI {
    * @param data
    * @returns
    */
-  async messageAddReaction(data: { msg_id: string; emoji: string }): Promise<{
+  messageAddReaction(data: { msg_id: string; emoji: string }): Promise<{
     code: number;
     message: string;
     data: any[];
@@ -262,7 +263,7 @@ export class KOOKAPI {
       method: 'post',
       url: ApiEnum.MessageAddReaction,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -270,7 +271,7 @@ export class KOOKAPI {
    * @param data
    * @returns
    */
-  async messageReactionList(params: { msg_id: string; emoji: string }): Promise<{
+  messageReactionList(params: { msg_id: string; emoji: string }): Promise<{
     code: number;
     message: string;
     data: {
@@ -293,7 +294,7 @@ export class KOOKAPI {
       method: 'get',
       url: ApiEnum.MessageReactionList,
       params
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -308,7 +309,7 @@ export class KOOKAPI {
    * @param user_id
    * @returns
    */
-  async userMe(): Promise<{
+  userMe(): Promise<{
     code: number;
     message: string;
     data: {
@@ -331,7 +332,7 @@ export class KOOKAPI {
     return this.service({
       method: 'get',
       url: ApiEnum.UserMe
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -340,7 +341,7 @@ export class KOOKAPI {
    * @param user_id
    * @returns
    */
-  async userView(
+  userView(
     guild_id: string,
     user_id: string
   ): Promise<{
@@ -368,7 +369,7 @@ export class KOOKAPI {
         guild_id,
         user_id
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -377,7 +378,7 @@ export class KOOKAPI {
    * @param user_id
    * @returns
    */
-  async guildKickout(
+  guildKickout(
     guild_id: string,
     user_id: string
   ): Promise<{
@@ -392,7 +393,7 @@ export class KOOKAPI {
         guild_id,
         target_id: user_id
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -402,7 +403,7 @@ export class KOOKAPI {
    * @param value
    * @returns
    */
-  async channelRoleCreate(
+  channelRoleCreate(
     channel_id: string,
     type: string,
     value: string
@@ -419,6 +420,6 @@ export class KOOKAPI {
         type,
         value
       }
-    }).then(res => res?.data);
+    });
   }
 }

@@ -28,13 +28,13 @@ export const start = () => {
 
   const intents = [] as IntentsEnum[];
 
-  if (config?.mode == 'guild') {
+  if (config?.mode === 'guild') {
     if (config?.is_private) {
       intents.push(...isPrivateIntents, ...pubIntents);
     } else {
       intents.push(...notPrivateIntents, ...pubIntents);
     }
-  } else if (config?.mode == 'group') {
+  } else if (config?.mode === 'group') {
     intents.push(...isGroupIntents, ...pubIntents);
   } else {
     if (config?.is_private) {
@@ -54,6 +54,7 @@ export const start = () => {
   });
 
   // 连接
-  client.connect(config?.gatewayURL);
+  void client.connect(config?.gatewayURL);
+
   register(client as any);
 };

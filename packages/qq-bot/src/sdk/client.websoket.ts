@@ -58,7 +58,7 @@ export class QQBotClients extends QQBotAPI {
 
       config.set('access_token', data.access_token);
       console.info('refresh', data.expires_in, 's');
-      setTimeout(accessToken, data.expires_in * 1000);
+      setTimeout(() => void accessToken(), data.expires_in * 1000);
     };
 
     await accessToken();
@@ -126,14 +126,14 @@ export class QQBotClients extends QQBotAPI {
     }
 
     // 重新连接的逻辑
-    const reconnect = async () => {
+    const reconnect = () => {
       if (this.#counter.value >= 5) {
         console.info('The maximum number of reconnections has been reached, cancel reconnection');
 
         return;
       }
       setTimeout(() => {
-        console.info('[ws] reconnecting...');
+        console.info('[ws-qqbot] reconnecting...');
         // 重新starrt
         start();
         // 记录
@@ -144,7 +144,7 @@ export class QQBotClients extends QQBotAPI {
     const start = () => {
       if (this.#gatewayUrl) {
         const map = {
-          0: async ({ t, d }) => {
+          0: ({ t, d }) => {
             if (this.#events[t]) {
               try {
                 for (const event of this.#events[t]) {
@@ -170,37 +170,36 @@ export class QQBotClients extends QQBotAPI {
             // Ready Event，鉴权成功
             if (t === 'READY') {
               this.#IntervalId = setInterval(() => {
-                if (this.#isConnected) {
-                  this.#ws &&
-                    this.#ws.send(
-                      JSON.stringify({
-                        op: 1, //  op = 1
-                        d: null // 如果是第一次连接，传null
-                      })
-                    );
+                if (this.#isConnected && this.#ws) {
+                  this.#ws.send(
+                    JSON.stringify({
+                      op: 1, //  op = 1
+                      d: null // 如果是第一次连接，传null
+                    })
+                  );
                 }
               }, this.#heartbeat_interval);
             }
             // Resumed Event，恢复连接成功
             if (t === 'RESUMED') {
-              console.info('[ws] restore connection');
+              console.info('[ws-qqbot] restore connection');
               // 重制次数
               this.#counter.reStart();
             }
           },
           6: ({ d }) => {
-            console.info('[ws] connection attempt', d);
+            console.info('[ws-qqbot] connection attempt', d);
           },
-          7: async ({ d }) => {
+          7: ({ d }) => {
             // 执行重新连接
-            console.info('[ws] reconnect', d);
+            console.info('[ws-qqbot] reconnect', d);
             // 取消鉴权发送
             if (this.#IntervalId) {
               clearInterval(this.#IntervalId);
             }
           },
           9: ({ d }) => {
-            console.info('[ws] parameter error', d);
+            console.info('[ws-qqbot] parameter error', d);
           },
           10: ({ d }) => {
             // 重制次数
@@ -208,29 +207,31 @@ export class QQBotClients extends QQBotAPI {
             // 记录新循环
             this.#heartbeat_interval = d.heartbeat_interval;
             // 发送鉴权
-            this.#ws && this.#ws.send(JSON.stringify(this.#aut()));
+            if (this.#ws) {
+              this.#ws.send(JSON.stringify(this.#aut()));
+            }
           },
           11: () => {
             // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-            console.info('[ws] heartbeat transmission');
+            console.info('[ws-qqbot] heartbeat transmission');
             // 重制次数
             this.#counter.reStart();
           },
           12: ({ d }) => {
-            console.info('[ws] platform data', d);
+            console.debug('[ws-qqbot] platform data', d);
           }
         };
 
         // 连接
         this.#ws = new WebSocket(this.#gatewayUrl);
         this.#ws.on('open', () => {
-          console.info('[ws] open');
+          console.info('[ws-qqbot] open');
         });
         // 监听消息
-        this.#ws.on('message', async msg => {
+        this.#ws.on('message', msg => {
           const message = JSON.parse(msg.toString('utf8'));
 
-          if (process.env.NTQQ_WS == 'dev') {
+          if (process.env.NTQQ_WS === 'dev') {
             console.info('message', message);
           }
           // 根据 opcode 进行处理
@@ -239,9 +240,9 @@ export class QQBotClients extends QQBotAPI {
           }
         });
         // 关闭
-        this.#ws.on('close', async err => {
-          await reconnect();
-          console.info('[ws] close', err);
+        this.#ws.on('close', err => {
+          void reconnect();
+          console.info('[ws-qqbot] close', err);
         });
       }
     };

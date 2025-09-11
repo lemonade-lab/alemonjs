@@ -3,6 +3,7 @@ import { ApiRequestData, FileType } from './typing.js';
 import { config } from './config.js';
 import FormData from 'form-data';
 import { createPicFrom } from 'alemonjs/utils';
+import { createAxiosInstance } from './instance.js';
 
 export const BOTS_API_RUL = 'https://bots.qq.com';
 export const API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com';
@@ -44,7 +45,7 @@ export class QQBotAPI {
       }
     });
 
-    return service(options);
+    return createAxiosInstance(service, options);
   }
 
   /**
@@ -64,29 +65,29 @@ export class QQBotAPI {
       }
     });
 
-    return service(opstion);
+    return createAxiosInstance(service, opstion);
   }
 
   /**
    * 得到鉴权
    * @returns
    */
-  async gateway() {
+  gateway() {
     const mode = config.get('mode');
 
     if (mode === 'group') {
       return this.groupService({
         url: '/gateway'
-      }).then(res => res?.data);
+      });
     } else if (mode === 'guild') {
       return this.guildServer({
         url: '/gateway'
-      }).then(res => res?.data);
+      });
     } else {
       // 默认group
       return this.groupService({
         url: '/gateway'
-      }).then(res => res?.data);
+      });
     }
   }
 
@@ -98,7 +99,7 @@ export class QQBotAPI {
    * @returns
    *   0 文本  1 图文 2 md 3 ark 4 embed
    */
-  async usersOpenMessages(openid: string, data: ApiRequestData): Promise<{ id: string; timestamp: number }> {
+  usersOpenMessages(openid: string, data: ApiRequestData): Promise<{ id: string; timestamp: number }> {
     const db = {
       ...(data.event_id
         ? { event_id: data.event_id }
@@ -112,7 +113,7 @@ export class QQBotAPI {
       url: `/v2/users/${openid}/messages`,
       method: 'post',
       data: db
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -143,7 +144,7 @@ export class QQBotAPI {
    * @param data
    * @returns
    */
-  async groupOpenMessages(group_openid: string, data: ApiRequestData): Promise<{ id: string; timestamp: number }> {
+  groupOpenMessages(group_openid: string, data: ApiRequestData): Promise<{ id: string; timestamp: number }> {
     const db = {
       ...(data.event_id
         ? { event_id: data.event_id }
@@ -157,7 +158,7 @@ export class QQBotAPI {
       url: `/v2/groups/${group_openid}/messages`,
       method: 'post',
       data: db
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -168,7 +169,7 @@ export class QQBotAPI {
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk
    */
-  async postRichMediaByUser(
+  postRichMediaByUser(
     openid: string,
     data: {
       srv_send_msg?: boolean;
@@ -181,7 +182,7 @@ export class QQBotAPI {
       url: `/v2/users/${openid}/files`,
       method: 'post',
       data: data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -192,7 +193,7 @@ export class QQBotAPI {
    *  1 图文 2 视频 3 语言 4 文件
    * 图片：png/jpg，视频：mp4，语音：silk
    */
-  async postRichMediaByGroup(
+  postRichMediaByGroup(
     openid: string,
     data: {
       srv_send_msg?: boolean;
@@ -208,7 +209,7 @@ export class QQBotAPI {
         srv_send_msg: false,
         ...data
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -217,11 +218,11 @@ export class QQBotAPI {
    * @param message_id
    * @returns
    */
-  async userMessageDelete(openid: string, message_id: string) {
+  userMessageDelete(openid: string, message_id: string) {
     return this.groupService({
       url: `/v2/users/${openid}/messages/${message_id}`,
       method: 'delete'
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -230,11 +231,11 @@ export class QQBotAPI {
    * @param message_id
    * @returns
    */
-  async grouMessageDelte(group_openid: string, message_id: string) {
+  grouMessageDelte(group_openid: string, message_id: string) {
     return this.groupService({
       url: `/v2/groups/${group_openid}/messages/${message_id}`,
       method: 'delete'
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -289,7 +290,7 @@ export class QQBotAPI {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -337,7 +338,7 @@ export class QQBotAPI {
         'Content-Type': `multipart/form-data; boundary=${dary}`
       },
       data: formdata
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -351,11 +352,11 @@ export class QQBotAPI {
    * @param message
    * @returns
    */
-  async usersMe() {
+  usersMe() {
     return this.guildServer({
       method: 'get',
       url: '/users/@me'
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -363,12 +364,12 @@ export class QQBotAPI {
    * @param message
    * @returns
    */
-  async usersMeGuilds(params: { before: string; after: string; limit: number }) {
+  usersMeGuilds(params: { before: string; after: string; limit: number }) {
     return this.guildServer({
       method: 'get',
       url: '/users/@me/guilds',
       params
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -382,11 +383,11 @@ export class QQBotAPI {
    * @param guild_id
    * @returns
    */
-  async guilds(guild_id: string) {
+  guilds(guild_id: string) {
     return this.guildServer({
       method: 'get',
       url: `/guilds/${guild_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -400,11 +401,11 @@ export class QQBotAPI {
    * @param guild_id
    * @returns
    */
-  async guildsChannels(guild_id: string) {
+  guildsChannels(guild_id: string) {
     return this.guildServer({
       method: 'get',
       url: `/guilds/${guild_id}/channels`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -412,11 +413,11 @@ export class QQBotAPI {
    * @param channel_id
    * @returns
    */
-  async channels(channel_id: string) {
+  channels(channel_id: string) {
     return this.guildServer({
       method: 'get',
       url: `/channels/${channel_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -424,7 +425,7 @@ export class QQBotAPI {
    * @param guild_id
    * @returns
    */
-  async guildsChannelsCreate(
+  guildsChannelsCreate(
     guild_id: string,
     data: {
       name: string;
@@ -442,7 +443,7 @@ export class QQBotAPI {
       method: 'post',
       url: `/guilds/${guild_id}/channels`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -450,7 +451,7 @@ export class QQBotAPI {
    * @param channel_id
    * @returns
    */
-  async guildsChannelsUpdate(
+  guildsChannelsUpdate(
     channel_id: string,
     data: {
       name: string;
@@ -464,7 +465,7 @@ export class QQBotAPI {
       method: 'PATCH',
       url: `/channels/${channel_id}`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -473,7 +474,7 @@ export class QQBotAPI {
    * @param data
    * @returns
    */
-  async guildsChannelsdelete(
+  guildsChannelsdelete(
     channel_id: string,
     data: {
       name: string;
@@ -487,7 +488,7 @@ export class QQBotAPI {
       method: 'DELETE',
       url: `/channels/${channel_id}`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -495,11 +496,11 @@ export class QQBotAPI {
    * @param channel_id
    * @returns
    */
-  async channelsChannelOnlineNums(channel_id: string) {
+  channelsChannelOnlineNums(channel_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/online_nums`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -513,7 +514,7 @@ export class QQBotAPI {
    * @param guild_id
    * @returns
    */
-  async guildsMembers(
+  guildsMembers(
     guild_id: string,
     params: {
       after: string;
@@ -524,7 +525,7 @@ export class QQBotAPI {
       method: 'GET',
       url: `/guilds/${guild_id}/members`,
       params
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -534,7 +535,7 @@ export class QQBotAPI {
    * @param params
    * @returns
    */
-  async guildsRolesMembers(
+  guildsRolesMembers(
     guild_id: string,
     role_id: string,
     params: {
@@ -546,7 +547,7 @@ export class QQBotAPI {
       method: 'GET',
       url: `/guilds/${guild_id}/roles/${role_id}/members`,
       params
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -555,11 +556,11 @@ export class QQBotAPI {
    * @param user_id
    * @returns
    */
-  async guildsMembersMessage(guild_id: string, user_id: string) {
+  guildsMembersMessage(guild_id: string, user_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/members/${user_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -568,11 +569,11 @@ export class QQBotAPI {
    * @param user_id
    * @returns
    */
-  async guildsMembersDelete(guild_id: string, user_id: string) {
+  guildsMembersDelete(guild_id: string, user_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -581,11 +582,11 @@ export class QQBotAPI {
    * @param message_id
    * @returns
    */
-  async channelsMessagesById(channel_id: string, message_id: string) {
+  channelsMessagesById(channel_id: string, message_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/messages/${message_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -595,11 +596,11 @@ export class QQBotAPI {
    * @param hidetip
    * @returns
    */
-  async channelsMessagesDelete(channel_id: string, message_id: string, hidetip = true) {
+  channelsMessagesDelete(channel_id: string, message_id: string, hidetip = true) {
     return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/messages/${message_id}?hidetip=${hidetip}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -613,11 +614,11 @@ export class QQBotAPI {
    * @param guild_id 频道id
    * @returns
    */
-  async guildsRoles(guild_id: string) {
+  guildsRoles(guild_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/roles`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -629,7 +630,7 @@ export class QQBotAPI {
    * @param {object?} data.hoist 在成员列表中单独展示: 0-否, 1-是
    * @returns
    */
-  async guildsRolesPost(
+  guildsRolesPost(
     guild_id: string,
     data: {
       name?: string;
@@ -641,7 +642,7 @@ export class QQBotAPI {
       method: 'POST',
       url: `/guilds/${guild_id}/roles`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -653,7 +654,7 @@ export class QQBotAPI {
    * @param {object?} data.hoist 在成员列表中单独展示: 0-否, 1-是
    * @returns
    */
-  async guildsRolesPatch(
+  guildsRolesPatch(
     guild_id: string,
     role_id: string,
     data: {
@@ -666,7 +667,7 @@ export class QQBotAPI {
       method: 'PATCH',
       url: `/guilds/${guild_id}/roles/${role_id}`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -674,11 +675,11 @@ export class QQBotAPI {
    * @param guild_id 频道id
    * @param role_id 身份组id
    */
-  async guildsRolesDelete(guild_id: string, role_id: string) {
+  guildsRolesDelete(guild_id: string, role_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/roles/${role_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -690,7 +691,7 @@ export class QQBotAPI {
    * @returns
    */
 
-  async guildsRolesMembersPut(guild_id: string, channel_id: string, user_id: string, role_id: string) {
+  guildsRolesMembersPut(guild_id: string, channel_id: string, user_id: string, role_id: string) {
     return this.guildServer({
       method: 'PUT',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`,
@@ -699,7 +700,7 @@ export class QQBotAPI {
           id: channel_id
         }
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -711,7 +712,7 @@ export class QQBotAPI {
    * @returns
    */
 
-  async guildsRolesMembersDelete(guild_id: string, channel_id: string, user_id: string, role_id: string) {
+  guildsRolesMembersDelete(guild_id: string, channel_id: string, user_id: string, role_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/members/${user_id}/roles/${role_id}`,
@@ -720,7 +721,7 @@ export class QQBotAPI {
           id: channel_id
         }
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -733,11 +734,11 @@ export class QQBotAPI {
    * @param channel_id 子频道id
    * @param user_id 用户id
    */
-  async channelsPermissions(channel_id: string, user_id: string) {
+  channelsPermissions(channel_id: string, user_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/members/${user_id}/permissions`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -746,7 +747,7 @@ export class QQBotAPI {
    * @param user_id 用户id
    * @param 参数包括add和remove两个字段分别表示授予的权限以及删除的权限。要授予用户权限即把add对应位置 1，删除用户权限即把remove对应位置 1。当两个字段同一位都为 1，表现为删除权限。
    */
-  async channelsPermissionsPut(channel_id: string, user_id: string, add: string, remove: string) {
+  channelsPermissionsPut(channel_id: string, user_id: string, add: string, remove: string) {
     return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/members/${user_id}/permissions`,
@@ -754,7 +755,7 @@ export class QQBotAPI {
         add,
         remove
       }
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -774,11 +775,11 @@ export class QQBotAPI {
    * @param guild_id 频道id
    * @returns
    */
-  async guildsMessageSetting(guild_id: string) {
+  guildsMessageSetting(guild_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/guilds/${guild_id}/message/setting`
-    }).then(res => res?.data);
+    });
   }
   /**
    * ***********
@@ -792,11 +793,11 @@ export class QQBotAPI {
    * @param source_guild_id 源频道 id
    * @returns
    */
-  async usersMeDms() {
+  usersMeDms() {
     return this.guildServer({
       method: 'POST',
       url: '/users/@me/dms'
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -805,11 +806,11 @@ export class QQBotAPI {
    * @param data
    * @returns
    */
-  async dmsMessageDelete(guild_id: string, message_id: string, hidetip = true) {
+  dmsMessageDelete(guild_id: string, message_id: string, hidetip = true) {
     return this.guildServer({
       method: 'DELETE',
       url: `/dms/${guild_id}/messages/${message_id}?hidetip=${hidetip}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -824,12 +825,12 @@ export class QQBotAPI {
    * @param data { mute_end_timestamp:禁言结束时间戳, mute_seconds:禁言时长 } 两个参数必须传一个 优先级 mute_end_timestamp > mute_seconds
    * 将mute_end_timestamp或mute_seconds传值为字符串'0'，则表示解除全体禁言
    */
-  async guildsMuteAll(guild_id: string, data: { mute_end_timestamp?: string; mute_seconds?: string }) {
+  guildsMuteAll(guild_id: string, data: { mute_end_timestamp?: string; mute_seconds?: string }) {
     return this.guildServer({
       method: 'PATCH',
       url: `/guilds/${guild_id}/mute`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -840,12 +841,12 @@ export class QQBotAPI {
    * 将mute_end_timestamp或mute_seconds传值为字符串'0'，则表示解除禁言
    * @returns
    */
-  async guildsMemberMute(guild_id: string, user_id: string, data: { mute_end_timestamp?: string; mute_seconds?: string }) {
+  guildsMemberMute(guild_id: string, user_id: string, data: { mute_end_timestamp?: string; mute_seconds?: string }) {
     return this.guildServer({
       method: 'PATCH',
       url: `/guilds/${guild_id}/members/${user_id}/mute`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -854,7 +855,7 @@ export class QQBotAPI {
    * @param data { mute_end_timestamp:禁言结束时间戳, mute_seconds:禁言时长, user_ids:用户id数组 } 两个参数必须传一个 优先级 mute_end_timestamp > mute_seconds
    * 将mute_end_timestamp或mute_seconds传值为字符串'0'，则表示解除禁言
    */
-  async guildsMute(
+  guildsMute(
     guild_id: string,
     data: {
       mute_end_timestamp?: string;
@@ -866,7 +867,7 @@ export class QQBotAPI {
       method: 'PATCH',
       url: `/guilds/${guild_id}/mute`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -886,7 +887,7 @@ export class QQBotAPI {
    * @param recommend_channels 推荐频道id数组 "recommend_channels": [{ "channel_id": "xxxx","introduce": "推荐语" }]
    * @returns 返回Announces 对象 （https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/announces/model.html#Announces）
    */
-  async guildsAnnounces(
+  guildsAnnounces(
     guild_id: string,
     data: {
       message_id?: string;
@@ -899,7 +900,7 @@ export class QQBotAPI {
       method: 'POST',
       url: `/guilds/${guild_id}/announces`,
       data
-    }).then(res => res?.data);
+    });
   }
   /**
    * 删除频道公告
@@ -908,11 +909,11 @@ export class QQBotAPI {
    * @returns
    */
 
-  async guildsAnnouncesDelete(guild_id: string, message_id: string) {
+  guildsAnnouncesDelete(guild_id: string, message_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/guilds/${guild_id}/announces/${message_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -928,11 +929,11 @@ export class QQBotAPI {
    * @returns  返回 PinsMessage对象 {  "guild_id": "xxxxxx",  "channel_id": "xxxxxx",  "message_ids": ["xxxxx"]}
    * @returns message_ids 为当前请求后子频道内所有精华消息 message_id 数组
    */
-  async channelsPinsPut(channel_id: string, message_id: string) {
+  channelsPinsPut(channel_id: string, message_id: string) {
     return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/pins/${message_id}`
-    }).then(res => res?.data);
+    });
   }
   /**
    * 删除精华消息
@@ -942,11 +943,11 @@ export class QQBotAPI {
    * @returns
    */
 
-  async channelsPinsDelete(channel_id: string, message_id: string) {
+  channelsPinsDelete(channel_id: string, message_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/pins/${message_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -955,11 +956,11 @@ export class QQBotAPI {
    * @returns 返回 PinsMessage对象 {  "guild_id": "xxxxxx",  "channel_id": "xxxxxx",  "message_ids": ["xxxxx"]}
    * @returns message_ids 为当前请求后子频道内所有精华消息 message_id 数组
    */
-  async channelsPins(channel_id: string) {
+  channelsPins(channel_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/pins`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -974,11 +975,11 @@ export class QQBotAPI {
    * @returns 返回 Schedule 对象数组(详见https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/schedule/model.html#schedule)
    */
 
-  async channelsSchedules(channel_id: string) {
+  channelsSchedules(channel_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/schedules`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -988,11 +989,11 @@ export class QQBotAPI {
    * @returns 返回 Schedule 对象(详见https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/schedule/model.html#schedule)
    */
 
-  async channelsSchedulesSchedule(channel_id: string, schedule_id: string) {
+  channelsSchedulesSchedule(channel_id: string, schedule_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/schedules/${schedule_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1004,16 +1005,16 @@ export class QQBotAPI {
    * @param end_timestamp 日程结束时间戳
    * @param jump_channel_id 日程开始时跳转的子频道id
    * @param remind_type 日程提醒类型
-   *  0	不提醒
-   *  1	开始时提醒
-   *  2	开始前 5 分钟提醒
-   *  3	开始前 15 分钟提醒
-   *  4	开始前 30 分钟提醒
-   *  5	开始前 60 分钟提醒
+   *  0不提醒
+   *  1开始时提醒
+   *  2开始前 5 分钟提醒
+   *  3开始前 15 分钟提醒
+   *  4开始前 30 分钟提醒
+   *  5开始前 60 分钟提醒
    * @returns 返回 Schedule 对象(详见https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/schedule/model.html#schedule)
    */
 
-  async channelsSchedulesPost(
+  channelsSchedulesPost(
     channel_id: string,
     data: {
       schedule: {
@@ -1030,7 +1031,7 @@ export class QQBotAPI {
       method: 'POST',
       url: `/channels/${channel_id}/schedules`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1043,15 +1044,15 @@ export class QQBotAPI {
    * @param end_timestamp 日程结束时间戳
    * @param jump_channel_id 日程开始时跳转的子频道id
    * @param remind_type 日程提醒类型
-   * 0	不提醒
-   * 1	开始时提醒
-   * 2	开始前 5 分钟提醒
-   * 3	开始前 15 分钟提醒
-   * 4	开始前 30 分钟提醒
-   * 5	开始前 60 分钟提醒
+   * 0不提醒
+   * 1开始时提醒
+   * 2开始前 5 分钟提醒
+   * 3开始前 15 分钟提醒
+   * 4开始前 30 分钟提醒
+   * 5开始前 60 分钟提醒
    * @returns 返回 Schedule 对象(详见https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/schedule/model.html#schedule)
    */
-  async channelsSchedulesSchedulePatch(
+  channelsSchedulesSchedulePatch(
     channel_id: string,
     schedule_id: string,
     data: {
@@ -1069,7 +1070,7 @@ export class QQBotAPI {
       method: 'PATCH',
       url: `/channels/${channel_id}/schedules/${schedule_id}`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1079,11 +1080,11 @@ export class QQBotAPI {
    * @returns
    */
 
-  async channelsSchedulesScheduleDelete(channel_id: string, schedule_id: string) {
+  channelsSchedulesScheduleDelete(channel_id: string, schedule_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/schedules/${schedule_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1101,11 +1102,11 @@ export class QQBotAPI {
    * @returns
    */
 
-  async channelsMessagesReactionsPut(channel_id: string, message_id: string, type: 1 | 2, id: string) {
+  channelsMessagesReactionsPut(channel_id: string, message_id: string, type: 1 | 2, id: string) {
     return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/messages/${message_id}/reactions/${type}/${id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1117,11 +1118,11 @@ export class QQBotAPI {
    * @returns
    */
 
-  async channelsMessagesReactionsDelete(channel_id: string, message_id: string, type: 1 | 2, id: string) {
+  channelsMessagesReactionsDelete(channel_id: string, message_id: string, type: 1 | 2, id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/messages/${message_id}/reactions/${type}/${id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1135,7 +1136,7 @@ export class QQBotAPI {
    * @param {object} data.limit 返回的用户数量 默认20 最大50
    * @returns data:{ users:User[], cookie:string,is_end:true|false }
    */
-  async channelsMessagesReactionsUsers(
+  channelsMessagesReactionsUsers(
     channel_id: string,
     message_id: string,
     type: 1 | 2,
@@ -1149,7 +1150,7 @@ export class QQBotAPI {
       method: 'GET',
       url: `/channels/${channel_id}/messages/${message_id}/reactions/${type}/${id}`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1167,7 +1168,7 @@ export class QQBotAPI {
    * @param text 状态文本（比如：简单爱-周杰伦），可选，status为0时传，其他操作不传
    * @returns
    */
-  async channelsAudioPost(
+  channelsAudioPost(
     channel_id: string,
     data: {
       audio_url?: string;
@@ -1179,7 +1180,7 @@ export class QQBotAPI {
       method: 'POST',
       url: `/channels/${channel_id}/audio`,
       data
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1187,11 +1188,11 @@ export class QQBotAPI {
    * @param channel_id 语音子频道id
    * @returns {}
    */
-  async channelsMicPut(channel_id: string) {
+  channelsMicPut(channel_id: string) {
     return this.guildServer({
       method: 'PUT',
       url: `/channels/${channel_id}/mic`
-    }).then(res => res?.data);
+    });
   }
   /**
    * 机器人下麦
@@ -1199,11 +1200,11 @@ export class QQBotAPI {
    * @returns {}
    */
 
-  async channelsMicDelete(channel_id: string) {
+  channelsMicDelete(channel_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/mic`
-    }).then(res => res?.data);
+    });
   }
   /**
    * **********
@@ -1221,11 +1222,11 @@ export class QQBotAPI {
    * @returns 返回 Thread 对象数组(详见https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/forum/model.html#Thread)
    * @returns is_finish 为 1 时，表示已拉取完 为 0 时，表示未拉取完
    */
-  async channelsThreads(channel_id: string) {
+  channelsThreads(channel_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/threads`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1235,11 +1236,11 @@ export class QQBotAPI {
    * @returns 返回 帖子详情对象(详见https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/forum/model.html#ThreadInfo)
    * 其中content字段可参考 https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/forum/model.html#RichText
    */
-  async channelsThreadsThread(channel_id: string, thread_id: string) {
+  channelsThreadsThread(channel_id: string, thread_id: string) {
     return this.guildServer({
       method: 'GET',
       url: `/channels/${channel_id}/threads/${thread_id}`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1251,7 +1252,7 @@ export class QQBotAPI {
    * @returns 返回 {task_id:string,create_time:string} 其中 task_id 为帖子id，create_time 发帖时间戳
    */
 
-  async channelsThreadsPut(
+  channelsThreadsPut(
     channel_id: string,
     data: {
       title: string;
@@ -1263,7 +1264,7 @@ export class QQBotAPI {
       method: 'PUT',
       url: `/channels/${channel_id}/threads`,
       data
-    }).then(res => res?.data);
+    });
   }
   /**
    * 删除帖子
@@ -1272,11 +1273,11 @@ export class QQBotAPI {
    * @returns
    */
 
-  async channelsThreadsDelete(channel_id: string, thread_id: string) {
+  channelsThreadsDelete(channel_id: string, thread_id: string) {
     return this.guildServer({
       method: 'DELETE',
       url: `/channels/${channel_id}/threads/${thread_id}`
-    }).then(res => res?.data);
+    });
   }
   /**
    * ********
@@ -1289,10 +1290,10 @@ export class QQBotAPI {
    * @param guild_id
    * @returns
    */
-  async guildApiPermission(guild_id: string) {
+  guildApiPermission(guild_id: string) {
     return this.guildServer({
       url: `/guilds/${guild_id}/api_permission`
-    }).then(res => res?.data);
+    });
   }
 
   /**
@@ -1301,7 +1302,7 @@ export class QQBotAPI {
    * @param code
    * @returns
    */
-  async interactionResponse(mode: 'group' | 'guild', interaction_id: string, code?: number) {
+  interactionResponse(mode: 'group' | 'guild', interaction_id: string, code?: number) {
     if (mode === 'group') {
       return this.groupService({
         method: 'PUT',
@@ -1309,7 +1310,7 @@ export class QQBotAPI {
         data: {
           code: code || 0
         }
-      }).then(res => res?.data);
+      });
     } else {
       return this.guildServer({
         method: 'PUT',
@@ -1317,7 +1318,7 @@ export class QQBotAPI {
         data: {
           code: code || 0
         }
-      }).then(res => res?.data);
+      });
     }
   }
 }

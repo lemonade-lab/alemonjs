@@ -118,14 +118,3 @@ export function startAdapterWithFallback() {
 
   startByFork();
 }
-
-['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
-  process?.on?.(sig, () => {
-    logger?.info?.(`[${sig}] 收到信号，正在关闭...`);
-    setImmediate(() => process.exit(0));
-  });
-});
-
-process?.on?.('exit', code => {
-  logger?.info?.(`[exit] 进程退出，code=${code}`);
-});

@@ -59,57 +59,58 @@ export class OneBotClient extends OneBotAPI {
    * @param cfg
    * @param conversation
    */
-  async connect() {
+  connect() {
     const { url, access_token: token, reverse_enable, reverse_port } = this.#options;
 
-    const c =
-      token == '' || !token
-        ? {}
-        : {
-            headers: {
-              ['Authorization']: `Bearer ${token}`
-            }
-          };
+    const notToken = !token || token === '';
 
-    const onMessage = async data => {
+    const c = notToken
+      ? {}
+      : {
+          headers: {
+            ['Authorization']: `Bearer ${token}`
+          }
+        };
+
+    const onMessage = data => {
       try {
         const event = JSON.parse(data.toString());
 
         if (!event) {
           logger.error('[OneBot] WebSocket message is empty');
-        } else if (event?.post_type == 'meta_event') {
+        } else if (event?.post_type === 'meta_event') {
           if (this.#events['META']) {
             this.#events['META'](event);
           }
-        } else if (event?.post_type == 'message') {
-          if (event?.message_type == 'group') {
+        } else if (event?.post_type === 'message') {
+          if (event?.message_type === 'group') {
             if (this.#events['MESSAGES']) {
               this.#events['MESSAGES'](event);
             }
-          } else if (event?.message_type == 'private') {
+          } else if (event?.message_type === 'private') {
             if (this.#events['DIRECT_MESSAGE']) {
               this.#events['DIRECT_MESSAGE'](event);
             }
           }
-        } else if (event?.post_type == 'notice') {
-          if (event?.notice_type == 'group_increase') {
+        } else if (event?.post_type === 'notice') {
+          if (event?.notice_type === 'group_increase') {
             // 群成员增加
             if (this.#events['NOTICE_GROUP_MEMBER_INCREASE']) {
               this.#events['NOTICE_GROUP_MEMBER_INCREASE'](event);
             }
-          } else if (event?.notice_type == 'group_decrease') {
+          } else if (event?.notice_type === 'group_decrease') {
             // 群成员减少
             if (this.#events['NOTICE_GROUP_MEMBER_REDUCE']) {
               this.#events['NOTICE_GROUP_MEMBER_REDUCE'](event);
             }
           }
-        } else if (event?.post_type == 'request') {
+        } else if (event?.post_type === 'request') {
           // 收到加群 或 加好友的请求。
-          if (event?.request_type == 'friend') {
+          if (event?.request_type === 'friend') {
             if (this.#events['REQUEST_ADD_FRIEND']) {
               this.#events['REQUEST_ADD_FRIEND'](event);
             }
-          } else if (event?.request_type == 'group') {
+          } else if (event?.request_type === 'group') {
             if (this.#events['REQUEST_ADD_GROUP']) {
               this.#events['REQUEST_ADD_GROUP'](event);
             }

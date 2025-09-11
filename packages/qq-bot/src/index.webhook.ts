@@ -4,7 +4,7 @@ import { getQQBotConfig } from './config';
 
 export const start = () => {
   const config = getQQBotConfig();
-  const { master_id, master_key, ...cfgConfig } = config;
+  const { master_id: _, master_key: __, ...cfgConfig } = config;
   const client = new QQBotClient({
     ...cfgConfig
   });

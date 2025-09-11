@@ -25,3 +25,14 @@ export * from './core/index.js';
 export * from './cbp/index.js';
 // 导出主要模块
 export * from './main.js';
+
+['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
+  process?.on?.(sig, () => {
+    logger?.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
+    setImmediate(() => process.exit(0));
+  });
+});
+
+process?.on?.('exit', code => {
+  logger?.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
+});

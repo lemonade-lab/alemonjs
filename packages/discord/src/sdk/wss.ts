@@ -210,7 +210,7 @@ export class DCClient extends DCAPI {
          * 心跳确认
          */
         11: () => {
-          logger.info('[ws-discord] 心跳确认');
+          logger.debug('[ws-discord] 心跳确认');
         }
       };
 

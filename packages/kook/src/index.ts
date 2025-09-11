@@ -13,7 +13,7 @@ export { KOOKAPI as API } from './sdk/api.js';
 
 export { type Options } from './config.js';
 
-export default () => {
+const main = () => {
   const config = getKOOKConfig();
 
   // 创建客户端
@@ -22,7 +22,7 @@ export default () => {
   });
 
   // 连接
-  client.connect();
+  void client.connect();
 
   const port = process.env?.port || 17117;
   const url = `ws://127.0.0.1:${port}`;
@@ -159,29 +159,29 @@ export default () => {
       return Promise.all([]);
     }
     const content = val
-      .filter(item => item.type == 'Mention' || item.type == 'Text')
+      .filter(item => item.type === 'Mention' || item.type === 'Text')
       .map(item => {
-        if (item.type == 'Mention') {
-          if (item.value == 'everyone' || item.value == 'all' || item.value == '' || typeof item.value !== 'string') {
+        if (item.type === 'Mention') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return '(met)all(met)';
           }
-          if (item.options?.belong == 'user') {
+          if (item.options?.belong === 'user') {
             return `(met)${item.value}(met)`;
-          } else if (item.options?.belong == 'channel') {
+          } else if (item.options?.belong === 'channel') {
             return `(chn)${item.value}(chn)`;
           }
 
           return '';
-        } else if (item.type == 'Text') {
-          if (item.options?.style == 'block') {
+        } else if (item.type === 'Text') {
+          if (item.options?.style === 'block') {
             return `\`${item.value}\``;
-          } else if (item.options?.style == 'italic') {
+          } else if (item.options?.style === 'italic') {
             return `*${item.value}*`;
-          } else if (item.options?.style == 'bold') {
+          } else if (item.options?.style === 'bold') {
             return `**${item.value}**`;
-          } else if (item.options?.style == 'strikethrough') {
+          } else if (item.options?.style === 'strikethrough') {
             return `~~${item.value}~~`;
-          } else if (item.options?.style == 'boldItalic') {
+          } else if (item.options?.style === 'boldItalic') {
             return `***${item.value}***`;
           }
 
@@ -200,7 +200,7 @@ export default () => {
 
         return [createResult(ResultCode.Ok, 'client.createMessage', res)];
       }
-      const images = val.filter(item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL');
+      const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
       if (images.length > 0) {
         let bufferData = null;
@@ -211,11 +211,11 @@ export default () => {
           }
           const item = images[i];
 
-          if (item.type == 'Image') {
+          if (item.type === 'Image') {
             bufferData = Buffer.from(item.value, 'base64');
-          } else if (item.type == 'ImageURL') {
+          } else if (item.type === 'ImageURL') {
             bufferData = await getBufferByURL(item.value);
-          } else if (item.type == 'ImageFile') {
+          } else if (item.type === 'ImageFile') {
             bufferData = readFileSync(item.value);
           }
         }
@@ -260,29 +260,29 @@ export default () => {
       return [];
     }
     const content = val
-      .filter(item => item.type == 'Mention' || item.type == 'Text')
+      .filter(item => item.type === 'Mention' || item.type === 'Text')
       .map(item => {
-        if (item.type == 'Mention') {
-          if (item.value == 'everyone' || item.value == 'all' || item.value == '' || typeof item.value !== 'string') {
+        if (item.type === 'Mention') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return '(met)all(met)';
           }
-          if (item.options?.belong == 'user') {
+          if (item.options?.belong === 'user') {
             return `(met)${item.value}(met)`;
-          } else if (item.options?.belong == 'channel') {
+          } else if (item.options?.belong === 'channel') {
             return `(chn)${item.value}(chn)`;
           }
 
           return '';
-        } else if (item.type == 'Text') {
-          if (item.options?.style == 'block') {
+        } else if (item.type === 'Text') {
+          if (item.options?.style === 'block') {
             return `\`${item.value}\``;
-          } else if (item.options?.style == 'italic') {
+          } else if (item.options?.style === 'italic') {
             return `*${item.value}*`;
-          } else if (item.options?.style == 'bold') {
+          } else if (item.options?.style === 'bold') {
             return `**${item.value}**`;
-          } else if (item.options?.style == 'strikethrough') {
+          } else if (item.options?.style === 'strikethrough') {
             return `~~${item.value}~~`;
-          } else if (item.options?.style == 'boldItalic') {
+          } else if (item.options?.style === 'boldItalic') {
             return `***${item.value}***`;
           }
 
@@ -301,7 +301,7 @@ export default () => {
 
         return [createResult(ResultCode.Ok, 'client.createDirectMessage', res)];
       }
-      const images = val.filter(item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL');
+      const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
       if (images.length > 0) {
         let bufferData = null;
@@ -312,11 +312,11 @@ export default () => {
           }
           const item = images[i];
 
-          if (item.type == 'Image') {
+          if (item.type === 'Image') {
             bufferData = Buffer.from(item.value, 'base64');
-          } else if (item.type == 'ImageURL') {
+          } else if (item.type === 'ImageURL') {
             bufferData = await getBufferByURL(item.value);
-          } else if (item.type == 'ImageFile') {
+          } else if (item.type === 'ImageFile') {
             bufferData = readFileSync(item.value);
           }
         }
@@ -375,15 +375,15 @@ export default () => {
         if (val.length < 0) {
           return [];
         }
-        if (event.name == 'message.create') {
+        if (event.name === 'message.create') {
           return await sendChannel(event.ChannelId, val);
-        } else if (event.name == 'private.message.create') {
+        } else if (event.name === 'private.message.create') {
           return await sendUser(event.OpenId, val);
         }
 
         return [];
       },
-      mention: async e => {
+      mention: e => {
         const event = e.value;
         const MessageMention: User[] = [];
         const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? [];
@@ -415,12 +415,14 @@ export default () => {
           });
         }
 
-        return MessageMention;
+        return new Promise(resolve => {
+          resolve(MessageMention);
+        });
       }
     }
   };
 
-  cbp.onactions(async (data, consume) => {
+  const onactions = async (data, consume) => {
     if (data.action === 'message.send') {
       const event = data.payload.event;
       const paramFormat = data.payload.params.format;
@@ -460,9 +462,11 @@ export default () => {
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     }
-  });
+  };
 
-  cbp.onapis(async (data, consume) => {
+  cbp.onactions((data, consume) => void onactions(data, consume));
+
+  const onapis = async (data, consume) => {
     const key = data.payload?.key;
 
     if (client[key]) {
@@ -472,5 +476,42 @@ export default () => {
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     }
-  });
+  };
+
+  cbp.onapis((data, consume) => void onapis(data, consume));
 };
+
+const mainProcess = () => {
+  ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
+    process?.on?.(sig, () => {
+      logger?.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
+      setImmediate(() => process.exit(0));
+    });
+  });
+
+  process?.on?.('exit', code => {
+    logger?.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
+  });
+
+  // 监听主进程消息
+  process.on('message', msg => {
+    try {
+      const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
+
+      if (data?.type === 'start') {
+        main();
+      } else if (data?.type === 'stop') {
+        process.exit(0);
+      }
+    } catch {}
+  });
+
+  // 主动发送 ready 消息
+  if (process.send) {
+    process.send(JSON.stringify({ type: 'ready' }));
+  }
+};
+
+mainProcess();
+
+export default main;

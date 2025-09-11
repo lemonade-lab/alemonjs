@@ -56,7 +56,7 @@ export class KOOKClient extends KOOKAPI {
         }
       });
 
-    if (!gatewayUrl && gatewayUrl == '') {
+    if (!gatewayUrl && gatewayUrl === '') {
       return;
     }
 
@@ -76,7 +76,7 @@ export class KOOKClient extends KOOKAPI {
              */
             this.#lastMessageSN = sn;
             try {
-              if (d.channel_type == 'GROUP') {
+              if (d.channel_type === 'GROUP') {
                 const t = ConversationMap[d.type]['public'](d);
 
                 if (this.#events[t]) {
@@ -153,16 +153,18 @@ export class KOOKClient extends KOOKAPI {
       console.info('[ws] open');
     });
 
-    this.#ws.on('message', async msg => {
+    const onMessage = msg => {
       const message = JSON.parse(msg.toString('utf8'));
 
-      if (process.env.KOOK_WS == 'dev') {
+      if (process.env.KOOK_WS === 'dev') {
         console.info('message', message);
       }
       if (map[message.s]) {
         map[message.s](message);
       }
-    });
+    };
+
+    this.#ws.on('message', msg => void onMessage(msg));
 
     // 心跳定时发送
     setInterval(() => {

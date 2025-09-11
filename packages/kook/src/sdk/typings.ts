@@ -184,7 +184,7 @@ export enum ApiEnum {
 export type MessageType = 1 | 2 | 3 | 4 | 8 | 9 | 10 | 255;
 
 /**
- * 	消息通道类型, GROUP 为组播消息, PERSON 为单播消息, BROADCAST 为广播消息
+ * 消息通道类型, GROUP 为组播消息, PERSON 为单播消息, BROADCAST 为广播消息
  */
 
 export type MessageChannelType = 'GROUP' | 'PERSON' | 'BROADCAST';
