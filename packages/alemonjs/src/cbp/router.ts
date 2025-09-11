@@ -4,49 +4,10 @@ import path, { join, dirname } from 'path';
 import mime from 'mime-types';
 import { createRequire } from 'module';
 import { html } from './hello.html';
+import { formatPath, getModuelFile } from './router-utils';
+import { collectMiddlewares, runMiddlewares } from './router-middleware';
 const require = createRequire(import.meta.url);
 const mainDirMap = new Map();
-const formatPath = (path: string) => {
-  if (!path || path === '/') {
-    return '/index.html';
-  }
-  const pates = path.split('/');
-  const lastPath = pates[pates.length - 1];
-
-  if (lastPath.includes('.')) {
-    return path;
-  }
-  path += '.html';
-
-  return path;
-};
-// 输入一个文件路径。
-const getModuelFile = (dir: string) => {
-  const dirMap: Record<string, string> = {
-    '.js': `${dir}.js`,
-    '.jsx': `${dir}.jsx`,
-    '.mjs': `${dir}.mjs`,
-    '.cjs': `${dir}.cjs`,
-    '/index.js': `${dir}/index.js`,
-    '/index.jsx': `${dir}/index.jsx`,
-    '/index.mjs': `${dir}/index.mjs`,
-    '/index.cjs': `${dir}/index.cjs`,
-    '.ts': `${dir}.ts`,
-    '.tsx': `${dir}.tsx`,
-    '/index.ts': `${dir}/index.ts`,
-    '/index.tsx': `${dir}/index.tsx`
-  };
-
-  for (const key in dirMap) {
-    const filePath = dirMap[key];
-
-    if (existsSync(filePath) && fs.statSync(filePath)) {
-      return filePath;
-    }
-  }
-
-  return '';
-};
 
 const router = new KoaRouter({
   prefix: '/'
@@ -127,13 +88,16 @@ router.all('app/{*path}', async ctx => {
         return;
       }
       const apiModule = await import(`file://${modulePath}`);
+      const handler = apiModule[ctx.method];
 
-      if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
+      if (!handler || typeof handler !== 'function') {
         ctx.status = 405;
 
         return;
       }
-      await apiModule[ctx.method](ctx);
+      const middlewares = await collectMiddlewares(modulePath);
+
+      await runMiddlewares(middlewares, ctx, handler);
     } catch (err) {
       console.error(`Error handling API request ${ctx.path}`);
       ctx.status = 500;
@@ -246,20 +210,23 @@ router.all('apps/:app/{*path}', async ctx => {
         ctx.status = 404;
         ctx.body = {
           code: 404,
-          message: `API 'route/${ctx.path}' 未找到。`,
-          data: null
+          message: `API '${ctx.path}' 未找到。`,
+          data: 'existsSync modulePath'
         };
 
         return;
       }
       const apiModule = await import(`file://${modulePath}`);
+      const handler = apiModule[ctx.method];
 
-      if (!apiModule[ctx.method] || typeof apiModule[ctx.method] !== 'function') {
+      if (!handler || typeof handler !== 'function') {
         ctx.status = 405;
 
         return;
       }
-      await apiModule[ctx.method](ctx);
+      const middlewares = await collectMiddlewares(modulePath);
+
+      await runMiddlewares(middlewares, ctx, handler);
     } catch (err) {
       logger.warn(`Error request ${ctx.path}:`, err?.message || '');
       ctx.status = 500;
