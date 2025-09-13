@@ -64,6 +64,7 @@ export type OnMiddlewareValue<C, T extends EventKeys> = {
 
 export type ResponseRoute = {
   regular?: RegExp;
+  selects?: EventKeys | EventKeys[];
   handler: () => Promise<any>;
   children?: ResponseRoute[];
 };

@@ -6,7 +6,7 @@
  * @author ningmengchongshui
  */
 import { isAsyncFunction } from 'util/types';
-import { Next, Events, EventKeys } from '../types';
+import { Next, Events, EventKeys, ResponseRoute } from '../types';
 import { ResponseRouter } from './store';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
@@ -21,7 +21,7 @@ export const expendEventRoute = <T extends EventKeys>(valueEvent: Events[T], sel
   const callHandler = createCallHandler(valueEvent);
 
   // 开始处理 handler
-  const processChildren = (nodes, middleware, next) => {
+  const processChildren = (nodes: ResponseRoute[], middleware, next) => {
     if (!nodes || nodes.length === 0) {
       next();
 
@@ -38,6 +38,16 @@ export const expendEventRoute = <T extends EventKeys>(valueEvent: Events[T], sel
         return;
       }
       const node = nodes[idx - 1];
+
+      if (node?.selects) {
+        const selects = Array.isArray(node.selects) ? node.selects : [node.selects];
+
+        if (!selects.includes(select)) {
+          void nextNode();
+
+          return;
+        }
+      }
 
       // 正则匹配
       if (EventMessageText.includes(select) && node.regular) {
@@ -113,12 +123,6 @@ export const expendEventRoute = <T extends EventKeys>(valueEvent: Events[T], sel
 
     void nextNode();
   };
-
-  if (routes.length === 0) {
-    nextCycle();
-
-    return;
-  }
 
   void processChildren(routes, [], nextCycle);
 };
