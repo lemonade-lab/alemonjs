@@ -2,7 +2,7 @@ import { dirname, join } from 'path';
 import { existsSync } from 'fs';
 import { createEventName, showErrorModule } from '../core/utils.js';
 import { getRecursiveDirFiles } from '../core/utils.js';
-import { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, ChildrenCycle } from '../types/index.js';
+import { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, childrenCallback } from '../types/index.js';
 import { createRequire } from 'module';
 import { ChildrenApp } from './store.js';
 import { ResultCode } from '../core/variable.js';
@@ -46,7 +46,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       throw new Error('The Children callback is not correct');
     }
 
-    let app: ChildrenCycle = null;
+    let app: childrenCallback = null;
 
     if (typeof moduleApp?.default?.callback !== 'function') {
       app = moduleApp?.default.callback;
@@ -61,7 +61,9 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       // 卸载
       App.un();
       try {
-        app?.unMounted && (await app.unMounted(e));
+        if (app?.unMounted) {
+          await app.unMounted(e);
+        }
       } catch (e) {
         // 卸载周期出意外，不需要进行卸载
         showErrorModule(e);
@@ -70,19 +72,41 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     // onCreated 创建
     try {
-      app?.onCreated && (await app?.onCreated());
+      if (app?.onCreated) {
+        await app?.onCreated();
+      }
     } catch (e) {
-      unMounted(e);
+      void unMounted(e);
 
       // 出错了，结束后续的操作。
       return;
     }
 
-    // onMounted 加载
-    try {
-      /**
-       * load response files
-       */
+    const registerMounted = async () => {
+      const res = await app?.register();
+
+      if (res && res?.response) {
+        // 注册了 response。
+        // 使用新的模式去进行回调执行。
+        // 不再需要用文件import的方式去加载。
+
+        App.register(res);
+      }
+
+      // 加载完成
+      App.on();
+
+      // mounted
+      try {
+        if (app?.onMounted) {
+          await app.onMounted({ response: [], middleware: [] });
+        }
+      } catch (e) {
+        void unMounted(e);
+      }
+    };
+
+    const fileMounted = async () => {
       const appsDir = join(mainDir, 'apps');
       const appsFiles = getRecursiveDirFiles(appsDir);
       // 使用 新 目录 response
@@ -130,11 +154,28 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         mwData.push(middleware);
       }
       App.pushMiddleware(mwData);
+
+      // 加载完成
       App.on();
+
+      // mounted
       try {
-        app?.onMounted && (await app.onMounted({ response: resData, middleware: mwData }));
+        if (app?.onMounted) {
+          await app.onMounted({ response: resData, middleware: mwData });
+        }
       } catch (e) {
         void unMounted(e);
+      }
+    };
+
+    // onMounted 加载
+    try {
+      if (app?.register) {
+        // 优先使用 register
+        await registerMounted();
+      } else {
+        // 使用文件方式加载
+        await fileMounted();
       }
     } catch (e) {
       void unMounted(e);
@@ -152,7 +193,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
  * 模块文件
  * @param app
  */
-export const loadChildrenFile = async (appName: string) => {
+export const loadChildrenFile = (appName: string) => {
   if (typeof appName !== 'string') {
     logger.error({
       code: ResultCode.FailParams,

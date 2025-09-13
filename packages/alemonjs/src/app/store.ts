@@ -5,7 +5,7 @@
  * @description 存储器
  */
 import { SinglyLinkedList } from '../datastructure/SinglyLinkedList';
-import { ChildrenCycle, EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
+import { childrenCallbackRes, ChildrenCycle, EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
 /**
@@ -143,6 +143,16 @@ export class Response {
   }
 }
 
+export class ResponseRouter {
+  get value() {
+    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
+      return alemonjsCore.storeChildrenApp[key].register?.response?.current ?? [];
+    });
+
+    return data.flat();
+  }
+}
+
 export class Middleware {
   get value() {
     // 得到所有 app，得到所有 res
@@ -256,6 +266,12 @@ export class ChildrenApp {
     this.#name = name;
   }
 
+  #registerRes: childrenCallbackRes = {};
+
+  register(config: childrenCallbackRes) {
+    this.#registerRes = config;
+  }
+
   /**
    * 推送响应体
    * @param data
@@ -288,7 +304,8 @@ export class ChildrenApp {
       name: this.#name,
       middleware: this.#middleware,
       response: this.#response,
-      cycle: this.#cycle
+      cycle: this.#cycle,
+      register: this.#registerRes
     };
   }
 

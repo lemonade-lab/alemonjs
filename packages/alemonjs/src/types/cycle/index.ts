@@ -1,5 +1,7 @@
 import { StoreMiddlewareItem, StoreResponseItem } from '../store/res';
 
+type StroreParam = { response: StoreResponseItem[]; middleware: StoreMiddlewareItem[] };
+
 /**
  * 子模块生命周期
  */
@@ -8,17 +10,17 @@ export type ChildrenCycle = {
    * 创建时
    * @returns
    */
-  onCreated?: () => void;
+  onCreated?: () => void | Promise<void>;
   /**
    * 挂载时。得到属于自己的 store
    * @returns
    */
-  onMounted?: (strore: { response: StoreResponseItem[]; middleware: StoreMiddlewareItem[] }) => void;
+  onMounted?: (store: StroreParam) => void | Promise<void>;
   /**
    * 卸载时
    * @returns
    */
-  unMounted?: (error: any) => void;
+  unMounted?: (error: any) => void | Promise<void>;
 };
 
 /**

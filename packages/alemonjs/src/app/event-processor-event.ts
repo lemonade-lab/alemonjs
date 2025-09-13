@@ -5,13 +5,13 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { isAsyncFunction } from 'util/types';
-import { Next, Events, OnResponseValue, Current, EventKeys, CurrentResultValue } from '../types';
+import { Next, Events, OnResponseValue, Current, EventKeys } from '../types';
 import { useState } from './hook-use-state';
 import { showErrorModule } from '../core/utils';
 import { Response } from './store';
-import { useMessage } from './hook-use-api';
 import { EventMessageText } from '../core/variable';
+import { expendEventRoute } from './event-processor-event-route';
+import { createCallHandler } from './event-processor-event-callHandler';
 
 /**
  * 消息体处理机制
@@ -20,12 +20,13 @@ import { EventMessageText } from '../core/variable';
  */
 export const expendEvent = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
   const res = new Response();
-  const [message] = useMessage(valueEvent);
 
-  // 得到所有 res
+  // 得到所有 response
   const StoreResponse = res.value;
 
   let valueI = 0;
+  // 开始处理 heandler
+  const callHandler = createCallHandler(valueEvent);
 
   /**
    * 下一步
@@ -119,65 +120,13 @@ export const expendEvent = <T extends EventKeys>(valueEvent: Events[T], select: 
       }
 
       const currents = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
-      let index = 0;
-      let isClose = false;
-      let isNext = false;
-      const onRes = (res: CurrentResultValue) => {
-        if (!res) {
-          isClose = true;
 
-          return;
-        }
-        if (Array.isArray(res)) {
-          if (res.length > 0) {
-            // 发送数据
-            void message.send(res);
-          }
-          isClose = true;
-        } else if (typeof res === 'object') {
-          if (Array.isArray(res.data)) {
-            // 发送数据
-            void message.send(res.data);
-          }
-          if (!res.allowGrouping) {
-            isClose = true;
-          }
-        }
-      };
-      const start = async () => {
-        if (index >= currents.length) {
-          return;
-        }
-        if (isNext) {
-          return;
-        }
-        if (isClose) {
-          return;
-        }
-        if (isAsyncFunction(currents[index])) {
-          const res = await currents[index](valueEvent, (...cns: boolean[]) => {
-            isNext = true;
-            nextEvent(...cns);
-          });
-
-          onRes(res);
-        } else {
-          const res = currents[index](valueEvent, (...cns: boolean[]) => {
-            isNext = true;
-            nextEvent(...cns);
-          });
-
-          onRes(res);
-        }
-        ++index;
-        void start();
-      };
-
-      void start();
+      callHandler(currents, nextEvent);
     } catch (err) {
       showErrorModule(err);
     }
   };
 
-  nextEvent();
+  // 路由优先。路由的搞完了。再处理其他
+  expendEventRoute(valueEvent, select, nextEvent);
 };

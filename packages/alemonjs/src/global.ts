@@ -6,7 +6,8 @@ import {
   OnDataFormatFunc,
   OnResponseReversalFuncBack,
   OnGroupFunc,
-  OnMiddlewareReversalFuncBack
+  OnMiddlewareReversalFuncBack,
+  DefineResponseFunc
 } from './types/event';
 import { StoreChildrenApp } from './types/store/res';
 import { StateSubscribeMap, SubscribeKeysMap } from './types/subscribe';
@@ -72,6 +73,10 @@ declare global {
    * 定义一个子模块
    */
   var defineChildren: DefineChildrenFunc;
+  /**
+   * 定义响应体
+   */
+  var defineResponse: DefineResponseFunc;
   /**
    * 定义选择器
    */

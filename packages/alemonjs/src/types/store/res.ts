@@ -1,3 +1,4 @@
+import { childrenCallbackRes } from '../event/index';
 import { ChildrenCycle } from '../cycle';
 import { EventKeys } from '../event/map';
 
@@ -81,4 +82,5 @@ export type StoreChildrenApp = {
   middleware: StoreMiddlewareItem[];
   response: StoreResponseItem[];
   cycle: ChildrenCycle;
+  register?: childrenCallbackRes;
 };

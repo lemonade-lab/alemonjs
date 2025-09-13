@@ -62,10 +62,21 @@ export type OnMiddlewareValue<C, T extends EventKeys> = {
   select: T | T[];
 };
 
-/**
- *
- */
-export type DefineChildrenCallback = (() => Promise<ChildrenCycle> | ChildrenCycle) | ChildrenCycle;
+export type ResponseRoute = {
+  regular?: RegExp;
+  handler: () => Promise<any>;
+  children?: ResponseRoute[];
+};
+
+export type DefineResponseFunc = (responses: ResponseRoute[]) => { current: ResponseRoute[] };
+
+export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc> };
+
+export type childrenCallback = ChildrenCycle & {
+  register?: () => (childrenCallbackRes | void) | Promise<childrenCallbackRes | void>;
+};
+
+export type DefineChildrenCallback = (() => Promise<childrenCallback> | childrenCallback) | childrenCallback;
 
 /**
  * 定义子模块
@@ -75,10 +86,7 @@ export type DefineChildrenValue = {
   callback: DefineChildrenCallback;
 };
 
-/**
- *
- */
-export type DefineChildrenFunc = (callback: (() => ChildrenCycle) | ChildrenCycle) => DefineChildrenValue;
+export type DefineChildrenFunc = (callback: (() => childrenCallback) | childrenCallback) => DefineChildrenValue;
 
 /**
  * 函数
