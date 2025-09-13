@@ -32,6 +32,7 @@ declare global {
     storeState: ResponseState;
     /**
      * 状态订阅
+     * @deprecated 废弃。指令管理可直接配置禁用正则
      */
     storeStateSubscribe: StateSubscribeMap;
     /**

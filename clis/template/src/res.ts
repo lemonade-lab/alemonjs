@@ -11,7 +11,7 @@ import { lazy } from 'alemonjs';
 export default defineResponse([
   {
     // 中间件。注意中间件可以根据 select 进行过滤。需要注意select的范围
-    handler: lazy(() => import('./mw/mw')),
+    handler: lazy(() => import('./response/mw')),
     children: [
       {
         // 正则匹配

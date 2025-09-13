@@ -146,7 +146,34 @@ export class Response {
 export class ResponseRouter {
   get value() {
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
+      if (!alemonjsCore.storeChildrenApp[key].register) {
+        return [];
+      }
+
       return alemonjsCore.storeChildrenApp[key].register?.response?.current ?? [];
+    });
+
+    return data.flat();
+  }
+}
+
+export class MiddlewareR {
+  get value() {
+    // 得到所有 app，得到所有 res
+    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
+      if (!alemonjsCore.storeChildrenApp[key].register) {
+        return [];
+      }
+
+      const current = alemonjsCore.storeChildrenApp[key].register?.middleware?.current;
+
+      if (!current) {
+        return [];
+      }
+
+      const currents = Array.isArray(current) ? current : [current];
+
+      return currents;
     });
 
     return data.flat();
@@ -203,6 +230,9 @@ export class StateSubscribe {
   }
 }
 
+/**
+ * @deprecated 废弃。指令管理可直接配置禁用正则
+ */
 class StateProxy {
   create(value: Record<string, boolean> = {}) {
     return new Proxy(value, {
@@ -224,6 +254,9 @@ class StateProxy {
   }
 }
 
+/**
+ * @deprecated 废弃。指令管理可直接配置禁用正则
+ */
 export class State {
   #name: string = null;
   /**

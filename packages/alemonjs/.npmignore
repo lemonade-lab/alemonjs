@@ -5,3 +5,4 @@ node_modules
 !/bin
 !/env.d.ts
 !/index.js
+!/README_CONFIG.md

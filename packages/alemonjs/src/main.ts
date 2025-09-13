@@ -21,9 +21,12 @@ const loadState = () => {
 const loadApps = () => {
   const cfg = getConfig();
 
-  if (cfg.value?.apps && Array.isArray(cfg.value.apps)) {
-    void Promise.all(cfg.value.apps.map(app => loadChildrenFile(app)));
-  }
+  const apps = Array.isArray(cfg.value?.apps) ? cfg.value.apps : Object.keys(cfg.value?.apps ?? {}).filter(Boolean);
+
+  // 去重
+  const uniqueApps = Array.from(new Set(apps));
+
+  void Promise.all(uniqueApps.map(app => loadChildrenFile(app)));
 };
 
 type ServerOptions = {
@@ -96,30 +99,46 @@ export const start = (options: StartOptions | string = {}) => {
   // 注入配置。
   loadState();
   const cfg = getConfig();
-  const url = options?.url ?? cfg.argv?.url ?? cfg.value?.url;
 
-  // 连接到 CBP 服务器
-  if (url) {
+  // 临时参数
+  const curURL = options?.url ?? cfg.argv?.url;
+  // 临时参数
+  const curLogin = options?.login ?? cfg.argv?.login;
+  // 临时参数
+  const curPlatform = options?.platform ?? cfg.argv?.platform;
+
+  const url = curURL ?? cfg.value?.url;
+
+  if (curURL) {
+    logger.info(`[Connecting to CBP server at ${curURL}]`);
+    cbpClient(curURL);
+  } else if (!curLogin && !curPlatform && url) {
     logger.info(`[Connecting to CBP server at ${url}]`);
     cbpClient(url);
   } else {
     // 创建 cbp 服务器
-    const port = options?.port ?? cfg.argv?.port ?? cfg.value?.port ?? defaultPort;
+    const curPort = options?.port ?? cfg.argv?.port;
+    const port = curPort ?? cfg.value?.port ?? defaultPort;
 
     // 设置环境变量
     process.env.port = port;
+
     cbpServer(port, () => {
       const httpURL = `http://127.0.0.1:${port}`;
       const wsURL = `ws://127.0.0.1:${port}`;
 
       logger.info(`[CBP server started at ${httpURL}]`);
       logger.info(`[CBP server started at ${wsURL}]`);
-      const isFullReceive = options?.is_full_receive ?? cfg.argv?.is_full_receive ?? cfg.value?.is_full_receive ?? true;
+
+      const curIsFullReceive = options?.is_full_receive ?? cfg.argv?.is_full_receive;
+      // 是否全量接收
+      const isFullReceive = curIsFullReceive ?? cfg.value?.is_full_receive ?? true;
 
       cbpClient(httpURL, { isFullReceive });
+
       // 加载平台服务
-      const platform = options?.platform ?? cfg.argv?.platform ?? cfg.value?.platform;
-      const login = options?.login ?? cfg.argv?.login ?? cfg.value?.login;
+      const platform = curPlatform ?? cfg.value?.platform;
+      const login = curLogin ?? cfg.value?.login;
 
       // 不登录平台
       if (!platform && !login) {
@@ -154,12 +173,16 @@ export const start = (options: StartOptions | string = {}) => {
       startAdapterWithFallback();
     });
   }
+
   // 获取入口文件
-  const input = options.input ?? cfg.argv?.input ?? cfg.value?.input ?? getInputExportPath();
+  const curInput = options?.input ?? cfg.argv?.input;
+  const input = curInput ?? cfg.value?.input ?? getInputExportPath();
 
   process.env.input = input;
+
   // 运行本地模块
   run(input);
+
   // load module
   loadApps();
 };

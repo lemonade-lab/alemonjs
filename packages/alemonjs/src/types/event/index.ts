@@ -71,7 +71,8 @@ export type ResponseRoute = {
 
 export type DefineResponseFunc = (responses: ResponseRoute[]) => { current: ResponseRoute[] };
 
-export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc> };
+// export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc>, middleware?: ReturnType<OnMiddlewareFunc> } | void;
+export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc> } | void;
 
 export type childrenCallback = ChildrenCycle & {
   register?: () => (childrenCallbackRes | void) | Promise<childrenCallbackRes | void>;

@@ -1,10 +1,10 @@
 import { getConfigValue } from '../core/config';
 import {
-  processor_repeated_clear_size,
-  processor_repeated_clear_time_max,
-  processor_repeated_clear_time_min,
-  processor_repeated_event_time,
-  processor_repeated_user_time
+  processorPepeatedClearSize,
+  processorRepeatedClearTimeMax,
+  processorRepeatedClearTimeMin,
+  processorRepeatedEventTime,
+  processorRepeatedUserTime
 } from '../core/variable';
 import { EventKeys, Events } from '../types';
 import { expendCycle } from './event-processor-cycle';
@@ -50,8 +50,8 @@ const cleanupStore = ({ Now, store, INTERVAL }) => {
 const cleanupStoreAll = () => {
   const Now = Date.now();
   const value = getConfigValue();
-  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processor_repeated_event_time;
-  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processor_repeated_user_time;
+  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
+  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
 
   cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap });
   cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAudoClearMap });
@@ -63,12 +63,12 @@ const callback = () => {
   // 下一次清理的时间，应该随着长度的增加而减少
   const length = ProcessorEventAutoClearMap.size + ProcessorEventUserAudoClearMap.size;
   // 长度控制在37个以内
-  const time = length > processor_repeated_clear_size ? processor_repeated_clear_time_min : processor_repeated_clear_time_max;
+  const time = length > processorPepeatedClearSize ? processorRepeatedClearTimeMin : processorRepeatedClearTimeMax;
 
   setTimeout(callback, time);
 };
 
-setTimeout(callback, processor_repeated_clear_time_min);
+setTimeout(callback, processorRepeatedClearTimeMin);
 
 /**
  * 消息处理器
@@ -78,10 +78,71 @@ setTimeout(callback, processor_repeated_clear_time_min);
  * @returns
  */
 export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
-  const Now = Date.now();
+  // 禁用规则设置
   const value = getConfigValue();
-  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processor_repeated_event_time;
-  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processor_repeated_user_time;
+  const disabledTextRegular = value?.disabled_text_regular;
+
+  // 检查文本禁用规则
+  if (disabledTextRegular && event['MessageText']) {
+    const reg = new RegExp(disabledTextRegular);
+
+    if (reg.test(event['MessageText'])) {
+      return;
+    }
+  }
+
+  const disabledSelects = value?.disabled_selects ?? {};
+
+  // 检查事件禁用规则
+  if (disabledSelects[name]) {
+    return;
+  }
+
+  const disabledUserId = value?.disabled_user_id ?? {};
+
+  if (event['UserId'] && disabledUserId[event['UserId']]) {
+    return;
+  }
+
+  const disabledUserKey = value?.disabled_user_key ?? {};
+
+  if (event['UserKey'] && disabledUserKey[event['UserKey']]) {
+    return;
+  }
+
+  const redirectRegular = value?.redirect_regular;
+  const redirectTarget = value?.redirect_target;
+
+  if (redirectRegular && redirectTarget && event['MessageText']) {
+    const reg = new RegExp(redirectRegular);
+
+    if (reg.test(event['MessageText'])) {
+      event['MessageText'] = event['MessageText'].replace(reg, redirectTarget);
+    }
+  }
+
+  const masterId = value?.master_id ?? {};
+  const masterKey = value?.master_key ?? {};
+
+  // 检查是否是 master
+  if (event['UserId'] && masterId[event['UserId']]) {
+    event['isMaster'] = true;
+  } else if (event['UserKey'] && masterKey[event['UserKey']]) {
+    event['isMaster'] = true;
+  }
+
+  const botId = value?.bot_id ?? {};
+  const botKey = value?.bot_key ?? {};
+
+  // 检查是否是 bot
+  if (event['UserId'] && botId[event['UserId']]) {
+    event['isBot'] = true;
+  } else if (event['UserKey'] && botKey[event['UserKey']]) {
+    event['isBot'] = true;
+  }
+
+  const Now = Date.now();
+  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
 
   if (event['MessageId']) {
     // 消息过长，要减少消息的长度
@@ -92,6 +153,9 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
       return;
     }
   }
+
+  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
+
   if (event['UserId']) {
     // 编号过长，要减少编号的长度
     const UserId = createHash(event['UserId']);
@@ -101,6 +165,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
       return;
     }
   }
+
   if (data) {
     // 当访问value的时候获取原始的data
     Object.defineProperty(event, 'value', {
@@ -109,7 +174,9 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
       }
     });
   }
+
   event['name'] = name;
+
   expendCycle(event, name);
 };
 

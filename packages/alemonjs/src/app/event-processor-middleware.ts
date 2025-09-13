@@ -5,13 +5,12 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { isAsyncFunction } from 'util/types';
-import { Next, Events, OnMiddlewareValue, Current, EventKeys, CurrentResultValue } from '../types';
+import { Next, Events, OnMiddlewareValue, Current, EventKeys } from '../types';
 import { useState } from './hook-use-state';
 import { showErrorModule } from '../core/utils';
 import { Middleware } from './store';
-import { useMessage } from './hook-use-api';
 import { EventMessageText } from '../core/variable';
+import { createMiddlewareCallHandler } from './event-processor-middleware-callHandler';
 
 /**
  * 处理中间件
@@ -19,13 +18,37 @@ import { EventMessageText } from '../core/variable';
  * @param select
  */
 export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
+  // const mdR = new MiddlewareR();
+
+  // const r = mdR.value;
+
+  // let index = 0;
+
+  // const nextMiddlewareR = (cn?: boolean, ...cns: boolean[]) => {
+  //   if (cn) {
+  //     next(...cns);
+
+  //     return;
+  //   }
+
+  //   if (index >= r.length) {
+  //     next();
+
+  //     return;
+  //   }
+
+  //   const route = r[index];
+  //   index++;
+  // };
+
   const mw = new Middleware();
-  const [message] = useMessage(valueEvent);
   // 得到所有 mws
   const mwFiles = mw.value;
 
   let valueI = 0;
   // let valueJ = 0
+
+  const callHandler = createMiddlewareCallHandler(valueEvent);
 
   /**
    * 下一步
@@ -120,63 +143,7 @@ export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], sel
 
       const currents = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
 
-      let index = 0;
-      let isClose = false;
-      let isNext = false;
-      /**
-       *
-       * @param res
-       * @returns
-       */
-      const onRes = (res: CurrentResultValue) => {
-        if (!res) {
-          isClose = true;
-        } else if (Array.isArray(res)) {
-          if (res.length > 0) {
-            // 发送数据
-            void message.send(res);
-          }
-          isClose = true;
-        } else if (typeof res === 'object') {
-          if (Array.isArray(res.data)) {
-            // 发送数据
-            void message.send(res.data);
-          }
-          if (!res.allowGrouping) {
-            isClose = true;
-          }
-        }
-      };
-      const start = async () => {
-        if (index >= currents.length) {
-          return;
-        }
-        if (isNext) {
-          return;
-        }
-        if (isClose) {
-          return;
-        }
-        if (isAsyncFunction(currents[index])) {
-          const res = await currents[index](valueEvent, (...cns: boolean[]) => {
-            isNext = true;
-            nextMiddleware(...cns);
-          });
-
-          onRes(res);
-        } else {
-          const res = currents[index](valueEvent, (...cns: boolean[]) => {
-            isNext = true;
-            nextMiddleware(...cns);
-          });
-
-          onRes(res);
-        }
-        ++index;
-        void start();
-      };
-
-      void start();
+      callHandler(currents, nextMiddleware);
     } catch (err) {
       showErrorModule(err);
     }

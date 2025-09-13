@@ -1,10 +1,10 @@
 import { EventKeys } from '../types';
 
-export const processor_repeated_event_time = 1000 * 60;
-export const processor_repeated_user_time = 1000 * 1;
-export const processor_repeated_clear_time_min = 1000 * 3;
-export const processor_repeated_clear_time_max = 1000 * 10;
-export const processor_repeated_clear_size = 37;
+export const processorRepeatedEventTime = 1000 * 60;
+export const processorRepeatedUserTime = 1000 * 1;
+export const processorRepeatedClearTimeMin = 1000 * 3;
+export const processorRepeatedClearTimeMax = 1000 * 10;
+export const processorPepeatedClearSize = 37;
 
 // 中间件文件后缀正则
 export const fileSuffixMiddleware = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/;

@@ -12,6 +12,7 @@ import { State, StateSubscribe } from './store';
  * 将会同时改变，因为状态是全局的
  * @param name 功能名
  * @param defaultValue 默认值，默认为 true
+ * @deprecated 废弃。指令管理可直接配置禁用正则
  * @throws {Error} - 如果 name 不是字符串，或者 defaultValue 不是布尔值，抛出错误。
  */
 export const useState = <T extends string>(name: T, defaultValue = true): [boolean, (value: boolean) => void] => {
@@ -36,19 +37,17 @@ export const useState = <T extends string>(name: T, defaultValue = true): [boole
   const state = new State(name, defaultValue);
   // 设置值的函数
   const setValue = (value: boolean) => {
-    if (state.value == value) {
+    if (state.value === value) {
       return;
     }
     state.value = value;
     // 更新config
     const cfg = getConfig();
 
-    if (!cfg.value.core) {
-      cfg.value.core = {};
-    }
-    if (!cfg.value.core.state) {
-      cfg.value.core.state = [];
-    }
+    cfg.value.core ??= {};
+
+    cfg.value.core.state ??= [];
+
     const cfgState = cfg.value.core.state;
     const cur = cfgState.find((i: string) => i === name);
 
@@ -69,6 +68,7 @@ export const useState = <T extends string>(name: T, defaultValue = true): [boole
  * 订阅状态变化
  * @param name 功能名
  * @param callback 回调函数
+ * @deprecated 废弃。指令管理可直接配置禁用正则
  * @throws {Error} - 如果 callback 无效，抛出错误。
  */
 export const onState = <T extends string>(name: T, callback: (value: boolean) => void) => {
@@ -89,6 +89,7 @@ export const onState = <T extends string>(name: T, callback: (value: boolean) =>
  * 取消订阅状态变化
  * @param name 功能名
  * @param callback 回调函数
+ * @deprecated 废弃。指令管理可直接配置禁用正则
  * @throws {Error} - 如果 callback 无效，抛出错误。
  */
 export const unState = <T extends string>(name: T, callback: (value: boolean) => void) => {
