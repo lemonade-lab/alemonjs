@@ -18,7 +18,8 @@ export async function collectMiddlewares(routeFile: string): Promise<Array<(ctx:
       const mwPath = path.join(dir, `_middleware${ext}`);
 
       if (existsSync(mwPath)) {
-        const mw = (await import(`file://${mwPath}`)).default;
+        const module = await import(`file://${mwPath}`);
+        const mw = module?.default ?? {};
 
         if (typeof mw === 'function') {
           middlewares.unshift(mw);

@@ -30,7 +30,6 @@ export * from './main.js';
 
 ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
   process?.on?.(sig, () => {
-    logger?.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
     setImmediate(() => process.exit(0));
   });
 });

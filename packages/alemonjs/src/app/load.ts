@@ -99,7 +99,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       // mounted
       try {
         if (app?.onMounted) {
-          await app.onMounted({ response: [], middleware: [] });
+          await app.onMounted({ response: [], responseMiddleware: {}, middleware: [] });
         }
       } catch (e) {
         void unMounted(e);
@@ -131,6 +131,33 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         resData.push(reesponse);
       }
       App.pushResponse(resData);
+
+      /**
+       * load response middleware files
+       */
+      const responseAndMiddlewareFiles = getRecursiveDirFiles(responseDir, item => fileSuffixMiddleware.test(item.name));
+      const resAndMwData: {
+        [key: string]: StoreResponseItem;
+      } = {};
+
+      for (const file of responseAndMiddlewareFiles) {
+        // 切掉 mainDir
+        const url = file.path.replace(mainDir, '');
+        const stateKey = createEventName(url, appName);
+        const reesponse: StoreResponseItem = {
+          input: mainDir,
+          dir: dirname(file.path),
+          path: file.path,
+          name: file.name,
+          stateKey,
+          appName: appName
+        };
+
+        resAndMwData[stateKey] = reesponse;
+      }
+
+      App.pushResponseMiddleware(resAndMwData);
+
       /**
        * load middleware files
        */
@@ -161,7 +188,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       // mounted
       try {
         if (app?.onMounted) {
-          await app.onMounted({ response: resData, middleware: mwData });
+          await app.onMounted({ response: resData, responseMiddleware: resAndMwData, middleware: mwData });
         }
       } catch (e) {
         void unMounted(e);

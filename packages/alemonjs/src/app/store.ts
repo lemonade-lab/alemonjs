@@ -115,8 +115,6 @@ export class Core {
       global.alemonjsCore = {
         storeState: {},
         storeStateSubscribe: {},
-        // storeActionsBus: {},
-        // storeMains: [],
         storeSubscribeList: {
           create: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>(),
           mount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>(),
@@ -140,6 +138,38 @@ export class Response {
     });
 
     return data.flat();
+  }
+}
+
+export class ResponseMiddleware {
+  find(name: string, stateKey: string) {
+    if (typeof name !== 'string' || typeof stateKey !== 'string') {
+      return [];
+    }
+    if (!alemonjsCore.storeChildrenApp[name]) {
+      return [];
+    }
+    const app = alemonjsCore.storeChildrenApp[name];
+
+    if (!app.middlewareResponse) {
+      return [];
+    }
+    // 找根据
+    const state = stateKey.split(':');
+    // 慢慢的去掉最后一个。并识别是否存在对应的 middlewareResponse
+    const mr: StoreResponseItem[] = [];
+
+    // main:response 不算
+    while (state.length > 1) {
+      const key = state.join(':');
+
+      if (app.middlewareResponse[key]) {
+        mr.push(app.middlewareResponse[key]);
+      }
+      state.pop();
+    }
+
+    return mr;
   }
 }
 
@@ -283,6 +313,10 @@ export class ChildrenApp {
   #middleware: StoreMiddlewareItem[] = [];
   // 响应体
   #response: StoreResponseItem[] = [];
+  // 响应体下的中间件
+  #middlewareResponse: {
+    [key: string]: StoreResponseItem;
+  } = {};
   // 周期
   #cycle: ChildrenCycle = null;
 
@@ -303,6 +337,16 @@ export class ChildrenApp {
    */
   pushResponse(data: StoreResponseItem[]) {
     this.#response = this.#response.concat(data);
+  }
+
+  /**
+   * 推送响应下的中间件
+   */
+  pushResponseMiddleware(data: { [key: string]: StoreResponseItem }) {
+    this.#middlewareResponse = {
+      ...this.#middlewareResponse,
+      ...data
+    };
   }
 
   /**
@@ -328,6 +372,7 @@ export class ChildrenApp {
     alemonjsCore.storeChildrenApp[this.#name] = {
       name: this.#name,
       middleware: this.#middleware,
+      middlewareResponse: this.#middlewareResponse,
       response: this.#response,
       cycle: this.#cycle,
       register: this.#registerRes

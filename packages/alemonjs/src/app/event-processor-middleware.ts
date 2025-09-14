@@ -5,13 +5,11 @@
  * @module processor
  * @author ningmengchongshui
  */
-import { Next, Events, OnMiddlewareValue, Current, EventKeys } from '../types';
-import { useState } from './hook-use-state';
-import { showErrorModule } from '../core/utils';
-import { Middleware } from './store';
-import { EventMessageText } from '../core/variable';
-import { expendMiddlewareRoute } from './event-processor-middleware-route';
+import { Next, Events, EventKeys } from '../types';
+import { Middleware, MiddlewareRouter } from './store';
 import { createCallHandler } from './event-processor-callHandler';
+import { createNextStep } from './event-processor-cycleFiles';
+import { createRouteProcessChildren } from './event-processor-cycleRoute';
 
 /**
  * 处理中间件
@@ -19,114 +17,24 @@ import { createCallHandler } from './event-processor-callHandler';
  * @param select
  */
 export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
+  // 读取所有全局中间件（文件）
   const mw = new Middleware();
-  // 得到所有 mws
+  // 所有中间件（文件）
   const mwFiles = mw.value;
-
-  let valueI = 0;
-  // let valueJ = 0
-
+  // 创建处理函数（文件）
   const callHandler = createCallHandler(valueEvent);
+  // 创建 next 处理函数（文件）
+  const nextMiddleware = createNextStep(valueEvent, select, next, mwFiles, callHandler);
 
-  /**
-   * 下一步
-   * @returns
-   */
-  const nextMiddleware: Next = (cn, ...cns) => {
-    if (cn) {
-      next(...cns);
+  // 读取所有全局中间件（路由）
+  const resRoute = new MiddlewareRouter();
+  // 所有中间件（路由）
+  const routes = resRoute.value;
+  // 创建处理函数（路由）
+  const callRouteHandler = createCallHandler(valueEvent);
+  // 创建 children 处理函数（路由）
+  const processChildren = createRouteProcessChildren(valueEvent, select, nextMiddleware, callRouteHandler);
 
-      return;
-    }
-    // 结束了
-    if (valueI >= mwFiles.length) {
-      next();
-
-      return;
-    }
-    // 检查所有
-    void calli();
-  };
-
-  /**
-   * 执行 i
-   * @returns
-   */
-  const calli = async () => {
-    // 调用完了
-    if (valueI >= mwFiles.length) {
-      // 开始调用j
-      nextMiddleware();
-
-      return;
-    }
-    valueI++;
-    const file = mwFiles[valueI - 1];
-
-    if (!file?.path) {
-      // 继续
-      nextMiddleware();
-
-      return;
-    }
-
-    try {
-      const app: {
-        default: OnMiddlewareValue<Current<EventKeys>, T>;
-        regular?: string | RegExp;
-        // name?: string
-        // state?: [boolean, (value: boolean) => void]
-      } = await import(`file://${file.path}`);
-
-      if (!app?.default?.current || !app?.default?.select) {
-        // 继续
-        nextMiddleware();
-
-        return;
-      }
-
-      // 检查状态
-      if (file?.stateKey) {
-        const [state] = useState(file?.stateKey);
-
-        if (state === false) {
-          // 继续
-          nextMiddleware();
-
-          return;
-        }
-      }
-
-      if (EventMessageText.includes(select)) {
-        if (app?.regular) {
-          const reg = new RegExp(app.regular);
-
-          if (!reg.test(valueEvent['MessageText'])) {
-            // 继续
-            nextMiddleware();
-
-            return;
-          }
-        }
-      }
-
-      const selects = Array.isArray(app.default.select) ? app.default.select : [app.default.select];
-
-      if (!selects.includes(select)) {
-        // 继续
-        nextMiddleware();
-
-        return;
-      }
-
-      const currents = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
-
-      callHandler(currents, nextMiddleware);
-    } catch (err) {
-      showErrorModule(err);
-    }
-  };
-
-  // 开始修正模式
-  expendMiddlewareRoute(valueEvent, select, nextMiddleware);
+  // 优先route系统。再到files系统
+  void processChildren(routes, [], nextMiddleware);
 };

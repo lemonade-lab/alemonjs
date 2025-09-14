@@ -1,6 +1,12 @@
 import { StoreMiddlewareItem, StoreResponseItem } from '../store/res';
 
-type StroreParam = { response: StoreResponseItem[]; middleware: StoreMiddlewareItem[] };
+type StroreParam = {
+  response: StoreResponseItem[];
+  responseMiddleware: {
+    [key: string]: StoreResponseItem;
+  };
+  middleware: StoreMiddlewareItem[];
+};
 
 /**
  * 子模块生命周期

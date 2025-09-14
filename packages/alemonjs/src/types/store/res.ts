@@ -81,6 +81,9 @@ export type StoreChildrenApp = {
   name: string;
   middleware: StoreMiddlewareItem[];
   response: StoreResponseItem[];
+  middlewareResponse: {
+    [key: string]: StoreResponseItem;
+  };
   cycle: ChildrenCycle;
   register?: childrenCallbackRes;
 };

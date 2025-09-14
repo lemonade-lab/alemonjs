@@ -1,29 +1,26 @@
-/**
- * @fileoverview 消息处理快
- * 登录模块向核心模块发送数据
- * 核心模块调用模块索引
- * @module processor
- * @author ningmengchongshui
- */
 import { isAsyncFunction } from 'util/types';
 import { Next, Events, EventKeys, ResponseRoute } from '../types';
-import { MiddlewareRouter } from './store';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
-import { createCallHandler } from './event-processor-callHandler';
 
-export const expendMiddlewareRoute = <T extends EventKeys>(valueEvent: Events[T], select: T, nextCycle: Next) => {
-  const resRoute = new MiddlewareRouter();
-
-  const routes = resRoute.value;
-
-  // 开始处理 heandler
-  const callHandler = createCallHandler(valueEvent);
-
+/**
+ * 创建路由处理调用函数
+ * @param valueEvent
+ * @param select
+ * @param nextCycle
+ * @param callHandler
+ * @returns
+ */
+export const createRouteProcessChildren = <T extends EventKeys>(
+  valueEvent: Events[T],
+  select: T,
+  nextCycle: Next,
+  callHandler: (currents: any, nextEvent: any) => void
+) => {
   // 开始处理 handler
-  const processChildren = (nodes: ResponseRoute[], middleware, next) => {
+  const processChildren = (nodes: ResponseRoute[], middleware, next: () => Promise<void> | void) => {
     if (!nodes || nodes.length === 0) {
-      next();
+      void next();
 
       return;
     }
@@ -33,7 +30,7 @@ export const expendMiddlewareRoute = <T extends EventKeys>(valueEvent: Events[T]
     const nextNode = async () => {
       idx++;
       if (idx > nodes.length) {
-        next();
+        void next();
 
         return;
       }
@@ -124,5 +121,5 @@ export const expendMiddlewareRoute = <T extends EventKeys>(valueEvent: Events[T]
     void nextNode();
   };
 
-  void processChildren(routes, [], nextCycle);
+  return processChildren;
 };
