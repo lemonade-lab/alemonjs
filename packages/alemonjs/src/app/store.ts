@@ -157,7 +157,7 @@ export class ResponseRouter {
   }
 }
 
-export class MiddlewareR {
+export class MiddlewareRouter {
   get value() {
     // 得到所有 app，得到所有 res
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
@@ -165,15 +165,7 @@ export class MiddlewareR {
         return [];
       }
 
-      const current = alemonjsCore.storeChildrenApp[key].register?.middleware?.current;
-
-      if (!current) {
-        return [];
-      }
-
-      const currents = Array.isArray(current) ? current : [current];
-
-      return currents;
+      return alemonjsCore.storeChildrenApp[key].register?.middleware?.current ?? [];
     });
 
     return data.flat();
@@ -347,6 +339,7 @@ export class ChildrenApp {
    */
   un() {
     // 清理
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete alemonjsCore.storeChildrenApp[this.#name];
   }
 

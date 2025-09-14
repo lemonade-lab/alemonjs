@@ -1,1 +1,5 @@
 port: 17117
+
+mapping_text:
+  - regular: '/abc'
+    target: '/image'

@@ -54,31 +54,10 @@ export type OnMiddlewareReversalFunc = <T extends EventKeys, C extends Current<T
  */
 export type OnMiddlewareReversalFuncBack = <C extends Current<T> | Current<T>[], T extends EventKeys>(callback: C, select: T | T[]) => OnMiddlewareValue<C, T>;
 
-/**
- *
- */
 export type OnMiddlewareValue<C, T extends EventKeys> = {
   current: C; // current 类型直接使用 callback 的类型
   select: T | T[];
 };
-
-export type ResponseRoute = {
-  regular?: RegExp;
-  selects?: EventKeys | EventKeys[];
-  handler: () => Promise<any>;
-  children?: ResponseRoute[];
-};
-
-export type DefineResponseFunc = (responses: ResponseRoute[]) => { current: ResponseRoute[] };
-
-// export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc>, middleware?: ReturnType<OnMiddlewareFunc> } | void;
-export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc> } | void;
-
-export type childrenCallback = ChildrenCycle & {
-  register?: () => (childrenCallbackRes | void) | Promise<childrenCallbackRes | void>;
-};
-
-export type DefineChildrenCallback = (() => Promise<childrenCallback> | childrenCallback) | childrenCallback;
 
 /**
  * 定义子模块
@@ -119,3 +98,22 @@ export type OnDataFormatFunc = (...data: DataEnums[]) => DataEnums[];
 export type OnGroupItem<C = any, T extends EventKeys = EventKeys> = OnResponseValue<C, T> | OnMiddlewareValue<C, T>;
 
 export type OnGroupFunc = <C, T extends EventKeys, TFirst extends OnGroupItem<C, T>>(...calls: [TFirst, ...Array<TFirst>]) => TFirst;
+
+export type ResponseRoute = {
+  regular?: RegExp;
+  selects?: EventKeys | EventKeys[];
+  handler: () => Promise<any>;
+  children?: ResponseRoute[];
+};
+
+export type DefineResponseFunc = (responses: ResponseRoute[]) => { current: ResponseRoute[] };
+
+export type defineMiddlewareFunc = (middleware: ResponseRoute[]) => { current: ResponseRoute[] };
+
+export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc>; middleware?: ReturnType<defineMiddlewareFunc> } | void;
+
+export type childrenCallback = ChildrenCycle & {
+  register?: () => (childrenCallbackRes | void) | Promise<childrenCallbackRes | void>;
+};
+
+export type DefineChildrenCallback = (() => Promise<childrenCallback> | childrenCallback) | childrenCallback;

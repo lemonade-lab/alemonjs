@@ -5,6 +5,7 @@ export * from './global.js';
 // 导出内部模块
 export * from './app/define-chidren.js';
 export * from './app/define-response.js';
+export * from './app/define-middleware.js';
 export * from './app/event-group.js';
 export * from './app/event-middleware';
 export * from './app/event-processor';

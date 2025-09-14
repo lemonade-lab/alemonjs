@@ -11,7 +11,7 @@ import { showErrorModule } from '../core/utils';
 import { Response } from './store';
 import { EventMessageText } from '../core/variable';
 import { expendEventRoute } from './event-processor-event-route';
-import { createCallHandler } from './event-processor-event-callHandler';
+import { createCallHandler } from './event-processor-callHandler';
 
 /**
  * 消息体处理机制

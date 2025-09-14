@@ -343,7 +343,7 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
  */
 export const useSend = <T extends EventKeys>(event: Events[T]) => {
   const [message] = useMessage(event);
-  const send = async (...val: DataEnums[]) => {
+  const send = (...val: DataEnums[]) => {
     return message.send(val);
   };
 

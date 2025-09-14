@@ -7,7 +7,8 @@ import {
   OnResponseReversalFuncBack,
   OnGroupFunc,
   OnMiddlewareReversalFuncBack,
-  DefineResponseFunc
+  DefineResponseFunc,
+  defineMiddlewareFunc
 } from './types/event';
 import { StoreChildrenApp } from './types/store/res';
 import { StateSubscribeMap, SubscribeKeysMap } from './types/subscribe';
@@ -79,6 +80,10 @@ declare global {
    */
   var defineResponse: DefineResponseFunc;
   /**
+   * 定义中间件
+   */
+  var defineMiddleware: defineMiddlewareFunc;
+  /**
    * 定义选择器
    */
   var onSelects: OnSelectsFunc;
@@ -88,6 +93,7 @@ declare global {
   var format: OnDataFormatFunc;
   /**
    * 定义一组标准执行
+   * @deprecated 废弃
    */
   var onGroup: OnGroupFunc;
   // eslint-disable-next-line @typescript-eslint/no-namespace

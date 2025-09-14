@@ -10,7 +10,8 @@ import { useState } from './hook-use-state';
 import { showErrorModule } from '../core/utils';
 import { Middleware } from './store';
 import { EventMessageText } from '../core/variable';
-import { createMiddlewareCallHandler } from './event-processor-middleware-callHandler';
+import { expendMiddlewareRoute } from './event-processor-middleware-route';
+import { createCallHandler } from './event-processor-callHandler';
 
 /**
  * 处理中间件
@@ -18,29 +19,6 @@ import { createMiddlewareCallHandler } from './event-processor-middleware-callHa
  * @param select
  */
 export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
-  // const mdR = new MiddlewareR();
-
-  // const r = mdR.value;
-
-  // let index = 0;
-
-  // const nextMiddlewareR = (cn?: boolean, ...cns: boolean[]) => {
-  //   if (cn) {
-  //     next(...cns);
-
-  //     return;
-  //   }
-
-  //   if (index >= r.length) {
-  //     next();
-
-  //     return;
-  //   }
-
-  //   const route = r[index];
-  //   index++;
-  // };
-
   const mw = new Middleware();
   // 得到所有 mws
   const mwFiles = mw.value;
@@ -48,7 +26,7 @@ export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], sel
   let valueI = 0;
   // let valueJ = 0
 
-  const callHandler = createMiddlewareCallHandler(valueEvent);
+  const callHandler = createCallHandler(valueEvent);
 
   /**
    * 下一步
@@ -150,5 +128,5 @@ export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], sel
   };
 
   // 开始修正模式
-  nextMiddleware();
+  expendMiddlewareRoute(valueEvent, select, nextMiddleware);
 };

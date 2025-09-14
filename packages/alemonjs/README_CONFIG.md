@@ -30,8 +30,12 @@ disabled_user_id:
 disabled_user_key:
   '123456': true # 多匹配则禁用
 # 重定向：把指定的文本，转为指定的内容 （禁用规则比重定向优先）
-redirect_regular: '^#' # 识别前缀 #
-redirect_target: '/' # 替换为 /
+redirect_text_regular: '^#' # 识别前缀 #
+redirect_text_target: '/' # 替换为 /
+# 映射规则
+mapping_text:
+  - regular: '/开始游戏'
+    target: '/踏入仙途'
 # ismaster 设置
 master_id:
   '1715713638': true

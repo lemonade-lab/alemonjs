@@ -1,11 +1,14 @@
 import response from './res';
+import middleware from './mw';
 
 export default defineChildren({
   // 注册
   register() {
     return {
       // 注册响应体
-      response
+      response,
+      // 注册中间件
+      middleware
     };
   },
   onCreated() {

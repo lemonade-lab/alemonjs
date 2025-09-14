@@ -3,6 +3,7 @@ import { OnGroupFunc } from '../types';
 /**
  * 定义一组标准执行导出
  * @param calls
+ * @deprecated 废弃
  * @returns
  */
 const onGroup: OnGroupFunc = (...calls) => {

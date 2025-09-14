@@ -7,13 +7,13 @@
  */
 import { isAsyncFunction } from 'util/types';
 import { Next, Events, EventKeys, ResponseRoute } from '../types';
-import { ResponseRouter } from './store';
+import { MiddlewareRouter } from './store';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
 import { createCallHandler } from './event-processor-callHandler';
 
-export const expendEventRoute = <T extends EventKeys>(valueEvent: Events[T], select: T, nextCycle: Next) => {
-  const resRoute = new ResponseRouter();
+export const expendMiddlewareRoute = <T extends EventKeys>(valueEvent: Events[T], select: T, nextCycle: Next) => {
+  const resRoute = new MiddlewareRouter();
 
   const routes = resRoute.value;
 

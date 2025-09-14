@@ -100,24 +100,43 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
   const disabledUserId = value?.disabled_user_id ?? {};
 
+  // 检查用户禁用规则
   if (event['UserId'] && disabledUserId[event['UserId']]) {
     return;
   }
 
   const disabledUserKey = value?.disabled_user_key ?? {};
 
+  // 检查用户禁用规则
   if (event['UserKey'] && disabledUserKey[event['UserKey']]) {
     return;
   }
 
-  const redirectRegular = value?.redirect_regular;
-  const redirectTarget = value?.redirect_target;
+  const redirectRegular = value?.redirect_regular ?? value?.redirect_text_regular;
+  const redirectTarget = value?.redirect_target ?? value?.redirect_text_target;
 
+  // 检查文本重定向规则
   if (redirectRegular && redirectTarget && event['MessageText']) {
     const reg = new RegExp(redirectRegular);
 
     if (reg.test(event['MessageText'])) {
       event['MessageText'] = event['MessageText'].replace(reg, redirectTarget);
+    }
+  }
+
+  const mappingText = value?.mapping_text ?? [];
+
+  // 检查文本映射规则
+  for (const mapping of mappingText) {
+    const { regular, target } = mapping ?? {};
+
+    if (!regular) {
+      continue;
+    }
+    const reg = new RegExp(regular);
+
+    if (reg.test(event['MessageText'])) {
+      event['MessageText'] = event['MessageText'].replace(reg, target);
     }
   }
 
