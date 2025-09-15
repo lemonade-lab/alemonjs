@@ -8892,7 +8892,27 @@ lru.min@^1.0.0:
   resolved "https://registry.npmmirror.com/lru.min/-/lru.min-1.1.2.tgz#01ce1d72cc50c7faf8bd1f809ebf05d4331021eb"
   integrity sha512-Nv9KddBcQSlQopmBHXSsZVY5xsdlZkdH/Iey0BlcBYggMd4two7cZnKOK9vmy3nY0O5RGH99z1PCeTpPqszUYg==
 
-lvyjs@0.2.20, lvyjs@^0.2.20:
+lvyjs@0.2.21:
+  version "0.2.21"
+  resolved "https://registry.npmmirror.com/lvyjs/-/lvyjs-0.2.21.tgz#0022a9ec52a1bbaec0dc4434c72d44753e8e2ec4"
+  integrity sha512-pjpVHM4YDm3WPJWyrfjLQVEjOLPX6wkmux/899dY+zyEsbHMhByo/DhCEkIf6KF+ICN1y2LemjpwShFHqj+u0A==
+  dependencies:
+    "@rollup/plugin-alias" "^5.1.0"
+    "@rollup/plugin-commonjs" "^28.0.0"
+    "@rollup/plugin-json" "^6.1.0"
+    "@rollup/plugin-typescript" "^11.1.6"
+    "@rollup/pluginutils" "^5.1.3"
+    autoprefixer "^10.4.20"
+    postcss "^8.4.47"
+    postcss-import "^16.1.0"
+    postcss-url "^10.1.3"
+    rollup "^4.18.1"
+    rollup-plugin-dts "^6.1.1"
+    rollup-plugin-styles "^4.0.0"
+    tsx "^4.19.1"
+    typescript "^5.5.3"
+
+lvyjs@^0.2.20:
   version "0.2.20"
   resolved "https://registry.npmmirror.com/lvyjs/-/lvyjs-0.2.20.tgz#2ed2420304293645c8311468bbffdf4ab1224ef0"
   integrity sha512-UevDGOdM8UNnI09xTzNsscNCLTrBj/CYGEXQfDq6k5b75eUVKTfoz1vG6eKSsL5ORlyBkKMf0fGKVi1+cdt5Xg==

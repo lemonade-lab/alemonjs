@@ -35,7 +35,7 @@
     "eslint-plugin-react": "^7.37.3",
     "globals": "^16",
     "lint-staged": "^16.1.5",
-    "lvyjs": "0.2.20",
+    "lvyjs": "0.2.21",
     "typescript-eslint": "^8.19.1"
   },
   "private": true,

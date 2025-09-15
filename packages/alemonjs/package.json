@@ -7,7 +7,7 @@
   "type": "module",
   "main": "lib/index.js",
   "scripts": {
-    "build": "node bundle.js"
+    "build": "lvy build"
   },
   "types": "lib",
   "exports": {

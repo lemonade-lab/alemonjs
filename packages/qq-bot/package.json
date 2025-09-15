@@ -7,7 +7,7 @@
   "type": "module",
   "main": "lib/index.js",
   "scripts": {
-    "build": "node bundle.js"
+    "build": "lvy build"
   },
   "dependencies": {
     "axios": "^1.4.0",

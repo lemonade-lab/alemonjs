@@ -10,7 +10,7 @@
     "url": "https://github.com/ningmengchongshui"
   },
   "scripts": {
-    "build": "node bundle.js"
+    "build": "lvy build"
   },
   "exports": {
     ".": "./lib/index.js",
