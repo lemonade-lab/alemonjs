@@ -94,54 +94,30 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 
 ## 平台支持情况
 
-| Project                | Status                      | Description |
-| ---------------------- | --------------------------- | ----------- |
-| 👉[@alemonjs/gui]      | [![gui-s]][gui-p]           | 测试平台    |
-| 👉[@alemonjs/qq-bot]   | [![qq-bot-s]][qq-bot-p]     | QQbot       |
-| 👉[@alemonjs/discord]  | [![discord-s]][discord-p]   | discord     |
-| 👉[@alemonjs/kook]     | [![kook-s]][kook-p]         | KOOK        |
-| 👉[@alemonjs/telegram] | [![telegram-s]][telegram-p] | telegram    |
-| 👉[@alemonjs/onebot]   | [![onebot-s]][onebot-p]     | onebot      |
-| 👉[@alemonjs/wechat]   | [![wechat-s]][wechat-p]     | wechat      |
+| Project               | Status                    | Description |
+| --------------------- | ------------------------- | ----------- |
+| 👉[@alemonjs/qq-bot]  | [![qq-bot-s]][qq-bot-p]   | QQbot       |
+| 👉[@alemonjs/discord] | [![discord-s]][discord-p] | discord     |
+| 👉[@alemonjs/onebot]  | [![onebot-s]][onebot-p]   | onebot      |
 
-[alemonjs]: https://github.com/lemonade-lab/alemonjs
-[a-s]: https://img.shields.io/npm/v/alemonjs.svg
-[a-p]: https://www.npmjs.com/package/alemonjs
-[@alemonjs/gui]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/gui
-[gui-s]: https://img.shields.io/npm/v/@alemonjs/gui.svg
-[gui-p]: https://www.npmjs.com/package/@alemonjs/gui
 [@alemonjs/qq-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-bot
 [qq-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-bot.svg
 [qq-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-bot
 [@alemonjs/discord]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/discord
 [discord-s]: https://img.shields.io/npm/v/@alemonjs/discord.svg
 [discord-p]: https://www.npmjs.com/package/@alemonjs/discord
-[@alemonjs/kook]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/kook
-[kook-s]: https://img.shields.io/npm/v/@alemonjs/kook.svg
-[kook-p]: https://www.npmjs.com/package/@alemonjs/kook
-[@alemonjs/telegram]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/telegram
-[telegram-s]: https://img.shields.io/npm/v/@alemonjs/telegram.svg
-[telegram-p]: https://www.npmjs.com/package/@alemonjs/telegram
-[@alemonjs/qq]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq
-[qq-s]: https://img.shields.io/npm/v/@alemonjs/qq.svg
-[qq-p]: https://www.npmjs.com/package/@alemonjs/qq
 [@alemonjs/onebot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/onebot
 [onebot-s]: https://img.shields.io/npm/v/@alemonjs/onebot.svg
 [onebot-p]: https://www.npmjs.com/package/@alemonjs/onebot
-[@alemonjs/wechat]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/wechat
-[wechat-s]: https://img.shields.io/npm/v/@alemonjs/wechat.svg
-[wechat-p]: https://www.npmjs.com/package/@alemonjs/wechat
 
 ## 生态列表
 
-| Project            | Status | Description                 |
-| ------------------ | ------ | --------------------------- |
-| 👉[vscode-gui]     |        | VsCode 扩展：可视化测试环境 |
-| 👉[nodejs-dev]     |        | 开发环境                    |
-| 👉[nodejs-desktop] |        | 桌面版                      |
-| 👉[alemongo]       |        | WEB 一站式面板              |
+| Project            | Status | Description |
+| ------------------ | ------ | ----------- |
+| 👉[nodejs-dev]     |        | 开发环境    |
+| 👉[nodejs-desktop] |        | 桌面端版本  |
+| 👉[alemongo]       |        | 服务端版本  |
 
-[vscode-gui]: https://marketplace.visualstudio.com/items?itemName=lemonade-x.alemonjs-gui
 [nodejs-dev]: https://github.com/lemonade-lab/lvyjs
 [nodejs-desktop]: https://github.com/lemonade-lab/alemonjs-desktop
 [alemongo]: https://github.com/lemonade-lab/alemongo

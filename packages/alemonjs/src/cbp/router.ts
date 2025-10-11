@@ -62,19 +62,19 @@ router.all('app/{*path}', async ctx => {
 
     try {
       const dir = join(mainDir, 'route', ctx.path?.replace(apiPath, '/api') || '');
-      const dirs = dir.split('/');
-      const fileName = dirs[dirs.length - 1];
 
-      if (fileName.includes('.')) {
+      // 检查路径是否存在且是文件（而不是目录）
+      if (existsSync(dir) && fs.statSync(dir).isFile()) {
         ctx.status = 404;
         ctx.body = {
           code: 404,
           message: `API '${ctx.path}' 未找到。`,
-          data: 'existsSync route filename'
+          data: 'route path is file not directory'
         };
 
         return;
       }
+
       const modulePath = getModuelFile(dir);
 
       if (!modulePath) {
@@ -191,19 +191,19 @@ router.all('apps/:app/{*path}', async ctx => {
         mainDirMap.set(appName, mainDir);
       }
       const dir = join(mainDirMap.get(appName), 'route', ctx.path?.replace(apiPath, '/api') || '');
-      const dirs = dir.split('/');
-      const fileName = dirs[dirs.length - 1];
 
-      if (fileName.includes('.')) {
+      // 检查路径是否存在且是文件（而不是目录）
+      if (existsSync(dir) && fs.statSync(dir).isFile()) {
         ctx.status = 404;
         ctx.body = {
           code: 404,
           message: `API 'route/${ctx.path}' 未找到。`,
-          data: null
+          data: 'route path is file not directory'
         };
 
         return;
       }
+
       const modulePath = getModuelFile(dir);
 
       if (!modulePath) {
