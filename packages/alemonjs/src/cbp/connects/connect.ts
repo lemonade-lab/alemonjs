@@ -1,5 +1,5 @@
-import { ResultCode } from '../core/variable';
-import { HEARTBEAT_INTERVAL } from './config';
+import { ResultCode } from '../../core';
+import { HEARTBEAT_INTERVAL } from '../processor/config';
 
 // 心跳
 export const useHeartbeat = ({ ping, isConnected, terminate }) => {

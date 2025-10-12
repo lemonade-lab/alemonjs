@@ -1,26 +1,17 @@
 import { IncomingMessage } from 'http';
 import { WebSocket } from 'ws';
 import * as flattedJSON from 'flatted';
-import { ParsedMessage } from './typings';
-import { onProcessor } from '../app/event-processor';
 import { dirname, join } from 'path';
 import { existsSync, readFileSync, watch, mkdirSync, writeFile } from 'fs';
 import _ from 'lodash';
 import { readFile } from 'fs/promises';
-import { actionResolves, actionTimeouts, apiResolves, apiTimeouts } from './config';
-import { ResultCode } from '../core/variable';
-import { createResult } from '../core/utils';
+import type { ParsedMessage } from '../typings';
 
 /**
  * @param ws
  * @param request
  */
-export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
-  if (global.testoneClient) {
-    delete global.testoneClient;
-  }
-  global.testoneClient = ws;
-
+export const createTestOneController = (ws: WebSocket, _request: IncomingMessage) => {
   // 确保目录存在
   const testonePath = join(process.cwd(), 'testone');
 
@@ -58,7 +49,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       .then(data => {
         const commands = JSON.parse(data);
 
-        global.testoneClient?.send(
+        ws?.send(
           flattedJSON.stringify({
             type: 'commands',
             payload: commands
@@ -79,7 +70,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       .then(data => {
         const users = JSON.parse(data);
 
-        global.testoneClient?.send(
+        ws?.send(
           flattedJSON.stringify({
             type: 'users',
             payload: users
@@ -100,7 +91,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       .then(data => {
         const channels = JSON.parse(data);
 
-        global.testoneClient?.send(
+        ws?.send(
           flattedJSON.stringify({
             type: 'channels',
             payload: channels
@@ -122,7 +113,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       .then(data => {
         const user = JSON.parse(data);
 
-        global.testoneClient?.send(
+        ws?.send(
           flattedJSON.stringify({
             type: 'user',
             payload: user
@@ -144,7 +135,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       .then(data => {
         const bot = JSON.parse(data);
 
-        global.testoneClient?.send(
+        ws?.send(
           flattedJSON.stringify({
             type: 'bot',
             payload: bot
@@ -173,7 +164,7 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       const privateMessage = existsSync(privateMessagePath) ? JSON.parse(readFileSync(privateMessagePath, 'utf-8')) : [];
       const publicMessage = existsSync(publicMessagePath) ? JSON.parse(readFileSync(publicMessagePath, 'utf-8')) : [];
 
-      global.testoneClient?.send(
+      ws?.send(
         flattedJSON.stringify({
           type: 'init.data',
           payload: {
@@ -223,60 +214,9 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
     });
   };
 
-  // 处理消息事件
-  global.testoneClient.on('message', (message: string) => {
-    try {
-      // 解析消息
-      const parsedMessage: ParsedMessage = flattedJSON.parse(message.toString());
-
-      // 如果是一个对象，且有 name 属性，说明是一个事件请求
-      if (parsedMessage.name) {
-        // 如果有 name，说明是一个事件请求。要进行处理
-        onProcessor(parsedMessage.name, parsedMessage as any, parsedMessage.value);
-        // 消息写入
-      } else if (parsedMessage?.actionId) {
-        // 如果有 actionId
-        const resolve = actionResolves.get(parsedMessage.actionId);
-
-        if (resolve) {
-          actionResolves.delete(parsedMessage.actionId);
-          // 清除超时器
-          const timeout = actionTimeouts.get(parsedMessage.actionId);
-
-          if (timeout) {
-            actionTimeouts.delete(parsedMessage.actionId);
-            clearTimeout(timeout);
-          }
-          // 调用回调函数
-          if (Array.isArray(parsedMessage.payload)) {
-            resolve(parsedMessage.payload);
-          } else {
-            // 错误处理
-            resolve([createResult(ResultCode.Fail, '消费处理错误', null)]);
-          }
-        }
-      } else if (parsedMessage?.apiId) {
-        // 如果有 apiId，说明是一个接口请求。要进行处理
-        const resolve = apiResolves.get(parsedMessage.apiId);
-
-        if (resolve) {
-          apiResolves.delete(parsedMessage.apiId);
-          // 清除超时器
-          const timeout = apiTimeouts.get(parsedMessage.apiId);
-
-          if (timeout) {
-            apiTimeouts.delete(parsedMessage.apiId);
-            clearTimeout(timeout);
-          }
-          // 调用回调函数
-          if (Array.isArray(parsedMessage.payload)) {
-            resolve(parsedMessage.payload);
-          } else {
-            // 错误处理
-            resolve([createResult(ResultCode.Fail, '接口处理错误', null)]);
-          }
-        }
-      } else if (parsedMessage.type === 'init.data') {
+  const controller = {
+    onMessage: (parsedMessage: ParsedMessage) => {
+      if (parsedMessage.type === 'init.data') {
         initData();
       } else if (parsedMessage.type === 'commands') {
         onCommands();
@@ -301,14 +241,16 @@ export const connectionTestOne = (ws: WebSocket, _request: IncomingMessage) => {
       } else if (parsedMessage.type === 'public.message.save') {
         onSaveMessage('public', parsedMessage.payload);
       }
-    } catch (error) {
-      logger.error('客户端解析消息失败:', error);
+    },
+    close: () => {
+      logger.info('WebSocket connection closed');
+      dirWatcher.close();
+    },
+    error: (err: Error) => {
+      logger.error('WebSocket error:', err);
+      dirWatcher.close();
     }
-  });
+  };
 
-  // 处理关闭事件
-  global.testoneClient.on('close', () => {
-    logger.info('WebSocket connection closed');
-    dirWatcher.close();
-  });
+  return controller;
 };

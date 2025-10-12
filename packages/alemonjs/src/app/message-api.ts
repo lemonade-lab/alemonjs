@@ -1,6 +1,6 @@
 import { DataEnums, OnDataFormatFunc } from '../types';
 import { ResultCode } from '../core/variable';
-import { sendAction } from '../cbp/actions';
+import { sendAction } from '../cbp/processor/actions';
 
 type BaseMap = {
   [key: string]: any;

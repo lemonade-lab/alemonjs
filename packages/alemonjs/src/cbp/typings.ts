@@ -1,7 +1,6 @@
-import { EventKeys } from '../types';
-import { Actions } from '../types/actions';
-import { Result } from '../core/utils';
-import { Apis } from '../types/apis';
+import type { EventKeys, Apis, Actions } from '../types';
+import type { Result } from '../core';
+
 export type ParsedMessage = {
   apiId?: string;
   actionId?: string;
@@ -18,9 +17,12 @@ export type ParsedMessage = {
   // 其他信息
   [key: string]: any;
 };
+
 export type CBPClientOptions = {
   open?: () => void;
   isFullReceive?: boolean; // 是否全量接收
 };
+
 export type ActionReplyFunc = (data: Actions, consume: (payload: Result[]) => void) => void;
+
 export type ApiReplyFunc = (data: Apis, consume: (payload: Result[]) => void) => void;

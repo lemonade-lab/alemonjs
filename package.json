@@ -35,7 +35,7 @@
     "eslint-plugin-react": "^7.37.3",
     "globals": "^16",
     "lint-staged": "^16.1.5",
-    "lvyjs": "0.2.21",
+    "lvyjs": "0.2.22",
     "typescript-eslint": "^8.19.1"
   },
   "private": true,
@@ -43,5 +43,6 @@
     "clis/*",
     "frontends/*",
     "packages/*"
-  ]
+  ],
+  "packageManager": "yarn@1.22.22"
 }

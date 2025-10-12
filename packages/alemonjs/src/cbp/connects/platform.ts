@@ -1,13 +1,10 @@
-import { WebSocket } from 'ws';
-import { Actions } from '../types/actions';
-import { ResultCode } from '../core/variable';
-import { EventsEnum } from '../types';
-import { DEVICE_ID_HEADER, deviceId, reconnectInterval, USER_AGENT_HEADER } from './config';
-import { Result } from '../core/utils';
-import { Apis } from '../types/apis';
 import * as flattedJSON from 'flatted';
+import { WebSocket } from 'ws';
+import { DEVICE_ID_HEADER, deviceId, reconnectInterval, USER_AGENT_HEADER } from '../processor/config';
+import { Result, ResultCode } from '../../core';
 import { useHeartbeat } from './connect';
-import { ActionReplyFunc, ApiReplyFunc } from './typings';
+import type { Actions, Apis, EventsEnum } from '../../types';
+import type { ActionReplyFunc, ApiReplyFunc } from '../typings';
 
 /**
  * CBP 平台端

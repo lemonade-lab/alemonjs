@@ -1,4 +1,4 @@
-import { Image, Text, useMessage } from 'alemonjs';
+import { Image, useMessage } from 'alemonjs';
 import img_url from '../../asstes/alemonjs.png';
 import { readFileSync } from 'fs';
 export const regular = /^(#|\/)?image$/;

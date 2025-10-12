@@ -4,7 +4,7 @@
  * 出现不同位置的模块也读取同一个数据
  * @description 存储器
  */
-import { SinglyLinkedList } from '../datastructure/SinglyLinkedList';
+import { SinglyLinkedList } from './SinglyLinkedList';
 import { childrenCallbackRes, ChildrenCycle, EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
@@ -401,4 +401,22 @@ export class ChildrenApp {
 }
 
 export const ProcessorEventAutoClearMap = new Map();
+
 export const ProcessorEventUserAudoClearMap = new Map();
+
+// 初始化日志
+export const logger = new Logger().value;
+
+// 初始化核心数据
+export const core = new Core().value;
+
+// 监听退出
+['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
+  process?.on?.(sig, () => {
+    setImmediate(() => process.exit(0));
+  });
+});
+
+process?.on?.('exit', code => {
+  logger?.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
+});

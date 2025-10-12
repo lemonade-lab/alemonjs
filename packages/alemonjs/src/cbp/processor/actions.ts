@@ -1,8 +1,8 @@
-import { ResultCode } from '../core/variable';
-import { createResult, Result } from '../core/utils';
-import { Actions } from '../types/actions';
-import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config';
 import * as flattedJSON from 'flatted';
+import { ResultCode, createResult, Result } from '../../core';
+import type { Actions } from '../../types';
+import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config';
+
 /**
  * 发送行为
  * @param data
@@ -15,16 +15,8 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
     data.actionId = actionId;
     // 设置设备 ID
     data.DeviceId = deviceId;
-    // 沙盒模式
-    if (global.sandbox) {
-      if (!global.testoneClient) {
-        return resolve([createResult(ResultCode.Fail, '未连接到客户端', null)]);
-      }
-      // 发送消息
-      global.testoneClient.send(flattedJSON.stringify(data));
-    } else {
-      global.chatbotClient.send(flattedJSON.stringify(data));
-    }
+    // 发送数据
+    global.chatbotClient.send(flattedJSON.stringify(data));
     // 设置回调函数
     actionResolves.set(actionId, resolve);
     // 超时

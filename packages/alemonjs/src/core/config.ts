@@ -1,7 +1,7 @@
 import { readFileSync, existsSync, watch, writeFileSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 import YAML from 'yaml';
-import { Package } from '../types/package';
+import type { Package } from '../types';
 import { ResultCode } from './variable';
 
 /**

@@ -1,16 +1,15 @@
 import { fork } from 'child_process';
 import { createRequire } from 'module';
+import { existsSync } from 'fs';
+import { join } from 'path';
 
 const require = createRequire(import.meta.url);
 
 /**
- * 启动平台平台连接，优先使用子进程（fork），如不支持或平台连接未响应，则自动降级为 import 动态加载。
- * 自动兼容新老版本平台连接。
- * @param modulePath 平台连接模块绝对路径（require.resolve 得到的）
- * @param env 环境变量对象
- * @param logger 日志对象（需实现 info/warn/error）
+ * 启动平台连接进程，优先 fork，失败后降级为 import
+ * @returns
  */
-export function startAdapterWithFallback() {
+export function startPlatformAdapterWithFallback() {
   let modulePath = '';
 
   try {
@@ -49,7 +48,10 @@ export function startAdapterWithFallback() {
     };
 
     try {
-      child = fork(modulePath);
+      // 继承主进程的 execArgv，包括任何自定义的 loader 配置
+      child = fork(modulePath, [], {
+        execArgv: process.execArgv
+      });
 
       // 超时
       const checkTimeout = async () => {

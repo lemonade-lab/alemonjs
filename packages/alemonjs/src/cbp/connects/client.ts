@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
-import { onProcessor } from '../app/event-processor';
-import { ResultCode } from '../core/variable';
+import * as flattedJSON from 'flatted';
+import { onProcessor } from '../../app/index';
+import { ResultCode, createResult } from '../../core';
 import {
   actionResolves,
   actionTimeouts,
@@ -11,10 +12,8 @@ import {
   FULL_RECEIVE_HEADER,
   reconnectInterval,
   USER_AGENT_HEADER
-} from './config';
-import { createResult } from '../core/utils';
-import * as flattedJSON from 'flatted';
-import { CBPClientOptions, ParsedMessage } from './typings';
+} from '../processor/config';
+import type { CBPClientOptions, ParsedMessage } from '../typings';
 import { useHeartbeat } from './connect';
 
 /**
@@ -135,6 +134,7 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
             }
           }
         } else if (parsedMessage.name) {
+          console.log('--- parsedMessage ----', parsedMessage);
           // 如果有 name，说明是一个事件请求。要进行处理
           onProcessor(parsedMessage.name, parsedMessage as any, parsedMessage.value);
         }

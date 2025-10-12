@@ -2,8 +2,8 @@ import { DataEnums, EventKeys, Events, User } from '../types';
 import { ResultCode } from '../core/variable';
 import { ChildrenApp } from './store';
 import { createResult, Result } from '../core/utils';
-import { sendAction } from '../cbp/actions';
-import { sendAPI } from '../cbp/api';
+import { sendAction } from '../cbp/processor/actions';
+import { sendAPI } from '../cbp/processor/api';
 
 type Options = {
   UserId?: string;

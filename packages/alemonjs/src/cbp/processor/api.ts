@@ -1,7 +1,6 @@
-import { ResultCode } from '../core/variable';
-import { createResult, Result } from '../core/utils';
+import { ResultCode, createResult, Result } from '../../core';
 import { apiTimeouts, apiResolves, deviceId, generateUniqueId, timeoutTime } from './config';
-import { Apis } from '../types/apis';
+import type { Apis } from '../../types';
 import * as flattedJSON from 'flatted';
 
 /**
@@ -16,21 +15,10 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
     data.apiId = ApiId;
     // 设置设备 ID
     data.DeviceId = deviceId;
-
-    // 沙盒模式
-    if (global.sandbox) {
-      if (!global.testoneClient) {
-        return resolve([createResult(ResultCode.Fail, '未连接到客户端', null)]);
-      }
-      // 发送消息
-      global.testoneClient.send(flattedJSON.stringify(data));
-    } else {
-      // 发送消息
-      global.chatbotClient.send(flattedJSON.stringify(data));
-    }
-
+    // 发送消息
+    global.chatbotClient.send(flattedJSON.stringify(data));
+    // 设置回调函数
     apiResolves.set(ApiId, resolve);
-
     // 超时
     const timeout = setTimeout(() => {
       // 被清理了

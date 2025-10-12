@@ -1,4 +1,4 @@
-import {
+import type {
   DefineChildrenFunc,
   OnResponseReversalFunc,
   OnMiddlewareReversalFunc,
@@ -8,13 +8,14 @@ import {
   OnGroupFunc,
   OnMiddlewareReversalFuncBack,
   DefineResponseFunc,
-  defineMiddlewareFunc
-} from './types/event';
-import { StoreChildrenApp } from './types/store/res';
-import { StateSubscribeMap, SubscribeKeysMap } from './types/subscribe';
-import { LoggerUtils } from './types/logger/index';
-import { ResponseState } from './types/state';
-import { Core, Logger } from './app/store';
+  defineMiddlewareFunc,
+  StoreChildrenApp,
+  StateSubscribeMap,
+  SubscribeKeysMap,
+  LoggerUtils,
+  ResponseState
+} from './types';
+
 import WebSocket, { Server } from 'ws';
 import { IncomingMessage } from 'http';
 
@@ -107,9 +108,3 @@ declare global {
     }
   }
 }
-
-// 初始化日志
-export const logger = new Logger().value;
-
-// 初始化核心数据
-export const core = new Core().value;
