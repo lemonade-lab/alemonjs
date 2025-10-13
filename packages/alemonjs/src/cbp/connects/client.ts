@@ -134,7 +134,6 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
             }
           }
         } else if (parsedMessage.name) {
-          console.log('--- parsedMessage ----', parsedMessage);
           // 如果有 name，说明是一个事件请求。要进行处理
           onProcessor(parsedMessage.name, parsedMessage as any, parsedMessage.value);
         }

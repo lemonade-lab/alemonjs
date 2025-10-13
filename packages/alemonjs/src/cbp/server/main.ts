@@ -272,7 +272,6 @@ const setPlatformClient = (originId: string, ws: WebSocket) => {
 
   // 得到平台客户端的消息
   ws.on('message', (message: string) => {
-    console.log('平台消息', message);
     try {
       // 解析消息
       const parsedMessage: ParsedMessage = JSON.parse(message.toString());

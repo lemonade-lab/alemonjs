@@ -84,7 +84,7 @@ export const activate = (context: Context) => {
         });
       }
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   });
 };

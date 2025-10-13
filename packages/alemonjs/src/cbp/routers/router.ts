@@ -99,7 +99,7 @@ router.all('app/{*path}', async ctx => {
 
       await runMiddlewares(middlewares, ctx, handler);
     } catch (err) {
-      console.error(`Error handling API request ${ctx.path}`);
+      logger.error(`Error handling API request ${ctx.path}`);
       ctx.status = 500;
       ctx.body = {
         code: 500,

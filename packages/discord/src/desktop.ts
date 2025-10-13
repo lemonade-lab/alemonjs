@@ -56,7 +56,7 @@ export const activate = context => {
         });
       }
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   });
 };

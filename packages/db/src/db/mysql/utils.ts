@@ -28,7 +28,7 @@ export const logging = (sql: string) => {
 
   appendFile(join(dir, `${TIME}.log`), `${time}\n${sql}\n`, err => {
     if (err) {
-      console.error('Error writing to log file:', err);
+      logger.error('Error writing to log file:', err);
     }
   });
 
