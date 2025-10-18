@@ -1,6 +1,23 @@
 import { cbpClient, loadModels } from './index';
 import { defaultPort } from './core/variable';
+import { createServer } from './server/main';
 
+// 应用服务器
+const mainServer = () => {
+  // 只有设置了 serverPort 时才启动应用服务器
+  const port = process.env.serverPort;
+
+  if (!port) {
+    return;
+  }
+  createServer(port, () => {
+    const httpURL = `http://127.0.0.1:${port}`;
+
+    logger.info(`应用服务器: ${httpURL}`);
+  });
+};
+
+// 连接 CBP 服务器
 const main = () => {
   const login = process.env.login ?? '';
   const platform = process.env.platform ?? '';
@@ -40,6 +57,8 @@ const mainProcess = () => {
 
       if (data?.type === 'start') {
         main();
+        // 启动内部服务器
+        mainServer();
       } else if (data?.type === 'stop') {
         process.exit(0);
       }
@@ -53,5 +72,3 @@ const mainProcess = () => {
 };
 
 mainProcess();
-
-export default main;

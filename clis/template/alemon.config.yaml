@@ -1,4 +1,7 @@
+# cbp端口
 port: 17117
+# 路由端口
+# serverPort: 18117
 
 mapping_text:
   - regular: '/abc'

@@ -83,9 +83,11 @@ export const start = (options: StartOptions | string = {}) => {
 
   // 得到端口号
   const port = createOptionsByKey(options, 'port', defaultPort);
+  const serverPort = createOptionsByKey(options, 'serverPort', '');
 
   // 设置环境变量
   process.env.port = port;
+  process.env.serverPort = serverPort;
 
   cbpServer(port, () => {
     const httpURL = `http://127.0.0.1:${port}`;
