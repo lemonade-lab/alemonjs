@@ -1,7 +1,6 @@
 import { fork } from 'child_process';
 import { createRequire } from 'module';
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { ResultCode } from 'core';
 
 const require = createRequire(import.meta.url);
 
@@ -16,7 +15,11 @@ export function startPlatformAdapterWithFallback() {
     modulePath = require.resolve(process.env.platform);
   } catch {
     void import(process.env.platform).then(res => res?.default());
-    logger?.warn?.('平台连接包未支持 require，降级为 import 加载, 请升级对应的平台连接包以提高进程稳定性');
+    logger?.warn?.({
+      code: ResultCode.Fail,
+      message: '平台连接包未支持 require，降级为 import 加载, 请升级对应的平台连接包以提高进程稳定性',
+      data: null
+    });
 
     return;
   }
@@ -56,7 +59,11 @@ export function startPlatformAdapterWithFallback() {
       // 超时
       const checkTimeout = async () => {
         if (!ready && !imported) {
-          logger?.warn?.('平台连接未及时响应（未发送 ready 消息），降级为 import 加载, 请升级对应的平台连接包以提高进程稳定性');
+          logger?.warn?.({
+            code: ResultCode.Fail,
+            message: '平台连接未及时响应（未发送 ready 消息），降级为 import 加载, 请升级对应的平台连接包以提高进程稳定性',
+            data: null
+          });
           try {
             child?.kill();
           } catch {}
@@ -69,7 +76,11 @@ export function startPlatformAdapterWithFallback() {
       child.on('exit', (code, signal) => {
         clearTimeout(timer);
         if (!imported) {
-          logger?.warn?.(`平台连接子进程已退出，code=${code}, signal=${signal}，3秒后自动重启`);
+          logger?.warn?.({
+            code: ResultCode.Fail,
+            message: `平台连接子进程已退出，code=${code}, signal=${signal}，3秒后自动重启`,
+            data: null
+          });
           restart();
         }
       });
@@ -81,15 +92,27 @@ export function startPlatformAdapterWithFallback() {
           if (data?.type === 'ready') {
             ready = true;
             clearTimeout(timer);
-            logger?.debug?.('平台连接已就绪（子进程 fork 模式）');
+            logger?.debug?.({
+              code: ResultCode.Ok,
+              message: '平台连接已就绪（子进程 fork 模式）',
+              data: null
+            });
             child?.send?.({ type: 'start' });
           }
         } catch (err) {
-          logger?.error?.('平台连接进程通信数据格式错误', err);
+          logger?.error?.({
+            code: ResultCode.Fail,
+            message: '平台连接进程通信数据格式错误',
+            data: err
+          });
         }
       });
     } catch (err) {
-      logger?.warn?.('fork 启动平台连接失败，将尝试 import 加载', err);
+      logger?.warn?.({
+        code: ResultCode.Fail,
+        message: 'fork 启动平台连接失败，将尝试 import 加载',
+        data: err
+      });
       void startByImport();
     }
   };
@@ -109,12 +132,24 @@ export function startPlatformAdapterWithFallback() {
 
       if (typeof mod.default === 'function') {
         await mod.default();
-        logger?.debug?.('通过 import 启动平台连接完成');
+        logger?.debug?.({
+          code: ResultCode.Ok,
+          message: '通过 import 启动平台连接完成',
+          data: null
+        });
       } else {
-        logger?.warn?.('通过 import 启动平台连接，但未找到默认导出函数');
+        logger?.warn?.({
+          code: ResultCode.Fail,
+          message: '通过 import 启动平台连接，但未找到默认导出函数',
+          data: null
+        });
       }
     } catch (err) {
-      logger?.error?.('import 启动平台连接失败', err);
+      logger?.error?.({
+        code: ResultCode.Fail,
+        message: 'import 启动平台连接失败',
+        data: err
+      });
     }
   };
 

@@ -6,6 +6,7 @@ import { createRequire } from 'module';
 import hello from './hello.html';
 import { formatPath, getModuelFile } from './utils';
 import { collectMiddlewares, runMiddlewares } from './middleware';
+import { ResultCode } from 'core';
 const require = createRequire(import.meta.url);
 const mainDirMap = new Map();
 
@@ -228,7 +229,11 @@ router.all('apps/:app/{*path}', async ctx => {
 
       await runMiddlewares(middlewares, ctx, handler);
     } catch (err) {
-      logger.warn(`Error request ${ctx.path}:`, err?.message || '');
+      logger.warn({
+        code: ResultCode.Fail,
+        message: `Error request ${ctx.path}:`,
+        data: err?.message ?? ''
+      });
       ctx.status = 500;
       ctx.body = {
         code: 500,
@@ -284,7 +289,11 @@ router.all('apps/:app/{*path}', async ctx => {
         data: null
       };
     } else {
-      logger.warn(`Error request ${ctx.path}:`, err?.message || '');
+      logger.warn({
+        code: ResultCode.Fail,
+        message: `Error request ${ctx.path}:`,
+        data: err?.message ?? ''
+      });
       ctx.status = 500;
       ctx.body = {
         code: 500,

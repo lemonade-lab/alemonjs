@@ -418,11 +418,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
     }
     const mTime = (curTime / 1000 / 60).toFixed(2);
 
-    logger.info({
-      code: ResultCode.Fail,
-      message: `[CBP Server] 第 ${count} 次重连，等待 ${mTime} 分钟后重新连接`,
-      data: null
-    });
+    logger.info(`[alemonjs][CBP Server] 第 ${count} 次重连，等待 ${mTime} 分钟后重新连接`);
 
     return curTime;
   };
@@ -551,7 +547,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       });
 
       chatbotServer.on('close', () => {
-        logger.info({
+        logger.warn({
           code: ResultCode.Ok,
           message: 'WebSocket server closed',
           data: null

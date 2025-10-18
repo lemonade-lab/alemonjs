@@ -418,5 +418,5 @@ export const core = new Core().value;
 });
 
 process?.on?.('exit', code => {
-  logger?.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
+  logger.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
 });

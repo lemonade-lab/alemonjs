@@ -1,4 +1,5 @@
 import { fork } from 'child_process';
+import { ResultCode } from 'core';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -12,8 +13,12 @@ export function startModuleAdapter() {
 
   try {
     modulePath = require.resolve('../client.js');
-  } catch {
-    logger?.warn?.('模块进程执行失败...');
+  } catch (e) {
+    logger?.warn?.({
+      code: ResultCode.Fail,
+      message: '模块加载进程启动失败，尝试使用 fork 模式启动',
+      data: e
+    });
 
     return;
   }
@@ -48,7 +53,11 @@ export function startModuleAdapter() {
       // 超时
       const checkTimeout = () => {
         if (!ready) {
-          logger?.warn?.('模块加载未及时响应（未发送 ready 消息）');
+          logger?.error?.({
+            code: ResultCode.Fail,
+            message: '模块加载未及时响应（未发送 ready 消息）',
+            data: null
+          });
           try {
             child?.kill();
           } catch {
@@ -61,7 +70,11 @@ export function startModuleAdapter() {
 
       child.on('exit', (code, signal) => {
         clearTimeout(timer);
-        logger?.warn?.(`模块加载子进程已退出，code=${code}, signal=${signal}，3秒后自动重启`);
+        logger?.warn?.({
+          code: ResultCode.Fail,
+          message: `模块加载子进程已退出，code=${code}, signal=${signal}，3秒后自动重启`,
+          data: null
+        });
         restart();
       });
 
@@ -72,15 +85,27 @@ export function startModuleAdapter() {
           if (data?.type === 'ready') {
             ready = true;
             clearTimeout(timer);
-            logger?.debug?.('模块加载已就绪（子进程 fork 模式）');
+            logger?.debug?.({
+              code: ResultCode.Ok,
+              message: '模块加载已就绪（子进程 fork 模式）',
+              data: null
+            });
             child?.send?.({ type: 'start' });
           }
         } catch (err) {
-          logger?.error?.('模块加载进程通信数据格式错误', err);
+          logger?.error?.({
+            code: ResultCode.Fail,
+            message: '模块加载进程通信数据格式错误',
+            data: err
+          });
         }
       });
     } catch (err) {
-      logger?.warn?.('fork 启动模块加载失败', err);
+      logger?.warn?.({
+        code: ResultCode.Fail,
+        message: 'fork 启动模块加载失败',
+        data: err
+      });
     }
   };
 

@@ -6,6 +6,7 @@ import { existsSync, readFileSync, watch, mkdirSync, writeFile } from 'fs';
 import _ from 'lodash';
 import { readFile } from 'fs/promises';
 import type { ParsedMessage } from '../typings';
+import { ResultCode } from 'core';
 
 /**
  * @param ws
@@ -57,7 +58,11 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
         );
       })
       .catch(error => {
-        logger.error('读取 commands.json 失败:', error);
+        logger.error({
+          code: ResultCode.Fail,
+          message: '读取 commands.json 失败',
+          data: error
+        });
       });
   }, 1000);
 
@@ -78,7 +83,11 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
         );
       })
       .catch(error => {
-        logger.error('读取 users.json 失败:', error);
+        logger.error({
+          code: ResultCode.Fail,
+          message: '读取 users.json 失败',
+          data: error
+        });
       });
   }, 1000);
 
@@ -99,7 +108,11 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
         );
       })
       .catch(error => {
-        logger.error('读取 channels.json 失败:', error);
+        logger.error({
+          code: ResultCode.Fail,
+          message: '读取 channels.json 失败',
+          data: error
+        });
       });
   }, 1000);
 
@@ -121,7 +134,11 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
         );
       })
       .catch(error => {
-        logger.error('读取 user.json 失败:', error);
+        logger.error({
+          code: ResultCode.Fail,
+          message: '读取 user.json 失败',
+          data: error
+        });
       });
   }, 1000);
 
@@ -143,7 +160,11 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
         );
       })
       .catch(error => {
-        logger.error('读取 bot.json 失败:', error);
+        logger.error({
+          code: ResultCode.Fail,
+          message: '读取 bot.json 失败',
+          data: error
+        });
       });
   }, 1000);
 
@@ -179,7 +200,11 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
         })
       );
     } catch (error) {
-      logger.error('初始化数据失败:', error);
+      logger.error({
+        code: ResultCode.Fail,
+        message: '初始化数据失败',
+        data: error
+      });
     }
   };
 
@@ -193,11 +218,19 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
 
         writeFile(messagePath, JSON.stringify(updatedMessages, null, 2), error => {
           if (error) {
-            logger.error(`写入 ${type} 消息失败:`, error);
+            logger.error({
+              code: ResultCode.Fail,
+              message: `写入 ${type} 消息失败`,
+              data: error
+            });
           }
         });
       } catch (error) {
-        logger.error(`读取 ${type} 消息失败:`, error);
+        logger.error({
+          code: ResultCode.Fail,
+          message: `读取 ${type} 消息失败`,
+          data: error
+        });
       }
     }
   };
@@ -209,7 +242,11 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
     messages.push(message);
     writeFile(messagePath, JSON.stringify(messages, null, 2), error => {
       if (error) {
-        logger.error(`写入 ${type} 消息失败:`, error);
+        logger.error({
+          code: ResultCode.Fail,
+          message: `写入 ${type} 消息失败`,
+          data: error
+        });
       }
     });
   };
@@ -243,11 +280,19 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
       }
     },
     close: () => {
-      logger.info('WebSocket connection closed');
+      logger.info({
+        code: ResultCode.Ok,
+        message: 'WebSocket connection closed',
+        data: null
+      });
       dirWatcher.close();
     },
     error: (err: Error) => {
-      logger.error('WebSocket error:', err);
+      logger.error({
+        code: ResultCode.Fail,
+        message: 'WebSocket error:',
+        data: err
+      });
       dirWatcher.close();
     }
   };

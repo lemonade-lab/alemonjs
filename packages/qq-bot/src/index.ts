@@ -27,13 +27,13 @@ const main = () => {
 const mainProcess = () => {
   ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
     process?.on?.(sig, () => {
-      logger?.info?.(`[@alemonjs/qq-bot][${sig}] 收到信号，正在关闭...`);
+      logger.info?.(`[@alemonjs/qq-bot][${sig}] 收到信号，正在关闭...`);
       setImmediate(() => process.exit(0));
     });
   });
 
   process?.on?.('exit', code => {
-    logger?.info?.(`[@alemonjs/qq-bot][exit] 进程退出，code=${code}`);
+    logger.info?.(`[@alemonjs/qq-bot][exit] 进程退出，code=${code}`);
   });
 
   // 监听主进程消息
