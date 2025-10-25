@@ -6,7 +6,7 @@ import { existsSync, readFileSync, watch, mkdirSync, writeFile } from 'fs';
 import _ from 'lodash';
 import { readFile } from 'fs/promises';
 import type { ParsedMessage } from '../typings';
-import { ResultCode } from 'core';
+import { ResultCode } from '../../core';
 
 /**
  * @param ws

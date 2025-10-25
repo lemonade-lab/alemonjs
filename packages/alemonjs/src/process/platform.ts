@@ -1,8 +1,12 @@
-import { fork } from 'child_process';
-import { createRequire } from 'module';
-import { ResultCode } from 'core';
+import childProcess from 'child_process';
+import { ResultCode } from '../core';
 
-const require = createRequire(import.meta.url);
+import module from 'module';
+
+const initRequire = () => {};
+
+initRequire.resolve = () => '';
+const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
 /**
  * 启动平台连接进程，优先 fork，失败后降级为 import
@@ -32,7 +36,7 @@ export function startPlatformAdapterWithFallback() {
 
     let restarted = false;
     let ready = false;
-    let child: ReturnType<typeof fork> | undefined;
+    let child: ReturnType<typeof childProcess.fork> | undefined;
 
     const restart = () => {
       if (restarted || imported) {
@@ -52,7 +56,7 @@ export function startPlatformAdapterWithFallback() {
 
     try {
       // 继承主进程的 execArgv，包括任何自定义的 loader 配置
-      child = fork(modulePath, [], {
+      child = childProcess.fork(modulePath, [], {
         execArgv: process.execArgv
       });
 

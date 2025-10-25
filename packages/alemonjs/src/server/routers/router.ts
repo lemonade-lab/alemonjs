@@ -2,12 +2,16 @@ import KoaRouter from 'koa-router';
 import fs, { existsSync } from 'fs';
 import path, { join, dirname } from 'path';
 import mime from 'mime-types';
-import { createRequire } from 'module';
 import hello from './hello.html';
 import { formatPath, getModuelFile } from './utils';
 import { collectMiddlewares, runMiddlewares } from './middleware';
 import { ResultCode } from 'core';
-const require = createRequire(import.meta.url);
+import module from 'module';
+
+const initRequire = () => {};
+
+initRequire.resolve = () => '';
+const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 const mainDirMap = new Map();
 
 const router = new KoaRouter({

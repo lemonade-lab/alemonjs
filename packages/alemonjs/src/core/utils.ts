@@ -3,9 +3,14 @@ import { readdirSync, Dirent, existsSync } from 'fs';
 import { join } from 'path';
 import path from 'path';
 import fs from 'fs';
-import { createRequire } from 'module';
 import { fileSuffixResponse, ResultCode } from './variable';
-const require = createRequire(import.meta.url);
+
+import module from 'module';
+
+const initRequire = () => {};
+
+initRequire.resolve = () => '';
+const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
 /**
  * 将字符串转为定长字符串

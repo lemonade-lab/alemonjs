@@ -1,8 +1,12 @@
-import { fork } from 'child_process';
-import { ResultCode } from 'core';
-import { createRequire } from 'module';
+import childProcess from 'child_process';
+import { ResultCode } from '../core';
 
-const require = createRequire(import.meta.url);
+import module from 'module';
+
+const initRequire = () => {};
+
+initRequire.resolve = () => '';
+const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
 /**
  * 启动模块加载进程
@@ -26,7 +30,7 @@ export function startModuleAdapter() {
   const startByFork = () => {
     let restarted = false;
     let ready = false;
-    let child: ReturnType<typeof fork> | undefined;
+    let child: ReturnType<typeof childProcess.fork> | undefined;
 
     const restart = () => {
       if (restarted) {
@@ -46,7 +50,7 @@ export function startModuleAdapter() {
 
     try {
       // 继承主进程的 execArgv，包括任何自定义的 loader 配置
-      child = fork(modulePath, [], {
+      child = childProcess.fork(modulePath, [], {
         execArgv: process.execArgv
       });
 

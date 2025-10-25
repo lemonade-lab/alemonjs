@@ -1,5 +1,6 @@
 # 依赖
 node_modules
-lib
+/lib
 alemonjs-*.tgz
-logs
+/logs
+/dist

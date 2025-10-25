@@ -18,25 +18,25 @@
   "devDependencies": {
     "@babel/preset-env": "^7.25.7",
     "@babel/preset-typescript": "^7.25.7",
+    "@eslint/js": "^9.18.0",
     "@types/jest": "^29.5.13",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^18",
     "@types/ws": "^8.18.1",
-    "husky": "^9.0.11",
-    "jest": "^29.7.0",
-    "lerna": "^8.1.9",
-    "prettier": "^2.8.8",
-    "ts-jest": "^29.2.5",
-    "tsx": "^4.19.1",
-    "ws": "^8.18.1",
-    "@eslint/js": "^9.18.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.3",
     "globals": "^16",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "lerna": "^8.1.9",
     "lint-staged": "^16.1.5",
     "lvyjs": "0.2.24",
-    "typescript-eslint": "^8.19.1"
+    "prettier": "^2.8.8",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.19.1",
+    "typescript-eslint": "^8.19.1",
+    "ws": "^8.18.1"
   },
   "private": true,
   "workspaces": [
@@ -44,5 +44,9 @@
     "frontends/*",
     "packages/*"
   ],
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "yarn@1.22.22",
+  "dependencies": {
+    "vite": "^7.1.12",
+    "vite-plugin-node-polyfills": "^0.24.0"
+  }
 }

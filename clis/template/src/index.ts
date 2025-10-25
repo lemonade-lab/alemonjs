@@ -1,5 +1,5 @@
-import response from './res';
-import middleware from './mw';
+import response from './routes';
+import middleware from './mws';
 export default defineChildren({
   // 注册
   register() {
