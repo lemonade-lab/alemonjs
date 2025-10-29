@@ -1,115 +1,180 @@
 import childProcess from 'child_process';
-import { ResultCode } from '../core';
-
+import { getConfigValue, ResultCode } from '../core';
 import module from 'module';
 
+// 初始化 require 的备用实现
 const initRequire = () => {};
 
 initRequire.resolve = () => '';
 const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
+// 子进程管理接口
+interface ChildProcessManager {
+  child?: childProcess.ChildProcess;
+  restarted: boolean;
+  ready: boolean;
+  timer?: NodeJS.Timeout;
+}
+
 /**
  * 启动模块加载进程
- * @returns
  */
-export function startModuleAdapter() {
+export function startModuleAdapter(): void {
+  const values = getConfigValue();
+  // 进程配置
+  const pro = values?.process ?? {};
+
   let modulePath = '';
+
+  // 配置常量
+  const CONFIG = {
+    RESTART_DELAY: pro?.restart_delay ?? 3000,
+    FORK_TIMEOUT: pro?.fork_timeout ?? 6000 // 6秒默认超时
+  } as const;
 
   try {
     modulePath = require.resolve('../client.js');
-  } catch (e) {
+  } catch (error) {
     logger?.warn?.({
       code: ResultCode.Fail,
-      message: '模块加载进程启动失败，尝试使用 fork 模式启动',
-      data: e
+      message: '模块加载进程启动失败',
+      data: error
     });
 
     return;
   }
 
-  const startByFork = () => {
-    let restarted = false;
-    let ready = false;
-    let child: ReturnType<typeof childProcess.fork> | undefined;
+  /**
+   * 通过 fork 启动模块加载进程
+   */
+  const startByFork = (): void => {
+    const manager: ChildProcessManager = {
+      restarted: false,
+      ready: false
+    };
 
-    const restart = () => {
-      if (restarted) {
+    /**
+     * 清理资源
+     */
+    const cleanup = (): void => {
+      if (manager.timer) {
+        clearTimeout(manager.timer);
+        manager.timer = undefined;
+      }
+      if (manager.child) {
+        manager.child.removeAllListeners();
+      }
+    };
+
+    /**
+     * 重启子进程
+     */
+    const restart = (): void => {
+      if (manager.restarted) {
         return;
       }
-      restarted = true;
-      if (child) {
-        child.removeAllListeners();
-        try {
-          child.kill();
-        } catch {}
-      }
+
+      manager.restarted = true;
+      cleanup();
+
       setTimeout(() => {
         startByFork();
-      }, 3000);
+      }, CONFIG.RESTART_DELAY);
+    };
+
+    /**
+     * 检查超时
+     */
+    const checkTimeout = (): void => {
+      if (!manager.ready) {
+        logger?.error?.({
+          code: ResultCode.Fail,
+          message: '模块加载未及时响应（未发送 ready 消息）',
+          data: null
+        });
+
+        try {
+          manager.child?.kill();
+        } catch {
+          // 忽略 kill 错误
+        }
+      }
     };
 
     try {
       // 继承主进程的 execArgv，包括任何自定义的 loader 配置
-      child = childProcess.fork(modulePath, [], {
+      manager.child = childProcess.fork(modulePath, [], {
         execArgv: process.execArgv
       });
 
-      // 超时
-      const checkTimeout = () => {
-        if (!ready) {
-          logger?.error?.({
-            code: ResultCode.Fail,
-            message: '模块加载未及时响应（未发送 ready 消息）',
-            data: null
-          });
-          try {
-            child?.kill();
-          } catch {
-            //
-          }
-        }
-      };
+      manager.timer = setTimeout(checkTimeout, CONFIG.FORK_TIMEOUT);
 
-      const timer = setTimeout(() => void checkTimeout(), 2000);
+      /**
+       * 子进程退出处理
+       */
+      manager.child.on('exit', (code, signal) => {
+        cleanup();
 
-      child.on('exit', (code, signal) => {
-        clearTimeout(timer);
         logger?.warn?.({
           code: ResultCode.Fail,
-          message: `模块加载子进程已退出，code=${code}, signal=${signal}，3秒后自动重启`,
+          message: `模块加载子进程已退出，code=${code}, signal=${signal}，${CONFIG.RESTART_DELAY / 1000}秒后自动重启`,
           data: null
         });
+
         restart();
       });
 
-      child.on('message', msg => {
+      /**
+       * 子进程消息处理
+       */
+      manager.child.on('message', (message: unknown) => {
         try {
-          const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
+          const data = typeof message === 'string' ? JSON.parse(message) : message;
 
           if (data?.type === 'ready') {
-            ready = true;
-            clearTimeout(timer);
+            manager.ready = true;
+            cleanup();
+
             logger?.debug?.({
               code: ResultCode.Ok,
               message: '模块加载已就绪（子进程 fork 模式）',
               data: null
             });
-            child?.send?.({ type: 'start' });
+
+            manager.child?.send?.({ type: 'start' });
           }
-        } catch (err) {
+        } catch (error) {
           logger?.error?.({
             code: ResultCode.Fail,
             message: '模块加载进程通信数据格式错误',
-            data: err
+            data: error
           });
         }
       });
-    } catch (err) {
+
+      /**
+       * 子进程错误处理
+       */
+      manager.child.on('error', error => {
+        logger?.error?.({
+          code: ResultCode.Fail,
+          message: '模块加载子进程发生错误',
+          data: error
+        });
+
+        // 错误事件也会触发 exit 事件，所以这里不需要额外处理重启
+      });
+    } catch (error) {
       logger?.warn?.({
         code: ResultCode.Fail,
         message: 'fork 启动模块加载失败',
-        data: err
+        data: error
       });
+
+      // fork 失败后延迟重启
+      setTimeout(() => {
+        startByFork();
+      }, CONFIG.RESTART_DELAY);
     }
   };
 
