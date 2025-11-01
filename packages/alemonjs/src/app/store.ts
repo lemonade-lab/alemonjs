@@ -13,6 +13,22 @@ import log4js from 'log4js';
  * @returns
  */
 const createLogger = () => {
+  if (process.env.BROWSER_ENV === 'browser') {
+    return {
+      // 开发调试
+      trace: console.trace.bind(console),
+      debug: console.debug.bind(console),
+      // 日常
+      info: console.info.bind(console),
+      mark: console.info.bind(console),
+      // 警告
+      warn: console.warn.bind(console),
+      // 错误
+      error: console.error.bind(console),
+      // 严重
+      fatal: console.error.bind(console)
+    };
+  }
   const logDir = process.env?.LOG_PATH ?? `./logs/${process.env.LOG_NAME ?? ''}`;
 
   mkdirSync(logDir, { recursive: true });
