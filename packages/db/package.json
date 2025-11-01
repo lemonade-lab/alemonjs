@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "数据库连接",
   "author": "lemonade",
   "license": "MIT",
@@ -19,18 +19,18 @@
     "desktop": {
       "platform": [],
       "logo": "antd.DatabaseOutlined",
-      "commond": [
+      "command": [
         {
           "name": "redis&mysql",
           "icon": "antd.DatabaseOutlined",
-          "commond": "open.db"
+          "command": "open.db"
         }
       ],
       "sidebars": [
         {
           "name": "DB",
           "icon": "antd.DatabaseOutlined",
-          "commond": "open.db"
+          "command": "open.db"
         }
       ]
     }

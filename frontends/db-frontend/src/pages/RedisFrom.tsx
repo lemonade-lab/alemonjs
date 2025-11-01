@@ -69,7 +69,7 @@ export default function RedisFrom() {
         <label htmlFor='port' className='block text-sm font-medium '>
           Port
         </label>
-        <Input className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring ' />
+        <Input name='port' value={formData.port} onChange={handleChange} className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring ' />
       </div>
       <div>
         <label htmlFor='password' className='block text-sm font-medium '>

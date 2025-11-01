@@ -28,10 +28,10 @@ export default function Table() {
     // 获取扩展列表
     window.desktopAPI.expansion.getList();
     // 监听扩展列表
-    window.desktopAPI.expansion.on(data => {
+    window.desktopAPI.expansion.on(e => {
       try {
-        if (data.type == 'get-expansions') {
-          const value = data.data;
+        if (e.type == 'get-expansions') {
+          const value = e.data;
           if (Array.isArray(value) && value && value.length > 0) {
             const value$1 = value.filter((item: any) => {
               if (!item?.alemonjs) return true;
@@ -52,10 +52,10 @@ export default function Table() {
         console.error('HomeApp 解析消息失败');
       }
     });
-    window.desktopAPI.onMessage(data => {
+    window.desktopAPI.onMessage(e => {
       // console.log('Form.tsx message', message)
-      if (data.type == 'process.get.apps') {
-        const { data: apps } = data;
+      if (e.type == 'process.get.apps') {
+        const { data: apps } = e;
         setExpansions(expansions => {
           return {
             ...expansions,
