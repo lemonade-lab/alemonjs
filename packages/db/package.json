@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "数据库连接",
   "author": "lemonade",
   "license": "MIT",

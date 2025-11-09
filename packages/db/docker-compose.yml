@@ -3,8 +3,6 @@ services:
     image: mysql:8.0
     container_name: mysql-container
     environment:
-      # 密码 Mm002580!
-      # 用户 root
       MYSQL_ROOT_PASSWORD: 'Mm002580!'
       MYSQL_ROOT_HOST: '%'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
@@ -13,9 +11,37 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/docker-dbinit.sql
+      - mysql-data:/var/lib/mysql # 添加 MySQL 数据持久化
+    restart: unless-stopped
 
   redis:
-    image: redis:6.2-alpine
-    container_name: redis-container
+    image: redis:7-alpine
+    container_name: redis-persistent
+    command:
+      - redis-server
+      - --appendonly yes # 启用 AOF 持久化
+      - --appendfsync everysec # 每秒同步一次
+      - --save 900 1 # RDB 持久化：900秒内至少1个变更
+      - --save 300 10 # RDB 持久化：300秒内至少10个变更
+      - --save 60 10000 # RDB 持久化：60秒内至少10000个变更
+      - --dir /data # 数据存储目录
+      - --dbfilename dump.rdb # RDB 文件名
+      - --appendfilename "appendonly.aof" # AOF 文件名
+      - --auto-aof-rewrite-percentage 100 # AOF 重写触发条件
+      - --auto-aof-rewrite-min-size 64mb # AOF 最小重写大小
     ports:
       - '6379:6379'
+    volumes:
+      - redis-data:/data # 使用命名卷
+    restart: unless-stopped
+    healthcheck: # 添加健康检查
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  redis-data:
+    driver: local
+  mysql-data:
+    driver: local
