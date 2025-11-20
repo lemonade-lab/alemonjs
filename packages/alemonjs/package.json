@@ -1,7 +1,6 @@
 {
-  "$schema": "https://json.schemastore.org/package",
   "name": "alemonjs",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",

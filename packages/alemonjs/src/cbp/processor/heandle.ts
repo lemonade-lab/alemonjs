@@ -11,12 +11,17 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
   const ApiId = generateUniqueId();
 
   return new Promise(resolve => {
+    if (!global.chatbotClient?.send) {
+      resolve([createResult(ResultCode.Fail, 'Chatbot client is not available', null)]);
+
+      return;
+    }
     // 设置唯一标识符
     data.apiId = ApiId;
     // 设置设备 ID
     data.DeviceId = deviceId;
     // 发送消息
-    global.chatbotClient.send(flattedJSON.stringify(data));
+    global.chatbotClient?.send(flattedJSON.stringify(data));
     // 设置回调函数
     apiResolves.set(ApiId, resolve);
     // 超时
