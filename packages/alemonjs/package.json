@@ -1,14 +1,13 @@
 {
   "name": "alemonjs",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "scripts": {
-    "build": "lvy build",
-    "bundle": "vite build"
+    "build": "lvy build && vite build"
   },
   "types": "lib",
   "exports": {
