@@ -1,7 +1,7 @@
 {
-  "name": "@alemonjs/discord",
-  "version": "2.1.0-alpha.19",
-  "description": "discord platform connection",
+  "name": "@alemonjs/bubble",
+  "version": "2.1.0-alpha.1",
+  "description": "bubble platform",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -33,22 +33,22 @@
     "desktop": {
       "platform": [
         {
-          "name": "discord"
+          "name": "bubble"
         }
       ],
-      "logo": "antd.DiscordOutlined",
+      "logo": "antd.bubbleOutlined",
       "command": [
         {
-          "name": "打开discord",
-          "icon": "antd.DiscordOutlined",
-          "command": "open.discord"
+          "name": "打开bubble",
+          "icon": "antd.bubbleOutlined",
+          "command": "open.bubble"
         }
       ],
       "sidebars": [
         {
           "name": "dc",
-          "icon": "antd.DiscordOutlined",
-          "command": "open.discord"
+          "icon": "antd.bubbleOutlined",
+          "command": "open.bubble"
         }
       ]
     }

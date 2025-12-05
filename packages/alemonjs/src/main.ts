@@ -56,7 +56,7 @@ const startPlatform = (options: StartOptions) => {
     process.env.login = login;
   }
 
-  startPlatformAdapterWithFallback();
+  void startPlatformAdapterWithFallback();
 };
 
 /**

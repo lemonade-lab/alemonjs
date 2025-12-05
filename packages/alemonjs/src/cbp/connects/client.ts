@@ -86,6 +86,14 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
             const configs = parsedMessage.payload;
             // env 同步
             const env = configs.env || {};
+            // argv
+            // const argv = configs.args || {};
+            // 同步 argv 参数
+            // if (argv) {
+            //   for (const key in argv) {
+            //     process.argv[key] = argv[key];
+            //   }
+            // }
 
             for (const key in env) {
               process.env[key] = env[key];

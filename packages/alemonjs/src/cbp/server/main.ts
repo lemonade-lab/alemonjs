@@ -4,7 +4,7 @@ import * as JSON from 'flatted';
 import * as flattedJSON from 'flatted';
 import koaCors from '@koa/cors';
 import MessageRouter from '../routers/router';
-import { ResultCode, getConfig } from '../../core';
+import { ResultCode } from '../../core';
 import {
   childrenBind,
   childrenClient,
@@ -489,15 +489,10 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
             JSON.stringify({
               active: 'sync',
               payload: {
-                value: getConfig().value,
-                args: getConfig().argv,
-                package: {
-                  version: getConfig().package?.version
-                },
                 env: {
+                  // 同步login 和 platform 环境变量
                   login: process.env.login,
-                  platform: process.env.platform,
-                  port: process.env.port
+                  platform: process.env.platform
                 }
               },
               // 主动消息
