@@ -163,7 +163,9 @@ export class BubbleAPI {
     file: any,
     filename?: string,
     extra: { channelId?: string | number; threadId?: string | number; messageId?: string | number } = {}
-  ): Promise<FileUploadResponse> {
+  ): Promise<{
+    data: FileUploadResponse;
+  }> {
     // lazy import form-data to avoid bundling in browser
     const FormData = (await import('form-data')).default;
     const form = new FormData();
@@ -175,9 +177,9 @@ export class BubbleAPI {
     if (extra.threadId) {
       form.append('threadId', String(extra.threadId));
     }
-    if (extra.messageId) {
-      form.append('messageId', String(extra.messageId));
-    }
+    // if (extra.messageId) {
+    //   form.append('messageId', String(extra.messageId));
+    // }
 
     const value = getBubbleConfig();
     const token = value.token;
