@@ -4,7 +4,7 @@ export * from './event/base/guild';
 export * from './event/base/message';
 export * from './event/base/platform';
 export * from './event/base/user';
-export * from './event/channal/index';
+export * from './event/channel/index';
 export * from './event/guild/index';
 export * from './event/interaction/index';
 export * from './event/member/index';

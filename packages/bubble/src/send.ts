@@ -1,4 +1,4 @@
-import { ButtonRow, createResult, DataEnums, ResultCode } from 'alemonjs';
+import { createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { BubbleClient } from './sdk/wss';
 
@@ -10,37 +10,12 @@ const ImageURLToBuffer = async (url: string) => {
   return Buffer.from(arrayBuffer);
 };
 
-const createButtonsData = (rows: ButtonRow[]) => {
-  return rows.map(row => {
-    const val = row.value;
-
-    return {
-      type: 1,
-      components: val.map(button => {
-        const value = button.value;
-        let text = '';
-
-        if (typeof button.options?.data === 'object') {
-          text = button.options?.data.click;
-        } else {
-          text = button.options.data;
-        }
-
-        return {
-          type: 2,
-          custom_id: text,
-          style: 1,
-          label: typeof value === 'object' ? value.title : value
-        };
-      })
-    };
-  });
-};
-
-export const sendchannel = async (
+export const sendToRoom = async (
   client: Client,
   param: {
-    channel_id: string | number;
+    channel_id: string | number | null;
+    thread_id?: string | number | null;
+    message_id?: string | number | null;
   },
   val: DataEnums[]
 ) => {
@@ -49,10 +24,10 @@ export const sendchannel = async (
       return [];
     }
     const channelId = String(param?.channel_id ?? '');
+    const threadId = String(param?.thread_id ?? '');
+    const messageId = param?.message_id ? String(param?.message_id) : undefined;
     // images
     const images = val.filter(item => item.type === 'Image' || item.type === 'ImageURL' || item.type === 'ImageFile');
-    // buttons
-    const buttons = val.filter(item => item.type === 'BT.group');
     // markdown
     const mds = val.filter(item => item.type === 'Markdown');
     // text
@@ -110,7 +85,7 @@ export const sendchannel = async (
         }
       }
 
-      const uploadRes = await client.uploadFile(bufferData, undefined, { channelId });
+      const uploadRes = await client.uploadFile(bufferData, undefined, { channelId, threadId, messageId: messageId });
 
       // uploadRes 的结构是 { file: Attachment }，需要提取 file 字段
       const fileAttachment = uploadRes?.file;
@@ -119,17 +94,27 @@ export const sendchannel = async (
         throw new Error('文件上传失败：未返回文件信息');
       }
 
-      const attachments = [fileAttachment];
+      if (channelId) {
+        const res = await client.sendMessage(channelId, {
+          content: content,
+          type: 'image',
+          attachments: [fileAttachment]
+        });
 
-      const payload = {
-        content: content,
-        type: 'text',
-        attachments
-      };
+        return [createResult(ResultCode.Ok, '完成', res)];
+      }
 
-      const res = await client.sendMessage(channelId, payload);
+      if (threadId) {
+        const res = await client.sendDm(threadId, {
+          content: content,
+          type: 'image',
+          attachments: [fileAttachment]
+        });
 
-      return [createResult(ResultCode.Ok, '完成', res)];
+        return [createResult(ResultCode.Ok, '完成', res)];
+      }
+
+      return [createResult(ResultCode.Ok, '完成', null)];
     }
 
     // markdown -> 转成 plain content (simple)
@@ -181,30 +166,20 @@ export const sendchannel = async (
       });
     }
 
-    if (buttons && buttons.length > 0) {
-      let components = null;
+    if ((content && content.length > 0) || (contentMd && contentMd.length > 0)) {
+      if (channelId) {
+        const res = await client.sendMessage(channelId, { content: content ?? contentMd, type: 'text' });
 
-      buttons.forEach(item => {
-        if (components) {
-          return;
-        }
-        const rows = item.value;
+        return [createResult(ResultCode.Ok, '完成', res)];
+      }
 
-        components = createButtonsData(rows);
-      });
+      if (threadId) {
+        const res = await client.sendDm(threadId, { content: content ?? contentMd, type: 'text' });
 
-      const res = await client.sendMessage(channelId, {
-        content: contentMd || content,
-        components
-      });
+        return [createResult(ResultCode.Ok, '完成', res)];
+      }
 
-      return [createResult(ResultCode.Ok, '完成', res)];
-    }
-
-    if (content && content.length > 0) {
-      const res = await client.sendMessage(channelId, { content: contentMd || content });
-
-      return [createResult(ResultCode.Ok, '完成', res)];
+      return [createResult(ResultCode.Ok, '完成', null)];
     }
 
     return [];
@@ -213,11 +188,13 @@ export const sendchannel = async (
   }
 };
 
-export const senduser = async (
+export const sendToUser = async (
   client: Client,
   param: {
     author_id?: string | number;
     channel_id?: string | number;
+    thread_id?: string | number;
+    message_id?: string | number;
   },
   val: DataEnums[]
 ) => {
@@ -225,19 +202,20 @@ export const senduser = async (
     return [];
   }
 
-  let channelId: string | number | undefined = param?.channel_id;
+  let threadId: string | number | undefined = param?.channel_id || param?.thread_id;
+  const messageId = param?.message_id;
 
-  if (!channelId && param.author_id) {
+  if (!threadId && param.author_id) {
     const dm = await client.getOrCreateDm(param.author_id);
 
-    channelId = dm?.id;
+    threadId = dm?.id;
   }
 
-  if (!channelId) {
+  if (!threadId) {
     return [];
   }
 
-  return sendchannel(client, { channel_id: channelId }, val);
+  return sendToRoom(client, { channel_id: null, thread_id: threadId, message_id: messageId }, val);
 };
 
 export default {};

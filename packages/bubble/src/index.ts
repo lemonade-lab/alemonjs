@@ -3,7 +3,7 @@ import type { User, PublicEventMessageCreate, PrivateEventMessageCreate, DataEnu
 import { ResultCode, cbpPlatform, createResult } from 'alemonjs';
 import { getMaster, platform } from './config';
 import { CDN_URL } from './sdk/api';
-import { sendchannel, senduser } from './send';
+import { sendToRoom, sendToUser } from './send';
 
 // pf
 export { platform } from './config';
@@ -155,12 +155,12 @@ const main = () => {
     active: {
       send: {
         channel: async (UserId: string, val: DataEnums[]) => {
-          const res = await sendchannel(client, { channel_id: UserId }, val);
+          const res = await sendToRoom(client, { channel_id: UserId }, val);
 
           return [createResult(ResultCode.Ok, '请求完成', res)];
         },
         user: async (OpenId: string, val: DataEnums[]) => {
-          const res = await senduser(client, { author_id: OpenId }, val);
+          const res = await sendToUser(client, { author_id: OpenId }, val);
 
           return [createResult(ResultCode.Ok, '请求完成', res)];
         }
@@ -175,17 +175,18 @@ const main = () => {
 
         if (tag === 'message.create') {
           const ChannelId = String(event.value.channelId || '');
-          const res = await sendchannel(client, { channel_id: ChannelId }, val);
+          const res = await sendToRoom(client, { channel_id: ChannelId, message_id: String(event.value.id || '') }, val);
 
           return [createResult(ResultCode.Ok, '请求完成', res)];
         } else if (tag === 'private.message.create') {
           const UserId = String(event.value.authorId || '');
           const ChannelId = String(event.value.channelId || '');
-          const res = await senduser(
+          const res = await sendToUser(
             client,
             {
               channel_id: ChannelId,
-              author_id: UserId
+              author_id: UserId,
+              message_id: String(event.value.id || '')
             },
             val
           );

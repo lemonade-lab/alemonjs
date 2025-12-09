@@ -1,4 +1,4 @@
-import { PublicEventChannalCreate, PublicEventChannalDelete } from './channal';
+import { PublicEventChannelCreate, PublicEventChannelDelete } from './channel';
 import { PublicEventGuildExit, PublicEventGuildJoin } from './guild';
 import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from './interaction';
 import { PublicEventMemberAdd, PublicEventMemberRemove } from './member';
@@ -31,8 +31,8 @@ export type Events = {
   'message.delete': PublicEventMessageDelete;
   'message.reaction.add': PublicEventMessageReactionAdd;
   'message.reaction.remove': PublicEventMessageReactionRemove;
-  'channal.create': PublicEventChannalCreate;
-  'channal.delete': PublicEventChannalDelete;
+  'channel.create': PublicEventChannelCreate;
+  'channel.delete': PublicEventChannelDelete;
   'guild.join': PublicEventGuildJoin;
   'guild.exit': PublicEventGuildExit;
   'member.add': PublicEventMemberAdd;

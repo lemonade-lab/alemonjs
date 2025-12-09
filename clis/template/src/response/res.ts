@@ -26,7 +26,7 @@ const tipResponse = onResponse(selects, (event, _next) => {
 });
 
 // 👇 演示：故意使用错误的selects，TypeScript会显示类型错误
-const wrongResponse = onResponse(['channal.create'], (event, _next) => {
+const wrongResponse = onResponse(['channel.create'], (event, _next) => {
   const [message] = useMessage(event);
   message.send(format(Text('这个响应使用了错误的selects')));
 });

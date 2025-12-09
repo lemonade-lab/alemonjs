@@ -12,8 +12,8 @@ type MAP = {
   'message.delete': undefined;
   'message.reaction.add': undefined;
   'message.reaction.remove': undefined;
-  'channal.create': undefined;
-  'channal.delete': undefined;
+  'channel.create': undefined;
+  'channel.delete': undefined;
   'guild.join': undefined;
   'guild.exit': undefined;
   'member.add': undefined;
