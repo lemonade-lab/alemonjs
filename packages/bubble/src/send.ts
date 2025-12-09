@@ -87,17 +87,16 @@ export const sendToRoom = async (
 
       const uploadRes = await client.uploadFile(bufferData, undefined, { channelId, threadId, messageId: messageId });
 
-      // uploadRes 的结构是 { file: Attachment }，需要提取 file 字段
       const fileAttachment = uploadRes?.data?.file;
 
       if (!fileAttachment) {
-        throw new Error('文件上传失败：未返回文件信息');
+        return [createResult(ResultCode.Ok, '文件上传失败：未返回文件信息', uploadRes)];
       }
 
       if (channelId) {
         const res = await client.sendMessage(channelId, {
           content: content,
-          type: 'text',
+          type: 'image',
           attachments: [fileAttachment]
         });
 
@@ -107,7 +106,7 @@ export const sendToRoom = async (
       if (threadId) {
         const res = await client.sendDm(threadId, {
           content: content,
-          type: 'text',
+          type: 'image',
           attachments: [fileAttachment]
         });
 
