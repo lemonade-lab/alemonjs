@@ -70,7 +70,7 @@ const main = () => {
   // 监听消息
   client.on('MESSAGE_CREATE', event => {
     // 消除bot消息
-    if (event.author?.bot) {
+    if (event.author?.is_bot) {
       return;
     }
 
@@ -93,64 +93,62 @@ const main = () => {
       msg = msg.replace(`<@${item.id}>`, '').trim();
     }
 
-    const UserId = String(event.author.id);
+    const UserId = String(event.authorId);
     const [isMaster, UserKey] = getMaster(UserId);
-    const UserAvatar = createUserAvatar(UserId, event.author.avatar);
+    const UserAvatar = createUserAvatar(UserId, event?.author?.avatar);
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
+      // 事件类型
+      Platform: platform,
+      // guild
+      GuildId: String(event.channelId || ''),
+      ChannelId: String(event.channelId || ''),
+      SpaceId: String(event.channelId || ''),
+      // user
+      UserId: UserId,
+      UserKey,
+      UserName: event?.author?.username,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      OpenId: UserId,
+      MessageId: String(event.id),
+      MessageText: msg,
+      CreateAt: Date.now(),
+      tag: 'message.create',
+      value: event
+    };
 
-    if (event.type === 0 && event.member) {
-      const e: PublicEventMessageCreate = {
-        name: 'message.create',
-        // 事件类型
-        Platform: platform,
-        // guild
-        GuildId: String(event.guild_id || ''),
-        ChannelId: String(event.channel_id || ''),
-        SpaceId: String(event.channel_id || ''),
-        // user
-        UserId: UserId,
-        UserKey,
-        UserName: event.author.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        OpenId: UserId,
-        // message
-        MessageId: String(event.id),
-        MessageText: msg,
-        CreateAt: Date.now(),
-        // other
-        tag: 'message.create',
-        value: event
-      };
+    cbp.send(e);
+  });
 
-      cbp.send(e);
-    } else if (event.type === 0 && !event.member) {
-      // 处理消息
-      const e: PrivateEventMessageCreate = {
-        name: 'private.message.create',
-        // 事件类型
-        Platform: platform,
-        // user
-        UserId: UserId,
-        UserKey,
-        UserName: event.author.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        OpenId: UserId,
-        // message
-        MessageId: String(event.id),
-        MessageText: msg,
-        CreateAt: Date.now(),
-        // other
-        tag: 'private.message.create',
-        value: event
-      };
+  client.on('DM_MESSAGE_CREATE', event => {
+    const UserId = String(event.authorId);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const UserAvatar = createUserAvatar(UserId, event?.author?.avatar);
+    // 处理消息
+    const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
+      // 事件类型
+      Platform: platform,
+      // user
+      UserId: UserId,
+      UserKey,
+      UserName: event?.author?.username,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      OpenId: UserId,
+      // message
+      MessageId: String(event.id),
+      MessageText: event.content,
+      CreateAt: Date.now(),
+      // other
+      tag: 'private.message.create',
+      value: event
+    };
 
-      cbp.send(e);
-    } else {
-      // 未知类型
-    }
+    cbp.send(e);
   });
 
   const api = {
@@ -176,31 +174,13 @@ const main = () => {
         const tag = event.tag;
 
         if (tag === 'message.create') {
-          const ChannelId = String(event.value.channel_id || '');
+          const ChannelId = String(event.value.channelId || '');
           const res = await sendchannel(client, { channel_id: ChannelId }, val);
 
           return [createResult(ResultCode.Ok, '请求完成', res)];
         } else if (tag === 'private.message.create') {
-          const UserId = String(event.value.author.id || '');
-          const ChannelId = String(event.value.channel_id || '');
-          const res = await senduser(
-            client,
-            {
-              channel_id: ChannelId,
-              author_id: UserId
-            },
-            val
-          );
-
-          return [createResult(ResultCode.Ok, '请求完成', res)];
-        } else if (tag === 'interaction.create') {
-          const ChannelId = String(event.value.channel_id || '');
-          const res = await sendchannel(client, { channel_id: ChannelId }, val);
-
-          return [createResult(ResultCode.Ok, '请求完成', res)];
-        } else if (tag === 'private.interaction.create') {
-          const UserId = String(event.value.user.id || '');
-          const ChannelId = String(event.value.channel_id || '');
+          const UserId = String(event.value.authorId || '');
+          const ChannelId = String(event.value.channelId || '');
           const res = await senduser(
             client,
             {

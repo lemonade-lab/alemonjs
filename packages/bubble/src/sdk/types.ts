@@ -71,31 +71,31 @@ export interface BaseMessage {
   id: string | number;
   content: string;
   type?: string | number;
-  channel_id?: string | number;
-  guild_id?: string | number;
-  author_id?: string | number;
-  author?: User;
-  mentions?: User[];
-  attachments?: Attachment[];
-  created_at?: string;
-  timestamp?: string;
+  channelId?: string | number;
+  guildId?: string | number;
+  authorId?: string | number;
+  author: {
+    id: number;
+    is_bot?: boolean;
+    avatar?: string | null;
+    username: string;
+  };
+  attachment?: Attachment[];
+  createdAt?: string;
 }
 
 /**
  * 频道消息创建事件
  */
 export interface MessageCreateEvent extends BaseMessage {
-  member?: {
-    nickname?: string;
-    roles?: number[];
-  };
+  mentions?: any[];
 }
 
 /**
  * 私聊消息创建事件
  */
 export interface DmMessageCreateEvent extends BaseMessage {
-  thread_id?: string | number;
+  threadId?: string | number;
 }
 
 /**
@@ -207,18 +207,5 @@ export interface FileQuota {
  */
 export interface BubbleEventMap {
   MESSAGE_CREATE: MessageCreateEvent;
-  MESSAGE_UPDATE: MessageUpdateEvent;
-  MESSAGE_DELETE: MessageDeleteEvent;
-  MESSAGE_UNPIN: MessageDeleteEvent;
   DM_MESSAGE_CREATE: DmMessageCreateEvent;
-  DM_MESSAGE_UPDATE: DmMessageCreateEvent;
-  DM_MESSAGE_DELETE: MessageDeleteEvent;
-  DM_MESSAGE_UNPIN: MessageDeleteEvent;
-  GUILD_MEMBER_ADD: GuildMemberEvent;
-  GUILD_MEMBER_UPDATE: GuildMemberEvent;
-  GUILD_MEMBER_REMOVE: GuildMemberEvent;
-  BOT_READY: BotReadyEvent;
-  EVENTS_SUBSCRIBED: EventsSubscribedEvent;
-  EVENTS_UNSUBSCRIBED: EventsUnsubscribedEvent;
-  SUBSCRIBE_DENIED: SubscribeDeniedEvent;
 }
