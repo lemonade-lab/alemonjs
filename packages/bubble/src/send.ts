@@ -162,7 +162,7 @@ export const sendToRoom = async (
             }
           });
         } else if (item.type === 'BT.group' && item.value.length > 0) {
-          contentMd += `<box>${item.value
+          contentMd += `<box  classWind="mt-2" variant="borderless" >${item.value
             ?.map(row => {
               const val = row.value;
 
