@@ -29,7 +29,7 @@ export const sendToRoom = async (
     // images
     const images = val.filter(item => item.type === 'Image' || item.type === 'ImageURL' || item.type === 'ImageFile');
     // markdown
-    const mds = val.filter(item => item.type === 'Markdown');
+    const mdAndButtons = val.filter(item => item.type === 'Markdown' || item.type === 'BT.group');
     // text
     const content = val
       .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
@@ -119,8 +119,8 @@ export const sendToRoom = async (
     // markdown -> 转成 plain content (simple)
     let contentMd = '';
 
-    if (mds && mds.length > 0) {
-      mds.forEach(item => {
+    if (mdAndButtons && mdAndButtons.length > 0) {
+      mdAndButtons.forEach(item => {
         if (item.type === 'Markdown') {
           const md = item.value;
 
@@ -161,19 +161,41 @@ export const sendToRoom = async (
               contentMd += String(value);
             }
           });
+        } else if (item.type === 'BT.group' && item.value.length > 0) {
+          contentMd += `<box>${item.value
+            ?.map(row => {
+              const val = row.value;
+
+              if (val.length === 0) {
+                return '';
+              }
+
+              return `<flex>${val
+                .map(button => {
+                  const value = button.value;
+                  const options = button.options;
+                  const autoEnter = options?.autoEnter ?? false;
+                  const label = typeof value === 'object' ? value.title : value;
+                  const command = options?.data || label;
+
+                  return `<btn command="${command}" enter="${String(autoEnter)}" >${label}</btn>`;
+                })
+                .join('')}</flex>`;
+            })
+            .join('')}</box>`;
         }
       });
     }
 
     if ((content && content.length > 0) || (contentMd && contentMd.length > 0)) {
       if (channelId) {
-        const res = await client.sendMessage(channelId, { content: content ?? contentMd, type: 'text' });
+        const res = await client.sendMessage(channelId, { content: content !== '' ? content : contentMd, type: 'text' });
 
         return [createResult(ResultCode.Ok, '完成', res)];
       }
 
       if (threadId) {
-        const res = await client.sendDm(threadId, { content: content ?? contentMd, type: 'text' });
+        const res = await client.sendDm(threadId, { content: content !== '' ? content : contentMd, type: 'text' });
 
         return [createResult(ResultCode.Ok, '完成', res)];
       }

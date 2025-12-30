@@ -5,8 +5,10 @@ import { DefineResponseFunc } from '../types';
  * @param fnc
  * @returns
  */
-export const lazy = (fnc: () => Promise<any>) => {
-  return async () => (await fnc()).default;
+export const lazy = <T extends { default: any }>(fnc: () => Promise<T>): (() => Promise<T['default']>) => {
+  const back = async () => (await fnc()).default;
+
+  return back;
 };
 
 export const defineResponse: DefineResponseFunc = responses => {
