@@ -127,18 +127,18 @@ export const sendToRoom = async (
           const map: {
             [key: string]: (value: any) => string;
           } = {
-            title: value => `# ${value}`,
-            subtitle: value => `## ${value}`,
-            text: value => `${value} `,
-            bold: value => `**${value}** `,
-            divider: () => '\n————————\n',
-            italic: value => `_${value}_ `,
-            italicStar: value => `*${value}* `,
-            strikethrough: value => `~~${value}~~ `,
-            blockquote: value => `\n> ${value}`,
-            newline: () => '\n',
-            link: value => `[🔗${value.text}](${value.url}) `,
-            image: value => `\n![${value}](${value})\n`
+            'MD.title': value => `# ${value}`,
+            'MD.subtitle': value => `## ${value}`,
+            'MD.text': value => `${value} `,
+            'MD.bold': value => `**${value}** `,
+            'MD.divider': () => '\n————————\n',
+            'MD.italic': value => `_${value}_ `,
+            'MD.italicStar': value => `*${value}* `,
+            'MD.strikethrough': value => `~~${value}~~ `,
+            'MD.blockquote': value => `\n> ${value}`,
+            'MD.newline': () => '\n',
+            'MD.link': value => `[🔗${value.text}](${value.url}) `,
+            'MD.image': value => `\n![${value}](${value})\n`
           };
 
           md.forEach(line => {
