@@ -128,15 +128,15 @@ export const sendToRoom = async (
             if (line.type === 'MD.text') {
               contentMd += line.value;
             } else if (line.type === 'MD.blockquote') {
-              contentMd += `> ${line.value}\n`;
+              contentMd += `\n> ${line.value}\n`;
             } else if (line.type === 'MD.bold') {
               contentMd += `**${line.value}**`;
             } else if (line.type === 'MD.italic') {
               contentMd += `*${line.value}*`;
             } else if (line.type === 'MD.divider') {
-              contentMd += '---\n';
+              contentMd += '\n---\n';
             } else if (line.type === 'MD.image') {
-              contentMd += `![${line.value}](${line.value})`;
+              contentMd += `\n![${line.value}](${line.value})\n`;
             } else if (line.type === 'MD.link') {
               contentMd += `[${line.value}](${line.value})`;
             } else if (line.type === 'MD.list') {
@@ -154,7 +154,7 @@ export const sendToRoom = async (
             } else if (line.type === 'MD.code') {
               const language = line?.options?.language || '';
 
-              contentMd += `\`\`\`${language}\n${line.value}\n\`\`\`\n`;
+              contentMd += `\n\`\`\`${language}\n${line.value}\n\`\`\`\n`;
             } else {
               const value = line['value'] || '';
 
