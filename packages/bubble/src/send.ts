@@ -124,22 +124,32 @@ export const sendToRoom = async (
         if (item.type === 'Markdown') {
           const md = item.value;
 
+          const map: {
+            [key: string]: (value: any) => string;
+          } = {
+            title: value => `# ${value}`,
+            subtitle: value => `## ${value}`,
+            text: value => `${value} `,
+            bold: value => `**${value}** `,
+            divider: () => '\n————————\n',
+            italic: value => `_${value}_ `,
+            italicStar: value => `*${value}* `,
+            strikethrough: value => `~~${value}~~ `,
+            blockquote: value => `\n> ${value}`,
+            newline: () => '\n',
+            link: value => `[🔗${value.text}](${value.url}) `,
+            image: value => `\n![${value}](${value})\n`
+          };
+
           md.forEach(line => {
-            if (line.type === 'MD.text') {
-              contentMd += line.value;
-            } else if (line.type === 'MD.blockquote') {
-              contentMd += `\n> ${line.value}\n`;
-            } else if (line.type === 'MD.bold') {
-              contentMd += `**${line.value}**`;
-            } else if (line.type === 'MD.italic') {
-              contentMd += `*${line.value}*`;
-            } else if (line.type === 'MD.divider') {
-              contentMd += '\n---\n';
-            } else if (line.type === 'MD.image') {
-              contentMd += `\n![${line.value}](${line.value})\n`;
-            } else if (line.type === 'MD.link') {
-              contentMd += `[${line.value}](${line.value})`;
-            } else if (line.type === 'MD.list') {
+            if (map[line.type]) {
+              const value = (line as any)?.value;
+
+              contentMd += map[line.type](value);
+
+              return;
+            }
+            if (line.type === 'MD.list') {
               const listStr = line.value.map(listItem => {
                 if (typeof listItem.value === 'object') {
                   return `\n${listItem.value.index}. ${listItem.value.text}`;
@@ -149,8 +159,7 @@ export const sendToRoom = async (
               });
 
               contentMd += `${listStr}\n`;
-            } else if (line.type === 'MD.newline') {
-              contentMd += '\n';
+              // 换行
             } else if (line.type === 'MD.code') {
               const language = line?.options?.language || '';
 

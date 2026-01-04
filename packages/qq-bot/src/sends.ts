@@ -167,47 +167,36 @@ const createArkList = (value: DataArkList['value']) => {
   };
 };
 
+const map: {
+  [key: string]: (value: any) => string;
+} = {
+  title: value => `# ${value}`,
+  subtitle: value => `## ${value}`,
+  text: value => `${value} `,
+  bold: value => `**${value}** `,
+  divider: () => '\n————————\n',
+  italic: value => `_${value}_ `,
+  italicStar: value => `*${value}* `,
+  strikethrough: value => `~~${value}~~ `,
+  blockquote: value => `\n> ${value}`,
+  newline: () => '\n',
+  link: value => `[🔗${value.text}](${value.url}) `
+};
+
 // 数据md转为文本
 const createMarkdownText = (data: DataMarkDown['value']) => {
   const content = data
     .map(mdItem => {
-      if (mdItem.type === 'MD.title') {
-        // \n
-        return `# ${mdItem.value}\n`;
-      } else if (mdItem.type === 'MD.subtitle') {
-        // \n
-        return `## ${mdItem.value}\n`;
-      } else if (mdItem.type === 'MD.text') {
-        // 正文
-        return `${mdItem.value} `;
-      } else if (mdItem.type === 'MD.bold') {
-        // 加粗
-        return `**${mdItem.value}** `;
-      } else if (mdItem.type === 'MD.divider') {
-        // 分割线
-        return '\n————————\n';
-      } else if (mdItem.type === 'MD.italic') {
-        // 斜体
-        return `_${mdItem.value}_ `;
-      } else if (mdItem.type === 'MD.italicStar') {
-        // 星号斜体
-        return `*${mdItem.value}* `;
-      } else if (mdItem.type === 'MD.strikethrough') {
-        // 删除线
-        return `~~${mdItem.value}~~ `;
-      } else if (mdItem.type === 'MD.blockquote') {
-        // \n
-        return `> ${mdItem.value}\n`;
-      } else if (mdItem.type === 'MD.newline') {
-        // 换行
-        return '\n';
-      } else if (mdItem.type === 'MD.link') {
-        //
-        return `[🔗${mdItem.value.text}](${mdItem.value.url}) `;
-      } else if (mdItem.type === 'MD.image') {
-        //
-        return `![text #${mdItem.options?.width || 208}px #${mdItem.options?.height || 320}px](${mdItem.value}) `;
+      if (map[mdItem.type]) {
+        const value = (mdItem as any)?.value;
+
+        return map[mdItem.type](value);
+      }
+      if (mdItem.type === 'MD.image') {
+        // 单独一行
+        return `\n![text #${mdItem.options?.width || 208}px #${mdItem.options?.height || 320}px](${mdItem.value})\n`;
       } else if (mdItem.type === 'MD.list') {
+        // 单独一行
         const listStr = mdItem.value.map(listItem => {
           // 有序
           if (typeof listItem.value === 'object') {
@@ -220,16 +209,15 @@ const createMarkdownText = (data: DataMarkDown['value']) => {
 
         return `${listStr}\n`;
       } else if (mdItem.type === 'MD.code') {
+        // 单独一行
         const language = mdItem?.options?.language || '';
 
-        return `\`\`\`${language}\n${mdItem.value}\n\`\`\`\n`;
+        return `\n\`\`\`${language}\n${mdItem.value}\n\`\`\`\n`;
       } else {
         const value = mdItem['value'] || '';
 
         return String(value);
       }
-
-      return;
     })
     .join('');
 
