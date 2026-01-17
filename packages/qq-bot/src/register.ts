@@ -575,6 +575,7 @@ export const register = (client: QQBotClients) => {
   const onactions = async (data, consume) => {
     // 新增action，用于获取机器人本身的信息
     if (data.action === 'me.info') {
+      // TODO 当前api似乎仅适用于guilds模式
       const res = await client.usersMe();
       const UserId = res.id;
       const [isMaster, UserKey] = getMaster(UserId);
@@ -618,6 +619,8 @@ export const register = (client: QQBotClients) => {
       const res = await api.active.send.user(user_id, paramFormat);
 
       consume(res);
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
   };
 
@@ -633,6 +636,8 @@ export const register = (client: QQBotClients) => {
       const res = await client[key](...params);
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
   };
 

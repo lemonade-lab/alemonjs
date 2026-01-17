@@ -329,16 +329,16 @@ const main = () => {
         return consume(res);
       }
       case 'message.send.channel': {
-        const channel_id = data.payload.ChannelId;
+        const ChannelId = data.payload.ChannelId;
         const val = data.payload.params.format;
-        const res = await api.active.send.channel(channel_id, val);
+        const res = await api.active.send.channel(ChannelId, val);
 
         return consume(res);
       }
       case 'message.send.user': {
-        const user_id = data.payload.UserId;
+        const UserId = data.payload.UserId;
         const val = data.payload.params.format;
-        const res = await api.active.send.user(user_id, val);
+        const res = await api.active.send.user(UserId, val);
 
         return consume(res);
       }
@@ -400,6 +400,9 @@ const main = () => {
 
         return consume([res]);
       }
+      default: {
+        return consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+      }
     }
   };
 
@@ -413,6 +416,8 @@ const main = () => {
       const res = await client[key](...params);
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
   };
 

@@ -222,7 +222,10 @@ const main = () => {
 
   const onactions = async (data, consume) => {
     try {
-      if (data.action === 'message.send') {
+      //
+      if (data.action === 'me.info') {
+        //
+      } else if (data.action === 'message.send') {
         const event = data.payload.event;
         const paramFormat = data.payload.params.format;
         const res = await api.use.send(event, paramFormat);
@@ -245,6 +248,8 @@ const main = () => {
         const res = await api.use.mention(event);
 
         consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } else {
+        consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }
     } catch (error) {
       consume([createResult(ResultCode.Fail, '请求失败', error)]);
@@ -267,6 +272,8 @@ const main = () => {
       } catch (error) {
         consume([createResult(ResultCode.Fail, '请求失败', error)]);
       }
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
   };
 

@@ -65,13 +65,17 @@ export default () => {
       const res = await sendMessage(event, paramFormat);
       consume(res);
     } else if (data.action === 'message.send.channel') {
-      const channel_id = data.payload.ChannelId;
-      const val = data.payload.params.format;
+      // const channel_id = data.payload.ChannelId;
+      // const val = data.payload.params.format;
+      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
     } else if (data.action === 'message.send.user') {
-      const user_id = data.payload.UserId;
-      const val = data.payload.params.format;
+      // const user_id = data.payload.UserId;
+      // const val = data.payload.params.format;
+      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
     } else if (data.action === 'mention.get') {
-      const event = data.payload.event;
+      // const event = data.payload.event;
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
   });
 
@@ -83,6 +87,8 @@ export default () => {
       const params = data.payload.params;
       const res = await client[key](...params);
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
   });
 };

@@ -61,12 +61,12 @@ export default () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string;
 
-    if (event?.chat.type == 'channel' || event?.chat.type == 'supergroup') {
+    if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup') {
       // 机器人消息不处理
       if (event?.from?.is_bot) {
         return;
       }
-      // 定义消
+      // 定义消息
       const e: PublicEventMessageCreate = {
         // 事件类型
         Platform: platform,
@@ -96,7 +96,7 @@ export default () => {
       cbp.send(e);
 
       //
-    } else if (event?.chat.type == 'private') {
+    } else if (event?.chat.type === 'private') {
       // 定义消
       const e: PrivateEventMessageCreate = {
         name: 'private.message.create',
@@ -166,7 +166,7 @@ export default () => {
           return [];
         }
         const content = val
-          .filter(item => item.type == 'Link' || item.type == 'Mention' || item.type == 'Text')
+          .filter(item => item.type === 'Link' || item.type === 'Mention' || item.type === 'Text')
           .map(item => item.value)
           .join('');
         const e = event?.value;
@@ -177,7 +177,7 @@ export default () => {
 
             return [createResult(ResultCode.Ok, 'message.send', res)];
           }
-          const images = val.filter(item => item.type == 'Image' || item.type == 'ImageFile' || item.type == 'ImageURL');
+          const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
           if (images.length > 1) {
             let data = null;
@@ -214,7 +214,7 @@ export default () => {
     }
   };
 
-  cbp.onactions(async (data, consume) => {
+  const onactions = async (data, consume) => {
     if (data.action === 'message.send') {
       const event = data.payload.event;
       const paramFormat = data.payload.params.format;
@@ -222,15 +222,19 @@ export default () => {
 
       consume(res);
     } else if (data.action === 'message.send.channel') {
-      consume([]);
+      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
     } else if (data.action === 'message.send.user') {
-      consume([]);
+      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
     } else if (data.action === 'mention.get') {
-      consume([]);
+      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
-  });
+  };
 
-  cbp.onapis(async (data, consume) => {
+  cbp.onactions((data, consume) => void onactions(data, consume));
+
+  const onapis = async (data, consume) => {
     const key = data.payload?.key;
 
     if (client[key]) {
@@ -238,6 +242,10 @@ export default () => {
       const res = await client[key](...params);
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
-  });
+  };
+
+  cbp.onapis((data, consume) => void onapis(data, consume));
 };

@@ -311,6 +311,8 @@ const main = () => {
         const res = await api.use.mention(event);
 
         consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } else {
+        consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }
     } catch (error) {
       consume([createResult(ResultCode.Fail, '请求失败', error)]);
