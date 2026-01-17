@@ -75,11 +75,11 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
         // 解析消息
         const parsedMessage: ParsedMessage = flattedJSON.parse(message.toString());
 
-        logger.debug({
-          code: ResultCode.Ok,
-          message: '客户端接收到消息',
-          data: parsedMessage
-        });
+        // logger.debug({
+        //   code: ResultCode.Ok,
+        //   message: '客户端接收到消息',
+        //   data: parsedMessage
+        // });
         if (parsedMessage?.activeId) {
           // 主端端主动消息。
           if (parsedMessage.active === 'sync') {

@@ -127,11 +127,11 @@ export const cbpPlatform = (
       try {
         const data = flattedJSON.parse(message.toString());
 
-        logger.debug({
-          code: ResultCode.Ok,
-          message: '平台端接收消息',
-          data: data
-        });
+        // logger.debug({
+        //   code: ResultCode.Ok,
+        //   message: '平台端接收消息',
+        //   data: data
+        // });
         if (data.apiId) {
           for (const cb of apiReplys) {
             void cb(
