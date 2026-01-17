@@ -135,6 +135,12 @@ export type ActionMessageForwardChannel = {
   };
 };
 
+// 获取我的信息
+export type ActionMeInfo = {
+  action: 'me.info';
+  payload: object;
+};
+
 type base = {
   // 动作ID
   actionId?: string;
@@ -152,5 +158,6 @@ export type Actions = (
   | ActionFileSendUser
   | ActionMessageForwardUser
   | ActionMessageForwardChannel
+  | ActionMeInfo
 ) &
   base;

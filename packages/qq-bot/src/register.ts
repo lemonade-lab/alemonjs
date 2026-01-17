@@ -573,7 +573,23 @@ export const register = (client: QQBotClients) => {
   };
 
   const onactions = async (data, consume) => {
-    if (data.action === 'message.send') {
+    // 新增action，用于获取机器人本身的信息
+    if (data.action === 'me.info') {
+      const res = await client.usersMe();
+      const UserId = res.id;
+      const [isMaster, UserKey] = getMaster(UserId);
+
+      const botInfo: User = {
+        UserId: res?.id,
+        UserName: res?.username,
+        UserAvatar: createUserAvatarURL(res?.id),
+        IsBot: true,
+        IsMaster: isMaster,
+        UserKey: UserKey
+      };
+
+      consume([createResult(ResultCode.Ok, '请求完成', botInfo)]);
+    } else if (data.action === 'message.send') {
       // 消息发送
       const event = data.payload.event;
       const paramFormat = data.payload.params.format;

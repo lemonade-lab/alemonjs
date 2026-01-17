@@ -421,3 +421,50 @@ export const useClient = <T extends object>(event: any, _ApiClass: new (...args:
 
   return [client] as const;
 };
+
+/**
+ * 获取我相关的数据
+ */
+export const useMe = () => {
+  /**
+   * 个人信息
+   * @returns
+   */
+  const info = async () => {
+    try {
+      const results = await sendAction({
+        action: 'me.info',
+        payload: {}
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      if (result) {
+        const data = result.data as User | null;
+
+        return createResult<User | null>(ResultCode.Ok, 'Successfully retrieved bot information', data);
+      } else {
+        return createResult(ResultCode.Warn, 'No bot information found', null);
+      }
+    } catch (err) {
+      return createResult(ResultCode.Fail, err?.message || 'Failed to get bot information', null);
+    }
+  };
+
+  /**
+   * 加入的服务器列表
+   */
+
+  /**
+   * 好友列表
+   */
+
+  /**
+   * 私聊线程列表
+   */
+
+  const control = {
+    info
+  };
+
+  return [control] as const;
+};
