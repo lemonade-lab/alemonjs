@@ -116,6 +116,32 @@ export class OneBotAPI {
     });
   }
 
+  getLoginInfo() {
+    if (!this.ws) {
+      return;
+    }
+
+    return send(this.ws, {
+      action: 'get_login_info',
+      params: {}
+    });
+  }
+
+  /**
+   * @param options
+   * @returns
+   */
+  getMsg(options: { message_id: number }) {
+    if (!this.ws) {
+      return;
+    }
+
+    return send(this.ws, {
+      action: 'get_msg',
+      params: options
+    });
+  }
+
   /**
    * 好友列表
    */

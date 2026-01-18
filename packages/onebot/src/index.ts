@@ -37,6 +37,8 @@ const main = () => {
     for (const item of message) {
       if (item.type === 'text') {
         msg += item.data.text;
+      } else if (item.type === 'at') {
+        //
       }
     }
 
@@ -58,6 +60,8 @@ const main = () => {
 
     const groupId = String(event.group_id);
 
+    const readyId = event.message.find(item => item.type === 'reply')?.data?.id;
+
     // 定义消
     const e: PublicEventMessageCreate = {
       name: 'message.create',
@@ -74,6 +78,7 @@ const main = () => {
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
       OpenId: UserId,
+      readyId,
       CreateAt: Date.now(),
       tag: 'message.create',
       value: event
@@ -89,6 +94,8 @@ const main = () => {
 
     const [isMaster, UserKey] = getMaster(UserId);
 
+    const readyId = event.message.find(item => item.type === 'reply')?.data?.id;
+
     // 定义消
     const e: PrivateEventMessageCreate = {
       name: 'private.message.create',
@@ -103,6 +110,7 @@ const main = () => {
       MessageText: msg.trim(),
       OpenId: String(event.user_id),
       CreateAt: Date.now(),
+      readyId,
       tag: 'private.message.create',
       value: event
     };
@@ -321,21 +329,21 @@ const main = () => {
 
   const onactions = async (data, consume) => {
     switch (data.action) {
-      // case 'me.info': {
-      //   const res = await client.getMe();
-      //   const UserId = String(res.id);
-      //   const [isMaster, UserKey] = getMaster(UserId);
-      //   const user: User = {
-      //     UserId: UserId,
-      //     UserName: res.name,
-      //     IsBot: true,
-      //     IsMaster: isMaster,
-      //     UserAvatar: '',
-      //     UserKey: UserKey
-      //   };
+      case 'me.info': {
+        const res = await client.getLoginInfo();
+        const UserId = String(res?.user_id);
+        const [isMaster, UserKey] = getMaster(UserId);
+        const user: User = {
+          UserId: UserId,
+          UserName: res?.nickname,
+          IsBot: true,
+          IsMaster: isMaster,
+          UserAvatar: '',
+          UserKey: UserKey
+        };
 
-      //   return consume([createResult(ResultCode.Ok, '请求完成', user)]);
-      // }
+        return consume([createResult(ResultCode.Ok, '请求完成', user)]);
+      }
       case 'message.send': {
         const event = data.payload.event;
         const paramFormat = data.payload.params.format;

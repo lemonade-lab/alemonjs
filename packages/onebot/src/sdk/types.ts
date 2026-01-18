@@ -35,6 +35,12 @@ type Message =
         id: number;
         content: any[];
       };
+    }
+  | {
+      type: 'reply';
+      data: {
+        id: string;
+      };
     };
 
 export interface MESSAGES_TYPE {

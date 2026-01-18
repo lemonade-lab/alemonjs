@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/onebot",
-  "version": "2.1.0-alpha.11",
-  "description": "onebot v11",
+  "version": "2.1.0-alpha.12",
+  "description": "oneBot v11",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

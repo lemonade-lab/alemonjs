@@ -11,6 +11,10 @@ export type Message = {
    * 来源设备编号
    */
   DeviceId?: string;
+  /**
+   * 当消息时回复的，会携带replyId
+   */
+  replyId?: string;
 };
 
 export type MessageText = {
