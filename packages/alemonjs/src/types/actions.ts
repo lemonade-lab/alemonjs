@@ -159,5 +159,9 @@ export type Actions = (
   | ActionMessageForwardUser
   | ActionMessageForwardChannel
   | ActionMeInfo
+  | {
+      action: string;
+      payload: object;
+    }
 ) &
   base;

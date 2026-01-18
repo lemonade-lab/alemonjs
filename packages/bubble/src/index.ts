@@ -222,9 +222,20 @@ const main = () => {
 
   const onactions = async (data, consume) => {
     try {
-      //
       if (data.action === 'me.info') {
-        //
+        const res = await client.getMe();
+        const UserId = String(res.id);
+        const [isMaster, UserKey] = getMaster(UserId);
+        const user: User = {
+          UserId: UserId,
+          UserName: res.name,
+          IsBot: true,
+          IsMaster: isMaster,
+          UserAvatar: '',
+          UserKey: UserKey
+        };
+
+        consume([createResult(ResultCode.Ok, '请求完成', user)]);
       } else if (data.action === 'message.send') {
         const event = data.payload.event;
         const paramFormat = data.payload.params.format;

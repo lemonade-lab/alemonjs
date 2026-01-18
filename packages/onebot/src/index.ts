@@ -321,6 +321,21 @@ const main = () => {
 
   const onactions = async (data, consume) => {
     switch (data.action) {
+      // case 'me.info': {
+      //   const res = await client.getMe();
+      //   const UserId = String(res.id);
+      //   const [isMaster, UserKey] = getMaster(UserId);
+      //   const user: User = {
+      //     UserId: UserId,
+      //     UserName: res.name,
+      //     IsBot: true,
+      //     IsMaster: isMaster,
+      //     UserAvatar: '',
+      //     UserKey: UserKey
+      //   };
+
+      //   return consume([createResult(ResultCode.Ok, '请求完成', user)]);
+      // }
       case 'message.send': {
         const event = data.payload.event;
         const paramFormat = data.payload.params.format;

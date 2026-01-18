@@ -1,9 +1,10 @@
 import { DataEnums, OnDataFormatFunc } from '../types';
 import { ResultCode } from '../core/variable';
 import { sendAction } from '../cbp/processor/actions';
+import { createResult, Result } from '../core';
 
 type BaseMap = {
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 /**
@@ -98,4 +99,61 @@ export const sendToUser = async (OpenID: string, data: DataEnums[]) => {
       }
     }
   });
+};
+
+type IntentResult = {
+  // 仅允许bol和int类型作为意图值
+  [key: string]: boolean | number;
+  // 定义框架必须告知开发者的意图
+  // 1. 图片相关
+  // 图片发送最大数量。为0则禁止发送图片
+  maxImageCount?: number;
+  // 图片发送最大大小。单位：字节。为0则禁止发送图片
+  maxImageSize?: number;
+  // 2. 文字相关
+  // 文字发送最大长度。为0则禁止发送文字
+  maxTextLength?: number;
+  // 3. markdown相关
+  // markdown发送最大长度。为0则禁止发送markdown
+  maxMarkdownLength?: number;
+  // markdown 是否允许发送link
+  allowMarkdownLink?: boolean;
+  // markdown 是否允许发送图片
+  allowMarkdownImage?: boolean;
+  // markdown 是否允许发送mention
+  allowMarkdownMention?: boolean;
+  // 4. 文件相关
+  // 文件发送最大数量。为0则禁止发送文件
+  maxFileCount?: number;
+  // 文件发送最大大小。单位：字节。为0则禁止发送文件
+  maxFileSize?: number;
+  // 5. 视频相关
+  // 视频发送最大数量。为0则禁止发送视频
+  maxVideoCount?: number;
+  // 视频发送最大大小。单位：字节。为0则禁止发送视频
+  maxVideoSize?: number;
+  // 6. 平台组件相关
+  // 是否允许发送按钮
+  allowButton?: boolean;
+  // 7. 组合拳
+  // 是否允许图文混合发送
+  allowMixImageText?: boolean;
+  // 是否允许markdown与按钮混合发送
+  allowMixMarkdownButton?: boolean;
+};
+
+/**
+ * 得到消息意图。
+ * 用于多平台下的降级消费。
+ * @param event
+ * @param data
+ * @returns
+ */
+export const getMessageIntent = async (): Promise<Result<IntentResult>> => {
+  const results = await sendAction({
+    action: 'message.intent',
+    payload: {}
+  });
+
+  return createResult(ResultCode.Ok, '获取成功', results[0]?.data ?? null);
 };

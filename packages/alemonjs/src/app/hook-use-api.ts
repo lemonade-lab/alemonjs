@@ -4,6 +4,7 @@ import { ChildrenApp } from './store';
 import { createResult, Result } from '../core/utils';
 import { sendAction } from '../cbp/processor/actions';
 import { sendAPI } from '../cbp/processor/api';
+import { BT, Image, ImageFile, ImageURL, Link, MD, Mention, Text } from './message-format';
 
 type Options = {
   UserId?: string;
@@ -225,18 +226,101 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
   //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
   // }
 
-  const message = {
-    send
-    // withdraw,
-    // forward,
-    // reply,
-    // update,
-    // pinning,
-    // horn,
-    // reaction
-  };
+  // 新的消息处理接口
 
-  return [message] as const;
+  class MessageController {
+    #format: DataEnums[] = [];
+
+    get currentFormat() {
+      return this.#format;
+    }
+
+    // Text 相关方法
+    addText(...args: Parameters<typeof Text>) {
+      this.#format.push(Text(...args));
+
+      return this;
+    }
+
+    addLink(...args: Parameters<typeof Link>) {
+      this.#format.push(Link(...args));
+
+      return this;
+    }
+
+    // Image 相关方法
+    addImage(...args: Parameters<typeof Image>) {
+      this.#format.push(Image(...args));
+
+      return this;
+    }
+
+    addImageFile(...args: Parameters<typeof ImageFile>) {
+      this.#format.push(ImageFile(...args));
+
+      return this;
+    }
+
+    addImageURL(...args: Parameters<typeof ImageURL>) {
+      this.#format.push(ImageURL(...args));
+
+      return this;
+    }
+
+    // Mention 方法
+    addMention(...args: Parameters<typeof Mention>) {
+      this.#format.push(Mention(...args));
+
+      return this;
+    }
+
+    addButtonGroup(...args: Parameters<typeof BT.group>) {
+      this.#format.push(BT.group(...args));
+
+      return this;
+    }
+
+    addButtonTemplate(...args: Parameters<typeof BT.template>) {
+      this.#format.push(BT.template(...args));
+
+      return this;
+    }
+
+    // Markdown 相关方法
+    addMarkdown(...args: Parameters<typeof MD>) {
+      this.#format.push(MD(...args));
+
+      return this;
+    }
+
+    addMarkdownTemplate(...args: Parameters<typeof MD.template>) {
+      this.#format.push(MD.template(...args));
+
+      return this;
+    }
+
+    addFormat(val: DataEnums[]) {
+      this.#format.push(...val);
+
+      return this;
+    }
+
+    // 其他实用方法
+    clear() {
+      this.#format = [];
+
+      return this;
+    }
+
+    send(val?: DataEnums[]) {
+      // 如果不传入 val，则使用内部缓存的格式化数据
+      const dataToSend = val && val.length > 0 ? val : this.#format;
+
+      return send(dataToSend);
+    }
+  }
+
+  return [new MessageController()] as const;
 };
 
 /**
@@ -245,7 +329,7 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
  * @param event
  * @returns
  */
-export const useMenber = <T extends EventKeys>(event: Events[T]) => {
+export const useMember = <T extends EventKeys>(event: Events[T]) => {
   if (!event || typeof event !== 'object') {
     logger.error({
       code: ResultCode.FailParams,
@@ -430,7 +514,7 @@ export const useMe = () => {
    * 个人信息
    * @returns
    */
-  const info = async () => {
+  const info = async (): Promise<Result<User | null>> => {
     try {
       const results = await sendAction({
         action: 'me.info',
@@ -439,14 +523,14 @@ export const useMe = () => {
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        const data = result.data as User | null;
+        const data: User | null = result?.data ?? null;
 
-        return createResult<User | null>(ResultCode.Ok, 'Successfully retrieved bot information', data);
-      } else {
-        return createResult(ResultCode.Warn, 'No bot information found', null);
+        return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
       }
-    } catch (err) {
-      return createResult(ResultCode.Fail, err?.message || 'Failed to get bot information', null);
+
+      return createResult(ResultCode.Warn, 'No bot information found', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get bot information', null);
     }
   };
 
