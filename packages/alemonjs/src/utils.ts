@@ -208,19 +208,92 @@ export const getPublicIP = async (
  * 正则表达式工具类
  */
 export class Regular extends RegExp {
-  public static or(...regs: RegExp[]): Regular {
-    return new Regular(`(${regs.map(reg => reg.source).join('|')})`, regs.map(reg => reg.flags).join(''));
+  /**
+   * 创建 Regular 实例
+   * @param pattern
+   * @param flags
+   * @returns
+   */
+  public static create(pattern: RegExp | string, flags?: string): Regular {
+    return new Regular(pattern, flags);
   }
 
-  public static and(...regs: RegExp[]): Regular {
-    return new Regular(regs.map(reg => `(?=${reg.source})`).join('') + '.*', regs.map(reg => reg.flags).join(''));
+  /**
+   * 合并多个正则表达式的 flags，去重并排序
+   * @param flags
+   * @returns
+   */
+  private static mergeFlags(...flags: string[]): string {
+    const flagSet = new Set<string>();
+
+    for (const flagStr of flags) {
+      for (const char of flagStr) {
+        flagSet.add(char);
+      }
+    }
+
+    // 按照字母顺序排序，确保一致性
+    return Array.from(flagSet).sort().join('');
   }
 
-  or(...regs: RegExp[]): Regular {
-    return Regular.or(this, ...regs);
+  /**
+   * @param regulars
+   * @returns
+   */
+  public static or(...regulars: RegExp[]): Regular {
+    // 对于 OR 操作，使用非捕获组 (?:...)
+
+    // 取出每个正则的 source 并用 | 连接
+    const source = regulars.map(reg => `(?:${reg.source})`).join('|');
+    // 合并 flags
+    const flags = Regular.mergeFlags(...regulars.map(reg => reg.flags));
+
+    // 重新创建 Regular 实例
+    return new Regular(`(?:${source})`, flags);
   }
 
-  and(...regs: RegExp[]): Regular {
-    return Regular.and(this, ...regs);
+  /**
+   * @param regulars
+   * @returns
+   */
+  public static and(...regulars: RegExp[]): Regular {
+    // 对于 AND 操作，使用正向先行断言
+    const lookAHeads = regulars.map(reg => `(?=.*${reg.source})`).join('');
+    // 合并 flags
+    const flags = Regular.mergeFlags(...regulars.map(reg => reg.flags));
+
+    // 重新创建 Regular 实例
+    return new Regular(`${lookAHeads}.*`, flags);
+  }
+
+  or(...regulars: RegExp[]): Regular {
+    return Regular.or(this, ...regulars);
+  }
+
+  and(...regulars: RegExp[]): Regular {
+    return Regular.and(this, ...regulars);
+  }
+
+  /**
+   * 追加新的 flags
+   */
+  withFlags(flags: 'i' | 'g' | 'm' | 's' | 'u' | 'y'): Regular {
+    const mergedFlags = Regular.mergeFlags(this.flags, flags);
+
+    return new Regular(this.source, mergedFlags);
+  }
+
+  /**
+   * 去除指定的 flags
+   */
+  withoutFlags(flagsToRemove: 'i' | 'g' | 'm' | 's' | 'u' | 'y'): Regular {
+    const currentFlagsSet = new Set(this.flags);
+
+    for (const char of flagsToRemove) {
+      currentFlagsSet.delete(char);
+    }
+    const newFlags = Array.from(currentFlagsSet).sort().join('');
+
+    return new Regular(this.source, newFlags);
   }
 }
