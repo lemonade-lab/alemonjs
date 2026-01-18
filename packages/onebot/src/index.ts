@@ -60,7 +60,7 @@ const main = () => {
 
     const groupId = String(event.group_id);
 
-    const readyId = event.message.find(item => item.type === 'reply')?.data?.id;
+    const replyId = event.message.find(item => item.type === 'reply')?.data?.id;
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -78,7 +78,7 @@ const main = () => {
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
       OpenId: UserId,
-      readyId,
+      replyId,
       CreateAt: Date.now(),
       tag: 'message.create',
       value: event
@@ -94,7 +94,7 @@ const main = () => {
 
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const readyId = event.message.find(item => item.type === 'reply')?.data?.id;
+    const replyId = event.message.find(item => item.type === 'reply')?.data?.id;
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -110,7 +110,7 @@ const main = () => {
       MessageText: msg.trim(),
       OpenId: String(event.user_id),
       CreateAt: Date.now(),
-      readyId,
+      replyId,
       tag: 'private.message.create',
       value: event
     };
