@@ -87,7 +87,7 @@ export interface DIRECT_MESSAGE_TYPE {
   temp_source: number;
 }
 
-export interface meta_event_lifecycle {
+export interface META_EVENT_LIFECYCLE {
   time: number;
   // 机器人id
   self_id: number;
@@ -97,7 +97,7 @@ export interface meta_event_lifecycle {
   sub_type: 'connect';
 }
 
-export interface meta_event_heartbeat {
+export interface META_EVENT_HEARTBEAT {
   time: number;
   // 机器人id
   self_id: number;

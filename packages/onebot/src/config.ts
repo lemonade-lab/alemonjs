@@ -17,13 +17,13 @@ export const getOneBotConfig = (): Options => {
 
 export const getMaster = (UserId: string) => {
   const config = getOneBotConfig();
-  const master_key = config.master_key || [];
-  const master_id = config.master_id || [];
+  const masterKey = config.master_key || [];
+  const masterId = config.master_id || [];
   const UserKey = useUserHashKey({
     Platform: platform,
     UserId: UserId
   });
-  const is = master_key.includes(UserKey) || master_id.includes(UserId);
+  const is = masterKey.includes(UserKey) || masterId.includes(UserId);
 
   return [is, UserKey] as const;
 };

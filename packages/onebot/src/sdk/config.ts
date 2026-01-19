@@ -1,11 +1,10 @@
+type PromiseHandlers = {
+  resolve: (value: any) => void;
+  reject: (reason?: any) => void;
+};
+
 // 行为回调
-export const actionResolves = new Map<
-  string,
-  {
-    resolve: (value: any) => void;
-    reject: (reason?: any) => void;
-  }
->();
+export const actionResolves = new Map<string, PromiseHandlers>();
 // 超时器
 export const actionTimeouts = new Map<string, NodeJS.Timeout>();
 // 生成唯一标识符

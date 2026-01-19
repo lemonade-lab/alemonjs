@@ -136,30 +136,30 @@ export class OneBotClient extends OneBotAPI {
       }, curTime);
     };
 
-    if (!this.ws) {
+    if (!this.__ws) {
       if (reverse_enable) {
         // reverse_open
         const server = new WebSocketServer({ port: reverse_port ?? 17158 });
 
         server.on('connection', ws => {
-          this.ws = ws;
+          this.__ws = ws;
           // message
-          this.ws.on('message', onMessage);
+          this.__ws.on('message', onMessage);
           // close
-          this.ws.on('close', onClose);
+          this.__ws.on('close', onClose);
           logger.info(`[OneBot] connected: ws://127.0.0.1:${reverse_port}`);
         });
       } else {
         // forward_open
-        this.ws = new WebSocket(url, c);
-        this.ws.on('open', () => {
+        this.__ws = new WebSocket(url, c);
+        this.__ws.on('open', () => {
           logger.info(`[OneBot] connected: ${url}`);
           this.#count = 0;
         });
         // message
-        this.ws.on('message', onMessage);
+        this.__ws.on('message', onMessage);
         // close
-        this.ws.on('close', onClose);
+        this.__ws.on('close', onClose);
       }
     }
   }
