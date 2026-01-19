@@ -1,0 +1,7 @@
+# 具体见 pm2.config.cjs
+pm2:
+  apps:
+    - name: 'gui'
+      script: 'node index.js --login gui'
+      env:
+        NODE_ENV: 'production'

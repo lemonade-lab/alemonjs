@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "dev",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["dev"],
+      "runtimeExecutable": "yarn",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "view",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["dev", "--view"],
+      "runtimeExecutable": "yarn",
+      "skipFiles": ["<node_internals>/**"],
+      "preLaunchTask": "open-browser"
+    }
+  ]
+}
