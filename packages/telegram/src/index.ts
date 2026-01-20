@@ -1,4 +1,13 @@
-import { cbpPlatform, createResult, DataEnums, PrivateEventMessageCreate, PublicEventMemberAdd, PublicEventMessageCreate, ResultCode } from 'alemonjs';
+import {
+  cbpPlatform,
+  createResult,
+  DataEnums,
+  definePlatform,
+  PrivateEventMessageCreate,
+  PublicEventMemberAdd,
+  PublicEventMessageCreate,
+  ResultCode
+} from 'alemonjs';
 import { getBufferByURL } from 'alemonjs/utils';
 import TelegramClient from 'node-telegram-bot-api';
 import { platform, getTGConfig, getMaster } from './config';
@@ -7,7 +16,8 @@ export { platform } from './config';
 export { type Options } from './config';
 export const API = TelegramClient;
 export * from './hook';
-export default () => {
+
+const main = () => {
   const config = getTGConfig();
   const client = new TelegramClient(config.token, {
     polling: true,
@@ -249,3 +259,5 @@ export default () => {
 
   cbp.onapis((data, consume) => void onapis(data, consume));
 };
+
+export default definePlatform({ main });

@@ -1,6 +1,6 @@
 import { BubbleClient } from './sdk/wss';
 import type { User, PublicEventMessageCreate, PrivateEventMessageCreate, DataEnums } from 'alemonjs';
-import { ResultCode, cbpPlatform, createResult } from 'alemonjs';
+import { ResultCode, cbpPlatform, createResult, definePlatform } from 'alemonjs';
 import { getMaster, platform } from './config';
 import { CDN_URL } from './sdk/api';
 import { sendToRoom, sendToUser } from './send';
@@ -291,37 +291,4 @@ const main = () => {
   cbp.onapis((data, consume) => void onapis(data, consume));
 };
 
-const mainProcess = () => {
-  ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
-    process?.on?.(sig, () => {
-      logger.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
-      setImmediate(() => process.exit(0));
-    });
-  });
-
-  process?.on?.('exit', code => {
-    logger.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
-  });
-
-  // 监听主进程消息
-  process.on('message', msg => {
-    try {
-      const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
-
-      if (data?.type === 'start') {
-        main();
-      } else if (data?.type === 'stop') {
-        process.exit(0);
-      }
-    } catch {}
-  });
-
-  // 主动发送 ready 消息
-  if (process.send) {
-    process.send(JSON.stringify({ type: 'ready' }));
-  }
-};
-
-mainProcess();
-
-export default main;
+export default definePlatform({ main });

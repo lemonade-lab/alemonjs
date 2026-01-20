@@ -1,10 +1,9 @@
-import { cbpPlatform, createResult, DataEnums, PrivateEventMessageCreate, PublicEventMessageCreate, ResultCode, User } from 'alemonjs';
+import { cbpPlatform, createResult, DataEnums, definePlatform, PrivateEventMessageCreate, PublicEventMessageCreate, ResultCode, User } from 'alemonjs';
 import { getBufferByURL } from 'alemonjs/utils';
 import { readFileSync } from 'fs';
 import { platform, getOneBotConfig, getMaster } from './config';
 import { OneBotClient } from './sdk/wss';
 import { BotMe } from './db';
-
 export { platform } from './config';
 export { OneBotAPI as API } from './sdk/api';
 export * from './hook';
@@ -45,12 +44,14 @@ const main = () => {
     return msg.trim();
   };
 
+  // 元组
   client.on('META', event => {
     if (event?.self_id) {
       BotMe.id = String(event.self_id);
     }
   });
 
+  // 消息
   client.on('MESSAGES', event => {
     const msg = getMessageText(event.message);
     const UserId = String(event.user_id);
@@ -87,6 +88,7 @@ const main = () => {
     cbp.send(e);
   });
 
+  // 私聊消息
   client.on('DIRECT_MESSAGE', event => {
     const msg = getMessageText(event.message);
     const UserId = String(event.user_id);
@@ -448,37 +450,4 @@ const main = () => {
   cbp.onapis((data, consume) => void onapis(data, consume));
 };
 
-const mainProcess = () => {
-  ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
-    process?.on?.(sig, () => {
-      logger.info?.(`[@alemonjs/onebot][${sig}] 收到信号，正在关闭...`);
-      setImmediate(() => process.exit(0));
-    });
-  });
-
-  process?.on?.('exit', code => {
-    logger.info?.(`[@alemonjs/onebot][exit] 进程退出，code=${code}`);
-  });
-
-  // 监听主进程消息
-  process.on('message', msg => {
-    try {
-      const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
-
-      if (data?.type === 'start') {
-        main();
-      } else if (data?.type === 'stop') {
-        process.exit(0);
-      }
-    } catch {}
-  });
-
-  // 主动发送 ready 消息
-  if (process.send) {
-    process.send(JSON.stringify({ type: 'ready' }));
-  }
-};
-
-mainProcess();
-
-export default main;
+export default definePlatform({ main });

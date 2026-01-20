@@ -27,7 +27,7 @@ const startPlatform = (options: StartOptions) => {
   // 不登录平台
   if (!platform && !login) {
     // 没有指定平台和登录名，则启动 sandbox 模式
-    global.sandbox = true;
+    global.__sandbox = true;
 
     return;
   }
@@ -80,6 +80,9 @@ export const start = (options: StartOptions | string = {}) => {
     // 如果是字符串，则认为是入口文件路径
     options = { input: options };
   }
+
+  // 保存全局参数
+  global.__options = options;
 
   // 得到端口号
   const port = createOptionsByKey(options, 'port', defaultPort);

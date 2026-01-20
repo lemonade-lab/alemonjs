@@ -12,9 +12,6 @@ input: 'lib/index.js' # 应用入口文件路径，快捷参数 --input
 login: 'discord' # 登录平台标识，快捷参数 --login
 url: 'ws://127.0.0.1:17117' # CBP服务器连接地址，快捷参数 --url
 is_full_receive: false # 是否全量接收消息（用于分流处理）
-
-# === CBP（Chat Bot Protocol）配置 ===
-loadBalanceStrategy: 'least-connections' # 负载均衡策略，快捷参数 --loadBalanceStrategy
 ```
 
 ### 权限管理
@@ -181,45 +178,6 @@ alemonc get login
 ChatBot Protocol
 
 ALemonJS 的核心通信协议，负责客户端与平台之间的消息传输和负载均衡。
-
-### 负载均衡策略
-
-```yaml
-# 负载均衡策略配置
-loadBalanceStrategy: 'least-connections' # 默认策略
-
-# 支持的策略类型：
-# - 'round-robin': 轮询算法
-# - 'least-connections': 最少连接算法（推荐）
-# - 'random': 随机算法
-# - 'first-available': 首个可用算法
-
-# 支持的策略类型：
-# - 'round-robin': 轮询算法
-# - 'least-connections': 最少连接算法（推荐）
-# - 'random': 随机算法
-# - 'first-available': 首个可用算法
-
-#1. **轮询算法 (round-robin)**
-#   - 按固定顺序依次分配请求
-#   - 适用于客户端处理能力相近的场景
-#   - 请求分布均匀
-
-#2. **最少连接算法 (least-connections)**
-#   - 优选当前连接数最少的客户端
-#   - 适用于客户端处理能力不同的场景
-#   - 提供最优的负载分配
-
-#3. **随机算法 (random)**
-#   - 随机选择可用客户端
-#   - 简单的概率性分布
-#   - 适用于临时测试场景
-
-#4. **首个可用算法 (first-available)**
-#   - 总是选择第一个健康的客户端
-#   - 类似主备模式
-#   - 适用于有优先级需求的场景
-```
 
 ### CBP 连接配置
 

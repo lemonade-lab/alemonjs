@@ -84,10 +84,20 @@ export class ConfigCore {
     [key: string]: any;
   } {
     if (!this.#value) {
-      return this.#update();
+      this.#update();
+
+      // 读取value的时候，优先级最高的是 global.__options
+
+      return {
+        ...(this.#value || {}),
+        ...(global?.__options || {})
+      };
     }
 
-    return this.#value;
+    return {
+      ...(this.#value || {}),
+      ...(global?.__options || {})
+    };
   }
 
   /**
@@ -185,14 +195,14 @@ export class ConfigCore {
  * @returns
  */
 export const getConfig = (): typeof ConfigCore.prototype => {
-  if (global?.config) {
-    return global.config;
+  if (global?.__config) {
+    return global.__config;
   }
   const configDir = process.env.CFG_PATH || 'alemon.config.yaml';
 
-  global.config = new ConfigCore(configDir);
+  global.__config = new ConfigCore(configDir);
 
-  return global.config;
+  return global.__config;
 };
 
 /**

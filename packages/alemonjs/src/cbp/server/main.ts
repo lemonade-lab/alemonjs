@@ -175,7 +175,7 @@ const setChildrenClient = (originId: string, ws: WebSocket) => {
   childrenClient.set(originId, ws);
   // 得到子客户端的消息。只会是actions请求。
   ws.on('message', (message: string) => {
-    if (global.sandbox) {
+    if (global.__sandbox) {
       if (global.testoneClient && global.testoneClient.readyState === WebSocket.OPEN) {
         // 发给 web 的数据，需要是字符串
         global.testoneClient.send(message.toString());
@@ -219,7 +219,7 @@ const setFullClient = (originId: string, ws: WebSocket) => {
   fullClient.set(originId, ws);
   // 处理消息事件
   ws.on('message', (message: string) => {
-    if (global.sandbox) {
+    if (global.__sandbox) {
       if (global.testoneClient && global.testoneClient.readyState === WebSocket.OPEN) {
         // 发给 web 的数据，需要是字符串
         global.testoneClient.send(message.toString());
@@ -451,7 +451,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       global.chatbotServer.on('connection', (ws, request) => {
         // 测试平台的连接
         if (request.url === '/testone') {
-          if (!global.sandbox) {
+          if (!global.__sandbox) {
             ws.close(4000, 'Sandbox mode required');
 
             return;

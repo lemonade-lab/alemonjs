@@ -190,17 +190,17 @@ export const getPublicIP = async (
 ): Promise<string> => {
   const { force, ...config } = options;
 
-  if (global.publicip && !force) {
-    return global.publicip;
+  if (global.__publicIp && !force) {
+    return global.__publicIp;
   }
 
   return await publicIp({
     onlyHttps: true,
     ...config
   }).then(ip => {
-    global.publicip = ip;
+    global.__publicIp = ip;
 
-    return global.publicip;
+    return global.__publicIp;
   });
 };
 
