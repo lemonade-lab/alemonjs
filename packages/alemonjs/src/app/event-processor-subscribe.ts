@@ -5,16 +5,17 @@
  */
 import { Next, Events, EventCycleEnum, EventKeys } from '../types';
 import { SubscribeList } from './store';
+import { SubscribeStatus } from './config';
 
 /**
  * 处理订阅
  * @param valueEvent
  * @param select
  * @param next
- * @param chioce
+ * @param choose
  */
-export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next, chioce: EventCycleEnum) => {
-  const subList = new SubscribeList(chioce, select);
+export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next, choose: EventCycleEnum) => {
+  const subList = new SubscribeList(choose, select);
   /**
    * 观察者下一步
    * @returns
@@ -28,10 +29,22 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
 
     const item = subList.value.popNext(); // 弹出下一个节点
 
-    // 可能是 undefined
+    // 这里代表没有 下一个节点，应该进入下一个周期
     if (!item) {
-      // 继续 next
+      // 下一个节点
       nextObserver(true);
+
+      return;
+    }
+
+    const selects = item.data.selects; // 订阅的 selects
+    const ID = item.data.id; // 订阅的 ID
+
+    // 查看是否激活，如果不激活，移除并继续下一个
+    if (item.data.status === SubscribeStatus.paused) {
+      subList.value.removeCurrent(); // 移除当前节点
+      // 下一个节点
+      nextObserver();
 
       return;
     }
@@ -40,60 +53,66 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
     for (const key in item.data.keys) {
       // 只要发现不符合的，就继续
       if (item.data.keys[key] !== valueEvent[key]) {
+        // 下一个节点
         nextObserver();
 
         return;
       }
     }
 
-    const clear = () => {
-      const selects = item.data.selects;
-      const ID = item.data.id; // 订阅的 ID
-
+    // 恢复
+    const onActive = () => {
       for (const select of selects) {
-        const subList = new SubscribeList(chioce, select);
-        const remove = () => {
+        const subList = new SubscribeList(choose, select);
+
+        const find = () => {
           const item = subList.value.popNext(); // 弹出下一个节点
 
-          if (!item || item.data.id !== ID) {
-            remove();
+          if (!item) {
+            return;
+          }
+          if (item.data.id !== ID) {
+            find();
 
             return;
           }
-          subList.value.removeCurrent(); // 移除当前节点
+          item.data.status = SubscribeStatus.active; // 标记为已激活
         };
 
-        remove();
+        find();
       }
     };
 
-    // 恢复
-    const restore = () => {
-      const selects = item.data.selects;
-
+    const onPaused = () => {
       for (const select of selects) {
-        const subList = new SubscribeList(chioce, select);
+        const subList = new SubscribeList(choose, select);
+        const find = () => {
+          const item = subList.value.popNext(); // 弹出下一个节点
 
-        subList.value.append(item.data);
+          if (!item) {
+            return;
+          }
+          if (item.data.id !== ID) {
+            find();
+
+            return;
+          }
+          item.data.status = SubscribeStatus.paused; // 标记为已暂停
+        };
+
+        find();
       }
     };
 
     // 订阅是执行则销毁
-    clear();
+    onPaused();
 
     const Continue: Next = (cn?: boolean, ...cns: boolean[]) => {
-      // next() 订阅继续
       // 重新注册。
-      restore();
+      onActive();
       // true
       if (cn) {
-        nextObserver(...cns);
-
-        return;
-      }
-      // false
-      if (typeof cn === 'boolean') {
-        clear();
+        // 下一个节点 next(true)
         nextObserver(...cns);
       }
     };

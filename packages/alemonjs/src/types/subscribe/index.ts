@@ -5,14 +5,14 @@ import { EventKeys } from '../event/map';
 /**
  * subscribe
  */
-
 export type SubscribeValue = {
   choose: EventCycleEnum;
   selects: EventKeys[];
   keys: {
     [key: string]: string | number | boolean;
   };
-  current: Function;
+  status?: 'active' | 'paused'; // 订阅状态： 激活中，执行中，已暂停
+  current: (...arg: any[]) => any;
   id: string;
 };
 

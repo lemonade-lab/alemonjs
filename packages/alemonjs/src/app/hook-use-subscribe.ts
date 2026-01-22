@@ -1,6 +1,7 @@
 import { EventCycleEnum, Current, Events, EventKeys } from '../types';
 import { ResultCode } from '../core/variable';
 import { SubscribeList } from './store';
+import { SubscribeStatus } from './config';
 
 type KeyMap = {
   [key: string]: string | number | boolean;
@@ -72,6 +73,7 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
         selects: curSelects,
         keys: values,
         current: callback,
+        status: SubscribeStatus.active,
         id: ID
       });
     }
@@ -120,18 +122,21 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
 
     for (const select of selects) {
       const subList = new SubscribeList(value.choose, select);
-      const remove = () => {
+      const find = () => {
         const item = subList.value.popNext(); // 弹出下一个节点
 
-        if (!item || item.data.id !== ID) {
-          remove();
+        if (!item) {
+          return;
+        }
+        if (item.data.id !== ID) {
+          find();
 
           return;
         }
-        subList.value.removeCurrent(); // 移除当前节点
+        item.data.status = SubscribeStatus.paused; // 标记为已暂停
       };
 
-      remove();
+      find();
     }
   };
 
