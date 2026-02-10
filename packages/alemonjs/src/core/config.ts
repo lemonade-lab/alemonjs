@@ -1,4 +1,4 @@
-import { readFileSync, existsSync, watch, writeFileSync, mkdirSync } from 'fs';
+import { readFileSync, existsSync, watch, writeFileSync, mkdirSync, FSWatcher } from 'fs';
 import { dirname, join } from 'path';
 import YAML from 'yaml';
 import type { Package } from '../types';
@@ -13,6 +13,12 @@ export class ConfigCore {
 
   #value: any = null;
 
+  // 缓存合并后的值，避免每次 get value 都重新合并
+  #mergedValue: any = null;
+
+  // 保存 watcher 引用，防止重复注册
+  #watcher: FSWatcher | null = null;
+
   #initValue = {
     gui: {
       port: 17127
@@ -25,6 +31,13 @@ export class ConfigCore {
    */
   constructor(dir: string) {
     this.#dir = dir;
+  }
+
+  /**
+   * 使合并缓存失效
+   */
+  #invalidateMergedCache() {
+    this.#mergedValue = null;
   }
 
   /**
@@ -49,28 +62,33 @@ export class ConfigCore {
       const d = YAML.parse(data);
 
       this.#value = d;
+      this.#invalidateMergedCache();
     } catch (err) {
       logger.error({
         code: ResultCode.FailInternal,
         message: 'Config file parse error',
         data: err
       });
-      process.cwd();
+    }
+    // 关闭旧的 watcher，防止重复监听
+    if (this.#watcher) {
+      this.#watcher.close();
+      this.#watcher = null;
     }
     // 存在配置文件 , 开始监听文件
-    watch(dir, () => {
+    this.#watcher = watch(dir, () => {
       try {
         const data = readFileSync(dir, 'utf-8');
         const d = YAML.parse(data);
 
         this.#value = d;
+        this.#invalidateMergedCache();
       } catch (err) {
         logger.error({
           code: ResultCode.FailInternal,
           message: 'Config file parse error',
           data: err
         });
-        process.cwd();
       }
     });
 
@@ -85,19 +103,19 @@ export class ConfigCore {
   } {
     if (!this.#value) {
       this.#update();
-
-      // 读取value的时候，优先级最高的是 global.__options
-
-      return {
-        ...(this.#value || {}),
-        ...(global?.__options || {})
-      };
     }
 
-    return {
+    // 使用缓存的合并结果
+    if (this.#mergedValue) {
+      return this.#mergedValue;
+    }
+
+    this.#mergedValue = {
       ...(this.#value || {}),
       ...(global?.__options || {})
     };
+
+    return this.#mergedValue;
   }
 
   /**

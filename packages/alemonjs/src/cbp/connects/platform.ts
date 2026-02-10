@@ -1,10 +1,10 @@
 import * as flattedJSON from 'flatted';
 import { WebSocket } from 'ws';
-import { DEVICE_ID_HEADER, deviceId, reconnectInterval, USER_AGENT_HEADER } from '../processor/config';
+import { deviceId } from '../processor/config';
 import { Result, ResultCode } from '../../core';
-import { useHeartbeat } from './connect';
 import type { Actions, Apis, EventsEnum } from '../../types';
 import type { ActionReplyFunc, ApiReplyFunc } from '../typings';
+import { createWSConnector } from './base';
 
 /**
  * CBP 平台端
@@ -18,30 +18,7 @@ export const cbpPlatform = (
     open: () => {}
   }
 ) => {
-  if (global.chatbotPlatform) {
-    delete global.chatbotPlatform;
-  }
   const { open = () => {} } = options;
-
-  const [heartbeatControl] = useHeartbeat({
-    ping: () => {
-      global?.chatbotPlatform?.ping?.();
-    },
-    isConnected: () => {
-      return global?.chatbotPlatform && global?.chatbotPlatform?.readyState === WebSocket.OPEN;
-    },
-    terminate: () => {
-      try {
-        global?.chatbotPlatform?.terminate?.();
-      } catch (error) {
-        logger.debug({
-          code: ResultCode.Fail,
-          message: '强制断开连接失败',
-          data: error
-        });
-      }
-    }
-  });
 
   /**
    * 发送数据
@@ -49,7 +26,7 @@ export const cbpPlatform = (
    */
   const send = (data: EventsEnum) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
-      data.DeviceId = deviceId; // 设置设备 ID
+      data.DeviceId = deviceId;
       global.chatbotPlatform.send(flattedJSON.stringify(data));
     }
   };
@@ -58,12 +35,9 @@ export const cbpPlatform = (
 
   /**
    * 消费数据
-   * @param data
-   * @param payload
    */
   const replyAction = (data: Actions, payload: Result[]) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
-      // 透传消费。也就是对应的设备进行处理消费。
       global.chatbotPlatform.send(
         flattedJSON.stringify({
           action: data.action,
@@ -77,7 +51,6 @@ export const cbpPlatform = (
 
   const replyApi = (data: Apis, payload: Result[]) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
-      // 透传消费。也就是对应的设备进行处理消费。
       global.chatbotPlatform.send(
         flattedJSON.stringify({
           action: data.action,
@@ -91,7 +64,6 @@ export const cbpPlatform = (
 
   /**
    * 接收行为
-   * @param reply
    */
   const onactions = (reply: ActionReplyFunc) => {
     actionReplys.push(reply);
@@ -104,49 +76,22 @@ export const cbpPlatform = (
     apiReplys.push(reply);
   };
 
-  /**
-   * 启动 WebSocket 连接
-   */
-  const start = () => {
-    global.chatbotPlatform = new WebSocket(url, {
-      headers: {
-        [USER_AGENT_HEADER]: 'platform',
-        [DEVICE_ID_HEADER]: deviceId
-      }
-    });
-    global.chatbotPlatform.on('open', () => {
-      open();
-      heartbeatControl.start(); // 启动心跳
-    });
-
-    global.chatbotPlatform.on('pong', () => {
-      heartbeatControl.pong(); // 更新 pong 时间
-    });
-
-    global.chatbotPlatform.on('message', message => {
+  createWSConnector({
+    url,
+    role: 'platform',
+    globalKey: 'chatbotPlatform',
+    onOpen: open,
+    onMessage: (messageStr: string) => {
       try {
-        const data = flattedJSON.parse(message.toString());
+        const data = flattedJSON.parse(messageStr);
 
-        // logger.debug({
-        //   code: ResultCode.Ok,
-        //   message: '平台端接收消息',
-        //   data: data
-        // });
         if (data.apiId) {
           for (const cb of apiReplys) {
-            void cb(
-              data,
-              // 传入一个消费函数
-              val => replyApi(data, val)
-            );
+            void cb(data, val => replyApi(data, val));
           }
         } else if (data.actionId) {
           for (const cb of actionReplys) {
-            void cb(
-              data,
-              // 传入一个消费函数
-              val => replyAction(data, val)
-            );
+            void cb(data, val => replyAction(data, val));
           }
         }
       } catch (error) {
@@ -156,30 +101,8 @@ export const cbpPlatform = (
           data: error
         });
       }
-    });
-    global.chatbotPlatform.on('close', err => {
-      heartbeatControl.stop(); // 停止心跳
-      logger.warn({
-        code: ResultCode.Fail,
-        message: '平台端连接关闭，尝试重新连接...',
-        data: err
-      });
-      delete global.chatbotPlatform;
-      // 重新连接逻辑
-      setTimeout(() => {
-        start(); // 重新连接
-      }, reconnectInterval); // 6秒后重连
-    });
-    global.chatbotPlatform.on('error', err => {
-      logger.error({
-        code: ResultCode.Fail,
-        message: '平台端错误',
-        data: err
-      });
-    });
-  };
-
-  start();
+    }
+  });
 
   const client = {
     send,

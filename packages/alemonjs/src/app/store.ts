@@ -231,18 +231,18 @@ export class Middleware {
 
 export class SubscribeList<T extends EventKeys> {
   #select: T;
-  #chioce: EventCycleEnum;
-  constructor(chioce: EventCycleEnum, select: T) {
+  #choice: EventCycleEnum;
+  constructor(choice: EventCycleEnum, select: T) {
     this.#select = select;
-    this.#chioce = chioce;
+    this.#choice = choice;
     // 如果不存在，则初始化
-    if (!alemonjsCore.storeSubscribeList[this.#chioce].has(this.#select)) {
-      alemonjsCore.storeSubscribeList[this.#chioce].set(this.#select, new SinglyLinkedList());
+    if (!alemonjsCore.storeSubscribeList[this.#choice].has(this.#select)) {
+      alemonjsCore.storeSubscribeList[this.#choice].set(this.#select, new SinglyLinkedList());
     }
   }
 
   get value() {
-    return alemonjsCore.storeSubscribeList[this.#chioce].get(this.#select);
+    return alemonjsCore.storeSubscribeList[this.#choice].get(this.#select);
   }
 }
 
@@ -377,7 +377,7 @@ export class ChildrenApp {
    * 推送周期
    * @param data
    */
-  pushSycle(data: ChildrenCycle) {
+  pushCycle(data: ChildrenCycle) {
     this.#cycle = data;
   }
 
@@ -418,7 +418,7 @@ export class ChildrenApp {
 
 export const ProcessorEventAutoClearMap = new Map();
 
-export const ProcessorEventUserAudoClearMap = new Map();
+export const ProcessorEventUserAutoClearMap = new Map();
 
 // 初始化日志
 export const logger = new Logger().value;

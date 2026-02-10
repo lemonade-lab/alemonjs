@@ -11,6 +11,10 @@ import { createCallHandler } from './event-processor-callHandler';
 import { createNextStep } from './event-processor-cycleFiles';
 import { createRouteProcessChildren } from './event-processor-cycleRoute';
 
+// 单例，避免每次事件处理都创建新对象
+const responseSingleton = new Response();
+const responseRouterSingleton = new ResponseRouter();
+
 /**
  * todo：
  * 当前的局部中间件算法有问题
@@ -28,19 +32,15 @@ import { createRouteProcessChildren } from './event-processor-cycleRoute';
  * @param key
  */
 export const expendEvent = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
-  // 创建所有响应体（文件）
-  const res = new Response();
   // 得到所有响应体（文件）
-  const StoreResponse = res.value;
+  const StoreResponse = responseSingleton.value;
   // 创建调用函数（文件）
   const callHandler = createCallHandler(valueEvent);
   // 创建next函数（文件）
   const nextEvent = createNextStep(valueEvent, select, next, StoreResponse, callHandler);
 
   // 得到所有响应体（路由）
-  const resRoute = new ResponseRouter();
-  // 得到所有响应体（路由）
-  const routes = resRoute.value;
+  const routes = responseRouterSingleton.value;
   // 创建调用函数（路由）
   const callRouteHandler = createCallHandler(valueEvent);
   // 创建 children 处理函数（路由）

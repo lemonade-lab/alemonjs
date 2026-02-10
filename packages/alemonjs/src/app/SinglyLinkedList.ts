@@ -10,11 +10,13 @@ class ListNode<T> {
 
 export class SinglyLinkedList<T> {
   private head: ListNode<T> | null; // 链表的头节点
+  private tail: ListNode<T> | null; // 链表的尾节点，用于 O(1) append
   private size: number; // 链表的大小
   private current: ListNode<T> | null; // 当前节点指针
 
   constructor(initialValues?: T[]) {
     this.head = null;
+    this.tail = null;
     this.size = 0;
     this.current = null; // 初始化当前节点为 null
 
@@ -23,19 +25,16 @@ export class SinglyLinkedList<T> {
     }
   }
 
-  // 在链表末尾添加新节点
+  // 在链表末尾添加新节点 - O(1)
   append(data: T): void {
     const newNode = new ListNode(data);
 
     if (!this.head) {
       this.head = newNode;
+      this.tail = newNode;
     } else {
-      let current = this.head;
-
-      while (current.next) {
-        current = current.next;
-      }
-      current.next = newNode;
+      this.tail.next = newNode;
+      this.tail = newNode;
     }
     this.size++;
   }
@@ -53,12 +52,15 @@ export class SinglyLinkedList<T> {
 
   // 删除当前节点
   removeCurrent(): void {
-    if (!this.head) {
+    if (!this.head || !this.current) {
       return;
     }
 
     if (this.current === this.head) {
       this.head = this.head.next; // 移除头节点
+      if (!this.head) {
+        this.tail = null; // 链表变空，重置 tail
+      }
       this.current = null; // 重置当前节点
       this.size--;
 
@@ -73,6 +75,10 @@ export class SinglyLinkedList<T> {
 
     if (previous && this.current) {
       previous.next = this.current.next; // 跳过当前节点
+      // 如果删除的是尾节点，更新 tail
+      if (this.current === this.tail) {
+        this.tail = previous;
+      }
       this.current = null; // 重置当前节点
       this.size--;
     }

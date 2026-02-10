@@ -18,52 +18,22 @@ import {
 import type { ParsedMessage } from '../typings';
 import { createTestOneController } from './testone';
 
-// 处理api
-const handleApi = (DeviceId: string, message: string) => {
-  // 指定的设备 处理消费。终端有记录每个客户端是谁
+// 路由消息到指定设备（统一处理 api 和 action 的客户端查找逻辑）
+const routeMessageToDevice = (DeviceId: string, message: string) => {
   if (childrenClient.has(DeviceId)) {
     const clientWs = childrenClient.get(DeviceId);
 
     if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-      // 发送消息到指定的子客户端
       clientWs.send(message);
     } else {
-      // 如果连接已关闭，删除该客户端
       childrenClient.delete(DeviceId);
     }
   } else if (fullClient.has(DeviceId)) {
     const clientWs = fullClient.get(DeviceId);
 
     if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-      // 发送消息到指定的全量客户端
       clientWs.send(message);
     } else {
-      // 如果连接已关闭，删除该客户端
-      fullClient.delete(DeviceId);
-    }
-  }
-};
-
-// 处理 action
-const handleAction = (DeviceId: string, message: string) => {
-  if (childrenClient.has(DeviceId)) {
-    const clientWs = childrenClient.get(DeviceId);
-
-    if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-      // 发送消息到指定的子客户端
-      clientWs.send(message);
-    } else {
-      // 如果连接已关闭，删除该客户端
-      childrenClient.delete(DeviceId);
-    }
-  } else if (fullClient.has(DeviceId)) {
-    const clientWs = fullClient.get(DeviceId);
-
-    if (clientWs && clientWs.readyState === WebSocket.OPEN) {
-      // 发送消息到指定的全量客户端
-      clientWs.send(message);
-    } else {
-      // 如果连接已关闭，删除该客户端
       fullClient.delete(DeviceId);
     }
   }
@@ -288,12 +258,12 @@ const setPlatformClient = (originId: string, ws: WebSocket) => {
         // 指定的设备 处理消费。终端有记录每个客户端是谁
         const DeviceId = parsedMessage.DeviceId;
 
-        handleApi(DeviceId, message);
+        routeMessageToDevice(DeviceId, message);
       } else if (parsedMessage?.actionId) {
         // 指定的设备 处理消费。终端有记录每个客户端是谁
         const DeviceId = parsedMessage.DeviceId;
 
-        handleAction(DeviceId, message);
+        routeMessageToDevice(DeviceId, message);
       } else if (parsedMessage?.name) {
         const ID = parsedMessage.ChannelId || parsedMessage.GuildId || parsedMessage.DeviceId;
 
@@ -358,12 +328,12 @@ const setTestOnePlatformClient = (ws: WebSocket) => {
         // 指定的设备 处理消费。终端有记录每个客户端是谁
         const DeviceId = parsedMessage.DeviceId;
 
-        handleApi(DeviceId, message);
+        routeMessageToDevice(DeviceId, message);
       } else if (parsedMessage?.actionId) {
         // 指定的设备 处理消费。终端有记录每个客户端是谁
         const DeviceId = parsedMessage.DeviceId;
 
-        handleAction(DeviceId, message);
+        routeMessageToDevice(DeviceId, message);
       } else if (parsedMessage?.name) {
         const ID = parsedMessage.ChannelId || parsedMessage.GuildId || parsedMessage.DeviceId;
 

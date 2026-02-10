@@ -1,4 +1,3 @@
-import { isAsyncFunction } from 'util/types';
 import { Next, Events, EventKeys, ResponseRoute } from '../types';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
@@ -79,7 +78,8 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         const currents = [];
 
         for (const item of currentsAndMiddleware) {
-          const app = isAsyncFunction(item) ? await item() : item();
+          // 统一使用 await，无需区分同步/异步函数
+          const app = await item();
           // 没有 default。因为是 import x from './';
 
           // 中间件也有 selects。

@@ -58,7 +58,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       app = await moduleApp.default.callback();
     }
 
-    App.pushSycle(app);
+    App.pushCycle(app);
 
     const unMounted = async e => {
       showErrorModule(e);
@@ -123,7 +123,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         // 切掉 mainDir
         const url = file.path.replace(mainDir, '');
         const stateKey = createEventName(url, appName);
-        const reesponse: StoreResponseItem = {
+        const responseItem: StoreResponseItem = {
           input: mainDir,
           dir: dirname(file.path),
           path: file.path,
@@ -132,7 +132,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
           appName: appName
         };
 
-        resData.push(reesponse);
+        resData.push(responseItem);
       }
       App.pushResponse(resData);
 
@@ -148,7 +148,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         // 切掉 mainDir
         const url = file.path.replace(mainDir, '');
         const stateKey = createEventName(url, appName);
-        const reesponse: StoreResponseItem = {
+        const responseItem: StoreResponseItem = {
           input: mainDir,
           dir: dirname(file.path),
           path: file.path,
@@ -157,7 +157,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
           appName: appName
         };
 
-        resAndMwData[stateKey] = reesponse;
+        resAndMwData[stateKey] = responseItem;
       }
 
       App.pushResponseMiddleware(resAndMwData);

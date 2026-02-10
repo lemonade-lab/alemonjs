@@ -1,14 +1,15 @@
 import { getConfigValue } from '../core/config';
 import {
-  processorPepeatedClearSize,
+  processorRepeatedClearSize,
   processorRepeatedClearTimeMax,
   processorRepeatedClearTimeMin,
   processorRepeatedEventTime,
-  processorRepeatedUserTime
+  processorRepeatedUserTime,
+  processorMaxMapSize
 } from '../core/variable';
 import { EventKeys, Events } from '../types';
 import { expendCycle } from './event-processor-cycle';
-import { ProcessorEventAutoClearMap, ProcessorEventUserAudoClearMap } from './store';
+import { ProcessorEventAutoClearMap, ProcessorEventUserAutoClearMap } from './store';
 import { createHash } from '../core/utils';
 
 /**
@@ -26,6 +27,18 @@ const filter = ({ Now, store, INTERVAL }, MessageId: string) => {
       store.set(MessageId, Date.now());
 
       return true;
+    }
+  }
+  // 防止 Map 无限增长导致内存泄漏
+  if (store.size >= processorMaxMapSize) {
+    cleanupStore({ Now, store, INTERVAL });
+    // 清理后仍然超限，删除最早的条目
+    if (store.size >= processorMaxMapSize) {
+      const firstKey = store.keys().next().value;
+
+      if (firstKey !== undefined) {
+        store.delete(firstKey);
+      }
     }
   }
   store.set(MessageId, Date.now());
@@ -54,16 +67,16 @@ const cleanupStoreAll = () => {
   const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
 
   cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap });
-  cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAudoClearMap });
+  cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap });
 };
 
 // 清理消息
 const callback = () => {
   cleanupStoreAll();
   // 下一次清理的时间，应该随着长度的增加而减少
-  const length = ProcessorEventAutoClearMap.size + ProcessorEventUserAudoClearMap.size;
+  const length = ProcessorEventAutoClearMap.size + ProcessorEventUserAutoClearMap.size;
   // 长度控制在37个以内
-  const time = length > processorPepeatedClearSize ? processorRepeatedClearTimeMin : processorRepeatedClearTimeMax;
+  const time = length > processorRepeatedClearSize ? processorRepeatedClearTimeMin : processorRepeatedClearTimeMax;
 
   setTimeout(callback, time);
 };
@@ -180,7 +193,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     const UserId = createHash(event['UserId']);
 
     // 频繁操作
-    if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAudoClearMap }, UserId)) {
+    if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
       return;
     }
   }

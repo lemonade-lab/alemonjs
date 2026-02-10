@@ -11,25 +11,25 @@ import { createCallHandler } from './event-processor-callHandler';
 import { createNextStep } from './event-processor-cycleFiles';
 import { createRouteProcessChildren } from './event-processor-cycleRoute';
 
+// 单例，避免每次事件处理都创建新对象
+const middlewareSingleton = new Middleware();
+const middlewareRouterSingleton = new MiddlewareRouter();
+
 /**
  * 处理中间件
  * @param event
  * @param select
  */
 export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
-  // 读取所有全局中间件（文件）
-  const mw = new Middleware();
   // 所有中间件（文件）
-  const mwFiles = mw.value;
+  const mwFiles = middlewareSingleton.value;
   // 创建处理函数（文件）
   const callHandler = createCallHandler(valueEvent);
   // 创建 next 处理函数（文件）
   const nextMiddleware = createNextStep(valueEvent, select, next, mwFiles, callHandler);
 
-  // 读取所有全局中间件（路由）
-  const resRoute = new MiddlewareRouter();
   // 所有中间件（路由）
-  const routes = resRoute.value;
+  const routes = middlewareRouterSingleton.value;
   // 创建处理函数（路由）
   const callRouteHandler = createCallHandler(valueEvent);
   // 创建 children 处理函数（路由）

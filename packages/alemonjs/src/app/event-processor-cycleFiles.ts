@@ -4,6 +4,31 @@ import { showErrorModule } from '../core/utils';
 import { EventMessageText } from '../core/variable';
 import { ResponseMiddleware } from './store';
 
+// 模块缓存，避免每次事件处理都重新 import
+const moduleCache = new Map<string, any>();
+
+/**
+ * 清除模块缓存（用于热更新等场景）
+ */
+export const clearModuleCache = (path?: string) => {
+  if (path) {
+    moduleCache.delete(path);
+  } else {
+    moduleCache.clear();
+  }
+};
+
+const loadModule = async (filePath: string) => {
+  if (moduleCache.has(filePath)) {
+    return moduleCache.get(filePath);
+  }
+  const mod = await import(`file://${filePath}`);
+
+  moduleCache.set(filePath, mod);
+
+  return mod;
+};
+
 const callHandlerFile = async <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
@@ -15,7 +40,7 @@ const callHandlerFile = async <T extends EventKeys>(
     const app: {
       default: OnResponseValue<Current<EventKeys>, T>;
       regular?: string | RegExp;
-    } = await import(`file://${file.path}`);
+    } = await loadModule(file.path);
 
     // bad case
     if (!app?.default?.current || !app?.default?.select) {

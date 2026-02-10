@@ -4,7 +4,8 @@ export const processorRepeatedEventTime = 1000 * 60;
 export const processorRepeatedUserTime = 1000 * 1;
 export const processorRepeatedClearTimeMin = 1000 * 3;
 export const processorRepeatedClearTimeMax = 1000 * 10;
-export const processorPepeatedClearSize = 37;
+export const processorRepeatedClearSize = 37;
+export const processorMaxMapSize = 10000;
 
 // 中间件文件后缀正则
 export const fileSuffixMiddleware = /^mw(\.|\..*\.)(js|ts|jsx|tsx)$/;

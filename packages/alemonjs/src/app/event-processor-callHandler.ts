@@ -1,4 +1,3 @@
-import { isAsyncFunction } from 'util/types';
 import { CurrentResultValue } from '../types';
 import { showErrorModule } from '../core';
 import { useMessage } from './hook-use-api';
@@ -6,7 +5,7 @@ import { useMessage } from './hook-use-api';
 export const createCallHandler = valueEvent => {
   const [message] = useMessage(valueEvent);
 
-  // 开始处理 heandler
+  // 开始处理 handler
   const callHandler = (currents, nextEvent) => {
     let index = 0;
     let isClose = false;
@@ -47,21 +46,13 @@ export const createCallHandler = valueEvent => {
       }
 
       try {
-        if (isAsyncFunction(currents[index])) {
-          const res = await currents[index](valueEvent, (...cns: boolean[]) => {
-            isNext = true;
-            nextEvent(...cns);
-          });
+        // 统一使用 await，无需区分同步/异步函数
+        const res = await currents[index](valueEvent, (...cns: boolean[]) => {
+          isNext = true;
+          nextEvent(...cns);
+        });
 
-          onRes(res);
-        } else {
-          const res = currents[index](valueEvent, (...cns: boolean[]) => {
-            isNext = true;
-            nextEvent(...cns);
-          });
-
-          onRes(res);
-        }
+        onRes(res);
       } catch (err) {
         showErrorModule(err);
 
