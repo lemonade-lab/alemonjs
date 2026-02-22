@@ -96,14 +96,14 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 
 ## 生态列表
 
-| Project            | Description          |
-| ------------------ | -------------------- |
-| 👉[nodejs-dev]     | 开发环境(捆绑打包器) |
-| 👉[nodejs-desktop] | 桌面端版本           |
-| 👉[alemongo]       | 服务端版本           |
+| Project        | Description                 |
+| -------------- | --------------------------- |
+| 👉[lvyjs]      | 开发环境(nodejs 捆绑打包器) |
+| 👉[alemondesk] | 桌面端版本(react-golang)    |
+| 👉[alemongo]   | 服务端版本(react-golang)    |
 
 [nodejs-dev]: https://github.com/lemonade-lab/lvyjs
-[nodejs-desktop]: https://github.com/lemonade-lab/alemonjs-desktop
+[alemondesk]: https://github.com/lemonade-lab/alemondesk
 [alemongo]: https://github.com/lemonade-lab/alemongo
 
 ## 贡献
