@@ -102,7 +102,7 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 | 👉[alemondesk] | 桌面端版本(react-golang)    |
 | 👉[alemongo]   | 服务端版本(react-golang)    |
 
-[nodejs-dev]: https://github.com/lemonade-lab/lvyjs
+[lvyjs]: https://github.com/lemonade-lab/lvyjs
 [alemondesk]: https://github.com/lemonade-lab/alemondesk
 [alemongo]: https://github.com/lemonade-lab/alemongo
 
