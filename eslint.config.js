@@ -9,7 +9,6 @@ export default [
   {
     ignores: [
       'frontends/**',
-      'clis/**',
       'node_modules/**',
       '**/*.css',
       '**/*.jpg',

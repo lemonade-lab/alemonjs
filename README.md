@@ -1,26 +1,22 @@
-# ALemonJS
+# [ALemonJS](https://alemonjs.com)
 
-[alemonjs](https://alemonjs.com) 是一个专门用于开发聊天机器人的 Node.js 框架，它提供了完整的事件驱动架构来处理各种聊天平台的消息和交互。
+专用于开发聊天机器人的 Node.js 框架，它提供了完整的事件驱动架构来处理各种聊天平台的消息和交互。
 
-https://alemonjs.com
+官网文档 https://alemonjs.com
 
 ## 🏗️ 架构设计特点
 
 1. 事件驱动架构
 
-基于事件选择器(onSelects)和响应处理器(onResponse)的模式
+基于事件选择器和响应处理器的模式
 
-支持多种事件类型（如 message.create、private.message.create 等）
+支持多种事件类型（如消息创建、消息撤回等）
 
 事件处理包含完整的生命周期：创建、挂载、卸载
 
 2. CBP 通信协议
 
-实现了自定义的 WebSocket 通信协议
-
 支持客户端-服务器架构，可以作为服务器运行也可以连接到远程服务器
-
-包含心跳机制、重连机制、消息去重等可靠性保障
 
 3. 模块化插件系统
 
@@ -28,13 +24,9 @@ https://alemonjs.com
 
 提供中间件机制用于消息预处理
 
-状态管理系统，支持模块的启用/禁用
+4. 支持自定义平台
 
-4. 多平台适配器
-
-通过环境变量动态加载不同的聊天平台适配器
-
-支持统一的消息格式处理（文本、图片、按钮、卡片等）
+可根据接口说明对接任意平台
 
 ## 🔧 核心组件分析
 
@@ -44,31 +36,23 @@ https://alemonjs.com
 
 用户操作频率限制（防止恶意刷屏）
 
-自动清理过期的消息记录
-
 6. Hook 系统
 
 类似 React Hooks 的设计模式
 
-提供 useMessage、useMention、useState 等常用 Hook
+提供 useMessage、useMention 等常用 Hook
 
 简化了消息处理的复杂性
 
 7.  消息格式化系统
 
-统一的消息格式定义
-
 支持文本、图片、按钮、Markdown、ARK 卡片等多种消息类型
-
-通过 format() 函数进行消息格式化
 
 8. 配置管理系统
 
 支持命令行参数、配置文件、环境变量多层配置
 
-动态配置加载和热更新
-
-平台特定的配置管理
+配置动态加载和热更新
 
 ## 💡 设计优势
 
@@ -112,11 +96,11 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 
 ## 生态列表
 
-| Project            | Status | Description |
-| ------------------ | ------ | ----------- |
-| 👉[nodejs-dev]     |        | 开发环境    |
-| 👉[nodejs-desktop] |        | 桌面端版本  |
-| 👉[alemongo]       |        | 服务端版本  |
+| Project            | Description          |
+| ------------------ | -------------------- |
+| 👉[nodejs-dev]     | 开发环境(捆绑打包器) |
+| 👉[nodejs-desktop] | 桌面端版本           |
+| 👉[alemongo]       | 服务端版本           |
 
 [nodejs-dev]: https://github.com/lemonade-lab/lvyjs
 [nodejs-desktop]: https://github.com/lemonade-lab/alemonjs-desktop
@@ -130,4 +114,4 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 
 ## 联系方式
 
-> QQ Group 806943302
+> QQ Group 1012967625
