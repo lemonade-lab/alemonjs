@@ -239,14 +239,14 @@ export class Format {
   /**
    * 创建一个新的 Markdown Format 实例
    */
-  createMarkdown() {
+  static createMarkdown() {
     return new FormatMarkDown();
   }
 
   /**
    * 创建一个新的 Button Format 实例
    */
-  createButtonGroup() {
+  static createButtonGroup() {
     return new FormatButtonGroup();
   }
 
