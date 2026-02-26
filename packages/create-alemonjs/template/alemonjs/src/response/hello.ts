@@ -5,6 +5,9 @@ export default async e => {
   const event = createEvent({
     event: e,
     selects: ['message.create']
+    // regular: /hello/,
+    // prefix: '/',
+    // exact: '/hello'
   });
 
   const [message] = useMessage(event);

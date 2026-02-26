@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/node": "^22",
     "@alemonjs/db": "^0.0.13",
-    "alemonjs": "2.1.14",
+    "alemonjs": "2.1.20",
     "jsxp": "1.2.4",
     "tailwindcss": "3",
     "cssnano": "^7",

@@ -3,7 +3,6 @@ import { useMessage, createEvent, Format } from 'alemonjs';
 import Help from '@src/image/component/help';
 
 export default async (e, next) => {
-  console.warn('help RES', e);
   // 创建事件
   const event = createEvent({
     event: e,
