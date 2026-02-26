@@ -1,439 +1,220 @@
-import {
-  DataMention,
-  DataImage,
-  DataText,
-  DataImageURL,
-  DataImageFile,
-  ButtonRow,
-  DataButtonGroup,
-  DataButton,
-  DataArkList,
-  DataArkListTip,
-  DataArkListContent,
-  DataArkListItem,
-  DataArkCard,
-  DataArkBigCard,
-  DataMarkdownTemplate,
-  DataMarkDown,
-  DataMarkdownTitle,
-  DataMarkdownSubtitle,
-  DataMarkdownBold,
-  DataMarkdownItalic,
-  DataMarkdownItalicStar,
-  DataMarkdownStrikethrough,
-  DataMarkdownLink,
-  DataMarkdownImage,
-  DataMarkdownList,
-  DataMarkdownListItem,
-  DataMarkdownBlockquote,
-  DataMarkdownDivider,
-  DataMarkdownNewline,
-  DataLink,
-  DataMarkdownText,
-  DataButtonTemplate,
-  DataMarkdownCode,
-  DataEnums,
-  EventKeys,
-  Events
-} from '../types';
+import { ButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums, EventKeys, Events } from '../types';
 
-/**
- * 文本消息
- * @param val
- * @param options
- * @returns
- */
-export const Text = (val: DataText['value'], options?: DataText['options']): DataText => {
-  return {
-    type: 'Text',
-    value: val,
-    options
-  };
-};
+import { Text, Link, Image, ImageFile, ImageURL, Mention, BT, MD } from './message-format-old.js';
 
-/**
- * 链接消息
- * @param val 要显示的文本
- * @param options 内容选项
- * @returns
- */
-export const Link = (val: DataLink['value'], options?: DataText['options']): DataText => {
-  return {
-    type: 'Text',
-    value: val,
-    options
-  };
-};
+export * from './message-format-old.js';
 
-/**
- * 图片链接，http 或 https 开头
- * @param val
- * @returns
- */
-export const ImageURL = (val: DataImageURL['value']): DataImageURL => {
-  return {
-    type: 'ImageURL',
-    value: val
-  };
-};
+class FormatButtonGroup {
+  #rows: ButtonRow[] = [];
+  #currentRow: DataButton[] | null = null;
 
-/**
- * 本地图片文件
- * @param val
- * @returns
- */
-export const ImageFile = (val: DataImageFile['value']): DataImageFile => {
-  return {
-    type: 'ImageFile',
-    value: val
-  };
-};
-
-/**
- * 图片消息
- * @param val
- * @returns
- */
-const Image = (val: Buffer): DataImage => {
-  return {
-    type: 'Image',
-    value: val.toString('base64')
-  };
-};
-
-Image.url = ImageURL;
-Image.file = ImageFile;
-export { Image };
-
-/**
- * 提及
- * @param UserId 默认 @ 所有人
- * @param options 默认 user
- * @returns
- */
-export const Mention = (UserId?: DataMention['value'], options?: DataMention['options']): DataMention => {
-  return {
-    type: 'Mention',
-    value: UserId,
-    options: options ?? {
-      belong: 'user'
-    }
-  };
-};
-
-const BT = (title: string, data: DataButton['options']['data'], options?: Omit<DataButton['options'], 'data'>): DataButton => {
-  return {
-    type: 'Button',
-    value: title,
-    options: {
-      data,
-      ...options
-    }
-  };
-};
-
-BT.group = function Group(...rows: ButtonRow[]): DataButtonGroup {
-  return {
-    type: 'BT.group',
-    value: rows
-  };
-};
-
-/**
- * 创建一个按钮模板
- * @param templateId  模板 ID
- * @returns
- */
-BT.template = function Template(templateId: DataButtonTemplate['value']): DataButtonTemplate {
-  return {
-    type: 'ButtonTemplate',
-    value: templateId
-  };
-};
-
-BT.row = function Row(...buttons: DataButton[]): ButtonRow {
-  return {
-    type: 'BT.row',
-    value: buttons
-  };
-};
-
-export { BT };
-
-// Ark 函数
-export const Ark = {
   /**
-   *
-   * @param values 要显示的文本
-   * @returns
+   * 获取按钮组数据
    */
-  list: (...values: DataArkList['value']): DataArkList => {
-    return {
-      type: 'Ark.list',
-      value: values
-    };
-  },
-  /**
-   *
-   * @param options 提示信息
-   * @returns
-   */
-  listTip: (options: DataArkListTip['value']): DataArkListTip => {
-    return {
-      type: 'Ark.listTip',
-      value: options
-    };
-  },
-  /**
-   *
-   * @param values 实际内容
-   * @returns
-   */
-  listContent: (...values: DataArkListContent['value']): DataArkListContent => {
-    return {
-      type: 'Ark.listContent',
-      value: values
-    };
-  },
-  /**
-   *
-   * @param value 列表项内容
-   * @returns
-   */
-  listItem: (value: DataArkListItem['value']): DataArkListItem => {
-    return {
-      type: 'Ark.listItem',
-      value: value
-    };
-  },
-  /**
-   * @param value 卡片内容
-   * @returns
-   */
-  Card: (value: DataArkCard['value']): DataArkCard => {
-    return {
-      type: 'Ark.Card',
-      value: value
-    };
-  },
-  /**
-   * @param value 大卡片内容
-   * @returns
-   */
-  BigCard: (value: DataArkBigCard['value']): DataArkBigCard => {
-    return {
-      type: 'Ark.BigCard',
-      value
-    };
+  get value(): DataButtonGroup {
+    this.#flush();
+
+    return BT.group(...this.#rows);
   }
-};
 
-/**
- *
- * @param values 要显示的文本
- * @returns
- */
-const MD = (...values: DataMarkDown['value']): DataMarkDown => {
-  return {
-    type: 'Markdown',
-    value: values
-  };
-};
-
-/**
- *
- * @param templateId 模板 ID
- * @param params 模板参数
- * @returns
- */
-MD.template = (templateId: DataMarkdownTemplate['value'], params?: DataMarkdownTemplate['options']['params']): DataMarkdownTemplate => {
-  return {
-    type: 'MarkdownTemplate',
-    value: templateId,
-    options: {
-      params
+  /**
+   * 将当前行刷入 rows
+   */
+  #flush(): void {
+    if (this.#currentRow && this.#currentRow.length > 0) {
+      this.#rows.push(BT.row(...this.#currentRow));
+      this.#currentRow = null;
     }
-  };
-};
+  }
 
-/**
- *
- * @param text 要显示的文本
- * @returns
- */
-MD.text = (text: string): DataMarkdownText => {
-  return {
-    type: 'MD.text',
-    value: text
-  };
-};
+  /**
+   * 新增一行按钮
+   */
+  addRow(): this {
+    this.#flush();
+    this.#currentRow = [];
 
-/**
- *
- * @param text 要显示的文本
- * @returns
- */
-MD.title = (text: string): DataMarkdownTitle => {
-  return {
-    type: 'MD.title',
-    value: text
-  };
-};
+    return this;
+  }
 
-/**
- *
- * @param text 要显示的文本
- * @returns
- */
-MD.subtitle = (text: string): DataMarkdownSubtitle => {
-  return {
-    type: 'MD.subtitle',
-    value: text
-  };
-};
+  /**
+   * 添加一个按钮到当前行，若无行则自动创建
+   */
+  addButton(...args: Parameters<typeof BT>): this {
+    if (!this.#currentRow) {
+      this.#currentRow = [];
+    }
 
-/**
- *
- * @param text 要显示的文本
- * @returns
- */
-MD.bold = (text: string): DataMarkdownBold => {
-  return {
-    type: 'MD.bold',
-    value: text
-  };
-};
+    this.#currentRow.push(BT(...args));
 
-/**
- *
- * @param text 要显示的文本
- * @returns
- */
-MD.italic = (text: string): DataMarkdownItalic => {
-  return {
-    type: 'MD.italic',
-    value: text
-  };
-};
+    return this;
+  }
 
-/**
- *
- * @param text 要显示的文本
- * @returns
- */
-MD.italicStar = (text: string): DataMarkdownItalicStar => {
-  return {
-    type: 'MD.italicStar',
-    value: text
-  };
-};
+  /**
+   * 清空
+   */
+  clear(): this {
+    this.#rows = [];
+    this.#currentRow = null;
 
-/**
- *
- * @param text 要显示的文本
- * @returns
- */
-MD.strikethrough = (text: string): DataMarkdownStrikethrough => {
-  return {
-    type: 'MD.strikethrough',
-    value: text
-  };
-};
+    return this;
+  }
+}
 
-/**
- *
- * @param text 要显示的文本
- * @param url  链接地址
- * @returns
- */
-MD.link = (text: string, url: string): DataMarkdownLink => {
-  return {
-    type: 'MD.link',
-    value: { text, url }
-  };
-};
+class FormatMarkDown {
+  #data: DataMarkDown['value'] = [];
 
-/**
- *
- * @param url 图片地址
- * @param options 图片选项
- * @returns
- */
-MD.image = (url: string, options?: { width?: number; height?: number }): DataMarkdownImage => {
-  return {
-    type: 'MD.image',
-    value: url,
-    options
-  };
-};
+  /**
+   * 获取 Markdown 数据
+   */
+  get value(): DataMarkDown {
+    return MD(...this.#data);
+  }
 
-/**
- *
- * @param items
- * @returns
- */
-MD.list = (...items: any[]): DataMarkdownList => {
-  return {
-    type: 'MD.list',
-    value: items
-  };
-};
+  /**
+   * 添加文本
+   */
+  addText(...args: Parameters<typeof MD.text>): this {
+    this.#data.push(MD.text(...args));
 
-/**
- *
- * @param indexOrText
- * @param text
- * @returns
- */
-MD.listItem = (indexOrText: number | string, text?: string): DataMarkdownListItem => {
-  return {
-    type: 'MD.listItem',
-    value: typeof indexOrText === 'number' ? { index: indexOrText, text } : indexOrText
-  };
-};
+    return this;
+  }
 
-/**
- *
- * @param text 块引用的文本内容
- * @returns
- */
-MD.blockquote = (text: string): DataMarkdownBlockquote => {
-  return {
-    type: 'MD.blockquote',
-    value: text
-  };
-};
+  /**
+   * 添加标题
+   */
+  addTitle(...args: Parameters<typeof MD.title>): this {
+    this.#data.push(MD.title(...args));
 
-/**
- *
- * @returns
- */
-MD.divider = (): DataMarkdownDivider => {
-  return {
-    type: 'MD.divider'
-  };
-};
+    return this;
+  }
 
-/**
- * @param value 是否换多行
- * @returns
- */
-MD.newline = (value = false): DataMarkdownNewline => {
-  return {
-    type: 'MD.newline',
-    value: value
-  };
-};
+  /**
+   * 添加副标题
+   */
+  addSubtitle(...args: Parameters<typeof MD.subtitle>): this {
+    this.#data.push(MD.subtitle(...args));
 
-MD.code = (value: DataMarkdownCode['value'], options?: DataMarkdownCode['options']): DataMarkdownCode => {
-  return {
-    type: 'MD.code',
-    value: value,
-    options: options
-  };
-};
+    return this;
+  }
 
-export { MD };
+  /**
+   * 添加粗体
+   */
+  addBold(...args: Parameters<typeof MD.bold>): this {
+    this.#data.push(MD.bold(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加斜体
+   */
+  addItalic(...args: Parameters<typeof MD.italic>): this {
+    this.#data.push(MD.italic(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加斜体（星号）
+   */
+  addItalicStar(...args: Parameters<typeof MD.italicStar>): this {
+    this.#data.push(MD.italicStar(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加删除线
+   */
+  addStrikethrough(...args: Parameters<typeof MD.strikethrough>): this {
+    this.#data.push(MD.strikethrough(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加链接
+   */
+  addLink(...args: Parameters<typeof MD.link>): this {
+    this.#data.push(MD.link(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加图片
+   */
+  addImage(...args: Parameters<typeof MD.image>): this {
+    this.#data.push(MD.image(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加列表
+   */
+  addList(...args: Parameters<typeof MD.list>): this {
+    this.#data.push(MD.list(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加引用
+   */
+  addBlockquote(...args: Parameters<typeof MD.blockquote>): this {
+    this.#data.push(MD.blockquote(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加分割线
+   */
+  addDivider(): this {
+    this.#data.push(MD.divider());
+
+    return this;
+  }
+
+  /**
+   * 添加换行
+   */
+  addNewline(...args: Parameters<typeof MD.newline>): this {
+    this.#data.push(MD.newline(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加代码
+   */
+  addCode(...args: Parameters<typeof MD.code>): this {
+    this.#data.push(MD.code(...args));
+
+    return this;
+  }
+
+  /**
+   * 换行
+   */
+  addBreak(): this {
+    this.#data.push(MD.newline());
+
+    return this;
+  }
+
+  /**
+   * 清空
+   */
+  clear(): this {
+    this.#data = [];
+
+    return this;
+  }
+}
 
 /**
  * 消息格式化构建器
@@ -453,6 +234,20 @@ export class Format {
    */
   static create() {
     return new Format();
+  }
+
+  /**
+   * 创建一个新的 Markdown Format 实例
+   */
+  createMarkdown() {
+    return new FormatMarkDown();
+  }
+
+  /**
+   * 创建一个新的 Button Format 实例
+   */
+  createButtonGroup() {
+    return new FormatButtonGroup();
   }
 
   /**
@@ -529,17 +324,14 @@ export class Format {
   /**
    * 添加按钮组
    */
-  addButtonGroup(...args: Parameters<typeof BT.group>) {
-    this.#data.push(BT.group(...args));
-
-    return this;
-  }
-
-  /**
-   * 添加按钮模板
-   */
-  addButtonTemplate(...args: Parameters<typeof BT.template>) {
-    this.#data.push(BT.template(...args));
+  addButtonGroup(bt: FormatButtonGroup): this;
+  addButtonGroup(...args: Parameters<typeof BT.group>): this;
+  addButtonGroup(...args: [FormatButtonGroup] | Parameters<typeof BT.group>) {
+    if (args[0] instanceof FormatButtonGroup) {
+      this.#data.push(args[0].value);
+    } else {
+      this.#data.push(BT.group(...(args as ButtonRow[])));
+    }
 
     return this;
   }
@@ -547,17 +339,14 @@ export class Format {
   /**
    * 添加 Markdown
    */
-  addMarkdown(...args: Parameters<typeof MD>) {
-    this.#data.push(MD(...args));
-
-    return this;
-  }
-
-  /**
-   * 添加 Markdown 模板
-   */
-  addMarkdownTemplate(...args: Parameters<typeof MD.template>) {
-    this.#data.push(MD.template(...args));
+  addMarkdown(md: FormatMarkDown): this;
+  addMarkdown(...args: Parameters<typeof MD>): this;
+  addMarkdown(...args: [FormatMarkDown] | Parameters<typeof MD>) {
+    if (args[0] instanceof FormatMarkDown) {
+      this.#data.push(args[0].value);
+    } else {
+      this.#data.push(MD(...(args as DataMarkDown['value'])));
+    }
 
     return this;
   }
