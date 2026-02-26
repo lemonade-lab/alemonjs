@@ -2,15 +2,15 @@ import { Next, Events, EventKeys, ResponseRoute } from '../types';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
 
-function isPromise(value) {
-  return value !== null && (typeof value === 'object' || typeof value === 'function') && typeof value.then === 'function';
-}
-
 function isAsyncFunction(fn) {
   // 获取 AsyncFunction 构造函数
   const AsyncFunction = (async () => {}).constructor;
 
   return fn instanceof AsyncFunction;
+}
+
+function isFunction(value) {
+  return isAsyncFunction(value) || typeof value === 'function' || value instanceof Function;
 }
 
 /**
@@ -115,7 +115,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
           const app = await item();
           // 没有 default。因为是 import x from './';
 
-          if (isPromise(app) || isAsyncFunction(app)) {
+          if (isFunction(app)) {
             // 纯异步函数
             currents.push(app);
             continue;
