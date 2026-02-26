@@ -4,7 +4,7 @@ import { ChildrenApp } from './store';
 import { createResult, Result } from '../core/utils';
 import { sendAction } from '../cbp/processor/actions';
 import { sendAPI } from '../cbp/processor/api';
-import { BT, Image, ImageFile, ImageURL, Link, MD, Mention, Text } from './message-format';
+import { BT, Format, Image, ImageFile, ImageURL, Link, MD, Mention, Text } from './message-format';
 
 type Options = {
   UserId?: string;
@@ -23,8 +23,16 @@ export const useMention = <T extends EventKeys>(
   event: Events[T]
 ): [
   {
-    find: (options: Options) => Promise<Result<User[]>>;
-    findOne: (options?: Options) => Promise<Result<User | null>>;
+    find: (options?: Options) => Promise<
+      Result<User[]> & {
+        count: number;
+      }
+    >;
+    findOne: (options?: Options) => Promise<
+      Result<User | null> & {
+        count: number;
+      }
+    >;
   }
 ] => {
   if (!event || typeof event !== 'object') {
@@ -35,102 +43,101 @@ export const useMention = <T extends EventKeys>(
     });
     throw new Error('Invalid event: event must be an object');
   }
+
+  // 提及数据缓存
   let res: User[] = null;
+
+  /** 加载数据（带缓存） */
+  const load = async () => {
+    if (res) {
+      return;
+    }
+    // 获取提及数据
+    const results = await sendAction({
+      action: 'mention.get',
+      payload: { event }
+    });
+    // 提及数据通常在 results 中，找到 code 为 Ok 的项目，并将其 data 作为提及数据缓存起来
+    const result = results.find(item => item.code === ResultCode.Ok);
+
+    if (result) {
+      res = result.data as User[];
+    }
+  };
+
+  /** 按条件过滤，默认排除 bot */
+  const match = (item: User, options: Options) => {
+    if (options.UserId !== undefined && item.UserId !== options.UserId) {
+      return false;
+    }
+    if (options.UserKey !== undefined && item.UserKey !== options.UserKey) {
+      return false;
+    }
+    if (options.UserName !== undefined && item.UserName !== options.UserName) {
+      return false;
+    }
+    if (options.IsMaster !== undefined && item.IsMaster !== options.IsMaster) {
+      return false;
+    }
+    if (options.IsBot !== undefined && item.IsBot !== options.IsBot) {
+      return false;
+    }
+    // 默认排除 bot
+    if (options.IsBot === undefined && item.IsBot) {
+      return false;
+    }
+
+    return true;
+  };
+
   const mention = {
     find: async (options: Options = {}) => {
       try {
-        if (!res) {
-          const results = await sendAction({
-            action: 'mention.get',
-            payload: {
-              event
-            }
-          });
-          const result = results.find(item => item.code === ResultCode.Ok);
-
-          if (result) {
-            res = result.data as User[];
-          }
-        }
+        await load();
       } catch (err) {
-        return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null);
+        const result = createResult<User[]>(ResultCode.Fail, err?.message || 'Failed to get mention data', null);
+
+        return {
+          ...result,
+          count: 0
+        };
       }
       if (!Array.isArray(res)) {
-        return createResult(ResultCode.Warn, 'No mention data found', null);
+        return {
+          ...createResult<User[]>(ResultCode.Warn, 'No mention data found', null),
+          count: 0
+        };
       }
-      // 过滤出符合条件的数据
-      const data = res.filter(item => {
-        if (options.UserId !== undefined && item.UserId !== options.UserId) {
-          return false;
-        }
-        if (options.UserKey !== undefined && item.UserKey !== options.UserKey) {
-          return false;
-        }
-        if (options.UserName !== undefined && item.UserName !== options.UserName) {
-          return false;
-        }
-        if (options.IsMaster !== undefined && item.IsMaster !== options.IsMaster) {
-          return false;
-        }
-        if (options.IsBot !== undefined && item.IsBot !== options.IsBot) {
-          return false;
-        }
 
-        return true;
-      });
+      const data = res.filter(item => match(item, options));
 
-      return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data);
+      const result = createResult(ResultCode.Ok, 'Successfully retrieved mention data', data);
+
+      return {
+        ...result,
+        count: data.length || 0
+      };
     },
     findOne: async (options: Options = {}) => {
-      try {
-        if (!res) {
-          const results = await sendAction({
-            action: 'mention.get',
-            payload: {
-              event
-            }
-          });
-          const result = results.find(item => item.code === ResultCode.Ok);
+      const results = await mention.find(options);
 
-          if (result) {
-            res = result.data as User[];
-          }
-        }
-      } catch (err) {
-        return createResult(ResultCode.Fail, err?.message || 'Failed to get mention data', null);
-      }
-      if (!Array.isArray(res)) {
-        return createResult(ResultCode.Warn, 'No mention data found', null);
-      }
-      // 根据条件查找
-      const data = res.find(item => {
-        if (options.UserId !== undefined && item.UserId !== options.UserId) {
-          return false;
-        }
-        if (options.UserKey !== undefined && item.UserKey !== options.UserKey) {
-          return false;
-        }
-        if (options.UserName !== undefined && item.UserName !== options.UserName) {
-          return false;
-        }
-        if (options.IsMaster !== undefined && item.IsMaster !== options.IsMaster) {
-          return false;
-        }
-        if (options.IsBot !== undefined && item.IsBot !== options.IsBot) {
-          return false;
-        }
-        if (item.IsBot) {
-          return false; // 如果是 bot，则不返回
-        }
+      if (results.code !== ResultCode.Ok || !results.data?.length) {
+        const result = createResult<User | null>(results.code, results.message, null);
 
-        return true;
-      });
-
-      if (!data) {
-        return createResult(ResultCode.Warn, 'No mention data found', null);
+        return {
+          ...result,
+          count: 0
+        };
       }
 
-      return createResult(ResultCode.Ok, 'Successfully retrieved mention data', data);
+      const data = results?.data[0];
+
+      const result = createResult<User | null>(ResultCode.Ok, results.message, data);
+
+      return {
+        ...result,
+        count: results.data?.length || 0
+      };
     }
   };
 
@@ -153,11 +160,29 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
   }
 
   /**
-   * 发送消息
+   * 消息参数类型
+   */
+  type MessageParams = {
+    format: Format | DataEnums[];
+  };
+
+  /**
+   * 将 format 参数解析为 DataEnums[]
+   */
+  const resolveFormat = (params: MessageParams): DataEnums[] => {
+    if (params.format instanceof Format) {
+      return params.format.value;
+    }
+
+    return params.format;
+  };
+
+  /**
+   * 发送消息（内部方法，兼容旧API）
    * @param val
    * @returns
    */
-  const send = async (val: DataEnums[]): Promise<Result[]> => {
+  const sendRaw = async (val: DataEnums[]): Promise<Result[]> => {
     if (!val || val.length === 0) {
       return [createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)];
     }
@@ -173,58 +198,6 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
 
     return Array.isArray(result) ? result : [result];
   };
-
-  // /**
-  //  * 撤回消息
-  //  */
-  // const withdraw = async (message_id?: string) => {
-  //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
-  // }
-
-  // /**
-  //  * 转发消息
-  //  */
-  // const forward = async (message_id?: string) => {
-  //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
-  // }
-
-  // /**
-  //  * 回复 quote
-  //  * ***
-  //  * 和send区别在于，
-  //  * 如果对应的平台支持引用时，进行引用回复
-  //  */
-  // const reply = async (message_id?: string) => {
-  //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
-  // }
-
-  // /**
-  //  * 更新消息
-  //  */
-  // const update = async (message_id?: string) => {
-  //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
-  // }
-
-  // /**
-  //  * 置顶消息
-  //  */
-  // const pinning = async (message_id?: string) => {
-  //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
-  // }
-
-  // /**
-  //  * 警告消息
-  //  */
-  // const horn = async (message_id?: string) => {
-  //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
-  // }
-
-  // /**
-  //  * 表态
-  //  */
-  // const reaction = async (message_id?: string) => {
-  //   return [createResult(ResultCode.Warn, '暂未支持', message_id)]
-  // }
 
   // 新的消息处理接口
 
@@ -312,11 +285,24 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
       return this;
     }
 
-    send(val?: DataEnums[]) {
-      // 如果不传入 val，则使用内部缓存的格式化数据
-      const dataToSend = val && val.length > 0 ? val : this.#format;
+    /**
+     * 发送消息
+     * @param params 消息参数，支持 { format: Format } 或 DataEnums[]
+     */
+    send(params?: MessageParams | DataEnums[]) {
+      if (!params) {
+        // 不传参数时使用内部缓存
+        return sendRaw(this.#format);
+      }
+      if (Array.isArray(params)) {
+        // 兼容旧API：直接传入 DataEnums[]
+        const dataToSend = params.length > 0 ? params : this.#format;
 
-      return send(dataToSend);
+        return sendRaw(dataToSend);
+      }
+
+      // 新API：传入 { format }
+      return sendRaw(resolveFormat(params));
     }
   }
 

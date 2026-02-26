@@ -89,11 +89,8 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     const registerMounted = async () => {
       const res = await app?.register();
 
-      if (res && res?.response) {
-        // 注册了 response。
-        // 使用新的模式去进行回调执行。
-        // 不再需要用文件import的方式去加载。
-
+      // 注册接口的结果。
+      if (res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter)) {
         App.register(res);
       }
 

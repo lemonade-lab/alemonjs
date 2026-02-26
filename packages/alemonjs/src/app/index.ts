@@ -4,6 +4,7 @@ export * from './define-children.js';
 export * from './define-platform.js';
 export * from './define-response.js';
 export * from './define-middleware.js';
+export * from './define-router.js';
 export * from './event-group.js';
 export * from './event-middleware';
 export * from './event-processor';

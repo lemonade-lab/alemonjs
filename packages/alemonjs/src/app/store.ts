@@ -195,8 +195,15 @@ export class ResponseRouter {
       if (!alemonjsCore.storeChildrenApp[key].register) {
         return [];
       }
+      if (alemonjsCore.storeChildrenApp[key].register?.responseRouter) {
+        return alemonjsCore.storeChildrenApp[key].register?.responseRouter?.current ?? [];
+      }
 
-      return alemonjsCore.storeChildrenApp[key].register?.response?.current ?? [];
+      if (alemonjsCore.storeChildrenApp[key].register?.response) {
+        return alemonjsCore.storeChildrenApp[key].register?.response?.current ?? [];
+      }
+
+      return [];
     });
 
     return data.flat();
@@ -210,8 +217,14 @@ export class MiddlewareRouter {
       if (!alemonjsCore.storeChildrenApp[key].register) {
         return [];
       }
+      if (alemonjsCore.storeChildrenApp[key].register?.middlewareRouter) {
+        return alemonjsCore.storeChildrenApp[key].register?.middlewareRouter?.current ?? [];
+      }
+      if (alemonjsCore.storeChildrenApp[key].register?.middleware) {
+        return alemonjsCore.storeChildrenApp[key].register?.middleware?.current ?? [];
+      }
 
-      return alemonjsCore.storeChildrenApp[key].register?.middleware?.current ?? [];
+      return [];
     });
 
     return data.flat();

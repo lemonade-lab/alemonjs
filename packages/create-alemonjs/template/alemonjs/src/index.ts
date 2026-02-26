@@ -1,19 +1,15 @@
-import { defineChildren, defineResponse, logger, lazy } from 'alemonjs';
+import { defineRouter, logger, lazy } from 'alemonjs';
 
-// 设置路由规则
-const response = defineResponse([
+const responseRouter = defineRouter([
   {
-    handler: lazy(() => import('./response/mw')),
-    children: [
-      {
-        regular: /hello/,
-        handler: lazy(() => import('./response/hello/res'))
-      },
-      {
-        regular: /help/,
-        handler: lazy(() => import('./response/help/res'))
-      }
-    ]
+    regular: /hello/,
+    selects: ['message.create'],
+    handler: lazy(() => import('./response/hello'))
+  },
+  {
+    regular: /help/,
+    selects: ['message.create'],
+    handler: lazy(() => import('./response/help'))
   }
 ]);
 
@@ -21,7 +17,7 @@ export default defineChildren({
   // 注册内容
   register() {
     return {
-      response
+      responseRouter
     };
   },
   // 当注册完成时

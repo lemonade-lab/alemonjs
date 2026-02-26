@@ -100,7 +100,13 @@ export type OnGroupItem<C = any, T extends EventKeys = EventKeys> = OnResponseVa
 export type OnGroupFunc = <C, T extends EventKeys, TFirst extends OnGroupItem<C, T>>(...calls: [TFirst, ...Array<TFirst>]) => TFirst;
 
 export type ResponseRoute = {
+  /** 正则匹配 */
   regular?: RegExp;
+  /** 前缀匹配（比正则更快） */
+  prefix?: string;
+  /** 精确匹配（最快） */
+  exact?: string;
+  /** 选择事件类型,默认 res */
   selects?: EventKeys | EventKeys[];
   handler: () => Promise<any>;
   children?: ResponseRoute[];
@@ -108,9 +114,17 @@ export type ResponseRoute = {
 
 export type DefineResponseFunc = (responses: ResponseRoute[]) => { current: ResponseRoute[] };
 
+export type DefineRouterFunc = (routes: ResponseRoute[]) => { current: ResponseRoute[] };
+
 export type defineMiddlewareFunc = (middleware: ResponseRoute[]) => { current: ResponseRoute[] };
 
-export type childrenCallbackRes = { response?: ReturnType<DefineResponseFunc>; middleware?: ReturnType<defineMiddlewareFunc> } | void;
+export type childrenCallbackRes = {
+  response?: ReturnType<DefineResponseFunc>;
+  middleware?: ReturnType<defineMiddlewareFunc>;
+  // 完整的路由机制。
+  responseRouter?: ReturnType<DefineRouterFunc>;
+  middlewareRouter?: ReturnType<DefineRouterFunc>;
+} | void;
 
 export type childrenCallback = ChildrenCycle & {
   register?: () => (childrenCallbackRes | void) | Promise<childrenCallbackRes | void>;

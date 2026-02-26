@@ -2,6 +2,17 @@ import { Next, Events, EventKeys, ResponseRoute } from '../types';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
 
+function isPromise(value) {
+  return value !== null && (typeof value === 'object' || typeof value === 'function') && typeof value.then === 'function';
+}
+
+function isAsyncFunction(fn) {
+  // 获取 AsyncFunction 构造函数
+  const AsyncFunction = (async () => {}).constructor;
+
+  return fn instanceof AsyncFunction;
+}
+
 /**
  * 创建路由处理调用函数
  * @param valueEvent
@@ -45,14 +56,37 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         }
       }
 
-      // 正则匹配
-      if (EventMessageText.includes(select) && node.regular) {
-        const reg = new RegExp(node.regular);
+      // 文本匹配（按性能从高到低：exact > prefix > regular）
+      if (EventMessageText.includes(select)) {
+        const text: string = valueEvent['MessageText'] ?? '';
 
-        if (!reg.test(valueEvent['MessageText'])) {
-          void nextNode();
+        // 精确匹配（最快，O(1) 字符串比较）
+        if (node.exact !== undefined) {
+          if (text !== node.exact) {
+            void nextNode();
 
-          return;
+            return;
+          }
+        }
+
+        // 前缀匹配（快，O(n) startsWith）
+        if (node.prefix !== undefined) {
+          if (!text.startsWith(node.prefix)) {
+            void nextNode();
+
+            return;
+          }
+        }
+
+        // 正则匹配
+        if (node.regular) {
+          const reg = new RegExp(node.regular);
+
+          if (!reg.test(text)) {
+            void nextNode();
+
+            return;
+          }
         }
       }
       if (!node.handler) {
@@ -78,14 +112,18 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         const currents = [];
 
         for (const item of currentsAndMiddleware) {
-          // 统一使用 await，无需区分同步/异步函数
           const app = await item();
           // 没有 default。因为是 import x from './';
+
+          if (isPromise(app) || isAsyncFunction(app)) {
+            // 纯异步函数
+            currents.push(app);
+            continue;
+          }
 
           // 中间件也有 selects。
           // 如果 发现 和当前要处理的 selects 不匹配。
           // 只要是一个不匹配。则说明处理还不是最终想要执行结果。
-
           const selects = Array.isArray(app.select) ? app.select : [app.select];
 
           // 没有匹配到

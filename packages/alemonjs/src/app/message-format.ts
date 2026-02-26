@@ -31,7 +31,10 @@ import {
   DataLink,
   DataMarkdownText,
   DataButtonTemplate,
-  DataMarkdownCode
+  DataMarkdownCode,
+  DataEnums,
+  EventKeys,
+  Events
 } from '../types';
 
 /**
@@ -431,3 +434,189 @@ MD.code = (value: DataMarkdownCode['value'], options?: DataMarkdownCode['options
 };
 
 export { MD };
+
+/**
+ * 消息格式化构建器
+ *
+ * @example
+ * ```ts
+ * const format = Format.create()
+ * format.addText('hello').addBreak().addText('world')
+ * message.send({ format })
+ * ```
+ */
+export class Format {
+  #data: DataEnums[] = [];
+
+  /**
+   * 创建一个新的 Format 实例
+   */
+  static create() {
+    return new Format();
+  }
+
+  /**
+   * 获取内部格式化数据
+   */
+  get value(): DataEnums[] {
+    return this.#data;
+  }
+
+  /**
+   * 添加文本
+   */
+  addText(...args: Parameters<typeof Text>) {
+    this.#data.push(Text(...args));
+
+    return this;
+  }
+
+  /**
+   * 换行
+   * @returns
+   */
+  addTextBreak() {
+    this.#data.push(Text('\n'));
+
+    return this;
+  }
+
+  /**
+   * 添加链接
+   */
+  addLink(...args: Parameters<typeof Link>) {
+    this.#data.push(Link(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加图片 (Buffer)
+   */
+  addImage(...args: Parameters<typeof Image>) {
+    this.#data.push(Image(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加图片文件
+   */
+  addImageFile(...args: Parameters<typeof ImageFile>) {
+    this.#data.push(ImageFile(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加图片链接
+   */
+  addImageURL(...args: Parameters<typeof ImageURL>) {
+    this.#data.push(ImageURL(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加提及
+   */
+  addMention(...args: Parameters<typeof Mention>) {
+    this.#data.push(Mention(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加按钮组
+   */
+  addButtonGroup(...args: Parameters<typeof BT.group>) {
+    this.#data.push(BT.group(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加按钮模板
+   */
+  addButtonTemplate(...args: Parameters<typeof BT.template>) {
+    this.#data.push(BT.template(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加 Markdown
+   */
+  addMarkdown(...args: Parameters<typeof MD>) {
+    this.#data.push(MD(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加 Markdown 模板
+   */
+  addMarkdownTemplate(...args: Parameters<typeof MD.template>) {
+    this.#data.push(MD.template(...args));
+
+    return this;
+  }
+
+  /**
+   * 清空
+   */
+  clear() {
+    this.#data = [];
+
+    return this;
+  }
+}
+
+/**
+ * 创建event
+ * @param options
+ * @returns
+ */
+export function createEvent<T extends EventKeys>(options: {
+  event: any;
+  selects: T | T[];
+  regular?: RegExp;
+  prefix?: string;
+  exact?: string;
+}): Events[T] & {
+  selects: boolean;
+  regular: boolean;
+  prefix: boolean;
+  exact: boolean;
+} {
+  const { event, selects, regular, prefix, exact } = options;
+  const { name, MessageText } = event || {};
+  const selectsArr = Array.isArray(selects) ? selects : [selects];
+
+  const o = {
+    selects: false,
+    regular: false,
+    prefix: false,
+    exact: false
+  };
+
+  // 匹配选择事件类型
+  if (selectsArr.includes(name)) {
+    o.selects = true;
+  }
+
+  // 精准匹配
+  if (exact && MessageText && MessageText === exact) {
+    o.exact = true;
+  }
+  // 前缀匹配
+  if (prefix && MessageText?.startsWith(prefix)) {
+    o.prefix = true;
+  }
+  // 正则匹配
+  if (regular && MessageText && new RegExp(regular).test(MessageText)) {
+    o.regular = true;
+  }
+
+  return { ...event, ...o };
+}
