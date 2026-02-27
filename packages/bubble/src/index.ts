@@ -64,6 +64,10 @@ const main = () => {
   void client.connect();
 
   const createUserAvatar = (_UserId: string, avatar: string | null) => {
+    if (avatar) {
+      return '';
+    }
+
     return `${CDN_URL}/${avatar}`;
   };
 
@@ -200,7 +204,7 @@ const main = () => {
         const event = e.value;
         const MessageMention: User[] = event.mentions.map(item => {
           const UserId = item.id;
-          const avatar = event.author.avatar;
+          const avatar = event.author?.avatar;
           const UserAvatar = createUserAvatar(UserId, avatar);
           const [isMaster, UserKey] = getMaster(UserId);
 
@@ -226,6 +230,7 @@ const main = () => {
         const res = await client.getMe();
         const UserId = String(res.id);
         const [isMaster, UserKey] = getMaster(UserId);
+        //
         const user: User = {
           UserId: UserId,
           UserName: res.name,
