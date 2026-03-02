@@ -1,5 +1,6 @@
 /**
  * 图片数据
+ * value 为带协议的字符串：https:// | http:// | file:// | base64://
  */
 export type DataImage = {
   type: 'Image';

@@ -4,33 +4,40 @@ import YAML from 'yaml';
 import type { Package } from '../types';
 import { ResultCode } from './variable';
 
+type ConfigValue = { [key: string]: any };
+type ConfigListener<T extends ConfigValue = ConfigValue> = (value: T) => void;
+
 /**
  * 配置类
  */
-export class ConfigCore {
-  //
-  #dir: string | null = null;
-
-  #value: any = null;
+class ConfigCore<T extends ConfigValue = ConfigValue> {
+  #value: T | null = null;
 
   // 缓存合并后的值，避免每次 get value 都重新合并
-  #mergedValue: any = null;
+  #mergedValue: T | null = null;
 
   // 保存 watcher 引用，防止重复注册
   #watcher: FSWatcher | null = null;
 
-  #initValue = {
-    gui: {
-      port: 17127
-    }
-  };
+  // 订阅者集合
+  #listeners = new Set<ConfigListener<T>>();
 
-  /**
-   *
-   * @param dir
-   */
+  // 防抖定时器
+  #debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // 防抖延迟 (ms)
+  #debounceDelay = 100;
+
+  // 缓存 argv proxy，避免每次创建新实例
+  #argvProxy: { [key: string]: string | null | undefined } | null = null;
+
+  // 缓存解析后的绝对路径
+  #resolvedDir: string | null = null;
+
+  #initValue: T = {} as T;
+
   constructor(dir: string) {
-    this.#dir = dir;
+    this.#resolvedDir = join(process.cwd(), dir);
   }
 
   /**
@@ -41,111 +48,193 @@ export class ConfigCore {
   }
 
   /**
-   *
-   * @returns
+   * 从磁盘读取并解析配置文件
    */
-  #update() {
-    if (!this.#dir) {
-      return this.#value;
-    }
-    // 读取配置文件
-    const dir = join(process.cwd(), this.#dir);
-
-    // 如果文件不存在
-    if (!existsSync(dir)) {
-      this.saveValue(this.#initValue);
-
-      return this.#value;
+  #readConfig(): T | null {
+    if (!this.#resolvedDir) {
+      return null;
     }
     try {
-      const data = readFileSync(dir, 'utf-8');
-      const d = YAML.parse(data);
+      const data = readFileSync(this.#resolvedDir, 'utf-8');
 
-      this.#value = d;
-      this.#invalidateMergedCache();
+      return YAML.parse(data) as T;
     } catch (err) {
       logger.error({
         code: ResultCode.FailInternal,
         message: 'Config file parse error',
         data: err
       });
-    }
-    // 关闭旧的 watcher，防止重复监听
-    if (this.#watcher) {
-      this.#watcher.close();
-      this.#watcher = null;
-    }
-    // 存在配置文件 , 开始监听文件
-    this.#watcher = watch(dir, () => {
-      try {
-        const data = readFileSync(dir, 'utf-8');
-        const d = YAML.parse(data);
 
-        this.#value = d;
-        this.#invalidateMergedCache();
-      } catch (err) {
-        logger.error({
-          code: ResultCode.FailInternal,
-          message: 'Config file parse error',
-          data: err
-        });
+      return null;
+    }
+  }
+
+  /**
+   * 更新内存中的配置值并使缓存失效
+   */
+  #applyValue(newValue: T | null) {
+    if (newValue === null) {
+      return;
+    }
+    this.#value = newValue;
+    this.#invalidateMergedCache();
+  }
+
+  /**
+   * 通知所有订阅者（带防抖）
+   */
+  #notifyListeners() {
+    if (this.#debounceTimer) {
+      clearTimeout(this.#debounceTimer);
+    }
+    this.#debounceTimer = setTimeout(() => {
+      this.#debounceTimer = null;
+
+      const val = this.value;
+
+      if (!val) {
+        return;
+      }
+      for (const listener of this.#listeners) {
+        try {
+          listener(val);
+        } catch (err) {
+          logger.error({
+            code: ResultCode.FailInternal,
+            message: 'Config listener error',
+            data: err
+          });
+        }
+      }
+    }, this.#debounceDelay);
+  }
+
+  /**
+   * 启动文件监听（仅一次）
+   */
+  #ensureWatcher() {
+    if (this.#watcher || !this.#resolvedDir) {
+      return;
+    }
+    if (!existsSync(this.#resolvedDir)) {
+      return;
+    }
+
+    this.#watcher = watch(this.#resolvedDir, () => {
+      const newValue = this.#readConfig();
+
+      if (newValue !== null) {
+        this.#applyValue(newValue);
+        this.#notifyListeners();
       }
     });
+  }
 
-    return this.#value;
+  /**
+   * 初始化：读取配置 + 启动监听
+   */
+  #init() {
+    if (!this.#resolvedDir) {
+      return;
+    }
+
+    if (!existsSync(this.#resolvedDir)) {
+      this.saveValue(this.#initValue);
+
+      return;
+    }
+
+    this.#applyValue(this.#readConfig());
+    this.#ensureWatcher();
   }
 
   /**
    * 当且仅当配置文件存在时
    */
-  get value(): null | {
-    [key: string]: any;
-  } {
+  get value(): T | null {
     if (!this.#value) {
-      this.#update();
+      this.#init();
     }
-
-    // 使用缓存的合并结果
     if (this.#mergedValue) {
       return this.#mergedValue;
     }
-
     this.#mergedValue = {
       ...(this.#value || {}),
       ...(global?.__options || {})
-    };
+    } as T;
 
     return this.#mergedValue;
   }
 
   /**
-   * 保存value
+   * 保存配置值到磁盘并同步内存
    */
-  saveValue(value: { [key: string]: any }) {
-    // 立即保存当前配置
-    if (!this.#dir) {
+  saveValue(value: T) {
+    if (!this.#resolvedDir) {
       return;
     }
-    // 读取配置文件
-    const dir = join(process.cwd(), this.#dir);
 
-    if (!existsSync(dir)) {
-      mkdirSync(dirname(dir), { recursive: true });
+    const dirPath = dirname(this.#resolvedDir);
+
+    if (!existsSync(this.#resolvedDir)) {
+      mkdirSync(dirPath, { recursive: true });
     }
+
     const data = YAML.stringify(value);
 
-    writeFileSync(dir, data, 'utf-8');
+    writeFileSync(this.#resolvedDir, data, 'utf-8');
+
+    // 同步更新内存值
+    this.#applyValue(value);
+
+    // 确保 watcher 已启动（首次 saveValue 创建文件后）
+    this.#ensureWatcher();
   }
 
-  #package = null;
+  /**
+   * 注册配置变更监听器
+   * @returns 取消订阅函数
+   */
+  onWatch(listener: ConfigListener<T>): () => void {
+    this.#listeners.add(listener);
+
+    // 确保 watcher 已启动
+    if (!this.#value) {
+      this.#init();
+    } else {
+      this.#ensureWatcher();
+    }
+
+    return () => {
+      this.#listeners.delete(listener);
+    };
+  }
+
+  /**
+   * 销毁实例，释放资源
+   */
+  dispose() {
+    if (this.#watcher) {
+      this.#watcher.close();
+      this.#watcher = null;
+    }
+    if (this.#debounceTimer) {
+      clearTimeout(this.#debounceTimer);
+      this.#debounceTimer = null;
+    }
+    this.#listeners.clear();
+  }
+
+  #package: Package | null = null;
 
   /**
    * package.json
    */
-  get package(): null | Package {
+  get package(): Package | null {
     if (this.#package) {
       return this.#package;
     }
+
     const dir = process.env.PKG_PATH || join(process.cwd(), 'package.json');
 
     if (!existsSync(dir)) {
@@ -157,9 +246,10 @@ export class ConfigCore {
 
       return null;
     }
-    const data = readFileSync(dir, 'utf-8');
 
     try {
+      const data = readFileSync(dir, 'utf-8');
+
       this.#package = JSON.parse(data);
     } catch (err) {
       logger.error({
@@ -182,20 +272,22 @@ export class ConfigCore {
    * 例：argv.login == 'gui'
    */
   get argv() {
-    const argv: {
-      [key: string]: string | null | undefined;
-    } = {};
+    if (this.#argvProxy) {
+      return this.#argvProxy;
+    }
 
-    return new Proxy(argv, {
+    this.#argvProxy = new Proxy({} as { [key: string]: string | null | undefined }, {
       get(_target, key) {
         if (typeof key === 'symbol') {
           return undefined;
         }
+
         const index$0 = process.argv.indexOf(key);
 
         if (index$0 !== -1) {
           return process.argv[index$0 + 1];
         }
+
         const index = process.argv.indexOf(`--${key}`);
 
         if (index !== -1) {
@@ -205,25 +297,37 @@ export class ConfigCore {
         return null;
       }
     });
+
+    return this.#argvProxy;
   }
 }
 
 /**
- *
  * @returns
  */
-export const getConfig = (): typeof ConfigCore.prototype => {
+export const getConfig = <T extends ConfigValue = ConfigValue>(): ConfigCore<T> => {
   if (global?.__config) {
-    return global.__config;
+    return global.__config as ConfigCore<T>;
   }
   const configDir = process.env.CFG_PATH || 'alemon.config.yaml';
 
-  global.__config = new ConfigCore(configDir);
+  global.__config = new ConfigCore<T>(configDir);
 
-  return global.__config;
+  return global.__config as ConfigCore<T>;
 };
 
 /**
  * @returns
  */
-export const getConfigValue = () => getConfig()?.value || {};
+export const getConfigValue = <T extends ConfigValue = ConfigValue>(): T => {
+  return (getConfig<T>()?.value || {}) as T;
+};
+
+/**
+ * 监听配置文件变更
+ * @param callback 配置变更时的回调，参数为新的配置值
+ * @returns 取消订阅函数
+ */
+export const onWatchConfigValue = <T extends ConfigValue = ConfigValue>(callback: ConfigListener<T>): (() => void) => {
+  return getConfig<T>().onWatch(callback);
+};

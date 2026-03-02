@@ -1,6 +1,6 @@
 import { ButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums, EventKeys, Events } from '../types';
 
-import { Text, Link, Image, ImageFile, ImageURL, Mention, BT, MD } from './message-format-old.js';
+import { Text, Link, Image, ImageFile, ImageURL, Mention, BT, MD, Markdown, Attachment, Audio, Video, Custom } from './message-format-old.js';
 
 export * from './message-format-old.js';
 
@@ -286,7 +286,7 @@ export class Format {
   }
 
   /**
-   * 添加图片 (Buffer)
+   * 添加图片 (Buffer 或带协议字符串)
    */
   addImage(...args: Parameters<typeof Image>) {
     this.#data.push(Image(...args));
@@ -337,7 +337,7 @@ export class Format {
   }
 
   /**
-   * 添加 Markdown
+   * 添加结构化 Markdown
    */
   addMarkdown(md: FormatMarkDown): this;
   addMarkdown(...args: Parameters<typeof MD>): this;
@@ -347,6 +347,51 @@ export class Format {
     } else {
       this.#data.push(MD(...(args as DataMarkDown['value'])));
     }
+
+    return this;
+  }
+
+  /**
+   * 添加纯 Markdown 文本
+   */
+  addMarkdownOriginal(...args: Parameters<typeof Markdown>) {
+    this.#data.push(Markdown(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加附件
+   */
+  addAttachment(...args: Parameters<typeof Attachment>) {
+    this.#data.push(Attachment(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加音频
+   */
+  addAudio(...args: Parameters<typeof Audio>) {
+    this.#data.push(Audio(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加视频
+   */
+  addVideo(...args: Parameters<typeof Video>) {
+    this.#data.push(Video(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加自定义数据
+   */
+  addCustom(...args: Parameters<typeof Custom>) {
+    this.#data.push(Custom(...args));
 
     return this;
   }

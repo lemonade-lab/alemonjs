@@ -31,8 +31,28 @@ import {
   DataLink,
   DataMarkdownText,
   DataButtonTemplate,
-  DataMarkdownCode
+  DataMarkdownCode,
+  DataCustom,
+  DataMarkdownOriginal,
+  DataAttachment,
+  DataAudio,
+  DataVideo
 } from '../types';
+
+/**
+ * 自定义数据，用户可以自由定义数据格式和内容
+ * @param value
+ * @param options
+ * @param type
+ * @returns
+ */
+export const Custom = (value: DataCustom['value'], options?: DataCustom['options'], type?: DataCustom['type']): DataCustom => {
+  return {
+    type: type,
+    value,
+    options
+  };
+};
 
 /**
  * 文本消息
@@ -88,13 +108,13 @@ export const ImageFile = (val: DataImageFile['value']): DataImageFile => {
 
 /**
  * 图片消息
- * @param val
+ * @param val Buffer 或带协议的字符串（https:// | http:// | file:// | base64://）
  * @returns
  */
-const Image = (val: Buffer): DataImage => {
+const Image = (val: Buffer | string): DataImage => {
   return {
     type: 'Image',
-    value: val.toString('base64')
+    value: typeof val === 'string' ? val : `base64://${val.toString('base64')}`
   };
 };
 
@@ -431,3 +451,53 @@ MD.code = (value: DataMarkdownCode['value'], options?: DataMarkdownCode['options
 };
 
 export { MD };
+
+/**
+ * 纯 Markdown 文本
+ * @param val 原始 Markdown 字符串
+ * @returns
+ */
+export const Markdown = (val: string): DataMarkdownOriginal => {
+  return {
+    type: 'MarkdownOriginal',
+    value: val
+  };
+};
+
+/**
+ * 附件消息
+ * @param val 带协议的字符串（https:// | http:// | file:// | base64://）
+ * @param options 附件选项
+ * @returns
+ */
+export const Attachment = (val: string, options?: DataAttachment['options']): DataAttachment => {
+  return {
+    type: 'Attachment',
+    value: val,
+    options
+  };
+};
+
+/**
+ * 音频消息
+ * @param val 带协议的字符串（https:// | http:// | file:// | base64://）
+ * @returns
+ */
+export const Audio = (val: string): DataAudio => {
+  return {
+    type: 'Audio',
+    value: val
+  };
+};
+
+/**
+ * 视频消息
+ * @param val 带协议的字符串（https:// | http:// | file:// | base64://）
+ * @returns
+ */
+export const Video = (val: string): DataVideo => {
+  return {
+    type: 'Video',
+    value: val
+  };
+};
