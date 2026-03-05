@@ -1,6 +1,6 @@
 import { DataButtonGroup, DataButtonTemplate } from './button';
 import { DataArkBigCard, DataArkCard, DataArkList } from './ark';
-import { DataMarkDown, DataMarkdownTemplate, DataCustom } from './markdown';
+import { DataMarkDown, DataMarkdownTemplate } from './markdown';
 import { DataImage, DataImageFile, DataImageURL } from './image';
 import { DataText } from './text';
 import { DataMention } from './mention';
@@ -60,8 +60,7 @@ export type DataEnums =
   | DataMarkdownOriginal
   | DataAttachment
   | DataAudio
-  | DataVideo
-  | DataCustom;
+  | DataVideo;
 
 // 消息数据格式
 export type MessageDataFormat = DataEnums[];

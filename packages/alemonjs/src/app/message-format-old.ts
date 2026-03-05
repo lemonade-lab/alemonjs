@@ -32,7 +32,6 @@ import {
   DataMarkdownText,
   DataButtonTemplate,
   DataMarkdownCode,
-  DataCustom,
   DataMarkdownOriginal,
   DataAttachment,
   DataAudio,
@@ -41,21 +40,6 @@ import {
   DataMarkdownContent,
   DataMarkdownButton
 } from '../types';
-
-/**
- * 自定义数据，用户可以自由定义数据格式和内容
- * @param value
- * @param options
- * @param type
- * @returns
- */
-export const Custom = (value: DataCustom['value'], options?: DataCustom['options'], type?: DataCustom['type']): DataCustom => {
-  return {
-    type: type,
-    value,
-    options
-  };
-};
 
 /**
  * 文本消息

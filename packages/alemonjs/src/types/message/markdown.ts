@@ -125,14 +125,6 @@ export type DataMarkdownCode = {
   };
 };
 
-export type DataCustom = {
-  type: string;
-  value: string;
-  options?: {
-    [key: string]: any;
-  };
-};
-
 type DataMarkDownBalue =
   | DataMarkdownMention // at
   | DataMarkdownContent // originalContent
@@ -150,8 +142,7 @@ type DataMarkDownBalue =
   | DataMarkdownBlockquote
   | DataMarkdownDivider
   | DataMarkdownNewline
-  | DataMarkdownCode
-  | DataCustom;
+  | DataMarkdownCode;
 
 export type DataMarkDown = {
   type: 'Markdown';

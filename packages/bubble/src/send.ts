@@ -75,7 +75,19 @@ export const sendToRoom = async (
         const item = images[i];
 
         if (item.type === 'Image') {
-          bufferData = Buffer.from(item.value, 'base64');
+          if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+            const res = await ImageURLToBuffer(item.value);
+
+            bufferData = res;
+          } else if (item.value.startsWith('buffer://')) {
+            const base64Str = item.value.replace('buffer://', '');
+
+            bufferData = Buffer.from(base64Str, 'base64');
+          } else if (item.value.startsWith('file://')) {
+            bufferData = readFileSync(item.value);
+          } else if (Buffer.isBuffer(item.value)) {
+            bufferData = item.value;
+          }
         } else if (item.type === 'ImageURL') {
           const res = await ImageURLToBuffer(item.value);
 
@@ -121,11 +133,11 @@ export const sendToRoom = async (
 
     if (mdAndButtons && mdAndButtons.length > 0) {
       mdAndButtons.forEach(item => {
-        if (item.type === 'Markdown') {
+        if (item.type === 'Markdown' && typeof item.value !== 'string') {
           const md = item.value;
 
           const map: {
-            [key: string]: (value: any) => string;
+            [key: string]: (value: any, options?: any) => string;
           } = {
             'MD.title': value => `# ${value}`,
             'MD.subtitle': value => `## ${value}`,
@@ -138,14 +150,37 @@ export const sendToRoom = async (
             'MD.blockquote': value => `\n> ${value}`,
             'MD.newline': () => '\n',
             'MD.link': value => `[🔗${value.text}](${value.url}) `,
-            'MD.image': value => `\n![${value}](${value})\n`
+            'MD.image': value => `\n![${value}](${value})\n`,
+            'MD.mention': (value, options) => {
+              const { belong } = options || {};
+
+              if (value === 'everyone' || value === 'all' || value === '' || typeof value !== 'string') {
+                return '<@everyone> ';
+              }
+              if (belong === 'user') {
+                return `<@${value}> `;
+              } else if (belong === 'channel') {
+                return `<#${value}> `;
+              }
+
+              return '';
+            },
+            'MD.button': (value, options) => {
+              const autoEnter = options?.autoEnter ?? false;
+              const label = typeof value === 'object' ? value.title : value;
+              const command = options?.data || label;
+
+              return `<btn variant="borderless" command="${command}" enter="${String(autoEnter)}" >${label}</btn> `;
+            },
+            'MD.content': value => `${value}`
           };
 
           md.forEach(line => {
             if (map[line.type]) {
-              const value = (line as any)?.value;
+              const value = line?.value;
+              const options = line?.options;
 
-              contentMd += map[line.type](value);
+              contentMd += map[line.type](value, options);
 
               return;
             }
@@ -170,7 +205,7 @@ export const sendToRoom = async (
               contentMd += String(value);
             }
           });
-        } else if (item.type === 'BT.group' && item.value.length > 0) {
+        } else if (item.type === 'BT.group' && item.value.length > 0 && typeof item.value !== 'string') {
           contentMd += `<box  classWind="mt-2" variant="borderless" >${item.value
             ?.map(row => {
               const val = row.value;
@@ -181,10 +216,10 @@ export const sendToRoom = async (
 
               return `<flex>${val
                 .map(button => {
-                  const value = button.value;
+                  const value = button?.value || {};
                   const options = button.options;
                   const autoEnter = options?.autoEnter ?? false;
-                  const label = typeof value === 'object' ? value.title : value;
+                  const label = value;
                   const command = options?.data || label;
 
                   return `<btn command="${command}" enter="${String(autoEnter)}" >${label}</btn>`;

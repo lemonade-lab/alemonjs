@@ -1,6 +1,6 @@
 import { ButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums, EventKeys, Events } from '../types';
 
-import { Text, Link, Image, ImageFile, ImageURL, Mention, BT, MD, Markdown, Attachment, Audio, Video, Custom } from './message-format-old.js';
+import { Text, Image, Link, ImageFile, ImageURL, Mention, BT, MD, Markdown, Attachment, Audio, Video } from './message-format-old.js';
 
 export * from './message-format-old.js';
 
@@ -401,15 +401,6 @@ export class Format {
    */
   addVideo(...args: Parameters<typeof Video>) {
     this.#data.push(Video(...args));
-
-    return this;
-  }
-
-  /**
-   * 添加自定义数据
-   */
-  addCustom(...args: Parameters<typeof Custom>) {
-    this.#data.push(Custom(...args));
 
     return this;
   }

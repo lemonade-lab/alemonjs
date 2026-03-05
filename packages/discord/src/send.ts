@@ -20,17 +20,13 @@ const createButtonsData = (rows: ButtonRow[]) => {
         const value = button.value;
         let text = '';
 
-        if (typeof button.options?.data === 'object') {
-          text = button.options?.data.click;
-        } else {
-          text = button.options.data;
-        }
+        text = button.options?.data;
 
         return {
           type: 2,
           custom_id: text,
           style: 1,
-          label: typeof value === 'object' ? value.title : value
+          label: value
         };
       })
     };
