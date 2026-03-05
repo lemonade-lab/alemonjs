@@ -36,7 +36,10 @@ import {
   DataMarkdownOriginal,
   DataAttachment,
   DataAudio,
-  DataVideo
+  DataVideo,
+  DataMarkdownMention,
+  DataMarkdownContent,
+  DataMarkdownButton
 } from '../types';
 
 /**
@@ -70,6 +73,7 @@ export const Text = (val: DataText['value'], options?: DataText['options']): Dat
 
 /**
  * 链接消息
+ * @deprecated 废弃，这个应该是md语法里的
  * @param val 要显示的文本
  * @param options 内容选项
  * @returns
@@ -84,6 +88,7 @@ export const Link = (val: DataLink['value'], options?: DataText['options']): Dat
 
 /**
  * 图片链接，http 或 https 开头
+ * @deprecated 废弃，推荐使用 Image
  * @param val
  * @returns
  */
@@ -96,6 +101,7 @@ export const ImageURL = (val: DataImageURL['value']): DataImageURL => {
 
 /**
  * 本地图片文件
+ * @deprecated 废弃，推荐使用 Image
  * @param val
  * @returns
  */
@@ -114,11 +120,18 @@ export const ImageFile = (val: DataImageFile['value']): DataImageFile => {
 const Image = (val: Buffer | string): DataImage => {
   return {
     type: 'Image',
+    // 自动转为 base64 格式字符串，或者直接使用带协议的字符串
     value: typeof val === 'string' ? val : `base64://${val.toString('base64')}`
   };
 };
 
+/**
+ * @deprecated 废弃，推荐使用 Image
+ */
 Image.url = ImageURL;
+/**
+ * @deprecated 废弃，推荐使用 Image
+ */
 Image.file = ImageFile;
 export { Image };
 
@@ -281,6 +294,35 @@ MD.template = (templateId: DataMarkdownTemplate['value'], params?: DataMarkdownT
 MD.text = (text: string): DataMarkdownText => {
   return {
     type: 'MD.text',
+    value: text
+  };
+};
+
+MD.mention = (uid?: string, options?: DataMarkdownMention['options']): DataMarkdownMention => {
+  return {
+    type: 'MD.mention',
+    // 默认 @所有人，如果传入 uid 则 @ 指定用户
+    value: uid || '',
+    options: options ?? {
+      belong: 'all'
+    }
+  };
+};
+
+MD.button = (title: string, data: DataMarkdownButton['options']): DataMarkdownButton => {
+  return {
+    type: 'MD.button',
+    value: title,
+    options: data
+  };
+};
+
+/**
+ * originalContent
+ */
+MD.content = (text: string): DataMarkdownContent => {
+  return {
+    type: 'MD.content',
     value: text
   };
 };

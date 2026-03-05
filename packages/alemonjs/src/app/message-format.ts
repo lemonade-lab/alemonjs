@@ -71,6 +71,21 @@ class FormatMarkDown {
     return MD(...this.#data);
   }
 
+  addMention(...args: Parameters<typeof MD.button>) {
+    this.#data.push(MD.button(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加原始文本
+   */
+  addContent(...args: Parameters<typeof MD.content>): this {
+    this.#data.push(MD.content(...args));
+
+    return this;
+  }
+
   /**
    * 添加文本
    */
@@ -267,47 +282,10 @@ export class Format {
   }
 
   /**
-   * 换行
-   * @returns
-   */
-  addTextBreak() {
-    this.#data.push(Text('\n'));
-
-    return this;
-  }
-
-  /**
-   * 添加链接
-   */
-  addLink(...args: Parameters<typeof Link>) {
-    this.#data.push(Link(...args));
-
-    return this;
-  }
-
-  /**
    * 添加图片 (Buffer 或带协议字符串)
    */
   addImage(...args: Parameters<typeof Image>) {
     this.#data.push(Image(...args));
-
-    return this;
-  }
-
-  /**
-   * 添加图片文件
-   */
-  addImageFile(...args: Parameters<typeof ImageFile>) {
-    this.#data.push(ImageFile(...args));
-
-    return this;
-  }
-
-  /**
-   * 添加图片链接
-   */
-  addImageURL(...args: Parameters<typeof ImageURL>) {
-    this.#data.push(ImageURL(...args));
 
     return this;
   }
@@ -392,6 +370,36 @@ export class Format {
    */
   addCustom(...args: Parameters<typeof Custom>) {
     this.#data.push(Custom(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加链接
+   * @deprecated 废弃，这个应该是md语法里的
+   */
+  addLink(...args: Parameters<typeof Link>) {
+    this.#data.push(Link(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加图片文件
+   * @deprecated 废弃，推荐使用 addImage
+   */
+  addImageFile(...args: Parameters<typeof ImageFile>) {
+    this.#data.push(ImageFile(...args));
+
+    return this;
+  }
+
+  /**
+   * 添加图片链接
+   * @deprecated 废弃，推荐使用 addImage
+   */
+  addImageURL(...args: Parameters<typeof ImageURL>) {
+    this.#data.push(ImageURL(...args));
 
     return this;
   }

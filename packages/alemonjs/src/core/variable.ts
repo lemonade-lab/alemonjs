@@ -65,3 +65,79 @@ export const ResultCode = {
 
 // 结果反馈码类型
 export type ResultCode = (typeof ResultCode)[keyof typeof ResultCode];
+
+export class Result {
+  #data: {
+    code: ResultCode;
+    message: string;
+    data: null;
+  }[] = [];
+
+  #currentIndex = 0;
+
+  get value() {
+    return this.#data;
+  }
+
+  static create() {
+    return new Result();
+  }
+
+  push(param: { code: ResultCode; message: string; data: null }) {
+    this.#data.push(param);
+
+    return this;
+  }
+
+  newIndex() {
+    // 如果当前索引位置有数据，则移动到下一个索引，否则保持在当前索引
+    if (this.#data[this.#currentIndex]) {
+      this.#currentIndex++;
+    } else {
+      this.#currentIndex = 0;
+    }
+
+    return this;
+  }
+
+  updateMessage(msg: string) {
+    if (!this.#data[this.#currentIndex]) {
+      this.#data[this.#currentIndex] = {
+        code: ResultCode.Ok,
+        message: msg,
+        data: null
+      };
+    }
+    this.#data[this.#currentIndex].message = msg;
+
+    return this;
+  }
+
+  updateData(data: any) {
+    if (!this.#data[this.#currentIndex]) {
+      this.#data[this.#currentIndex] = {
+        code: ResultCode.Ok,
+        message: '',
+        data: data
+      };
+    }
+
+    return this;
+  }
+
+  updateCode(callback: (code: typeof ResultCode) => ResultCode) {
+    const newCode = callback(ResultCode);
+
+    if (!this.#data[this.#currentIndex]) {
+      this.#data[this.#currentIndex] = {
+        code: newCode,
+        message: '',
+        data: null
+      };
+    } else {
+      this.#data[this.#currentIndex].code = newCode;
+    }
+
+    return this;
+  }
+}

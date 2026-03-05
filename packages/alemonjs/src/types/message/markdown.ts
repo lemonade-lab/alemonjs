@@ -18,6 +18,35 @@ export type DataMarkdownText = {
   value: string;
 };
 
+export type DataMarkdownMention = {
+  type: 'MD.mention';
+  value?: string;
+  options?: {
+    belong?: 'user' | 'channel' | 'all'; // 默认为 user，表示只@用户；channel 表示@频道内所有人；all 表示@所有人
+  };
+};
+
+export type DataMarkdownContent = {
+  type: 'MD.content';
+  value: string;
+};
+
+export type DataMarkdownButton = {
+  type: 'MD.button';
+  // 显示的文字
+  value: string;
+  options?: {
+    // 禁止提示
+    toolTip?: string;
+    // 自动回车
+    autoEnter?: boolean;
+    // 数据
+    data?: string;
+    // isLink?: boolean
+    type?: 'command' | 'link' | 'call';
+  };
+};
+
 export type DataMarkdownTitle = {
   type: 'MD.title';
   value: string;
@@ -105,6 +134,9 @@ export type DataCustom = {
 };
 
 type DataMarkDownBalue =
+  | DataMarkdownMention // at
+  | DataMarkdownContent // originalContent
+  | DataMarkdownButton // 按钮
   | DataMarkdownText
   | DataMarkdownTitle
   | DataMarkdownSubtitle
