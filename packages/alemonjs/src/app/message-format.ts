@@ -4,7 +4,7 @@ import { Text, Link, Image, ImageFile, ImageURL, Mention, BT, MD, Markdown, Atta
 
 export * from './message-format-old.js';
 
-class FormatButtonGroup {
+export class FormatButtonGroup {
   #rows: ButtonRow[] = [];
   #currentRow: DataButton[] | null = null;
 
@@ -28,7 +28,24 @@ class FormatButtonGroup {
   }
 
   /**
+   * 吸收另一个 FormatButtonGroup 的数据
+   * @param group 要吸收的 FormatButtonGroup 实例
+   * @returns 当前实例
+   */
+  absorb(group: FormatButtonGroup): this {
+    // 如果当前有row且不是空的，则新增一行
+    if (this.#currentRow && this.#currentRow.length > 0) {
+      this.#flush();
+    }
+    // 吸收另一个实例的所有行
+    this.#rows.push(...group.value.value);
+
+    return this;
+  }
+
+  /**
    * 新增一行按钮
+   * @returns 当前实例
    */
   addRow(): this {
     this.#flush();
@@ -61,7 +78,7 @@ class FormatButtonGroup {
   }
 }
 
-class FormatMarkDown {
+export class FormatMarkDown {
   #data: DataMarkDown['value'] = [];
 
   /**
@@ -69,6 +86,17 @@ class FormatMarkDown {
    */
   get value(): DataMarkDown {
     return MD(...this.#data);
+  }
+
+  /**
+   * 吸收另一个 FormatMarkDown 的数据
+   * @param md 要吸收的 FormatMarkDown 实例
+   * @returns 当前实例
+   */
+  absorb(md: FormatMarkDown): this {
+    this.#data.push(...md.value.value);
+
+    return this;
   }
 
   /**
@@ -276,6 +304,12 @@ export class Format {
    */
   get value(): DataEnums[] {
     return this.#data;
+  }
+
+  absorb(format: Format): this {
+    this.#data.push(...format.value);
+
+    return this;
   }
 
   /**
