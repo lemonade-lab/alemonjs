@@ -71,12 +71,6 @@ class FormatMarkDown {
     return MD(...this.#data);
   }
 
-  addMention(...args: Parameters<typeof MD.button>) {
-    this.#data.push(MD.button(...args));
-
-    return this;
-  }
-
   /**
    * 添加原始文本
    */
@@ -217,6 +211,18 @@ class FormatMarkDown {
    */
   addBreak(): this {
     this.#data.push(MD.newline());
+
+    return this;
+  }
+
+  addMention(...args: Parameters<typeof MD.mention>): this {
+    this.#data.push(MD.mention(...args));
+
+    return this;
+  }
+
+  addButton(...args: Parameters<typeof MD.button>): this {
+    this.#data.push(MD.button(...args));
 
     return this;
   }
