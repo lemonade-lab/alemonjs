@@ -348,6 +348,10 @@ const sendOpenApiMessage = async (
 
   if (images.length > 0) {
     const url = await resolveRichMediaUrl(images, uploadMedia);
+
+    if (!url) {
+      return [createResult(ResultCode.Fail, '图片上传失败', null)];
+    }
     const res = await sendMessage({
       content,
       media: { file_info: url },
