@@ -297,26 +297,41 @@ const filterImages = (val: DataEnums[]) => {
 
 /** 通过富媒体上传获取图片 URL */
 const resolveRichMediaUrl = async (images: DataEnums[], uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>): Promise<string> => {
-  let url = '';
-
   for (const item of images) {
-    if (url) {
-      break;
-    }
+    let fileData: string;
+    let fileInfo: string;
 
     if (item.type === 'ImageURL') {
-      url = item.value;
-    } else if (item.type === 'ImageFile' || item.type === 'Image') {
-      const fileData = item.type === 'ImageFile' ? readFileSync(item.value, 'base64') : item.value;
-      const fileInfo = await uploadMedia({ file_type: 1, file_data: fileData }).then(res => res?.file_info);
+      // 如果是图片链接，需要axios获取图片数据并转换为base64
+      fileData = await axios.get(item.value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
+    } else if (item.type === 'Image') {
+      if (typeof item.value === 'string' && (item.value.startsWith('https://') || item.value.startsWith('http://'))) {
+        // 如果是图片链接，需要axios获取图片数据并转换为base64
+        fileData = await axios.get(item.value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
+      } else if (typeof item.value === 'string' && item.value.startsWith('file://')) {
+        // 如果是file协议的本地文件路径，读取文件并转换为base64
+        const localFilePath = item.value.replace('file://', '');
 
-      if (fileInfo) {
-        url = fileInfo;
+        fileData = readFileSync(localFilePath, 'base64');
+      } else if (typeof item.value === 'string' && item.value.startsWith('base64://')) {
+        // 如果是base64协议的字符串，直接提取base64数据
+        fileData = item.value.replace('base64://', '');
+      } else if (Buffer.isBuffer(item.value)) {
+        // 如果已经是Buffer数据，直接转换为base64字符串
+        fileData = item.value.toString('base64');
       }
+    } else if (item.type === 'ImageFile') {
+      fileData = readFileSync(item.value, 'base64');
+    }
+
+    if (fileData) {
+      fileInfo = await uploadMedia({ file_type: 1, file_data: fileData }).then(res => res?.file_info);
+    }
+
+    if (fileInfo) {
+      return fileInfo;
     }
   }
-
-  return url;
 };
 
 /** Open API 通用发送逻辑（群组 / C2C） */
