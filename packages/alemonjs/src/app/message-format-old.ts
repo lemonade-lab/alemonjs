@@ -261,10 +261,10 @@ Markdown.text = (text: string): DataMarkdownText => {
 Markdown.mention = (uid?: string, options?: DataMarkdownMention['options']): DataMarkdownMention => {
   return {
     type: 'MD.mention',
-    // 默认 @所有人，如果传入 uid 则 @ 指定用户
-    value: uid || '',
+    // 如果没有传 uid，默认 @所有人；如果传了 uid，就 @指定用户
+    value: uid || 'everyone',
     options: options ?? {
-      belong: 'all'
+      belong: 'user'
     }
   };
 };

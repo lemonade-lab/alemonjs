@@ -125,10 +125,10 @@ const mdFormatters: Record<string, (value: any, options?: any) => string> = {
     if (belong === 'channel') {
       return '';
     }
-    if (belong === 'all') {
-      return '<qqbot-at-everyone />';
+    if (belong === 'user') {
+      return `<qqbot-at-user id="${value}" />`;
     }
-    if (value === 'everyone' || value === 'all' || value === '' || typeof value !== 'string') {
+    if (value === 'everyone') {
       return '<qqbot-at-everyone />';
     }
 

@@ -6,9 +6,9 @@ export type DataMarkdownText = {
 
 export type DataMarkdownMention = {
   type: 'MD.mention';
-  value?: string;
+  value?: string | 'everyone'; // everyone 表示 @所有人，字符串表示 @指定用户
   options?: {
-    belong?: 'user' | 'channel' | 'all'; // 默认为 user，表示只@用户；channel 表示@频道内所有人；all 表示@所有人
+    belong?: 'user' | 'channel';
   };
 };
 
