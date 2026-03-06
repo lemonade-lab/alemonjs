@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { QQBotAPI } from './sdk/api';
 import { FileType } from './sdk/typing';
 import {
-  ButtonRow,
+  DataButtonRow,
   ClientAPIMessageResult,
   createResult,
   DataArkBigCard,
@@ -19,7 +19,7 @@ type Client = typeof QQBotAPI.prototype;
 
 // ==================== 数据构造器 ====================
 
-const createButtonsData = (rows: ButtonRow[]) => {
+const createButtonsData = (rows: DataButtonRow[]) => {
   let id = 0;
 
   return {
@@ -118,7 +118,8 @@ const mdFormatters: Record<string, (value: any, options?: any) => string> = {
   'MD.blockquote': value => `\n> ${value}`,
   'MD.newline': () => '\n',
   'MD.link': value => `[🔗${value.text}](${value.url}) `,
-  'MD.at': (value, options) => {
+  'MD.image': (value, options) => `\n![text #${options?.width || 208}px #${options?.height || 320}px](${value})\n`,
+  'MD.mention': (value, options) => {
     const { belong } = options || {};
 
     if (belong === 'channel') {
