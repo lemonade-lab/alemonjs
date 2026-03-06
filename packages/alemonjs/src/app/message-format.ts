@@ -1,11 +1,11 @@
-import { ButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums, EventKeys, Events } from '../types';
+import { DataButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums, EventKeys, Events } from '../types';
 
-import { Text, Image, Link, ImageFile, ImageURL, Mention, BT, MD, Markdown, Attachment, Audio, Video } from './message-format-old.js';
+import { Text, Image, Link, ImageFile, ImageURL, Mention, BT, MD, MarkdownOriginal, Attachment, Audio, Video } from './message-format-old.js';
 
 export * from './message-format-old.js';
 
 export class FormatButtonGroup {
-  #rows: ButtonRow[] = [];
+  #rows: DataButtonRow[] = [];
   #currentRow: DataButton[] | null = null;
 
   /**
@@ -348,7 +348,7 @@ export class Format {
     if (args[0] instanceof FormatButtonGroup) {
       this.#data.push(args[0].value);
     } else {
-      this.#data.push(BT.group(...(args as ButtonRow[])));
+      this.#data.push(BT.group(...(args as DataButtonRow[])));
     }
 
     return this;
@@ -372,8 +372,8 @@ export class Format {
   /**
    * 添加纯 Markdown 文本
    */
-  addMarkdownOriginal(...args: Parameters<typeof Markdown>) {
-    this.#data.push(Markdown(...args));
+  addMarkdownOriginal(...args: Parameters<typeof MarkdownOriginal>) {
+    this.#data.push(MarkdownOriginal(...args));
 
     return this;
   }

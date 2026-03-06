@@ -1,18 +1,4 @@
-/**
- *
- */
-export type DataMarkdownTemplate = {
-  type: 'MarkdownTemplate';
-  value: string; // template_id
-  options: {
-    params: {
-      [key: string]: string;
-    };
-  };
-};
-
 // type Markdown
-
 export type DataMarkdownText = {
   type: 'MD.text';
   value: string;

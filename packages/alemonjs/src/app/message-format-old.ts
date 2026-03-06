@@ -4,7 +4,7 @@ import {
   DataText,
   DataImageURL,
   DataImageFile,
-  ButtonRow,
+  DataButtonRow,
   DataButtonGroup,
   DataButton,
   DataArkList,
@@ -13,7 +13,6 @@ import {
   DataArkListItem,
   DataArkCard,
   DataArkBigCard,
-  DataMarkdownTemplate,
   DataMarkDown,
   DataMarkdownTitle,
   DataMarkdownSubtitle,
@@ -30,7 +29,6 @@ import {
   DataMarkdownNewline,
   DataLink,
   DataMarkdownText,
-  DataButtonTemplate,
   DataMarkdownCode,
   DataMarkdownOriginal,
   DataAttachment,
@@ -135,46 +133,40 @@ export const Mention = (UserId?: DataMention['value'], options?: DataMention['op
   };
 };
 
-const BT = (title: string, data: DataButton['options']['data'], options?: Omit<DataButton['options'], 'data'>): DataButton => {
+export const Button = (title: string, data: DataButton['options']['data'], options?: Omit<DataButton['options'], 'data'>): DataButton => {
   return {
     type: 'Button',
     value: title,
     options: {
-      data,
+      data, // command 数据，必填
       ...options
     }
   };
 };
 
-BT.group = function Group(...rows: ButtonRow[]): DataButtonGroup {
+const ButtonGroup = (...rows: DataButtonRow[]): DataButtonGroup => {
   return {
     type: 'BT.group',
     value: rows
   };
 };
 
-/**
- * 创建一个按钮模板
- * @param templateId  模板 ID
- * @returns
- */
-BT.template = function Template(templateId: DataButtonTemplate['value']): DataButtonTemplate {
-  return {
-    type: 'ButtonTemplate',
-    value: templateId
-  };
-};
-
-BT.row = function Row(...buttons: DataButton[]): ButtonRow {
+const ButtonRow = (...buttons: DataButton[]): DataButtonRow => {
   return {
     type: 'BT.row',
     value: buttons
   };
 };
 
-export { BT };
+Button.group = ButtonGroup;
 
-// Ark 函数
+Button.row = ButtonRow;
+
+export const BT = Button;
+
+/**
+ * @deprecated 废弃，推荐使用 MD
+ */
 export const Ark = {
   /**
    *
@@ -247,7 +239,7 @@ export const Ark = {
  * @param values 要显示的文本
  * @returns
  */
-const MD = (...values: DataMarkDown['value']): DataMarkDown => {
+const Markdown = (...values: DataMarkDown['value']): DataMarkDown => {
   return {
     type: 'Markdown',
     value: values
@@ -256,33 +248,17 @@ const MD = (...values: DataMarkDown['value']): DataMarkDown => {
 
 /**
  *
- * @param templateId 模板 ID
- * @param params 模板参数
- * @returns
- */
-MD.template = (templateId: DataMarkdownTemplate['value'], params?: DataMarkdownTemplate['options']['params']): DataMarkdownTemplate => {
-  return {
-    type: 'MarkdownTemplate',
-    value: templateId,
-    options: {
-      params
-    }
-  };
-};
-
-/**
- *
  * @param text 要显示的文本
  * @returns
  */
-MD.text = (text: string): DataMarkdownText => {
+Markdown.text = (text: string): DataMarkdownText => {
   return {
     type: 'MD.text',
     value: text
   };
 };
 
-MD.mention = (uid?: string, options?: DataMarkdownMention['options']): DataMarkdownMention => {
+Markdown.mention = (uid?: string, options?: DataMarkdownMention['options']): DataMarkdownMention => {
   return {
     type: 'MD.mention',
     // 默认 @所有人，如果传入 uid 则 @ 指定用户
@@ -293,7 +269,7 @@ MD.mention = (uid?: string, options?: DataMarkdownMention['options']): DataMarkd
   };
 };
 
-MD.button = (title: string, data: DataMarkdownButton['options']): DataMarkdownButton => {
+Markdown.button = (title: string, data: DataMarkdownButton['options']): DataMarkdownButton => {
   return {
     type: 'MD.button',
     value: title,
@@ -304,7 +280,7 @@ MD.button = (title: string, data: DataMarkdownButton['options']): DataMarkdownBu
 /**
  * originalContent
  */
-MD.content = (text: string): DataMarkdownContent => {
+Markdown.content = (text: string): DataMarkdownContent => {
   return {
     type: 'MD.content',
     value: text
@@ -316,7 +292,7 @@ MD.content = (text: string): DataMarkdownContent => {
  * @param text 要显示的文本
  * @returns
  */
-MD.title = (text: string): DataMarkdownTitle => {
+Markdown.title = (text: string): DataMarkdownTitle => {
   return {
     type: 'MD.title',
     value: text
@@ -328,7 +304,7 @@ MD.title = (text: string): DataMarkdownTitle => {
  * @param text 要显示的文本
  * @returns
  */
-MD.subtitle = (text: string): DataMarkdownSubtitle => {
+Markdown.subtitle = (text: string): DataMarkdownSubtitle => {
   return {
     type: 'MD.subtitle',
     value: text
@@ -340,7 +316,7 @@ MD.subtitle = (text: string): DataMarkdownSubtitle => {
  * @param text 要显示的文本
  * @returns
  */
-MD.bold = (text: string): DataMarkdownBold => {
+Markdown.bold = (text: string): DataMarkdownBold => {
   return {
     type: 'MD.bold',
     value: text
@@ -352,7 +328,7 @@ MD.bold = (text: string): DataMarkdownBold => {
  * @param text 要显示的文本
  * @returns
  */
-MD.italic = (text: string): DataMarkdownItalic => {
+Markdown.italic = (text: string): DataMarkdownItalic => {
   return {
     type: 'MD.italic',
     value: text
@@ -364,7 +340,7 @@ MD.italic = (text: string): DataMarkdownItalic => {
  * @param text 要显示的文本
  * @returns
  */
-MD.italicStar = (text: string): DataMarkdownItalicStar => {
+Markdown.italicStar = (text: string): DataMarkdownItalicStar => {
   return {
     type: 'MD.italicStar',
     value: text
@@ -376,7 +352,7 @@ MD.italicStar = (text: string): DataMarkdownItalicStar => {
  * @param text 要显示的文本
  * @returns
  */
-MD.strikethrough = (text: string): DataMarkdownStrikethrough => {
+Markdown.strikethrough = (text: string): DataMarkdownStrikethrough => {
   return {
     type: 'MD.strikethrough',
     value: text
@@ -389,7 +365,7 @@ MD.strikethrough = (text: string): DataMarkdownStrikethrough => {
  * @param url  链接地址
  * @returns
  */
-MD.link = (text: string, url: string): DataMarkdownLink => {
+Markdown.link = (text: string, url: string): DataMarkdownLink => {
   return {
     type: 'MD.link',
     value: { text, url }
@@ -402,7 +378,7 @@ MD.link = (text: string, url: string): DataMarkdownLink => {
  * @param options 图片选项
  * @returns
  */
-MD.image = (url: string, options?: { width?: number; height?: number }): DataMarkdownImage => {
+Markdown.image = (url: string, options?: { width?: number; height?: number }): DataMarkdownImage => {
   return {
     type: 'MD.image',
     value: url,
@@ -415,7 +391,7 @@ MD.image = (url: string, options?: { width?: number; height?: number }): DataMar
  * @param items
  * @returns
  */
-MD.list = (...items: any[]): DataMarkdownList => {
+Markdown.list = (...items: any[]): DataMarkdownList => {
   return {
     type: 'MD.list',
     value: items
@@ -428,7 +404,7 @@ MD.list = (...items: any[]): DataMarkdownList => {
  * @param text
  * @returns
  */
-MD.listItem = (indexOrText: number | string, text?: string): DataMarkdownListItem => {
+Markdown.listItem = (indexOrText: number | string, text?: string): DataMarkdownListItem => {
   return {
     type: 'MD.listItem',
     value: typeof indexOrText === 'number' ? { index: indexOrText, text } : indexOrText
@@ -440,7 +416,7 @@ MD.listItem = (indexOrText: number | string, text?: string): DataMarkdownListIte
  * @param text 块引用的文本内容
  * @returns
  */
-MD.blockquote = (text: string): DataMarkdownBlockquote => {
+Markdown.blockquote = (text: string): DataMarkdownBlockquote => {
   return {
     type: 'MD.blockquote',
     value: text
@@ -451,7 +427,7 @@ MD.blockquote = (text: string): DataMarkdownBlockquote => {
  *
  * @returns
  */
-MD.divider = (): DataMarkdownDivider => {
+Markdown.divider = (): DataMarkdownDivider => {
   return {
     type: 'MD.divider'
   };
@@ -461,14 +437,14 @@ MD.divider = (): DataMarkdownDivider => {
  * @param value 是否换多行
  * @returns
  */
-MD.newline = (value = false): DataMarkdownNewline => {
+Markdown.newline = (value = false): DataMarkdownNewline => {
   return {
     type: 'MD.newline',
     value: value
   };
 };
 
-MD.code = (value: DataMarkdownCode['value'], options?: DataMarkdownCode['options']): DataMarkdownCode => {
+Markdown.code = (value: DataMarkdownCode['value'], options?: DataMarkdownCode['options']): DataMarkdownCode => {
   return {
     type: 'MD.code',
     value: value,
@@ -476,14 +452,15 @@ MD.code = (value: DataMarkdownCode['value'], options?: DataMarkdownCode['options
   };
 };
 
-export { MD };
+export const MD = Markdown;
+export { Markdown };
 
 /**
  * 纯 Markdown 文本
  * @param val 原始 Markdown 字符串
  * @returns
  */
-export const Markdown = (val: string): DataMarkdownOriginal => {
+export const MarkdownOriginal = (val: string): DataMarkdownOriginal => {
   return {
     type: 'MarkdownOriginal',
     value: val

@@ -14,17 +14,12 @@ export type DataButton = {
   };
 };
 
-export type ButtonRow = {
-  type: 'BT.row';
+export type DataButtonRow = {
+  type: 'ButtonRow' | 'BT.row';
   value: DataButton[];
 };
 
 export type DataButtonGroup = {
-  type: 'BT.group';
-  value: ButtonRow[];
-};
-
-export type DataButtonTemplate = {
-  type: 'ButtonTemplate';
-  value: string;
+  type: 'ButtonGroup' | 'BT.group';
+  value: DataButtonRow[];
 };
