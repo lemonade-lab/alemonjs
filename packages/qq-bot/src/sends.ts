@@ -19,12 +19,19 @@ type Client = typeof QQBotAPI.prototype;
 
 // ==================== 数据构造器 ====================
 
-const createButtonsData = (rows: DataButtonRow[]) => {
-  let id = 0;
+/** QQ Bot 平台按钮限制：最多 5 行，每行最多 5 个按钮 */
+const MAX_BUTTON_ROWS = 5;
+const MAX_BUTTONS_PER_ROW = 5;
+
+const createButtonsData = (rows: DataButtonRow[], startId = 0) => {
+  let id = startId;
+
+  // 裁剪行数，每行裁剪按钮数
+  const clippedRows = rows.slice(0, MAX_BUTTON_ROWS);
 
   return {
-    rows: rows.map(row => ({
-      buttons: row.value.map(button => {
+    rows: clippedRows.map(row => ({
+      buttons: row.value.slice(0, MAX_BUTTONS_PER_ROW).map(button => {
         const value = button.value;
         const options = button.options;
 
@@ -49,7 +56,8 @@ const createButtonsData = (rows: DataButtonRow[]) => {
           }
         };
       })
-    }))
+    })),
+    nextId: id
   };
 };
 
@@ -252,14 +260,40 @@ const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null =
         params['keyboard'] = { id: item.value };
       }
     } else if (item.type === 'BT.group' && typeof item?.value !== 'string') {
-      params['keyboard'] = { content: createButtonsData(item.value) };
+      // 追加模式：合并多个 BT.group 的行，并裁剪到 5×5
+      if (params['keyboard']?.content?.rows) {
+        const existingRows = params['keyboard'].content.rows;
+        const currentId = params['keyboard'].content.nextId ?? existingRows.length;
+        const remaining = MAX_BUTTON_ROWS - existingRows.length;
+
+        if (remaining > 0) {
+          const { rows: newRows, nextId } = createButtonsData(item.value.slice(0, remaining), currentId);
+
+          existingRows.push(...newRows);
+          params['keyboard'].content.nextId = nextId;
+        }
+      } else {
+        const result = createButtonsData(item.value);
+
+        params['keyboard'] = { content: result };
+      }
     } else if (item.type === 'Markdown' && typeof item?.value !== 'string') {
       const content = createMarkdownText(item.value);
 
       if (content) {
-        params['markdown'] = { content };
+        // 应该是追加模式，所以如果已经存在 markdown 内容，则追加到 content 后面
+        if (params['markdown']?.content) {
+          params['markdown'].content += content;
+        } else {
+          params['markdown'] = { content };
+        }
       }
     }
+  }
+
+  // 清理内部辅助字段，避免发送到 API
+  if (params['keyboard']?.content?.nextId !== undefined) {
+    delete params['keyboard'].content.nextId;
   }
 
   return params;
