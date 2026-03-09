@@ -44,7 +44,10 @@ export const definePlatform = (options: Options) => {
     }
   };
 
-  mainProcess();
+  // 仅当作为平台进程入口加载时才执行 mainProcess，
+  if (!global.__client_loaded) {
+    mainProcess();
+  }
 
   // 这里是旧兼容性返回
   return options.main;

@@ -233,6 +233,9 @@ export function startPlatformAdapterWithFallback(): Promise<void> {
           const data = typeof message === 'string' ? JSON.parse(message) : message;
 
           if (data?.type === 'ready') {
+            if (manager.ready) {
+              return; // ← 新增：防止重复触发 start
+            }
             manager.ready = true;
 
             if (manager.timer) {

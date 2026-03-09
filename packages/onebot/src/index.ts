@@ -164,10 +164,49 @@ const main = () => {
 
           return empty;
         } else if (item.type === 'Image') {
+          // 可能是 Buffer、https://、http://、base64://
+          if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+            const res = await getBufferByURL(item.value);
+
+            return {
+              type: 'image',
+              data: {
+                file: `base64://${res.toString('base64')}`
+              }
+            };
+          } else if (item.value.startsWith('base64://')) {
+            const base64Str = item.value.replace('base64://', '');
+
+            return {
+              type: 'image',
+              data: {
+                file: `base64://${base64Str}`
+              }
+            };
+          } else if (item.value.startsWith('buffer://')) {
+            const base64Str = item.value.replace('buffer://', '');
+
+            return {
+              type: 'image',
+              data: {
+                file: `base64://${base64Str}`
+              }
+            };
+          } else if (item.value.startsWith('file://')) {
+            const db = readFileSync(item.value.slice(7)); // 剥离 file:// 前缀
+
+            return {
+              type: 'image',
+              data: {
+                file: `base64://${db.toString('base64')}`
+              }
+            };
+          }
+
           return {
             type: 'image',
             data: {
-              file: `base64://${item.value}`
+              file: `base64://${item.value.toString('base64')}`
             }
           };
         } else if (item.type === 'ImageFile') {

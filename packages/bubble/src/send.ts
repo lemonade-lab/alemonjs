@@ -75,18 +75,18 @@ export const sendToRoom = async (
         const item = images[i];
 
         if (item.type === 'Image') {
-          if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+          if (Buffer.isBuffer(item.value)) {
+            bufferData = item.value;
+          } else if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
             const res = await ImageURLToBuffer(item.value);
 
             bufferData = res;
-          } else if (item.value.startsWith('buffer://')) {
-            const base64Str = item.value.replace('buffer://', '');
+          } else if (item.value.startsWith('base64://')) {
+            const base64Str = item.value.slice(9); // 'base64://'.length === 9
 
             bufferData = Buffer.from(base64Str, 'base64');
           } else if (item.value.startsWith('file://')) {
             bufferData = readFileSync(item.value);
-          } else if (Buffer.isBuffer(item.value)) {
-            bufferData = item.value;
           }
         } else if (item.type === 'ImageURL') {
           const res = await ImageURLToBuffer(item.value);

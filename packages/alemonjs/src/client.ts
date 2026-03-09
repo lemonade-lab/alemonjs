@@ -2,6 +2,9 @@ import { cbpClient, loadModels } from './index';
 import { defaultPort } from './core/variable';
 import { createServer } from './server/main';
 
+// 标记当前为客户端进程，防止 definePlatform 被 import 时的副作用
+global.__client_loaded = true;
+
 // 应用服务器
 const mainServer = () => {
   // 只有设置了 serverPort 时才启动应用服务器
