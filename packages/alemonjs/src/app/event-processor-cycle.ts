@@ -41,7 +41,7 @@ const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
     });
   } else {
     // 批量收集非空字段后一次 join — 避免多次 typeof 检查 + 字符串 += 拼接
-    const parts = [`[Name: ${select}]`];
+    const parts = [`[Name:${select}]`];
     const fields = ['GuildId', 'ChannelId', 'UserKey', 'UserId', 'MessageId', 'MessageText'] as const;
 
     for (const f of fields) {
