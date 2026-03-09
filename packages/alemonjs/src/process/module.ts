@@ -1,6 +1,7 @@
 import childProcess from 'child_process';
 import { getConfigValue, ResultCode } from '../core';
 import module from 'module';
+import { setClientChild, forwardFromClient } from './ipc-bridge';
 
 // 初始化 require 的备用实现
 const initRequire = () => {};
@@ -54,16 +55,25 @@ export function startModuleAdapter(): void {
     };
 
     /**
-     * 清理资源
+     * 清理定时器
      */
-    const cleanup = (): void => {
+    const clearTimer = (): void => {
       if (manager.timer) {
         clearTimeout(manager.timer);
         manager.timer = undefined;
       }
+    };
+
+    /**
+     * 完全清理资源（进程退出/重启时使用）
+     */
+    const cleanup = (): void => {
+      clearTimer();
       if (manager.child) {
         manager.child.removeAllListeners();
       }
+      // 清除 IPC 桥接引用
+      setClientChild(null);
     };
 
     /**
@@ -102,9 +112,11 @@ export function startModuleAdapter(): void {
     };
 
     try {
-      // 继承主进程的 execArgv，包括任何自定义的 loader 配置
+      // 继承主进程的 execArgv，启用 IPC 模式
       manager.child = childProcess.fork(modulePath, [], {
-        execArgv: process.execArgv
+        execArgv: process.execArgv,
+        env: { ...process.env, __ALEMON_IPC: '1' },
+        serialization: 'advanced'
       });
 
       manager.timer = setTimeout(checkTimeout, CONFIG.FORK_TIMEOUT);
@@ -125,7 +137,7 @@ export function startModuleAdapter(): void {
       });
 
       /**
-       * 子进程消息处理
+       * 子进程消息处理（IPC 极速通道）
        */
       manager.child.on('message', (message: unknown) => {
         try {
@@ -133,15 +145,22 @@ export function startModuleAdapter(): void {
 
           if (data?.type === 'ready') {
             manager.ready = true;
-            cleanup();
+            // 仅清理定时器，保留消息监听器用于 IPC 数据通道
+            clearTimer();
+
+            // 设置客户端子进程引用到 IPC 桥接
+            setClientChild(manager.child);
 
             logger?.debug?.({
               code: ResultCode.Ok,
-              message: '模块加载已就绪（子进程 fork 模式）',
+              message: '模块加载已就绪（IPC）',
               data: null
             });
 
             manager.child?.send?.({ type: 'start' });
+          } else if (data?.type === 'ipc:data') {
+            // IPC 数据消息：客户端 → 平台（通过桥接转发）
+            forwardFromClient(data.data);
           }
         } catch (error) {
           logger?.error?.({

@@ -1,6 +1,7 @@
 import childProcess from 'child_process';
 import { getConfigValue, ResultCode } from '../core';
 import module from 'module';
+import { setPlatformChild, forwardFromPlatform } from './ipc-bridge';
 
 // 初始化 require 的备用实现
 const initRequire = () => {};
@@ -129,6 +130,8 @@ export function startPlatformAdapterWithFallback(): Promise<void> {
       if (manager.child) {
         manager.child.removeAllListeners();
       }
+      // 清除 IPC 桥接引用
+      setPlatformChild(null);
     };
 
     const restart = (): void => {
@@ -154,6 +157,17 @@ export function startPlatformAdapterWithFallback(): Promise<void> {
 
       isForkFailed = true; // 标记 fork 失败
       cleanup();
+
+      // 如果未启动 WS 服务器（纯 IPC 模式），降级无意义，直接拒绝
+      if (!process.env.port) {
+        logger?.error?.({
+          code: ResultCode.Fail,
+          message: 'fork 启动平台连接失败，当前为纯 IPC 模式（未配置 port），无法降级到 WebSocket，已终止平台连接',
+          data: error
+        });
+
+        return;
+      }
 
       logger?.warn?.({
         code: ResultCode.Fail,
@@ -184,9 +198,11 @@ export function startPlatformAdapterWithFallback(): Promise<void> {
     };
 
     try {
-      // 创建子进程，继承主进程的 execArgv
+      // 创建子进程，继承主进程的 execArgv，启用 IPC 模式
       manager.child = childProcess.fork(modulePath, [], {
-        execArgv: process.execArgv
+        execArgv: process.execArgv,
+        env: { ...process.env, __ALEMON_IPC: '1' },
+        serialization: 'advanced'
       });
 
       // 设置超时检查
@@ -211,7 +227,7 @@ export function startPlatformAdapterWithFallback(): Promise<void> {
         }
       });
 
-      // 子进程消息处理
+      // 子进程消息处理（IPC 极速通道）
       manager.child.on('message', (message: unknown) => {
         try {
           const data = typeof message === 'string' ? JSON.parse(message) : message;
@@ -224,13 +240,19 @@ export function startPlatformAdapterWithFallback(): Promise<void> {
               manager.timer = undefined;
             }
 
+            // 设置平台子进程引用到 IPC 桥接
+            setPlatformChild(manager.child);
+
             logger?.debug?.({
               code: ResultCode.Ok,
-              message: '平台连接已就绪（子进程 fork 模式）',
+              message: '平台连接已就绪（IPC）',
               data: null
             });
 
             manager.child?.send?.({ type: 'start' });
+          } else if (data?.type === 'ipc:data') {
+            // IPC 数据消息：平台 → 客户端（通过桥接转发）
+            forwardFromPlatform(data.data);
           }
         } catch (error) {
           logger?.error?.({

@@ -1,9 +1,10 @@
 import { getConfig } from './core/config.js';
 import { cbpServer } from './cbp/server/main.js';
-import { defaultPlatformCommonPrefix, defaultPort, filePrefixCommon } from './core/variable.js';
+import { defaultPlatformCommonPrefix, filePrefixCommon } from './core/variable.js';
 import type { StartOptions } from './types';
 import { startPlatformAdapterWithFallback } from './process/platform.js';
 import { startModuleAdapter } from './process/module.js';
+import { generateSocketPath } from './process/direct-channel.js';
 
 // 得到最恰当的参数
 const createOptionsByKey = (options: StartOptions, key: string, defaultValue: any) => {
@@ -66,7 +67,7 @@ const startClient = (options: StartOptions) => {
   process.env.input = createOptionsByKey(options, 'input', '');
   process.env.output = createOptionsByKey(options, 'output', '');
   process.env.is_full_receive = String(createOptionsByKey(options, 'is_full_receive', true));
-  process.env.port = String(createOptionsByKey(options, 'port', defaultPort));
+  process.env.port = String(createOptionsByKey(options, 'port', '') || '');
   process.env.url = createOptionsByKey(options, 'url', '');
 
   startModuleAdapter();
@@ -84,25 +85,37 @@ export const start = (options: StartOptions | string = {}) => {
   // 保存全局参数
   global.__options = options;
 
-  // 得到端口号
-  const port = createOptionsByKey(options, 'port', defaultPort);
+  // 得到端口号（传空字符串或 0 表示不启动 WS）
+  const port = createOptionsByKey(options, 'port', '');
   const serverPort = createOptionsByKey(options, 'serverPort', '');
 
   // 设置环境变量
-  process.env.port = port;
+  process.env.port = port ? String(port) : '';
   process.env.serverPort = serverPort;
 
-  cbpServer(port, () => {
-    const httpURL = `http://127.0.0.1:${port}`;
-    const wsURL = `ws://127.0.0.1:${port}`;
+  if (port) {
+    // 有端口：启动 CBP WebSocket 服务器（兼容前端 UI 和远程连接）
+    cbpServer(port, () => {
+      const httpURL = `http://127.0.0.1:${port}`;
+      const wsURL = `ws://127.0.0.1:${port}`;
 
-    logger.info(`[CBP server started at ${httpURL}]`);
-    logger.info(`[CBP server started at ${wsURL}]`);
+      logger.info(`[CBP server started at ${httpURL}]`);
+      logger.info(`[CBP server started at ${wsURL}]`);
 
-    // 启动客户端进程
+      // 启动客户端进程
+      startClient(options);
+
+      // 启动平台进程
+      startPlatform(options);
+    });
+  } else {
+    // 无端口：纯 IPC 模式 + 直连通道，不启动 WS 服务器
+    const sockPath = generateSocketPath();
+    process.env.__ALEMON_DIRECT_SOCK = sockPath;
+    logger.info('[Direct-IPC mode] 平台↔客户端直连通道，无主进程桥接');
+
+    // 直接启动客户端和平台进程（客户端先启动 UDS 服务端，平台后连接）
     startClient(options);
-
-    // 启动平台进程
     startPlatform(options);
-  });
+  }
 };

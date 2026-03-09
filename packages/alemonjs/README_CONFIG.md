@@ -4,8 +4,8 @@
 
 ```yaml
 # === 服务器配置 ===
-port: 17117 # CBP服务器端口，快捷参数 --port
-serverPort: 18110 # 应用服务器端口（可选，仅在需要Web服务时设置）
+port: 17117 # CBP Websocket 端口 （可选，将允许外部客户端互动）
+serverPort: 18110 # Koa 服务器端口（可选，仅在需要Web服务时设置）
 
 # === 应用配置 ===
 input: 'lib/index.js' # 应用入口文件路径，快捷参数 --input
