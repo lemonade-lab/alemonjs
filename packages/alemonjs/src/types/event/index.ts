@@ -4,20 +4,11 @@ import { EventKeys, Events } from './map';
 import { DataEnums } from '../message';
 
 /**
- * 当前结果
- */
-export type CurrentResult = {
-  allowGrouping?: boolean;
-  data?: DataEnums[];
-  [key: string]: any;
-};
-
-export type CurrentResultValue = void | CurrentResult['allowGrouping'] | CurrentResult | CurrentResult['data'];
-
-/**
  * 当前事件
+ * return true → 继续执行下一个 handler
+ * return void/false → 停止当前链
  */
-export type Current<T extends EventKeys> = (event: Events[T], next: Next) => CurrentResultValue;
+export type Current<T extends EventKeys> = (event: Events[T], next: Next) => void | boolean | Promise<void | boolean>;
 
 // 返回值类型
 export type OnResponseValue<C, T extends EventKeys> = {

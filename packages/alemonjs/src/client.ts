@@ -65,9 +65,9 @@ const mainProcess = () => {
     } catch {}
   });
 
-  // 主动发送 ready 消息
+  // 主动发送 ready 消息（serialization: 'advanced' 直接发送对象，无需 JSON.stringify）
   if (process.send) {
-    process.send(JSON.stringify({ type: 'ready' }));
+    process.send({ type: 'ready' });
   }
 };
 

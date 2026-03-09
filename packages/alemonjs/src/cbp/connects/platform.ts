@@ -214,7 +214,7 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
  * @returns
  */
 export const cbpPlatform = (
-  url: string,
+  url?: string,
   options = {
     open: () => {}
   }
@@ -231,7 +231,21 @@ export const cbpPlatform = (
     return cbpPlatformIPC(open);
   }
 
-  // 以下为 WebSocket 模式（原有逻辑）
+  const createCurrentURL = () => {
+    if (url) {
+      if (url.startsWith('ws://') || url.startsWith('wss://')) {
+        return url;
+      }
+      // 视为端口号
+      if (/^\d+$/.test(url)) {
+        return `ws://localhost:${url}`;
+      }
+    }
+    if (process.env.__ALEMON_PLATFORM_WS_URL) {
+      return process.env.__ALEMON_PLATFORM_WS_URL;
+    }
+  };
+  const currentURL = createCurrentURL() || `ws://localhost:${process.env.port || 17117}`;
 
   /**
    * 发送数据
@@ -290,7 +304,7 @@ export const cbpPlatform = (
   };
 
   createWSConnector({
-    url,
+    url: currentURL,
     role: 'platform',
     globalKey: 'chatbotPlatform',
     onOpen: open,

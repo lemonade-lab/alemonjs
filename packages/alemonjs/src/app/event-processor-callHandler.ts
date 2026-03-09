@@ -1,38 +1,11 @@
-import { CurrentResultValue } from '../types';
 import { showErrorModule } from '../core';
-import { useMessage } from './hook-use-api';
 
 export const createCallHandler = valueEvent => {
-  const [message] = useMessage(valueEvent);
-
   // 开始处理 handler
   const callHandler = (currents, nextEvent) => {
     let index = 0;
     let isClose = false;
     let isNext = false;
-
-    const onRes = (res: CurrentResultValue) => {
-      if (!res) {
-        isClose = true;
-
-        return;
-      }
-      if (Array.isArray(res)) {
-        if (res.length > 0) {
-          // 发送数据
-          void message.send(res);
-        }
-        isClose = true;
-      } else if (typeof res === 'object') {
-        if (Array.isArray(res.data)) {
-          // 发送数据
-          void message.send(res.data);
-        }
-        if (!res.allowGrouping) {
-          isClose = true;
-        }
-      }
-    };
 
     const start = async () => {
       if (index >= currents.length) {
@@ -52,7 +25,11 @@ export const createCallHandler = valueEvent => {
           nextEvent(...cns);
         });
 
-        onRes(res);
+        // return true → 局部中间件放行，继续执行 children handler
+        // return void/false → 处理完毕或拦截，停止当前链
+        if (res !== true) {
+          isClose = true;
+        }
       } catch (err) {
         showErrorModule(err);
 

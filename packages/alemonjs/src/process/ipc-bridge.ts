@@ -40,19 +40,21 @@ export const forwardFromPlatform = (data: any) => {
     clientChild.send({ type: 'ipc:data', data });
   }
 
-  // 同时转发到 WebSocket 前端客户端（供 UI 使用）
-  try {
-    const messageStr = flattedJSON.stringify(data);
+  // 同时转发到 WebSocket 前端客户端（供 UI 使用）— 无客户端时短路跳过
+  if (fullClient.size > 0) {
+    try {
+      const messageStr = flattedJSON.stringify(data);
 
-    fullClient.forEach((ws, id) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(messageStr);
-      } else {
-        fullClient.delete(id);
-      }
-    });
-  } catch {
-    // 序列化失败时忽略前端转发
+      fullClient.forEach((ws, id) => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(messageStr);
+        } else {
+          fullClient.delete(id);
+        }
+      });
+    } catch {
+      // 序列化失败时忽略前端转发
+    }
   }
 };
 

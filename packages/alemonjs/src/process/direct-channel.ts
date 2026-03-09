@@ -23,36 +23,39 @@ export const generateSocketPath = (): string => {
 };
 
 /**
- * 消息编码：4字节长度前缀 + V8 序列化数据
+ * 消息编码：4字节长度前缀 + V8 序列化数据（单次分配，零拷贝）
  */
 const encodeMessage = (data: any): Buffer => {
   const serialized = v8.serialize(data);
-  const header = Buffer.alloc(4);
+  const buf = Buffer.allocUnsafe(4 + serialized.length);
 
-  header.writeUInt32BE(serialized.length, 0);
+  buf.writeUInt32BE(serialized.length, 0);
+  serialized.copy(buf, 4);
 
-  return Buffer.concat([header, serialized]);
+  return buf;
 };
 
 /**
- * 创建流式消息解析器（处理粘包/拆包）
+ * 创建流式消息解析器（处理粘包/拆包，优化 Buffer 分配）
  */
 const createMessageParser = (onMessage: (data: any) => void) => {
-  let buffer = Buffer.alloc(0);
+  let buffer: Buffer<ArrayBufferLike> = Buffer.alloc(0);
 
   return (chunk: Buffer) => {
-    buffer = Buffer.concat([buffer, chunk]);
+    // 优化：如果 buffer 为空，直接使用 chunk 避免 concat
+    buffer = buffer.length === 0 ? chunk : Buffer.concat([buffer, chunk]);
 
     while (buffer.length >= 4) {
       const msgLen = buffer.readUInt32BE(0);
+      const totalLen = 4 + msgLen;
 
-      if (buffer.length < 4 + msgLen) {
+      if (buffer.length < totalLen) {
         break;
       }
 
-      const msgBuf = buffer.subarray(4, 4 + msgLen);
+      const msgBuf = buffer.subarray(4, totalLen);
 
-      buffer = buffer.subarray(4 + msgLen);
+      buffer = buffer.subarray(totalLen);
 
       try {
         onMessage(v8.deserialize(msgBuf));

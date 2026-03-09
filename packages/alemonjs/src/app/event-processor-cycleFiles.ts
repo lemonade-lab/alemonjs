@@ -1,8 +1,11 @@
 import { Next, Events, Current, EventKeys, StoreResponseItem, OnResponseValue } from '../types';
 import { useState } from './hook-use-state';
-import { showErrorModule } from '../core/utils';
+import { showErrorModule, getCachedRegExp } from '../core/utils';
 import { EventMessageText } from '../core/variable';
 import { ResponseMiddleware } from './store';
+
+// 模块级单例 — ResponseMiddleware 无状态，无需每文件 new
+const responseMiddlewareSingleton = new ResponseMiddleware();
 
 // 模块缓存，避免每次事件处理都重新 import
 const moduleCache = new Map<string, any>();
@@ -64,9 +67,7 @@ const callHandlerFile = async <T extends EventKeys>(
 
     if (EventMessageText.includes(select)) {
       if (app?.regular) {
-        const reg = new RegExp(app.regular);
-
-        if (!reg.test(valueEvent['MessageText'])) {
+        if (!getCachedRegExp(app.regular).test(valueEvent['MessageText'])) {
           // 继续
           nextStep();
 
@@ -149,15 +150,15 @@ export const createNextStep = <T extends EventKeys>(
       return;
     }
 
-    // 调用局部中间件
-    const responseMiddleware = new ResponseMiddleware();
-
-    // 找到当前响应体下对应的所有中间件。
-    const currentsAndMiddleware = responseMiddleware.find(file.appName, file.stateKey);
+    // 调用局部中间件（使用模块级单例，避免每文件创建新实例）
+    const currentsAndMiddleware = responseMiddlewareSingleton.find(file.appName, file.stateKey);
 
     const currents = [];
 
-    for (const cm of [...currentsAndMiddleware, file]) {
+    // 直接遍历 middleware 数组 + file，避免每文件 spread 创建新数组
+    const iterItems = currentsAndMiddleware.length > 0 ? currentsAndMiddleware.concat(file) : [file];
+
+    for (const cm of iterItems) {
       let isBreak = false;
 
       if (recordCloseMw.has(cm.stateKey)) {

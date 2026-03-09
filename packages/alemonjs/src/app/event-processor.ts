@@ -10,7 +10,7 @@ import {
 import { EventKeys, Events } from '../types';
 import { expendCycle } from './event-processor-cycle';
 import { ProcessorEventAutoClearMap, ProcessorEventUserAutoClearMap } from './store';
-import { createHash } from '../core/utils';
+import { fastHash, getCachedRegExp } from '../core/utils';
 
 /**
  * 过滤掉重复消息
@@ -45,34 +45,52 @@ const filter = ({ Now, store, INTERVAL }, MessageId: string) => {
 };
 
 /**
- * 清理旧消息
+ * 清理旧消息（带预算限制，避免大 Map 阻塞 Event Loop）
+ * @returns 是否全部清理完毕
  */
-const cleanupStore = ({ Now, store, INTERVAL }) => {
+const CLEANUP_BUDGET = 1000;
+const cleanupStore = ({ Now, store, INTERVAL }): boolean => {
+  let cleaned = 0;
+
   for (const [ID, timestamp] of store.entries()) {
+    if (cleaned >= CLEANUP_BUDGET) {
+      return false; // 预算用尽，下次继续
+    }
     // 超过时间间隔
     if (Now - timestamp > INTERVAL) {
-      // 删除
       store.delete(ID);
+      cleaned++;
     }
   }
+
+  return true;
 };
 
 /**
  * 清理所有消息
  */
-const cleanupStoreAll = () => {
+const cleanupStoreAll = (): boolean => {
   const Now = Date.now();
   const value = getConfigValue();
   const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
   const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
 
-  cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap });
-  cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap });
+  const a = cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap });
+  const b = cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap });
+
+  return a && b;
 };
 
 // 清理消息
 const callback = () => {
-  cleanupStoreAll();
+  const allDone = cleanupStoreAll();
+
+  // 如果预算用尽未清完，立即调度下一轮
+  if (!allDone) {
+    setImmediate(callback);
+
+    return;
+  }
   // 下一次清理的时间，应该随着长度的增加而减少
   const length = ProcessorEventAutoClearMap.size + ProcessorEventUserAutoClearMap.size;
   // 长度控制在37个以内
@@ -97,9 +115,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
   // 检查文本禁用规则
   if (disabledTextRegular && event['MessageText']) {
-    const reg = new RegExp(disabledTextRegular);
-
-    if (reg.test(event['MessageText'])) {
+    if (getCachedRegExp(disabledTextRegular).test(event['MessageText'])) {
       return;
     }
   }
@@ -130,10 +146,10 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
   // 检查文本重定向规则
   if (redirectRegular && redirectTarget && event['MessageText']) {
-    const reg = new RegExp(redirectRegular);
+    const cachedReg = getCachedRegExp(redirectRegular);
 
-    if (reg.test(event['MessageText'])) {
-      event['MessageText'] = event['MessageText'].replace(reg, redirectTarget);
+    if (cachedReg.test(event['MessageText'])) {
+      event['MessageText'] = event['MessageText'].replace(cachedReg, redirectTarget);
     }
   }
 
@@ -146,10 +162,10 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     if (!regular) {
       continue;
     }
-    const reg = new RegExp(regular);
+    const cachedReg = getCachedRegExp(regular);
 
-    if (reg.test(event['MessageText'])) {
-      event['MessageText'] = event['MessageText'].replace(reg, target);
+    if (cachedReg.test(event['MessageText'])) {
+      event['MessageText'] = event['MessageText'].replace(cachedReg, target);
     }
   }
 
@@ -177,8 +193,8 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
   const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
 
   if (event['MessageId']) {
-    // 消息过长，要减少消息的长度
-    const MessageId = createHash(event['MessageId']);
+    // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
+    const MessageId = fastHash(event['MessageId']);
 
     // 重复消息
     if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
@@ -189,8 +205,8 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
   const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
 
   if (event['UserId']) {
-    // 编号过长，要减少编号的长度
-    const UserId = createHash(event['UserId']);
+    // FNV-1a 快速哈希
+    const UserId = fastHash(event['UserId']);
 
     // 频繁操作
     if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
@@ -199,17 +215,13 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
   }
 
   if (data) {
-    // 当访问value的时候获取原始的data
-    Object.defineProperty(event, 'value', {
-      get() {
-        return data;
-      }
-    });
+    // 直接赋值 — 避免 defineProperty 破坏 V8 Hidden Class 优化
+    event['value'] = data;
   }
 
   event['name'] = name;
 
-  expendCycle(event, name);
+  expendCycle(event, name, value);
 };
 
 /**

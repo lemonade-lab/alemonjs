@@ -1,6 +1,5 @@
 import Koa from 'koa';
 import { WebSocketServer, WebSocket } from 'ws';
-import * as JSON from 'flatted';
 import * as flattedJSON from 'flatted';
 import koaCors from '@koa/cors';
 import MessageRouter from '../routers/router';
@@ -8,6 +7,9 @@ import { ResultCode } from '../../core';
 import {
   childrenBind,
   childrenClient,
+  clientBindCount,
+  bindChannelToClient,
+  unbindClient,
   DEVICE_ID_HEADER,
   FULL_RECEIVE_HEADER,
   fullClient,
@@ -48,7 +50,7 @@ const handleEvent = (message: string, ID: string) => {
       clientWs.send(message);
     } else {
       // 如果连接已关闭，删除该客户端
-      childrenClient.delete(clientId);
+      fullClient.delete(clientId);
     }
   });
   // 根据所在群进行分流。
@@ -62,7 +64,7 @@ const handleEvent = (message: string, ID: string) => {
 
     return;
   }
-  // 重新绑定并发送消息
+  // 重新绑定并发送消息（使用 O(1) 计数器查找最少绑定的客户端）
   const reBind = () => {
     if (childrenClient.size === 0) {
       return;
@@ -70,21 +72,20 @@ const handleEvent = (message: string, ID: string) => {
       // 只有一个客户端，直接绑定
       const [bindId, clientWs] = childrenClient.entries().next().value;
 
-      childrenBind.set(ID, bindId);
+      bindChannelToClient(ID, bindId);
       clientWs.send(message);
 
       return;
     }
-    // 有多个客户端，找到绑定最少的那个。
-    // 如果大家都一样。就拿最近的第一个直接绑定。
-    let minBindCount = Infinity;
+    // O(1) 计数器查找绑定最少的客户端（替代 O(n) 全量扫描）
+    let minCount = Infinity;
     let bindId: string | null = null;
 
     childrenClient.forEach((_, id) => {
-      const count = Array.from(childrenBind.values()).filter(v => v === id).length;
+      const count = clientBindCount.get(id) ?? 0;
 
-      if (count < minBindCount) {
-        minBindCount = count;
+      if (count < minCount) {
+        minCount = count;
         bindId = id;
       }
     });
@@ -93,12 +94,13 @@ const handleEvent = (message: string, ID: string) => {
 
       if (clientWs && clientWs.readyState === WebSocket.OPEN) {
         // 进行绑定
-        childrenBind.set(ID, bindId);
+        bindChannelToClient(ID, bindId);
         // 发送消息到绑定的客户端
         clientWs.send(message);
       } else {
         // 如果连接已关闭，删除该客户端
         childrenClient.delete(bindId);
+        unbindClient(bindId);
         // 重新进行绑定
         reBind();
       }
@@ -169,6 +171,8 @@ const setChildrenClient = (originId: string, ws: WebSocket) => {
   // 处理关闭事件
   ws.on('close', () => {
     childrenClient.delete(originId);
+    // 清理该客户端的所有频道绑定记录（防止内存泄漏）
+    unbindClient(originId);
     logger.debug({
       code: ResultCode.Fail,
       message: `Client ${originId} disconnected`,
@@ -244,7 +248,7 @@ const setPlatformClient = (originId: string, ws: WebSocket) => {
   ws.on('message', (message: string) => {
     try {
       // 解析消息
-      const parsedMessage: ParsedMessage = JSON.parse(message.toString());
+      const parsedMessage: ParsedMessage = flattedJSON.parse(message.toString());
 
       // 1. 解析得到 actionId ，说明是消费行为请求。要广播告诉所有客户端。
       // 2. 解析得到 name ，说明是一个事件请求。
@@ -456,7 +460,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         } else if (origin === USER_AGENT_HEADER_VALUE_MAP.client) {
           // 连接时，需要给客户端发送主动消息
           ws.send(
-            JSON.stringify({
+            flattedJSON.stringify({
               active: 'sync',
               payload: {
                 env: {
@@ -486,6 +490,8 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         platformClient.clear();
         childrenClient.clear();
         fullClient.clear();
+        childrenBind.clear();
+        clientBindCount.clear();
         delete global.testoneClient;
 
         // 发现是端口已经被占用
@@ -521,6 +527,8 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         platformClient.clear();
         childrenClient.clear();
         fullClient.clear();
+        childrenBind.clear();
+        clientBindCount.clear();
       });
     } catch (error) {
       logger.error({

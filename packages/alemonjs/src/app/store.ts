@@ -146,14 +146,29 @@ export class Core {
   }
 }
 
+// Store 版本计数器 — ChildrenApp 注册/卸载时递增，用于脏标记缓存
+let _storeVersion = 0;
+
+export const bumpStoreVersion = () => {
+  _storeVersion++;
+};
+
 export class Response {
+  #cache: StoreResponseItem[] | null = null;
+  #cacheVersion = -1;
+
   get value() {
-    // 得到所有 app，得到所有 res
+    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+      return this.#cache;
+    }
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
       return alemonjsCore.storeChildrenApp[key].response;
     });
 
-    return data.flat();
+    this.#cache = data.flat();
+    this.#cacheVersion = _storeVersion;
+
+    return this.#cache;
   }
 }
 
@@ -190,7 +205,13 @@ export class ResponseMiddleware {
 }
 
 export class ResponseRouter {
+  #cache: any[] | null = null;
+  #cacheVersion = -1;
+
   get value() {
+    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+      return this.#cache;
+    }
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
       if (!alemonjsCore.storeChildrenApp[key].register) {
         return [];
@@ -206,13 +227,21 @@ export class ResponseRouter {
       return [];
     });
 
-    return data.flat();
+    this.#cache = data.flat();
+    this.#cacheVersion = _storeVersion;
+
+    return this.#cache;
   }
 }
 
 export class MiddlewareRouter {
+  #cache: any[] | null = null;
+  #cacheVersion = -1;
+
   get value() {
-    // 得到所有 app，得到所有 res
+    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+      return this.#cache;
+    }
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
       if (!alemonjsCore.storeChildrenApp[key].register) {
         return [];
@@ -227,18 +256,29 @@ export class MiddlewareRouter {
       return [];
     });
 
-    return data.flat();
+    this.#cache = data.flat();
+    this.#cacheVersion = _storeVersion;
+
+    return this.#cache;
   }
 }
 
 export class Middleware {
+  #cache: StoreMiddlewareItem[] | null = null;
+  #cacheVersion = -1;
+
   get value() {
-    // 得到所有 app，得到所有 res
+    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+      return this.#cache;
+    }
     const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
       return alemonjsCore.storeChildrenApp[key].middleware;
     });
 
-    return data.flat();
+    this.#cache = data.flat();
+    this.#cacheVersion = _storeVersion;
+
+    return this.#cache;
   }
 }
 
@@ -258,6 +298,17 @@ export class SubscribeList<T extends EventKeys> {
     return alemonjsCore.storeSubscribeList[this.#choice].get(this.#select);
   }
 }
+
+/**
+ * 纯函数版 SubscribeList 访问 — 避免每次创建类实例的 GC 开销
+ */
+export const getSubscribeList = <T extends EventKeys>(choice: EventCycleEnum, select: T): SinglyLinkedList<SubscribeValue> => {
+  if (!alemonjsCore.storeSubscribeList[choice].has(select)) {
+    alemonjsCore.storeSubscribeList[choice].set(select, new SinglyLinkedList());
+  }
+
+  return alemonjsCore.storeSubscribeList[choice].get(select);
+};
 
 export class StateSubscribe {
   #name: string = null;
@@ -406,6 +457,7 @@ export class ChildrenApp {
       cycle: this.#cycle,
       register: this.#registerRes
     };
+    bumpStoreVersion();
   }
 
   /**
@@ -415,6 +467,7 @@ export class ChildrenApp {
     // 清理
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete alemonjsCore.storeChildrenApp[this.#name];
+    bumpStoreVersion();
   }
 
   /**

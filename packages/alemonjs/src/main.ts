@@ -111,6 +111,7 @@ export const start = (options: StartOptions | string = {}) => {
   } else {
     // 无端口：纯 IPC 模式 + 直连通道，不启动 WS 服务器
     const sockPath = generateSocketPath();
+
     process.env.__ALEMON_DIRECT_SOCK = sockPath;
     logger.info('[Direct-IPC mode] 平台↔客户端直连通道，无主进程桥接');
 

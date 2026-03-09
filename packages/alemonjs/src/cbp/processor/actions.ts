@@ -17,6 +17,7 @@ const setupActionResolve = (actionId: string, resolve: (value: Result[] | Promis
     actionTimeouts.delete(actionId);
     resolve([createResult(ResultCode.Fail, '行为超时', null)]);
   }, timeoutTime);
+
   actionTimeouts.set(actionId, timeout);
 };
 
@@ -34,9 +35,11 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
 
     // 最优：直连通道（UDS V8 序列化，零桥接）
     const directSend = getDirectSend();
+
     if (directSend) {
       directSend(data);
       setupActionResolve(actionId, resolve);
+
       return;
     }
 
@@ -44,6 +47,7 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
     if (process.env.__ALEMON_IPC === '1' && typeof process.send === 'function') {
       process.send({ type: 'ipc:data', data });
       setupActionResolve(actionId, resolve);
+
       return;
     }
 

@@ -17,6 +17,7 @@ const setupApiResolve = (apiId: string, resolve: (value: Result[] | PromiseLike<
     apiTimeouts.delete(apiId);
     resolve([createResult(ResultCode.Fail, '接口超时', null)]);
   }, timeoutTime);
+
   apiTimeouts.set(apiId, timeout);
 };
 
@@ -34,9 +35,11 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
 
     // 最优：直连通道（UDS V8 序列化，零桥接）
     const directSend = getDirectSend();
+
     if (directSend) {
       directSend(data);
       setupApiResolve(ApiId, resolve);
+
       return;
     }
 
@@ -44,6 +47,7 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
     if (process.env.__ALEMON_IPC === '1' && typeof process.send === 'function') {
       process.send({ type: 'ipc:data', data });
       setupApiResolve(ApiId, resolve);
+
       return;
     }
 

@@ -4,7 +4,7 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventCycleEnum, EventKeys } from '../types';
-import { SubscribeList } from './store';
+import { getSubscribeList } from './store';
 import { SubscribeStatus } from './config';
 
 /**
@@ -15,7 +15,7 @@ import { SubscribeStatus } from './config';
  * @param choose
  */
 export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next, choose: EventCycleEnum) => {
-  const subList = new SubscribeList(choose, select);
+  const subListValue = getSubscribeList(choose, select);
   /**
    * 观察者下一步
    * @returns
@@ -27,7 +27,7 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
       return;
     }
 
-    const item = subList.value.popNext(); // 弹出下一个节点
+    const item = subListValue.popNext(); // 弹出下一个节点
 
     // 这里代表没有 下一个节点，应该进入下一个周期
     if (!item) {
@@ -42,7 +42,7 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
 
     // 查看是否激活，如果不激活，移除并继续下一个
     if (item.data.status === SubscribeStatus.paused) {
-      subList.value.removeCurrent(); // 移除当前节点
+      subListValue.removeCurrent(); // 移除当前节点
       // 下一个节点
       nextObserver();
 
@@ -60,47 +60,34 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
       }
     }
 
-    // 恢复
+    // 恢复（循环替代递归 — 避免深链表栈溢出风险）
     const onActive = () => {
       for (const select of selects) {
-        const subList = new SubscribeList(choose, select);
+        const subListVal = getSubscribeList(choose, select);
+        let item = subListVal.popNext();
 
-        const find = () => {
-          const item = subList.value.popNext(); // 弹出下一个节点
-
-          if (!item) {
-            return;
+        while (item) {
+          if (item.data.id === ID) {
+            item.data.status = SubscribeStatus.active;
+            break;
           }
-          if (item.data.id !== ID) {
-            find();
-
-            return;
-          }
-          item.data.status = SubscribeStatus.active; // 标记为已激活
-        };
-
-        find();
+          item = subListVal.popNext();
+        }
       }
     };
 
     const onPaused = () => {
       for (const select of selects) {
-        const subList = new SubscribeList(choose, select);
-        const find = () => {
-          const item = subList.value.popNext(); // 弹出下一个节点
+        const subListVal = getSubscribeList(choose, select);
+        let item = subListVal.popNext();
 
-          if (!item) {
-            return;
+        while (item) {
+          if (item.data.id === ID) {
+            item.data.status = SubscribeStatus.paused;
+            break;
           }
-          if (item.data.id !== ID) {
-            find();
-
-            return;
-          }
-          item.data.status = SubscribeStatus.paused; // 标记为已暂停
-        };
-
-        find();
+          item = subListVal.popNext();
+        }
       }
     };
 

@@ -5,6 +5,7 @@ import { createResult, Result } from '../core/utils';
 import { sendAction } from '../cbp/processor/actions';
 import { sendAPI } from '../cbp/processor/api';
 import { BT, Format, Image, ImageFile, ImageURL, Link, MD, Mention, Text } from './message-format';
+import { MessageControllerImpl } from './message-controller';
 
 type Options = {
   UserId?: string;
@@ -201,112 +202,66 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
 
   // 新的消息处理接口
 
-  class MessageController {
-    #format: DataEnums[] = [];
+  // 轻量代理 — 仅在首次调用 builder 方法时才创建完整 MessageController
+  // 绝大多数事件只用 send()，避免每条消息都分配完整类实例 + 空数组
+  let _ctrl: any = null;
 
+  const getCtrl = () => {
+    if (!_ctrl) {
+      _ctrl = new MessageControllerImpl(sendRaw, resolveFormat);
+    }
+
+    return _ctrl;
+  };
+
+  const lightweight = {
     get currentFormat() {
-      return this.#format;
-    }
-
-    // Text 相关方法
+      return getCtrl().currentFormat;
+    },
     addText(...args: Parameters<typeof Text>) {
-      this.#format.push(Text(...args));
-
-      return this;
-    }
-
+      return getCtrl().addText(...args);
+    },
     addLink(...args: Parameters<typeof Link>) {
-      this.#format.push(Link(...args));
-
-      return this;
-    }
-
-    // Image 相关方法
+      return getCtrl().addLink(...args);
+    },
     addImage(...args: Parameters<typeof Image>) {
-      this.#format.push(Image(...args));
-
-      return this;
-    }
-
+      return getCtrl().addImage(...args);
+    },
     addImageFile(...args: Parameters<typeof ImageFile>) {
-      this.#format.push(ImageFile(...args));
-
-      return this;
-    }
-
+      return getCtrl().addImageFile(...args);
+    },
     addImageURL(...args: Parameters<typeof ImageURL>) {
-      this.#format.push(ImageURL(...args));
-
-      return this;
-    }
-
-    // Mention 方法
+      return getCtrl().addImageURL(...args);
+    },
     addMention(...args: Parameters<typeof Mention>) {
-      this.#format.push(Mention(...args));
-
-      return this;
-    }
-
+      return getCtrl().addMention(...args);
+    },
     addButtonGroup(...args: Parameters<typeof BT.group>) {
-      this.#format.push(BT.group(...args));
-
-      return this;
-    }
-
-    addButtonTemplate(...args: Parameters<typeof BT.template>) {
-      this.#format.push(BT.template(...args));
-
-      return this;
-    }
-
-    // Markdown 相关方法
+      return getCtrl().addButtonGroup(...args);
+    },
     addMarkdown(...args: Parameters<typeof MD>) {
-      this.#format.push(MD(...args));
-
-      return this;
-    }
-
-    addMarkdownTemplate(...args: Parameters<typeof MD.template>) {
-      this.#format.push(MD.template(...args));
-
-      return this;
-    }
-
+      return getCtrl().addMarkdown(...args);
+    },
     addFormat(val: DataEnums[]) {
-      this.#format.push(...val);
-
-      return this;
-    }
-
-    // 其他实用方法
+      return getCtrl().addFormat(val);
+    },
     clear() {
-      this.#format = [];
-
-      return this;
-    }
-
-    /**
-     * 发送消息
-     * @param params 消息参数，支持 { format: Format } 或 DataEnums[]
-     */
+      return getCtrl().clear();
+    },
     send(params?: MessageParams | DataEnums[]) {
+      // send 直接走快速路径，无需创建完整 controller
       if (!params) {
-        // 不传参数时使用内部缓存
-        return sendRaw(this.#format);
+        return _ctrl ? sendRaw(_ctrl.currentFormat) : sendRaw([]);
       }
       if (Array.isArray(params)) {
-        // 兼容旧API：直接传入 DataEnums[]
-        const dataToSend = params.length > 0 ? params : this.#format;
-
-        return sendRaw(dataToSend);
+        return sendRaw(params.length > 0 ? params : _ctrl ? _ctrl.currentFormat : []);
       }
 
-      // 新API：传入 { format }
       return sendRaw(resolveFormat(params));
     }
-  }
+  };
 
-  return [new MessageController()] as const;
+  return [lightweight] as const;
 };
 
 /**

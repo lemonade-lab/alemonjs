@@ -40,27 +40,18 @@ const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
       data: log
     });
   } else {
-    let baseLog = `[Name: ${select}]`;
+    // 批量收集非空字段后一次 join — 避免多次 typeof 检查 + 字符串 += 拼接
+    const parts = [`[Name: ${select}]`];
+    const fields = ['GuildId', 'ChannelId', 'UserKey', 'UserId', 'MessageId', 'MessageText'] as const;
 
-    if (typeof event['GuildId'] === 'string' && event['GuildId'] !== '') {
-      baseLog += `[GuildId:${event['GuildId']}]`;
+    for (const f of fields) {
+      const v = event[f];
+
+      if (typeof v === 'string' && v !== '') {
+        parts.push(`[${f}:${v}]`);
+      }
     }
-    if (typeof event['ChannelId'] === 'string' && event['ChannelId'] !== '') {
-      baseLog += `[ChannelId:${event['ChannelId']}]`;
-    }
-    if (typeof event['UserKey'] === 'string' && event['UserKey'] !== '') {
-      baseLog += `[UserKey:${event['UserKey']}]`;
-    }
-    if (typeof event['UserId'] === 'string' && event['UserId'] !== '') {
-      baseLog += `[UserId:${event['UserId']}]`;
-    }
-    if (typeof event['MessageId'] === 'string' && event['MessageId'] !== '') {
-      baseLog += `[MessageId:${event['MessageId']}]`;
-    }
-    if (typeof event['MessageText'] === 'string' && event['MessageText'] !== '') {
-      baseLog += `[MessageText:${event['MessageText']}]`;
-    }
-    logger.info(baseLog);
+    logger.info(parts.join(''));
   }
 };
 
@@ -69,7 +60,7 @@ const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
  * @param event
  * @param key
  */
-export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: T) => {
+export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: T, config?: any) => {
   const nextEnd: Next = () => {};
   // unmount
   const nextUnMount: Next = (cn, ...cns) => {
@@ -107,7 +98,7 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
     }
     void expendMiddleware(valueEvent, select, nextMount);
   };
-  const value = getConfigValue() ?? {};
+  const value = config ?? getConfigValue() ?? {};
 
   if (Array.isArray(value?.logs?.channel_id)) {
     const channelIds = value?.logs?.channel_id;

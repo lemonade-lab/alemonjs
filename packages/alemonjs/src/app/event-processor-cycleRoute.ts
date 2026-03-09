@@ -1,11 +1,12 @@
 import { Next, Events, EventKeys, ResponseRoute } from '../types';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
+import { getCachedRegExp } from '../core/utils';
+
+// 缓存 AsyncFunction 构造函数 — 避免每次调用创建匿名 async 函数
+const AsyncFunction = (async () => {}).constructor;
 
 function isAsyncFunction(fn) {
-  // 获取 AsyncFunction 构造函数
-  const AsyncFunction = (async () => {}).constructor;
-
   return fn instanceof AsyncFunction;
 }
 
@@ -78,11 +79,9 @@ export const createRouteProcessChildren = <T extends EventKeys>(
           }
         }
 
-        // 正则匹配
+        // 正则匹配（使用缓存，避免每条消息重编译）
         if (node.regular) {
-          const reg = new RegExp(node.regular);
-
-          if (!reg.test(text)) {
+          if (!getCachedRegExp(node.regular).test(text)) {
             void nextNode();
 
             return;
@@ -96,15 +95,19 @@ export const createRouteProcessChildren = <T extends EventKeys>(
       }
       // 递归：如果有children，继续递归下去
       if (node.children && node.children.length > 0) {
-        // middleware 追加自身 handler
-
-        processChildren(node.children, [...middleware, node.handler], nextNode);
+        // push/pop 回溯 — 避免每层递归 spread 创建新数组
+        middleware.push(node.handler);
+        processChildren(node.children, middleware, () => {
+          middleware.pop();
+          void nextNode();
+        });
 
         return;
       }
 
-      // 没有children，直接处理handler
-      const currentsAndMiddleware = [...middleware, node.handler];
+      // 没有children，直接处理handler — 临时拼接，无需 spread
+      middleware.push(node.handler);
+      const currentsAndMiddleware = middleware;
 
       // node.handler 是一个异步函数。函数执行的结果是 { current: Current[] | Current, select: xxx }
 
@@ -140,6 +143,9 @@ export const createRouteProcessChildren = <T extends EventKeys>(
           currents.push(...currentsItem);
         }
 
+        // 回溯 pop 当前 handler
+        middleware.pop();
+
         // 要把二维数组拍平
         callHandler(currents, (cn, ...cns) => {
           if (cn) {
@@ -152,6 +158,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
           void nextNode();
         });
       } catch (err) {
+        middleware.pop();
         showErrorModule(err);
       }
     };
