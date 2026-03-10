@@ -126,6 +126,7 @@ export class OneBotClient extends OneBotAPI {
 
     const onClose = (code, reason) => {
       logger.error(`[OneBot] WebSocket closed: ${code} - ${reason.toString('utf8')}`);
+      this.__ws = null;
       if (reverse_enable) {
         return;
       }

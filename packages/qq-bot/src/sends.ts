@@ -157,15 +157,12 @@ const createMarkdownText = (data: DataMarkDown['value']): string => {
       if (mdFormatters[mdItem.type]) {
         return mdFormatters[mdItem.type]((mdItem as any)?.value, (mdItem as any)?.options);
       }
-      if (mdItem.type === 'MD.image') {
-        return `\n![text #${mdItem.options?.width || 208}px #${mdItem.options?.height || 320}px](${mdItem.value})\n`;
-      }
       if (mdItem.type === 'MD.list' && typeof mdItem.value !== 'string') {
         const listStr = mdItem.value.map(listItem => {
           return typeof listItem.value === 'object' ? `\n${listItem.value.index}. ${listItem.value.text}` : `\n- ${listItem.value}`;
         });
 
-        return `${listStr}\n`;
+        return `${listStr.join('')}\n`;
       }
       if (mdItem.type === 'MD.code') {
         const language = mdItem?.options?.language || '';
@@ -353,6 +350,9 @@ const resolveRichMediaUrl = async (images: DataEnums[], uploadMedia: (data: { fi
       } else if (Buffer.isBuffer(item.value)) {
         // 如果已经是Buffer数据，直接转换为base64字符串
         fileData = item.value.toString('base64');
+      } else if (typeof item.value === 'string') {
+        // 兆底：视为裸 base64 字符串
+        fileData = item.value;
       }
     } else if (item.type === 'ImageFile') {
       fileData = readFileSync(item.value, 'base64');
@@ -366,6 +366,8 @@ const resolveRichMediaUrl = async (images: DataEnums[], uploadMedia: (data: { fi
       return fileInfo;
     }
   }
+
+  return undefined;
 };
 
 /** Open API 通用发送逻辑（群组 / C2C） */

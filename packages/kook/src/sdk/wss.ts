@@ -26,6 +26,8 @@ export class KOOKClient extends KOOKAPI {
 
   #ws: WebSocket;
 
+  #heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+
   #events: {
     [K in keyof KOOKEventMap]?: (event: KOOKEventMap[K]) => any;
   } = {};
@@ -56,7 +58,7 @@ export class KOOKClient extends KOOKAPI {
         }
       });
 
-    if (!gatewayUrl && gatewayUrl === '') {
+    if (!gatewayUrl || gatewayUrl === '') {
       return;
     }
 
@@ -134,13 +136,14 @@ export class KOOKClient extends KOOKAPI {
       },
       5: () => {
         console.info('[ws] Connection failed, reconnect');
-        /**
-         * 处理 RECONNECT 信令
-         * 断开当前连接并进行重新连接
-         */
         this.#isConnected = false;
         this.#sessionId = null;
-        console.info('[ws] sessionId', this.#sessionId);
+        if (this.#heartbeatInterval) {
+          clearInterval(this.#heartbeatInterval);
+          this.#heartbeatInterval = null;
+        }
+        this.#ws.close();
+        void this.connect();
       },
       6: () => {
         console.info('[ws] resume ack');
@@ -166,8 +169,11 @@ export class KOOKClient extends KOOKAPI {
 
     this.#ws.on('message', msg => void onMessage(msg));
 
-    // 心跳定时发送
-    setInterval(() => {
+    // 心跳定时发送 — 先清除旧定时器避免重连后泄漏
+    if (this.#heartbeatInterval) {
+      clearInterval(this.#heartbeatInterval);
+    }
+    this.#heartbeatInterval = setInterval(() => {
       if (this.#isConnected) {
         this.#ws.send(
           JSON.stringify({
@@ -179,7 +185,19 @@ export class KOOKClient extends KOOKAPI {
     }, 30000);
 
     this.#ws.on('close', () => {
+      if (this.#heartbeatInterval) {
+        clearInterval(this.#heartbeatInterval);
+        this.#heartbeatInterval = null;
+      }
       console.error('[ws] close');
+      // 非主动断开时自动重连
+      if (this.#isConnected) {
+        this.#isConnected = false;
+        this.#sessionId = null;
+        setTimeout(() => {
+          void this.connect();
+        }, 5000);
+      }
     });
 
     this.#ws.on('error', err => {

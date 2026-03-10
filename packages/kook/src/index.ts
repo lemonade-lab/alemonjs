@@ -68,7 +68,7 @@ const main = () => {
       OpenId: data?.code,
       CreateAt: Date.now(),
       //
-      tag: 'MESSAGES_PUBLIC',
+      tag: 'MESSAGES_DIRECT',
       value: event
     };
 
@@ -149,19 +149,15 @@ const main = () => {
   });
 
   /**
-   *
-   * @param channel_id
-   * @param val
-   * @returns
+   * 将 DataEnums 中的 Mention/Text 转为 KOOK KMarkdown 格式文本
    */
-  const sendChannel = async (target_id: string, val: DataEnums[]) => {
-    if (val.length < 0) {
-      return Promise.all([]);
-    }
-    const content = val
-      .filter(item => item.type === 'Mention' || item.type === 'Text')
+  const formatKookContent = (val: DataEnums[]): string => {
+    return val
+      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
       .map(item => {
-        if (item.type === 'Mention') {
+        if (item.type === 'Link') {
+          return `[${item.value}](${item?.options?.link ?? item.value})`;
+        } else if (item.type === 'Mention') {
           if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return '(met)all(met)';
           }
@@ -187,10 +183,93 @@ const main = () => {
 
           return item.value;
         }
+
+        return '';
       })
       .join('');
+  };
+
+  /**
+   * 解析 Image/ImageURL/ImageFile 为 Buffer
+   */
+  const resolveImageBuffer = async (val: DataEnums[]): Promise<Buffer | null> => {
+    const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
+
+    for (const item of images) {
+      if (item.type === 'Image') {
+        if (Buffer.isBuffer(item.value)) {
+          return item.value;
+        } else if (typeof item.value === 'string') {
+          if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+            return await getBufferByURL(item.value);
+          } else if (item.value.startsWith('base64://')) {
+            return Buffer.from(item.value.slice(9), 'base64');
+          } else if (item.value.startsWith('file://')) {
+            return readFileSync(item.value.slice(7));
+          } else {
+            return Buffer.from(item.value, 'base64');
+          }
+        }
+      } else if (item.type === 'ImageURL') {
+        return await getBufferByURL(item.value);
+      } else if (item.type === 'ImageFile') {
+        return readFileSync(item.value);
+      }
+    }
+
+    return null;
+  };
+
+  /**
+   * 上传图片并获取 URL
+   */
+  const uploadAndGetImageUrl = async (val: DataEnums[]): Promise<string | null> => {
+    const bufferData = await resolveImageBuffer(val);
+
+    if (!bufferData) {
+      return null;
+    }
+    const imageRes = await client.postImage(bufferData);
+
+    if (!imageRes || typeof imageRes === 'boolean') {
+      return null;
+    }
+    const url = imageRes.data?.url;
+
+    return url || null;
+  };
+
+  /**
+   *
+   * @param channel_id
+   * @param val
+   * @returns
+   */
+  const sendChannel = async (target_id: string, val: DataEnums[]) => {
+    if (!val || val.length <= 0) {
+      return [];
+    }
+    const content = formatKookContent(val);
 
     try {
+      const imageUrl = await uploadAndGetImageUrl(val);
+
+      if (imageUrl && content) {
+        // 先发图片，再发文本
+        const imgRes = await client.createMessage({
+          type: 2,
+          target_id: target_id,
+          content: imageUrl
+        });
+        const txtRes = await client.createMessage({
+          type: 9,
+          target_id: target_id,
+          content: content
+        });
+
+        return [createResult(ResultCode.Ok, 'client.createMessage', imgRes), createResult(ResultCode.Ok, 'client.createMessage', txtRes)];
+      }
+
       if (content) {
         const res = await client.createMessage({
           type: 9,
@@ -200,44 +279,12 @@ const main = () => {
 
         return [createResult(ResultCode.Ok, 'client.createMessage', res)];
       }
-      const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
-      if (images.length > 0) {
-        let bufferData = null;
-
-        for (let i = 0; i < images.length; i++) {
-          if (bufferData) {
-            break;
-          }
-          const item = images[i];
-
-          if (item.type === 'Image') {
-            bufferData = Buffer.from(item.value, 'base64');
-          } else if (item.type === 'ImageURL') {
-            bufferData = await getBufferByURL(item.value);
-          } else if (item.type === 'ImageFile') {
-            bufferData = readFileSync(item.value);
-          }
-        }
-        if (!bufferData) {
-          return [];
-        }
-        // 上传图片
-        const imageRes = await client.postImage(bufferData);
-
-        if (!imageRes) {
-          return [];
-        }
-        const url = imageRes.data?.url;
-
-        if (!url) {
-          return [];
-        }
-        // 发送消息
+      if (imageUrl) {
         const res = await client.createMessage({
           type: 2,
           target_id: target_id,
-          content: url
+          content: imageUrl
         });
 
         return [createResult(ResultCode.Ok, 'client.createMessage', res)];
@@ -256,42 +303,29 @@ const main = () => {
    * @returns
    */
   const sendUser = async (open_id: string, val: DataEnums[]) => {
-    if (val.length < 0) {
+    if (!val || val.length <= 0) {
       return [];
     }
-    const content = val
-      .filter(item => item.type === 'Mention' || item.type === 'Text')
-      .map(item => {
-        if (item.type === 'Mention') {
-          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
-            return '(met)all(met)';
-          }
-          if (item.options?.belong === 'user') {
-            return `(met)${item.value}(met)`;
-          } else if (item.options?.belong === 'channel') {
-            return `(chn)${item.value}(chn)`;
-          }
-
-          return '';
-        } else if (item.type === 'Text') {
-          if (item.options?.style === 'block') {
-            return `\`${item.value}\``;
-          } else if (item.options?.style === 'italic') {
-            return `*${item.value}*`;
-          } else if (item.options?.style === 'bold') {
-            return `**${item.value}**`;
-          } else if (item.options?.style === 'strikethrough') {
-            return `~~${item.value}~~`;
-          } else if (item.options?.style === 'boldItalic') {
-            return `***${item.value}***`;
-          }
-
-          return item.value;
-        }
-      })
-      .join('');
+    const content = formatKookContent(val);
 
     try {
+      const imageUrl = await uploadAndGetImageUrl(val);
+
+      if (imageUrl && content) {
+        const imgRes = await client.createDirectMessage({
+          type: 2,
+          chat_code: open_id,
+          content: imageUrl
+        });
+        const txtRes = await client.createDirectMessage({
+          type: 9,
+          chat_code: open_id,
+          content: content
+        });
+
+        return [createResult(ResultCode.Ok, 'client.createDirectMessage', imgRes), createResult(ResultCode.Ok, 'client.createDirectMessage', txtRes)];
+      }
+
       if (content) {
         const res = await client.createDirectMessage({
           type: 9,
@@ -301,43 +335,12 @@ const main = () => {
 
         return [createResult(ResultCode.Ok, 'client.createDirectMessage', res)];
       }
-      const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
-      if (images.length > 0) {
-        let bufferData = null;
-
-        for (let i = 0; i < images.length; i++) {
-          if (bufferData) {
-            break;
-          }
-          const item = images[i];
-
-          if (item.type === 'Image') {
-            bufferData = Buffer.from(item.value, 'base64');
-          } else if (item.type === 'ImageURL') {
-            bufferData = await getBufferByURL(item.value);
-          } else if (item.type === 'ImageFile') {
-            bufferData = readFileSync(item.value);
-          }
-        }
-        if (!bufferData) {
-          return [];
-        }
-        // 上传图片
-        const imageRes = await client.postImage(bufferData);
-
-        if (!imageRes) {
-          return [];
-        }
-        const url = imageRes.data?.url;
-
-        if (!url) {
-          return [];
-        }
+      if (imageUrl) {
         const res = await client.createDirectMessage({
           type: 2,
           chat_code: open_id,
-          content: url
+          content: imageUrl
         });
 
         return [createResult(ResultCode.Ok, 'client.createDirectMessage', res)];
@@ -372,7 +375,7 @@ const main = () => {
     },
     use: {
       send: async (event, val: DataEnums[]) => {
-        if (val.length < 0) {
+        if (!val || val.length <= 0) {
           return [];
         }
         if (event.name === 'message.create') {
@@ -423,46 +426,50 @@ const main = () => {
   };
 
   const onactions = async (data, consume) => {
-    if (data.action === 'message.send') {
-      const event = data.payload.event;
-      const paramFormat = data.payload.params.format;
-      const res = await api.use.send(event, paramFormat);
+    try {
+      if (data.action === 'message.send') {
+        const event = data.payload.event;
+        const paramFormat = data.payload.params.format;
+        const res = await api.use.send(event, paramFormat);
 
-      if (!res) {
-        consume([createResult(ResultCode.Ok, '请求完成', null)]);
+        if (!res) {
+          consume([createResult(ResultCode.Ok, '请求完成', null)]);
 
-        return;
+          return;
+        }
+        consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)));
+      } else if (data.action === 'message.send.channel') {
+        const channel_id = data.payload.ChannelId;
+        const val = data.payload.params.format;
+        const res = await api.active.send.channel(channel_id, val);
+
+        if (!res) {
+          consume([createResult(ResultCode.Ok, '请求完成', null)]);
+
+          return;
+        }
+        consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)));
+      } else if (data.action === 'message.send.user') {
+        const userId = data.payload.UserId;
+        const val = data.payload.params.format;
+        const res = await api.active.send.user(userId, val);
+
+        if (!res) {
+          consume([createResult(ResultCode.Ok, '请求完成', null)]);
+
+          return;
+        }
+        consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)));
+      } else if (data.action === 'mention.get') {
+        const event = data.payload.event;
+        const res = await api.use.mention(event);
+
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } else {
+        consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }
-      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)));
-    } else if (data.action === 'message.send.channel') {
-      const channel_id = data.payload.ChannelId;
-      const val = data.payload.params.format;
-      const res = await api.active.send.channel(channel_id, val);
-
-      if (!res) {
-        consume([createResult(ResultCode.Ok, '请求完成', null)]);
-
-        return;
-      }
-      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)));
-    } else if (data.action === 'message.send.user') {
-      const userId = data.payload.UserId;
-      const val = data.payload.params.format;
-      const res = await api.active.send.user(userId, val);
-
-      if (!res) {
-        consume([createResult(ResultCode.Ok, '请求完成', null)]);
-
-        return;
-      }
-      consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)));
-    } else if (data.action === 'mention.get') {
-      const event = data.payload.event;
-      const res = await api.use.mention(event);
-
-      consume([createResult(ResultCode.Ok, '请求完成', res)]);
-    } else {
-      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 
@@ -472,11 +479,15 @@ const main = () => {
     const key = data.payload?.key;
 
     if (client[key]) {
-      // 如果 client 上有对应的 key，直接调用。
       const params = data.payload.params;
-      const res = await client[key](...params);
 
-      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      try {
+        const res = await client[key](...params);
+
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } catch (error) {
+        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+      }
     } else {
       consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }

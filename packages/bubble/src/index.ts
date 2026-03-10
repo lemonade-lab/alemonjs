@@ -64,7 +64,7 @@ const main = () => {
   void client.connect();
 
   const createUserAvatar = (_UserId: string, avatar: string | null) => {
-    if (avatar) {
+    if (!avatar) {
       return '';
     }
 
@@ -172,7 +172,7 @@ const main = () => {
     },
     use: {
       send: async (event, val: DataEnums[]) => {
-        if (val.length < 0) {
+        if (!val || val.length <= 0) {
           return [];
         }
         const tag = event.tag;
@@ -202,9 +202,9 @@ const main = () => {
       },
       mention: e => {
         const event = e.value;
-        const MessageMention: User[] = event.mentions.map(item => {
+        const MessageMention: User[] = (event.mentions || []).map(item => {
           const UserId = item.id;
-          const avatar = event.author?.avatar;
+          const avatar = item.avatar;
           const UserAvatar = createUserAvatar(UserId, avatar);
           const [isMaster, UserKey] = getMaster(UserId);
 

@@ -49,14 +49,14 @@ export const useState = <T extends string>(name: T, defaultValue = true): [boole
     cfg.value.core.state ??= [];
 
     const cfgState = cfg.value.core.state;
-    const cur = cfgState.find((i: string) => i === name);
+    const exists = cfgState.includes(name);
 
-    if (cur !== value) {
-      if (value) {
-        cfg.value.core.state = cfg.value.core.state.filter((i: string) => i !== name);
-      } else {
-        cfg.value.core.state.push(name);
-      }
+    if (value && exists) {
+      // 启用：从禁用列表中移除
+      cfg.value.core.state = cfg.value.core.state.filter((i: string) => i !== name);
+    } else if (!value && !exists) {
+      // 禁用：添加到禁用列表
+      cfg.value.core.state.push(name);
     }
     cfg.saveValue(cfg.value);
   };

@@ -156,16 +156,18 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
   const mappingText = value?.mapping_text ?? [];
 
   // 检查文本映射规则
-  for (const mapping of mappingText) {
-    const { regular, target } = mapping ?? {};
+  if (event['MessageText']) {
+    for (const mapping of mappingText) {
+      const { regular, target } = mapping ?? {};
 
-    if (!regular) {
-      continue;
-    }
-    const cachedReg = getCachedRegExp(regular);
+      if (!regular) {
+        continue;
+      }
+      const cachedReg = getCachedRegExp(regular);
 
-    if (cachedReg.test(event['MessageText'])) {
-      event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+      if (cachedReg.test(event['MessageText'])) {
+        event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+      }
     }
   }
 

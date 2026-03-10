@@ -217,7 +217,7 @@ const main = () => {
     },
     use: {
       send: async (event, val: DataEnums[]) => {
-        if (val.length < 0) {
+        if (!val || val.length <= 0) {
           return [];
         }
         const tag = event.tag;
@@ -264,9 +264,13 @@ const main = () => {
       },
       mention: e => {
         const event: MESSAGE_CREATE_TYPE = e.value;
+
+        if (!event?.mentions) {
+          return new Promise<User[]>(resolve => resolve([]));
+        }
         const MessageMention: User[] = event.mentions.map(item => {
           const UserId = item.id;
-          const avatar = event.author.avatar;
+          const avatar = item.avatar;
           const UserAvatar = createUserAvatar(UserId, avatar);
           const [isMaster, UserKey] = getMaster(UserId);
 
@@ -335,6 +339,8 @@ const main = () => {
       } catch (error) {
         consume([createResult(ResultCode.Fail, '请求失败', error)]);
       }
+    } else {
+      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }
   };
 

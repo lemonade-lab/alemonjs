@@ -169,6 +169,9 @@ export class QQBotClients extends QQBotAPI {
 
             // Ready Event，鉴权成功
             if (t === 'READY') {
+              if (this.#IntervalId) {
+                clearInterval(this.#IntervalId);
+              }
               this.#IntervalId = setInterval(() => {
                 if (this.#isConnected && this.#ws) {
                   this.#ws.send(
@@ -241,6 +244,11 @@ export class QQBotClients extends QQBotAPI {
         });
         // 关闭
         this.#ws.on('close', err => {
+          this.#isConnected = false;
+          if (this.#IntervalId) {
+            clearInterval(this.#IntervalId);
+            this.#IntervalId = null;
+          }
           void reconnect();
           console.info('[ws-qqbot] close', err);
         });

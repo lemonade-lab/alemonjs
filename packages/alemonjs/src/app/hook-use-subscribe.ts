@@ -46,14 +46,20 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
     // 分配id
     const ID = Date.now().toString(36) + Math.random().toString(36).substring(2, 15);
 
+    // 没有选择任何 key，无法绑定订阅
+    if (keys.length === 0) {
+      logger.warn({
+        code: ResultCode.FailParams,
+        message: 'subscribe keys is empty',
+        data: null
+      });
+
+      return { selects: curSelects, choose, id: ID };
+    }
+
     // 创建 订阅 列表
     for (const select of curSelects) {
       const subList = new SubscribeList(choose, select);
-
-      // 没有选择
-      if (keys.length === 0) {
-        return;
-      }
       // 只能选择基础数据类型的key
       const values: KeyMap = {};
 
@@ -122,21 +128,14 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
 
     for (const select of selects) {
       const subList = new SubscribeList(value.choose, select);
-      const find = () => {
-        const item = subList.value.popNext(); // 弹出下一个节点
 
-        if (!item) {
-          return;
+      subList.value.forEach(node => {
+        if (node.data.id === ID) {
+          node.data.status = SubscribeStatus.paused; // 标记为已暂停
+
+          return true; // break
         }
-        if (item.data.id !== ID) {
-          find();
-
-          return;
-        }
-        item.data.status = SubscribeStatus.paused; // 标记为已暂停
-      };
-
-      find();
+      });
     }
   };
 

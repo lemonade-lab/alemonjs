@@ -95,10 +95,14 @@ export const createDirectServer = (sockPath: string, onMessage: (data: any) => v
 
       socket.on('data', parser);
       socket.on('error', () => {
-        connection = null;
+        if (connection === socket) {
+          connection = null;
+        }
       });
       socket.on('close', () => {
-        connection = null;
+        if (connection === socket) {
+          connection = null;
+        }
       });
     });
 
@@ -147,6 +151,11 @@ export const createDirectClient = (sockPath: string, onMessage: (data: any) => v
       const parser = createMessageParser(onMessage);
 
       const socket = net.createConnection(sockPath, () => {
+        // 连接成功后替换 error handler
+        socket.removeListener('error', reject);
+        socket.on('error', () => {
+          // 运行时 socket 错误，静默处理（send 中已有 destroyed 检查）
+        });
         resolve({
           send: (data: any) => {
             if (!socket.destroyed) {

@@ -1,5 +1,5 @@
 import { getConfigValue, useUserHashKey } from 'alemonjs';
-export const platform = 'telegram';
+export const platform = 'kook';
 export type Options = {
   token: string;
   master_key?: string[];

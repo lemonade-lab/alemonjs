@@ -131,7 +131,8 @@ export const createRouteProcessChildren = <T extends EventKeys>(
 
           // 没有匹配到
           if (!selects.includes(select)) {
-            // 需要继续。
+            // 回溯 pop，避免中间件泄漏
+            middleware.pop();
             void nextNode();
 
             return;

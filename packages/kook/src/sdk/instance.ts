@@ -106,14 +106,14 @@ const loggerError = err => {
  * @param options
  * @returns
  */
-export const createAxiosInstance = (service: AxiosInstance, options: AxiosRequestConfig): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    service(options)
-      .then(res => resolve(res?.data ?? {}))
-      .catch(err => {
-        loggerError(err);
-        // 丢出错误中携带的响应数据
-        reject(err?.response?.data);
-      });
-  });
+export const createAxiosInstance = async (service: AxiosInstance, options: AxiosRequestConfig): Promise<any> => {
+  try {
+    const res = await service(options);
+
+    return res?.data ?? {};
+  } catch (err) {
+    loggerError(err);
+    // 丢出错误中携带的响应数据
+    throw err?.response?.data ?? err;
+  }
 };

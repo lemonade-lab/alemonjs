@@ -9,7 +9,7 @@ export type PublicEventMemberAdd = platform &
   Channel &
   Message &
   User & {
-    naem: 'member.add';
+    name: 'member.add';
   } & Expansion;
 // 成员移除
 export type PublicEventMemberRemove = platform &

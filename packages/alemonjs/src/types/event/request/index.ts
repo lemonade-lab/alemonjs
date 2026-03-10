@@ -6,11 +6,11 @@ import { User } from '../base/user';
 export type PrivateEventRequestFriendAdd = platform &
   Message &
   User & {
-    name: 'private.request.friend.add';
+    name: 'private.friend.add';
   } & Expansion;
 // 私有消息-频道添加请求
 export type PrivateEventRequestGuildAdd = platform &
   Message &
   User & {
-    name: 'private.request.guild.add';
+    name: 'private.guild.add';
   } & Expansion;

@@ -184,6 +184,8 @@ export class DCClient extends DCAPI {
          */
         7: () => {
           logger.info('[ws-discord] 重新连接');
+          clearTimeout(this.#timeout_id);
+          this.#ws.close();
         },
         /**
          * 无效会话

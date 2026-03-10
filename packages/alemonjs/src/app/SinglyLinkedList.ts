@@ -79,7 +79,7 @@ export class SinglyLinkedList<T> {
       if (this.current === this.tail) {
         this.tail = previous;
       }
-      this.current = null; // 重置当前节点
+      this.current = previous; // 设置为前驱节点，使 popNext() 从正确位置继续
       this.size--;
     }
   }
@@ -87,5 +87,17 @@ export class SinglyLinkedList<T> {
   // 获取链表的大小
   getSize(): number {
     return this.size;
+  }
+
+  // 遍历链表（不改变 current 游标）—— 回调返回 true 时提前终止
+  forEach(callback: (node: ListNode<T>) => boolean | undefined): void {
+    let node = this.head;
+
+    while (node) {
+      if (callback(node) === true) {
+        break;
+      }
+      node = node.next;
+    }
   }
 }

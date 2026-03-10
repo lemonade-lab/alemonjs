@@ -8,7 +8,7 @@ import { DataEnums } from '../message';
  * return true → 继续执行下一个 handler
  * return void/false → 停止当前链
  */
-export type Current<T extends EventKeys> = (event: Events[T], next: Next) => void | boolean | Promise<void | boolean>;
+export type Current<T extends EventKeys> = (event: Events[T], next: Next) => boolean | Promise<boolean> | undefined;
 
 // 返回值类型
 export type OnResponseValue<C, T extends EventKeys> = {
@@ -109,16 +109,18 @@ export type DefineRouterFunc = (routes: ResponseRoute[]) => { current: ResponseR
 
 export type defineMiddlewareFunc = (middleware: ResponseRoute[]) => { current: ResponseRoute[] };
 
-export type childrenCallbackRes = {
-  response?: ReturnType<DefineResponseFunc>;
-  middleware?: ReturnType<defineMiddlewareFunc>;
-  // 完整的路由机制。
-  responseRouter?: ReturnType<DefineRouterFunc>;
-  middlewareRouter?: ReturnType<DefineRouterFunc>;
-} | void;
+export type childrenCallbackRes =
+  | {
+      response?: ReturnType<DefineResponseFunc>;
+      middleware?: ReturnType<defineMiddlewareFunc>;
+      // 完整的路由机制。
+      responseRouter?: ReturnType<DefineRouterFunc>;
+      middlewareRouter?: ReturnType<DefineRouterFunc>;
+    }
+  | undefined;
 
 export type childrenCallback = ChildrenCycle & {
-  register?: () => (childrenCallbackRes | void) | Promise<childrenCallbackRes | void>;
+  register?: () => (childrenCallbackRes | undefined) | Promise<childrenCallbackRes | undefined>;
 };
 
 export type DefineChildrenCallback = (() => Promise<childrenCallback> | childrenCallback) | childrenCallback;

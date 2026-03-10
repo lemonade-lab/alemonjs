@@ -64,30 +64,28 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
     const onActive = () => {
       for (const select of selects) {
         const subListVal = getSubscribeList(choose, select);
-        let item = subListVal.popNext();
 
-        while (item) {
-          if (item.data.id === ID) {
-            item.data.status = SubscribeStatus.active;
-            break;
+        subListVal.forEach(node => {
+          if (node.data.id === ID) {
+            node.data.status = SubscribeStatus.active;
+
+            return true; // break
           }
-          item = subListVal.popNext();
-        }
+        });
       }
     };
 
     const onPaused = () => {
       for (const select of selects) {
         const subListVal = getSubscribeList(choose, select);
-        let item = subListVal.popNext();
 
-        while (item) {
-          if (item.data.id === ID) {
-            item.data.status = SubscribeStatus.paused;
-            break;
+        subListVal.forEach(node => {
+          if (node.data.id === ID) {
+            node.data.status = SubscribeStatus.paused;
+
+            return true; // break
           }
-          item = subListVal.popNext();
-        }
+        });
       }
     };
 

@@ -174,7 +174,11 @@ export class DCAPI {
     }
   ): Promise<any> {
     const formdata = await this.createFrom(message.image, message.msg_id, message.content, message.name);
-    const dary = formdata !== false ? formdata.getBoundary() : '';
+
+    if (!formdata) {
+      return false;
+    }
+    const dary = formdata.getBoundary();
 
     return this.request({
       method: 'post',
@@ -1320,7 +1324,7 @@ export class DCAPI {
    */
   deleteMessage(channel_id: string, message_id: string) {
     return this.request({
-      method: 'PATCH',
+      method: 'DELETE',
       url: `/channels/${channel_id}/messages/${message_id}`
     });
   }

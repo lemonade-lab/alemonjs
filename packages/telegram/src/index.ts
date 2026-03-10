@@ -35,41 +35,31 @@ const main = () => {
    * @param UserId
    * @returns
    */
-  const getUserProfilePhotosUrl = (UserId: number) => {
-    return new Promise((resolve, reject) => {
-      if (!UserId) {
-        reject(new Error('UserId 不能为空'));
+  const getUserProfilePhotosUrl = async (UserId: number): Promise<string> => {
+    if (!UserId) {
+      return '';
+    }
 
-        return;
+    try {
+      const profilePhotos = await client.getUserProfilePhotos(UserId);
+
+      if (profilePhotos.total_count > 0) {
+        const fileId = profilePhotos.photos[0][0].file_id;
+        const file = await client.getFile(fileId);
+
+        return `https://api.telegram.org/file/bot${config.token}/${file.file_path}`;
       }
-      client
-        .getUserProfilePhotos(UserId)
-        .then(profilePhotos => {
-          if (profilePhotos.total_count > 0) {
-            // 获取第一张头像的文件 Id
-            const fileId = profilePhotos.photos[0][0].file_id;
+    } catch {
+      // 获取头像失败不应阻断事件处理
+    }
 
-            // 获取文件信息以获取下载链接
-            client
-              .getFile(fileId)
-              .then(file => {
-                const filePath = file.file_path;
-
-                resolve(`https://api.telegram.org/file/bot${config.token}/${filePath}`);
-              })
-              .catch(reject);
-          } else {
-            reject(new Error('用户没有头像'));
-          }
-        })
-        .catch(reject);
-    });
+    return '';
   };
 
   client.on('text', async event => {
     const UserId = String(event?.from?.id);
     const [isMaster, UserKey] = getMaster(UserId);
-    const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string;
+    const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
 
     if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup') {
       // 机器人消息不处理
@@ -88,7 +78,7 @@ const main = () => {
         // user
         UserId: UserId,
         UserKey: UserKey,
-        UserName: event?.chat.username,
+        UserName: event?.from?.username,
         UserAvatar: UserAvatar,
         IsMaster: isMaster,
         IsBot: false,
@@ -141,11 +131,11 @@ const main = () => {
 
     const UserId = String(event?.from?.id);
     const [isMaster, UserKey] = getMaster(UserId);
-    const UserAvatar = (await getUserProfilePhotosUrl(event?.from?.id)) as string;
+    const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
 
     // 定义消
     const e: PublicEventMemberAdd = {
-      naem: 'member.add',
+      name: 'member.add',
       // 事件类型
       Platform: platform,
       // guild
@@ -155,7 +145,7 @@ const main = () => {
       // user
       UserId: UserId,
       UserKey: UserKey,
-      UserName: event?.chat.username,
+      UserName: event?.from?.username,
       UserAvatar: UserAvatar,
       IsMaster: isMaster,
       IsBot: false,
@@ -172,7 +162,7 @@ const main = () => {
   const api = {
     use: {
       send: async (event, val: DataEnums[]) => {
-        if (val.length < 0) {
+        if (!val || val.length <= 0) {
           return [];
         }
         const content = val
@@ -182,14 +172,9 @@ const main = () => {
         const e = event?.value;
 
         try {
-          if (content) {
-            const res = await client.sendMessage(e.chat.id, content);
-
-            return [createResult(ResultCode.Ok, 'message.send', res)];
-          }
           const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 
-          if (images.length > 1) {
+          if (images.length > 0) {
             let data = null;
 
             for (let i = 0; i < images.length; i++) {
@@ -199,14 +184,34 @@ const main = () => {
               const item = images[i];
 
               if (item.type === 'Image') {
-                data = item.value;
+                if (Buffer.isBuffer(item.value)) {
+                  data = item.value;
+                } else if (typeof item.value === 'string') {
+                  if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+                    data = await getBufferByURL(item.value);
+                  } else if (item.value.startsWith('base64://')) {
+                    data = Buffer.from(item.value.slice(9), 'base64');
+                  } else if (item.value.startsWith('file://')) {
+                    data = readFileSync(item.value.slice(7));
+                  } else {
+                    data = Buffer.from(item.value, 'base64');
+                  }
+                }
               } else if (item.type === 'ImageFile') {
                 data = readFileSync(item.value);
               } else if (item.type === 'ImageURL') {
                 data = await getBufferByURL(item.value);
               }
             }
-            const res = await client.sendPhoto(e.chat.id, data);
+            if (data) {
+              const res = await client.sendPhoto(e.chat.id, data, content ? { caption: content } : undefined);
+
+              return [createResult(ResultCode.Ok, 'message.send', res)];
+            }
+          }
+
+          if (content) {
+            const res = await client.sendMessage(e.chat.id, content);
 
             return [createResult(ResultCode.Ok, 'message.send', res)];
           }
@@ -225,20 +230,24 @@ const main = () => {
   };
 
   const onactions = async (data, consume) => {
-    if (data.action === 'message.send') {
-      const event = data.payload.event;
-      const paramFormat = data.payload.params.format;
-      const res = await api.use.send(event, paramFormat);
+    try {
+      if (data.action === 'message.send') {
+        const event = data.payload.event;
+        const paramFormat = data.payload.params.format;
+        const res = await api.use.send(event, paramFormat);
 
-      consume(res);
-    } else if (data.action === 'message.send.channel') {
-      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
-    } else if (data.action === 'message.send.user') {
-      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
-    } else if (data.action === 'mention.get') {
-      consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
-    } else {
-      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+        consume(res);
+      } else if (data.action === 'message.send.channel') {
+        consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
+      } else if (data.action === 'message.send.user') {
+        consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
+      } else if (data.action === 'mention.get') {
+        consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
+      } else {
+        consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+      }
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 
@@ -249,9 +258,14 @@ const main = () => {
 
     if (client[key]) {
       const params = data.payload.params;
-      const res = await client[key](...params);
 
-      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      try {
+        const res = await client[key](...params);
+
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } catch (error) {
+        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+      }
     } else {
       consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }

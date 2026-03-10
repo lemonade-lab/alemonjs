@@ -145,7 +145,7 @@ const main = () => {
         } else if (item.type === 'Mention') {
           const options = item.options || {};
 
-          if (options.belong === 'everyone') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
             return {
               type: 'at',
               data: {
@@ -165,7 +165,15 @@ const main = () => {
           return empty;
         } else if (item.type === 'Image') {
           // 可能是 Buffer、https://、http://、base64://
-          if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+          if (Buffer.isBuffer(item.value)) {
+            return {
+              type: 'image',
+              data: {
+                file: `base64://${item.value.toString('base64')}`
+              }
+            };
+          }
+          if (typeof item.value === 'string' && (item.value.startsWith('http://') || item.value.startsWith('https://'))) {
             const res = await getBufferByURL(item.value);
 
             return {
@@ -206,7 +214,7 @@ const main = () => {
           return {
             type: 'image',
             data: {
-              file: `base64://${item.value.toString('base64')}`
+              file: `base64://${item.value}`
             }
           };
         } else if (item.type === 'ImageFile') {
@@ -243,7 +251,7 @@ const main = () => {
    * @returns
    */
   const sendGroup = async (ChannelId: number, val: DataEnums[]) => {
-    if (val.length < 0) {
+    if (!val || val.length <= 0) {
       return [];
     }
     try {
@@ -266,7 +274,7 @@ const main = () => {
    * @returns
    */
   const sendPrivate = async (UserId: number, val: DataEnums[]) => {
-    if (val.length < 0) {
+    if (!val || val.length <= 0) {
       return [];
     }
     try {
@@ -302,8 +310,8 @@ const main = () => {
         },
         val: DataEnums[]
       ) => {
-        if (val.length < 0) {
-          return Promise.all([]);
+        if (!val || val.length <= 0) {
+          return [];
         }
         if (event['name'] === 'private.message.create') {
           const UserId = Number(event.UserId);
@@ -437,28 +445,28 @@ const main = () => {
         return consume([res]);
       }
       case 'message.forward.channel': {
+        const params = await Promise.all(
+          data.payload.params.map(async i => ({
+            ...i,
+            content: await DataToMessage(i.content)
+          }))
+        );
         const res = await api.use.forward
-          .channel(
-            data.payload.ChannelId,
-            data.payload.params.map(i => ({
-              ...i,
-              content: DataToMessage(i.content)
-            }))
-          )
+          .channel(data.payload.ChannelId, params)
           .then(res => createResult(ResultCode.Ok, data.action, res))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         return consume([res]);
       }
       case 'message.forward.user': {
+        const params = await Promise.all(
+          data.payload.params.map(async i => ({
+            ...i,
+            content: await DataToMessage(i.content)
+          }))
+        );
         const res = await api.use.forward
-          .user(
-            data.payload.UserId,
-            data.payload.params.map(i => ({
-              ...i,
-              content: DataToMessage(i.content)
-            }))
-          )
+          .user(data.payload.UserId, params)
           .then(res => createResult(ResultCode.Ok, data.action, res))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -477,9 +485,14 @@ const main = () => {
 
     if (client[key]) {
       const params = data.payload.params;
-      const res = await client[key](...params);
 
-      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      try {
+        const res = await client[key](...params);
+
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } catch (error) {
+        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+      }
     } else {
       consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }

@@ -54,7 +54,7 @@ export const register = (client: QQBotClients) => {
       OpenId: `C2C:${event.op_member_openid}`,
       MessageId: '',
       CreateAt: Date.now(),
-      tag: 'GROUP_DEL_ROBOT',
+      tag: 'GROUP_ADD_ROBOT',
       value: event
     };
 
@@ -495,7 +495,7 @@ export const register = (client: QQBotClients) => {
         },
         val: DataEnums[]
       ) => {
-        if (val.length < 0) {
+        if (!val || val.length <= 0) {
           return [];
         }
         // 打  tag
@@ -573,54 +573,58 @@ export const register = (client: QQBotClients) => {
   };
 
   const onactions = async (data, consume) => {
-    // 新增action，用于获取机器人本身的信息
-    if (data.action === 'me.info') {
-      // TODO 当前api似乎仅适用于guilds模式
-      const res = await client.usersMe();
-      const UserId = res.id;
-      const [isMaster, UserKey] = getMaster(UserId);
+    try {
+      // 新增action，用于获取机器人本身的信息
+      if (data.action === 'me.info') {
+        // TODO 当前api似乎仅适用于guilds模式
+        const res = await client.usersMe();
+        const UserId = res.id;
+        const [isMaster, UserKey] = getMaster(UserId);
 
-      const botInfo: User = {
-        UserId: res?.id,
-        UserName: res?.username,
-        UserAvatar: createUserAvatarURL(res?.id),
-        IsBot: true,
-        IsMaster: isMaster,
-        UserKey: UserKey
-      };
+        const botInfo: User = {
+          UserId: res?.id,
+          UserName: res?.username,
+          UserAvatar: createUserAvatarURL(res?.id),
+          IsBot: true,
+          IsMaster: isMaster,
+          UserKey: UserKey
+        };
 
-      consume([createResult(ResultCode.Ok, '请求完成', botInfo)]);
-    } else if (data.action === 'message.send') {
-      // 消息发送
-      const event = data.payload.event;
-      const paramFormat = data.payload.params.format;
-      // 消费
-      const res = await api.use.send(event, paramFormat);
+        consume([createResult(ResultCode.Ok, '请求完成', botInfo)]);
+      } else if (data.action === 'message.send') {
+        // 消息发送
+        const event = data.payload.event;
+        const paramFormat = data.payload.params.format;
+        // 消费
+        const res = await api.use.send(event, paramFormat);
 
-      consume(res);
-    } else if (data.action === 'mention.get') {
-      const event = data.payload.event;
-      // 获取提及
-      const metions = await api.use.mention(event);
+        consume(res);
+      } else if (data.action === 'mention.get') {
+        const event = data.payload.event;
+        // 获取提及
+        const metions = await api.use.mention(event);
 
-      // 消费
-      consume([createResult(ResultCode.Ok, '请求完成', metions)]);
-    } else if (data.action === 'message.send.channel') {
-      // 主动发送消息到频道
-      const channel_id = data.payload.ChannelId;
-      const paramFormat = data.payload.params.format;
-      const res = await api.active.send.channel(channel_id, paramFormat);
+        // 消费
+        consume([createResult(ResultCode.Ok, '请求完成', metions)]);
+      } else if (data.action === 'message.send.channel') {
+        // 主动发送消息到频道
+        const channel_id = data.payload.ChannelId;
+        const paramFormat = data.payload.params.format;
+        const res = await api.active.send.channel(channel_id, paramFormat);
 
-      consume(res);
-    } else if (data.action === 'message.send.user') {
-      // 主动发送消息到用户
-      const user_id = data.payload.UserId;
-      const paramFormat = data.payload.params.format;
-      const res = await api.active.send.user(user_id, paramFormat);
+        consume(res);
+      } else if (data.action === 'message.send.user') {
+        // 主动发送消息到用户
+        const user_id = data.payload.UserId;
+        const paramFormat = data.payload.params.format;
+        const res = await api.active.send.user(user_id, paramFormat);
 
-      consume(res);
-    } else {
-      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+        consume(res);
+      } else {
+        consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+      }
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 
@@ -631,11 +635,15 @@ export const register = (client: QQBotClients) => {
     const key = data.payload?.key;
 
     if (client[key]) {
-      // 如果 client 上有对应的 key，直接调用。
       const params = data.payload.params;
-      const res = await client[key](...params);
 
-      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      try {
+        const res = await client[key](...params);
+
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } catch (error) {
+        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+      }
     } else {
       consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
     }

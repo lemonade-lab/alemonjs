@@ -93,8 +93,6 @@ export class Result {
     // 如果当前索引位置有数据，则移动到下一个索引，否则保持在当前索引
     if (this.#data[this.#currentIndex]) {
       this.#currentIndex++;
-    } else {
-      this.#currentIndex = 0;
     }
 
     return this;
@@ -121,6 +119,7 @@ export class Result {
         data: data
       };
     }
+    this.#data[this.#currentIndex].data = data;
 
     return this;
   }

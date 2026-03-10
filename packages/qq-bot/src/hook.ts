@@ -65,7 +65,7 @@ export const useMode = <T extends EventKeys>(event: Events[T]) => {
   }
   // 私聊
   if (tag === 'C2C_MESSAGE_CREATE') {
-    currentMode = 'group';
+    currentMode = 'c2c';
   }
   // 频道私聊
   if (tag === 'DIRECT_MESSAGE_CREATE') {
@@ -79,7 +79,7 @@ export const useMode = <T extends EventKeys>(event: Events[T]) => {
   if (tag === 'MESSAGE_CREATE') {
     currentMode = 'guild';
   }
-  const isMode = (mode: 'guild' | 'group') => {
+  const isMode = (mode: 'guild' | 'group' | 'c2c') => {
     return currentMode === mode;
   };
 

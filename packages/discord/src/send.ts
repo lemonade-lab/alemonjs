@@ -1,4 +1,4 @@
-import { ButtonRow, createResult, DataEnums, ResultCode } from 'alemonjs';
+import { DataButtonRow, createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { DCClient } from './sdk/wss';
 
@@ -10,7 +10,7 @@ const ImageURLToBuffer = async (url: string) => {
   return Buffer.from(arrayBuffer);
 };
 
-const createButtonsData = (rows: ButtonRow[]) => {
+const createButtonsData = (rows: DataButtonRow[]) => {
   return rows.map(row => {
     const val = row.value;
 
@@ -18,9 +18,7 @@ const createButtonsData = (rows: ButtonRow[]) => {
       type: 1,
       components: val.map(button => {
         const value = button.value;
-        let text = '';
-
-        text = button.options?.data;
+        const text = button.options?.data ?? '';
 
         return {
           type: 2,
@@ -41,7 +39,7 @@ export const sendchannel = async (
   val: DataEnums[]
 ) => {
   try {
-    if (val.length < 0) {
+    if (!val || val.length <= 0) {
       return [];
     }
     const channel_id = param?.channel_id ?? '';
@@ -94,7 +92,19 @@ export const sendchannel = async (
         const item = images[i];
 
         if (item.type === 'Image') {
-          bufferData = Buffer.from(item.value, 'base64');
+          if (Buffer.isBuffer(item.value)) {
+            bufferData = item.value;
+          } else if (typeof item.value === 'string') {
+            if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+              bufferData = await ImageURLToBuffer(item.value);
+            } else if (item.value.startsWith('base64://')) {
+              bufferData = Buffer.from(item.value.slice(9), 'base64');
+            } else if (item.value.startsWith('file://')) {
+              bufferData = readFileSync(item.value.slice(7));
+            } else {
+              bufferData = Buffer.from(item.value, 'base64');
+            }
+          }
         } else if (item.type === 'ImageURL') {
           const res = await ImageURLToBuffer(item.value);
 
@@ -145,7 +155,9 @@ export const sendchannel = async (
               contentMd += `*${line.value}*`;
             } else if (line.type === 'MD.link') {
               // 链接
-              contentMd += `[${line.value}](${line.value})`;
+              contentMd += `[${typeof line.value === 'object' ? line.value.text : line.value}](${
+                typeof line.value === 'object' ? line.value.url : line.value
+              })`;
             } else if (line.type === 'MD.list') {
               const listStr = line.value.map(listItem => {
                 // 有序
@@ -156,7 +168,7 @@ export const sendchannel = async (
                 return `\n- ${listItem.value}`;
               });
 
-              contentMd += `${listStr}\n`;
+              contentMd += `${listStr.join('')}\n`;
             } else if (line.type === 'MD.newline') {
               // 换行
               contentMd += '\n';
@@ -202,7 +214,7 @@ export const sendchannel = async (
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }
-    if (content) {
+    if (content || contentMd) {
       const res = await client.channelsMessagesForm(channel_id, {
         content: contentMd || content
       });
@@ -224,8 +236,8 @@ export const senduser = async (
   },
   val: DataEnums[]
 ) => {
-  if (val.length < 0) {
-    return Promise.all([]);
+  if (!val || val.length <= 0) {
+    return [];
   }
   const channelId = param?.channel_id ?? (await client.userMeChannels(param.author_id))?.id;
 

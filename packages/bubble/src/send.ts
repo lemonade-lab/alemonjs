@@ -86,7 +86,7 @@ export const sendToRoom = async (
 
             bufferData = Buffer.from(base64Str, 'base64');
           } else if (item.value.startsWith('file://')) {
-            bufferData = readFileSync(item.value);
+            bufferData = readFileSync(item.value.slice(7));
           }
         } else if (item.type === 'ImageURL') {
           const res = await ImageURLToBuffer(item.value);
@@ -193,7 +193,7 @@ export const sendToRoom = async (
                 return `\n- ${listItem.value}`;
               });
 
-              contentMd += `${listStr}\n`;
+              contentMd += `${listStr.join('')}\n`;
               // 换行
             } else if (line.type === 'MD.code') {
               const language = line?.options?.language || '';
