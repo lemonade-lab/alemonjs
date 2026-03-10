@@ -28,20 +28,10 @@ export const start = () => {
 
   const intents = [] as IntentsEnum[];
 
-  if (config?.mode === 'guild') {
-    if (config?.is_private) {
-      intents.push(...isPrivateIntents, ...pubIntents);
-    } else {
-      intents.push(...notPrivateIntents, ...pubIntents);
-    }
-  } else if (config?.mode === 'group') {
-    intents.push(...isGroupIntents, ...pubIntents);
+  if (config?.is_private) {
+    intents.push(...isPrivateIntents, ...pubIntents);
   } else {
-    if (config?.is_private) {
-      intents.push(...isPrivateIntents, ...pubIntents);
-    } else {
-      intents.push(...notPrivateIntents, ...isGroupIntents, ...pubIntents);
-    }
+    intents.push(...notPrivateIntents, ...isGroupIntents, ...pubIntents);
   }
 
   const client = new QQBotClients({
@@ -50,7 +40,9 @@ export const start = () => {
     is_private: config?.is_private ?? false,
     sandbox: config?.sandbox ?? false,
     shard: config?.shard ?? [0, 1],
-    mode: config?.mode ?? 'group'
+    gatewayURL: config?.gatewayURL,
+    base_url_gateway: config?.base_url_gateway,
+    base_url_app_access_token: config?.base_url_app_access_token
   });
 
   // 连接

@@ -108,10 +108,6 @@ export interface Options {
    */
   sandbox?: boolean;
   /**
-   *
-   */
-  mode?: 'guild' | 'group' | '';
-  /**
    * 路由
    */
   route?: string;
@@ -127,4 +123,6 @@ export interface Options {
    * WebSocket 网关地址
    */
   gatewayURL?: string;
+  base_url_gateway?: string;
+  base_url_app_access_token?: string;
 }

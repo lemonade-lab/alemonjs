@@ -23,15 +23,27 @@ export class QQBotAPI {
   getAuthentication() {
     const app_id = config.get('app_id');
     const secret = config.get('secret');
-    // 群聊是加密token
-    // const token = config.get('access_token');
+
+    const baseUrlAppAccessToken = config.get('base_url_app_access_token');
+
+    const params: {
+      baseURL?: string;
+      url: string;
+    } = {
+      url: '/app/getAppAccessToken'
+    };
+
+    if (baseUrlAppAccessToken) {
+      params.baseURL = baseUrlAppAccessToken;
+    }
+
     const service = axios.create({
       baseURL: BOTS_API_RUL,
       timeout: 20000
     });
 
     return createAxiosInstance(service, {
-      url: '/app/getAppAccessToken',
+      ...params,
       method: 'post',
       data: {
         appId: `${app_id}`,
@@ -41,16 +53,16 @@ export class QQBotAPI {
   }
 
   /**
-   * group
-   * @param config
+   * 统一鉴权请求（QQBot AccessToken）
+   * @param options
    * @returns
    */
   groupService(options: AxiosRequestConfig) {
     const app_id = config.get('app_id');
-    // 群聊是加密token
     const token = config.get('access_token');
+    const sandbox = config.get('sandbox');
     const service = axios.create({
-      baseURL: API_URL,
+      baseURL: sandbox ? API_URL_SANDBOX : API_URL,
       timeout: 20000,
       headers: {
         'X-Union-Appid': app_id,
@@ -62,23 +74,10 @@ export class QQBotAPI {
   }
 
   /**
-   * guild
-   * @param opstion
-   * @returns
+   * @deprecated 使用 groupService 代替，鉴权方式已统一
    */
-  guildServer(opstion: AxiosRequestConfig) {
-    const app_id = config.get('app_id');
-    const token = config.get('token');
-    const sandbox = config.get('sandbox');
-    const service = axios.create({
-      baseURL: sandbox ? API_URL_SANDBOX : API_URL,
-      timeout: 20000,
-      headers: {
-        Authorization: `Bot ${app_id}.${token}`
-      }
-    });
-
-    return createAxiosInstance(service, opstion);
+  guildServer(options: AxiosRequestConfig) {
+    return this.groupService(options);
   }
 
   /**
@@ -86,22 +85,20 @@ export class QQBotAPI {
    * @returns
    */
   gateway() {
-    const mode = config.get('mode');
+    const baseUrlGateway = config.get('base_url_gateway');
 
-    if (mode === 'group') {
-      return this.groupService({
-        url: '/gateway'
-      });
-    } else if (mode === 'guild') {
-      return this.guildServer({
-        url: '/gateway'
-      });
-    } else {
-      // 默认group
-      return this.groupService({
-        url: '/gateway'
-      });
+    const params: {
+      baseURL?: string;
+      url: string;
+    } = {
+      url: '/gateway'
+    };
+
+    if (baseUrlGateway) {
+      params.baseURL = baseUrlGateway;
     }
+
+    return this.groupService(params);
   }
 
   /**
@@ -1315,23 +1312,13 @@ export class QQBotAPI {
    * @param code
    * @returns
    */
-  interactionResponse(mode: 'group' | 'guild', interaction_id: string, code?: number) {
-    if (mode === 'group') {
-      return this.groupService({
-        method: 'PUT',
-        url: `/interactions/${interaction_id}`,
-        data: {
-          code: code || 0
-        }
-      });
-    } else {
-      return this.guildServer({
-        method: 'PUT',
-        url: `/interactions/${interaction_id}`,
-        data: {
-          code: code || 0
-        }
-      });
-    }
+  interactionResponse(_mode: 'group' | 'guild', interaction_id: string, code?: number) {
+    return this.groupService({
+      method: 'PUT',
+      url: `/interactions/${interaction_id}`,
+      data: {
+        code: code || 0
+      }
+    });
   }
 }
