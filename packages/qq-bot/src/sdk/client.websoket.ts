@@ -54,7 +54,7 @@ export class QQBotClients extends QQBotAPI {
         access_token: string;
         expires_in: number;
         cache: boolean;
-      } = await this.getAuthentication(app_id, secret).then(res => res.data);
+      } = await this.getAuthentication();
 
       config.set('access_token', data.access_token);
       console.info('refresh', data.expires_in, 's');

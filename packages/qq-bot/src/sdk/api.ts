@@ -20,10 +20,23 @@ export class QQBotAPI {
    * @param clientSecret
    * @returns
    */
-  getAuthentication(app_id: string, clientSecret: string) {
-    return axios.post(`${BOTS_API_RUL}/app/getAppAccessToken`, {
-      appId: app_id,
-      clientSecret: clientSecret
+  getAuthentication() {
+    const app_id = config.get('app_id');
+    const secret = config.get('secret');
+    // 群聊是加密token
+    // const token = config.get('access_token');
+    const service = axios.create({
+      baseURL: BOTS_API_RUL,
+      timeout: 20000
+    });
+
+    return createAxiosInstance(service, {
+      url: '/app/getAppAccessToken',
+      method: 'post',
+      data: {
+        appId: `${app_id}`,
+        clientSecret: `${secret}`
+      }
     });
   }
 

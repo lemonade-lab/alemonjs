@@ -64,13 +64,9 @@ export class QQBotClient extends QQBotAPI {
   async #setTimeoutBotConfig() {
     const callBack = async () => {
       const app_id = config.get('app_id');
-
-      if (!app_id) {
-        return;
-      }
       const secret = config.get('secret');
 
-      if (!secret) {
+      if (!app_id || !secret) {
         return;
       }
       // 发送请求
@@ -78,7 +74,7 @@ export class QQBotClient extends QQBotAPI {
         access_token: string;
         expires_in: number;
         cache: boolean;
-      } = await this.getAuthentication(app_id, secret).then(res => res.data);
+      } = await this.getAuthentication();
 
       config.set('access_token', data.access_token);
       console.info('refresh', data.expires_in, 's');
