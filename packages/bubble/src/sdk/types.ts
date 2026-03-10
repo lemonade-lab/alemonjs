@@ -76,6 +76,7 @@ export interface BaseMessage {
   authorId?: string | number;
   author: {
     id: number;
+    isBot?: boolean;
     is_bot?: boolean;
     avatar?: string | null;
     username: string;

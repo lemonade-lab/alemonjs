@@ -74,7 +74,7 @@ const main = () => {
   // 监听消息
   client.on('MESSAGE_CREATE', event => {
     // 消除bot消息
-    if (event.author?.is_bot) {
+    if (event.author?.is_bot || event.author?.isBot) {
       return;
     }
 
