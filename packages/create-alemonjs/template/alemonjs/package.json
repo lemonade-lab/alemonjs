@@ -5,7 +5,9 @@
   "main": "lib/index.js",
   "type": "module",
   "scripts": {
-    "dev": "npx lvy dev",
+    "app": "node index.js",
+    "dev": "npx lvy app.ts",
+    "view": "npx lvy app.ts --jsxp",
     "build": "npx lvy build",
     "review": "npx alemonc start",
     "start": "npx pm2 startOrRestart pm2.config.cjs",
@@ -19,11 +21,11 @@
   "devDependencies": {
     "@types/node": "^22",
     "@alemonjs/db": "^0.0.13",
-    "alemonjs": "2.1.20",
+    "alemonjs": "2.1.35",
     "jsxp": "1.2.4",
     "tailwindcss": "3",
     "cssnano": "^7",
-    "lvyjs": "^0.2.25",
+    "lvyjs": "^0.3.0-alpha.2",
     "pm2": "^5"
   },
   "publishConfig": {

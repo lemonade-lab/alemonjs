@@ -1,3 +1,7 @@
+# 默认无端口模式，可配置选配端口
+# port: 17117
+# 默认不启动web服务器，可选配
+# serverPort: 17118
 # 具体见 pm2.config.cjs
 pm2:
   apps:
