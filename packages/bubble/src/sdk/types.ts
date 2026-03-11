@@ -208,5 +208,11 @@ export interface FileQuota {
  */
 export interface BubbleEventMap {
   MESSAGE_CREATE: MessageCreateEvent;
+  MESSAGE_UPDATE: MessageUpdateEvent;
+  MESSAGE_DELETE: MessageDeleteEvent;
   DM_MESSAGE_CREATE: DmMessageCreateEvent;
+  DM_MESSAGE_UPDATE: MessageUpdateEvent;
+  DM_MESSAGE_DELETE: MessageDeleteEvent;
+  GUILD_MEMBER_ADD: GuildMemberEvent;
+  GUILD_MEMBER_REMOVE: GuildMemberEvent;
 }

@@ -78,11 +78,14 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 
 ## 平台支持情况
 
-| Project               | Status                    | Description |
-| --------------------- | ------------------------- | ----------- |
-| 👉[@alemonjs/qq-bot]  | [![qq-bot-s]][qq-bot-p]   | QQbot       |
-| 👉[@alemonjs/discord] | [![discord-s]][discord-p] | discord     |
-| 👉[@alemonjs/onebot]  | [![onebot-s]][onebot-p]   | onebot      |
+| Project                | Status                      | Description |
+| ---------------------- | --------------------------- | ----------- |
+| 👉[@alemonjs/qq-bot]   | [![qq-bot-s]][qq-bot-p]     | QQbot       |
+| 👉[@alemonjs/discord]  | [![discord-s]][discord-p]   | Discord     |
+| 👉[@alemonjs/onebot]   | [![onebot-s]][onebot-p]     | OneBot      |
+| 👉[@alemonjs/kook]     | [![kook-s]][kook-p]         | KOOK        |
+| 👉[@alemonjs/telegram] | [![telegram-s]][telegram-p] | Telegram    |
+| 👉[@alemonjs/bubble]   | [![bubble-s]][bubble-p]     | Bubble      |
 
 [@alemonjs/qq-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-bot
 [qq-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-bot.svg
@@ -93,14 +96,23 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 [@alemonjs/onebot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/onebot
 [onebot-s]: https://img.shields.io/npm/v/@alemonjs/onebot.svg
 [onebot-p]: https://www.npmjs.com/package/@alemonjs/onebot
+[@alemonjs/kook]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/kook
+[kook-s]: https://img.shields.io/npm/v/@alemonjs/kook.svg
+[kook-p]: https://www.npmjs.com/package/@alemonjs/kook
+[@alemonjs/telegram]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/telegram
+[telegram-s]: https://img.shields.io/npm/v/@alemonjs/telegram.svg
+[telegram-p]: https://www.npmjs.com/package/@alemonjs/telegram
+[@alemonjs/bubble]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/bubble
+[bubble-s]: https://img.shields.io/npm/v/@alemonjs/bubble.svg
+[bubble-p]: https://www.npmjs.com/package/@alemonjs/bubble
 
 ## 生态列表
 
 | Project        | Description                 |
 | -------------- | --------------------------- |
 | 👉[lvyjs]      | 开发环境(nodejs 捆绑打包器) |
-| 👉[alemondesk] | 桌面端版本(react-golang)    |
-| 👉[alemongo]   | 服务端版本(react-golang)    |
+| 👉[alemondesk] | 桌面端版本(react+golang)    |
+| 👉[alemongo]   | 服务端版本(react+golang)    |
 
 [lvyjs]: https://github.com/lemonade-lab/lvyjs
 [alemondesk]: https://github.com/lemonade-lab/alemondesk
@@ -111,7 +123,3 @@ TypeScript 全支持：完整的类型定义，提供良好的开发体验
 <a href="https://github.com/lemonade-lab/docs/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=lemonade-lab/alemonjs" />
 </a>
-
-## 联系方式
-
-> QQ Group 1012967625

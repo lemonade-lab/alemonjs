@@ -1,10 +1,11 @@
 import { Guild, Channel } from '../base/guild';
-import { Message, MessageOpen, MessageText } from '../base/message';
+import { Message, MessageMedia, MessageOpen, MessageText } from '../base/message';
 import { User } from '../base/user';
 import { platform } from '../base/platform';
 import { Expansion } from '../base/expansion';
 // 公有事件-消息创建
 export type PublicEventMessageCreate = MessageText &
+  MessageMedia &
   MessageOpen &
   platform &
   Guild &
@@ -41,4 +42,11 @@ export type PublicEventMessageReactionRemove = platform &
   Channel &
   Message & {
     name: 'message.reaction.remove';
+  } & Expansion;
+// 公有事件-消息置顶
+export type PublicEventMessagePin = platform &
+  Guild &
+  Channel &
+  Message & {
+    name: 'message.pin';
   } & Expansion;

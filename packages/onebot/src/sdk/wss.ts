@@ -60,7 +60,7 @@ export class OneBotClient extends OneBotAPI {
    * @param conversation
    */
   connect() {
-    const { url, access_token: token, reverse_enable, reverse_port } = this.#options;
+    const { url, access_token: token, reverse_enable: reverseEnable, reverse_port: reversePort } = this.#options;
 
     const notToken = !token || token === '';
 
@@ -103,6 +103,21 @@ export class OneBotClient extends OneBotAPI {
             if (this.#events['NOTICE_GROUP_MEMBER_REDUCE']) {
               this.#events['NOTICE_GROUP_MEMBER_REDUCE'](event);
             }
+          } else if (event?.notice_type === 'group_recall') {
+            // 群消息撤回
+            if (this.#events['NOTICE_GROUP_RECALL']) {
+              this.#events['NOTICE_GROUP_RECALL'](event);
+            }
+          } else if (event?.notice_type === 'friend_recall') {
+            // 好友消息撤回
+            if (this.#events['NOTICE_FRIEND_RECALL']) {
+              this.#events['NOTICE_FRIEND_RECALL'](event);
+            }
+          } else if (event?.notice_type === 'group_ban') {
+            // 群禁言
+            if (this.#events['NOTICE_GROUP_BAN']) {
+              this.#events['NOTICE_GROUP_BAN'](event);
+            }
           }
         } else if (event?.post_type === 'request') {
           // 收到加群 或 加好友的请求。
@@ -127,7 +142,7 @@ export class OneBotClient extends OneBotAPI {
     const onClose = (code, reason) => {
       logger.error(`[OneBot] WebSocket closed: ${code} - ${reason.toString('utf8')}`);
       this.__ws = null;
-      if (reverse_enable) {
+      if (reverseEnable) {
         return;
       }
       const curTime = this.#getReConnectTime();
@@ -138,9 +153,9 @@ export class OneBotClient extends OneBotAPI {
     };
 
     if (!this.__ws) {
-      if (reverse_enable) {
+      if (reverseEnable) {
         // reverse_open
-        const server = new WebSocketServer({ port: reverse_port ?? 17158 });
+        const server = new WebSocketServer({ port: reversePort ?? 17158 });
 
         server.on('connection', ws => {
           this.__ws = ws;
@@ -148,7 +163,7 @@ export class OneBotClient extends OneBotAPI {
           this.__ws.on('message', onMessage);
           // close
           this.__ws.on('close', onClose);
-          logger.info(`[OneBot] connected: ws://127.0.0.1:${reverse_port}`);
+          logger.info(`[OneBot] connected: ws://127.0.0.1:${reversePort}`);
         });
       } else {
         // forward_open

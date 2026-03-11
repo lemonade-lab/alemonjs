@@ -6,9 +6,12 @@ export type platform = {
   /**
    * 标记
    */
-  tag: string;
   /**
    * 原始消息
    */
   value: any;
+  /**
+   * 机器人编号
+   */
+  BotId?: string;
 };

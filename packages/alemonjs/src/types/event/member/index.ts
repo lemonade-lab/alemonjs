@@ -19,3 +19,19 @@ export type PublicEventMemberRemove = platform &
   User & {
     name: 'member.remove';
   } & Expansion;
+// 成员封禁
+export type PublicEventMemberBan = platform &
+  Guild &
+  Channel &
+  Message &
+  User & {
+    name: 'member.ban';
+  } & Expansion;
+// 成员解封
+export type PublicEventMemberUnban = platform &
+  Guild &
+  Channel &
+  Message &
+  User & {
+    name: 'member.unban';
+  } & Expansion;

@@ -3,9 +3,15 @@ import {
   createResult,
   DataEnums,
   definePlatform,
+  MessageMediaItem,
   PrivateEventMessageCreate,
   PublicEventMemberAdd,
+  PublicEventMemberRemove,
   PublicEventMessageCreate,
+  PublicEventMessageUpdate,
+  PrivateEventMessageUpdate,
+  PublicEventInteractionCreate,
+  PrivateEventInteractionCreate,
   ResultCode
 } from 'alemonjs';
 import { getBufferByURL } from 'alemonjs/utils';
@@ -29,6 +35,9 @@ const main = () => {
   });
   const url = `ws://127.0.0.1:${process.env?.port || 17117}`;
   const cbp = cbpPlatform(url);
+
+  // 机器人Id（Telegram token 格式为 botId:hash）
+  const botId = config.token ? config.token.split(':')[0] : '';
 
   /**
    *
@@ -86,9 +95,9 @@ const main = () => {
         MessageId: String(event?.message_id),
         MessageText: event?.text,
         OpenId: String(event?.chat?.id),
-        CreateAt: Date.now(),
         // other
-        tag: 'txt',
+        BotId: botId,
+        _tag: 'txt',
         value: event
       };
 
@@ -113,15 +122,173 @@ const main = () => {
         MessageId: String(event?.message_id),
         MessageText: event?.text,
         OpenId: String(event?.chat?.id),
-        CreateAt: Date.now(),
         // other
-        tag: 'txt',
+        BotId: botId,
+        _tag: 'txt',
         value: event
       };
 
       cbp.send(e);
     }
   });
+
+  /**
+   * 从 Telegram 消息中提取媒体信息
+   */
+  const extractMediaFromEvent = (event: any): MessageMediaItem[] => {
+    const media: MessageMediaItem[] = [];
+
+    if (event?.photo && event.photo.length > 0) {
+      // 取最大分辨率的图片
+      const photo = event.photo[event.photo.length - 1];
+
+      media.push({
+        Type: 'image',
+        FileId: photo.file_id,
+        FileSize: photo.file_size
+      });
+    }
+
+    if (event?.audio) {
+      media.push({
+        Type: 'audio',
+        FileId: event.audio.file_id,
+        FileName: event.audio.file_name,
+        FileSize: event.audio.file_size,
+        MimeType: event.audio.mime_type
+      });
+    }
+
+    if (event?.video) {
+      media.push({
+        Type: 'video',
+        FileId: event.video.file_id,
+        FileName: event.video.file_name,
+        FileSize: event.video.file_size,
+        MimeType: event.video.mime_type
+      });
+    }
+
+    if (event?.document) {
+      media.push({
+        Type: 'file',
+        FileId: event.document.file_id,
+        FileName: event.document.file_name,
+        FileSize: event.document.file_size,
+        MimeType: event.document.mime_type
+      });
+    }
+
+    if (event?.sticker) {
+      media.push({
+        Type: 'sticker',
+        FileId: event.sticker.file_id,
+        FileSize: event.sticker.file_size
+      });
+    }
+
+    if (event?.voice) {
+      media.push({
+        Type: 'audio',
+        FileId: event.voice.file_id,
+        FileSize: event.voice.file_size,
+        MimeType: event.voice.mime_type
+      });
+    }
+
+    if (event?.animation) {
+      media.push({
+        Type: 'animation',
+        FileId: event.animation.file_id,
+        FileName: event.animation.file_name,
+        FileSize: event.animation.file_size,
+        MimeType: event.animation.mime_type
+      });
+    }
+
+    return media;
+  };
+
+  /**
+   * 通用媒体消息处理
+   */
+  const handleMediaMessage = async (event: any) => {
+    if (!event?.from) {
+      return;
+    }
+
+    const UserId = String(event?.from?.id);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
+    const MessageMedia = extractMediaFromEvent(event);
+    const caption = event?.caption ?? '';
+
+    if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup' || event?.chat.type === 'group') {
+      const e: PublicEventMessageCreate = {
+        Platform: platform,
+        name: 'message.create',
+        GuildId: String(event?.chat.id),
+        ChannelId: String(event?.chat.id),
+        SpaceId: String(event?.chat.id),
+        UserId: UserId,
+        UserKey: UserKey,
+        UserName: event?.from?.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: String(event?.message_id),
+        MessageText: caption,
+        MessageMedia: MessageMedia,
+        OpenId: String(event?.chat?.id),
+        BotId: botId,
+        _tag: 'media',
+        value: event
+      };
+
+      cbp.send(e);
+    } else if (event?.chat.type === 'private') {
+      const e: PrivateEventMessageCreate = {
+        name: 'private.message.create',
+        Platform: platform,
+        UserId: UserId,
+        UserKey: UserKey,
+        UserName: event?.from?.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: String(event?.message_id),
+        MessageText: caption,
+        MessageMedia: MessageMedia,
+        OpenId: String(event?.chat?.id),
+        BotId: botId,
+        _tag: 'media',
+        value: event
+      };
+
+      cbp.send(e);
+    }
+  };
+
+  // 图片消息
+  client.on('photo', event => void handleMediaMessage(event));
+
+  // 音频消息
+  client.on('audio', event => void handleMediaMessage(event));
+
+  // 视频消息
+  client.on('video', event => void handleMediaMessage(event));
+
+  // 文件消息
+  client.on('document', event => void handleMediaMessage(event));
+
+  // 贴纸消息
+  client.on('sticker', event => void handleMediaMessage(event));
+
+  // 语音消息
+  client.on('voice', event => void handleMediaMessage(event));
+
+  // 动画消息(GIF)
+  client.on('animation', event => void handleMediaMessage(event));
 
   client.on('new_chat_members', async event => {
     // 机器人消息不处理
@@ -150,13 +317,163 @@ const main = () => {
       IsMaster: isMaster,
       IsBot: false,
       MessageId: String(event?.message_id),
-      CreateAt: Date.now(),
       // othder
-      tag: 'txt',
+      BotId: botId,
+      _tag: 'txt',
       value: event
     };
 
     cbp.send(e);
+  });
+
+  // 消息编辑
+  client.on('edited_message', async event => {
+    if (!event?.from) {
+      return;
+    }
+
+    const UserId = String(event?.from?.id);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
+
+    if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup') {
+      const e: PublicEventMessageUpdate = {
+        name: 'message.update',
+        Platform: platform,
+        GuildId: String(event?.chat.id),
+        ChannelId: String(event?.chat.id),
+        SpaceId: String(event?.chat.id),
+        UserId: UserId,
+        UserKey: UserKey,
+        UserName: event?.from?.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: String(event?.message_id),
+        BotId: botId,
+        _tag: 'edited_message',
+        value: event
+      };
+
+      cbp.send(e);
+    } else if (event?.chat.type === 'private') {
+      const e: PrivateEventMessageUpdate = {
+        name: 'private.message.update',
+        Platform: platform,
+        UserId: UserId,
+        UserKey: UserKey,
+        UserName: event?.from?.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: String(event?.message_id),
+        BotId: botId,
+        _tag: 'edited_message',
+        value: event
+      };
+
+      cbp.send(e);
+    }
+  });
+
+  // 成员离开
+  client.on('left_chat_member', async event => {
+    if (!event?.from) {
+      return;
+    }
+
+    const UserId = String(event?.from?.id);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
+
+    const e: PublicEventMemberRemove = {
+      name: 'member.remove',
+      Platform: platform,
+      GuildId: String(event?.chat.id),
+      ChannelId: String(event?.chat.id),
+      SpaceId: String(event?.chat.id),
+      UserId: UserId,
+      UserKey: UserKey,
+      UserName: event?.from?.username,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: String(event?.message_id),
+      BotId: botId,
+      _tag: 'left_chat_member',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 按钮交互回调
+  client.on('callback_query', async event => {
+    if (!event?.from) {
+      return;
+    }
+
+    const UserId = String(event?.from?.id);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
+    const MessageText = event?.data ?? '';
+    const chatType = event?.message?.chat?.type;
+
+    if (chatType === 'channel' || chatType === 'supergroup') {
+      const e: PublicEventInteractionCreate = {
+        name: 'interaction.create',
+        Platform: platform,
+        GuildId: String(event?.message?.chat?.id ?? ''),
+        ChannelId: String(event?.message?.chat?.id ?? ''),
+        SpaceId: String(event?.message?.chat?.id ?? ''),
+        UserId: UserId,
+        UserKey: UserKey,
+        UserName: event?.from?.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: String(event?.message?.message_id ?? event?.id ?? ''),
+        MessageText: MessageText,
+        OpenId: String(event?.message?.chat?.id ?? ''),
+        BotId: botId,
+        _tag: 'callback_query',
+        value: event
+      };
+
+      cbp.send(e);
+
+      // 回应交互
+      try {
+        await client.answerCallbackQuery(event.id);
+      } catch {
+        // ignore
+      }
+    } else {
+      const e: PrivateEventInteractionCreate = {
+        name: 'private.interaction.create',
+        Platform: platform,
+        UserId: UserId,
+        UserKey: UserKey,
+        UserName: event?.from?.username,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: String(event?.message?.message_id ?? event?.id ?? ''),
+        MessageText: MessageText,
+        OpenId: String(event?.message?.chat?.id ?? ''),
+        BotId: botId,
+        _tag: 'callback_query',
+        value: event
+      };
+
+      cbp.send(e);
+
+      try {
+        await client.answerCallbackQuery(event.id);
+      } catch {
+        // ignore
+      }
+    }
   });
 
   const api = {

@@ -22,6 +22,7 @@ const cbpPlatformDirect = (sockPath: string, open: () => void) => {
    */
   const send = (data: EventsEnum) => {
     data.DeviceId = deviceId;
+    data.CreateAt = Date.now();
     if (channel) {
       channel.send(data);
     } else {
@@ -117,6 +118,7 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
   const send = (data: EventsEnum) => {
     if (typeof process.send === 'function') {
       data.DeviceId = deviceId;
+      data.CreateAt = Date.now();
       process.send({ type: 'ipc:data', data });
     }
   };
@@ -254,6 +256,7 @@ export const cbpPlatform = (
   const send = (data: EventsEnum) => {
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
       data.DeviceId = deviceId;
+      data.CreateAt = Date.now();
       global.chatbotPlatform.send(flattedJSON.stringify(data));
     }
   };

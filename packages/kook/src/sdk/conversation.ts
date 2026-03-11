@@ -67,14 +67,14 @@ export const ConversationMap = {
 
         return '';
       } else if (event.extra.type === 'exited_channel') {
-        console.info('111exited_channel');
+        console.info('exited_channel');
 
         return '';
       } else if (event.extra.type === 'updated_channel') {
         // ChannelData
         console.info('updated_channel');
 
-        return '';
+        return KOOKEventKey['CHANNEL_UPDATE'];
         /**
          * ***********
          * 频道进出
@@ -88,6 +88,22 @@ export const ConversationMap = {
         console.info('exited_guild');
 
         return KOOKEventKey['MEMBER_REMOVE'];
+      } else if (event.extra.type === 'self_joined_guild') {
+        console.info('self_joined_guild');
+
+        return KOOKEventKey['GUILD_JOIN'];
+      } else if (event.extra.type === 'self_exited_guild') {
+        console.info('self_exited_guild');
+
+        return KOOKEventKey['GUILD_EXIT'];
+      } else if (event.extra.type === 'added_channel') {
+        console.info('added_channel');
+
+        return KOOKEventKey['CHANNEL_CREATE'];
+      } else if (event.extra.type === 'deleted_channel') {
+        console.info('deleted_channel');
+
+        return KOOKEventKey['CHANNEL_DELETE'];
         /**
          * **********
          * 消息变动
@@ -98,13 +114,18 @@ export const ConversationMap = {
         // EditingData
         console.info('updated_message');
 
-        return '';
+        return KOOKEventKey['MESSAGES_UPDATE'];
+      } else if (event.extra.type === 'deleted_message') {
+        // 消息删除
+        console.info('deleted_message');
+
+        return KOOKEventKey['MESSAGES_DELETE'];
       } else if (event.extra.type === 'pinned_message') {
         // 顶置消息
         // overheadData
         console.info('pinned_message');
 
-        return '';
+        return KOOKEventKey['MESSAGES_PIN'];
       }
     },
     direct: (event: SystemData) => {

@@ -516,10 +516,10 @@ const sendGuildMessage = async (
  */
 export const GROUP_AT_MESSAGE_CREATE = async (
   client: Client,
-  event: { ChannelId: string; MessageId?: string; tag?: string },
+  event: { ChannelId: string; MessageId?: string; _tag?: string },
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const baseParams = buildBaseParams(event.tag, event.MessageId, 'INTERACTION_CREATE_GROUP');
+  const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_GROUP');
   const content = extractContent(val, 'group');
 
   try {
@@ -541,10 +541,10 @@ export const GROUP_AT_MESSAGE_CREATE = async (
  */
 export const C2C_MESSAGE_CREATE = async (
   client: Client,
-  event: { UserId: string; MessageId?: string; tag?: string },
+  event: { UserId: string; MessageId?: string; _tag?: string },
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const baseParams = buildBaseParams(event.tag, event.MessageId, 'INTERACTION_CREATE_C2C');
+  const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_C2C');
   const content = extractContent(val, 'group');
 
   try {
@@ -566,10 +566,10 @@ export const C2C_MESSAGE_CREATE = async (
  */
 export const DIRECT_MESSAGE_CREATE = async (
   client: Client,
-  event: { UserId: string; MessageId?: string; tag?: string },
+  event: { UserId: string; MessageId?: string; _tag?: string },
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const baseParams = buildBaseParams(event.tag, event.MessageId, 'INTERACTION_CREATE_GUILD');
+  const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_GUILD');
   const content = extractContent(val, 'guild-direct');
 
   try {
@@ -584,10 +584,10 @@ export const DIRECT_MESSAGE_CREATE = async (
  */
 export const MESSAGE_CREATE = async (
   client: Client,
-  event: { ChannelId: string; MessageId?: string; tag?: string },
+  event: { ChannelId: string; MessageId?: string; _tag?: string },
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
-  const baseParams = buildBaseParams(event.tag, event.MessageId, 'INTERACTION_CREATE_GUILD');
+  const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_GUILD');
   const content = extractContent(val, 'guild-public');
 
   try {
@@ -602,7 +602,7 @@ export const MESSAGE_CREATE = async (
  */
 export const AT_MESSAGE_CREATE = (
   client: Client,
-  event: { ChannelId: string; MessageId?: string; tag?: string },
+  event: { ChannelId: string; MessageId?: string; _tag?: string },
   val: DataEnums[]
 ): Promise<ClientAPIMessageResult[]> => {
   return MESSAGE_CREATE(client, event, val);

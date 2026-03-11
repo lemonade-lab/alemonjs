@@ -1,9 +1,10 @@
 import { Expansion } from '../base/expansion';
-import { Message, MessageOpen, MessageText } from '../base/message';
+import { Message, MessageMedia, MessageOpen, MessageText } from '../base/message';
 import { platform } from '../base/platform';
 import { User } from '../base/user';
 // 私有消息-消息创建
 export type PrivateEventMessageCreate = MessageText &
+  MessageMedia &
   MessageOpen &
   platform &
   Message &

@@ -443,10 +443,14 @@ export const SystemDataEnum = [
    * 频道进出事件
    */
 
-  // 进入频道
-  'exited_guild',
-  // 退出
+  // 成员进入频道
   'joined_guild',
+  // 成员退出频道
+  'exited_guild',
+  // 机器人加入频道
+  'self_joined_guild',
+  // 机器人退出频道
+  'self_exited_guild',
 
   /**
    * 成员上麦事件
@@ -458,19 +462,24 @@ export const SystemDataEnum = [
   'exited_channel',
 
   /**
-   * 成员信息变更事件
-   * 身份组信息变更
+   * 子频道变更事件
    */
 
-  // 更新频道信息
+  // 更新子频道信息
   'updated_channel',
+  // 新增子频道
+  'added_channel',
+  // 删除子频道
+  'deleted_channel',
 
   /**
-   *
+   * 消息事件
    */
 
   // 顶置消息
   'pinned_message',
+  // 删除消息
+  'deleted_message',
 
   /**
    *

@@ -1,4 +1,25 @@
-import { PrivateEventMessageCreate, PublicEventMessageCreate, User, DataEnums, cbpPlatform, createResult, ResultCode, definePlatform } from 'alemonjs';
+import {
+  PrivateEventMessageCreate,
+  PublicEventMessageCreate,
+  PublicEventMessageReactionAdd,
+  PublicEventMessageReactionRemove,
+  PublicEventMessageUpdate,
+  PublicEventMessageDelete,
+  PublicEventMessagePin,
+  PublicEventMemberAdd,
+  PublicEventMemberRemove,
+  PublicEventGuildJoin,
+  PublicEventGuildExit,
+  PublicEventChannelCreate,
+  PublicEventChannelDelete,
+  PublicEventChannelUpdate,
+  User,
+  DataEnums,
+  cbpPlatform,
+  createResult,
+  ResultCode,
+  definePlatform
+} from 'alemonjs';
 import { KOOKClient } from './sdk/index';
 import { readFileSync } from 'fs';
 import { getKOOKConfig, getMaster } from './config.js';
@@ -23,6 +44,16 @@ const main = () => {
 
   // 连接
   void client.connect();
+
+  // 机器人Id
+  let botId = '';
+
+  client
+    .userMe()
+    .then(res => {
+      botId = String(res?.data?.id ?? '');
+    })
+    .catch(() => {});
 
   const port = process.env?.port || 17117;
   const url = `ws://127.0.0.1:${port}`;
@@ -66,9 +97,9 @@ const main = () => {
       MessageId: event.msg_id,
       MessageText: msg,
       OpenId: data?.code,
-      CreateAt: Date.now(),
       //
-      tag: 'MESSAGES_DIRECT',
+      BotId: botId,
+      _tag: 'MESSAGES_DIRECT',
       value: event
     };
 
@@ -95,18 +126,18 @@ const main = () => {
      * 艾特类型所得到的
      * 包括机器人在内
      */
-    const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? [];
+    const mentionRolePart = event.extra.kmarkdown?.mention_role_part ?? [];
 
-    for (const item of mention_role_part) {
+    for (const item of mentionRolePart) {
       msg = msg.replace(`(rol)${item.role_id}(rol)`, '').trim();
     }
 
     /**
      * 艾特用户所得到的
      */
-    const mention_part = event.extra.kmarkdown?.mention_part ?? [];
+    const mentionPart = event.extra.kmarkdown?.mention_part ?? [];
 
-    for (const item of mention_part) {
+    for (const item of mentionPart) {
       msg = msg.replace(`(met)${item.id}(met)`, '').trim();
     }
 
@@ -134,9 +165,9 @@ const main = () => {
       MessageId: event.msg_id,
       MessageText: msg,
       OpenId: data?.code,
-      CreateAt: Date.now(),
       //
-      tag: 'MESSAGES_PUBLIC',
+      BotId: botId,
+      _tag: 'MESSAGES_PUBLIC',
       value: event
     };
 
@@ -146,6 +177,294 @@ const main = () => {
   // 发送错误时
   client.on('ERROR', msg => {
     console.error(msg);
+  });
+
+  // 表情表态事件
+  client.on('REACTIONS', event => {
+    const reactionType = event.extra?.type;
+    const body = event.extra?.body as any;
+
+    if (!body) {
+      return;
+    }
+
+    if (reactionType === 'added_reaction') {
+      const e: PublicEventMessageReactionAdd = {
+        name: 'message.reaction.add',
+        Platform: platform,
+        GuildId: body.channel_id ?? '',
+        ChannelId: body.channel_id ?? '',
+        SpaceId: body.channel_id ?? '',
+        MessageId: body.msg_id ?? '',
+        BotId: botId,
+        _tag: 'REACTIONS_ADD',
+        value: event
+      };
+
+      cbp.send(e);
+    } else if (reactionType === 'deleted_reaction') {
+      const e: PublicEventMessageReactionRemove = {
+        name: 'message.reaction.remove',
+        Platform: platform,
+        GuildId: body.channel_id ?? '',
+        ChannelId: body.channel_id ?? '',
+        SpaceId: body.channel_id ?? '',
+        MessageId: body.msg_id ?? '',
+        BotId: botId,
+        _tag: 'REACTIONS_REMOVE',
+        value: event
+      };
+
+      cbp.send(e);
+    }
+  });
+
+  // 成员加入服务器
+  client.on('MEMBER_ADD', event => {
+    const body = event.extra?.body as any;
+
+    if (!body) {
+      return;
+    }
+
+    const UserId = body.user_id ?? event.author_id;
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    const e: PublicEventMemberAdd = {
+      name: 'member.add',
+      Platform: platform,
+      GuildId: event.target_id ?? '',
+      ChannelId: '',
+      SpaceId: event.target_id ?? '',
+      UserId: UserId,
+      UserKey,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'MEMBER_ADD',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 成员离开服务器
+  client.on('MEMBER_REMOVE', event => {
+    const body = event.extra?.body as any;
+
+    if (!body) {
+      return;
+    }
+
+    const UserId = body.user_id ?? event.author_id;
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    const e: PublicEventMemberRemove = {
+      name: 'member.remove',
+      Platform: platform,
+      GuildId: event.target_id ?? '',
+      ChannelId: '',
+      SpaceId: event.target_id ?? '',
+      UserId: UserId,
+      UserKey,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'MEMBER_REMOVE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 消息更新
+  client.on('MESSAGES_UPDATE', event => {
+    const body = event.extra?.body;
+
+    if (!body) {
+      return;
+    }
+
+    const e: PublicEventMessageUpdate = {
+      name: 'message.update',
+      Platform: platform,
+      GuildId: body.channel_id ?? event.target_id ?? '',
+      ChannelId: body.channel_id ?? event.target_id ?? '',
+      SpaceId: body.channel_id ?? event.target_id ?? '',
+      UserId: body.author_id ?? event.author_id ?? '',
+      UserKey: '',
+      IsMaster: false,
+      IsBot: false,
+      MessageId: body.msg_id ?? event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'MESSAGES_UPDATE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 消息删除
+  client.on('MESSAGES_DELETE', event => {
+    const body = event.extra?.body;
+
+    if (!body) {
+      return;
+    }
+
+    const e: PublicEventMessageDelete = {
+      name: 'message.delete',
+      Platform: platform,
+      GuildId: body.channel_id ?? event.target_id ?? '',
+      ChannelId: body.channel_id ?? event.target_id ?? '',
+      SpaceId: body.channel_id ?? event.target_id ?? '',
+      MessageId: body.msg_id ?? event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'MESSAGES_DELETE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 消息置顶
+  client.on('MESSAGES_PIN', event => {
+    const body = event.extra?.body;
+
+    if (!body) {
+      return;
+    }
+
+    const e: PublicEventMessagePin = {
+      name: 'message.pin',
+      Platform: platform,
+      GuildId: body.channel_id ?? event.target_id ?? '',
+      ChannelId: body.channel_id ?? event.target_id ?? '',
+      SpaceId: body.channel_id ?? event.target_id ?? '',
+      MessageId: body.msg_id ?? event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'MESSAGES_PIN',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 机器人加入服务器
+  client.on('GUILD_JOIN', event => {
+    const body = event.extra?.body;
+
+    const e: PublicEventGuildJoin = {
+      name: 'guild.join',
+      Platform: platform,
+      GuildId: body?.guild_id ?? event.target_id ?? '',
+      ChannelId: '',
+      SpaceId: body?.guild_id ?? event.target_id ?? '',
+      UserId: event.author_id ?? '',
+      UserKey: '',
+      IsMaster: false,
+      IsBot: true,
+      MessageId: event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'GUILD_JOIN',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 机器人退出服务器
+  client.on('GUILD_EXIT', event => {
+    const body = event.extra?.body;
+
+    const e: PublicEventGuildExit = {
+      name: 'guild.exit',
+      Platform: platform,
+      GuildId: body?.guild_id ?? event.target_id ?? '',
+      ChannelId: '',
+      SpaceId: body?.guild_id ?? event.target_id ?? '',
+      UserId: event.author_id ?? '',
+      UserKey: '',
+      IsMaster: false,
+      IsBot: true,
+      MessageId: event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'GUILD_EXIT',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 频道创建
+  client.on('CHANNEL_CREATE', event => {
+    const body = event.extra?.body;
+
+    if (!body) {
+      return;
+    }
+
+    const e: PublicEventChannelCreate = {
+      name: 'channel.create',
+      Platform: platform,
+      GuildId: body.guild_id ?? event.target_id ?? '',
+      ChannelId: body.id ?? '',
+      SpaceId: body.guild_id ?? event.target_id ?? '',
+      MessageId: event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'CHANNEL_CREATE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 频道删除
+  client.on('CHANNEL_DELETE', event => {
+    const body = event.extra?.body;
+
+    if (!body) {
+      return;
+    }
+
+    const e: PublicEventChannelDelete = {
+      name: 'channel.delete',
+      Platform: platform,
+      GuildId: body.guild_id ?? event.target_id ?? '',
+      ChannelId: body.id ?? '',
+      SpaceId: body.guild_id ?? event.target_id ?? '',
+      MessageId: event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'CHANNEL_DELETE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 频道更新
+  client.on('CHANNEL_UPDATE', event => {
+    const body = event.extra?.body;
+
+    if (!body) {
+      return;
+    }
+
+    const e: PublicEventChannelUpdate = {
+      name: 'channel.update',
+      Platform: platform,
+      GuildId: body.guild_id ?? event.target_id ?? '',
+      ChannelId: body.id ?? '',
+      SpaceId: body.guild_id ?? event.target_id ?? '',
+      MessageId: event.msg_id ?? '',
+      BotId: botId,
+      _tag: 'CHANNEL_UPDATE',
+      value: event
+    };
+
+    cbp.send(e);
   });
 
   /**
@@ -245,7 +564,7 @@ const main = () => {
    * @param val
    * @returns
    */
-  const sendChannel = async (target_id: string, val: DataEnums[]) => {
+  const sendChannel = async (targetId: string, val: DataEnums[]) => {
     if (!val || val.length <= 0) {
       return [];
     }
@@ -258,12 +577,12 @@ const main = () => {
         // 先发图片，再发文本
         const imgRes = await client.createMessage({
           type: 2,
-          target_id: target_id,
+          target_id: targetId,
           content: imageUrl
         });
         const txtRes = await client.createMessage({
           type: 9,
-          target_id: target_id,
+          target_id: targetId,
           content: content
         });
 
@@ -273,7 +592,7 @@ const main = () => {
       if (content) {
         const res = await client.createMessage({
           type: 9,
-          target_id: target_id,
+          target_id: targetId,
           content: content
         });
 
@@ -283,7 +602,7 @@ const main = () => {
       if (imageUrl) {
         const res = await client.createMessage({
           type: 2,
-          target_id: target_id,
+          target_id: targetId,
           content: imageUrl
         });
 
@@ -302,7 +621,7 @@ const main = () => {
    * @param val
    * @returns
    */
-  const sendUser = async (open_id: string, val: DataEnums[]) => {
+  const sendUser = async (openId: string, val: DataEnums[]) => {
     if (!val || val.length <= 0) {
       return [];
     }
@@ -314,12 +633,12 @@ const main = () => {
       if (imageUrl && content) {
         const imgRes = await client.createDirectMessage({
           type: 2,
-          chat_code: open_id,
+          chat_code: openId,
           content: imageUrl
         });
         const txtRes = await client.createDirectMessage({
           type: 9,
-          chat_code: open_id,
+          chat_code: openId,
           content: content
         });
 
@@ -329,7 +648,7 @@ const main = () => {
       if (content) {
         const res = await client.createDirectMessage({
           type: 9,
-          chat_code: open_id,
+          chat_code: openId,
           content: content
         });
 
@@ -339,7 +658,7 @@ const main = () => {
       if (imageUrl) {
         const res = await client.createDirectMessage({
           type: 2,
-          chat_code: open_id,
+          chat_code: openId,
           content: imageUrl
         });
 
@@ -389,9 +708,9 @@ const main = () => {
       mention: e => {
         const event = e.value;
         const MessageMention: User[] = [];
-        const mention_role_part = event.extra.kmarkdown?.mention_role_part ?? [];
+        const mentionRolePart = event.extra.kmarkdown?.mention_role_part ?? [];
 
-        for (const item of mention_role_part) {
+        for (const item of mentionRolePart) {
           const UserId = item.role_id;
           const [isMaster, UserKey] = getMaster(UserId);
 
@@ -403,9 +722,9 @@ const main = () => {
             IsBot: true
           });
         }
-        const mention_part = event.extra.kmarkdown?.mention_part ?? [];
+        const mentionPart = event.extra.kmarkdown?.mention_part ?? [];
 
-        for (const item of mention_part) {
+        for (const item of mentionPart) {
           const UserId = item.id;
           const [isMaster, UserKey] = getMaster(UserId);
 
@@ -439,9 +758,9 @@ const main = () => {
         }
         consume(res.map(item => createResult(ResultCode.Ok, '请求完成', item)));
       } else if (data.action === 'message.send.channel') {
-        const channel_id = data.payload.ChannelId;
+        const channelId = data.payload.ChannelId;
         const val = data.payload.params.format;
-        const res = await api.active.send.channel(channel_id, val);
+        const res = await api.active.send.channel(channelId, val);
 
         if (!res) {
           consume([createResult(ResultCode.Ok, '请求完成', null)]);

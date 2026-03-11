@@ -4,17 +4,9 @@ export type Message = {
    */
   MessageId: string;
   /**
-   * 创建时间
+   * 当消息是回复时，携带 ReplyId
    */
-  CreateAt: number;
-  /**
-   * 来源设备编号
-   */
-  DeviceId?: string;
-  /**
-   * 当消息时回复的，会携带replyId
-   */
-  replyId?: string;
+  ReplyId?: string;
 };
 
 export type MessageText = {
@@ -29,4 +21,44 @@ export type MessageOpen = {
    * 开放编号
    */
   OpenId: string;
+};
+
+/**
+ * 媒体项
+ */
+export type MessageMediaItem = {
+  /**
+   * 媒体类型
+   */
+  Type: 'image' | 'audio' | 'video' | 'file' | 'sticker' | 'animation';
+  /**
+   * 媒体URL
+   */
+  Url?: string;
+  /**
+   * 文件标识
+   */
+  FileId?: string;
+  /**
+   * 文件名
+   */
+  FileName?: string;
+  /**
+   * 文件大小(bytes)
+   */
+  FileSize?: number;
+  /**
+   * MIME类型
+   */
+  MimeType?: string;
+};
+
+/**
+ * 媒体消息
+ */
+export type MessageMedia = {
+  /**
+   * 媒体消息列表
+   */
+  MessageMedia?: MessageMediaItem[];
 };

@@ -16,3 +16,10 @@ export type PublicEventChannelDelete = platform &
   Message & {
     name: 'channel.delete';
   } & Expansion;
+// 公有事件-子频道更新
+export type PublicEventChannelUpdate = platform &
+  Guild &
+  Channel &
+  Message & {
+    name: 'channel.update';
+  } & Expansion;

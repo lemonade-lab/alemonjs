@@ -1,4 +1,21 @@
-import { cbpPlatform, createResult, DataEnums, definePlatform, PrivateEventMessageCreate, PublicEventMessageCreate, ResultCode, User } from 'alemonjs';
+import {
+  cbpPlatform,
+  createResult,
+  DataEnums,
+  definePlatform,
+  PrivateEventMessageCreate,
+  PrivateEventMessageDelete,
+  PrivateEventRequestFriendAdd,
+  PrivateEventRequestGuildAdd,
+  PublicEventMemberAdd,
+  PublicEventMemberBan,
+  PublicEventMemberRemove,
+  PublicEventMemberUnban,
+  PublicEventMessageCreate,
+  PublicEventMessageDelete,
+  ResultCode,
+  User
+} from 'alemonjs';
 import { getBufferByURL } from 'alemonjs/utils';
 import { readFileSync } from 'fs';
 import { platform, getOneBotConfig, getMaster } from './config';
@@ -61,7 +78,7 @@ const main = () => {
 
     const groupId = String(event.group_id);
 
-    const replyId = event.message.find(item => item.type === 'reply')?.data?.id;
+    const ReplyId = event.message.find(item => item.type === 'reply')?.data?.id;
 
     // 定义消
     const e: PublicEventMessageCreate = {
@@ -79,9 +96,10 @@ const main = () => {
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
       OpenId: UserId,
-      replyId,
-      CreateAt: Date.now(),
-      tag: 'message.create',
+      ReplyId,
+      replyId: ReplyId,
+      BotId: BotMe.id,
+      _tag: 'message.create',
       value: event
     };
 
@@ -96,7 +114,7 @@ const main = () => {
 
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const replyId = event.message.find(item => item.type === 'reply')?.data?.id;
+    const ReplyId = event.message.find(item => item.type === 'reply')?.data?.id;
 
     // 定义消
     const e: PrivateEventMessageCreate = {
@@ -111,13 +129,195 @@ const main = () => {
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
       OpenId: String(event.user_id),
-      CreateAt: Date.now(),
-      replyId,
-      tag: 'private.message.create',
+      ReplyId,
+      replyId: ReplyId,
+      BotId: BotMe.id,
+      _tag: 'private.message.create',
       value: event
     };
 
     cbp.send(e);
+  });
+
+  // 群成员增加
+  client.on('NOTICE_GROUP_MEMBER_INCREASE', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const groupId = String(event.group_id);
+
+    const e: PublicEventMemberAdd = {
+      name: 'member.add',
+      Platform: platform,
+      GuildId: groupId,
+      ChannelId: groupId,
+      SpaceId: groupId,
+      UserId: UserId,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: '',
+      BotId: BotMe.id,
+      _tag: 'NOTICE_GROUP_MEMBER_INCREASE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 群成员减少
+  client.on('NOTICE_GROUP_MEMBER_REDUCE', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const groupId = String(event.group_id);
+
+    const e: PublicEventMemberRemove = {
+      name: 'member.remove',
+      Platform: platform,
+      GuildId: groupId,
+      ChannelId: groupId,
+      SpaceId: groupId,
+      UserId: UserId,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: '',
+      BotId: BotMe.id,
+      _tag: 'NOTICE_GROUP_MEMBER_REDUCE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 好友添加请求
+  client.on('REQUEST_ADD_FRIEND', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    const e: PrivateEventRequestFriendAdd = {
+      name: 'private.friend.add',
+      Platform: platform,
+      UserId: UserId,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: String(event.flag ?? ''),
+      BotId: BotMe.id,
+      _tag: 'REQUEST_ADD_FRIEND',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 入群请求
+  client.on('REQUEST_ADD_GROUP', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    const e: PrivateEventRequestGuildAdd = {
+      name: 'private.guild.add',
+      Platform: platform,
+      UserId: UserId,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: String(event.flag ?? ''),
+      BotId: BotMe.id,
+      _tag: 'REQUEST_ADD_GROUP',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 群消息撤回
+  client.on('NOTICE_GROUP_RECALL', event => {
+    const groupId = String(event.group_id);
+
+    const e: PublicEventMessageDelete = {
+      name: 'message.delete',
+      Platform: platform,
+      GuildId: groupId,
+      ChannelId: groupId,
+      SpaceId: groupId,
+      MessageId: String(event.message_id ?? ''),
+      BotId: BotMe.id,
+      _tag: 'NOTICE_GROUP_RECALL',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 好友消息撤回
+  client.on('NOTICE_FRIEND_RECALL', event => {
+    const e: PrivateEventMessageDelete = {
+      name: 'private.message.delete',
+      Platform: platform,
+      MessageId: String(event.message_id ?? ''),
+      BotId: BotMe.id,
+      _tag: 'NOTICE_FRIEND_RECALL',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 群禁言
+  client.on('NOTICE_GROUP_BAN', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const groupId = String(event.group_id);
+
+    if (event.sub_type === 'ban') {
+      const e: PublicEventMemberBan = {
+        name: 'member.ban',
+        Platform: platform,
+        GuildId: groupId,
+        ChannelId: groupId,
+        SpaceId: groupId,
+        UserId: UserId,
+        UserKey,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: '',
+        BotId: BotMe.id,
+        _tag: 'NOTICE_GROUP_BAN',
+        value: event
+      };
+
+      cbp.send(e);
+    } else if (event.sub_type === 'lift_ban') {
+      const e: PublicEventMemberUnban = {
+        name: 'member.unban',
+        Platform: platform,
+        GuildId: groupId,
+        ChannelId: groupId,
+        SpaceId: groupId,
+        UserId: UserId,
+        UserKey,
+        UserAvatar: UserAvatar,
+        IsMaster: isMaster,
+        IsBot: false,
+        MessageId: '',
+        BotId: BotMe.id,
+        _tag: 'NOTICE_GROUP_BAN_LIFT',
+        value: event
+      };
+
+      cbp.send(e);
+    }
   });
 
   /**

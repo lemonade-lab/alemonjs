@@ -14,3 +14,9 @@ export type PrivateEventRequestGuildAdd = platform &
   User & {
     name: 'private.guild.add';
   } & Expansion;
+// 私有消息-好友删除
+export type PrivateEventRequestFriendRemove = platform &
+  Message &
+  User & {
+    name: 'private.friend.remove';
+  } & Expansion;
