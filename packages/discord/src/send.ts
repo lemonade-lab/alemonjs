@@ -1,6 +1,7 @@
 import { DataButtonRow, createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { DCClient } from './sdk/wss';
+import { dataEnumToDiscordText } from './format';
 
 type Client = typeof DCClient.prototype;
 
@@ -31,6 +32,67 @@ const createButtonsData = (rows: DataButtonRow[]) => {
   });
 };
 
+/** 将结构化 Markdown 转为 Discord 原生 Markdown 文本 */
+const buildDiscordMdContent = (mds: DataEnums[]): string => {
+  let contentMd = '';
+
+  if (mds && mds.length > 0) {
+    mds.forEach(item => {
+      if (item.type === 'Markdown') {
+        const md = item.value;
+
+        md.forEach(line => {
+          if (line.type === 'MD.text') {
+            contentMd += line.value;
+          } else if (line.type === 'MD.blockquote') {
+            contentMd += `> ${line.value}\n`;
+          } else if (line.type === 'MD.bold') {
+            contentMd += `**${line.value}**`;
+          } else if (line.type === 'MD.italic') {
+            contentMd += `*${line.value}*`;
+          } else if (line.type === 'MD.divider') {
+            contentMd += '---\n';
+          } else if (line.type === 'MD.image') {
+            contentMd += `![${line.value}](${line.value})`;
+          } else if (line.type === 'MD.italicStar') {
+            contentMd += `*${line.value}*`;
+          } else if (line.type === 'MD.link') {
+            contentMd += `[${line.value.text}](${line.value.url})`;
+          } else if (line.type === 'MD.list') {
+            const listStr = line.value.map(listItem => {
+              if (typeof listItem.value === 'object') {
+                return `\n${listItem.value.index}. ${listItem.value.text}`;
+              }
+
+              return `\n- ${listItem.value}`;
+            });
+
+            contentMd += `${listStr.join('')}\n`;
+          } else if (line.type === 'MD.newline') {
+            contentMd += '\n';
+          } else if (line.type === 'MD.strikethrough') {
+            contentMd += `~~${line.value}~~`;
+          } else if (line.type === 'MD.subtitle') {
+            contentMd += `## ${line.value}\n`;
+          } else if (line.type === 'MD.title') {
+            contentMd += `# ${line.value}\n`;
+          } else if (line.type === 'MD.code') {
+            const language = line?.options?.language || '';
+
+            contentMd += `\`\`\`${language}\n${line.value}\n\`\`\`\n`;
+          } else {
+            const value = line['value'] || '';
+
+            contentMd += String(value);
+          }
+        });
+      }
+    });
+  }
+
+  return contentMd;
+};
+
 export const sendchannel = async (
   client: Client,
   param: {
@@ -42,13 +104,20 @@ export const sendchannel = async (
     if (!val || val.length <= 0) {
       return [];
     }
-    const channel_id = param?.channel_id ?? '';
+    const channelId = param?.channel_id ?? '';
     // images
     const images = val.filter(item => item.type === 'Image' || item.type === 'ImageURL' || item.type === 'ImageFile');
     // buttons
     const buttons = val.filter(item => item.type === 'BT.group');
     // markdown
     const mds = val.filter(item => item.type === 'Markdown');
+    // 降级处理：将不被原生支持的类型转为文本
+    const nativeTypes = new Set(['Image', 'ImageURL', 'ImageFile', 'BT.group', 'Markdown', 'Mention', 'Text', 'Link']);
+    const unsupportedItems = val.filter(item => !nativeTypes.has(item.type));
+    const fallbackText = unsupportedItems
+      .map(item => dataEnumToDiscordText(item))
+      .filter(Boolean)
+      .join('\n');
     // text
     const content = val
       .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
@@ -82,6 +151,11 @@ export const sendchannel = async (
       })
       .join('');
 
+    // Markdown → Discord 原生格式，与 Text 合并
+    const contentMd = buildDiscordMdContent(mds);
+    // 合并 Text、Markdown 和降级文本内容
+    const finalContent = [content, contentMd, fallbackText].filter(Boolean).join('\n');
+
     if (images.length > 0) {
       let bufferData = null;
 
@@ -114,87 +188,16 @@ export const sendchannel = async (
         }
       }
       const res = await client.channelsMessagesForm(
-        channel_id,
+        channelId,
         {
-          content: content
+          content: finalContent
         },
         bufferData
       );
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }
-    // discord 的 md。会替代掉 content
-    let contentMd = '';
 
-    if (mds && mds.length > 0) {
-      mds.forEach(item => {
-        if (item.type === 'Markdown') {
-          const md = item.value;
-
-          md.forEach(line => {
-            if (line.type === 'MD.text') {
-              // 普通文本
-              contentMd += line.value;
-            } else if (line.type === 'MD.blockquote') {
-              // 引用
-              contentMd += `> ${line.value}\n`;
-            } else if (line.type === 'MD.bold') {
-              // 粗体
-              contentMd += `**${line.value}**`;
-            } else if (line.type === 'MD.italic') {
-              // 斜体
-              contentMd += `*${line.value}*`;
-            } else if (line.type === 'MD.divider') {
-              // 分割线
-              contentMd += '---\n';
-            } else if (line.type === 'MD.image') {
-              // 图片
-              contentMd += `![${line.value}](${line.value})`;
-            } else if (line.type === 'MD.italicStar') {
-              // 星号斜体
-              contentMd += `*${line.value}*`;
-            } else if (line.type === 'MD.link') {
-              // 链接
-              contentMd += `[${typeof line.value === 'object' ? line.value.text : line.value}](${
-                typeof line.value === 'object' ? line.value.url : line.value
-              })`;
-            } else if (line.type === 'MD.list') {
-              const listStr = line.value.map(listItem => {
-                // 有序
-                if (typeof listItem.value === 'object') {
-                  return `\n${listItem.value.index}. ${listItem.value.text}`;
-                }
-
-                return `\n- ${listItem.value}`;
-              });
-
-              contentMd += `${listStr.join('')}\n`;
-            } else if (line.type === 'MD.newline') {
-              // 换行
-              contentMd += '\n';
-            } else if (line.type === 'MD.strikethrough') {
-              // 删除线
-              contentMd += `~~${line.value}~~`;
-            } else if (line.type === 'MD.subtitle') {
-              // 副标题
-              contentMd += `## ${line.value}\n`;
-            } else if (line.type === 'MD.title') {
-              // 标题
-              contentMd += `# ${line.value}\n`;
-            } else if (line.type === 'MD.code') {
-              // 代码块
-              const language = line?.options?.language || '';
-
-              contentMd += `\`\`\`${language}\n${line.value}\n\`\`\`\n`;
-            } else {
-              const value = line['value'] || '';
-
-              contentMd += String(value);
-            }
-          });
-        }
-      });
-    }
     if (buttons && buttons.length > 0) {
       let components = null;
 
@@ -204,19 +207,22 @@ export const sendchannel = async (
         }
         const rows = item.value;
 
+        if (typeof rows === 'string') {
+          return;
+        }
         // 构造成按钮
-        components = createButtonsData(rows);
+        components = createButtonsData(rows as DataButtonRow[]);
       });
-      const res = await client.channelsMessages(channel_id, {
-        content: contentMd || content,
+      const res = await client.channelsMessages(channelId, {
+        content: finalContent,
         components: components
       });
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }
-    if (content || contentMd) {
-      const res = await client.channelsMessagesForm(channel_id, {
-        content: contentMd || content
+    if (finalContent) {
+      const res = await client.channelsMessagesForm(channelId, {
+        content: finalContent
       });
 
       return [createResult(ResultCode.Ok, '完成', res)];

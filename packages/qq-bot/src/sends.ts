@@ -1,19 +1,11 @@
 import { readFileSync } from 'fs';
 import { QQBotAPI } from './sdk/api';
 import { FileType } from './sdk/typing';
-import {
-  DataButtonRow,
-  ClientAPIMessageResult,
-  createResult,
-  DataArkBigCard,
-  DataArkCard,
-  DataArkList,
-  DataMarkDown,
-  DataMention,
-  ResultCode,
-  type DataEnums
-} from 'alemonjs';
+import { DataButtonRow, ClientAPIMessageResult, createResult, DataMarkDown, DataMention, ResultCode, type DataEnums } from 'alemonjs';
 import axios from 'axios';
+import { dataEnumToText, markdownToText, buttonsToText } from './format';
+import { getQQBotConfig } from './config';
+import type { DataArkBigCard, DataArkCard, DataArkList } from './types';
 
 type Client = typeof QQBotAPI.prototype;
 
@@ -214,7 +206,23 @@ const formatMention = (item: DataMention, mode: MentionMode): string => {
 
 /** 从消息数据中提取文本内容 */
 const extractContent = (val: DataEnums[], mode: MentionMode): string => {
-  return val
+  // 原生支持的类型集合
+  const nativeTypes = new Set([
+    'Mention',
+    'Text',
+    'Link',
+    'Image',
+    'ImageFile',
+    'ImageURL',
+    'Markdown',
+    'BT.group',
+    'ButtonTemplate',
+    'Ark.list',
+    'Ark.Card',
+    'Ark.BigCard'
+  ]);
+  // 原生文本
+  const nativeText = val
     .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
     .map(item => {
       if (item.type === 'Link') {
@@ -230,6 +238,14 @@ const extractContent = (val: DataEnums[], mode: MentionMode): string => {
       return '';
     })
     .join('');
+  // 降级处理：将不被原生支持的类型转为文本
+  const fallbackText = val
+    .filter(item => !nativeTypes.has(item.type))
+    .map(item => dataEnumToText(item))
+    .filter(Boolean)
+    .join('\n');
+
+  return [nativeText, fallbackText].filter(Boolean).join('\n');
 };
 
 /** 构建 baseParams（event_id 或 msg_id） */
@@ -243,7 +259,7 @@ const buildBaseParams = (tag: string | undefined, messageId: string | undefined,
 
 /** 构建 Markdown 和按钮参数 */
 const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null => {
-  const items = val.filter(item => item.type === 'Markdown' || item.type === 'BT.group' || item.type === 'ButtonTemplate');
+  const items = (val as any[]).filter(item => item.type === 'Markdown' || item.type === 'BT.group' || item.type === 'ButtonTemplate');
 
   if (items.length === 0) {
     return null;
@@ -298,7 +314,7 @@ const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null =
 
 /** 构建 Ark 参数 */
 const buildArkParams = (val: DataEnums[]): Record<string, any> | null => {
-  const items = val.filter(item => item.type === 'Ark.BigCard' || item.type === 'Ark.Card' || item.type === 'Ark.list');
+  const items = (val as any[]).filter(item => item.type === 'Ark.BigCard' || item.type === 'Ark.Card' || item.type === 'Ark.list');
 
   if (items.length === 0) {
     return null;
@@ -370,6 +386,26 @@ const resolveRichMediaUrl = async (images: DataEnums[], uploadMedia: (data: { fi
   return undefined;
 };
 
+/** 当 markdownToText 选项开启时，将 Markdown 和按钮降级为纯文本并追加到 content */
+const flattenMdToText = (content: string, val: DataEnums[]): string => {
+  const mdItems = val.filter(item => item.type === 'Markdown');
+  const btnItems = val.filter(item => item.type === 'BT.group');
+  const parts: string[] = [content];
+
+  for (const item of mdItems) {
+    if (item.type === 'Markdown' && typeof item.value !== 'string') {
+      parts.push(markdownToText(item.value));
+    }
+  }
+  for (const item of btnItems) {
+    if (item.type === 'BT.group' && typeof item.value !== 'string') {
+      parts.push(buttonsToText(item.value as any));
+    }
+  }
+
+  return parts.filter(Boolean).join('\n');
+};
+
 /** Open API 通用发送逻辑（群组 / C2C） */
 const sendOpenApiMessage = async (
   content: string,
@@ -379,6 +415,9 @@ const sendOpenApiMessage = async (
   sendMessage: (data: any) => Promise<any>,
   label: string
 ): Promise<ClientAPIMessageResult[]> => {
+  const config = getQQBotConfig();
+  const mdToText = config.markdownToText === true;
+
   // 图片
   const images = filterImages(val);
 
@@ -388,8 +427,10 @@ const sendOpenApiMessage = async (
     if (!url) {
       return [createResult(ResultCode.Fail, '图片上传失败', null)];
     }
+    // 图片消息(msg_type:7)无法携带原生 markdown 模板，始终将 MD/Buttons 降级为文本合入 content
+    const imgContent = flattenMdToText(content, val);
     const res = await sendMessage({
-      content,
+      content: imgContent,
       media: { file_info: url },
       msg_type: 7,
       ...baseParams
@@ -398,10 +439,27 @@ const sendOpenApiMessage = async (
     return [createResult(ResultCode.Ok, label, { id: res.id })];
   }
 
+  // markdownToText 模式：跳过原生 MD，全部降级为纯文本
+  if (mdToText) {
+    const textContent = flattenMdToText(content, val);
+
+    if (textContent) {
+      const res = await sendMessage({ content: textContent, msg_type: 0, ...baseParams });
+
+      return [createResult(ResultCode.Ok, label, { id: res.id })];
+    }
+
+    return [];
+  }
+
   // Markdown & 按钮
   const mdParams = buildMdAndButtonsParams(val);
 
   if (mdParams) {
+    // 规则 2：Text 合并进 Markdown — 将 content 合入 markdown.content 使其在消息体中可见
+    if (mdParams.markdown?.content && content) {
+      mdParams.markdown.content = content + '\n' + mdParams.markdown.content;
+    }
     const res = await sendMessage({ content, msg_type: 2, ...mdParams, ...baseParams });
 
     return [createResult(ResultCode.Ok, label, { id: res.id })];
@@ -471,20 +529,42 @@ const sendGuildMessage = async (
   sendMessage: (data: any, buffer?: Buffer) => Promise<any>,
   label: string
 ): Promise<ClientAPIMessageResult[]> => {
+  const config = getQQBotConfig();
+  const mdToText = config.markdownToText === true;
+
   // 图片
   const images = filterImages(val);
 
   if (images.length > 0) {
     const imageBuffer = await resolveImageBuffer(images);
-    const res = await sendMessage({ content, ...baseParams }, imageBuffer);
+    // 图片消息无法携带原生 markdown，始终将 MD/Buttons 降级为文本合入 content
+    const imgContent = flattenMdToText(content, val);
+    const res = await sendMessage({ content: imgContent, ...baseParams }, imageBuffer);
 
     return [createResult(ResultCode.Ok, label, { id: res?.id })];
+  }
+
+  // markdownToText 模式：跳过原生 MD，全部降级为纯文本
+  if (mdToText) {
+    const textContent = flattenMdToText(content, val);
+
+    if (textContent) {
+      const res = await sendMessage({ content: textContent, ...baseParams });
+
+      return [createResult(ResultCode.Ok, label, { id: res?.id })];
+    }
+
+    return [];
   }
 
   // Markdown & 按钮
   const mdParams = buildMdAndButtonsParams(val);
 
   if (mdParams) {
+    // 规则 2：Text 合并进 Markdown — 将 content 合入 markdown.content 使其在消息体中可见
+    if (mdParams.markdown?.content && content) {
+      mdParams.markdown.content = content + '\n' + mdParams.markdown.content;
+    }
     const res = await sendMessage({ content: '', ...mdParams, ...baseParams });
 
     return [createResult(ResultCode.Ok, label, { id: res.id })];

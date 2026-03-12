@@ -44,4 +44,6 @@ qq-bot:
   # 4) 域名代理模式
   # base_url_gateway: https://[your addr]
   # base_url_app_access_token: https://[your addr]
+  # 启动md强制转换为text，特别是当没有md权限，但使用了md数据格式时
+  markdownToText: true
 ```

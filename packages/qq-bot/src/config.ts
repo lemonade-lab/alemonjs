@@ -11,6 +11,12 @@ export type Options = {
    * 主人-用户ID
    */
   master_id?: string[];
+  /**
+   * 将 Markdown 降级为纯文本发送
+   * 部分机器人不支持 Markdown 消息类型，开启后 Markdown 和按钮将转为可读纯文本
+   * @default false
+   */
+  markdownToText?: boolean;
 } & sdkOptions;
 
 export const getQQBotConfig = (): Options => {

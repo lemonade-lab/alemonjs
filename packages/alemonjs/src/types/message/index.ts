@@ -1,6 +1,5 @@
-import { DataButtonGroup, DataButtonTemplate } from './button';
-import { DataArkBigCard, DataArkCard, DataArkList } from './ark';
-import { DataMarkDown, DataMarkdownTemplate } from './markdown';
+import { DataButtonGroup } from './button';
+import { DataMarkDown } from './markdown';
 import { DataImage, DataImageFile, DataImageURL } from './image';
 import { DataText } from './text';
 import { DataMention } from './mention';
@@ -23,9 +22,6 @@ export * from './image';
 
 // button
 export * from './button';
-
-// ark
-export * from './ark';
 
 // md
 export * from './markdown';
@@ -51,12 +47,7 @@ export type DataEnums =
   | DataImageFile
   | DataMention
   | DataButtonGroup
-  | DataButtonTemplate
-  | DataArkList
-  | DataArkCard
-  | DataArkBigCard
   | DataMarkDown
-  | DataMarkdownTemplate
   | DataMarkdownOriginal
   | DataAttachment
   | DataAudio

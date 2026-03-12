@@ -1,6 +1,7 @@
 import { createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { BubbleClient } from './sdk/wss';
+import { dataEnumToBubbleText } from './format';
 
 type Client = typeof BubbleClient.prototype;
 
@@ -8,6 +9,112 @@ const ImageURLToBuffer = async (url: string) => {
   const arrayBuffer = await fetch(url).then(res => res.arrayBuffer());
 
   return Buffer.from(arrayBuffer);
+};
+
+/** 将 Markdown/ButtonGroup 转为 Bubble 原生格式文本 */
+const buildBubbleMdContent = (mdAndButtons: DataEnums[]): string => {
+  let contentMd = '';
+
+  if (mdAndButtons && mdAndButtons.length > 0) {
+    mdAndButtons.forEach(item => {
+      if (item.type === 'Markdown' && typeof item.value !== 'string') {
+        const md = item.value;
+
+        const map: {
+          [key: string]: (value: any, options?: any) => string;
+        } = {
+          'MD.title': value => `# ${value}`,
+          'MD.subtitle': value => `## ${value}`,
+          'MD.text': value => `${value} `,
+          'MD.bold': value => `**${value}** `,
+          'MD.divider': () => '\n————————\n',
+          'MD.italic': value => `_${value}_ `,
+          'MD.italicStar': value => `*${value}* `,
+          'MD.strikethrough': value => `~~${value}~~ `,
+          'MD.blockquote': value => `\n> ${value}`,
+          'MD.newline': () => '\n',
+          'MD.link': value => `[🔗${value.text}](${value.url}) `,
+          'MD.image': value => `\n![${value}](${value})\n`,
+          'MD.mention': (value, options) => {
+            const { belong } = options || {};
+
+            if (value === 'everyone' || value === 'all' || value === '' || typeof value !== 'string') {
+              return '<@everyone> ';
+            }
+            if (belong === 'user') {
+              return `<@${value}> `;
+            } else if (belong === 'channel') {
+              return `<#${value}> `;
+            }
+
+            return '';
+          },
+          'MD.button': (value, options) => {
+            const autoEnter = options?.autoEnter ?? false;
+            const label = typeof value === 'object' ? value.title : value;
+            const command = options?.data || label;
+
+            return `<btn variant="borderless" command="${command}" enter="${String(autoEnter)}" >${label}</btn> `;
+          },
+          'MD.content': value => `${value}`
+        };
+
+        md.forEach(line => {
+          if (map[line.type]) {
+            const value = 'value' in line ? line.value : undefined;
+            const options = 'options' in line ? line.options : {};
+
+            contentMd += map[line.type](value, options);
+
+            return;
+          }
+          if (line.type === 'MD.list') {
+            const listStr = line.value.map(listItem => {
+              if (typeof listItem.value === 'object') {
+                return `\n${listItem.value.index}. ${listItem.value.text}`;
+              }
+
+              return `\n- ${listItem.value}`;
+            });
+
+            contentMd += `${listStr.join('')}\n`;
+          } else if (line.type === 'MD.code') {
+            const language = line?.options?.language || '';
+
+            contentMd += `\n\`\`\`${language}\n${line.value}\n\`\`\`\n`;
+          } else {
+            const value = line['value'] || '';
+
+            contentMd += String(value);
+          }
+        });
+      } else if (item.type === 'BT.group' && item.value.length > 0 && typeof item.value !== 'string') {
+        contentMd += `<box  classWind="mt-2" variant="borderless" >${item.value
+          ?.map(row => {
+            const val = row.value;
+
+            if (val.length === 0) {
+              return '';
+            }
+
+            return `<flex>${val
+              .map(button => {
+                const value = button?.value || {};
+                const options = button.options;
+                const autoEnter = options?.autoEnter ?? false;
+                const label = value;
+                const command = options?.data || label;
+
+                return `<btn command="${command}" enter="${String(autoEnter)}" >${label}</btn>`;
+              })
+              .join('')}</flex>`;
+          })
+          .join('')}</box>`;
+      }
+    });
+  }
+
+  return contentMd;
 };
 
 export const sendToRoom = async (
@@ -30,6 +137,13 @@ export const sendToRoom = async (
     const images = val.filter(item => item.type === 'Image' || item.type === 'ImageURL' || item.type === 'ImageFile');
     // markdown
     const mdAndButtons = val.filter(item => item.type === 'Markdown' || item.type === 'BT.group');
+    // 降级处理：将不被原生支持的类型转为文本
+    const nativeTypes = new Set(['Image', 'ImageURL', 'ImageFile', 'Markdown', 'BT.group', 'Mention', 'Text', 'Link']);
+    const unsupportedItems = val.filter(item => !nativeTypes.has(item.type));
+    const fallbackText = unsupportedItems
+      .map(item => dataEnumToBubbleText(item))
+      .filter(Boolean)
+      .join('\n');
     // text
     const content = val
       .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
@@ -64,6 +178,11 @@ export const sendToRoom = async (
         return '';
       })
       .join('');
+
+    // Markdown/ButtonGroup → Bubble 原生格式，与 Text 合并
+    const contentMd = buildBubbleMdContent(mdAndButtons);
+    // 合并 Text、Markdown 和降级文本内容
+    const finalContent = [content, contentMd, fallbackText].filter(Boolean).join('\n');
 
     if (images.length > 0) {
       let bufferData = null;
@@ -107,7 +226,7 @@ export const sendToRoom = async (
 
       if (channelId) {
         const res = await client.sendMessage(channelId, {
-          content: content,
+          content: finalContent,
           type: 'image',
           attachments: [fileAttachment]
         });
@@ -117,7 +236,7 @@ export const sendToRoom = async (
 
       if (threadId) {
         const res = await client.sendDm(threadId, {
-          content: content,
+          content: finalContent,
           type: 'image',
           attachments: [fileAttachment]
         });
@@ -128,118 +247,15 @@ export const sendToRoom = async (
       return [createResult(ResultCode.Ok, '完成', null)];
     }
 
-    // markdown -> 转成 plain content (simple)
-    let contentMd = '';
-
-    if (mdAndButtons && mdAndButtons.length > 0) {
-      mdAndButtons.forEach(item => {
-        if (item.type === 'Markdown' && typeof item.value !== 'string') {
-          const md = item.value;
-
-          const map: {
-            [key: string]: (value: any, options?: any) => string;
-          } = {
-            'MD.title': value => `# ${value}`,
-            'MD.subtitle': value => `## ${value}`,
-            'MD.text': value => `${value} `,
-            'MD.bold': value => `**${value}** `,
-            'MD.divider': () => '\n————————\n',
-            'MD.italic': value => `_${value}_ `,
-            'MD.italicStar': value => `*${value}* `,
-            'MD.strikethrough': value => `~~${value}~~ `,
-            'MD.blockquote': value => `\n> ${value}`,
-            'MD.newline': () => '\n',
-            'MD.link': value => `[🔗${value.text}](${value.url}) `,
-            'MD.image': value => `\n![${value}](${value})\n`,
-            'MD.mention': (value, options) => {
-              const { belong } = options || {};
-
-              if (value === 'everyone' || value === 'all' || value === '' || typeof value !== 'string') {
-                return '<@everyone> ';
-              }
-              if (belong === 'user') {
-                return `<@${value}> `;
-              } else if (belong === 'channel') {
-                return `<#${value}> `;
-              }
-
-              return '';
-            },
-            'MD.button': (value, options) => {
-              const autoEnter = options?.autoEnter ?? false;
-              const label = typeof value === 'object' ? value.title : value;
-              const command = options?.data || label;
-
-              return `<btn variant="borderless" command="${command}" enter="${String(autoEnter)}" >${label}</btn> `;
-            },
-            'MD.content': value => `${value}`
-          };
-
-          md.forEach(line => {
-            if (map[line.type]) {
-              const value = line?.value;
-              const options = line?.options;
-
-              contentMd += map[line.type](value, options);
-
-              return;
-            }
-            if (line.type === 'MD.list') {
-              const listStr = line.value.map(listItem => {
-                if (typeof listItem.value === 'object') {
-                  return `\n${listItem.value.index}. ${listItem.value.text}`;
-                }
-
-                return `\n- ${listItem.value}`;
-              });
-
-              contentMd += `${listStr.join('')}\n`;
-              // 换行
-            } else if (line.type === 'MD.code') {
-              const language = line?.options?.language || '';
-
-              contentMd += `\n\`\`\`${language}\n${line.value}\n\`\`\`\n`;
-            } else {
-              const value = line['value'] || '';
-
-              contentMd += String(value);
-            }
-          });
-        } else if (item.type === 'BT.group' && item.value.length > 0 && typeof item.value !== 'string') {
-          contentMd += `<box  classWind="mt-2" variant="borderless" >${item.value
-            ?.map(row => {
-              const val = row.value;
-
-              if (val.length === 0) {
-                return '';
-              }
-
-              return `<flex>${val
-                .map(button => {
-                  const value = button?.value || {};
-                  const options = button.options;
-                  const autoEnter = options?.autoEnter ?? false;
-                  const label = value;
-                  const command = options?.data || label;
-
-                  return `<btn command="${command}" enter="${String(autoEnter)}" >${label}</btn>`;
-                })
-                .join('')}</flex>`;
-            })
-            .join('')}</box>`;
-        }
-      });
-    }
-
-    if ((content && content.length > 0) || (contentMd && contentMd.length > 0)) {
+    if (finalContent && finalContent.length > 0) {
       if (channelId) {
-        const res = await client.sendMessage(channelId, { content: content !== '' ? content : contentMd, type: 'text' });
+        const res = await client.sendMessage(channelId, { content: finalContent, type: 'text' });
 
         return [createResult(ResultCode.Ok, '完成', res)];
       }
 
       if (threadId) {
-        const res = await client.sendDm(threadId, { content: content !== '' ? content : contentMd, type: 'text' });
+        const res = await client.sendDm(threadId, { content: finalContent, type: 'text' });
 
         return [createResult(ResultCode.Ok, '完成', res)];
       }

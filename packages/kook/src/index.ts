@@ -25,6 +25,7 @@ import { readFileSync } from 'fs';
 import { getKOOKConfig, getMaster } from './config.js';
 import { getBufferByURL } from 'alemonjs/utils';
 import { platform } from './config.js';
+import { dataEnumToKMarkdown } from './format';
 
 export * from './hook.js';
 
@@ -471,8 +472,20 @@ const main = () => {
    * 将 DataEnums 中的 Mention/Text 转为 KOOK KMarkdown 格式文本
    */
   const formatKookContent = (val: DataEnums[]): string => {
-    return val
-      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
+    // 已原生支持的类型
+    const nativeItems = val.filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link');
+    // 未原生支持的类型（排除图片类，图片单独处理）
+    const unsupportedItems = val.filter(
+      item =>
+        item.type !== 'Mention' &&
+        item.type !== 'Text' &&
+        item.type !== 'Link' &&
+        item.type !== 'Image' &&
+        item.type !== 'ImageURL' &&
+        item.type !== 'ImageFile'
+    );
+
+    const nativeText = nativeItems
       .map(item => {
         if (item.type === 'Link') {
           return `[${item.value}](${item?.options?.link ?? item.value})`;
@@ -506,6 +519,17 @@ const main = () => {
         return '';
       })
       .join('');
+
+    // 降级处理：将 Markdown、Ark、Button 等不支持的类型转为 KMarkdown
+    const fallbackText =
+      unsupportedItems.length > 0
+        ? unsupportedItems
+            .map(item => dataEnumToKMarkdown(item))
+            .filter(Boolean)
+            .join('')
+        : '';
+
+    return [nativeText, fallbackText].filter(Boolean).join('');
   };
 
   /**

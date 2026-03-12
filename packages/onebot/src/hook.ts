@@ -11,15 +11,21 @@ type MAP = {
   'message.delete': undefined;
   'message.reaction.add': undefined;
   'message.reaction.remove': undefined;
+  'message.pin': undefined;
   'channel.create': undefined;
   'channel.delete': undefined;
+  'channel.update': undefined;
   'guild.join': undefined;
   'guild.exit': undefined;
+  'guild.update': undefined;
   'member.add': undefined;
   'member.remove': undefined;
+  'member.ban': undefined;
+  'member.unban': undefined;
   'private.message.update': undefined;
   'private.message.delete': undefined;
   'private.friend.add': undefined;
+  'private.friend.remove': undefined;
   'private.guild.add': undefined;
 };
 

@@ -21,6 +21,7 @@ import { readFileSync } from 'fs';
 import { platform, getOneBotConfig, getMaster } from './config';
 import { OneBotClient } from './sdk/wss';
 import { BotMe } from './db';
+import { dataEnumToText } from './format';
 export { platform } from './config';
 export { OneBotAPI as API } from './sdk/api';
 export * from './hook';
@@ -433,6 +434,18 @@ const main = () => {
             type: 'image',
             data: {
               file: `base64://${db.toString('base64')}`
+            }
+          };
+        }
+
+        // 降级处理：将 Markdown、Ark、Button、Link 等不支持的类型转为纯文本
+        const fallbackText = dataEnumToText(item);
+
+        if (fallbackText) {
+          return {
+            type: 'text',
+            data: {
+              text: fallbackText
             }
           };
         }

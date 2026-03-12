@@ -7,12 +7,6 @@ import {
   DataButtonRow,
   DataButtonGroup,
   DataButton,
-  DataArkList,
-  DataArkListTip,
-  DataArkListContent,
-  DataArkListItem,
-  DataArkCard,
-  DataArkBigCard,
   DataMarkDown,
   DataMarkdownTitle,
   DataMarkdownSubtitle,
@@ -163,76 +157,6 @@ Button.group = ButtonGroup;
 Button.row = ButtonRow;
 
 export const BT = Button;
-
-/**
- * @deprecated 废弃，推荐使用 MD
- */
-export const Ark = {
-  /**
-   *
-   * @param values 要显示的文本
-   * @returns
-   */
-  list: (...values: DataArkList['value']): DataArkList => {
-    return {
-      type: 'Ark.list',
-      value: values
-    };
-  },
-  /**
-   *
-   * @param options 提示信息
-   * @returns
-   */
-  listTip: (options: DataArkListTip['value']): DataArkListTip => {
-    return {
-      type: 'Ark.listTip',
-      value: options
-    };
-  },
-  /**
-   *
-   * @param values 实际内容
-   * @returns
-   */
-  listContent: (...values: DataArkListContent['value']): DataArkListContent => {
-    return {
-      type: 'Ark.listContent',
-      value: values
-    };
-  },
-  /**
-   *
-   * @param value 列表项内容
-   * @returns
-   */
-  listItem: (value: DataArkListItem['value']): DataArkListItem => {
-    return {
-      type: 'Ark.listItem',
-      value: value
-    };
-  },
-  /**
-   * @param value 卡片内容
-   * @returns
-   */
-  Card: (value: DataArkCard['value']): DataArkCard => {
-    return {
-      type: 'Ark.Card',
-      value: value
-    };
-  },
-  /**
-   * @param value 大卡片内容
-   * @returns
-   */
-  BigCard: (value: DataArkBigCard['value']): DataArkBigCard => {
-    return {
-      type: 'Ark.BigCard',
-      value
-    };
-  }
-};
 
 /**
  *
