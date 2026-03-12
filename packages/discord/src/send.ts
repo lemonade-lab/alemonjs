@@ -2,6 +2,7 @@ import { DataButtonRow, createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { DCClient } from './sdk/wss';
 import { dataEnumToDiscordText } from './format';
+import { getDiscordConfig } from './config';
 
 type Client = typeof DCClient.prototype;
 
@@ -114,8 +115,9 @@ export const sendchannel = async (
     // 降级处理：将不被原生支持的类型转为文本
     const nativeTypes = new Set(['Image', 'ImageURL', 'ImageFile', 'BT.group', 'Markdown', 'Mention', 'Text', 'Link']);
     const unsupportedItems = val.filter(item => !nativeTypes.has(item.type));
+    const hide = getDiscordConfig().hideUnsupported === true;
     const fallbackText = unsupportedItems
-      .map(item => dataEnumToDiscordText(item))
+      .map(item => dataEnumToDiscordText(item, hide))
       .filter(Boolean)
       .join('\n');
     // text
@@ -155,6 +157,13 @@ export const sendchannel = async (
     const contentMd = buildDiscordMdContent(mds);
     // 合并 Text、Markdown 和降级文本内容
     const finalContent = [content, contentMd, fallbackText].filter(Boolean).join('\n');
+
+    // hideUnsupported 模式：检查转换后内容是否为空
+    if (hide && !finalContent && images.length <= 0 && buttons.length <= 0) {
+      logger.info('[discord] hideUnsupported: 消息内容转换后为空，跳过发送');
+
+      return [];
+    }
 
     if (images.length > 0) {
       let bufferData = null;

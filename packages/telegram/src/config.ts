@@ -7,6 +7,12 @@ export type Options = {
   proxy?: string;
   master_key?: string[];
   master_id?: string[];
+  /**
+   * 隐藏不支持的消息类型
+   * 开启后，不被平台原生支持的消息类型将被直接丢弃（留空），而非降级为文本占位符
+   * @default false
+   */
+  hideUnsupported?: boolean;
 };
 export const getTGConfig = (): Options => {
   const value = getConfigValue() || {};

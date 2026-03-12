@@ -3,16 +3,16 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
 /**
  * 将结构化 Markdown 子元素数组转为可读纯文本
  */
-export const markdownToText = (items: DataMarkDown['value']): string => {
+export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: boolean): string => {
   return items
     .map(item => {
       switch (item.type) {
         case 'MD.text':
           return item.value;
         case 'MD.title':
-          return `【${item.value}】\n`;
+          return hideUnsupported ? `${item.value}\n` : `【${item.value}】\n`;
         case 'MD.subtitle':
-          return `〖${item.value}〗\n`;
+          return hideUnsupported ? `${item.value}\n` : `〖${item.value}〗\n`;
         case 'MD.bold':
         case 'MD.italic':
         case 'MD.italicStar':
@@ -24,7 +24,7 @@ export const markdownToText = (items: DataMarkDown['value']): string => {
           return `${v.text}( ${v.url} )`;
         }
         case 'MD.image':
-          return '[图片]';
+          return hideUnsupported ? '' : '[图片]';
         case 'MD.list':
           return (
             item.value
@@ -40,7 +40,7 @@ export const markdownToText = (items: DataMarkDown['value']): string => {
         case 'MD.blockquote':
           return `> ${item.value}\n`;
         case 'MD.divider':
-          return '————————\n';
+          return hideUnsupported ? '' : '————————\n';
         case 'MD.newline':
           return '\n';
         case 'MD.code':
@@ -54,7 +54,7 @@ export const markdownToText = (items: DataMarkDown['value']): string => {
         case 'MD.content':
           return item.value;
         case 'MD.button':
-          return `[${item.value}]`;
+          return hideUnsupported ? String(item.value) : `[${item.value}]`;
         default:
           return String((item as any)?.value ?? '');
       }
@@ -73,11 +73,11 @@ export const buttonsToText = (rows: any[]): string => {
  * 将原始 Markdown 字符串转为可读纯文本
  * QQ Bot 不支持原始 Markdown 直接渲染，需要降级
  */
-export const markdownRawToText = (raw: string): string => {
+export const markdownRawToText = (raw: string, hideUnsupported?: boolean): string => {
   let text = raw;
 
-  // 图片 ![alt](url) → [图片]
-  text = text.replace(/!\[([^\]]*)\]\([^)]*\)/g, '[图片]');
+  // 图片 ![alt](url) → [图片] 或隐藏
+  text = text.replace(/!\[([^\]]*)\]\([^)]*\)/g, hideUnsupported ? '' : '[图片]');
   // 链接 [text](url) → text
   text = text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1');
   // 标题
@@ -100,7 +100,7 @@ export const markdownRawToText = (raw: string): string => {
   // 引用
   text = text.replace(/^>\s+/gm, '');
   // 分割线
-  text = text.replace(/^[-*_]{3,}\s*$/gm, '————————');
+  text = text.replace(/^[-*_]{3,}\s*$/gm, hideUnsupported ? '' : '————————');
   // 无序列表
   text = text.replace(/^[\s]*[-*+]\s+/gm, '· ');
   // 有序列表
@@ -117,19 +117,19 @@ export const markdownRawToText = (raw: string): string => {
  * qq-bot 内部扩展: ButtonTemplate, Ark.list, Ark.Card, Ark.BigCard
  * 其余类型降级为文本
  */
-export const dataEnumToText = (item: DataEnums): string => {
+export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean): string => {
   switch (item.type) {
     case 'MarkdownOriginal':
-      return markdownRawToText(String(item.value));
+      return markdownRawToText(String(item.value), hideUnsupported);
 
     case 'Attachment':
-      return `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
+      return hideUnsupported ? '' : `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
 
     case 'Audio':
-      return '[音频]';
+      return hideUnsupported ? '' : '[音频]';
 
     case 'Video':
-      return '[视频]';
+      return hideUnsupported ? '' : '[视频]';
 
     default:
       return '';

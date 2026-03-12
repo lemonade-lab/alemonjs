@@ -439,7 +439,8 @@ const main = () => {
         }
 
         // 降级处理：将 Markdown、Ark、Button、Link 等不支持的类型转为纯文本
-        const fallbackText = dataEnumToText(item);
+        const hide = getOneBotConfig().hideUnsupported === true;
+        const fallbackText = dataEnumToText(item, hide);
 
         if (fallbackText) {
           return {
@@ -469,9 +470,19 @@ const main = () => {
     }
     try {
       const message = await DataToMessage(val);
+      const effectiveMessage = message.filter(m => !(m.type === 'text' && !m.data?.text));
+
+      if (effectiveMessage.length <= 0) {
+        if (getOneBotConfig().hideUnsupported === true) {
+          logger.info('[onebot] hideUnsupported: 消息内容转换后为空，跳过发送');
+        }
+
+        return [];
+      }
+
       const res = await client.sendGroupMessage({
         group_id: ChannelId,
-        message: message
+        message: effectiveMessage
       });
 
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', res)];
@@ -492,9 +503,19 @@ const main = () => {
     }
     try {
       const message = await DataToMessage(val);
+      const effectiveMessage = message.filter(m => !(m.type === 'text' && !m.data?.text));
+
+      if (effectiveMessage.length <= 0) {
+        if (getOneBotConfig().hideUnsupported === true) {
+          logger.info('[onebot] hideUnsupported: 消息内容转换后为空，跳过发送');
+        }
+
+        return [];
+      }
+
       const res = await client.sendPrivateMessage({
         user_id: UserId,
-        message: message
+        message: effectiveMessage
       });
 
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', res)];

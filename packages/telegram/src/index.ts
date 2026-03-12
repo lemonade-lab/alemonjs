@@ -513,16 +513,23 @@ const main = () => {
             item.type !== 'ImageFile' &&
             item.type !== 'ImageURL'
         );
+        const hide = getTGConfig().hideUnsupported === true;
         const fallbackText = unsupportedItems
-          .map(item => dataEnumToText(item))
+          .map(item => dataEnumToText(item, hide))
           .filter(Boolean)
           .join('');
         const content = [nativeText, fallbackText].filter(Boolean).join('');
         const e = event?.value;
 
-        try {
-          const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
+        // hideUnsupported 模式：检查转换后内容是否为空
+        const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
+        if (hide && !content && images.length <= 0) {
+          logger.info('[telegram] hideUnsupported: 消息内容转换后为空，跳过发送');
 
+          return [];
+        }
+
+        try {
           if (images.length > 0) {
             let data = null;
 

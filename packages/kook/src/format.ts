@@ -4,7 +4,7 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
  * 将结构化 Markdown 子元素数组转为 KMarkdown 格式
  * KOOK 支持 KMarkdown，所以可以保留部分格式
  */
-export const markdownToKMarkdown = (items: DataMarkDown['value']): string => {
+export const markdownToKMarkdown = (items: DataMarkDown['value'], hideUnsupported?: boolean): string => {
   return items
     .map(item => {
       switch (item.type) {
@@ -27,7 +27,7 @@ export const markdownToKMarkdown = (items: DataMarkDown['value']): string => {
           return `[${v.text}](${v.url})`;
         }
         case 'MD.image':
-          return '[图片]';
+          return hideUnsupported ? '' : '[图片]';
         case 'MD.list':
           return (
             item.value
@@ -43,7 +43,7 @@ export const markdownToKMarkdown = (items: DataMarkDown['value']): string => {
         case 'MD.blockquote':
           return `> ${item.value}\n`;
         case 'MD.divider':
-          return '---\n';
+          return hideUnsupported ? '' : '---\n';
         case 'MD.newline':
           return '\n';
         case 'MD.code': {
@@ -60,7 +60,7 @@ export const markdownToKMarkdown = (items: DataMarkDown['value']): string => {
         case 'MD.content':
           return item.value;
         case 'MD.button':
-          return `[${item.value}]`;
+          return hideUnsupported ? String(item.value) : `[${item.value}]`;
         default:
           return String((item as any)?.value ?? '');
       }
@@ -72,12 +72,12 @@ export const markdownToKMarkdown = (items: DataMarkDown['value']): string => {
  * 将原始 Markdown 字符串转为 KMarkdown
  * KOOK 的 KMarkdown 与标准 Markdown 语法接近，大部分可直接透传
  */
-export const markdownRawToKMarkdown = (raw: string): string => {
+export const markdownRawToKMarkdown = (raw: string, hideUnsupported?: boolean): string => {
   // KMarkdown 基本兼容标准 Markdown，仅去除不支持的图片语法
   let text = raw;
 
-  // 图片 → 占位
-  text = text.replace(/!\[([^\]]*)\]\([^)]*\)/g, '[图片]');
+  // 图片 → 占位或隐藏
+  text = text.replace(/!\[([^\]]*)\]\([^)]*\)/g, hideUnsupported ? '' : '[图片]');
 
   return text;
 };
@@ -88,26 +88,26 @@ export const markdownRawToKMarkdown = (raw: string): string => {
  * kook 原生支持: Text, Mention, Link, Image, ImageFile, ImageURL
  * 其余类型（Markdown, MarkdownOriginal, Button, Ark 等）降级为 KMarkdown
  */
-export const dataEnumToKMarkdown = (item: DataEnums): string => {
+export const dataEnumToKMarkdown = (item: DataEnums, hideUnsupported?: boolean): string => {
   switch (item.type) {
     case 'Markdown':
-      return markdownToKMarkdown((item as any).value);
+      return markdownToKMarkdown((item as any).value, hideUnsupported);
 
     case 'MarkdownOriginal':
-      return markdownRawToKMarkdown(String(item.value));
+      return markdownRawToKMarkdown(String(item.value), hideUnsupported);
 
     case 'BT.group':
     case 'ButtonGroup':
-      return (item as any).value.map((row: any) => row.value.map((btn: any) => `[${btn.value}]`).join(' ')).join('\n');
+      return hideUnsupported ? '' : (item as any).value.map((row: any) => row.value.map((btn: any) => `[${btn.value}]`).join(' ')).join('\n');
 
     case 'Attachment':
-      return `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
+      return hideUnsupported ? '' : `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
 
     case 'Audio':
-      return '[音频]';
+      return hideUnsupported ? '' : '[音频]';
 
     case 'Video':
-      return '[视频]';
+      return hideUnsupported ? '' : '[视频]';
 
     default:
       return '';

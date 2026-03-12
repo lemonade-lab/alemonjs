@@ -239,9 +239,11 @@ const extractContent = (val: DataEnums[], mode: MentionMode): string => {
     })
     .join('');
   // 降级处理：将不被原生支持的类型转为文本
+  const config = getQQBotConfig();
+  const hide = config.hideUnsupported === true;
   const fallbackText = val
     .filter(item => !nativeTypes.has(item.type))
-    .map(item => dataEnumToText(item))
+    .map(item => dataEnumToText(item, hide))
     .filter(Boolean)
     .join('\n');
 
@@ -439,6 +441,13 @@ const sendOpenApiMessage = async (
     return [createResult(ResultCode.Ok, label, { id: res.id })];
   }
 
+  // hideUnsupported 模式：检查转换后内容是否为空
+  if (config.hideUnsupported === true && !content && !buildMdAndButtonsParams(val) && !buildArkParams(val)) {
+    logger.info('[qq-bot] hideUnsupported: 消息内容转换后为空，跳过发送');
+
+    return [];
+  }
+
   // markdownToText 模式：跳过原生 MD，全部降级为纯文本
   if (mdToText) {
     const textContent = flattenMdToText(content, val);
@@ -542,6 +551,13 @@ const sendGuildMessage = async (
     const res = await sendMessage({ content: imgContent, ...baseParams }, imageBuffer);
 
     return [createResult(ResultCode.Ok, label, { id: res?.id })];
+  }
+
+  // hideUnsupported 模式：检查转换后内容是否为空
+  if (config.hideUnsupported === true && !content && !buildMdAndButtonsParams(val) && !buildArkParams(val)) {
+    logger.info('[qq-bot] hideUnsupported: 消息内容转换后为空，跳过发送');
+
+    return [];
   }
 
   // markdownToText 模式：跳过原生 MD，全部降级为纯文本

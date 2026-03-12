@@ -2,6 +2,7 @@ import { createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { BubbleClient } from './sdk/wss';
 import { dataEnumToBubbleText } from './format';
+import { getBubbleConfig } from './config';
 
 type Client = typeof BubbleClient.prototype;
 
@@ -140,8 +141,9 @@ export const sendToRoom = async (
     // 降级处理：将不被原生支持的类型转为文本
     const nativeTypes = new Set(['Image', 'ImageURL', 'ImageFile', 'Markdown', 'BT.group', 'Mention', 'Text', 'Link']);
     const unsupportedItems = val.filter(item => !nativeTypes.has(item.type));
+    const hide = getBubbleConfig().hideUnsupported === true;
     const fallbackText = unsupportedItems
-      .map(item => dataEnumToBubbleText(item))
+      .map(item => dataEnumToBubbleText(item, hide))
       .filter(Boolean)
       .join('\n');
     // text
@@ -183,6 +185,13 @@ export const sendToRoom = async (
     const contentMd = buildBubbleMdContent(mdAndButtons);
     // 合并 Text、Markdown 和降级文本内容
     const finalContent = [content, contentMd, fallbackText].filter(Boolean).join('\n');
+
+    // hideUnsupported 模式：检查转换后内容是否为空
+    if (hide && !finalContent && images.length <= 0) {
+      logger.info('[bubble] hideUnsupported: 消息内容转换后为空，跳过发送');
+
+      return [];
+    }
 
     if (images.length > 0) {
       let bufferData = null;

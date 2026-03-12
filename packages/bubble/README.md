@@ -1,7 +1,5 @@
 # @alemonjs/bubble
 
-Bubble 平台适配器 for AlemonJS
-
 [文档 https://bubble.alemonjs.com/developer/docs](https://bubble.alemonjs.com/developer/docs)
 
 ## 安装
@@ -44,35 +42,10 @@ bubble:
 
   # 客户端名称（可选，默认: alemonjs-bot）
   clientName: 'alemonjs-bot'
+
+  # 隐藏不支持的消息类型（可选，默认: false）
+  # 开启后，转为文本时不可读内容（如 [视频]、[音频]、[图片]、[附件] 等占位符）将被置空
+  # 可读内容（如标题、按钮文本、链接等）仍会保留为纯文本
+  # 转换后内容为空时，将跳过发送并输出 info 日志
+  hideUnsupported: true
 ```
-
-## 功能特性
-
-- ✅ WebSocket Gateway 实时事件推送
-- ✅ 完整的 HTTP API 接口支持
-- ✅ 文件上传功能
-- ✅ 类型安全的 TypeScript 支持
-- ✅ 自动重连机制
-- ✅ 事件订阅管理
-
-## API 文档
-
-详细的 API 文档请参考：[https://bubble.alemonjs.com/developer/docs](https://bubble.alemonjs.com/developer/docs)
-
-## 支持的事件类型
-
-- `MESSAGE_CREATE` - 频道新消息创建
-- `MESSAGE_UPDATE` - 频道消息更新
-- `MESSAGE_DELETE` - 频道消息删除
-- `MESSAGE_UNPIN` - 频道消息取消置顶
-- `DM_MESSAGE_CREATE` - 私聊新消息创建
-- `DM_MESSAGE_UPDATE` - 私聊消息更新
-- `DM_MESSAGE_DELETE` - 私聊消息删除
-- `DM_MESSAGE_UNPIN` - 私聊消息取消置顶
-- `GUILD_MEMBER_ADD` - 成员加入服务器
-- `GUILD_MEMBER_UPDATE` - 成员更新
-- `GUILD_MEMBER_REMOVE` - 成员离开服务器
-- `BOT_READY` - 机器人就绪
-- `EVENTS_SUBSCRIBED` - 事件订阅成功
-- `EVENTS_UNSUBSCRIBED` - 事件取消订阅成功
-- `SUBSCRIBE_DENIED` - 订阅被拒绝

@@ -72,11 +72,11 @@ export const markdownToDiscordText = (items: DataMarkDown['value']): string => {
  * 将原始 Markdown 字符串转为 Discord 兼容文本
  * Discord 原生支持大部分标准 Markdown，仅去除不支持的图片语法
  */
-export const markdownRawToDiscordText = (raw: string): string => {
+export const markdownRawToDiscordText = (raw: string, hideUnsupported?: boolean): string => {
   let text = raw;
 
-  // Discord 不支持 ![alt](url) 内嵌图片，转为链接
-  text = text.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '[$1]($2)');
+  // Discord 不支持 ![alt](url) 内嵌图片，转为链接或隐藏
+  text = text.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, hideUnsupported ? '' : '[$1]($2)');
 
   return text;
 };
@@ -87,19 +87,19 @@ export const markdownRawToDiscordText = (raw: string): string => {
  * discord 原生支持: Text, Mention, Link, Image, ImageFile, ImageURL, Markdown, BT.group
  * 其余类型降级为文本
  */
-export const dataEnumToDiscordText = (item: DataEnums): string => {
+export const dataEnumToDiscordText = (item: DataEnums, hideUnsupported?: boolean): string => {
   switch (item.type) {
     case 'MarkdownOriginal':
-      return markdownRawToDiscordText(String(item.value));
+      return markdownRawToDiscordText(String(item.value), hideUnsupported);
 
     case 'Attachment':
-      return `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
+      return hideUnsupported ? '' : `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
 
     case 'Audio':
-      return '[音频]';
+      return hideUnsupported ? '' : '[音频]';
 
     case 'Video':
-      return '[视频]';
+      return hideUnsupported ? '' : '[视频]';
 
     default:
       return '';

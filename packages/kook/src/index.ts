@@ -521,10 +521,11 @@ const main = () => {
       .join('');
 
     // 降级处理：将 Markdown、Ark、Button 等不支持的类型转为 KMarkdown
+    const hide = getKOOKConfig().hideUnsupported === true;
     const fallbackText =
       unsupportedItems.length > 0
         ? unsupportedItems
-            .map(item => dataEnumToKMarkdown(item))
+            .map(item => dataEnumToKMarkdown(item, hide))
             .filter(Boolean)
             .join('')
         : '';
@@ -597,6 +598,13 @@ const main = () => {
     try {
       const imageUrl = await uploadAndGetImageUrl(val);
 
+      // hideUnsupported 模式：检查转换后内容是否为空
+      if (getKOOKConfig().hideUnsupported === true && !content && !imageUrl) {
+        logger.info('[kook] hideUnsupported: 消息内容转换后为空，跳过发送');
+
+        return [];
+      }
+
       if (imageUrl && content) {
         // 先发图片，再发文本
         const imgRes = await client.createMessage({
@@ -653,6 +661,13 @@ const main = () => {
 
     try {
       const imageUrl = await uploadAndGetImageUrl(val);
+
+      // hideUnsupported 模式：检查转换后内容是否为空
+      if (getKOOKConfig().hideUnsupported === true && !content && !imageUrl) {
+        logger.info('[kook] hideUnsupported: 消息内容转换后为空，跳过发送');
+
+        return [];
+      }
 
       if (imageUrl && content) {
         const imgRes = await client.createDirectMessage({

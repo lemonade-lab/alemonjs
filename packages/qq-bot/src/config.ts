@@ -17,6 +17,12 @@ export type Options = {
    * @default false
    */
   markdownToText?: boolean;
+  /**
+   * 隐藏不支持的消息类型
+   * 开启后，不被平台原生支持的消息类型将被直接丢弃（留空），而非降级为文本占位符
+   * @default false
+   */
+  hideUnsupported?: boolean;
 } & sdkOptions;
 
 export const getQQBotConfig = (): Options => {

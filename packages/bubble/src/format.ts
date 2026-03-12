@@ -77,7 +77,12 @@ export const markdownToBubbleText = (items: DataMarkDown['value']): string => {
  * 将原始 Markdown 字符串转为 Bubble 兼容文本
  * Bubble 支持 Markdown，大部分可直接透传
  */
-export const markdownRawToBubbleText = (raw: string): string => {
+export const markdownRawToBubbleText = (raw: string, hideUnsupported?: boolean): string => {
+  if (hideUnsupported) {
+    // 隐藏不可阅读信息：图片
+    return raw.replace(/!\[([^\]]*)\]\([^)]*\)/g, '');
+  }
+
   return raw;
 };
 
@@ -87,19 +92,19 @@ export const markdownRawToBubbleText = (raw: string): string => {
  * bubble 原生支持: Text, Mention, Link, Image, ImageFile, ImageURL, Markdown, BT.group
  * 其余类型降级为文本
  */
-export const dataEnumToBubbleText = (item: DataEnums): string => {
+export const dataEnumToBubbleText = (item: DataEnums, hideUnsupported?: boolean): string => {
   switch (item.type) {
     case 'MarkdownOriginal':
-      return markdownRawToBubbleText(String(item.value));
+      return markdownRawToBubbleText(String(item.value), hideUnsupported);
 
     case 'Attachment':
-      return `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
+      return hideUnsupported ? '' : `[附件${(item as any).options?.filename ? ': ' + (item as any).options.filename : ''}]`;
 
     case 'Audio':
-      return '[音频]';
+      return hideUnsupported ? '' : '[音频]';
 
     case 'Video':
-      return '[视频]';
+      return hideUnsupported ? '' : '[视频]';
 
     default:
       return '';
