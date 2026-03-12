@@ -8,7 +8,7 @@ import { DataEnums } from '../message';
  * return true → 继续执行下一个 handler
  * return void/false → 停止当前链
  */
-export type Current<T extends EventKeys> = (event: Events[T], next: Next) => boolean | Promise<boolean | undefined> | undefined;
+export type Current<T extends EventKeys> = (event: Events[T], next: Next) => Promise<boolean | void | undefined> | boolean | void | undefined;
 
 // 返回值类型
 export type OnResponseValue<C, T extends EventKeys> = {
