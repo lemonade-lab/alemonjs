@@ -19,10 +19,13 @@ export type Options = {
   markdownToText?: boolean;
   /**
    * 隐藏不支持的消息类型
-   * 开启后，不被平台原生支持的消息类型将被直接丢弃（留空），而非降级为文本占位符
+   * - true 或 1：一级隐藏，不可读占位符（[视频]、[音频]等）被置空，可读内容保留
+   * - 2：二级隐藏，按钮仅显示指令数据，链接仅显示 URL
+   * - 3：三级隐藏，按钮和链接的 data 也不保留，完全隐藏
+   * - 4：四级隐藏，不进行任何转换，直接丢弃
    * @default false
    */
-  hideUnsupported?: boolean;
+  hideUnsupported?: boolean | number;
 } & sdkOptions;
 
 export const getQQBotConfig = (): Options => {

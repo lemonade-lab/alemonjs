@@ -513,7 +513,7 @@ const main = () => {
             item.type !== 'ImageFile' &&
             item.type !== 'ImageURL'
         );
-        const hide = getTGConfig().hideUnsupported === true;
+        const hide = getTGConfig().hideUnsupported;
         const fallbackText = unsupportedItems
           .map(item => dataEnumToText(item, hide))
           .filter(Boolean)

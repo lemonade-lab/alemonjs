@@ -4,7 +4,9 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
  * 将结构化 Markdown 子元素数组转为 Telegram HTML 格式
  * Telegram 支持 HTML parse_mode，可以保留部分格式
  */
-export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsupported?: boolean): string => {
+export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsupported?: boolean | number): string => {
+  if (Number(hideUnsupported) >= 4) return '';
+
   return items
     .map(item => {
       switch (item.type) {
@@ -24,7 +26,9 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
         case 'MD.link': {
           const v = item.value as unknown as { text: string; url: string };
 
-          return `<a href="${v.url}">${v.text}</a>`;
+          if (Number(hideUnsupported) >= 3) return '';
+
+          return Number(hideUnsupported) >= 2 ? v.url : `<a href="${v.url}">${v.text}</a>`;
         }
         case 'MD.image':
           return hideUnsupported ? '' : '[图片]';
@@ -60,22 +64,30 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
         case 'MD.content':
           return item.value;
         case 'MD.button':
+          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 2) {
+            return (item as any).options?.data || String(item.value);
+          }
+
           return hideUnsupported ? String(item.value) : `[${item.value}]`;
         default:
           return String((item as any)?.value ?? '');
       }
     })
-    .join('');
+    .join('')
+    .trim();
 };
 
 /**
  * 将原始 Markdown 字符串转为纯文本
  */
-export const markdownRawToText = (raw: string, hideUnsupported?: boolean): string => {
+export const markdownRawToText = (raw: string, hideUnsupported?: boolean | number): string => {
+  if (Number(hideUnsupported) >= 4) return '';
+
   let text = raw;
 
   text = text.replace(/!\[([^\]]*)\]\([^)]*\)/g, hideUnsupported ? '' : '[图片]');
-  text = text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1');
+  text = text.replace(/\[([^\]]*)\]\(([^)]*)\)/g, Number(hideUnsupported) >= 2 ? '$2' : '$1');
   text = text.replace(/^#{1,6}\s+/gm, '');
   text = text.replace(/(\*{3}|_{3})([^*_]+)\1/g, '$2');
   text = text.replace(/(\*{2}|_{2})([^*_]+)\1/g, '$2');
@@ -100,7 +112,9 @@ export const markdownRawToText = (raw: string, hideUnsupported?: boolean): strin
  * telegram 原生支持: Text, Mention, Link, Image, ImageFile, ImageURL
  * 其余类型（Markdown, MarkdownOriginal, Button, Ark 等）降级
  */
-export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean): string => {
+export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean | number): string => {
+  if (Number(hideUnsupported) >= 4) return '';
+
   switch (item.type) {
     case 'Markdown':
       return markdownToTelegramText((item as any).value, hideUnsupported);

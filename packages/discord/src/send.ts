@@ -115,7 +115,7 @@ export const sendchannel = async (
     // 降级处理：将不被原生支持的类型转为文本
     const nativeTypes = new Set(['Image', 'ImageURL', 'ImageFile', 'BT.group', 'Markdown', 'Mention', 'Text', 'Link']);
     const unsupportedItems = val.filter(item => !nativeTypes.has(item.type));
-    const hide = getDiscordConfig().hideUnsupported === true;
+    const hide = getDiscordConfig().hideUnsupported;
     const fallbackText = unsupportedItems
       .map(item => dataEnumToDiscordText(item, hide))
       .filter(Boolean)

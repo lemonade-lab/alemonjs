@@ -240,7 +240,7 @@ const extractContent = (val: DataEnums[], mode: MentionMode): string => {
     .join('');
   // 降级处理：将不被原生支持的类型转为文本
   const config = getQQBotConfig();
-  const hide = config.hideUnsupported === true;
+  const hide = config.hideUnsupported;
   const fallbackText = val
     .filter(item => !nativeTypes.has(item.type))
     .map(item => dataEnumToText(item, hide))
@@ -554,7 +554,7 @@ const sendGuildMessage = async (
   }
 
   // hideUnsupported 模式：检查转换后内容是否为空
-  if (config.hideUnsupported === true && !content && !buildMdAndButtonsParams(val) && !buildArkParams(val)) {
+  if (config.hideUnsupported && !content && !buildMdAndButtonsParams(val) && !buildArkParams(val)) {
     logger.info('[qq-bot] hideUnsupported: 消息内容转换后为空，跳过发送');
 
     return [];

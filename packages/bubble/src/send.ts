@@ -141,7 +141,7 @@ export const sendToRoom = async (
     // 降级处理：将不被原生支持的类型转为文本
     const nativeTypes = new Set(['Image', 'ImageURL', 'ImageFile', 'Markdown', 'BT.group', 'Mention', 'Text', 'Link']);
     const unsupportedItems = val.filter(item => !nativeTypes.has(item.type));
-    const hide = getBubbleConfig().hideUnsupported === true;
+    const hide = getBubbleConfig().hideUnsupported;
     const fallbackText = unsupportedItems
       .map(item => dataEnumToBubbleText(item, hide))
       .filter(Boolean)

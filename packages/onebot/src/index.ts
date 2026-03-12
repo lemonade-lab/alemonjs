@@ -21,7 +21,7 @@ import { readFileSync } from 'fs';
 import { platform, getOneBotConfig, getMaster } from './config';
 import { OneBotClient } from './sdk/wss';
 import { BotMe } from './db';
-import { dataEnumToText } from './format';
+import { dataEnumToText, markdownToText } from './format';
 export { platform } from './config';
 export { OneBotAPI as API } from './sdk/api';
 export * from './hook';
@@ -334,75 +334,102 @@ const main = () => {
       }
     };
 
-    const message = await Promise.all(
-      val.map(async item => {
-        if (item.type === 'Text') {
-          return {
-            type: 'text',
-            data: {
-              text: item.value
+    const message = (
+      await Promise.all(
+        val.map(async item => {
+          if (item.type === 'Text') {
+            return {
+              type: 'text',
+              data: {
+                text: item.value
+              }
+            };
+          } else if (item.type === 'Mention') {
+            const options = item.options || {};
+
+            if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
+              return {
+                type: 'at',
+                data: {
+                  qq: 'all',
+                  nickname: ''
+                }
+              };
+            } else if (options.belong === 'user') {
+              return {
+                type: 'at',
+                data: {
+                  qq: item.value
+                }
+              };
             }
-          };
-        } else if (item.type === 'Mention') {
-          const options = item.options || {};
 
-          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
-            return {
-              type: 'at',
-              data: {
-                qq: 'all',
-                nickname: ''
-              }
-            };
-          } else if (options.belong === 'user') {
-            return {
-              type: 'at',
-              data: {
-                qq: item.value
-              }
-            };
-          }
+            return empty;
+          } else if (item.type === 'Image') {
+            // 可能是 Buffer、https://、http://、base64://
+            if (Buffer.isBuffer(item.value)) {
+              return {
+                type: 'image',
+                data: {
+                  file: `base64://${item.value.toString('base64')}`
+                }
+              };
+            }
+            if (typeof item.value === 'string' && (item.value.startsWith('http://') || item.value.startsWith('https://'))) {
+              const res = await getBufferByURL(item.value);
 
-          return empty;
-        } else if (item.type === 'Image') {
-          // 可能是 Buffer、https://、http://、base64://
-          if (Buffer.isBuffer(item.value)) {
-            return {
-              type: 'image',
-              data: {
-                file: `base64://${item.value.toString('base64')}`
-              }
-            };
-          }
-          if (typeof item.value === 'string' && (item.value.startsWith('http://') || item.value.startsWith('https://'))) {
-            const res = await getBufferByURL(item.value);
+              return {
+                type: 'image',
+                data: {
+                  file: `base64://${res.toString('base64')}`
+                }
+              };
+            } else if (item.value.startsWith('base64://')) {
+              const base64Str = item.value.replace('base64://', '');
 
-            return {
-              type: 'image',
-              data: {
-                file: `base64://${res.toString('base64')}`
-              }
-            };
-          } else if (item.value.startsWith('base64://')) {
-            const base64Str = item.value.replace('base64://', '');
+              return {
+                type: 'image',
+                data: {
+                  file: `base64://${base64Str}`
+                }
+              };
+            } else if (item.value.startsWith('buffer://')) {
+              const base64Str = item.value.replace('buffer://', '');
 
-            return {
-              type: 'image',
-              data: {
-                file: `base64://${base64Str}`
-              }
-            };
-          } else if (item.value.startsWith('buffer://')) {
-            const base64Str = item.value.replace('buffer://', '');
+              return {
+                type: 'image',
+                data: {
+                  file: `base64://${base64Str}`
+                }
+              };
+            } else if (item.value.startsWith('file://')) {
+              const db = readFileSync(item.value.slice(7)); // 剥离 file:// 前缀
+
+              return {
+                type: 'image',
+                data: {
+                  file: `base64://${db.toString('base64')}`
+                }
+              };
+            }
 
             return {
               type: 'image',
               data: {
-                file: `base64://${base64Str}`
+                file: `base64://${item.value}`
               }
             };
-          } else if (item.value.startsWith('file://')) {
-            const db = readFileSync(item.value.slice(7)); // 剥离 file:// 前缀
+          } else if (item.type === 'ImageFile') {
+            const db = readFileSync(item.value);
+
+            return {
+              type: 'image',
+              data: {
+                file: `base64://${db.toString('base64')}`
+              }
+            };
+          } else if (item.type === 'ImageURL') {
+            const db = await getBufferByURL(item.value);
 
             return {
               type: 'image',
@@ -412,48 +439,54 @@ const main = () => {
             };
           }
 
-          return {
-            type: 'image',
-            data: {
-              file: `base64://${item.value}`
+          // 降级处理：将 Markdown、Ark、Button、Link 等不支持的类型转为纯文本
+          const hide = getOneBotConfig().hideUnsupported;
+
+          // Level 2: Markdown 中的 MD.mention 转为原生 at 段
+          if (Number(hide) >= 2 && item.type === 'Markdown' && typeof (item as any).value !== 'string') {
+            const mdItems = (item as any).value;
+            const segments: any[] = [];
+            let currentText = '';
+
+            for (const mdItem of mdItems) {
+              if (mdItem.type === 'MD.mention') {
+                if (currentText) {
+                  segments.push({ type: 'text', data: { text: currentText } });
+                  currentText = '';
+                }
+
+                if (mdItem.value === 'everyone') {
+                  segments.push({ type: 'at', data: { qq: 'all', nickname: '' } });
+                } else if (mdItem.value) {
+                  segments.push({ type: 'at', data: { qq: String(mdItem.value) } });
+                }
+              } else {
+                currentText += markdownToText([mdItem], hide);
+              }
             }
-          };
-        } else if (item.type === 'ImageFile') {
-          const db = readFileSync(item.value);
 
-          return {
-            type: 'image',
-            data: {
-              file: `base64://${db.toString('base64')}`
+            if (currentText) {
+              segments.push({ type: 'text', data: { text: currentText } });
             }
-          };
-        } else if (item.type === 'ImageURL') {
-          const db = await getBufferByURL(item.value);
 
-          return {
-            type: 'image',
-            data: {
-              file: `base64://${db.toString('base64')}`
-            }
-          };
-        }
+            return segments.length > 0 ? segments : [empty];
+          }
 
-        // 降级处理：将 Markdown、Ark、Button、Link 等不支持的类型转为纯文本
-        const hide = getOneBotConfig().hideUnsupported === true;
-        const fallbackText = dataEnumToText(item, hide);
+          const fallbackText = dataEnumToText(item, hide);
 
-        if (fallbackText) {
-          return {
-            type: 'text',
-            data: {
-              text: fallbackText
-            }
-          };
-        }
+          if (fallbackText) {
+            return {
+              type: 'text',
+              data: {
+                text: fallbackText
+              }
+            };
+          }
 
-        return empty;
-      })
-    );
+          return empty;
+        })
+      )
+    ).flat();
 
     return message;
   };
@@ -473,7 +506,7 @@ const main = () => {
       const effectiveMessage = message.filter(m => !(m.type === 'text' && !m.data?.text));
 
       if (effectiveMessage.length <= 0) {
-        if (getOneBotConfig().hideUnsupported === true) {
+        if (getOneBotConfig().hideUnsupported) {
           logger.info('[onebot] hideUnsupported: 消息内容转换后为空，跳过发送');
         }
 
@@ -506,7 +539,7 @@ const main = () => {
       const effectiveMessage = message.filter(m => !(m.type === 'text' && !m.data?.text));
 
       if (effectiveMessage.length <= 0) {
-        if (getOneBotConfig().hideUnsupported === true) {
+        if (getOneBotConfig().hideUnsupported) {
           logger.info('[onebot] hideUnsupported: 消息内容转换后为空，跳过发送');
         }
 

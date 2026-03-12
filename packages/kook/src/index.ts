@@ -521,7 +521,7 @@ const main = () => {
       .join('');
 
     // 降级处理：将 Markdown、Ark、Button 等不支持的类型转为 KMarkdown
-    const hide = getKOOKConfig().hideUnsupported === true;
+    const hide = getKOOKConfig().hideUnsupported;
     const fallbackText =
       unsupportedItems.length > 0
         ? unsupportedItems
@@ -599,7 +599,7 @@ const main = () => {
       const imageUrl = await uploadAndGetImageUrl(val);
 
       // hideUnsupported 模式：检查转换后内容是否为空
-      if (getKOOKConfig().hideUnsupported === true && !content && !imageUrl) {
+      if (getKOOKConfig().hideUnsupported && !content && !imageUrl) {
         logger.info('[kook] hideUnsupported: 消息内容转换后为空，跳过发送');
 
         return [];
@@ -663,7 +663,7 @@ const main = () => {
       const imageUrl = await uploadAndGetImageUrl(val);
 
       // hideUnsupported 模式：检查转换后内容是否为空
-      if (getKOOKConfig().hideUnsupported === true && !content && !imageUrl) {
+      if (getKOOKConfig().hideUnsupported && !content && !imageUrl) {
         logger.info('[kook] hideUnsupported: 消息内容转换后为空，跳过发送');
 
         return [];

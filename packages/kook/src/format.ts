@@ -4,7 +4,9 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
  * 将结构化 Markdown 子元素数组转为 KMarkdown 格式
  * KOOK 支持 KMarkdown，所以可以保留部分格式
  */
-export const markdownToKMarkdown = (items: DataMarkDown['value'], hideUnsupported?: boolean): string => {
+export const markdownToKMarkdown = (items: DataMarkDown['value'], hideUnsupported?: boolean | number): string => {
+  if (Number(hideUnsupported) >= 4) return '';
+
   return items
     .map(item => {
       switch (item.type) {
@@ -24,7 +26,9 @@ export const markdownToKMarkdown = (items: DataMarkDown['value'], hideUnsupporte
         case 'MD.link': {
           const v = item.value as unknown as { text: string; url: string };
 
-          return `[${v.text}](${v.url})`;
+          if (Number(hideUnsupported) >= 3) return '';
+
+          return Number(hideUnsupported) >= 2 ? v.url : `[${v.text}](${v.url})`;
         }
         case 'MD.image':
           return hideUnsupported ? '' : '[图片]';
@@ -60,19 +64,27 @@ export const markdownToKMarkdown = (items: DataMarkDown['value'], hideUnsupporte
         case 'MD.content':
           return item.value;
         case 'MD.button':
+          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 2) {
+            return (item as any).options?.data || String(item.value);
+          }
+
           return hideUnsupported ? String(item.value) : `[${item.value}]`;
         default:
           return String((item as any)?.value ?? '');
       }
     })
-    .join('');
+    .join('')
+    .trim();
 };
 
 /**
  * 将原始 Markdown 字符串转为 KMarkdown
  * KOOK 的 KMarkdown 与标准 Markdown 语法接近，大部分可直接透传
  */
-export const markdownRawToKMarkdown = (raw: string, hideUnsupported?: boolean): string => {
+export const markdownRawToKMarkdown = (raw: string, hideUnsupported?: boolean | number): string => {
+  if (Number(hideUnsupported) >= 4) return '';
+
   // KMarkdown 基本兼容标准 Markdown，仅去除不支持的图片语法
   let text = raw;
 
@@ -88,7 +100,9 @@ export const markdownRawToKMarkdown = (raw: string, hideUnsupported?: boolean): 
  * kook 原生支持: Text, Mention, Link, Image, ImageFile, ImageURL
  * 其余类型（Markdown, MarkdownOriginal, Button, Ark 等）降级为 KMarkdown
  */
-export const dataEnumToKMarkdown = (item: DataEnums, hideUnsupported?: boolean): string => {
+export const dataEnumToKMarkdown = (item: DataEnums, hideUnsupported?: boolean | number): string => {
+  if (Number(hideUnsupported) >= 4) return '';
+
   switch (item.type) {
     case 'Markdown':
       return markdownToKMarkdown((item as any).value, hideUnsupported);
