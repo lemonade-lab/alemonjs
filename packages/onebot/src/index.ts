@@ -466,19 +466,24 @@ const main = () => {
             }
 
             if (currentText) {
-              segments.push({ type: 'text', data: { text: currentText } });
+              const trimmedText = currentText.replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
+
+              if (trimmedText) {
+                segments.push({ type: 'text', data: { text: trimmedText } });
+              }
             }
 
             return segments.length > 0 ? segments : [empty];
           }
 
           const fallbackText = dataEnumToText(item, hide);
+          const trimmedFallback = fallbackText?.replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
 
-          if (fallbackText) {
+          if (trimmedFallback) {
             return {
               type: 'text',
               data: {
-                text: fallbackText
+                text: trimmedFallback
               }
             };
           }

@@ -530,7 +530,10 @@ const main = () => {
             .join('')
         : '';
 
-    return [nativeText, fallbackText].filter(Boolean).join('');
+    return [nativeText, fallbackText]
+      .filter(Boolean)
+      .join('')
+      .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
   };
 
   /**

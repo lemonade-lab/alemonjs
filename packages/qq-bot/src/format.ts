@@ -68,8 +68,7 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
           return String((item as any)?.value ?? '');
       }
     })
-    .join('')
-    .trim();
+    .join('');
 };
 
 /**
@@ -118,7 +117,7 @@ export const markdownRawToText = (raw: string, hideUnsupported?: boolean | numbe
   // 有序列表
   text = text.replace(/^[\s]*(\d+)\.\s+/gm, '$1. ');
 
-  return text.trim();
+  return text;
 };
 
 /**

@@ -74,8 +74,7 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
           return String((item as any)?.value ?? '');
       }
     })
-    .join('')
-    .trim();
+    .join('');
 };
 
 /**
@@ -103,7 +102,7 @@ export const markdownRawToText = (raw: string, hideUnsupported?: boolean | numbe
   text = text.replace(/^[\s]*[-*+]\s+/gm, '· ');
   text = text.replace(/^[\s]*(\d+)\.\s+/gm, '$1. ');
 
-  return text.trim();
+  return text;
 };
 
 /**

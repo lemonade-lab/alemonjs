@@ -74,8 +74,7 @@ export const markdownToKMarkdown = (items: DataMarkDown['value'], hideUnsupporte
           return String((item as any)?.value ?? '');
       }
     })
-    .join('')
-    .trim();
+    .join('');
 };
 
 /**

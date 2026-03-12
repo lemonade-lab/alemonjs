@@ -518,7 +518,10 @@ const main = () => {
           .map(item => dataEnumToText(item, hide))
           .filter(Boolean)
           .join('');
-        const content = [nativeText, fallbackText].filter(Boolean).join('');
+        const content = [nativeText, fallbackText]
+          .filter(Boolean)
+          .join('')
+          .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
         const e = event?.value;
 
         // hideUnsupported 模式：检查转换后内容是否为空

@@ -74,8 +74,7 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
           return String((item as any)?.value ?? '');
       }
     })
-    .join('')
-    .trim();
+    .join('');
 };
 
 /**

@@ -184,7 +184,10 @@ export const sendToRoom = async (
     // Markdown/ButtonGroup → Bubble 原生格式，与 Text 合并
     const contentMd = buildBubbleMdContent(mdAndButtons);
     // 合并 Text、Markdown 和降级文本内容
-    const finalContent = [content, contentMd, fallbackText].filter(Boolean).join('\n');
+    const finalContent = [content, contentMd, fallbackText]
+      .filter(Boolean)
+      .join('\n')
+      .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
 
     // hideUnsupported 模式：检查转换后内容是否为空
     if (hide && !finalContent && images.length <= 0) {

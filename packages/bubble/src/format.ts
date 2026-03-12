@@ -81,8 +81,7 @@ export const markdownToBubbleText = (items: DataMarkDown['value'], hideUnsupport
           return String((item as any)?.value ?? '');
       }
     })
-    .join('')
-    .trim();
+    .join('');
 };
 
 /**

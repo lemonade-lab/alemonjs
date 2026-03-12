@@ -405,7 +405,10 @@ const flattenMdToText = (content: string, val: DataEnums[]): string => {
     }
   }
 
-  return parts.filter(Boolean).join('\n');
+  return parts
+    .filter(Boolean)
+    .join('\n')
+    .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
 };
 
 /** Open API 通用发送逻辑（群组 / C2C） */
