@@ -16,6 +16,9 @@ import { SubscribeStatus } from './config';
  */
 export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next, choose: EventCycleEnum) => {
   const subListValue = getSubscribeList(choose, select);
+
+  subListValue.resetCursor();
+
   /**
    * 观察者下一步
    * @returns

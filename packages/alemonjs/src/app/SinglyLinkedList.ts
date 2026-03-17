@@ -89,6 +89,11 @@ export class SinglyLinkedList<T> {
     return this.size;
   }
 
+  // 重置游标到起点，使 popNext() 下次从 head 开始
+  resetCursor(): void {
+    this.current = null;
+  }
+
   // 遍历链表（不改变 current 游标）—— 回调返回 true 时提前终止
   forEach(callback: (node: ListNode<T>) => boolean | undefined): void {
     let node = this.head;
