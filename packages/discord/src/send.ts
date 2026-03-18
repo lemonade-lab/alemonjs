@@ -33,6 +33,57 @@ const createButtonsData = (rows: DataButtonRow[]) => {
   });
 };
 
+const mapToMarkdown = {
+  'MD.text': (item: { value: string }) => item.value,
+  'MD.blockquote': (item: { value: string }) => `> ${item.value}\n`,
+  'MD.bold': (item: { value: string }) => `**${item.value}**`,
+  'MD.italic': (item: { value: string }) => `*${item.value}*`,
+  'MD.divider': () => '---\n',
+  'MD.image': (item: { value: string }) => `![${item.value}](${item.value})`,
+  'MD.italicStar': (item: { value: string }) => `*${item.value}*`,
+  'MD.link': (item: { value: { text: string; url: string } }) => `[${item.value.text}](${item.value.url})`,
+  'MD.newline': () => '\n',
+  'MD.strikethrough': (item: { value: string }) => `~~${item.value}~~`,
+  'MD.subtitle': (item: { value: string }) => `## ${item.value}\n`,
+  'MD.title': (item: { value: string }) => `# ${item.value}\n`,
+  'MD.code': (item: { value: string; options?: { language?: string } }) => `\`\`\`${item.options?.language ?? ''}\n${item.value}\n\`\`\`\n`,
+  'MD.list': (item: { value: any }) => {
+    const listStr = item.value.map(listItem => {
+      if (typeof listItem.value === 'object') {
+        return `\n${listItem.value.index}. ${listItem.value.text}`;
+      }
+
+      return `\n- ${listItem.value}`;
+    });
+
+    return `${listStr.join('')}\n`;
+  },
+  'MD.mention': (item: { value: string; options?: { belong?: string } }) => {
+    const { value, options } = item;
+
+    if (value === 'everyone' || value === 'all' || value === '' || typeof value !== 'string') {
+      return '<@everyone>';
+    }
+    if (options?.belong === 'user') {
+      return `<@${value}>`;
+    } else if (options?.belong === 'channel') {
+      return `<#${value}>`;
+    }
+
+    return '';
+  },
+  'MD.content': (item: { value: string }) => item.value,
+  'MD.button': (item: { value: string; options: { data: string } }) => {
+    // const { value, options } = item || {};
+    // const { data } = options || {};
+
+    // return `[${value}](${data})`;
+    const { value } = item || {};
+
+    return value;
+  }
+};
+
 /** 将结构化 Markdown 转为 Discord 原生 Markdown 文本 */
 const buildDiscordMdContent = (mds: DataEnums[]): string => {
   let contentMd = '';
@@ -43,48 +94,8 @@ const buildDiscordMdContent = (mds: DataEnums[]): string => {
         const md = item.value;
 
         md.forEach(line => {
-          if (line.type === 'MD.text') {
-            contentMd += line.value;
-          } else if (line.type === 'MD.blockquote') {
-            contentMd += `> ${line.value}\n`;
-          } else if (line.type === 'MD.bold') {
-            contentMd += `**${line.value}**`;
-          } else if (line.type === 'MD.italic') {
-            contentMd += `*${line.value}*`;
-          } else if (line.type === 'MD.divider') {
-            contentMd += '---\n';
-          } else if (line.type === 'MD.image') {
-            contentMd += `![${line.value}](${line.value})`;
-          } else if (line.type === 'MD.italicStar') {
-            contentMd += `*${line.value}*`;
-          } else if (line.type === 'MD.link') {
-            contentMd += `[${line.value.text}](${line.value.url})`;
-          } else if (line.type === 'MD.list') {
-            const listStr = line.value.map(listItem => {
-              if (typeof listItem.value === 'object') {
-                return `\n${listItem.value.index}. ${listItem.value.text}`;
-              }
-
-              return `\n- ${listItem.value}`;
-            });
-
-            contentMd += `${listStr.join('')}\n`;
-          } else if (line.type === 'MD.newline') {
-            contentMd += '\n';
-          } else if (line.type === 'MD.strikethrough') {
-            contentMd += `~~${line.value}~~`;
-          } else if (line.type === 'MD.subtitle') {
-            contentMd += `## ${line.value}\n`;
-          } else if (line.type === 'MD.title') {
-            contentMd += `# ${line.value}\n`;
-          } else if (line.type === 'MD.code') {
-            const language = line?.options?.language || '';
-
-            contentMd += `\`\`\`${language}\n${line.value}\n\`\`\`\n`;
-          } else {
-            const value = line['value'] || '';
-
-            contentMd += String(value);
+          if (mapToMarkdown[line.type]) {
+            contentMd += mapToMarkdown[line.type](line as any);
           }
         });
       }
