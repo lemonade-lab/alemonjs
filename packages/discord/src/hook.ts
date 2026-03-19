@@ -25,7 +25,7 @@ type MAP = {
 };
 
 /**
- *
+ * @deprecated 框架已支持useClient，平台的废弃
  * @param event
  * @returns
  */
@@ -37,6 +37,7 @@ export const useValue = <T extends EventKeys>(event: Events[T]) => {
 
 /**
  *
+ * @deprecated 框架已支持useClient，平台的废弃
  * @param event
  * @returns
  */

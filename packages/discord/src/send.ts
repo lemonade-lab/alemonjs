@@ -1,252 +1,179 @@
 import { DataButtonRow, createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { DCClient } from './sdk/wss';
-import { dataEnumToDiscordText } from './format';
+import { markdownToDiscordText, markdownRawToDiscordText, dataEnumToDiscordText } from './format';
 import { getDiscordConfig } from './config';
 
 type Client = typeof DCClient.prototype;
 
-const ImageURLToBuffer = async (url: string) => {
+const fetchImageBuffer = async (url: string) => {
   const arrayBuffer = await fetch(url).then(res => res.arrayBuffer());
 
   return Buffer.from(arrayBuffer);
 };
 
-const createButtonsData = (rows: DataButtonRow[]) => {
-  return rows.map(row => {
-    const val = row.value;
+const createButtonsData = (rows: DataButtonRow[]) =>
+  rows.map(row => ({
+    type: 1,
+    components: row.value.map(button => ({
+      type: 2,
+      custom_id: button.options?.data ?? '',
+      style: 1,
+      label: button.value
+    }))
+  }));
 
-    return {
-      type: 1,
-      components: val.map(button => {
-        const value = button.value;
-        const text = button.options?.data ?? '';
+/** 解析图片数据为 Buffer */
+const resolveImageBuffer = async (item: DataEnums): Promise<Buffer | null> => {
+  if (item.type === 'Image') {
+    if (Buffer.isBuffer(item.value)) {
+      return item.value;
+    }
+    if (typeof item.value !== 'string') {
+      return null;
+    }
+    if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+      return await fetchImageBuffer(item.value);
+    }
+    if (item.value.startsWith('base64://')) {
+      return Buffer.from(item.value.slice(9), 'base64');
+    }
+    if (item.value.startsWith('file://')) {
+      return readFileSync(item.value.slice(7));
+    }
 
-        return {
-          type: 2,
-          custom_id: text,
-          style: 1,
-          label: value
-        };
-      })
-    };
-  });
+    return Buffer.from(item.value, 'base64');
+  }
+  if (item.type === 'ImageURL') {
+    return await fetchImageBuffer(item.value);
+  }
+  if (item.type === 'ImageFile') {
+    return readFileSync(item.value);
+  }
+
+  return null;
 };
 
-const mapToMarkdown = {
-  'MD.text': (item: { value: string }) => item.value,
-  'MD.blockquote': (item: { value: string }) => `> ${item.value}\n`,
-  'MD.bold': (item: { value: string }) => `**${item.value}**`,
-  'MD.italic': (item: { value: string }) => `*${item.value}*`,
-  'MD.divider': () => '---\n',
-  'MD.image': (item: { value: string }) => `![${item.value}](${item.value})`,
-  'MD.italicStar': (item: { value: string }) => `*${item.value}*`,
-  'MD.link': (item: { value: { text: string; url: string } }) => `[${item.value.text}](${item.value.url})`,
-  'MD.newline': () => '\n',
-  'MD.strikethrough': (item: { value: string }) => `~~${item.value}~~`,
-  'MD.subtitle': (item: { value: string }) => `## ${item.value}\n`,
-  'MD.title': (item: { value: string }) => `# ${item.value}\n`,
-  'MD.code': (item: { value: string; options?: { language?: string } }) => `\`\`\`${item.options?.language ?? ''}\n${item.value}\n\`\`\`\n`,
-  'MD.list': (item: { value: any }) => {
-    const listStr = item.value.map(listItem => {
-      if (typeof listItem.value === 'object') {
-        return `\n${listItem.value.index}. ${listItem.value.text}`;
-      }
-
-      return `\n- ${listItem.value}`;
-    });
-
-    return `${listStr.join('')}\n`;
-  },
-  'MD.mention': (item: { value: string; options?: { belong?: string } }) => {
-    const { value, options } = item;
-
-    if (value === 'everyone' || value === 'all' || value === '' || typeof value !== 'string') {
+/** 将 Text / Mention / Link 项转为 Discord 文本 */
+const formatTextItem = (item: DataEnums): string => {
+  if (item.type === 'Link') {
+    return `[${item.value}](${item?.options?.link ?? item.value})`;
+  }
+  if (item.type === 'Mention') {
+    if (item.options?.belong === 'everyone' || item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
       return '<@everyone>';
     }
-    if (options?.belong === 'user') {
-      return `<@${value}>`;
-    } else if (options?.belong === 'channel') {
-      return `<#${value}>`;
+    if (item.options?.belong === 'user') {
+      return `<@${item.value}>`;
+    }
+    if (item.options?.belong === 'channel') {
+      return `<#${item.value}>`;
     }
 
     return '';
-  },
-  'MD.content': (item: { value: string }) => item.value,
-  'MD.button': (item: { value: string; options: { data: string } }) => {
-    // const { value, options } = item || {};
-    // const { data } = options || {};
-
-    // return `[${value}](${data})`;
-    const { value } = item || {};
-
-    return value;
   }
-};
+  if (item.type === 'Text') {
+    const wrapMap: Record<string, string> = { block: '`', italic: '*', bold: '**', boldItalic: '***', strikethrough: '~~' };
+    const wrap = wrapMap[item.options?.style];
 
-/** 将结构化 Markdown 转为 Discord 原生 Markdown 文本 */
-const buildDiscordMdContent = (mds: DataEnums[]): string => {
-  let contentMd = '';
-
-  if (mds && mds.length > 0) {
-    mds.forEach(item => {
-      if (item.type === 'Markdown') {
-        const md = item.value;
-
-        md.forEach(line => {
-          if (mapToMarkdown[line.type]) {
-            contentMd += mapToMarkdown[line.type](line as any);
-          }
-        });
-      }
-    });
+    return wrap ? `${wrap}${item.value}${wrap}` : item.value;
   }
 
-  return contentMd;
+  return '';
 };
 
-export const sendchannel = async (
-  client: Client,
-  param: {
-    channel_id: string;
-  },
-  val: DataEnums[]
-) => {
+export const sendchannel = async (client: Client, param: { channel_id: string }, val: DataEnums[]) => {
   try {
     if (!val || val.length <= 0) {
       return [];
     }
+
     const channelId = param?.channel_id ?? '';
-    // images
-    const images = val.filter(item => item.type === 'Image' || item.type === 'ImageURL' || item.type === 'ImageFile');
-    // buttons
-    const buttons = val.filter(item => item.type === 'BT.group');
-    // markdown
-    const mds = val.filter(item => item.type === 'Markdown');
-    // 降级处理：将不被原生支持的类型转为文本
-    const nativeTypes = new Set(['Image', 'ImageURL', 'ImageFile', 'BT.group', 'Markdown', 'Mention', 'Text', 'Link']);
-    const unsupportedItems = val.filter(item => !nativeTypes.has(item.type));
     const hide = getDiscordConfig().hideUnsupported;
-    const fallbackText = unsupportedItems
-      .map(item => dataEnumToDiscordText(item, hide))
-      .filter(Boolean)
-      .join('\n');
-    // text
-    const content = val
-      .filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link')
-      .map(item => {
-        if (item.type === 'Link') {
-          return `[${item.value}](${item?.options?.link ?? item.value})`;
-        } else if (item.type === 'Mention') {
-          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
-            return '<@everyone>';
-          }
-          if (item.options?.belong === 'user') {
-            return `<@${item.value}>`;
-          } else if (item.options?.belong === 'channel') {
-            return `<#${item.value}>`;
-          }
 
-          return '';
-        } else if (item.type === 'Text') {
-          if (item.options?.style === 'block') {
-            return `\`${item.value}\``;
-          } else if (item.options?.style === 'italic') {
-            return `*${item.value}*`;
-          } else if (item.options?.style === 'bold') {
-            return `**${item.value}**`;
-          } else if (item.options?.style === 'strikethrough') {
-            return `~~${item.value}~~`;
-          }
+    // 单次遍历分类
+    const images: DataEnums[] = [];
+    const buttons: DataEnums[] = [];
+    const textParts: string[] = [];
+    const mdParts: string[] = [];
+    const fallbackParts: string[] = [];
 
-          return item.value;
+    for (const item of val) {
+      switch (item.type) {
+        case 'Image':
+        case 'ImageURL':
+        case 'ImageFile':
+          images.push(item);
+          break;
+        case 'BT.group':
+        case 'ButtonGroup':
+          buttons.push(item);
+          break;
+        case 'Markdown':
+          mdParts.push(markdownToDiscordText(item.value as any, hide));
+          break;
+        case 'MarkdownOriginal':
+          mdParts.push(markdownRawToDiscordText(String(item.value), hide));
+          break;
+        case 'Mention':
+        case 'Text':
+        case 'Link':
+          textParts.push(formatTextItem(item));
+          break;
+        default: {
+          const t = dataEnumToDiscordText(item, hide);
+
+          if (t) {
+            fallbackParts.push(t);
+          }
         }
-      })
-      .join('');
+      }
+    }
 
-    // Markdown → Discord 原生格式，与 Text 合并
-    const contentMd = buildDiscordMdContent(mds);
-    // 合并 Text、Markdown 和降级文本内容
-    const finalContent = [content, contentMd, fallbackText]
+    const finalContent = [textParts.join(''), mdParts.join(''), fallbackParts.join('\n')]
       .filter(Boolean)
       .join('\n')
       .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
 
-    // hideUnsupported 模式：检查转换后内容是否为空
     if (hide && !finalContent && images.length <= 0 && buttons.length <= 0) {
       logger.info('[discord] hideUnsupported: 消息内容转换后为空，跳过发送');
 
       return [];
     }
 
+    // 发送图片
     if (images.length > 0) {
-      let bufferData = null;
+      let bufferData: Buffer | null = null;
 
-      for (let i = 0; i < images.length; i++) {
+      for (const img of images) {
+        bufferData = await resolveImageBuffer(img);
         if (bufferData) {
           break;
         }
-        const item = images[i];
-
-        if (item.type === 'Image') {
-          if (Buffer.isBuffer(item.value)) {
-            bufferData = item.value;
-          } else if (typeof item.value === 'string') {
-            if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
-              bufferData = await ImageURLToBuffer(item.value);
-            } else if (item.value.startsWith('base64://')) {
-              bufferData = Buffer.from(item.value.slice(9), 'base64');
-            } else if (item.value.startsWith('file://')) {
-              bufferData = readFileSync(item.value.slice(7));
-            } else {
-              bufferData = Buffer.from(item.value, 'base64');
-            }
-          }
-        } else if (item.type === 'ImageURL') {
-          const res = await ImageURLToBuffer(item.value);
-
-          bufferData = res;
-        } else if (item.type === 'ImageFile') {
-          bufferData = readFileSync(item.value);
-        }
       }
-      const res = await client.channelsMessagesForm(
-        channelId,
-        {
-          content: finalContent
-        },
-        bufferData
-      );
+      const res = await client.channelsMessagesForm(channelId, { content: finalContent }, bufferData);
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }
 
-    if (buttons && buttons.length > 0) {
+    // 发送按钮
+    if (buttons.length > 0) {
       let components = null;
 
-      buttons.forEach(item => {
-        if (components) {
-          return;
+      for (const item of buttons) {
+        if (typeof item.value !== 'string') {
+          components = createButtonsData(item.value as DataButtonRow[]);
+          break;
         }
-        const rows = item.value;
-
-        if (typeof rows === 'string') {
-          return;
-        }
-        // 构造成按钮
-        components = createButtonsData(rows as DataButtonRow[]);
-      });
-      const res = await client.channelsMessages(channelId, {
-        content: finalContent,
-        components: components
-      });
+      }
+      const res = await client.channelsMessages(channelId, { content: finalContent, components });
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }
+
+    // 发送纯文本
     if (finalContent) {
-      const res = await client.channelsMessagesForm(channelId, {
-        content: finalContent
-      });
+      const res = await client.channelsMessagesForm(channelId, { content: finalContent });
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }
@@ -257,14 +184,7 @@ export const sendchannel = async (
   }
 };
 
-export const senduser = async (
-  client: Client,
-  param: {
-    author_id?: string;
-    channel_id?: string;
-  },
-  val: DataEnums[]
-) => {
+export const senduser = async (client: Client, param: { author_id?: string; channel_id?: string }, val: DataEnums[]) => {
   if (!val || val.length <= 0) {
     return [];
   }

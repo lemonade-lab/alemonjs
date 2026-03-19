@@ -5,7 +5,9 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
  * Discord 原生支持 Markdown, 可直接保留格式
  */
 export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   return items
     .map(item => {
@@ -26,7 +28,9 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
         case 'MD.link': {
           const v = item.value as unknown as { text: string; url: string };
 
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
 
           return Number(hideUnsupported) >= 2 ? v.url : `[${v.text}](${v.url})`;
         }
@@ -64,12 +68,14 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
         case 'MD.content':
           return item.value;
         case 'MD.button':
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
           if (Number(hideUnsupported) >= 2) {
             return (item as any).options?.data || String(item.value);
           }
 
-          return `[${item.value}]`;
+          return item.value;
         default:
           return String((item as any)?.value ?? '');
       }
@@ -82,7 +88,9 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
  * Discord 原生支持大部分标准 Markdown，仅去除不支持的图片语法
  */
 export const markdownRawToDiscordText = (raw: string, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   let text = raw;
 
@@ -99,7 +107,9 @@ export const markdownRawToDiscordText = (raw: string, hideUnsupported?: boolean 
  * 其余类型降级为文本
  */
 export const dataEnumToDiscordText = (item: DataEnums, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   switch (item.type) {
     case 'MarkdownOriginal':
