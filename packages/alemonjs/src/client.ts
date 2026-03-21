@@ -42,6 +42,16 @@ const main = () => {
 };
 
 const mainProcess = () => {
+  // unhandledRejection 捕获未处理的 Promise 拒绝，记录后继续运行，不退出进程
+  process.on('unhandledRejection', (reason: unknown) => {
+    logger.error('[alemonjs][unhandledRejection] 未捕获的 Promise 拒绝:', reason);
+  });
+
+  // uncaughtException 捕获未捕获的异常，记录后继续运行，不退出进程
+  process.on('uncaughtException', (error: Error) => {
+    logger.error('[alemonjs][uncaughtException] 未捕获的异常:', error);
+  });
+
   ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
     process?.on?.(sig, () => {
       logger.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
