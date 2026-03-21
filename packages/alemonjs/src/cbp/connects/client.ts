@@ -1,6 +1,7 @@
 import * as flattedJSON from 'flatted';
 import { onProcessor } from '../../app/index';
-import { ResultCode, createResult } from '../../core';
+import { ResultCode } from '../../core/variable';
+import { createResult } from '../../core/utils';
 import { actionResolves, actionTimeouts, apiResolves, apiTimeouts, FULL_RECEIVE_HEADER } from '../processor/config';
 import type { CBPClientOptions, ParsedMessage } from '../typings';
 import { createWSConnector } from './base';

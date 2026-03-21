@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { createEventName, showErrorModule } from '../../core/utils.js';
 import { getRecursiveDirFiles } from '../../core/utils.js';
 import type { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, childrenCallback } from '../../types';
-import { ChildrenApp } from '../../app/store.js';
+import { ChildrenApp } from '../../store/store.js';
 import { ResultCode } from '../../core/variable.js';
 import { fileSuffixMiddleware } from '../../core/variable.js';
 import module from 'module';

@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 import { randomUUID } from 'node:crypto';
-import { Result } from '../../core';
+import { Result } from '../../core/utils';
 // 子客户端
 export const childrenClient = new Map<string, WebSocket>();
 // 平台客户端

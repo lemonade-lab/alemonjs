@@ -1,4 +1,5 @@
-import { ResultCode, createResult, Result } from '../../core';
+import { ResultCode } from '../../core/variable';
+import { createResult, Result } from '../../core/utils';
 import { apiTimeouts, apiResolves, deviceId, generateUniqueId, timeoutTime } from './config';
 import type { Apis } from '../../types';
 import * as flattedJSON from 'flatted';

@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws';
-import { ResultCode } from '../../core';
+import { ResultCode } from '../../core/variable';
 import { DEVICE_ID_HEADER, deviceId, reconnectInterval, USER_AGENT_HEADER } from '../processor/config';
 import { useHeartbeat } from './connect';
 

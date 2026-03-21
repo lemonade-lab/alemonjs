@@ -9,9 +9,20 @@ import { generateSocketPath } from './process/direct-channel.js';
 // 得到最恰当的参数
 const createOptionsByKey = (options: StartOptions, key: string, defaultValue: any) => {
   const cfg = getConfig();
-  // 创建 cbp 服务器
   const curValue = options?.[key] ?? cfg.argv?.[key];
   const value = curValue ?? cfg.value?.[key] ?? defaultValue;
+
+  return value;
+};
+
+// 从 cbp 子配置中读取，回退到旧的顶层 key
+const createCBPOptionsByKey = (options: StartOptions, key: string, defaultValue: any) => {
+  const cfg = getConfig();
+  const curValue = options?.[key] ?? cfg.argv?.[key];
+  // cbp 子配置优先 > 旧的顶层 key > 默认值
+  const cbpValue = cfg.value?.cbp?.[key];
+  const topValue = cfg.value?.[key];
+  const value = curValue ?? cbpValue ?? topValue ?? defaultValue;
 
   return value;
 };
@@ -57,6 +68,7 @@ const startPlatform = (options: StartOptions) => {
     process.env.login = login;
   }
 
+  // 启动平台连接适配器
   void startPlatformAdapterWithFallback();
 };
 
@@ -64,16 +76,18 @@ const startPlatform = (options: StartOptions) => {
  * 启动客户端
  */
 const startClient = (options: StartOptions) => {
+  // 格式化 env 变量
   process.env.input = createOptionsByKey(options, 'input', '');
   process.env.output = createOptionsByKey(options, 'output', '');
-  process.env.is_full_receive = String(createOptionsByKey(options, 'is_full_receive', true));
-  process.env.port = String(createOptionsByKey(options, 'port', '') || '');
-  process.env.url = createOptionsByKey(options, 'url', '');
-
+  process.env.is_full_receive = String(createCBPOptionsByKey(options, 'is_full_receive', true));
+  process.env.port = String(createCBPOptionsByKey(options, 'port', '') || '');
+  process.env.url = createCBPOptionsByKey(options, 'url', '');
+  // 启动模块加载适配器
   startModuleAdapter();
 };
 
 /**
+ * 启动程序
  * @param input
  */
 export const start = (options: StartOptions | string = {}) => {
@@ -85,26 +99,24 @@ export const start = (options: StartOptions | string = {}) => {
   // 保存全局参数
   global.__options = options;
 
-  // 得到端口号（传空字符串或 0 表示不启动 WS）
-  const port = createOptionsByKey(options, 'port', '');
-  const serverPort = createOptionsByKey(options, 'serverPort', '');
+  // 得到端口号（cbp.port 优先，回退到旧的顶层 port）
+  const port = createCBPOptionsByKey(options, 'port', '');
+
+  // 检查 cbp.enable，显式设为 false 时不启动 CBP 服务器
+  const cfg = getConfig();
+  const cbpEnable = cfg.value?.cbp?.enable;
 
   // 设置环境变量
   process.env.port = port ? String(port) : '';
-  process.env.serverPort = serverPort;
 
-  if (port) {
+  if (port && cbpEnable !== false) {
     // 有端口：启动 CBP WebSocket 服务器（兼容前端 UI 和远程连接）
     cbpServer(port, () => {
-      const httpURL = `http://127.0.0.1:${port}`;
-      const wsURL = `ws://127.0.0.1:${port}`;
-
-      logger.info(`[CBP server started at ${httpURL}]`);
-      logger.info(`[CBP server started at ${wsURL}]`);
+      logger.info(`[API mode] http://127.0.0.1:${port}`);
+      logger.info(`[WebSocket mode] ws://127.0.0.1:${port}`);
 
       // 启动客户端进程
       startClient(options);
-
       // 启动平台进程
       startPlatform(options);
     });
@@ -113,10 +125,11 @@ export const start = (options: StartOptions | string = {}) => {
     const sockPath = generateSocketPath();
 
     process.env.__ALEMON_DIRECT_SOCK = sockPath;
-    logger.info('[Direct-IPC mode] 平台↔客户端直连通道，无主进程桥接');
+    logger.info('[Direct-IPC mode] 平台↔客户端直连');
 
     // 直接启动客户端和平台进程（客户端先启动 UDS 服务端，平台后连接）
     startClient(options);
+    // 启动平台进程
     startPlatform(options);
   }
 };

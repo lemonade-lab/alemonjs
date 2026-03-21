@@ -4,7 +4,114 @@ import YAML from 'yaml';
 import type { Package } from '../types';
 import { ResultCode } from './variable';
 
-type ConfigValue = { [key: string]: any };
+type ConfigValue = {
+  [key: string]: any;
+  /** 平台连接包路径 */
+  platform?: string;
+  /** 登录标识 */
+  login?: string;
+  /** 输入目录 */
+  input?: string;
+  /** 输出目录 */
+  output?: string;
+  /** 应用模块列表 */
+  apps?:
+    | string[]
+    | {
+        [appName: string]:
+          | {
+              [key: string]: any;
+            }
+          | boolean;
+      };
+  /** 启动插件模块 */
+  apps_plugins?: {
+    [moduleName: string]:
+      | {
+          /** 是否启用，默认 true */
+          enable?: boolean;
+          [key: string]: any;
+        }
+      | boolean;
+  };
+  /** 进程配置 */
+  process?: {
+    restart_delay?: number;
+    fork_timeout?: number;
+    fork_restart_delay?: number;
+  };
+  /** 消息处理器配置 */
+  processor?: {
+    repeated_event_time?: number;
+    repeated_user_time?: number;
+  };
+  /** 日志配置 */
+  logs?: {
+    channel_id?: string[];
+  };
+  /** 管理员用户 ID */
+  master_id?: { [key: string]: boolean };
+  /** 管理员用户 Key */
+  master_key?: { [key: string]: boolean };
+  /** 机器人 ID */
+  bot_id?: { [key: string]: boolean };
+  /** 机器人 Key */
+  bot_key?: { [key: string]: boolean };
+  /** 禁用文本正则 */
+  disabled_text_regular?: string;
+  /** 禁用选择器 */
+  disabled_selects?: { [key: string]: boolean };
+  /** 禁用用户 ID */
+  disabled_user_id?: { [key: string]: boolean };
+  /** 禁用用户 Key */
+  disabled_user_key?: { [key: string]: boolean };
+  /** 重定向正则（别名） */
+  redirect_regular?: string;
+  /** 重定向文本正则 */
+  redirect_text_regular?: string;
+  /** 重定向目标（别名） */
+  redirect_target?: string;
+  /** 重定向文本目标 */
+  redirect_text_target?: string;
+  /** 文本映射规则 */
+  mapping_text?: { regular?: string; target?: string }[];
+  /** @deprecated 请使用 cbp.port */
+  port?: number | string;
+  /** @deprecated 请使用 cbp.url */
+  url?: string;
+  /** @deprecated 请使用 cbp.is_full_receive */
+  is_full_receive?: boolean;
+  /** CBP 服务器配置 */
+  cbp?: {
+    /** 是否启用 CBP 服务器，默认 true（配置了 port 时） */
+    enable?: boolean;
+    /** CBP 服务器端口 */
+    port?: number | string;
+    /** CBP 远程连接地址 */
+    url?: string;
+    /** 是否全量接收消息 */
+    is_full_receive?: boolean;
+    /** CBP 应用插件，key 为包名，value 为配置 */
+    apps?: {
+      [packageName: string]:
+        | {
+            /** WS 路由路径，默认取包名最后一段 */
+            path?: string;
+            /** 是否启用，默认 true */
+            enable?: boolean;
+          }
+        | boolean;
+    };
+  };
+  /**
+   * 核心运行时状态
+   * @deprecated 设计已废弃
+   */
+  core?: {
+    state?: string[];
+    [key: string]: any;
+  };
+};
 type ConfigListener<T extends ConfigValue = ConfigValue> = (value: T) => void;
 
 /**

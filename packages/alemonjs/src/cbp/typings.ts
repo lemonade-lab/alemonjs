@@ -1,5 +1,5 @@
+import { Result } from '../core/utils';
 import type { EventKeys, Apis, Actions } from '../types';
-import type { Result } from '../core';
 
 export type ParsedMessage = {
   apiId?: string;

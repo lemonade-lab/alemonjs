@@ -1,4 +1,4 @@
-import { SinglyLinkedList } from '../../app/SinglyLinkedList';
+import { SinglyLinkedList } from '../../store/SinglyLinkedList';
 import { EventCycleEnum } from '../cycle';
 import { EventKeys } from '../event/map';
 

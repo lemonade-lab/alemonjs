@@ -66,7 +66,7 @@ export const ResultCode = {
 // 结果反馈码类型
 export type ResultCode = (typeof ResultCode)[keyof typeof ResultCode];
 
-export class Result {
+export class ResultCore {
   #data: {
     code: ResultCode;
     message: string;
@@ -80,7 +80,7 @@ export class Result {
   }
 
   static create() {
-    return new Result();
+    return new ResultCore();
   }
 
   push(param: { code: ResultCode; message: string; data: null }) {

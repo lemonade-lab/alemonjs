@@ -1,7 +1,8 @@
 import childProcess from 'child_process';
-import { getConfigValue, ResultCode } from '../core';
 import module from 'module';
 import { setClientChild, forwardFromClient } from './ipc-bridge';
+import { getConfigValue } from '../core/config';
+import { ResultCode } from '../core/variable';
 
 // 初始化 require 的备用实现
 const initRequire = () => {};
@@ -19,6 +20,7 @@ interface ChildProcessManager {
 
 /**
  * 启动模块加载进程
+ * 加载所有的apps模块
  */
 export function startModuleAdapter(): void {
   const values = getConfigValue();
@@ -34,7 +36,7 @@ export function startModuleAdapter(): void {
   } as const;
 
   try {
-    modulePath = require.resolve('../client.js');
+    modulePath = require.resolve('./client.js');
   } catch (error) {
     logger?.warn?.({
       code: ResultCode.Fail,

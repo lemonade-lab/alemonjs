@@ -4,7 +4,6 @@ import { join } from 'path';
 import path from 'path';
 import fs from 'fs';
 import { fileSuffixResponse, ResultCode } from './variable';
-
 import module from 'module';
 
 const initRequire = () => {};

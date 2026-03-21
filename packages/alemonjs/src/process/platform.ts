@@ -1,7 +1,8 @@
 import childProcess from 'child_process';
-import { getConfigValue, ResultCode } from '../core';
 import module from 'module';
 import { setPlatformChild, forwardFromPlatform } from './ipc-bridge';
+import { getConfigValue } from '../core/config';
+import { ResultCode } from 'core/variable';
 
 // 初始化 require 的备用实现
 const initRequire = () => {};

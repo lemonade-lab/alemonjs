@@ -1,7 +1,3 @@
-# 默认无端口模式，可配置选配端口
-# port: 17117
-# 默认不启动web服务器，可选配
-# serverPort: 17118
 # 具体见 pm2.config.cjs
 pm2:
   apps:
@@ -9,3 +5,18 @@ pm2:
       script: 'node index.js --login gui'
       env:
         NODE_ENV: 'production'
+# 加载 ws 插件
+# cbp:
+# 默认无端口模式，可配置选配端口
+#   enable: true
+#   port: 17117
+#   apps:
+#     "@alemonjs/testone":
+#       # 是否开启
+#       enable: true
+# 加载 apps 插件
+# apps_plugins:
+#   "@alemonjs/web":
+#     # 端口号，默认17118
+#     port: 17118
+#     enable: true

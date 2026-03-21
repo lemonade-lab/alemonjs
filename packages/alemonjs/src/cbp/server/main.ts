@@ -3,7 +3,6 @@ import { WebSocketServer, WebSocket } from 'ws';
 import * as flattedJSON from 'flatted';
 import koaCors from '@koa/cors';
 import MessageRouter from '../routers/router';
-import { ResultCode } from '../../core';
 import {
   childrenBind,
   childrenClient,
@@ -18,7 +17,95 @@ import {
   USER_AGENT_HEADER_VALUE_MAP
 } from '../processor/config';
 import type { ParsedMessage } from '../typings';
-import { createTestOneController } from './testone';
+import { getConfigValue } from '../../core/config';
+import { ResultCode } from '../../core/variable';
+
+// CBP 应用处理器接口
+type CBPAppHandler = {
+  onClientMessage: (message: string) => void;
+  onConnection: (ws: WebSocket) => void;
+  cleanup: () => void;
+};
+
+// 已加载的 CBP 应用处理器 Map<路由路径, handler>
+const cbpAppHandlers = new Map<string, CBPAppHandler>();
+
+/**
+ * 从包名提取默认路由路径
+ * @example '@alemonjs/testone' -> 'testone'
+ * @example 'my-plugin' -> 'my-plugin'
+ */
+const getDefaultPath = (packageName: string): string => {
+  const parts = packageName.split('/');
+
+  return parts[parts.length - 1];
+};
+
+/**
+ * 加载所有 CBP 应用插件
+ * 从 cbp.apps 配置中读取包名和路由路径，动态 import 并注册
+ */
+const loadCBPApps = async (): Promise<void> => {
+  const values = getConfigValue() || {};
+  const cbpApps = values?.cbp?.apps;
+
+  if (!cbpApps || Object.keys(cbpApps).length === 0) {
+    return;
+  }
+
+  for (const [packageName, config] of Object.entries(cbpApps)) {
+    // 检查 enable 字段，显式设为 false 时跳过
+    if (typeof config === 'object' && config?.enable === false) {
+      continue;
+    }
+
+    const routePath = (typeof config === 'object' && config?.path) || getDefaultPath(packageName);
+
+    if (cbpAppHandlers.has(routePath)) {
+      continue;
+    }
+
+    try {
+      const mod = await import(packageName);
+
+      if (typeof mod.createHandler !== 'function') {
+        logger.error({
+          code: ResultCode.Fail,
+          message: `CBP 应用 ${packageName} 未导出 createHandler 函数`,
+          data: null
+        });
+
+        continue;
+      }
+
+      const handler: CBPAppHandler = mod.createHandler(routeMessageToDevice, handleEvent);
+
+      cbpAppHandlers.set(routePath, handler);
+      logger.info(`[CBP] 已加载应用: ${packageName} -> /${routePath}`);
+    } catch (err) {
+      logger.error({
+        code: ResultCode.Fail,
+        message: `CBP 应用 ${packageName} 加载失败`,
+        data: err
+      });
+    }
+  }
+};
+
+/**
+ * 清理所有 CBP 应用处理器
+ */
+const cleanupCBPApps = () => {
+  cbpAppHandlers.forEach(handler => handler.cleanup());
+  cbpAppHandlers.clear();
+};
+
+/**
+ * 将客户端消息广播给所有 CBP 应用处理器
+ */
+const broadcastToApps = (message: string) => {
+  cbpAppHandlers.forEach(handler => handler.onClientMessage(message));
+};
 
 // 路由消息到指定设备（统一处理 api 和 action 的客户端查找逻辑）
 const routeMessageToDevice = (DeviceId: string, message: string) => {
@@ -148,10 +235,7 @@ const setChildrenClient = (originId: string, ws: WebSocket) => {
   // 得到子客户端的消息。只会是actions请求。
   ws.on('message', (message: string) => {
     if (global.__sandbox) {
-      if (global.testoneClient && global.testoneClient.readyState === WebSocket.OPEN) {
-        // 发给 web 的数据，需要是字符串
-        global.testoneClient.send(message.toString());
-      }
+      broadcastToApps(message.toString());
 
       return;
     }
@@ -194,10 +278,7 @@ const setFullClient = (originId: string, ws: WebSocket) => {
   // 处理消息事件
   ws.on('message', (message: string) => {
     if (global.__sandbox) {
-      if (global.testoneClient && global.testoneClient.readyState === WebSocket.OPEN) {
-        // 发给 web 的数据，需要是字符串
-        global.testoneClient.send(message.toString());
-      }
+      broadcastToApps(message.toString());
 
       return;
     }
@@ -302,69 +383,6 @@ const setPlatformClient = (originId: string, ws: WebSocket) => {
 };
 
 /**
- * @param originId
- * @param ws
- */
-const setTestOnePlatformClient = (ws: WebSocket) => {
-  if (global.testoneClient) {
-    delete global.testoneClient;
-  }
-
-  global.testoneClient = ws;
-
-  const controller = createTestOneController(ws, null);
-
-  // 得到平台客户端的消息
-  ws.on('message', (message: string) => {
-    try {
-      // 解析消息
-      const parsedMessage: ParsedMessage = flattedJSON.parse(message.toString());
-
-      // 1. 解析得到 actionId ，说明是消费行为请求。要广播告诉所有客户端。
-      // 2. 解析得到 name ，说明是一个事件请求。
-      // 3. 解析得到 apiId ，说明是一个接口请求。
-      logger.debug({
-        code: ResultCode.Ok,
-        message: '测试端接收到消息',
-        data: parsedMessage
-      });
-      if (parsedMessage.apiId) {
-        // 指定的设备 处理消费。终端有记录每个客户端是谁
-        const DeviceId = parsedMessage.DeviceId;
-
-        routeMessageToDevice(DeviceId, message);
-      } else if (parsedMessage?.actionId) {
-        // 指定的设备 处理消费。终端有记录每个客户端是谁
-        const DeviceId = parsedMessage.DeviceId;
-
-        routeMessageToDevice(DeviceId, message);
-      } else if (parsedMessage?.name) {
-        const ID = parsedMessage.ChannelId || parsedMessage.GuildId || parsedMessage.DeviceId;
-
-        handleEvent(message, ID);
-      } else {
-        controller.onMessage(parsedMessage);
-      }
-    } catch (error) {
-      logger.error({
-        code: ResultCode.Fail,
-        message: '测试端解析平台消息失败',
-        data: error
-      });
-    }
-  });
-
-  // 处理关闭事件
-  ws.on('close', () => {
-    controller.close();
-  });
-
-  ws.on('error', err => {
-    controller.error(err);
-  });
-};
-
-/**
  * CBP 服务器
  * @param port
  * @param listeningListener
@@ -401,7 +419,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
    * 创建服务器
    * @returns
    */
-  const createServer = () => {
+  const createWSServer = () => {
     try {
       // create
       const app = new Koa();
@@ -421,16 +439,22 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       // 创建 WebSocketServer 并监听同一个端口
       global.chatbotServer = new WebSocketServer({ server });
 
+      // 加载 CBP 应用插件
+      void loadCBPApps();
+
       // 处理客户端连接
       global.chatbotServer.on('connection', (ws, request) => {
-        // 测试平台的连接
-        if (request.url === '/testone') {
+        // 匹配 CBP 应用路由 (e.g. /testone, /monitor)
+        const urlPath = (request.url || '').replace(/^\//, '');
+
+        if (urlPath && cbpAppHandlers.has(urlPath)) {
           if (!global.__sandbox) {
             ws.close(4000, 'Sandbox mode required');
 
             return;
           }
-          setTestOnePlatformClient(ws);
+
+          cbpAppHandlers.get(urlPath).onConnection(ws);
 
           return;
         }
@@ -492,7 +516,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         fullClient.clear();
         childrenBind.clear();
         clientBindCount.clear();
-        delete global.testoneClient;
+        cleanupCBPApps();
 
         // 发现是端口已经被占用
         if (err.code === 'EADDRINUSE') {
@@ -506,7 +530,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
 
           // 清理所有客户端连接，开始重新创建服务器
           setTimeout(() => {
-            createServer();
+            createWSServer();
           }, reCreateTime);
         } else {
           logger.error({
@@ -539,5 +563,5 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
     }
   };
 
-  createServer();
+  createWSServer();
 };

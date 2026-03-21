@@ -1,7 +1,8 @@
 import * as flattedJSON from 'flatted';
 import { WebSocket } from 'ws';
 import { deviceId } from '../processor/config';
-import { Result, ResultCode } from '../../core';
+import { ResultCode } from '../../core/variable';
+import { Result } from '../../core/utils';
 import type { Actions, Apis, EventsEnum } from '../../types';
 import type { ActionReplyFunc, ApiReplyFunc } from '../typings';
 import { createWSConnector } from './base';

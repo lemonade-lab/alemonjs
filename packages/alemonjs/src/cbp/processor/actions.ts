@@ -1,5 +1,6 @@
 import * as flattedJSON from 'flatted';
-import { ResultCode, createResult, Result } from '../../core';
+import { ResultCode } from '../../core/variable';
+import { createResult, Result } from '../../core/utils';
 import type { Actions } from '../../types';
 import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config';
 import { getDirectSend } from './transport';

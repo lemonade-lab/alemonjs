@@ -1,0 +1,43 @@
+{
+  "name": "@alemonjs/testone",
+  "version": "2.1.0",
+  "description": "alemonjs testone sandbox testing plugin",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib",
+  "scripts": {
+    "build": "lvy build"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.js"
+    },
+    "./package": "./package.json"
+  },
+  "dependencies": {
+    "flatted": "^3.3.3",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.0"
+  },
+  "peerDependencies": {
+    "ws": "^8.18.0"
+  },
+  "keywords": [
+    "alemonjs"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
+  }
+}

@@ -1,18 +1,12 @@
 type ServerOptions = {
-  /**
-   * @description 协议端口
-   */
+  /** @deprecated 请使用 cbp.port */
   port?: number;
-  /**
-   * @description 应用服务器端口
-   */
-  serverPort?: number;
+  /** @deprecated 已无消费者 */
+  server_port?: number;
 };
 
 type ClientOptions = {
-  /**
-   * @description 连接到 CBP 服务器的 URL
-   */
+  /** @deprecated 请使用 cbp.url */
   url?: string;
 };
 
@@ -87,6 +81,23 @@ type AppsOptions = {
 
 type CBPOptions = {
   cbp?: {
+    /** 是否启用 CBP 服务器 */
+    enable?: boolean;
+    /** CBP 服务器端口 */
+    port?: number | string;
+    /** CBP 远程连接地址 */
+    url?: string;
+    /** 是否全量接收消息 */
+    is_full_receive?: boolean;
+    /** CBP 应用插件 */
+    apps?: {
+      [packageName: string]:
+        | {
+            path?: string;
+            enable?: boolean;
+          }
+        | true;
+    };
     timeout?: number;
     reconnectInterval?: string;
     heartbeatInterval?: string;
