@@ -59,10 +59,23 @@ export const forwardFromPlatform = (data: any) => {
 };
 
 /**
- * 将消息从客户端子进程转发到平台子进程
+ * 将消息从客户端子进程转发到平台子进程（sandbox 模式下同时转发到 testone）
  */
 export const forwardFromClient = (data: any) => {
   if (platformChild?.connected) {
     platformChild.send({ type: 'ipc:data', data });
+  }
+
+  // sandbox 模式下，将客户端动作转发给 testone 前端
+  if (global.__sandbox && global.testoneClient) {
+    try {
+      const messageStr = typeof data === 'string' ? data : flattedJSON.stringify(data);
+
+      if (global.testoneClient.readyState === WebSocket.OPEN) {
+        global.testoneClient.send(messageStr);
+      }
+    } catch {
+      // 序列化失败忽略
+    }
   }
 };

@@ -19,6 +19,7 @@ import {
 } from '../processor/config';
 import type { ParsedMessage } from '../typings';
 import { createTestOneController } from './testone';
+import { getClientChild } from '../../process/ipc-bridge';
 
 // 路由消息到指定设备（统一处理 api 和 action 的客户端查找逻辑）
 const routeMessageToDevice = (DeviceId: string, message: string) => {
@@ -38,18 +39,42 @@ const routeMessageToDevice = (DeviceId: string, message: string) => {
     } else {
       fullClient.delete(DeviceId);
     }
+  } else {
+    // WebSocket Map 中找不到该设备，尝试 IPC 桥转发（fork 模式）
+    const clientChild = getClientChild();
+
+    if (clientChild?.connected) {
+      try {
+        const parsed = flattedJSON.parse(String(message));
+
+        clientChild.send({ type: 'ipc:data', data: parsed });
+      } catch {
+        // 解析失败忽略
+      }
+    }
   }
 };
 
 // 处理事件
 const handleEvent = (message: string, ID: string) => {
-  // 全量客户端
+  // 尝试通过 IPC 桥转发到客户端子进程（fork 模式下 WebSocket Map 为空）
+  const clientChild = getClientChild();
+
+  if (clientChild?.connected) {
+    try {
+      const parsed = flattedJSON.parse(String(message));
+
+      clientChild.send({ type: 'ipc:data', data: parsed });
+    } catch {
+      // 解析失败忽略
+    }
+  }
+
+  // 全量客户端（WebSocket 直连的前端 UI 等）
   fullClient.forEach((clientWs, clientId) => {
-    // 检查状态 并检查状态
     if (clientWs.readyState === WebSocket.OPEN) {
       clientWs.send(message);
     } else {
-      // 如果连接已关闭，删除该客户端
       fullClient.delete(clientId);
     }
   });
