@@ -12,10 +12,8 @@ type ConfigValue = {
   login?: string;
   /** 输入目录 */
   input?: string;
-  /** 输出目录 */
-  output?: string;
   /** 应用模块列表 */
-  apps?:
+  modules?:
     | string[]
     | {
         [appName: string]:
@@ -25,7 +23,7 @@ type ConfigValue = {
           | boolean;
       };
   /** 启动插件模块 */
-  apps_plugins?: {
+  plugins?: {
     [moduleName: string]:
       | {
           /** 是否启用，默认 true */
@@ -40,47 +38,41 @@ type ConfigValue = {
     fork_timeout?: number;
     fork_restart_delay?: number;
   };
-  /** 消息处理器配置 */
-  processor?: {
+  /** 身份与权限配置 */
+  auth?: {
+    master?: {
+      id?: { [key: string]: boolean };
+      key?: { [key: string]: boolean };
+    };
+    bot?: {
+      id?: { [key: string]: boolean };
+      key?: { [key: string]: boolean };
+    };
+  };
+  /** 事件处理规则 */
+  event?: {
+    /** 防重复事件时间间隔 (ms) */
     repeated_event_time?: number;
+    /** 防重复用户时间间隔 (ms) */
     repeated_user_time?: number;
+    /** 过滤规则 */
+    disabled?: {
+      /** 文本正则过滤 */
+      text_regular?: string;
+      /** 选择器过滤 */
+      selects?: { [key: string]: boolean };
+      /** 用户 ID 过滤 */
+      user_id?: { [key: string]: boolean };
+      /** 用户 Key 过滤 */
+      user_key?: { [key: string]: boolean };
+    };
+    /** 文本转换规则（合并重定向与映射） */
+    transforms?: { pattern: string; target: string }[];
   };
   /** 日志配置 */
   logs?: {
     channel_id?: string[];
   };
-  /** 管理员用户 ID */
-  master_id?: { [key: string]: boolean };
-  /** 管理员用户 Key */
-  master_key?: { [key: string]: boolean };
-  /** 机器人 ID */
-  bot_id?: { [key: string]: boolean };
-  /** 机器人 Key */
-  bot_key?: { [key: string]: boolean };
-  /** 禁用文本正则 */
-  disabled_text_regular?: string;
-  /** 禁用选择器 */
-  disabled_selects?: { [key: string]: boolean };
-  /** 禁用用户 ID */
-  disabled_user_id?: { [key: string]: boolean };
-  /** 禁用用户 Key */
-  disabled_user_key?: { [key: string]: boolean };
-  /** 重定向正则（别名） */
-  redirect_regular?: string;
-  /** 重定向文本正则 */
-  redirect_text_regular?: string;
-  /** 重定向目标（别名） */
-  redirect_target?: string;
-  /** 重定向文本目标 */
-  redirect_text_target?: string;
-  /** 文本映射规则 */
-  mapping_text?: { regular?: string; target?: string }[];
-  /** @deprecated 请使用 cbp.port */
-  port?: number | string;
-  /** @deprecated 请使用 cbp.url */
-  url?: string;
-  /** @deprecated 请使用 cbp.is_full_receive */
-  is_full_receive?: boolean;
   /** CBP 服务器配置 */
   cbp?: {
     /** 是否启用 CBP 服务器，默认 true（配置了 port 时） */
@@ -92,7 +84,7 @@ type ConfigValue = {
     /** 是否全量接收消息 */
     is_full_receive?: boolean;
     /** CBP 应用插件，key 为包名，value 为配置 */
-    apps?: {
+    plugins?: {
       [packageName: string]:
         | {
             /** WS 路由路径，默认取包名最后一段 */
@@ -102,7 +94,72 @@ type ConfigValue = {
           }
         | boolean;
     };
+    /** @deprecated 请使用 cbp.plugins */
+    apps?: {
+      [packageName: string]:
+        | {
+            path?: string;
+            enable?: boolean;
+          }
+        | boolean;
+    };
   };
+  /** @deprecated 请使用 modules */
+  apps?:
+    | string[]
+    | {
+        [appName: string]:
+          | {
+              [key: string]: any;
+            }
+          | boolean;
+      };
+  /** @deprecated 请使用 plugins */
+  apps_plugins?: {
+    [moduleName: string]:
+      | {
+          enable?: boolean;
+          [key: string]: any;
+        }
+      | boolean;
+  };
+  /** @deprecated 请使用 event.repeated_event_time */
+  processor?: {
+    repeated_event_time?: number;
+    repeated_user_time?: number;
+  };
+  /** @deprecated 请使用 auth.master */
+  master_id?: { [key: string]: boolean };
+  /** @deprecated 请使用 auth.master */
+  master_key?: { [key: string]: boolean };
+  /** @deprecated 请使用 auth.bot */
+  bot_id?: { [key: string]: boolean };
+  /** @deprecated 请使用 auth.bot */
+  bot_key?: { [key: string]: boolean };
+  /** @deprecated 请使用 event.disabled.text_regular */
+  disabled_text_regular?: string;
+  /** @deprecated 请使用 event.disabled.selects */
+  disabled_selects?: { [key: string]: boolean };
+  /** @deprecated 请使用 event.disabled.user_id */
+  disabled_user_id?: { [key: string]: boolean };
+  /** @deprecated 请使用 event.disabled.user_key */
+  disabled_user_key?: { [key: string]: boolean };
+  /** @deprecated 请使用 event.transforms */
+  redirect_regular?: string;
+  /** @deprecated 请使用 event.transforms */
+  redirect_text_regular?: string;
+  /** @deprecated 请使用 event.transforms */
+  redirect_target?: string;
+  /** @deprecated 请使用 event.transforms */
+  redirect_text_target?: string;
+  /** @deprecated 请使用 event.transforms */
+  mapping_text?: { regular?: string; target?: string }[];
+  /** @deprecated 请使用 cbp.port */
+  port?: number | string;
+  /** @deprecated 请使用 cbp.url */
+  url?: string;
+  /** @deprecated 请使用 cbp.is_full_receive */
+  is_full_receive?: boolean;
   /**
    * 核心运行时状态
    * @deprecated 设计已废弃

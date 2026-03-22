@@ -16,6 +16,7 @@ export * from './hook-use/hook-use-client.js';
 export * from './hook-use/hook-use-me.js';
 export * from './hook-use/hook-use-menber.js';
 export * from './hook-use/hook-use-mention.js';
+export * from './hook-use/hook-use-message.js';
 export * from './hook-use/hook-use-state.js';
 export * from './hook-use/hook-use-subscribe.js';
 export * from './event/event-group.js';

@@ -58,7 +58,8 @@ const mainProcess = () => {
         main();
 
         const values = getConfigValue() || {};
-        const startOptions = values.apps_plugins || {};
+        // plugins 优先，回退到旧的 apps_plugins
+        const startOptions = values.plugins || values.apps_plugins || {};
 
         // start 插件。在apps进程启动中使用
         for (const key in startOptions) {

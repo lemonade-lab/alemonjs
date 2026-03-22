@@ -19,52 +19,17 @@ import WebSocket, { Server } from 'ws';
 import { IncomingMessage } from 'http';
 
 declare global {
-  /**
-   * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-   * 打印
-   */
   var logger: LoggerUtils;
-  /**
-   * 核心
-   * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-   */
   var alemonjsCore: {
-    /**
-     * 状态
-     * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-     */
     storeState: ResponseState;
-    /**
-     * 状态订阅
-     * @deprecated 废弃。指令管理可直接配置禁用正则
-     * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-     */
     storeStateSubscribe: StateSubscribeMap;
-    /**
-     * 订阅列表
-     * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-     */
     storeSubscribeList: SubscribeKeysMap;
-    /**
-     * 子模块
-     * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-     */
     storeChildrenApp: {
       [key: string]: StoreChildrenApp;
     };
   };
-  /**
-   * 聊天机器人
-   * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-   */
   var chatbotServer: Server<typeof WebSocket, typeof IncomingMessage>;
-  /**
-   * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-   */
   var chatbotPlatform: WebSocket;
-  /**
-   * @deprecated 不再推荐使用全局变量，建议通过 import 引入
-   */
   var chatbotClient: WebSocket;
   /**
    * 定义响应体

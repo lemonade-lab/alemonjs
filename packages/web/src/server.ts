@@ -28,7 +28,7 @@ export const createServer = (options: { port: number; listeningListener: () => v
         allowMethods: ['GET', 'POST', 'PUT', 'DELETE'] // 允许的 HTTP 方法
       })
     );
-    app.listen(port, listeningListener);
+    app.listen(port, typeof listeningListener === 'function' ? listeningListener : undefined);
   } catch (error) {
     logger.error({
       code: 5000,

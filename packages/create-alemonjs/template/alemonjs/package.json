@@ -26,7 +26,7 @@
     "@alemonjs/onebot": "^2.1.4",
     "@alemonjs/qq-bot": "^2.1.4",
     "alemonjs": "2.1.38",
-    "jsxp": "1.2.4",
+    "jsxp": "1.3.0",
     "tailwindcss": "3",
     "cssnano": "^7",
     "lvyjs": "^0.3.0-alpha.2",

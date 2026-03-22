@@ -6,8 +6,9 @@ import { ResultCode } from '../../core/variable.js';
 
 const loadApps = () => {
   const cfg = getConfig();
-
-  const apps = Array.isArray(cfg.value?.apps) ? cfg.value.apps : Object.keys(cfg.value?.apps ?? {}).filter(Boolean);
+  // modules 优先，回退到旧的 apps
+  const raw = cfg.value?.modules ?? cfg.value?.apps;
+  const apps = Array.isArray(raw) ? raw : Object.keys(raw ?? {}).filter(Boolean);
 
   // 去重
   const uniqueApps = Array.from(new Set(apps));

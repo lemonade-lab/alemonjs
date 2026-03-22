@@ -5,18 +5,23 @@ pm2:
       script: 'node index.js --login gui'
       env:
         NODE_ENV: 'production'
-# 加载 ws 插件
-# cbp:
-# 默认无端口模式，可配置选配端口
-#   enable: true
-#   port: 17117
-#   apps:
-#     "@alemonjs/testone":
-#       # 是否开启
-#       enable: true
-# 加载 apps 插件
-# apps_plugins:
-#   "@alemonjs/web":
-#     # 端口号，默认17118
-#     port: 17118
-#     enable: true
+
+# websocket 服务器配置,可用于本地调试和插件开发
+cbp:
+  enable: false
+  port: 17117
+  plugins:
+    '@alemonjs/testone':
+      # 是否开启
+      enable: false
+
+# 一般功能模块，本地开发可通过 start('./xxx') 来开启指定
+modules:
+  'alemonjs-game':
+    enable: false
+
+# 应用插件，该插件会植入到应用进程中
+plugins:
+  '@alemonjs/web':
+    port: 17118
+    enable: false

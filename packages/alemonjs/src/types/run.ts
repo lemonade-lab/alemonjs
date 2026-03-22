@@ -29,51 +29,74 @@ type AppOptions = {
   is_full_receive?: boolean;
 };
 
-type MasterOptions = {
+type AuthOptions = {
+  auth?: {
+    master?: {
+      id?: { [key: string]: boolean };
+      key?: { [key: string]: boolean };
+    };
+    bot?: {
+      id?: { [key: string]: boolean };
+      key?: { [key: string]: boolean };
+    };
+  };
+  /** @deprecated 请使用 auth.master */
   master_key?: {
     [key: string]: boolean;
   };
+  /** @deprecated 请使用 auth.master */
   master_id?: {
     [key: string]: boolean;
   };
 };
 
-type BotOptions = {
-  bot_key?: {
-    [key: string]: boolean;
+type EventOptions = {
+  event?: {
+    repeated_event_time?: number;
+    repeated_user_time?: number;
+    disabled?: {
+      text_regular?: string;
+      selects?: { [key: string]: boolean };
+      user_id?: { [key: string]: boolean };
+      user_key?: { [key: string]: boolean };
+    };
+    transforms?: { pattern: string; target: string }[];
   };
-  bot_id?: {
-    [key: string]: boolean;
-  };
-};
-
-type MessageOptions = {
+  /** @deprecated 请使用 event.disabled */
   disabled_text_regular?: string;
+  /** @deprecated 请使用 event.disabled */
   disabled_selects?: {
     [key: string]: boolean;
   };
+  /** @deprecated 请使用 event.disabled */
   disabled_user_id?: {
     [key: string]: boolean;
   };
+  /** @deprecated 请使用 event.disabled */
   disabled_user_key?: {
     [key: string]: boolean;
   };
+  /** @deprecated 请使用 event.transforms */
   redirect_text_regular?: string;
+  /** @deprecated 请使用 event.transforms */
   redirect_text_target?: string;
+  /** @deprecated 请使用 event.transforms */
   mapping_text?: {
     regular?: string;
     target?: string;
   }[];
-};
-
-type ProcessorOptions = {
+  /** @deprecated 请使用 event */
   processor?: {
     repeated_event_time?: number;
     repeated_user_time?: number;
   };
 };
 
-type AppsOptions = {
+type ModulesOptions = {
+  modules?: {
+    [key: string]: boolean;
+  };
+  /** @deprecated 请使用 modules */
   apps?: {
     [key: string]: boolean;
   };
@@ -90,6 +113,15 @@ type CBPOptions = {
     /** 是否全量接收消息 */
     is_full_receive?: boolean;
     /** CBP 应用插件 */
+    plugins?: {
+      [packageName: string]:
+        | {
+            path?: string;
+            enable?: boolean;
+          }
+        | true;
+    };
+    /** @deprecated 请使用 cbp.plugins */
     apps?: {
       [packageName: string]:
         | {
@@ -111,12 +143,4 @@ type CBPOptions = {
   };
 };
 
-export type StartOptions = ServerOptions &
-  ClientOptions &
-  AppOptions &
-  MasterOptions &
-  BotOptions &
-  MessageOptions &
-  ProcessorOptions &
-  AppsOptions &
-  CBPOptions;
+export type StartOptions = ServerOptions & ClientOptions & AppOptions & AuthOptions & EventOptions & ModulesOptions & CBPOptions;

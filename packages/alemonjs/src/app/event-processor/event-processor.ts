@@ -72,8 +72,8 @@ const cleanupStore = ({ Now, store, INTERVAL }): boolean => {
 const cleanupStoreAll = (): boolean => {
   const Now = Date.now();
   const value = getConfigValue();
-  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
-  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
+  const EVENT_INTERVAL = value?.event?.repeated_event_time ?? value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
+  const USER_INTERVAL = value?.event?.repeated_user_time ?? value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
 
   const a = cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap });
   const b = cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap });
@@ -111,7 +111,7 @@ setTimeout(callback, processorRepeatedClearTimeMin);
 export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
   // 禁用规则设置
   const value = getConfigValue();
-  const disabledTextRegular = value?.disabled_text_regular;
+  const disabledTextRegular = value?.event?.disabled?.text_regular ?? value?.disabled_text_regular;
 
   // 检查文本禁用规则
   if (disabledTextRegular && event['MessageText']) {
@@ -120,59 +120,77 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     }
   }
 
-  const disabledSelects = value?.disabled_selects ?? {};
+  const disabledSelects = value?.event?.disabled?.selects ?? value?.disabled_selects ?? {};
 
   // 检查事件禁用规则
   if (disabledSelects[name]) {
     return;
   }
 
-  const disabledUserId = value?.disabled_user_id ?? {};
+  const disabledUserId = value?.event?.disabled?.user_id ?? value?.disabled_user_id ?? {};
 
   // 检查用户禁用规则
   if (event['UserId'] && disabledUserId[event['UserId']]) {
     return;
   }
 
-  const disabledUserKey = value?.disabled_user_key ?? {};
+  const disabledUserKey = value?.event?.disabled?.user_key ?? value?.disabled_user_key ?? {};
 
   // 检查用户禁用规则
   if (event['UserKey'] && disabledUserKey[event['UserKey']]) {
     return;
   }
 
-  const redirectRegular = value?.redirect_regular ?? value?.redirect_text_regular;
-  const redirectTarget = value?.redirect_target ?? value?.redirect_text_target;
-
-  // 检查文本重定向规则
-  if (redirectRegular && redirectTarget && event['MessageText']) {
-    const cachedReg = getCachedRegExp(redirectRegular);
-
-    if (cachedReg.test(event['MessageText'])) {
-      event['MessageText'] = event['MessageText'].replace(cachedReg, redirectTarget);
-    }
-  }
-
-  const mappingText = value?.mapping_text ?? [];
-
-  // 检查文本映射规则
+  // 文本转换规则（合并 event.transforms + 旧的 redirect + mapping_text）
   if (event['MessageText']) {
-    for (const mapping of mappingText) {
-      const { regular, target } = mapping ?? {};
+    const transforms = value?.event?.transforms;
 
-      if (!regular) {
-        continue;
+    if (transforms && transforms.length > 0) {
+      // 新格式：event.transforms 数组
+      for (const rule of transforms) {
+        const { pattern, target } = rule ?? {};
+
+        if (!pattern) {
+          continue;
+        }
+        const cachedReg = getCachedRegExp(pattern);
+
+        if (cachedReg.test(event['MessageText'])) {
+          event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+        }
       }
-      const cachedReg = getCachedRegExp(regular);
+    } else {
+      // 旧格式兼容：redirect_* + mapping_text
+      const redirectRegular = value?.redirect_regular ?? value?.redirect_text_regular;
+      const redirectTarget = value?.redirect_target ?? value?.redirect_text_target;
 
-      if (cachedReg.test(event['MessageText'])) {
-        event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+      if (redirectRegular && redirectTarget) {
+        const cachedReg = getCachedRegExp(redirectRegular);
+
+        if (cachedReg.test(event['MessageText'])) {
+          event['MessageText'] = event['MessageText'].replace(cachedReg, redirectTarget);
+        }
+      }
+
+      const mappingText = value?.mapping_text ?? [];
+
+      for (const mapping of mappingText) {
+        const { regular, target } = mapping ?? {};
+
+        if (!regular) {
+          continue;
+        }
+        const cachedReg = getCachedRegExp(regular);
+
+        if (cachedReg.test(event['MessageText'])) {
+          event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+        }
       }
     }
   }
 
-  const masterId = value?.master_id ?? {};
-  const masterKey = value?.master_key ?? {};
+  const masterId = value?.auth?.master?.id ?? value?.master_id ?? {};
+  const masterKey = value?.auth?.master?.key ?? value?.master_key ?? {};
 
   // 检查是否是 master
   if (event['UserId'] && masterId[event['UserId']]) {
@@ -181,8 +199,8 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     event['isMaster'] = true;
   }
 
-  const botId = value?.bot_id ?? {};
-  const botKey = value?.bot_key ?? {};
+  const botId = value?.auth?.bot?.id ?? value?.bot_id ?? {};
+  const botKey = value?.auth?.bot?.key ?? value?.bot_key ?? {};
 
   // 检查是否是 bot
   if (event['UserId'] && botId[event['UserId']]) {
@@ -192,7 +210,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
   }
 
   const Now = Date.now();
-  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
+  const EVENT_INTERVAL = value?.event?.repeated_event_time ?? value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
 
   if (event['MessageId']) {
     // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
@@ -204,7 +222,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     }
   }
 
-  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
+  const USER_INTERVAL = value?.event?.repeated_user_time ?? value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
 
   if (event['UserId']) {
     // FNV-1a 快速哈希

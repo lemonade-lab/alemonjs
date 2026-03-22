@@ -3,6 +3,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import * as flattedJSON from 'flatted';
 import koaCors from '@koa/cors';
 import MessageRouter from '../routers/router';
+import { getClientChild, setCBPAppsBroadcast } from '../../process/ipc-bridge';
 import {
   childrenBind,
   childrenClient,
@@ -47,7 +48,8 @@ const getDefaultPath = (packageName: string): string => {
  */
 const loadCBPApps = async (): Promise<void> => {
   const values = getConfigValue() || {};
-  const cbpApps = values?.cbp?.apps;
+  // cbp.plugins 优先，回退到旧的 cbp.apps
+  const cbpApps = values?.cbp?.plugins ?? values?.cbp?.apps;
 
   if (!cbpApps || Object.keys(cbpApps).length === 0) {
     return;
@@ -125,12 +127,38 @@ const routeMessageToDevice = (DeviceId: string, message: string) => {
     } else {
       fullClient.delete(DeviceId);
     }
+  } else {
+    // WebSocket Map 中找不到该设备，尝试 IPC 桥转发（fork 模式）
+    const clientChild = getClientChild();
+
+    if (clientChild?.connected) {
+      try {
+        const parsed = flattedJSON.parse(String(message));
+
+        clientChild.send({ type: 'ipc:data', data: parsed });
+      } catch {
+        // 解析失败忽略
+      }
+    }
   }
 };
 
 // 处理事件
 const handleEvent = (message: string, ID: string) => {
-  // 全量客户端
+  // 尝试通过 IPC 桥转发到客户端子进程（fork 模式下 WebSocket Map 为空）
+  const clientChild = getClientChild();
+
+  if (clientChild?.connected) {
+    try {
+      const parsed = flattedJSON.parse(String(message));
+
+      clientChild.send({ type: 'ipc:data', data: parsed });
+    } catch {
+      // 解析失败忽略
+    }
+  }
+
+  // 全量客户端（WebSocket 直连的前端 UI 等）
   fullClient.forEach((clientWs, clientId) => {
     // 检查状态 并检查状态
     if (clientWs.readyState === WebSocket.OPEN) {
@@ -440,7 +468,12 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
       global.chatbotServer = new WebSocketServer({ server });
 
       // 加载 CBP 应用插件
-      void loadCBPApps();
+      void loadCBPApps().then(() => {
+        // 注册广播回调，供 IPC 桥在 sandbox 模式下转发客户端消息到 CBP apps
+        if (cbpAppHandlers.size > 0) {
+          setCBPAppsBroadcast(broadcastToApps);
+        }
+      });
 
       // 处理客户端连接
       global.chatbotServer.on('connection', (ws, request) => {
@@ -448,11 +481,9 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         const urlPath = (request.url || '').replace(/^\//, '');
 
         if (urlPath && cbpAppHandlers.has(urlPath)) {
-          if (!global.__sandbox) {
-            ws.close(4000, 'Sandbox mode required');
-
-            return;
-          }
+          // 用户在 cbp.apps 中显式配置并启用了该应用，直接允许连接
+          // 同时标记 sandbox 模式，使客户端消息能广播到 apps
+          global.__sandbox = true;
 
           cbpAppHandlers.get(urlPath).onConnection(ws);
 

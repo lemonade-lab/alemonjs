@@ -78,7 +78,6 @@ const startPlatform = (options: StartOptions) => {
 const startClient = (options: StartOptions) => {
   // 格式化 env 变量
   process.env.input = createOptionsByKey(options, 'input', '');
-  process.env.output = createOptionsByKey(options, 'output', '');
   process.env.is_full_receive = String(createCBPOptionsByKey(options, 'is_full_receive', true));
   process.env.port = String(createCBPOptionsByKey(options, 'port', '') || '');
   process.env.url = createCBPOptionsByKey(options, 'url', '');
