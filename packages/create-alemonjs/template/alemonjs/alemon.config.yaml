@@ -5,7 +5,7 @@
 # 具体见 pm2.config.cjs
 pm2:
   apps:
-    - name: 'gui'
-      script: 'node index.js --login gui'
+    - name: 'qq-bot'
+      script: 'node index.js --login qq-bot'
       env:
         NODE_ENV: 'production'
