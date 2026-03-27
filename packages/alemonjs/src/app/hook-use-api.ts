@@ -4,8 +4,7 @@ import { ChildrenApp } from './store';
 import { createResult, Result } from '../core/utils';
 import { sendAction } from '../cbp/processor/actions';
 import { sendAPI } from '../cbp/processor/api';
-import { BT, Format, Image, ImageFile, ImageURL, Link, MD, Mention, Text } from './message-format';
-import { MessageControllerImpl } from './message-controller';
+import { Format } from './message-format';
 
 type Options = {
   UserId?: string;
@@ -183,7 +182,7 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
    * @param val
    * @returns
    */
-  const sendRaw = async (val: DataEnums[]): Promise<Result[]> => {
+  const sendRaw = async (val: DataEnums[], replyId?: string): Promise<Result[]> => {
     if (!val || val.length === 0) {
       return [createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)];
     }
@@ -192,7 +191,8 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
       payload: {
         event,
         params: {
-          format: val
+          format: val,
+          replyId
         }
       }
     });
@@ -200,64 +200,23 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
     return Array.isArray(result) ? result : [result];
   };
 
-  // 新的消息处理接口
-
-  // 轻量代理 — 仅在首次调用 builder 方法时才创建完整 MessageController
-  // 绝大多数事件只用 send()，避免每条消息都分配完整类实例 + 空数组
-  let _ctrl: any = null;
-
-  const getCtrl = () => {
-    if (!_ctrl) {
-      _ctrl = new MessageControllerImpl(sendRaw, resolveFormat);
-    }
-
-    return _ctrl;
-  };
-
   const lightweight = {
-    get currentFormat() {
-      return getCtrl().currentFormat;
-    },
-    addText(...args: Parameters<typeof Text>) {
-      return getCtrl().addText(...args);
-    },
-    addLink(...args: Parameters<typeof Link>) {
-      return getCtrl().addLink(...args);
-    },
-    addImage(...args: Parameters<typeof Image>) {
-      return getCtrl().addImage(...args);
-    },
-    addImageFile(...args: Parameters<typeof ImageFile>) {
-      return getCtrl().addImageFile(...args);
-    },
-    addImageURL(...args: Parameters<typeof ImageURL>) {
-      return getCtrl().addImageURL(...args);
-    },
-    addMention(...args: Parameters<typeof Mention>) {
-      return getCtrl().addMention(...args);
-    },
-    addButtonGroup(...args: Parameters<typeof BT.group>) {
-      return getCtrl().addButtonGroup(...args);
-    },
-    addMarkdown(...args: Parameters<typeof MD>) {
-      return getCtrl().addMarkdown(...args);
-    },
-    addFormat(val: DataEnums[]) {
-      return getCtrl().addFormat(val);
-    },
-    clear() {
-      return getCtrl().clear();
-    },
-    send(params?: MessageParams | DataEnums[]) {
-      // send 直接走快速路径，无需创建完整 controller
-      if (!params) {
-        return _ctrl ? sendRaw(_ctrl.currentFormat) : sendRaw([]);
+    /**
+     * @param params
+     * @param param2 - 可选参数，包含 replyId 用于指定回复的消息 ID，如果不提供则默认使用事件消息 ID 进行回复
+     * @returns
+     */
+    send(
+      params?: MessageParams | DataEnums[],
+      param2?: {
+        replyId?: string;
       }
+    ) {
       if (Array.isArray(params)) {
-        return sendRaw(params.length > 0 ? params : _ctrl ? _ctrl.currentFormat : []);
+        return sendRaw(params.length > 0 ? params : [], param2?.replyId ?? event.MessageId);
       }
 
-      return sendRaw(resolveFormat(params));
+      return sendRaw(resolveFormat(params), param2?.replyId ?? event.MessageId);
     }
   };
 
@@ -280,47 +239,37 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
     throw new Error('Invalid event: event must be an object');
   }
 
-  // /**
-  //  * 获取用户信息
-  //  * @param user_id
-  //  * @returns
-  //  */
-  // const information = async (user_id?: string) => {
-  //   return createResult(ResultCode.Warn, '暂未支持', user_id)
-  // }
+  /**
+   * @param userId
+   * @returns
+   */
+  const information = async (params: { userId: string }) => {
+    try {
+      const results = await sendAction({
+        action: 'member.info',
+        payload: {
+          event,
+          params: {
+            userId: params?.userId
+          }
+        }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
 
-  // /**
-  //  * 禁言
-  //  * @param all 是否是全体
-  //  * @returns
-  //  */
-  // const mute = async (all: boolean = false) => {
-  //   return createResult(ResultCode.Warn, '暂未支持', all)
-  // }
+      if (result) {
+        const data: User | null = result?.data ?? null;
 
-  // /**
-  //  * 解除禁言
-  //  * @param all 是否是全体
-  //  * @returns
-  //  */
-  // const unmute = async (all: boolean = false) => {
-  //   return createResult(ResultCode.Warn, '暂未支持', all)
-  // }
+        return createResult(ResultCode.Ok, 'Successfully retrieved member information', data);
+      }
 
-  // /**
-  //  * 移除用户
-  //  * @param user_id
-  //  * @returns
-  //  */
-  // const remove = async (user_id?: string) => {
-  //   return createResult(ResultCode.Warn, '暂未支持', user_id)
-  // }
+      return createResult(ResultCode.Warn, 'No member information found', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get member information', null);
+    }
+  };
 
   const member = {
-    // information,
-    // mute,
-    // unmute,
-    // remove
+    information
   };
 
   return [member] as const;
@@ -342,20 +291,7 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
     throw new Error('Invalid event: event must be an object');
   }
 
-  // // 退出
-  // const exit = async (channel_id?: string) => {
-  //   return createResult(ResultCode.Warn, '暂未支持', channel_id)
-  // }
-
-  // // 加入
-  // const join = async (channel_id?: string) => {
-  //   return createResult(ResultCode.Warn, '暂未支持', channel_id)
-  // }
-
-  const channel = {
-    // exit,
-    // join
-  };
+  const channel = {};
 
   return [channel] as const;
 };
@@ -431,6 +367,10 @@ export const createSelects = onSelects;
 export const useClient = <T extends object>(event: any, _ApiClass: new (...args: any[]) => T) => {
   const client = new Proxy({} as T, {
     get(_target, prop) {
+      if (typeof prop === 'symbol') {
+        return undefined;
+      }
+
       return (...args: any[]) => {
         return sendAPI({
           action: 'client.api',
@@ -478,17 +418,76 @@ export const useMe = () => {
   /**
    * 加入的服务器列表
    */
+  const guilds = async (): Promise<Result<User | null>> => {
+    try {
+      const results = await sendAction({
+        action: 'me.guilds',
+        payload: {}
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      if (result) {
+        const data: User | null = result?.data ?? null;
+
+        return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
+      }
+
+      return createResult(ResultCode.Warn, 'No bot information found', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get bot information', null);
+    }
+  };
+  /**
+   * 私聊线程列表
+   */
+  const threads = async (): Promise<Result<User | null>> => {
+    try {
+      const results = await sendAction({
+        action: 'me.threads',
+        payload: {}
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      if (result) {
+        const data: User | null = result?.data ?? null;
+
+        return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
+      }
+
+      return createResult(ResultCode.Warn, 'No bot information found', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get bot information', null);
+    }
+  };
 
   /**
    * 好友列表
    */
+  const friends = async (): Promise<Result<User | null>> => {
+    try {
+      const results = await sendAction({
+        action: 'me.friends',
+        payload: {}
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
 
-  /**
-   * 私聊线程列表
-   */
+      if (result) {
+        const data: User | null = result?.data ?? null;
+
+        return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
+      }
+
+      return createResult(ResultCode.Warn, 'No bot information found', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get bot information', null);
+    }
+  };
 
   const control = {
-    info
+    info,
+    guilds,
+    threads,
+    friends
   };
 
   return [control] as const;
