@@ -107,15 +107,15 @@ const createArkListData = (value: DataArkList['value']) => {
 };
 
 const mdFormatters: Record<string, (value: any, options?: any) => string> = {
-  'MD.title': value => `# ${value}`,
-  'MD.subtitle': value => `## ${value}`,
+  'MD.title': value => `# ${value} `,
+  'MD.subtitle': value => `## ${value} `,
   'MD.text': value => `${value} `,
   'MD.bold': value => `**${value}** `,
-  'MD.divider': () => '\n————————\n',
-  'MD.italic': value => `_${value}_ `,
+  'MD.divider': () => '\n***\n',
+  'MD.italic': value => `__${value}__ `,
   'MD.italicStar': value => `*${value}* `,
   'MD.strikethrough': value => `~~${value}~~ `,
-  'MD.blockquote': value => `\n> ${value}`,
+  'MD.blockquote': value => `\n> ${value} `,
   'MD.newline': () => '\n',
   'MD.link': value => `[🔗${value.text}](${value.url}) `,
   'MD.image': (value, options) => `\n![text #${options?.width || 208}px #${options?.height || 320}px](${value})\n`,
