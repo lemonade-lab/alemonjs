@@ -164,6 +164,7 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
    */
   type MessageParams = {
     format: Format | DataEnums[];
+    replyId?: string;
   };
 
   /**
@@ -206,17 +207,12 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
      * @param param2 - 可选参数，包含 replyId 用于指定回复的消息 ID，如果不提供则默认使用事件消息 ID 进行回复
      * @returns
      */
-    send(
-      params?: MessageParams | DataEnums[],
-      param2?: {
-        replyId?: string;
-      }
-    ) {
+    send(params?: MessageParams | DataEnums[]) {
       if (Array.isArray(params)) {
-        return sendRaw(params.length > 0 ? params : [], param2?.replyId ?? event.MessageId);
+        return sendRaw(params.length > 0 ? params : []);
       }
 
-      return sendRaw(resolveFormat(params), param2?.replyId ?? event.MessageId);
+      return sendRaw(resolveFormat(params), params?.replyId ?? event.MessageId);
     }
   };
 

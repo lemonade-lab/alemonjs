@@ -68,8 +68,7 @@ declare global {
    */
   var onMiddleware: OnMiddlewareReversalFunc;
   /**
-   * 定义中间件
-   * @deprecated
+   * @deprecated 废弃，请使用 onMiddleware
    */
   var OnMiddleware: OnMiddlewareReversalFuncBack;
   /**
@@ -90,6 +89,7 @@ declare global {
   var onSelects: OnSelectsFunc;
   /**
    * 定义数据格式
+   * @deprecated 废弃，请使用 Format
    */
   var format: OnDataFormatFunc;
   /**
