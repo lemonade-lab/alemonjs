@@ -215,6 +215,7 @@ const extractContent = (val: DataEnums[], mode: MentionMode): string => {
     'ImageFile',
     'ImageURL',
     'Markdown',
+    'MarkdownOriginal',
     'BT.group',
     'ButtonTemplate',
     'Ark.list',
@@ -229,7 +230,7 @@ const extractContent = (val: DataEnums[], mode: MentionMode): string => {
         return `[${item.value}](${item?.options?.link})`;
       }
       if (item.type === 'Mention') {
-        return formatMention(item as DataMention, mode);
+        return formatMention(item, mode);
       }
       if (item.type === 'Text') {
         return item.value;
@@ -261,7 +262,9 @@ const buildBaseParams = (tag: string | undefined, messageId: string | undefined,
 
 /** 构建 Markdown 和按钮参数 */
 const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null => {
-  const items = (val as any[]).filter(item => item.type === 'Markdown' || item.type === 'BT.group' || item.type === 'ButtonTemplate');
+  const items = (val as any[]).filter(
+    item => item.type === 'Markdown' || item.type === 'MarkdownOriginal' || item.type === 'BT.group' || item.type === 'ButtonTemplate'
+  );
 
   if (items.length === 0) {
     return null;
@@ -302,6 +305,12 @@ const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null =
         } else {
           params['markdown'] = { content };
         }
+      }
+    } else if (item.type === 'MarkdownOriginal' && typeof item?.value === 'string') {
+      if (params['markdown']?.content) {
+        params['markdown'].content += '\n' + item.value;
+      } else {
+        params['markdown'] = { content: item.value };
       }
     }
   }
