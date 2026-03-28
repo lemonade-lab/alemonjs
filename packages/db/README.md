@@ -1,12 +1,12 @@
 # [https://alemonjs.com/](https://alemonjs.com/)
 
-提供 redis 和 sequelize mysql 连接
+提供 redis 和 sequelize 连接
 
 ```ts
 import { getIoRedis, getSequelize } from '@alemonjs/db';
 // redis
 export const Redis = getIoRedis();
-// seuqlieze mysql
+// seuqlieze
 export const sequelize = getSequelize();
 ```
 
@@ -19,17 +19,19 @@ yarn add @alemonjs/db -W
 - alemon.config.yaml
 
 ```yaml
-redis:
-  host: '127.0.0.1'
-  port: '6379'
-  password: ''
-  db: '0'
-mysql:
-  host: '127.0.0.1'
-  port: '3306'
-  user: 'root'
-  password: 'Mm002580!'
-  database: 'alemonjs'
+db:
+  dialect: mysql
+  mysql:
+    host: '127.0.0.1'
+    port: '3306'
+    user: 'root'
+    password: 'Mysql123456!'
+    database: 'alemonjs'
+  redis:
+    host: '127.0.0.1'
+    port: '6379'
+    password: ''
+    db: '0'
 ```
 
 - use
@@ -56,7 +58,7 @@ services:
     environment:
       # 密码 Mm002580!
       # 用户 root
-      MYSQL_ROOT_PASSWORD: 'Mm002580!'
+      MYSQL_ROOT_PASSWORD: 'Mysql123456!'
       MYSQL_ROOT_HOST: '%'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:

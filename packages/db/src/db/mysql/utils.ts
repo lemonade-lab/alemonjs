@@ -9,7 +9,7 @@ import { getMysqlConfig } from '../../config';
  */
 export const initLogPath = () => {
   const mysql = getMysqlConfig();
-  const dir = mysql.logPath || join(process.cwd(), 'logs', 'mysql');
+  const dir = mysql.logPath || join(process.cwd(), 'logs', 'db');
 
   mkdirSync(dir, { recursive: true });
 
