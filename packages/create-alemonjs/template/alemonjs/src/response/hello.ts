@@ -16,7 +16,7 @@ export default async e => {
   const userRes = await mention.findOne();
   if (!userRes.count || !userRes.data) {
     // 没有找到用户
-    console.log('没有找到@用户');
+    logger.warn('没有找到@用户');
     return;
   }
   const user = userRes.data;
