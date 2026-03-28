@@ -10,6 +10,7 @@ import * as v8 from 'v8';
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as flatted from 'flatted';
 
 /**
  * 生成唯一的 Socket 路径（跨平台）
@@ -24,9 +25,11 @@ export const generateSocketPath = (): string => {
 
 /**
  * 消息编码：4字节长度前缀 + V8 序列化数据（单次分配，零拷贝）
+ * 通过 flatted 往返清理不可序列化的值（function, symbol, 循环引用），防止 v8.serialize 抛错
  */
 const encodeMessage = (data: any): Buffer => {
-  const serialized = v8.serialize(data);
+  const safeData = flatted.parse(flatted.stringify(data));
+  const serialized = v8.serialize(safeData);
   const buf = Buffer.allocUnsafe(4 + serialized.length);
 
   buf.writeUInt32BE(serialized.length, 0);

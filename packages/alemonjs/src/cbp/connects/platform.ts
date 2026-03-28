@@ -1,7 +1,7 @@
 import * as flattedJSON from 'flatted';
 import { WebSocket } from 'ws';
 import { deviceId } from '../processor/config';
-import { Result, ResultCode } from '../../core';
+import { Result, ResultCode, sanitizeForSerialization } from '../../core';
 import type { Actions, Apis, EventsEnum } from '../../types';
 import type { ActionReplyFunc, ApiReplyFunc } from '../typings';
 import { createWSConnector } from './base';
@@ -119,7 +119,7 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
     if (typeof process.send === 'function') {
       data.DeviceId = deviceId;
       data.CreateAt = Date.now();
-      process.send({ type: 'ipc:data', data });
+      process.send({ type: 'ipc:data', data: sanitizeForSerialization(data) });
     }
   };
 
@@ -257,7 +257,7 @@ export const cbpPlatform = (
     if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
       data.DeviceId = deviceId;
       data.CreateAt = Date.now();
-      global.chatbotPlatform.send(flattedJSON.stringify(data));
+      global.chatbotPlatform.send(flattedJSON.stringify(sanitizeForSerialization(data)));
     }
   };
   const actionReplys: ActionReplyFunc[] = [];

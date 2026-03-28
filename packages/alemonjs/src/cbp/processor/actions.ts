@@ -1,5 +1,5 @@
 import * as flattedJSON from 'flatted';
-import { ResultCode, createResult, Result } from '../../core';
+import { ResultCode, createResult, Result, sanitizeForSerialization } from '../../core';
 import type { Actions } from '../../types';
 import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config';
 import { getDirectSend } from './transport';
@@ -33,11 +33,14 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
     data.actionId = actionId;
     data.DeviceId = deviceId;
 
+    // 清理不可序列化的值（如中间件挂载的函数），防止跨进程传输报错
+    const safeData = sanitizeForSerialization(data);
+
     // 最优：直连通道（UDS V8 序列化，零桥接）
     const directSend = getDirectSend();
 
     if (directSend) {
-      directSend(data);
+      directSend(safeData);
       setupActionResolve(actionId, resolve);
 
       return;
@@ -45,7 +48,7 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
 
     // 次选：fork IPC（经主进程桥接）
     if (process.env.__ALEMON_IPC === '1' && typeof process.send === 'function') {
-      process.send({ type: 'ipc:data', data });
+      process.send({ type: 'ipc:data', data: safeData });
       setupActionResolve(actionId, resolve);
 
       return;
@@ -58,7 +61,7 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
       return;
     }
     // 发送数据
-    global.chatbotClient?.send(flattedJSON.stringify(data));
+    global.chatbotClient?.send(flattedJSON.stringify(safeData));
     // 设置回调和超时
     setupActionResolve(actionId, resolve);
   });

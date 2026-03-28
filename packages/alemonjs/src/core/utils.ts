@@ -186,6 +186,16 @@ export const showErrorModule = (e: Error) => {
   });
 };
 
+/**
+ * 清理不可序列化的值（function, symbol, 循环引用等），确保数据可安全通过 V8 serialize / JSON / IPC 传输
+ * 利用 flatted（已有依赖）做一次 stringify → parse 往返，自动剥离不可序列化的类型
+ */
+export const sanitizeForSerialization = (data: any): any => {
+  const flatted = require('flatted');
+
+  return flatted.parse(flatted.stringify(data));
+};
+
 const createExports = (packageJson: any) => {
   if (packageJson?.exports) {
     if (typeof packageJson.exports === 'string') {
