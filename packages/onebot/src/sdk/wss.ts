@@ -118,6 +118,31 @@ export class OneBotClient extends OneBotAPI {
             if (this.#events['NOTICE_GROUP_BAN']) {
               this.#events['NOTICE_GROUP_BAN'](event);
             }
+          } else if (event?.notice_type === 'group_upload') {
+            // 群文件上传
+            if (this.#events['NOTICE_GROUP_UPLOAD']) {
+              this.#events['NOTICE_GROUP_UPLOAD'](event);
+            }
+          } else if (event?.notice_type === 'offline_file') {
+            // 离线文件接收
+            if (this.#events['NOTICE_OFFLINE_FILE']) {
+              this.#events['NOTICE_OFFLINE_FILE'](event);
+            }
+          } else if (event?.notice_type === 'group_admin') {
+            // 群管理员变动
+            if (this.#events['NOTICE_GROUP_ADMIN']) {
+              this.#events['NOTICE_GROUP_ADMIN'](event);
+            }
+          } else if (event?.notice_type === 'notify') {
+            // 戳一戳/运气王/荣誉
+            if (this.#events['NOTICE_NOTIFY']) {
+              this.#events['NOTICE_NOTIFY'](event);
+            }
+          } else if (event?.notice_type === 'friend_add') {
+            // 好友已添加
+            if (this.#events['NOTICE_FRIEND_ADD']) {
+              this.#events['NOTICE_FRIEND_ADD'](event);
+            }
           }
         } else if (event?.post_type === 'request') {
           // 收到加群 或 加好友的请求。

@@ -41,6 +41,47 @@ type Message =
       data: {
         id: string;
       };
+    }
+  | {
+      type: 'at';
+      data: {
+        qq: string;
+        nickname?: string;
+      };
+    }
+  | {
+      type: 'face';
+      data: {
+        id: string;
+      };
+    }
+  | {
+      type: 'record';
+      data: {
+        file: string;
+        file_id?: string;
+        url?: string;
+        file_size?: string;
+      };
+    }
+  | {
+      type: 'video';
+      data: {
+        file: string;
+        file_id?: string;
+        url?: string;
+        file_size?: string;
+      };
+    }
+  | {
+      type: 'file';
+      data: {
+        file: string;
+        file_id?: string;
+        url?: string;
+        file_size?: string;
+        file_name?: string;
+      };
     };
 
 export interface MESSAGES_TYPE {
@@ -117,6 +158,70 @@ export interface group_recall {
   notice_type: 'group_recall';
   operator_id: number;
   message_id: number;
+}
+
+/** 群文件上传通知 */
+export interface NOTICE_GROUP_UPLOAD_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'group_upload';
+  group_id: number;
+  user_id: number;
+  file: {
+    id: string;
+    name: string;
+    size: number;
+    busid: number;
+    url?: string;
+  };
+}
+
+/** 离线文件接收通知 */
+export interface NOTICE_OFFLINE_FILE_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'offline_file';
+  user_id: number;
+  file: {
+    name: string;
+    size: number;
+    url: string;
+  };
+}
+
+/** 群管理员变动通知 */
+export interface NOTICE_GROUP_ADMIN_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'group_admin';
+  group_id: number;
+  user_id: number;
+  sub_type: 'set' | 'unset';
+}
+
+/** 群内戳一戳/运气王/荣誉通知 */
+export interface NOTICE_NOTIFY_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'notify';
+  group_id: number;
+  user_id: number;
+  target_id?: number;
+  sub_type: 'poke' | 'lucky_king' | 'honor';
+  honor_type?: 'talkative' | 'performer' | 'emotion';
+}
+
+/** 好友已添加通知 */
+export interface NOTICE_FRIEND_ADD_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'friend_add';
+  user_id: number;
 }
 
 export interface request_friend {

@@ -15,5 +15,27 @@ https://github.com/lemonade-lab/alemongo
 推荐使用 vscode `ALemonTestOne` 插件进行本地开发并测试
 
 ```yaml
-port: 17117 # 开启协议端口，默认不开启（生产模式）
+# 开启协议端口，默认0不开启
+# port: 17117
+```
+
+### 安装模块
+
+- 编辑 package.json
+
+> 本地新增工作区，扩展模块都安装在 packages，并使用 yarn install 可进行本地模块化
+
+```json
+{
+  "private": true,
+  "workspaces": ["packages/*"]
+}
+```
+
+- 编辑 alemon.config.yaml
+
+```yaml
+apps:
+  - 'alemonjs-1'
+  - 'alemonjs-2'
 ```

@@ -3,6 +3,7 @@ import {
   createResult,
   DataEnums,
   definePlatform,
+  MessageMediaItem,
   PrivateEventMessageCreate,
   PrivateEventMessageDelete,
   PrivateEventRequestFriendAdd,
@@ -62,6 +63,51 @@ const main = () => {
     return msg.trim();
   };
 
+  /**
+   * 从 OneBot 消息段中提取媒体信息
+   */
+  const extractMediaFromMessage = (message: any[]): MessageMediaItem[] => {
+    const media: MessageMediaItem[] = [];
+
+    for (const item of message) {
+      if (item.type === 'image') {
+        media.push({
+          Type: 'image',
+          Url: item.data?.url,
+          FileId: item.data?.file_id,
+          FileName: item.data?.file,
+          FileSize: item.data?.file_size ? Number(item.data.file_size) : undefined
+        });
+      } else if (item.type === 'record') {
+        media.push({
+          Type: 'audio',
+          Url: item.data?.url,
+          FileId: item.data?.file_id,
+          FileName: item.data?.file,
+          FileSize: item.data?.file_size ? Number(item.data.file_size) : undefined
+        });
+      } else if (item.type === 'video') {
+        media.push({
+          Type: 'video',
+          Url: item.data?.url,
+          FileId: item.data?.file_id,
+          FileName: item.data?.file,
+          FileSize: item.data?.file_size ? Number(item.data.file_size) : undefined
+        });
+      } else if (item.type === 'file') {
+        media.push({
+          Type: 'file',
+          Url: item.data?.url,
+          FileId: item.data?.file_id,
+          FileName: item.data?.file_name || item.data?.file,
+          FileSize: item.data?.file_size ? Number(item.data.file_size) : undefined
+        });
+      }
+    }
+
+    return media;
+  };
+
   // 元组
   client.on('META', event => {
     if (event?.self_id) {
@@ -81,6 +127,8 @@ const main = () => {
 
     const ReplyId = event.message.find(item => item.type === 'reply')?.data?.id;
 
+    const MessageMedia = extractMediaFromMessage(event.message);
+
     // 定义消
     const e: PublicEventMessageCreate = {
       name: 'message.create',
@@ -96,6 +144,7 @@ const main = () => {
       UserAvatar: UserAvatar,
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
+      MessageMedia,
       OpenId: UserId,
       ReplyId,
       replyId: ReplyId,
@@ -117,6 +166,8 @@ const main = () => {
 
     const ReplyId = event.message.find(item => item.type === 'reply')?.data?.id;
 
+    const MessageMedia = extractMediaFromMessage(event.message);
+
     // 定义消
     const e: PrivateEventMessageCreate = {
       name: 'private.message.create',
@@ -129,6 +180,7 @@ const main = () => {
       UserAvatar: UserAvatar,
       MessageId: String(event.message_id),
       MessageText: msg.trim(),
+      MessageMedia,
       OpenId: String(event.user_id),
       ReplyId,
       replyId: ReplyId,
@@ -321,6 +373,79 @@ const main = () => {
     }
   });
 
+  // 群文件上传 —— 映射为 message.create + MessageMedia
+  client.on('NOTICE_GROUP_UPLOAD', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const groupId = String(event.group_id);
+
+    const e: PublicEventMessageCreate = {
+      name: 'message.create',
+      Platform: platform,
+      GuildId: groupId,
+      ChannelId: groupId,
+      IsMaster: isMaster,
+      SpaceId: groupId,
+      IsBot: false,
+      UserId: UserId,
+      UserName: '',
+      UserKey,
+      UserAvatar: UserAvatar,
+      MessageId: '',
+      MessageText: '',
+      MessageMedia: [
+        {
+          Type: 'file',
+          FileId: event.file?.id,
+          FileName: event.file?.name,
+          FileSize: event.file?.size,
+          Url: event.file?.url
+        }
+      ],
+      OpenId: UserId,
+      BotId: BotMe.id,
+      _tag: 'NOTICE_GROUP_UPLOAD',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 离线文件接收 —— 映射为 private.message.create + MessageMedia
+  client.on('NOTICE_OFFLINE_FILE', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    const e: PrivateEventMessageCreate = {
+      name: 'private.message.create',
+      Platform: platform,
+      IsMaster: isMaster,
+      IsBot: false,
+      UserId: UserId,
+      UserName: '',
+      UserKey,
+      UserAvatar: UserAvatar,
+      MessageId: '',
+      MessageText: '',
+      MessageMedia: [
+        {
+          Type: 'file',
+          FileName: event.file?.name,
+          FileSize: event.file?.size,
+          Url: event.file?.url
+        }
+      ],
+      OpenId: UserId,
+      BotId: BotMe.id,
+      _tag: 'NOTICE_OFFLINE_FILE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
   /**
    * @param val
    * @returns
@@ -435,6 +560,96 @@ const main = () => {
               type: 'image',
               data: {
                 file: `base64://${db.toString('base64')}`
+              }
+            };
+          } else if (item.type === 'Audio') {
+            if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+              return {
+                type: 'record',
+                data: {
+                  file: item.value
+                }
+              };
+            } else if (item.value.startsWith('file://')) {
+              const db = readFileSync(item.value.slice(7));
+
+              return {
+                type: 'record',
+                data: {
+                  file: `base64://${db.toString('base64')}`
+                }
+              };
+            } else if (item.value.startsWith('base64://')) {
+              return {
+                type: 'record',
+                data: {
+                  file: item.value
+                }
+              };
+            }
+
+            return {
+              type: 'record',
+              data: {
+                file: item.value
+              }
+            };
+          } else if (item.type === 'Video') {
+            if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+              return {
+                type: 'video',
+                data: {
+                  file: item.value
+                }
+              };
+            } else if (item.value.startsWith('file://')) {
+              const db = readFileSync(item.value.slice(7));
+
+              return {
+                type: 'video',
+                data: {
+                  file: `base64://${db.toString('base64')}`
+                }
+              };
+            } else if (item.value.startsWith('base64://')) {
+              return {
+                type: 'video',
+                data: {
+                  file: item.value
+                }
+              };
+            }
+
+            return {
+              type: 'video',
+              data: {
+                file: item.value
+              }
+            };
+          } else if (item.type === 'Attachment') {
+            if (item.value.startsWith('http://') || item.value.startsWith('https://')) {
+              return {
+                type: 'file',
+                data: {
+                  file: item.value,
+                  name: item.options?.filename
+                }
+              };
+            } else if (item.value.startsWith('file://')) {
+              return {
+                type: 'file',
+                data: {
+                  file: item.value,
+                  name: item.options?.filename
+                }
+              };
+            }
+
+            return {
+              type: 'file',
+              data: {
+                file: item.value,
+                name: item.options?.filename
               }
             };
           }
