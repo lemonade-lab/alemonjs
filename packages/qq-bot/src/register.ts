@@ -5,18 +5,24 @@ import {
   PrivateEventInteractionCreate,
   PrivateEventMessageCreate,
   PrivateEventMessageDelete,
+  PrivateEventNoticeCreate,
   PrivateEventRequestFriendAdd,
+  PrivateEventRequestFriendRemove,
   PublicEventChannelCreate,
   PublicEventChannelDelete,
+  PublicEventChannelUpdate,
   PublicEventGuildExit,
   PublicEventGuildJoin,
+  PublicEventGuildUpdate,
   PublicEventInteractionCreate,
   PublicEventMemberAdd,
   PublicEventMemberRemove,
+  PublicEventMemberUpdate,
   PublicEventMessageCreate,
   PublicEventMessageDelete,
   PublicEventMessageReactionAdd,
   PublicEventMessageReactionRemove,
+  PublicEventNoticeCreate,
   ResultCode
 } from 'alemonjs';
 import { QQBotClients } from './sdk/client.websoket';
@@ -642,6 +648,32 @@ export const register = (client: QQBotClients) => {
     cbp.send(e);
   });
 
+  // 频道成员资料变更
+  client.on('GUILD_MEMBER_UPDATE', event => {
+    const UserId = event.user?.id ?? '';
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    const e: PublicEventMemberUpdate = {
+      name: 'member.update',
+      Platform: platform,
+      GuildId: event.guild_id ?? '',
+      ChannelId: '',
+      SpaceId: `GUILD:${event.guild_id ?? ''}`,
+      UserId: UserId,
+      UserKey,
+      UserName: event.user?.username ?? '',
+      UserAvatar: createUserAvatarURL(UserId),
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: '',
+      BotId: botId,
+      _tag: 'GUILD_MEMBER_UPDATE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
   // 好友添加
   client.on('FRIEND_ADD', event => {
     const e: PrivateEventRequestFriendAdd = {
@@ -654,6 +686,140 @@ export const register = (client: QQBotClients) => {
       MessageId: '',
       BotId: botId,
       _tag: 'FRIEND_ADD',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 好友删除
+  client.on('FRIEND_DEL', event => {
+    const e: PrivateEventRequestFriendRemove = {
+      name: 'private.friend.remove',
+      Platform: platform,
+      UserId: event.openid ?? '',
+      UserKey: '',
+      IsMaster: false,
+      IsBot: false,
+      MessageId: '',
+      BotId: botId,
+      _tag: 'FRIEND_DEL',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 子频道更新
+  client.on('CHANNEL_UPDATE', event => {
+    const e: PublicEventChannelUpdate = {
+      name: 'channel.update',
+      Platform: platform,
+      GuildId: event.guild_id ?? '',
+      ChannelId: event.id ?? '',
+      SpaceId: `GUILD:${event.guild_id ?? ''}`,
+      MessageId: '',
+      BotId: botId,
+      _tag: 'CHANNEL_UPDATE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 频道信息更新
+  client.on('GUILD_UPDATE', event => {
+    const e: PublicEventGuildUpdate = {
+      name: 'guild.update',
+      Platform: platform,
+      GuildId: event.id ?? '',
+      ChannelId: '',
+      SpaceId: `GUILD:${event.id ?? ''}`,
+      MessageId: '',
+      BotId: botId,
+      _tag: 'GUILD_UPDATE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 群消息推送开启
+  client.on('GROUP_MSG_RECEIVE', event => {
+    const e: PublicEventNoticeCreate = {
+      name: 'notice.create',
+      Platform: platform,
+      GuildId: event.group_openid,
+      ChannelId: event.group_openid,
+      SpaceId: `GROUP:${event.group_openid}`,
+      UserId: event.op_member_openid,
+      UserKey: '',
+      IsMaster: false,
+      IsBot: false,
+      MessageId: `group_msg_receive_${event.group_openid}_${event.timestamp}`,
+      MessageText: '',
+      OpenId: `C2C:${event.op_member_openid}`,
+      BotId: botId,
+      _tag: 'GROUP_MSG_RECEIVE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 群消息推送关闭
+  client.on('GROUP_MSG_REJECT', event => {
+    const e: PublicEventNoticeCreate = {
+      name: 'notice.create',
+      Platform: platform,
+      GuildId: event.group_openid,
+      ChannelId: event.group_openid,
+      SpaceId: `GROUP:${event.group_openid}`,
+      UserId: event.op_member_openid,
+      UserKey: '',
+      IsMaster: false,
+      IsBot: false,
+      MessageId: `group_msg_reject_${event.group_openid}_${event.timestamp}`,
+      MessageText: '',
+      OpenId: `C2C:${event.op_member_openid}`,
+      BotId: botId,
+      _tag: 'GROUP_MSG_REJECT',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // C2C消息推送开启
+  client.on('C2C_MSG_RECEIVE', event => {
+    const e: PrivateEventNoticeCreate = {
+      name: 'private.notice.create',
+      Platform: platform,
+      UserId: event.openid ?? '',
+      UserKey: '',
+      IsMaster: false,
+      IsBot: false,
+      MessageId: `c2c_msg_receive_${event.openid}_${event.timestamp}`,
+      BotId: botId,
+      _tag: 'C2C_MSG_RECEIVE',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // C2C消息推送关闭
+  client.on('C2C_MSG_REJECT', event => {
+    const e: PrivateEventNoticeCreate = {
+      name: 'private.notice.create',
+      Platform: platform,
+      UserId: event.openid ?? '',
+      UserKey: '',
+      IsMaster: false,
+      IsBot: false,
+      MessageId: `c2c_msg_reject_${event.openid}_${event.timestamp}`,
+      BotId: botId,
+      _tag: 'C2C_MSG_REJECT',
       value: event
     };
 
