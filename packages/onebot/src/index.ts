@@ -12,8 +12,10 @@ import {
   PublicEventMemberBan,
   PublicEventMemberRemove,
   PublicEventMemberUnban,
+  PublicEventMemberUpdate,
   PublicEventMessageCreate,
   PublicEventMessageDelete,
+  PublicEventNoticeCreate,
   ResultCode,
   User
 } from 'alemonjs';
@@ -392,7 +394,7 @@ const main = () => {
       UserName: '',
       UserKey,
       UserAvatar: UserAvatar,
-      MessageId: '',
+      MessageId: `upload_${event.user_id}_${event.time}`,
       MessageText: '',
       MessageMedia: [
         {
@@ -427,7 +429,7 @@ const main = () => {
       UserName: '',
       UserKey,
       UserAvatar: UserAvatar,
-      MessageId: '',
+      MessageId: `offline_${event.user_id}_${event.time}`,
       MessageText: '',
       MessageMedia: [
         {
@@ -444,6 +446,88 @@ const main = () => {
     };
 
     cbp.send(e);
+  });
+
+  // 群管理员变动
+  client.on('NOTICE_GROUP_ADMIN', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+    const groupId = String(event.group_id);
+
+    const e: PublicEventMemberUpdate = {
+      name: 'member.update',
+      Platform: platform,
+      GuildId: groupId,
+      ChannelId: groupId,
+      SpaceId: groupId,
+      UserId: UserId,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: '',
+      BotId: BotMe.id,
+      _tag: `NOTICE_GROUP_ADMIN_${event.sub_type === 'set' ? 'SET' : 'UNSET'}`,
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 好友已添加通知
+  client.on('NOTICE_FRIEND_ADD', event => {
+    const UserId = String(event.user_id);
+    const UserAvatar = createUserAvatar(UserId);
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    const e: PrivateEventRequestFriendAdd = {
+      name: 'private.friend.add',
+      Platform: platform,
+      UserId: UserId,
+      UserKey,
+      UserAvatar: UserAvatar,
+      IsMaster: isMaster,
+      IsBot: false,
+      MessageId: '',
+      BotId: BotMe.id,
+      _tag: 'NOTICE_FRIEND_ADD',
+      value: event
+    };
+
+    cbp.send(e);
+  });
+
+  // 戳一戳通知 —— 映射为 notice.create
+  client.on('NOTICE_NOTIFY', event => {
+    if (event.sub_type === 'poke') {
+      const UserId = String(event.user_id);
+      const UserAvatar = createUserAvatar(UserId);
+      const [isMaster, UserKey] = getMaster(UserId);
+      const groupId = String(event.group_id);
+
+      const e: PublicEventNoticeCreate = {
+        name: 'notice.create',
+        Platform: platform,
+        GuildId: groupId,
+        ChannelId: groupId,
+        IsMaster: isMaster,
+        SpaceId: groupId,
+        IsBot: false,
+        UserId: UserId,
+        UserName: '',
+        UserKey,
+        UserAvatar: UserAvatar,
+        MessageId: `poke_${event.user_id}_${event.time}`,
+        MessageText: '',
+        OpenId: UserId,
+        BotId: BotMe.id,
+        _tag: 'NOTICE_NOTIFY_POKE',
+        value: event
+      };
+
+      cbp.send(e);
+    }
   });
 
   /**

@@ -1,7 +1,8 @@
 import { PublicEventChannelCreate, PublicEventChannelDelete, PublicEventChannelUpdate } from './channel';
 import { PublicEventGuildExit, PublicEventGuildJoin, PublicEventGuildUpdate } from './guild';
 import { PrivateEventInteractionCreate, PublicEventInteractionCreate } from './interaction';
-import { PublicEventMemberAdd, PublicEventMemberBan, PublicEventMemberRemove, PublicEventMemberUnban } from './member';
+import { PublicEventMemberAdd, PublicEventMemberBan, PublicEventMemberRemove, PublicEventMemberUnban, PublicEventMemberUpdate } from './member';
+import { PublicEventNoticeCreate, PrivateEventNoticeCreate } from './notice';
 import {
   PublicEventMessageCreate,
   PublicEventMessageDelete,
@@ -41,11 +42,14 @@ type RawEvents = {
   'member.remove': PublicEventMemberRemove;
   'member.ban': PublicEventMemberBan;
   'member.unban': PublicEventMemberUnban;
+  'member.update': PublicEventMemberUpdate;
+  'notice.create': PublicEventNoticeCreate;
   'private.message.update': PrivateEventMessageUpdate;
   'private.message.delete': PrivateEventMessageDelete;
   'private.friend.add': PrivateEventRequestFriendAdd;
   'private.friend.remove': PrivateEventRequestFriendRemove;
   'private.guild.add': PrivateEventRequestGuildAdd;
+  'private.notice.create': PrivateEventNoticeCreate;
 };
 
 /**

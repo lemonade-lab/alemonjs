@@ -148,7 +148,7 @@ export interface META_EVENT_HEARTBEAT {
   interval: number;
 }
 
-export interface group_recall {
+export interface GROUP_RECALL {
   time: number;
   // 机器人id
   self_id: number;
@@ -158,6 +158,66 @@ export interface group_recall {
   notice_type: 'group_recall';
   operator_id: number;
   message_id: number;
+}
+
+/** 好友消息撤回 */
+export interface NOTICE_FRIEND_RECALL_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'friend_recall';
+  user_id: number;
+  message_id: number;
+}
+
+/** 群成员增加 */
+export interface NOTICE_GROUP_MEMBER_INCREASE_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'group_increase';
+  group_id: number;
+  user_id: number;
+  operator_id: number;
+  sub_type: 'approve' | 'invite';
+}
+
+/** 群成员减少 */
+export interface NOTICE_GROUP_MEMBER_REDUCE_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'group_decrease';
+  group_id: number;
+  user_id: number;
+  operator_id: number;
+  sub_type: 'leave' | 'kick' | 'kick_me';
+}
+
+/** 群禁言 */
+export interface NOTICE_GROUP_BAN_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'notice';
+  notice_type: 'group_ban';
+  group_id: number;
+  user_id: number;
+  operator_id: number;
+  sub_type: 'ban' | 'lift_ban';
+  duration: number;
+}
+
+/** 加群请求/邀请 */
+export interface REQUEST_ADD_GROUP_TYPE {
+  time: number;
+  self_id: number;
+  post_type: 'request';
+  request_type: 'group';
+  group_id: number;
+  user_id: number;
+  comment: string;
+  flag: string;
+  sub_type: 'add' | 'invite';
 }
 
 /** 群文件上传通知 */
@@ -224,7 +284,7 @@ export interface NOTICE_FRIEND_ADD_TYPE {
   user_id: number;
 }
 
-export interface request_friend {
+export interface REQUEST_FRIEND {
   time: number;
   self_id: number;
   post_type: 'request';

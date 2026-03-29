@@ -27,9 +27,8 @@ export class OneBotClient extends OneBotAPI {
     }
   }
 
-  #events: {
-    [K in keyof OneBotEventMap]?: (event: OneBotEventMap[K]) => any;
-  } = {};
+  // 类型安全由 on() 方法的泛型签名保证
+  #events: { [K in keyof OneBotEventMap]?: (event: any) => any } = {};
 
   // 重连次数
   #count = 0;

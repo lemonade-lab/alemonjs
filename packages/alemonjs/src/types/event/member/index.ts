@@ -35,3 +35,11 @@ export type PublicEventMemberUnban = platform &
   User & {
     name: 'member.unban';
   } & Expansion;
+// 成员属性变更（管理员设置/取消、角色变更等）
+export type PublicEventMemberUpdate = platform &
+  Guild &
+  Channel &
+  Message &
+  User & {
+    name: 'member.update';
+  } & Expansion;

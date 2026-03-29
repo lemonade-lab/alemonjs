@@ -9,6 +9,7 @@ export * from './event/channel/index';
 export * from './event/guild/index';
 export * from './event/interaction/index';
 export * from './event/member/index';
+export * from './event/notice/index';
 export * from './event/message/message';
 export * from './event/message/private.message';
 export * from './event/request/index';
