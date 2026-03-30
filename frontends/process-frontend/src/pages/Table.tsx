@@ -78,24 +78,24 @@ export default function Table() {
   }, []);
 
   return (
-    <table className='min-w-full'>
+    <table className='min-w-full text-sm'>
       <thead>
         <tr className=''>
-          <th className='py-3 px-4 text-left '>名称</th>
-          <th className='py-3 px-4 text-left'>描述</th>
-          <th className='py-3 px-4 text-left'>版本</th>
-          <th className='py-3 px-4 text-left'>作者</th>
-          <th className='py-3 px-4 text-left'>操作</th>
+          <th className='py-2 px-3 text-left '>名称</th>
+          <th className='py-2 px-3 text-left'>描述</th>
+          <th className='py-2 px-3 text-left'>版本</th>
+          <th className='py-2 px-3 text-left'>作者</th>
+          <th className='py-2 px-3 text-left'>操作</th>
         </tr>
       </thead>
       <tbody>
         {expansions.package.map(item => (
           <tr key={item.name} className=''>
-            <td className='py-3 px-4 '>{item?.name.replace(/^(@alemonjs\/|alemonjs-)/, '')}</td>
-            <td className='py-3 px-4 '>{item?.description}</td>
-            <td className='py-3 px-4 '>{item?.version}</td>
-            <td className='py-3 px-4 '>{typeof item.author === 'string' ? item.author : item?.author?.name}</td>
-            <td className='py-3 px-4 '>
+            <td className='py-2 px-3 '>{item?.name.replace(/^(@alemonjs\/|alemonjs-)/, '')}</td>
+            <td className='py-2 px-3 '>{item?.description}</td>
+            <td className='py-2 px-3 '>{item?.version}</td>
+            <td className='py-2 px-3 '>{typeof item.author === 'string' ? item.author : item?.author?.name}</td>
+            <td className='py-2 px-3 '>
               {typeof item._alemonjs_apps_switch === 'boolean' && (
                 <Switch
                   value={item._alemonjs_apps_switch}

@@ -1,4 +1,4 @@
-import { Button, Input } from '@alemonjs/react-ui';
+import { Button, Input, Select } from '@alemonjs/react-ui';
 import React, { useEffect, useState } from 'react';
 
 export default function WebhookForm() {
@@ -9,7 +9,9 @@ export default function WebhookForm() {
     master_key: '',
     route: '/webhook',
     port: 17157,
-    sandbox: false
+    sandbox: false,
+    markdownToText: false,
+    hideUnsupported: ''
   });
 
   useEffect(() => {
@@ -31,7 +33,9 @@ export default function WebhookForm() {
           route: db.route || '/webhook',
           port: db.port || 17157,
           sandbox: db.sandbox || false,
-          master_key: Array.isArray(db?.master_key) ? db.master_key.join(',') : ''
+          master_key: Array.isArray(db?.master_key) ? db.master_key.join(',') : '',
+          markdownToText: db.markdownToText || false,
+          hideUnsupported: db?.hideUnsupported ?? ''
         });
       }
     });
@@ -128,6 +132,28 @@ export default function WebhookForm() {
           <Input type='checkbox' id='sandbox' name='sandbox' checked={formData.sandbox} onChange={handleChange} className='mr-2' />
           Sandbox
         </label>
+      </div>
+      <div>
+        <label className='inline-flex items-center'>
+          <Input type='checkbox' id='markdownToText' name='markdownToText' checked={formData.markdownToText} onChange={handleChange} className='mr-2' />
+          Markdown To Text
+        </label>
+      </div>
+      <div>
+        <label className='block text-sm font-medium '>Hide Unsupported</label>
+        <Select
+          id='hideUnsupported'
+          name='hideUnsupported'
+          value={formData.hideUnsupported}
+          onChange={handleChange as any}
+          className='mt-1 w-full p-2 rounded-md border focus:outline-none'
+        >
+          <option value=''>关闭</option>
+          <option value='1'>1 - 一级隐藏</option>
+          <option value='2'>2 - 二级隐藏</option>
+          <option value='3'>3 - 三级隐藏</option>
+          <option value='4'>4 - 四级隐藏</option>
+        </Select>
       </div>
       <Button type='submit' className='w-full  p-2 rounded-md  transition duration-200'>
         保存

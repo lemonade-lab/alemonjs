@@ -33,12 +33,32 @@ export const activate = (context: Context) => {
   // 监听 webview 的消息。
   webView.onMessage(data => {
     try {
-      if (data.type === 'redis.form.save') {
+      if (data.type === 'dialect.form.save') {
+        const config = getConfig();
+        const value = config.value ?? {};
+
+        if (!value.db) {
+          value.db = {};
+        }
+        value.db.dialect = data.data ?? 'mysql';
+        config.saveValue(value);
+        context.notification('Dialect 配置保存成功～');
+      } else if (data.type === 'dialect.init') {
+        const config = getConfigValue() ?? {};
+
+        webView.postMessage({
+          type: 'dialect.init',
+          data: config.db?.dialect ?? config.dialect ?? 'mysql'
+        });
+      } else if (data.type === 'redis.form.save') {
         const db = data.data;
         const config = getConfig();
         const value = config.value ?? {};
 
-        value.redis = {
+        if (!value.db) {
+          value.db = {};
+        }
+        value.db.redis = {
           host: db.host ?? '127.0.0.1',
           port: db.port ?? 6379,
           password: db.password ?? '',
@@ -47,22 +67,21 @@ export const activate = (context: Context) => {
         config.saveValue(value);
         context.notification('Redis 配置保存成功～');
       } else if (data.type === 'redis.init') {
-        let config = getConfigValue();
+        const config = getConfigValue() ?? {};
 
-        if (!config) {
-          config = {};
-        }
-        // 发送消息
         webView.postMessage({
           type: 'redis.init',
-          data: config.redis ?? {}
+          data: config.db?.redis ?? config.redis ?? {}
         });
       } else if (data.type === 'mysql.form.save') {
         const db = data.data;
         const config = getConfig();
         const value = config.value ?? {};
 
-        value.mysql = {
+        if (!value.db) {
+          value.db = {};
+        }
+        value.db.mysql = {
           host: db.host ?? '127.0.0.1',
           port: db.port ?? 3306,
           user: db.user ?? 'root',
@@ -72,15 +91,11 @@ export const activate = (context: Context) => {
         config.saveValue(value);
         context.notification('MySQL 配置保存成功～');
       } else if (data.type === 'mysql.init') {
-        let config = getConfigValue();
+        const config = getConfigValue() ?? {};
 
-        if (!config) {
-          config = {};
-        }
-        // 发送消息
         webView.postMessage({
           type: 'mysql.init',
-          data: config.mysql ?? {}
+          data: config.db?.mysql ?? config.mysql ?? {}
         });
       }
     } catch (e) {

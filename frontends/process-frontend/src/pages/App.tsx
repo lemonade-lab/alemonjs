@@ -2,7 +2,7 @@ import { PrimaryDiv, SecondaryDiv } from '@alemonjs/react-ui';
 import Table from './Table';
 export default function App() {
   return (
-    <SecondaryDiv className='flex items-center justify-center p-8'>
+    <SecondaryDiv className='flex items-center justify-center p-2'>
       <PrimaryDiv className='rounded-lg shadow-inner w-full'>
         <Table />
       </PrimaryDiv>

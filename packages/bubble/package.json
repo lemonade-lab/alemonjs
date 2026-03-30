@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/bubble",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "bubble platform",
   "author": "lemonade",
   "license": "MIT",
@@ -36,18 +36,15 @@
           "name": "bubble"
         }
       ],
-      "logo": "antd.bubbleOutlined",
       "command": [
         {
           "name": "打开bubble",
-          "icon": "antd.bubbleOutlined",
           "command": "open.bubble"
         }
       ],
       "sidebars": [
         {
-          "name": "dc",
-          "icon": "antd.bubbleOutlined",
+          "name": "bubble",
           "command": "open.bubble"
         }
       ]
