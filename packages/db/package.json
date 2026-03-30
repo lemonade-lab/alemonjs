@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "数据库连接",
   "author": "lemonade",
   "license": "MIT",
@@ -39,7 +39,6 @@
     "ioredis": "^5.4.1",
     "mysql2": "^3.6.2",
     "sequelize": "^6.33.0",
-    "sqlite3": "^5.1.7",
     "dayjs": "^1.11.13"
   },
   "devDependencies": {
