@@ -439,14 +439,14 @@ export class QQBotAPI {
     guild_id: string,
     data: {
       name: string;
-      type: number;
-      sub_type: number;
-      position: number;
-      parent_id: string;
-      private_type: number;
-      private_user_ids: string[];
-      speak_permission: number;
-      application_id: string;
+      type?: number;
+      sub_type?: number;
+      position?: number;
+      parent_id?: string;
+      private_type?: number;
+      private_user_ids?: string[];
+      speak_permission?: number;
+      application_id?: string;
     }
   ) {
     return this.guildServer({
@@ -464,11 +464,11 @@ export class QQBotAPI {
   guildsChannelsUpdate(
     channel_id: string,
     data: {
-      name: string;
-      position: number;
-      parent_id: string;
-      private_type: number;
-      speak_permission: number;
+      name?: string;
+      position?: number;
+      parent_id?: string;
+      private_type?: number;
+      speak_permission?: number;
     }
   ) {
     return this.guildServer({
@@ -486,12 +486,12 @@ export class QQBotAPI {
    */
   guildsChannelsdelete(
     channel_id: string,
-    data: {
-      name: string;
-      position: number;
-      parent_id: string;
-      private_type: number;
-      speak_permission: number;
+    data?: {
+      name?: string;
+      position?: number;
+      parent_id?: string;
+      private_type?: number;
+      speak_permission?: number;
     }
   ) {
     return this.guildServer({

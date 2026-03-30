@@ -526,6 +526,7 @@ const main = () => {
 
         // hideUnsupported 模式：检查转换后内容是否为空
         const images = val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
+
         if (hide && !content && images.length <= 0) {
           logger.info('[telegram] hideUnsupported: 消息内容转换后为空，跳过发送');
 
@@ -597,11 +598,314 @@ const main = () => {
 
         consume(res);
       } else if (data.action === 'message.send.channel') {
-        consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
+        // Telegram中channel就是chat_id
+        const chatId = data.payload.ChannelId;
+        const format = data.payload.params?.format ?? [];
+        const content = format.map(i => i.value).join('');
+
+        if (!content) {
+          consume([createResult(ResultCode.Fail, '消息内容为空', null)]);
+
+          return;
+        }
+        const res = await client
+          .sendMessage(chatId, content)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
       } else if (data.action === 'message.send.user') {
-        consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
+        const userId = data.payload.UserId;
+        const format = data.payload.params?.format ?? [];
+        const content = format.map(i => i.value).join('');
+
+        if (!content) {
+          consume([createResult(ResultCode.Fail, '消息内容为空', null)]);
+
+          return;
+        }
+        const res = await client
+          .sendMessage(userId, content)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
       } else if (data.action === 'mention.get') {
-        consume([createResult(ResultCode.Fail, '暂未支持，请尝试升级版本', null)]);
+        const res = await api.use.mention();
+
+        consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      }
+      // ─── me ───
+      else if (data.action === 'me.info') {
+        const res = await client
+          .getMe()
+          .then(r =>
+            createResult(ResultCode.Ok, data.action, {
+              UserId: String(r?.id),
+              UserName: r?.username ?? r?.first_name,
+              UserAvatar: '',
+              IsBot: true,
+              IsMaster: false,
+              UserKey: ''
+            })
+          )
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 消息管理 ───
+      else if (data.action === 'message.delete') {
+        // Telegram deleteMessage 需要 chat_id + message_id
+        const chatId = data.payload.ChannelId ?? data.payload.event?.value?.chat?.id;
+        const messageId = data.payload.MessageId;
+
+        if (!chatId) {
+          consume([createResult(ResultCode.Fail, 'message.delete 需要 ChannelId (chat_id)', null)]);
+
+          return;
+        }
+        const res = await client
+          .deleteMessage(chatId, messageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'message.pin') {
+        const chatId = data.payload.ChannelId;
+        const messageId = data.payload.MessageId;
+        const res = await client
+          .pinChatMessage(chatId, messageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'message.unpin') {
+        const chatId = data.payload.ChannelId;
+        const messageId = data.payload.MessageId;
+        const res = await client
+          .unpinChatMessage(chatId, { message_id: Number(messageId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 成员管理 ───
+      else if (data.action === 'member.info') {
+        const guildId = data.payload.params?.guildId ?? data.payload.GuildId;
+        const userId = data.payload.params?.userId ?? data.payload.UserId;
+        const res = await client
+          .getChatMember(guildId, userId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.kick') {
+        const res = await client
+          .banChatMember(data.payload.GuildId, data.payload.UserId)
+          .then(async r => {
+            // Telegram kick = ban then unban
+            await client.unbanChatMember(data.payload.GuildId, data.payload.UserId);
+
+            return createResult(ResultCode.Ok, data.action, r);
+          })
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.ban') {
+        const res = await client
+          .banChatMember(data.payload.GuildId, data.payload.UserId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.unban') {
+        const res = await client
+          .unbanChatMember(data.payload.GuildId, data.payload.UserId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.list') {
+        // Telegram 只能获取管理员列表
+        const res = await client
+          .getChatAdministrators(data.payload.GuildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.mute') {
+        const chatId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const duration = data.payload.params?.duration ?? 0;
+        // duration > 0: 禁言（移除发送消息权限），= 0: 解除禁言
+        const untilDate = duration > 0 ? Math.floor(Date.now() / 1000) + duration : 0;
+        const canSend = duration <= 0;
+        const res = await client
+          .restrictChatMember(chatId, userId, {
+            until_date: untilDate,
+            permissions: {
+              can_send_messages: canSend,
+              can_send_audios: canSend,
+              can_send_documents: canSend,
+              can_send_photos: canSend,
+              can_send_videos: canSend,
+              can_send_video_notes: canSend,
+              can_send_voice_notes: canSend,
+              can_send_polls: canSend,
+              can_send_other_messages: canSend,
+              can_add_web_page_previews: canSend
+            }
+          })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.admin') {
+        const chatId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const enable = data.payload.params?.enable ?? true;
+        const res = await client
+          .promoteChatMember(chatId, userId, {
+            can_manage_chat: enable,
+            can_delete_messages: enable,
+            can_manage_video_chats: enable,
+            can_restrict_members: enable,
+            can_promote_members: false,
+            can_change_info: enable,
+            can_invite_users: enable,
+            can_pin_messages: enable
+          })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.title') {
+        const chatId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const title = data.payload.params?.title ?? '';
+        const res = await client
+          .setChatAdministratorCustomTitle(chatId, userId, title)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 服务器 ───
+      else if (data.action === 'guild.info') {
+        const chatId = data.payload.GuildId;
+        const res = await client
+          .getChat(chatId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 消息编辑 ───
+      else if (data.action === 'message.edit') {
+        const format = data.payload.params?.format;
+        const content = format?.map(i => i.value).join('') ?? '';
+        const chatId = data.payload.ChannelId ?? data.payload.GuildId;
+        const messageId = data.payload.MessageId;
+        const res = await client
+          .editMessageText(content, { chat_id: chatId, message_id: messageId })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 消息转发 ───
+      else if (data.action === 'message.forward.channel') {
+        const res = await client
+          .forwardMessage(data.payload.ChannelId, data.payload.FromChannelId, data.payload.MessageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'message.forward.user') {
+        const res = await client
+          .forwardMessage(data.payload.UserId, data.payload.FromChannelId, data.payload.MessageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 服务器管理 ───
+      else if (data.action === 'guild.update') {
+        const params = data.payload.params;
+        const chatId = data.payload.GuildId;
+        const results = [];
+
+        if (params?.name) {
+          const r = await client.setChatTitle(chatId, params.name).catch(e => e);
+
+          results.push(r);
+        }
+        if (params?.description) {
+          const r = await client.setChatDescription(chatId, params.description).catch(e => e);
+
+          results.push(r);
+        }
+        consume([createResult(ResultCode.Ok, data.action, results)]);
+      } else if (data.action === 'guild.leave') {
+        const res = await client
+          .leaveChat(data.payload.GuildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'guild.mute') {
+        // Telegram 通过 setChatPermissions 实现全员禁言
+        const chatId = data.payload.GuildId;
+        const duration = data.payload.params?.duration ?? 0;
+        const muted = duration > 0;
+        const res = await client
+          .setChatPermissions(chatId, {
+            can_send_messages: !muted,
+            can_send_audios: !muted,
+            can_send_documents: !muted,
+            can_send_photos: !muted,
+            can_send_videos: !muted,
+            can_send_video_notes: !muted,
+            can_send_voice_notes: !muted,
+            can_send_polls: !muted,
+            can_send_other_messages: !muted,
+            can_add_web_page_previews: !muted
+          })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 表情回应 ───
+      else if (data.action === 'reaction.add') {
+        const chatId = data.payload.ChannelId;
+        const messageId = data.payload.MessageId;
+        const emoji = data.payload.EmojiId;
+        // setMessageReaction 未在类型中定义，通过动态调用
+        const res = await (client as any)
+          .setMessageReaction(chatId, messageId, { reaction: [{ type: 'emoji', emoji }] })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'reaction.remove') {
+        const chatId = data.payload.ChannelId;
+        const messageId = data.payload.MessageId;
+        const res = await (client as any)
+          .setMessageReaction(chatId, messageId, { reaction: [] })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 用户信息 ───
+      else if (data.action === 'user.info') {
+        const res = await client
+          .getChat(data.payload.UserId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }

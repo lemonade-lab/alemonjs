@@ -999,6 +999,24 @@ const main = () => {
 
         return consume([res]);
       }
+      case 'message.pin': {
+        const messageId = data.payload.MessageId;
+        const res = await client
+          .setEssenceMsg({ message_id: Number(messageId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'message.unpin': {
+        const messageId = data.payload.MessageId;
+        const res = await client
+          .deleteEssenceMsg({ message_id: Number(messageId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
       case 'file.send.channel': {
         const res = await api.use.file
           .channel(data.payload.ChannelId, data.payload.params)
@@ -1039,6 +1057,208 @@ const main = () => {
         const res = await api.use.forward
           .user(data.payload.UserId, params)
           .then(res => createResult(ResultCode.Ok, data.action, res))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── 成员管理 ───
+      case 'member.info': {
+        const guildId = data.payload.params?.guildId ?? data.payload.GuildId;
+        const userId = data.payload.params?.userId ?? data.payload.UserId;
+        const res = await client
+          .getGroupMemberInfo({ group_id: Number(guildId), user_id: Number(userId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'member.list': {
+        const guildId = data.payload.GuildId;
+        const res = await client
+          .getGroupMemberList({ group_id: Number(guildId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'member.kick': {
+        const guildId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const res = await client
+          .setGroupKick({ group_id: Number(guildId), user_id: Number(userId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'member.ban': {
+        const guildId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const duration = data.payload.params?.duration ?? 0;
+        const res = await client
+          .setGroupBan({ group_id: Number(guildId), user_id: Number(userId), duration: Number(duration) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'member.unban': {
+        const guildId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const res = await client
+          .setGroupBan({ group_id: Number(guildId), user_id: Number(userId), duration: 0 })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── 服务器/群 ───
+      case 'guild.info': {
+        const guildId = data.payload.GuildId;
+        const res = await client
+          .getGroupInfo({ group_id: Number(guildId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'guild.list': {
+        const res = await client
+          .getGroupList()
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── me ───
+      case 'me.friends': {
+        const res = await client
+          .getFriendList()
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'me.guilds': {
+        const res = await client
+          .getGroupList()
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── 消息获取 ───
+      case 'message.get': {
+        const messageId = data.payload.MessageId;
+        const res = await client
+          .getMsg({ message_id: Number(messageId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── 服务器/群管理扩展 ───
+      case 'guild.update': {
+        const guildId = data.payload.GuildId;
+        const name = data.payload.params?.name;
+        const res = await client
+          .setGroupName({ group_id: Number(guildId), group_name: name ?? '' })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'guild.leave': {
+        const guildId = data.payload.GuildId;
+        const isDismiss = data.payload.params?.isDismiss ?? false;
+        const res = await client
+          .setGroupLeave({ group_id: Number(guildId), is_dismiss: isDismiss })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'guild.mute': {
+        const guildId = data.payload.GuildId;
+        const enable = data.payload.params?.enable ?? true;
+        const res = await client
+          .setGroupWholeBan({ group_id: Number(guildId), enable })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── 成员管理扩展 ───
+      case 'member.mute': {
+        const guildId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const duration = data.payload.params?.duration ?? 0;
+        const res = await client
+          .setGroupBan({ group_id: Number(guildId), user_id: Number(userId), duration: Number(duration) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'member.admin': {
+        const guildId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const enable = data.payload.params?.enable ?? true;
+        const res = await client
+          .setGroupAdmin({ group_id: Number(guildId), user_id: Number(userId), enable })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'member.card': {
+        const guildId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const card = data.payload.params?.card ?? '';
+        const res = await client
+          .setGroupCard({ group_id: Number(guildId), user_id: Number(userId), card })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'member.title': {
+        const guildId = data.payload.GuildId;
+        const userId = data.payload.UserId;
+        const title = data.payload.params?.title ?? '';
+        const duration = data.payload.params?.duration ?? -1;
+        const res = await client
+          .setGroupSpecialTitle({ group_id: Number(guildId), user_id: Number(userId), special_title: title, duration })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── 请求处理 ───
+      case 'request.friend': {
+        const params = data.payload.params;
+        const res = await client
+          .setFriendAddRequest({ flag: params.flag, approve: params.approve, remark: params.remark })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      case 'request.guild': {
+        const params = data.payload.params;
+        const res = await client
+          .setGroupAddRequest({ flag: params.flag, sub_type: params.subType, approve: params.approve, reason: params.reason })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
+      // ─── 用户信息 ───
+      case 'user.info': {
+        const userId = data.payload.UserId;
+        const res = await client
+          .getStrangerInfo({ user_id: Number(userId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         return consume([res]);

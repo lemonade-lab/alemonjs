@@ -5,7 +5,9 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
  * Telegram 支持 HTML parse_mode，可以保留部分格式
  */
 export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   return items
     .map(item => {
@@ -26,7 +28,9 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
         case 'MD.link': {
           const v = item.value as unknown as { text: string; url: string };
 
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
 
           return Number(hideUnsupported) >= 2 ? v.url : `<a href="${v.url}">${v.text}</a>`;
         }
@@ -64,7 +68,9 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
         case 'MD.content':
           return item.value;
         case 'MD.button':
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
           if (Number(hideUnsupported) >= 2) {
             return (item as any).options?.data || String(item.value);
           }
@@ -81,7 +87,9 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
  * 将原始 Markdown 字符串转为纯文本
  */
 export const markdownRawToText = (raw: string, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   let text = raw;
 
@@ -112,7 +120,9 @@ export const markdownRawToText = (raw: string, hideUnsupported?: boolean | numbe
  * 其余类型（Markdown, MarkdownOriginal, Button, Ark 等）降级
  */
 export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   switch (item.type) {
     case 'Markdown':

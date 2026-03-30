@@ -1,4 +1,5 @@
 import { DataEnums } from './message';
+import { PaginationParams } from './standard';
 
 export type ActionMessageSend = {
   // 发送消息
@@ -59,8 +60,66 @@ export type ActionMessageDelete = {
   payload: {
     // 消息ID
     MessageId: string;
+    // 频道ID（部分平台需要）
+    ChannelId?: string;
+    // 事件
+    event?: any;
   };
 };
+
+// ─── 消息编辑 ───
+
+export type ActionMessageEdit = {
+  action: 'message.edit';
+  payload: {
+    ChannelId: string;
+    MessageId: string;
+    params: {
+      format?: DataEnums[];
+    };
+    event?: any;
+  };
+};
+
+// ─── 消息置顶/取消置顶 ───
+
+export type ActionMessagePin = {
+  action: 'message.pin';
+  payload: {
+    ChannelId: string;
+    MessageId: string;
+  };
+};
+
+export type ActionMessageUnpin = {
+  action: 'message.unpin';
+  payload: {
+    ChannelId: string;
+    MessageId: string;
+  };
+};
+
+// ─── 表情回应 ───
+
+export type ActionReactionAdd = {
+  action: 'reaction.add';
+  payload: {
+    ChannelId: string;
+    MessageId: string;
+    EmojiId: string;
+  };
+};
+
+export type ActionReactionRemove = {
+  action: 'reaction.remove';
+  payload: {
+    ChannelId: string;
+    MessageId: string;
+    EmojiId: string;
+  };
+};
+
+// ─── 文件操作 ───
 
 export type ActionFileSendChannel = {
   // 发送文件
@@ -92,6 +151,8 @@ export type ActionFileSendUser = {
     };
   };
 };
+
+// ─── 消息转发 ───
 
 export type ActionMessageForwardUser = {
   // 发送合并转发消息
@@ -135,10 +196,318 @@ export type ActionMessageForwardChannel = {
   };
 };
 
-// 获取我的信息
+// ─── 成员管理 ───
+
+export type ActionMemberInfo = {
+  action: 'member.info';
+  payload: {
+    event?: any;
+    params: {
+      userId: string;
+      guildId?: string;
+    };
+  };
+};
+
+export type ActionMemberList = {
+  action: 'member.list';
+  payload: {
+    GuildId: string;
+    params?: PaginationParams;
+  };
+};
+
+export type ActionMemberKick = {
+  action: 'member.kick';
+  payload: {
+    GuildId: string;
+    UserId: string;
+  };
+};
+
+export type ActionMemberBan = {
+  action: 'member.ban';
+  payload: {
+    GuildId: string;
+    UserId: string;
+    params?: {
+      reason?: string;
+      duration?: number;
+    };
+  };
+};
+
+export type ActionMemberUnban = {
+  action: 'member.unban';
+  payload: {
+    GuildId: string;
+    UserId: string;
+  };
+};
+
+// ─── 服务器/公会 ───
+
+export type ActionGuildInfo = {
+  action: 'guild.info';
+  payload: {
+    GuildId: string;
+  };
+};
+
+export type ActionGuildList = {
+  action: 'guild.list';
+  payload: object;
+};
+
+// ─── 频道管理 ───
+
+export type ActionChannelInfo = {
+  action: 'channel.info';
+  payload: {
+    ChannelId: string;
+  };
+};
+
+export type ActionChannelList = {
+  action: 'channel.list';
+  payload: {
+    GuildId: string;
+  };
+};
+
+export type ActionChannelCreate = {
+  action: 'channel.create';
+  payload: {
+    GuildId: string;
+    params: {
+      name: string;
+      type?: string;
+      parentId?: string;
+    };
+  };
+};
+
+export type ActionChannelUpdate = {
+  action: 'channel.update';
+  payload: {
+    ChannelId: string;
+    params: {
+      name?: string;
+      topic?: string;
+      position?: number;
+    };
+  };
+};
+
+export type ActionChannelDelete = {
+  action: 'channel.delete';
+  payload: {
+    ChannelId: string;
+  };
+};
+
+// ─── 角色管理 ───
+
+export type ActionRoleList = {
+  action: 'role.list';
+  payload: {
+    GuildId: string;
+  };
+};
+
+export type ActionRoleCreate = {
+  action: 'role.create';
+  payload: {
+    GuildId: string;
+    params: {
+      name: string;
+      color?: number;
+      permissions?: string;
+    };
+  };
+};
+
+export type ActionRoleUpdate = {
+  action: 'role.update';
+  payload: {
+    GuildId: string;
+    RoleId: string;
+    params: {
+      name?: string;
+      color?: number;
+      permissions?: string;
+    };
+  };
+};
+
+export type ActionRoleDelete = {
+  action: 'role.delete';
+  payload: {
+    GuildId: string;
+    RoleId: string;
+  };
+};
+
+export type ActionRoleAssign = {
+  action: 'role.assign';
+  payload: {
+    GuildId: string;
+    UserId: string;
+    RoleId: string;
+  };
+};
+
+export type ActionRoleRemove = {
+  action: 'role.remove';
+  payload: {
+    GuildId: string;
+    UserId: string;
+    RoleId: string;
+  };
+};
+
+// ─── Bot 自身信息 ───
+
 export type ActionMeInfo = {
   action: 'me.info';
   payload: object;
+};
+
+export type ActionMeGuilds = {
+  action: 'me.guilds';
+  payload: object;
+};
+
+export type ActionMeThreads = {
+  action: 'me.threads';
+  payload: object;
+};
+
+export type ActionMeFriends = {
+  action: 'me.friends';
+  payload: object;
+};
+
+// ─── 获取消息 ───
+
+export type ActionMessageGet = {
+  action: 'message.get';
+  payload: {
+    MessageId: string;
+  };
+};
+
+// ─── 服务器管理扩展 ───
+
+export type ActionGuildUpdate = {
+  action: 'guild.update';
+  payload: {
+    GuildId: string;
+    params: {
+      name?: string;
+    };
+  };
+};
+
+export type ActionGuildLeave = {
+  action: 'guild.leave';
+  payload: {
+    GuildId: string;
+    params?: {
+      isDismiss?: boolean;
+    };
+  };
+};
+
+export type ActionGuildMute = {
+  action: 'guild.mute';
+  payload: {
+    GuildId: string;
+    params: {
+      enable: boolean;
+    };
+  };
+};
+
+// ─── 成员管理扩展 ───
+
+export type ActionMemberMute = {
+  action: 'member.mute';
+  payload: {
+    GuildId: string;
+    UserId: string;
+    params: {
+      duration: number;
+    };
+  };
+};
+
+export type ActionMemberAdmin = {
+  action: 'member.admin';
+  payload: {
+    GuildId: string;
+    UserId: string;
+    params: {
+      enable: boolean;
+    };
+  };
+};
+
+export type ActionMemberCard = {
+  action: 'member.card';
+  payload: {
+    GuildId: string;
+    UserId: string;
+    params: {
+      card: string;
+    };
+  };
+};
+
+export type ActionMemberTitle = {
+  action: 'member.title';
+  payload: {
+    GuildId: string;
+    UserId: string;
+    params: {
+      title: string;
+      duration?: number;
+    };
+  };
+};
+
+// ─── 请求处理 ───
+
+export type ActionRequestFriend = {
+  action: 'request.friend';
+  payload: {
+    params: {
+      flag: string;
+      approve: boolean;
+      remark?: string;
+    };
+  };
+};
+
+export type ActionRequestGuild = {
+  action: 'request.guild';
+  payload: {
+    params: {
+      flag: string;
+      subType: string;
+      approve: boolean;
+      reason?: string;
+    };
+  };
+};
+
+// ─── 用户信息 ───
+
+export type ActionUserInfo = {
+  action: 'user.info';
+  payload: {
+    UserId: string;
+  };
 };
 
 type base = {
@@ -148,20 +517,73 @@ type base = {
   DeviceId?: string;
 };
 
-export type Actions = (
-  | ActionMessageSend
-  | ActionMentionGet
-  | ActionMessageSendChannel
-  | ActionMessageSendUser
-  | ActionMessageDelete
-  | ActionFileSendChannel
-  | ActionFileSendUser
-  | ActionMessageForwardUser
-  | ActionMessageForwardChannel
-  | ActionMeInfo
-  | {
-      action: string;
-      payload: object;
-    }
-) &
-  base;
+export type Actions = // 消息
+  (
+    | ActionMessageSend
+    | ActionMessageSendChannel
+    | ActionMessageSendUser
+    | ActionMessageDelete
+    | ActionMessageEdit
+    | ActionMessagePin
+    | ActionMessageUnpin
+    // 提及
+    | ActionMentionGet
+    // 表情回应
+    | ActionReactionAdd
+    | ActionReactionRemove
+    // 文件
+    | ActionFileSendChannel
+    | ActionFileSendUser
+    // 转发
+    | ActionMessageForwardUser
+    | ActionMessageForwardChannel
+    // 成员
+    | ActionMemberInfo
+    | ActionMemberList
+    | ActionMemberKick
+    | ActionMemberBan
+    | ActionMemberUnban
+    // 服务器
+    | ActionGuildInfo
+    | ActionGuildList
+    // 频道
+    | ActionChannelInfo
+    | ActionChannelList
+    | ActionChannelCreate
+    | ActionChannelUpdate
+    | ActionChannelDelete
+    // 角色
+    | ActionRoleList
+    | ActionRoleCreate
+    | ActionRoleUpdate
+    | ActionRoleDelete
+    | ActionRoleAssign
+    | ActionRoleRemove
+    // 自身
+    | ActionMeInfo
+    | ActionMeGuilds
+    | ActionMeThreads
+    | ActionMeFriends
+    // 消息获取
+    | ActionMessageGet
+    // 服务器管理扩展
+    | ActionGuildUpdate
+    | ActionGuildLeave
+    | ActionGuildMute
+    // 成员管理扩展
+    | ActionMemberMute
+    | ActionMemberAdmin
+    | ActionMemberCard
+    | ActionMemberTitle
+    // 请求处理
+    | ActionRequestFriend
+    | ActionRequestGuild
+    // 用户信息
+    | ActionUserInfo
+    // 兜底
+    | {
+        action: string;
+        payload: object;
+      }
+  ) &
+    base;

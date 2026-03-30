@@ -4,7 +4,9 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
  * 将结构化 Markdown 子元素数组转为可读纯文本
  */
 export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   return items
     .map(item => {
@@ -23,7 +25,9 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
         case 'MD.link': {
           const v = item.value as unknown as { text: string; url: string };
 
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
 
           return Number(hideUnsupported) >= 2 ? v.url : `${v.text}( ${v.url} )`;
         }
@@ -58,7 +62,9 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
         case 'MD.content':
           return item.value;
         case 'MD.button':
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
           if (Number(hideUnsupported) >= 2) {
             return (item as any).options?.data || String(item.value);
           }
@@ -83,7 +89,9 @@ export const buttonsToText = (rows: any[]): string => {
  * QQ Bot 不支持原始 Markdown 直接渲染，需要降级
  */
 export const markdownRawToText = (raw: string, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   let text = raw;
 
@@ -129,7 +137,9 @@ export const markdownRawToText = (raw: string, hideUnsupported?: boolean | numbe
  * 其余类型降级为文本
  */
 export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   switch (item.type) {
     case 'MarkdownOriginal':

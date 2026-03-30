@@ -23,6 +23,7 @@ export * from './package/index';
 export * from './state/index';
 export * from './store/res';
 export * from './subscribe';
+export * from './standard';
 export * from './actions';
 export * from './apis';
 export * from './run';

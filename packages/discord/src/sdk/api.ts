@@ -420,10 +420,11 @@ export class DCAPI {
    * 修改频道
    * *********
    */
-  guildsUpdate(guild_id: string) {
+  guildsUpdate(guild_id: string, data?: any) {
     return this.request({
       method: 'PATCH',
-      url: `/guilds/${guild_id}`
+      url: `/guilds/${guild_id}`,
+      data
     });
   }
 
@@ -499,10 +500,11 @@ export class DCAPI {
    * 修改频道成员
    * *********
    */
-  guildsMembersUpdate(guild_id: string, user_id: string) {
+  guildsMembersUpdate(guild_id: string, user_id: string, data?: any) {
     return this.request({
       method: 'PATCH',
-      url: `/guilds/${guild_id}/members/${user_id}`
+      url: `/guilds/${guild_id}/members/${user_id}`,
+      data
     });
   }
 
@@ -544,10 +546,11 @@ export class DCAPI {
    * 创建频道角色
    * *********
    */
-  guildsRolesCreate(guild_id: string) {
+  guildsRolesCreate(guild_id: string, data?: any) {
     return this.request({
       method: 'post',
-      url: `/guilds/${guild_id}/roles`
+      url: `/guilds/${guild_id}/roles`,
+      data
     });
   }
   /**
@@ -566,10 +569,11 @@ export class DCAPI {
    * 修改频道角色
    * *********
    */
-  guildsRolesUpdateById(guild_id: string, role_id: string) {
+  guildsRolesUpdateById(guild_id: string, role_id: string, data?: any) {
     return this.request({
       method: 'PATCH',
-      url: `/guilds/${guild_id}/roles/${role_id}`
+      url: `/guilds/${guild_id}/roles/${role_id}`,
+      data
     });
   }
   /**
@@ -914,10 +918,11 @@ export class DCAPI {
    * 修改子频道
    * *********
    */
-  guildsChannelsUpdate(channel_id: string) {
+  guildsChannelsUpdate(channel_id: string, data?: any) {
     return this.request({
       method: 'PATCH',
-      url: `/channels/${channel_id}`
+      url: `/channels/${channel_id}`,
+      data
     });
   }
   /**
@@ -936,10 +941,11 @@ export class DCAPI {
    * 创建子频道
    * *********
    */
-  guildsChannelsCreate(guild_id: string) {
+  guildsChannelsCreate(guild_id: string, data?: any) {
     return this.request({
       method: 'post',
-      url: `/guilds/${guild_id}/channels`
+      url: `/guilds/${guild_id}/channels`,
+      data
     });
   }
   /**
@@ -1311,10 +1317,11 @@ export class DCAPI {
    * 编辑消息
    * *********
    */
-  editMessage(channel_id: string, message_id: string) {
+  editMessage(channel_id: string, message_id: string, data?: any) {
     return this.request({
       method: 'PATCH',
-      url: `/channels/${channel_id}/messages/${message_id}`
+      url: `/channels/${channel_id}/messages/${message_id}`,
+      data
     });
   }
   /**

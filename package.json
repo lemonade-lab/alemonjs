@@ -10,7 +10,10 @@
     "build-core": "yarn --cwd packages/alemonjs build",
     "fix:code": "eslint packages --ext .ts,.tsx,.js --fix --quiet",
     "test": "jest",
-    "format": "prettier --write --list-different .",
+    "lint": "eslint packages --ext .ts,.tsx,.js --max-warnings=0",
+    "lint:fix": "eslint packages --ext .ts,.tsx,.js --fix --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "check-format": "git diff --exit-code",
     "prepare": "husky"
   },

@@ -4,7 +4,9 @@ import type { DataEnums, DataMarkDown } from 'alemonjs';
  * 将结构化 Markdown 子元素数组转为 Bubble 兼容的 Markdown 文本
  */
 export const markdownToBubbleText = (items: DataMarkDown['value'], hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   return items
     .map(item => {
@@ -25,7 +27,9 @@ export const markdownToBubbleText = (items: DataMarkDown['value'], hideUnsupport
         case 'MD.link': {
           const v = item.value as unknown as { text: string; url: string };
 
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
 
           return Number(hideUnsupported) >= 2 ? v.url : `[${v.text}](${v.url})`;
         }
@@ -63,7 +67,9 @@ export const markdownToBubbleText = (items: DataMarkDown['value'], hideUnsupport
         case 'MD.content':
           return item.value;
         case 'MD.button': {
-          if (Number(hideUnsupported) >= 3) return '';
+          if (Number(hideUnsupported) >= 3) {
+            return '';
+          }
           if (Number(hideUnsupported) >= 2) {
             const btnData = (item as any).options?.data || (typeof item.value === 'object' ? (item.value as any).title : item.value);
 
@@ -89,7 +95,9 @@ export const markdownToBubbleText = (items: DataMarkDown['value'], hideUnsupport
  * Bubble 支持 Markdown，大部分可直接透传
  */
 export const markdownRawToBubbleText = (raw: string, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
   if (hideUnsupported) {
     // 隐藏不可阅读信息：图片
     return raw.replace(/!\[([^\]]*)\]\([^)]*\)/g, '');
@@ -105,7 +113,9 @@ export const markdownRawToBubbleText = (raw: string, hideUnsupported?: boolean |
  * 其余类型降级为文本
  */
 export const dataEnumToBubbleText = (item: DataEnums, hideUnsupported?: boolean | number): string => {
-  if (Number(hideUnsupported) >= 4) return '';
+  if (Number(hideUnsupported) >= 4) {
+    return '';
+  }
 
   switch (item.type) {
     case 'MarkdownOriginal':

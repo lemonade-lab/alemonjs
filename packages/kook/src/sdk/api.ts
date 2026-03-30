@@ -422,4 +422,220 @@ export class KOOKAPI {
       }
     });
   }
+
+  // ─── 服务器（Guild） ───
+
+  /** 获取服务器列表 */
+  guildList(): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.GuildList
+    });
+  }
+
+  /** 获取服务器详情 */
+  guildView(guild_id: string): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.GuildView,
+      params: { guild_id }
+    });
+  }
+
+  /** 获取服务器成员列表 */
+  guildUserList(
+    guild_id: string,
+    params?: {
+      channel_id?: string;
+      search?: string;
+      role_id?: number;
+      mobile_verified?: number;
+      active_time?: number;
+      joined_at?: number;
+      page?: number;
+      page_size?: number;
+    }
+  ): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.GuildUserList,
+      params: { guild_id, ...params }
+    });
+  }
+
+  /** 退出服务器 */
+  guildLeave(guild_id: string): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildLeave,
+      data: { guild_id }
+    });
+  }
+
+  /** 修改服务器昵称 */
+  guildNickname(guild_id: string, nickname: string, user_id?: string): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildNickname,
+      data: { guild_id, nickname, ...(user_id ? { user_id } : {}) }
+    });
+  }
+
+  /** 服务器禁言（添加） */
+  guildMuteCreate(guild_id: string, user_id: string, type: 1 | 2): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildMuteCreate,
+      data: { guild_id, user_id, type }
+    });
+  }
+
+  /** 服务器禁言（删除） */
+  guildMuteDelete(guild_id: string, user_id: string, type: 1 | 2): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildMuteDelete,
+      data: { guild_id, user_id, type }
+    });
+  }
+
+  /** 获取指定消息 */
+  messageView(msg_id: string): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.MessageView,
+      params: { msg_id }
+    });
+  }
+
+  // ─── 频道（Channel） ───
+
+  /** 获取频道列表 */
+  channelList(guild_id: string): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.ChannelList,
+      params: { guild_id }
+    });
+  }
+
+  /** 获取频道详情 */
+  channelView(channel_id: string): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.ChannelView,
+      params: { target_id: channel_id }
+    });
+  }
+
+  /** 创建频道 */
+  channelCreate(data: { guild_id: string; name: string; type?: number; parent_id?: string; limit_amount?: number; voice_quality?: string }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.ChannelCreate,
+      data
+    });
+  }
+
+  /** 编辑频道 */
+  channelUpdate(data: { channel_id: string; name?: string; topic?: string; slow_mode?: number }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.ChannelUpdate,
+      data
+    });
+  }
+
+  /** 删除频道 */
+  channelDelete(channel_id: string): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.ChannelDelete,
+      data: { channel_id }
+    });
+  }
+
+  // ─── 服务器角色（Guild Role） ───
+
+  /** 获取服务器角色列表 */
+  guildRoleList(guild_id: string): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.GuildRoleList,
+      params: { guild_id }
+    });
+  }
+
+  /** 创建服务器角色 */
+  guildRoleCreate(data: { guild_id: string; name?: string }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildRoleCreate,
+      data
+    });
+  }
+
+  /** 更新服务器角色 */
+  guildRoleUpdate(data: {
+    guild_id: string;
+    role_id: number;
+    name?: string;
+    color?: number;
+    hoist?: 0 | 1;
+    mentionable?: 0 | 1;
+    permissions?: number;
+  }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildRoleUpdate,
+      data
+    });
+  }
+
+  /** 删除服务器角色 */
+  guildRoleDelete(data: { guild_id: string; role_id: number }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildRoleDelete,
+      data
+    });
+  }
+
+  /** 赋予用户角色 */
+  guildRoleGrant(data: { guild_id: string; user_id: string; role_id: number }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildRoleGrant,
+      data
+    });
+  }
+
+  /** 撤销用户角色 */
+  guildRoleRevoke(data: { guild_id: string; user_id: string; role_id: number }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.GuildRoleRevoke,
+      data
+    });
+  }
+
+  // ─── 黑名单（Ban） ───
+
+  /** 加入黑名单（封禁） */
+  blacklistCreate(data: { guild_id: string; target_id: string; remark?: string; del_msg_days?: number }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.BlacklistCreate,
+      data
+    });
+  }
+
+  /** 移出黑名单（解封） */
+  blacklistDelete(data: { guild_id: string; target_id: string }): Promise<any> {
+    return this.service({
+      method: 'post',
+      url: ApiEnum.BlacklistDelete,
+      data
+    });
+  }
 }

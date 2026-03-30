@@ -650,4 +650,28 @@ export class OneBotAPI {
       }
     });
   }
+
+  /** 设置精华消息 (pin) */
+  setEssenceMsg(options: { message_id: number }) {
+    if (!this.__ws) {
+      return;
+    }
+
+    return send(this.__ws, {
+      action: 'set_essence_msg',
+      params: options
+    });
+  }
+
+  /** 删除精华消息 (unpin) */
+  deleteEssenceMsg(options: { message_id: number }) {
+    if (!this.__ws) {
+      return;
+    }
+
+    return send(this.__ws, {
+      action: 'delete_essence_msg',
+      params: options
+    });
+  }
 }

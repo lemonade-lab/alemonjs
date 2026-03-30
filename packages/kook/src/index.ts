@@ -826,6 +826,249 @@ const main = () => {
         const res = await api.use.mention(event);
 
         consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      } else if (data.action === 'me.info') {
+        const res = await client
+          .userMe()
+          .then(r => {
+            const d = r?.data ?? r;
+            const [isMaster, UserKey] = getMaster(String(d?.id));
+
+            return createResult(ResultCode.Ok, data.action, {
+              UserId: String(d?.id),
+              UserName: d?.username,
+              UserAvatar: d?.avatar ?? '',
+              IsBot: true,
+              IsMaster: isMaster,
+              UserKey
+            });
+          })
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'message.delete') {
+        // ─── 消息管理 ───
+        const messageId = data.payload.MessageId;
+        const res = await client
+          .messageDelete(messageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'message.edit') {
+        const messageId = data.payload.MessageId;
+        // 简单取文本内容
+        const format = data.payload.params?.format;
+        const content = format?.map(i => i.value).join('') ?? '';
+        const res = await client
+          .messageUpdate({ msg_id: messageId, content })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'reaction.add') {
+        // ─── 表情回应 ───
+        const res = await client
+          .messageAddReaction({ msg_id: data.payload.MessageId, emoji: data.payload.EmojiId })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'reaction.remove') {
+        const res = await client
+          .messageDeleteReaction({ msg_id: data.payload.MessageId, emoji: data.payload.EmojiId, user_id: '' })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.info') {
+        const guildId = data.payload.params?.guildId ?? data.payload.GuildId;
+        const userId = data.payload.params?.userId ?? data.payload.UserId;
+        const res = await client
+          .userView(guildId, userId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.list') {
+        const guildId = data.payload.GuildId;
+        const res = await client
+          .guildUserList(guildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.kick') {
+        const res = await client
+          .guildKickout(data.payload.GuildId, data.payload.UserId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.ban') {
+        const res = await client
+          .blacklistCreate({ guild_id: data.payload.GuildId, target_id: data.payload.UserId, remark: data.payload.params?.reason })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.unban') {
+        const res = await client
+          .blacklistDelete({ guild_id: data.payload.GuildId, target_id: data.payload.UserId })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'member.mute') {
+        const duration = data.payload.params?.duration ?? 0;
+
+        // type: 1=麦克风禁言, 2=耳机禁言; 默认1
+        if (duration > 0) {
+          const res = await client
+            .guildMuteCreate(data.payload.GuildId, data.payload.UserId, 1)
+            .then(r => createResult(ResultCode.Ok, data.action, r))
+            .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+          consume([res]);
+        } else {
+          const res = await client
+            .guildMuteDelete(data.payload.GuildId, data.payload.UserId, 1)
+            .then(r => createResult(ResultCode.Ok, data.action, r))
+            .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+          consume([res]);
+        }
+      } else if (data.action === 'member.card') {
+        const res = await client
+          .guildNickname(data.payload.GuildId, data.payload.params?.card ?? '', data.payload.UserId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'guild.info') {
+        const res = await client
+          .guildView(data.payload.GuildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'guild.list') {
+        const res = await client
+          .guildList()
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'me.guilds') {
+        const res = await client
+          .guildList()
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'channel.info') {
+        const res = await client
+          .channelView(data.payload.ChannelId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'channel.list') {
+        const res = await client
+          .channelList(data.payload.GuildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'channel.create') {
+        const params = data.payload.params;
+        const res = await client
+          .channelCreate({ guild_id: data.payload.GuildId, name: params.name, type: params.type ? Number(params.type) : 1, parent_id: params.parentId })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'channel.update') {
+        const params = data.payload.params;
+        const res = await client
+          .channelUpdate({ channel_id: data.payload.ChannelId, name: params.name, topic: params.topic })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'channel.delete') {
+        const res = await client
+          .channelDelete(data.payload.ChannelId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 角色管理 ───
+      else if (data.action === 'role.list') {
+        const res = await client
+          .guildRoleList(data.payload.GuildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'role.create') {
+        const params = data.payload.params;
+        const res = await client
+          .guildRoleCreate({ guild_id: data.payload.GuildId, name: params.name })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'role.update') {
+        const params = data.payload.params;
+        const res = await client
+          .guildRoleUpdate({ guild_id: data.payload.GuildId, role_id: Number(data.payload.RoleId), name: params.name, color: params.color })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'role.delete') {
+        const res = await client
+          .guildRoleDelete({ guild_id: data.payload.GuildId, role_id: Number(data.payload.RoleId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'role.assign') {
+        const res = await client
+          .guildRoleGrant({ guild_id: data.payload.GuildId, user_id: data.payload.UserId, role_id: Number(data.payload.RoleId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'role.remove') {
+        const res = await client
+          .guildRoleRevoke({ guild_id: data.payload.GuildId, user_id: data.payload.UserId, role_id: Number(data.payload.RoleId) })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'message.get') {
+        const res = await client
+          .messageView(data.payload.MessageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'guild.leave') {
+        const res = await client
+          .guildLeave(data.payload.GuildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'user.info') {
+        const res = await client
+          .userView(data.payload.GuildId ?? '', data.payload.UserId)
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }
