@@ -1,6 +1,6 @@
 {
   "name": "create-alemonjs",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "alemonjs dev template",
   "author": "ningmengchongshui",
   "main": "bin/index.js",
