@@ -6,6 +6,7 @@ import fs from 'fs';
 import { fileSuffixResponse, ResultCode } from './variable';
 
 import module from 'module';
+import { getConfigValue } from './config';
 
 const initRequire = () => {};
 
@@ -66,8 +67,36 @@ export const getCachedRegExp = (pattern: string | RegExp): RegExp => {
  * @param e
  * @returns
  */
-export const useUserHashKey = (event: { UserId: string; Platform: string }) => {
+export const createUserHashKey = (event: { UserId: string; Platform: string }) => {
   return fastHash(`${event.Platform}:${event.UserId}`);
+};
+
+/**
+ * @deprecated 已废弃，请直接使用 useUserHashKey
+ */
+export const useUserHashKey = createUserHashKey;
+
+/**
+ * 判断用户是否为主人
+ * @param UserId
+ * @param platform
+ * @returns
+ */
+export const isMaster = (UserId: string, platform: string) => {
+  const values = getConfigValue() || {};
+  const mainMasterKey = values.master_key || [];
+  const mainMasterId = values.master_id || [];
+  const value = values[platform] || {};
+  const masterKey = value.master_key || [];
+  const masterId = value.master_id || [];
+  const UserKey = createUserHashKey({
+    Platform: platform,
+    UserId: UserId
+  });
+  const cMaster = mainMasterKey.concat(masterKey);
+  const cMasterId = mainMasterId.concat(masterId);
+
+  return cMaster.includes(UserKey) || cMasterId.includes(UserId);
 };
 
 /**

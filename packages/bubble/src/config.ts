@@ -76,6 +76,9 @@ export const getBubbleConfig = (): Options & {
 };
 
 export const getMaster = (UserId: string) => {
+  const values = getConfigValue() || {};
+  const mainMasterKey = values.master_key || [];
+  const mainMasterId = values.master_id || [];
   const config = getBubbleConfig();
   const masterKey = config.master_key || [];
   const masterId = config.master_id || [];
@@ -83,7 +86,7 @@ export const getMaster = (UserId: string) => {
     Platform: platform,
     UserId: UserId
   });
-  const is = masterKey.includes(UserKey) || masterId.includes(UserId);
+  const is = mainMasterKey.includes(UserKey) || mainMasterId.includes(UserId) || masterKey.includes(UserKey) || masterId.includes(UserId);
 
   return [is, UserKey] as const;
 };
