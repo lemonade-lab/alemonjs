@@ -8,11 +8,11 @@ export class Context {
   }
 
   createAction(_context: typeof this): typeof Actions.prototype {
-    // @ts-ignore
+    // @ts-expect-error method stub with no return value
   }
 
   createSidebarWebView(_context: typeof this): typeof webView.prototype {
-    // @ts-ignore
+    // @ts-expect-error method stub with no return value
   }
 
   /**
@@ -28,7 +28,7 @@ export class Context {
    * @param command
    * @param callback
    */
-  onCommand(command: string, callback: Function) {
+  onCommand(command: string, callback: () => void) {
     commands.push({
       command: command,
       callback
@@ -48,7 +48,7 @@ export class webView {
 
   _name: string | null = null;
 
-  __messages: Function[] = [];
+  __messages: ((...args: any[]) => void)[] = [];
 
   constructor(_ctx: typeof Context.prototype, _name: string) {
     this._name = _name;
@@ -58,7 +58,7 @@ export class webView {
    *
    * @param {*} callback
    */
-  onMessage(callback: Function) {
+  onMessage(callback: (...args: any[]) => void) {
     this.__messages.push(callback);
   }
 

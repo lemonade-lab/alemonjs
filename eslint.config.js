@@ -20,7 +20,9 @@ export default [
       '.tmp/**',
       '*.config.js',
       '*.config.ts',
-      '.puppeteerrc.cjs'
+      '.puppeteerrc.cjs',
+      '**/*.cjs',
+      '**/bin/**'
     ]
   },
 

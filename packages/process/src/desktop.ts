@@ -38,7 +38,7 @@ export const activate = (context: typeof Context.prototype) => {
   // 监听 webview 的消息。
   webView.onMessage(data => {
     try {
-      if (data.type == 'process.get.apps') {
+      if (data.type === 'process.get.apps') {
         let config = getConfigValue();
 
         if (!config) {
@@ -51,7 +51,7 @@ export const activate = (context: typeof Context.prototype) => {
           type: 'process.get.apps',
           data: d
         });
-      } else if (data.type == 'process.open.apps') {
+      } else if (data.type === 'process.open.apps') {
         const config = getConfig();
         let value = config.value;
 
@@ -70,7 +70,7 @@ export const activate = (context: typeof Context.prototype) => {
           value.apps = [name];
           config.saveValue(value);
         }
-      } else if (data.type == 'process.disable.apps') {
+      } else if (data.type === 'process.disable.apps') {
         const config = getConfig();
         let value = config.value;
 

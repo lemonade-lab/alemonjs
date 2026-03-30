@@ -12,7 +12,7 @@ export default `<script>
               const cssVariables = data.data
                   try {
         Object.keys(cssVariables).forEach(key => {
-          document.documentElement.style.setProperty(\`--$\{key\}\`, cssVariables[key])
+          document.documentElement.style.setProperty(\`--$\{key}\`, cssVariables[key])
         })
       } catch (e) {
         console.error(e)

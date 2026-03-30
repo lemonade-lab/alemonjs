@@ -417,9 +417,8 @@ const main = () => {
         const res = await api.use.mention(event);
 
         consume([createResult(ResultCode.Ok, '请求完成', res)]);
-      }
-      // ─── 媒体上传 ───
-      else if (data.action === 'media.upload') {
+      } else if (data.action === 'media.upload') {
+        // ─── 媒体上传 ───
         const params = data.payload.params;
         const fileData = params?.url ?? params?.data;
 
@@ -433,18 +432,16 @@ const main = () => {
 
           consume([res]);
         }
-      }
-      // ─── 消息历史 ───
-      else if (data.action === 'history.list') {
+      } else if (data.action === 'history.list') {
+        // ─── 消息历史 ───
         const res = await client
           .getChannelMessages(data.payload.ChannelId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员搜索 ───
-      else if (data.action === 'member.search') {
+      } else if (data.action === 'member.search') {
+        // ─── 成员搜索 ───
         const guildId = data.payload.GuildId;
         const keyword = data.payload.params?.keyword ?? '';
         const res = await client

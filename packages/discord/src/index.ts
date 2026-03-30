@@ -546,9 +546,8 @@ const main = () => {
         const res = await api.use.mention(event);
 
         consume([createResult(ResultCode.Ok, '请求完成', res)]);
-      }
-      // ─── me ───
-      else if (data.action === 'me.info') {
+      } else if (data.action === 'me.info') {
+        // ─── me ───
         const res = await client
           .usersMe()
           .then(r => {
@@ -573,9 +572,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 消息管理 ───
-      else if (data.action === 'message.delete') {
+      } else if (data.action === 'message.delete') {
+        // ─── 消息管理 ───
         const channelId = data.payload.ChannelId;
         const messageId = data.payload.MessageId;
         const res = await client
@@ -607,9 +605,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 表情回应 ───
-      else if (data.action === 'reaction.add') {
+      } else if (data.action === 'reaction.add') {
+        // ─── 表情回应 ───
         const res = await client
           .createareaction(data.payload.ChannelId, data.payload.MessageId, data.payload.EmojiId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -623,9 +620,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员管理 ───
-      else if (data.action === 'member.info') {
+      } else if (data.action === 'member.info') {
+        // ─── 成员管理 ───
         const guildId = data.payload.params?.guildId ?? data.payload.GuildId;
         const userId = data.payload.params?.userId ?? data.payload.UserId;
         const res = await client
@@ -662,9 +658,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 服务器 ───
-      else if (data.action === 'guild.info') {
+      } else if (data.action === 'guild.info') {
+        // ─── 服务器 ───
         const res = await client
           .guild(data.payload.GuildId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -678,9 +673,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 频道管理 ───
-      else if (data.action === 'channel.info') {
+      } else if (data.action === 'channel.info') {
+        // ─── 频道管理 ───
         const res = await client
           .guildsChannels(data.payload.ChannelId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -717,9 +711,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 角色管理 ───
-      else if (data.action === 'role.list') {
+      } else if (data.action === 'role.list') {
+        // ─── 角色管理 ───
         const res = await client
           .guildsRoles(data.payload.GuildId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -771,18 +764,16 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 消息获取 ───
-      else if (data.action === 'message.get') {
+      } else if (data.action === 'message.get') {
+        // ─── 消息获取 ───
         const res = await client
           .guildsChannelsmessages(data.payload.ChannelId, data.payload.MessageId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 服务器管理 ───
-      else if (data.action === 'guild.update') {
+      } else if (data.action === 'guild.update') {
+        // ─── 服务器管理 ───
         const res = await client
           .guildsUpdate(data.payload.GuildId, data.payload.params)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -796,9 +787,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员扩展 ───
-      else if (data.action === 'member.card') {
+      } else if (data.action === 'member.card') {
+        // ─── 成员扩展 ───
         const res = await client
           .guildsMembersUpdate(data.payload.GuildId, data.payload.UserId, { nick: data.payload.params?.card })
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -814,27 +804,24 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 用户信息 ───
-      else if (data.action === 'user.info') {
+      } else if (data.action === 'user.info') {
+        // ─── 用户信息 ───
         const res = await client
           .userMessage(data.payload.UserId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 消息历史 ───
-      else if (data.action === 'history.list') {
+      } else if (data.action === 'history.list') {
+        // ─── 消息历史 ───
         const res = await client
           .guildsChannelsanymessages(data.payload.ChannelId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员搜索 ───
-      else if (data.action === 'member.search') {
+      } else if (data.action === 'member.search') {
+        // ─── 成员搜索 ───
         const res = await client
           .guildsMembersSearch(data.payload.GuildId)
           .then(r => createResult(ResultCode.Ok, data.action, r))

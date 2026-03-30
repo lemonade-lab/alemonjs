@@ -1,6 +1,6 @@
 export const commands: {
   command: string;
-  callback: Function;
+  callback: () => void;
 }[] = [];
 type LocalStorageType = {
   package: {

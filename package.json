@@ -15,7 +15,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check-format": "git diff --exit-code",
-    "prepare": "husky"
+    "prepare": "husky",
+    "push": "yarn build && lerna publish from-package --yes",
+    "push:patch": "lerna version patch --yes && yarn publish",
+    "push:minor": "lerna version minor --yes && yarn publish",
+    "push:major": "lerna version major --yes && yarn publish"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.7",

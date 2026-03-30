@@ -25,7 +25,7 @@ export class BaseConfig<D> {
    */
   has(key: string) {
     if (Object.prototype.hasOwnProperty.call(this.#data, key)) {
-      true;
+      return true;
     }
 
     return false;

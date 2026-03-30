@@ -37,5 +37,5 @@ export async function cloneRepo(repoUrl: string) {
  * @param data
  */
 export const gitClone = (data: string) => {
-  cloneRepo(data);
+  void cloneRepo(data);
 };

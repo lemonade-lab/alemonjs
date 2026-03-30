@@ -1029,9 +1029,8 @@ export const register = (client: QQBotClients) => {
         const res = await api.active.send.user(userId, paramFormat);
 
         consume(res);
-      }
-      // ─── 消息管理 ───
-      else if (data.action === 'message.delete') {
+      } else if (data.action === 'message.delete') {
+        // ─── 消息管理 ───
         const channelId = data.payload.ChannelId;
         const messageId = data.payload.MessageId;
         // 频道子频道消息撤回
@@ -1055,9 +1054,8 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 表情回应 ───
-      else if (data.action === 'reaction.add') {
+      } else if (data.action === 'reaction.add') {
+        // ─── 表情回应 ───
         // QQ Bot表情表态 type: 1=emoji, 2=emoji_id
         const res = await client
           .channelsMessagesReactionsPut(data.payload.ChannelId, data.payload.MessageId, 1, data.payload.EmojiId)
@@ -1072,18 +1070,16 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 消息获取 ───
-      else if (data.action === 'message.get') {
+      } else if (data.action === 'message.get') {
+        // ─── 消息获取 ───
         const res = await client
           .channelsMessagesById(data.payload.ChannelId, data.payload.MessageId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员管理 ───
-      else if (data.action === 'member.info') {
+      } else if (data.action === 'member.info') {
+        // ─── 成员管理 ───
         const guildId = data.payload.params?.guildId ?? data.payload.GuildId;
         const userId = data.payload.params?.userId ?? data.payload.UserId;
         const res = await client
@@ -1128,9 +1124,8 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员禁言 ───
-      else if (data.action === 'member.mute') {
+      } else if (data.action === 'member.mute') {
+        // ─── 成员禁言 ───
         const guildId = data.payload.GuildId;
         const userId = data.payload.UserId;
         const duration = data.payload.params?.duration ?? 0;
@@ -1141,9 +1136,8 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 服务器 ───
-      else if (data.action === 'guild.info') {
+      } else if (data.action === 'guild.info') {
+        // ─── 服务器 ───
         const res = await client
           .guilds(data.payload.GuildId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -1157,9 +1151,8 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 全员禁言 ───
-      else if (data.action === 'guild.mute') {
+      } else if (data.action === 'guild.mute') {
+        // ─── 全员禁言 ───
         const guildId = data.payload.GuildId;
         const duration = data.payload.params?.duration ?? 0;
         const mute_seconds = String(duration);
@@ -1169,9 +1162,8 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 频道管理 ───
-      else if (data.action === 'channel.info') {
+      } else if (data.action === 'channel.info') {
+        // ─── 频道管理 ───
         const res = await client
           .channels(data.payload.ChannelId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -1210,9 +1202,8 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 角色管理 ───
-      else if (data.action === 'role.list') {
+      } else if (data.action === 'role.list') {
+        // ─── 角色管理 ───
         const res = await client
           .guildsRoles(data.payload.GuildId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -1257,9 +1248,8 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 文件发送 ───
-      else if (data.action === 'file.send.channel') {
+      } else if (data.action === 'file.send.channel') {
+        // ─── 文件发送 ───
         const res = await client
           .postRichMediaByGroup(data.payload.ChannelId, {
             file_type: data.payload.params?.file_type ?? 1,
@@ -1283,18 +1273,16 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── me ───
-      else if (data.action === 'me.guilds') {
+      } else if (data.action === 'me.guilds') {
+        // ─── me ───
         const res = await client
           .usersMeGuilds({ before: '', after: '', limit: 100 })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 媒体 ───
-      else if (data.action === 'media.send.channel') {
+      } else if (data.action === 'media.send.channel') {
+        // ─── 媒体 ───
         // QQ-Bot 频道暂不支持独立媒体发送，使用消息通道
         consume([createResult(ResultCode.Warn, 'media.send.channel not directly supported, use message.send with format', null)]);
       } else if (data.action === 'media.send.user') {
@@ -1310,9 +1298,8 @@ export const register = (client: QQBotClients) => {
       } else if (data.action === 'media.upload') {
         // 没有目标时仅上传不发送，QQ-Bot 不支持纯上传
         consume([createResult(ResultCode.Warn, 'media.upload not supported, use media.send.user or media.send.channel', null)]);
-      }
-      // ─── 权限 ───
-      else if (data.action === 'permission.get') {
+      } else if (data.action === 'permission.get') {
+        // ─── 权限 ───
         const res = await client
           .channelsPermissions(data.payload.ChannelId, data.payload.UserId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -1327,18 +1314,16 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 表情回应列表 ───
-      else if (data.action === 'reaction.list') {
+      } else if (data.action === 'reaction.list') {
+        // ─── 表情回应列表 ───
         const res = await client
           .channelsMessagesReactionsUsers(data.payload.ChannelId, data.payload.MessageId, 1, data.payload.EmojiId, { limit: data.payload.params?.limit ?? 20 })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 频道公告 ───
-      else if (data.action === 'channel.announce') {
+      } else if (data.action === 'channel.announce') {
+        // ─── 频道公告 ───
         const guildId = data.payload.GuildId;
         const params = data.payload.params;
 

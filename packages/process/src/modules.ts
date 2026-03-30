@@ -15,7 +15,7 @@ const cacheDir = join(nodeModulesDir, '.alemonjs');
  * @param callback
  * @returns
  */
-export const addModules = (name: string, callback?: Function) => {
+export const addModules = (name: string, callback?: () => void) => {
   try {
     const pkg = require(`${name}/package`);
 
@@ -93,12 +93,12 @@ export const addModules = (name: string, callback?: Function) => {
         }
         // 执行回调函数
         callback?.();
-      } catch (e) {
-        // console.error(e)
+      } catch {
+        //
       }
     };
 
-    createDesktop();
+    void createDesktop();
   } catch (e) {
     if (storage.has(name)) {
       // 已存在的出错，删除
@@ -160,7 +160,7 @@ export const updateModules = (name?: string) => {
 };
 
 // 删除
-export const delModules = (name: string, callback?: Function) => {
+export const delModules = (name: string, callback?: () => void) => {
   // 确保 nodeModulesDir、 pkgModulesDir和cacheDir 都存在时，都删除。
   fs.rmdirSync(join(nodeModulesDir, name), { recursive: true });
   fs.rmdirSync(join(pkgModulesDir, name), { recursive: true });
@@ -187,7 +187,7 @@ export const disableModules = (name: string) => {
 };
 
 // 恢复
-export const cloneModules = (name: string, callback?: Function) => {
+export const cloneModules = (name: string, callback?: () => void) => {
   // 把依赖都放进 pkgModulesDir 目录下
   const _pkgDir = join(pkgModulesDir, name);
   const _cacheDir = join(cacheDir, name);

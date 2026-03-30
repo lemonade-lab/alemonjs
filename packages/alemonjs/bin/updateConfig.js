@@ -61,7 +61,9 @@ export function updateConfig(action, key, value = []) {
       }
       current = current[currentKey];
     }
-    delete current[keys[keys.length - 1]];
+    const delKey = keys[keys.length - 1];
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete current[delKey];
   } else if (action === 'get') {
     for (let i = 0; i < keys.length; i++) {
       const currentKey = keys[i];

@@ -830,7 +830,7 @@ const main = () => {
         const res = await client
           .userMe()
           .then(r => {
-            const d = r?.data ?? r;
+            const d: any = r?.data ?? r;
             const [isMaster, UserKey] = getMaster(String(d?.id));
 
             return createResult(ResultCode.Ok, data.action, {
@@ -1002,9 +1002,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 角色管理 ───
-      else if (data.action === 'role.list') {
+      } else if (data.action === 'role.list') {
+        // ─── 角色管理 ───
         const res = await client
           .guildRoleList(data.payload.GuildId)
           .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
@@ -1069,9 +1068,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 媒体上传 ───
-      else if (data.action === 'media.upload') {
+      } else if (data.action === 'media.upload') {
+        // ─── 媒体上传 ───
         const params = data.payload.params;
         const fileData = params?.url ?? params?.data;
 
@@ -1085,27 +1083,24 @@ const main = () => {
 
           consume([res]);
         }
-      }
-      // ─── 消息历史 ───
-      else if (data.action === 'history.list') {
+      } else if (data.action === 'history.list') {
+        // ─── 消息历史 ───
         const res = await client
           .messageList(data.payload.ChannelId, { page_size: data.payload.params?.limit })
           .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 表情回应列表 ───
-      else if (data.action === 'reaction.list') {
+      } else if (data.action === 'reaction.list') {
+        // ─── 表情回应列表 ───
         const res = await client
           .messageReactionList({ msg_id: data.payload.MessageId, emoji: data.payload.EmojiId })
           .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员搜索 ───
-      else if (data.action === 'member.search') {
+      } else if (data.action === 'member.search') {
+        // ─── 成员搜索 ───
         const res = await client
           .guildUserList(data.payload.GuildId, { search: data.payload.params?.keyword, page_size: data.payload.params?.limit })
           .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))

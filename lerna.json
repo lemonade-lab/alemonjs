@@ -1,5 +1,15 @@
 {
   "version": "independent",
-  "packages": ["frontends/*","packages/*"],
-  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
+  "packages": [
+    "packages/*"
+  ],
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "command": {
+    "publish": {
+      "conventionalCommits": false,
+      "allowBranch": "*",
+      "message": "chore(release): publish",
+      "registry": "https://registry.npmjs.org/"
+    }
+  }
 }

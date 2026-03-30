@@ -9,9 +9,6 @@ export class KOOKClient extends KOOKAPI {
   // 标记是否已连接
   #isConnected = false;
 
-  // 存储 session Id
-  #sessionId = null;
-
   // 存储最新的消息序号
   #lastMessageSN = 0;
 

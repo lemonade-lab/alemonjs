@@ -15,7 +15,7 @@ export const addExpansions = (name: string) => {
 /**
  * 主动获取扩展列表
  */
-export const getExpansions = async () => {
+export const getExpansions = () => {
   updateModules();
   // 更新模块列表
   sendGetExpansions(getPackages());
