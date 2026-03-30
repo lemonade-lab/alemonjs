@@ -10,6 +10,7 @@
     "build": "lvy build"
   },
   "dependencies": {
+    "@noble/curves": "^1.7.0",
     "axios": "^1.4.0",
     "file-type": "^18.5.0",
     "form-data": "^4.0.0",
@@ -21,9 +22,8 @@
     "mime-types": "^2.1.35",
     "public-ip": "^6.0.1",
     "qrcode": "^1.5.3",
-    "ws": "^8.13.0",
     "uuid": "^11.0.3",
-    "@noble/curves": "^1.7.0"
+    "ws": "^8.13.0"
   },
   "peerDependencies": {
     "alemonjs": "^2.1.0-alpha.15"
@@ -73,5 +73,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/lemonade-lab/alemonjs.git"
-  }
+  },
+  "gitHead": "c6aa5616afe091a37610dad22fbb2d2618d943b8"
 }
