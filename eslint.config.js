@@ -10,6 +10,8 @@ export default [
     ignores: [
       'frontends/**',
       'node_modules/**',
+      '**/lib/**',
+      '**/dist/**',
       '**/*.css',
       '**/*.jpg',
       '**/*.png',

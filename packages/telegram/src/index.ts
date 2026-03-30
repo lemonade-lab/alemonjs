@@ -634,9 +634,8 @@ const main = () => {
         const res = await api.use.mention();
 
         consume([createResult(ResultCode.Ok, '请求完成', res)]);
-      }
-      // ─── me ───
-      else if (data.action === 'me.info') {
+      } else if (data.action === 'me.info') {
+        // ─── me ───
         const res = await client
           .getMe()
           .then(r =>
@@ -652,9 +651,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 消息管理 ───
-      else if (data.action === 'message.delete') {
+      } else if (data.action === 'message.delete') {
+        // ─── 消息管理 ───
         // Telegram deleteMessage 需要 chat_id + message_id
         const chatId = data.payload.ChannelId ?? data.payload.event?.value?.chat?.id;
         const messageId = data.payload.MessageId;
@@ -688,9 +686,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 成员管理 ───
-      else if (data.action === 'member.info') {
+      } else if (data.action === 'member.info') {
+        // ─── 成员管理 ───
         const guildId = data.payload.params?.guildId ?? data.payload.GuildId;
         const userId = data.payload.params?.userId ?? data.payload.UserId;
         const res = await client
@@ -789,9 +786,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 服务器 ───
-      else if (data.action === 'guild.info') {
+      } else if (data.action === 'guild.info') {
+        // ─── 服务器 ───
         const chatId = data.payload.GuildId;
         const res = await client
           .getChat(chatId)
@@ -799,9 +795,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 消息编辑 ───
-      else if (data.action === 'message.edit') {
+      } else if (data.action === 'message.edit') {
+        // ─── 消息编辑 ───
         const format = data.payload.params?.format;
         const content = format?.map(i => i.value).join('') ?? '';
         const chatId = data.payload.ChannelId ?? data.payload.GuildId;
@@ -812,9 +807,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 消息转发 ───
-      else if (data.action === 'message.forward.channel') {
+      } else if (data.action === 'message.forward.channel') {
+        // ─── 消息转发 ───
         const res = await client
           .forwardMessage(data.payload.ChannelId, data.payload.FromChannelId, data.payload.MessageId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
@@ -828,9 +822,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 服务器管理 ───
-      else if (data.action === 'guild.update') {
+      } else if (data.action === 'guild.update') {
+        // ─── 服务器管理 ───
         const params = data.payload.params;
         const chatId = data.payload.GuildId;
         const results = [];
@@ -875,9 +868,8 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 表情回应 ───
-      else if (data.action === 'reaction.add') {
+      } else if (data.action === 'reaction.add') {
+        // ─── 表情回应 ───
         const chatId = data.payload.ChannelId;
         const messageId = data.payload.MessageId;
         const emoji = data.payload.EmojiId;
@@ -897,15 +889,80 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
-      }
-      // ─── 用户信息 ───
-      else if (data.action === 'user.info') {
+      } else if (data.action === 'user.info') {
+        // ─── 用户信息 ───
         const res = await client
           .getChat(data.payload.UserId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
+      } else if (data.action === 'media.send.channel') {
+        // ─── 媒体发送到频道 ───
+        const channelId = data.payload.ChannelId;
+        const params = data.payload.params;
+        const source = params?.url ?? params?.data ?? '';
+
+        try {
+          let res: any;
+
+          if (params?.type === 'image') {
+            res = await client.sendPhoto(channelId, source);
+          } else if (params?.type === 'audio') {
+            res = await client.sendAudio(channelId, source);
+          } else if (params?.type === 'video') {
+            res = await client.sendVideo(channelId, source);
+          } else {
+            res = await client.sendDocument(channelId, source);
+          }
+          consume([createResult(ResultCode.Ok, data.action, res)]);
+        } catch (err) {
+          consume([createResult(ResultCode.Fail, data.action, err)]);
+        }
+      } else if (data.action === 'media.send.user') {
+        const userId = data.payload.UserId;
+        const params = data.payload.params;
+        const source = params?.url ?? params?.data ?? '';
+
+        try {
+          let res: any;
+
+          if (params?.type === 'image') {
+            res = await client.sendPhoto(userId, source);
+          } else if (params?.type === 'audio') {
+            res = await client.sendAudio(userId, source);
+          } else if (params?.type === 'video') {
+            res = await client.sendVideo(userId, source);
+          } else {
+            res = await client.sendDocument(userId, source);
+          }
+          consume([createResult(ResultCode.Ok, data.action, res)]);
+        } catch (err) {
+          consume([createResult(ResultCode.Fail, data.action, err)]);
+        }
+      } else if (data.action === 'permission.set') {
+        // ─── 权限 ───
+        const chatId = data.payload.ChannelId;
+        const userId = data.payload.UserId;
+
+        try {
+          const res = await client.restrictChatMember(chatId, userId, {
+            permissions: {
+              can_send_messages: data.payload.params?.allow ? true : false,
+              can_send_audios: data.payload.params?.allow ? true : false,
+              can_send_documents: data.payload.params?.allow ? true : false,
+              can_send_photos: data.payload.params?.allow ? true : false,
+              can_send_videos: data.payload.params?.allow ? true : false,
+              can_send_video_notes: data.payload.params?.allow ? true : false,
+              can_send_voice_notes: data.payload.params?.allow ? true : false,
+              can_send_other_messages: data.payload.params?.allow ? true : false
+            }
+          });
+
+          consume([createResult(ResultCode.Ok, data.action, res)]);
+        } catch (err) {
+          consume([createResult(ResultCode.Fail, data.action, err)]);
+        }
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }

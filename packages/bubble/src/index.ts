@@ -417,6 +417,47 @@ const main = () => {
         const res = await api.use.mention(event);
 
         consume([createResult(ResultCode.Ok, '请求完成', res)]);
+      }
+      // ─── 媒体上传 ───
+      else if (data.action === 'media.upload') {
+        const params = data.payload.params;
+        const fileData = params?.url ?? params?.data;
+
+        if (!fileData) {
+          consume([createResult(ResultCode.FailParams, 'Missing url or data', null)]);
+        } else {
+          const res = await client
+            .uploadFile(fileData, params?.name)
+            .then(r => createResult(ResultCode.Ok, data.action, r))
+            .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+          consume([res]);
+        }
+      }
+      // ─── 消息历史 ───
+      else if (data.action === 'history.list') {
+        const res = await client
+          .getChannelMessages(data.payload.ChannelId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 成员搜索 ───
+      else if (data.action === 'member.search') {
+        const guildId = data.payload.GuildId;
+        const keyword = data.payload.params?.keyword ?? '';
+        const res = await client
+          .listGuildMembers(guildId)
+          .then(r => {
+            const list = Array.isArray(r) ? r : [];
+            const filtered = list.filter((m: any) => (m.name ?? '').includes(keyword) || (m.username ?? '').includes(keyword));
+
+            return createResult(ResultCode.Ok, data.action, filtered);
+          })
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }

@@ -250,6 +250,22 @@ export class KOOKAPI {
   }
 
   /**
+   * 获取频道消息列表
+   * @param target_id 频道 ID
+   * @param params.msg_id 参考消息 ID
+   * @param params.pin 是否查看置顶消息
+   * @param params.flag before/after/around
+   * @param params.page_size 每页数量
+   */
+  messageList(target_id: string, params?: { msg_id?: string; pin?: number; flag?: string; page_size?: number }): Promise<any> {
+    return this.service({
+      method: 'get',
+      url: ApiEnum.MessageList,
+      params: { target_id, ...params }
+    });
+  }
+
+  /**
    * 发回应
    * @param data
    * @returns

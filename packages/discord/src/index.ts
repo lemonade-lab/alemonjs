@@ -823,6 +823,24 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
+      }
+      // ─── 消息历史 ───
+      else if (data.action === 'history.list') {
+        const res = await client
+          .guildsChannelsanymessages(data.payload.ChannelId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 成员搜索 ───
+      else if (data.action === 'member.search') {
+        const res = await client
+          .guildsMembersSearch(data.payload.GuildId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }

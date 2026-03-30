@@ -1263,6 +1263,22 @@ const main = () => {
 
         return consume([res]);
       }
+      // ─── 成员搜索 ───
+      case 'member.search': {
+        const guildId = data.payload.GuildId;
+        const keyword = data.payload.params?.keyword ?? '';
+        const res = await client
+          .getGroupMemberList({ group_id: Number(guildId) })
+          .then(r => {
+            const list = r?.data ?? r;
+            const filtered = Array.isArray(list) ? list.filter((m: any) => (m.card ?? '').includes(keyword) || (m.nickname ?? '').includes(keyword)) : [];
+
+            return createResult(ResultCode.Ok, data.action, filtered);
+          })
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        return consume([res]);
+      }
       default: {
         return consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }

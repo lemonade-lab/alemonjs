@@ -216,10 +216,10 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
 
     /**
      * 删除消息
-     * @param messageId 消息 ID，不传则删除触发消息
+     * @param params.messageId 消息 ID，不传则删除触发消息
      */
-    async delete(messageId?: string): Promise<Result> {
-      const targetId = messageId || event.MessageId;
+    async delete(params?: { messageId?: string }): Promise<Result> {
+      const targetId = params?.messageId || event.MessageId;
 
       if (!targetId) {
         return createResult(ResultCode.FailParams, 'Missing MessageId', null);
@@ -264,10 +264,10 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
 
     /**
      * 置顶消息
-     * @param messageId 消息 ID，不传则置顶触发消息
+     * @param params.messageId 消息 ID，不传则置顶触发消息
      */
-    async pin(messageId?: string): Promise<Result> {
-      const targetId = messageId || event.MessageId;
+    async pin(params?: { messageId?: string }): Promise<Result> {
+      const targetId = params?.messageId || event.MessageId;
       const channelId = (event as any).ChannelId;
 
       if (!targetId || !channelId) {
@@ -288,10 +288,10 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
 
     /**
      * 取消置顶消息
-     * @param messageId 消息 ID，不传则取消置顶触发消息
+     * @param params.messageId 消息 ID，不传则取消置顶触发消息
      */
-    async unpin(messageId?: string): Promise<Result> {
-      const targetId = messageId || event.MessageId;
+    async unpin(params?: { messageId?: string }): Promise<Result> {
+      const targetId = params?.messageId || event.MessageId;
       const channelId = (event as any).ChannelId;
 
       if (!targetId || !channelId) {
@@ -312,10 +312,10 @@ export const useMessage = <T extends EventKeys>(event: Events[T]) => {
 
     /**
      * 获取消息详情
-     * @param messageId 消息 ID
+     * @param params.messageId 消息 ID
      */
-    async get(messageId?: string): Promise<Result> {
-      const targetId = messageId || event.MessageId;
+    async get(params?: { messageId?: string }): Promise<Result> {
+      const targetId = params?.messageId || event.MessageId;
 
       if (!targetId) {
         return createResult(ResultCode.FailParams, 'Missing MessageId', null);
@@ -413,16 +413,16 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 踢出成员
    */
-  const kick = async (userId: string, guildId?: string): Promise<Result> => {
-    const gid = getGuildId(guildId);
+  const kick = async (params: { userId: string; guildId?: string }): Promise<Result> => {
+    const gid = getGuildId(params.guildId);
 
-    if (!gid || !userId) {
+    if (!gid || !params.userId) {
       return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
     }
     try {
       const results = await sendAction({
         action: 'member.kick',
-        payload: { GuildId: gid, UserId: userId }
+        payload: { GuildId: gid, UserId: params.userId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -435,16 +435,16 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 封禁成员
    */
-  const ban = async (userId: string, params?: { guildId?: string; reason?: string; duration?: number }): Promise<Result> => {
-    const gid = getGuildId(params?.guildId);
+  const ban = async (params: { userId: string; guildId?: string; reason?: string; duration?: number }): Promise<Result> => {
+    const gid = getGuildId(params.guildId);
 
-    if (!gid || !userId) {
+    if (!gid || !params.userId) {
       return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
     }
     try {
       const results = await sendAction({
         action: 'member.ban',
-        payload: { GuildId: gid, UserId: userId, params: { reason: params?.reason, duration: params?.duration } }
+        payload: { GuildId: gid, UserId: params.userId, params: { reason: params.reason, duration: params.duration } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -457,16 +457,16 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 解封成员
    */
-  const unban = async (userId: string, guildId?: string): Promise<Result> => {
-    const gid = getGuildId(guildId);
+  const unban = async (params: { userId: string; guildId?: string }): Promise<Result> => {
+    const gid = getGuildId(params.guildId);
 
-    if (!gid || !userId) {
+    if (!gid || !params.userId) {
       return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
     }
     try {
       const results = await sendAction({
         action: 'member.unban',
-        payload: { GuildId: gid, UserId: userId }
+        payload: { GuildId: gid, UserId: params.userId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -481,6 +481,31 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
    */
   const information = (params: { userId: string }) => info(params);
 
+  /**
+   * 搜索成员
+   * @param keyword 搜索关键字
+   * @param guildId 服务器 ID（不传则使用事件上下文）
+   * @param limit 返回数量限制
+   */
+  const search = async (params: { keyword: string; guildId?: string; limit?: number }): Promise<Result> => {
+    const gid = getGuildId(params.guildId);
+
+    if (!gid || !params.keyword) {
+      return createResult(ResultCode.FailParams, 'Missing GuildId or keyword', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'member.search',
+        payload: { GuildId: gid, params: { keyword: params.keyword, limit: params.limit } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Member search not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to search members', null);
+    }
+  };
+
   const member = {
     info,
     information,
@@ -488,6 +513,7 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
     kick,
     ban,
     unban,
+    search,
 
     /**
      * 禁言成员
@@ -495,16 +521,16 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
      * @param duration 禁言时长（秒），0 表示解除禁言
      * @param guildId 服务器 ID（不传则使用事件上下文）
      */
-    async mute(userId: string, duration: number, guildId?: string): Promise<Result> {
-      const gid = getGuildId(guildId);
+    async mute(params: { userId: string; duration: number; guildId?: string }): Promise<Result> {
+      const gid = getGuildId(params.guildId);
 
-      if (!gid || !userId) {
+      if (!gid || !params.userId) {
         return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
       }
       try {
         const results = await sendAction({
           action: 'member.mute',
-          payload: { GuildId: gid, UserId: userId, params: { duration } }
+          payload: { GuildId: gid, UserId: params.userId, params: { duration: params.duration } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -520,16 +546,16 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
      * @param enable 是否设为管理员
      * @param guildId 服务器 ID（不传则使用事件上下文）
      */
-    async admin(userId: string, enable: boolean, guildId?: string): Promise<Result> {
-      const gid = getGuildId(guildId);
+    async admin(params: { userId: string; enable: boolean; guildId?: string }): Promise<Result> {
+      const gid = getGuildId(params.guildId);
 
-      if (!gid || !userId) {
+      if (!gid || !params.userId) {
         return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
       }
       try {
         const results = await sendAction({
           action: 'member.admin',
-          payload: { GuildId: gid, UserId: userId, params: { enable } }
+          payload: { GuildId: gid, UserId: params.userId, params: { enable: params.enable } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -545,16 +571,16 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
      * @param card 名片内容，空字符串表示取消
      * @param guildId 服务器 ID（不传则使用事件上下文）
      */
-    async card(userId: string, card: string, guildId?: string): Promise<Result> {
-      const gid = getGuildId(guildId);
+    async card(params: { userId: string; card: string; guildId?: string }): Promise<Result> {
+      const gid = getGuildId(params.guildId);
 
-      if (!gid || !userId) {
+      if (!gid || !params.userId) {
         return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
       }
       try {
         const results = await sendAction({
           action: 'member.card',
-          payload: { GuildId: gid, UserId: userId, params: { card } }
+          payload: { GuildId: gid, UserId: params.userId, params: { card: params.card } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -571,16 +597,16 @@ export const useMember = <T extends EventKeys>(event: Events[T]) => {
      * @param guildId 服务器 ID（不传则使用事件上下文）
      * @param duration 有效期（秒），-1 表示永久
      */
-    async title(userId: string, title: string, guildId?: string, duration = -1): Promise<Result> {
-      const gid = getGuildId(guildId);
+    async title(params: { userId: string; title: string; guildId?: string; duration?: number }): Promise<Result> {
+      const gid = getGuildId(params.guildId);
 
-      if (!gid || !userId) {
+      if (!gid || !params.userId) {
         return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
       }
       try {
         const results = await sendAction({
           action: 'member.title',
-          payload: { GuildId: gid, UserId: userId, params: { title, duration } }
+          payload: { GuildId: gid, UserId: params.userId, params: { title: params.title, duration: params.duration ?? -1 } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -612,8 +638,8 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
    * 获取频道信息
    * @param channelId 频道 ID（不传则使用事件上下文）
    */
-  const info = async (channelId?: string): Promise<Result<ChannelInfo | null>> => {
-    const cid = channelId || (event as any).ChannelId;
+  const info = async (params?: { channelId?: string }): Promise<Result<ChannelInfo | null>> => {
+    const cid = params?.channelId || (event as any).ChannelId;
 
     if (!cid) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
@@ -639,8 +665,8 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
    * 获取频道列表
    * @param guildId 服务器 ID（不传则使用事件上下文）
    */
-  const list = async (guildId?: string): Promise<Result<ChannelInfo[]>> => {
-    const gid = guildId || (event as any).GuildId;
+  const list = async (params?: { guildId?: string }): Promise<Result<ChannelInfo[]>> => {
+    const gid = params?.guildId || (event as any).GuildId;
 
     if (!gid) {
       return createResult(ResultCode.FailParams, 'Missing GuildId', []);
@@ -689,14 +715,14 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 更新频道
    */
-  const update = async (channelId: string, params: { name?: string; topic?: string; position?: number }): Promise<Result> => {
-    if (!channelId) {
+  const update = async (params: { channelId: string; name?: string; topic?: string; position?: number }): Promise<Result> => {
+    if (!params.channelId) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
     }
     try {
       const results = await sendAction({
         action: 'channel.update',
-        payload: { ChannelId: channelId, params }
+        payload: { ChannelId: params.channelId, params: { name: params.name, topic: params.topic, position: params.position } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -709,14 +735,14 @@ export const useChannel = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 删除频道
    */
-  const remove = async (channelId: string): Promise<Result> => {
-    if (!channelId) {
+  const remove = async (params: { channelId: string }): Promise<Result> => {
+    if (!params.channelId) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
     }
     try {
       const results = await sendAction({
         action: 'channel.delete',
-        payload: { ChannelId: channelId }
+        payload: { ChannelId: params.channelId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -846,8 +872,8 @@ export const useGuild = <T extends EventKeys>(event: Events[T]) => {
    * 获取服务器信息
    * @param guildId 服务器 ID（不传则使用事件上下文）
    */
-  const info = async (guildId?: string): Promise<Result<GuildInfo | null>> => {
-    const gid = guildId || (event as any).GuildId;
+  const info = async (params?: { guildId?: string }): Promise<Result<GuildInfo | null>> => {
+    const gid = params?.guildId || (event as any).GuildId;
 
     if (!gid) {
       return createResult(ResultCode.FailParams, 'Missing GuildId', null);
@@ -923,8 +949,8 @@ export const useGuild = <T extends EventKeys>(event: Events[T]) => {
      * @param guildId 服务器 ID（不传则使用事件上下文）
      * @param isDismiss 是否解散（仅群主有效）
      */
-    async leave(guildId?: string, isDismiss?: boolean): Promise<Result> {
-      const gid = guildId || (event as any).GuildId;
+    async leave(params?: { guildId?: string; isDismiss?: boolean }): Promise<Result> {
+      const gid = params?.guildId || (event as any).GuildId;
 
       if (!gid) {
         return createResult(ResultCode.FailParams, 'Missing GuildId', null);
@@ -932,7 +958,7 @@ export const useGuild = <T extends EventKeys>(event: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'guild.leave',
-          payload: { GuildId: gid, params: { isDismiss } }
+          payload: { GuildId: gid, params: { isDismiss: params?.isDismiss } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -947,8 +973,8 @@ export const useGuild = <T extends EventKeys>(event: Events[T]) => {
      * @param enable 是否开启全员禁言
      * @param guildId 服务器 ID（不传则使用事件上下文）
      */
-    async mute(enable: boolean, guildId?: string): Promise<Result> {
-      const gid = guildId || (event as any).GuildId;
+    async mute(params: { enable: boolean; guildId?: string }): Promise<Result> {
+      const gid = params.guildId || (event as any).GuildId;
 
       if (!gid) {
         return createResult(ResultCode.FailParams, 'Missing GuildId', null);
@@ -956,7 +982,7 @@ export const useGuild = <T extends EventKeys>(event: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'guild.mute',
-          payload: { GuildId: gid, params: { enable } }
+          payload: { GuildId: gid, params: { enable: params.enable } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -989,8 +1015,8 @@ export const useRole = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 获取角色列表
    */
-  const list = async (guildId?: string): Promise<Result<RoleInfo[]>> => {
-    const gid = getGuildId(guildId);
+  const list = async (params?: { guildId?: string }): Promise<Result<RoleInfo[]>> => {
+    const gid = getGuildId(params?.guildId);
 
     if (!gid) {
       return createResult(ResultCode.FailParams, 'Missing GuildId', []);
@@ -1037,16 +1063,16 @@ export const useRole = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 更新角色
    */
-  const update = async (roleId: string, params: { name?: string; color?: number; permissions?: string; guildId?: string }): Promise<Result> => {
+  const update = async (params: { roleId: string; name?: string; color?: number; permissions?: string; guildId?: string }): Promise<Result> => {
     const gid = getGuildId(params.guildId);
 
-    if (!gid || !roleId) {
+    if (!gid || !params.roleId) {
       return createResult(ResultCode.FailParams, 'Missing GuildId or RoleId', null);
     }
     try {
       const results = await sendAction({
         action: 'role.update',
-        payload: { GuildId: gid, RoleId: roleId, params: { name: params.name, color: params.color, permissions: params.permissions } }
+        payload: { GuildId: gid, RoleId: params.roleId, params: { name: params.name, color: params.color, permissions: params.permissions } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1059,16 +1085,16 @@ export const useRole = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 删除角色
    */
-  const remove = async (roleId: string, guildId?: string): Promise<Result> => {
-    const gid = getGuildId(guildId);
+  const remove = async (params: { roleId: string; guildId?: string }): Promise<Result> => {
+    const gid = getGuildId(params.guildId);
 
-    if (!gid || !roleId) {
+    if (!gid || !params.roleId) {
       return createResult(ResultCode.FailParams, 'Missing GuildId or RoleId', null);
     }
     try {
       const results = await sendAction({
         action: 'role.delete',
-        payload: { GuildId: gid, RoleId: roleId }
+        payload: { GuildId: gid, RoleId: params.roleId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1081,16 +1107,16 @@ export const useRole = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 为成员分配角色
    */
-  const assign = async (userId: string, roleId: string, guildId?: string): Promise<Result> => {
-    const gid = getGuildId(guildId);
+  const assign = async (params: { userId: string; roleId: string; guildId?: string }): Promise<Result> => {
+    const gid = getGuildId(params.guildId);
 
-    if (!gid || !userId || !roleId) {
+    if (!gid || !params.userId || !params.roleId) {
       return createResult(ResultCode.FailParams, 'Missing GuildId, UserId or RoleId', null);
     }
     try {
       const results = await sendAction({
         action: 'role.assign',
-        payload: { GuildId: gid, UserId: userId, RoleId: roleId }
+        payload: { GuildId: gid, UserId: params.userId, RoleId: params.roleId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1103,16 +1129,16 @@ export const useRole = <T extends EventKeys>(event: Events[T]) => {
   /**
    * 移除成员角色
    */
-  const revoke = async (userId: string, roleId: string, guildId?: string): Promise<Result> => {
-    const gid = getGuildId(guildId);
+  const revoke = async (params: { userId: string; roleId: string; guildId?: string }): Promise<Result> => {
+    const gid = getGuildId(params.guildId);
 
-    if (!gid || !userId || !roleId) {
+    if (!gid || !params.userId || !params.roleId) {
       return createResult(ResultCode.FailParams, 'Missing GuildId, UserId or RoleId', null);
     }
     try {
       const results = await sendAction({
         action: 'role.remove',
-        payload: { GuildId: gid, UserId: userId, RoleId: roleId }
+        payload: { GuildId: gid, UserId: params.userId, RoleId: params.roleId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1153,17 +1179,17 @@ export const useReaction = <T extends EventKeys>(event: Events[T]) => {
    * @param emojiId 表情 ID 或 Unicode
    * @param messageId 消息 ID（不传则使用触发消息）
    */
-  const add = async (emojiId: string, messageId?: string): Promise<Result> => {
-    const mid = messageId || event.MessageId;
+  const add = async (params: { emojiId: string; messageId?: string }): Promise<Result> => {
+    const mid = params.messageId || event.MessageId;
     const cid = (event as any).ChannelId;
 
-    if (!mid || !cid || !emojiId) {
+    if (!mid || !cid || !params.emojiId) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
     }
     try {
       const results = await sendAction({
         action: 'reaction.add',
-        payload: { ChannelId: cid, MessageId: mid, EmojiId: emojiId }
+        payload: { ChannelId: cid, MessageId: mid, EmojiId: params.emojiId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1178,17 +1204,17 @@ export const useReaction = <T extends EventKeys>(event: Events[T]) => {
    * @param emojiId 表情 ID 或 Unicode
    * @param messageId 消息 ID（不传则使用触发消息）
    */
-  const remove = async (emojiId: string, messageId?: string): Promise<Result> => {
-    const mid = messageId || event.MessageId;
+  const remove = async (params: { emojiId: string; messageId?: string }): Promise<Result> => {
+    const mid = params.messageId || event.MessageId;
     const cid = (event as any).ChannelId;
 
-    if (!mid || !cid || !emojiId) {
+    if (!mid || !cid || !params.emojiId) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
     }
     try {
       const results = await sendAction({
         action: 'reaction.remove',
-        payload: { ChannelId: cid, MessageId: mid, EmojiId: emojiId }
+        payload: { ChannelId: cid, MessageId: mid, EmojiId: params.emojiId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1198,9 +1224,36 @@ export const useReaction = <T extends EventKeys>(event: Events[T]) => {
     }
   };
 
+  /**
+   * 获取某个表情的回应用户列表
+   * @param emojiId 表情 ID 或 Unicode
+   * @param messageId 消息 ID（不传则使用触发消息）
+   * @param limit 返回数量限制
+   */
+  const list = async (params: { emojiId: string; messageId?: string; limit?: number }): Promise<Result> => {
+    const mid = params.messageId || event.MessageId;
+    const cid = (event as any).ChannelId;
+
+    if (!mid || !cid || !params.emojiId) {
+      return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'reaction.list',
+        payload: { ChannelId: cid, MessageId: mid, EmojiId: params.emojiId, params: { limit: params.limit } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Reaction list not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to list reactions', null);
+    }
+  };
+
   const reaction = {
     add,
-    remove
+    remove,
+    list
   };
 
   return [reaction] as const;
@@ -1320,14 +1373,14 @@ export const useRequest = () => {
    * @param approve 是否同意
    * @param remark 备注（同意时有效）
    */
-  const friend = async (flag: string, approve: boolean, remark?: string): Promise<Result> => {
-    if (!flag) {
+  const friend = async (params: { flag: string; approve: boolean; remark?: string }): Promise<Result> => {
+    if (!params.flag) {
       return createResult(ResultCode.FailParams, 'Missing flag', null);
     }
     try {
       const results = await sendAction({
         action: 'request.friend',
-        payload: { params: { flag, approve, remark } }
+        payload: { params: { flag: params.flag, approve: params.approve, remark: params.remark } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1344,14 +1397,14 @@ export const useRequest = () => {
    * @param approve 是否同意
    * @param reason 拒绝理由（拒绝时有效）
    */
-  const guild = async (flag: string, subType: string, approve: boolean, reason?: string): Promise<Result> => {
-    if (!flag || !subType) {
+  const guild = async (params: { flag: string; subType: string; approve: boolean; reason?: string }): Promise<Result> => {
+    if (!params.flag || !params.subType) {
       return createResult(ResultCode.FailParams, 'Missing flag or subType', null);
     }
     try {
       const results = await sendAction({
         action: 'request.guild',
-        payload: { params: { flag, subType, approve, reason } }
+        payload: { params: { flag: params.flag, subType: params.subType, approve: params.approve, reason: params.reason } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1377,14 +1430,14 @@ export const useUser = () => {
    * 获取用户信息
    * @param userId 用户 ID
    */
-  const info = async (userId: string): Promise<Result<User | null>> => {
-    if (!userId) {
+  const info = async (params: { userId: string }): Promise<Result<User | null>> => {
+    if (!params.userId) {
       return createResult(ResultCode.FailParams, 'Missing UserId', null);
     }
     try {
       const results = await sendAction({
         action: 'user.info',
-        payload: { UserId: userId }
+        payload: { UserId: params.userId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -1403,4 +1456,284 @@ export const useUser = () => {
   };
 
   return [user] as const;
+};
+
+/**
+ * 媒体管理（图片/音频/视频/文件）
+ * @param event 事件上下文
+ */
+export const useMedia = <T extends EventKeys>(event: Events[T]) => {
+  if (!event || typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid event: event must be an object',
+      data: null
+    });
+    throw new Error('Invalid event: event must be an object');
+  }
+
+  type MediaType = 'image' | 'audio' | 'video' | 'file';
+
+  /**
+   * 上传媒体文件（仅上传，不发送）
+   * @param params.type 媒体类型
+   * @param params.url 文件 URL
+   * @param params.data base64 数据
+   * @param params.name 文件名
+   */
+  const upload = async (params: { type: MediaType; url?: string; data?: string; name?: string }): Promise<Result> => {
+    try {
+      const results = await sendAction({
+        action: 'media.upload',
+        payload: { params }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Media upload not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to upload media', null);
+    }
+  };
+
+  /**
+   * 发送媒体到频道
+   * @param channelId 频道 ID（不传则使用事件上下文）
+   */
+  const sendChannel = async (params: { type: MediaType; url?: string; data?: string; name?: string; channelId?: string }): Promise<Result> => {
+    const cid = params.channelId || (event as any).ChannelId;
+
+    if (!cid) {
+      return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'media.send.channel',
+        payload: { ChannelId: cid, params: { type: params.type, url: params.url, data: params.data, name: params.name } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Media send not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to send media to channel', null);
+    }
+  };
+
+  /**
+   * 发送媒体到用户
+   * @param userId 用户 ID
+   */
+  const sendUser = async (params: { userId: string; type: MediaType; url?: string; data?: string; name?: string }): Promise<Result> => {
+    if (!params.userId) {
+      return createResult(ResultCode.FailParams, 'Missing UserId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'media.send.user',
+        payload: { UserId: params.userId, params: { type: params.type, url: params.url, data: params.data, name: params.name } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Media send not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to send media to user', null);
+    }
+  };
+
+  const media = {
+    upload,
+    sendChannel,
+    sendUser
+  };
+
+  return [media] as const;
+};
+
+/**
+ * 消息历史记录
+ * @param event 事件上下文
+ */
+export const useHistory = <T extends EventKeys>(event: Events[T]) => {
+  if (!event || typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid event: event must be an object',
+      data: null
+    });
+    throw new Error('Invalid event: event must be an object');
+  }
+
+  /**
+   * 获取频道消息历史
+   * @param channelId 频道 ID（不传则使用事件上下文）
+   * @param params.limit 返回数量
+   * @param params.before 在此消息之前
+   * @param params.after 在此消息之后
+   */
+  const list = async (params?: { channelId?: string; limit?: number; before?: string; after?: string }): Promise<Result> => {
+    const cid = params?.channelId || (event as any).ChannelId;
+
+    if (!cid) {
+      return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'history.list',
+        payload: { ChannelId: cid, params: { limit: params?.limit, before: params?.before, after: params?.after } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'History list not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get message history', null);
+    }
+  };
+
+  const history = {
+    list
+  };
+
+  return [history] as const;
+};
+
+/**
+ * 频道权限管理
+ * @param event 事件上下文
+ */
+export const usePermission = <T extends EventKeys>(event: Events[T]) => {
+  if (!event || typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid event: event must be an object',
+      data: null
+    });
+    throw new Error('Invalid event: event must be an object');
+  }
+
+  /**
+   * 获取用户在频道中的权限
+   * @param userId 用户 ID
+   * @param channelId 频道 ID（不传则使用事件上下文）
+   */
+  const get = async (params: { userId: string; channelId?: string }): Promise<Result> => {
+    const cid = params.channelId || (event as any).ChannelId;
+
+    if (!cid || !params.userId) {
+      return createResult(ResultCode.FailParams, 'Missing ChannelId or UserId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'permission.get',
+        payload: { ChannelId: cid, UserId: params.userId }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Permission get not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get permission', null);
+    }
+  };
+
+  /**
+   * 设置用户在频道中的权限
+   * @param userId 用户 ID
+   * @param params.allow 允许的权限位
+   * @param params.deny 拒绝的权限位
+   * @param channelId 频道 ID（不传则使用事件上下文）
+   */
+  const set = async (params: { userId: string; allow?: string; deny?: string; channelId?: string }): Promise<Result> => {
+    const cid = params.channelId || (event as any).ChannelId;
+
+    if (!cid || !params.userId) {
+      return createResult(ResultCode.FailParams, 'Missing ChannelId or UserId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'permission.set',
+        payload: { ChannelId: cid, UserId: params.userId, params: { allow: params.allow, deny: params.deny } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Permission set not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to set permission', null);
+    }
+  };
+
+  const permission = {
+    get,
+    set
+  };
+
+  return [permission] as const;
+};
+
+/**
+ * 频道公告管理
+ * @param event 事件上下文
+ */
+export const useAnnounce = <T extends EventKeys>(event: Events[T]) => {
+  if (!event || typeof event !== 'object') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid event: event must be an object',
+      data: null
+    });
+    throw new Error('Invalid event: event must be an object');
+  }
+
+  /**
+   * 设置公告
+   * @param messageId 消息 ID
+   * @param params.channelId 频道 ID（用于指定公告来源子频道）
+   * @param guildId 服务器 ID（不传则使用事件上下文）
+   */
+  const set = async (params: { messageId: string; channelId?: string; guildId?: string }): Promise<Result> => {
+    const gid = params.guildId || (event as any).GuildId;
+
+    if (!gid || !params.messageId) {
+      return createResult(ResultCode.FailParams, 'Missing GuildId or MessageId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'channel.announce',
+        payload: { GuildId: gid, params: { messageId: params.messageId, channelId: params.channelId } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Announce set not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to set announcement', null);
+    }
+  };
+
+  /**
+   * 删除公告
+   * @param messageId 消息 ID（传 'all' 删除所有公告）
+   * @param guildId 服务器 ID（不传则使用事件上下文）
+   */
+  const remove = async (params?: { messageId?: string; guildId?: string }): Promise<Result> => {
+    const gid = params?.guildId || (event as any).GuildId;
+
+    if (!gid) {
+      return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+    }
+    try {
+      const results = await sendAction({
+        action: 'channel.announce',
+        payload: { GuildId: gid, params: { messageId: params?.messageId || 'all', remove: true } }
+      });
+      const result = results.find(item => item.code === ResultCode.Ok);
+
+      return result || createResult(ResultCode.Warn, 'Announce remove not supported or failed', null);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to remove announcement', null);
+    }
+  };
+
+  const announce = {
+    set,
+    remove
+  };
+
+  return [announce] as const;
 };

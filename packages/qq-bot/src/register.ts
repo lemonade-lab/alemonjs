@@ -1292,6 +1292,71 @@ export const register = (client: QQBotClients) => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
+      }
+      // ─── 媒体 ───
+      else if (data.action === 'media.send.channel') {
+        // QQ-Bot 频道暂不支持独立媒体发送，使用消息通道
+        consume([createResult(ResultCode.Warn, 'media.send.channel not directly supported, use message.send with format', null)]);
+      } else if (data.action === 'media.send.user') {
+        const userId = data.payload.UserId;
+        const params = data.payload.params;
+        const fileType = params?.type === 'image' ? 1 : params?.type === 'video' ? 2 : params?.type === 'audio' ? 3 : 4;
+        const res = await client
+          .postRichMediaByUser(userId, { file_type: fileType as any, url: params?.url, file_data: params?.data })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'media.upload') {
+        // 没有目标时仅上传不发送，QQ-Bot 不支持纯上传
+        consume([createResult(ResultCode.Warn, 'media.upload not supported, use media.send.user or media.send.channel', null)]);
+      }
+      // ─── 权限 ───
+      else if (data.action === 'permission.get') {
+        const res = await client
+          .channelsPermissions(data.payload.ChannelId, data.payload.UserId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'permission.set') {
+        const params = data.payload.params;
+        const res = await client
+          .channelsPermissionsPut(data.payload.ChannelId, data.payload.UserId, params?.allow ?? '0', params?.deny ?? '0')
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 表情回应列表 ───
+      else if (data.action === 'reaction.list') {
+        const res = await client
+          .channelsMessagesReactionsUsers(data.payload.ChannelId, data.payload.MessageId, 1, data.payload.EmojiId, { limit: data.payload.params?.limit ?? 20 })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 频道公告 ───
+      else if (data.action === 'channel.announce') {
+        const guildId = data.payload.GuildId;
+        const params = data.payload.params;
+
+        if (params?.remove) {
+          const res = await client
+            .guildsAnnouncesDelete(guildId, params?.messageId ?? 'all')
+            .then(r => createResult(ResultCode.Ok, data.action, r))
+            .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+          consume([res]);
+        } else {
+          const res = await client
+            .guildsAnnounces(guildId, { message_id: params?.messageId, channel_id: params?.channelId })
+            .then(r => createResult(ResultCode.Ok, data.action, r))
+            .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+          consume([res]);
+        }
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }

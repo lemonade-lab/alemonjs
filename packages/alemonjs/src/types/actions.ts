@@ -510,6 +510,128 @@ export type ActionUserInfo = {
   };
 };
 
+// ─── 媒体 ───
+
+export type ActionMediaUpload = {
+  action: 'media.upload';
+  payload: {
+    params: {
+      /** 媒体类型：image | audio | video | file */
+      type: 'image' | 'audio' | 'video' | 'file';
+      /** 文件 URL 或 base64 数据 */
+      url?: string;
+      data?: string;
+      /** 文件名 */
+      name?: string;
+    };
+  };
+};
+
+export type ActionMediaSendChannel = {
+  action: 'media.send.channel';
+  payload: {
+    ChannelId: string;
+    params: {
+      type: 'image' | 'audio' | 'video' | 'file';
+      url?: string;
+      data?: string;
+      name?: string;
+    };
+  };
+};
+
+export type ActionMediaSendUser = {
+  action: 'media.send.user';
+  payload: {
+    UserId: string;
+    params: {
+      type: 'image' | 'audio' | 'video' | 'file';
+      url?: string;
+      data?: string;
+      name?: string;
+    };
+  };
+};
+
+// ─── 消息历史 ───
+
+export type ActionHistoryList = {
+  action: 'history.list';
+  payload: {
+    ChannelId: string;
+    params?: {
+      limit?: number;
+      before?: string;
+      after?: string;
+    };
+  };
+};
+
+// ─── 权限 ───
+
+export type ActionPermissionGet = {
+  action: 'permission.get';
+  payload: {
+    ChannelId: string;
+    UserId: string;
+  };
+};
+
+export type ActionPermissionSet = {
+  action: 'permission.set';
+  payload: {
+    ChannelId: string;
+    UserId: string;
+    params: {
+      allow?: string;
+      deny?: string;
+    };
+  };
+};
+
+// ─── 表情回应列表 ───
+
+export type ActionReactionList = {
+  action: 'reaction.list';
+  payload: {
+    ChannelId: string;
+    MessageId: string;
+    EmojiId: string;
+    params?: {
+      limit?: number;
+    };
+  };
+};
+
+// ─── 成员搜索 ───
+
+export type ActionMemberSearch = {
+  action: 'member.search';
+  payload: {
+    GuildId: string;
+    params: {
+      keyword: string;
+      limit?: number;
+    };
+  };
+};
+
+// ─── 频道公告 ───
+
+export type ActionChannelAnnounce = {
+  action: 'channel.announce';
+  payload: {
+    GuildId: string;
+    params: {
+      /** 消息 ID（设置公告），传 'all' 或留空表示删除 */
+      messageId?: string;
+      channelId?: string;
+      /** 是否删除公告 */
+      remove?: boolean;
+    };
+  };
+};
+
 type base = {
   // 动作ID
   actionId?: string;
@@ -580,6 +702,21 @@ export type Actions = // 消息
     | ActionRequestGuild
     // 用户信息
     | ActionUserInfo
+    // 媒体
+    | ActionMediaUpload
+    | ActionMediaSendChannel
+    | ActionMediaSendUser
+    // 消息历史
+    | ActionHistoryList
+    // 权限
+    | ActionPermissionGet
+    | ActionPermissionSet
+    // 表情回应列表
+    | ActionReactionList
+    // 成员搜索
+    | ActionMemberSearch
+    // 频道公告
+    | ActionChannelAnnounce
     // 兜底
     | {
         action: string;

@@ -1069,6 +1069,49 @@ const main = () => {
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
+      }
+      // ─── 媒体上传 ───
+      else if (data.action === 'media.upload') {
+        const params = data.payload.params;
+        const fileData = params?.url ?? params?.data;
+
+        if (!fileData) {
+          consume([createResult(ResultCode.FailParams, 'Missing url or data', null)]);
+        } else {
+          const res = await client
+            .postImage(fileData, params?.name)
+            .then(r => createResult(ResultCode.Ok, data.action, r))
+            .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+          consume([res]);
+        }
+      }
+      // ─── 消息历史 ───
+      else if (data.action === 'history.list') {
+        const res = await client
+          .messageList(data.payload.ChannelId, { page_size: data.payload.params?.limit })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 表情回应列表 ───
+      else if (data.action === 'reaction.list') {
+        const res = await client
+          .messageReactionList({ msg_id: data.payload.MessageId, emoji: data.payload.EmojiId })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      }
+      // ─── 成员搜索 ───
+      else if (data.action === 'member.search') {
+        const res = await client
+          .guildUserList(data.payload.GuildId, { search: data.payload.params?.keyword, page_size: data.payload.params?.limit })
+          .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }
