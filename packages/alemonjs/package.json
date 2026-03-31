@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.1.46",
+  "version": "2.1.47",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -28,8 +28,8 @@
   },
   "dependencies": {
     "@koa/cors": "^5.0.0",
-    "axios": "^1.10.0",
-    "chalk": "^5.3.0",
+    "axios": "^1.14.0",
+    "chalk": "^5.6.2",
     "commander": "^13.1.0",
     "file-type": "21.0.0",
     "flatted": "^3.3.3",

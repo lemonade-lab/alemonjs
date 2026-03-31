@@ -17,7 +17,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "animate.css": "^4.1.1",
     "autoprefixer": "^10.4.19",
-    "axios": "^1.6.8",
+    "axios": "^1.14.0",
     "classnames": "^2.5.1",
     "dayjs": "^1.11.13",
     "echarts-for-react": "^3.0.2",
