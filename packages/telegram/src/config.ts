@@ -1,4 +1,4 @@
-import { getConfigValue, isMaster } from 'alemonjs';
+import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 export const platform = 'telegram';
 export type Options = {
   token: string;
@@ -23,5 +23,11 @@ export const getTGConfig = (): Options => {
   return value[platform] || {};
 };
 export const getMaster = (UserId: string) => {
-  return isMaster(UserId, platform);
+  const isMasterUser = isMaster(UserId, platform);
+  const UserKey = createUserHashKey({
+    Platform: platform,
+    UserId
+  });
+
+  return [isMasterUser, UserKey] as const;
 };

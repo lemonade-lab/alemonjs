@@ -1,4 +1,4 @@
-import { getConfigValue, isMaster } from 'alemonjs';
+import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 import { Options as sdkOptions } from './sdk/typing';
 export const platform = 'qq-bot';
 
@@ -34,5 +34,11 @@ export const getQQBotConfig = (): Options => {
   return value[platform] || {};
 };
 export const getMaster = (UserId: string) => {
-  return isMaster(UserId, platform);
+  const isMasterUser = isMaster(UserId, platform);
+  const UserKey = createUserHashKey({
+    Platform: platform,
+    UserId
+  });
+
+  return [isMasterUser, UserKey] as const;
 };
