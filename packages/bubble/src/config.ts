@@ -1,4 +1,4 @@
-import { getConfigValue, useUserHashKey } from 'alemonjs';
+import { getConfigValue, isMaster } from 'alemonjs';
 import { BUBBLEOptions } from './sdk/wss.types';
 import { GATEWAY_URL, API_URL, CDN_URL } from './sdk/api.js';
 
@@ -76,17 +76,5 @@ export const getBubbleConfig = (): Options & {
 };
 
 export const getMaster = (UserId: string) => {
-  const values = getConfigValue() || {};
-  const mainMasterKey = values.master_key || [];
-  const mainMasterId = values.master_id || [];
-  const config = getBubbleConfig();
-  const masterKey = config.master_key || [];
-  const masterId = config.master_id || [];
-  const UserKey = useUserHashKey({
-    Platform: platform,
-    UserId: UserId
-  });
-  const is = mainMasterKey.includes(UserKey) || mainMasterId.includes(UserId) || masterKey.includes(UserKey) || masterId.includes(UserId);
-
-  return [is, UserKey] as const;
+  return isMaster(UserId, platform);
 };

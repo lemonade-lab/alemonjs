@@ -13,13 +13,23 @@ import type {
   StateSubscribeMap,
   SubscribeKeysMap,
   LoggerUtils,
-  ResponseState
+  ResponseState,
+  StartOptions
 } from './types';
 
 import WebSocket, { Server } from 'ws';
 import { IncomingMessage } from 'http';
 
 declare global {
+  /**
+   * 全局配置实例
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  var __config: any;
+  /**
+   * 全局启动参数
+   */
+  var __options: StartOptions;
   /**
    * 打印
    */

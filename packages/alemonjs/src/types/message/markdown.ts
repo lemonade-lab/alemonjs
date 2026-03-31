@@ -67,7 +67,7 @@ export type DataMarkdownLink = {
   type: 'MD.link';
   value: {
     text: string;
-    url: string;
+    url?: string;
   };
 };
 export type DataMarkdownImage = {

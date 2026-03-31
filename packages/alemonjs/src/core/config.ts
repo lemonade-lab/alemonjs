@@ -4,7 +4,42 @@ import YAML from 'yaml';
 import type { Package } from '../types';
 import { ResultCode } from './variable';
 
-type ConfigValue = { [key: string]: any };
+type ConfigValue = {
+  [key: string]: any;
+  /** 主人-用户KEY */
+  master_key?: { [key: string]: boolean } | string[];
+  /** 主人-用户ID */
+  master_id?: { [key: string]: boolean } | string[];
+  /** 机器人-KEY */
+  bot_key?: { [key: string]: boolean } | string[];
+  /** 机器人-ID */
+  bot_id?: { [key: string]: boolean } | string[];
+  /** 禁用文本正则 */
+  disabled_text_regular?: string;
+  /** 禁用事件选择器 */
+  disabled_selects?: { [key: string]: boolean };
+  /** 禁用用户ID */
+  disabled_user_id?: { [key: string]: boolean } | string[];
+  /** 禁用用户KEY */
+  disabled_user_key?: { [key: string]: boolean } | string[];
+  /** 重定向正则 */
+  redirect_regular?: string;
+  /** 重定向目标 */
+  redirect_target?: string;
+  /** @deprecated 使用 redirect_regular */
+  redirect_text_regular?: string;
+  /** @deprecated 使用 redirect_target */
+  redirect_text_target?: string;
+  /** 文本映射规则 */
+  mapping_text?: { regular?: string; target?: string }[];
+  /** 处理器参数 */
+  processor?: {
+    repeated_event_time?: number;
+    repeated_user_time?: number;
+  };
+  /** 应用列表 */
+  apps?: string[] | { [key: string]: boolean };
+};
 type ConfigListener<T extends ConfigValue = ConfigValue> = (value: T) => void;
 
 /**

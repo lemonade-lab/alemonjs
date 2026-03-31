@@ -10,7 +10,7 @@ import {
 import { EventKeys, Events } from '../types';
 import { expendCycle } from './event-processor-cycle';
 import { ProcessorEventAutoClearMap, ProcessorEventUserAutoClearMap } from './store';
-import { fastHash, getCachedRegExp } from '../core/utils';
+import { fastHash, getCachedRegExp, matchIn } from '../core/utils';
 
 /**
  * 过滤掉重复消息
@@ -127,17 +127,17 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     return;
   }
 
-  const disabledUserId = value?.disabled_user_id ?? {};
+  const disabledUserId = value?.disabled_user_id;
 
   // 检查用户禁用规则
-  if (event['UserId'] && disabledUserId[event['UserId']]) {
+  if (event['UserId'] && matchIn(disabledUserId, event['UserId'])) {
     return;
   }
 
-  const disabledUserKey = value?.disabled_user_key ?? {};
+  const disabledUserKey = value?.disabled_user_key;
 
   // 检查用户禁用规则
-  if (event['UserKey'] && disabledUserKey[event['UserKey']]) {
+  if (event['UserKey'] && matchIn(disabledUserKey, event['UserKey'])) {
     return;
   }
 
@@ -171,23 +171,23 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
     }
   }
 
-  const masterId = value?.master_id ?? {};
-  const masterKey = value?.master_key ?? {};
+  const masterId = value?.master_id;
+  const masterKey = value?.master_key;
 
   // 检查是否是 master
-  if (event['UserId'] && masterId[event['UserId']]) {
+  if (event['UserId'] && matchIn(masterId, event['UserId'])) {
     event['isMaster'] = true;
-  } else if (event['UserKey'] && masterKey[event['UserKey']]) {
+  } else if (event['UserKey'] && matchIn(masterKey, event['UserKey'])) {
     event['isMaster'] = true;
   }
 
-  const botId = value?.bot_id ?? {};
-  const botKey = value?.bot_key ?? {};
+  const botId = value?.bot_id;
+  const botKey = value?.bot_key;
 
   // 检查是否是 bot
-  if (event['UserId'] && botId[event['UserId']]) {
+  if (event['UserId'] && matchIn(botId, event['UserId'])) {
     event['isBot'] = true;
-  } else if (event['UserKey'] && botKey[event['UserKey']]) {
+  } else if (event['UserKey'] && matchIn(botKey, event['UserKey'])) {
     event['isBot'] = true;
   }
 

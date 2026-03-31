@@ -117,7 +117,16 @@ const mdFormatters: Record<string, (value: any, options?: any) => string> = {
   'MD.strikethrough': value => `~~${value}~~ `,
   'MD.blockquote': value => `\n> ${value} `,
   'MD.newline': () => '\n',
-  'MD.link': value => `[🔗${value.text}](${value.url}) `,
+  'MD.link': value => {
+    if (!value?.text && !value?.url) {
+      return '';
+    }
+    if (!value?.text || !value?.url) {
+      return `<${value?.url ?? value?.text}> `;
+    }
+
+    return `[🔗${value?.text}](${value?.url}) `;
+  },
   'MD.image': (value, options) => `\n![text #${options?.width || 208}px #${options?.height || 320}px](${value})\n`,
   'MD.mention': (value, options) => {
     const { belong } = options || {};

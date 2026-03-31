@@ -289,7 +289,7 @@ Markdown.strikethrough = (text: string): DataMarkdownStrikethrough => {
  * @param url  链接地址
  * @returns
  */
-Markdown.link = (text: string, url: string): DataMarkdownLink => {
+Markdown.link = (text: string, url?: string): DataMarkdownLink => {
   return {
     type: 'MD.link',
     value: { text, url }

@@ -77,26 +77,34 @@ export const createUserHashKey = (event: { UserId: string; Platform: string }) =
 export const useUserHashKey = createUserHashKey;
 
 /**
+ * 匹配 key 是否存在于数组或对象中
+ */
+export const matchIn = (source: any, key: string): boolean => {
+  if (Array.isArray(source)) {
+    return source.includes(key);
+  }
+  if (source && typeof source === 'object') {
+    return Object.prototype.hasOwnProperty.call(source, key) && !!source[key];
+  }
+
+  return false;
+};
+
+/**
  * 判断用户是否为主人
  * @param UserId
  * @param platform
  * @returns
  */
-export const isMaster = (UserId: string, platform: string) => {
+export const isMaster = (UserId: string, platform: string): boolean => {
   const values = getConfigValue() || {};
-  const mainMasterKey = values.master_key || [];
-  const mainMasterId = values.master_id || [];
-  const value = values[platform] || {};
-  const masterKey = value.master_key || [];
-  const masterId = value.master_id || [];
+  const value = values[platform] && typeof values[platform] === 'object' ? values[platform] : {};
   const UserKey = createUserHashKey({
     Platform: platform,
     UserId: UserId
   });
-  const cMaster = mainMasterKey.concat(masterKey);
-  const cMasterId = mainMasterId.concat(masterId);
 
-  return cMaster.includes(UserKey) || cMasterId.includes(UserId);
+  return matchIn(values.master_key, UserKey) || matchIn(values.master_id, UserId) || matchIn(value.master_key, UserKey) || matchIn(value.master_id, UserId);
 };
 
 /**
