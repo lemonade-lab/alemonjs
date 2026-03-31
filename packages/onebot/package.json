@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/onebot",
-  "version": "2.1.9",
+  "version": "2.1.10",
   "description": "oneBot v11",
   "author": "lemonade",
   "license": "MIT",
@@ -35,7 +35,19 @@
         }
       ],
       "logo": "antd.RobotOutlined"
-    }
+    },
+    "command": [
+      {
+        "name": "onebot",
+        "command": "open.onebot"
+      }
+    ],
+    "sidebars": [
+      {
+        "name": "onebot",
+        "command": "open.onebot"
+      }
+    ]
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

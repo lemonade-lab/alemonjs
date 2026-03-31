@@ -39,14 +39,14 @@
       "logo": "antd.DiscordOutlined",
       "command": [
         {
-          "name": "打开discord",
+          "name": "discord",
           "icon": "antd.DiscordOutlined",
           "command": "open.discord"
         }
       ],
       "sidebars": [
         {
-          "name": "dc",
+          "name": "discord",
           "icon": "antd.DiscordOutlined",
           "command": "open.discord"
         }

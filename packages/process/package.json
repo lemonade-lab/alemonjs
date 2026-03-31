@@ -24,18 +24,18 @@
     "desktop": {
       "logo": "antd.AppstoreOutlined",
       "platform": [],
-      "commond": [
+      "command": [
         {
-          "name": "配置应用",
+          "name": "apps",
           "icon": "antd.AppstoreOutlined",
-          "commond": "open.process"
+          "command": "open.process"
         }
       ],
       "sidebars": [
         {
-          "name": "APPS",
+          "name": "apps",
           "icon": "antd.AppstoreOutlined",
-          "commond": "open.process"
+          "command": "open.process"
         }
       ]
     }

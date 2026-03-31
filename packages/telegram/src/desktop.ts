@@ -11,7 +11,7 @@ export const activate = context => {
   const webView = context.createSidebarWebView(context);
 
   // 当命令被触发的时候。
-  context.onCommand('open.qq-bot', () => {
+  context.onCommand('open.telegram', () => {
     const dir = join(__dirname, '../', 'dist', 'index.html');
     const scriptReg = /<script.*?src="(.+?)".*?>/;
     const styleReg = /<link.*?rel="stylesheet".*?href="(.+?)".*?>/;
@@ -32,19 +32,19 @@ export const activate = context => {
   // 监听 webview 的消息。
   webView.onMessage(data => {
     try {
-      if (data.type === 'qq-bot.form.save') {
+      if (data.type === 'telegram.form.save') {
         const db = data.data;
         const config = getConfig();
         const value = config.value ?? {};
 
-        value['qq-bot'] = {
+        value['telegram'] = {
           ...db,
           master_key: db.master_key?.split(',') ?? null,
           master_id: db.master_id?.split(',') ?? null
         };
         config.saveValue(value);
-        context.notification('QQ Bot 配置保存成功～');
-      } else if (data.type === 'qq-bot.init') {
+        context.notification('Telegram 配置保存成功～');
+      } else if (data.type === 'telegram.init') {
         let config = getConfigValue();
 
         if (!config) {
@@ -52,8 +52,8 @@ export const activate = context => {
         }
         // 发送消息
         webView.postMessage({
-          type: 'qq-bot.init',
-          data: config['qq-bot'] ?? {}
+          type: 'telegram.init',
+          data: config.telegram ?? {}
         });
       }
     } catch (e) {

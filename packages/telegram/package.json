@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/telegram",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "telegram platform connection",
   "author": "lemonade",
   "license": "MIT",
@@ -32,7 +32,19 @@
           "name": "telegram"
         }
       ]
-    }
+    },
+    "command": [
+      {
+        "name": "telegram",
+        "command": "open.telegram"
+      }
+    ],
+    "sidebars": [
+      {
+        "name": "telegram",
+        "command": "open.telegram"
+      }
+    ]
   },
   "keywords": [
     "alemonjs"
