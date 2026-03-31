@@ -70,6 +70,12 @@ export type DataMarkdownLink = {
     url: string;
   };
 };
+
+export type DataMarkdownNakedLink = {
+  type: 'MD.nakedLink';
+  value: string;
+};
+
 export type DataMarkdownImage = {
   type: 'MD.image';
   value: string;
@@ -123,6 +129,7 @@ type DataMarkDownBalue =
   | DataMarkdownItalicStar
   | DataMarkdownStrikethrough
   | DataMarkdownLink
+  | DataMarkdownNakedLink
   | DataMarkdownImage
   | DataMarkdownList
   | DataMarkdownBlockquote

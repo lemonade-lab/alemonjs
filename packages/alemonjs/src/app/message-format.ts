@@ -180,6 +180,12 @@ export class FormatMarkDown {
     return this;
   }
 
+  addNakedLink(...args: Parameters<typeof MD.nakedLink>): this {
+    this.#data.push(MD.nakedLink(...args));
+
+    return this;
+  }
+
   /**
    * 添加图片
    */

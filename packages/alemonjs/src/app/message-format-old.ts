@@ -30,7 +30,8 @@ import {
   DataVideo,
   DataMarkdownMention,
   DataMarkdownContent,
-  DataMarkdownButton
+  DataMarkdownButton,
+  DataMarkdownNakedLink
 } from '../types';
 
 /**
@@ -293,6 +294,13 @@ Markdown.link = (text: string, url: string): DataMarkdownLink => {
   return {
     type: 'MD.link',
     value: { text, url }
+  };
+};
+
+Markdown.nakedLink = (url: string): DataMarkdownNakedLink => {
+  return {
+    type: 'MD.nakedLink',
+    value: url
   };
 };
 
