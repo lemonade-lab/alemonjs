@@ -1,5 +1,5 @@
 import { Next, Events, Current, EventKeys, StoreResponseItem, OnResponseValue } from '../types';
-import { useState } from './hook-use-state';
+import { useState } from './event-utils';
 import { showErrorModule, getCachedRegExp } from '../core/utils';
 import { EventMessageText } from '../core/variable';
 import { ResponseMiddleware } from './store';

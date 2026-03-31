@@ -1,6 +1,58 @@
 import { getConfig } from '../core/config';
-import { ResultCode } from '../core/variable';
 import { State, StateSubscribe } from './store';
+
+import { EventKeys } from '../types';
+import { ResultCode } from '../core/variable';
+import { ChildrenApp } from './store';
+
+type BaseMap = {
+  [key: string]: unknown;
+};
+
+/**
+ * 卸载模块
+ * @param name
+ * @throws {Error} - 如果 name 无效，抛出错误。
+ */
+export const unChildren = (name = 'main') => {
+  if (!name || typeof name !== 'string') {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'Invalid name: name must be a string',
+      data: null
+    });
+    throw new Error('Invalid name: name must be a string');
+  }
+  const app = new ChildrenApp(name);
+
+  app.un();
+};
+
+/**
+ * 创建选择器
+ * @param values
+ * @returns
+ */
+export const onSelects = <T extends EventKeys[] | EventKeys>(values: T) => values;
+global.onSelects = onSelects;
+
+/**
+ * 废弃,请使用onSelects
+ * @deprecated
+ * @param values
+ * @returns
+ */
+export const createSelects = onSelects;
+
+/**
+ * 创建原生value映射
+ * @deprecated 试验性功能，请勿使用
+ * @param event
+ * @returns
+ */
+export const createEventValue = <T extends keyof R, R extends BaseMap>(event: { value: R[T] }) => {
+  return event.value;
+};
 
 /**
  * 获取指定功能是启动还是关闭

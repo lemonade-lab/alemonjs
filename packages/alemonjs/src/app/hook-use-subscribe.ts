@@ -2,6 +2,7 @@ import { EventCycleEnum, Current, Events, EventKeys } from '../types';
 import { ResultCode } from '../core/variable';
 import { SubscribeList } from './store';
 import { SubscribeStatus } from './config';
+import { getCurrentEvent } from './hook-event-context';
 
 type KeyMap = {
   [key: string]: string | number | boolean;
@@ -9,13 +10,38 @@ type KeyMap = {
 
 /**
  * 订阅事件
- * @param event
- * @param select
+ * @param eventOrSelects
+ * @param maybeSelects
  * @returns
  */
-export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T | T[]) => {
+export function useSubscribe<T extends EventKeys>(
+  selects: T | T[]
+): readonly [
+  {
+    create: (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum };
+    mount: (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum };
+    unmount: (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum };
+    cancel: (value: { id: string; selects: T[]; choose: EventCycleEnum }) => void;
+  }
+];
+export function useSubscribe<T extends EventKeys>(
+  event: Events[T] | undefined,
+  selects: T | T[]
+): readonly [
+  {
+    create: (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum };
+    mount: (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum };
+    unmount: (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum };
+    cancel: (value: { id: string; selects: T[]; choose: EventCycleEnum }) => void;
+  }
+];
+export function useSubscribe<T extends EventKeys>(eventOrSelects: Events[T] | T | T[] | undefined, maybeSelects?: T | T[]) {
+  const selects = (maybeSelects === undefined ? eventOrSelects : maybeSelects) as T | T[];
+  const event = (maybeSelects === undefined ? undefined : eventOrSelects) as Events[T] | undefined;
+  const valueEvent = event ?? getCurrentEvent<T>();
+
   // 检查参数
-  if (typeof event !== 'object') {
+  if (typeof valueEvent !== 'object' || valueEvent === null) {
     logger.error({
       code: ResultCode.FailParams,
       message: 'event is not object',
@@ -64,8 +90,8 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
       const values: KeyMap = {};
 
       for (const key of keys) {
-        if (typeof key === 'string' && (typeof event[key] === 'string' || typeof event[key] === 'number' || typeof event[key] === 'boolean')) {
-          values[key] = event[key];
+        if (typeof key === 'string' && (typeof valueEvent[key] === 'string' || typeof valueEvent[key] === 'number' || typeof valueEvent[key] === 'boolean')) {
+          values[key] = valueEvent[key];
         } else {
           logger.warn({
             code: ResultCode.FailParams,
@@ -147,7 +173,7 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
   };
 
   return [subscribe] as const;
-};
+}
 
 /**
  * 使用观察者模式订阅事件
@@ -157,8 +183,32 @@ export const useSubscribe = <T extends EventKeys>(event: Events[T], selects: T |
  * 废弃，请使用 useSubscribe
  * @deprecated
  */
-export const useObserver = <T extends EventKeys>(event: Events[T], selects: T | T[]) => {
+export function useObserver<T extends EventKeys>(
+  selects: T | T[]
+): readonly [
+  (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum },
+  (value: { id: string; selects: T[]; choose: EventCycleEnum }) => void
+];
+export function useObserver<T extends EventKeys>(
+  event: Events[T] | undefined,
+  selects: T | T[]
+): readonly [
+  (callback: Current<T>, keys: (keyof Events[T])[]) => { id: string; selects: T[]; choose: EventCycleEnum },
+  (value: { id: string; selects: T[]; choose: EventCycleEnum }) => void
+];
+export function useObserver<T extends EventKeys>(eventOrSelects?: Events[T] | T | T[], maybeSelects?: T | T[]) {
+  const selects = (maybeSelects === undefined ? eventOrSelects : maybeSelects) as T | T[] | undefined;
+  const event = (maybeSelects === undefined ? undefined : eventOrSelects) as Events[T] | undefined;
+
+  if (selects === undefined) {
+    logger.error({
+      code: ResultCode.FailParams,
+      message: 'select is not string or array',
+      data: null
+    });
+    throw new Error('select is not string or array');
+  }
   const [subscribe] = useSubscribe(event, selects);
 
   return [subscribe.mount, subscribe.cancel] as const;
-};
+}

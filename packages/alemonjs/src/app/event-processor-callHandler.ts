@@ -1,4 +1,5 @@
 import { showErrorModule } from '../core';
+import { withEventContext } from './hook-event-context';
 
 export const createCallHandler = valueEvent => {
   // 开始处理 handler
@@ -20,10 +21,12 @@ export const createCallHandler = valueEvent => {
 
       try {
         // 统一使用 await，无需区分同步/异步函数
-        const res = await currents[index](valueEvent, (...cns: boolean[]) => {
-          isNext = true;
-          nextEvent(...cns);
-        });
+        const res = await withEventContext(valueEvent, () =>
+          currents[index](valueEvent, (...cns: boolean[]) => {
+            isNext = true;
+            nextEvent(...cns);
+          })
+        );
 
         // return true → 局部中间件放行，继续执行 children handler
         // return void/false → 处理完毕或拦截，停止当前链

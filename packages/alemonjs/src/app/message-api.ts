@@ -4,20 +4,6 @@ import { sendAction } from '../cbp/processor/actions';
 import { createResult, Result } from '../core';
 import { Format } from './message-format';
 
-type BaseMap = {
-  [key: string]: unknown;
-};
-
-/**
- * 创建原生value映射
- * @deprecated 试验性功能，请勿使用
- * @param event
- * @returns
- */
-export const createEventValue = <T extends keyof R, R extends BaseMap>(event: { value: R[T] }) => {
-  return event.value;
-};
-
 /**
  * 创建数据格式。
  * @param {...DataEnums[]} data - 要格式化的数据。
