@@ -23,7 +23,8 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
     "desktop": {
@@ -31,20 +32,23 @@
         {
           "name": "telegram"
         }
+      ],
+      "logo": "antd.SendOutlined",
+      "command": [
+        {
+          "name": "telegram",
+          "icon": "antd.SendOutlined",
+          "command": "open.telegram"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "telegram",
+          "icon": "antd.SendOutlined",
+          "command": "open.telegram"
+        }
       ]
-    },
-    "command": [
-      {
-        "name": "telegram",
-        "command": "open.telegram"
-      }
-    ],
-    "sidebars": [
-      {
-        "name": "telegram",
-        "command": "open.telegram"
-      }
-    ]
+    }
   },
   "keywords": [
     "alemonjs"

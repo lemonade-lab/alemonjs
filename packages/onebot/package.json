@@ -9,13 +9,15 @@
   "scripts": {
     "build": "lvy build"
   },
+  "types": "lib",
   "exports": {
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts",
       "require": "./lib/index.js"
     },
-    "./package": "./package.json"
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
   },
   "keywords": [
     "alemonjs"
@@ -34,20 +36,22 @@
           "name": "onebot"
         }
       ],
-      "logo": "antd.RobotOutlined"
-    },
-    "command": [
-      {
-        "name": "onebot",
-        "command": "open.onebot"
-      }
-    ],
-    "sidebars": [
-      {
-        "name": "onebot",
-        "command": "open.onebot"
-      }
-    ]
+      "logo": "antd.RobotOutlined",
+      "command": [
+        {
+          "name": "onebot",
+          "icon": "antd.RobotOutlined",
+          "command": "open.onebot"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "onebot",
+          "icon": "antd.RobotOutlined",
+          "command": "open.onebot"
+        }
+      ]
+    }
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

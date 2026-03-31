@@ -4,6 +4,7 @@
   "publisher": "lemonade-x",
   "description": "阿柠檬机器人可视化管理界面",
   "version": "0.0.15",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build"
