@@ -22,13 +22,13 @@ class App extends Component {
       a { color: #0099cc; }
     `;
 
-    const head = Head(null, Title('欢迎使用 AlemonJS！'), Style(style));
+    const head = Head(null, Title('欢迎使用 ALemonJS！'), Style(style));
 
     const body = Body(
       null,
-      H1('AlemonJS 启动成功！'),
-      P(null, '已成功通过 ', A({ href: 'https://alemonjs.com', target: '_blank' }, 'AlemonJS 框架'), ' 启动。'),
-      Div({ className: 'footer' }, '— 感谢选择 AlemonJS。')
+      H1('ALemonJS 启动成功！'),
+      P(null, '已成功通过 ', A({ href: 'https://alemonjs.com', target: '_blank' }, 'ALemonJS 框架'), ' 启动。'),
+      Div({ className: 'footer' }, '— 感谢选择 ALemonJS。')
     );
 
     return Html(null, head, body);

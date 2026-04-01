@@ -8,7 +8,7 @@ import YAML from 'yaml';
  * 输出项目诊断信息
  */
 export function info() {
-  console.log('=== AlemonJS 项目信息 ===\n');
+  console.log('=== ALemonJS 项目信息 ===\n');
 
   // Node 版本
   console.log(`Node.js:  ${process.version}`);

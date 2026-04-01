@@ -11,7 +11,7 @@ export default async () => {
   const format = Format.create();
   // pic
   const img = await renderComponentIsHtmlToBuffer(Help, {
-    data: 'AlemonJS 跨平台开发框架'
+    data: 'ALemonJS 跨平台开发框架'
   });
   // send
   if (typeof img != 'boolean') {

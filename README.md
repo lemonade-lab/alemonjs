@@ -1,4 +1,4 @@
-# [AlemonJS](https://alemonjs.com)
+# [ALemonJS](https://alemonjs.com)
 
 [![npm version](https://img.shields.io/npm/v/alemonjs.svg)](https://www.npmjs.com/package/alemonjs)
 [![license](https://img.shields.io/npm/l/alemonjs.svg)](https://github.com/lemonade-lab/alemonjs/blob/main/LICENSE)
@@ -32,7 +32,7 @@ yarn dev
 └─────────────────────┬────────────────────────────────┘
                       │  CBP (Cross-platform Protocol)
 ┌─────────────────────┴────────────────────────────────┐
-│                   AlemonJS Core                       │
+│                   ALemonJS Core                       │
 │   事件处理器 (过滤/去重/中间件/订阅/响应)              │
 │   模块加载器 (loadChildren → ChildrenApp 生命周期)    │
 │   通信层:                                             │
