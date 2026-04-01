@@ -222,8 +222,8 @@ Platform 事件 → onProcessor (过滤/去重)
 | 👉[alemondesk] | 桌面端版本（React + Golang）   |
 | 👉[alemongo]   | 服务端版本（React + Golang）   |
 
-[lvyjs]: https://github.com/lemonade-lab/lvyjs/packages/lvyjs
-[jsxp]: https://github.com/lemonade-lab/lvyjs/packages/jsxp
+[lvyjs]: https://github.com/lemonade-lab/lvyjs/tree/main/packages/lvyjs
+[jsxp]: https://github.com/lemonade-lab/lvyjs/tree/main/packages/jsxp
 [alemondesk]: https://github.com/lemonade-lab/alemondesk
 [alemongo]: https://github.com/lemonade-lab/alemongo
 
