@@ -1,4 +1,4 @@
-import { DataButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums, EventKeys, Events } from '../types';
+import { DataButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums } from '../types';
 
 import { Text, Image, Link, ImageFile, ImageURL, Mention, BT, MD, MarkdownOriginal, Attachment, Audio, Video } from './message-format-old.js';
 
@@ -443,53 +443,4 @@ export class Format {
 
     return this;
   }
-}
-
-/**
- * 创建event
- * @param options
- * @returns
- */
-export function createEvent<T extends EventKeys>(options: {
-  event: any;
-  selects: T | T[];
-  regular?: RegExp;
-  prefix?: string;
-  exact?: string;
-}): Events[T] & {
-  selects: boolean;
-  regular: boolean;
-  prefix: boolean;
-  exact: boolean;
-} {
-  const { event, selects, regular, prefix, exact } = options;
-  const { name, MessageText } = event || {};
-  const selectsArr = Array.isArray(selects) ? selects : [selects];
-
-  const o = {
-    selects: false,
-    regular: false,
-    prefix: false,
-    exact: false
-  };
-
-  // 匹配选择事件类型
-  if ((selectsArr as EventKeys[]).includes(name)) {
-    o.selects = true;
-  }
-
-  // 精准匹配
-  if (exact && MessageText && MessageText === exact) {
-    o.exact = true;
-  }
-  // 前缀匹配
-  if (prefix && MessageText?.startsWith(prefix)) {
-    o.prefix = true;
-  }
-  // 正则匹配
-  if (regular && MessageText && new RegExp(regular).test(MessageText)) {
-    o.regular = true;
-  }
-
-  return { ...event, ...o };
 }

@@ -63,3 +63,22 @@ export function useEvent<T extends EventKeys>(eventOrOptions?: Events[T] | UseEv
 
   return [r] as const;
 }
+
+/**
+ * 创建event
+ * @deprecated 该函数不建议直接使用，推荐使用useEvent
+ * @param options
+ * @returns
+ */
+export function createEvent<T extends EventKeys>(options: { event: any; selects: T | T[]; regular?: RegExp; prefix?: string; exact?: string }) {
+  const { event, selects, regular, prefix, exact } = options;
+  const [eventRef] = useEvent(event, { selects, regular, prefix, exact });
+  const o = eventRef.match;
+  const e = eventRef.current;
+
+  return {
+    ...e,
+    ...o,
+    value: eventRef.value
+  };
+}
