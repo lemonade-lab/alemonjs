@@ -1,14 +1,16 @@
 import { defineRouter, logger, lazy } from 'alemonjs';
 
+const selects = onSelects(['message.create', 'private.message.create', 'interaction.create', 'private.interaction.create'])
+
 const responseRouter = defineRouter([
   {
     regular: /hello/,
-    selects: ['message.create', 'private.message.create'],
+    selects: selects,
     handler: lazy(() => import('./response/hello'))
   },
   {
     regular: /help/,
-    selects: ['message.create', 'private.message.create'],
+    selects: selects,
     handler: lazy(() => import('./response/help'))
   }
 ]);

@@ -1,22 +1,20 @@
-import { renderComponentToBuffer } from 'jsxp';
-import { useMessage, createEvent, Format } from 'alemonjs';
+import { renderComponentIsHtmlToBuffer } from 'jsxp';
+import { useMessage, Format, useEvent } from 'alemonjs';
 import Help from '@src/image/component/help';
 
-export default async (e, next) => {
+export default async () => {
   // 创建事件
-  const event = createEvent({
-    event: e,
+  const [event] = useEvent({
     selects: ['message.create']
   });
   // 事件不匹配
-  if (!event.selects) {
-    next();
+  if (!event.match.selects) {
     return;
   }
-  const [message] = useMessage(event);
+  const [message] = useMessage();
   const format = Format.create();
   // pic
-  const img = await renderComponentToBuffer('/help', Help, {
+  const img = await renderComponentIsHtmlToBuffer(Help, {
     data: 'AlemonJS 跨平台开发框架'
   });
   // send
