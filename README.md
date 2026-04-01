@@ -60,32 +60,43 @@ yarn dev
 
 ### Hook 系统
 
-类似 React Hooks 的设计模式，简化消息处理：
-
-| Hook           | 用途                                 |
-| -------------- | ------------------------------------ |
-| `useMessage`   | 发送消息（文本/图片/按钮等）         |
-| `useMention`   | 获取 @提及用户，支持条件过滤         |
-| `useSubscribe` | 跨生命周期事件订阅（如等待用户回复） |
+| Hook            | 用途                                 |
+| --------------- | ------------------------------------ |
+| `useMessage`    | 发送消息（文本/图片/按钮等）         |
+| `useMention`    | 获取 @提及用户，支持条件过滤         |
+| `useSubscribe`  | 跨生命周期事件订阅（如等待用户回复） |
+| `useChannel`    | 频道操作                             |
+| `useGuild`      | 服务器/群组操作                      |
+| `useMember`     | 成员信息管理                         |
+| `usePermission` | 权限查询与管理                       |
+| `useReaction`   | 表情回应操作                         |
+| `useRole`       | 角色管理                             |
+| `useUser`       | 用户信息操作                         |
+| `useHistory`    | 历史消息查询                         |
+| `useMedia`      | 媒体资源操作                         |
+| `useAnnounce`   | 公告管理                             |
+| `useRequest`    | 请求处理                             |
+| `useClient`     | 客户端连接操作                       |
+| `useMe`         | 当前机器人信息                       |
+| `useEvent`      | 事件上下文访问                       |
 
 ### 消息格式化（Format）
 
 链式 API 构建富文本消息：
 
 ```typescript
-import { useMessage, createEvent, Format } from 'alemonjs';
+import { useEvent, useMessage, Format } from 'alemonjs';
 
-export default async (e, next) => {
-  const event = createEvent({
-    event: e,
+export default async (_, next) => {
+  const [event] = useEvent({
     selects: ['message.create', 'private.message.create']
   });
-  if (!event.selects) {
+  if (!event.match.selects) {
     next();
     return;
   }
 
-  const [message] = useMessage(event);
+  const [message] = useMessage();
   const format = Format.create();
   format.addText('Hello!');
   format.addImage('https://example.com/img.png');
@@ -95,6 +106,19 @@ export default async (e, next) => {
 ```
 
 支持文本、图片、按钮组、Markdown、@提及、链接、附件、音视频等消息类型。
+
+### 事件构建（FormatEvent）
+
+推荐使用类型安全的 `FormatEvent` API 构建事件对象：
+
+```typescript
+import { FormatEvent } from 'alemonjs';
+
+FormatEvent.create('message.create')
+  .addPlatform({ Platform: 'discord', value: raw })
+  .addGuild({ GuildId: 'g1', SpaceId: 's1' })
+  .addMessage({ MessageId: 'm1' });
+```
 
 ### 声明式路由
 
@@ -110,6 +134,7 @@ export default defineChildren({
         { regular: /^\/help/, handler: lazy(() => import('./response/help')) },
         {
           prefix: '/admin',
+          selects: ['message.create'],
           handler: lazy(() => import('./middleware/admin-auth')),
           children: [{ exact: '/admin ban', handler: lazy(() => import('./response/admin-ban')) }]
         }
@@ -119,20 +144,26 @@ export default defineChildren({
 });
 ```
 
+路由配置支持 `selects` 属性按事件类型过滤，可指定单个或多个事件类型：
+
+```typescript
+{ exact: '/ping', selects: ['message.create', 'private.message.create'], handler: ... }
+```
+
 ### 事件处理管线
 
 ```
 Platform 事件 → onProcessor (过滤/去重)
+    → expendSubscribeCreate (创建阶段订阅)
     → expendMiddleware (中间件链)
-    → expendSubscribe('create')
+    → expendSubscribeMount (挂载阶段订阅)
     → expendEvent (路由匹配 → handler 执行)
-    → expendSubscribe('mount')
-    → expendSubscribe('unmount')
+    → expendSubscribeUnmount (卸载阶段订阅)
 ```
 
 ### 配置系统
 
-通过 `alemonjs.config.yml` 管理，支持命令行参数 > 配置文件 > 默认值的合并优先级，100ms 防抖变更通知。
+通过 `alemon.config.yaml` 管理，支持命令行参数 > 配置文件 > 默认值的合并优先级，100ms 防抖变更通知。
 
 ## 📦 平台支持
 
@@ -187,10 +218,12 @@ Platform 事件 → onProcessor (过滤/去重)
 | Project        | Description                    |
 | -------------- | ------------------------------ |
 | 👉[lvyjs]      | 开发环境（Node.js 捆绑打包器） |
+| 👉[jsxp]       | 截图工具(puppeteer)            |
 | 👉[alemondesk] | 桌面端版本（React + Golang）   |
 | 👉[alemongo]   | 服务端版本（React + Golang）   |
 
-[lvyjs]: https://github.com/lemonade-lab/lvyjs
+[lvyjs]: https://github.com/lemonade-lab/lvyjs/packages/lvyjs
+[jsxp]: https://github.com/lemonade-lab/lvyjs/packages/jsxp
 [alemondesk]: https://github.com/lemonade-lab/alemondesk
 [alemongo]: https://github.com/lemonade-lab/alemongo
 
