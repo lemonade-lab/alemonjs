@@ -4,6 +4,7 @@ import { createEventName, showErrorModule } from '../../core/utils.js';
 import { getRecursiveDirFiles } from '../../core/utils.js';
 import type { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, childrenCallback } from '../../types';
 import { ChildrenApp } from '../../app/store.js';
+import { registerExpose } from '../../app/expose.js';
 import { ResultCode } from '../../core/variable.js';
 import { fileSuffixMiddleware } from '../../core/variable.js';
 import module from 'module';
@@ -92,6 +93,11 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       // 注册接口的结果。
       if (res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter)) {
         App.register(res);
+      }
+
+      // 注册 expose 协议
+      if (res?.expose) {
+        registerExpose(appName, res.expose.getConfigs());
       }
 
       // 加载完成

@@ -2,6 +2,7 @@ import { ChildrenCycle, Next } from '../cycle';
 import { ClientAPI } from '../client';
 import { EventKeys, Events } from './map';
 import { DataEnums } from '../message';
+import { Expose } from '../../app/expose';
 
 /**
  * 当前事件
@@ -116,6 +117,8 @@ export type childrenCallbackRes =
       // 完整的路由机制。
       responseRouter?: ReturnType<DefineRouterFunc>;
       middlewareRouter?: ReturnType<DefineRouterFunc>;
+      /** expose 协议通信实例 */
+      expose?: Expose;
     }
   | undefined;
 

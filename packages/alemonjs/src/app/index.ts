@@ -1,4 +1,5 @@
 export * from './store.js';
+export * from './expose.js';
 export * from './load_modules/index.js';
 export * from './define-children.js';
 export * from './define-platform.js';

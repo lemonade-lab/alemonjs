@@ -8,6 +8,7 @@ import { SinglyLinkedList } from './SinglyLinkedList';
 import { childrenCallbackRes, ChildrenCycle, EventCycleEnum, EventKeys, FileTreeNode, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
+import { disposeExpose } from './expose.js';
 /**
  *
  * @returns
@@ -594,6 +595,8 @@ export class ChildrenApp {
    * 卸载
    */
   un() {
+    // 清理 expose 注册
+    disposeExpose(this.#name);
     // 清理
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete alemonjsCore.storeChildrenApp[this.#name];

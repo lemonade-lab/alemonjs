@@ -1,4 +1,5 @@
 import { defineRouter, logger, lazy } from 'alemonjs';
+import expose from './expose';
 
 const selects = onSelects(['message.create', 'private.message.create', 'interaction.create', 'private.interaction.create'])
 
@@ -19,7 +20,8 @@ export default defineChildren({
   // 注册内容
   register() {
     return {
-      responseRouter
+      responseRouter,
+      expose: expose
     };
   },
   // 当注册完成时
