@@ -87,8 +87,8 @@ yarn dev
 ```typescript
 import { useEvent, useMessage, Format } from 'alemonjs';
 
-export default async (_, next) => {
-  const [event] = useEvent({
+export default () => {
+  const [event, next] = useEvent({
     selects: ['message.create', 'private.message.create']
   });
   if (!event.match.selects) {

@@ -5,11 +5,11 @@ import { createResult, Result } from '../../core/utils';
 import { sendAction } from '../../cbp/processor/actions';
 import { sendAPI } from '../../cbp/processor/api';
 import { Format } from '../message-format';
-import { getCurrentEvent } from '../hook-event-context';
+import { getCurrentEvent, getCurrentNext } from '../hook-event-context';
 
 export type { DataEnums, EventKeys, Events, User, GuildInfo, ChannelInfo, MemberInfo, RoleInfo, PaginationParams, PaginatedResult, Result };
 
-export { ResultCode, ChildrenApp, createResult, sendAction, sendAPI, Format, getCurrentEvent };
+export { ResultCode, ChildrenApp, createResult, sendAction, sendAPI, Format, getCurrentEvent, getCurrentNext };
 
 export type Options = {
   UserId?: string;

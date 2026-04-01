@@ -1,5 +1,5 @@
-import { EventKeys, Events } from 'types';
-import { getEventOrThrow } from './common';
+import { EventKeys, Events } from '../../types';
+import { getEventOrThrow, getCurrentNext } from './common';
 
 type UseEventOptions<T extends EventKeys> = {
   selects: T | T[];
@@ -18,9 +18,9 @@ type UseEventResult<T extends EventKeys> = {
   match: { selects: boolean; regular: boolean; prefix: boolean; exact: boolean };
 };
 
-export function useEvent<T extends EventKeys>(options?: UseEventOptions<T>): readonly [UseEventResult<T>];
+export function useEvent<T extends EventKeys>(options?: UseEventOptions<T>): readonly [UseEventResult<T>, (...args: boolean[]) => void];
 
-export function useEvent<T extends EventKeys>(event?: Events[T], options?: UseEventOptions<T>): readonly [UseEventResult<T>];
+export function useEvent<T extends EventKeys>(event?: Events[T], options?: UseEventOptions<T>): readonly [UseEventResult<T>, (...args: boolean[]) => void];
 
 /**
  * @param event
@@ -61,7 +61,9 @@ export function useEvent<T extends EventKeys>(eventOrOptions?: Events[T] | UseEv
     }
   });
 
-  return [r] as const;
+  const next = getCurrentNext() ?? (() => {});
+
+  return [r, next] as const;
 }
 
 /**

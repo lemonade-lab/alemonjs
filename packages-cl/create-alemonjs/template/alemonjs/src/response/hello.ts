@@ -1,15 +1,6 @@
-import { useMention, useMessage, Format, useEvent } from 'alemonjs';
+import { useMention, useMessage, Format } from 'alemonjs';
 
 export default async () => {
-  // 创建事件
-  const [event] = useEvent({
-    selects: ['message.create', 'private.message.create', 'interaction.create', 'private.interaction.create']
-  });
-
-  if (!event.match.selects) {
-    return;
-  }
-
   const [message] = useMessage();
   const [mention] = useMention();
   const format = Format.create();
@@ -25,7 +16,6 @@ export default async () => {
     return;
   }
   const user = userRes.data;
-
 
   format.addText(`hello, ${user.UserName || user.UserId}!`);
 

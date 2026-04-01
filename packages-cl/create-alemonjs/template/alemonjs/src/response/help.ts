@@ -3,14 +3,10 @@ import { useMessage, Format, useEvent } from 'alemonjs';
 import Help from '@src/image/component/help';
 
 export default async () => {
-  // 创建事件
   const [event] = useEvent({
     selects: ['message.create']
   });
-  // 事件不匹配
-  if (!event.match.selects) {
-    return;
-  }
+  logger.info('收到', event.current?.MessageText ?? '');
   const [message] = useMessage();
   const format = Format.create();
   // pic
