@@ -12,7 +12,7 @@ const loadApps = () => {
   // 去重
   const uniqueApps = Array.from(new Set(apps));
 
-  void Promise.all(uniqueApps.map(app => loadChildrenFile(app)));
+  uniqueApps.forEach(app => void loadChildrenFile(app));
 };
 
 /**

@@ -18,8 +18,17 @@ type MAP = {
   'member.remove': undefined;
   'private.message.update': undefined;
   'private.message.delete': undefined;
+  'message.pin': undefined;
+  'channel.update': undefined;
+  'guild.update': undefined;
+  'member.ban': undefined;
+  'member.unban': undefined;
+  'member.update': undefined;
+  'notice.create': undefined;
   'private.friend.add': undefined;
+  'private.friend.remove': undefined;
   'private.guild.add': undefined;
+  'private.notice.create': undefined;
 };
 
 /**

@@ -254,7 +254,7 @@ export const cbpPlatform = (
    * @param data
    */
   const send = (data: EventsEnum) => {
-    if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
+    if (global.chatbotPlatform?.readyState === WebSocket.OPEN) {
       data.DeviceId = deviceId;
       data.CreateAt = Date.now();
       global.chatbotPlatform.send(flattedJSON.stringify(sanitizeForSerialization(data)));
@@ -267,7 +267,7 @@ export const cbpPlatform = (
    * 消费数据
    */
   const replyAction = (data: Actions, payload: Result[]) => {
-    if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
+    if (global.chatbotPlatform?.readyState === WebSocket.OPEN) {
       global.chatbotPlatform.send(
         flattedJSON.stringify({
           action: data.action,
@@ -280,7 +280,7 @@ export const cbpPlatform = (
   };
 
   const replyApi = (data: Apis, payload: Result[]) => {
-    if (global.chatbotPlatform && global.chatbotPlatform.readyState === WebSocket.OPEN) {
+    if (global.chatbotPlatform?.readyState === WebSocket.OPEN) {
       global.chatbotPlatform.send(
         flattedJSON.stringify({
           action: data.action,

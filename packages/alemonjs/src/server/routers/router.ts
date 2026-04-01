@@ -3,7 +3,7 @@ import fs, { existsSync } from 'fs';
 import path, { join, dirname } from 'path';
 import mime from 'mime-types';
 import hello from './hello.html';
-import { formatPath, getModuelFile } from './utils';
+import { formatPath, getModuelFile, safePath, isValidPackageName } from './utils';
 import { collectMiddlewares, runMiddlewares } from './middleware';
 import { ResultCode } from 'core';
 import module from 'module';
@@ -66,7 +66,19 @@ router.all('app/{*path}', async ctx => {
     const mainDir = dirname(mainPath);
 
     try {
-      const dir = join(mainDir, 'route', ctx.path?.replace(apiPath, '/api') || '');
+      const routeBase = join(mainDir, 'route');
+      const dir = safePath(routeBase, ctx.path?.replace(apiPath, '/api') || '');
+
+      if (!dir) {
+        ctx.status = 403;
+        ctx.body = {
+          code: 403,
+          message: '非法路径',
+          data: null
+        };
+
+        return;
+      }
 
       // 检查路径是否存在且是文件（而不是目录）
       if (existsSync(dir) && fs.statSync(dir).isFile()) {
@@ -138,7 +150,19 @@ router.all('app/{*path}', async ctx => {
 
     return;
   }
-  const fullPath = root ? path.join(rootPath, root, resourcePath) : path.join(rootPath, resourcePath);
+  const webRoot = root ? path.join(rootPath, root) : rootPath;
+  const fullPath = safePath(webRoot, resourcePath);
+
+  if (!fullPath) {
+    ctx.status = 403;
+    ctx.body = {
+      code: 403,
+      message: '非法路径',
+      data: null
+    };
+
+    return;
+  }
 
   try {
     // 返回文件
@@ -173,6 +197,18 @@ router.all('app', ctx => {
 
 router.all('apps/:app/{*path}', async ctx => {
   const appName = ctx.params.app;
+
+  if (!isValidPackageName(appName)) {
+    ctx.status = 400;
+    ctx.body = {
+      code: 400,
+      message: '无效的应用名称',
+      data: null
+    };
+
+    return;
+  }
+
   const apiPath = `/apps/${appName}/api`;
 
   if (ctx.path.startsWith(apiPath)) {
@@ -195,7 +231,19 @@ router.all('apps/:app/{*path}', async ctx => {
 
         mainDirMap.set(appName, mainDir);
       }
-      const dir = join(mainDirMap.get(appName), 'route', ctx.path?.replace(apiPath, '/api') || '');
+      const routeBase = join(mainDirMap.get(appName), 'route');
+      const dir = safePath(routeBase, ctx.path?.replace(apiPath, '/api') || '');
+
+      if (!dir) {
+        ctx.status = 403;
+        ctx.body = {
+          code: 403,
+          message: '非法路径',
+          data: null
+        };
+
+        return;
+      }
 
       // 检查路径是否存在且是文件（而不是目录）
       if (existsSync(dir) && fs.statSync(dir).isFile()) {
@@ -274,7 +322,19 @@ router.all('apps/:app/{*path}', async ctx => {
 
     return;
   }
-  const fullPath = root ? path.join(rootPath, root, resourcePath) : path.join(rootPath, resourcePath);
+  const webRoot = root ? path.join(rootPath, root) : rootPath;
+  const fullPath = safePath(webRoot, resourcePath);
+
+  if (!fullPath) {
+    ctx.status = 403;
+    ctx.body = {
+      code: 403,
+      message: '非法路径',
+      data: null
+    };
+
+    return;
+  }
 
   try {
     // 返回文件

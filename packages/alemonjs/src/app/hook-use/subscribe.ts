@@ -1,8 +1,8 @@
-import { EventCycleEnum, Current, Events, EventKeys } from '../types';
-import { ResultCode } from '../core/variable';
-import { SubscribeList } from './store';
-import { SubscribeStatus } from './config';
-import { getCurrentEvent } from './hook-event-context';
+import { EventCycleEnum, Current, Events, EventKeys } from '../../types';
+import { ResultCode } from '../../core/variable';
+import { SubscribeList } from '../store';
+import { SubscribeStatus } from '../config';
+import { getCurrentEvent } from '../hook-event-context';
 
 type KeyMap = {
   [key: string]: string | number | boolean;

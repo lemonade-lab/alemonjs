@@ -1,6 +1,32 @@
 import { EventKeys, Events, getCurrentEvent, ResultCode, sendAPI } from './common';
 
 /**
+ * 创建递归代理，支持嵌套属性访问
+ * client.api.use.send(...args) → key = 'api.use.send'
+ */
+const createDeepProxy = <T extends object>(event: unknown, path: string[] = []): T => {
+  return new Proxy((() => {}) as unknown as T, {
+    get(_target, prop) {
+      if (typeof prop === 'symbol') {
+        return undefined;
+      }
+
+      return createDeepProxy(event, [...path, String(prop)]);
+    },
+    apply(_target, _thisArg, args) {
+      return sendAPI({
+        action: 'client.api',
+        payload: {
+          event,
+          key: path.join('.'),
+          params: args
+        }
+      });
+    }
+  });
+};
+
+/**
  * 使用客户端
  *
  * useClient()                 — 无参，event 从上下文取
@@ -29,24 +55,7 @@ export function useClient<T extends object, K extends EventKeys = EventKeys>(
     throw new Error('Invalid event: event must be an object');
   }
 
-  const client = new Proxy({} as T, {
-    get(_target, prop) {
-      if (typeof prop === 'symbol') {
-        return undefined;
-      }
-
-      return (...args: any[]) => {
-        return sendAPI({
-          action: 'client.api',
-          payload: {
-            event: valueEvent,
-            key: String(prop),
-            params: args
-          }
-        });
-      };
-    }
-  });
+  const client = createDeepProxy<T>(valueEvent);
 
   return [client] as const;
 }

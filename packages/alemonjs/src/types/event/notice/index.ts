@@ -1,10 +1,10 @@
 import { Guild, Channel } from '../base/guild';
 import { Message } from '../base/message';
 import { User } from '../base/user';
-import { platform } from '../base/platform';
+import { Platform } from '../base/platform';
 import { Expansion } from '../base/expansion';
 // 公共通知（戳一戳、运气王、荣誉等平台级通知）
-export type PublicEventNoticeCreate = platform &
+export type PublicEventNoticeCreate = Platform &
   Guild &
   Channel &
   Message &
@@ -12,7 +12,7 @@ export type PublicEventNoticeCreate = platform &
     name: 'notice.create';
   } & Expansion;
 // 私有通知
-export type PrivateEventNoticeCreate = platform &
+export type PrivateEventNoticeCreate = Platform &
   Message &
   User & {
     name: 'private.notice.create';

@@ -1,11 +1,8 @@
-export type platform = {
+export type Platform = {
   /**
    * 平台
    */
   Platform: string;
-  /**
-   * 标记
-   */
   /**
    * 原始消息
    */

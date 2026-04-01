@@ -47,7 +47,7 @@ export class MessageDirect {
    * 发送到频道
    * @param params
    */
-  async sendToChannel(params: { SpaceId: string; format: Format; replyId?: string }) {
+  async sendToChannel(params: { SpaceId: string; format: Format | DataEnums[]; replyId?: string }) {
     if (!params.SpaceId || typeof params.SpaceId !== 'string') {
       logger.error({
         code: ResultCode.FailParams,
@@ -62,7 +62,7 @@ export class MessageDirect {
       payload: {
         ChannelId: params.SpaceId,
         params: {
-          format: params.format.value,
+          format: Array.isArray(params.format) ? params.format : params.format.value,
           replyId: params?.replyId
         }
       }
@@ -73,7 +73,7 @@ export class MessageDirect {
    * 私信
    * @param params
    */
-  async sendToUser(params: { OpenID: string; format: Format }) {
+  async sendToUser(params: { OpenID: string; format: Format | DataEnums[] }) {
     if (!params.OpenID || typeof params.OpenID !== 'string') {
       logger.error({
         code: ResultCode.FailParams,
@@ -88,7 +88,7 @@ export class MessageDirect {
       payload: {
         UserId: params.OpenID,
         params: {
-          format: params.format.value
+          format: Array.isArray(params.format) ? params.format : params.format.value
         }
       }
     });
@@ -102,25 +102,8 @@ export class MessageDirect {
  * @throws {Error} - 如果 SpaceId 无效或发送失败，抛出错误。
  * @deprecated 废弃，推荐使用 MessageDirect.create().sendToChannel()
  */
-export const sendToChannel = async (SpaceId: string, data: DataEnums[]) => {
-  if (!SpaceId || typeof SpaceId !== 'string') {
-    logger.error({
-      code: ResultCode.FailParams,
-      message: 'Invalid SpaceId: SpaceId must be a string',
-      data: null
-    });
-    throw new Error('Invalid SpaceId: SpaceId must be a string');
-  }
-
-  return await sendAction({
-    action: 'message.send.channel',
-    payload: {
-      ChannelId: SpaceId,
-      params: {
-        format: data
-      }
-    }
-  });
+export const sendToChannel = (SpaceId: string, data: DataEnums[]) => {
+  return MessageDirect.create().sendToChannel({ SpaceId, format: data, replyId: undefined });
 };
 
 /**
@@ -130,25 +113,8 @@ export const sendToChannel = async (SpaceId: string, data: DataEnums[]) => {
  * @throws {Error} - 如果 user_id 无效或发送失败，抛出错误。
  * @deprecated 废弃，推荐使用 MessageDirect.create().sendToUser()
  */
-export const sendToUser = async (OpenID: string, data: DataEnums[]) => {
-  if (!OpenID || typeof OpenID !== 'string') {
-    logger.error({
-      code: ResultCode.FailParams,
-      message: 'Invalid OpenID: OpenID must be a string',
-      data: null
-    });
-    throw new Error('Invalid OpenID: OpenID must be a string');
-  }
-
-  return await sendAction({
-    action: 'message.send.user',
-    payload: {
-      UserId: OpenID,
-      params: {
-        format: data
-      }
-    }
-  });
+export const sendToUser = (OpenID: string, data: DataEnums[]) => {
+  return MessageDirect.create().sendToUser({ OpenID, format: data });
 };
 
 type IntentResult = {

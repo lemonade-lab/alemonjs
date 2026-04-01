@@ -26,7 +26,7 @@ const routeMessageToDevice = (DeviceId: string, message: string) => {
   if (childrenClient.has(DeviceId)) {
     const clientWs = childrenClient.get(DeviceId);
 
-    if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+    if (clientWs?.readyState === WebSocket.OPEN) {
       clientWs.send(message);
     } else {
       childrenClient.delete(DeviceId);
@@ -34,7 +34,7 @@ const routeMessageToDevice = (DeviceId: string, message: string) => {
   } else if (fullClient.has(DeviceId)) {
     const clientWs = fullClient.get(DeviceId);
 
-    if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+    if (clientWs?.readyState === WebSocket.OPEN) {
       clientWs.send(message);
     } else {
       fullClient.delete(DeviceId);
@@ -117,7 +117,7 @@ const handleEvent = (message: string, ID: string) => {
     if (bindId) {
       const clientWs = childrenClient.get(bindId);
 
-      if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+      if (clientWs?.readyState === WebSocket.OPEN) {
         // 进行绑定
         bindChannelToClient(ID, bindId);
         // 发送消息到绑定的客户端
@@ -156,7 +156,7 @@ const handleEvent = (message: string, ID: string) => {
   }
   const clientWs = childrenClient.get(bindId);
 
-  if (!clientWs || clientWs.readyState !== WebSocket.OPEN) {
+  if (clientWs?.readyState !== WebSocket.OPEN) {
     // 如果连接已关闭，删除该客户端
     childrenClient.delete(bindId);
     // 重新进行绑定
@@ -173,7 +173,7 @@ const setChildrenClient = (originId: string, ws: WebSocket) => {
   // 得到子客户端的消息。只会是actions请求。
   ws.on('message', (message: string) => {
     if (global.__sandbox) {
-      if (global.testoneClient && global.testoneClient.readyState === WebSocket.OPEN) {
+      if (global.testoneClient?.readyState === WebSocket.OPEN) {
         // 发给 web 的数据，需要是字符串
         global.testoneClient.send(message.toString());
       }
@@ -219,7 +219,7 @@ const setFullClient = (originId: string, ws: WebSocket) => {
   // 处理消息事件
   ws.on('message', (message: string) => {
     if (global.__sandbox) {
-      if (global.testoneClient && global.testoneClient.readyState === WebSocket.OPEN) {
+      if (global.testoneClient?.readyState === WebSocket.OPEN) {
         // 发给 web 的数据，需要是字符串
         global.testoneClient.send(message.toString());
       }

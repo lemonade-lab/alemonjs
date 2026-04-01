@@ -1,17 +1,6 @@
 import { BubbleClient } from './sdk/wss';
-import type {
-  User,
-  PublicEventMessageCreate,
-  PrivateEventMessageCreate,
-  PublicEventMessageUpdate,
-  PublicEventMessageDelete,
-  PrivateEventMessageUpdate,
-  PrivateEventMessageDelete,
-  PublicEventMemberAdd,
-  PublicEventMemberRemove,
-  DataEnums
-} from 'alemonjs';
-import { ResultCode, cbpPlatform, createResult, definePlatform } from 'alemonjs';
+import type { DataEnums, User } from 'alemonjs';
+import { ResultCode, cbpPlatform, createResult, definePlatform, FormatEvent } from 'alemonjs';
 import { getMaster, platform } from './config';
 import { CDN_URL } from './sdk/api';
 import { sendToRoom, sendToUser } from './send';
@@ -121,59 +110,34 @@ const main = () => {
     const UserId = String(event.authorId);
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = createUserAvatar(UserId, event?.author?.avatar);
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      // 事件类型
-      Platform: platform,
-      // guild
-      GuildId: String(event.channelId || ''),
-      ChannelId: String(event.channelId || ''),
-      SpaceId: String(event.channelId || ''),
-      // user
-      UserId: UserId,
-      UserKey,
-      UserName: event?.author?.username,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      OpenId: UserId,
-      MessageId: String(event.id),
-      MessageText: msg,
-      BotId: botId,
-      _tag: 'message.create',
-      value: event
-    };
 
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: String(event.channelId || ''), SpaceId: String(event.channelId || '') })
+        .addChannel({ ChannelId: String(event.channelId || '') })
+        .addUser({ UserId, UserKey, UserName: event?.author?.username, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.id) })
+        .addText({ MessageText: msg })
+        .addOpen({ OpenId: UserId })
+        .add({ tag: 'message.create' }).value
+    );
   });
 
   client.on('DM_MESSAGE_CREATE', event => {
     const UserId = String(event.authorId);
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = createUserAvatar(UserId, event?.author?.avatar);
-    // 处理消息
-    const e: PrivateEventMessageCreate = {
-      name: 'private.message.create',
-      // 事件类型
-      Platform: platform,
-      // user
-      UserId: UserId,
-      UserKey,
-      UserName: event?.author?.username,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      OpenId: UserId,
-      // message
-      MessageId: String(event.id),
-      MessageText: event.content,
-      // other
-      BotId: botId,
-      _tag: 'private.message.create',
-      value: event
-    };
 
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId, UserKey, UserName: event?.author?.username, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.id) })
+        .addText({ MessageText: event.content })
+        .addOpen({ OpenId: UserId })
+        .add({ tag: 'private.message.create' }).value
+    );
   });
 
   // 消息更新
@@ -182,42 +146,27 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = createUserAvatar(UserId, event?.author?.avatar);
 
-    const e: PublicEventMessageUpdate = {
-      name: 'message.update',
-      Platform: platform,
-      GuildId: String(event.channelId || ''),
-      ChannelId: String(event.channelId || ''),
-      SpaceId: String(event.channelId || ''),
-      UserId: UserId,
-      UserKey,
-      UserName: event?.author?.username,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: String(event.id),
-      BotId: botId,
-      _tag: 'MESSAGE_UPDATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.update')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: String(event.channelId || ''), SpaceId: String(event.channelId || '') })
+        .addChannel({ ChannelId: String(event.channelId || '') })
+        .addUser({ UserId, UserKey, UserName: event?.author?.username, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.id) })
+        .add({ tag: 'MESSAGE_UPDATE' }).value
+    );
   });
 
   // 消息删除
   client.on('MESSAGE_DELETE', event => {
-    const e: PublicEventMessageDelete = {
-      name: 'message.delete',
-      Platform: platform,
-      GuildId: String(event.guild_id || ''),
-      ChannelId: String(event.channel_id || ''),
-      SpaceId: String(event.channel_id || ''),
-      MessageId: String(event.id),
-      BotId: botId,
-      _tag: 'MESSAGE_DELETE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: String(event.guild_id || ''), SpaceId: String(event.channel_id || '') })
+        .addChannel({ ChannelId: String(event.channel_id || '') })
+        .addMessage({ MessageId: String(event.id) })
+        .add({ tag: 'MESSAGE_DELETE' }).value
+    );
   });
 
   // 私聊消息更新
@@ -226,36 +175,23 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = createUserAvatar(UserId, event?.author?.avatar);
 
-    const e: PrivateEventMessageUpdate = {
-      name: 'private.message.update',
-      Platform: platform,
-      UserId: UserId,
-      UserKey,
-      UserName: event?.author?.username,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: String(event.id),
-      BotId: botId,
-      _tag: 'DM_MESSAGE_UPDATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.update')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId, UserKey, UserName: event?.author?.username, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.id) })
+        .add({ tag: 'DM_MESSAGE_UPDATE' }).value
+    );
   });
 
   // 私聊消息删除
   client.on('DM_MESSAGE_DELETE', event => {
-    const e: PrivateEventMessageDelete = {
-      name: 'private.message.delete',
-      Platform: platform,
-      MessageId: String(event.id),
-      BotId: botId,
-      _tag: 'DM_MESSAGE_DELETE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addMessage({ MessageId: String(event.id) })
+        .add({ tag: 'DM_MESSAGE_DELETE' }).value
+    );
   });
 
   // 成员加入
@@ -263,24 +199,15 @@ const main = () => {
     const UserId = String(event.user_id || event.user?.id || '');
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PublicEventMemberAdd = {
-      name: 'member.add',
-      Platform: platform,
-      GuildId: String(event.guild_id || ''),
-      ChannelId: '',
-      SpaceId: String(event.guild_id || ''),
-      UserId: UserId,
-      UserKey,
-      UserName: event.user?.username ?? event.nickname,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_MEMBER_ADD',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.add')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: String(event.guild_id || ''), SpaceId: String(event.guild_id || '') })
+        .addChannel({ ChannelId: '' })
+        .addUser({ UserId, UserKey, UserName: event.user?.username ?? event.nickname, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_MEMBER_ADD' }).value
+    );
   });
 
   // 成员移除
@@ -288,24 +215,15 @@ const main = () => {
     const UserId = String(event.user_id || event.user?.id || '');
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PublicEventMemberRemove = {
-      name: 'member.remove',
-      Platform: platform,
-      GuildId: String(event.guild_id || ''),
-      ChannelId: '',
-      SpaceId: String(event.guild_id || ''),
-      UserId: UserId,
-      UserKey,
-      UserName: event.user?.username ?? event.nickname,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_MEMBER_REMOVE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.remove')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: String(event.guild_id || ''), SpaceId: String(event.guild_id || '') })
+        .addChannel({ ChannelId: '' })
+        .addUser({ UserId, UserKey, UserName: event.user?.username ?? event.nickname, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_MEMBER_REMOVE' }).value
+    );
   });
 
   const api = {
@@ -467,20 +385,34 @@ const main = () => {
 
   const onapis = async (data, consume) => {
     const key = data.payload?.key;
+    const params = data.payload?.params;
 
-    if (client[key]) {
-      // 如果 client 上有对应的 key，直接调用。
-      const params = data.payload.params;
+    try {
+      // 支持嵌套路径，如 'api.use.send'
+      const keys = key.split('.');
+      let target: any = client;
 
-      try {
-        const res = await client[key](...params);
+      for (const k of keys) {
+        if (target === null || target === undefined || !(k in target)) {
+          consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
 
-        consume([createResult(ResultCode.Ok, '请求完成', res)]);
-      } catch (error) {
-        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+          return;
+        }
+
+        target = target[k];
       }
-    } else {
-      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+
+      if (typeof target !== 'function') {
+        consume([createResult(ResultCode.Fail, '目标不是可调用方法', null)]);
+
+        return;
+      }
+
+      const res = await target(...params);
+
+      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 

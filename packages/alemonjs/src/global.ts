@@ -24,7 +24,7 @@ declare global {
   /**
    * 全局配置实例
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   var __config: any;
   /**
    * 全局启动参数

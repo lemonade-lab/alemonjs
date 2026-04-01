@@ -12,6 +12,10 @@ export class KOOKClient extends KOOKAPI {
   // 存储最新的消息序号
   #lastMessageSN = 0;
 
+  // 会话 ID（暂存，后续用于 resume）
+  // @ts-expect-error write-only for now
+  #sessionId: string | null = null;
+
   /**
    *
    * @param opstion
@@ -109,7 +113,7 @@ export class KOOKClient extends KOOKAPI {
         }
       },
       1: ({ d }) => {
-        if (d && d.code === 0) {
+        if (d?.code === 0) {
           console.info('[ws] ok');
           this.#sessionId = d.session_id;
           this.#isConnected = true;

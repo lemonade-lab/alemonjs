@@ -1,19 +1,5 @@
-import {
-  cbpPlatform,
-  createResult,
-  DataEnums,
-  definePlatform,
-  MessageMediaItem,
-  PrivateEventMessageCreate,
-  PublicEventMemberAdd,
-  PublicEventMemberRemove,
-  PublicEventMessageCreate,
-  PublicEventMessageUpdate,
-  PrivateEventMessageUpdate,
-  PublicEventInteractionCreate,
-  PrivateEventInteractionCreate,
-  ResultCode
-} from 'alemonjs';
+import type { DataEnums, MessageMediaItem } from 'alemonjs';
+import { cbpPlatform, createResult, definePlatform, ResultCode, FormatEvent } from 'alemonjs';
 import { getBufferByURL } from 'alemonjs/utils';
 import TelegramClient from 'node-telegram-bot-api';
 import { platform, getTGConfig, getMaster } from './config';
@@ -76,60 +62,37 @@ const main = () => {
       if (event?.from?.is_bot) {
         return;
       }
-      // 定义消息
-      const e: PublicEventMessageCreate = {
-        // 事件类型
-        Platform: platform,
-        name: 'message.create',
-        // 频道
-        GuildId: String(event?.chat.id),
-        ChannelId: String(event?.chat.id),
-        SpaceId: String(event?.chat.id),
-        // user
-        UserId: UserId,
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // message
-        MessageId: String(event?.message_id),
-        MessageText: event?.text,
-        OpenId: String(event?.chat?.id),
-        // other
-        BotId: botId,
-        _tag: 'txt',
-        value: event
-      };
-
       // 发送消息
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('message.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addGuild({ GuildId: String(event?.chat.id), SpaceId: String(event?.chat.id) })
+          .addChannel({ ChannelId: String(event?.chat.id) })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message_id) })
+          .addText({ MessageText: event?.text })
+          .addOpen({ OpenId: String(event?.chat?.id) })
+          .add({ tag: 'txt' }).value
+      );
 
       //
     } else if (event?.chat.type === 'private') {
-      // 定义消
-      const e: PrivateEventMessageCreate = {
-        name: 'private.message.create',
-        // 事件类型
-        Platform: platform,
-        // 用户Id
-        UserId: String(event?.from.id),
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // message
-        MessageId: String(event?.message_id),
-        MessageText: event?.text,
-        OpenId: String(event?.chat?.id),
-        // other
-        BotId: botId,
-        _tag: 'txt',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('private.message.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addUser({
+            UserId: String(event?.from.id),
+            UserKey,
+            UserName: event?.from?.username,
+            UserAvatar,
+            IsMaster: isMaster,
+            IsBot: false
+          })
+          .addMessage({ MessageId: String(event?.message_id) })
+          .addText({ MessageText: event?.text })
+          .addOpen({ OpenId: String(event?.chat?.id) })
+          .add({ tag: 'txt' }).value
+      );
     }
   });
 
@@ -225,48 +188,29 @@ const main = () => {
     const caption = event?.caption ?? '';
 
     if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup' || event?.chat.type === 'group') {
-      const e: PublicEventMessageCreate = {
-        Platform: platform,
-        name: 'message.create',
-        GuildId: String(event?.chat.id),
-        ChannelId: String(event?.chat.id),
-        SpaceId: String(event?.chat.id),
-        UserId: UserId,
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: String(event?.message_id),
-        MessageText: caption,
-        MessageMedia: MessageMedia,
-        OpenId: String(event?.chat?.id),
-        BotId: botId,
-        _tag: 'media',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('message.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addGuild({ GuildId: String(event?.chat.id), SpaceId: String(event?.chat.id) })
+          .addChannel({ ChannelId: String(event?.chat.id) })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message_id) })
+          .addText({ MessageText: caption })
+          .addMedia({ MessageMedia: MessageMedia })
+          .addOpen({ OpenId: String(event?.chat?.id) })
+          .add({ tag: 'media' }).value
+      );
     } else if (event?.chat.type === 'private') {
-      const e: PrivateEventMessageCreate = {
-        name: 'private.message.create',
-        Platform: platform,
-        UserId: UserId,
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: String(event?.message_id),
-        MessageText: caption,
-        MessageMedia: MessageMedia,
-        OpenId: String(event?.chat?.id),
-        BotId: botId,
-        _tag: 'media',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('private.message.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message_id) })
+          .addText({ MessageText: caption })
+          .addMedia({ MessageMedia: MessageMedia })
+          .addOpen({ OpenId: String(event?.chat?.id) })
+          .add({ tag: 'media' }).value
+      );
     }
   };
 
@@ -301,30 +245,15 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
 
-    // 定义消
-    const e: PublicEventMemberAdd = {
-      name: 'member.add',
-      // 事件类型
-      Platform: platform,
-      // guild
-      GuildId: String(event?.chat.id),
-      ChannelId: String(event?.chat.id),
-      SpaceId: String(event?.chat.id),
-      // user
-      UserId: UserId,
-      UserKey: UserKey,
-      UserName: event?.from?.username,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: String(event?.message_id),
-      // othder
-      BotId: botId,
-      _tag: 'txt',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.add')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: String(event?.chat.id), SpaceId: String(event?.chat.id) })
+        .addChannel({ ChannelId: String(event?.chat.id) })
+        .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event?.message_id) })
+        .add({ tag: 'txt' }).value
+    );
   });
 
   // 消息编辑
@@ -338,42 +267,23 @@ const main = () => {
     const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
 
     if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup') {
-      const e: PublicEventMessageUpdate = {
-        name: 'message.update',
-        Platform: platform,
-        GuildId: String(event?.chat.id),
-        ChannelId: String(event?.chat.id),
-        SpaceId: String(event?.chat.id),
-        UserId: UserId,
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: String(event?.message_id),
-        BotId: botId,
-        _tag: 'edited_message',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('message.update')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addGuild({ GuildId: String(event?.chat.id), SpaceId: String(event?.chat.id) })
+          .addChannel({ ChannelId: String(event?.chat.id) })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message_id) })
+          .add({ tag: 'edited_message' }).value
+      );
     } else if (event?.chat.type === 'private') {
-      const e: PrivateEventMessageUpdate = {
-        name: 'private.message.update',
-        Platform: platform,
-        UserId: UserId,
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: String(event?.message_id),
-        BotId: botId,
-        _tag: 'edited_message',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('private.message.update')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message_id) })
+          .add({ tag: 'edited_message' }).value
+      );
     }
   });
 
@@ -387,25 +297,15 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
 
-    const e: PublicEventMemberRemove = {
-      name: 'member.remove',
-      Platform: platform,
-      GuildId: String(event?.chat.id),
-      ChannelId: String(event?.chat.id),
-      SpaceId: String(event?.chat.id),
-      UserId: UserId,
-      UserKey: UserKey,
-      UserName: event?.from?.username,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: String(event?.message_id),
-      BotId: botId,
-      _tag: 'left_chat_member',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.remove')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: String(event?.chat.id), SpaceId: String(event?.chat.id) })
+        .addChannel({ ChannelId: String(event?.chat.id) })
+        .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event?.message_id) })
+        .add({ tag: 'left_chat_member' }).value
+    );
   });
 
   // 按钮交互回调
@@ -421,27 +321,17 @@ const main = () => {
     const chatType = event?.message?.chat?.type;
 
     if (chatType === 'channel' || chatType === 'supergroup') {
-      const e: PublicEventInteractionCreate = {
-        name: 'interaction.create',
-        Platform: platform,
-        GuildId: String(event?.message?.chat?.id ?? ''),
-        ChannelId: String(event?.message?.chat?.id ?? ''),
-        SpaceId: String(event?.message?.chat?.id ?? ''),
-        UserId: UserId,
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: String(event?.message?.message_id ?? event?.id ?? ''),
-        MessageText: MessageText,
-        OpenId: String(event?.message?.chat?.id ?? ''),
-        BotId: botId,
-        _tag: 'callback_query',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('interaction.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addGuild({ GuildId: String(event?.message?.chat?.id ?? ''), SpaceId: String(event?.message?.chat?.id ?? '') })
+          .addChannel({ ChannelId: String(event?.message?.chat?.id ?? '') })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message?.message_id ?? event?.id ?? '') })
+          .addText({ MessageText: MessageText })
+          .addOpen({ OpenId: String(event?.message?.chat?.id ?? '') })
+          .add({ tag: 'callback_query' }).value
+      );
 
       // 回应交互
       try {
@@ -450,24 +340,15 @@ const main = () => {
         // ignore
       }
     } else {
-      const e: PrivateEventInteractionCreate = {
-        name: 'private.interaction.create',
-        Platform: platform,
-        UserId: UserId,
-        UserKey: UserKey,
-        UserName: event?.from?.username,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: String(event?.message?.message_id ?? event?.id ?? ''),
-        MessageText: MessageText,
-        OpenId: String(event?.message?.chat?.id ?? ''),
-        BotId: botId,
-        _tag: 'callback_query',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('private.interaction.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message?.message_id ?? event?.id ?? '') })
+          .addText({ MessageText: MessageText })
+          .addOpen({ OpenId: String(event?.message?.chat?.id ?? '') })
+          .add({ tag: 'callback_query' }).value
+      );
 
       try {
         await client.answerCallbackQuery(event.id);
@@ -975,19 +856,34 @@ const main = () => {
 
   const onapis = async (data, consume) => {
     const key = data.payload?.key;
+    const params = data.payload?.params;
 
-    if (client[key]) {
-      const params = data.payload.params;
+    try {
+      // 支持嵌套路径，如 'api.use.send'
+      const keys = key.split('.');
+      let target: any = client;
 
-      try {
-        const res = await client[key](...params);
+      for (const k of keys) {
+        if (target === null || target === undefined || !(k in target)) {
+          consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
 
-        consume([createResult(ResultCode.Ok, '请求完成', res)]);
-      } catch (error) {
-        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+          return;
+        }
+
+        target = target[k];
       }
-    } else {
-      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+
+      if (typeof target !== 'function') {
+        consume([createResult(ResultCode.Fail, '目标不是可调用方法', null)]);
+
+        return;
+      }
+
+      const res = await target(...params);
+
+      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 

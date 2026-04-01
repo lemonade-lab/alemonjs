@@ -1,6 +1,29 @@
 import fs, { existsSync } from 'fs';
+import path from 'path';
 
-// 输入一个文件路径。
+/**
+ * 确保解析后的路径在 root 目录内，防止路径遍历攻击（../）
+ * @returns 安全的绝对路径，如果越界则返回 null
+ */
+export const safePath = (root: string, untrusted: string): string | null => {
+  const resolved = path.resolve(root, untrusted);
+
+  // 确保 resolved 以 root + sep 开头（或恰好等于 root）
+  if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+    return null;
+  }
+
+  return resolved;
+};
+
+/**
+ * 校验 npm 包名是否合法（包含 scoped 包）
+ * 不允许路径分隔符、.. 等注入
+ */
+export const isValidPackageName = (name: string): boolean => {
+  // 符合 npm 包名规范: @scope/name 或 name
+  return /^(?:@[a-z0-9\-~][a-z0-9\-._~]*\/)?[a-z0-9\-~][a-z0-9\-._~]*$/.test(name);
+};
 export const getModuelFile = (dir: string) => {
   const dirMap: Record<string, string> = {
     '.js': `${dir}.js`,

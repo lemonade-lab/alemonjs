@@ -1,24 +1,5 @@
-import {
-  cbpPlatform,
-  createResult,
-  DataEnums,
-  definePlatform,
-  MessageMediaItem,
-  PrivateEventMessageCreate,
-  PrivateEventMessageDelete,
-  PrivateEventRequestFriendAdd,
-  PrivateEventRequestGuildAdd,
-  PublicEventMemberAdd,
-  PublicEventMemberBan,
-  PublicEventMemberRemove,
-  PublicEventMemberUnban,
-  PublicEventMemberUpdate,
-  PublicEventMessageCreate,
-  PublicEventMessageDelete,
-  PublicEventNoticeCreate,
-  ResultCode,
-  User
-} from 'alemonjs';
+import type { DataEnums, MessageMediaItem, User } from 'alemonjs';
+import { cbpPlatform, createResult, definePlatform, ResultCode, FormatEvent } from 'alemonjs';
 import { getBufferByURL } from 'alemonjs/utils';
 import { readFileSync } from 'fs';
 import { platform, getOneBotConfig, getMaster } from './config';
@@ -132,30 +113,18 @@ const main = () => {
     const MessageMedia = extractMediaFromMessage(event.message);
 
     // 定义消
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      Platform: platform,
-      GuildId: groupId,
-      ChannelId: groupId,
-      IsMaster: isMaster,
-      SpaceId: groupId,
-      IsBot: false,
-      UserId: UserId,
-      UserName: event.sender.nickname,
-      UserKey,
-      UserAvatar: UserAvatar,
-      MessageId: String(event.message_id),
-      MessageText: msg.trim(),
-      MessageMedia,
-      OpenId: UserId,
-      ReplyId,
-      replyId: ReplyId,
-      BotId: BotMe.id,
-      _tag: 'message.create',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addGuild({ GuildId: groupId, SpaceId: groupId })
+        .addChannel({ ChannelId: groupId })
+        .addUser({ UserId, UserKey, UserName: event.sender.nickname, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.message_id), ReplyId })
+        .addText({ MessageText: msg.trim() })
+        .addMedia({ MessageMedia })
+        .addOpen({ OpenId: UserId })
+        .add({ tag: 'message.create', replyId: ReplyId }).value
+    );
   });
 
   // 私聊消息
@@ -171,27 +140,16 @@ const main = () => {
     const MessageMedia = extractMediaFromMessage(event.message);
 
     // 定义消
-    const e: PrivateEventMessageCreate = {
-      name: 'private.message.create',
-      Platform: platform,
-      IsMaster: isMaster,
-      IsBot: false,
-      UserId: UserId,
-      UserName: event.sender.nickname,
-      UserKey,
-      UserAvatar: UserAvatar,
-      MessageId: String(event.message_id),
-      MessageText: msg.trim(),
-      MessageMedia,
-      OpenId: String(event.user_id),
-      ReplyId,
-      replyId: ReplyId,
-      BotId: BotMe.id,
-      _tag: 'private.message.create',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addUser({ UserId, UserKey, UserName: event.sender.nickname, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.message_id), ReplyId })
+        .addText({ MessageText: msg.trim() })
+        .addMedia({ MessageMedia })
+        .addOpen({ OpenId: String(event.user_id) })
+        .add({ tag: 'private.message.create', replyId: ReplyId }).value
+    );
   });
 
   // 群成员增加
@@ -201,24 +159,15 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const groupId = String(event.group_id);
 
-    const e: PublicEventMemberAdd = {
-      name: 'member.add',
-      Platform: platform,
-      GuildId: groupId,
-      ChannelId: groupId,
-      SpaceId: groupId,
-      UserId: UserId,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: BotMe.id,
-      _tag: 'NOTICE_GROUP_MEMBER_INCREASE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.add')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addGuild({ GuildId: groupId, SpaceId: groupId })
+        .addChannel({ ChannelId: groupId })
+        .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'NOTICE_GROUP_MEMBER_INCREASE' }).value
+    );
   });
 
   // 群成员减少
@@ -228,24 +177,15 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const groupId = String(event.group_id);
 
-    const e: PublicEventMemberRemove = {
-      name: 'member.remove',
-      Platform: platform,
-      GuildId: groupId,
-      ChannelId: groupId,
-      SpaceId: groupId,
-      UserId: UserId,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: BotMe.id,
-      _tag: 'NOTICE_GROUP_MEMBER_REDUCE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.remove')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addGuild({ GuildId: groupId, SpaceId: groupId })
+        .addChannel({ ChannelId: groupId })
+        .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'NOTICE_GROUP_MEMBER_REDUCE' }).value
+    );
   });
 
   // 好友添加请求
@@ -254,21 +194,13 @@ const main = () => {
     const UserAvatar = createUserAvatar(UserId);
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PrivateEventRequestFriendAdd = {
-      name: 'private.friend.add',
-      Platform: platform,
-      UserId: UserId,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: String(event.flag ?? ''),
-      BotId: BotMe.id,
-      _tag: 'REQUEST_ADD_FRIEND',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.friend.add')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.flag ?? '') })
+        .add({ tag: 'REQUEST_ADD_FRIEND' }).value
+    );
   });
 
   // 入群请求
@@ -277,54 +209,37 @@ const main = () => {
     const UserAvatar = createUserAvatar(UserId);
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PrivateEventRequestGuildAdd = {
-      name: 'private.guild.add',
-      Platform: platform,
-      UserId: UserId,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: String(event.flag ?? ''),
-      BotId: BotMe.id,
-      _tag: 'REQUEST_ADD_GROUP',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.guild.add')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: String(event.flag ?? '') })
+        .add({ tag: 'REQUEST_ADD_GROUP' }).value
+    );
   });
 
   // 群消息撤回
   client.on('NOTICE_GROUP_RECALL', event => {
     const groupId = String(event.group_id);
 
-    const e: PublicEventMessageDelete = {
-      name: 'message.delete',
-      Platform: platform,
-      GuildId: groupId,
-      ChannelId: groupId,
-      SpaceId: groupId,
-      MessageId: String(event.message_id ?? ''),
-      BotId: BotMe.id,
-      _tag: 'NOTICE_GROUP_RECALL',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addGuild({ GuildId: groupId, SpaceId: groupId })
+        .addChannel({ ChannelId: groupId })
+        .addMessage({ MessageId: String(event.message_id ?? '') })
+        .add({ tag: 'NOTICE_GROUP_RECALL' }).value
+    );
   });
 
   // 好友消息撤回
   client.on('NOTICE_FRIEND_RECALL', event => {
-    const e: PrivateEventMessageDelete = {
-      name: 'private.message.delete',
-      Platform: platform,
-      MessageId: String(event.message_id ?? ''),
-      BotId: BotMe.id,
-      _tag: 'NOTICE_FRIEND_RECALL',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addMessage({ MessageId: String(event.message_id ?? '') })
+        .add({ tag: 'NOTICE_FRIEND_RECALL' }).value
+    );
   });
 
   // 群禁言
@@ -335,43 +250,25 @@ const main = () => {
     const groupId = String(event.group_id);
 
     if (event.sub_type === 'ban') {
-      const e: PublicEventMemberBan = {
-        name: 'member.ban',
-        Platform: platform,
-        GuildId: groupId,
-        ChannelId: groupId,
-        SpaceId: groupId,
-        UserId: UserId,
-        UserKey,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: '',
-        BotId: BotMe.id,
-        _tag: 'NOTICE_GROUP_BAN',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('member.ban')
+          .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+          .addGuild({ GuildId: groupId, SpaceId: groupId })
+          .addChannel({ ChannelId: groupId })
+          .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: '' })
+          .add({ tag: 'NOTICE_GROUP_BAN' }).value
+      );
     } else if (event.sub_type === 'lift_ban') {
-      const e: PublicEventMemberUnban = {
-        name: 'member.unban',
-        Platform: platform,
-        GuildId: groupId,
-        ChannelId: groupId,
-        SpaceId: groupId,
-        UserId: UserId,
-        UserKey,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        MessageId: '',
-        BotId: BotMe.id,
-        _tag: 'NOTICE_GROUP_BAN_LIFT',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('member.unban')
+          .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+          .addGuild({ GuildId: groupId, SpaceId: groupId })
+          .addChannel({ ChannelId: groupId })
+          .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: '' })
+          .add({ tag: 'NOTICE_GROUP_BAN_LIFT' }).value
+      );
     }
   });
 
@@ -382,36 +279,28 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const groupId = String(event.group_id);
 
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      Platform: platform,
-      GuildId: groupId,
-      ChannelId: groupId,
-      IsMaster: isMaster,
-      SpaceId: groupId,
-      IsBot: false,
-      UserId: UserId,
-      UserName: '',
-      UserKey,
-      UserAvatar: UserAvatar,
-      MessageId: `upload_${event.user_id}_${event.time}`,
-      MessageText: '',
-      MessageMedia: [
-        {
-          Type: 'file',
-          FileId: event.file?.id,
-          FileName: event.file?.name,
-          FileSize: event.file?.size,
-          Url: event.file?.url
-        }
-      ],
-      OpenId: UserId,
-      BotId: BotMe.id,
-      _tag: 'NOTICE_GROUP_UPLOAD',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addGuild({ GuildId: groupId, SpaceId: groupId })
+        .addChannel({ ChannelId: groupId })
+        .addUser({ UserId, UserName: '', UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: `upload_${event.user_id}_${event.time}` })
+        .addText({ MessageText: '' })
+        .addMedia({
+          MessageMedia: [
+            {
+              Type: 'file',
+              FileId: event.file?.id,
+              FileName: event.file?.name,
+              FileSize: event.file?.size,
+              Url: event.file?.url
+            }
+          ]
+        })
+        .addOpen({ OpenId: UserId })
+        .add({ tag: 'NOTICE_GROUP_UPLOAD' }).value
+    );
   });
 
   // 离线文件接收 —— 映射为 private.message.create + MessageMedia
@@ -420,32 +309,25 @@ const main = () => {
     const UserAvatar = createUserAvatar(UserId);
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PrivateEventMessageCreate = {
-      name: 'private.message.create',
-      Platform: platform,
-      IsMaster: isMaster,
-      IsBot: false,
-      UserId: UserId,
-      UserName: '',
-      UserKey,
-      UserAvatar: UserAvatar,
-      MessageId: `offline_${event.user_id}_${event.time}`,
-      MessageText: '',
-      MessageMedia: [
-        {
-          Type: 'file',
-          FileName: event.file?.name,
-          FileSize: event.file?.size,
-          Url: event.file?.url
-        }
-      ],
-      OpenId: UserId,
-      BotId: BotMe.id,
-      _tag: 'NOTICE_OFFLINE_FILE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addUser({ UserId, UserName: '', UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: `offline_${event.user_id}_${event.time}` })
+        .addText({ MessageText: '' })
+        .addMedia({
+          MessageMedia: [
+            {
+              Type: 'file',
+              FileName: event.file?.name,
+              FileSize: event.file?.size,
+              Url: event.file?.url
+            }
+          ]
+        })
+        .addOpen({ OpenId: UserId })
+        .add({ tag: 'NOTICE_OFFLINE_FILE' }).value
+    );
   });
 
   // 群管理员变动
@@ -455,24 +337,15 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const groupId = String(event.group_id);
 
-    const e: PublicEventMemberUpdate = {
-      name: 'member.update',
-      Platform: platform,
-      GuildId: groupId,
-      ChannelId: groupId,
-      SpaceId: groupId,
-      UserId: UserId,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: BotMe.id,
-      _tag: `NOTICE_GROUP_ADMIN_${event.sub_type === 'set' ? 'SET' : 'UNSET'}`,
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.update')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addGuild({ GuildId: groupId, SpaceId: groupId })
+        .addChannel({ ChannelId: groupId })
+        .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: `NOTICE_GROUP_ADMIN_${event.sub_type === 'set' ? 'SET' : 'UNSET'}` }).value
+    );
   });
 
   // 好友已添加通知
@@ -481,21 +354,13 @@ const main = () => {
     const UserAvatar = createUserAvatar(UserId);
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PrivateEventRequestFriendAdd = {
-      name: 'private.friend.add',
-      Platform: platform,
-      UserId: UserId,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: BotMe.id,
-      _tag: 'NOTICE_FRIEND_ADD',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.friend.add')
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'NOTICE_FRIEND_ADD' }).value
+    );
   });
 
   // 戳一戳通知 —— 映射为 notice.create
@@ -506,27 +371,15 @@ const main = () => {
       const [isMaster, UserKey] = getMaster(UserId);
       const groupId = String(event.group_id);
 
-      const e: PublicEventNoticeCreate = {
-        name: 'notice.create',
-        Platform: platform,
-        GuildId: groupId,
-        ChannelId: groupId,
-        IsMaster: isMaster,
-        SpaceId: groupId,
-        IsBot: false,
-        UserId: UserId,
-        UserName: '',
-        UserKey,
-        UserAvatar: UserAvatar,
-        MessageId: `poke_${event.user_id}_${event.time}`,
-        MessageText: '',
-        OpenId: UserId,
-        BotId: BotMe.id,
-        _tag: 'NOTICE_NOTIFY_POKE',
-        value: event
-      };
-
-      cbp.send(e);
+      cbp.send(
+        FormatEvent.create('notice.create')
+          .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+          .addGuild({ GuildId: groupId, SpaceId: groupId })
+          .addChannel({ ChannelId: groupId })
+          .addUser({ UserId, UserName: '', UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: `poke_${event.user_id}_${event.time}` })
+          .add({ tag: 'NOTICE_NOTIFY_POKE' }).value
+      );
     }
   });
 
@@ -1289,19 +1142,34 @@ const main = () => {
 
   const onapis = async (data, consume) => {
     const key = data.payload?.key;
+    const params = data.payload?.params;
 
-    if (client[key]) {
-      const params = data.payload.params;
+    try {
+      // 支持嵌套路径，如 'api.use.send'
+      const keys = key.split('.');
+      let target: any = client;
 
-      try {
-        const res = await client[key](...params);
+      for (const k of keys) {
+        if (target === null || target === undefined || !(k in target)) {
+          consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
 
-        consume([createResult(ResultCode.Ok, '请求完成', res)]);
-      } catch (error) {
-        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+          return;
+        }
+
+        target = target[k];
       }
-    } else {
-      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+
+      if (typeof target !== 'function') {
+        consume([createResult(ResultCode.Fail, '目标不是可调用方法', null)]);
+
+        return;
+      }
+
+      const res = await target(...params);
+
+      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 

@@ -16,6 +16,7 @@ export * from './event/request/index';
 export * from './event/actions';
 export * from './event/index';
 export * from './event/map';
+export * from './event/builder';
 export * from './logger/index';
 export * from './client/index';
 export * from './message/index';

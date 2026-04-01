@@ -46,7 +46,9 @@
   "private": true,
   "workspaces": [
     "frontends/*",
-    "packages/*"
+    "packages/*",
+    "packages-cl/*",
+    "packages-ex/*"
   ],
   "packageManager": "yarn@1.22.22",
   "dependencies": {

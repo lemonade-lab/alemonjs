@@ -1,8 +1,10 @@
 {
   "version": "independent",
-  "packages": [
+  "workspaces": [
+    "frontends/*",
     "packages/*",
-    "frontends/*"
+    "packages-cl/*",
+    "packages-ex/*"
   ],
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "command": {

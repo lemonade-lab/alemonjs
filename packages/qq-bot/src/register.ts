@@ -1,32 +1,6 @@
-import {
-  cbpPlatform,
-  createResult,
-  DataEnums,
-  PrivateEventInteractionCreate,
-  PrivateEventMessageCreate,
-  PrivateEventMessageDelete,
-  PrivateEventNoticeCreate,
-  PrivateEventRequestFriendAdd,
-  PrivateEventRequestFriendRemove,
-  PublicEventChannelCreate,
-  PublicEventChannelDelete,
-  PublicEventChannelUpdate,
-  PublicEventGuildExit,
-  PublicEventGuildJoin,
-  PublicEventGuildUpdate,
-  PublicEventInteractionCreate,
-  PublicEventMemberAdd,
-  PublicEventMemberRemove,
-  PublicEventMemberUpdate,
-  PublicEventMessageCreate,
-  PublicEventMessageDelete,
-  PublicEventMessageReactionAdd,
-  PublicEventMessageReactionRemove,
-  PublicEventNoticeCreate,
-  ResultCode
-} from 'alemonjs';
+import type { DataEnums, User } from 'alemonjs';
+import { cbpPlatform, createResult, ResultCode, FormatEvent } from 'alemonjs';
 import { QQBotClients } from './sdk/client.websoket';
-import { User } from 'alemonjs';
 import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE';
 import { AT_MESSAGE_CREATE, C2C_MESSAGE_CREATE, DIRECT_MESSAGE_CREATE, GROUP_AT_MESSAGE_CREATE, MESSAGE_CREATE } from './sends';
 import { getMaster, getQQBotConfig } from './config';
@@ -58,48 +32,40 @@ export const register = (client: QQBotClients) => {
 
   client.on('GROUP_ADD_ROBOT', event => {
     // 机器人加入群组
-    const e: PublicEventGuildJoin = {
-      name: 'guild.join',
-      Platform: platform,
-      GuildId: event.group_openid,
-      ChannelId: event.group_openid,
-      SpaceId: `GROUP:${event.group_openid}`,
-      UserId: event.op_member_openid,
-      UserKey: event.op_member_openid,
-      UserAvatar: createUserAvatarURL(event.op_member_openid),
-      IsMaster: false,
-      IsBot: false,
-      OpenId: `C2C:${event.op_member_openid}`,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GROUP_ADD_ROBOT',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('guild.join')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
+        .addChannel({ ChannelId: event.group_openid })
+        .addUser({
+          UserId: event.op_member_openid,
+          UserKey: event.op_member_openid,
+          UserAvatar: createUserAvatarURL(event.op_member_openid),
+          IsMaster: false,
+          IsBot: false
+        })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GROUP_ADD_ROBOT' }).value
+    );
   });
 
   client.on('GROUP_DEL_ROBOT', event => {
     // 机器人离开群组
-    const e: PublicEventGuildExit = {
-      name: 'guild.exit',
-      Platform: platform,
-      GuildId: event.group_openid,
-      ChannelId: event.group_openid,
-      SpaceId: `GROUP:${event.group_openid}`,
-      UserId: event.op_member_openid,
-      UserKey: event.op_member_openid,
-      UserAvatar: createUserAvatarURL(event.op_member_openid),
-      IsMaster: false,
-      IsBot: false,
-      OpenId: `C2C:${event.op_member_openid}`,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GROUP_DEL_ROBOT',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('guild.exit')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
+        .addChannel({ ChannelId: event.group_openid })
+        .addUser({
+          UserId: event.op_member_openid,
+          UserKey: event.op_member_openid,
+          UserAvatar: createUserAvatarURL(event.op_member_openid),
+          IsMaster: false,
+          IsBot: false
+        })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GROUP_DEL_ROBOT' }).value
+    );
   });
 
   // 监听消息
@@ -109,29 +75,17 @@ export const register = (client: QQBotClients) => {
     const UserAvatar = createUserAvatarURL(event.author.id);
 
     // 定义消
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      Platform: platform,
-      // guild
-      GuildId: event.group_id,
-      ChannelId: event.group_id,
-      SpaceId: `GROUP:${event.group_id}`,
-      // 用户Id
-      UserId: event.author.id,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      // 格式化数据
-      MessageId: event.id,
-      MessageText: event.content?.trim(),
-      OpenId: `C2C:${event.author.member_openid}`,
-      BotId: botId,
-      _tag: 'GROUP_AT_MESSAGE_CREATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_id, SpaceId: `GROUP:${event.group_id}` })
+        .addChannel({ ChannelId: event.group_id })
+        .addUser({ UserId: event.author.id, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: event.id })
+        .addText({ MessageText: event.content?.trim() })
+        .addOpen({ OpenId: `C2C:${event.author.member_openid}` })
+        .add({ tag: 'GROUP_AT_MESSAGE_CREATE' }).value
+    );
   });
 
   client.on('C2C_MESSAGE_CREATE', event => {
@@ -140,27 +94,15 @@ export const register = (client: QQBotClients) => {
     const UserAvatar = createUserAvatarURL(event.author.id);
 
     // 定义消
-    const e: PrivateEventMessageCreate = {
-      name: 'private.message.create',
-      // 事件类型
-      Platform: platform,
-      // 用户Id
-      UserId: event.author.id,
-      UserKey,
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      // 格式化数据
-      MessageId: event.id,
-      MessageText: event.content?.trim(),
-      OpenId: `C2C:${event.author.user_openid}`,
-      //
-      BotId: botId,
-      _tag: 'C2C_MESSAGE_CREATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId: event.author.id, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: event.id })
+        .addText({ MessageText: event.content?.trim() })
+        .addOpen({ OpenId: `C2C:${event.author.user_openid}` })
+        .add({ tag: 'C2C_MESSAGE_CREATE' }).value
+    );
   });
 
   /**
@@ -182,28 +124,22 @@ export const register = (client: QQBotClients) => {
     const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
-    const e: PrivateEventMessageCreate = {
-      name: 'private.message.create',
-      // 事件类型
-      Platform: platform,
-      // 用户Id
-      UserId: event?.author?.id ?? '',
-      UserKey,
-      UserName: event?.author?.username ?? '',
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: event.author?.bot,
-      // message
-      MessageId: event.id,
-      MessageText: msg?.trim(),
-      OpenId: `DIRECT:${event.guild_id}`,
-      //
-      BotId: botId,
-      _tag: 'DIRECT_MESSAGE_CREATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({
+          UserId: event?.author?.id ?? '',
+          UserKey,
+          UserName: event?.author?.username ?? '',
+          UserAvatar: UserAvatar,
+          IsMaster: isMaster,
+          IsBot: event.author?.bot
+        })
+        .addMessage({ MessageId: event.id })
+        .addText({ MessageText: msg?.trim() })
+        .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
+        .add({ tag: 'DIRECT_MESSAGE_CREATE' }).value
+    );
   });
 
   // 监听消息
@@ -222,31 +158,24 @@ export const register = (client: QQBotClients) => {
     const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      // 事件类型
-      Platform: platform,
-      GuildId: event.guild_id,
-      ChannelId: event.channel_id,
-      SpaceId: `GUILD:${event.channel_id}`,
-      IsMaster: isMaster,
-      // 用户Id
-      UserId: event?.author?.id ?? '',
-      UserKey,
-      UserName: event?.author?.username ?? '',
-      UserAvatar: UserAvatar,
-      IsBot: event.author?.bot,
-      // message
-      MessageId: event.id,
-      MessageText: msg?.trim(),
-      OpenId: `DIRECT:${event.guild_id}`,
-      //
-      BotId: botId,
-      _tag: 'AT_MESSAGE_CREATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
+        .addChannel({ ChannelId: event.channel_id })
+        .addUser({
+          UserId: event?.author?.id ?? '',
+          UserKey,
+          UserName: event?.author?.username ?? '',
+          UserAvatar: UserAvatar,
+          IsMaster: isMaster,
+          IsBot: event.author?.bot
+        })
+        .addMessage({ MessageId: event.id })
+        .addText({ MessageText: msg?.trim() })
+        .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
+        .add({ tag: 'AT_MESSAGE_CREATE' }).value
+    );
   });
 
   /**
@@ -295,31 +224,24 @@ export const register = (client: QQBotClients) => {
     const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
-    const e: PublicEventMessageCreate = {
-      name: 'message.create',
-      // 事件类型
-      Platform: platform,
-      //
-      GuildId: event.guild_id,
-      ChannelId: event.channel_id,
-      SpaceId: `GUILD:${event.channel_id}`,
-      UserId: event?.author?.id ?? '',
-      UserKey,
-      UserName: event?.author?.username ?? '',
-      UserAvatar: UserAvatar,
-      IsMaster: isMaster,
-      IsBot: false,
-      // message
-      MessageId: event.id,
-      MessageText: msg?.trim(),
-      OpenId: `DIRECT:${event.guild_id}`,
-      //
-      BotId: botId,
-      _tag: 'MESSAGE_CREATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
+        .addChannel({ ChannelId: event.channel_id })
+        .addUser({
+          UserId: event?.author?.id ?? '',
+          UserKey,
+          UserName: event?.author?.username ?? '',
+          UserAvatar: UserAvatar,
+          IsMaster: isMaster,
+          IsBot: false
+        })
+        .addMessage({ MessageId: event.id })
+        .addText({ MessageText: msg?.trim() })
+        .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
+        .add({ tag: 'MESSAGE_CREATE' }).value
+    );
   });
 
   client.on('INTERACTION_CREATE', event => {
@@ -343,27 +265,15 @@ export const register = (client: QQBotClients) => {
 
       const MessageText = event.data.resolved.button_data?.trim() || '';
 
-      const e: PublicEventInteractionCreate = {
-        name: 'interaction.create',
-        Platform: platform,
-        // guild
-        GuildId: event.group_openid,
-        ChannelId: event.group_openid,
-        SpaceId: `GROUP:${event.group_openid}`,
-        // 用户Id
-        UserId: event.group_member_openid,
-        UserKey,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // 格式化数据
-        MessageId: `INTERACTION_CREATE:${event.id}`,
-        MessageText: MessageText,
-        OpenId: `C2C:${event.group_member_openid}`,
-        BotId: botId,
-        _tag: 'INTERACTION_CREATE_GROUP',
-        value: event
-      };
+      const e = FormatEvent.create('interaction.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
+        .addChannel({ ChannelId: event.group_openid })
+        .addUser({ UserId: event.group_member_openid, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: `INTERACTION_CREATE:${event.id}` })
+        .addText({ MessageText: MessageText })
+        .addOpen({ OpenId: `C2C:${event.group_member_openid}` })
+        .add({ tag: 'INTERACTION_CREATE_GROUP' }).value;
 
       cbp.send(e);
     } else if (event.scene === 'c2c') {
@@ -376,23 +286,13 @@ export const register = (client: QQBotClients) => {
       const MessageText = event.data.resolved.button_data?.trim() || '';
 
       // 处理消息
-      const e: PrivateEventInteractionCreate = {
-        name: 'private.interaction.create',
-        Platform: platform,
-        // 用户Id
-        UserId: event.user_openid,
-        UserKey,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // 格式化数据
-        MessageId: event.id,
-        MessageText: MessageText,
-        OpenId: `C2C:${event.user_openid}`,
-        BotId: botId,
-        _tag: 'INTERACTION_CREATE_C2C',
-        value: event
-      };
+      const e = FormatEvent.create('private.interaction.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId: event.user_openid, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: event.id })
+        .addText({ MessageText: MessageText })
+        .addOpen({ OpenId: `C2C:${event.user_openid}` })
+        .add({ tag: 'INTERACTION_CREATE_C2C' }).value;
 
       cbp.send(e);
     } else if (event.scene === 'guild') {
@@ -403,27 +303,15 @@ export const register = (client: QQBotClients) => {
 
       const MessageText = event.data.resolved.button_data?.trim() || '';
       // 处理消息
-      const e: PublicEventInteractionCreate = {
-        name: 'interaction.create',
-        Platform: platform,
-        // guild
-        GuildId: event.guild_id,
-        ChannelId: event.channel_id,
-        SpaceId: `GUILD:${event.channel_id}`,
-        // 用户Id
-        UserId: event.data.resolved.user_id,
-        UserKey,
-        UserAvatar: UserAvatar,
-        IsMaster: isMaster,
-        IsBot: false,
-        // 格式化数据
-        MessageId: event.data.resolved.message_id,
-        MessageText: MessageText,
-        OpenId: `DIRECT:${event.guild_id}`,
-        BotId: botId,
-        _tag: 'INTERACTION_CREATE_GUILD',
-        value: event
-      };
+      const e = FormatEvent.create('interaction.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
+        .addChannel({ ChannelId: event.channel_id })
+        .addUser({ UserId: event.data.resolved.user_id, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: event.data.resolved.message_id })
+        .addText({ MessageText: MessageText })
+        .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
+        .add({ tag: 'INTERACTION_CREATE_GUILD' }).value;
 
       cbp.send(e);
     } else {
@@ -438,162 +326,115 @@ export const register = (client: QQBotClients) => {
   // 频道消息删除（私域）
   client.on('MESSAGE_DELETE', event => {
     const msg = event?.message ?? event;
-    const e: PublicEventMessageDelete = {
-      name: 'message.delete',
-      Platform: platform,
-      GuildId: msg?.guild_id ?? '',
-      ChannelId: msg?.channel_id ?? '',
-      SpaceId: `GUILD:${msg?.channel_id ?? ''}`,
-      MessageId: msg?.id ?? '',
-      BotId: botId,
-      _tag: 'MESSAGE_DELETE',
-      value: event
-    };
 
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: msg?.guild_id ?? '', SpaceId: `GUILD:${msg?.channel_id ?? ''}` })
+        .addChannel({ ChannelId: msg?.channel_id ?? '' })
+        .addMessage({ MessageId: msg?.id ?? '' })
+        .add({ tag: 'MESSAGE_DELETE' }).value
+    );
   });
 
   // 公域消息删除
   client.on('PUBLIC_MESSAGE_DELETE', event => {
     const msg = event.message;
-    const e: PublicEventMessageDelete = {
-      name: 'message.delete',
-      Platform: platform,
-      GuildId: msg.guild_id ?? '',
-      ChannelId: msg.channel_id ?? '',
-      SpaceId: `GUILD:${msg.channel_id ?? ''}`,
-      MessageId: msg.id ?? '',
-      BotId: botId,
-      _tag: 'PUBLIC_MESSAGE_DELETE',
-      value: event
-    };
 
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: msg.guild_id ?? '', SpaceId: `GUILD:${msg.channel_id ?? ''}` })
+        .addChannel({ ChannelId: msg.channel_id ?? '' })
+        .addMessage({ MessageId: msg.id ?? '' })
+        .add({ tag: 'PUBLIC_MESSAGE_DELETE' }).value
+    );
   });
 
   // 频道私聊消息删除
   client.on('DIRECT_MESSAGE_DELETE', event => {
     const msg = event.message;
-    const e: PrivateEventMessageDelete = {
-      name: 'private.message.delete',
-      Platform: platform,
-      MessageId: msg.id ?? '',
-      BotId: botId,
-      _tag: 'DIRECT_MESSAGE_DELETE',
-      value: event
-    };
 
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.message.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addMessage({ MessageId: msg.id ?? '' })
+        .add({ tag: 'DIRECT_MESSAGE_DELETE' }).value
+    );
   });
 
   // 表情表态 - 添加
   client.on('MESSAGE_REACTION_ADD', event => {
-    const e: PublicEventMessageReactionAdd = {
-      name: 'message.reaction.add',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: event.channel_id ?? '',
-      SpaceId: `GUILD:${event.channel_id ?? ''}`,
-      MessageId: event.target?.id ?? '',
-      BotId: botId,
-      _tag: 'MESSAGE_REACTION_ADD',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.reaction.add')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.channel_id ?? ''}` })
+        .addChannel({ ChannelId: event.channel_id ?? '' })
+        .addMessage({ MessageId: event.target?.id ?? '' })
+        .add({ tag: 'MESSAGE_REACTION_ADD' }).value
+    );
   });
 
   // 表情表态 - 移除
   client.on('MESSAGE_REACTION_REMOVE', event => {
-    const e: PublicEventMessageReactionRemove = {
-      name: 'message.reaction.remove',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: event.channel_id ?? '',
-      SpaceId: `GUILD:${event.channel_id ?? ''}`,
-      MessageId: event.target?.id ?? '',
-      BotId: botId,
-      _tag: 'MESSAGE_REACTION_REMOVE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('message.reaction.remove')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.channel_id ?? ''}` })
+        .addChannel({ ChannelId: event.channel_id ?? '' })
+        .addMessage({ MessageId: event.target?.id ?? '' })
+        .add({ tag: 'MESSAGE_REACTION_REMOVE' }).value
+    );
   });
 
   // 子频道创建
   client.on('CHANNEL_CREATE', event => {
-    const e: PublicEventChannelCreate = {
-      name: 'channel.create',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: event.id ?? '',
-      SpaceId: `GUILD:${event.guild_id ?? ''}`,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'CHANNEL_CREATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('channel.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
+        .addChannel({ ChannelId: event.id ?? '' })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'CHANNEL_CREATE' }).value
+    );
   });
 
   // 子频道删除
   client.on('CHANNEL_DELETE', event => {
-    const e: PublicEventChannelDelete = {
-      name: 'channel.delete',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: event.id ?? '',
-      SpaceId: `GUILD:${event.guild_id ?? ''}`,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'CHANNEL_DELETE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('channel.delete')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
+        .addChannel({ ChannelId: event.id ?? '' })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'CHANNEL_DELETE' }).value
+    );
   });
 
   // 服务器创建（机器人加入频道）
   client.on('GUILD_CREATE', event => {
-    const e: PublicEventGuildJoin = {
-      name: 'guild.join',
-      Platform: platform,
-      GuildId: event.id ?? '',
-      ChannelId: '',
-      SpaceId: `GUILD:${event.id ?? ''}`,
-      UserId: event.op_user_id ?? '',
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_CREATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('guild.join')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
+        .addChannel({ ChannelId: '' })
+        .addUser({ UserId: event.op_user_id ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_CREATE' }).value
+    );
   });
 
   // 服务器删除（机器人退出频道）
   client.on('GUILD_DELETE', event => {
-    const e: PublicEventGuildExit = {
-      name: 'guild.exit',
-      Platform: platform,
-      GuildId: event.id ?? '',
-      ChannelId: '',
-      SpaceId: `GUILD:${event.id ?? ''}`,
-      UserId: event.op_user_id ?? '',
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_DELETE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('guild.exit')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
+        .addChannel({ ChannelId: '' })
+        .addUser({ UserId: event.op_user_id ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_DELETE' }).value
+    );
   });
 
   // 频道成员加入
@@ -601,25 +442,15 @@ export const register = (client: QQBotClients) => {
     const UserId = event.user?.id ?? '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PublicEventMemberAdd = {
-      name: 'member.add',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: '',
-      SpaceId: `GUILD:${event.guild_id ?? ''}`,
-      UserId: UserId,
-      UserKey,
-      UserName: event.user?.username ?? '',
-      UserAvatar: createUserAvatarURL(UserId),
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_MEMBER_ADD',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.add')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
+        .addChannel({ ChannelId: '' })
+        .addUser({ UserId: UserId, UserKey, UserName: event.user?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_MEMBER_ADD' }).value
+    );
   });
 
   // 频道成员移除
@@ -627,25 +458,15 @@ export const register = (client: QQBotClients) => {
     const UserId = event.user?.id ?? '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PublicEventMemberRemove = {
-      name: 'member.remove',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: '',
-      SpaceId: `GUILD:${event.guild_id ?? ''}`,
-      UserId: UserId,
-      UserKey,
-      UserName: event.user?.username ?? '',
-      UserAvatar: createUserAvatarURL(UserId),
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_MEMBER_REMOVE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.remove')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
+        .addChannel({ ChannelId: '' })
+        .addUser({ UserId: UserId, UserKey, UserName: event.user?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_MEMBER_REMOVE' }).value
+    );
   });
 
   // 频道成员资料变更
@@ -653,177 +474,109 @@ export const register = (client: QQBotClients) => {
     const UserId = event.user?.id ?? '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    const e: PublicEventMemberUpdate = {
-      name: 'member.update',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: '',
-      SpaceId: `GUILD:${event.guild_id ?? ''}`,
-      UserId: UserId,
-      UserKey,
-      UserName: event.user?.username ?? '',
-      UserAvatar: createUserAvatarURL(UserId),
-      IsMaster: isMaster,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_MEMBER_UPDATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('member.update')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
+        .addChannel({ ChannelId: '' })
+        .addUser({ UserId: UserId, UserKey, UserName: event.user?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_MEMBER_UPDATE' }).value
+    );
   });
 
   // 好友添加
   client.on('FRIEND_ADD', event => {
-    const e: PrivateEventRequestFriendAdd = {
-      name: 'private.friend.add',
-      Platform: platform,
-      UserId: event.openid ?? '',
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'FRIEND_ADD',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.friend.add')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'FRIEND_ADD' }).value
+    );
   });
 
   // 好友删除
   client.on('FRIEND_DEL', event => {
-    const e: PrivateEventRequestFriendRemove = {
-      name: 'private.friend.remove',
-      Platform: platform,
-      UserId: event.openid ?? '',
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'FRIEND_DEL',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.friend.remove')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'FRIEND_DEL' }).value
+    );
   });
 
   // 子频道更新
   client.on('CHANNEL_UPDATE', event => {
-    const e: PublicEventChannelUpdate = {
-      name: 'channel.update',
-      Platform: platform,
-      GuildId: event.guild_id ?? '',
-      ChannelId: event.id ?? '',
-      SpaceId: `GUILD:${event.guild_id ?? ''}`,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'CHANNEL_UPDATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('channel.update')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
+        .addChannel({ ChannelId: event.id ?? '' })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'CHANNEL_UPDATE' }).value
+    );
   });
 
   // 频道信息更新
   client.on('GUILD_UPDATE', event => {
-    const e: PublicEventGuildUpdate = {
-      name: 'guild.update',
-      Platform: platform,
-      GuildId: event.id ?? '',
-      ChannelId: '',
-      SpaceId: `GUILD:${event.id ?? ''}`,
-      MessageId: '',
-      BotId: botId,
-      _tag: 'GUILD_UPDATE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('guild.update')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
+        .addChannel({ ChannelId: '' })
+        .addMessage({ MessageId: '' })
+        .add({ tag: 'GUILD_UPDATE' }).value
+    );
   });
 
   // 群消息推送开启
   client.on('GROUP_MSG_RECEIVE', event => {
-    const e: PublicEventNoticeCreate = {
-      name: 'notice.create',
-      Platform: platform,
-      GuildId: event.group_openid,
-      ChannelId: event.group_openid,
-      SpaceId: `GROUP:${event.group_openid}`,
-      UserId: event.op_member_openid,
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: `group_msg_receive_${event.group_openid}_${event.timestamp}`,
-      MessageText: '',
-      OpenId: `C2C:${event.op_member_openid}`,
-      BotId: botId,
-      _tag: 'GROUP_MSG_RECEIVE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
+        .addChannel({ ChannelId: event.group_openid })
+        .addUser({ UserId: event.op_member_openid, UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: `group_msg_receive_${event.group_openid}_${event.timestamp}` })
+        .add({ tag: 'GROUP_MSG_RECEIVE' }).value
+    );
   });
 
   // 群消息推送关闭
   client.on('GROUP_MSG_REJECT', event => {
-    const e: PublicEventNoticeCreate = {
-      name: 'notice.create',
-      Platform: platform,
-      GuildId: event.group_openid,
-      ChannelId: event.group_openid,
-      SpaceId: `GROUP:${event.group_openid}`,
-      UserId: event.op_member_openid,
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: `group_msg_reject_${event.group_openid}_${event.timestamp}`,
-      MessageText: '',
-      OpenId: `C2C:${event.op_member_openid}`,
-      BotId: botId,
-      _tag: 'GROUP_MSG_REJECT',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
+        .addChannel({ ChannelId: event.group_openid })
+        .addUser({ UserId: event.op_member_openid, UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: `group_msg_reject_${event.group_openid}_${event.timestamp}` })
+        .add({ tag: 'GROUP_MSG_REJECT' }).value
+    );
   });
 
   // C2C消息推送开启
   client.on('C2C_MSG_RECEIVE', event => {
-    const e: PrivateEventNoticeCreate = {
-      name: 'private.notice.create',
-      Platform: platform,
-      UserId: event.openid ?? '',
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: `c2c_msg_receive_${event.openid}_${event.timestamp}`,
-      BotId: botId,
-      _tag: 'C2C_MSG_RECEIVE',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: `c2c_msg_receive_${event.openid}_${event.timestamp}` })
+        .add({ tag: 'C2C_MSG_RECEIVE' }).value
+    );
   });
 
   // C2C消息推送关闭
   client.on('C2C_MSG_REJECT', event => {
-    const e: PrivateEventNoticeCreate = {
-      name: 'private.notice.create',
-      Platform: platform,
-      UserId: event.openid ?? '',
-      UserKey: '',
-      IsMaster: false,
-      IsBot: false,
-      MessageId: `c2c_msg_reject_${event.openid}_${event.timestamp}`,
-      BotId: botId,
-      _tag: 'C2C_MSG_REJECT',
-      value: event
-    };
-
-    cbp.send(e);
+    cbp.send(
+      FormatEvent.create('private.notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: `c2c_msg_reject_${event.openid}_${event.timestamp}` })
+        .add({ tag: 'C2C_MSG_REJECT' }).value
+    );
   });
 
   client.on('ERROR', console.error);
@@ -1355,19 +1108,34 @@ export const register = (client: QQBotClients) => {
 
   const onapis = async (data, consume) => {
     const key = data.payload?.key;
+    const params = data.payload?.params;
 
-    if (client[key]) {
-      const params = data.payload.params;
+    try {
+      // 支持嵌套路径，如 'api.use.send'
+      const keys = key.split('.');
+      let target: any = client;
 
-      try {
-        const res = await client[key](...params);
+      for (const k of keys) {
+        if (target === null || target === undefined || !(k in target)) {
+          consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
 
-        consume([createResult(ResultCode.Ok, '请求完成', res)]);
-      } catch (error) {
-        consume([createResult(ResultCode.Fail, '请求失败', error)]);
+          return;
+        }
+
+        target = target[k];
       }
-    } else {
-      consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+
+      if (typeof target !== 'function') {
+        consume([createResult(ResultCode.Fail, '目标不是可调用方法', null)]);
+
+        return;
+      }
+
+      const res = await target(...params);
+
+      consume([createResult(ResultCode.Ok, '请求完成', res)]);
+    } catch (error) {
+      consume([createResult(ResultCode.Fail, '请求失败', error)]);
     }
   };
 

@@ -474,7 +474,7 @@ export function createEvent<T extends EventKeys>(options: {
   };
 
   // 匹配选择事件类型
-  if (selectsArr.includes(name)) {
+  if ((selectsArr as EventKeys[]).includes(name)) {
     o.selects = true;
   }
 

@@ -1,10 +1,10 @@
 import { Guild, Channel } from '../base/guild';
 import { Message } from '../base/message';
 import { User } from '../base/user';
-import { platform } from '../base/platform';
+import { Platform } from '../base/platform';
 import { Expansion } from '../base/expansion';
 // 成员添加
-export type PublicEventMemberAdd = platform &
+export type PublicEventMemberAdd = Platform &
   Guild &
   Channel &
   Message &
@@ -12,7 +12,7 @@ export type PublicEventMemberAdd = platform &
     name: 'member.add';
   } & Expansion;
 // 成员移除
-export type PublicEventMemberRemove = platform &
+export type PublicEventMemberRemove = Platform &
   Guild &
   Channel &
   Message &
@@ -20,7 +20,7 @@ export type PublicEventMemberRemove = platform &
     name: 'member.remove';
   } & Expansion;
 // 成员封禁
-export type PublicEventMemberBan = platform &
+export type PublicEventMemberBan = Platform &
   Guild &
   Channel &
   Message &
@@ -28,7 +28,7 @@ export type PublicEventMemberBan = platform &
     name: 'member.ban';
   } & Expansion;
 // 成员解封
-export type PublicEventMemberUnban = platform &
+export type PublicEventMemberUnban = Platform &
   Guild &
   Channel &
   Message &
@@ -36,7 +36,7 @@ export type PublicEventMemberUnban = platform &
     name: 'member.unban';
   } & Expansion;
 // 成员属性变更（管理员设置/取消、角色变更等）
-export type PublicEventMemberUpdate = platform &
+export type PublicEventMemberUpdate = Platform &
   Guild &
   Channel &
   Message &
