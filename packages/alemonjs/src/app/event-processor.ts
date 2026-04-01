@@ -169,6 +169,10 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
         event['MessageText'] = event['MessageText'].replace(cachedReg, target);
       }
     }
+  } else {
+    // 当 MessageText 为空时，兜底为一个空字符串，避免后续正则判断出错
+    // 也避免开发者忘记了，增加健壮性
+    event['MessageText'] = '';
   }
 
   const masterId = value?.master_id;

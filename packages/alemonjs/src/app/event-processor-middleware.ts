@@ -6,13 +6,13 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventKeys } from '../types';
-import { Middleware, MiddlewareRouter } from './store';
+import { MiddlewareTree, MiddlewareRouter } from './store';
 import { createCallHandler } from './event-processor-callHandler';
-import { createNextStep } from './event-processor-cycleFiles';
+import { createFileTreeStep } from './event-processor-cycleFiles';
 import { createRouteProcessChildren } from './event-processor-cycleRoute';
 
 // 单例，避免每次事件处理都创建新对象
-const middlewareSingleton = new Middleware();
+const middlewareTreeSingleton = new MiddlewareTree();
 const middlewareRouterSingleton = new MiddlewareRouter();
 
 /**
@@ -21,12 +21,12 @@ const middlewareRouterSingleton = new MiddlewareRouter();
  * @param select
  */
 export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
-  // 所有中间件（文件）
-  const mwFiles = middlewareSingleton.value;
+  // 得到中间件文件树
+  const root = middlewareTreeSingleton.value;
   // 创建处理函数（文件）
   const callHandler = createCallHandler(valueEvent);
-  // 创建 next 处理函数（文件）
-  const nextMiddleware = createNextStep(valueEvent, select, next, mwFiles, callHandler);
+  // 创建文件树遍历函数
+  const nextMiddleware = createFileTreeStep(valueEvent, select, next, root, callHandler);
 
   // 所有中间件（路由）
   const routes = middlewareRouterSingleton.value;

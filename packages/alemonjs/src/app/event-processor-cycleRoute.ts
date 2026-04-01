@@ -28,8 +28,63 @@ export const createRouteProcessChildren = <T extends EventKeys>(
   nextCycle: Next,
   callHandler: (currents: any, nextEvent: any) => void
 ) => {
+  // handler 执行结果缓存 — 同一个 handler 在一次事件中只执行一次
+  const handlerResultCache = new Map<() => any, { matched: boolean; currents: any[] }>();
+
+  /**
+   * 链表节点 — 替代 concat 数组，每层只创建 O(1) 节点
+   */
+  interface HandlerNode {
+    handler: () => any;
+    prev: HandlerNode | null;
+  }
+
+  /** 从链表尾部回溯收集所有 handler（返回按根→叶顺序） */
+  const collectHandlers = (tail: HandlerNode): Array<() => any> => {
+    const result: Array<() => any> = [];
+    let node: HandlerNode | null = tail;
+
+    while (node) {
+      result.push(node.handler);
+      node = node.prev;
+    }
+    result.reverse();
+
+    return result;
+  };
+
+  /**
+   * 执行 handler 并缓存结果，已缓存则直接返回
+   */
+  const resolveHandler = async (handler: () => any): Promise<{ matched: boolean; currents: any[] }> => {
+    if (handlerResultCache.has(handler)) {
+      return handlerResultCache.get(handler);
+    }
+
+    const app = await handler();
+    const result: { matched: boolean; currents: any[] } = { matched: true, currents: [] };
+
+    if (isFunction(app)) {
+      result.currents.push(app);
+    } else {
+      const selects = Array.isArray(app.select) ? app.select : [app.select];
+
+      if (!selects.includes(select)) {
+        result.matched = false;
+      } else {
+        const items = Array.isArray(app.current) ? app.current : [app.current];
+
+        result.currents.push(...items);
+      }
+    }
+
+    handlerResultCache.set(handler, result);
+
+    return result;
+  };
+
   // 开始处理 handler
-  const processChildren = (nodes: ResponseRoute[], middleware, next: () => Promise<void> | void) => {
+  const processChildren = (nodes: ResponseRoute[], pendingTail: HandlerNode | null, next: () => Promise<void> | void) => {
     if (!nodes || nodes.length === 0) {
       void next();
 
@@ -88,70 +143,45 @@ export const createRouteProcessChildren = <T extends EventKeys>(
           }
         }
       }
+
       if (!node.handler) {
         void nextNode();
 
         return;
       }
-      // 递归：如果有children，继续递归下去
+
+      // 当前节点的链表节点 — O(1), 无数组拷贝
+      const currentNode: HandlerNode = { handler: node.handler, prev: pendingTail };
+
+      // 有 children → 不执行 handler，只挂链表，递归下去
       if (node.children && node.children.length > 0) {
-        // push/pop 回溯 — 避免每层递归 spread 创建新数组
-        middleware.push(node.handler);
-        processChildren(node.children, middleware, () => {
-          middleware.pop();
+        processChildren(node.children, currentNode, () => {
           void nextNode();
         });
 
         return;
       }
 
-      // 没有children，直接处理handler — 临时拼接，无需 spread
-      middleware.push(node.handler);
-      const currentsAndMiddleware = middleware;
-
-      // node.handler 是一个异步函数。函数执行的结果是 { current: Current[] | Current, select: xxx }
-
+      // 叶子节点 → 从链表收集全部 handler 并执行
       try {
-        const currents = [];
+        const allHandlers = collectHandlers(currentNode);
+        const allCurrents: any[] = [];
 
-        for (const item of currentsAndMiddleware) {
-          const app = await item();
-          // 没有 default。因为是 import x from './';
+        for (const h of allHandlers) {
+          const result = await resolveHandler(h);
 
-          if (isFunction(app)) {
-            // 纯异步函数
-            currents.push(app);
-            continue;
-          }
-
-          // 中间件也有 selects。
-          // 如果 发现 和当前要处理的 selects 不匹配。
-          // 只要是一个不匹配。则说明处理还不是最终想要执行结果。
-          const selects = Array.isArray(app.select) ? app.select : [app.select];
-
-          // 没有匹配到
-          if (!selects.includes(select)) {
-            // 回溯 pop，避免中间件泄漏
-            middleware.pop();
+          if (!result.matched) {
+            // handler 的 select 不匹配 → 整条路径无效
             void nextNode();
 
             return;
           }
 
-          // 可能是数组。也可能不是数组
-          const currentsItem = Array.isArray(app.current) ? app.current : [app.current];
-
-          currents.push(...currentsItem);
+          allCurrents.push(...result.currents);
         }
 
-        // 回溯 pop 当前 handler
-        middleware.pop();
-
-        // 要把二维数组拍平
-        callHandler(currents, (cn, ...cns) => {
+        callHandler(allCurrents, (cn, ...cns) => {
           if (cn) {
-            // 这里的 next 要加 true。
-            // 因为下一层是旧版本逻辑。不加一层。会出现处理了没有完全结束周期
             nextCycle(true, ...cns);
 
             return;
@@ -159,7 +189,6 @@ export const createRouteProcessChildren = <T extends EventKeys>(
           void nextNode();
         });
       } catch (err) {
-        middleware.pop();
         showErrorModule(err);
       }
     };
@@ -167,5 +196,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
     void nextNode();
   };
 
-  return processChildren;
+  return (nodes: ResponseRoute[], _pending: any[], next: () => Promise<void> | void) => {
+    processChildren(nodes, null, next);
+  };
 };

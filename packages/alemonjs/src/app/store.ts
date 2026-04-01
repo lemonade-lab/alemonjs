@@ -5,7 +5,7 @@
  * @description 存储器
  */
 import { SinglyLinkedList } from './SinglyLinkedList';
-import { childrenCallbackRes, ChildrenCycle, EventCycleEnum, EventKeys, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
+import { childrenCallbackRes, ChildrenCycle, EventCycleEnum, EventKeys, FileTreeNode, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
 /**
@@ -172,6 +172,9 @@ export class Response {
   }
 }
 
+/**
+ * @deprecated 已被 ResponseTree 替代，保留仅为兼容
+ */
 export class ResponseMiddleware {
   find(name: string, stateKey: string) {
     if (typeof name !== 'string' || typeof stateKey !== 'string') {
@@ -201,6 +204,133 @@ export class ResponseMiddleware {
     }
 
     return mr;
+  }
+}
+
+// ─── 文件树构建 ───────────────────────────────────────────────
+
+function createTreeNode(): FileTreeNode {
+  return { files: [], children: new Map() };
+}
+
+/**
+ * 将扁平的 response 数组 + middlewareResponse 字典按 stateKey 层级组装为树
+ */
+function buildFileTree(files: StoreResponseItem[], middlewareResponse: { [key: string]: StoreResponseItem } | undefined): FileTreeNode {
+  const root = createTreeNode();
+
+  for (const file of files) {
+    if (!file.stateKey) {
+      root.files.push(file);
+      continue;
+    }
+    const parts = file.stateKey.split(':');
+    let node = root;
+
+    for (const part of parts) {
+      if (!node.children.has(part)) {
+        node.children.set(part, createTreeNode());
+      }
+      node = node.children.get(part)!;
+    }
+    node.files.push(file);
+  }
+
+  if (middlewareResponse) {
+    for (const [key, mw] of Object.entries(middlewareResponse)) {
+      const parts = key.split(':');
+      let node = root;
+
+      for (const part of parts) {
+        if (!node.children.has(part)) {
+          node.children.set(part, createTreeNode());
+        }
+        node = node.children.get(part)!;
+      }
+      node.middleware = mw;
+    }
+  }
+
+  return root;
+}
+
+/**
+ * 合并两棵文件树
+ */
+function mergeFileTree(target: FileTreeNode, source: FileTreeNode) {
+  target.files.push(...source.files);
+
+  if (source.middleware) {
+    if (!target.middleware) {
+      target.middleware = source.middleware;
+    } else {
+      console.warn(`[mergeFileTree] middleware conflict at same stateKey, keeping first (${target.middleware.path}), discarding (${source.middleware.path})`);
+    }
+  }
+
+  for (const [key, child] of source.children) {
+    if (target.children.has(key)) {
+      mergeFileTree(target.children.get(key), child);
+    } else {
+      target.children.set(key, child);
+    }
+  }
+}
+
+/**
+ * 中间件文件树 — 替代扁平 Middleware 数组
+ * 复用 buildFileTree / mergeFileTree，无 middlewareResponse（中间件无嵌套中间件概念）
+ */
+export class MiddlewareTree {
+  #cache: FileTreeNode | null = null;
+  #cacheVersion = -1;
+
+  get value(): FileTreeNode {
+    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+      return this.#cache;
+    }
+
+    const root = createTreeNode();
+
+    for (const appKey of Object.keys(alemonjsCore.storeChildrenApp)) {
+      const app = alemonjsCore.storeChildrenApp[appKey];
+      const subTree = buildFileTree(app.middleware ?? [], undefined);
+
+      mergeFileTree(root, subTree);
+    }
+
+    this.#cache = root;
+    this.#cacheVersion = _storeVersion;
+
+    return this.#cache;
+  }
+}
+
+/**
+ * 文件响应体树 — 替代扁平 Response + ResponseMiddleware 的组合
+ */
+export class ResponseTree {
+  #cache: FileTreeNode | null = null;
+  #cacheVersion = -1;
+
+  get value(): FileTreeNode {
+    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+      return this.#cache;
+    }
+
+    const root = createTreeNode();
+
+    for (const appKey of Object.keys(alemonjsCore.storeChildrenApp)) {
+      const app = alemonjsCore.storeChildrenApp[appKey];
+      const subTree = buildFileTree(app.response ?? [], app.middlewareResponse);
+
+      mergeFileTree(root, subTree);
+    }
+
+    this.#cache = root;
+    this.#cacheVersion = _storeVersion;
+
+    return this.#cache;
   }
 }
 

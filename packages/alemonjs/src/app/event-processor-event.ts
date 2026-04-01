@@ -6,25 +6,14 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventKeys } from '../types';
-import { Response, ResponseRouter } from './store';
+import { ResponseRouter, ResponseTree } from './store';
 import { createCallHandler } from './event-processor-callHandler';
-import { createNextStep } from './event-processor-cycleFiles';
+import { createFileTreeStep } from './event-processor-cycleFiles';
 import { createRouteProcessChildren } from './event-processor-cycleRoute';
 
 // 单例，避免每次事件处理都创建新对象
-const responseSingleton = new Response();
+const responseTreeSingleton = new ResponseTree();
 const responseRouterSingleton = new ResponseRouter();
-
-/**
- * todo：
- * 当前的局部中间件算法有问题
- * ****
- * 当前仅仅是简单的记录。被关闭的中间件。
- * ****
- * 在一个指令匹配多个 res 的情况下。
- * 会出现多次计算同一个中间件的结果。即 bad case
- * 需要一个缓存机制。
- */
 
 /**
  * 消息体处理机制
@@ -32,12 +21,12 @@ const responseRouterSingleton = new ResponseRouter();
  * @param key
  */
 export const expendEvent = <T extends EventKeys>(valueEvent: Events[T], select: T, next: Next) => {
-  // 得到所有响应体（文件）
-  const StoreResponse = responseSingleton.value;
+  // 得到文件响应体树
+  const root = responseTreeSingleton.value;
   // 创建调用函数（文件）
   const callHandler = createCallHandler(valueEvent);
-  // 创建next函数（文件）
-  const nextEvent = createNextStep(valueEvent, select, next, StoreResponse, callHandler);
+  // 创建文件树遍历函数（中间件在树层级只执行一次）
+  const nextEvent = createFileTreeStep(valueEvent, select, next, root, callHandler);
 
   // 得到所有响应体（路由）
   const routes = responseRouterSingleton.value;
