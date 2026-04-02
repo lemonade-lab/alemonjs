@@ -41,7 +41,7 @@ export class FormatEvent<T extends EventKeys = EventKeys> {
     Object.assign(this.#data, otherParams);
     Object.defineProperty(this.#data, 'value', {
       value,
-      enumerable: false
+      enumerable: true
     });
 
     return this;

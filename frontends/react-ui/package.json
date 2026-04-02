@@ -1,10 +1,9 @@
 {
   "name": "@alemonjs/react-ui",
-  "displayName": "ALemonJS web",
+  "displayName": "ALemonJS-React-UI",
   "publisher": "lemonade-x",
-  "description": "阿柠檬机器人React组件库",
-  "version": "0.0.6",
-  "private": true,
+  "description": "阿柠檬统一色块",
+  "version": "0.0.7",
   "main": "lib/react-ui.js",
   "module": "lib/react-ui.mjs",
   "types": "lib/index.d.ts",
