@@ -38,6 +38,7 @@ jest.mock('../../../packages/alemonjs/src/app/event-utils', () => ({
 
 import { createRouteProcessChildren } from '../../../packages/alemonjs/src/app/event-processor-cycleRoute';
 import { createFileTreeStep, createNextStep } from '../../../packages/alemonjs/src/app/event-processor-cycleFiles';
+import { showErrorModule } from '../../../packages/alemonjs/src/core';
 
 // ─── 类型（避免依赖内部 types barrel） ──────────────────────
 
@@ -446,6 +447,33 @@ describe('createRouteProcessChildren', () => {
       expect(fnA.tracker.calls).toBe(1);
       expect(fnB.tracker.calls).toBe(1);
       expect(executed.length).toBe(2);
+    });
+
+    it('叶子 handler 抛错后应继续处理后续节点', async () => {
+      const boom = jest.fn(async () => {
+        throw new Error('boom');
+      });
+      const fnB = createTrackedHandler('B');
+
+      const routes: any[] = [
+        { handler: boom, regular: /hello/ },
+        { handler: fnB.handler, regular: /hello/ }
+      ];
+
+      const { callHandler, executed } = createSimpleCallHandler();
+      const done = jest.fn();
+      const processChildren = createRouteProcessChildren(baseEvent, select, done, callHandler);
+      processChildren(routes, [], () => {
+        done();
+      });
+
+      await flushAsync();
+
+      expect(boom).toHaveBeenCalledTimes(1);
+      expect(fnB.tracker.calls).toBe(1);
+      expect(executed.length).toBe(1);
+      expect(done).toHaveBeenCalled();
+      expect(showErrorModule).toHaveBeenCalled();
     });
   });
 });

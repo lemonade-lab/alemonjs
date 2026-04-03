@@ -190,6 +190,8 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         });
       } catch (err) {
         showErrorModule(err);
+        // 异常时跳过当前节点，继续后续节点，避免整条链卡住
+        void nextNode();
       }
     };
 

@@ -6,6 +6,7 @@
 import { Next, Events, EventCycleEnum, EventKeys } from '../types';
 import { getSubscribeList } from './store';
 import { SubscribeStatus } from './config';
+import { withEventContext } from './hook-event-context';
 
 /**
  * 处理订阅
@@ -105,7 +106,7 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
       }
     };
 
-    item.data.current(valueEvent, Continue);
+    withEventContext(valueEvent, Continue, () => item.data.current(valueEvent, Continue));
   };
 
   // 先从观察者开始
