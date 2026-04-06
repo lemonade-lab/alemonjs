@@ -1001,6 +1001,7 @@ const main = () => {
     try {
       // 支持嵌套路径，如 'api.use.send'
       const keys = key.split('.');
+      let parent: any = null;
       let target: any = client;
 
       for (const k of keys) {
@@ -1010,6 +1011,7 @@ const main = () => {
           return;
         }
 
+        parent = target;
         target = target[k];
       }
 
@@ -1019,7 +1021,7 @@ const main = () => {
         return;
       }
 
-      const res = await target(...params);
+      const res = await target.call(parent, ...params);
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     } catch (error) {
