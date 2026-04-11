@@ -25,6 +25,7 @@ export * from './state/index';
 export * from './store/res';
 export * from './expose/index';
 export * from './subscribe';
+export * from './schedule';
 export * from './standard';
 export * from './actions';
 export * from './apis';

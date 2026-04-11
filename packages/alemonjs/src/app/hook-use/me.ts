@@ -29,6 +29,19 @@ export const useMe = () => {
   };
 
   /**
+   * @deprecated 试验性功能，暂不可用
+   * @param action
+   * @returns
+   */
+  const isMentionMe = () => {
+    try {
+      return createResult(ResultCode.Warn, 'No bot information found', false);
+    } catch {
+      return createResult(ResultCode.Fail, 'Failed to get bot information', false);
+    }
+  };
+
+  /**
    * 加入的服务器列表
    */
   const guilds = async (): Promise<Result<GuildInfo[]>> => {
@@ -97,6 +110,7 @@ export const useMe = () => {
 
   const control = {
     info,
+    isMentionMe,
     guilds,
     threads,
     friends

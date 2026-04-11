@@ -7,6 +7,7 @@ import { ChildrenApp } from '../../app/store.js';
 import { registerExpose } from '../../app/expose.js';
 import { ResultCode } from '../../core/variable.js';
 import { fileSuffixMiddleware } from '../../core/variable.js';
+import { scheduleCancelByApp, registerAppDir, unregisterAppDir } from '../../app/schedule-store.js';
 import module from 'module';
 
 const initRequire = () => {};
@@ -32,6 +33,9 @@ export const loadChildren = async (mainPath: string, appName: string) => {
   }
   const mainDir = dirname(mainPath);
   const App = new ChildrenApp(appName);
+
+  // 注册应用目录，用于 schedule 自动推断 appName
+  registerAppDir(appName, mainDir);
 
   try {
     const moduleApp: {
@@ -63,6 +67,10 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     const unMounted = async e => {
       showErrorModule(e);
+      // 卸载时自动清理该应用的所有定时任务
+      scheduleCancelByApp(appName);
+      // 注销应用目录映射
+      unregisterAppDir(appName);
       // 卸载
       App.un();
       try {
