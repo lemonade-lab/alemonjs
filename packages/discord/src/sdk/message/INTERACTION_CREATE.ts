@@ -84,8 +84,10 @@ interface Channel {
 
 interface Data {
   id: number;
-  custom_id: string;
-  component_type: number;
+  custom_id?: string;
+  component_type?: number;
+  type?: number;
+  name?: string;
 }
 
 type Public = {

@@ -1647,7 +1647,7 @@ export class DCAPI {
   }
 
   /**
-   *
+   * 交互回调（仅发送者可见）
    */
   interactionsCallback(id: string, token: string, content: string) {
     return this.request({
@@ -1660,6 +1660,253 @@ export class DCAPI {
           flags: 64 // EPHEMERAL（仅发送者可见）
         }
       }
+    });
+  }
+
+  /**
+   * 交互回调（发送消息，所有人可见）
+   */
+  interactionsCallbackMessage(id: string, token: string, messageData: any) {
+    return this.request({
+      method: 'POST',
+      url: `/interactions/${id}/${token}/callback`,
+      data: {
+        type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
+        data: messageData
+      }
+    });
+  }
+
+  /**
+   * 交互回调（发送FormData消息，支持图片附件）
+   */
+  interactionsCallbackForm(id: string, token: string, formData: any) {
+    return this.request({
+      method: 'POST',
+      url: `/interactions/${id}/${token}/callback`,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
+
+  /**
+   * 交互延迟回调（先告知用户正在处理）
+   */
+  interactionsDeferred(id: string, token: string) {
+    return this.request({
+      method: 'POST',
+      url: `/interactions/${id}/${token}/callback`,
+      data: {
+        type: 5 // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+      }
+    });
+  }
+
+  /**
+   * 交互后续消息（用于已回调后追加消息）
+   */
+  interactionsFollowup(application_id: string, token: string, messageData: any) {
+    return this.request({
+      method: 'POST',
+      url: `/webhooks/${application_id}/${token}`,
+      data: messageData
+    });
+  }
+
+  /**
+   * 交互后续消息（FormData，支持图片附件）
+   */
+  interactionsFollowupForm(application_id: string, token: string, formData: any) {
+    return this.request({
+      method: 'POST',
+      url: `/webhooks/${application_id}/${token}`,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
+
+  /**
+   * ************
+   * 应用命令api
+   * ***********
+   */
+
+  /**
+   * *********
+   * 获取全局应用命令列表
+   * *********
+   */
+  getGlobalApplicationCommands(application_id: string, params?: { with_localizations?: boolean }) {
+    return this.request({
+      method: 'GET',
+      url: `/applications/${application_id}/commands`,
+      params
+    });
+  }
+  /**
+   * *********
+   * 创建全局应用命令
+   * *********
+   */
+  createGlobalApplicationCommand(application_id: string, data: any) {
+    return this.request({
+      method: 'POST',
+      url: `/applications/${application_id}/commands`,
+      data
+    });
+  }
+  /**
+   * *********
+   * 获取单个全局应用命令
+   * *********
+   */
+  getGlobalApplicationCommand(application_id: string, command_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/applications/${application_id}/commands/${command_id}`
+    });
+  }
+  /**
+   * *********
+   * 编辑全局应用命令
+   * *********
+   */
+  editGlobalApplicationCommand(application_id: string, command_id: string, data: any) {
+    return this.request({
+      method: 'PATCH',
+      url: `/applications/${application_id}/commands/${command_id}`,
+      data
+    });
+  }
+  /**
+   * *********
+   * 删除全局应用命令
+   * *********
+   */
+  deleteGlobalApplicationCommand(application_id: string, command_id: string) {
+    return this.request({
+      method: 'DELETE',
+      url: `/applications/${application_id}/commands/${command_id}`
+    });
+  }
+  /**
+   * *********
+   * 批量覆盖全局应用命令
+   * *********
+   */
+  bulkOverwriteGlobalApplicationCommands(application_id: string, data: any[]) {
+    return this.request({
+      method: 'PUT',
+      url: `/applications/${application_id}/commands`,
+      data
+    });
+  }
+  /**
+   * *********
+   * 获取公会应用命令列表
+   * *********
+   */
+  getGuildApplicationCommands(application_id: string, guild_id: string, params?: { with_localizations?: boolean }) {
+    return this.request({
+      method: 'GET',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands`,
+      params
+    });
+  }
+  /**
+   * *********
+   * 创建公会应用命令
+   * *********
+   */
+  createGuildApplicationCommand(application_id: string, guild_id: string, data: any) {
+    return this.request({
+      method: 'POST',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands`,
+      data
+    });
+  }
+  /**
+   * *********
+   * 获取单个公会应用命令
+   * *********
+   */
+  getGuildApplicationCommand(application_id: string, guild_id: string, command_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands/${command_id}`
+    });
+  }
+  /**
+   * *********
+   * 编辑公会应用命令
+   * *********
+   */
+  editGuildApplicationCommand(application_id: string, guild_id: string, command_id: string, data: any) {
+    return this.request({
+      method: 'PATCH',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands/${command_id}`,
+      data
+    });
+  }
+  /**
+   * *********
+   * 删除公会应用命令
+   * *********
+   */
+  deleteGuildApplicationCommand(application_id: string, guild_id: string, command_id: string) {
+    return this.request({
+      method: 'DELETE',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands/${command_id}`
+    });
+  }
+  /**
+   * *********
+   * 批量覆盖公会应用命令
+   * *********
+   */
+  bulkOverwriteGuildApplicationCommands(application_id: string, guild_id: string, data: any[]) {
+    return this.request({
+      method: 'PUT',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands`,
+      data
+    });
+  }
+  /**
+   * *********
+   * 获取公会应用命令权限列表
+   * *********
+   */
+  getGuildApplicationCommandPermissions(application_id: string, guild_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands/permissions`
+    });
+  }
+  /**
+   * *********
+   * 获取应用命令权限
+   * *********
+   */
+  getApplicationCommandPermissions(application_id: string, guild_id: string, command_id: string) {
+    return this.request({
+      method: 'GET',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands/${command_id}/permissions`
+    });
+  }
+  /**
+   * *********
+   * 编辑应用命令权限
+   * *********
+   */
+  editApplicationCommandPermissions(application_id: string, guild_id: string, command_id: string, data: any) {
+    return this.request({
+      method: 'PUT',
+      url: `/applications/${application_id}/guilds/${guild_id}/commands/${command_id}/permissions`,
+      data
     });
   }
 }

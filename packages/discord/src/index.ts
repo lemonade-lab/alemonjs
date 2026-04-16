@@ -117,7 +117,8 @@ const main = () => {
     const UserAvatar = createUserAvatar(UserId, user.avatar);
     const UserName = user.username;
     const [isMaster, UserKey] = getMaster(UserId);
-    const MessageText = event.data.custom_id;
+    const isCustom = !!event.data?.custom_id;
+    const MessageText = isCustom ? event?.data?.custom_id : `/${event.data?.name}`;
 
     if (isPrivate) {
       // 处理消息
@@ -144,7 +145,7 @@ const main = () => {
       );
     }
 
-    void client.interactionsCallback(event.id, event.token, MessageText);
+    void client.interactionsCallback(event.id, event.token, '正在处理您的请求...');
   });
 
   // 消息更新
