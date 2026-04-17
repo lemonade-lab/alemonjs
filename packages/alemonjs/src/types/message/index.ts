@@ -8,6 +8,9 @@ import { DataAttachment } from './attachment';
 import { DataAudio } from './audio';
 import { DataVideo } from './video';
 import { DataMarkdownOriginal } from './markdown-raw';
+import { DataSelect } from './select';
+import { DataModal, DataTextInput } from './modal';
+import { DataEmbed } from './embed';
 
 // text
 export * from './text';
@@ -38,6 +41,15 @@ export * from './audio';
 // video
 export * from './video';
 
+// select
+export * from './select';
+
+// modal
+export * from './modal';
+
+// embed
+export * from './embed';
+
 // enums
 export type DataEnums =
   | DataText
@@ -51,7 +63,11 @@ export type DataEnums =
   | DataMarkdownOriginal
   | DataAttachment
   | DataAudio
-  | DataVideo;
+  | DataVideo
+  | DataSelect
+  | DataModal
+  | DataTextInput
+  | DataEmbed;
 
 // 消息数据格式
 export type MessageDataFormat = DataEnums[];

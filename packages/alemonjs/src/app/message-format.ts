@@ -1,8 +1,39 @@
-import { DataButtonRow, DataButtonGroup, DataButton, DataMarkDown, DataEnums } from '../types';
-
-import { Text, Image, Link, ImageFile, ImageURL, Mention, BT, MD, MarkdownOriginal, Attachment, Audio, Video } from './message-format-old.js';
-
-export * from './message-format-old.js';
+import {
+  DataMention,
+  DataText,
+  DataImageURL,
+  DataImageFile,
+  DataButtonRow,
+  DataButtonGroup,
+  DataButton,
+  DataMarkDown,
+  DataMarkdownTitle,
+  DataMarkdownSubtitle,
+  DataMarkdownBold,
+  DataMarkdownItalic,
+  DataMarkdownItalicStar,
+  DataMarkdownStrikethrough,
+  DataMarkdownLink,
+  DataMarkdownImage,
+  DataMarkdownList,
+  DataMarkdownBlockquote,
+  DataMarkdownDivider,
+  DataMarkdownNewline,
+  DataLink,
+  DataMarkdownText,
+  DataMarkdownCode,
+  DataMarkdownOriginal,
+  DataAttachment,
+  DataMarkdownMention,
+  DataMarkdownContent,
+  DataMarkdownButton,
+  DataEnums,
+  DataSelect,
+  DataSelectOption,
+  DataModal,
+  DataTextInput,
+  DataEmbed
+} from '../types';
 
 export class FormatButtonGroup {
   #rows: DataButtonRow[] = [];
@@ -14,7 +45,10 @@ export class FormatButtonGroup {
   get value(): DataButtonGroup {
     this.#flush();
 
-    return BT.group(...this.#rows);
+    return {
+      type: 'BT.group',
+      value: this.#rows
+    };
   }
 
   /**
@@ -22,7 +56,10 @@ export class FormatButtonGroup {
    */
   #flush(): void {
     if (this.#currentRow && this.#currentRow.length > 0) {
-      this.#rows.push(BT.row(...this.#currentRow));
+      this.#rows.push({
+        type: 'BT.row',
+        value: this.#currentRow
+      });
       this.#currentRow = null;
     }
   }
@@ -57,12 +94,19 @@ export class FormatButtonGroup {
   /**
    * 添加一个按钮到当前行，若无行则自动创建
    */
-  addButton(...args: Parameters<typeof BT>): this {
+  addButton(title: string, data: DataButton['options']['data'], options?: Omit<DataButton['options'], 'data'>): this {
+    // 如果没有当前行，则自动创建
     if (!this.#currentRow) {
       this.#currentRow = [];
     }
-
-    this.#currentRow.push(BT(...args));
+    this.#currentRow.push({
+      type: 'Button',
+      value: title,
+      options: {
+        data,
+        ...options
+      }
+    });
 
     return this;
   }
@@ -85,7 +129,10 @@ export class FormatMarkDown {
    * 获取 Markdown 数据
    */
   get value(): DataMarkDown {
-    return MD(...this.#data);
+    return {
+      type: 'Markdown',
+      value: this.#data
+    };
   }
 
   /**
@@ -102,8 +149,11 @@ export class FormatMarkDown {
   /**
    * 添加原始文本
    */
-  addContent(...args: Parameters<typeof MD.content>): this {
-    this.#data.push(MD.content(...args));
+  addContent(text: string): this {
+    this.#data.push({
+      type: 'MD.content',
+      value: text
+    } as DataMarkdownContent);
 
     return this;
   }
@@ -111,8 +161,11 @@ export class FormatMarkDown {
   /**
    * 添加文本
    */
-  addText(...args: Parameters<typeof MD.text>): this {
-    this.#data.push(MD.text(...args));
+  addText(text: string): this {
+    this.#data.push({
+      type: 'MD.text',
+      value: text
+    } as DataMarkdownText);
 
     return this;
   }
@@ -120,8 +173,11 @@ export class FormatMarkDown {
   /**
    * 添加标题
    */
-  addTitle(...args: Parameters<typeof MD.title>): this {
-    this.#data.push(MD.title(...args));
+  addTitle(text: string): this {
+    this.#data.push({
+      type: 'MD.title',
+      value: text
+    } as DataMarkdownTitle);
 
     return this;
   }
@@ -129,8 +185,11 @@ export class FormatMarkDown {
   /**
    * 添加副标题
    */
-  addSubtitle(...args: Parameters<typeof MD.subtitle>): this {
-    this.#data.push(MD.subtitle(...args));
+  addSubtitle(text: string): this {
+    this.#data.push({
+      type: 'MD.subtitle',
+      value: text
+    } as DataMarkdownSubtitle);
 
     return this;
   }
@@ -138,8 +197,11 @@ export class FormatMarkDown {
   /**
    * 添加粗体
    */
-  addBold(...args: Parameters<typeof MD.bold>): this {
-    this.#data.push(MD.bold(...args));
+  addBold(text: string): this {
+    this.#data.push({
+      type: 'MD.bold',
+      value: text
+    } as DataMarkdownBold);
 
     return this;
   }
@@ -147,8 +209,11 @@ export class FormatMarkDown {
   /**
    * 添加斜体
    */
-  addItalic(...args: Parameters<typeof MD.italic>): this {
-    this.#data.push(MD.italic(...args));
+  addItalic(text: string): this {
+    this.#data.push({
+      type: 'MD.italic',
+      value: text
+    } as DataMarkdownItalic);
 
     return this;
   }
@@ -156,8 +221,11 @@ export class FormatMarkDown {
   /**
    * 添加斜体（星号）
    */
-  addItalicStar(...args: Parameters<typeof MD.italicStar>): this {
-    this.#data.push(MD.italicStar(...args));
+  addItalicStar(text: string): this {
+    this.#data.push({
+      type: 'MD.italicStar',
+      value: text
+    } as DataMarkdownItalicStar);
 
     return this;
   }
@@ -165,8 +233,11 @@ export class FormatMarkDown {
   /**
    * 添加删除线
    */
-  addStrikethrough(...args: Parameters<typeof MD.strikethrough>): this {
-    this.#data.push(MD.strikethrough(...args));
+  addStrikethrough(text: string): this {
+    this.#data.push({
+      type: 'MD.strikethrough',
+      value: text
+    } as DataMarkdownStrikethrough);
 
     return this;
   }
@@ -174,8 +245,11 @@ export class FormatMarkDown {
   /**
    * 添加链接
    */
-  addLink(...args: Parameters<typeof MD.link>): this {
-    this.#data.push(MD.link(...args));
+  addLink(text: string, url?: string): this {
+    this.#data.push({
+      type: 'MD.link',
+      value: { text, url }
+    } as DataMarkdownLink);
 
     return this;
   }
@@ -183,8 +257,12 @@ export class FormatMarkDown {
   /**
    * 添加图片
    */
-  addImage(...args: Parameters<typeof MD.image>): this {
-    this.#data.push(MD.image(...args));
+  addImage(url: string, options?: { width?: number; height?: number }): this {
+    this.#data.push({
+      type: 'MD.image',
+      value: url,
+      options
+    } as DataMarkdownImage);
 
     return this;
   }
@@ -192,8 +270,11 @@ export class FormatMarkDown {
   /**
    * 添加列表
    */
-  addList(...args: Parameters<typeof MD.list>): this {
-    this.#data.push(MD.list(...args));
+  addList(...items: any[]): this {
+    this.#data.push({
+      type: 'MD.list',
+      value: items
+    } as DataMarkdownList);
 
     return this;
   }
@@ -201,8 +282,11 @@ export class FormatMarkDown {
   /**
    * 添加引用
    */
-  addBlockquote(...args: Parameters<typeof MD.blockquote>): this {
-    this.#data.push(MD.blockquote(...args));
+  addBlockquote(text: string): this {
+    this.#data.push({
+      type: 'MD.blockquote',
+      value: text
+    } as DataMarkdownBlockquote);
 
     return this;
   }
@@ -211,7 +295,9 @@ export class FormatMarkDown {
    * 添加分割线
    */
   addDivider(): this {
-    this.#data.push(MD.divider());
+    this.#data.push({
+      type: 'MD.divider'
+    } as DataMarkdownDivider);
 
     return this;
   }
@@ -219,8 +305,11 @@ export class FormatMarkDown {
   /**
    * 添加换行
    */
-  addNewline(...args: Parameters<typeof MD.newline>): this {
-    this.#data.push(MD.newline(...args));
+  addNewline(value = false): this {
+    this.#data.push({
+      type: 'MD.newline',
+      value
+    } as DataMarkdownNewline);
 
     return this;
   }
@@ -228,8 +317,12 @@ export class FormatMarkDown {
   /**
    * 添加代码
    */
-  addCode(...args: Parameters<typeof MD.code>): this {
-    this.#data.push(MD.code(...args));
+  addCode(value: DataMarkdownCode['value'], options?: DataMarkdownCode['options']): this {
+    this.#data.push({
+      type: 'MD.code',
+      value,
+      options
+    } as DataMarkdownCode);
 
     return this;
   }
@@ -238,19 +331,25 @@ export class FormatMarkDown {
    * 换行
    */
   addBreak(): this {
-    this.#data.push(MD.newline());
+    return this.addNewline();
+  }
+
+  addMention(uid?: string, options?: DataMarkdownMention['options']): this {
+    this.#data.push({
+      type: 'MD.mention',
+      value: uid || 'everyone',
+      options: options ?? { belong: 'user' }
+    } as DataMarkdownMention);
 
     return this;
   }
 
-  addMention(...args: Parameters<typeof MD.mention>): this {
-    this.#data.push(MD.mention(...args));
-
-    return this;
-  }
-
-  addButton(...args: Parameters<typeof MD.button>): this {
-    this.#data.push(MD.button(...args));
+  addButton(title: string, data: DataMarkdownButton['options']): this {
+    this.#data.push({
+      type: 'MD.button',
+      value: title,
+      options: data
+    } as DataMarkdownButton);
 
     return this;
   }
@@ -260,6 +359,118 @@ export class FormatMarkDown {
    */
   clear(): this {
     this.#data = [];
+
+    return this;
+  }
+}
+
+/**
+ * Select 构建器（选项组）
+ */
+export class FormatSelect {
+  #options: DataSelectOption[] = [];
+  #meta: DataSelect['options'] = {};
+
+  get value(): DataSelect {
+    return {
+      type: 'Select',
+      value: this.#options,
+      options: this.#meta
+    };
+  }
+
+  setCustomId(customId: string): this {
+    this.#meta.customId = customId;
+
+    return this;
+  }
+
+  setPlaceholder(placeholder: string): this {
+    this.#meta.placeholder = placeholder;
+
+    return this;
+  }
+
+  setRange(min?: number, max?: number): this {
+    if (min !== undefined) {
+      this.#meta.minValues = min;
+    }
+    if (max !== undefined) {
+      this.#meta.maxValues = max;
+    }
+
+    return this;
+  }
+
+  setKind(kind: DataSelect['options']['kind']): this {
+    this.#meta.kind = kind;
+
+    return this;
+  }
+
+  setDisabled(disabled = true): this {
+    this.#meta.disabled = disabled;
+
+    return this;
+  }
+
+  addOption(label: string, value: string, extra?: Omit<DataSelectOption, 'label' | 'value'>): this {
+    this.#options.push({ label, value, ...extra });
+
+    return this;
+  }
+
+  clear(): this {
+    this.#options = [];
+    this.#meta = {};
+
+    return this;
+  }
+}
+
+/**
+ * Modal（弹窗表单）构建器
+ */
+export class FormatModal {
+  #inputs: DataTextInput[] = [];
+  #meta: DataModal['options'] = { customId: '', title: '' };
+
+  get value(): DataModal {
+    return {
+      type: 'Modal',
+      value: this.#inputs,
+      options: this.#meta
+    };
+  }
+
+  setCustomId(customId: string): this {
+    this.#meta.customId = customId;
+
+    return this;
+  }
+
+  setTitle(title: string): this {
+    this.#meta.title = title;
+
+    return this;
+  }
+
+  /**
+   * 添加输入框
+   */
+  addInput(label: string, options: DataTextInput['options']): this {
+    this.#inputs.push({
+      type: 'TextInput',
+      value: label,
+      options
+    });
+
+    return this;
+  }
+
+  clear(): this {
+    this.#inputs = [];
+    this.#meta = { customId: '', title: '' };
 
     return this;
   }
@@ -300,6 +511,20 @@ export class Format {
   }
 
   /**
+   * 创建一个新的 Select 实例
+   */
+  static createSelect() {
+    return new FormatSelect();
+  }
+
+  /**
+   * 创建一个新的 Modal 实例
+   */
+  static createModal() {
+    return new FormatModal();
+  }
+
+  /**
    * 获取内部格式化数据
    */
   get value(): DataEnums[] {
@@ -315,8 +540,12 @@ export class Format {
   /**
    * 添加文本
    */
-  addText(...args: Parameters<typeof Text>) {
-    this.#data.push(Text(...args));
+  addText(val: DataText['value'], options?: DataText['options']): this {
+    this.#data.push({
+      type: 'Text',
+      value: val,
+      options
+    });
 
     return this;
   }
@@ -324,8 +553,11 @@ export class Format {
   /**
    * 添加图片 (Buffer 或带协议字符串)
    */
-  addImage(...args: Parameters<typeof Image>) {
-    this.#data.push(Image(...args));
+  addImage(val: Buffer | string): this {
+    this.#data.push({
+      type: 'Image',
+      value: typeof val === 'string' ? val : `base64://${val.toString('base64')}`
+    });
 
     return this;
   }
@@ -333,8 +565,12 @@ export class Format {
   /**
    * 添加提及
    */
-  addMention(...args: Parameters<typeof Mention>) {
-    this.#data.push(Mention(...args));
+  addMention(UserId?: DataMention['value'], options?: DataMention['options']): this {
+    this.#data.push({
+      type: 'Mention',
+      value: UserId,
+      options: options ?? { belong: 'user' }
+    });
 
     return this;
   }
@@ -343,12 +579,15 @@ export class Format {
    * 添加按钮组
    */
   addButtonGroup(bt: FormatButtonGroup): this;
-  addButtonGroup(...args: Parameters<typeof BT.group>): this;
-  addButtonGroup(...args: [FormatButtonGroup] | Parameters<typeof BT.group>) {
+  addButtonGroup(...rows: DataButtonRow[]): this;
+  addButtonGroup(...args: [FormatButtonGroup] | DataButtonRow[]): this {
     if (args[0] instanceof FormatButtonGroup) {
       this.#data.push(args[0].value);
     } else {
-      this.#data.push(BT.group(...(args as DataButtonRow[])));
+      this.#data.push({
+        type: 'BT.group',
+        value: args as DataButtonRow[]
+      });
     }
 
     return this;
@@ -358,12 +597,15 @@ export class Format {
    * 添加结构化 Markdown
    */
   addMarkdown(md: FormatMarkDown): this;
-  addMarkdown(...args: Parameters<typeof MD>): this;
-  addMarkdown(...args: [FormatMarkDown] | Parameters<typeof MD>) {
+  addMarkdown(...values: DataMarkDown['value']): this;
+  addMarkdown(...args: [FormatMarkDown] | DataMarkDown['value']): this {
     if (args[0] instanceof FormatMarkDown) {
       this.#data.push(args[0].value);
     } else {
-      this.#data.push(MD(...(args as DataMarkDown['value'])));
+      this.#data.push({
+        type: 'Markdown',
+        value: args as DataMarkDown['value']
+      });
     }
 
     return this;
@@ -372,8 +614,11 @@ export class Format {
   /**
    * 添加纯 Markdown 文本
    */
-  addMarkdownOriginal(...args: Parameters<typeof MarkdownOriginal>) {
-    this.#data.push(MarkdownOriginal(...args));
+  addMarkdownOriginal(val: string): this {
+    this.#data.push({
+      type: 'MarkdownOriginal',
+      value: val
+    } as DataMarkdownOriginal);
 
     return this;
   }
@@ -381,8 +626,12 @@ export class Format {
   /**
    * 添加附件
    */
-  addAttachment(...args: Parameters<typeof Attachment>) {
-    this.#data.push(Attachment(...args));
+  addAttachment(val: string, options?: DataAttachment['options']): this {
+    this.#data.push({
+      type: 'Attachment',
+      value: val,
+      options
+    });
 
     return this;
   }
@@ -390,8 +639,11 @@ export class Format {
   /**
    * 添加音频
    */
-  addAudio(...args: Parameters<typeof Audio>) {
-    this.#data.push(Audio(...args));
+  addAudio(val: string): this {
+    this.#data.push({
+      type: 'Audio',
+      value: val
+    });
 
     return this;
   }
@@ -399,8 +651,11 @@ export class Format {
   /**
    * 添加视频
    */
-  addVideo(...args: Parameters<typeof Video>) {
-    this.#data.push(Video(...args));
+  addVideo(val: string): this {
+    this.#data.push({
+      type: 'Video',
+      value: val
+    });
 
     return this;
   }
@@ -409,8 +664,12 @@ export class Format {
    * 添加链接
    * @deprecated 废弃，这个应该是md语法里的
    */
-  addLink(...args: Parameters<typeof Link>) {
-    this.#data.push(Link(...args));
+  addLink(val: DataLink['value'], options?: DataText['options']): this {
+    this.#data.push({
+      type: 'Text',
+      value: val,
+      options
+    });
 
     return this;
   }
@@ -419,8 +678,11 @@ export class Format {
    * 添加图片文件
    * @deprecated 废弃，推荐使用 addImage
    */
-  addImageFile(...args: Parameters<typeof ImageFile>) {
-    this.#data.push(ImageFile(...args));
+  addImageFile(val: DataImageFile['value']): this {
+    this.#data.push({
+      type: 'ImageFile',
+      value: val
+    });
 
     return this;
   }
@@ -429,8 +691,61 @@ export class Format {
    * 添加图片链接
    * @deprecated 废弃，推荐使用 addImage
    */
-  addImageURL(...args: Parameters<typeof ImageURL>) {
-    this.#data.push(ImageURL(...args));
+  addImageURL(val: DataImageURL['value']): this {
+    this.#data.push({
+      type: 'ImageURL',
+      value: val
+    });
+
+    return this;
+  }
+
+  /**
+   * 添加下拉选择组件
+   */
+  addSelect(select: FormatSelect): this;
+  addSelect(options: DataSelectOption[], meta?: DataSelect['options']): this;
+  addSelect(...args: [FormatSelect] | [DataSelectOption[], DataSelect['options']?]): this {
+    if (args[0] instanceof FormatSelect) {
+      this.#data.push(args[0].value);
+    } else {
+      this.#data.push({
+        type: 'Select',
+        value: args[0],
+        options: (args[1] ?? {}) as DataSelect['options']
+      });
+    }
+
+    return this;
+  }
+
+  /**
+   * 添加弹窗表单
+   */
+  addModal(modal: FormatModal): this;
+  addModal(inputs: DataTextInput[], meta: DataModal['options']): this;
+  addModal(...args: [FormatModal] | [DataTextInput[], DataModal['options']]): this {
+    if (args[0] instanceof FormatModal) {
+      this.#data.push(args[0].value);
+    } else {
+      this.#data.push({
+        type: 'Modal',
+        value: args[0],
+        options: args[1] as DataModal['options']
+      });
+    }
+
+    return this;
+  }
+
+  /**
+   * 添加富媒体卡片
+   */
+  addEmbed(embed: DataEmbed['value']): this {
+    this.#data.push({
+      type: 'Embed',
+      value: embed
+    });
 
     return this;
   }
@@ -438,7 +753,7 @@ export class Format {
   /**
    * 清空
    */
-  clear() {
+  clear(): this {
     this.#data = [];
 
     return this;
