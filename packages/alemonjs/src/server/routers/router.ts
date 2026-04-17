@@ -5,8 +5,8 @@ import mime from 'mime-types';
 import hello from './hello.html';
 import { formatPath, getModuelFile, safePath, isValidPackageName } from './utils';
 import { collectMiddlewares, runMiddlewares } from './middleware';
-import { ResultCode } from 'core';
 import module from 'module';
+import { ResultCode } from '../../core';
 
 const initRequire = () => {};
 

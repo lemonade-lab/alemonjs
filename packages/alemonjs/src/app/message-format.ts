@@ -35,6 +35,8 @@ import {
   DataEmbed
 } from '../types';
 
+export * from './message-format-old.js';
+
 export class FormatButtonGroup {
   #rows: DataButtonRow[] = [];
   #currentRow: DataButton[] | null = null;
