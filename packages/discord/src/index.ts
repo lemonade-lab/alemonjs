@@ -117,8 +117,11 @@ const main = () => {
     const UserAvatar = createUserAvatar(UserId, user.avatar);
     const UserName = user.username;
     const [isMaster, UserKey] = getMaster(UserId);
+
     const isCustom = !!event.data?.custom_id;
-    const MessageText = isCustom ? event?.data?.custom_id : `/${event.data?.name}`;
+    const customId = isCustom ? event.data.custom_id : '';
+    const notAutoConfirmation = isCustom ? /^autoConfirmation:/.test(customId) : false;
+    const currentMessageText = notAutoConfirmation ? customId.replace(/^autoConfirmation:/, '') : customId;
 
     if (isPrivate) {
       // 处理消息
@@ -127,7 +130,7 @@ const main = () => {
           .addPlatform({ Platform: platform, value: event, BotId: botId })
           .addUser({ UserId, UserKey, UserName: UserName, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
           .addMessage({ MessageId: event.id })
-          .addText({ MessageText: MessageText })
+          .addText({ MessageText: currentMessageText })
           .addOpen({ OpenId: UserId })
           .add({ tag: 'private.interaction.create' }).value
       );
@@ -139,13 +142,16 @@ const main = () => {
           .addChannel({ ChannelId: event.channel_id })
           .addUser({ UserId, UserKey, UserName: UserName, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
           .addMessage({ MessageId: event.id })
-          .addText({ MessageText: MessageText })
+          .addText({ MessageText: currentMessageText })
           .addOpen({ OpenId: UserId })
           .add({ tag: 'interaction.create' }).value
       );
     }
 
-    void client.interactionsCallback(event.id, event.token, '正在处理您的请求...');
+    // 不是 非自动确认，则自动发起确认
+    if (!notAutoConfirmation) {
+      void client.interactionsCallbackEphemeral(event.id, event.token, '正在处理...');
+    }
   });
 
   // 消息更新

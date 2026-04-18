@@ -714,7 +714,7 @@ export class Format {
       this.#data.push({
         type: 'Select',
         value: args[0],
-        options: (args[1] ?? {}) as DataSelect['options']
+        options: args[1] ?? {}
       });
     }
 
@@ -733,7 +733,7 @@ export class Format {
       this.#data.push({
         type: 'Modal',
         value: args[0],
-        options: args[1] as DataModal['options']
+        options: args[1]
       });
     }
 

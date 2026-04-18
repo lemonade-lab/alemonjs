@@ -17,7 +17,8 @@ const createButtonsData = (rows: DataButtonRow[]) =>
     type: 1,
     components: row.value.map(button => ({
       type: 2,
-      custom_id: button.options?.data ?? '',
+      // 在 标注仅 onlyInteraction 的时候插入前缀。
+      custom_id: button.options?.notAutoConfirmation ? `notAutoConfirmation:${button.options.data}` : button.options?.data,
       style: 1,
       label: button.value
     }))

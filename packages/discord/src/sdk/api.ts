@@ -1647,16 +1647,48 @@ export class DCAPI {
   }
 
   /**
+   * @param id
+   * @param token
+   * @param data
+   * @returns
+   */
+  interactionsCallback(
+    id: string,
+    token: string,
+    data: {
+      type: number;
+      data: any;
+    }
+  ) {
+    // return this.request({
+    //   method: 'POST',
+    //   url: `/interactions/${id}/${token}/callback`,
+    //   data: {
+    //     type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
+    //     data: {
+    //       content: content,
+    //       flags: 64 // EPHEMERAL（仅发送者可见）
+    //     }
+    //   }
+    // });
+    return this.request({
+      method: 'POST',
+      url: `/interactions/${id}/${token}/callback`,
+      data
+    });
+  }
+
+  /**
    * 交互回调（仅发送者可见）
    */
-  interactionsCallback(id: string, token: string, content: string) {
+  interactionsCallbackEphemeral(id: string, token: string, content: string) {
     return this.request({
       method: 'POST',
       url: `/interactions/${id}/${token}/callback`,
       data: {
         type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
         data: {
-          content: content,
+          content,
           flags: 64 // EPHEMERAL（仅发送者可见）
         }
       }
@@ -1700,6 +1732,21 @@ export class DCAPI {
       url: `/interactions/${id}/${token}/callback`,
       data: {
         type: 5 // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+      }
+    });
+  }
+
+  /**
+   * 交互回调（弹出 Modal）
+   * modalData: { custom_id, title, components: [...] }
+   */
+  interactionsCallbackModal(id: string, token: string, modalData: any) {
+    return this.request({
+      method: 'POST',
+      url: `/interactions/${id}/${token}/callback`,
+      data: {
+        type: 9, // MODAL
+        data: modalData
       }
     });
   }
