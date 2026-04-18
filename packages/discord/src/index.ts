@@ -120,8 +120,8 @@ const main = () => {
 
     const isCustom = !!event.data?.custom_id;
     const customId = isCustom ? event.data.custom_id : '';
-    const notAutoConfirmation = isCustom ? /^autoConfirmation:/.test(customId) : false;
-    const currentMessageText = notAutoConfirmation ? customId.replace(/^autoConfirmation:/, '') : customId;
+    const notAutoConfirmation = isCustom ? /^notAutoConfirmation:/.test(customId) : false;
+    const currentMessageText = notAutoConfirmation ? customId.replace(/^notAutoConfirmation:/, '') : customId;
 
     if (isPrivate) {
       // 处理消息
