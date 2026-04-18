@@ -3,13 +3,13 @@ export type DataButton = {
   // 显示的文字
   value: string;
   options?: {
-    // 禁止提示
+    // 禁用时提示
     toolTip?: string;
     // 自动回车
     autoEnter?: boolean;
     // 数据
     data?: string;
-    // isLink?: boolean
+    // 按钮类型，默认 command
     type?: 'command' | 'link' | 'call';
   };
 };

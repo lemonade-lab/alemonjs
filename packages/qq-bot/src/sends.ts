@@ -146,7 +146,11 @@ const mdFormatters: Record<string, (value: any, options?: any) => string> = {
   'MD.content': value => `${value}`,
   'MD.button': (title, options) => {
     // 得到要发送的文本
-    const { data } = options || {};
+    const { data, autoEnter } = options || {};
+
+    if (autoEnter) {
+      return `<qqbot-cmd-enter text="${data}" show="${title}" />`;
+    }
 
     return `<qqbot-cmd-input text="${data}" show="${title}" />`;
   }
