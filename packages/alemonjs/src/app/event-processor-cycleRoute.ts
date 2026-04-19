@@ -103,7 +103,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
       const node = nodes[idx - 1];
 
       // 检查平台，不是这个平台的直接跳过。
-      if (node.platform && node.platform !== valueEvent.platform) {
+      if (node.platform && node.platform !== valueEvent.Platform) {
         void nextNode();
 
         return;
