@@ -9,7 +9,6 @@ import { DataAudio } from './audio';
 import { DataVideo } from './video';
 import { DataMarkdownOriginal } from './markdown-raw';
 import { DataSelect } from './select';
-import { DataModal, DataTextInput } from './modal';
 import { DataEmbed } from './embed';
 
 // text
@@ -44,9 +43,6 @@ export * from './video';
 // select
 export * from './select';
 
-// modal
-export * from './modal';
-
 // embed
 export * from './embed';
 
@@ -65,8 +61,6 @@ export type DataEnums =
   | DataAudio
   | DataVideo
   | DataSelect
-  | DataModal
-  | DataTextInput
   | DataEmbed;
 
 // 消息数据格式

@@ -332,7 +332,7 @@ export interface SystemData {
     // 用户进出频道事件
     type: (typeof SystemDataEnum)[number];
     body: // 消息顶置
-    | overheadData
+      | overheadData
       // 成员信息
       | memberData
       // 成员信息变更

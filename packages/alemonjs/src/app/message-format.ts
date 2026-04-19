@@ -30,8 +30,6 @@ import {
   DataEnums,
   DataSelect,
   DataSelectOption,
-  DataModal,
-  DataTextInput,
   DataEmbed
 } from '../types';
 
@@ -431,54 +429,6 @@ export class FormatSelect {
 }
 
 /**
- * Modal（弹窗表单）构建器
- */
-export class FormatModal {
-  #inputs: DataTextInput[] = [];
-  #meta: DataModal['options'] = { customId: '', title: '' };
-
-  get value(): DataModal {
-    return {
-      type: 'Modal',
-      value: this.#inputs,
-      options: this.#meta
-    };
-  }
-
-  setCustomId(customId: string): this {
-    this.#meta.customId = customId;
-
-    return this;
-  }
-
-  setTitle(title: string): this {
-    this.#meta.title = title;
-
-    return this;
-  }
-
-  /**
-   * 添加输入框
-   */
-  addInput(label: string, options: DataTextInput['options']): this {
-    this.#inputs.push({
-      type: 'TextInput',
-      value: label,
-      options
-    });
-
-    return this;
-  }
-
-  clear(): this {
-    this.#inputs = [];
-    this.#meta = { customId: '', title: '' };
-
-    return this;
-  }
-}
-
-/**
  * 消息格式化构建器
  *
  * @example
@@ -517,13 +467,6 @@ export class Format {
    */
   static createSelect() {
     return new FormatSelect();
-  }
-
-  /**
-   * 创建一个新的 Modal 实例
-   */
-  static createModal() {
-    return new FormatModal();
   }
 
   /**
@@ -715,25 +658,6 @@ export class Format {
         type: 'Select',
         value: args[0],
         options: args[1] ?? {}
-      });
-    }
-
-    return this;
-  }
-
-  /**
-   * 添加弹窗表单
-   */
-  addModal(modal: FormatModal): this;
-  addModal(inputs: DataTextInput[], meta: DataModal['options']): this;
-  addModal(...args: [FormatModal] | [DataTextInput[], DataModal['options']]): this {
-    if (args[0] instanceof FormatModal) {
-      this.#data.push(args[0].value);
-    } else {
-      this.#data.push({
-        type: 'Modal',
-        value: args[0],
-        options: args[1]
       });
     }
 

@@ -18,7 +18,7 @@ const createButtonsData = (rows: DataButtonRow[]) =>
     components: row.value.map(button => ({
       type: 2,
       // 在 标注仅 onlyInteraction 的时候插入前缀。
-      custom_id: button.options?.notAutoConfirmation ? `notAutoConfirmation:${button.options.data}` : button.options?.data ?? '',
+      custom_id: button.options?.notAutoConfirmation ? `notAutoConfirmation:${button.options.data}` : (button.options?.data ?? ''),
       style: 1,
       label: button.value
     }))
@@ -162,9 +162,6 @@ export const sendchannel = async (client: Client, param: { channel_id: string },
           break;
         case 'Embed':
           embeds.push(item);
-          break;
-        case 'Modal':
-          logger.warn('[discord] Modal 必须通过 interaction callback 发送，channelsMessages 流程已跳过');
           break;
         case 'Markdown':
           mdParts.push(markdownToDiscordText(item.value as any, hide));
