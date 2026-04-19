@@ -213,7 +213,23 @@ export const sendchannel = async (client: Client, param: { channel_id: string },
     // 构造 embeds
     const embedData = embeds.length > 0 ? embeds.map(createEmbedData) : undefined;
 
-    // 发送图片
+    const hasComponents = components.length > 0;
+    const hasEmbeds = !!embedData;
+
+    // 构造基础 payload（content + components + embeds 可同时存在）
+    const payload: any = {};
+
+    if (finalContent) {
+      payload.content = finalContent;
+    }
+    if (hasComponents) {
+      payload.components = components;
+    }
+    if (hasEmbeds) {
+      payload.embeds = embedData;
+    }
+
+    // 发送图片（multipart）：图片 + content/components/embeds 可共存
     if (images.length > 0) {
       let bufferData: Buffer | null = null;
 
@@ -223,31 +239,25 @@ export const sendchannel = async (client: Client, param: { channel_id: string },
           break;
         }
       }
-      const payload: any = { content: finalContent };
 
-      if (components.length > 0) {
-        payload.components = components;
+      // 图片以附件形式发送；若存在 embeds 且未显式指定 image.url，则让第一个 embed 引用该附件
+      if (bufferData && hasEmbeds) {
+        payload.attachments = [{ id: 0, filename: 'image.png' }];
+        const firstEmbed = payload.embeds[0];
+
+        if (firstEmbed && !firstEmbed.image) {
+          firstEmbed.image = { url: 'attachment://image.png' };
+        }
       }
-      if (embedData) {
-        payload.embeds = embedData;
-      }
-      const res = await client.channelsMessagesForm(channelId, payload, bufferData);
+
+      const res = await client.channelsMessagesForm(channelId, payload, bufferData ?? undefined);
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }
 
-    // 发送带组件/嵌入或纯文本
-    if (components.length > 0 || embedData || finalContent) {
-      const payload: any = { content: finalContent };
-
-      if (components.length > 0) {
-        payload.components = components;
-      }
-      if (embedData) {
-        payload.embeds = embedData;
-      }
-      const res =
-        components.length > 0 || embedData ? await client.channelsMessages(channelId, payload) : await client.channelsMessagesForm(channelId, payload);
+    // 无图片：走 JSON 端点
+    if (hasComponents || hasEmbeds || finalContent) {
+      const res = await client.channelsMessages(channelId, payload);
 
       return [createResult(ResultCode.Ok, '完成', res)];
     }

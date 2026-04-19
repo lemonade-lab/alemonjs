@@ -119,9 +119,10 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
 
     const isCustom = !!event.data?.custom_id;
-    const customId = isCustom ? event.data.custom_id : '';
-    const notAutoConfirmation = isCustom ? /^notAutoConfirmation:/.test(customId) : false;
-    const currentMessageText = notAutoConfirmation ? customId.replace(/^notAutoConfirmation:/, '') : customId;
+    const isName = !!event.data?.name;
+    const command = isCustom ? event.data.custom_id : isName ? `/${event.data.name}` : '';
+    const notAutoConfirmation = isCustom ? /^notAutoConfirmation:/.test(command) : false;
+    const currentMessageText = notAutoConfirmation ? command.replace(/^notAutoConfirmation:/, '') : command;
 
     if (isPrivate) {
       // 处理消息

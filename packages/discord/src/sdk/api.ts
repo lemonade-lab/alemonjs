@@ -87,20 +87,19 @@ export class DCAPI {
   async channelsMessagesForm(channel_id: string, param: MessageData = {}, img?: string | Buffer | Readable) {
     const formData = new FormData();
 
-    for (const key in param) {
-      if (param[key]) {
-        formData.append(key, param[key]);
-      }
-    }
+    // Discord multipart 规范：结构化字段统一塞进 payload_json，文件用 files[0]/files[1]...
+    // 否则数组类字段（embeds / components / attachments）会被强转为字符串，导致 4000 Arrays are not supported
     if (img) {
       const from = await createPicFrom(img);
 
       if (from) {
         const { picData, name } = from;
 
-        formData.append('file', picData, name);
+        formData.append('files[0]', picData, name);
       }
     }
+
+    formData.append('payload_json', JSON.stringify(param ?? {}));
 
     return this.request({
       method: 'post',

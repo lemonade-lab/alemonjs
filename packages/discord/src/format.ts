@@ -35,7 +35,7 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
           return Number(hideUnsupported) >= 2 ? v.url : `[${v.text}](${v.url})`;
         }
         case 'MD.image':
-          return `![image](${item.value})`;
+          return `[image](${item.value})`;
         case 'MD.list':
           return (
             item.value
