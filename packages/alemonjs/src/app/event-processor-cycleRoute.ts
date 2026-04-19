@@ -102,6 +102,14 @@ export const createRouteProcessChildren = <T extends EventKeys>(
       }
       const node = nodes[idx - 1];
 
+      // 检查平台，不是这个平台的直接跳过。
+      if (node.platform && node.platform !== valueEvent.platform) {
+        void nextNode();
+
+        return;
+      }
+
+      // selects 匹配（如果有） — O(n) includes，通常 n 很小
       if (node?.selects) {
         const selects = Array.isArray(node.selects) ? node.selects : [node.selects];
 
@@ -144,6 +152,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         }
       }
 
+      // 无 handler，继续下一个节点
       if (!node.handler) {
         void nextNode();
 
