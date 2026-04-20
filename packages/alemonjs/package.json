@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.1.63",
+  "version": "2.1.65",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -43,6 +43,7 @@
     "qrcode": "^1.5.4",
     "uuid": "11.1.0",
     "ws": "^8.18.0",
+    "https-proxy-agent": "^9.0.0",
     "yaml": "^2.5.1"
   },
   "devDependencies": {
