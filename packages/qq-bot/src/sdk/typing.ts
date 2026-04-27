@@ -81,10 +81,6 @@ export interface Options {
    */
   app_id: string;
   /**
-   * 钥匙
-   */
-  token: string;
-  /**
    * 密钥
    */
   secret: string;
@@ -123,6 +119,12 @@ export interface Options {
    * WebSocket 网关地址
    */
   gatewayURL?: string;
+  /**
+   * API 基础地址
+   */
   base_url_gateway?: string;
+  /**
+   * API 基础地址（获取 access_token）
+   */
   base_url_app_access_token?: string;
 }

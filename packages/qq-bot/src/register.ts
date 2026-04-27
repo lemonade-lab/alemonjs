@@ -80,7 +80,14 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_id, SpaceId: `GROUP:${event.group_id}` })
         .addChannel({ ChannelId: event.group_id })
-        .addUser({ UserId: event.author.id, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addUser({
+          UserId: event.author.id,
+          UserKey,
+          UserAvatar: UserAvatar,
+          UserName: event?.author?.username,
+          IsMaster: isMaster,
+          IsBot: false
+        })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: event.content?.trim() })
         .addOpen({ OpenId: `C2C:${event.author.member_openid}` })
@@ -97,7 +104,14 @@ export const register = (client: QQBotClients) => {
     cbp.send(
       FormatEvent.create('private.message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addUser({ UserId: event.author.id, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addUser({
+          UserId: event.author.id,
+          UserKey,
+          UserAvatar: UserAvatar,
+          UserName: event?.author?.username,
+          IsMaster: isMaster,
+          IsBot: false
+        })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: event.content?.trim() })
         .addOpen({ OpenId: `C2C:${event.author.user_openid}` })
@@ -269,7 +283,14 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
-        .addUser({ UserId: event.group_member_openid, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addUser({
+          UserId: event.group_member_openid,
+          UserKey,
+          UserAvatar: UserAvatar,
+          // UserName: event?.author?.username ?? '',
+          IsMaster: isMaster,
+          IsBot: false
+        })
         .addMessage({ MessageId: `INTERACTION_CREATE:${event.id}` })
         .addText({ MessageText: MessageText })
         .addOpen({ OpenId: `C2C:${event.group_member_openid}` })
@@ -288,7 +309,14 @@ export const register = (client: QQBotClients) => {
       // 处理消息
       const e = FormatEvent.create('private.interaction.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addUser({ UserId: event.user_openid, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+        .addUser({
+          UserId: event.user_openid,
+          UserKey,
+          UserAvatar: UserAvatar,
+          // UserName: event?.author?.username ?? '',
+          IsMaster: isMaster,
+          IsBot: false
+        })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: MessageText })
         .addOpen({ OpenId: `C2C:${event.user_openid}` })

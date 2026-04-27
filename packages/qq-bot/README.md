@@ -18,8 +18,6 @@ yarn add @alemonjs/qq-bot
 qq-bot:
   # 编号
   app_id: ''
-  # 令牌
-  token: ''
   # 密钥
   secret: ''
 ```

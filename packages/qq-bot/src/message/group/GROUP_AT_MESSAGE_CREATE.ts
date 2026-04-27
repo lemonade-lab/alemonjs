@@ -5,6 +5,7 @@ export interface GROUP_AT_MESSAGE_CREATE_TYPE {
   author: {
     id: string;
     member_openid: string;
+    username: string;
   };
   content: string;
   group_openid: string;
