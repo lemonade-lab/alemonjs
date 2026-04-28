@@ -1,6 +1,11 @@
 import { Expose, runHandler } from 'alemonjs';
 import { helpStore } from './store';
 
+/**
+ * 该功能测试中
+ * - 插件间通讯
+ * - 功能识别
+ */
 const expose = Expose.create();
 
 expose.provide({
