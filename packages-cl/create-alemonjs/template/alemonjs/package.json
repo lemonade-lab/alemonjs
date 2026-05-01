@@ -23,7 +23,7 @@
     "@alemonjs/db": "^0.0.16",
     "@alemonjs/bubble": "^2.1.10",
     "@alemonjs/discord": "^2.1.21",
-    "@alemonjs/onebot": "^2.1.14",
+    "@alemonjs/onebot": "^2.1.15",
     "@alemonjs/qq-bot": "^2.1.16",
     "alemonjs": "2.1.65",
     "jsxp": "1.4.0",

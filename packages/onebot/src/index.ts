@@ -409,7 +409,7 @@ const main = () => {
           } else if (item.type === 'Mention') {
             const options = item.options || {};
 
-            if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
+            if (item.value === 'everyone' || item.value === 'all' || item.value === '' || (typeof item.value !== 'string' && typeof item.value !== 'number')) {
               return {
                 type: 'at',
                 data: {
@@ -421,7 +421,7 @@ const main = () => {
               return {
                 type: 'at',
                 data: {
-                  qq: item.value
+                  qq: Number(item.value)
                 }
               };
             }
