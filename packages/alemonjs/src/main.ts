@@ -21,42 +21,14 @@ const createOptionsByKey = (options: StartOptions, key: string, defaultValue: an
  * @returns
  */
 const startPlatform = (options: StartOptions) => {
-  // 得到平台和登录名
   const platform = createOptionsByKey(options, 'platform', '');
   const login = createOptionsByKey(options, 'login', '');
 
-  // 不登录平台
   if (!platform && !login) {
-    // 没有指定平台和登录名，则启动 sandbox 模式
     global.__sandbox = true;
 
     return;
   }
-
-  // 如果存在
-  if (platform) {
-    const reg = filePrefixCommon;
-
-    if (reg.test(platform)) {
-      process.env.platform = platform;
-      // 剪切
-      process.env.login = platform.replace(reg, '');
-    } else {
-      process.env.platform = platform;
-      // 不是执行前缀。则platform 和 login 相同。
-      process.env.login = platform;
-    }
-  } else {
-    // 如果没有指定平台，则使用登录名作为平台
-    process.env.platform = `${defaultPlatformCommonPrefix}${login}`;
-    process.env.login = login;
-  }
-
-  // 设置了 login。强制指定
-  if (login) {
-    process.env.login = login;
-  }
-
   void startPlatformAdapterWithFallback();
 };
 
@@ -88,6 +60,23 @@ export const start = (options: StartOptions | string = {}) => {
   // 得到端口号（传空字符串或 0 表示不启动 WS）
   const port = createOptionsByKey(options, 'port', '');
   const serverPort = createOptionsByKey(options, 'serverPort', '');
+  const platform = createOptionsByKey(options, 'platform', '');
+  const login = createOptionsByKey(options, 'login', '');
+
+  if (platform) {
+    const reg = filePrefixCommon;
+
+    if (reg.test(platform)) {
+      process.env.platform = platform;
+      process.env.login = platform.replace(reg, '');
+    } else {
+      process.env.platform = platform;
+      process.env.login = platform;
+    }
+  } else if (login) {
+    process.env.platform = `${defaultPlatformCommonPrefix}${login}`;
+    process.env.login = login;
+  }
 
   // 设置环境变量
   process.env.port = port ? String(port) : '';
