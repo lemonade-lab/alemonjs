@@ -1,5 +1,5 @@
 import { showErrorModule } from '../core';
-import { withEventContext } from './hook-event-context';
+import { finishCurrentTrace, withEventContext } from './hook-event-context';
 
 export const createCallHandler = valueEvent => {
   // 开始处理 handler
@@ -30,9 +30,16 @@ export const createCallHandler = valueEvent => {
         // return true → 局部中间件放行，继续执行 children handler
         // return void/false → 处理完毕或拦截，停止当前链
         if (res !== true) {
+          if (!isNext) {
+            finishCurrentTrace('consumed');
+
+            return;
+          }
+
           isClose = true;
         }
       } catch (err) {
+        finishCurrentTrace('error');
         showErrorModule(err);
 
         return;

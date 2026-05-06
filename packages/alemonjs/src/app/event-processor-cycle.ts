@@ -6,62 +6,20 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventKeys } from '../types';
-import { ResultCode } from '../core/variable';
 import { expendEvent } from './event-processor-event';
 import { expendMiddleware } from './event-processor-middleware';
 import { expendSubscribeCreate, expendSubscribeMount, expendSubscribeUnmount } from './event-processor-subscribe';
-import { getConfigValue } from '../core/config';
-
-/**
- * 打印日志
- * @param event
- * @param select
- */
-const showLog = <T extends EventKeys>(event: Events[T], select: T) => {
-  if (process.env.NODE_ENV === 'development') {
-    const log: {
-      [key: string]: string | number | boolean;
-    } = {
-      Name: select
-    };
-
-    for (const key in event) {
-      if (Object.prototype.hasOwnProperty.call(event, key)) {
-        const value = event[key];
-
-        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-          log[key] = value;
-        }
-      }
-    }
-    logger.debug({
-      code: ResultCode.Ok,
-      message: 'new event',
-      data: log
-    });
-  } else {
-    // 批量收集非空字段后一次 join — 避免多次 typeof 检查 + 字符串 += 拼接
-    const parts = [`[Name:${select}]`];
-    const fields = ['GuildId', 'ChannelId', 'UserKey', 'UserId', 'MessageId', 'MessageText'] as const;
-
-    for (const f of fields) {
-      const v = event[f];
-
-      if (typeof v === 'string' && v !== '') {
-        parts.push(`[${f}:${v}]`);
-      }
-    }
-    logger.info(parts.join(''));
-  }
-};
+import { finishCurrentTrace } from './hook-event-context';
 
 /**
  * 消息体处理机制
  * @param event
  * @param key
  */
-export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: T, config?: any) => {
-  const nextEnd: Next = () => {};
+export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: T, _config?: any) => {
+  const nextEnd: Next = () => {
+    finishCurrentTrace('completed');
+  };
   // unmount
   const nextUnMount: Next = (cn, ...cns) => {
     if (cn) {
@@ -98,17 +56,7 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
     }
     void expendMiddleware(valueEvent, select, nextMount);
   };
-  const value = config ?? getConfigValue() ?? {};
 
-  if (Array.isArray(value?.logs?.channel_id)) {
-    const channelIds = value?.logs?.channel_id;
-
-    if (channelIds && channelIds.length > 0 && channelIds.includes(valueEvent['ChannelId'])) {
-      showLog(valueEvent, select);
-    }
-  } else {
-    showLog(valueEvent, select);
-  }
   // create
   void expendSubscribeCreate(valueEvent, select, nextCreate);
 };

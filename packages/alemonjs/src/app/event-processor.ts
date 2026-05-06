@@ -9,6 +9,7 @@ import {
 } from '../core/variable';
 import { EventKeys, Events } from '../types';
 import { expendCycle } from './event-processor-cycle';
+import { finishCurrentTrace, withProcessorTrace } from './hook-event-context';
 import { ProcessorEventAutoClearMap, ProcessorEventUserAutoClearMap } from './store';
 import { fastHash, getCachedRegExp, matchIn } from '../core/utils';
 
@@ -109,125 +110,144 @@ setTimeout(callback, processorRepeatedClearTimeMin);
  * @returns
  */
 export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
-  // 禁用规则设置
-  const value = getConfigValue();
-  const disabledTextRegular = value?.disabled_text_regular;
+  withProcessorTrace(name, event, () => {
+    try {
+      // 禁用规则设置
+      const value = getConfigValue();
+      const disabledTextRegular = value?.disabled_text_regular;
 
-  // 检查文本禁用规则
-  if (disabledTextRegular && event['MessageText']) {
-    if (getCachedRegExp(disabledTextRegular).test(event['MessageText'])) {
-      return;
-    }
-  }
+      // 检查文本禁用规则
+      if (disabledTextRegular && event['MessageText']) {
+        if (getCachedRegExp(disabledTextRegular).test(event['MessageText'])) {
+          finishCurrentTrace('filtered');
 
-  const disabledSelects = value?.disabled_selects ?? {};
-
-  // 检查事件禁用规则
-  if (disabledSelects[name]) {
-    return;
-  }
-
-  const disabledUserId = value?.disabled_user_id;
-
-  // 检查用户禁用规则
-  if (event['UserId'] && matchIn(disabledUserId, event['UserId'])) {
-    return;
-  }
-
-  const disabledUserKey = value?.disabled_user_key;
-
-  // 检查用户禁用规则
-  if (event['UserKey'] && matchIn(disabledUserKey, event['UserKey'])) {
-    return;
-  }
-
-  const redirectRegular = value?.redirect_regular ?? value?.redirect_text_regular;
-  const redirectTarget = value?.redirect_target ?? value?.redirect_text_target;
-
-  // 检查文本重定向规则
-  if (redirectRegular && redirectTarget && event['MessageText']) {
-    const cachedReg = getCachedRegExp(redirectRegular);
-
-    if (cachedReg.test(event['MessageText'])) {
-      event['MessageText'] = event['MessageText'].replace(cachedReg, redirectTarget);
-    }
-  }
-
-  const mappingText = value?.mapping_text ?? [];
-
-  // 检查文本映射规则
-  if (event['MessageText']) {
-    for (const mapping of mappingText) {
-      const { regular, target } = mapping ?? {};
-
-      if (!regular) {
-        continue;
+          return;
+        }
       }
-      const cachedReg = getCachedRegExp(regular);
 
-      if (cachedReg.test(event['MessageText'])) {
-        event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+      const disabledSelects = value?.disabled_selects ?? {};
+
+      // 检查事件禁用规则
+      if (disabledSelects[name]) {
+        finishCurrentTrace('filtered');
+
+        return;
       }
+
+      const disabledUserId = value?.disabled_user_id;
+
+      // 检查用户禁用规则
+      if (event['UserId'] && matchIn(disabledUserId, event['UserId'])) {
+        finishCurrentTrace('filtered');
+
+        return;
+      }
+
+      const disabledUserKey = value?.disabled_user_key;
+
+      // 检查用户禁用规则
+      if (event['UserKey'] && matchIn(disabledUserKey, event['UserKey'])) {
+        finishCurrentTrace('filtered');
+
+        return;
+      }
+
+      const redirectRegular = value?.redirect_regular ?? value?.redirect_text_regular;
+      const redirectTarget = value?.redirect_target ?? value?.redirect_text_target;
+
+      // 检查文本重定向规则
+      if (redirectRegular && redirectTarget && event['MessageText']) {
+        const cachedReg = getCachedRegExp(redirectRegular);
+
+        if (cachedReg.test(event['MessageText'])) {
+          event['MessageText'] = event['MessageText'].replace(cachedReg, redirectTarget);
+        }
+      }
+
+      const mappingText = value?.mapping_text ?? [];
+
+      // 检查文本映射规则
+      if (event['MessageText']) {
+        for (const mapping of mappingText) {
+          const { regular, target } = mapping ?? {};
+
+          if (!regular) {
+            continue;
+          }
+          const cachedReg = getCachedRegExp(regular);
+
+          if (cachedReg.test(event['MessageText'])) {
+            event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+          }
+        }
+      } else {
+        // 当 MessageText 为空时，兜底为一个空字符串，避免后续正则判断出错
+        // 也避免开发者忘记了，增加健壮性
+        event['MessageText'] = '';
+      }
+
+      const masterId = value?.master_id;
+      const masterKey = value?.master_key;
+
+      // 检查是否是 master
+      if (event['UserId'] && matchIn(masterId, event['UserId'])) {
+        event['isMaster'] = true;
+      } else if (event['UserKey'] && matchIn(masterKey, event['UserKey'])) {
+        event['isMaster'] = true;
+      }
+
+      const botId = value?.bot_id;
+      const botKey = value?.bot_key;
+
+      // 检查是否是 bot
+      if (event['UserId'] && matchIn(botId, event['UserId'])) {
+        event['isBot'] = true;
+      } else if (event['UserKey'] && matchIn(botKey, event['UserKey'])) {
+        event['isBot'] = true;
+      }
+
+      const Now = Date.now();
+      const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
+
+      if (event['MessageId']) {
+        // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
+        const MessageId = fastHash(event['MessageId']);
+
+        // 重复消息
+        if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
+          finishCurrentTrace('filtered');
+
+          return;
+        }
+      }
+
+      const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
+
+      if (event['UserId']) {
+        // FNV-1a 快速哈希
+        const UserId = fastHash(event['UserId']);
+
+        // 频繁操作
+        if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
+          finishCurrentTrace('filtered');
+
+          return;
+        }
+      }
+
+      if (data) {
+        // 直接赋值 — 避免 defineProperty 破坏 V8 Hidden Class 优化
+        event['value'] = data;
+      }
+
+      event['name'] = name;
+
+      expendCycle(event, name, value);
+    } catch (error) {
+      finishCurrentTrace('error');
+      throw error;
     }
-  } else {
-    // 当 MessageText 为空时，兜底为一个空字符串，避免后续正则判断出错
-    // 也避免开发者忘记了，增加健壮性
-    event['MessageText'] = '';
-  }
-
-  const masterId = value?.master_id;
-  const masterKey = value?.master_key;
-
-  // 检查是否是 master
-  if (event['UserId'] && matchIn(masterId, event['UserId'])) {
-    event['isMaster'] = true;
-  } else if (event['UserKey'] && matchIn(masterKey, event['UserKey'])) {
-    event['isMaster'] = true;
-  }
-
-  const botId = value?.bot_id;
-  const botKey = value?.bot_key;
-
-  // 检查是否是 bot
-  if (event['UserId'] && matchIn(botId, event['UserId'])) {
-    event['isBot'] = true;
-  } else if (event['UserKey'] && matchIn(botKey, event['UserKey'])) {
-    event['isBot'] = true;
-  }
-
-  const Now = Date.now();
-  const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
-
-  if (event['MessageId']) {
-    // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
-    const MessageId = fastHash(event['MessageId']);
-
-    // 重复消息
-    if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
-      return;
-    }
-  }
-
-  const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
-
-  if (event['UserId']) {
-    // FNV-1a 快速哈希
-    const UserId = fastHash(event['UserId']);
-
-    // 频繁操作
-    if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
-      return;
-    }
-  }
-
-  if (data) {
-    // 直接赋值 — 避免 defineProperty 破坏 V8 Hidden Class 优化
-    event['value'] = data;
-  }
-
-  event['name'] = name;
-
-  expendCycle(event, name, value);
+  });
 };
 
 /**

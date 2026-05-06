@@ -4,9 +4,10 @@
  * @author ningmengchongshui
  */
 import { Next, Events, EventCycleEnum, EventKeys } from '../types';
+import { showErrorModule } from '../core';
 import { getSubscribeList } from './store';
 import { SubscribeStatus } from './config';
-import { withEventContext } from './hook-event-context';
+import { finishCurrentTrace, withEventContext } from './hook-event-context';
 
 /**
  * 处理订阅
@@ -96,17 +97,45 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
     // 订阅是执行则销毁
     onPaused();
 
+    let isContinue = false;
+
     const Continue: Next = (cn?: boolean, ...cns: boolean[]) => {
       // 重新注册。
       onActive();
       // true
       if (cn) {
+        isContinue = true;
         // 下一个节点 next(true)
         nextObserver(...cns);
       }
     };
 
-    withEventContext(valueEvent, Continue, () => item.data.current(valueEvent, Continue));
+    try {
+      const result = withEventContext(valueEvent, Continue, () => item.data.current(valueEvent, Continue));
+
+      if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
+        void (result as PromiseLike<unknown>).then(
+          () => {
+            if (!isContinue) {
+              finishCurrentTrace('consumed');
+            }
+          },
+          error => {
+            finishCurrentTrace('error');
+            showErrorModule(error);
+          }
+        );
+
+        return;
+      }
+
+      if (!isContinue) {
+        finishCurrentTrace('consumed');
+      }
+    } catch (error) {
+      finishCurrentTrace('error');
+      showErrorModule(error);
+    }
   };
 
   // 先从观察者开始
