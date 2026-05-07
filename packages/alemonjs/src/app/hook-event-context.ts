@@ -56,7 +56,7 @@ const createLogData = <T extends EventKeys>(event: Events[T], select: T, reason:
 };
 
 const createLogText = <T extends EventKeys>(event: Events[T], select: T, reason: EventTraceReason, duration: number) => {
-  const parts = [`[Name:${select}]`, `[reason:${reason}]`, `[duration:${duration}ms]`];
+  const parts = [`[Name:${select}]`, `[Reason:${reason}]`, `[Duration:${duration}ms]`];
   const fields = ['GuildId', 'ChannelId', 'UserKey', 'UserId', 'MessageId', 'MessageText'] as const;
 
   for (const f of fields) {
