@@ -93,7 +93,7 @@ export type OnGroupFunc = <C, T extends EventKeys, TFirst extends OnGroupItem<C,
 
 export type ResponseRoute = {
   /** 平台类型 */
-  platform?: string;
+  platform?: string | string[];
   /** 正则匹配 */
   regular?: RegExp;
   /** 前缀匹配（比正则更快） */
