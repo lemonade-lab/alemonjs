@@ -22,3 +22,4 @@ export * from './schedule-store.js';
 export * from './event-utils.js';
 export * from './message-api.js';
 export * from './message-format.js';
+export * from './router/main.js';
