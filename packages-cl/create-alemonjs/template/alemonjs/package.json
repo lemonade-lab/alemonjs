@@ -25,7 +25,7 @@
     "@alemonjs/discord": "^2.1.21",
     "@alemonjs/onebot": "^2.1.15",
     "@alemonjs/qq-bot": "^2.1.16",
-    "alemonjs": "2.1.65",
+    "alemonjs": "2.1.70",
     "jsxp": "1.4.0",
     "tailwindcss": "3",
     "cssnano": "^7",

@@ -167,7 +167,10 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
       const mappingText = value?.mapping_text ?? [];
 
       // 检查文本映射规则
-      if (event['MessageText']) {
+      if (event['MessageText'] && typeof event['MessageText'] === 'string') {
+        // 消息前后空格
+        event['MessageText'] = event['MessageText'].trim();
+        //
         for (const mapping of mappingText) {
           const { regular, target } = mapping ?? {};
 

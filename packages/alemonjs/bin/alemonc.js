@@ -68,6 +68,13 @@ program
   });
 
 program
+  .command('upgrade')
+  .description('检查并更新 alemonjs 和 @alemonjs/* 包到最新版本')
+  .action(() => {
+    versionUpdate();
+  });
+
+program
   .command('info')
   .description('输出项目诊断信息')
   .action(() => {
