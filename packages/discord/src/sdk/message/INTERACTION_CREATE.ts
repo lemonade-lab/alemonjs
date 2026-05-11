@@ -88,6 +88,7 @@ interface Data {
   component_type?: number;
   type?: number;
   name?: string;
+  values?: string[];
 }
 
 type Public = {

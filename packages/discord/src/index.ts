@@ -16,6 +16,23 @@ export * from './hook';
 
 export { type Options } from './config';
 
+const SELECT_DUP_PREFIX = '__alemon_dup__:';
+
+const decodeDuplicateSelectValue = (value: unknown) => {
+  if (typeof value !== 'string' || !value.startsWith(SELECT_DUP_PREFIX)) {
+    return value;
+  }
+
+  const content = value.slice(SELECT_DUP_PREFIX.length);
+  const separatorIndex = content.indexOf(':');
+
+  if (separatorIndex < 0) {
+    return value;
+  }
+
+  return content.slice(separatorIndex + 1);
+};
+
 // main
 const main = () => {
   const port = process.env?.port || 17117;
@@ -111,6 +128,12 @@ const main = () => {
   });
 
   client.on('INTERACTION_CREATE', event => {
+    const selectedValues = Array.isArray(event?.data?.values) ? event.data.values.map(item => decodeDuplicateSelectValue(item)) : [];
+
+    if (selectedValues.length > 0) {
+      event.data.values = selectedValues.filter((item): item is string => typeof item === 'string');
+    }
+
     const isPrivate = typeof event['user'] === 'object' ? true : false;
     const user = isPrivate ? event['user'] : event['member'].user;
     const UserId = user.id;
@@ -120,7 +143,8 @@ const main = () => {
 
     const isCustom = !!event.data?.custom_id;
     const isName = !!event.data?.name;
-    const command = isCustom ? event.data.custom_id : isName ? `/${event.data.name}` : '';
+    const selectedCommand = typeof selectedValues[0] === 'string' ? selectedValues[0] : '';
+    const command = selectedCommand || (isCustom ? event.data.custom_id : isName ? `/${event.data.name}` : '');
     const notAutoConfirmation = isCustom ? /^notAutoConfirmation:/.test(command) : false;
     const currentMessageText = notAutoConfirmation ? command.replace(/^notAutoConfirmation:/, '') : command;
 

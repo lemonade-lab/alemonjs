@@ -6,14 +6,18 @@ import { getDiscordConfig } from './config';
 
 type Client = typeof DCClient.prototype;
 
+const SELECT_DUP_PREFIX = '__alemon_dup__:';
+
+const encodeDuplicateSelectValue = (value: string, index: number) => `${SELECT_DUP_PREFIX}${index}:${value}`;
+
 const fetchImageBuffer = async (url: string) => {
   const arrayBuffer = await fetch(url).then(res => res.arrayBuffer());
 
   return Buffer.from(arrayBuffer);
 };
 
-const createButtonsData = (rows: DataButtonRow[]) =>
-  rows.map(row => ({
+const createButtonsData = (rows: DataButtonRow[]) => {
+  return rows.map(row => ({
     type: 1,
     components: row.value.map(button => ({
       type: 2,
@@ -23,6 +27,7 @@ const createButtonsData = (rows: DataButtonRow[]) =>
       label: button.value
     }))
   }));
+};
 
 /** 将通用 Select 组件转换为 Discord Select 组件（包裹在 ActionRow 内） */
 const createSelectData = (select: DataSelect) => {
@@ -39,13 +44,22 @@ const createSelectData = (select: DataSelect) => {
   };
 
   if (kind === 'string') {
-    base.options = (select.value ?? []).map(opt => ({
-      label: opt.label,
-      value: opt.value,
-      description: opt.description,
-      default: opt.default,
-      emoji: opt.emoji ? { name: opt.emoji } : undefined
-    }));
+    const seenValues = new Map<string, number>();
+
+    base.options = (select.value ?? []).map(opt => {
+      const rawValue = String(opt.value ?? '');
+      const nextIndex = seenValues.get(rawValue) ?? 0;
+
+      seenValues.set(rawValue, nextIndex + 1);
+
+      return {
+        label: opt.label,
+        value: nextIndex > 0 ? encodeDuplicateSelectValue(rawValue, nextIndex) : rawValue,
+        description: opt.description,
+        default: opt.default,
+        emoji: opt.emoji ? { name: opt.emoji } : undefined
+      };
+    });
   }
 
   return { type: 1, components: [base] };
@@ -238,12 +252,15 @@ export const sendchannel = async (client: Client, param: { channel_id: string },
       }
 
       // 图片以附件形式发送；若存在 embeds 且未显式指定 image.url，则让第一个 embed 引用该附件
-      if (bufferData && hasEmbeds) {
+      if (bufferData) {
         payload.attachments = [{ id: 0, filename: 'image.png' }];
-        const firstEmbed = payload.embeds[0];
 
-        if (firstEmbed && !firstEmbed.image) {
-          firstEmbed.image = { url: 'attachment://image.png' };
+        if (hasEmbeds) {
+          const firstEmbed = payload.embeds[0];
+
+          if (firstEmbed && !firstEmbed.image) {
+            firstEmbed.image = { url: 'attachment://image.png' };
+          }
         }
       }
 
