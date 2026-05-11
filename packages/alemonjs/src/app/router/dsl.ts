@@ -208,7 +208,7 @@ function getLookupCandidates(event: { name?: string; MessageText?: string; __rou
           : [...(twoKey ? [{ key: twoKey, keyLength: 2 as const }] : []), { key: oneKey, keyLength: 1 as const }];
 
       return {
-        normalizedCommand: parsed?.normalized,
+        normalizedCommand: parsed.normalizedText,
         rawArgs: parsed.tokens,
         candidates
       };
