@@ -175,11 +175,45 @@ function getRouteMessageText(event: { MessageText?: string; __route?: { text?: s
   return event.MessageText;
 }
 
+function shouldParseInteractionAsText(messageText?: string) {
+  const text = String(messageText ?? '').trim();
+
+  if (!text) {
+    return false;
+  }
+
+  // 文本型 interaction（slash command / select value 转命令文本 / 按钮里携带命令参数）
+  // 需要像普通消息一样拆词和解析参数，而不是按 custom_id 整串精确匹配。
+  return /\s/.test(text);
+}
+
 function getLookupCandidates(event: { name?: string; MessageText?: string; __route?: { text?: string } }, keyPolicy?: GroupOptions['keyPolicy']) {
   const eventName = String(event.name ?? '');
   const routeMessageText = getRouteMessageText(event);
 
   if (eventName.includes('interaction')) {
+    if (shouldParseInteractionAsText(routeMessageText)) {
+      const parsed = parseMessageText(routeMessageText);
+
+      if (!parsed) {
+        return null;
+      }
+
+      const oneKey = parsed.tokens[0] ?? '';
+      const twoKey = parsed.tokens.length >= 2 ? `${parsed.tokens[0]} ${parsed.tokens[1]}` : '';
+      const maxWords = keyPolicy?.maxWords ?? 2;
+      const candidates =
+        maxWords === 1
+          ? [{ key: oneKey, keyLength: 1 as const }]
+          : [...(twoKey ? [{ key: twoKey, keyLength: 2 as const }] : []), { key: oneKey, keyLength: 1 as const }];
+
+      return {
+        normalizedCommand: parsed?.normalized,
+        rawArgs: parsed.tokens,
+        candidates
+      };
+    }
+
     const interactionKey = normalizeInteractionKey(routeMessageText);
 
     if (!interactionKey) {
