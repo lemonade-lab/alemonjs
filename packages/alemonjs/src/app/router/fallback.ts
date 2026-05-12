@@ -41,6 +41,14 @@ function normalizeForCompare(text: string) {
   return text.replace(/^([!！/#＃])\s*/, '').trim();
 }
 
+function shouldCheckCandidate(messageText: string, candidate: string) {
+  if (!messageText || !candidate) {
+    return false;
+  }
+
+  return messageText.startsWith(candidate);
+}
+
 function getAdaptiveMaxDistance(input: string) {
   if (input.length <= 2) {
     return 1;
@@ -72,6 +80,12 @@ export function checkFallbackHint(messageText: string | undefined, routeKeys: st
     return { matched: false };
   }
 
+  const normalizedMessage = normalizeForCompare(String(messageText ?? ''));
+
+  if (!normalizedMessage) {
+    return { matched: false };
+  }
+
   const parsed = parseMessageText(messageText);
 
   if (!parsed) {
@@ -94,6 +108,11 @@ export function checkFallbackHint(messageText: string | undefined, routeKeys: st
 
   for (const routeKey of routeKeys) {
     const normalizedKey = normalizeForCompare(routeKey);
+
+    if (!shouldCheckCandidate(normalizedMessage, normalizedKey)) {
+      continue;
+    }
+
     const distance = levenshteinDistance(attemptedKey, normalizedKey);
 
     if (!bestMatch || distance < bestMatch.distance) {
