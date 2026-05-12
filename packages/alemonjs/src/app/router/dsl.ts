@@ -82,6 +82,7 @@ function normalizeRouteConfig<P extends string, E extends string>(config: RouteD
 
   return {
     path: normalizeRoutePath(path),
+    description: config.description,
     events: config.events,
     platforms: config.platforms,
     schema: config.schema
@@ -101,6 +102,110 @@ function normalizeResConfig<P extends string, E extends string>(
 
 function getImporterLabel(importer: RouteImporter, index: number) {
   return importer.name || `anonymous_${index + 1}`;
+}
+
+function formatRouteDescription(description?: string) {
+  return typeof description === 'string' && description.trim() ? description.trim() : undefined;
+}
+
+function formatArgRuleHint(arg: { name: string; description?: string; rules?: any[] }, displayIndex: number) {
+  const rules = arg.rules ?? [];
+  const parts: string[] = [];
+  const typeRule = rules.find(rule => rule.type);
+  const requiredRule = rules.find(rule => rule.required);
+
+  if (requiredRule) {
+    parts.push('必填');
+  } else {
+    parts.push('可选');
+  }
+
+  if (typeRule?.type === 'number') {
+    parts.push('数字');
+  } else if (typeRule?.type === 'enum') {
+    parts.push(`枚举: ${(typeRule.enum ?? []).join(' / ')}`);
+  } else if (typeRule?.type === 'range') {
+    parts.push('区间');
+  } else if (typeRule?.type === 'rest') {
+    parts.push('剩余文本');
+  } else {
+    parts.push('文本');
+  }
+
+  if (typeof typeRule?.min === 'number') {
+    parts.push(`最小 ${typeRule.min}`);
+  }
+  if (typeof typeRule?.max === 'number') {
+    parts.push(`最大 ${typeRule.max}`);
+  }
+
+  const suffix = arg.description ? `，${arg.description}` : '';
+
+  return `参数${displayIndex} \`${arg.name}\`：${parts.join('，')}${suffix}`;
+}
+
+function buildSchemaHints(schema?: { args?: Array<{ name: string; description?: string; rules?: any[] }> }) {
+  const args = schema?.args ?? [];
+
+  if (args.length === 0) {
+    return [];
+  }
+
+  return args.map((arg, index) => formatArgRuleHint(arg, index + 1));
+}
+
+function quoteCommand(command?: string) {
+  return command ? `\`${command}\`` : '';
+}
+
+function buildFallbackReply(params: { suggestedKey?: string; description?: string; usage?: string }) {
+  const lines: string[] = [];
+  const commandText = quoteCommand(params.suggestedKey);
+
+  if (commandText) {
+    lines.push(`我猜你想用的是 ${commandText}。`);
+    lines.push(`可以直接输入：${commandText}`);
+  } else {
+    lines.push('我还没完全认出你这条指令。');
+  }
+
+  if (params.description) {
+    lines.push(params.description);
+  }
+
+  if (params.usage && params.usage !== params.suggestedKey) {
+    lines.push(`如果你想继续，可以这样写：\`${params.usage}\``);
+  }
+
+  return lines;
+}
+
+function buildValidationReply(params: { error?: string; commandKey?: string; description?: string; usage?: string; schemaHints?: string[] }) {
+  const lines: string[] = [];
+  const commandText = quoteCommand(params.commandKey);
+
+  if (commandText) {
+    lines.push(`我已经识别到你想用的是 ${commandText}。`);
+  }
+
+  lines.push(params.error || '这条指令的参数还不完整。');
+
+  if (params.description) {
+    lines.push(params.description);
+  }
+
+  if (params.usage) {
+    lines.push(`你可以这样输入：\`${params.usage}\``);
+  } else if (commandText) {
+    lines.push(`请继续补全 ${commandText} 所需的参数。`);
+  }
+
+  if (params.schemaHints && params.schemaHints.length > 0) {
+    lines.push('参数说明：');
+    lines.push(...params.schemaHints);
+  }
+
+  return lines;
 }
 
 function normalizeInteractionKey(messageText?: string) {
@@ -467,6 +572,7 @@ export class Router<P extends string = string, E extends string = string> {
       eventName,
       routes: [...routes.two.values(), ...routes.one.values()].map(route => ({
         path: route.config.path,
+        description: route?.config?.description,
         importerCount: route.importers.length
       }))
     }));
@@ -706,15 +812,15 @@ export class Router<P extends string = string, E extends string = string> {
     }
 
     const eventName = String(event.name ?? '');
-    const routeKeys = this.inspect()
+    const routeMetas = this.inspect()
       .filter(item => item.eventName === eventName)
       .flatMap(item => item.routes)
       .filter(route => {
         const routeEntry = this.routes.get(eventName)?.one.get(route.path) ?? this.routes.get(eventName)?.two.get(route.path);
 
         return routeEntry ? applicableScopeIds.includes(routeEntry.scopeId) : false;
-      })
-      .map(route => route.path);
+      });
+    const routeKeys = routeMetas.map(route => route.path);
     const fallback = checkFallbackHint(typeof event.MessageText === 'string' ? event.MessageText : undefined, routeKeys, fallbackOptions);
 
     if (!fallback.matched) {
@@ -726,8 +832,20 @@ export class Router<P extends string = string, E extends string = string> {
     const [message] = useMessage();
     const md = Format.createMarkdown();
     const format = Format.create();
+    const suggestedRoute = fallback.suggestedKey ? routeMetas.find(route => route.path === fallback.suggestedKey) : undefined;
+    const replyLines = buildFallbackReply({
+      suggestedKey: fallback.suggestedKey,
+      description: formatRouteDescription(suggestedRoute?.description),
+      usage: suggestedRoute?.path
+    });
 
-    md.addText(fallback.message ?? '未匹配到可用指令');
+    replyLines.forEach((line, index) => {
+      if (index > 0) {
+        md.addNewline();
+      }
+      md.addText(line);
+    });
+
     format.addMarkdown(md);
     void message.send({ format });
   }
@@ -741,16 +859,26 @@ export class Router<P extends string = string, E extends string = string> {
     const [message] = useMessage();
     const md = Format.createMarkdown();
     const format = Format.create();
+    const routeEntry =
+      (result.eventName && result.matchedPath
+        ? (this.routes.get(result.eventName)?.one.get(result.matchedPath) ?? this.routes.get(result.eventName)?.two.get(result.matchedPath))
+        : undefined) ?? undefined;
+    const description = formatRouteDescription(routeEntry?.config.description);
+    const schemaHints = buildSchemaHints(routeEntry?.config.schema);
+    const replyLines = buildValidationReply({
+      error: validation && !validation.valid ? validation.error : '参数校验失败',
+      commandKey: result.commandKey,
+      description,
+      usage: validation && !validation.valid ? validation.usage : undefined,
+      schemaHints
+    });
 
-    md.addText(validation && !validation.valid ? validation.error : '参数校验失败');
-
-    if (validation && !validation.valid && validation.usage) {
-      md.addNewline();
-      md.addText(`应使用：${validation.usage}`);
-    } else if (result.commandKey) {
-      md.addNewline();
-      md.addText(`请补全 \`${result.commandKey}\` 所需参数。`);
-    }
+    replyLines.forEach((line, index) => {
+      if (index > 0) {
+        md.addNewline();
+      }
+      md.addText(line);
+    });
 
     format.addMarkdown(md);
     void message.send({ format });

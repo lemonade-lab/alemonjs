@@ -23,6 +23,7 @@ export type RouteExecutable = (event: Record<string, unknown>, next: RouteNext) 
 
 export type RouteHandlerConfig<P extends string = string, E extends string = string> = {
   path?: string;
+  description?: string;
   events?: readonly E[];
   platforms?: readonly P[];
   schema?: RouteSchema;
@@ -59,6 +60,7 @@ export type RouteDefinitions<P extends string = string, E extends string = strin
 
 export type NormalizedRouteConfig<P extends string = string, E extends string = string> = {
   path?: string;
+  description?: string;
   events?: readonly E[];
   platforms?: readonly P[];
   schema?: RouteSchema;

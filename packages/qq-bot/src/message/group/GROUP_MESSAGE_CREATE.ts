@@ -1,7 +1,7 @@
 /**
- * 群消息事件 AT 事件
+ * 群消息事件
  */
-export interface GROUP_AT_MESSAGE_CREATE_TYPE {
+export interface GROUP_MESSAGE_CREATE_TYPE {
   author: {
     bot?: boolean;
     id: string;

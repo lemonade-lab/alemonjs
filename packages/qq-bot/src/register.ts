@@ -2,6 +2,7 @@ import type { DataEnums, User } from 'alemonjs';
 import { cbpPlatform, createResult, ResultCode, FormatEvent } from 'alemonjs';
 import { QQBotClients } from './sdk/client.websoket';
 import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE';
+import { GROUP_MESSAGE_CREATE_TYPE } from './message/group/GROUP_MESSAGE_CREATE';
 import { AT_MESSAGE_CREATE, C2C_MESSAGE_CREATE, DIRECT_MESSAGE_CREATE, GROUP_AT_MESSAGE_CREATE, MESSAGE_CREATE } from './sends';
 import { getMaster, getQQBotConfig } from './config';
 import { platform } from './config';
@@ -28,6 +29,38 @@ export const register = (client: QQBotClients) => {
 
   const createUserAvatarURL = (authorId: string) => {
     return `https://q.qlogo.cn/qqapp/${config.app_id}/${authorId}/640`;
+  };
+
+  const getGroupMessageMeta = (event: GROUP_MESSAGE_CREATE_TYPE) => {
+    const author = event?.author;
+    const UserId = author?.id ?? '';
+    const memberOpenId = author?.member_openid ?? '';
+    const groupId = event?.group_id ?? event?.group_openid ?? '';
+    const messageId = event?.id ?? '';
+    const [isMaster, UserKey] = UserId ? getMaster(UserId) : [false, ''];
+
+    return {
+      UserId,
+      UserKey,
+      isMaster,
+      UserName: author?.username ?? '',
+      UserAvatar: UserId ? createUserAvatarURL(UserId) : '',
+      groupId,
+      messageId,
+      openId: memberOpenId ? `C2C:${memberOpenId}` : ''
+    };
+  };
+
+  const getGroupAuditMeta = (event: { audit_id?: string; audit_time?: string; group_openid?: string; message_id?: string }) => {
+    const groupId = event?.group_openid ?? '';
+    const messageId = event?.message_id ?? event?.audit_id ?? '';
+    const auditTime = event?.audit_time ?? '';
+
+    return {
+      groupId,
+      messageId,
+      auditTime
+    };
   };
 
   client.on('GROUP_ADD_ROBOT', event => {
@@ -69,28 +102,61 @@ export const register = (client: QQBotClients) => {
   });
 
   // 监听消息
-  client.on('GROUP_AT_MESSAGE_CREATE', event => {
-    const UserId = event.author.id;
-    const [isMaster, UserKey] = getMaster(UserId);
-    const UserAvatar = createUserAvatarURL(event.author.id);
+  client.on('GROUP_MESSAGE_CREATE', event => {
+    if (event?.author?.bot) {
+      return;
+    }
+
+    const msg = getMessageContent(event);
+    const meta = getGroupMessageMeta(event);
 
     // 定义消
     cbp.send(
       FormatEvent.create('message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addGuild({ GuildId: event.group_id, SpaceId: `GROUP:${event.group_id}` })
-        .addChannel({ ChannelId: event.group_id })
+        .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
+        .addChannel({ ChannelId: meta.groupId })
         .addUser({
-          UserId: event.author.id,
-          UserKey,
-          UserAvatar: UserAvatar,
-          UserName: event?.author?.username,
-          IsMaster: isMaster,
+          UserId: meta.UserId,
+          UserKey: meta.UserKey,
+          UserAvatar: meta.UserAvatar,
+          UserName: meta.UserName,
+          IsMaster: meta.isMaster,
           IsBot: false
         })
-        .addMessage({ MessageId: event.id })
-        .addText({ MessageText: event.content?.trim() })
-        .addOpen({ OpenId: `C2C:${event.author.member_openid}` })
+        .addMessage({ MessageId: meta.messageId })
+        .addText({ MessageText: msg?.trim() })
+        .addOpen({ OpenId: meta.openId })
+        .add({ tag: 'GROUP_MESSAGE_CREATE' }).value
+    );
+  });
+
+  // 监听消息
+  client.on('GROUP_AT_MESSAGE_CREATE', event => {
+    if (event?.author?.bot) {
+      return;
+    }
+
+    const msg = getMessageContent(event);
+    const meta = getGroupMessageMeta(event);
+
+    // 定义消
+    cbp.send(
+      FormatEvent.create('message.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
+        .addChannel({ ChannelId: meta.groupId })
+        .addUser({
+          UserId: meta.UserId,
+          UserKey: meta.UserKey,
+          UserAvatar: meta.UserAvatar,
+          UserName: meta.UserName,
+          IsMaster: meta.isMaster,
+          IsBot: false
+        })
+        .addMessage({ MessageId: meta.messageId })
+        .addText({ MessageText: msg?.trim() })
+        .addOpen({ OpenId: meta.openId })
         .add({ tag: 'GROUP_AT_MESSAGE_CREATE' }).value
     );
   });
@@ -585,6 +651,38 @@ export const register = (client: QQBotClients) => {
     );
   });
 
+  // 群消息审核通过
+  client.on('MESSAGE_AUDIT_PASS', event => {
+    const meta = getGroupAuditMeta(event);
+
+    cbp.send(
+      FormatEvent.create('notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
+        .addChannel({ ChannelId: meta.groupId })
+        .addUser({ UserId: '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: meta.messageId })
+        .addText({ MessageText: meta.auditTime })
+        .add({ tag: 'MESSAGE_AUDIT_PASS' }).value
+    );
+  });
+
+  // 群消息审核不通过
+  client.on('MESSAGE_AUDIT_REJECT', event => {
+    const meta = getGroupAuditMeta(event);
+
+    cbp.send(
+      FormatEvent.create('notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
+        .addChannel({ ChannelId: meta.groupId })
+        .addUser({ UserId: '', UserKey: '', IsMaster: false, IsBot: false })
+        .addMessage({ MessageId: meta.messageId })
+        .addText({ MessageText: meta.auditTime })
+        .add({ tag: 'MESSAGE_AUDIT_REJECT' }).value
+    );
+  });
+
   // C2C消息推送开启
   client.on('C2C_MSG_RECEIVE', event => {
     cbp.send(
@@ -695,6 +793,9 @@ export const register = (client: QQBotClients) => {
         if (tag === 'GROUP_AT_MESSAGE_CREATE') {
           return await GROUP_AT_MESSAGE_CREATE(client, event, val);
         }
+        if (tag === 'GROUP_MESSAGE_CREATE') {
+          return await GROUP_AT_MESSAGE_CREATE(client, event, val);
+        }
         // 私聊
         if (tag === 'C2C_MESSAGE_CREATE') {
           return await C2C_MESSAGE_CREATE(client, event, val);
@@ -726,19 +827,10 @@ export const register = (client: QQBotClients) => {
       },
       mention: event => {
         const value = event.value || {};
-        const tag = event._tag;
-        // const event = e.value
         const Metions: User[] = [];
 
-        // group
-        if (tag === 'GROUP_AT_MESSAGE_CREATE' || tag === 'C2C_MESSAGE_CREATE') {
-          // return Metions;
-          return new Promise<User[]>(resolve => resolve(Metions));
-        }
-        // guild
         if (value.mentions) {
-          const mentions: AT_MESSAGE_CREATE_TYPE['mentions'] = event.value['mentions'];
-          // 艾特消息处理
+          const mentions = (event.value['mentions'] || []) as NonNullable<AT_MESSAGE_CREATE_TYPE['mentions'] | GROUP_MESSAGE_CREATE_TYPE['mentions']>;
           const MessageMention: User[] = mentions.map(item => {
             const UserId = item.id;
             const [isMaster, UserKey] = getMaster(UserId);
@@ -747,15 +839,13 @@ export const register = (client: QQBotClients) => {
               UserId: item.id,
               IsMaster: isMaster,
               UserName: item.username,
-              IsBot: item.bot,
+              IsBot: item.bot ?? false,
               UserKey: UserKey
             };
           });
 
-          // return MessageMention;
           return new Promise<User[]>(resolve => resolve(MessageMention));
         } else {
-          // return Metions;
           return new Promise<User[]>(resolve => resolve(Metions));
         }
       }

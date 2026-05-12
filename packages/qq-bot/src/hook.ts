@@ -1,5 +1,6 @@
 import { createEventValue, EventKeys, Events, useClient as createUseClient } from 'alemonjs';
 import { GROUP_AT_MESSAGE_CREATE_TYPE } from './message/group/GROUP_AT_MESSAGE_CREATE';
+import { GROUP_MESSAGE_CREATE_TYPE } from './message/group/GROUP_MESSAGE_CREATE';
 import { QQBotAPI as API } from './sdk/api';
 import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE';
 import { INTERACTION_CREATE_TYPE } from './message/INTERACTION_CREATE';
@@ -28,9 +29,11 @@ import { GROUP_MSG_RECEIVE_TYPE } from './message/group/GROUP_MSG_RECEIVE';
 import { GROUP_MSG_REJECT_TYPE } from './message/group/GROUP_MSG_REJECT';
 import { C2C_MSG_RECEIVE_TYPE } from './message/group/C2C_MSG_RECEIVE';
 import { C2C_MSG_REJECT_TYPE } from './message/group/C2C_MSG_REJECT';
+import { MESSAGE_AUDIT_PASS_TYPE } from './message/group/MESSAGE_AUDIT_PASS';
+import { MESSAGE_AUDIT_REJECT_TYPE } from './message/group/MESSAGE_AUDIT_REJECT';
 
 type MAP = {
-  'message.create': GROUP_AT_MESSAGE_CREATE_TYPE | AT_MESSAGE_CREATE_TYPE | MESSAGE_CREATE_TYPE;
+  'message.create': GROUP_AT_MESSAGE_CREATE_TYPE | GROUP_MESSAGE_CREATE_TYPE | AT_MESSAGE_CREATE_TYPE | MESSAGE_CREATE_TYPE;
   'private.message.create': DIRECT_MESSAGE_CREATE_TYPE | C2C_MESSAGE_CREATE_TYPE;
   'interaction.create': INTERACTION_CREATE_TYPE;
   'private.interaction.create': INTERACTION_CREATE_TYPE;
@@ -50,7 +53,7 @@ type MAP = {
   'member.ban': undefined;
   'member.unban': undefined;
   'member.update': GUILD_MEMBER_UPDATE_TYPE;
-  'notice.create': GROUP_MSG_RECEIVE_TYPE | GROUP_MSG_REJECT_TYPE;
+  'notice.create': GROUP_MSG_RECEIVE_TYPE | GROUP_MSG_REJECT_TYPE | MESSAGE_AUDIT_PASS_TYPE | MESSAGE_AUDIT_REJECT_TYPE;
   'private.message.update': undefined;
   'private.message.delete': DIRECT_MESSAGE_DELETE_TYPE;
   'private.friend.add': FRIEND_ADD_TYPE;
@@ -93,6 +96,9 @@ export const useMode = <T extends EventKeys>(event: Events[T]) => {
 
   // 群at
   if (tag === 'GROUP_AT_MESSAGE_CREATE') {
+    currentMode = 'group';
+  }
+  if (tag === 'GROUP_MESSAGE_CREATE') {
     currentMode = 'group';
   }
   // 私聊

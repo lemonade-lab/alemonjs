@@ -31,6 +31,7 @@ export type RouteRule = {
 
 export type RouteArgSchema = {
   name: string;
+  description?: string;
   defaultValue?: RouteSchemaValue;
   rules?: RouteRule[];
 };
