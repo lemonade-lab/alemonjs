@@ -41,12 +41,18 @@ function normalizeForCompare(text: string) {
   return text.replace(/^([!！/#＃])\s*/, '').trim();
 }
 
+function escapeRegExp(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function shouldCheckCandidate(messageText: string, candidate: string) {
   if (!messageText || !candidate) {
     return false;
   }
 
-  return messageText.startsWith(candidate);
+  const candidatePattern = new RegExp(`^${escapeRegExp(candidate)}(?:\\s|$)`);
+
+  return candidatePattern.test(messageText);
 }
 
 function getAdaptiveMaxDistance(input: string) {

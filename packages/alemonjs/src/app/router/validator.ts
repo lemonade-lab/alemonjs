@@ -86,6 +86,30 @@ function getMaxArgs(schema?: RouteSchema) {
   return args.length > 0 ? args.length : undefined;
 }
 
+function getMissingRequiredArg(rawArgs: string[], schema?: RouteSchema) {
+  const args = schema?.args ?? [];
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    const requiredRule = getRequiredRule(arg);
+
+    if (!requiredRule) {
+      continue;
+    }
+
+    const rawValue = arg.rules?.some(rule => rule.type === 'rest') ? rawArgs.slice(index).join(' ').trim() : rawArgs[index];
+
+    if (rawValue === undefined || rawValue === '') {
+      return {
+        arg,
+        displayIndex: index + 1
+      };
+    }
+  }
+
+  return null;
+}
+
 function parseRange(rawValue: string, rule: RouteRule) {
   const separators = rule.separators ?? ['-', '－'];
   const separator = separators.find(item => rawValue.includes(item));
@@ -105,8 +129,18 @@ function parseRange(rawValue: string, rule: RouteRule) {
   return { start, end };
 }
 
+function formatArgReference(argName: string | undefined, displayIndex: number) {
+  const name = String(argName ?? '').trim();
+
+  if (name) {
+    return `参数「${name}」`;
+  }
+
+  return `第${displayIndex}个参数`;
+}
+
 function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRuleValidatorContext, usage?: string): RouteValidationResult {
-  const messagePrefix = `参数${context.displayIndex}`;
+  const messagePrefix = formatArgReference(context.argName, context.displayIndex);
   const normalizedValue = rule.normalizeMap?.[rawValue] ?? rawValue;
 
   if (rule.pattern) {
@@ -345,9 +379,13 @@ export function validateRouteArgsForCommand(commandPath: string | undefined, raw
   const usage = schema?.usage;
 
   if (rawArgs.length < minArgs) {
+    const missingRequiredArg = getMissingRequiredArg(rawArgs, schema);
+
     return {
       valid: false,
-      error: schema?.messages?.tooFewArgs ?? `至少需要 ${minArgs} 个参数`,
+      error:
+        schema?.messages?.tooFewArgs ??
+        (missingRequiredArg ? `${formatArgReference(missingRequiredArg.arg.name, missingRequiredArg.displayIndex)}是必填的` : `至少需要 ${minArgs} 个参数`),
       usage
     };
   }
@@ -376,7 +414,7 @@ export function validateRouteArgsForCommand(commandPath: string | undefined, raw
         if (requiredRule) {
           return {
             valid: false,
-            error: requiredRule.message ?? `参数${displayIndex}是必填的`,
+            error: requiredRule.message ?? `${formatArgReference(arg.name, displayIndex)}是必填的`,
             usage
           };
         }
@@ -418,7 +456,7 @@ export function validateRouteArgsForCommand(commandPath: string | undefined, raw
       if (requiredRule) {
         return {
           valid: false,
-          error: requiredRule.message ?? `参数${displayIndex}是必填的`,
+          error: requiredRule.message ?? `${formatArgReference(arg.name, displayIndex)}是必填的`,
           usage
         };
       }

@@ -108,6 +108,16 @@ function formatRouteDescription(description?: string) {
   return typeof description === 'string' && description.trim() ? description.trim() : undefined;
 }
 
+function formatArgReference(arg: { name?: string }, displayIndex: number) {
+  const name = typeof arg.name === 'string' ? arg.name.trim() : '';
+
+  if (name) {
+    return `参数「${name}」`;
+  }
+
+  return `第${displayIndex}个参数`;
+}
+
 function formatArgRuleHint(arg: { name: string; description?: string; rules?: any[] }, displayIndex: number) {
   const rules = arg.rules ?? [];
   const parts: string[] = [];
@@ -141,7 +151,7 @@ function formatArgRuleHint(arg: { name: string; description?: string; rules?: an
 
   const suffix = arg.description ? `，${arg.description}` : '';
 
-  return `参数${displayIndex} \`${arg.name}\`：${parts.join('，')}${suffix}`;
+  return `${formatArgReference(arg, displayIndex)}：${parts.join('，')}${suffix}`;
 }
 
 function buildSchemaHints(schema?: { args?: Array<{ name: string; description?: string; rules?: any[] }> }) {
