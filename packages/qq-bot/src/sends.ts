@@ -31,20 +31,29 @@ const createButtonsData = (rows: DataButtonRow[], startId = 0) => {
         const typing = options?.type ?? 'command';
         const typeMap = { command: 2, link: 0, call: 1 };
 
+        // 透传的原始数据
+        const rowData = options?.rawData ?? {};
+
         return {
           id: String(id),
           render_data: {
             label: value,
             visited_label: value,
-            style: 0
+            // 不设置为蓝，默认为灰
+            style: options.style !== 'blue' ? 0 : 1
           },
           action: {
             type: typeMap[typing],
-            permission: { type: 2 },
+            permission: {
+              type: typeof options.permission?.type === 'undefined' ? 2 : options?.permission?.type,
+              specify_user_ids: options?.permission?.userIds,
+              specify_role_ids: options?.permission?.roleIds
+            },
             unsupport_tips: options?.toolTip ?? '',
             data: options?.data ?? '',
             at_bot_show_channel_list: false,
-            enter: options?.autoEnter ?? false
+            enter: options?.autoEnter ?? false,
+            ...rowData
           }
         };
       })

@@ -13,6 +13,20 @@ export type DataButton = {
     type?: 'command' | 'link' | 'call';
     // 是否自动确认，默认 false - 即自动提交
     notAutoConfirmation?: boolean;
+    // 是否引用回复
+    reply?: boolean;
+    // 权限
+    permission?: {
+      type?: number;
+      userIds?: string[];
+      roleIds?: string[];
+    };
+    // 风格
+    style?: 'gray' | 'blue' | 'purple' | string;
+    // 原始数据。直接透传
+    rawData: {
+      [key: string]: any;
+    };
   };
 };
 
