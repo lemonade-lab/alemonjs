@@ -203,13 +203,13 @@ Platform 事件 → onProcessor (过滤/去重)
 | 👉[@alemonjs/process] | [![process-s]][process-p] | 桌面端进程通信模块                   |
 | 👉[create-alemonjs]   | [![create-s]][create-p]   | 项目脚手架                           |
 
-[@alemonjs/db]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/db
+[@alemonjs/db]: https://github.com/lemonade-lab/alemonjs/tree/main/packages-ex/db
 [db-s]: https://img.shields.io/npm/v/@alemonjs/db.svg
 [db-p]: https://www.npmjs.com/package/@alemonjs/db
-[@alemonjs/process]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/process
+[@alemonjs/process]: https://github.com/lemonade-lab/alemonjs/tree/main/packages-ex/process
 [process-s]: https://img.shields.io/npm/v/@alemonjs/process.svg
 [process-p]: https://www.npmjs.com/package/@alemonjs/process
-[create-alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/create-alemonjs
+[create-alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages-cl/create-alemonjs
 [create-s]: https://img.shields.io/npm/v/create-alemonjs.svg
 [create-p]: https://www.npmjs.com/package/create-alemonjs
 
