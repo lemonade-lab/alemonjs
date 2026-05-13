@@ -13,7 +13,7 @@
 # 创建新项目
 npm create alemonjs@latest
 # 进入项目目录
-cd my-bot
+cd alemonjs
 # 安装依赖
 yarn install
 # 启动开发
@@ -25,8 +25,6 @@ yarn dev
 ```
 ┌──────────────────────────────────────────────────────┐
 │                    开发者应用层                        │
-│   defineChildren → defineRouter → handler(response)   │
-│                   defineMiddleware                     │
 │   Hooks: useMessage, useMention, useSubscribe         │
 │   Format: 链式消息构建器                               │
 └─────────────────────┬────────────────────────────────┘
@@ -36,9 +34,9 @@ yarn dev
 │   事件处理器 (过滤/去重/中间件/订阅/响应)              │
 │   模块加载器 (loadChildren → ChildrenApp 生命周期)    │
 │   通信层:                                             │
-│   ├─ Direct Channel (UDS + V8 序列化, ~20μs)         │
-│   ├─ IPC Bridge (fork 子进程, ~50μs)                 │
-│   └─ WebSocket (flattedJSON, ~1ms)                   │
+│   ├─ Direct Channel (UDS + V8 序列化)         │
+│   ├─ IPC Bridge (fork 子进程)                 │
+│   └─ WebSocket (flattedJSON)                   │
 └─────────────────────┬────────────────────────────────┘
                       │
 ┌─────────────────────┴────────────────────────────────┐
@@ -99,7 +97,7 @@ export default () => {
   const [message] = useMessage();
   const format = Format.create();
   format.addText('Hello!');
-  format.addImage('https://example.com/img.png');
+  format.addImage('https://alemonjs.com/me.png');
   format.addButtonGroup(Format.createButtonGroup().addRow().addButton('确认', { action: 'confirm' }));
   message.send({ format });
 };
@@ -107,47 +105,39 @@ export default () => {
 
 支持文本、图片、按钮组、Markdown、@提及、链接、附件、音视频等消息类型。
 
-### 事件构建（FormatEvent）
-
-推荐使用类型安全的 `FormatEvent` API 构建事件对象：
-
-```typescript
-import { FormatEvent } from 'alemonjs';
-
-FormatEvent.create('message.create')
-  .addPlatform({ Platform: 'discord', value: raw })
-  .addGuild({ GuildId: 'g1', SpaceId: 's1' })
-  .addMessage({ MessageId: 'm1' });
-```
-
 ### 声明式路由
 
 ```typescript
 import { defineChildren, defineRouter, lazy } from 'alemonjs';
 
+const router = Router.create({
+  events: ['message.create', 'private.message.create']
+});
+
+const app = router.group(
+  {
+    routeText: {
+      prefixes: ['/', '#', '＃', '!', '！'],
+      stripPrefix: true,
+      allowBare: true
+    },
+    keyPolicy: {
+      maxWords: 2
+    }
+  },
+  // 中间件
+  () => import('@src/response/mw')
+);
+// 功能
+app.use(['帮助'], () => import('@src/response/help'));
+
 export default defineChildren({
   async register() {
     return {
-      responseRouter: defineRouter([
-        { exact: '/ping', handler: lazy(() => import('./response/ping')) },
-        { prefix: '/echo', handler: lazy(() => import('./response/echo')) },
-        { regular: /^\/help/, handler: lazy(() => import('./response/help')) },
-        {
-          prefix: '/admin',
-          selects: ['message.create'],
-          handler: lazy(() => import('./middleware/admin-auth')),
-          children: [{ exact: '/admin ban', handler: lazy(() => import('./response/admin-ban')) }]
-        }
-      ])
+      responseRouter: app.define
     };
   }
 });
-```
-
-路由配置支持 `selects` 属性按事件类型过滤，可指定单个或多个事件类型：
-
-```typescript
-{ exact: '/ping', selects: ['message.create', 'private.message.create'], handler: ... }
 ```
 
 ### 事件处理管线
@@ -163,7 +153,7 @@ Platform 事件 → onProcessor (过滤/去重)
 
 ### 配置系统
 
-通过 `alemon.config.yaml` 管理，支持命令行参数 > 配置文件 > 默认值的合并优先级，100ms 防抖变更通知。
+通过 `alemon.config.yaml` 管理，支持命令行参数 > 配置文件 > 默认值的合并优先级
 
 ## 📦 平台支持
 
@@ -218,7 +208,7 @@ Platform 事件 → onProcessor (过滤/去重)
 | Project        | Description                    |
 | -------------- | ------------------------------ |
 | 👉[lvyjs]      | 开发环境（Node.js 捆绑打包器） |
-| 👉[jsxp]       | 截图工具(puppeteer)            |
+| 👉[jsxp]       | 截图工具(Playwright)           |
 | 👉[alemondesk] | 桌面端版本（React + Golang）   |
 | 👉[alemongo]   | 服务端版本（React + Golang）   |
 
