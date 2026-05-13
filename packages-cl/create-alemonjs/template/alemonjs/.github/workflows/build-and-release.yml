@@ -1,0 +1,159 @@
+name: 发布新版本
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号(自增)'
+        required: false
+      runner-type:
+        description: '选择运行器类型'
+        required: false
+        default: 'macos-latest'
+        type: choice
+        options:
+          - self-hosted
+          - macos-latest
+          - ubuntu-latest
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: 构建和上传发布资产
+    runs-on: ${{ github.event.inputs.runner-type || 'self-hosted' }}
+
+    steps:
+      - name: 结账代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整 tag 历史
+
+      - name: 检查分支
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "错误: 该工作流只能在 main 分支上运行。"
+          exit 1
+
+      - name: 设置nodejs版本
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 缓存游戏依赖
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-root-${{ hashFiles('yarn.lock') }}
+
+      - name: 检查yarn工具
+        run: |
+          if ! command -v yarn &> /dev/null; then
+             npm install -g yarn
+          fi
+
+      - name: 安装游戏依赖
+        run: |
+          yarn install --ignore-engines
+
+      - name: 自动获取/自增版本号
+        id: versioning
+        run: |
+          # 如果用户输入 version，则直接用
+          if [[ -n "${{ github.event.inputs.version }}" ]]; then
+            VERSION="v${{ github.event.inputs.version }}"
+          else
+            # 自动获取最新 tag
+            LATEST_TAG=$(git tag --sort=-v:refname | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | head -n 1)
+            if [ -z "$LATEST_TAG" ]; then
+              VERSION="v0.0.1"
+            else
+              VERSION_NUM=${LATEST_TAG#v}
+              MAJOR=$(echo $VERSION_NUM | cut -d. -f1)
+              MINOR=$(echo $VERSION_NUM | cut -d. -f2)
+              PATCH=$(echo $VERSION_NUM | cut -d. -f3)
+              PATCH=$((PATCH + 1))
+              VERSION="v$MAJOR.$MINOR.$PATCH"
+            fi
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "本次发布版本号: $VERSION"
+
+      - name: 打包
+        run: |
+          yarn build
+          mkdir -p dist-release
+          cp -rf ./lib dist-release/lib
+          if [[ -f ./.puppeteerrc.cjs ]]; then
+            cp -rf ./.puppeteerrc.cjs dist-release/.puppeteerrc.cjs
+          fi
+          cp -rf ./package.json dist-release/package.json
+          cp -rf ./README.md dist-release/README.md
+          # 检查 dist 目录是否存在且不为空
+          if [[ ! -d dist-release || -z $(ls -A dist-release) ]]; then
+            echo "错误: 'dist' 目录不存在或为空，构建步骤可能失败。"
+            exit 1
+          fi
+          # 转移产物
+          mv dist-release ../dist-release
+
+      - name: 推送 release
+        run: |
+          DEPLOY_BRANCH="release"
+          git fetch origin $DEPLOY_BRANCH || echo "远程分支 $DEPLOY_BRANCH 不存在，准备创建..."
+          if ! git show-ref --verify --quiet refs/remotes/origin/$DEPLOY_BRANCH; then
+             git checkout -b $DEPLOY_BRANCH
+             git push origin $DEPLOY_BRANCH
+          else
+            git checkout $DEPLOY_BRANCH
+          fi
+
+          # 删除依赖
+          rm -rf node_modules
+          rm -rf .gitignore
+          # 删除流水线
+          rm -rf .github
+
+          # 清理非 git 文件夹的其他内容（保护 .git 目录）
+          find . -mindepth 1 ! -path './.git*' -exec rm -rf {} + || true
+
+          # 移动 dist-release 文件夹内容到根目录
+          mv ../dist-release/* ./ || {
+            echo "错误: 无法将 'dist-release' 目录中的文件移动到根目录，目录可能为空。"
+            exit 1
+          }
+
+          # 检查 .git 是否还在
+          if [ ! -d .git ]; then
+            echo "错误：.git 目录已丢失，无法进行后续 git 操作"
+            exit 1
+          fi
+
+          # 去除 package.json 中一些字段
+          jq 'del(.devDependencies)' package.json > package.json.tmp && mv package.json.tmp package.json
+          jq 'del(.workspaces)' package.json > package.json.tmp && mv package.json.tmp package.json
+          jq 'del(.private)' package.json > package.json.tmp && mv package.json.tmp package.json
+          jq 'del(.scripts)' package.json > package.json.tmp && mv package.json.tmp package.json
+          jq --arg version "${{ steps.versioning.outputs.version }}" '.version = ($version | sub("^v";""))' package.json > package.json.tmp && mv package.json.tmp package.json
+
+          # 开始产出
+          git config --local user.email "ningmengchongshui@gmail.com"
+          git config --local user.name "ningmengchongshui"
+          git config --local push.autoSetupRemote true
+          git add -A
+          git commit -m "${{ steps.versioning.outputs.version }}"
+          git push origin $DEPLOY_BRANCH || {
+            echo "错误：推送失败，请检查..."
+            exit 1
+          }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 打 tag 并推送
+        run: |
+          TAG="${{ steps.versioning.outputs.version }}"
+          git tag -f $TAG
+          git push origin $TAG --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
