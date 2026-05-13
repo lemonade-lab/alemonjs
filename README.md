@@ -105,7 +105,7 @@ export default () => {
 
 支持文本、图片、按钮组、Markdown、@提及、链接、附件、音视频等消息类型。
 
-### 声明式路由
+### 链式路由
 
 ```typescript
 import { defineChildren, defineRouter, lazy } from 'alemonjs';
