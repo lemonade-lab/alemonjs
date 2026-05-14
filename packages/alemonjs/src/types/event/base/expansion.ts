@@ -10,13 +10,28 @@ export type Expansion = {
   /**
    * 当前事件是否至少尝试过一次消息发送。
    */
+  _sendAttempted?: boolean;
+  /**
+   * 当前事件是否至少尝试过一次消息发送。
+   * @deprecated 请改用 _sendAttempted
+   */
   _has_send_attempt?: boolean;
   /**
    * 当前事件是否至少成功发送过一次消息。
    */
+  _sendSucceeded?: boolean;
+  /**
+   * 当前事件是否至少成功发送过一次消息。
+   * @deprecated 请改用 _sendSucceeded
+   */
   _has_send_success?: boolean;
   /**
    * 最近一次消息发送失败的错误信息。
+   */
+  _lastSendError?: string | null;
+  /**
+   * 最近一次消息发送失败的错误信息。
+   * @deprecated 请改用 _lastSendError
    */
   _last_send_error?: string | null;
   [key: string]: any;

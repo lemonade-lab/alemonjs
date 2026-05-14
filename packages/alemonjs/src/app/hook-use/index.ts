@@ -12,6 +12,7 @@ export * from './permission';
 export * from './reaction';
 export * from './request';
 export * from './role';
+export * from './route';
 export * from './user';
 export * from './subscribe';
 export * from './event';

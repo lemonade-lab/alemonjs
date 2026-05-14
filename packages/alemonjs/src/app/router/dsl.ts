@@ -708,6 +708,8 @@ export class Router<P extends string = string, E extends string = string> {
       attachRouteContext(event, {
         key: match.route.config.path,
         text: match.normalizedCommand,
+        sourceText: typeof event.MessageText === 'string' ? event.MessageText : undefined,
+        rewrittenText: match.normalizedCommand,
         rawArgs: match.rawArgs,
         parsedArgs: [],
         params: {}
@@ -736,6 +738,8 @@ export class Router<P extends string = string, E extends string = string> {
     attachRouteContext(event, {
       key: match.route.config.path,
       text: match.normalizedCommand,
+      sourceText: initialMessageText,
+      rewrittenText: match.normalizedCommand,
       rawArgs: match.rawArgs,
       parsedArgs: match.parsedArgs,
       params
@@ -778,6 +782,8 @@ export class Router<P extends string = string, E extends string = string> {
       attachRouteContext(event, {
         key: '',
         text: scopedText,
+        sourceText: typeof event.MessageText === 'string' ? event.MessageText : undefined,
+        rewrittenText: scopedText,
         rawArgs: [],
         parsedArgs: [],
         params: {}

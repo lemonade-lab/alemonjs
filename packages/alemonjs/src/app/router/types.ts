@@ -4,6 +4,8 @@ export type RouteParams = Record<string, RouteSchemaValue | undefined>;
 export type RouteContext = {
   key: string;
   text: string;
+  sourceText?: string;
+  rewrittenText?: string;
   rawArgs: string[];
   parsedArgs: RouteSchemaValue[];
   params: RouteParams;

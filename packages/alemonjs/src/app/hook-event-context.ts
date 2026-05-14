@@ -165,6 +165,21 @@ const getTargetEvent = <T extends EventKeys>(event?: Events[T]) => {
   return event ?? (eventStore.getStore()?.event as Events[T] | undefined);
 };
 
+const setSendAttempted = <T extends EventKeys>(target: Events[T]) => {
+  target._sendAttempted = true;
+  target._has_send_attempt = true;
+};
+
+const setSendSucceeded = <T extends EventKeys>(target: Events[T]) => {
+  target._sendSucceeded = true;
+  target._has_send_success = true;
+};
+
+const setLastSendError = <T extends EventKeys>(target: Events[T], error: string | null) => {
+  target._lastSendError = error;
+  target._last_send_error = error;
+};
+
 /**
  * 标记当前事件至少尝试过一次消息发送。
  */
@@ -175,7 +190,7 @@ export const markEventSendAttempt = <T extends EventKeys>(event?: Events[T]) => 
     return;
   }
 
-  target._has_send_attempt = true;
+  setSendAttempted(target);
 };
 
 /**
@@ -188,9 +203,9 @@ export const markEventSendSuccess = <T extends EventKeys>(event?: Events[T]) => 
     return;
   }
 
-  target._has_send_attempt = true;
-  target._has_send_success = true;
-  target._last_send_error = null;
+  setSendAttempted(target);
+  setSendSucceeded(target);
+  setLastSendError(target, null);
 };
 
 /**
@@ -203,8 +218,8 @@ export const markEventSendFailure = <T extends EventKeys>(error: unknown, event?
     return;
   }
 
-  target._has_send_attempt = true;
-  target._last_send_error = error instanceof Error ? error.message : typeof error === 'string' ? error : 'Unknown send error';
+  setSendAttempted(target);
+  setLastSendError(target, error instanceof Error ? error.message : typeof error === 'string' ? error : 'Unknown send error');
 };
 
 /**
