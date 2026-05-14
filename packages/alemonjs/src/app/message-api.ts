@@ -3,6 +3,7 @@ import { ResultCode } from '../core/variable';
 import { sendAction } from '../cbp/processor/actions';
 import { createResult, Result } from '../core';
 import { Format } from './message-format';
+import { markEventSendAttempt, markEventSendFailure, recordEventSendResults } from './hook-event-context';
 
 /**
  * 创建数据格式。
@@ -57,16 +58,27 @@ export class MessageDirect {
       throw new Error('Invalid SpaceId: SpaceId must be a string');
     }
 
-    return await sendAction({
-      action: 'message.send.channel',
-      payload: {
-        ChannelId: params.SpaceId,
-        params: {
-          format: Array.isArray(params.format) ? params.format : params.format.value,
-          replyId: params?.replyId
+    markEventSendAttempt();
+
+    try {
+      const results = await sendAction({
+        action: 'message.send.channel',
+        payload: {
+          ChannelId: params.SpaceId,
+          params: {
+            format: Array.isArray(params.format) ? params.format : params.format.value,
+            replyId: params?.replyId
+          }
         }
-      }
-    });
+      });
+
+      recordEventSendResults(results, undefined);
+
+      return results;
+    } catch (error) {
+      markEventSendFailure(error);
+      throw error;
+    }
   }
 
   /**
@@ -83,15 +95,26 @@ export class MessageDirect {
       throw new Error('Invalid OpenID: OpenID must be a string');
     }
 
-    return await sendAction({
-      action: 'message.send.user',
-      payload: {
-        UserId: params.OpenID,
-        params: {
-          format: Array.isArray(params.format) ? params.format : params.format.value
+    markEventSendAttempt();
+
+    try {
+      const results = await sendAction({
+        action: 'message.send.user',
+        payload: {
+          UserId: params.OpenID,
+          params: {
+            format: Array.isArray(params.format) ? params.format : params.format.value
+          }
         }
-      }
-    });
+      });
+
+      recordEventSendResults(results, undefined);
+
+      return results;
+    } catch (error) {
+      markEventSendFailure(error);
+      throw error;
+    }
   }
 }
 

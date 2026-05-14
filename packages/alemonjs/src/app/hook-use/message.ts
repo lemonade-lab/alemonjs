@@ -1,4 +1,17 @@
-import { DataEnums, EventKeys, Events, Format, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import {
+  DataEnums,
+  EventKeys,
+  Events,
+  Format,
+  Result,
+  ResultCode,
+  createResult,
+  getEventOrThrow,
+  markEventSendAttempt,
+  markEventSendFailure,
+  recordEventSendResults,
+  sendAction
+} from './common';
 
 /**
  * 消息处理
@@ -36,18 +49,28 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
     if (!val || val.length === 0) {
       return [createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)];
     }
-    const result = await sendAction({
-      action: 'message.send',
-      payload: {
-        event: valueEvent,
-        params: {
-          format: val,
-          replyId
-        }
-      }
-    });
+    markEventSendAttempt(valueEvent);
 
-    return Array.isArray(result) ? result : [result];
+    try {
+      const result = await sendAction({
+        action: 'message.send',
+        payload: {
+          event: valueEvent,
+          params: {
+            format: val,
+            replyId
+          }
+        }
+      });
+      const results = Array.isArray(result) ? result : [result];
+
+      recordEventSendResults(results, valueEvent);
+
+      return results;
+    } catch (error) {
+      markEventSendFailure(error, valueEvent);
+      throw error;
+    }
   };
 
   const lightweight = {

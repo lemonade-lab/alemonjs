@@ -194,9 +194,9 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
       // 检查是否是 master
       if (event['UserId'] && matchIn(masterId, event['UserId'])) {
-        event['isMaster'] = true;
+        event['IsMaster'] = true;
       } else if (event['UserKey'] && matchIn(masterKey, event['UserKey'])) {
-        event['isMaster'] = true;
+        event['IsMaster'] = true;
       }
 
       const botId = value?.bot_id;
@@ -204,9 +204,9 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
       // 检查是否是 bot
       if (event['UserId'] && matchIn(botId, event['UserId'])) {
-        event['isBot'] = true;
+        event['IsBot'] = true;
       } else if (event['UserKey'] && matchIn(botKey, event['UserKey'])) {
-        event['isBot'] = true;
+        event['IsBot'] = true;
       }
 
       const Now = Date.now();

@@ -4,7 +4,7 @@ import { QQBotClients } from './sdk/client.websoket';
 import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE';
 import { GROUP_MESSAGE_CREATE_TYPE } from './message/group/GROUP_MESSAGE_CREATE';
 import { AT_MESSAGE_CREATE, C2C_MESSAGE_CREATE, DIRECT_MESSAGE_CREATE, GROUP_AT_MESSAGE_CREATE, MESSAGE_CREATE } from './sends';
-import { getMaster, getQQBotConfig } from './config';
+import { getIdentity, getMaster, getQQBotConfig } from './config';
 import { platform } from './config';
 
 export const register = (client: QQBotClients) => {
@@ -63,6 +63,18 @@ export const register = (client: QQBotClients) => {
     };
   };
 
+  const createUserMeta = (UserId: string, extra: Partial<User> = {}): User => {
+    const [IsMaster, UserKey] = getIdentity(UserId);
+
+    return {
+      UserId,
+      UserKey,
+      IsMaster,
+      IsBot: false,
+      ...extra
+    };
+  };
+
   client.on('GROUP_ADD_ROBOT', event => {
     // 机器人加入群组
     cbp.send(
@@ -70,14 +82,7 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
-        .addUser({
-          UserId: event.op_member_openid,
-          UserKey: event.op_member_openid,
-          UserAvatar: createUserAvatarURL(event.op_member_openid),
-          IsMaster: false,
-          IsBot: false
-        })
-        .addMessage({ MessageId: '' })
+        .addUser(createUserMeta(event.op_member_openid, { UserAvatar: createUserAvatarURL(event.op_member_openid) }))
         .add({ tag: 'GROUP_ADD_ROBOT' }).value
     );
   });
@@ -89,14 +94,7 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
-        .addUser({
-          UserId: event.op_member_openid,
-          UserKey: event.op_member_openid,
-          UserAvatar: createUserAvatarURL(event.op_member_openid),
-          IsMaster: false,
-          IsBot: false
-        })
-        .addMessage({ MessageId: '' })
+        .addUser(createUserMeta(event.op_member_openid, { UserAvatar: createUserAvatarURL(event.op_member_openid) }))
         .add({ tag: 'GROUP_DEL_ROBOT' }).value
     );
   });
@@ -488,7 +486,6 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
         .addChannel({ ChannelId: event.id ?? '' })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'CHANNEL_CREATE' }).value
     );
   });
@@ -500,7 +497,6 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
         .addChannel({ ChannelId: event.id ?? '' })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'CHANNEL_DELETE' }).value
     );
   });
@@ -511,9 +507,7 @@ export const register = (client: QQBotClients) => {
       FormatEvent.create('guild.join')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
-        .addChannel({ ChannelId: '' })
         .addUser({ UserId: event.op_user_id ?? '', UserKey: '', IsMaster: false, IsBot: false })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'GUILD_CREATE' }).value
     );
   });
@@ -524,9 +518,7 @@ export const register = (client: QQBotClients) => {
       FormatEvent.create('guild.exit')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
-        .addChannel({ ChannelId: '' })
         .addUser({ UserId: event.op_user_id ?? '', UserKey: '', IsMaster: false, IsBot: false })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'GUILD_DELETE' }).value
     );
   });
@@ -540,9 +532,7 @@ export const register = (client: QQBotClients) => {
       FormatEvent.create('member.add')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
-        .addChannel({ ChannelId: '' })
         .addUser({ UserId: UserId, UserKey, UserName: event.user?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'GUILD_MEMBER_ADD' }).value
     );
   });
@@ -556,9 +546,7 @@ export const register = (client: QQBotClients) => {
       FormatEvent.create('member.remove')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
-        .addChannel({ ChannelId: '' })
         .addUser({ UserId: UserId, UserKey, UserName: event.user?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'GUILD_MEMBER_REMOVE' }).value
     );
   });
@@ -572,9 +560,7 @@ export const register = (client: QQBotClients) => {
       FormatEvent.create('member.update')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
-        .addChannel({ ChannelId: '' })
         .addUser({ UserId: UserId, UserKey, UserName: event.user?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'GUILD_MEMBER_UPDATE' }).value
     );
   });
@@ -584,8 +570,7 @@ export const register = (client: QQBotClients) => {
     cbp.send(
       FormatEvent.create('private.friend.add')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
-        .addMessage({ MessageId: '' })
+        .addUser(createUserMeta(event.openid ?? ''))
         .add({ tag: 'FRIEND_ADD' }).value
     );
   });
@@ -595,8 +580,7 @@ export const register = (client: QQBotClients) => {
     cbp.send(
       FormatEvent.create('private.friend.remove')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
-        .addMessage({ MessageId: '' })
+        .addUser(createUserMeta(event.openid ?? ''))
         .add({ tag: 'FRIEND_DEL' }).value
     );
   });
@@ -608,7 +592,6 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
         .addChannel({ ChannelId: event.id ?? '' })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'CHANNEL_UPDATE' }).value
     );
   });
@@ -619,8 +602,6 @@ export const register = (client: QQBotClients) => {
       FormatEvent.create('guild.update')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
-        .addChannel({ ChannelId: '' })
-        .addMessage({ MessageId: '' })
         .add({ tag: 'GUILD_UPDATE' }).value
     );
   });
@@ -632,7 +613,7 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
-        .addUser({ UserId: event.op_member_openid, UserKey: '', IsMaster: false, IsBot: false })
+        .addUser(createUserMeta(event.op_member_openid))
         .addMessage({ MessageId: `group_msg_receive_${event.group_openid}_${event.timestamp}` })
         .add({ tag: 'GROUP_MSG_RECEIVE' }).value
     );
@@ -645,7 +626,7 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
-        .addUser({ UserId: event.op_member_openid, UserKey: '', IsMaster: false, IsBot: false })
+        .addUser(createUserMeta(event.op_member_openid))
         .addMessage({ MessageId: `group_msg_reject_${event.group_openid}_${event.timestamp}` })
         .add({ tag: 'GROUP_MSG_REJECT' }).value
     );
@@ -660,9 +641,7 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
         .addChannel({ ChannelId: meta.groupId })
-        .addUser({ UserId: '', UserKey: '', IsMaster: false, IsBot: false })
         .addMessage({ MessageId: meta.messageId })
-        .addText({ MessageText: meta.auditTime })
         .add({ tag: 'MESSAGE_AUDIT_PASS' }).value
     );
   });
@@ -676,9 +655,7 @@ export const register = (client: QQBotClients) => {
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
         .addChannel({ ChannelId: meta.groupId })
-        .addUser({ UserId: '', UserKey: '', IsMaster: false, IsBot: false })
         .addMessage({ MessageId: meta.messageId })
-        .addText({ MessageText: meta.auditTime })
         .add({ tag: 'MESSAGE_AUDIT_REJECT' }).value
     );
   });
@@ -688,7 +665,7 @@ export const register = (client: QQBotClients) => {
     cbp.send(
       FormatEvent.create('private.notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addUser(createUserMeta(event.openid ?? ''))
         .addMessage({ MessageId: `c2c_msg_receive_${event.openid}_${event.timestamp}` })
         .add({ tag: 'C2C_MSG_RECEIVE' }).value
     );
@@ -699,7 +676,7 @@ export const register = (client: QQBotClients) => {
     cbp.send(
       FormatEvent.create('private.notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addUser({ UserId: event.openid ?? '', UserKey: '', IsMaster: false, IsBot: false })
+        .addUser(createUserMeta(event.openid ?? ''))
         .addMessage({ MessageId: `c2c_msg_reject_${event.openid}_${event.timestamp}` })
         .add({ tag: 'C2C_MSG_REJECT' }).value
     );

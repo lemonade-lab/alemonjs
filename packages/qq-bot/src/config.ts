@@ -33,12 +33,16 @@ export const getQQBotConfig = (): Options => {
 
   return value[platform] || {};
 };
-export const getMaster = (UserId: string) => {
-  const isMasterUser = isMaster(UserId, platform);
+export const getIdentity = (UserId: string) => {
+  const isMasterUser = UserId ? isMaster(UserId, platform) : false;
   const UserKey = createUserHashKey({
     Platform: platform,
     UserId
   });
 
   return [isMasterUser, UserKey] as const;
+};
+
+export const getMaster = (UserId: string) => {
+  return getIdentity(UserId);
 };

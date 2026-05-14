@@ -6,6 +6,18 @@ import { Counter } from 'alemonjs/utils';
 import { QQBotEventMap } from './message.js';
 import { Options } from './typing.js';
 
+const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unknown> }>(message: T): T => {
+  if (!message?.id || !message?.d || typeof message.d !== 'object' || Array.isArray(message.d)) {
+    return message;
+  }
+
+  if (message.d.id === undefined || message.d.id === null || message.d.id === '') {
+    message.d.id = message.id;
+  }
+
+  return message;
+};
+
 /**
  * 连接
  */
@@ -232,7 +244,7 @@ export class QQBotClients extends QQBotAPI {
         });
         // 监听消息
         this.#ws.on('message', msg => {
-          const message = JSON.parse(msg.toString('utf8'));
+          const message = normalizeGatewayMessage(JSON.parse(msg.toString('utf8')));
 
           if (process.env.NTQQ_WS === 'dev') {
             console.info('message', message);

@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { performance } from 'node:perf_hooks';
 import { getConfigValue } from '../core/config';
 import { ResultCode } from '../core/variable';
+import { Result } from '../core';
 import { EventKeys, Events } from '../types';
 
 export type EventTraceReason = 'filtered' | 'completed' | 'consumed' | 'error';
@@ -158,4 +159,69 @@ export const getCurrentNext = (): ((...args: boolean[]) => void) | undefined => 
  */
 export const finishCurrentTrace = (reason: EventTraceReason) => {
   eventStore.getStore()?.trace?.finish(reason);
+};
+
+const getTargetEvent = <T extends EventKeys>(event?: Events[T]) => {
+  return event ?? (eventStore.getStore()?.event as Events[T] | undefined);
+};
+
+/**
+ * 标记当前事件至少尝试过一次消息发送。
+ */
+export const markEventSendAttempt = <T extends EventKeys>(event?: Events[T]) => {
+  const target = getTargetEvent(event);
+
+  if (!target) {
+    return;
+  }
+
+  target._has_send_attempt = true;
+};
+
+/**
+ * 标记当前事件至少成功发送过一次消息。
+ */
+export const markEventSendSuccess = <T extends EventKeys>(event?: Events[T]) => {
+  const target = getTargetEvent(event);
+
+  if (!target) {
+    return;
+  }
+
+  target._has_send_attempt = true;
+  target._has_send_success = true;
+  target._last_send_error = null;
+};
+
+/**
+ * 标记当前事件最近一次消息发送失败。
+ */
+export const markEventSendFailure = <T extends EventKeys>(error: unknown, event?: Events[T]) => {
+  const target = getTargetEvent(event);
+
+  if (!target) {
+    return;
+  }
+
+  target._has_send_attempt = true;
+  target._last_send_error = error instanceof Error ? error.message : typeof error === 'string' ? error : 'Unknown send error';
+};
+
+/**
+ * 根据发送结果自动更新当前事件的发送状态。
+ */
+export const recordEventSendResults = <T extends EventKeys>(results: Result[], event?: Events[T]) => {
+  markEventSendAttempt(event);
+
+  if (Array.isArray(results) && results.some(item => item?.code === ResultCode.Ok)) {
+    markEventSendSuccess(event);
+
+    return;
+  }
+
+  const firstError = Array.isArray(results) ? results.find(item => item?.code !== ResultCode.Ok)?.message : null;
+
+  if (firstError) {
+    markEventSendFailure(firstError, event);
+  }
 };

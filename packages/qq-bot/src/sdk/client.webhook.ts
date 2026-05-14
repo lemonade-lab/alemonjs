@@ -19,6 +19,18 @@ type Data = {
   t: string;
 };
 
+const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unknown> }>(message: T): T => {
+  if (!message?.id || !message?.d || typeof message.d !== 'object' || Array.isArray(message.d)) {
+    return message;
+  }
+
+  if (message.d.id === undefined || message.d.id === null || message.d.id === '') {
+    message.d.id = message.id;
+  }
+
+  return message;
+};
+
 export class QQBotClient extends QQBotAPI {
   #events: {
     [K in keyof QQBotEventMap]?: ((event: QQBotEventMap[K]) => any)[];
@@ -129,7 +141,7 @@ export class QQBotClient extends QQBotAPI {
 
             return;
           }
-          const body = ctx.request.body as Data;
+          const body = normalizeGatewayMessage(ctx.request.body as Data);
 
           if (+body.op === 13) {
             ctx.status = 200;
@@ -181,7 +193,7 @@ export class QQBotClient extends QQBotAPI {
           ws.on('message', (message: string) => {
             // 拿到消息
             try {
-              const body: Data = JSON.parse(message.toString());
+              const body = normalizeGatewayMessage(JSON.parse(message.toString()) as Data);
 
               for (const event of this.#events[body.t] || []) {
                 event(body.d);
@@ -207,7 +219,7 @@ export class QQBotClient extends QQBotAPI {
           this.#ws.on('message', data => {
             try {
               // 拿到消息
-              const body: Data = JSON.parse(data.toString());
+              const body = normalizeGatewayMessage(JSON.parse(data.toString()) as Data);
               const accessToken = body['access_token'];
 
               if (accessToken) {
