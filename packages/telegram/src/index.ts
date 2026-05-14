@@ -25,6 +25,8 @@ const main = () => {
 
   // 机器人Id（Telegram token 格式为 botId:hash）
   const botId = config.token ? config.token.split(':')[0] : '';
+  let botUsername: string | undefined;
+  let botUsernamePromise: Promise<string> | null = null;
 
   /**
    *
@@ -52,12 +54,64 @@ const main = () => {
     return '';
   };
 
+  const getBotUsername = async (): Promise<string> => {
+    if (botUsername !== undefined) {
+      return botUsername;
+    }
+
+    if (!botUsernamePromise) {
+      botUsernamePromise = client
+        .getMe()
+        .then(me => {
+          botUsername = me?.username ? `@${me.username}`.toLowerCase() : '';
+          botUsernamePromise = null;
+
+          return botUsername;
+        })
+        .catch(() => {
+          botUsernamePromise = null;
+
+          return '';
+        });
+    }
+
+    return botUsernamePromise;
+  };
+
+  const isAtBot = async (event: any): Promise<boolean> => {
+    const entities = event?.entities ?? event?.caption_entities ?? [];
+
+    if (!Array.isArray(entities) || entities.length <= 0) {
+      return false;
+    }
+
+    const botUsername = await getBotUsername();
+    const content = String(event?.text ?? event?.caption ?? '');
+
+    for (const entity of entities) {
+      if (entity?.type === 'text_mention' && String(entity?.user?.id ?? '') === botId) {
+        return true;
+      }
+
+      if (entity?.type === 'mention' && botUsername) {
+        const mention = content.slice(entity.offset, entity.offset + entity.length).toLowerCase();
+
+        if (mention === botUsername) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
   client.on('text', async event => {
     const UserId = String(event?.from?.id);
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
+    const IsAtMe = await isAtBot(event);
 
-    if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup') {
+    if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup' || event?.chat.type === 'group') {
       // 机器人消息不处理
       if (event?.from?.is_bot) {
         return;
@@ -65,7 +119,7 @@ const main = () => {
       // 发送消息
       cbp.send(
         FormatEvent.create('message.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe, IsPrivate: false })
           .addGuild({ GuildId: String(event?.chat.id), SpaceId: String(event?.chat.id) })
           .addChannel({ ChannelId: String(event?.chat.id) })
           .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
@@ -79,7 +133,7 @@ const main = () => {
     } else if (event?.chat.type === 'private') {
       cbp.send(
         FormatEvent.create('private.message.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
           .addUser({
             UserId: String(event?.from.id),
             UserKey,
@@ -186,11 +240,12 @@ const main = () => {
     const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
     const MessageMedia = extractMediaFromEvent(event);
     const caption = event?.caption ?? '';
+    const IsAtMe = await isAtBot(event);
 
     if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup' || event?.chat.type === 'group') {
       cbp.send(
         FormatEvent.create('message.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe, IsPrivate: false })
           .addGuild({ GuildId: String(event?.chat.id), SpaceId: String(event?.chat.id) })
           .addChannel({ ChannelId: String(event?.chat.id) })
           .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
@@ -203,7 +258,7 @@ const main = () => {
     } else if (event?.chat.type === 'private') {
       cbp.send(
         FormatEvent.create('private.message.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
           .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
           .addMessage({ MessageId: String(event?.message_id) })
           .addText({ MessageText: caption })
@@ -266,7 +321,7 @@ const main = () => {
     const [isMaster, UserKey] = getMaster(UserId);
     const UserAvatar = await getUserProfilePhotosUrl(event?.from?.id);
 
-    if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup') {
+    if (event?.chat.type === 'channel' || event?.chat.type === 'supergroup' || event?.chat.type === 'group') {
       cbp.send(
         FormatEvent.create('message.update')
           .addPlatform({ Platform: platform, value: event, BotId: botId })
@@ -320,10 +375,26 @@ const main = () => {
     const MessageText = event?.data ?? '';
     const chatType = event?.message?.chat?.type;
 
-    if (chatType === 'channel' || chatType === 'supergroup') {
+    if (chatType === 'private') {
+      cbp.send(
+        FormatEvent.create('private.interaction.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
+          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event?.message?.message_id ?? event?.id ?? '') })
+          .addText({ MessageText: MessageText })
+          .addOpen({ OpenId: String(event?.message?.chat?.id ?? '') })
+          .add({ tag: 'callback_query' }).value
+      );
+
+      try {
+        await client.answerCallbackQuery(event.id);
+      } catch {
+        // ignore
+      }
+    } else {
       cbp.send(
         FormatEvent.create('interaction.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
           .addGuild({ GuildId: String(event?.message?.chat?.id ?? ''), SpaceId: String(event?.message?.chat?.id ?? '') })
           .addChannel({ ChannelId: String(event?.message?.chat?.id ?? '') })
           .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
@@ -334,22 +405,6 @@ const main = () => {
       );
 
       // 回应交互
-      try {
-        await client.answerCallbackQuery(event.id);
-      } catch {
-        // ignore
-      }
-    } else {
-      cbp.send(
-        FormatEvent.create('private.interaction.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
-          .addUser({ UserId: UserId, UserKey: UserKey, UserName: event?.from?.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
-          .addMessage({ MessageId: String(event?.message?.message_id ?? event?.id ?? '') })
-          .addText({ MessageText: MessageText })
-          .addOpen({ OpenId: String(event?.message?.chat?.id ?? '') })
-          .add({ tag: 'callback_query' }).value
-      );
-
       try {
         await client.answerCallbackQuery(event.id);
       } catch {

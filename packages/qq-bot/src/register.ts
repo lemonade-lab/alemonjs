@@ -111,7 +111,7 @@ export const register = (client: QQBotClients) => {
     // 定义消
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
         .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
         .addChannel({ ChannelId: meta.groupId })
         .addUser({
@@ -141,7 +141,7 @@ export const register = (client: QQBotClients) => {
     // 定义消
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: true, IsPrivate: false })
         .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
         .addChannel({ ChannelId: meta.groupId })
         .addUser({
@@ -167,7 +167,7 @@ export const register = (client: QQBotClients) => {
     // 定义消
     cbp.send(
       FormatEvent.create('private.message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
         .addUser({
           UserId: event.author.id,
           UserKey,
@@ -204,7 +204,7 @@ export const register = (client: QQBotClients) => {
     // 定义消
     cbp.send(
       FormatEvent.create('private.message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
         .addUser({
           UserId: event?.author?.id ?? '',
           UserKey,
@@ -238,7 +238,7 @@ export const register = (client: QQBotClients) => {
     // 定义消
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: true, IsPrivate: false })
         .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
         .addChannel({ ChannelId: event.channel_id })
         .addUser({
@@ -304,7 +304,7 @@ export const register = (client: QQBotClients) => {
     // 定义消
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
         .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
         .addChannel({ ChannelId: event.channel_id })
         .addUser({
@@ -344,7 +344,7 @@ export const register = (client: QQBotClients) => {
       const MessageText = event.data.resolved.button_data?.trim() || '';
 
       const e = FormatEvent.create('interaction.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
         .addUser({
@@ -372,7 +372,7 @@ export const register = (client: QQBotClients) => {
 
       // 处理消息
       const e = FormatEvent.create('private.interaction.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
         .addUser({
           UserId: event.user_openid,
           UserKey,
@@ -396,7 +396,7 @@ export const register = (client: QQBotClients) => {
       const MessageText = event.data.resolved.button_data?.trim() || '';
       // 处理消息
       const e = FormatEvent.create('interaction.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
         .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
         .addChannel({ ChannelId: event.channel_id })
         .addUser({ UserId: event.data.resolved.user_id, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })

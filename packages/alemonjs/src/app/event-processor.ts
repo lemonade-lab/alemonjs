@@ -244,6 +244,8 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
       }
 
       event['name'] = name;
+      event['IsPrivate'] = event['IsPrivate'] ?? name.startsWith('private.');
+      event['IsAtMe'] = event['IsAtMe'] ?? false;
 
       expendCycle(event, name, value);
     } catch (error) {

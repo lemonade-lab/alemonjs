@@ -1,5 +1,13 @@
 export type Expansion = {
   /**
+   * 当前消息是否 @ 了机器人。
+   */
+  IsAtMe?: boolean;
+  /**
+   * 当前事件是否来自私聊/私人窗口。
+   */
+  IsPrivate?: boolean;
+  /**
    * 当前事件是否至少尝试过一次消息发送。
    */
   _has_send_attempt?: boolean;

@@ -65,7 +65,7 @@ const main = () => {
     // 定义消
     cbp.send(
       FormatEvent.create('private.message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
         .addUser({ UserId, UserKey, UserName: event.extra.author.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
         .addMessage({ MessageId: event.msg_id })
         .addText({ MessageText: msg })
@@ -116,7 +116,13 @@ const main = () => {
     // 定义消
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({
+          Platform: platform,
+          value: event,
+          BotId: botId,
+          IsAtMe: mentionPart.some(item => String(item.id) === String(botId)),
+          IsPrivate: false
+        })
         .addGuild({ GuildId: event.extra.guild_id, SpaceId: event.target_id })
         .addChannel({ ChannelId: event.target_id })
         .addUser({ UserId, UserKey, UserName: event.extra.author.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })

@@ -113,7 +113,13 @@ const main = () => {
 
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({
+          Platform: platform,
+          value: event,
+          BotId: botId,
+          IsAtMe: atUsers.some(item => item.id === botId),
+          IsPrivate: false
+        })
         .addGuild({ GuildId: String(event.channelId || ''), SpaceId: String(event.channelId || '') })
         .addChannel({ ChannelId: String(event.channelId || '') })
         .addUser({ UserId, UserKey, UserName: event?.author?.username, UserAvatar, IsMaster: isMaster, IsBot: false })
@@ -131,7 +137,7 @@ const main = () => {
 
     cbp.send(
       FormatEvent.create('private.message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
         .addUser({ UserId, UserKey, UserName: event?.author?.username, UserAvatar, IsMaster: isMaster, IsBot: false })
         .addMessage({ MessageId: String(event.id) })
         .addText({ MessageText: event.content })

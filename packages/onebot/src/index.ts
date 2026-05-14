@@ -46,6 +46,10 @@ const main = () => {
     return msg.trim();
   };
 
+  const isAtBot = (message: any[], botId: string) => {
+    return message.some(item => item.type === 'at' && String(item.data?.qq ?? '') === String(botId));
+  };
+
   /**
    * 从 OneBot 消息段中提取媒体信息
    */
@@ -101,6 +105,7 @@ const main = () => {
   // 消息
   client.on('MESSAGES', event => {
     const msg = getMessageText(event.message);
+    const IsAtMe = isAtBot(event.message, BotMe.id);
     const UserId = String(event.user_id);
     const UserAvatar = createUserAvatar(UserId);
 
@@ -115,7 +120,7 @@ const main = () => {
     // 定义消
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id, IsAtMe, IsPrivate: false })
         .addGuild({ GuildId: groupId, SpaceId: groupId })
         .addChannel({ ChannelId: groupId })
         .addUser({ UserId, UserKey, UserName: event.sender.nickname, UserAvatar, IsMaster: isMaster, IsBot: false })
@@ -142,7 +147,7 @@ const main = () => {
     // 定义消
     cbp.send(
       FormatEvent.create('private.message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id, IsAtMe: false, IsPrivate: true })
         .addUser({ UserId, UserKey, UserName: event.sender.nickname, UserAvatar, IsMaster: isMaster, IsBot: false })
         .addMessage({ MessageId: String(event.message_id), ReplyId })
         .addText({ MessageText: msg.trim() })
@@ -281,7 +286,7 @@ const main = () => {
 
     cbp.send(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id, IsAtMe: false, IsPrivate: false })
         .addGuild({ GuildId: groupId, SpaceId: groupId })
         .addChannel({ ChannelId: groupId })
         .addUser({ UserId, UserName: '', UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
@@ -311,7 +316,7 @@ const main = () => {
 
     cbp.send(
       FormatEvent.create('private.message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id })
+        .addPlatform({ Platform: platform, value: event, BotId: BotMe.id, IsAtMe: false, IsPrivate: true })
         .addUser({ UserId, UserName: '', UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
         .addMessage({ MessageId: `offline_${event.user_id}_${event.time}` })
         .addText({ MessageText: '' })

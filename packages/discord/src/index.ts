@@ -102,7 +102,7 @@ const main = () => {
     if (event.type === 0 && event.member) {
       cbp.send(
         FormatEvent.create('message.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: atUsers.some(item => item.id === botId), IsPrivate: false })
           .addGuild({ GuildId: event.guild_id, SpaceId: event.channel_id })
           .addChannel({ ChannelId: event.channel_id })
           .addUser({ UserId, UserKey, UserName: event.author.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
@@ -115,7 +115,7 @@ const main = () => {
       // 处理消息
       cbp.send(
         FormatEvent.create('private.message.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
           .addUser({ UserId, UserKey, UserName: event.author.username, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
           .addMessage({ MessageId: event.id })
           .addText({ MessageText: msg })
@@ -152,7 +152,7 @@ const main = () => {
       // 处理消息
       cbp.send(
         FormatEvent.create('private.interaction.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
           .addUser({ UserId, UserKey, UserName: UserName, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
           .addMessage({ MessageId: event.id })
           .addText({ MessageText: currentMessageText })
@@ -162,7 +162,7 @@ const main = () => {
     } else {
       cbp.send(
         FormatEvent.create('interaction.create')
-          .addPlatform({ Platform: platform, value: event, BotId: botId })
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
           .addGuild({ GuildId: event['guild_id'], SpaceId: event.channel_id })
           .addChannel({ ChannelId: event.channel_id })
           .addUser({ UserId, UserKey, UserName: UserName, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
