@@ -58,4 +58,7 @@ function createTemplate(name: string) {
   }
 }
 
-void createTemplate('alemonjs');
+const args = process.argv.slice(2);
+const templateName = args.includes('--bot') ? 'alemonb' : 'alemonjs';
+
+void createTemplate(templateName);
