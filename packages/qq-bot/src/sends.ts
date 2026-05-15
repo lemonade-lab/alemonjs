@@ -52,9 +52,9 @@ const createButtonsData = (rows: DataButtonRow[], startId = 0) => {
             unsupport_tips: options?.toolTip ?? '',
             data: options?.data ?? '',
             at_bot_show_channel_list: false,
-            enter: options?.autoEnter ?? false,
-            ...rowData
-          }
+            enter: options?.autoEnter ?? false
+          },
+          ...rowData
         };
       })
     })),
