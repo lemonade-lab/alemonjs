@@ -88,8 +88,8 @@ export const start = (options: StartOptions | string = {}) => {
       const httpURL = `http://127.0.0.1:${port}`;
       const wsURL = `ws://127.0.0.1:${port}`;
 
-      logger.info(`[CBP server started at ${httpURL}]`);
-      logger.info(`[CBP server started at ${wsURL}]`);
+      logger.info(`[CBP-Server] ${httpURL}`);
+      logger.info(`[CBP-Server] ${wsURL}]`);
 
       // 启动客户端进程
       startClient(options);
@@ -102,7 +102,7 @@ export const start = (options: StartOptions | string = {}) => {
     const sockPath = generateSocketPath();
 
     process.env.__ALEMON_DIRECT_SOCK = sockPath;
-    logger.info('[Direct-IPC mode] 平台↔客户端直连通道，无主进程桥接');
+    logger.info('[Direct-IPC] 平台↔客户端直连');
 
     // 直接启动客户端和平台进程（客户端先启动 UDS 服务端，平台后连接）
     startClient(options);
