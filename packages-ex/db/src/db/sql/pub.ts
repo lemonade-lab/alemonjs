@@ -49,7 +49,7 @@ function findOneRandomValue<M extends Model>(this: ModelStatic<M>, options: Find
 function findAllCurrentValues<M extends Model>(this: ModelStatic<M>, options: FindOptions<Attributes<M>> = {}): Promise<Attributes<M>[]> {
   const where = options?.where ?? {};
 
-  where['deleted_at'] = null; // 确保只查询未删除的数据
+  where['deleted_at'] = null;
 
   return this.findAll({
     ...options,
@@ -67,7 +67,7 @@ function findAllCurrentValues<M extends Model>(this: ModelStatic<M>, options: Fi
 function findOneCurrentValue<M extends Model>(this: ModelStatic<M>, options: FindOptions<Attributes<M>> = {}): Promise<Attributes<M>> {
   const where = options?.where ?? {};
 
-  where['deleted_at'] = null; // 确保只查询未删除的数据
+  where['deleted_at'] = null;
 
   return this.findOne({
     ...options,
@@ -98,7 +98,7 @@ function findOrCreateValue<M extends Model>(this: ModelStatic<M>, options: any =
 function deleted<M extends Model>(this: ModelStatic<M>, options: any = {}): Promise<number> {
   const where = options?.where ?? {};
 
-  where['deleted_at'] = null; // 确保只操作未删除的数据
+  where['deleted_at'] = null;
 
   return this.update(
     {
@@ -112,11 +112,11 @@ function deleted<M extends Model>(this: ModelStatic<M>, options: any = {}): Prom
 }
 
 const initModelOptions: ModelOptions = {
-  freezeTableName: true, // 禁止自动复数化表名
-  timestamps: true, // 自动添加时间戳
-  deletedAt: 'deleted_at', // 重命名 deletedAt 字段为 deleted_at
-  createdAt: 'created_at', // 重命名 createAt 字段为 created_at
-  updatedAt: 'updated_at' // 重命名 updateAt 字段为 updated_at
+  freezeTableName: true,
+  timestamps: true,
+  deletedAt: 'deleted_at',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 };
 
 /**

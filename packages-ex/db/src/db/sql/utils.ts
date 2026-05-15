@@ -1,15 +1,18 @@
 import { appendFile, mkdirSync } from 'fs';
 import { join } from 'path';
 import dayjs from 'dayjs';
-import { getMysqlConfig } from '../../config';
+import { getMysqlConfig, getPgsqlConfig, getSqlConfig, getSqliteConfig } from '../../config';
 
 /**
  * 初始化日志路径
  * @returns 日志目录路径
  */
 export const initLogPath = () => {
+  const sql = getSqlConfig();
+  const pgsql = getPgsqlConfig();
   const mysql = getMysqlConfig();
-  const dir = mysql.logPath || join(process.cwd(), 'logs', 'db');
+  const sqlite = getSqliteConfig();
+  const dir = sql.logPath || pgsql.logPath || mysql.logPath || sqlite.logPath || join(process.cwd(), 'logs', 'db');
 
   mkdirSync(dir, { recursive: true });
 

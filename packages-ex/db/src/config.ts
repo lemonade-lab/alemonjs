@@ -1,5 +1,7 @@
 import { getConfigValue } from 'alemonjs';
 
+export type SqlDialect = 'pgsql' | 'mysql' | 'sqlite';
+
 /**
  * 获取 db 配置（新格式）
  */
@@ -17,12 +19,30 @@ export const getDialect = (): string | undefined => {
 };
 
 /**
+ * 获取 SQL 通用配置
+ */
+export const getSqlConfig = () => {
+  const value = getConfigValue() || {};
+
+  return value?.db?.sql || value?.sql || {};
+};
+
+/**
  * 获取 MySQL 配置，优先读取 db.mysql，回退到顶层 mysql
  */
 export const getMysqlConfig = () => {
   const value = getConfigValue() || {};
 
   return value?.db?.mysql || value?.mysql || {};
+};
+
+/**
+ * 获取 PostgreSQL 配置，优先读取 db.pgsql，兼容 pg/postgres/postgresql
+ */
+export const getPgsqlConfig = () => {
+  const value = getConfigValue() || {};
+
+  return value?.db?.pgsql || value?.db?.pg || value?.db?.postgres || value?.db?.postgresql || value?.pgsql || value?.pg || value?.postgres || value?.postgresql || {};
 };
 
 /**

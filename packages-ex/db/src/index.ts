@@ -1,3 +1,3 @@
 export * from './db/redis';
-export * from './db/mysql/connect';
-export * from './db/mysql/pub';
+export * from './db/sql/connect';
+export * from './db/sql/pub';

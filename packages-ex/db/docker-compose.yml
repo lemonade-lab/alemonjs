@@ -14,27 +14,50 @@ services:
       - mysql-data:/var/lib/mysql # 添加 MySQL 数据持久化
     restart: unless-stopped
 
+  postgres:
+    image: postgres:16
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 'Postgres123456!'
+      POSTGRES_DB: alemonjs
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     container_name: redis-persistent
     command:
       - redis-server
-      - --appendonly yes # 启用 AOF 持久化
-      - --appendfsync everysec # 每秒同步一次
-      - --save 900 1 # RDB 持久化：900秒内至少1个变更
-      - --save 300 10 # RDB 持久化：300秒内至少10个变更
-      - --save 60 10000 # RDB 持久化：60秒内至少10000个变更
-      - --dir /data # 数据存储目录
-      - --dbfilename dump.rdb # RDB 文件名
-      - --appendfilename "appendonly.aof" # AOF 文件名
-      - --auto-aof-rewrite-percentage 100 # AOF 重写触发条件
-      - --auto-aof-rewrite-min-size 64mb # AOF 最小重写大小
+      - --appendonly
+      - 'yes'
+      - --appendfsync
+      - everysec
+      - --save
+      - 900 1
+      - --save
+      - 300 10
+      - --save
+      - 60 10000
+      - --dir
+      - /data
+      - --dbfilename
+      - dump.rdb
+      - --appendfilename
+      - appendonly.aof
+      - --auto-aof-rewrite-percentage
+      - '100'
+      - --auto-aof-rewrite-min-size
+      - 64mb
     ports:
       - '6379:6379'
     volumes:
-      - redis-data:/data # 使用命名卷
+      - redis-data:/data
     restart: unless-stopped
-    healthcheck: # 添加健康检查
+    healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 30s
       timeout: 10s
@@ -43,5 +66,5 @@ services:
 volumes:
   redis-data:
     driver: local
-  mysql-data:
+  postgres-data:
     driver: local

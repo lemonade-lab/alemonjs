@@ -187,11 +187,11 @@ Platform 事件 → onProcessor (过滤/去重)
 
 ## 📦 扩展包
 
-| Package               | Status                    | Description                          |
-| --------------------- | ------------------------- | ------------------------------------ |
-| 👉[@alemonjs/db]      | [![db-s]][db-p]           | 数据库模块（Redis / MySQL / SQLite） |
-| 👉[@alemonjs/process] | [![process-s]][process-p] | 桌面端进程通信模块                   |
-| 👉[create-alemonjs]   | [![create-s]][create-p]   | 项目脚手架                           |
+| Package               | Status                    | Description                                       |
+| --------------------- | ------------------------- | ------------------------------------------------- |
+| 👉[@alemonjs/db]      | [![db-s]][db-p]           | 数据库模块（Redis / PostgreSQL / MySQL / SQLite） |
+| 👉[@alemonjs/process] | [![process-s]][process-p] | 桌面端进程通信模块                                |
+| 👉[create-alemonjs]   | [![create-s]][create-p]   | 项目脚手架                                        |
 
 [@alemonjs/db]: https://github.com/lemonade-lab/alemonjs/tree/main/packages-ex/db
 [db-s]: https://img.shields.io/npm/v/@alemonjs/db.svg
