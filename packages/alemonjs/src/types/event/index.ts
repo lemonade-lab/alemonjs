@@ -3,6 +3,7 @@ import { ClientAPI } from '../client';
 import { EventKeys, Events } from './map';
 import { DataEnums } from '../message';
 import { Expose } from '../../app/expose';
+import type KoaRouter from 'koa-router';
 
 /**
  * 当前事件
@@ -119,6 +120,8 @@ export type childrenCallbackRes =
       // 完整的路由机制。
       responseRouter?: ReturnType<DefineRouterFunc>;
       middlewareRouter?: ReturnType<DefineRouterFunc>;
+      /** 直接注册 Koa Router */
+      koaRouter?: KoaRouter | KoaRouter[];
       /** expose 协议通信实例 */
       expose?: Expose;
     }

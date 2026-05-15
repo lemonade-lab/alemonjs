@@ -9,6 +9,36 @@ import { childrenCallbackRes, ChildrenCycle, EventCycleEnum, EventKeys, FileTree
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
 import { disposeExpose } from './expose.js';
+import type KoaRouter from 'koa-router';
+
+export type RuntimeAppStatus = 'discovered' | 'loading' | 'ready' | 'failed' | 'disposed';
+
+export type RuntimeAppCapability = {
+  event: boolean;
+  httpApi: boolean;
+  web: boolean;
+  schedule: boolean;
+  expose: boolean;
+};
+
+export type RuntimeAppError = {
+  message: string;
+  stack?: string;
+  time: number;
+};
+
+export type RuntimeAppRecord = {
+  name: string;
+  kind: 'main' | 'plugin';
+  enabled: boolean;
+  status: RuntimeAppStatus;
+  rootDir: string;
+  mainPath: string;
+  error?: RuntimeAppError;
+  capabilities: RuntimeAppCapability;
+  createdAt: number;
+  updatedAt: number;
+};
 /**
  *
  * @returns
@@ -137,7 +167,9 @@ export class Core {
           mount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>(),
           unmount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>()
         },
-        storeChildrenApp: {}
+        storeChildrenApp: {},
+        runtimeApps: {},
+        runtimeAppKoaRouters: {}
       };
     }
   }
@@ -149,6 +181,262 @@ export class Core {
 
 // Store 版本计数器 — ChildrenApp 注册/卸载时递增，用于脏标记缓存
 let _storeVersion = 0;
+
+const createEmptyRuntimeCapabilities = (): RuntimeAppCapability => ({
+  event: false,
+  httpApi: false,
+  web: false,
+  schedule: false,
+  expose: false
+});
+
+const logRuntimeAppStatus = (
+  level: 'info' | 'warn',
+  record: Pick<RuntimeAppRecord, 'name' | 'kind' | 'status' | 'capabilities'> & {
+    error?: RuntimeAppError;
+  }
+) => {
+  if (!global.logger?.[level]) {
+    return;
+  }
+
+  global.logger[level]({
+    message: 'runtime app status',
+    data: {
+      app: record.name,
+      kind: record.kind,
+      status: record.status,
+      capabilities: record.capabilities,
+      error: record.error?.message ?? null
+    }
+  });
+};
+
+const normalizeRuntimeAppError = (error?: unknown): RuntimeAppError | undefined => {
+  if (!error) {
+    return undefined;
+  }
+
+  if (error instanceof Error) {
+    return {
+      message: error.message,
+      stack: error.stack,
+      time: Date.now()
+    };
+  }
+
+  return {
+    message: typeof error === 'string' ? error : 'Unknown runtime app error',
+    time: Date.now()
+  };
+};
+
+const sameRuntimeAppCapabilities = (left: RuntimeAppCapability, right: RuntimeAppCapability) => {
+  return (
+    left.event === right.event && left.httpApi === right.httpApi && left.web === right.web && left.schedule === right.schedule && left.expose === right.expose
+  );
+};
+
+const sameRuntimeAppError = (left?: RuntimeAppError, right?: RuntimeAppError) => {
+  if (!left && !right) {
+    return true;
+  }
+
+  if (!left || !right) {
+    return false;
+  }
+
+  return left.message === right.message && left.stack === right.stack;
+};
+
+const getRuntimeAppStore = (): Record<string, RuntimeAppRecord> => {
+  if (!global.alemonjsCore.runtimeApps) {
+    global.alemonjsCore.runtimeApps = {};
+  }
+
+  return global.alemonjsCore.runtimeApps;
+};
+
+const getRuntimeAppKoaRouterStore = (): Record<string, KoaRouter[]> => {
+  if (!global.alemonjsCore.runtimeAppKoaRouters) {
+    global.alemonjsCore.runtimeAppKoaRouters = {};
+  }
+
+  return global.alemonjsCore.runtimeAppKoaRouters;
+};
+
+export const registerRuntimeApp = (
+  record: Omit<RuntimeAppRecord, 'createdAt' | 'updatedAt' | 'capabilities'> & {
+    capabilities?: Partial<RuntimeAppCapability>;
+  }
+) => {
+  const runtimeApps = getRuntimeAppStore();
+  const current = runtimeApps[record.name];
+  const now = Date.now();
+  const nextCapabilities = {
+    ...(current?.capabilities ?? createEmptyRuntimeCapabilities()),
+    ...(record.capabilities ?? {})
+  };
+
+  runtimeApps[record.name] = {
+    name: record.name,
+    kind: record.kind,
+    enabled: record.enabled,
+    status: record.status,
+    rootDir: record.rootDir,
+    mainPath: record.mainPath,
+    error: record.error,
+    capabilities: nextCapabilities,
+    createdAt: current?.createdAt ?? now,
+    updatedAt: now
+  };
+
+  if (!current || current.status !== record.status) {
+    logRuntimeAppStatus('info', runtimeApps[record.name]);
+  }
+
+  return runtimeApps[record.name];
+};
+
+export const updateRuntimeAppStatus = (name: string, status: RuntimeAppStatus, error?: unknown) => {
+  const runtimeApps = getRuntimeAppStore();
+  const current = runtimeApps[name];
+
+  if (!current) {
+    return;
+  }
+
+  const normalizedError = normalizeRuntimeAppError(error);
+
+  if (current.status === status && sameRuntimeAppError(current.error, normalizedError)) {
+    return current;
+  }
+
+  current.status = status;
+  current.updatedAt = Date.now();
+  current.error = normalizedError;
+
+  logRuntimeAppStatus(status === 'failed' ? 'warn' : 'info', current);
+
+  return current;
+};
+
+export const updateRuntimeAppCapabilities = (name: string, capabilities: Partial<RuntimeAppCapability>) => {
+  const runtimeApps = getRuntimeAppStore();
+  const current = runtimeApps[name];
+
+  if (!current) {
+    return;
+  }
+
+  const nextCapabilities = {
+    ...current.capabilities,
+    ...capabilities
+  };
+
+  if (sameRuntimeAppCapabilities(current.capabilities, nextCapabilities)) {
+    return current;
+  }
+
+  current.capabilities = nextCapabilities;
+  current.updatedAt = Date.now();
+
+  return current;
+};
+
+export const setRuntimeAppKoaRouters = (name: string, koaRouters?: KoaRouter | KoaRouter[]) => {
+  const koaRouterStore = getRuntimeAppKoaRouterStore();
+
+  if (!koaRouters) {
+    delete koaRouterStore[name];
+
+    return [];
+  }
+
+  const normalizedRouters = (Array.isArray(koaRouters) ? koaRouters : [koaRouters]).filter(Boolean);
+
+  koaRouterStore[name] = normalizedRouters;
+
+  return normalizedRouters;
+};
+
+export const getRuntimeAppKoaRouters = (name: string) => {
+  return getRuntimeAppKoaRouterStore()[name] ?? [];
+};
+
+export const clearRuntimeAppKoaRouters = (name: string) => {
+  const koaRouterStore = getRuntimeAppKoaRouterStore();
+
+  delete koaRouterStore[name];
+};
+
+export const listRuntimeAppKoaRouters = () => {
+  return Object.entries(getRuntimeAppKoaRouterStore())
+    .sort(([left], [right]) => {
+      if (left === 'main' && right !== 'main') {
+        return -1;
+      }
+      if (left !== 'main' && right === 'main') {
+        return 1;
+      }
+
+      return left.localeCompare(right);
+    })
+    .map(([name, routers]) => ({
+      name,
+      routers: [...routers]
+    }));
+};
+
+export const getRuntimeApp = (name: string) => {
+  return getRuntimeAppStore()[name];
+};
+
+export const toRuntimeAppSnapshot = (item: RuntimeAppRecord) => ({
+  ...item,
+  capabilities: { ...item.capabilities },
+  error: item.error
+    ? {
+        message: item.error.message,
+        time: item.error.time
+      }
+    : undefined
+});
+
+export const listRuntimeApps = () => {
+  return Object.values(getRuntimeAppStore())
+    .sort((left, right) => {
+      if (left.name === 'main' && right.name !== 'main') {
+        return -1;
+      }
+      if (left.name !== 'main' && right.name === 'main') {
+        return 1;
+      }
+
+      return left.name.localeCompare(right.name);
+    })
+    .map(toRuntimeAppSnapshot);
+};
+
+export const disposeRuntimeApp = (name: string) => {
+  clearRuntimeAppKoaRouters(name);
+
+  return updateRuntimeAppStatus(name, 'disposed');
+};
+
+export const disposeAllRuntimeApps = () => {
+  const runtimeApps = listRuntimeApps();
+
+  runtimeApps.forEach(app => {
+    disposeRuntimeApp(app.name);
+  });
+
+  return runtimeApps;
+};
+
+export const hasRuntimeAppCapability = (name: string, capability: keyof RuntimeAppCapability) => {
+  return Boolean(getRuntimeApp(name)?.capabilities?.[capability]);
+};
 
 export const bumpStoreVersion = () => {
   _storeVersion++;

@@ -7,16 +7,153 @@ import { formatPath, getModuelFile, safePath, isValidPackageName } from './utils
 import { collectMiddlewares, runMiddlewares } from './middleware';
 import module from 'module';
 import { ResultCode } from '../../core';
+import {
+  RuntimeAppStatus,
+  getRuntimeApp,
+  getRuntimeAppKoaRouters,
+  hasRuntimeAppCapability,
+  listRuntimeAppKoaRouters,
+  listRuntimeApps,
+  toRuntimeAppSnapshot
+} from '../../app/store.js';
 
 const initRequire = () => {};
 
 initRequire.resolve = () => '';
 const require = module?.createRequire?.(import.meta.url) ?? initRequire;
-const mainDirMap = new Map();
 
 const router = new KoaRouter({
   prefix: '/'
 });
+
+const resolvePackageRoot = (startDir: string) => {
+  let currentDir = startDir;
+
+  while (currentDir && currentDir !== path.dirname(currentDir)) {
+    if (existsSync(path.join(currentDir, 'package.json'))) {
+      return currentDir;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+
+  return startDir;
+};
+
+const readWebRootConfig = (packageRoot: string) => {
+  const packageJsonPath = path.join(packageRoot, 'package.json');
+
+  if (!existsSync(packageJsonPath)) {
+    return '';
+  }
+
+  const pkg = require(packageJsonPath) ?? {};
+
+  return pkg?.alemonjs?.web?.root ?? '';
+};
+
+const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, capability: 'httpApi' | 'web') => {
+  const runtimeApp = getRuntimeApp(appName);
+
+  if (!runtimeApp || !runtimeApp.enabled) {
+    ctx.status = 404;
+    ctx.body = {
+      code: 404,
+      message: '应用未注册或未启用',
+      data: null
+    };
+
+    return null;
+  }
+
+  if (runtimeApp.status === 'discovered' || runtimeApp.status === 'loading') {
+    ctx.status = 503;
+    ctx.body = {
+      code: 503,
+      message: '应用正在初始化',
+      data: {
+        app: appName,
+        status: runtimeApp.status
+      }
+    };
+
+    return null;
+  }
+
+  if (runtimeApp.status === 'failed') {
+    ctx.status = 500;
+    ctx.body = {
+      code: 500,
+      message: '应用生命周期失败',
+      data: {
+        app: appName,
+        status: runtimeApp.status,
+        lifecycle: 'failed'
+      }
+    };
+
+    return null;
+  }
+
+  if (runtimeApp.status === 'disposed') {
+    ctx.status = 410;
+    ctx.body = {
+      code: 410,
+      message: '应用已卸载或已结束服务',
+      data: {
+        app: appName,
+        status: runtimeApp.status,
+        lifecycle: 'disposed'
+      }
+    };
+
+    return null;
+  }
+
+  if (runtimeApp.status !== 'ready' || !hasRuntimeAppCapability(appName, capability)) {
+    ctx.status = 404;
+    ctx.body = {
+      code: 404,
+      message: '应用未提供对应服务能力',
+      data: null
+    };
+
+    return null;
+  }
+
+  return runtimeApp;
+};
+
+const dispatchRegisteredKoaRouters = async (ctx: KoaRouter.RouterContext) => {
+  const registeredRouters = listRuntimeAppKoaRouters();
+
+  for (const item of registeredRouters) {
+    const runtimeApp = getRuntimeApp(item.name);
+
+    if (!runtimeApp || !runtimeApp.enabled || runtimeApp.status !== 'ready' || !hasRuntimeAppCapability(item.name, 'httpApi')) {
+      continue;
+    }
+
+    const routers = getRuntimeAppKoaRouters(item.name);
+
+    for (const koaRouter of routers) {
+      const beforeMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
+
+      await koaRouter.routes()(ctx, async () => {});
+
+      const afterMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
+
+      if (afterMatched <= beforeMatched) {
+        continue;
+      }
+
+      await koaRouter.allowedMethods()(ctx, async () => {});
+
+      return true;
+    }
+  }
+
+  return false;
+};
 
 router.get('/', ctx => {
   ctx.status = 200;
@@ -32,6 +169,57 @@ router.get('api/online', ctx => {
     message: 'service online',
     data: null
   };
+});
+
+router.get('api/runtime/apps', ctx => {
+  const status = String(ctx.query?.status ?? '').trim() as RuntimeAppStatus | '';
+  const data = listRuntimeApps().filter(item => {
+    if (!status) {
+      return true;
+    }
+
+    return item.status === status;
+  });
+
+  ctx.status = 200;
+  ctx.body = {
+    code: 200,
+    message: 'runtime apps',
+    data
+  };
+});
+
+router.get('api/runtime/apps/:app', ctx => {
+  const appName = ctx.params.app;
+  const runtimeApp = getRuntimeApp(appName);
+
+  if (!runtimeApp) {
+    ctx.status = 404;
+    ctx.body = {
+      code: 404,
+      message: '应用未注册',
+      data: null
+    };
+
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = {
+    code: 200,
+    message: 'runtime app',
+    data: toRuntimeAppSnapshot(runtimeApp)
+  };
+});
+
+router.use(async (ctx, next) => {
+  const handled = await dispatchRegisteredKoaRouters(ctx);
+
+  if (handled) {
+    return;
+  }
+
+  await next();
 });
 
 router.all('app/{*path}', async ctx => {
@@ -50,6 +238,11 @@ router.all('app/{*path}', async ctx => {
   const apiPath = '/app/api';
 
   if (ctx.path.startsWith(apiPath)) {
+    const runtimeApp = denyRuntimeAppAccess(ctx, 'main', 'httpApi');
+
+    if (!runtimeApp) {
+      return;
+    }
     const mainPath = join(rootPath, process.env.input);
 
     // 路径
@@ -135,11 +328,15 @@ router.all('app/{*path}', async ctx => {
   }
   let root = '';
   const resourcePath = formatPath(ctx.params?.path);
+  const runtimeApp = denyRuntimeAppAccess(ctx, 'main', 'web');
+
+  if (!runtimeApp) {
+    return;
+  }
+  const packageRoot = resolvePackageRoot(runtimeApp.rootDir);
 
   try {
-    const pkg = require(path.join(rootPath, 'package.json')) ?? {};
-
-    root = pkg.alemonjs?.web?.root ?? '';
+    root = readWebRootConfig(packageRoot);
   } catch (err) {
     ctx.status = 500;
     ctx.body = {
@@ -150,7 +347,7 @@ router.all('app/{*path}', async ctx => {
 
     return;
   }
-  const webRoot = root ? path.join(rootPath, root) : rootPath;
+  const webRoot = root ? path.join(packageRoot, root) : packageRoot;
   const fullPath = safePath(webRoot, resourcePath);
 
   if (!fullPath) {
@@ -212,26 +409,13 @@ router.all('apps/:app/{*path}', async ctx => {
   const apiPath = `/apps/${appName}/api`;
 
   if (ctx.path.startsWith(apiPath)) {
+    const runtimeApp = denyRuntimeAppAccess(ctx, appName, 'httpApi');
+
+    if (!runtimeApp) {
+      return;
+    }
     try {
-      if (!mainDirMap.has(appName)) {
-        const mainPath = require.resolve(appName);
-
-        // 不存在 main
-        if (!existsSync(mainPath)) {
-          ctx.status = 400;
-          ctx.body = {
-            code: 400,
-            message: '未找到主要入口文件',
-            data: null
-          };
-
-          return;
-        }
-        const mainDir = dirname(mainPath);
-
-        mainDirMap.set(appName, mainDir);
-      }
-      const routeBase = join(mainDirMap.get(appName), 'route');
+      const routeBase = join(runtimeApp.rootDir, 'route');
       const dir = safePath(routeBase, ctx.path?.replace(apiPath, '/api') || '');
 
       if (!dir) {
@@ -304,14 +488,17 @@ router.all('apps/:app/{*path}', async ctx => {
     return;
   }
   // 不是 packages，而是 node_modules。需要是模块化
-  const rootPath = path.join(process.cwd(), 'node_modules', appName);
+  const runtimeApp = denyRuntimeAppAccess(ctx, appName, 'web');
+
+  if (!runtimeApp) {
+    return;
+  }
+  const packageRoot = resolvePackageRoot(runtimeApp.rootDir);
   const resourcePath = formatPath(ctx.params?.path);
   let root = '';
 
   try {
-    const pkg = require(`${appName}/package`) ?? {};
-
-    root = pkg?.alemonjs?.web?.root ?? '';
+    root = readWebRootConfig(packageRoot);
   } catch (err) {
     ctx.status = 500;
     ctx.body = {
@@ -322,7 +509,7 @@ router.all('apps/:app/{*path}', async ctx => {
 
     return;
   }
-  const webRoot = root ? path.join(rootPath, root) : rootPath;
+  const webRoot = root ? path.join(packageRoot, root) : packageRoot;
   const fullPath = safePath(webRoot, resourcePath);
 
   if (!fullPath) {

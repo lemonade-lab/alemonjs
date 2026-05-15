@@ -1,9 +1,28 @@
 import { cbpClient, loadModels } from './index';
 import { defaultPort } from './core/variable';
 import { createServer } from './server/main';
+import { disposeAllRuntimeApps } from './app/store.js';
+import { scheduleCancelByApp, unregisterAppDir } from './app/schedule-store.js';
 
 // 标记当前为客户端进程，防止 definePlatform 被 import 时的副作用
 global.__client_loaded = true;
+
+let runtimeDisposed = false;
+
+const disposeRuntime = () => {
+  if (runtimeDisposed) {
+    return;
+  }
+
+  runtimeDisposed = true;
+
+  const apps = disposeAllRuntimeApps();
+
+  apps.forEach(app => {
+    scheduleCancelByApp(app.name);
+    unregisterAppDir(app.name);
+  });
+};
 
 // 应用服务器
 const mainServer = () => {
@@ -55,11 +74,13 @@ const mainProcess = () => {
   ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
     process?.on?.(sig, () => {
       logger.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
+      disposeRuntime();
       setImmediate(() => process.exit(0));
     });
   });
 
   process?.on?.('exit', code => {
+    disposeRuntime();
     logger.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
   });
 
@@ -73,6 +94,7 @@ const mainProcess = () => {
         // 启动内部服务器
         mainServer();
       } else if (data?.type === 'stop') {
+        disposeRuntime();
         process.exit(0);
       }
     } catch {}

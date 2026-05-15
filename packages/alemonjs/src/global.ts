@@ -19,6 +19,8 @@ import type {
 
 import WebSocket, { Server } from 'ws';
 import { IncomingMessage } from 'http';
+import type KoaRouter from 'koa-router';
+import type { RuntimeAppRecord } from './app/store.js';
 
 declare global {
   /**
@@ -56,6 +58,12 @@ declare global {
      */
     storeChildrenApp: {
       [key: string]: StoreChildrenApp;
+    };
+    runtimeApps?: {
+      [key: string]: RuntimeAppRecord;
+    };
+    runtimeAppKoaRouters?: {
+      [key: string]: KoaRouter[];
     };
   };
   /**

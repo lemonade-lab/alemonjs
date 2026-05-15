@@ -9,11 +9,53 @@ import { ResultCode } from '../../core/variable.js';
 import { fileSuffixMiddleware } from '../../core/variable.js';
 import { scheduleCancelByApp, registerAppDir, unregisterAppDir } from '../../app/schedule-store.js';
 import module from 'module';
+import {
+  clearRuntimeAppKoaRouters,
+  registerRuntimeApp,
+  setRuntimeAppKoaRouters,
+  updateRuntimeAppCapabilities,
+  updateRuntimeAppStatus
+} from '../../app/store.js';
 
 const initRequire = () => {};
 
 initRequire.resolve = () => '';
 const require = module?.createRequire?.(import.meta.url) ?? initRequire;
+
+const resolvePackageRoot = (startDir: string) => {
+  let currentDir = startDir;
+
+  while (currentDir && currentDir !== dirname(currentDir)) {
+    if (existsSync(join(currentDir, 'package.json'))) {
+      return currentDir;
+    }
+    currentDir = dirname(currentDir);
+  }
+
+  return startDir;
+};
+
+const detectWebCapability = (startDir: string) => {
+  const packageRoot = resolvePackageRoot(startDir);
+  const packageJsonPath = join(packageRoot, 'package.json');
+
+  if (!existsSync(packageJsonPath)) {
+    return existsSync(join(packageRoot, 'index.html'));
+  }
+
+  try {
+    const pkg = require(packageJsonPath) ?? {};
+    const root = pkg?.alemonjs?.web?.root;
+
+    if (typeof root === 'string' && root.trim()) {
+      return existsSync(join(packageRoot, root));
+    }
+  } catch {
+    // ignore package parsing failures here; runtime route access still rechecks at request time
+  }
+
+  return existsSync(join(packageRoot, 'index.html'));
+};
 
 /**
  * 加载子模块
@@ -33,6 +75,25 @@ export const loadChildren = async (mainPath: string, appName: string) => {
   }
   const mainDir = dirname(mainPath);
   const App = new ChildrenApp(appName);
+  const kind = appName === 'main' ? 'main' : 'plugin';
+  const baseCapabilities = {
+    event: false,
+    httpApi: existsSync(join(mainDir, 'route', 'api')),
+    web: detectWebCapability(mainDir),
+    schedule: false,
+    expose: false
+  };
+
+  registerRuntimeApp({
+    name: appName,
+    kind,
+    enabled: true,
+    status: 'discovered',
+    rootDir: mainDir,
+    mainPath,
+    capabilities: baseCapabilities
+  });
+  updateRuntimeAppStatus(appName, 'loading');
 
   // 注册应用目录，用于 schedule 自动推断 appName
   registerAppDir(appName, mainDir);
@@ -67,6 +128,8 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     const unMounted = async e => {
       showErrorModule(e);
+      clearRuntimeAppKoaRouters(appName);
+      updateRuntimeAppStatus(appName, 'failed', e);
       // 卸载时自动清理该应用的所有定时任务
       scheduleCancelByApp(appName);
       // 注销应用目录映射
@@ -97,16 +160,27 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     const registerMounted = async () => {
       const res = await app?.register();
+      const hasEventCapability = Boolean(res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter));
+      const hasExposeCapability = Boolean(res?.expose);
+      const hasKoaRouterCapability = Boolean(res?.koaRouter);
 
       // 注册接口的结果。
       if (res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter)) {
         App.register(res);
       }
 
+      setRuntimeAppKoaRouters(appName, res?.koaRouter);
+
       // 注册 expose 协议
       if (res?.expose) {
         registerExpose(appName, res.expose.getConfigs());
       }
+      updateRuntimeAppCapabilities(appName, {
+        ...baseCapabilities,
+        httpApi: baseCapabilities.httpApi || hasKoaRouterCapability,
+        event: hasEventCapability,
+        expose: hasExposeCapability
+      });
 
       // 加载完成
       App.on();
@@ -116,6 +190,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         if (app?.onMounted) {
           await app.onMounted({ response: [], responseMiddleware: {}, middleware: [] });
         }
+        updateRuntimeAppStatus(appName, 'ready');
       } catch (e) {
         void unMounted(e);
       }
@@ -196,6 +271,10 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         mwData.push(middleware);
       }
       App.pushMiddleware(mwData);
+      updateRuntimeAppCapabilities(appName, {
+        ...baseCapabilities,
+        event: resData.length > 0 || Object.keys(resAndMwData).length > 0 || mwData.length > 0
+      });
 
       // 加载完成
       App.on();
@@ -205,6 +284,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
         if (app?.onMounted) {
           await app.onMounted({ response: resData, responseMiddleware: resAndMwData, middleware: mwData });
         }
+        updateRuntimeAppStatus(appName, 'ready');
       } catch (e) {
         void unMounted(e);
       }
@@ -226,6 +306,8 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     // unMounted 卸载
   } catch (e) {
     showErrorModule(e);
+    clearRuntimeAppKoaRouters(appName);
+    updateRuntimeAppStatus(appName, 'failed', e);
     // 卸载
     App.un();
   }
@@ -250,6 +332,7 @@ export const loadChildrenFile = (appName: string) => {
 
     // 不存在 main
     if (!existsSync(mainPath)) {
+      updateRuntimeAppStatus(appName, 'failed', new Error('The main file does not exist,' + mainPath));
       logger.error({
         code: ResultCode.FailParams,
         message: 'The main file does not exist,' + mainPath,
@@ -258,8 +341,17 @@ export const loadChildrenFile = (appName: string) => {
 
       return;
     }
+    registerRuntimeApp({
+      name: appName,
+      kind: 'plugin',
+      enabled: true,
+      status: 'discovered',
+      rootDir: dirname(mainPath),
+      mainPath
+    });
     void loadChildren(mainPath, appName);
   } catch (e) {
+    updateRuntimeAppStatus(appName, 'failed', e);
     showErrorModule(e);
   }
 };
