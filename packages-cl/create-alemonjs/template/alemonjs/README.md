@@ -9,7 +9,7 @@
 yarn dev --port 17117
 ```
 
-### 安装模块
+### 安装第三方模块
 
 - 编辑 package.json
 
@@ -21,6 +21,19 @@ yarn dev --port 17117
   "workspaces": ["packages/*"]
 }
 ```
+
+- 安装
+
+> 下面的方式选其一
+
+```sh
+yarn add alemonjs-xxx -W
+```
+
+```bash
+git clone --depth=1 <url> ./plugins/
+```
+
 
 - 编辑 alemon.config.yaml
 
