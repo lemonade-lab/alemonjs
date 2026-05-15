@@ -191,7 +191,7 @@ const createEmptyRuntimeCapabilities = (): RuntimeAppCapability => ({
 });
 
 const logRuntimeAppStatus = (
-  level: 'info' | 'warn',
+  level: 'debug' | 'info' | 'warn',
   record: Pick<RuntimeAppRecord, 'name' | 'kind' | 'status' | 'capabilities'> & {
     error?: RuntimeAppError;
   }
@@ -292,7 +292,7 @@ export const registerRuntimeApp = (
   };
 
   if (!current || current.status !== record.status) {
-    logRuntimeAppStatus('info', runtimeApps[record.name]);
+    logRuntimeAppStatus(record.status === 'failed' ? 'warn' : 'debug', runtimeApps[record.name]);
   }
 
   return runtimeApps[record.name];
@@ -316,7 +316,9 @@ export const updateRuntimeAppStatus = (name: string, status: RuntimeAppStatus, e
   current.updatedAt = Date.now();
   current.error = normalizedError;
 
-  logRuntimeAppStatus(status === 'failed' ? 'warn' : 'info', current);
+  const level = status === 'failed' ? 'warn' : status === 'disposed' ? 'info' : 'debug';
+
+  logRuntimeAppStatus(level, current);
 
   return current;
 };
