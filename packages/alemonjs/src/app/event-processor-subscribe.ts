@@ -8,6 +8,7 @@ import { showErrorModule } from '../core';
 import { getSubscribeList } from './store';
 import { SubscribeStatus } from './config';
 import { finishCurrentTrace, withEventContext } from './hook-event-context';
+import { dispatchEventError } from './event-error';
 
 /**
  * 处理订阅
@@ -111,7 +112,10 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
     };
 
     try {
-      const result = withEventContext(valueEvent, Continue, () => item.data.current(valueEvent, Continue));
+      const result = withEventContext(valueEvent, Continue, () => item.data.current(valueEvent, Continue), {
+        appName: item.data.appName,
+        phase: 'subscribe'
+      });
 
       if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
         void (result as PromiseLike<unknown>).then(
@@ -120,9 +124,22 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
               finishCurrentTrace('consumed');
             }
           },
-          error => {
+          async error => {
             finishCurrentTrace('error');
+            const shouldContinue =
+              typeof item.data.appName === 'string'
+                ? await dispatchEventError({
+                    event: valueEvent,
+                    error,
+                    appName: item.data.appName,
+                    phase: 'subscribe'
+                  })
+                : false;
             showErrorModule(error);
+
+            if (shouldContinue) {
+              nextObserver(true);
+            }
           }
         );
 
@@ -134,7 +151,22 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
       }
     } catch (error) {
       finishCurrentTrace('error');
-      showErrorModule(error);
+      void (async () => {
+        const shouldContinue =
+          typeof item.data.appName === 'string'
+            ? await dispatchEventError({
+                event: valueEvent,
+                error,
+                appName: item.data.appName,
+                phase: 'subscribe'
+              })
+            : false;
+        showErrorModule(error);
+
+        if (shouldContinue) {
+          nextObserver(true);
+        }
+      })();
     }
   };
 

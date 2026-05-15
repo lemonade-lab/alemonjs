@@ -6,6 +6,8 @@ import { ResultCode } from './variable';
 
 type ConfigValue = {
   [key: string]: any;
+  /** 应用列表 */
+  apps?: string[] | { [key: string]: boolean };
   /** 主人-用户KEY */
   master_key?: { [key: string]: boolean } | string[];
   /** 主人-用户ID */
@@ -37,8 +39,6 @@ type ConfigValue = {
     repeated_event_time?: number;
     repeated_user_time?: number;
   };
-  /** 应用列表 */
-  apps?: string[] | { [key: string]: boolean };
 };
 type ConfigListener<T extends ConfigValue = ConfigValue> = (value: T) => void;
 

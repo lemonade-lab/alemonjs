@@ -695,10 +695,10 @@ aggregate-error@^4.0.1:
     clean-stack "^4.0.0"
     indent-string "^5.0.0"
 
-alemonjs@2.1.82:
-  version "2.1.82"
-  resolved "https://registry.npmmirror.com/alemonjs/-/alemonjs-2.1.82.tgz#80ae7ff8d9ff2f687fb185279e3d185f52cdbacc"
-  integrity sha512-9xngz0HMpwjvUbsqK+vRKHQKDyZOJR3BGiMBy2n8zsTTIMpP2wuCt3t5hspFHxWcpTDDkwQjzvg6x5zJhdPjQQ==
+alemonjs@2.1.83:
+  version "2.1.83"
+  resolved "https://registry.npmmirror.com/alemonjs/-/alemonjs-2.1.83.tgz#27e6fb393e4a32405baf4578c75e8d93d34ebf86"
+  integrity sha512-d+aqUUKEfp4TqHcpwO71Vm/U3xf+jHz1LB/8ypITWnr+q2BaRo/bVf4OxFQTDaIjD+ZORoCdIX8Wo+VuSgzGdQ==
   dependencies:
     "@koa/cors" "^5.0.0"
     axios "^1.14.0"

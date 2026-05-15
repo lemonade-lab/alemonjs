@@ -2,7 +2,6 @@
   "name": "alemonjs-bot",
   "version": "1.0.0",
   "description": "template bot",
-  "main": "lib/index.js",
   "type": "module",
   "scripts": {
     "app": "node index.js",
@@ -17,7 +16,7 @@
     "@alemonjs/discord": "^2.1.23",
     "@alemonjs/onebot": "^2.1.16",
     "@alemonjs/qq-bot": "^2.1.22",
-    "alemonjs": "2.1.82",
+    "alemonjs": "2.1.83",
     "jsxp": "1.4.0",
     "pm2": "^5"
   }

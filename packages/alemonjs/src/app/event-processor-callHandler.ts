@@ -1,9 +1,18 @@
 import { showErrorModule } from '../core';
 import { finishCurrentTrace, withEventContext } from './hook-event-context';
+import { dispatchEventError } from './event-error';
+import type { EventErrorPhase } from '../types';
 
 export const createCallHandler = valueEvent => {
   // 开始处理 handler
-  const callHandler = (currents, nextEvent) => {
+  const callHandler = (
+    currents,
+    nextEvent,
+    meta?: {
+      appName?: string;
+      phase?: EventErrorPhase;
+    }
+  ) => {
     let index = 0;
     let isClose = false;
     let isNext = false;
@@ -25,7 +34,10 @@ export const createCallHandler = valueEvent => {
           isNext = true;
           nextEvent(...cns);
         };
-        const res = await withEventContext(valueEvent, nextFn, () => currents[index](valueEvent, nextFn));
+        const res = await withEventContext(valueEvent, nextFn, () => currents[index](valueEvent, nextFn), {
+          appName: meta?.appName,
+          phase: meta?.phase
+        });
 
         // return true → 局部中间件放行，继续执行 children handler
         // return void/false → 处理完毕或拦截，停止当前链
@@ -40,7 +52,22 @@ export const createCallHandler = valueEvent => {
         }
       } catch (err) {
         finishCurrentTrace('error');
+        const shouldContinue =
+          meta?.appName && meta?.phase
+            ? await dispatchEventError({
+                event: valueEvent,
+                error: err,
+                appName: meta.appName,
+                phase: meta.phase
+              })
+            : false;
         showErrorModule(err);
+
+        if (shouldContinue) {
+          nextEvent();
+
+          return;
+        }
 
         return;
       }

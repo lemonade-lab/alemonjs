@@ -12,6 +12,7 @@ import { expendCycle } from './event-processor-cycle';
 import { finishCurrentTrace, withProcessorTrace } from './hook-event-context';
 import { ProcessorEventAutoClearMap, ProcessorEventUserAutoClearMap } from './store';
 import { fastHash, getCachedRegExp, matchIn } from '../core/utils';
+import { dispatchEventStart } from './lifecycle-callbacks.js';
 
 /**
  * 过滤掉重复消息
@@ -110,8 +111,12 @@ setTimeout(callback, processorRepeatedClearTimeMin);
  * @returns
  */
 export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
-  withProcessorTrace(name, event, () => {
+  void withProcessorTrace(name, event, async () => {
     try {
+      await dispatchEventStart({
+        event,
+        name
+      });
       // 禁用规则设置
       const value = getConfigValue();
       const disabledTextRegular = value?.disabled_text_regular;

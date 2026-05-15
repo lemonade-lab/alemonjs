@@ -1,6 +1,7 @@
 import { Next, Events, Current, EventKeys, FileTreeNode, StoreResponseItem, OnResponseValue } from '../types';
 import { showErrorModule, getCachedRegExp } from '../core/utils';
 import { EventMessageText } from '../core/variable';
+import { dispatchEventError } from './event-error';
 
 // 模块缓存，避免每次事件处理都重新 import
 const moduleCache = new Map<string, any>();
@@ -64,7 +65,8 @@ const callHandlerFile = async <T extends EventKeys>(
   select: T,
   file: StoreResponseItem,
   nextStep: Next,
-  callback: (app: { default: OnResponseValue<Current<EventKeys>, T>; regular?: string | RegExp }) => void
+  callback: (app: { default: OnResponseValue<Current<EventKeys>, T>; regular?: string | RegExp }) => void,
+  phase: 'middleware' | 'response'
 ) => {
   try {
     const app: {
@@ -102,9 +104,19 @@ const callHandlerFile = async <T extends EventKeys>(
 
     callback(app);
   } catch (err) {
+    const shouldContinue = await dispatchEventError({
+      event: valueEvent,
+      error: err,
+      appName: file.appName,
+      phase
+    });
+
     showErrorModule(err);
-    // 异常时也要推进链，避免整条子树静默丢失
-    nextStep();
+
+    if (shouldContinue) {
+      // 异常时显式允许继续，才推进链
+      nextStep();
+    }
   }
 };
 
@@ -178,7 +190,8 @@ export const createNextStep = <T extends EventKeys>(
         const currentsItem = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
 
         currents.push(...currentsItem);
-      }
+      },
+      'response'
     );
 
     // 如果有 currents 说明匹配成功
@@ -202,7 +215,15 @@ export const createFileTreeStep = <T extends EventKeys>(
   select: T,
   next: Next,
   root: FileTreeNode,
-  callHandler: (currents: any, nextEvent: any) => void
+  callHandler: (
+    currents: any,
+    nextEvent: any,
+    meta?: {
+      appName?: string;
+      phase?: 'middleware' | 'response';
+    }
+  ) => void,
+  phase: 'middleware' | 'response'
 ) => {
   /**
    * 处理树节点（DFS）
@@ -247,7 +268,8 @@ export const createFileTreeStep = <T extends EventKeys>(
         const items = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
 
         mwCurrents.push(...items);
-      }
+      },
+      'middleware'
     );
 
     if (matched) {
@@ -268,16 +290,23 @@ export const createFileTreeStep = <T extends EventKeys>(
         }
       ]);
 
-      callHandler(gateCurrents, (cn, ...cns) => {
-        if (cn) {
-          // 中间件内部调用了 next(true) → 冒泡到上层周期
-          done(true, ...cns);
+      callHandler(
+        gateCurrents,
+        (cn, ...cns) => {
+          if (cn) {
+            // 中间件内部调用了 next(true) → 冒泡到上层周期
+            done(true, ...cns);
 
-          return;
+            return;
+          }
+          // 所有中间件 current 通过 → 继续处理子树
+          void processContent(node, done);
+        },
+        {
+          appName: node.middleware?.appName,
+          phase
         }
-        // 所有中间件 current 通过 → 继续处理子树
-        void processContent(node, done);
-      });
+      );
       // 如果中间件拦截（return void/false）→ 哨兵不执行 → 子树跳过
     }
     // 如果 !matched，callHandlerFile 的 nextStep 分支已调用 processContent
@@ -333,16 +362,24 @@ export const createFileTreeStep = <T extends EventKeys>(
         const fileCurrents = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
 
         // 只有文件自身的 handler — 中间件已在树层级门控过
-        callHandler(fileCurrents, (cn, ...cns) => {
-          if (cn) {
-            // handler 调用了 next(true) → 冒泡到上层周期
-            treeDone(true, ...cns);
-          } else {
-            // handler 调用了 next() → 继续处理下一个文件
-            processFiles(node, idx + 1, filesDone, treeDone);
+        callHandler(
+          fileCurrents,
+          (cn, ...cns) => {
+            if (cn) {
+              // handler 调用了 next(true) → 冒泡到上层周期
+              treeDone(true, ...cns);
+            } else {
+              // handler 调用了 next() → 继续处理下一个文件
+              processFiles(node, idx + 1, filesDone, treeDone);
+            }
+          },
+          {
+            appName: file.appName,
+            phase
           }
-        });
-      }
+        );
+      },
+      phase
     );
   };
 

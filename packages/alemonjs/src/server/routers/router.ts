@@ -16,6 +16,7 @@ import {
   listRuntimeApps,
   toRuntimeAppSnapshot
 } from '../../app/store.js';
+import { dispatchHttpError } from '../../app/lifecycle-callbacks.js';
 
 const initRequire = () => {};
 
@@ -136,19 +137,48 @@ const dispatchRegisteredKoaRouters = async (ctx: KoaRouter.RouterContext) => {
     const routers = getRuntimeAppKoaRouters(item.name);
 
     for (const koaRouter of routers) {
-      const beforeMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
+      try {
+        const beforeMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
 
-      await koaRouter.routes()(ctx, async () => {});
+        await koaRouter.routes()(ctx, async () => {});
 
-      const afterMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
+        const afterMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
 
-      if (afterMatched <= beforeMatched) {
-        continue;
+        if (afterMatched <= beforeMatched) {
+          continue;
+        }
+
+        await koaRouter.allowedMethods()(ctx, async () => {});
+
+        return true;
+      } catch (error) {
+        const handled = await dispatchHttpError({
+          ctx,
+          error,
+          appName: item.name,
+          path: ctx.path,
+          method: ctx.method,
+          kind: 'koa-router'
+        });
+
+        if (handled) {
+          return true;
+        }
+
+        logger.warn({
+          code: ResultCode.Fail,
+          message: `Error request ${ctx.path}:`,
+          data: error instanceof Error ? error.message : String(error)
+        });
+        ctx.status = 500;
+        ctx.body = {
+          code: 500,
+          message: '处理 Koa Router 请求时发生错误。',
+          error: error instanceof Error ? error.message : String(error)
+        };
+
+        return true;
       }
-
-      await koaRouter.allowedMethods()(ctx, async () => {});
-
-      return true;
     }
   }
 
@@ -309,12 +339,24 @@ router.all('app/{*path}', async ctx => {
 
       await runMiddlewares(middlewares, ctx, handler);
     } catch (err) {
-      console.error(`Error handling API request ${ctx.path}`);
+      const handled = await dispatchHttpError({
+        ctx,
+        error: err,
+        appName: 'main',
+        path: ctx.path,
+        method: ctx.method,
+        kind: 'api'
+      });
+
+      if (handled) {
+        return;
+      }
+
       ctx.status = 500;
       ctx.body = {
         code: 500,
         message: '处理 API 请求时发生错误。',
-        error: err.message
+        error: err instanceof Error ? err.message : String(err)
       };
     }
 
@@ -338,11 +380,24 @@ router.all('app/{*path}', async ctx => {
   try {
     root = readWebRootConfig(packageRoot);
   } catch (err) {
+    const handled = await dispatchHttpError({
+      ctx,
+      error: err,
+      appName: 'main',
+      path: ctx.path,
+      method: ctx.method,
+      kind: 'web'
+    });
+
+    if (handled) {
+      return;
+    }
+
     ctx.status = 500;
     ctx.body = {
       code: 500,
       message: '加载 package.json 时发生错误。',
-      error: err.message
+      error: err instanceof Error ? err.message : String(err)
     };
 
     return;
@@ -370,6 +425,19 @@ router.all('app/{*path}', async ctx => {
     ctx.body = file;
     ctx.status = 200;
   } catch (err) {
+    const handled = await dispatchHttpError({
+      ctx,
+      error: err,
+      appName: 'main',
+      path: ctx.path,
+      method: ctx.method,
+      kind: 'web'
+    });
+
+    if (handled) {
+      return;
+    }
+
     if (err?.status === 404) {
       ctx.status = 404;
       ctx.body = {
@@ -382,7 +450,7 @@ router.all('app/{*path}', async ctx => {
       ctx.body = {
         code: 500,
         message: '加载资源时发生服务器错误。',
-        error: err.message
+        error: err instanceof Error ? err.message : String(err)
       };
     }
   }
@@ -465,16 +533,29 @@ router.all('apps/:app/{*path}', async ctx => {
 
       await runMiddlewares(middlewares, ctx, handler);
     } catch (err) {
+      const handled = await dispatchHttpError({
+        ctx,
+        error: err,
+        appName,
+        path: ctx.path,
+        method: ctx.method,
+        kind: 'api'
+      });
+
+      if (handled) {
+        return;
+      }
+
       logger.warn({
         code: ResultCode.Fail,
         message: `Error request ${ctx.path}:`,
-        data: err?.message ?? ''
+        data: err instanceof Error ? err.message : String(err)
       });
       ctx.status = 500;
       ctx.body = {
         code: 500,
         message: '处理 API 请求时发生错误。',
-        error: err.message
+        error: err instanceof Error ? err.message : String(err)
       };
     }
 
@@ -500,11 +581,24 @@ router.all('apps/:app/{*path}', async ctx => {
   try {
     root = readWebRootConfig(packageRoot);
   } catch (err) {
+    const handled = await dispatchHttpError({
+      ctx,
+      error: err,
+      appName,
+      path: ctx.path,
+      method: ctx.method,
+      kind: 'web'
+    });
+
+    if (handled) {
+      return;
+    }
+
     ctx.status = 500;
     ctx.body = {
       code: 500,
       message: '加载 package.json 时发生错误。',
-      error: err.message
+      error: err instanceof Error ? err.message : String(err)
     };
 
     return;
@@ -532,6 +626,19 @@ router.all('apps/:app/{*path}', async ctx => {
     ctx.body = file;
     ctx.status = 200;
   } catch (err) {
+    const handled = await dispatchHttpError({
+      ctx,
+      error: err,
+      appName,
+      path: ctx.path,
+      method: ctx.method,
+      kind: 'web'
+    });
+
+    if (handled) {
+      return;
+    }
+
     if (err?.status === 404) {
       ctx.status = 404;
       ctx.body = {
@@ -543,13 +650,13 @@ router.all('apps/:app/{*path}', async ctx => {
       logger.warn({
         code: ResultCode.Fail,
         message: `Error request ${ctx.path}:`,
-        data: err?.message ?? ''
+        data: err instanceof Error ? err.message : String(err)
       });
       ctx.status = 500;
       ctx.body = {
         code: 500,
         message: `加载子应用 '${appName}' 资源时发生服务器错误。`,
-        error: err.message
+        error: err instanceof Error ? err.message : String(err)
       };
     }
   }

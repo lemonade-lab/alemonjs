@@ -16,6 +16,7 @@ import {
   updateRuntimeAppCapabilities,
   updateRuntimeAppStatus
 } from '../../app/store.js';
+import { dispatchAppDispose, dispatchAppReady, dispatchRuntimeStatusChange } from '../../app/lifecycle-callbacks.js';
 
 const initRequire = () => {};
 
@@ -125,6 +126,11 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     }
 
     App.pushCycle(app);
+    await dispatchRuntimeStatusChange({
+      appName,
+      previousStatus: 'discovered',
+      status: 'loading'
+    });
 
     const unMounted = async e => {
       showErrorModule(e);
@@ -135,15 +141,8 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       // 注销应用目录映射
       unregisterAppDir(appName);
       // 卸载
+      await dispatchAppDispose(appName, e);
       App.un();
-      try {
-        if (app?.unMounted) {
-          await app.unMounted(e);
-        }
-      } catch (e) {
-        // 卸载周期出意外，不需要进行卸载
-        showErrorModule(e);
-      }
     };
 
     // onCreated 创建
@@ -186,10 +185,13 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       App.on();
 
       // mounted
+      const emptyStore = { response: [], responseMiddleware: {}, middleware: [] };
+
       try {
         if (app?.onMounted) {
-          await app.onMounted({ response: [], responseMiddleware: {}, middleware: [] });
+          await app.onMounted(emptyStore);
         }
+        await dispatchAppReady(appName, emptyStore);
         updateRuntimeAppStatus(appName, 'ready');
       } catch (e) {
         void unMounted(e);
@@ -280,10 +282,13 @@ export const loadChildren = async (mainPath: string, appName: string) => {
       App.on();
 
       // mounted
+      const mountedStore = { response: resData, responseMiddleware: resAndMwData, middleware: mwData };
+
       try {
         if (app?.onMounted) {
-          await app.onMounted({ response: resData, responseMiddleware: resAndMwData, middleware: mwData });
+          await app.onMounted(mountedStore);
         }
+        await dispatchAppReady(appName, mountedStore);
         updateRuntimeAppStatus(appName, 'ready');
       } catch (e) {
         void unMounted(e);

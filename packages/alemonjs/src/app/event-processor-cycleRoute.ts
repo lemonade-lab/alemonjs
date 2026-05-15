@@ -2,6 +2,7 @@ import { Next, Events, EventKeys, ResponseRoute } from '../types';
 import { EventMessageText } from '../core/variable';
 import { showErrorModule } from '../core';
 import { getCachedRegExp } from '../core/utils';
+import { dispatchEventError } from './event-error';
 
 // 缓存 AsyncFunction 构造函数 — 避免每次调用创建匿名 async 函数
 const AsyncFunction = (async () => {}).constructor;
@@ -26,7 +27,15 @@ export const createRouteProcessChildren = <T extends EventKeys>(
   valueEvent: Events[T],
   select: T,
   nextCycle: Next,
-  callHandler: (currents: any, nextEvent: any) => void
+  callHandler: (
+    currents: any,
+    nextEvent: any,
+    meta?: {
+      appName?: string;
+      phase?: 'route';
+    }
+  ) => void,
+  phase: 'route'
 ) => {
   // handler 执行结果缓存 — 同一个 handler 在一次事件中只执行一次
   const handlerResultCache = new Map<() => any, { matched: boolean; currents: any[] }>();
@@ -201,18 +210,38 @@ export const createRouteProcessChildren = <T extends EventKeys>(
           allCurrents.push(...result.currents);
         }
 
-        callHandler(allCurrents, (cn, ...cns) => {
-          if (cn) {
-            nextCycle(true, ...cns);
+        callHandler(
+          allCurrents,
+          (cn, ...cns) => {
+            if (cn) {
+              nextCycle(true, ...cns);
 
-            return;
+              return;
+            }
+            void nextNode();
+          },
+          {
+            appName: node.appName,
+            phase
           }
-          void nextNode();
-        });
+        );
       } catch (err) {
+        const shouldContinue =
+          typeof node.appName === 'string'
+            ? await dispatchEventError({
+                event: valueEvent,
+                error: err,
+                appName: node.appName,
+                phase
+              })
+            : false;
+
         showErrorModule(err);
-        // 异常时跳过当前节点，继续后续节点，避免整条链卡住
-        void nextNode();
+
+        if (shouldContinue) {
+          // 异常时显式允许继续，才推进后续节点
+          void nextNode();
+        }
       }
     };
 

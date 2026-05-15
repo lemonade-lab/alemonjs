@@ -2,7 +2,7 @@ import { EventCycleEnum, Current, Events, EventKeys } from '../../types';
 import { ResultCode } from '../../core/variable';
 import { SubscribeList } from '../store';
 import { SubscribeStatus } from '../config';
-import { getCurrentEvent } from '../hook-event-context';
+import { getCurrentAppName, getCurrentEvent } from '../hook-event-context';
 
 type KeyMap = {
   [key: string]: string | number | boolean;
@@ -39,6 +39,7 @@ export function useSubscribe<T extends EventKeys>(eventOrSelects: Events[T] | T 
   const selects = (maybeSelects === undefined ? eventOrSelects : maybeSelects) as T | T[];
   const event = (maybeSelects === undefined ? undefined : eventOrSelects) as Events[T] | undefined;
   const valueEvent = event ?? getCurrentEvent<T>();
+  const appName = getCurrentAppName();
 
   // 检查参数
   if (typeof valueEvent !== 'object' || valueEvent === null) {
@@ -101,6 +102,7 @@ export function useSubscribe<T extends EventKeys>(eventOrSelects: Events[T] | T 
         }
       }
       subList.value.append({
+        appName,
         choose,
         selects: curSelects,
         keys: values,

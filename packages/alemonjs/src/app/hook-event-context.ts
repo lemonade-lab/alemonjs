@@ -3,9 +3,8 @@ import { performance } from 'node:perf_hooks';
 import { getConfigValue } from '../core/config';
 import { ResultCode } from '../core/variable';
 import { Result } from '../core';
-import { EventKeys, Events } from '../types';
-
-export type EventTraceReason = 'filtered' | 'completed' | 'consumed' | 'error';
+import { EventErrorPhase, EventKeys, Events, EventTraceReason } from '../types';
+import { dispatchEventFinished } from './lifecycle-callbacks.js';
 
 type EventTrace<T extends EventKeys = EventKeys> = {
   select: T;
@@ -18,6 +17,8 @@ type EventContext<T extends EventKeys = EventKeys> = {
   event: Events[T];
   next?: (...args: boolean[]) => void;
   trace?: EventTrace<T>;
+  appName?: string;
+  phase?: EventErrorPhase;
 };
 
 const eventStore = new AsyncLocalStorage<EventContext>();
@@ -97,11 +98,18 @@ const createEventTrace = <T extends EventKeys>(select: T): EventTrace<T> => {
           message: 'event processor finished',
           data: createLogData(event, trace.select, reason, duration)
         });
-
-        return;
+      } else {
+        logger.info(createLogText(event, trace.select, reason, duration));
       }
-
-      logger.info(createLogText(event, trace.select, reason, duration));
+      void dispatchEventFinished({
+        event,
+        name: trace.select,
+        reason,
+        duration,
+        hasSendAttempted: event._sendAttempted === true || event._has_send_attempt === true,
+        hasSendSucceeded: event._sendSucceeded === true || event._has_send_success === true,
+        lastSendError: event._lastSendError ?? event._last_send_error ?? null
+      });
     }
   };
 
@@ -111,14 +119,24 @@ const createEventTrace = <T extends EventKeys>(select: T): EventTrace<T> => {
 /**
  * 在当前异步调用链中绑定事件上下文。
  */
-export const withEventContext = <T extends EventKeys, R>(event: Events[T], next: (...args: boolean[]) => void, runner: () => R): R => {
+export const withEventContext = <T extends EventKeys, R>(
+  event: Events[T],
+  next: (...args: boolean[]) => void,
+  runner: () => R,
+  options?: {
+    appName?: string;
+    phase?: EventErrorPhase;
+  }
+): R => {
   const current = eventStore.getStore();
 
   return eventStore.run(
     {
       event,
       next,
-      trace: current?.trace as EventTrace<T> | undefined
+      trace: current?.trace as EventTrace<T> | undefined,
+      appName: options?.appName ?? current?.appName,
+      phase: options?.phase ?? current?.phase
     },
     runner
   );
@@ -152,6 +170,20 @@ export const getCurrentEvent = <T extends EventKeys>(): Events[T] | undefined =>
  */
 export const getCurrentNext = (): ((...args: boolean[]) => void) | undefined => {
   return eventStore.getStore()?.next;
+};
+
+/**
+ * 读取当前异步调用链中的 appName。
+ */
+export const getCurrentAppName = (): string | undefined => {
+  return eventStore.getStore()?.appName;
+};
+
+/**
+ * 读取当前异步调用链中的错误阶段。
+ */
+export const getCurrentPhase = (): EventErrorPhase | undefined => {
+  return eventStore.getStore()?.phase;
 };
 
 /**

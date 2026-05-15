@@ -2,8 +2,7 @@ import { Router, logger } from 'alemonjs';
 import expose from './expose';
 
 const router = Router.create({
-  // 只选择有消息的事件
-  events: ['message.create', 'private.message.create', 'interaction.create', 'private.interaction.create']
+  events: ['message.create', 'private.message.create'] // 选择消息创建
 });
 
 const appGroup = router.group({ // 精准规则匹配，复杂度 O1，稳定 且 几乎无损耗
@@ -25,8 +24,8 @@ export default defineChildren({
       expose: expose
     };
   },
-  // 当注册完成时
-  onCreated() {
+  // 当准备好时
+  onReady() {
     logger.info('本地测试启动');
   }
 });

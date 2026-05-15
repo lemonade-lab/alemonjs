@@ -26,14 +26,14 @@ export const expendMiddleware = <T extends EventKeys>(valueEvent: Events[T], sel
   // 创建处理函数（文件）
   const callHandler = createCallHandler(valueEvent);
   // 创建文件树遍历函数
-  const nextMiddleware = createFileTreeStep(valueEvent, select, next, root, callHandler);
+  const nextMiddleware = createFileTreeStep(valueEvent, select, next, root, callHandler, 'middleware');
 
   // 所有中间件（路由）
   const routes = middlewareRouterSingleton.value;
   // 创建处理函数（路由）
   const callRouteHandler = createCallHandler(valueEvent);
   // 创建 children 处理函数（路由）
-  const processChildren = createRouteProcessChildren(valueEvent, select, nextMiddleware, callRouteHandler);
+  const processChildren = createRouteProcessChildren(valueEvent, select, nextMiddleware, callRouteHandler, 'route');
 
   // 优先route系统。再到files系统
   void processChildren(routes, [], nextMiddleware);

@@ -3,18 +3,21 @@ import { defaultPort } from './core/variable';
 import { createServer } from './server/main';
 import { disposeAllRuntimeApps } from './app/store.js';
 import { scheduleCancelByApp, unregisterAppDir } from './app/schedule-store.js';
+import { dispatchDisposeAllApps } from './app/lifecycle-callbacks.js';
 
 // 标记当前为客户端进程，防止 definePlatform 被 import 时的副作用
 global.__client_loaded = true;
 
 let runtimeDisposed = false;
 
-const disposeRuntime = () => {
+const disposeRuntime = async () => {
   if (runtimeDisposed) {
     return;
   }
 
   runtimeDisposed = true;
+
+  await dispatchDisposeAllApps();
 
   const apps = disposeAllRuntimeApps();
 
@@ -22,6 +25,12 @@ const disposeRuntime = () => {
     scheduleCancelByApp(app.name);
     unregisterAppDir(app.name);
   });
+};
+
+const shutdown = async (reason: string) => {
+  logger.info?.(`[alemonjs][${reason}] 收到信号，正在关闭...`);
+  await disposeRuntime();
+  process.exit(0);
 };
 
 // 应用服务器
@@ -73,14 +82,12 @@ const mainProcess = () => {
 
   ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
     process?.on?.(sig, () => {
-      logger.info?.(`[alemonjs][${sig}] 收到信号，正在关闭...`);
-      disposeRuntime();
-      setImmediate(() => process.exit(0));
+      void shutdown(sig);
     });
   });
 
   process?.on?.('exit', code => {
-    disposeRuntime();
+    void disposeRuntime();
     logger.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
   });
 
@@ -94,8 +101,7 @@ const mainProcess = () => {
         // 启动内部服务器
         mainServer();
       } else if (data?.type === 'stop') {
-        disposeRuntime();
-        process.exit(0);
+        void shutdown('stop');
       }
     } catch {}
   });

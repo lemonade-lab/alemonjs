@@ -93,6 +93,8 @@ export type OnGroupItem<C = any, T extends EventKeys = EventKeys> = OnResponseVa
 export type OnGroupFunc = <C, T extends EventKeys, TFirst extends OnGroupItem<C, T>>(...calls: [TFirst, ...Array<TFirst>]) => TFirst;
 
 export type ResponseRoute = {
+  /** 内部归属 appName */
+  appName?: string;
   /** 平台类型 */
   platform?: string | string[];
   /** 正则匹配 */

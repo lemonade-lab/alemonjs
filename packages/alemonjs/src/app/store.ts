@@ -5,11 +5,22 @@
  * @description 存储器
  */
 import { SinglyLinkedList } from './SinglyLinkedList';
-import { childrenCallbackRes, ChildrenCycle, EventCycleEnum, EventKeys, FileTreeNode, StoreMiddlewareItem, StoreResponseItem, SubscribeValue } from '../types';
+import {
+  childrenCallbackRes,
+  ChildrenCycle,
+  EventCycleEnum,
+  EventKeys,
+  FileTreeNode,
+  ResponseRoute,
+  StoreMiddlewareItem,
+  StoreResponseItem,
+  SubscribeValue
+} from '../types';
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
 import { disposeExpose } from './expose.js';
 import type KoaRouter from 'koa-router';
+import { dispatchRuntimeStatusChange } from './lifecycle-callbacks.js';
 
 export type RuntimeAppStatus = 'discovered' | 'loading' | 'ready' | 'failed' | 'disposed';
 
@@ -307,6 +318,7 @@ export const updateRuntimeAppStatus = (name: string, status: RuntimeAppStatus, e
   }
 
   const normalizedError = normalizeRuntimeAppError(error);
+  const previousStatus = current.status;
 
   if (current.status === status && sameRuntimeAppError(current.error, normalizedError)) {
     return current;
@@ -319,6 +331,17 @@ export const updateRuntimeAppStatus = (name: string, status: RuntimeAppStatus, e
   const level = status === 'failed' ? 'warn' : status === 'disposed' ? 'info' : 'debug';
 
   logRuntimeAppStatus(level, current);
+  void dispatchRuntimeStatusChange({
+    appName: name,
+    previousStatus,
+    status,
+    error: normalizedError
+      ? {
+          message: normalizedError.message,
+          time: normalizedError.time
+        }
+      : undefined
+  });
 
   return current;
 };
@@ -568,6 +591,14 @@ function mergeFileTree(target: FileTreeNode, source: FileTreeNode) {
   }
 }
 
+const attachRouteAppName = (appName: string, routes: ResponseRoute[] = []): ResponseRoute[] => {
+  return routes.map(route => ({
+    ...route,
+    appName,
+    children: route.children ? attachRouteAppName(appName, route.children) : route.children
+  }));
+};
+
 /**
  * 中间件文件树 — 替代扁平 Middleware 数组
  * 复用 buildFileTree / mergeFileTree，无 middlewareResponse（中间件无嵌套中间件概念）
@@ -638,11 +669,11 @@ export class ResponseRouter {
         return [];
       }
       if (alemonjsCore.storeChildrenApp[key].register?.responseRouter) {
-        return alemonjsCore.storeChildrenApp[key].register?.responseRouter?.current ?? [];
+        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.responseRouter?.current ?? []);
       }
 
       if (alemonjsCore.storeChildrenApp[key].register?.response) {
-        return alemonjsCore.storeChildrenApp[key].register?.response?.current ?? [];
+        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.response?.current ?? []);
       }
 
       return [];
@@ -668,10 +699,10 @@ export class MiddlewareRouter {
         return [];
       }
       if (alemonjsCore.storeChildrenApp[key].register?.middlewareRouter) {
-        return alemonjsCore.storeChildrenApp[key].register?.middlewareRouter?.current ?? [];
+        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.middlewareRouter?.current ?? []);
       }
       if (alemonjsCore.storeChildrenApp[key].register?.middleware) {
-        return alemonjsCore.storeChildrenApp[key].register?.middleware?.current ?? [];
+        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.middleware?.current ?? []);
       }
 
       return [];
@@ -904,6 +935,14 @@ export class ChildrenApp {
     return alemonjsCore.storeChildrenApp[this.#name];
   }
 }
+
+export const getChildrenApp = (name: string) => {
+  return alemonjsCore.storeChildrenApp[name] ?? null;
+};
+
+export const listChildrenApps = () => {
+  return Object.values(alemonjsCore.storeChildrenApp);
+};
 
 export const ProcessorEventAutoClearMap = new Map();
 

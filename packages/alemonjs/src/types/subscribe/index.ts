@@ -6,6 +6,7 @@ import { EventKeys } from '../event/map';
  * subscribe
  */
 export type SubscribeValue = {
+  appName?: string;
   choose: EventCycleEnum;
   selects: EventKeys[];
   keys: {
