@@ -6,6 +6,54 @@ import type { Actions, Apis, EventsEnum } from '../../types';
 import type { ActionReplyFunc, ApiReplyFunc } from '../typings';
 import { createWSConnector } from './base';
 import { createDirectClient, type DirectChannel } from '../../process/direct-channel';
+import {
+  createActionResponseEnvelope,
+  createApiResponseEnvelope,
+  createEventEnvelope,
+  isNormalizedActionRequest,
+  isNormalizedApiRequest,
+  normalizeInboundMessage,
+  toLegacyActionData,
+  toLegacyApiData
+} from '../normalize';
+
+/**
+ * 平台端长期兼容桥：
+ * - 外部平台包继续使用旧 cbpPlatform API
+ * - 内部协议已可逐步切换到 CBP v1 envelope / normalized message
+ * - 旧平台包永远只看 legacy action/api data 结构
+ */
+const dispatchLegacyActionHandlers = (actionReplys: ActionReplyFunc[], replyAction: (data: Actions, payload: Result[]) => void, input: unknown) => {
+  const normalized = normalizeInboundMessage(input);
+
+  if (!isNormalizedActionRequest(normalized)) {
+    return false;
+  }
+
+  const legacy = toLegacyActionData(normalized);
+
+  for (const cb of actionReplys) {
+    void cb(legacy, val => replyAction(legacy, val));
+  }
+
+  return true;
+};
+
+const dispatchLegacyApiHandlers = (apiReplys: ApiReplyFunc[], replyApi: (data: Apis, payload: Result[]) => void, input: unknown) => {
+  const normalized = normalizeInboundMessage(input);
+
+  if (!isNormalizedApiRequest(normalized)) {
+    return false;
+  }
+
+  const legacy = toLegacyApiData(normalized);
+
+  for (const cb of apiReplys) {
+    void cb(legacy, val => replyApi(legacy, val));
+  }
+
+  return true;
+};
 
 /**
  * 直连模式的平台端（Unix Domain Socket 直连客户端，零桥接跳转）
@@ -23,10 +71,12 @@ const cbpPlatformDirect = (sockPath: string, open: () => void) => {
   const send = (data: EventsEnum) => {
     data.DeviceId = deviceId;
     data.CreateAt = Date.now();
+    const envelope = createEventEnvelope(data as unknown as Record<string, unknown>);
+
     if (channel) {
-      channel.send(data);
+      channel.send(envelope);
     } else {
-      pendingQueue.push({ ...data });
+      pendingQueue.push(envelope);
     }
   };
 
@@ -34,24 +84,14 @@ const cbpPlatformDirect = (sockPath: string, open: () => void) => {
    * 回复行为结果
    */
   const replyAction = (data: Actions, payload: Result[]) => {
-    channel?.send({
-      action: data.action,
-      payload: payload,
-      actionId: data.actionId,
-      DeviceId: data.DeviceId
-    });
+    channel?.send(createActionResponseEnvelope(data, payload));
   };
 
   /**
    * 回复接口结果
    */
   const replyApi = (data: Apis, payload: Result[]) => {
-    channel?.send({
-      action: data.action,
-      apiId: data.apiId,
-      DeviceId: data.DeviceId,
-      payload: payload
-    });
+    channel?.send(createApiResponseEnvelope(data, payload));
   };
 
   const onactions = (reply: ActionReplyFunc) => {
@@ -64,16 +104,11 @@ const cbpPlatformDirect = (sockPath: string, open: () => void) => {
 
   // 异步建立直连（自带重试）
   createDirectClient(sockPath, (data: any) => {
-    // 接收来自客户端的行为/接口请求
-    if (data?.apiId) {
-      for (const cb of apiReplys) {
-        void cb(data, val => replyApi(data, val));
-      }
-    } else if (data?.actionId) {
-      for (const cb of actionReplys) {
-        void cb(data, val => replyAction(data, val));
-      }
+    if (dispatchLegacyApiHandlers(apiReplys, replyApi, data)) {
+      return;
     }
+
+    dispatchLegacyActionHandlers(actionReplys, replyAction, data);
   })
     .then(ch => {
       channel = ch;
@@ -119,7 +154,9 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
     if (typeof process.send === 'function') {
       data.DeviceId = deviceId;
       data.CreateAt = Date.now();
-      process.send({ type: 'ipc:data', data: sanitizeForSerialization(data) });
+      const envelope = createEventEnvelope(data as unknown as Record<string, unknown>);
+
+      process.send({ type: 'ipc:data', data: sanitizeForSerialization(envelope) });
     }
   };
 
@@ -130,12 +167,7 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
     if (typeof process.send === 'function') {
       process.send({
         type: 'ipc:data',
-        data: {
-          action: data.action,
-          payload: payload,
-          actionId: data.actionId,
-          DeviceId: data.DeviceId
-        }
+        data: sanitizeForSerialization(createActionResponseEnvelope(data, payload))
       });
     }
   };
@@ -147,12 +179,7 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
     if (typeof process.send === 'function') {
       process.send({
         type: 'ipc:data',
-        data: {
-          action: data.action,
-          apiId: data.apiId,
-          DeviceId: data.DeviceId,
-          payload: payload
-        }
+        data: sanitizeForSerialization(createApiResponseEnvelope(data, payload))
       });
     }
   };
@@ -171,17 +198,11 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
       const msg = typeof message === 'string' ? JSON.parse(message) : message;
 
       if (msg?.type === 'ipc:data') {
-        const data = msg.data;
-
-        if (data?.apiId) {
-          for (const cb of apiReplys) {
-            void cb(data, val => replyApi(data, val));
-          }
-        } else if (data?.actionId) {
-          for (const cb of actionReplys) {
-            void cb(data, val => replyAction(data, val));
-          }
+        if (dispatchLegacyApiHandlers(apiReplys, replyApi, msg.data)) {
+          return;
         }
+
+        dispatchLegacyActionHandlers(actionReplys, replyAction, msg.data);
       }
     } catch (error) {
       logger.error({
@@ -257,7 +278,9 @@ export const cbpPlatform = (
     if (global.chatbotPlatform?.readyState === WebSocket.OPEN) {
       data.DeviceId = deviceId;
       data.CreateAt = Date.now();
-      global.chatbotPlatform.send(flattedJSON.stringify(sanitizeForSerialization(data)));
+      const envelope = createEventEnvelope(data as unknown as Record<string, unknown>);
+
+      global.chatbotPlatform.send(flattedJSON.stringify(sanitizeForSerialization(envelope)));
     }
   };
   const actionReplys: ActionReplyFunc[] = [];
@@ -268,27 +291,13 @@ export const cbpPlatform = (
    */
   const replyAction = (data: Actions, payload: Result[]) => {
     if (global.chatbotPlatform?.readyState === WebSocket.OPEN) {
-      global.chatbotPlatform.send(
-        flattedJSON.stringify({
-          action: data.action,
-          payload: payload,
-          actionId: data.actionId,
-          DeviceId: data.DeviceId
-        })
-      );
+      global.chatbotPlatform.send(flattedJSON.stringify(createActionResponseEnvelope(data, payload)));
     }
   };
 
   const replyApi = (data: Apis, payload: Result[]) => {
     if (global.chatbotPlatform?.readyState === WebSocket.OPEN) {
-      global.chatbotPlatform.send(
-        flattedJSON.stringify({
-          action: data.action,
-          apiId: data.apiId,
-          DeviceId: data.DeviceId,
-          payload: payload
-        })
-      );
+      global.chatbotPlatform.send(flattedJSON.stringify(createApiResponseEnvelope(data, payload)));
     }
   };
 
@@ -315,15 +324,11 @@ export const cbpPlatform = (
       try {
         const data = flattedJSON.parse(messageStr);
 
-        if (data.apiId) {
-          for (const cb of apiReplys) {
-            void cb(data, val => replyApi(data, val));
-          }
-        } else if (data.actionId) {
-          for (const cb of actionReplys) {
-            void cb(data, val => replyAction(data, val));
-          }
+        if (dispatchLegacyApiHandlers(apiReplys, replyApi, data)) {
+          return;
         }
+
+        dispatchLegacyActionHandlers(actionReplys, replyAction, data);
       } catch (error) {
         logger.error({
           code: ResultCode.Fail,

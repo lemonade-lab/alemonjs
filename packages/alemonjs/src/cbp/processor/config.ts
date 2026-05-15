@@ -21,18 +21,21 @@ export const DEVICE_ID_HEADER = 'x-device-id';
 // 是否全量接收
 export const FULL_RECEIVE_HEADER = 'x-full-receive';
 
-type actionResolvesValue = Result[] | PromiseLike<Result[]>;
+type RequestReplyValue = Result[] | PromiseLike<Result[]>;
 
-type actionResolvesValueFunc = (value: actionResolvesValue) => void;
+type RequestReplyResolve = (value: RequestReplyValue) => void;
 
-// 行为回调
-export const actionResolves = new Map<string, actionResolvesValueFunc>();
-// 接口回调
-export const apiResolves = new Map<string, actionResolvesValueFunc>();
-// 超时器
-export const actionTimeouts = new Map<string, NodeJS.Timeout>();
-// 接口超时器
-export const apiTimeouts = new Map<string, NodeJS.Timeout>();
+// Request / reply registry：内核统一按 requestId 跟踪，action/api 仅作为兼容分类存在
+export const actionRequestResolves = new Map<string, RequestReplyResolve>();
+export const apiRequestResolves = new Map<string, RequestReplyResolve>();
+export const actionRequestTimeouts = new Map<string, NodeJS.Timeout>();
+export const apiRequestTimeouts = new Map<string, NodeJS.Timeout>();
+
+// Legacy aliases kept for compatibility with older internal call sites.
+export const actionResolves = actionRequestResolves;
+export const apiResolves = apiRequestResolves;
+export const actionTimeouts = actionRequestTimeouts;
+export const apiTimeouts = apiRequestTimeouts;
 // 分配绑定记录
 export const childrenBind = new Map<string, string>();
 // 客户端绑定计数（O(1) 负载均衡查询，替代 O(n) 全量扫描）

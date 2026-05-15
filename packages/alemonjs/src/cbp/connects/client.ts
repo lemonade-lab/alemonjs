@@ -1,55 +1,70 @@
 import * as flattedJSON from 'flatted';
 import { onProcessor } from '../../app/index';
 import { ResultCode, createResult } from '../../core';
-import { actionResolves, actionTimeouts, apiResolves, apiTimeouts, FULL_RECEIVE_HEADER } from '../processor/config';
-import type { CBPClientOptions, ParsedMessage } from '../typings';
+import { actionRequestResolves, actionRequestTimeouts, apiRequestResolves, apiRequestTimeouts, FULL_RECEIVE_HEADER } from '../processor/config';
+import type { CBPClientOptions } from '../typings';
 import { createWSConnector } from './base';
 import { setDirectSend } from '../processor/transport';
 import { createDirectServer } from '../../process/direct-channel';
+import { normalizeInboundMessage } from '../normalize';
 
 /**
- * 通用消息处理（直连 / IPC / WS 共用）
+ * 通用入站消息处理（直连 / IPC / WS 共用）
  */
-const handleParsedMessage = (parsedMessage: ParsedMessage) => {
-  if (parsedMessage?.apiId) {
+const handleInboundMessage = (message: unknown) => {
+  const normalized = normalizeInboundMessage(message);
+
+  if (!normalized) {
+    return;
+  }
+
+  if (normalized.kind === 'api.res') {
     // 接口响应
-    const resolve = apiResolves.get(parsedMessage.apiId);
+    const resolve = apiRequestResolves.get(normalized.replyTo);
 
     if (resolve) {
-      apiResolves.delete(parsedMessage.apiId);
-      const timeout = apiTimeouts.get(parsedMessage.apiId);
+      apiRequestResolves.delete(normalized.replyTo);
+      const timeout = apiRequestTimeouts.get(normalized.replyTo);
 
       if (timeout) {
-        apiTimeouts.delete(parsedMessage.apiId);
+        apiRequestTimeouts.delete(normalized.replyTo);
         clearTimeout(timeout);
       }
-      if (Array.isArray(parsedMessage.payload)) {
-        resolve(parsedMessage.payload);
+      if (Array.isArray(normalized.results)) {
+        resolve(normalized.results);
       } else {
         resolve([createResult(ResultCode.Fail, '接口处理错误', null)]);
       }
     }
-  } else if (parsedMessage?.actionId) {
+  } else if (normalized.kind === 'action.res') {
     // 行为响应
-    const resolve = actionResolves.get(parsedMessage.actionId);
+    const resolve = actionRequestResolves.get(normalized.replyTo);
 
     if (resolve) {
-      actionResolves.delete(parsedMessage.actionId);
-      const timeout = actionTimeouts.get(parsedMessage.actionId);
+      actionRequestResolves.delete(normalized.replyTo);
+      const timeout = actionRequestTimeouts.get(normalized.replyTo);
 
       if (timeout) {
-        actionTimeouts.delete(parsedMessage.actionId);
+        actionRequestTimeouts.delete(normalized.replyTo);
         clearTimeout(timeout);
       }
-      if (Array.isArray(parsedMessage.payload)) {
-        resolve(parsedMessage.payload);
+      if (Array.isArray(normalized.results)) {
+        resolve(normalized.results);
       } else {
         resolve([createResult(ResultCode.Fail, '消费处理错误', null)]);
       }
     }
-  } else if (parsedMessage.name) {
+  } else if (normalized.kind === 'event') {
     // 事件消息
-    onProcessor(parsedMessage.name, parsedMessage as any, parsedMessage.value);
+    onProcessor(normalized.eventName as any, normalized.event as any, normalized.raw);
+  } else if (normalized.kind === 'control' && normalized.op === 'sync') {
+    const env = normalized.payload?.env;
+
+    if (env && typeof env === 'object') {
+      for (const key in env) {
+        process.env[key] = String(env[key]);
+      }
+    }
   }
 };
 
@@ -59,7 +74,7 @@ const handleParsedMessage = (parsedMessage: ParsedMessage) => {
  */
 const cbpClientDirect = (sockPath: string, open: () => void) => {
   createDirectServer(sockPath, (data: any) => {
-    handleParsedMessage(data as ParsedMessage);
+    handleInboundMessage(data);
   })
     .then(channel => {
       // 设置直连发送函数（供 sendAction / sendAPI 使用）
@@ -93,7 +108,7 @@ const cbpClientIPC = (open: () => void) => {
       const msg = typeof message === 'string' ? JSON.parse(message) : message;
 
       if (msg?.type === 'ipc:data') {
-        handleParsedMessage(msg.data as ParsedMessage);
+        handleInboundMessage(msg.data);
       }
     } catch (error) {
       logger.error({
@@ -148,21 +163,9 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
     onOpen: open,
     onMessage: (messageStr: string) => {
       try {
-        const parsedMessage: ParsedMessage = flattedJSON.parse(messageStr);
+        const parsedMessage = flattedJSON.parse(messageStr);
 
-        if (parsedMessage?.activeId) {
-          // 主端主动消息
-          if (parsedMessage.active === 'sync') {
-            const configs = parsedMessage.payload;
-            const env = configs.env || {};
-
-            for (const key in env) {
-              process.env[key] = env[key];
-            }
-          }
-        } else {
-          handleParsedMessage(parsedMessage);
-        }
+        handleInboundMessage(parsedMessage);
       } catch (error) {
         logger.error({
           code: ResultCode.Fail,

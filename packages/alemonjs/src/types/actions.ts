@@ -1,6 +1,71 @@
 import { DataEnums } from './message';
 import { PaginationParams } from './standard';
 
+export type MessageActionName =
+  | 'message.send'
+  | 'message.send.channel'
+  | 'message.send.user'
+  | 'message.delete'
+  | 'message.edit'
+  | 'message.pin'
+  | 'message.unpin'
+  | 'message.forward.user'
+  | 'message.forward.channel'
+  | 'message.get'
+  | 'message.intent';
+
+export type MentionActionName = 'mention.get';
+
+export type ReactionActionName = 'reaction.add' | 'reaction.remove' | 'reaction.list';
+
+export type FileActionName = 'file.send.channel' | 'file.send.user';
+
+export type MemberActionName =
+  | 'member.info'
+  | 'member.list'
+  | 'member.kick'
+  | 'member.ban'
+  | 'member.unban'
+  | 'member.mute'
+  | 'member.admin'
+  | 'member.card'
+  | 'member.title'
+  | 'member.search';
+
+export type GuildActionName = 'guild.info' | 'guild.list' | 'guild.update' | 'guild.leave' | 'guild.mute';
+
+export type ChannelActionName = 'channel.info' | 'channel.list' | 'channel.create' | 'channel.update' | 'channel.delete' | 'channel.announce';
+
+export type RoleActionName = 'role.list' | 'role.create' | 'role.update' | 'role.delete' | 'role.assign' | 'role.remove';
+
+export type MeActionName = 'me.info' | 'me.guilds' | 'me.threads' | 'me.friends';
+
+export type RequestActionName = 'request.friend' | 'request.guild';
+
+export type UserActionName = 'user.info';
+
+export type MediaActionName = 'media.upload' | 'media.send.channel' | 'media.send.user';
+
+export type HistoryActionName = 'history.list';
+
+export type PermissionActionName = 'permission.get' | 'permission.set';
+
+export type StandardActionName =
+  | MessageActionName
+  | MentionActionName
+  | ReactionActionName
+  | FileActionName
+  | MemberActionName
+  | GuildActionName
+  | ChannelActionName
+  | RoleActionName
+  | MeActionName
+  | RequestActionName
+  | UserActionName
+  | MediaActionName
+  | HistoryActionName
+  | PermissionActionName;
+
 export type ActionMessageSend = {
   // 发送消息
   action: 'message.send';
@@ -397,6 +462,11 @@ export type ActionMessageGet = {
   };
 };
 
+export type ActionMessageIntent = {
+  action: 'message.intent';
+  payload: object;
+};
+
 // ─── 服务器管理扩展 ───
 
 export type ActionGuildUpdate = {
@@ -659,6 +729,7 @@ export type Actions = // 消息
     // 转发
     | ActionMessageForwardUser
     | ActionMessageForwardChannel
+    | ActionMessageIntent
     // 成员
     | ActionMemberInfo
     | ActionMemberList

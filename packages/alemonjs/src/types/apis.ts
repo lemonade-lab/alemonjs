@@ -1,8 +1,11 @@
+export type StandardApiName = 'client.api';
+
 export type Apis = {
   /**
-   * 行为
+   * Legacy 字段名，语义上表示 api name。
+   * 当前 CBPEnvelope 已使用 `payload.api` 作为正式协议字段。
    */
-  action: string;
+  action: StandardApiName | string;
   // 负载
   payload: {
     // 事件

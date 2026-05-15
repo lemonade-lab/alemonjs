@@ -882,10 +882,10 @@ export class Router<P extends string = string, E extends string = string> {
     const description = formatRouteDescription(routeEntry?.config.description);
     const schemaHints = buildSchemaHints(routeEntry?.config.schema);
     const replyLines = buildValidationReply({
-      error: validation && !validation.valid ? validation.error : '参数校验失败',
+      error: validation?.valid === false ? validation.error : '参数校验失败',
       commandKey: result.commandKey,
       description,
-      usage: validation && !validation.valid ? validation.usage : undefined,
+      usage: validation?.valid === false ? validation.usage : undefined,
       schemaHints
     });
 

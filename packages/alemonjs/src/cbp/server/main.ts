@@ -17,9 +17,37 @@ import {
   USER_AGENT_HEADER,
   USER_AGENT_HEADER_VALUE_MAP
 } from '../processor/config';
-import type { ParsedMessage } from '../typings';
 import { createTestOneController } from './testone';
 import { getClientChild } from '../../process/ipc-bridge';
+import { getNormalizedDeviceId, getNormalizedEventRouteId, normalizeInboundMessage } from '../normalize';
+
+const routeNormalizedMessage = (message: string, input: unknown) => {
+  const normalized = normalizeInboundMessage(input);
+
+  if (!normalized) {
+    return { normalized: null, handled: false } as const;
+  }
+
+  if (normalized.kind === 'api.res' || normalized.kind === 'action.res') {
+    const resolvedDeviceId = getNormalizedDeviceId(normalized);
+
+    if (resolvedDeviceId) {
+      routeMessageToDevice(resolvedDeviceId, message);
+    }
+
+    return { normalized, handled: true } as const;
+  }
+
+  if (normalized.kind === 'event') {
+    const routeId = getNormalizedEventRouteId(normalized);
+
+    handleEvent(message, routeId || '');
+
+    return { normalized, handled: true } as const;
+  }
+
+  return { normalized, handled: false } as const;
+};
 
 // 路由消息到指定设备（统一处理 api 和 action 的客户端查找逻辑）
 const routeMessageToDevice = (DeviceId: string, message: string) => {
@@ -272,32 +300,15 @@ const setPlatformClient = (originId: string, ws: WebSocket) => {
   // 得到平台客户端的消息
   ws.on('message', (message: string) => {
     try {
-      // 解析消息
-      const parsedMessage: ParsedMessage = flattedJSON.parse(message.toString());
+      const inbound = flattedJSON.parse(message.toString());
 
-      // 1. 解析得到 actionId ，说明是消费行为请求。要广播告诉所有客户端。
-      // 2. 解析得到 name ，说明是一个事件请求。
-      // 3. 解析得到 apiId ，说明是一个接口请求。
+      routeNormalizedMessage(message.toString(), inbound);
+
       logger.debug({
         code: ResultCode.Ok,
         message: '服务端接收到消息',
-        data: parsedMessage
+        data: inbound
       });
-      if (parsedMessage.apiId) {
-        // 指定的设备 处理消费。终端有记录每个客户端是谁
-        const DeviceId = parsedMessage.DeviceId;
-
-        routeMessageToDevice(DeviceId, message);
-      } else if (parsedMessage?.actionId) {
-        // 指定的设备 处理消费。终端有记录每个客户端是谁
-        const DeviceId = parsedMessage.DeviceId;
-
-        routeMessageToDevice(DeviceId, message);
-      } else if (parsedMessage?.name) {
-        const ID = parsedMessage.ChannelId || parsedMessage.GuildId || parsedMessage.DeviceId;
-
-        handleEvent(message, ID);
-      }
     } catch (error) {
       logger.error({
         code: ResultCode.Fail,
@@ -342,33 +353,17 @@ const setTestOnePlatformClient = (ws: WebSocket) => {
   // 得到平台客户端的消息
   ws.on('message', (message: string) => {
     try {
-      // 解析消息
-      const parsedMessage: ParsedMessage = flattedJSON.parse(message.toString());
+      const inbound = flattedJSON.parse(message.toString());
+      const { handled } = routeNormalizedMessage(message.toString(), inbound);
 
-      // 1. 解析得到 actionId ，说明是消费行为请求。要广播告诉所有客户端。
-      // 2. 解析得到 name ，说明是一个事件请求。
-      // 3. 解析得到 apiId ，说明是一个接口请求。
       logger.debug({
         code: ResultCode.Ok,
         message: '测试端接收到消息',
-        data: parsedMessage
+        data: inbound
       });
-      if (parsedMessage.apiId) {
-        // 指定的设备 处理消费。终端有记录每个客户端是谁
-        const DeviceId = parsedMessage.DeviceId;
 
-        routeMessageToDevice(DeviceId, message);
-      } else if (parsedMessage?.actionId) {
-        // 指定的设备 处理消费。终端有记录每个客户端是谁
-        const DeviceId = parsedMessage.DeviceId;
-
-        routeMessageToDevice(DeviceId, message);
-      } else if (parsedMessage?.name) {
-        const ID = parsedMessage.ChannelId || parsedMessage.GuildId || parsedMessage.DeviceId;
-
-        handleEvent(message, ID);
-      } else {
-        controller.onMessage(parsedMessage);
+      if (!handled) {
+        controller.onMessage(inbound);
       }
     } catch (error) {
       logger.error({

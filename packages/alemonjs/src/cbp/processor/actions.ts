@@ -1,24 +1,25 @@
 import * as flattedJSON from 'flatted';
 import { ResultCode, createResult, Result, sanitizeForSerialization } from '../../core';
 import type { Actions } from '../../types';
-import { actionResolves, actionTimeouts, deviceId, generateUniqueId, timeoutTime } from './config';
+import { actionRequestResolves, actionRequestTimeouts, deviceId, generateUniqueId, timeoutTime } from './config';
 import { getDirectSend } from './transport';
+import { createActionRequestEnvelope } from '../normalize';
 
 /**
  * 设置超时和回调（公用）
  */
-const setupActionResolve = (actionId: string, resolve: (value: Result[] | PromiseLike<Result[]>) => void) => {
-  actionResolves.set(actionId, resolve);
+const setupActionResolve = (requestId: string, resolve: (value: Result[] | PromiseLike<Result[]>) => void) => {
+  actionRequestResolves.set(requestId, resolve);
   const timeout = setTimeout(() => {
-    if (!actionResolves.has(actionId) || !actionTimeouts.has(actionId)) {
+    if (!actionRequestResolves.has(requestId) || !actionRequestTimeouts.has(requestId)) {
       return;
     }
-    actionResolves.delete(actionId);
-    actionTimeouts.delete(actionId);
+    actionRequestResolves.delete(requestId);
+    actionRequestTimeouts.delete(requestId);
     resolve([createResult(ResultCode.Fail, '行为超时', null)]);
   }, timeoutTime);
 
-  actionTimeouts.set(actionId, timeout);
+  actionRequestTimeouts.set(requestId, timeout);
 };
 
 /**
@@ -27,21 +28,23 @@ const setupActionResolve = (actionId: string, resolve: (value: Result[] | Promis
  * @param data
  */
 export const sendAction = (data: Actions): Promise<Result[]> => {
-  const actionId = generateUniqueId();
+  const requestId = generateUniqueId();
 
   return new Promise(resolve => {
-    data.actionId = actionId;
+    // 兼容旧平台包：legacy data 仍保留 actionId 字段
+    data.actionId = requestId;
     data.DeviceId = deviceId;
 
+    const envelope = createActionRequestEnvelope(data);
     // 清理不可序列化的值（如中间件挂载的函数），防止跨进程传输报错
-    const safeData = sanitizeForSerialization(data);
+    const safeData = sanitizeForSerialization(envelope);
 
     // 最优：直连通道（UDS V8 序列化，零桥接）
     const directSend = getDirectSend();
 
     if (directSend) {
       directSend(safeData);
-      setupActionResolve(actionId, resolve);
+      setupActionResolve(requestId, resolve);
 
       return;
     }
@@ -49,7 +52,7 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
     // 次选：fork IPC（经主进程桥接）
     if (process.env.__ALEMON_IPC === '1' && typeof process.send === 'function') {
       process.send({ type: 'ipc:data', data: safeData });
-      setupActionResolve(actionId, resolve);
+      setupActionResolve(requestId, resolve);
 
       return;
     }
@@ -63,6 +66,6 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
     // 发送数据
     global.chatbotClient?.send(flattedJSON.stringify(safeData));
     // 设置回调和超时
-    setupActionResolve(actionId, resolve);
+    setupActionResolve(requestId, resolve);
   });
 };

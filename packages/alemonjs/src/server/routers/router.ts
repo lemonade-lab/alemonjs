@@ -55,7 +55,7 @@ const readWebRootConfig = (packageRoot: string) => {
 const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, capability: 'httpApi' | 'web') => {
   const runtimeApp = getRuntimeApp(appName);
 
-  if (!runtimeApp || !runtimeApp.enabled) {
+  if (!runtimeApp?.enabled) {
     ctx.status = 404;
     ctx.body = {
       code: 404,
@@ -138,11 +138,12 @@ const dispatchRegisteredKoaRouters = async (ctx: KoaRouter.RouterContext) => {
 
     for (const koaRouter of routers) {
       try {
-        const beforeMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
+        const matchedContext = ctx as KoaRouter.RouterContext & { matched?: string[] };
+        const beforeMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
 
         await koaRouter.routes()(ctx, async () => {});
 
-        const afterMatched = Array.isArray(ctx.matched) ? ctx.matched.length : 0;
+        const afterMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
 
         if (afterMatched <= beforeMatched) {
           continue;

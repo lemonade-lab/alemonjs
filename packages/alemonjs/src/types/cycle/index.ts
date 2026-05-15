@@ -1,5 +1,5 @@
 import { StoreMiddlewareItem, StoreResponseItem } from '../store/res';
-import { Events } from '../event';
+import type { Events } from '../event/map';
 import { EventKeys } from '../event/map';
 import type KoaRouter from 'koa-router';
 type StroreParam = {
