@@ -1,3 +1,13 @@
+/**
+ * 不会被alemonjs引用
+ * 但会被插件应用的工具函数
+ * 用于为开发提供便利函数
+ * 适用于大部分场景
+ * 避免重复造轮子
+ * 该工具使用需要安装必要的包
+ * npm install axios qrcode file-type public-ip https-proxy-agent
+ * @description 工具函数
+ */
 import { existsSync, PathLike } from 'fs';
 import axios from 'axios';
 import { toDataURL } from 'qrcode';
@@ -68,6 +78,10 @@ export const createQRCode = async (text: string, targetPath?: string): Promise<B
   }
 };
 
+/**
+ * 计数器类
+ * 用于生成递增的数字ID等场景
+ */
 export class Counter {
   #counter = 1;
   #val = 0;

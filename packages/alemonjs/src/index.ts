@@ -2,6 +2,8 @@
 export * from './types/index.js';
 // 导出全局变量
 export * from './global.js';
+// common
+export * from './common/index.js';
 // core
 export * from './core/index.js';
 // cbp

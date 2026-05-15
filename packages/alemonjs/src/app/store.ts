@@ -16,11 +16,10 @@ import {
   StoreResponseItem,
   SubscribeValue
 } from '../types';
-import { mkdirSync } from 'node:fs';
-import log4js from 'log4js';
 import { disposeExpose } from './expose.js';
 import type KoaRouter from 'koa-router';
 import { dispatchRuntimeStatusChange } from './lifecycle-callbacks.js';
+export { Logger, logger } from '../core/logger.js';
 
 export type RuntimeAppStatus = 'discovered' | 'loading' | 'ready' | 'failed' | 'disposed';
 
@@ -50,123 +49,6 @@ export type RuntimeAppRecord = {
   createdAt: number;
   updatedAt: number;
 };
-/**
- *
- * @returns
- */
-const createLogger = () => {
-  if (process.env.BROWSER_ENV === 'browser') {
-    return {
-      // 开发调试
-      trace: console.trace.bind(console),
-      debug: console.debug.bind(console),
-      // 日常
-      info: console.info.bind(console),
-      mark: console.info.bind(console),
-      // 警告
-      warn: console.warn.bind(console),
-      // 错误
-      error: console.error.bind(console),
-      // 严重
-      fatal: console.error.bind(console)
-    };
-  }
-  const logDir = process.env?.LOG_PATH ?? `./logs/${process.env.LOG_NAME ?? ''}`;
-
-  mkdirSync(logDir, { recursive: true });
-  // 当环境被设置为 development 时。被视为 trace
-  const level = process.env.NODE_ENV === 'development' ? 'trace' : 'info';
-  const hideTime = process.env.LOGGER_TIME === 'false' ? true : false;
-  const hideLevel = process.env.LOGGER_LEVEL === 'false' ? true : false;
-  let pattern = '';
-
-  if (hideTime && hideLevel) {
-    pattern = '%m';
-  } else if (hideTime && !hideLevel) {
-    pattern = '[%p] %m';
-  } else if (!hideTime && hideLevel) {
-    pattern = '[%d{yyyy-MM-dd hh:mm:ss}] %m';
-  } else {
-    pattern = '[%d{yyyy-MM-dd hh:mm:ss}][%p] %m';
-  }
-  log4js.configure({
-    appenders: {
-      console: {
-        type: 'console',
-        layout: {
-          type: 'pattern',
-          pattern: pattern
-        }
-      },
-      command: {
-        type: 'dateFile',
-        filename: `${logDir}/command`,
-        pattern: 'yyyy-MM-dd.log',
-        numBackups: 15,
-        alwaysIncludePattern: true,
-        layout: {
-          type: 'pattern',
-          pattern: pattern
-        }
-      },
-      error: {
-        type: 'dateFile',
-        filename: `${logDir}/error`,
-        pattern: 'yyyy-MM-dd.log',
-        numBackups: 15,
-        alwaysIncludePattern: true,
-        layout: {
-          type: 'pattern',
-          pattern: pattern
-        }
-      }
-    },
-    categories: {
-      default: { appenders: ['console'], level: level },
-      command: { appenders: ['console', 'command'], level: 'info' },
-      error: { appenders: ['console', 'command', 'error'], level: 'warn' }
-    }
-  });
-  const defaultLogger = log4js.getLogger('default');
-  const commandLogger = log4js.getLogger('command');
-  const errorLogger = log4js.getLogger('error');
-
-  return {
-    // 开发调试
-    trace: defaultLogger.trace.bind(defaultLogger),
-    debug: defaultLogger.debug.bind(defaultLogger),
-    // 日常
-    info: commandLogger.info.bind(commandLogger),
-    mark: commandLogger.mark.bind(commandLogger),
-    // 警告
-    warn: errorLogger.warn.bind(errorLogger),
-    // 错误
-    error: errorLogger.error.bind(errorLogger),
-    // 严重
-    fatal: errorLogger.fatal.bind(errorLogger)
-  };
-};
-
-export class Logger {
-  #logger = null;
-
-  /**
-   * 创建一个 logger，如果未存在全局变量则赋值
-   * @returns
-   */
-  constructor() {
-    this.#logger = createLogger();
-    // 如果已经存在，就返回内部 logger
-    if (!global.logger) {
-      global.logger = this.#logger;
-    }
-  }
-
-  get value() {
-    return this.#logger;
-  }
-}
-
 export class Core {
   constructor() {
     if (!global.alemonjsCore) {
@@ -302,7 +184,7 @@ export const registerRuntimeApp = (
     updatedAt: now
   };
 
-  if (!current || current.status !== record.status) {
+  if (current?.status !== record.status) {
     logRuntimeAppStatus(record.status === 'failed' ? 'warn' : 'debug', runtimeApps[record.name]);
   }
 
@@ -373,7 +255,7 @@ export const setRuntimeAppKoaRouters = (name: string, koaRouters?: KoaRouter | K
   const koaRouterStore = getRuntimeAppKoaRouterStore();
 
   if (!koaRouters) {
-    delete koaRouterStore[name];
+    Reflect.deleteProperty(koaRouterStore, name);
 
     return [];
   }
@@ -392,7 +274,7 @@ export const getRuntimeAppKoaRouters = (name: string) => {
 export const clearRuntimeAppKoaRouters = (name: string) => {
   const koaRouterStore = getRuntimeAppKoaRouterStore();
 
-  delete koaRouterStore[name];
+  Reflect.deleteProperty(koaRouterStore, name);
 };
 
 export const listRuntimeAppKoaRouters = () => {
@@ -919,8 +801,7 @@ export class ChildrenApp {
     // 清理 expose 注册
     disposeExpose(this.#name);
     // 清理
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete alemonjsCore.storeChildrenApp[this.#name];
+    Reflect.deleteProperty(alemonjsCore.storeChildrenApp, this.#name);
     bumpStoreVersion();
   }
 
@@ -947,9 +828,6 @@ export const listChildrenApps = () => {
 export const ProcessorEventAutoClearMap = new Map();
 
 export const ProcessorEventUserAutoClearMap = new Map();
-
-// 初始化日志
-export const logger = new Logger().value;
 
 // 初始化核心数据
 export const core = new Core().value;

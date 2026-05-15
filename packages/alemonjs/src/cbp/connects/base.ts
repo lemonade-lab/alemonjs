@@ -26,8 +26,7 @@ export const createWSConnector = (options: WSConnectorOptions) => {
   const { url, role, onOpen, onMessage, extraHeaders = {}, globalKey } = options;
 
   if (global[globalKey]) {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete global[globalKey];
+    Reflect.deleteProperty(global, globalKey);
   }
 
   const [heartbeatControl] = useHeartbeat({
@@ -79,8 +78,7 @@ export const createWSConnector = (options: WSConnectorOptions) => {
         message: `${role} 连接关闭，尝试重新连接...`,
         data: code
       });
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete global[globalKey];
+      Reflect.deleteProperty(global, globalKey);
       setTimeout(() => {
         start();
       }, reconnectInterval);

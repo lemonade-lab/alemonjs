@@ -22,6 +22,26 @@
       "types": "./lib/utils.d.ts",
       "require": "./lib/utils.js"
     },
+    "./platform": {
+      "import": "./lib/platform/index.js",
+      "types": "./lib/platform/index.d.ts",
+      "require": "./lib/platform/index.js"
+    },
+    "./common": {
+      "import": "./lib/common/index.js",
+      "types": "./lib/common/index.d.ts",
+      "require": "./lib/common/index.js"
+    },
+    "./core": {
+      "import": "./lib/core/index.js",
+      "types": "./lib/core/index.d.ts",
+      "require": "./lib/core/index.js"
+    },
+    "./app": {
+      "import": "./lib/application/index.js",
+      "types": "./lib/application/index.d.ts",
+      "require": "./lib/application/index.js"
+    },
     "./env": {
       "types": "./lib/global.d.ts"
     }
@@ -57,6 +77,7 @@
     "@types/uuid": "^10.0.0"
   },
   "bin": {
+    "alemonjs": "./bin/alemonjs.js",
     "alemonc": "./bin/alemonc.js"
   },
   "keywords": [
