@@ -2,7 +2,7 @@ import { ChildrenCycle, Next } from '../cycle';
 import { ClientAPI } from '../client';
 import { EventKeys, Events } from './map';
 import { DataEnums } from '../message';
-import { Expose } from '../../app/expose';
+import { Expose } from '../../application/expose';
 import type KoaRouter from 'koa-router';
 
 /**

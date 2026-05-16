@@ -1,10 +1,10 @@
-import { getConfig } from './config.js';
-import { cbpServer } from '../cbp/server/main.js';
-import { defaultPlatformCommonPrefix, filePrefixCommon } from './variable.js';
+import { getConfig } from '../common/config.js';
+import { cbpServer } from './cbp/server/main.js';
+import { defaultPlatformCommonPrefix, filePrefixCommon } from '../common/variable.js';
 import type { StartOptions } from '../types';
-import { startPlatformAdapterWithFallback } from '../process/platform.js';
-import { startModuleAdapter } from '../process/module.js';
-import { generateSocketPath } from '../process/direct-channel.js';
+import { startPlatformAdapterWithFallback } from './process/platform.js';
+import { startModuleAdapter } from './process/module.js';
+import { generateSocketPath } from '../common/direct-channel.js';
 
 // 得到最恰当的参数
 const createOptionsByKey = (options: StartOptions, key: string, defaultValue: any) => {

@@ -1,4 +1,4 @@
-import { Expose, registerExpose, disposeExpose, clearAllExpose } from '../../../packages/alemonjs/src/app/expose';
+import { Expose, registerExpose, disposeExpose, clearAllExpose } from '../../../packages/alemonjs/src/application/expose';
 
 const expose = Expose.create();
 

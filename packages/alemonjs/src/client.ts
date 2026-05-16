@@ -1,1 +1,1 @@
-import './core/client-runtime.js';
+import './application/runtime/client-runtime.js';

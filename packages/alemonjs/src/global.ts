@@ -17,10 +17,11 @@ import type {
   StartOptions
 } from './types';
 
-import WebSocket, { Server } from 'ws';
-import { IncomingMessage } from 'http';
+import { type Server } from 'ws';
+import type WebSocket from 'ws';
+import type { IncomingMessage } from 'http';
 import type KoaRouter from 'koa-router';
-import type { RuntimeAppRecord } from './app/store.js';
+import type { RuntimeAppRecord } from './application/runtime/store.js';
 
 declare global {
   /**

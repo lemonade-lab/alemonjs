@@ -1,4 +1,4 @@
-import { validateRouteArgsForCommand } from '../../../packages/alemonjs/src/app/router/validator';
+import { validateRouteArgsForCommand } from '../../../packages/alemonjs/src/application/router/validator';
 
 describe('validateRouteArgsForCommand', () => {
   it('uses arg name in required validation errors', () => {

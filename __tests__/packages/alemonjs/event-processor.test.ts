@@ -5,13 +5,13 @@
 
 // ─── Mock 依赖 ──────────────────────────────────────────────
 
-// mock core/variable — 提供 EventMessageText
-jest.mock('../../../packages/alemonjs/src/core/variable', () => ({
+// mock common/variable — 提供 EventMessageText
+jest.mock('../../../packages/alemonjs/src/common/variable', () => ({
   EventMessageText: ['message.create', 'private.message.create']
 }));
 
-// mock core/utils — showErrorModule + getCachedRegExp
-jest.mock('../../../packages/alemonjs/src/core/utils', () => ({
+// mock common/utils — showErrorModule + getCachedRegExp
+jest.mock('../../../packages/alemonjs/src/common/utils', () => ({
   showErrorModule: jest.fn(),
   getCachedRegExp: (pattern: string | RegExp) => {
     if (pattern instanceof RegExp) return pattern;
@@ -19,26 +19,26 @@ jest.mock('../../../packages/alemonjs/src/core/utils', () => ({
   }
 }));
 
-// mock core — re-export showErrorModule
-jest.mock('../../../packages/alemonjs/src/core', () => ({
+// mock common — re-export showErrorModule
+jest.mock('../../../packages/alemonjs/src/common', () => ({
   showErrorModule: jest.fn()
 }));
 
 // mock hook-event-context — withEventContext 透传执行
-jest.mock('../../../packages/alemonjs/src/app/hook-event-context', () => ({
+jest.mock('../../../packages/alemonjs/src/application/runtime/hook-event-context', () => ({
   withEventContext: (_event: any, _next: any, fn: () => any) => fn()
 }));
 
 // mock event-utils — useState 默认返回 true
-jest.mock('../../../packages/alemonjs/src/app/event-utils', () => ({
+jest.mock('../../../packages/alemonjs/src/application/runtime/event-utils', () => ({
   useState: () => [true]
 }));
 
 // ─── 导入被测模块 ────────────────────────────────────────────
 
-import { createRouteProcessChildren } from '../../../packages/alemonjs/src/app/event-processor-cycleRoute';
-import { createFileTreeStep, createNextStep } from '../../../packages/alemonjs/src/app/event-processor-cycleFiles';
-import { showErrorModule } from '../../../packages/alemonjs/src/core';
+import { createRouteProcessChildren } from '../../../packages/alemonjs/src/application/runtime/event-processor-cycleRoute';
+import { createFileTreeStep, createNextStep } from '../../../packages/alemonjs/src/application/runtime/event-processor-cycleFiles';
+import { showErrorModule } from '../../../packages/alemonjs/src/common';
 
 // ─── 类型（避免依赖内部 types barrel） ──────────────────────
 

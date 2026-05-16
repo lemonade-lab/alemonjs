@@ -2,15 +2,15 @@
 export * from './types/index.js';
 // 导出全局变量
 export * from './global.js';
-// common
+// flat compatibility exports
 export * from './common/index.js';
-// core
 export * from './core/index.js';
-// cbp
-export * from './cbp/index.js';
-// app
-export * from './app/index.js';
-// 进程加载不导出
-// export * from './process/index.js';
-// 导出主要模块
+export * from './platform/index.js';
+export * from './application/index.js';
+// start
+export { start } from './main.js';
 export * from './main.js';
+export * as common from './common/index.js';
+export * as core from './core/index.js';
+export * as platform from './platform/index.js';
+export * as application from './application/index.js';

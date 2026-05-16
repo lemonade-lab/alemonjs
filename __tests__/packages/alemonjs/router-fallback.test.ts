@@ -1,4 +1,4 @@
-import { checkFallbackHint } from '../../../packages/alemonjs/src/app/router/fallback';
+import { checkFallbackHint } from '../../../packages/alemonjs/src/application/router/fallback';
 
 describe('checkFallbackHint', () => {
   it('does not treat normal chat that only shares the same prefix as a command attempt', () => {

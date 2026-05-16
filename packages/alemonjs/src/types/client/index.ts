@@ -1,4 +1,4 @@
-import { Result } from '../../core/utils';
+import { Result } from '../../common/result';
 import { User } from '../event/base/user';
 import { EventKeys, Events } from '../event/map';
 import { DataEnums } from '../message';

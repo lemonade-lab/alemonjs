@@ -441,19 +441,19 @@ type CBPError = {
 
 当前 `packages/alemonjs` 内核里，CBP v1 已经落在这些文件上：
 
-- [src/cbp/typings.ts](../src/cbp/typings.ts)
+- [src/common/cbp/typings.ts](../src/common/cbp/typings.ts)
   - 定义 `CBPEnvelope`、`NormalizedCBPMessage`
-- [src/cbp/normalize.ts](../src/cbp/normalize.ts)
+- [src/common/cbp/normalize.ts](../src/common/cbp/normalize.ts)
   - 唯一协议转换层
-- [src/cbp/connects/client.ts](../src/cbp/connects/client.ts)
+- [src/application/runtime/cbp/connects/client.ts](../src/application/runtime/cbp/connects/client.ts)
   - 入站消息标准化后再分发
-- [src/cbp/server/main.ts](../src/cbp/server/main.ts)
+- [src/core/cbp/server/main.ts](../src/core/cbp/server/main.ts)
   - 服务端基于 normalized 进行路由
-- [src/cbp/processor/actions.ts](../src/cbp/processor/actions.ts)
+- [src/application/runtime/cbp/processor/actions.ts](../src/application/runtime/cbp/processor/actions.ts)
   - action request / reply 发送层
-- [src/cbp/processor/api.ts](../src/cbp/processor/api.ts)
+- [src/application/runtime/cbp/processor/api.ts](../src/application/runtime/cbp/processor/api.ts)
   - api request / reply 发送层
-- [src/cbp/connects/platform.ts](../src/cbp/connects/platform.ts)
+- [src/platform/cbp-platform.ts](../src/platform/cbp-platform.ts)
   - 旧平台包兼容桥
 
 ---

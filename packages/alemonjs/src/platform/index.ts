@@ -1,11 +1,5 @@
 export * from '../types/index.js';
-export * from '../cbp/index.js';
-export { definePlatform } from '../app/define-platform.js';
-export { FormatEvent, wrapEvent } from '../app/event-format.js';
-export { createEventValue } from '../app/event-utils.js';
-export { useClient } from '../app/hook-use/client.js';
-export { getConfig, getConfigValue } from '../common/config.js';
-export { logger } from '../common/logger.js';
-export { createResult } from '../common/result.js';
-export { ResultCode } from '../common/variable.js';
-export { createUserHashKey, useUserHashKey, isMaster } from '../common/identity.js';
+export { definePlatform } from './define-platform.js';
+export { cbpPlatform } from './cbp-platform.js';
+export { FormatEvent, wrapEvent } from './event-format.js';
+export { createEventValue } from './event-value.js';

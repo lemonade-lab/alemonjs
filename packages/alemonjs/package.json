@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.1.83-alpha.1",
+  "version": "2.1.83-alpha.4",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -37,7 +37,7 @@
       "types": "./lib/core/index.d.ts",
       "require": "./lib/core/index.js"
     },
-    "./app": {
+    "./application": {
       "import": "./lib/application/index.js",
       "types": "./lib/application/index.d.ts",
       "require": "./lib/application/index.js"
