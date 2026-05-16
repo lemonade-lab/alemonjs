@@ -30,12 +30,23 @@ const resolvePackageRoot = (startDir: string) => {
   return startDir;
 };
 
+const detectDefaultWebRoot = (packageRoot: string) => {
+  if (existsSync(join(packageRoot, 'dist', 'index.html'))) {
+    return 'dist';
+  }
+  if (existsSync(join(packageRoot, 'index.html'))) {
+    return '';
+  }
+
+  return null;
+};
+
 const detectWebCapability = (startDir: string) => {
   const packageRoot = resolvePackageRoot(startDir);
   const packageJsonPath = join(packageRoot, 'package.json');
 
   if (!existsSync(packageJsonPath)) {
-    return existsSync(join(packageRoot, 'index.html'));
+    return Boolean(detectDefaultWebRoot(packageRoot));
   }
 
   try {
@@ -49,7 +60,7 @@ const detectWebCapability = (startDir: string) => {
     // ignore package parsing failures here; runtime route access still rechecks at request time
   }
 
-  return existsSync(join(packageRoot, 'index.html'));
+  return Boolean(detectDefaultWebRoot(packageRoot));
 };
 
 /**

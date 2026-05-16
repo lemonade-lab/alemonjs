@@ -9,6 +9,7 @@ import module from 'module';
 import { ResultCode } from '../../../../common/index.js';
 import {
   RuntimeAppStatus,
+  getChildrenApp,
   getRuntimeApp,
   getRuntimeAppKoaRouters,
   hasRuntimeAppCapability,
@@ -44,12 +45,55 @@ const readWebRootConfig = (packageRoot: string) => {
   const packageJsonPath = path.join(packageRoot, 'package.json');
 
   if (!existsSync(packageJsonPath)) {
+    if (existsSync(path.join(packageRoot, 'dist', 'index.html'))) {
+      return 'dist';
+    }
+
     return '';
   }
 
   const pkg = require(packageJsonPath) ?? {};
+  const configuredRoot = pkg?.alemonjs?.web?.root ?? '';
 
-  return pkg?.alemonjs?.web?.root ?? '';
+  if (typeof configuredRoot === 'string' && configuredRoot.trim()) {
+    return configuredRoot;
+  }
+
+  if (existsSync(path.join(packageRoot, 'dist', 'index.html'))) {
+    return 'dist';
+  }
+
+  return '';
+};
+
+const matchBasePath = (requestPath: string, basePath: string) => {
+  if (!basePath) {
+    return requestPath;
+  }
+  if (requestPath === basePath) {
+    return '/';
+  }
+  if (requestPath.startsWith(`${basePath}/`)) {
+    return requestPath.slice(basePath.length) || '/';
+  }
+
+  return '';
+};
+
+const rewriteCtxPath = async (ctx: KoaRouter.RouterContext, nextPath: string, handler: () => Promise<void>) => {
+  const search = ctx.querystring ? `?${ctx.querystring}` : '';
+  const originalUrl = ctx.url;
+  const originalReqUrl = ctx.req.url;
+
+  ctx.url = `${nextPath}${search}`;
+  ctx.req.url = `${nextPath}${search}`;
+
+  try {
+    await handler();
+  } finally {
+    ctx.url = originalUrl;
+    ctx.req.url = originalReqUrl;
+  }
 };
 
 const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, capability: 'httpApi' | 'web') => {
@@ -126,59 +170,100 @@ const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, cap
 
 const dispatchRegisteredKoaRouters = async (ctx: KoaRouter.RouterContext) => {
   const registeredRouters = listRuntimeAppKoaRouters();
+  const candidates = new Set<string>(registeredRouters.map(item => item.name));
+  const runtimeApps = listRuntimeApps();
 
-  for (const item of registeredRouters) {
-    const runtimeApp = getRuntimeApp(item.name);
+  runtimeApps.forEach(item => {
+    if (item.capabilities?.httpApi) {
+      candidates.add(item.name);
+    }
+  });
 
-    if (!runtimeApp || !runtimeApp.enabled || runtimeApp.status !== 'ready' || !hasRuntimeAppCapability(item.name, 'httpApi')) {
+  for (const appName of candidates) {
+    const runtimeApp = getRuntimeApp(appName);
+
+    if (!runtimeApp || !runtimeApp.enabled || runtimeApp.status !== 'ready' || !hasRuntimeAppCapability(appName, 'httpApi')) {
       continue;
     }
 
-    const routers = getRuntimeAppKoaRouters(item.name);
+    const registerRouters = getChildrenApp(appName)?.register?.koaRouter;
+    const storedRouters = getRuntimeAppKoaRouters(appName);
+    const routers = (storedRouters.length ? storedRouters : Array.isArray(registerRouters) ? registerRouters : registerRouters ? [registerRouters] : []).filter(
+      Boolean
+    );
+    const aliasBases = appName === 'main' ? ['', '/app'] : ['', `/apps/${appName}`];
 
     for (const koaRouter of routers) {
-      try {
-        const matchedContext = ctx as KoaRouter.RouterContext & { matched?: string[] };
-        const beforeMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
+      for (const basePath of aliasBases) {
+        const rewrittenPath = matchBasePath(ctx.path, basePath);
 
-        await koaRouter.routes()(ctx, async () => {});
-
-        const afterMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
-
-        if (afterMatched <= beforeMatched) {
+        if (!rewrittenPath) {
           continue;
         }
 
-        await koaRouter.allowedMethods()(ctx, async () => {});
+        try {
+          const matchedContext = ctx as KoaRouter.RouterContext & { matched?: string[] };
+          const beforeMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
+          const beforeStatus = ctx.status;
+          const beforeBody = ctx.body;
+          const beforeMatchedRoute = (ctx as KoaRouter.RouterContext & { _matchedRoute?: string })._matchedRoute;
+          const beforeRouterPath = (ctx as KoaRouter.RouterContext & { routerPath?: string }).routerPath;
+          let fallthrough = false;
 
-        return true;
-      } catch (error) {
-        const handled = await dispatchHttpError({
-          ctx,
-          error,
-          appName: item.name,
-          path: ctx.path,
-          method: ctx.method,
-          kind: 'koa-router'
-        });
+          await rewriteCtxPath(ctx, rewrittenPath, async () => {
+            await koaRouter.routes()(ctx, async () => {
+              fallthrough = true;
+            });
+          });
 
-        if (handled) {
+          const afterMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
+          const afterMatchedRoute = (ctx as KoaRouter.RouterContext & { _matchedRoute?: string })._matchedRoute;
+          const afterRouterPath = (ctx as KoaRouter.RouterContext & { routerPath?: string }).routerPath;
+          const handled =
+            afterMatched > beforeMatched ||
+            afterMatchedRoute !== beforeMatchedRoute ||
+            afterRouterPath !== beforeRouterPath ||
+            ctx.status !== beforeStatus ||
+            ctx.body !== beforeBody ||
+            !fallthrough;
+
+          if (!handled) {
+            continue;
+          }
+
+          await rewriteCtxPath(ctx, rewrittenPath, async () => {
+            await koaRouter.allowedMethods()(ctx, async () => {});
+          });
+
+          return true;
+        } catch (error) {
+          const handled = await dispatchHttpError({
+            ctx,
+            error,
+            appName,
+            path: ctx.path,
+            method: ctx.method,
+            kind: 'koa-router'
+          });
+
+          if (handled) {
+            return true;
+          }
+
+          logger.warn({
+            code: ResultCode.Fail,
+            message: `Error request ${ctx.path}:`,
+            data: error instanceof Error ? error.message : String(error)
+          });
+          ctx.status = 500;
+          ctx.body = {
+            code: 500,
+            message: '处理 Koa Router 请求时发生错误。',
+            error: error instanceof Error ? error.message : String(error)
+          };
+
           return true;
         }
-
-        logger.warn({
-          code: ResultCode.Fail,
-          message: `Error request ${ctx.path}:`,
-          data: error instanceof Error ? error.message : String(error)
-        });
-        ctx.status = 500;
-        ctx.body = {
-          code: 500,
-          message: '处理 Koa Router 请求时发生错误。',
-          error: error instanceof Error ? error.message : String(error)
-        };
-
-        return true;
       }
     }
   }
@@ -253,7 +338,7 @@ router.use(async (ctx, next) => {
   await next();
 });
 
-router.all('app/{*path}', async ctx => {
+const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
   if (!process.env.input) {
     ctx.status = 400;
     ctx.body = {
@@ -455,13 +540,13 @@ router.all('app/{*path}', async ctx => {
       };
     }
   }
-});
+};
 
-router.all('app', ctx => {
-  ctx.redirect('/app/');
-});
+router.all('app', handleMainAppRequest);
+router.all('app/', handleMainAppRequest);
+router.all('app/{*path}', handleMainAppRequest);
 
-router.all('apps/:app/{*path}', async ctx => {
+const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
   const appName = ctx.params.app;
 
   if (!isValidPackageName(appName)) {
@@ -661,11 +746,10 @@ router.all('apps/:app/{*path}', async ctx => {
       };
     }
   }
-});
-router.all('apps/:name', ctx => {
-  if (ctx.path === `/apps/${ctx.params.name}`) {
-    ctx.redirect(`/apps/${ctx.params.name}/`);
-  }
-});
+};
+
+router.all('apps/:app', handlePluginAppRequest);
+router.all('apps/:app/', handlePluginAppRequest);
+router.all('apps/:app/{*path}', handlePluginAppRequest);
 
 export { router as default };

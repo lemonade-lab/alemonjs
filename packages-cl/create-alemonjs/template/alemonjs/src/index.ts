@@ -1,5 +1,15 @@
 import { Router, logger } from 'alemonjs';
 import expose from './expose';
+import koaRouter from 'koa-router';
+
+const r = new koaRouter({
+  prefix: '/api'
+});
+
+// 简单的 HTTP 路由示例 /app/api/ping
+r.get('/ping', (ctx) => {
+  ctx.body = 'pong';
+});
 
 const router = Router.create({
   events: ['message.create', 'private.message.create'] // 选择消息创建
@@ -21,7 +31,8 @@ export default defineChildren({
   register() {
     return {
       responseRouter: router.define,
-      expose: expose
+      expose: expose,
+      koaRouter: r
     };
   },
   // 当准备好时

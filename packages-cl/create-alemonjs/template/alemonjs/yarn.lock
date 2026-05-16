@@ -35,10 +35,10 @@
     dayjs "^1.11.13"
     ws "^8.18.1"
 
-"@alemonjs/qq-bot@^2.1.22":
-  version "2.1.22"
-  resolved "https://registry.npmmirror.com/@alemonjs/qq-bot/-/qq-bot-2.1.22.tgz#02b60c843c1484aaf60e5be63b9126682a4ff96e"
-  integrity sha512-QNcUA4muvdxOg53IIrsBDYeJvU4Y6deJz0HAsf3zDkZ47hfvBifFvg6HbH3wdsJ0qHcCxEOH71rXt8EOOXo92w==
+"@alemonjs/qq-bot@^2.1.23":
+  version "2.1.23"
+  resolved "https://registry.npmmirror.com/@alemonjs/qq-bot/-/qq-bot-2.1.23.tgz#78d74703c481ae604af8149e71c2906e679cc6b9"
+  integrity sha512-8v5DC9LtUKiEcTYBAI73HLNyIVTF4I22PaNXkFPnF5Fxj2zqOWk/YBkKJ+hHO14WNKpGoQIOgWk8+Szw6NPL2A==
   dependencies:
     "@noble/curves" "^1.7.0"
     axios "^1.4.0"
@@ -695,10 +695,10 @@ aggregate-error@^4.0.1:
     clean-stack "^4.0.0"
     indent-string "^5.0.0"
 
-alemonjs@2.1.83:
-  version "2.1.83"
-  resolved "https://registry.npmmirror.com/alemonjs/-/alemonjs-2.1.83.tgz#27e6fb393e4a32405baf4578c75e8d93d34ebf86"
-  integrity sha512-d+aqUUKEfp4TqHcpwO71Vm/U3xf+jHz1LB/8ypITWnr+q2BaRo/bVf4OxFQTDaIjD+ZORoCdIX8Wo+VuSgzGdQ==
+alemonjs@2.1.83-alpha.6:
+  version "2.1.83-alpha.6"
+  resolved "https://registry.npmmirror.com/alemonjs/-/alemonjs-2.1.83-alpha.6.tgz#f30e6eb74e4651578322ac9a52563bfc8092d186"
+  integrity sha512-xuaOuN+WeKFBpwMZYRsTPivSdk+nOgL64WAtoSPvffklZ1v9D080pTb46ovduD9rf8g2QsIIeymrBdtjSdtpTA==
   dependencies:
     "@koa/cors" "^5.0.0"
     axios "^1.14.0"

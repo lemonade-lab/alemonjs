@@ -44,7 +44,7 @@ export const getModuelFile = (dir: string) => {
 
 export const formatPath = (pathValue: string) => {
   if (!pathValue || pathValue === '/') {
-    return '/index.html';
+    return 'index.html';
   }
   const pates = pathValue.split('/');
   const lastPath = pates[pates.length - 1];
