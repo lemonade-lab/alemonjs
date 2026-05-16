@@ -7,6 +7,8 @@ export * from './common/index.js';
 export * from './core/index.js';
 export * from './platform/index.js';
 export * from './application/index.js';
+export { cbpServer } from './core/cbp/index.js';
+export { Result } from './common/variable.js';
 // start
 export { start } from './main.js';
 export * from './main.js';
