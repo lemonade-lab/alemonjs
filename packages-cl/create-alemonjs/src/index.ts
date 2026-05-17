@@ -29,7 +29,7 @@ function createTemplate(name: string) {
 
   // 存在
   if (existsSync(dirPath)) {
-    console.error('Robot name already exists!');
+    console.error(`${name} already exists!`);
 
     return;
   }
@@ -59,6 +59,8 @@ function createTemplate(name: string) {
 }
 
 const args = process.argv.slice(2);
-const templateName = args.includes('--bot') ? 'alemonb' : 'alemonjs';
+const envBotValue = process.env.npm_config_bot;
+const useBotTemplate = args.includes('--bot') || (typeof envBotValue === 'string' && envBotValue !== 'false');
+const templateName = useBotTemplate ? 'alemonb' : 'alemonjs';
 
 void createTemplate(templateName);

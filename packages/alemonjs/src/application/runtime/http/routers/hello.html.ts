@@ -314,19 +314,12 @@ export const renderHelloHtml = (apps: RuntimeAppRecord[]) => {
     <main class="page">
       <section class="hero">
         <p class="hero-kicker">ALemonJS Launchpad</p>
-        <h1 class="hero-title">欢迎使用阿柠檬机器人应用服务</h1>
-        <p class="hero-desc">这里会自动列出当前已准备好的主应用与插件。</p>
-        <div class="hero-meta">
-          <span class="hero-pill"><strong>${visibleApps.length}</strong> 个可访问入口</span>
-          <span class="hero-pill">主应用统一在 <strong>/app</strong></span>
-          <span class="hero-pill">插件统一在 <strong>/apps/&lt;name&gt;</strong></span>
-        </div>
+        <h1 class="hero-title">阿柠檬机器人</h1>
       </section>
       <section>
         <div class="section-head">
           <div>
             <h2 class="section-title">应用列表</h2>
-            <p class="section-note">点击次数越高，卡片排序越靠前。排序记录仅保存在当前浏览器本地。</p>
           </div>
         </div>
         <div class="app-grid" id="app-grid">${cards}</div>

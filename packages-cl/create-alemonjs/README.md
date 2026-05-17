@@ -13,3 +13,9 @@ npm create alemonjs@latest -y
 ```sh
 npm create alemonjs@latest -- --bot
 ```
+
+也支持：
+
+```sh
+npm create alemonjs@latest -y --bot
+```
