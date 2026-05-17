@@ -2,7 +2,7 @@ import KoaRouter from 'koa-router';
 import fs, { existsSync } from 'fs';
 import path, { join, dirname } from 'path';
 import mime from 'mime-types';
-import hello from './hello.html';
+import { renderHelloHtml } from './hello.html';
 import { formatPath, getModuelFile, safePath, isValidPackageName } from './utils';
 import { collectMiddlewares, runMiddlewares } from './middleware';
 import module from 'module';
@@ -274,7 +274,7 @@ const dispatchRegisteredKoaRouters = async (ctx: KoaRouter.RouterContext) => {
 router.get('/', ctx => {
   ctx.status = 200;
   ctx.set('Content-Type', 'text/html; charset=utf-8');
-  ctx.body = hello;
+  ctx.body = renderHelloHtml(listRuntimeApps());
 });
 
 // 响应服务在线
