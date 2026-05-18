@@ -43,16 +43,35 @@ export const getModuelFile = (dir: string) => {
 };
 
 export const formatPath = (pathValue: string) => {
-  if (!pathValue || pathValue === '/') {
+  const normalizedPath = String(pathValue || '')
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '')
+    .replace(/\/{2,}/g, '/')
+    .trim();
+
+  if (!normalizedPath) {
     return 'index.html';
   }
-  const pates = pathValue.split('/');
-  const lastPath = pates[pates.length - 1];
+
+  if (normalizedPath === 'index' || normalizedPath === 'index.html') {
+    return 'index.html';
+  }
+
+  if (normalizedPath.endsWith('/')) {
+    return `${normalizedPath}index.html`;
+  }
+
+  const parts = normalizedPath.split('/');
+  const lastPath = parts[parts.length - 1];
+
+  if (lastPath === 'index' || lastPath === 'index.html') {
+    parts[parts.length - 1] = 'index.html';
+    return parts.join('/');
+  }
 
   if (lastPath.includes('.')) {
-    return pathValue;
+    return normalizedPath;
   }
-  pathValue += '.html';
 
-  return pathValue;
+  return `${normalizedPath}.html`;
 };

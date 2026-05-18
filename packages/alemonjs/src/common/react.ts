@@ -52,7 +52,7 @@ function attrsToString(props: Props = {}): string {
   const parts: string[] = [];
 
   for (const key of Object.keys(props)) {
-    if (key === 'children') {
+    if (key === 'children' || key === 'dangerouslySetInnerHTML') {
       continue;
     }
     const val = props[key];
@@ -83,6 +83,18 @@ function attrsToString(props: Props = {}): string {
 }
 
 const voidTags = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+const rawTextTags = new Set(['script', 'style']);
+
+function renderRawText(vnode: any): string {
+  if (vnode === null || vnode === undefined || vnode === false) {
+    return '';
+  }
+  if (typeof vnode === 'string' || typeof vnode === 'number') {
+    return String(vnode);
+  }
+
+  return renderToString(vnode);
+}
 
 export function renderToString(vnode: any): string {
   if (vnode === null || vnode === undefined || vnode === false) {
@@ -125,14 +137,23 @@ export function renderToString(vnode: any): string {
   if (voidTags.has(tag.toLowerCase())) {
     return `<${tag}${attrs} />`;
   }
-  const children = (vnode.children ?? []).map(renderToString).join('');
+  const children = rawTextTags.has(tag.toLowerCase())
+    ? (vnode.children ?? []).map(renderRawText).join('')
+    : (vnode.children ?? []).map(renderToString).join('');
 
   return `<${tag}${attrs}>${children}</${tag}>`;
 }
 
 function makeTag(tag: string) {
   return function tagFactory(first?: any, ...restChildren: any[]) {
-    const looksLikeProps = first !== null && typeof first === 'object' && !Array.isArray(first) && Object.prototype.toString.call(first) === '[object Object]';
+    const looksLikeVNode =
+      first !== null &&
+      typeof first === 'object' &&
+      !Array.isArray(first) &&
+      Object.prototype.toString.call(first) === '[object Object]' &&
+      ('type' in first || 'children' in first);
+    const looksLikeProps =
+      first !== null && typeof first === 'object' && !Array.isArray(first) && Object.prototype.toString.call(first) === '[object Object]' && !looksLikeVNode;
 
     if (looksLikeProps) {
       return createElement(tag, first as Props, ...restChildren);

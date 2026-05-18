@@ -80,6 +80,21 @@ const matchBasePath = (requestPath: string, basePath: string) => {
   return '';
 };
 
+const matchApiBasePath = (requestPath: string, basePath: string) => {
+  return requestPath === basePath || requestPath.startsWith(`${basePath}/`);
+};
+
+const needsTrailingSlashRedirect = (requestUrl: string, basePath: string) => {
+  return requestUrl === basePath || requestUrl.startsWith(`${basePath}?`);
+};
+
+const getOriginalPathname = (ctx: KoaRouter.RouterContext) => {
+  const rawUrl = typeof ctx.originalUrl === 'string' && ctx.originalUrl ? ctx.originalUrl : ctx.url;
+  const [pathname] = String(rawUrl).split('?');
+
+  return pathname || '/';
+};
+
 const rewriteCtxPath = async (ctx: KoaRouter.RouterContext, nextPath: string, handler: () => Promise<void>) => {
   const search = ctx.querystring ? `?${ctx.querystring}` : '';
   const originalUrl = ctx.url;
@@ -168,6 +183,122 @@ const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, cap
   return runtimeApp;
 };
 
+const getRuntimeAppRouters = (appName: string) => {
+  const registerRouters = getChildrenApp(appName)?.register?.koaRouter;
+  const storedRouters = getRuntimeAppKoaRouters(appName);
+
+  return (storedRouters.length ? storedRouters : Array.isArray(registerRouters) ? registerRouters : registerRouters ? [registerRouters] : []).filter(Boolean);
+};
+
+const dispatchAppKoaRouters = async (ctx: KoaRouter.RouterContext, appName: string) => {
+  const runtimeApp = getRuntimeApp(appName);
+
+  if (!runtimeApp || !runtimeApp.enabled || runtimeApp.status !== 'ready' || !hasRuntimeAppCapability(appName, 'httpApi')) {
+    return false;
+  }
+
+  const routers = getRuntimeAppRouters(appName);
+  const aliasBases = appName === 'main' ? ['/app'] : [`/apps/${appName}`];
+
+  for (const koaRouter of routers) {
+    for (const basePath of aliasBases) {
+      const rewrittenPath = matchBasePath(ctx.path, basePath);
+
+      if (!rewrittenPath) {
+        continue;
+      }
+
+      try {
+        const matchedContext = ctx as KoaRouter.RouterContext & { matched?: string[] };
+        const beforeMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
+        const beforeStatus = ctx.status;
+        const beforeBody = ctx.body;
+        const beforeMatchedRoute = (ctx as KoaRouter.RouterContext & { _matchedRoute?: string })._matchedRoute;
+        const beforeRouterPath = (ctx as KoaRouter.RouterContext & { routerPath?: string }).routerPath;
+        let fallthrough = false;
+
+        await rewriteCtxPath(ctx, rewrittenPath, async () => {
+          await koaRouter.routes()(ctx, async () => {
+            fallthrough = true;
+          });
+        });
+
+        const afterMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
+        const afterMatchedRoute = (ctx as KoaRouter.RouterContext & { _matchedRoute?: string })._matchedRoute;
+        const afterRouterPath = (ctx as KoaRouter.RouterContext & { routerPath?: string }).routerPath;
+        const handled =
+          afterMatched > beforeMatched ||
+          afterMatchedRoute !== beforeMatchedRoute ||
+          afterRouterPath !== beforeRouterPath ||
+          ctx.status !== beforeStatus ||
+          ctx.body !== beforeBody ||
+          !fallthrough;
+
+        if (!handled) {
+          continue;
+        }
+
+        await rewriteCtxPath(ctx, rewrittenPath, async () => {
+          await koaRouter.allowedMethods()(ctx, async () => {});
+        });
+
+        return true;
+      } catch (error) {
+        const handled = await dispatchHttpError({
+          ctx,
+          error,
+          appName,
+          path: ctx.path,
+          method: ctx.method,
+          kind: 'koa-router'
+        });
+
+        if (handled) {
+          return true;
+        }
+
+        logger.warn({
+          code: ResultCode.Fail,
+          message: `Error request ${ctx.path}:`,
+          data: error instanceof Error ? error.message : String(error)
+        });
+        ctx.status = 500;
+        ctx.body = {
+          code: 500,
+          message: '处理 Koa Router 请求时发生错误。',
+          error: error instanceof Error ? error.message : String(error)
+        };
+
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+const isNamespacedHtmlRequest = (ctx: KoaRouter.RouterContext) => {
+  if (ctx.method !== 'GET') {
+    return false;
+  }
+
+  if (ctx.path === '/app' || ctx.path.startsWith('/app/')) {
+    return !matchApiBasePath(ctx.path, '/app/api');
+  }
+
+  if (!ctx.path.startsWith('/apps/')) {
+    return false;
+  }
+
+  const [, , appName, segment = ''] = ctx.path.split('/');
+
+  if (!appName) {
+    return false;
+  }
+
+  return !matchApiBasePath(ctx.path, `/apps/${appName}/api`);
+};
+
 const dispatchRegisteredKoaRouters = async (ctx: KoaRouter.RouterContext) => {
   const registeredRouters = listRuntimeAppKoaRouters();
   const candidates = new Set<string>(registeredRouters.map(item => item.name));
@@ -180,95 +311,96 @@ const dispatchRegisteredKoaRouters = async (ctx: KoaRouter.RouterContext) => {
   });
 
   for (const appName of candidates) {
-    const runtimeApp = getRuntimeApp(appName);
+    const handled = await dispatchAppKoaRouters(ctx, appName);
 
-    if (!runtimeApp || !runtimeApp.enabled || runtimeApp.status !== 'ready' || !hasRuntimeAppCapability(appName, 'httpApi')) {
-      continue;
-    }
-
-    const registerRouters = getChildrenApp(appName)?.register?.koaRouter;
-    const storedRouters = getRuntimeAppKoaRouters(appName);
-    const routers = (storedRouters.length ? storedRouters : Array.isArray(registerRouters) ? registerRouters : registerRouters ? [registerRouters] : []).filter(
-      Boolean
-    );
-    const aliasBases = appName === 'main' ? ['', '/app'] : ['', `/apps/${appName}`];
-
-    for (const koaRouter of routers) {
-      for (const basePath of aliasBases) {
-        const rewrittenPath = matchBasePath(ctx.path, basePath);
-
-        if (!rewrittenPath) {
-          continue;
-        }
-
-        try {
-          const matchedContext = ctx as KoaRouter.RouterContext & { matched?: string[] };
-          const beforeMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
-          const beforeStatus = ctx.status;
-          const beforeBody = ctx.body;
-          const beforeMatchedRoute = (ctx as KoaRouter.RouterContext & { _matchedRoute?: string })._matchedRoute;
-          const beforeRouterPath = (ctx as KoaRouter.RouterContext & { routerPath?: string }).routerPath;
-          let fallthrough = false;
-
-          await rewriteCtxPath(ctx, rewrittenPath, async () => {
-            await koaRouter.routes()(ctx, async () => {
-              fallthrough = true;
-            });
-          });
-
-          const afterMatched = Array.isArray(matchedContext.matched) ? matchedContext.matched.length : 0;
-          const afterMatchedRoute = (ctx as KoaRouter.RouterContext & { _matchedRoute?: string })._matchedRoute;
-          const afterRouterPath = (ctx as KoaRouter.RouterContext & { routerPath?: string }).routerPath;
-          const handled =
-            afterMatched > beforeMatched ||
-            afterMatchedRoute !== beforeMatchedRoute ||
-            afterRouterPath !== beforeRouterPath ||
-            ctx.status !== beforeStatus ||
-            ctx.body !== beforeBody ||
-            !fallthrough;
-
-          if (!handled) {
-            continue;
-          }
-
-          await rewriteCtxPath(ctx, rewrittenPath, async () => {
-            await koaRouter.allowedMethods()(ctx, async () => {});
-          });
-
-          return true;
-        } catch (error) {
-          const handled = await dispatchHttpError({
-            ctx,
-            error,
-            appName,
-            path: ctx.path,
-            method: ctx.method,
-            kind: 'koa-router'
-          });
-
-          if (handled) {
-            return true;
-          }
-
-          logger.warn({
-            code: ResultCode.Fail,
-            message: `Error request ${ctx.path}:`,
-            data: error instanceof Error ? error.message : String(error)
-          });
-          ctx.status = 500;
-          ctx.body = {
-            code: 500,
-            message: '处理 Koa Router 请求时发生错误。',
-            error: error instanceof Error ? error.message : String(error)
-          };
-
-          return true;
-        }
-      }
+    if (handled) {
+      return true;
     }
   }
 
   return false;
+};
+
+const serveStaticResource = async (ctx: KoaRouter.RouterContext, appName: string, rootDir: string, resourcePath: string) => {
+  const packageRoot = resolvePackageRoot(rootDir);
+  let root = '';
+
+  try {
+    root = readWebRootConfig(packageRoot);
+  } catch (err) {
+    const handled = await dispatchHttpError({
+      ctx,
+      error: err,
+      appName,
+      path: ctx.path,
+      method: ctx.method,
+      kind: 'web'
+    });
+
+    if (handled) {
+      return 'handled';
+    }
+
+    ctx.status = 500;
+    ctx.body = {
+      code: 500,
+      message: '加载 package.json 时发生错误。',
+      error: err instanceof Error ? err.message : String(err)
+    };
+
+    return 'handled';
+  }
+
+  const webRoot = root ? path.join(packageRoot, root) : packageRoot;
+  const fullPath = safePath(webRoot, resourcePath);
+
+  if (!fullPath) {
+    ctx.status = 403;
+    ctx.body = {
+      code: 403,
+      message: '非法路径',
+      data: null
+    };
+
+    return 'handled';
+  }
+
+  if (!existsSync(fullPath)) {
+    return 'miss';
+  }
+
+  try {
+    const file = await fs.promises.readFile(fullPath);
+    const mimeType = mime.lookup(fullPath) || 'application/octet-stream';
+
+    ctx.set('Content-Type', mimeType);
+    ctx.body = file;
+    ctx.status = 200;
+
+    return 'handled';
+  } catch (err) {
+    const handled = await dispatchHttpError({
+      ctx,
+      error: err,
+      appName,
+      path: ctx.path,
+      method: ctx.method,
+      kind: 'web'
+    });
+
+    if (handled) {
+      return 'handled';
+    }
+
+    ctx.status = 500;
+    ctx.body = {
+      code: 500,
+      message: appName === 'main' ? '加载资源时发生服务器错误。' : `加载子应用 '${appName}' 资源时发生服务器错误。`,
+      error: err instanceof Error ? err.message : String(err)
+    };
+
+    return 'handled';
+  }
 };
 
 router.get('/', ctx => {
@@ -277,7 +409,6 @@ router.get('/', ctx => {
   ctx.body = renderHelloHtml(listRuntimeApps());
 });
 
-// 响应服务在线
 router.get('api/online', ctx => {
   ctx.status = 200;
   ctx.body = {
@@ -329,6 +460,12 @@ router.get('api/runtime/apps/:app', ctx => {
 });
 
 router.use(async (ctx, next) => {
+  if (isNamespacedHtmlRequest(ctx)) {
+    await next();
+
+    return;
+  }
+
   const handled = await dispatchRegisteredKoaRouters(ctx);
 
   if (handled) {
@@ -339,6 +476,12 @@ router.use(async (ctx, next) => {
 });
 
 const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
+  if (needsTrailingSlashRedirect(getOriginalPathname(ctx), '/app')) {
+    ctx.redirect('/app/');
+
+    return;
+  }
+
   if (!process.env.input) {
     ctx.status = 400;
     ctx.body = {
@@ -349,19 +492,19 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
 
     return;
   }
-  const rootPath = process.cwd();
 
+  const rootPath = process.cwd();
   const apiPath = '/app/api';
 
-  if (ctx.path.startsWith(apiPath)) {
+  if (matchApiBasePath(ctx.path, apiPath)) {
     const runtimeApp = denyRuntimeAppAccess(ctx, 'main', 'httpApi');
 
     if (!runtimeApp) {
       return;
     }
+
     const mainPath = join(rootPath, process.env.input);
 
-    // 路径
     if (!existsSync(mainPath)) {
       ctx.status = 400;
       ctx.body = {
@@ -389,7 +532,6 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
         return;
       }
 
-      // 检查路径是否存在且是文件（而不是目录）
       if (existsSync(dir) && fs.statSync(dir).isFile()) {
         ctx.status = 404;
         ctx.body = {
@@ -413,6 +555,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
 
         return;
       }
+
       const apiModule = await import(`file://${modulePath}`);
       const handler = apiModule[ctx.method];
 
@@ -421,6 +564,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
 
         return;
       }
+
       const middlewares = await collectMiddlewares(modulePath);
 
       await runMiddlewares(middlewares, ctx, handler);
@@ -448,98 +592,46 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
 
     return;
   }
-  // 如果不是 get请求。即不响应
+
   if (ctx.method !== 'GET') {
     ctx.status = 405;
 
     return;
   }
-  let root = '';
+
+  const runtimeApp = getRuntimeApp('main');
   const resourcePath = formatPath(ctx.params?.path);
-  const runtimeApp = denyRuntimeAppAccess(ctx, 'main', 'web');
 
-  if (!runtimeApp) {
+  if (!runtimeApp?.enabled || runtimeApp.status !== 'ready') {
+    denyRuntimeAppAccess(ctx, 'main', 'web');
+
     return;
   }
-  const packageRoot = resolvePackageRoot(runtimeApp.rootDir);
 
-  try {
-    root = readWebRootConfig(packageRoot);
-  } catch (err) {
-    const handled = await dispatchHttpError({
-      ctx,
-      error: err,
-      appName: 'main',
-      path: ctx.path,
-      method: ctx.method,
-      kind: 'web'
-    });
+  if (hasRuntimeAppCapability('main', 'web')) {
+    const staticResult = await serveStaticResource(ctx, 'main', runtimeApp.rootDir, resourcePath);
 
-    if (handled) {
+    if (staticResult === 'handled') {
       return;
     }
+  }
 
-    ctx.status = 500;
-    ctx.body = {
-      code: 500,
-      message: '加载 package.json 时发生错误。',
-      error: err instanceof Error ? err.message : String(err)
-    };
-
+  if (await dispatchAppKoaRouters(ctx, 'main')) {
     return;
   }
-  const webRoot = root ? path.join(packageRoot, root) : packageRoot;
-  const fullPath = safePath(webRoot, resourcePath);
 
-  if (!fullPath) {
-    ctx.status = 403;
-    ctx.body = {
-      code: 403,
-      message: '非法路径',
-      data: null
-    };
+  if (!hasRuntimeAppCapability('main', 'web')) {
+    denyRuntimeAppAccess(ctx, 'main', 'web');
 
     return;
   }
 
-  try {
-    // 返回文件
-    const file = await fs.promises.readFile(fullPath);
-    const mimeType = mime.lookup(fullPath) || 'application/octet-stream';
-
-    ctx.set('Content-Type', mimeType); // 自动设置响应头
-    ctx.body = file;
-    ctx.status = 200;
-  } catch (err) {
-    const handled = await dispatchHttpError({
-      ctx,
-      error: err,
-      appName: 'main',
-      path: ctx.path,
-      method: ctx.method,
-      kind: 'web'
-    });
-
-    if (handled) {
-      return;
-    }
-
-    if (err?.status === 404) {
-      ctx.status = 404;
-      ctx.body = {
-        code: 404,
-        message: '资源中未找到。',
-        data: null
-      };
-    } else {
-      ctx.status = 500;
-      ctx.body = {
-        code: 500,
-        message: '加载资源时发生服务器错误。',
-        error: err instanceof Error ? err.message : String(err)
-      };
-    }
-  }
+  ctx.status = 404;
+  ctx.body = {
+    code: 404,
+    message: '资源中未找到。',
+    data: null
+  };
 };
 
 router.all('app', handleMainAppRequest);
@@ -560,14 +652,21 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
     return;
   }
 
+  if (needsTrailingSlashRedirect(getOriginalPathname(ctx), `/apps/${appName}`)) {
+    ctx.redirect(`/apps/${appName}/`);
+
+    return;
+  }
+
   const apiPath = `/apps/${appName}/api`;
 
-  if (ctx.path.startsWith(apiPath)) {
+  if (matchApiBasePath(ctx.path, apiPath)) {
     const runtimeApp = denyRuntimeAppAccess(ctx, appName, 'httpApi');
 
     if (!runtimeApp) {
       return;
     }
+
     try {
       const routeBase = join(runtimeApp.rootDir, 'route');
       const dir = safePath(routeBase, ctx.path?.replace(apiPath, '/api') || '');
@@ -583,7 +682,6 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
         return;
       }
 
-      // 检查路径是否存在且是文件（而不是目录）
       if (existsSync(dir) && fs.statSync(dir).isFile()) {
         ctx.status = 404;
         ctx.body = {
@@ -607,6 +705,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
 
         return;
       }
+
       const apiModule = await import(`file://${modulePath}`);
       const handler = apiModule[ctx.method];
 
@@ -615,6 +714,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
 
         return;
       }
+
       const middlewares = await collectMiddlewares(modulePath);
 
       await runMiddlewares(middlewares, ctx, handler);
@@ -648,104 +748,45 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
     return;
   }
 
-  // 如果不是 get请求。即不响应
   if (ctx.method !== 'GET') {
     ctx.status = 405;
 
     return;
   }
-  // 不是 packages，而是 node_modules。需要是模块化
-  const runtimeApp = denyRuntimeAppAccess(ctx, appName, 'web');
 
-  if (!runtimeApp) {
-    return;
-  }
-  const packageRoot = resolvePackageRoot(runtimeApp.rootDir);
+  const runtimeApp = getRuntimeApp(appName);
   const resourcePath = formatPath(ctx.params?.path);
-  let root = '';
 
-  try {
-    root = readWebRootConfig(packageRoot);
-  } catch (err) {
-    const handled = await dispatchHttpError({
-      ctx,
-      error: err,
-      appName,
-      path: ctx.path,
-      method: ctx.method,
-      kind: 'web'
-    });
-
-    if (handled) {
-      return;
-    }
-
-    ctx.status = 500;
-    ctx.body = {
-      code: 500,
-      message: '加载 package.json 时发生错误。',
-      error: err instanceof Error ? err.message : String(err)
-    };
-
-    return;
-  }
-  const webRoot = root ? path.join(packageRoot, root) : packageRoot;
-  const fullPath = safePath(webRoot, resourcePath);
-
-  if (!fullPath) {
-    ctx.status = 403;
-    ctx.body = {
-      code: 403,
-      message: '非法路径',
-      data: null
-    };
+  if (!runtimeApp?.enabled || runtimeApp.status !== 'ready') {
+    denyRuntimeAppAccess(ctx, appName, 'web');
 
     return;
   }
 
-  try {
-    // 返回文件
-    const file = await fs.promises.readFile(fullPath);
-    const mimeType = mime.lookup(fullPath) || 'application/octet-stream';
+  if (hasRuntimeAppCapability(appName, 'web')) {
+    const staticResult = await serveStaticResource(ctx, appName, runtimeApp.rootDir, resourcePath);
 
-    ctx.set('Content-Type', mimeType); // 自动设置响应头
-    ctx.body = file;
-    ctx.status = 200;
-  } catch (err) {
-    const handled = await dispatchHttpError({
-      ctx,
-      error: err,
-      appName,
-      path: ctx.path,
-      method: ctx.method,
-      kind: 'web'
-    });
-
-    if (handled) {
+    if (staticResult === 'handled') {
       return;
     }
-
-    if (err?.status === 404) {
-      ctx.status = 404;
-      ctx.body = {
-        code: 404,
-        message: `资源 '${resourcePath}' 在子应用 '${appName}' 中未找到。`,
-        data: null
-      };
-    } else {
-      logger.warn({
-        code: ResultCode.Fail,
-        message: `Error request ${ctx.path}:`,
-        data: err instanceof Error ? err.message : String(err)
-      });
-      ctx.status = 500;
-      ctx.body = {
-        code: 500,
-        message: `加载子应用 '${appName}' 资源时发生服务器错误。`,
-        error: err instanceof Error ? err.message : String(err)
-      };
-    }
   }
+
+  if (await dispatchAppKoaRouters(ctx, appName)) {
+    return;
+  }
+
+  if (!hasRuntimeAppCapability(appName, 'web')) {
+    denyRuntimeAppAccess(ctx, appName, 'web');
+
+    return;
+  }
+
+  ctx.status = 404;
+  ctx.body = {
+    code: 404,
+    message: `资源 '${resourcePath}' 在子应用 '${appName}' 中未找到。`,
+    data: null
+  };
 };
 
 router.all('apps/:app', handlePluginAppRequest);
