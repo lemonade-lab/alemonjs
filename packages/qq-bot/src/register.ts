@@ -264,23 +264,19 @@ export const register = (client: QQBotClients) => {
   const getMessageContent = event => {
     let msg = event?.content ?? '';
     // 艾特消息处理
-    const atUsers: {
-      id: string;
-    }[] = [];
 
-    if (event.mentions) {
+    if (event?.mentions) {
       // 去掉@ 转为纯消息
       for (const item of event.mentions) {
-        atUsers.push({
-          id: item.id
-        });
+        // TODO sb tx
+        if (item?.id) {
+          msg = msg.replace(`<@!${item.id}>`, '').trim();
+          msg = msg.replace(`<@${item.id}>`, '').trim();
+        }
+        if (item?.username) {
+          msg = msg.replace(`[${item.username}]`, '').trim();
+        }
       }
-      // 循环删除文本中的at信息并去除前后空格
-      atUsers.forEach(item => {
-        // 主动提出
-        msg = msg.replace(`<@!${item.id}>`, '').trim();
-        msg = msg.replace(`<@${item.id}>`, '').trim();
-      });
     }
 
     return msg;
