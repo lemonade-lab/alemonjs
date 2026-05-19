@@ -277,7 +277,9 @@ export const register = (client: QQBotClients) => {
       }
       // 循环删除文本中的at信息并去除前后空格
       atUsers.forEach(item => {
+        // 主动提出
         msg = msg.replace(`<@!${item.id}>`, '').trim();
+        msg = msg.replace(`<@${item.id}>`, '').trim();
       });
     }
 

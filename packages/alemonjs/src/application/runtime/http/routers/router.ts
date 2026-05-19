@@ -218,7 +218,7 @@ const dispatchAppKoaRouters = async (ctx: KoaRouter.RouterContext, appName: stri
         let fallthrough = false;
 
         await rewriteCtxPath(ctx, rewrittenPath, async () => {
-          await koaRouter.routes()(ctx, async () => {
+          await koaRouter.routes()(ctx, () => {
             fallthrough = true;
           });
         });
@@ -290,7 +290,7 @@ const isNamespacedHtmlRequest = (ctx: KoaRouter.RouterContext) => {
     return false;
   }
 
-  const [, , appName, segment = ''] = ctx.path.split('/');
+  const [, , appName] = ctx.path.split('/');
 
   if (!appName) {
     return false;
