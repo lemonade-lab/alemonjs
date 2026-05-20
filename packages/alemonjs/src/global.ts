@@ -9,6 +9,7 @@ import type {
   OnMiddlewareReversalFuncBack,
   DefineResponseFunc,
   defineMiddlewareFunc,
+  DefineRouterFunc,
   StoreChildrenApp,
   StateSubscribeMap,
   SubscribeKeysMap,
@@ -33,6 +34,18 @@ declare global {
    * 全局启动参数
    */
   var __options: StartOptions;
+  /**
+   * 当前进程是否为 sandbox/testone 模式
+   */
+  var __sandbox: boolean | undefined;
+  /**
+   * 客户端运行时兼容初始化标记
+   */
+  var __client_loaded: boolean | undefined;
+  /**
+   * 缓存的公网 IP
+   */
+  var __publicIp: string | undefined;
   /**
    * 打印
    */
@@ -74,6 +87,10 @@ declare global {
   var chatbotPlatform: WebSocket;
   var chatbotClient: WebSocket;
   /**
+   * testone 调试前端 websocket
+   */
+  var testoneClient: WebSocket | undefined;
+  /**
    * 定义响应体
    */
   var onResponse: OnResponseReversalFunc;
@@ -102,6 +119,10 @@ declare global {
    * 定义中间件
    */
   var defineMiddleware: defineMiddlewareFunc;
+  /**
+   * 定义路由
+   */
+  var defineRouter: DefineRouterFunc;
   /**
    * 定义选择器
    */

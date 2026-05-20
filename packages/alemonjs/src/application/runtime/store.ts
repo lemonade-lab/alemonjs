@@ -184,8 +184,8 @@ export const registerRuntimeApp = (
     updatedAt: now
   };
 
-  if (current?.status !== record.status) {
-    logRuntimeAppStatus(record.status === 'failed' ? 'warn' : 'debug', runtimeApps[record.name]);
+  if (current?.status !== record.status && process.env.NODE_ENV === 'development') {
+    logRuntimeAppStatus('debug', runtimeApps[record.name]);
   }
 
   return runtimeApps[record.name];

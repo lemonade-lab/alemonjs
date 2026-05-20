@@ -218,7 +218,7 @@ const dispatchAppKoaRouters = async (ctx: KoaRouter.RouterContext, appName: stri
         let fallthrough = false;
 
         await rewriteCtxPath(ctx, rewrittenPath, async () => {
-          await koaRouter.routes()(ctx, () => {
+          await koaRouter.routes()(ctx, async () => {
             fallthrough = true;
           });
         });

@@ -1,5 +1,5 @@
 import { dirname, join } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { createEventName, showErrorModule } from '../../../common/utils.js';
 import { getRecursiveDirFiles } from '../../../common/utils.js';
 import type { StoreMiddlewareItem, StoreResponseItem, DefineChildrenValue, childrenCallback } from '../../../types/index.js';
@@ -16,6 +16,61 @@ const initRequire = () => {};
 
 initRequire.resolve = () => '';
 const require = module?.createRequire?.(import.meta.url) ?? initRequire;
+
+const resolvePackageDir = (appName: string) => {
+  const resolveWithPaths = require.resolve as typeof require.resolve & {
+    paths?: (request: string) => string[] | null;
+  };
+  const candidatePaths = resolveWithPaths?.paths?.(appName) ?? [];
+
+  for (const basePath of candidatePaths) {
+    const packageDir = join(basePath, appName);
+
+    if (existsSync(join(packageDir, 'package.json'))) {
+      return packageDir;
+    }
+  }
+
+  return null;
+};
+
+const resolvePackageEntryFromPackageJson = (packageDir: string) => {
+  const packageJsonPath = join(packageDir, 'package.json');
+
+  if (!existsSync(packageJsonPath)) {
+    return null;
+  }
+
+  try {
+    const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) ?? {};
+    const exportsField = pkg?.exports;
+    let entry: string | null = null;
+
+    if (typeof exportsField === 'string') {
+      entry = exportsField;
+    } else if (exportsField && typeof exportsField === 'object') {
+      const rootExport = exportsField['.'];
+
+      if (typeof rootExport === 'string') {
+        entry = rootExport;
+      } else if (rootExport && typeof rootExport === 'object') {
+        entry = rootExport.import ?? rootExport.default ?? rootExport.require ?? null;
+      }
+    }
+
+    if (!entry) {
+      entry = pkg?.module ?? pkg?.main ?? 'index.js';
+    }
+
+    if (typeof entry !== 'string' || !entry.trim()) {
+      return null;
+    }
+
+    return join(packageDir, entry);
+  } catch {
+    return null;
+  }
+};
 
 const resolvePackageRoot = (startDir: string) => {
   let currentDir = startDir;
@@ -338,7 +393,16 @@ export const loadChildrenFile = (appName: string) => {
     return;
   }
   try {
-    const mainPath = require.resolve(appName);
+    let mainPath = require.resolve(appName);
+
+    if (!existsSync(mainPath)) {
+      const packageDir = resolvePackageDir(appName);
+      const fallbackMainPath = packageDir ? resolvePackageEntryFromPackageJson(packageDir) : null;
+
+      if (fallbackMainPath) {
+        mainPath = fallbackMainPath;
+      }
+    }
 
     // 不存在 main
     if (!existsSync(mainPath)) {
@@ -361,6 +425,23 @@ export const loadChildrenFile = (appName: string) => {
     });
     void loadChildren(mainPath, appName);
   } catch (e) {
+    const packageDir = resolvePackageDir(appName);
+    const fallbackMainPath = packageDir ? resolvePackageEntryFromPackageJson(packageDir) : null;
+
+    if (fallbackMainPath && existsSync(fallbackMainPath)) {
+      registerRuntimeApp({
+        name: appName,
+        kind: 'plugin',
+        enabled: true,
+        status: 'discovered',
+        rootDir: dirname(fallbackMainPath),
+        mainPath: fallbackMainPath
+      });
+      void loadChildren(fallbackMainPath, appName);
+
+      return;
+    }
+
     updateRuntimeAppStatus(appName, 'failed', e);
     showErrorModule(e);
   }

@@ -52,3 +52,5 @@ export const defineRouter: DefineRouterFunc = routes => {
     current: routes
   };
 };
+
+global.defineRouter = defineRouter;
