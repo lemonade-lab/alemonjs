@@ -6,6 +6,7 @@ import { execSync, spawnSync } from 'child_process';
 
 const RELEASE_TYPES = new Set(['patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease']);
 const SEMVER_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
+const DEFAULT_PUBLISH_FILES = ['lib', 'package.json', 'README.md'];
 
 function readPackageJson() {
   const pkgPath = join(process.cwd(), 'package.json');
@@ -188,28 +189,48 @@ function getPackResult(cwd = process.cwd()) {
   return result[0];
 }
 
-function copyPublishFiles(files) {
-  const stageDir = fs.mkdtempSync(join(os.tmpdir(), 'alemon-publish-'));
-
-  for (const item of files) {
-    const relativePath = item.path;
-    const sourcePath = join(process.cwd(), relativePath);
-    const targetPath = join(stageDir, relativePath);
-
-    fs.mkdirSync(join(targetPath, '..'), { recursive: true });
-    fs.copyFileSync(sourcePath, targetPath);
+function hasNpmPublishRules(pkg) {
+  if (fs.existsSync(join(process.cwd(), '.npmignore'))) {
+    return true;
   }
 
-  return stageDir;
+  return Array.isArray(pkg.files) && pkg.files.length > 0;
 }
 
-function materializePublishDir(sourceDir, files) {
-  const publishDir = fs.mkdtempSync(join(os.tmpdir(), 'alemon-release-'));
+function getDefaultPublishFiles() {
+  return DEFAULT_PUBLISH_FILES.filter(file => fs.existsSync(join(process.cwd(), file)));
+}
+
+function warnDefaultPublishState(pkg, publishFiles) {
+  const hasLibDir = fs.existsSync(join(process.cwd(), 'lib'));
+  const mainField = typeof pkg.main === 'string' ? pkg.main : '';
+
+  if (!hasLibDir && mainField.startsWith('./lib/')) {
+    console.warn(`警告: 缺少 lib/ 目录，但 package.json main 指向 ${mainField}，将继续发布`);
+  }
+
+  if (publishFiles.length === 0) {
+    console.warn('警告: 默认发布规则下没有匹配到任何文件');
+  }
+}
+
+function copyPublishFiles(files) {
+  const publishDir = fs.mkdtempSync(join(os.tmpdir(), 'alemon-publish-'));
 
   for (const item of files) {
-    const relativePath = item.path;
-    const sourcePath = join(sourceDir, relativePath);
+    const relativePath = typeof item === 'string' ? item : item.path;
+    const sourcePath = join(process.cwd(), relativePath);
     const targetPath = join(publishDir, relativePath);
+
+    if (!fs.existsSync(sourcePath)) {
+      continue;
+    }
+
+    if (fs.statSync(sourcePath).isDirectory()) {
+      fs.mkdirSync(join(targetPath, '..'), { recursive: true });
+      fs.cpSync(sourcePath, targetPath, { recursive: true });
+      continue;
+    }
 
     fs.mkdirSync(join(targetPath, '..'), { recursive: true });
     fs.copyFileSync(sourcePath, targetPath);
@@ -335,7 +356,6 @@ export async function publish(release, options = {}) {
     console.log(`已更新 package.json 版本: ${localVersion} -> ${targetVersion}`);
   }
 
-  let stageDir = null;
   let publishDir = null;
   let worktreeDir = null;
   try {
@@ -350,13 +370,17 @@ export async function publish(release, options = {}) {
       console.log('已跳过构建');
     }
 
-    const packResult = getPackResult();
-    stageDir = copyPublishFiles(packResult.files);
+    const useNpmRules = hasNpmPublishRules(pkg);
+    const publishFiles = useNpmRules ? getPackResult().files : getDefaultPublishFiles();
 
-    const filteredPackResult = getPackResult(stageDir);
-    publishDir = materializePublishDir(stageDir, filteredPackResult.files);
+    if (!useNpmRules) {
+      warnDefaultPublishState(pkg, publishFiles);
+    }
 
-    console.log(`发布文件数: ${filteredPackResult.files.length}`);
+    publishDir = copyPublishFiles(publishFiles);
+
+    console.log(`发布规则: ${useNpmRules ? 'npm' : 'default'}`);
+    console.log(`发布文件数: ${publishFiles.length}`);
 
     if (options.dryRun) {
       console.log('dry-run 模式，不会真正推送到 git');
@@ -388,9 +412,6 @@ export async function publish(release, options = {}) {
     }
     throw error;
   } finally {
-    if (stageDir) {
-      fs.rmSync(stageDir, { recursive: true, force: true });
-    }
     if (publishDir) {
       fs.rmSync(publishDir, { recursive: true, force: true });
     }

@@ -117,7 +117,8 @@ alemonc publish --dry-run
 - 传 `patch/minor/major/prepatch/preminor/premajor/prerelease` 时会自动递增
 - 传具体版本号时会直接以该版本发布
 - 默认先执行 `npm run build`
-- 文件选择规则直接复用 npm 机制，也就是 `package.json.files`、`.npmignore`、`.gitignore` 和 npm 默认规则
+- 默认发布内容是 `lib/`、`package.json`、`README.md`
+- 如果项目配置了 `.npmignore` 或 `package.json.files`，则切换为 npm 文件选择规则
 - 最终把产物提交到 git `release` 分支，并推送对应 tag
 - 默认要求 git 工作区干净，发布成功后会自动提交源码中的 `package.json` 版本变更
 
