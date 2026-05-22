@@ -100,6 +100,27 @@ alemonc version update
 
 读取本地 `package.json`，查找所有 `alemonjs` 和 `@alemonjs/*` 依赖，检查并更新到最新版本。
 
+#### publish — 智能发布当前包
+
+```sh
+alemonc publish
+alemonc publish patch
+alemonc publish --dry-run
+```
+
+行为说明：
+
+- 默认会查询 git tag 历史作为版本基线
+- 不传参数时：
+  - 如果本地版本高于最新 tag，直接发布本地版本
+  - 否则自动按最新 tag `patch +1`
+- 传 `patch/minor/major/prepatch/preminor/premajor/prerelease` 时会自动递增
+- 传具体版本号时会直接以该版本发布
+- 默认先执行 `npm run build`
+- 文件选择规则直接复用 npm 机制，也就是 `package.json.files`、`.npmignore`、`.gitignore` 和 npm 默认规则
+- 最终把产物提交到 git `release` 分支，并推送对应 tag
+- 默认要求 git 工作区干净，发布成功后会自动提交源码中的 `package.json` 版本变更
+
 ---
 
 ### 项目诊断

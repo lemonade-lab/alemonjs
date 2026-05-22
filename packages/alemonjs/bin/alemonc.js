@@ -6,6 +6,7 @@ import { versionUpdate } from './versionUpdate.js';
 import { info } from './info.js';
 import { platformAdd, platformRemove, platformList } from './platform.js';
 import { login } from './login.js';
+import { publish } from './publish.js';
 import { Command } from 'commander';
 const program = new Command();
 
@@ -75,6 +76,24 @@ program
   });
 
 program
+  .command('publish [release]')
+  .description('智能发布当前包到 git release 仓库，支持 patch/minor/major 或直接指定版本号')
+  .option('--tag <tag>', 'git 标签通道，默认 stable 为 latest，预发布为 next')
+  .option('--preid <preid>', '预发布标识，默认 beta', 'beta')
+  .option('--branch <branch>', '发布目标分支，默认 release')
+  .option('--dry-run', '只执行检查和打包，不真正发布')
+  .option('--skip-build', '跳过构建')
+  .option('--no-git-checks', '跳过 git 干净工作区检查及发布后自动提交源码版本')
+  .action(async (release, options) => {
+    try {
+      await publish(release, options);
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
   .command('info')
   .description('输出项目诊断信息')
   .action(() => {
@@ -118,4 +137,4 @@ program
     program.help();
   });
 
-program.parse(process.argv);
+program.parseAsync(process.argv);

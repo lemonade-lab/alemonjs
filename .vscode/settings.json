@@ -12,5 +12,6 @@
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["alemonc", "alemonjs", "borderless", "everysec", "jsxp", "lvyjs", "ningmengchongshui", "onebot", "qrcode"]
+  "cSpell.words": ["alemonc", "alemonjs", "borderless", "everysec", "jsxp", "lvyjs", "ningmengchongshui", "onebot", "qrcode"],
+  "commentTranslate.hover.enabled": false
 }
