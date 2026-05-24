@@ -437,8 +437,8 @@ export async function publish(release, options = {}) {
       console.log(`已推送到分支: ${releaseBranch}`);
     }
 
-    runCommand('git', ['tag', '-f', gitTagName]);
-    runCommand('git', ['push', 'origin', gitTagName, '--force']);
+    runCommand('git', ['-C', worktreeDir, 'tag', '-f', gitTagName]);
+    runCommand('git', ['-C', worktreeDir, 'push', 'origin', gitTagName, '--force']);
     console.log(`发布完成: ${packageName}@${targetVersion}`);
   } catch (error) {
     if (targetVersion !== localVersion) {

@@ -1,114 +1,81 @@
-# [ALemonJS](https://alemonjs.com)
+# ALemonJS
 
-[![npm version](https://img.shields.io/npm/v/alemonjs.svg)](https://www.npmjs.com/package/alemonjs)
-[![license](https://img.shields.io/npm/l/alemonjs.svg)](https://github.com/lemonade-lab/alemonjs/blob/main/LICENSE)
+<p align="center">
+  <a href="https://alemonjs.com">Website</a>
+  ·
+  <a href="./README.en.md">English</a>
+  ·
+  <a href="https://www.npmjs.com/package/alemonjs">npm</a>
+</p>
 
-专用于开发跨平台聊天机器人的 Node.js 框架，提供完整的事件驱动架构、声明式路由、Hook 系统和多通道通信协议（CBP），一套代码即可运行在 QQ、Discord、KOOK、Telegram 等多个平台。
+<p align="center">
+  <a href="https://www.npmjs.com/package/alemonjs">
+    <img src="https://img.shields.io/npm/v/alemonjs.svg" alt="npm version">
+  </a>
+  <a href="https://github.com/lemonade-lab/alemonjs/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/alemonjs.svg" alt="license">
+  </a>
+</p>
 
-官网文档 https://alemonjs.com
+ALemonJS 是一个面向跨平台聊天机器人的 Node.js 框架。  
+它把事件处理、声明式路由、Hook、消息格式化与多通道通信协议整合在一起，让同一套业务代码可以运行在 QQ、Discord、KOOK、Telegram、OneBot 等平台。
 
-## 🚀 快速开始
+## Why ALemonJS
+
+- 跨平台优先：统一事件模型与消息能力，减少平台差异带来的业务分叉
+- 架构完整：内置应用层、运行时核心、平台适配层，适合从小型机器人到多模块项目
+- 通信灵活：支持 Direct Channel、IPC Bridge、WebSocket 三种通信路径
+- 路由与生命周期清晰：支持声明式路由、模块生命周期、按需加载与插件化组织
+- 面向工程：monorepo 管理、平台包拆分、桌面与服务端生态并行发展
+
+## Quick Start
 
 ```bash
-# 创建新项目
 npm create alemonjs@latest
-# 进入项目目录
 cd alemonjs
-# 安装依赖
 yarn install
-# 启动开发
 yarn dev
 ```
 
-## 🏗️ 架构设计
+官网文档：<https://alemonjs.com>
 
-```
-┌──────────────────────────────────────────────────────┐
-│                    开发者应用层                        │
-│   Hooks: useMessage, useMention, useSubscribe         │
-│   Format: 链式消息构建器                               │
-└─────────────────────┬────────────────────────────────┘
-                      │  CBP (Cross-platform Protocol)
-┌─────────────────────┴────────────────────────────────┐
-│                   ALemonJS Core                       │
-│   事件处理器 (过滤/去重/中间件/订阅/响应)              │
-│   模块加载器 (loadChildren → ChildrenApp 生命周期)    │
-│   通信层:                                             │
-│   ├─ Direct Channel (UDS + V8 序列化)         │
-│   ├─ IPC Bridge (fork 子进程)                 │
-│   └─ WebSocket (flattedJSON)                   │
-└─────────────────────┬────────────────────────────────┘
-                      │
-┌─────────────────────┴────────────────────────────────┐
-│                  平台适配器层                          │
-│   @alemonjs/discord  │ @alemonjs/qq-bot               │
-│   @alemonjs/kook     │ @alemonjs/onebot               │
-└──────────────────────────────────────────────────────┘
+## Architecture
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│                        Application Layer                     │
+│   Hooks · Router · Format · Response · Middleware           │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               │ CBP (Cross-platform Protocol)
+                               │
+┌──────────────────────────────┴───────────────────────────────┐
+│                         ALemonJS Core                        │
+│   Event Processor · Runtime Store · Module Loader           │
+│   Direct Channel · IPC Bridge · WebSocket                  │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+┌──────────────────────────────┴───────────────────────────────┐
+│                       Platform Adapters                      │
+│   Discord · QQ Bot · OneBot · KOOK · Telegram · Bubble     │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-### 核心特性
+## Core Capabilities
 
-- **事件驱动架构** — 基于事件选择器（selects）和响应处理器（handler）的模式，支持消息、交互、成员变动等 30+ 种事件类型，生命周期覆盖创建（create）、挂载（mount）、卸载（unmount）
-- **CBP 通信协议** — 三通道通信（Direct Channel / IPC / WebSocket），Platform 进程与 Client 进程分离，支持本地运行或远程服务器连接
-- **声明式路由** — `defineRouter` 支持精确匹配、前缀匹配、正则匹配和嵌套子路由，配合 `lazy()` 懒加载按需加载处理器
-- **模块化插件** — `defineChildren` 定义子模块入口，包含 `onCreated → register → onMounted → unMounted` 完整生命周期
-- **自定义平台** — 通过 `definePlatform` 可对接任意聊天平台
+### Event-Driven Runtime
 
-## 🔧 核心组件
+- 基于 `selects + handler` 的事件处理模型
+- 覆盖消息、交互、成员、请求等多类事件
+- 支持 middleware、subscribe、response、router 的组合处理
 
-### Hook 系统
+### Declarative Router
 
-| Hook            | 用途                                 |
-| --------------- | ------------------------------------ |
-| `useMessage`    | 发送消息（文本/图片/按钮等）         |
-| `useMention`    | 获取 @提及用户，支持条件过滤         |
-| `useSubscribe`  | 跨生命周期事件订阅（如等待用户回复） |
-| `useChannel`    | 频道操作                             |
-| `useGuild`      | 服务器/群组操作                      |
-| `useMember`     | 成员信息管理                         |
-| `usePermission` | 权限查询与管理                       |
-| `useReaction`   | 表情回应操作                         |
-| `useRole`       | 角色管理                             |
-| `useUser`       | 用户信息操作                         |
-| `useHistory`    | 历史消息查询                         |
-| `useMedia`      | 媒体资源操作                         |
-| `useAnnounce`   | 公告管理                             |
-| `useRequest`    | 请求处理                             |
-| `useClient`     | 客户端连接操作                       |
-| `useMe`         | 当前机器人信息                       |
-| `useEvent`      | 事件上下文访问                       |
+- 支持前缀匹配、精确匹配、嵌套路由与懒加载
+- 适合命令型机器人、菜单型交互和模块化业务组织
 
-### 消息格式化（Format）
-
-链式 API 构建富文本消息：
-
-```typescript
-import { useEvent, useMessage, Format } from 'alemonjs';
-
-export default () => {
-  const [event, next] = useEvent({
-    selects: ['message.create', 'private.message.create']
-  });
-  if (!event.match.selects) {
-    next();
-    return;
-  }
-
-  const [message] = useMessage();
-  const format = Format.create();
-  format.addText('Hello!');
-  format.addImage('https://alemonjs.com/me.png');
-  format.addButtonGroup(Format.createButtonGroup().addRow().addButton('确认', { action: 'confirm' }));
-  message.send({ format });
-};
-```
-
-支持文本、图片、按钮组、Markdown、@提及、链接、附件、音视频等消息类型。
-
-### 链式路由
-
-```typescript
-import { defineChildren, defineRouter, lazy } from 'alemonjs';
+```ts
+import { defineChildren, Router } from 'alemonjs';
 
 const router = Router.create({
   events: ['message.create', 'private.message.create']
@@ -125,10 +92,9 @@ const app = router.group(
       maxWords: 2
     }
   },
-  // 中间件
   () => import('@src/response/mw')
 );
-// 功能
+
 app.use(['帮助'], () => import('@src/response/help'));
 
 export default defineChildren({
@@ -140,85 +106,89 @@ export default defineChildren({
 });
 ```
 
-### 事件处理管线
+### Hook System
 
+| Hook                                     | 用途                                  |
+| ---------------------------------------- | ------------------------------------- |
+| `useMessage`                             | 发送文本、图片、按钮、Markdown 等消息 |
+| `useMention`                             | 获取 @ 提及用户                       |
+| `useSubscribe`                           | 处理跨阶段订阅与等待回复              |
+| `useChannel` / `useGuild` / `useMember`  | 频道、群组、成员相关操作              |
+| `usePermission` / `useRole` / `useUser`  | 权限、角色、用户能力                  |
+| `useHistory` / `useMedia` / `useRequest` | 历史消息、媒体、请求处理              |
+| `useClient` / `useMe` / `useEvent`       | 客户端、当前机器人、事件上下文        |
+
+### Message Formatting
+
+```ts
+import { Format, useEvent, useMessage } from 'alemonjs';
+
+export default () => {
+  const [event, next] = useEvent({
+    selects: ['message.create', 'private.message.create']
+  });
+
+  if (!event.match.selects) {
+    next();
+    return;
+  }
+
+  const [message] = useMessage();
+  const format = Format.create();
+
+  format.addText('Hello!');
+  format.addImage('https://alemonjs.com/me.png');
+  format.addButtonGroup(Format.createButtonGroup().addRow().addButton('确认', { action: 'confirm' }));
+
+  message.send({ format });
+};
 ```
-Platform 事件 → onProcessor (过滤/去重)
-    → expendSubscribeCreate (创建阶段订阅)
-    → expendMiddleware (中间件链)
-    → expendSubscribeMount (挂载阶段订阅)
-    → expendEvent (路由匹配 → handler 执行)
-    → expendSubscribeUnmount (卸载阶段订阅)
+
+支持文本、图片、按钮组、Markdown、@提及、链接、附件、音视频等消息结构。
+
+## Packages
+
+### Platform Adapters
+
+| Package                                                                  | Description |
+| ------------------------------------------------------------------------ | ----------- |
+| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)     | QQ 机器人   |
+| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)   | Discord     |
+| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)     | OneBot      |
+| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)         | KOOK        |
+| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram) | Telegram    |
+| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)     | Bubble      |
+
+### Extensions
+
+| Package                                                                | Description        |
+| ---------------------------------------------------------------------- | ------------------ |
+| [`@alemonjs/db`](https://www.npmjs.com/package/@alemonjs/db)           | 数据库模块         |
+| [`@alemonjs/process`](https://www.npmjs.com/package/@alemonjs/process) | 桌面端进程通信模块 |
+| [`create-alemonjs`](https://www.npmjs.com/package/create-alemonjs)     | 项目脚手架         |
+
+## Ecosystem
+
+| Project                                                                   | Description            |
+| ------------------------------------------------------------------------- | ---------------------- |
+| [`lvyjs`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/lvyjs) | Node.js 开发与打包工具 |
+| [`jsxp`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/jsxp)   | 截图工具               |
+| [`alemondesk`](https://github.com/lemonade-lab/alemondesk)                | 桌面端项目             |
+| [`alemongo`](https://github.com/lemonade-lab/alemongo)                    | 服务端项目             |
+
+## Monorepo
+
+```text
+packages/      核心包与平台适配器
+packages-ex/   扩展能力
+packages-cl/   脚手架
+frontends/     前端与桌面相关界面
 ```
 
-### 配置系统
+## Contributing
 
-通过 `alemon.config.yaml` 管理，支持命令行参数 > 配置文件 > 默认值的合并优先级
-
-## 📦 平台支持
-
-| Project                | Status                      | Description |
-| ---------------------- | --------------------------- | ----------- |
-| 👉[@alemonjs/qq-bot]   | [![qq-bot-s]][qq-bot-p]     | QQ 机器人   |
-| 👉[@alemonjs/discord]  | [![discord-s]][discord-p]   | Discord     |
-| 👉[@alemonjs/onebot]   | [![onebot-s]][onebot-p]     | OneBot      |
-| 👉[@alemonjs/kook]     | [![kook-s]][kook-p]         | KOOK        |
-| 👉[@alemonjs/telegram] | [![telegram-s]][telegram-p] | Telegram    |
-| 👉[@alemonjs/bubble]   | [![bubble-s]][bubble-p]     | Bubble      |
-
-[@alemonjs/qq-bot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/qq-bot
-[qq-bot-s]: https://img.shields.io/npm/v/@alemonjs/qq-bot.svg
-[qq-bot-p]: https://www.npmjs.com/package/@alemonjs/qq-bot
-[@alemonjs/discord]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/discord
-[discord-s]: https://img.shields.io/npm/v/@alemonjs/discord.svg
-[discord-p]: https://www.npmjs.com/package/@alemonjs/discord
-[@alemonjs/onebot]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/onebot
-[onebot-s]: https://img.shields.io/npm/v/@alemonjs/onebot.svg
-[onebot-p]: https://www.npmjs.com/package/@alemonjs/onebot
-[@alemonjs/kook]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/kook
-[kook-s]: https://img.shields.io/npm/v/@alemonjs/kook.svg
-[kook-p]: https://www.npmjs.com/package/@alemonjs/kook
-[@alemonjs/telegram]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/telegram
-[telegram-s]: https://img.shields.io/npm/v/@alemonjs/telegram.svg
-[telegram-p]: https://www.npmjs.com/package/@alemonjs/telegram
-[@alemonjs/bubble]: https://github.com/lemonade-lab/alemonjs/tree/main/packages/bubble
-[bubble-s]: https://img.shields.io/npm/v/@alemonjs/bubble.svg
-[bubble-p]: https://www.npmjs.com/package/@alemonjs/bubble
-
-## 📦 扩展包
-
-| Package               | Status                    | Description                                       |
-| --------------------- | ------------------------- | ------------------------------------------------- |
-| 👉[@alemonjs/db]      | [![db-s]][db-p]           | 数据库模块（Redis / PostgreSQL / MySQL / SQLite） |
-| 👉[@alemonjs/process] | [![process-s]][process-p] | 桌面端进程通信模块                                |
-| 👉[create-alemonjs]   | [![create-s]][create-p]   | 项目脚手架                                        |
-
-[@alemonjs/db]: https://github.com/lemonade-lab/alemonjs/tree/main/packages-ex/db
-[db-s]: https://img.shields.io/npm/v/@alemonjs/db.svg
-[db-p]: https://www.npmjs.com/package/@alemonjs/db
-[@alemonjs/process]: https://github.com/lemonade-lab/alemonjs/tree/main/packages-ex/process
-[process-s]: https://img.shields.io/npm/v/@alemonjs/process.svg
-[process-p]: https://www.npmjs.com/package/@alemonjs/process
-[create-alemonjs]: https://github.com/lemonade-lab/alemonjs/tree/main/packages-cl/create-alemonjs
-[create-s]: https://img.shields.io/npm/v/create-alemonjs.svg
-[create-p]: https://www.npmjs.com/package/create-alemonjs
-
-## 🌐 生态
-
-| Project        | Description                    |
-| -------------- | ------------------------------ |
-| 👉[lvyjs]      | 开发环境（Node.js 捆绑打包器） |
-| 👉[jsxp]       | 截图工具(Playwright)           |
-| 👉[alemondesk] | 桌面端版本（React + Golang）   |
-| 👉[alemongo]   | 服务端版本（React + Golang）   |
-
-[lvyjs]: https://github.com/lemonade-lab/lvyjs/tree/main/packages/lvyjs
-[jsxp]: https://github.com/lemonade-lab/lvyjs/tree/main/packages/jsxp
-[alemondesk]: https://github.com/lemonade-lab/alemondesk
-[alemongo]: https://github.com/lemonade-lab/alemongo
-
-## 贡献
+欢迎提交 issue、讨论与 PR。
 
 <a href="https://github.com/lemonade-lab/docs/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=lemonade-lab/alemonjs" />
+  <img src="https://contrib.rocks/image?repo=lemonade-lab/alemonjs" alt="contributors" />
 </a>
