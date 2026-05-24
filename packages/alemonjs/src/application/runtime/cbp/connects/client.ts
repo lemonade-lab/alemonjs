@@ -7,6 +7,12 @@ import { setDirectSend } from '../processor/transport.js';
 import { createDirectServer } from '../../../../common/direct-channel.js';
 import { normalizeInboundMessage } from '../../../../common/cbp/normalize.js';
 
+const notifyTransportReady = (transport: 'ipc' | 'direct' | 'ws') => {
+  if (typeof process.send === 'function') {
+    process.send({ type: 'transport_ready', protocolVersion: 'v2', transport });
+  }
+};
+
 /**
  * 通用入站消息处理（直连 / IPC / WS 共用）
  */
@@ -78,6 +84,7 @@ const cbpClientDirect = (sockPath: string, open: () => void) => {
     .then(channel => {
       // 设置直连发送函数（供 sendAction / sendAPI 使用）
       setDirectSend(channel.send);
+      notifyTransportReady('direct');
       open();
 
       logger.debug({
@@ -119,6 +126,7 @@ const cbpClientIPC = (open: () => void) => {
   });
 
   // 就绪回调
+  notifyTransportReady('ipc');
   open();
 
   logger.debug({
@@ -159,7 +167,10 @@ export const cbpClient = (url: string, options: CBPClientOptions = {}) => {
     extraHeaders: {
       [FULL_RECEIVE_HEADER]: isFullReceive ? '1' : '0'
     },
-    onOpen: open,
+    onOpen: () => {
+      notifyTransportReady('ws');
+      open();
+    },
     onMessage: (messageStr: string) => {
       try {
         const parsedMessage = flattedJSON.parse(messageStr);

@@ -15,6 +15,12 @@ import {
   toLegacyApiData
 } from '../common/cbp/normalize.js';
 
+const notifyTransportReady = (transport: 'ipc' | 'direct' | 'ws') => {
+  if (typeof process.send === 'function') {
+    process.send({ type: 'transport_ready', protocolVersion: 'v2', transport });
+  }
+};
+
 const dispatchLegacyActionHandlers = (actionReplys: ActionReplyFunc[], replyAction: (data: Actions, payload: Result[]) => void, input: unknown) => {
   const normalized = normalizeInboundMessage(input);
 
@@ -95,6 +101,7 @@ const cbpPlatformDirect = (sockPath: string, open: () => void) => {
       }
       pendingQueue.length = 0;
 
+      notifyTransportReady('direct');
       open();
 
       logger.debug({
@@ -175,6 +182,7 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
     }
   });
 
+  notifyTransportReady('ipc');
   open();
 
   logger.debug({
@@ -259,7 +267,10 @@ export const cbpPlatform = (
     url: currentURL,
     role: 'platform',
     globalKey: 'chatbotPlatform',
-    onOpen: open,
+    onOpen: () => {
+      notifyTransportReady('ws');
+      open();
+    },
     onMessage: (messageStr: string) => {
       try {
         const data = flattedJSON.parse(messageStr);

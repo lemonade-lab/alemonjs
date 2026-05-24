@@ -14,6 +14,11 @@ type Options = {
 
 export const definePlatform = (options: Options) => {
   const platformName = options.name || process.env.platform || 'unknown';
+
+  if (global.__platform_bootstrap_loaded) {
+    return options.main;
+  }
+
   // 开始注册子进程交互
   const mainProcess = () => {
     ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {

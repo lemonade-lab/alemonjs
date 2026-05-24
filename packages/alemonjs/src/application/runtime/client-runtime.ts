@@ -18,8 +18,9 @@ import { dispatchDisposeAllApps } from './lifecycle-callbacks.js';
 global.__client_loaded = true;
 
 let runtimeDisposed = false;
+let runtimeStarted = false;
 
-const disposeRuntime = async () => {
+export const disposeClientRuntime = async () => {
   if (runtimeDisposed) {
     return;
   }
@@ -31,12 +32,6 @@ const disposeRuntime = async () => {
     scheduleCancelByApp(app.name);
     unregisterAppDir(app.name);
   });
-};
-
-const shutdown = async (reason: string) => {
-  logger.info?.(`[alemonjs][${reason}] 收到信号，正在关闭...`);
-  await disposeRuntime();
-  process.exit(0);
 };
 
 const mainServer = () => {
@@ -65,39 +60,20 @@ const main = () => {
   } else {
     cbpClient(`http://127.0.0.1:${port}`, { isFullReceive });
   }
-
-  loadModels();
 };
 
-const mainProcess = () => {
-  process.on('unhandledRejection', (reason: unknown) => {
-    logger.error('[alemonjs][unhandledRejection] 未捕获的 Promise 拒绝:', reason);
-  });
-  process.on('uncaughtException', (error: Error) => {
-    logger.error('[alemonjs][uncaughtException] 未捕获的异常:', error);
-  });
-  ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
-    process?.on?.(sig, () => void shutdown(sig));
-  });
-  process?.on?.('exit', code => {
-    void disposeRuntime();
-    logger.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
-  });
-  process.on('message', msg => {
-    try {
-      const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
+export const startClientRuntime = async () => {
+  if (runtimeStarted) {
+    return;
+  }
 
-      if (data?.type === 'start') {
-        main();
-        mainServer();
-      } else if (data?.type === 'stop') {
-        void shutdown('stop');
-      }
-    } catch {}
-  });
+  runtimeStarted = true;
+  runtimeDisposed = false;
+  main();
+  mainServer();
+  await loadModels();
+
   if (process.send) {
-    process.send({ type: 'ready' });
+    process.send({ type: 'app_ready', protocolVersion: 'v2' });
   }
 };
-
-mainProcess();

@@ -382,7 +382,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
  * 模块文件
  * @param app
  */
-export const loadChildrenFile = (appName: string) => {
+export const loadChildrenFile = async (appName: string) => {
   if (typeof appName !== 'string') {
     logger.error({
       code: ResultCode.FailParams,
@@ -423,7 +423,7 @@ export const loadChildrenFile = (appName: string) => {
       rootDir: dirname(mainPath),
       mainPath
     });
-    void loadChildren(mainPath, appName);
+    await loadChildren(mainPath, appName);
   } catch (e) {
     const packageDir = resolvePackageDir(appName);
     const fallbackMainPath = packageDir ? resolvePackageEntryFromPackageJson(packageDir) : null;
@@ -437,7 +437,7 @@ export const loadChildrenFile = (appName: string) => {
         rootDir: dirname(fallbackMainPath),
         mainPath: fallbackMainPath
       });
-      void loadChildren(fallbackMainPath, appName);
+      await loadChildren(fallbackMainPath, appName);
 
       return;
     }

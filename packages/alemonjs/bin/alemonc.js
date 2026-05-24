@@ -78,8 +78,7 @@ program
 program
   .command('publish [release]')
   .description('智能发布当前包到 git release 仓库，支持 patch/minor/major 或直接指定版本号')
-  .option('--tag <tag>', 'git 标签通道，默认 stable 为 latest，预发布为 next')
-  .option('--preid <preid>', '预发布标识，默认 beta', 'beta')
+  .option('--preid <preid>', '预发布标识，仅允许 alpha/beta/rc/next', 'beta')
   .option('--branch <branch>', '发布目标分支，默认 release')
   .option('--dry-run', '只执行检查和打包，不真正发布')
   .option('--skip-build', '跳过构建')

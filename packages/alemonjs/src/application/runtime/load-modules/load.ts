@@ -16,17 +16,19 @@ const loadApps = () => {
   // 去重
   const uniqueApps = Array.from(new Set(apps));
 
-  uniqueApps.forEach(app => {
-    registerRuntimeApp({
-      name: app,
-      kind: 'plugin',
-      enabled: true,
-      status: 'discovered',
-      rootDir: '',
-      mainPath: ''
-    });
-    void loadChildrenFile(app);
-  });
+  return Promise.all(
+    uniqueApps.map(async app => {
+      registerRuntimeApp({
+        name: app,
+        kind: 'plugin',
+        enabled: true,
+        status: 'discovered',
+        rootDir: '',
+        mainPath: ''
+      });
+      await loadChildrenFile(app);
+    })
+  );
 };
 
 /**
@@ -34,7 +36,7 @@ const loadApps = () => {
  * @param input
  * @returns
  */
-export const run = (input: string) => {
+export const run = async (input: string) => {
   if (!input) {
     return;
   }
@@ -59,18 +61,15 @@ export const run = (input: string) => {
     mainPath
   });
   // 指定运行的，name识别为 'main:res:xxx'
-  void loadChildren(mainPath, 'main');
+  await loadChildren(mainPath, 'main');
 };
 
 /**
  * 启动模块进程
  */
-export function loadModels() {
+export async function loadModels() {
   const input = process.env.input ?? '';
 
-  // 运行本地模块
-  run(input);
-
-  // load module
-  loadApps();
+  await run(input);
+  await loadApps();
 }

@@ -5,7 +5,9 @@ import os from 'os';
 import { execSync, spawnSync } from 'child_process';
 
 const RELEASE_TYPES = new Set(['patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease']);
-const SEMVER_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
+const PRERELEASE_IDS = new Set(['alpha', 'beta', 'rc', 'next']);
+const SEMVER_RE = /^\d+\.\d+\.\d+(?:-(alpha|beta|rc|next)\.\d+)?$/;
+const TAG_RE = /^v\d+\.\d+\.\d+(?:-(alpha|beta|rc|next)\.\d+)?$/;
 const DEFAULT_PUBLISH_FILES = ['lib', 'package.json', 'README.md'];
 
 function readPackageJson() {
@@ -70,8 +72,21 @@ function ensureCleanGit() {
   }
 }
 
+function normalizeVersionInput(version) {
+  return String(version).trim().replace(/^v/, '');
+}
+
+function validatePreid(preid) {
+  const value = String(preid || 'beta').trim();
+  if (!PRERELEASE_IDS.has(value)) {
+    throw new Error(`非法预发布标识: ${value}，仅允许 alpha、beta、rc、next`);
+  }
+
+  return value;
+}
+
 function parseVersion(version) {
-  const matched = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
+  const matched = normalizeVersionInput(version).match(/^(\d+)\.(\d+)\.(\d+)(?:-((alpha|beta|rc|next)\.(\d+)))?$/);
   if (!matched) {
     throw new Error(`非法版本号: ${version}`);
   }
@@ -80,7 +95,9 @@ function parseVersion(version) {
     major: Number(matched[1]),
     minor: Number(matched[2]),
     patch: Number(matched[3]),
-    prerelease: matched[4] ?? null
+    prerelease: matched[4] ?? null,
+    prereleaseId: matched[5] ?? null,
+    prereleaseNum: matched[6] ? Number(matched[6]) : null
   };
 }
 
@@ -102,6 +119,7 @@ function compareVersions(a, b) {
 
 function incrementVersion(baseVersion, releaseType, preid = 'beta') {
   const parsed = parseVersion(baseVersion);
+  const safePreid = validatePreid(preid);
 
   if (releaseType === 'patch') {
     return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}`;
@@ -116,28 +134,23 @@ function incrementVersion(baseVersion, releaseType, preid = 'beta') {
   }
 
   if (releaseType === 'prepatch') {
-    return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-${preid}.0`;
+    return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-${safePreid}.0`;
   }
 
   if (releaseType === 'preminor') {
-    return `${parsed.major}.${parsed.minor + 1}.0-${preid}.0`;
+    return `${parsed.major}.${parsed.minor + 1}.0-${safePreid}.0`;
   }
 
   if (releaseType === 'premajor') {
-    return `${parsed.major + 1}.0.0-${preid}.0`;
+    return `${parsed.major + 1}.0.0-${safePreid}.0`;
   }
 
   if (releaseType === 'prerelease') {
-    if (parsed.prerelease) {
-      const next = parsed.prerelease.match(/^(.*?)(\d+)$/);
-      if (next) {
-        return `${parsed.major}.${parsed.minor}.${parsed.patch}-${next[1]}${Number(next[2]) + 1}`;
-      }
-
-      return `${parsed.major}.${parsed.minor}.${parsed.patch}-${parsed.prerelease}.1`;
+    if (parsed.prerelease && parsed.prereleaseId === safePreid && parsed.prereleaseNum !== null) {
+      return `${parsed.major}.${parsed.minor}.${parsed.patch}-${safePreid}.${parsed.prereleaseNum + 1}`;
     }
 
-    return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-${preid}.0`;
+    return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-${safePreid}.0`;
   }
 
   throw new Error(`不支持的发布类型: ${releaseType}`);
@@ -161,8 +174,10 @@ function resolveTargetVersion(localVersion, remoteVersion, release, preid) {
     return incrementVersion(base, release, preid);
   }
 
-  if (SEMVER_RE.test(release)) {
-    return release;
+  const normalizedRelease = normalizeVersionInput(release);
+
+  if (SEMVER_RE.test(normalizedRelease)) {
+    return normalizedRelease;
   }
 
   throw new Error(`无法识别的发布参数: ${release}`);
@@ -261,6 +276,22 @@ function ensureGitRepo() {
   }
 }
 
+function getLatestReleaseVersion() {
+  const tags = getCommandOutput('git tag --list --sort=-v:refname');
+  if (!tags) {
+    return '';
+  }
+
+  for (const tag of tags.split('\n')) {
+    const value = tag.trim();
+    if (TAG_RE.test(value)) {
+      return value.slice(1);
+    }
+  }
+
+  return '';
+}
+
 function remoteBranchExists(branch) {
   const result = spawnSync('git', ['ls-remote', '--exit-code', '--heads', 'origin', branch], {
     cwd: process.cwd(),
@@ -317,7 +348,7 @@ export async function publish(release, options = {}) {
 
   const { pkgPath, pkg } = readPackageJson();
   const packageName = pkg.name;
-  const localVersion = String(pkg.version || '').trim();
+  const localVersion = normalizeVersionInput(String(pkg.version || '').trim());
 
   if (!packageName) {
     throw new Error('package.json 缺少 name');
@@ -333,7 +364,7 @@ export async function publish(release, options = {}) {
   ensureGitRepo();
 
   const releaseBranch = options.branch || 'release';
-  const remoteVersion = getCommandOutput(`git tag --list "v*" --sort=-v:refname | head -n 1`).replace(/^v/, '');
+  const remoteVersion = getLatestReleaseVersion();
   if (remoteVersion) {
     console.log(`最新 git tag: v${remoteVersion}`);
   } else {
@@ -344,9 +375,9 @@ export async function publish(release, options = {}) {
     ensureCleanGit();
   }
 
-  const targetVersion = resolveTargetVersion(localVersion, remoteVersion, release, options.preid);
-  const distTag = options.tag || (targetVersion.includes('-') ? 'next' : 'latest');
-  const gitTagName = distTag === 'latest' ? `v${targetVersion}` : `v${targetVersion}-${distTag}`;
+  const preid = validatePreid(options.preid);
+  const targetVersion = resolveTargetVersion(localVersion, remoteVersion, release, preid);
+  const gitTagName = `v${targetVersion}`;
   console.log(`目标版本: ${targetVersion}`);
   console.log(`发布分支: ${releaseBranch}`);
   console.log(`git 标签: ${gitTagName}`);
@@ -383,6 +414,10 @@ export async function publish(release, options = {}) {
     console.log(`发布文件数: ${publishFiles.length}`);
 
     if (options.dryRun) {
+      if (targetVersion !== localVersion) {
+        updateVersion(pkgPath, pkg, localVersion);
+        console.log(`已回滚 package.json 版本到 ${localVersion}`);
+      }
       console.log('dry-run 模式，不会真正推送到 git');
       return;
     }

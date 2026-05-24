@@ -43,6 +43,10 @@ declare global {
    */
   var __client_loaded: boolean | undefined;
   /**
+   * 平台 bootstrap 初始化标记
+   */
+  var __platform_bootstrap_loaded: boolean | undefined;
+  /**
    * 缓存的公网 IP
    */
   var __publicIp: string | undefined;
@@ -144,6 +148,8 @@ declare global {
       platform?: string;
       port?: string;
       input?: string;
+      __ALEMON_PLATFORM_ENTRY?: string;
+      __ALEMON_DIRECT_SOCK?: string;
       NODE_ENV?: 'development' | 'production';
     }
   }

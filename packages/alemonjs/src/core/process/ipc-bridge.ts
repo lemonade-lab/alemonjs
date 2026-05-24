@@ -43,6 +43,11 @@ export const forwardFromPlatform = (data: any) => {
   // 转发到客户端子进程（IPC 极速通道）
   if (clientChild?.connected) {
     clientChild.send({ type: 'ipc:data', data: safeData });
+  } else if (process.env.NODE_ENV === 'development') {
+    logger.debug?.({
+      message: 'skip forwarding platform message before client transport ready',
+      data: null
+    });
   }
 
   // 同时转发到 WebSocket 前端客户端（供 UI 使用）— 无客户端时短路跳过
@@ -72,6 +77,11 @@ export const forwardFromClient = (data: any) => {
 
   if (platformChild?.connected) {
     platformChild.send({ type: 'ipc:data', data: safeData });
+  } else if (process.env.NODE_ENV === 'development') {
+    logger.debug?.({
+      message: 'skip forwarding client message before platform transport ready',
+      data: null
+    });
   }
 
   // sandbox 模式下，将客户端动作转发给 testone 前端

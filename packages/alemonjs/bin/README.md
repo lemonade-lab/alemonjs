@@ -105,17 +105,24 @@ alemonc version update
 ```sh
 alemonc publish
 alemonc publish patch
+alemonc publish prepatch --preid beta
+alemonc publish v1.0.33-rc.0
 alemonc publish --dry-run
 ```
 
 行为说明：
 
 - 默认会查询 git tag 历史作为版本基线
+- 版本格式严格为：
+  - 正式版：`v1.0.33`
+  - 预发布版：`v1.0.33-alpha.0`、`v1.0.33-beta.0`、`v1.0.33-rc.0`、`v1.0.33-next.0`
+- `package.json.version` 保存为不带 `v` 的形式，如 `1.0.33`、`1.0.33-beta.0`
 - 不传参数时：
   - 如果本地版本高于最新 tag，直接发布本地版本
   - 否则自动按最新 tag `patch +1`
 - 传 `patch/minor/major/prepatch/preminor/premajor/prerelease` 时会自动递增
-- 传具体版本号时会直接以该版本发布
+- 传具体版本号时可写 `v1.0.33` 或 `1.0.33`
+- `--preid` 仅允许 `alpha`、`beta`、`rc`、`next`
 - 默认先执行 `npm run build`
 - 默认发布内容是 `lib/`、`package.json`、`README.md`
 - 如果项目配置了 `.npmignore` 或 `package.json.files`，则切换为 npm 文件选择规则
