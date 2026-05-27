@@ -2,7 +2,8 @@
 import fs from 'fs';
 import { join } from 'path';
 import os from 'os';
-import { execSync, spawnSync } from 'child_process';
+import { execSync } from 'child_process';
+import spawn from 'cross-spawn';
 
 const RELEASE_TYPES = new Set(['patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease']);
 const PRERELEASE_IDS = new Set(['alpha', 'beta', 'rc', 'next']);
@@ -24,7 +25,7 @@ function readPackageJson() {
 }
 
 function runCommand(command, args, options = {}) {
-  const result = spawnSync(command, args, {
+  const result = spawn.sync(command, args, {
     cwd: process.cwd(),
     stdio: 'inherit',
     shell: false,
@@ -49,7 +50,7 @@ function getCommandOutput(command) {
 }
 
 function hasCommand(command) {
-  const result = spawnSync(command, ['--version'], {
+  const result = spawn.sync(command, ['--version'], {
     cwd: process.cwd(),
     stdio: 'ignore'
   });
@@ -293,7 +294,7 @@ function getLatestReleaseVersion() {
 }
 
 function remoteBranchExists(branch) {
-  const result = spawnSync('git', ['ls-remote', '--exit-code', '--heads', 'origin', branch], {
+  const result = spawn.sync('git', ['ls-remote', '--exit-code', '--heads', 'origin', branch], {
     cwd: process.cwd(),
     stdio: 'ignore'
   });
@@ -302,7 +303,7 @@ function remoteBranchExists(branch) {
 }
 
 function localBranchExists(branch) {
-  const result = spawnSync('git', ['show-ref', '--verify', '--quiet', `refs/heads/${branch}`], {
+  const result = spawn.sync('git', ['show-ref', '--verify', '--quiet', `refs/heads/${branch}`], {
     cwd: process.cwd(),
     stdio: 'ignore'
   });
@@ -330,7 +331,7 @@ function cleanupWorktree(worktreeDir) {
     return;
   }
 
-  spawnSync('git', ['worktree', 'remove', '--force', worktreeDir], {
+  spawn.sync('git', ['worktree', 'remove', '--force', worktreeDir], {
     cwd: process.cwd(),
     stdio: 'ignore'
   });
@@ -428,7 +429,7 @@ export async function publish(release, options = {}) {
     copyDirContents(publishDir, worktreeDir);
 
     runCommand('git', ['-C', worktreeDir, 'add', '-A']);
-    const hasChanges = spawnSync('git', ['-C', worktreeDir, 'diff', '--cached', '--quiet']).status !== 0;
+    const hasChanges = spawn.sync('git', ['-C', worktreeDir, 'diff', '--cached', '--quiet']).status !== 0;
     if (!hasChanges) {
       console.log('release 分支无文件变化，跳过提交');
     } else {
