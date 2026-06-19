@@ -129,6 +129,33 @@ export const register = (client: QQBotClients) => {
     );
   });
 
+  client.on('GROUP_MEMBER_ADD', event => {
+    const UserId = event.op_member_openid ?? event.member_openid ?? '';
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    cbp.send(
+      FormatEvent.create('member.add')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_openid ?? '', SpaceId: `GROUP:${event.group_openid ?? ''}` })
+        .addChannel({ ChannelId: event.group_openid ?? '' })
+        .addUser({ UserId: UserId, UserKey, UserName: event?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
+        .add({ tag: 'GROUP_MEMBER_ADD' }).value
+    );
+  });
+  client.on('GROUP_MEMBER_REMOVE', event => {
+    const UserId = event.op_member_openid ?? event.member_openid ?? '';
+    const [isMaster, UserKey] = getMaster(UserId);
+
+    cbp.send(
+      FormatEvent.create('member.remove')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: event.group_openid ?? '', SpaceId: `GROUP:${event.group_openid ?? ''}` })
+        .addChannel({ ChannelId: event.group_openid ?? '' })
+        .addUser({ UserId: UserId, UserKey, UserName: event?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: false })
+        .add({ tag: 'GROUP_MEMBER_REMOVE' }).value
+    );
+  });
+
   // 监听消息
   client.on('GROUP_AT_MESSAGE_CREATE', event => {
     if (event?.author?.bot) {

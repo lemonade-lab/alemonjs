@@ -31,18 +31,18 @@
         }
       ],
       "logo": "antd.RobotOutlined",
-      "commond": [
+      "command": [
         {
           "name": "kook",
           "icon": "antd.RobotOutlined",
-          "commond": "open.kook"
+          "command": "open.kook"
         }
       ],
       "sidebars": [
         {
           "name": "kook",
           "icon": "antd.RobotOutlined",
-          "commond": "open.kook"
+          "command": "open.kook"
         }
       ]
     }

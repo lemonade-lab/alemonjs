@@ -12,6 +12,9 @@ import { MESSAGE_AUDIT_REJECT_TYPE } from '../message/group/MESSAGE_AUDIT_REJECT
 import { FRIEND_ADD_TYPE } from '../message/group/FRIEND_ADD';
 import { FRIEND_DEL_TYPE } from '../message/group/FRIEND_DEL';
 import { ERROR_TYPE } from '../message/ERROR';
+import { GROUP_MEMBER_REMOVE } from '../message/group/GROUP_MEMBER_REMOVE';
+import { GROUP_MEMBER_ADD } from '../message/group/GROUP_MEMBER_ADD';
+
 export type QQBotGroupEventMap = {
   C2C_MESSAGE_CREATE: C2C_MESSAGE_CREATE_TYPE;
   C2C_MSG_REJECT: C2C_MSG_REJECT_TYPE;
@@ -27,4 +30,6 @@ export type QQBotGroupEventMap = {
   FRIEND_ADD: FRIEND_ADD_TYPE;
   FRIEND_DEL: FRIEND_DEL_TYPE;
   ERROR: ERROR_TYPE;
+  GROUP_MEMBER_ADD: GROUP_MEMBER_ADD;
+  GROUP_MEMBER_REMOVE: GROUP_MEMBER_REMOVE;
 };
