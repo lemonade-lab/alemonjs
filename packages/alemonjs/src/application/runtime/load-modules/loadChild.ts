@@ -8,6 +8,7 @@ import { registerExpose } from '../../../application/expose.js';
 import { ResultCode } from '../../../common/variable.js';
 import { fileSuffixMiddleware } from '../../../common/variable.js';
 import { scheduleCancelByApp, registerAppDir, unregisterAppDir } from '../schedule-store.js';
+import { validateContextRegistration } from '../../context.js';
 import module from 'module';
 import { clearRuntimeAppKoaRouters, registerRuntimeApp, setRuntimeAppKoaRouters, updateRuntimeAppCapabilities, updateRuntimeAppStatus } from '../store.js';
 import { dispatchAppDispose, dispatchAppReady, dispatchRuntimeStatusChange } from '../lifecycle-callbacks.js';
@@ -219,12 +220,13 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     const registerMounted = async () => {
       const res = await app?.register();
-      const hasEventCapability = Boolean(res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter));
+      validateContextRegistration(res);
+      const hasEventCapability = Boolean(res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter || res?.middlewareContent || res?.responseContent));
       const hasExposeCapability = Boolean(res?.expose);
       const hasKoaRouterCapability = Boolean(res?.koaRouter);
 
       // 注册接口的结果。
-      if (res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter)) {
+      if (res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter || res?.middlewareContent || res?.responseContent)) {
         App.register(res);
       }
 

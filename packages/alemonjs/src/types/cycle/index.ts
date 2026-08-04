@@ -10,7 +10,7 @@ type StroreParam = {
   middleware: StoreMiddlewareItem[];
 };
 
-export type EventErrorPhase = 'middleware' | 'response' | 'subscribe' | 'route';
+export type EventErrorPhase = 'middleware' | 'response' | 'subscribe' | 'route' | 'context' | 'middleware-content' | 'response-content';
 export type EventTraceReason = 'filtered' | 'completed' | 'consumed' | 'error';
 export type RuntimeLifecycleStatus = 'discovered' | 'loading' | 'ready' | 'failed' | 'disposed';
 

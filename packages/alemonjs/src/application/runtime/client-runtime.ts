@@ -14,6 +14,7 @@ import { createServer } from './http-server.js';
 import { disposeAllRuntimeApps } from './store.js';
 import { scheduleCancelByApp, unregisterAppDir } from './schedule-store.js';
 import { dispatchDisposeAllApps } from './lifecycle-callbacks.js';
+import { clearActiveContexts } from './context-registry.js';
 
 global.__client_loaded = true;
 
@@ -26,6 +27,7 @@ export const disposeClientRuntime = async () => {
   }
   runtimeDisposed = true;
   await dispatchDisposeAllApps();
+  clearActiveContexts();
   const apps = disposeAllRuntimeApps();
 
   apps.forEach(app => {

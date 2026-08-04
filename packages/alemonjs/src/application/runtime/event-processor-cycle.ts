@@ -10,6 +10,7 @@ import { expendEvent } from './event-processor-event';
 import { expendMiddleware } from './event-processor-middleware';
 import { expendSubscribeCreate, expendSubscribeMount, expendSubscribeUnmount } from './event-processor-subscribe';
 import { finishCurrentTrace } from './hook-event-context';
+import { expendContext } from '../context';
 
 /**
  * 消息体处理机制
@@ -38,23 +39,41 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
     }
     void expendEvent(valueEvent, select, nextUnMount);
   };
-  // mount
-  const nextMount: Next = (cn, ...cns) => {
+  // response content runs after legacy mount subscriptions and before routes.
+  const nextResponseContent: Next = (cn, ...cns) => {
     if (cn) {
       nextEvent(...cns);
 
       return;
     }
-    void expendSubscribeMount(valueEvent, select, nextEvent);
+    void expendContext(valueEvent, select, nextEvent, 'response');
   };
-  // middleware
-  const nextCreate: Next = (cn, ...cns) => {
+  // mount
+  const nextMount: Next = (cn, ...cns) => {
+    if (cn) {
+      nextResponseContent(...cns);
+
+      return;
+    }
+    void expendSubscribeMount(valueEvent, select, nextResponseContent);
+  };
+  // middleware content runs before middleware routers and middleware files.
+  const nextMiddlewareContent: Next = (cn, ...cns) => {
     if (cn) {
       nextMount(...cns);
 
       return;
     }
-    void expendMiddleware(valueEvent, select, nextMount);
+    void expendContext(valueEvent, select, nextMount, 'middleware');
+  };
+  // middleware
+  const nextCreate: Next = (cn, ...cns) => {
+    if (cn) {
+      nextMiddlewareContent(...cns);
+
+      return;
+    }
+    void expendMiddleware(valueEvent, select, nextMiddlewareContent);
   };
 
   // create

@@ -5,6 +5,8 @@ export { defineMiddleware } from './define-middleware.js';
 export { defineRouter, lazy, runHandler } from './define-router.js';
 export * from './expose.js';
 export * from './hooks/index.js';
+export { createContext, configureContext } from './context.js';
+export type { Context, ContextAction, ContextConfiguration, ContextHandler, ContextPhase } from './context.js';
 export * from './schedule.js';
 export * from './format/message-api.js';
 export * from './format/message-format.js';

@@ -19,6 +19,7 @@ import {
 import { disposeExpose } from '../../application/expose.js';
 import type KoaRouter from 'koa-router';
 import { dispatchRuntimeStatusChange } from './lifecycle-callbacks.js';
+import { clearActiveContextsByApp } from './context-registry.js';
 export { Logger, logger } from '../../common/logger.js';
 
 export type RuntimeAppStatus = 'discovered' | 'loading' | 'ready' | 'failed' | 'disposed';
@@ -219,9 +220,9 @@ export const updateRuntimeAppStatus = (name: string, status: RuntimeAppStatus, e
     status,
     error: normalizedError
       ? {
-          message: normalizedError.message,
-          time: normalizedError.time
-        }
+        message: normalizedError.message,
+        time: normalizedError.time
+      }
       : undefined
   });
 
@@ -304,9 +305,9 @@ export const toRuntimeAppSnapshot = (item: RuntimeAppRecord) => ({
   capabilities: { ...item.capabilities },
   error: item.error
     ? {
-        message: item.error.message,
-        time: item.error.time
-      }
+      message: item.error.message,
+      time: item.error.time
+    }
     : undefined
 });
 
@@ -800,6 +801,8 @@ export class ChildrenApp {
   un() {
     // 清理 expose 注册
     disposeExpose(this.#name);
+    // 清理该应用还未结束的交互上下文
+    clearActiveContextsByApp(this.#name);
     // 清理
     Reflect.deleteProperty(alemonjsCore.storeChildrenApp, this.#name);
     bumpStoreVersion();
