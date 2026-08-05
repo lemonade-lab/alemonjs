@@ -27,6 +27,14 @@
     "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
+    "config": [
+      {
+        "name": "token",
+        "type": "string",
+        "required": true,
+        "description": "token"
+      }
+    ],
     "desktop": {
       "platform": [
         {

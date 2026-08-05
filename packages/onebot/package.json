@@ -30,6 +30,21 @@
     "alemonjs": "^2.1.14"
   },
   "alemonjs": {
+    "config": [
+      {
+        "name": "token",
+        "type": "string",
+        "required": true,
+        "description": "token"
+      },
+      {
+        "name": "url",
+        "type": "string",
+        "required": true,
+        "default": "ws://127.0.0.1:3001",
+        "description": "连接地址"
+      }
+    ],
     "desktop": {
       "platform": [
         {

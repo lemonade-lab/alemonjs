@@ -30,6 +30,14 @@
     "alemonjs": "^2.1.0-alpha.15"
   },
   "alemonjs": {
+    "config": [
+      {
+        "name": "token",
+        "type": "string",
+        "required": true,
+        "description": "token"
+      }
+    ],
     "desktop": {
       "platform": [
         {

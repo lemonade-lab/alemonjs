@@ -39,6 +39,20 @@
     "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
+    "config": [
+      {
+        "name": "app_id",
+        "type": "string",
+        "required": true,
+        "description": "app_id"
+      },
+      {
+        "name": "secret",
+        "type": "string",
+        "required": true,
+        "description": "secret"
+      }
+    ],
     "desktop": {
       "platform": [
         {
