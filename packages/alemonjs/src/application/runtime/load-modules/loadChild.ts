@@ -221,7 +221,9 @@ export const loadChildren = async (mainPath: string, appName: string) => {
     const registerMounted = async () => {
       const res = await app?.register();
       validateContextRegistration(res);
-      const hasEventCapability = Boolean(res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter || res?.middlewareContent || res?.responseContent));
+      const hasEventCapability = Boolean(
+        res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter || res?.middlewareContent || res?.responseContent)
+      );
       const hasExposeCapability = Boolean(res?.expose);
       const hasKoaRouterCapability = Boolean(res?.koaRouter);
 

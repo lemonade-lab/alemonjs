@@ -220,9 +220,9 @@ export const updateRuntimeAppStatus = (name: string, status: RuntimeAppStatus, e
     status,
     error: normalizedError
       ? {
-        message: normalizedError.message,
-        time: normalizedError.time
-      }
+          message: normalizedError.message,
+          time: normalizedError.time
+        }
       : undefined
   });
 
@@ -305,9 +305,9 @@ export const toRuntimeAppSnapshot = (item: RuntimeAppRecord) => ({
   capabilities: { ...item.capabilities },
   error: item.error
     ? {
-      message: item.error.message,
-      time: item.error.time
-    }
+        message: item.error.message,
+        time: item.error.time
+      }
     : undefined
 });
 

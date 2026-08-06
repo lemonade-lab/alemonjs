@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.1.92",
+  "version": "2.1.93",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -49,33 +49,27 @@
   "dependencies": {
     "@koa/cors": "^5.0.0",
     "axios": "^1.14.0",
-    "chalk": "^5.6.2",
     "commander": "^13.1.0",
     "cron": "^4.4.0",
     "cross-spawn": "^7.0.6",
     "file-type": "21.0.0",
     "flatted": "^3.3.3",
+    "https-proxy-agent": "^9.0.0",
     "koa": "^3.0.1",
     "koa-router": "^14.0.0",
-    "koa-static": "^5.0.0",
+    "lodash": "^4.18.1",
     "log4js": "^6.9.1",
     "mime-types": "^3.0.1",
     "public-ip": "^7.0.1",
     "qrcode": "^1.5.4",
-    "uuid": "11.1.0",
     "ws": "^8.18.0",
-    "https-proxy-agent": "^9.0.0",
     "yaml": "^2.5.1"
   },
   "devDependencies": {
     "@types/koa": "^2.15.0",
-    "@types/koa-bodyparser": "^4.3.12",
-    "@types/koa-mount": "^4.0.5",
     "@types/koa-router": "^7.4.8",
-    "@types/koa-static": "^4.0.4",
     "@types/koa__cors": "^5.0.0",
-    "@types/mime-types": "^3.0.1",
-    "@types/uuid": "^10.0.0"
+    "@types/mime-types": "^3.0.1"
   },
   "bin": {
     "alemonjs": "./bin/alemonjs.js",

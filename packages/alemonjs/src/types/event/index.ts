@@ -118,20 +118,20 @@ export type defineMiddlewareFunc = (middleware: ResponseRoute[]) => { current: R
 
 export type childrenCallbackRes =
   | {
-    response?: ReturnType<DefineResponseFunc>;
-    middleware?: ReturnType<defineMiddlewareFunc>;
-    // 完整的路由机制。
-    responseRouter?: ReturnType<DefineRouterFunc>;
-    middlewareRouter?: ReturnType<DefineRouterFunc>;
-    /** 直接注册 Koa Router */
-    koaRouter?: KoaRouter | KoaRouter[];
-    /** expose 协议通信实例 */
-    expose?: Expose;
-    /** 在 responseRouter 前运行的活跃上下文定义。 */
-    responseContent?: ContextConfiguration;
-    /** 在 middlewareRouter 前运行的活跃上下文定义。 */
-    middlewareContent?: ContextConfiguration;
-  }
+      response?: ReturnType<DefineResponseFunc>;
+      middleware?: ReturnType<defineMiddlewareFunc>;
+      // 完整的路由机制。
+      responseRouter?: ReturnType<DefineRouterFunc>;
+      middlewareRouter?: ReturnType<DefineRouterFunc>;
+      /** 直接注册 Koa Router */
+      koaRouter?: KoaRouter | KoaRouter[];
+      /** expose 协议通信实例 */
+      expose?: Expose;
+      /** 在 responseRouter 前运行的活跃上下文定义。 */
+      responseContent?: ContextConfiguration;
+      /** 在 middlewareRouter 前运行的活跃上下文定义。 */
+      middlewareContent?: ContextConfiguration;
+    }
   | undefined;
 
 export type childrenCallback = ChildrenCycle & {

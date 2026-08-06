@@ -33,11 +33,7 @@ export type ContextAction<T = unknown> = {
   close: () => void;
 };
 
-export type ContextHandler<S extends ContextState, T = unknown> = (
-  event: Events[EventKeys],
-  state: S,
-  action: ContextAction<T>
-) => void | Promise<void>;
+export type ContextHandler<S extends ContextState, T = unknown> = (event: Events[EventKeys], state: S, action: ContextAction<T>) => void | Promise<void>;
 
 type ContextConfig<S extends ContextState, R extends Record<string, ContextHandler<S, any>>> = {
   name: string;
@@ -244,8 +240,8 @@ export const createContext = <S extends ContextState, R extends Record<string, C
       }
     ])
   ) as {
-      [K in keyof R]: (payload?: unknown) => void;
-    };
+    [K in keyof R]: (payload?: unknown) => void;
+  };
 
   const context: InternalContext = {
     name: config.name,
@@ -267,7 +263,7 @@ const getRegisteredContexts = (appName: string, phase: ContextPhase): InternalCo
   const register = getChildrenApp(appName)?.register;
   const content = phase === 'middleware' ? register?.middlewareContent : register?.responseContent;
 
-  return content ? (Object.values(content.contexts)) : [];
+  return content ? Object.values(content.contexts) : [];
 };
 
 const getContextPhases = (appName: string, definition: ContextDefinition): ContextPhase[] => {
@@ -283,10 +279,7 @@ const isRegistered = (appName: string, definition: ContextDefinition, phase?: Co
 };
 
 /** Validates phase ownership before an application registration is mounted. */
-export const validateContextRegistration = (register?: {
-  middlewareContent?: ContextConfiguration;
-  responseContent?: ContextConfiguration;
-}) => {
+export const validateContextRegistration = (register?: { middlewareContent?: ContextConfiguration; responseContent?: ContextConfiguration }) => {
   const owners = new Map<ContextDefinition, ContextPhase>();
 
   for (const phase of ['middleware', 'response'] as const) {
@@ -385,9 +378,13 @@ const dispatchContext = <T>(action: ContextDispatchAction<T>, event?: Events[Eve
   };
 
   if (definition.expiresIn) {
-    expirationTimerId = scheduleTimeout(() => {
-      removeActiveContext(key, id);
-    }, definition.expiresIn, appName);
+    expirationTimerId = scheduleTimeout(
+      () => {
+        removeActiveContext(key, id);
+      },
+      definition.expiresIn,
+      appName
+    );
   }
 
   putActiveContext(context);
@@ -476,10 +473,15 @@ export const expendContext = async <T extends EventKeys>(event: Events[T], selec
       };
 
       try {
-        await withEventContext(event, () => control.pass(), () => handler(event, active.state, control), {
-          appName: active.appName,
-          phase: active.phase === 'middleware' ? 'middleware-content' : 'response-content'
-        });
+        await withEventContext(
+          event,
+          () => control.pass(),
+          () => handler(event, active.state, control),
+          {
+            appName: active.appName,
+            phase: active.phase === 'middleware' ? 'middleware-content' : 'response-content'
+          }
+        );
       } catch (error) {
         showErrorModule(error instanceof Error ? error : new Error(typeof error === 'string' ? error : 'Context handler failed'));
 
