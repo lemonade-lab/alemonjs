@@ -11,3 +11,4 @@ log
 *.log
 *.logs
 .nx
+/.npmrc
