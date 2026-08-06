@@ -16,3 +16,6 @@ logs
 node_modules
 lib
 dist
+
+/.nx/cache
+/.nx/workspace-data

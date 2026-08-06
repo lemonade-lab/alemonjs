@@ -1,16 +1,14 @@
 {
-    "targetDefaults": {
-        "build": {
-            "dependsOn": [
-                "^build"
-            ]
-        }
-    },
-    "tasksRunnerOptions": {
-        "default": {
-            "options": {
-                "retry": 1
-            }
-        }
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"]
     }
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "options": {
+        "retry": 1
+      }
+    }
+  }
 }
