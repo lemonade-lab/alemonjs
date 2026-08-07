@@ -877,7 +877,7 @@ export class Router<P extends string = string, E extends string = string> {
     const format = Format.create();
     const routeEntry =
       (result.eventName && result.matchedPath
-        ? this.routes.get(result.eventName)?.one.get(result.matchedPath) ?? this.routes.get(result.eventName)?.two.get(result.matchedPath)
+        ? (this.routes.get(result.eventName)?.one.get(result.matchedPath) ?? this.routes.get(result.eventName)?.two.get(result.matchedPath))
         : undefined) ?? undefined;
     const description = formatRouteDescription(routeEntry?.config.description);
     const schemaHints = buildSchemaHints(routeEntry?.config.schema);
