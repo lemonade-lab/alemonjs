@@ -42,14 +42,16 @@ export interface Options {
 
 // 平台
 export const platform = 'discord';
+export const platformFullName = '@alemonjs/discord';
 
 export const getDiscordConfig = (): Options & {
   [key: string]: any;
 } => {
   const value = getConfigValue() || {};
-  const config = value[platform] || {};
+  const commonValue = value[platform] || {};
+  const bagValue = value[platformFullName] || {};
 
-  return config;
+  return { ...commonValue, ...bagValue } as Options;
 };
 
 export const getMaster = (UserId: string) => {

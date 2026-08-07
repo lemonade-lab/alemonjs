@@ -4,6 +4,12 @@ import { dirname, join } from 'path';
 import { existsSync } from 'fs';
 import { ResultCode } from '../../../common/variable.js';
 import { registerRuntimeApp } from '../store.js';
+import module from 'module';
+
+const initRequire = () => {};
+
+initRequire.resolve = () => '';
+const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
 const loadApps = () => {
   const cfg = getConfig();
@@ -46,7 +52,7 @@ export const run = async (input: string) => {
   if (!existsSync(mainPath)) {
     logger.warn({
       code: ResultCode.Warn,
-      message: '未找到主要入口文件',
+      message: '未找到指定的主应用入口文件，但不影响继续运行',
       data: null
     });
 
@@ -68,8 +74,20 @@ export const run = async (input: string) => {
  * 启动模块进程
  */
 export async function loadModels() {
-  const input = process.env.input ?? '';
+  // 如果为空，则默认读取本地的 package.json 中的 main 字段
+  if (!process.env.input) {
+    const pkgPath = join(process.cwd(), 'package.json');
 
-  await run(input);
+    // 主动读的，要检查 package.json 是否存在 main 字段，如果没有，则不报错，继续运行
+    if (existsSync(pkgPath)) {
+      const pkg = require(pkgPath) ?? {};
+
+      if (pkg?.main) {
+        process.env.input = pkg.main;
+      }
+    }
+  }
+
+  await run(process.env.input ?? '');
   await loadApps();
 }

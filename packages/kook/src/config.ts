@@ -1,5 +1,6 @@
 import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 export const platform = 'kook';
+export const platformFullName = '@alemonjs/kook';
 export type Options = {
   token: string;
   master_key?: string[];
@@ -16,8 +17,10 @@ export type Options = {
 };
 export const getKOOKConfig = (): Options => {
   const value = getConfigValue() || {};
+  const commonValue = value[platform] || {};
+  const bagValue = value[platformFullName] || {};
 
-  return value[platform] || {};
+  return { ...commonValue, ...bagValue } as Options;
 };
 export const getMaster = (UserId: string) => {
   const isMasterUser = isMaster(UserId, platform);

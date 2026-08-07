@@ -1,6 +1,7 @@
 import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 import { Options as sdkOptions } from './sdk/typing';
 export const platform = 'qq-bot';
+export const platformFullName = '@alemonjs/qq-bot';
 
 export type Options = {
   /**
@@ -30,8 +31,10 @@ export type Options = {
 
 export const getQQBotConfig = (): Options => {
   const value = getConfigValue() || {};
+  const commonValue = value[platform] || {};
+  const bagValue = value[platformFullName] || {};
 
-  return value[platform] || {};
+  return { ...commonValue, ...bagValue } as Options;
 };
 export const getIdentity = (UserId: string) => {
   const isMasterUser = UserId ? isMaster(UserId, platform) : false;

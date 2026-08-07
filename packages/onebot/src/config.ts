@@ -1,5 +1,6 @@
 import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 export const platform = 'onebot';
+export const platformFullName = '@alemonjs/onebot';
 
 export type Options = {
   url: string;
@@ -20,8 +21,10 @@ export type Options = {
 };
 export const getOneBotConfig = (): Options => {
   const value = getConfigValue() || {};
+  const commonValue = value[platform] || {};
+  const bagValue = value[platformFullName] || {};
 
-  return value[platform] || {};
+  return { ...commonValue, ...bagValue } as Options;
 };
 
 export const getMaster = (UserId: string) => {

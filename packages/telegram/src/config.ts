@@ -1,5 +1,6 @@
 import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 export const platform = 'telegram';
+export const platformFullName = '@alemonjs/telegram';
 export type Options = {
   token: string;
   base_api_url?: string;
@@ -19,8 +20,10 @@ export type Options = {
 };
 export const getTGConfig = (): Options => {
   const value = getConfigValue() || {};
+  const commonValue = value[platform] || {};
+  const bagValue = value[platformFullName] || {};
 
-  return value[platform] || {};
+  return { ...commonValue, ...bagValue } as Options;
 };
 export const getMaster = (UserId: string) => {
   const isMasterUser = isMaster(UserId, platform);

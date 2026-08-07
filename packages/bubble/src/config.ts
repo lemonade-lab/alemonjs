@@ -2,6 +2,8 @@ import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 import { BUBBLEOptions } from './sdk/wss.types';
 import { GATEWAY_URL, API_URL, CDN_URL } from './sdk/api.js';
 
+export const platformFullName = '@alemonjs/bubble';
+
 export type Options = BUBBLEOptions & {
   /**
    * 主人钥匙
@@ -53,7 +55,10 @@ export const getBubbleConfig = (): Options & {
   [key: string]: any;
 } => {
   const value = getConfigValue() || {};
-  const config = value[platform] || {};
+  const commonValue = value[platform] || {};
+  const bagValue = value[platformFullName] || {};
+
+  const config = { ...commonValue, ...bagValue } as Options;
 
   // 如果没有提供 URL，使用配置中的 GATEWAY_URL 或默认值
   if (!config.URL && !config.GATEWAY_URL) {
