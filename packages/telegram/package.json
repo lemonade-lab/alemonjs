@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/telegram",
-  "version": "2.1.13",
+  "version": "2.1.14",
   "description": "telegram platform connection",
   "author": "lemonade",
   "license": "MIT",
@@ -27,12 +27,33 @@
     "./desktop": "./lib/desktop.js"
   },
   "alemonjs": {
+    "config-source": {
+      "readme": "https://github.com/lemonade-lab/alemonjs/blob/main/packages/telegram/README.md",
+      "official": "https://core.telegram.org/bots/api",
+      "platform": "https://t.me/BotFather"
+    },
     "config": [
       {
         "name": "token",
         "type": "string",
         "required": true,
         "description": "token"
+      },
+      {
+        "name": "proxy",
+        "type": "string",
+        "required": false,
+        "rules": [
+          {
+            "pattern": "^http://|^https://",
+            "message": "proxy必须以http://或https://开头"
+          },
+          {
+            "pattern": "^(http|https)://[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$",
+            "message": "proxy格式不正确"
+          }
+        ],
+        "description": "proxy"
       }
     ],
     "desktop": {

@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/bubble",
-  "version": "2.1.12",
+  "version": "2.1.13",
   "description": "bubble platform",
   "author": "lemonade",
   "license": "MIT",
@@ -30,6 +30,9 @@
     "alemonjs": "^2.1.0-alpha.15"
   },
   "alemonjs": {
+    "config-source": {
+      "readme": "https://github.com/lemonade-lab/alemonjs/blob/main/packages/bubble/README.md"
+    },
     "config": [
       {
         "name": "token",

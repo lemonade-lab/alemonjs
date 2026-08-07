@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "2.1.28",
+  "version": "2.1.29",
   "description": "阿柠檬qq-bot平台连接",
   "author": "lemonade",
   "license": "MIT",
@@ -52,6 +52,11 @@
         "description": "secret"
       }
     ],
+    "config-source": {
+      "readme": "https://github.com/lemonade-lab/alemonjs/blob/main/packages/qq-bot/README.md",
+      "official": "https://bot.q.qq.com/wiki/develop/api-v2/",
+      "platform": "https://q.qq.com/"
+    },
     "desktop": {
       "platform": [
         {
