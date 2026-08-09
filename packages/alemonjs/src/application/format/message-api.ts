@@ -49,7 +49,7 @@ export class MessageDirect {
    * 发送到频道
    * @param params
    */
-  async sendToChannel(params: { SpaceId: string; format: Format | DataEnums[]; replyId?: string }) {
+  async sendToChannel(params: { SpaceId: string; format: Format | DataEnums[]; replyId?: string; BotId?: string }) {
     if (!params.SpaceId || typeof params.SpaceId !== 'string') {
       logger.error({
         code: ResultCode.FailParams,
@@ -66,6 +66,7 @@ export class MessageDirect {
         action: 'message.send.channel',
         payload: {
           ChannelId: params.SpaceId,
+          BotId: params.BotId,
           params: {
             format: Array.isArray(params.format) ? params.format : params.format.value,
             replyId: params?.replyId
@@ -86,7 +87,7 @@ export class MessageDirect {
    * 私信
    * @param params
    */
-  async sendToUser(params: { OpenID: string; format: Format | DataEnums[] }) {
+  async sendToUser(params: { OpenID: string; format: Format | DataEnums[]; BotId?: string }) {
     if (!params.OpenID || typeof params.OpenID !== 'string') {
       logger.error({
         code: ResultCode.FailParams,
@@ -103,8 +104,45 @@ export class MessageDirect {
         action: 'message.send.user',
         payload: {
           UserId: params.OpenID,
+          BotId: params.BotId,
           params: {
             format: Array.isArray(params.format) ? params.format : params.format.value
+          }
+        }
+      });
+
+      recordEventSendResults(results, undefined);
+
+      return results;
+    } catch (error) {
+      markEventSendFailure(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send to an explicitly scoped destination. Prefer this for group/C2C
+   * platforms where the destination identifier is not a channel or user ID.
+   */
+  async sendToTarget(params: {
+    target: { scope: 'group' | 'c2c' | 'channel' | 'direct'; targetId: string; BotId?: string };
+    format: Format | DataEnums[];
+    replyId?: string;
+  }) {
+    if (!params.target?.targetId) {
+      throw new Error('Invalid targetId: targetId must be a non-empty string');
+    }
+
+    markEventSendAttempt();
+
+    try {
+      const results = await sendAction({
+        action: 'message.send.target',
+        payload: {
+          target: params.target,
+          params: {
+            format: Array.isArray(params.format) ? params.format : params.format.value,
+            replyId: params.replyId
           }
         }
       });

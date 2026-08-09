@@ -2,6 +2,13 @@
  * 群消息事件 AT 事件
  */
 export interface GROUP_AT_MESSAGE_CREATE_TYPE {
+  attachments?: {
+    id?: string;
+    url?: string;
+    content_type?: string;
+    filename?: string;
+    size?: number;
+  }[];
   author: {
     bot?: boolean;
     id: string;

@@ -3,6 +3,7 @@ import { Message, MessageText, MessageMedia, MessageOpen } from './base/message'
 import { Platform } from './base/platform';
 import { User } from './base/user';
 import { AutoFields } from './base/auto';
+import { Interaction } from './base/interaction';
 import { EventKeys, Events } from './map';
 
 /**
@@ -17,6 +18,7 @@ export type ReservedEventKeys =
   | keyof MessageMedia
   | keyof MessageOpen
   | keyof Platform
+  | keyof Interaction
   | keyof AutoFields
   | 'name'
   | 'Timestamp';
@@ -36,6 +38,8 @@ type TextMethods<T extends EventKeys> = Events[T] extends MessageText ? { addTex
 type MediaMethods<T extends EventKeys> = Events[T] extends MessageMedia ? { addMedia(params: MessageMedia): EventBuilder<T> } : Record<string, never>;
 
 type OpenMethods<T extends EventKeys> = Events[T] extends MessageOpen ? { addOpen(params: MessageOpen): EventBuilder<T> } : Record<string, never>;
+
+type InteractionMethods<T extends EventKeys> = Events[T] extends Interaction ? { addInteraction(params: Interaction): EventBuilder<T> } : Record<string, never>;
 
 /**
  * 事件构建器类型：根据事件名 T 只暴露该事件实际包含的字段方法
@@ -75,4 +79,5 @@ export type EventBuilder<T extends EventKeys> = {
   MessageMethods<T> &
   TextMethods<T> &
   MediaMethods<T> &
-  OpenMethods<T>;
+  OpenMethods<T> &
+  InteractionMethods<T>;

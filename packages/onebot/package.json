@@ -1,13 +1,14 @@
 {
   "name": "@alemonjs/onebot",
-  "version": "2.1.20",
-  "description": "oneBot v11",
+  "version": "2.1.21",
+  "description": "OneBot v11（默认）/ v12（实验性 WebSocket）",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "scripts": {
-    "build": "lvy build"
+    "build": "lvy build",
+    "test:ws": "yarn build && node tests/ws.integration.mjs"
   },
   "types": "lib",
   "exports": {
@@ -35,6 +36,19 @@
     },
     "config": [
       {
+        "name": "version",
+        "type": "number",
+        "required": false,
+        "default": 11,
+        "rules": [
+          {
+            "pattern": "^(11|12)$",
+            "message": "OneBot 版本必须为 11 或 12"
+          }
+        ],
+        "description": "OneBot 协议版本；12 为实验性候选标准，仅支持 WebSocket"
+      },
+      {
         "name": "url",
         "type": "string",
         "required": true,
@@ -56,6 +70,18 @@
         "type": "string",
         "required": false,
         "description": "token"
+      },
+      {
+        "name": "default_bot",
+        "type": "string",
+        "required": false,
+        "rules": [
+          {
+            "pattern": "^[^:\\s]+:[^:\\s]+$",
+            "message": "默认 Bot 必须为 <platform>:<user_id>，例如 qq:123456"
+          }
+        ],
+        "description": "v12 多 Bot 主动发送的默认 Bot"
       },
       {
         "name": "reverse_enable",

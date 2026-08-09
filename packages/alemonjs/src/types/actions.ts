@@ -1,10 +1,22 @@
 import { DataEnums } from './message';
 import { PaginationParams } from './standard';
+import { ConnectionStatus } from './connection';
+
+/** Platform-neutral destination. IDs are opaque platform identifiers. */
+export type ActionTargetScope = 'group' | 'c2c' | 'channel' | 'direct';
+
+export type ActionTarget = {
+  scope: ActionTargetScope;
+  targetId: string;
+  /** Selects a specific bot when a platform has multiple bot accounts. */
+  BotId?: string;
+};
 
 export type MessageActionName =
   | 'message.send'
   | 'message.send.channel'
   | 'message.send.user'
+  | 'message.send.target'
   | 'message.delete'
   | 'message.edit'
   | 'message.pin'
@@ -44,7 +56,11 @@ export type RequestActionName = 'request.friend' | 'request.guild';
 
 export type UserActionName = 'user.info';
 
-export type MediaActionName = 'media.upload' | 'media.send.channel' | 'media.send.user';
+export type MediaActionName = 'media.upload' | 'media.send.channel' | 'media.send.user' | 'media.send';
+
+export type InteractionActionName = 'interaction.ack';
+
+export type ConnectionActionName = 'connection.status';
 
 export type HistoryActionName = 'history.list';
 
@@ -63,6 +79,8 @@ export type StandardActionName =
   | RequestActionName
   | UserActionName
   | MediaActionName
+  | InteractionActionName
+  | ConnectionActionName
   | HistoryActionName
   | PermissionActionName;
 
@@ -88,6 +106,7 @@ export type ActionMessageSendChannel = {
   payload: {
     // 频道ID
     ChannelId: string;
+    BotId?: string;
     // 参数
     params: {
       format?: DataEnums[];
@@ -102,9 +121,22 @@ export type ActionMessageSendUser = {
   payload: {
     // 用户ID
     UserId: string;
+    BotId?: string;
     // 参数
     params: {
       format?: DataEnums[];
+    };
+  };
+};
+
+/** Preferred proactive send API. Unlike legacy channel/user actions it preserves the target scope. */
+export type ActionMessageSendTarget = {
+  action: 'message.send.target';
+  payload: {
+    target: ActionTarget;
+    params: {
+      format?: DataEnums[];
+      replyId?: string;
     };
   };
 };
@@ -127,8 +159,30 @@ export type ActionMessageDelete = {
     MessageId: string;
     // 频道ID（部分平台需要）
     ChannelId?: string;
+    /** Preferred target routing for group/C2C/direct messages. */
+    target?: ActionTarget;
     // 事件
     event?: any;
+  };
+};
+
+export type ActionInteractionAck = {
+  action: 'interaction.ack';
+  payload: {
+    InteractionId: string;
+    /** Derive this from the source interaction whenever possible. */
+    target?: ActionTarget;
+    params?: {
+      /** Platform-defined acknowledgement result, usually 0 for success. */
+      code?: number;
+    };
+  };
+};
+
+export type ActionConnectionStatus = {
+  action: 'connection.status';
+  payload: {
+    BotId?: string;
   };
 };
 
@@ -582,18 +636,27 @@ export type ActionUserInfo = {
 
 // ─── 媒体 ───
 
+export type ActionMediaParams = {
+  /** 媒体类型：image | audio | video | file */
+  type: 'image' | 'audio' | 'video' | 'file';
+  /** One of URL, base64 data, or a platform-prepared file identifier. */
+  url?: string;
+  data?: string;
+  /** A path readable by the platform process; preferred for large files. */
+  filePath?: string;
+  fileId?: string;
+  /** 文件名 */
+  name?: string;
+  /** Optional accompanying text when the platform supports it. */
+  content?: string;
+};
+
 export type ActionMediaUpload = {
   action: 'media.upload';
   payload: {
-    params: {
-      /** 媒体类型：image | audio | video | file */
-      type: 'image' | 'audio' | 'video' | 'file';
-      /** 文件 URL 或 base64 数据 */
-      url?: string;
-      data?: string;
-      /** 文件名 */
-      name?: string;
-    };
+    /** Required by platforms, such as QQ, whose media upload is target-scoped. */
+    target?: ActionTarget;
+    params: ActionMediaParams;
   };
 };
 
@@ -601,12 +664,8 @@ export type ActionMediaSendChannel = {
   action: 'media.send.channel';
   payload: {
     ChannelId: string;
-    params: {
-      type: 'image' | 'audio' | 'video' | 'file';
-      url?: string;
-      data?: string;
-      name?: string;
-    };
+    BotId?: string;
+    params: ActionMediaParams;
   };
 };
 
@@ -614,12 +673,16 @@ export type ActionMediaSendUser = {
   action: 'media.send.user';
   payload: {
     UserId: string;
-    params: {
-      type: 'image' | 'audio' | 'video' | 'file';
-      url?: string;
-      data?: string;
-      name?: string;
-    };
+    BotId?: string;
+    params: ActionMediaParams;
+  };
+};
+
+export type ActionMediaSend = {
+  action: 'media.send';
+  payload: {
+    target: ActionTarget;
+    params: ActionMediaParams;
   };
 };
 
@@ -714,7 +777,10 @@ export type Actions = // 消息
     | ActionMessageSend
     | ActionMessageSendChannel
     | ActionMessageSendUser
+    | ActionMessageSendTarget
     | ActionMessageDelete
+    | ActionInteractionAck
+    | ActionConnectionStatus
     | ActionMessageEdit
     | ActionMessagePin
     | ActionMessageUnpin
@@ -777,6 +843,7 @@ export type Actions = // 消息
     | ActionMediaUpload
     | ActionMediaSendChannel
     | ActionMediaSendUser
+    | ActionMediaSend
     // 消息历史
     | ActionHistoryList
     // 权限

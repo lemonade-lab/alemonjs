@@ -30,6 +30,20 @@ qq-bot:
 
 > 4、域名代理模式
 
+### 多 Bot（WebSocket）
+
+`bots` 的键是稳定 BotId/AppId。配置多个 Bot 时，主动操作需提供 `BotId`，或设置 `default_bot`；事件回复会自动使用事件所属 Bot。Webhook 不支持该配置。
+
+```yaml
+qq-bot:
+  default_bot: 'app-a'
+  bots:
+    app-a:
+      secret: 'secret-a'
+    app-b:
+      secret: 'secret-b'
+```
+
 ```sh
 qq-bot:
   # 频道沙盒，默认false

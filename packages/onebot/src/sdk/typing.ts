@@ -33,4 +33,17 @@ export type OneBotEventMap = {
   NOTICE_GROUP_ADMIN: NOTICE_GROUP_ADMIN_TYPE;
   NOTICE_NOTIFY: NOTICE_NOTIFY_TYPE;
   NOTICE_FRIEND_ADD: NOTICE_FRIEND_ADD_TYPE;
+  /** Raw OneBot 12 event. Platform extensions stay in this raw payload. */
+  V12_EVENT: OneBotV12Event;
+};
+
+export type OneBotV12Self = { platform: string; user_id: string };
+export type OneBotV12Event = {
+  id?: string;
+  time?: number;
+  type: string;
+  detail_type?: string;
+  sub_type?: string;
+  self?: OneBotV12Self;
+  [key: string]: any;
 };

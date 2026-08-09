@@ -10,8 +10,11 @@ export default function WebsoketForm() {
     mode: 'group',
     sandbox: false,
     markdownToText: false,
-    hideUnsupported: ''
+    hideUnsupported: '',
+    default_bot: '',
+    bots_json: ''
   });
+  const [connectionStatus, setConnectionStatus] = useState<any>();
 
   useEffect(() => {
     if (!window.createDesktopAPI) return;
@@ -22,6 +25,7 @@ export default function WebsoketForm() {
     API.postMessage({
       type: 'qq-bot.init'
     });
+    API.postMessage({ type: 'qq-bot.status' });
     API.onMessage(data => {
       if (data.type === 'qq-bot.init') {
         const db = data.data;
@@ -33,13 +37,19 @@ export default function WebsoketForm() {
           sandbox: db.sandbox || false,
           master_key: Array.isArray(db?.master_key) ? db.master_key.join(',') : '',
           markdownToText: db.markdownToText || false,
-          hideUnsupported: db?.hideUnsupported ?? ''
+          hideUnsupported: db?.hideUnsupported ?? '',
+          default_bot: db.default_bot || '',
+          bots_json: db.bots ? JSON.stringify(db.bots, null, 2) : ''
         });
+      } else if (data.type === 'qq-bot.status') {
+        setConnectionStatus(data.data);
       }
     });
+    const timer = setInterval(() => API.postMessage({ type: 'qq-bot.status' }), 5_000);
+    return () => clearInterval(timer);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData({
       ...formData,
@@ -49,9 +59,16 @@ export default function WebsoketForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    let bots: Record<string, unknown> | undefined;
+    try {
+      bots = formData.bots_json.trim() ? JSON.parse(formData.bots_json) : undefined;
+    } catch {
+      window.alert('Bots JSON 格式无效');
+      return;
+    }
     window.API.postMessage({
       type: 'qq-bot.form.save',
-      data: formData
+      data: { ...formData, bots, bots_json: undefined }
     });
   };
 
@@ -89,6 +106,27 @@ export default function WebsoketForm() {
           onChange={handleChange}
           className='mt-1 block w-full p-2 border  rounded-md focus:outline-none focus:ring '
         />
+      </div>
+      <div>
+        <label className='block text-sm font-medium '>Default Bot（多 Bot 主动发送必填）</label>
+        <Input type='text' name='default_bot' value={formData.default_bot} onChange={handleChange} className='mt-1 block w-full p-2 border rounded-md' />
+      </div>
+      <div>
+        <label className='block text-sm font-medium '>Bots JSON（键必须等于 App ID，仅 WebSocket）</label>
+        <textarea
+          name='bots_json'
+          value={formData.bots_json}
+          onChange={handleChange}
+          rows={7}
+          className='mt-1 block w-full p-2 border rounded-md font-mono text-xs'
+          placeholder={'{\n  "app_id": { "secret": "..." }\n}'}
+        />
+      </div>
+      <div>
+        <label className='block text-sm font-medium '>连接状态</label>
+        <pre className='mt-1 max-h-40 overflow-auto rounded-md border p-2 text-xs'>
+          {JSON.stringify(connectionStatus ?? { state: 'stopped', bots: [] }, null, 2)}
+        </pre>
       </div>
       <div>
         <label className='block text-sm font-medium '>Master Key</label>

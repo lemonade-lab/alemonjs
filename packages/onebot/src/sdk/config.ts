@@ -13,3 +13,16 @@ export const generateUniqueId = () => {
 };
 // 超时时间
 export const timeoutTime = 1000 * 12; // 12秒
+
+/** Reject every in-flight action when a transport can no longer deliver it. */
+export const rejectPendingActions = (reason: Error) => {
+  for (const [id, { reject }] of actionResolves) {
+    const timeout = actionTimeouts.get(id);
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    reject(reason);
+  }
+  actionResolves.clear();
+  actionTimeouts.clear();
+};

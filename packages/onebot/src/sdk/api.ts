@@ -1,6 +1,19 @@
 import WebSocket from 'ws';
 import { actionResolves, actionTimeouts, generateUniqueId, timeoutTime } from './config';
 
+export type OneBotConnectionState = 'idle' | 'connecting' | 'ready' | 'offline' | 'failed';
+export type OneBotTransport = 'forward_ws' | 'reverse_ws' | null;
+export type OneBotBotStatus = { id: string; platform: string; userId: string; online: boolean };
+export type OneBotConnectionStatus = {
+  requestedVersion: 11 | 12;
+  activeVersion: 11 | 12 | null;
+  fallback: boolean;
+  fallbackReason?: string;
+  state: OneBotConnectionState;
+  transport: OneBotTransport;
+  bots: OneBotBotStatus[];
+};
+
 /**
  *
  * @param ws
@@ -16,13 +29,28 @@ const send = (
 ): Promise<any> => {
   const id = generateUniqueId();
 
-  // 设置唯一标识符
-  data.echo = id;
-
   return new Promise((resolve, reject) => {
+    if (ws.readyState !== WebSocket.OPEN) {
+      reject(new Error('[OneBot] WebSocket 未连接，动作无法发送'));
+      return;
+    }
+    // 设置唯一标识符
+    data.echo = id;
     actionResolves.set(id, { resolve, reject });
-    // 发送消息
-    ws.send(JSON.stringify(data));
+    try {
+      ws.send(JSON.stringify(data), error => {
+        if (!error) return;
+        const timeout = actionTimeouts.get(id);
+        if (timeout) clearTimeout(timeout);
+        actionTimeouts.delete(id);
+        actionResolves.delete(id);
+        reject(error);
+      });
+    } catch (error) {
+      actionResolves.delete(id);
+      reject(error);
+      return;
+    }
     // 30 秒后超时
     const timeout = setTimeout(() => {
       // 被清理了
@@ -69,6 +97,31 @@ export const consume = (parsedMessage: any) => {
 export class OneBotAPI {
   __ws: WebSocket | null = null;
 
+  #connectionStatus: OneBotConnectionStatus = {
+    requestedVersion: 11,
+    activeVersion: null,
+    fallback: false,
+    state: 'idle',
+    transport: null,
+    bots: []
+  };
+
+  /** Read-only snapshot suitable for useClient<API>() and desktop diagnostics. */
+  getConnectionStatus(): OneBotConnectionStatus {
+    return {
+      ...this.#connectionStatus,
+      bots: this.#connectionStatus.bots.map(bot => ({ ...bot }))
+    };
+  }
+
+  protected updateConnectionStatus(patch: Partial<OneBotConnectionStatus>) {
+    this.#connectionStatus = {
+      ...this.#connectionStatus,
+      ...patch,
+      bots: patch.bots ?? this.#connectionStatus.bots
+    };
+  }
+
   /**
    * 发送任意请求
    * @param options
@@ -76,7 +129,7 @@ export class OneBotAPI {
    */
   send(options: { [key: string]: any }) {
     if (!this.__ws) {
-      return;
+      return Promise.reject(new Error('[OneBot] WebSocket 未连接'));
     }
 
     return send(this.__ws, options);
@@ -87,7 +140,7 @@ export class OneBotAPI {
    * @param options
    * @returns
    */
-  sendPrivateMessage(options: { user_id: number; message: any[] }) {
+  sendPrivateMessage(options: { user_id: string | number; message: any[] }) {
     if (!this.__ws) {
       return;
     }
@@ -103,7 +156,7 @@ export class OneBotAPI {
    * @param options
    * @returns
    */
-  sendGroupMessage(options: { group_id: number; message: any[] }) {
+  sendGroupMessage(options: { group_id: string | number; message: any[] }) {
     if (!this.__ws) {
       return;
     }
@@ -131,7 +184,7 @@ export class OneBotAPI {
   }
 
   /** 撤回消息 */
-  deleteMsg(options: { message_id: number }) {
+  deleteMsg(options: { message_id: string | number }) {
     if (!this.__ws) {
       return;
     }
@@ -146,7 +199,7 @@ export class OneBotAPI {
    * @param options
    * @returns
    */
-  getMsg(options: { message_id: number }) {
+  getMsg(options: { message_id: string | number }) {
     if (!this.__ws) {
       return;
     }
@@ -177,7 +230,7 @@ export class OneBotAPI {
    * @param options
    * @returns
    */
-  sendLike(options: { user_id: number; times?: number }) {
+  sendLike(options: { user_id: string | number; times?: number }) {
     if (!this.__ws) {
       return;
     }
@@ -189,7 +242,7 @@ export class OneBotAPI {
   }
 
   // 群组踢人
-  setGroupKick(options: { group_id: number; user_id: number; reject_add_request?: boolean }) {
+  setGroupKick(options: { group_id: string | number; user_id: string | number; reject_add_request?: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -201,7 +254,7 @@ export class OneBotAPI {
   }
 
   // 群组单人禁言
-  setGroupBan(options: { group_id: number; user_id: number; duration: number }) {
+  setGroupBan(options: { group_id: string | number; user_id: string | number; duration: number }) {
     if (!this.__ws) {
       return;
     }
@@ -213,7 +266,7 @@ export class OneBotAPI {
   }
 
   // 群组匿名用户禁言
-  setGroupAnonymousBan(options: { group_id: number; anonymous: { id: string; name: string }; duration: number }) {
+  setGroupAnonymousBan(options: { group_id: string | number; anonymous: { id: string; name: string }; duration: number }) {
     if (!this.__ws) {
       return;
     }
@@ -225,7 +278,7 @@ export class OneBotAPI {
   }
 
   // 群组全员禁言
-  setGroupWholeBan(options: { group_id: number; enable: boolean }) {
+  setGroupWholeBan(options: { group_id: string | number; enable: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -237,7 +290,7 @@ export class OneBotAPI {
   }
 
   // 群组设置管理员
-  setGroupAdmin(options: { group_id: number; user_id: number; enable: boolean }) {
+  setGroupAdmin(options: { group_id: string | number; user_id: string | number; enable: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -249,7 +302,7 @@ export class OneBotAPI {
   }
 
   // 群组匿名
-  setGroupAnonymous(options: { group_id: number; enable: boolean }) {
+  setGroupAnonymous(options: { group_id: string | number; enable: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -261,7 +314,7 @@ export class OneBotAPI {
   }
 
   // 设置群名片（群备注）
-  setGroupCard(options: { group_id: number; user_id: number; card: string }) {
+  setGroupCard(options: { group_id: string | number; user_id: string | number; card: string }) {
     if (!this.__ws) {
       return;
     }
@@ -273,7 +326,7 @@ export class OneBotAPI {
   }
 
   // 设置群名
-  setGroupName(options: { group_id: number; group_name: string }) {
+  setGroupName(options: { group_id: string | number; group_name: string }) {
     if (!this.__ws) {
       return;
     }
@@ -285,7 +338,7 @@ export class OneBotAPI {
   }
 
   // 退出群组
-  setGroupLeave(options: { group_id: number; is_dismiss?: boolean }) {
+  setGroupLeave(options: { group_id: string | number; is_dismiss?: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -297,7 +350,7 @@ export class OneBotAPI {
   }
 
   // 设置群组专属头
-  setGroupSpecialTitle(options: { group_id: number; user_id: number; special_title: string; duration: number }) {
+  setGroupSpecialTitle(options: { group_id: string | number; user_id: string | number; special_title: string; duration: number }) {
     if (!this.__ws) {
       return;
     }
@@ -353,7 +406,7 @@ export class OneBotAPI {
   }
 
   // get_stranger_info
-  getStrangerInfo(options: { user_id: number; no_cache?: boolean }) {
+  getStrangerInfo(options: { user_id: string | number; no_cache?: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -381,7 +434,7 @@ export class OneBotAPI {
   /**
    * 获取群信息
    */
-  getGroupInfo(params?: { group_id: number; no_cache?: boolean }) {
+  getGroupInfo(params?: { group_id: string | number; no_cache?: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -407,7 +460,7 @@ export class OneBotAPI {
   }
 
   // 获取群成员信息
-  getGroupMemberInfo(options: { group_id: number; user_id: number; no_cache?: boolean }) {
+  getGroupMemberInfo(options: { group_id: string | number; user_id: string | number; no_cache?: boolean }) {
     if (!this.__ws) {
       return;
     }
@@ -423,7 +476,7 @@ export class OneBotAPI {
    * @param options
    * @returns
    */
-  getGroupMemberList(options: { group_id: number }) {
+  getGroupMemberList(options: { group_id: string | number }) {
     if (!this.__ws) {
       return;
     }
@@ -435,7 +488,7 @@ export class OneBotAPI {
   }
 
   // 获取群荣誉信息
-  getGroupHonorInfo(options: { group_id: number; type: 'talkative' | 'performer' | 'legend' | 'strong_newbie' }) {
+  getGroupHonorInfo(options: { group_id: string | number; type: 'talkative' | 'performer' | 'legend' | 'strong_newbie' }) {
     if (!this.__ws) {
       return;
     }
@@ -578,7 +631,7 @@ export class OneBotAPI {
   }
 
   /** 上传私聊文件 */
-  uploadPrivateFile(options: { user_id: number; file: string; name?: string }) {
+  uploadPrivateFile(options: { user_id: string | number; file: string; name?: string }) {
     if (!this.__ws) {
       return;
     }
@@ -590,7 +643,7 @@ export class OneBotAPI {
   }
 
   /** 上传群文件 */
-  uploadGroupFile(options: { group_id: number; file: string; name?: string; folder?: string }) {
+  uploadGroupFile(options: { group_id: string | number; file: string; name?: string; folder?: string }) {
     if (!this.__ws) {
       return;
     }
@@ -603,7 +656,7 @@ export class OneBotAPI {
 
   /** 发送私聊转发 */
   sendPrivateForward(options: {
-    user_id: number;
+    user_id: string | number;
     messages: {
       time?: number;
       content: any[];
@@ -628,7 +681,7 @@ export class OneBotAPI {
 
   /** 发送群转发 */
   sendGroupForward(options: {
-    group_id: number;
+    group_id: string | number;
     messages: {
       time?: number;
       content: any[];
@@ -652,7 +705,7 @@ export class OneBotAPI {
   }
 
   /** 设置精华消息 (pin) */
-  setEssenceMsg(options: { message_id: number }) {
+  setEssenceMsg(options: { message_id: string | number }) {
     if (!this.__ws) {
       return;
     }
@@ -664,7 +717,7 @@ export class OneBotAPI {
   }
 
   /** 删除精华消息 (unpin) */
-  deleteEssenceMsg(options: { message_id: number }) {
+  deleteEssenceMsg(options: { message_id: string | number }) {
     if (!this.__ws) {
       return;
     }

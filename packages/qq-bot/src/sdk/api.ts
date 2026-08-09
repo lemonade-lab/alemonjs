@@ -1,17 +1,198 @@
 import axios, { type AxiosRequestConfig } from 'axios';
 import { ApiRequestData, FileType } from './typing.js';
-import { config } from './config.js';
+import { QQBotConfig } from './config.js';
 import FormData from 'form-data';
 import { createPicFrom } from 'alemonjs/utils';
 import { createAxiosInstance } from './instance.js';
+import { randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
 
 export const BOTS_API_RUL = 'https://bots.qq.com';
 export const API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com';
 export const API_URL = 'https://api.sgroup.qq.com';
 
-const msgMap = new Map<string, number>();
+export type QQBotConnectionState = 'idle' | 'connecting' | 'ready' | 'reconnecting' | 'offline' | 'stopped';
+export type QQBotConnectionStatus = {
+  state: QQBotConnectionState;
+  transport: 'websocket' | 'webhook' | 'proxy' | null;
+  reconnectAttempts: number;
+  heartbeatAcknowledged: boolean;
+  sessionId?: string;
+  sequence?: number;
+  resumed: boolean;
+  lastError?: string;
+};
+
+export type QQBotMediaHashes = {
+  sha256: string;
+  md5: string;
+  sha1: string;
+  md5_10m: string;
+};
+
+type QQBotStream = {
+  userOpenId: string;
+  msgId: string;
+  eventId: string;
+  msgSeq: number;
+  index: number;
+  streamMessageId?: string;
+  lastSentAt: number;
+  lastSentText: string;
+  timer?: NodeJS.Timeout;
+  latest?: string;
+  sendTask?: Promise<unknown>;
+};
 
 export class QQBotAPI {
+  protected readonly config: QQBotConfig;
+
+  #msgMap = new Map<string, number>();
+
+  #streams = new Map<string, QQBotStream>();
+  #onStreamClosed?: (streamId: string) => void;
+  #connectionStatus: QQBotConnectionStatus = {
+    state: 'idle',
+    transport: null,
+    reconnectAttempts: 0,
+    heartbeatAcknowledged: false,
+    resumed: false
+  };
+
+  constructor(options: Record<string, unknown> = {}) {
+    this.config = new QQBotConfig(options);
+  }
+
+  /** Read-only runtime snapshot, available through useClient<API>(). */
+  getConnectionStatus(): QQBotConnectionStatus {
+    return { ...this.#connectionStatus };
+  }
+
+  protected updateConnectionStatus(patch: Partial<QQBotConnectionStatus>) {
+    this.#connectionStatus = { ...this.#connectionStatus, ...patch };
+  }
+
+  /** Internal transport hook used by the multi-bot registry to discard stale routes. */
+  setStreamLifecycleListener(listener?: (streamId: string) => void) {
+    this.#onStreamClosed = listener;
+  }
+
+  /** C2C-only input indicator. This is intentionally a QQ extension, not a core action. */
+  sendTyping(params: { BotId?: string; userOpenId: string; msgId?: string; durationSec?: number }) {
+    if (!params.userOpenId) throw new Error('userOpenId is required');
+
+    return this.groupService({
+      url: `/v2/users/${params.userOpenId}/input_notify`,
+      method: 'post',
+      data: {
+        ...(params.msgId && { msg_id: params.msgId }),
+        input_second: Math.max(1, Math.min(Number(params.durationSec) || 30, 60))
+      }
+    });
+  }
+
+  streamOpen(params: { BotId?: string; userOpenId: string; msgId: string; eventId?: string }) {
+    if (!params.userOpenId || !params.msgId) throw new Error('C2C streaming requires userOpenId and msgId');
+    const streamId = randomUUID();
+    const stream: QQBotStream = {
+      userOpenId: params.userOpenId,
+      msgId: params.msgId,
+      eventId: params.eventId || params.msgId,
+      msgSeq: this.getMessageSeq(params.msgId),
+      index: 0,
+      lastSentAt: 0,
+      lastSentText: ''
+    };
+
+    stream.timer = setTimeout(() => this.streamCancel(streamId), 5 * 60 * 1000);
+    this.#streams.set(streamId, stream);
+
+    return { streamId };
+  }
+
+  async streamUpdate(streamId: string, fullText: string) {
+    const stream = this.#streams.get(streamId);
+    if (!stream) throw new Error('Unknown or expired streamId');
+    stream.latest = fullText;
+    if (!stream.sendTask) {
+      stream.sendTask = (async () => {
+        let result: unknown;
+        while (stream.latest !== undefined && this.#streams.get(streamId) === stream) {
+          const content = stream.latest;
+          stream.latest = undefined;
+          // QQ accepts at most a practical update rate.  500ms is the default,
+          // and the API contract never permits callers below 300ms.
+          const wait = Math.max(0, 500 - (Date.now() - stream.lastSentAt));
+          if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+          // The stream may have timed out or its gateway may have stopped
+          // while the rate limiter was waiting. Never emit a trailing packet.
+          if (this.#streams.get(streamId) !== stream) break;
+          stream.lastSentAt = Date.now();
+          const response: { id?: string } = await this.groupService({
+            url: `/v2/users/${stream.userOpenId}/stream_messages`,
+            method: 'post',
+            data: {
+              msg_id: stream.msgId,
+              event_id: stream.eventId,
+              msg_seq: stream.msgSeq,
+              index: stream.index++,
+              input_mode: 'replace',
+              input_state: 1,
+              content_type: 'markdown',
+              content_raw: content,
+              ...(stream.streamMessageId && { stream_msg_id: stream.streamMessageId })
+            }
+          });
+          if (response?.id && !stream.streamMessageId) stream.streamMessageId = response.id;
+          stream.lastSentText = content;
+          result = response;
+        }
+        return result;
+      })().finally(() => {
+        if (this.#streams.get(streamId) === stream) stream.sendTask = undefined;
+      });
+    }
+
+    return stream.sendTask;
+  }
+
+  async streamComplete(streamId: string) {
+    const stream = this.#streams.get(streamId);
+    if (!stream) throw new Error('Unknown or expired streamId');
+    try {
+      await stream.sendTask;
+      return await this.groupService({
+        url: `/v2/users/${stream.userOpenId}/stream_messages`,
+        method: 'post',
+        data: {
+          msg_id: stream.msgId,
+          event_id: stream.eventId,
+          msg_seq: stream.msgSeq,
+          index: stream.index++,
+          input_mode: 'replace',
+          input_state: 10,
+          content_type: 'markdown',
+          content_raw: stream.latest ?? stream.lastSentText,
+          ...(stream.streamMessageId && { stream_msg_id: stream.streamMessageId })
+        }
+      });
+    } finally {
+      this.streamCancel(streamId);
+    }
+  }
+
+  streamCancel(streamId: string) {
+    const stream = this.#streams.get(streamId);
+    if (stream?.timer) clearTimeout(stream.timer);
+    if (this.#streams.delete(streamId)) this.#onStreamClosed?.(streamId);
+  }
+
+  /** Called by transports during shutdown so C2C streams cannot leak timers. */
+  protected cancelStreams() {
+    for (const streamId of this.#streams.keys()) this.streamCancel(streamId);
+  }
+
   // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
 
   /**
@@ -21,10 +202,10 @@ export class QQBotAPI {
    * @returns
    */
   getAuthentication() {
-    const app_id = config.get('app_id');
-    const secret = config.get('secret');
+    const app_id = this.config.get('app_id');
+    const secret = this.config.get('secret');
 
-    const baseUrlAppAccessToken = config.get('base_url_app_access_token');
+    const baseUrlAppAccessToken = this.config.get('base_url_app_access_token');
 
     const params: {
       baseURL?: string;
@@ -58,9 +239,9 @@ export class QQBotAPI {
    * @returns
    */
   groupService(options: AxiosRequestConfig) {
-    const app_id = config.get('app_id');
-    const token = config.get('access_token');
-    const sandbox = config.get('sandbox');
+    const app_id = this.config.get('app_id');
+    const token = this.config.get('access_token');
+    const sandbox = this.config.get('sandbox');
     const service = axios.create({
       baseURL: sandbox ? API_URL_SANDBOX : API_URL,
       timeout: 20000,
@@ -85,7 +266,7 @@ export class QQBotAPI {
    * @returns
    */
   gateway() {
-    const baseUrlGateway = config.get('base_url_gateway');
+    const baseUrlGateway = this.config.get('base_url_gateway');
 
     const params: {
       baseURL?: string;
@@ -132,16 +313,16 @@ export class QQBotAPI {
    * @returns
    */
   getMessageSeq(MessageId: string): number {
-    let seq = msgMap.get(MessageId) || 0;
+    let seq = this.#msgMap.get(MessageId) || 0;
 
     seq++;
-    msgMap.set(MessageId, seq);
+    this.#msgMap.set(MessageId, seq);
     // 如果映射表大小超过 100，则删除最早添加的 MessageId
-    if (msgMap.size > 100) {
-      const firstKey = msgMap.keys().next().value;
+    if (this.#msgMap.size > 100) {
+      const firstKey = this.#msgMap.keys().next().value;
 
       if (firstKey) {
-        msgMap.delete(firstKey);
+        this.#msgMap.delete(firstKey);
       }
     }
 
@@ -220,6 +401,135 @@ export class QQBotAPI {
         ...data
       }
     });
+  }
+
+  /** Produces upload and cache hashes without materialising the file in memory. */
+  async getMediaFileHashes(filePath: string): Promise<QQBotMediaHashes> {
+    const sha256 = createHash('sha256');
+    const md5 = createHash('md5');
+    const sha1 = createHash('sha1');
+    const md5_10m = createHash('md5');
+    let firstBytes = 0;
+    const firstLimit = 10_002_432;
+
+    for await (const chunk of createReadStream(filePath)) {
+      const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      sha256.update(data);
+      md5.update(data);
+      sha1.update(data);
+      if (firstBytes < firstLimit) {
+        const length = Math.min(data.length, firstLimit - firstBytes);
+        md5_10m.update(data.subarray(0, length));
+        firstBytes += length;
+      }
+    }
+
+    return {
+      sha256: sha256.digest('hex'),
+      md5: md5.digest('hex'),
+      sha1: sha1.digest('hex'),
+      md5_10m: md5_10m.digest('hex')
+    };
+  }
+
+  /**
+   * QQ's large-file protocol: prepare -> COS PUT -> part finish -> complete.
+   * A local path is read one part at a time, including retry attempts.
+   */
+  async postChunkedRichMedia(params: {
+    scope: 'group' | 'c2c';
+    targetId: string;
+    fileType: FileType;
+    data?: Buffer;
+    filePath?: string;
+    size?: number;
+    hashes?: QQBotMediaHashes;
+    name?: string;
+    onProgress?: (uploaded: number, total: number) => void;
+  }): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
+    const hasBuffer = Buffer.isBuffer(params.data);
+    const hasFile = Boolean(params.filePath);
+    if (hasBuffer === hasFile) throw new Error('Chunked media requires exactly one of data or filePath');
+    const total = hasBuffer ? params.data!.length : Number(params.size);
+    if (!Number.isSafeInteger(total) || total < 1) throw new Error('Chunked media requires a valid file size');
+    const hashes = params.hashes || (hasBuffer ? this.#getMediaBufferHashes(params.data!) : await this.getMediaFileHashes(params.filePath!));
+    const prefix = params.scope === 'group' ? `/v2/groups/${params.targetId}` : `/v2/users/${params.targetId}`;
+    const prepared: {
+      upload_id: string;
+      block_size: number;
+      parts: Array<{ index: number; presigned_url: string }>;
+    } = await this.groupService({
+      url: `${prefix}/upload_prepare`,
+      method: 'post',
+      data: {
+        file_type: params.fileType,
+        file_name: params.name || 'file',
+        file_size: total,
+        md5: hashes.md5,
+        sha1: hashes.sha1,
+        md5_10m: hashes.md5_10m
+      }
+    });
+    let uploaded = 0;
+    for (const part of prepared.parts || []) {
+      const offset = (part.index - 1) * prepared.block_size;
+      const length = Math.min(prepared.block_size, total - offset);
+      if (length <= 0) throw new Error(`QQ returned invalid upload part index: ${part.index}`);
+      const body = hasBuffer ? params.data!.subarray(offset, offset + length) : undefined;
+      const partMd5 = body ? createHash('md5').update(body).digest('hex') : await this.#getFilePartHash(params.filePath!, offset, length);
+      await this.#retry(() =>
+        axios.put(part.presigned_url, body || createReadStream(params.filePath!, { start: offset, end: offset + length - 1 }), {
+          timeout: 300_000,
+          maxBodyLength: Infinity,
+          maxContentLength: Infinity,
+          headers: { 'Content-Length': String(length) }
+        })
+      );
+      await this.#retry(() =>
+        this.groupService({
+          url: `${prefix}/upload_part_finish`,
+          method: 'post',
+          data: { upload_id: prepared.upload_id, part_index: part.index, block_size: length, md5: partMd5 }
+        })
+      );
+      uploaded += length;
+      params.onProgress?.(uploaded, total);
+    }
+    return this.#retry(() =>
+      this.groupService({
+        url: `${prefix}/complete_upload`,
+        method: 'post',
+        data: { upload_id: prepared.upload_id }
+      })
+    );
+  }
+
+  #getMediaBufferHashes(data: Buffer): QQBotMediaHashes {
+    return {
+      sha256: createHash('sha256').update(data).digest('hex'),
+      md5: createHash('md5').update(data).digest('hex'),
+      sha1: createHash('sha1').update(data).digest('hex'),
+      md5_10m: createHash('md5').update(data.subarray(0, 10_002_432)).digest('hex')
+    };
+  }
+
+  async #getFilePartHash(filePath: string, start: number, length: number) {
+    const md5 = createHash('md5');
+    for await (const chunk of createReadStream(filePath, { start, end: start + length - 1 })) md5.update(chunk);
+    return md5.digest('hex');
+  }
+
+  async #retry<T>(operation: () => Promise<T>, attempts = 3): Promise<T> {
+    let lastError: unknown;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+        if (attempt + 1 < attempts) await new Promise(resolve => setTimeout(resolve, 250 * 2 ** attempt));
+      }
+    }
+    throw lastError;
   }
 
   /**

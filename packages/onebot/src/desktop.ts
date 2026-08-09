@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, getConfigValue } from 'alemonjs';
+import { getPublishedConnectionStatus } from './sdk/status';
 // 当前目录
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -39,6 +40,9 @@ export const activate = context => {
 
         value['onebot'] = {
           ...db,
+          version: Number(db.version ?? 11),
+          default_bot: db.default_bot?.trim() || undefined,
+          reverse_port: Number(db.reverse_port ?? 17158),
           master_key: db.master_key?.split(',') ?? null,
           master_id: db.master_id?.split(',') ?? null
         };
@@ -54,6 +58,15 @@ export const activate = context => {
         webView.postMessage({
           type: 'onebot.init',
           data: config.onebot ?? {}
+        });
+        webView.postMessage({
+          type: 'onebot.status',
+          data: getPublishedConnectionStatus() ?? null
+        });
+      } else if (data.type === 'onebot.status') {
+        webView.postMessage({
+          type: 'onebot.status',
+          data: getPublishedConnectionStatus() ?? null
         });
       }
     } catch (e) {

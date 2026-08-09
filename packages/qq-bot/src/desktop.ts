@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { getConfig, getConfigValue } from 'alemonjs';
+import { getQQBotRegistry } from './index.websoket';
 // 当前目录
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -33,7 +34,7 @@ export const activate = context => {
   webView.onMessage(data => {
     try {
       if (data.type === 'qq-bot.form.save') {
-        const db = data.data;
+        const { bots_json: _botsJson, ...db } = data.data;
         const config = getConfig();
         const value = config.value ?? {};
 
@@ -54,6 +55,11 @@ export const activate = context => {
         webView.postMessage({
           type: 'qq-bot.init',
           data: config['qq-bot'] ?? {}
+        });
+      } else if (data.type === 'qq-bot.status') {
+        webView.postMessage({
+          type: 'qq-bot.status',
+          data: getQQBotRegistry()?.getConnectionStatus() ?? { Platform: 'qq-bot', state: 'stopped', bots: [] }
         });
       }
     } catch (e) {

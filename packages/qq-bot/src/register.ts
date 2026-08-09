@@ -1,5 +1,8 @@
-import type { DataEnums, User } from 'alemonjs';
+import type { ActionTarget, DataEnums, MessageMediaItem, User } from 'alemonjs';
 import { cbpPlatform, createResult, ResultCode, FormatEvent } from 'alemonjs';
+import { createHash } from 'node:crypto';
+import { readFile, stat } from 'node:fs/promises';
+import { basename } from 'node:path';
 import { QQBotClients } from './sdk/client.websoket';
 import { AT_MESSAGE_CREATE_TYPE } from './message/AT_MESSAGE_CREATE';
 import { GROUP_MESSAGE_CREATE_TYPE } from './message/group/GROUP_MESSAGE_CREATE';
@@ -7,18 +10,35 @@ import { AT_MESSAGE_CREATE, C2C_MESSAGE_CREATE, DIRECT_MESSAGE_CREATE, GROUP_AT_
 import { getIdentity, getMaster, getQQBotConfig } from './config';
 import { platform } from './config';
 
-export const register = (client: QQBotClients) => {
+export type QQBotRegistration = {
+  onAction: (data: any, consume: (result: any[]) => void) => Promise<void>;
+  onApi: (data: any, consume: (result: any[]) => void) => Promise<void>;
+};
+
+export const register = (
+  client: QQBotClients,
+  options?: {
+    botId?: string;
+    cbp?: ReturnType<typeof cbpPlatform>;
+    bindActions?: boolean;
+  }
+): QQBotRegistration => {
+  // QQ's rich-media API accepts at most 100 MiB.  Keeping the guard here
+  // makes every legacy and scoped media action fail before buffering a file
+  // that can never be uploaded.
+  const MAX_MEDIA_SIZE = 100 * 1024 * 1024;
   const config = getQQBotConfig();
 
-  // 机器人Id
-  const botId = String(config?.app_id ?? '');
+  // Nested multi-bot config has no top-level app_id. The registry owns the
+  // stable identity and passes it here for every event and action.
+  const botId = String(options?.botId ?? config?.app_id ?? '');
   /**
    * 连接 alemonjs 服务器。
    * 向 alemonjs 推送标准信息
    */
   const port = process.env?.port || config?.port || 17117;
   const url = `ws://127.0.0.1:${port}`;
-  const cbp = cbpPlatform(url);
+  const cbp = options?.cbp ?? cbpPlatform(url);
 
   /**
    * group
@@ -28,7 +48,7 @@ export const register = (client: QQBotClients) => {
    */
 
   const createUserAvatarURL = (authorId: string) => {
-    return `https://q.qlogo.cn/qqapp/${config.app_id}/${authorId}/640`;
+    return `https://q.qlogo.cn/qqapp/${botId}/${authorId}/640`;
   };
 
   const getGroupMessageMeta = (event: GROUP_MESSAGE_CREATE_TYPE) => {
@@ -61,6 +81,91 @@ export const register = (client: QQBotClients) => {
       messageId,
       auditTime
     };
+  };
+
+  const getMediaItems = (attachments?: Array<{ url?: string; content_type?: string; filename?: string; size?: number }>): MessageMediaItem[] => {
+    return (attachments || []).flatMap(attachment => {
+      if (!attachment?.url) return [];
+      const mimeType = attachment.content_type || '';
+      const Type: MessageMediaItem['Type'] = mimeType.startsWith('image/')
+        ? 'image'
+        : mimeType.startsWith('audio/')
+          ? 'audio'
+          : mimeType.startsWith('video/')
+            ? 'video'
+            : 'file';
+
+      return [
+        {
+          Type,
+          Url: attachment.url,
+          ...(attachment.filename && { FileName: attachment.filename }),
+          ...(typeof attachment.size === 'number' && { FileSize: attachment.size }),
+          ...(mimeType && { MimeType: mimeType })
+        }
+      ];
+    });
+  };
+
+  const normalizeTarget = (target?: ActionTarget): ActionTarget | undefined => {
+    if (!target?.targetId || !target.scope) return undefined;
+
+    return target;
+  };
+
+  const validateTargetBot = (target: ActionTarget) => {
+    return !target.BotId || target.BotId === botId;
+  };
+
+  const mediaCache = new Map<string, { fileId: string; expiresAt?: number }>();
+  const mediaType = (type: string) => (type === 'image' ? 1 : type === 'video' ? 2 : type === 'audio' ? 3 : 4);
+
+  const prepareMedia = async (target: ActionTarget, params: any) => {
+    const sources = [params?.url, params?.data, params?.filePath, params?.fileId].filter(value => value !== undefined && value !== '').length;
+    if (sources !== 1) throw new Error('Provide exactly one media source: url, data, filePath, or fileId');
+    if (params.fileId) return { fileId: String(params.fileId), reused: true };
+
+    let data = params.data as string | undefined;
+    let buffer: Buffer | undefined;
+    let name = params.name as string | undefined;
+    let hashSource: string | Buffer = String(params.url || '');
+    if (params.filePath) {
+      const metadata = await stat(String(params.filePath));
+      if (!metadata.isFile()) throw new Error('media filePath must point to a regular file');
+      if (metadata.size > MAX_MEDIA_SIZE) throw new Error('QQ media files must not exceed 100 MiB');
+      buffer = await readFile(String(params.filePath));
+      data = `base64://${buffer.toString('base64')}`;
+      hashSource = buffer;
+      name ||= basename(String(params.filePath));
+    } else if (data) {
+      hashSource = data;
+      const value = data.replace(/^base64:\/\//, '');
+      buffer = Buffer.from(value, 'base64');
+      if (buffer.length > MAX_MEDIA_SIZE) throw new Error('QQ media files must not exceed 100 MiB');
+    }
+    const key = [botId, target.scope, target.targetId, params.type, createHash('sha256').update(hashSource).digest('hex')].join(':');
+    const cached = mediaCache.get(key);
+    if (cached && (!cached.expiresAt || cached.expiresAt > Date.now())) {
+      return { fileId: cached.fileId, expiresAt: cached.expiresAt, reused: true };
+    }
+    return { key, url: params.url, data, buffer, name, reused: false };
+  };
+
+  const uploadMedia = async (target: ActionTarget, params: any) => {
+    if (!validateTargetBot(target)) throw new Error(`BotId ${target.BotId} is not active`);
+    if (target.scope !== 'group' && target.scope !== 'c2c') throw new Error('QQ media upload only supports group and c2c targets');
+    const prepared = await prepareMedia(target, params);
+    if (prepared.fileId) return prepared;
+    const fileType = mediaType(params.type);
+    const value =
+      prepared.buffer && prepared.buffer.length >= 5 * 1024 * 1024
+        ? await client.postChunkedRichMedia({ scope: target.scope, targetId: target.targetId, fileType, data: prepared.buffer, name: prepared.name })
+        : target.scope === 'group'
+          ? await client.postRichMediaByGroup(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false })
+          : await client.postRichMediaByUser(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false });
+    const expiresAt = value.ttl ? Date.now() + value.ttl * 1000 : undefined;
+    if (prepared.key) mediaCache.set(prepared.key, { fileId: value.file_info, expiresAt });
+    return { fileId: value.file_info, expiresAt, reused: false };
   };
 
   const createUserMeta = (UserId: string, extra: Partial<User> = {}): User => {
@@ -124,6 +229,7 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: meta.messageId })
         .addText({ MessageText: msg?.trim() })
+        .addMedia({ MessageMedia: getMediaItems(event.attachments) })
         .addOpen({ OpenId: meta.openId })
         .add({ tag: 'GROUP_MESSAGE_CREATE' }).value
     );
@@ -181,6 +287,7 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: meta.messageId })
         .addText({ MessageText: msg?.trim() })
+        .addMedia({ MessageMedia: getMediaItems(event.attachments) })
         .addOpen({ OpenId: meta.openId })
         .add({ tag: 'GROUP_AT_MESSAGE_CREATE' }).value
     );
@@ -205,6 +312,7 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: event.content?.trim() })
+        .addMedia({ MessageMedia: getMediaItems(event.attachments) })
         .addOpen({ OpenId: `C2C:${event.author.user_openid}` })
         .add({ tag: 'C2C_MESSAGE_CREATE' }).value
     );
@@ -242,6 +350,7 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: msg?.trim() })
+        .addMedia({ MessageMedia: getMediaItems(event.attachments) })
         .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
         .add({ tag: 'DIRECT_MESSAGE_CREATE' }).value
     );
@@ -278,6 +387,7 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: msg?.trim() })
+        .addMedia({ MessageMedia: getMediaItems(event.attachments) })
         .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
         .add({ tag: 'AT_MESSAGE_CREATE' }).value
     );
@@ -342,6 +452,7 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: msg?.trim() })
+        .addMedia({ MessageMedia: getMediaItems(event.attachments) })
         .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
         .add({ tag: 'MESSAGE_CREATE' }).value
     );
@@ -382,6 +493,11 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: `INTERACTION_CREATE:${event.id}` })
         .addText({ MessageText: MessageText })
+        .addInteraction({
+          InteractionId: event.id,
+          InteractionData: JSON.stringify(event.data.resolved),
+          Target: { scope: 'group', targetId: event.group_openid, BotId: botId }
+        })
         .addOpen({ OpenId: `C2C:${event.group_member_openid}` })
         .add({ tag: 'INTERACTION_CREATE_GROUP' }).value;
 
@@ -408,6 +524,11 @@ export const register = (client: QQBotClients) => {
         })
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: MessageText })
+        .addInteraction({
+          InteractionId: event.id,
+          InteractionData: JSON.stringify(event.data.resolved),
+          Target: { scope: 'c2c', targetId: event.user_openid, BotId: botId }
+        })
         .addOpen({ OpenId: `C2C:${event.user_openid}` })
         .add({ tag: 'INTERACTION_CREATE_C2C' }).value;
 
@@ -427,6 +548,11 @@ export const register = (client: QQBotClients) => {
         .addUser({ UserId: event.data.resolved.user_id, UserKey, UserAvatar: UserAvatar, IsMaster: isMaster, IsBot: false })
         .addMessage({ MessageId: event.data.resolved.message_id })
         .addText({ MessageText: MessageText })
+        .addInteraction({
+          InteractionId: event.id,
+          InteractionData: JSON.stringify(event.data.resolved),
+          Target: { scope: 'channel', targetId: event.channel_id, BotId: botId }
+        })
         .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
         .add({ tag: 'INTERACTION_CREATE_GUILD' }).value;
 
@@ -712,6 +838,23 @@ export const register = (client: QQBotClients) => {
   const api = {
     active: {
       send: {
+        target: async (target: ActionTarget, val: DataEnums[], replyId?: string) => {
+          if (!validateTargetBot(target)) return [createResult(ResultCode.FailParams, `BotId ${target.BotId} is not active`, null)];
+          if (target.scope === 'group') {
+            return GROUP_AT_MESSAGE_CREATE(client, { ChannelId: target.targetId, MessageId: replyId }, val);
+          }
+          if (target.scope === 'c2c') {
+            return C2C_MESSAGE_CREATE(client, { UserId: target.targetId, MessageId: replyId }, val);
+          }
+          if (target.scope === 'channel') {
+            return AT_MESSAGE_CREATE(client, { ChannelId: target.targetId, MessageId: replyId }, val);
+          }
+          if (target.scope === 'direct') {
+            return DIRECT_MESSAGE_CREATE(client, { UserId: target.targetId, MessageId: replyId }, val);
+          }
+
+          return [createResult(ResultCode.FailParams, `Unsupported target scope: ${target.scope}`, null)];
+        },
         channel: async (SpaceId: string, val: DataEnums[]) => {
           if (/^GUILD:/.test(SpaceId)) {
             const id = SpaceId.replace('GUILD:', '');
@@ -902,13 +1045,48 @@ export const register = (client: QQBotClients) => {
         const res = await api.active.send.user(userId, paramFormat);
 
         consume(res);
+      } else if (data.action === 'message.send.target') {
+        const target = normalizeTarget(data.payload.target);
+        if (!target) {
+          consume([createResult(ResultCode.FailParams, 'message.send.target 缺少 target', null)]);
+          return;
+        }
+        const res = await api.active.send.target(target, data.payload.params?.format || [], data.payload.params?.replyId);
+
+        consume(res);
       } else if (data.action === 'message.delete') {
         // ─── 消息管理 ───
-        const channelId = data.payload.ChannelId;
         const messageId = data.payload.MessageId;
-        // 频道子频道消息撤回
+        const params = data.payload.params ?? {};
+        const target = normalizeTarget(data.payload.target);
+        if (target && !validateTargetBot(target)) {
+          consume([createResult(ResultCode.FailParams, `BotId ${target.BotId} is not active`, null)]);
+          return;
+        }
+        const scope = target?.scope ?? params.scope ?? params.messageType;
+        const request =
+          scope === 'group'
+            ? client.grouMessageDelte(String(target?.targetId ?? params.groupId ?? data.payload.GroupId ?? data.payload.ChannelId), messageId)
+            : scope === 'user' || scope === 'c2c'
+              ? client.userMessageDelete(String(target?.targetId ?? params.userId ?? data.payload.UserId), messageId)
+              : scope === 'direct'
+                ? client.dmsMessageDelete(String(target?.targetId ?? params.guildId ?? data.payload.GuildId ?? data.payload.ChannelId), messageId)
+                : client.channelsMessagesDelete(target?.targetId ?? data.payload.ChannelId, messageId);
+        const res = await request.then(r => createResult(ResultCode.Ok, data.action, r)).catch(err => createResult(ResultCode.Fail, data.action, err));
+
+        consume([res]);
+      } else if (data.action === 'interaction.ack') {
+        const params = data.payload.params ?? {};
+        const interactionId = String(params.interactionId ?? data.payload.InteractionId ?? '');
+        const mode = data.payload.target?.scope === 'channel' || data.payload.target?.scope === 'direct' || params.mode === 'guild' ? 'guild' : 'group';
+
+        if (!interactionId) {
+          consume([createResult(ResultCode.Fail, 'interaction.ack 缺少 InteractionId', null)]);
+
+          return;
+        }
         const res = await client
-          .channelsMessagesDelete(channelId, messageId)
+          .interactionResponse(mode, interactionId, params.code)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1169,8 +1347,63 @@ export const register = (client: QQBotClients) => {
 
         consume([res]);
       } else if (data.action === 'media.upload') {
-        // 没有目标时仅上传不发送，QQ-Bot 不支持纯上传
-        consume([createResult(ResultCode.Warn, 'media.upload not supported, use media.send.user or media.send.channel', null)]);
+        const target = normalizeTarget(data.payload.target);
+        if (!target) {
+          consume([createResult(ResultCode.Warn, 'QQ media.upload requires target', null)]);
+          return;
+        }
+        const res = await uploadMedia(target, data.payload.params || {})
+          .then(value => createResult(ResultCode.Ok, data.action, value))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'media.send') {
+        const target = normalizeTarget(data.payload.target);
+        if (!target) {
+          consume([createResult(ResultCode.FailParams, 'media.send 缺少 target', null)]);
+          return;
+        }
+        if (!validateTargetBot(target)) {
+          consume([createResult(ResultCode.FailParams, `BotId ${target.BotId} is not active`, null)]);
+          return;
+        }
+        const params = data.payload.params || {};
+        if (params.fileId) {
+          const send =
+            target.scope === 'group'
+              ? client.groupOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
+              : target.scope === 'c2c'
+                ? client.usersOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
+                : null;
+          if (!send) {
+            consume([createResult(ResultCode.Warn, 'QQ media.send only supports group and c2c targets', null)]);
+            return;
+          }
+          const res = await send
+            .then(value => createResult(ResultCode.Ok, data.action, { id: value.id }))
+            .catch(err => createResult(ResultCode.Fail, data.action, err));
+          consume([res]);
+          return;
+        }
+        const upload = await uploadMedia(target, params)
+          .then(value => value.fileId)
+          .catch(error => {
+            consume([createResult(ResultCode.Fail, data.action, error)]);
+            return null;
+          });
+        if (!upload) return;
+        await onactions(
+          { action: 'media.send', payload: { target, params: { ...params, fileId: upload, url: undefined, data: undefined, filePath: undefined } } },
+          consume
+        );
+      } else if (data.action === 'connection.status') {
+        const status = client.getConnectionStatus();
+        consume([
+          createResult(ResultCode.Ok, data.action, {
+            Platform: platform,
+            state: status.state,
+            bots: [{ BotId: botId, ...status }]
+          })
+        ]);
       } else if (data.action === 'permission.get') {
         // ─── 权限 ───
         const res = await client
@@ -1223,9 +1456,6 @@ export const register = (client: QQBotClients) => {
     }
   };
 
-  // 处理行为
-  cbp.onactions((data, consume) => void onactions(data, consume));
-
   const onapis = async (data, consume) => {
     const key = data.payload?.key;
     const params = data.payload?.params;
@@ -1261,6 +1491,10 @@ export const register = (client: QQBotClients) => {
     }
   };
 
-  // 处理 api 调用
-  cbp.onapis((data, consume) => void onapis(data, consume));
+  if (options?.bindActions !== false) {
+    cbp.onactions((data, consume) => void onactions(data, consume));
+    cbp.onapis((data, consume) => void onapis(data, consume));
+  }
+
+  return { onAction: onactions, onApi: onapis };
 };

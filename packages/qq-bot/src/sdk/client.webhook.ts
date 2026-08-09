@@ -4,7 +4,6 @@ import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
 import { WebhookAPI } from './webhook.secret.js';
 import Koa from 'koa';
-import { config } from './config.js';
 import { v4 as uuidv4 } from 'uuid';
 import { WebSocket, WebSocketServer } from 'ws';
 import { Options } from '../config.js';
@@ -48,10 +47,7 @@ export class QQBotClient extends QQBotAPI {
    * @param opstion
    */
   constructor(opstion: Options) {
-    super();
-    for (const key in opstion) {
-      config.set(key, opstion[key]);
-    }
+    super(opstion);
   }
 
   /**
@@ -75,8 +71,8 @@ export class QQBotClient extends QQBotAPI {
    */
   async #setTimeoutBotConfig() {
     const callBack = async () => {
-      const app_id = config.get('app_id');
-      const secret = config.get('secret');
+      const app_id = this.config.get('app_id');
+      const secret = this.config.get('secret');
 
       if (!app_id || !secret) {
         return;
@@ -88,7 +84,7 @@ export class QQBotClient extends QQBotAPI {
         cache: boolean;
       } = await this.getAuthentication();
 
-      config.set('access_token', data.access_token);
+      this.config.set('access_token', data.access_token);
       console.info('refresh', data.expires_in, 's');
       setTimeout(() => void callBack(), data.expires_in * 1000);
     };
@@ -103,16 +99,18 @@ export class QQBotClient extends QQBotAPI {
    */
   connect() {
     try {
-      const ws = config.get('ws');
+      const ws = this.config.get('ws');
+
+      this.updateConnectionStatus({ state: 'connecting', transport: ws ? 'proxy' : 'webhook' });
 
       if (!ws) {
         void this.#setTimeoutBotConfig();
         this.#app = new Koa();
         this.#app.use(bodyParser());
         const router = new Router();
-        const port = config.get('port');
-        const secret = config.get('secret');
-        const route = config.get('route') ?? '/webhook';
+        const port = this.config.get('port');
+        const secret = this.config.get('secret');
+        const route = this.config.get('route') ?? '/webhook';
         const cfg = {
           secret: secret ?? '',
           port: port ? Number(port) : 17157
@@ -157,7 +155,7 @@ export class QQBotClient extends QQBotAPI {
             for (const event of this.#events[body.t] || []) {
               event(body.d);
             }
-            const accessToken = config.get('access_token');
+            const accessToken = this.config.get('access_token');
 
             // 也可以分法到客户端。 发送失败需要处理 或清理调
             for (const client of this.#client) {
@@ -177,6 +175,7 @@ export class QQBotClient extends QQBotAPI {
         // 启动服务
         const server = this.#app.listen(cfg.port, () => {
           console.log('Server running at http://localhost:' + cfg.port + route);
+          this.updateConnectionStatus({ state: 'ready' });
         });
         // 创建 WebSocketServer 并监听同一个端口
         const wss = new WebSocketServer({ server: server });
@@ -214,6 +213,7 @@ export class QQBotClient extends QQBotAPI {
           this.#ws = new WebSocket(ws);
           this.#ws.on('open', () => {
             this.#count = 0;
+            this.updateConnectionStatus({ state: 'ready' });
             console.log('ws connected');
           });
           this.#ws.on('message', data => {
@@ -223,7 +223,7 @@ export class QQBotClient extends QQBotAPI {
               const accessToken = body['access_token'];
 
               if (accessToken) {
-                config.set('access_token', accessToken);
+                this.config.set('access_token', accessToken);
               }
               for (const event of this.#events[body.t] || []) {
                 event(body.d);
@@ -233,6 +233,7 @@ export class QQBotClient extends QQBotAPI {
             }
           });
           this.#ws.on('close', () => {
+            this.updateConnectionStatus({ state: 'offline' });
             console.log('ws closed');
             // 重连5次，超过5次不再重连
             if (this.#count > 5) {

@@ -2,9 +2,11 @@ import { Guild, Channel } from '../base/guild';
 import { Message, MessageOpen, MessageText } from '../base/message';
 import { User } from '../base/user';
 import { Platform } from '../base/platform';
+import { Interaction } from '../base/interaction';
 import { Expansion } from '../base/expansion';
 // 私有消息-交互创建
 export type PrivateEventInteractionCreate = MessageText &
+  Interaction &
   MessageOpen &
   Platform &
   Message &
@@ -14,6 +16,7 @@ export type PrivateEventInteractionCreate = MessageText &
 
 // 公有事件-交互创建
 export type PublicEventInteractionCreate = MessageText &
+  Interaction &
   MessageOpen &
   Platform &
   Guild &

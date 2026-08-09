@@ -1,9 +1,15 @@
-import { QQBotClients } from './sdk/client.websoket';
-import { register } from './register';
-import { getQQBotConfig } from './config';
+import { getQQBotBots, getQQBotConfig } from './config';
 import { IntentsEnum } from './sdk/intents';
+import { QQBotRegistry } from './sdk/registry';
+
+let activeRegistry: QQBotRegistry | undefined;
+
+export const getQQBotRegistry = () => activeRegistry;
 export const start = () => {
   const config = getQQBotConfig();
+  const { bots, defaultBot } = getQQBotBots();
+  const registry = new QQBotRegistry(defaultBot);
+  activeRegistry = registry;
 
   const notPrivateIntents = [
     'GUILDS', // base
@@ -34,19 +40,15 @@ export const start = () => {
     intents.push(...notPrivateIntents, ...isGroupIntents, ...pubIntents);
   }
 
-  const client = new QQBotClients({
-    ...config,
-    intents: config?.intents || intents,
-    is_private: config?.is_private ?? false,
-    sandbox: config?.sandbox ?? false,
-    shard: config?.shard ?? [0, 1],
-    gatewayURL: config?.gatewayURL,
-    base_url_gateway: config?.base_url_gateway,
-    base_url_app_access_token: config?.base_url_app_access_token
-  });
+  for (const [botId, botConfig] of bots) {
+    const client = registry.add(botId, {
+      ...botConfig,
+      intents: botConfig.intents || intents,
+      is_private: botConfig.is_private ?? false,
+      sandbox: botConfig.sandbox ?? false,
+      shard: botConfig.shard ?? [0, 1]
+    });
 
-  // 连接
-  void client.connect(config?.gatewayURL);
-
-  register(client as any);
+    void client.connect(botConfig.gatewayURL);
+  }
 };

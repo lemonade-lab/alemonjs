@@ -236,6 +236,9 @@ const extractContent = (val: DataEnums[], mode: MentionMode): string => {
     'Image',
     'ImageFile',
     'ImageURL',
+    'Audio',
+    'Video',
+    'Attachment',
     'Markdown',
     'MarkdownOriginal',
     'BT.group',
@@ -375,16 +378,17 @@ const filterImages = (val: DataEnums[]) => {
 
 // ==================== Open API 发送（群组/私聊） ====================
 
-/** 通过富媒体上传获取图片 URL */
-const resolveRichMediaUrl = async (images: DataEnums[], uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>): Promise<string> => {
-  for (const item of images) {
+/** 通过富媒体上传获取 file_info。群/C2C 的图片、语音、视频、文件走同一工作流。 */
+const resolveRichMediaUrl = async (items: DataEnums[], uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>): Promise<string> => {
+  for (const item of items) {
     let fileData: string;
     let fileInfo: string;
+    const fileType: FileType = item.type === 'Video' ? 2 : item.type === 'Audio' ? 3 : item.type === 'Attachment' ? 4 : 1;
 
     if (item.type === 'ImageURL') {
       // 如果是图片链接，需要axios获取图片数据并转换为base64
       fileData = await axios.get(item.value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
-    } else if (item.type === 'Image') {
+    } else if (item.type === 'Image' || item.type === 'Audio' || item.type === 'Video' || item.type === 'Attachment') {
       if (typeof item.value === 'string' && (item.value.startsWith('https://') || item.value.startsWith('http://'))) {
         // 如果是图片链接，需要axios获取图片数据并转换为base64
         fileData = await axios.get(item.value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
@@ -399,6 +403,8 @@ const resolveRichMediaUrl = async (images: DataEnums[], uploadMedia: (data: { fi
       } else if (Buffer.isBuffer(item.value)) {
         // 如果已经是Buffer数据，直接转换为base64字符串
         fileData = item.value.toString('base64');
+      } else if (typeof item.value === 'string' && item.value.startsWith('buffer://')) {
+        fileData = item.value.replace('buffer://', '');
       } else if (typeof item.value === 'string') {
         // 兆底：视为裸 base64 字符串
         fileData = item.value;
@@ -408,7 +414,7 @@ const resolveRichMediaUrl = async (images: DataEnums[], uploadMedia: (data: { fi
     }
 
     if (fileData) {
-      fileInfo = await uploadMedia({ file_type: 1, file_data: fileData }).then(res => res?.file_info);
+      fileInfo = await uploadMedia({ file_type: fileType, file_data: fileData }).then(res => res?.file_info);
     }
 
     if (fileInfo) {
@@ -456,6 +462,7 @@ const sendOpenApiMessage = async (
 
   // 图片
   const images = filterImages(val);
+  const richMedia = val.filter(item => item.type === 'Audio' || item.type === 'Video' || item.type === 'Attachment');
 
   if (images.length > 0) {
     const url = await resolveRichMediaUrl(images, uploadMedia);
@@ -468,6 +475,22 @@ const sendOpenApiMessage = async (
     const res = await sendMessage({
       content: imgContent,
       media: { file_info: url },
+      msg_type: 7,
+      ...baseParams
+    });
+
+    return [createResult(ResultCode.Ok, label, { id: res.id })];
+  }
+
+  if (richMedia.length > 0) {
+    const fileInfo = await resolveRichMediaUrl(richMedia, uploadMedia);
+
+    if (!fileInfo) {
+      return [createResult(ResultCode.Fail, '富媒体上传失败', null)];
+    }
+    const res = await sendMessage({
+      content: flattenMdToText(content, val),
+      media: { file_info: fileInfo },
       msg_type: 7,
       ...baseParams
     });

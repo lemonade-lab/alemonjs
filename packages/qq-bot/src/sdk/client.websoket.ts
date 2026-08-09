@@ -1,10 +1,9 @@
 import WebSocket from 'ws';
 import { QQBotAPI } from './api.js';
-import { config } from './config.js';
 import { getIntentsMask } from './intents.js';
-import { Counter } from 'alemonjs/utils';
 import { QQBotEventMap } from './message.js';
 import { Options } from './typing.js';
+import { FileSessionStore, SessionStore } from './session.js';
 
 const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unknown> }>(message: T): T => {
   if (!message?.id || !message?.d || typeof message.d !== 'object' || Array.isArray(message.d)) {
@@ -19,78 +18,263 @@ const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unk
 };
 
 /**
- * 连接
+ * QQ 机器人网关连接。
+ *
+ * 网关会主动发送 op=7 要求客户端重新连接，也可能因网络或重复连接被关闭。
+ * 因此重连必须由客户端统一调度，避免旧 socket 的 close 事件重复创建连接。
  */
 export class QQBotClients extends QQBotAPI {
-  //
-  #counter = new Counter(1); // 初始值为1
-
-  // 标记是否已连接
   #isConnected = false;
 
-  // 存储最新的消息序号
-  #heartbeat_interval = 30000;
+  #stopped = false;
 
-  // 鉴权
-  #IntervalId: NodeJS.Timeout | null = null;
+  #sessionId: string | null = null;
 
-  // url
-  #gatewayUrl = null;
+  #sessionStore: SessionStore;
+
+  #sessionLoaded = false;
+
+  #sequence: number | null = null;
+
+  #heartbeatAcknowledged = true;
+
+  #heartbeatInterval = 30000;
+
+  #heartbeatTimer: NodeJS.Timeout | null = null;
+
+  #accessTokenTimer: NodeJS.Timeout | null = null;
+
+  #accessTokenTask: Promise<void> | null = null;
+
+  #reconnectTimer: NodeJS.Timeout | null = null;
+
+  #reconnectAttempts = 0;
+
+  #gatewayUrl: string | null = null;
+
+  #ws: WebSocket | null = null;
+
+  #events: {
+    [K in keyof QQBotEventMap]?: ((event: QQBotEventMap[K]) => any)[];
+  } = {};
 
   /**
    * 设置配置
-   * @param opstion
+   * @param option
    */
-  constructor(opstion: Options) {
-    super();
-    for (const key in opstion) {
-      config.set(key, opstion[key]);
+  constructor(option: Options) {
+    super(option);
+    this.#sessionStore = option.sessionStore || new FileSessionStore();
+  }
+
+  async #loadSession() {
+    if (this.#sessionLoaded) return;
+    this.#sessionLoaded = true;
+    const botId = String(this.config.get('app_id') || '');
+    const session = botId ? await this.#sessionStore.load(botId) : null;
+
+    if (session) {
+      this.#sessionId = session.sessionId;
+      this.#sequence = session.sequence;
     }
   }
 
-  /**
-   * 定时鉴权
-   * @param cfg
-   * @returns
-   */
-  async #setTimeoutBotConfig() {
-    const accessToken = async () => {
-      const app_id = config.get('app_id');
-      const secret = config.get('secret');
+  #persistSession() {
+    const botId = String(this.config.get('app_id') || '');
+    if (!botId || !this.#sessionId || this.#sequence === null) return;
+    void this.#sessionStore.save({ botId, sessionId: this.#sessionId, sequence: this.#sequence }).catch(err => {
+      console.warn('[ws-qqbot] session persistence failed', err);
+    });
+  }
 
-      if (!app_id || !secret) {
+  #clearSession() {
+    const botId = String(this.config.get('app_id') || '');
+    this.#sessionId = null;
+    this.#sequence = null;
+    if (botId) void this.#sessionStore.clear(botId).catch(() => undefined);
+  }
+
+  #clearHeartbeat() {
+    if (this.#heartbeatTimer) {
+      clearInterval(this.#heartbeatTimer);
+      this.#heartbeatTimer = null;
+    }
+  }
+
+  #startHeartbeat(ws: WebSocket) {
+    this.#clearHeartbeat();
+
+    this.#heartbeatTimer = setInterval(() => {
+      if (this.#ws !== ws || !this.#isConnected || ws.readyState !== WebSocket.OPEN) {
+        this.#clearHeartbeat();
+
         return;
       }
-      // 发送请求
+
+      if (!this.#heartbeatAcknowledged) {
+        this.#requestReconnect('heartbeat acknowledgement timeout');
+
+        return;
+      }
+
+      try {
+        this.#heartbeatAcknowledged = false;
+        this.updateConnectionStatus({ heartbeatAcknowledged: false });
+        ws.send(
+          JSON.stringify({
+            op: 1,
+            d: null
+          })
+        );
+      } catch (err) {
+        console.error('[ws-qqbot] heartbeat failed', err);
+        this.#requestReconnect('heartbeat failed');
+      }
+    }, this.#heartbeatInterval);
+  }
+
+  #getReconnectDelay() {
+    const delay = Math.min(1000 * 2 ** Math.min(this.#reconnectAttempts, 5), 30000);
+    const jitter = Math.floor(Math.random() * Math.min(1000, Math.floor(delay / 4)));
+
+    return delay + jitter;
+  }
+
+  #scheduleReconnect(reason: string) {
+    if (this.#stopped || this.#reconnectTimer) {
+      return;
+    }
+
+    const delay = this.#getReconnectDelay();
+
+    this.#reconnectAttempts++;
+    this.updateConnectionStatus({
+      state: 'reconnecting',
+      reconnectAttempts: this.#reconnectAttempts,
+      heartbeatAcknowledged: this.#heartbeatAcknowledged,
+      lastError: reason
+    });
+    console.info(`[ws-qqbot] ${reason}; reconnecting in ${delay}ms (attempt ${this.#reconnectAttempts})`);
+
+    this.#reconnectTimer = setTimeout(() => {
+      this.#reconnectTimer = null;
+      void this.connect();
+    }, delay);
+  }
+
+  #requestReconnect(reason: string) {
+    this.#isConnected = false;
+    this.#clearHeartbeat();
+    // C2C stream sessions are tied to the current gateway lifecycle. They
+    // cannot be safely resumed after a transport interruption.
+    this.cancelStreams();
+    this.#scheduleReconnect(reason);
+
+    const ws = this.#ws;
+
+    if (ws && ws.readyState !== WebSocket.CLOSED && ws.readyState !== WebSocket.CLOSING) {
+      ws.close();
+    }
+  }
+
+  /** Stops reconnecting and releases the active gateway socket. */
+  disconnect() {
+    this.#stopped = true;
+    this.#isConnected = false;
+    this.#clearHeartbeat();
+    if (this.#reconnectTimer) {
+      clearTimeout(this.#reconnectTimer);
+    }
+    if (this.#accessTokenTimer) {
+      clearTimeout(this.#accessTokenTimer);
+    }
+    this.#reconnectTimer = null;
+    this.#accessTokenTimer = null;
+    const ws = this.#ws;
+
+    this.#ws = null;
+    this.cancelStreams();
+    if (ws && ws.readyState !== WebSocket.CLOSED) {
+      ws.close(1000, 'client stopped');
+    }
+    this.updateConnectionStatus({ state: 'stopped', heartbeatAcknowledged: false });
+  }
+
+  #scheduleAccessTokenRefresh(delay: number) {
+    if (this.#accessTokenTimer) {
+      clearTimeout(this.#accessTokenTimer);
+    }
+
+    this.#accessTokenTimer = setTimeout(() => {
+      this.#accessTokenTimer = null;
+      void this.#startAccessTokenRefresh().catch(() => undefined);
+    }, delay);
+  }
+
+  async #refreshAccessToken() {
+    const appId = this.config.get('app_id');
+    const secret = this.config.get('secret');
+
+    if (!appId || !secret) {
+      throw new Error('QQ Bot app_id or secret is missing');
+    }
+
+    try {
       const data: {
         access_token: string;
         expires_in: number;
-        cache: boolean;
       } = await this.getAuthentication();
 
-      config.set('access_token', data.access_token);
-      console.info('refresh', data.expires_in, 's');
-      setTimeout(() => void accessToken(), data.expires_in * 1000);
-    };
+      if (!data?.access_token) {
+        throw new Error('QQ Bot access token is empty');
+      }
 
-    await accessToken();
+      this.config.set('access_token', data.access_token);
+      const expiresIn = Number(data.expires_in);
+      const refreshIn = Math.max(60000, (Number.isFinite(expiresIn) ? expiresIn * 1000 : 3600000) - 60000);
+
+      this.#scheduleAccessTokenRefresh(refreshIn);
+      console.info(`[ws-qqbot] access token refreshed; next refresh in ${refreshIn}ms`);
+    } catch (err) {
+      this.#scheduleAccessTokenRefresh(30000);
+      console.error('[ws-qqbot] access token refresh failed; retrying in 30000ms', err);
+      throw err;
+    }
+  }
+
+  #startAccessTokenRefresh() {
+    if (this.#accessTokenTask === null) {
+      this.#accessTokenTask = this.#refreshAccessToken().finally(() => {
+        this.#accessTokenTask = null;
+      });
+    }
+
+    return this.#accessTokenTask;
+  }
+
+  async #ensureAccessToken() {
+    if (this.#accessTokenTimer) {
+      return;
+    }
+
+    await this.#startAccessTokenRefresh();
   }
 
   /**
    * 鉴权数据
-   * @returns
+   * @returns WebSocket Identify 数据
    */
   #aut() {
-    const token = config.get('access_token');
-    const intents = config.get('intents');
-    const shard = config.get('shard');
+    const token = this.config.get('access_token');
+    const intents = this.config.get('intents');
+    const shard = this.config.get('shard');
 
     return {
-      op: 2, // op = 2
+      op: 2,
       d: {
         token: `QQBot ${token}`,
         intents: getIntentsMask(intents),
-        shard: shard,
+        shard,
         properties: {
           $os: process.platform,
           $browser: 'alemonjs',
@@ -100,11 +284,16 @@ export class QQBotClients extends QQBotAPI {
     };
   }
 
-  #ws: WebSocket | null = null;
-
-  #events: {
-    [K in keyof QQBotEventMap]?: ((event: QQBotEventMap[K]) => any)[];
-  } = {};
+  #resume() {
+    return {
+      op: 6,
+      d: {
+        token: `QQBot ${this.config.get('access_token')}`,
+        session_id: this.#sessionId,
+        seq: this.#sequence
+      }
+    };
+  }
 
   /**
    * 注册事件处理程序
@@ -120,153 +309,192 @@ export class QQBotClients extends QQBotAPI {
     return this;
   }
 
+  #emitError(err: unknown) {
+    for (const event of this.#events.ERROR || []) {
+      try {
+        event(err as never);
+      } catch (error) {
+        console.error('[ws-qqbot] error handler failed', error);
+      }
+    }
+  }
+
+  #handleDispatch(t: keyof QQBotEventMap, d: unknown) {
+    for (const event of this.#events[t] || []) {
+      try {
+        event(d as never);
+      } catch (err) {
+        this.#emitError(err);
+      }
+    }
+  }
+
   /**
-   *
-   * @param cfg
-   * @param conversation
+   * 建立或恢复网关连接。
    */
   async connect(gatewayURL?: string) {
-    // 定时模式
-    await this.#setTimeoutBotConfig();
-
-    // 请求url
-    if (!this.#gatewayUrl) {
-      this.#gatewayUrl = gatewayURL ?? (await this.gateway().then(res => res?.url));
+    this.#stopped = false;
+    if (gatewayURL) {
+      this.#gatewayUrl = gatewayURL;
     }
-    if (!this.#gatewayUrl) {
+
+    if (this.#ws && this.#ws.readyState !== WebSocket.CLOSED) {
       return;
     }
 
-    // 重新连接的逻辑
-    const reconnect = () => {
-      if (this.#counter.value >= 5) {
-        console.info('The maximum number of reconnections has been reached, cancel reconnection');
+    await this.#loadSession();
+
+    try {
+      await this.#ensureAccessToken();
+    } catch {
+      this.#scheduleReconnect('access token unavailable');
+
+      return;
+    }
+
+    if (!this.#gatewayUrl) {
+      try {
+        this.#gatewayUrl = await this.gateway().then(res => res?.url);
+      } catch (err) {
+        this.#emitError(err);
+        this.#scheduleReconnect('gateway request failed');
 
         return;
       }
-      setTimeout(() => {
-        console.info('[ws-qqbot] reconnecting...');
-        // 重新starrt
-        start();
-        // 记录
-        this.#counter.next();
-      }, 5000);
-    };
+    }
 
-    const start = () => {
-      if (this.#gatewayUrl) {
+    if (!this.#gatewayUrl) {
+      this.#scheduleReconnect('gateway URL is empty');
+
+      return;
+    }
+
+    let ws: WebSocket;
+
+    try {
+      ws = new WebSocket(this.#gatewayUrl);
+    } catch (err) {
+      this.#emitError(err);
+      this.#scheduleReconnect('gateway connection creation failed');
+
+      return;
+    }
+
+    this.#ws = ws;
+    this.updateConnectionStatus({ state: 'connecting', transport: 'websocket', lastError: undefined });
+    ws.on('open', () => {
+      if (this.#ws === ws) {
+        console.info('[ws-qqbot] open');
+      }
+    });
+
+    ws.on('message', msg => {
+      if (this.#ws !== ws) {
+        return;
+      }
+
+      try {
+        const message = normalizeGatewayMessage(JSON.parse(msg.toString('utf8')));
+
+        if (process.env.NTQQ_WS === 'dev') {
+          console.info('message', message);
+        }
+
         const map = {
-          0: ({ t, d }) => {
-            if (this.#events[t]) {
-              try {
-                for (const event of this.#events[t]) {
-                  // 是否是函数
-                  if (typeof event !== 'function') {
-                    continue;
-                  }
-                  event(d);
-                }
-              } catch (err) {
-                if (this.#events['ERROR']) {
-                  for (const event of this.#events['ERROR']) {
-                    // 是否是函数
-                    if (typeof event !== 'function') {
-                      continue;
-                    }
-                    event(err);
-                  }
-                }
-              }
+          0: ({ t, d, s }) => {
+            if (typeof s === 'number') {
+              this.#sequence = s;
             }
-
-            // Ready Event，鉴权成功
-            if (t === 'READY') {
-              if (this.#IntervalId) {
-                clearInterval(this.#IntervalId);
-              }
-              this.#IntervalId = setInterval(() => {
-                if (this.#isConnected && this.#ws) {
-                  this.#ws.send(
-                    JSON.stringify({
-                      op: 1, //  op = 1
-                      d: null // 如果是第一次连接，传null
-                    })
-                  );
-                }
-              }, this.#heartbeat_interval);
+            if (t === 'READY' && d?.session_id) {
+              this.#sessionId = String(d.session_id);
             }
-            // Resumed Event，恢复连接成功
-            if (t === 'RESUMED') {
-              console.info('[ws-qqbot] restore connection');
-              // 重制次数
-              this.#counter.reStart();
+            this.#persistSession();
+            this.#handleDispatch(t, d);
+            if (t === 'READY' || t === 'RESUMED') {
+              this.#reconnectAttempts = 0;
+              this.updateConnectionStatus({
+                state: 'ready',
+                reconnectAttempts: 0,
+                heartbeatAcknowledged: this.#heartbeatAcknowledged,
+                sessionId: this.#sessionId ?? undefined,
+                sequence: this.#sequence ?? undefined,
+                resumed: t === 'RESUMED'
+              });
+              console.info(t === 'READY' ? '[ws-qqbot] ready' : '[ws-qqbot] restored connection');
             }
-          },
-          6: ({ d }) => {
-            console.info('[ws-qqbot] connection attempt', d);
           },
           7: ({ d }) => {
-            // 执行重新连接
-            console.info('[ws-qqbot] reconnect', d);
-            // 取消鉴权发送
-            if (this.#IntervalId) {
-              clearInterval(this.#IntervalId);
-            }
+            console.info('[ws-qqbot] gateway requested reconnect', d);
+            this.#requestReconnect('gateway requested reconnect');
           },
           9: ({ d }) => {
-            console.info('[ws-qqbot] parameter error', d);
+            console.error('[ws-qqbot] invalid session', d);
+            this.#clearSession();
+            this.#requestReconnect('invalid session');
           },
           10: ({ d }) => {
-            // 重制次数
             this.#isConnected = true;
-            // 记录新循环
-            this.#heartbeat_interval = d.heartbeat_interval;
-            // 发送鉴权
-            if (this.#ws) {
-              this.#ws.send(JSON.stringify(this.#aut()));
+            this.#heartbeatInterval = Number(d?.heartbeat_interval) || 30000;
+            this.#startHeartbeat(ws);
+
+            try {
+              const resumable = this.#sessionId && this.#sequence !== null;
+
+              ws.send(JSON.stringify(resumable ? this.#resume() : this.#aut()));
+              this.updateConnectionStatus({
+                state: 'connecting',
+                heartbeatAcknowledged: true,
+                sessionId: this.#sessionId ?? undefined,
+                sequence: this.#sequence ?? undefined,
+                resumed: Boolean(resumable)
+              });
+            } catch (err) {
+              console.error('[ws-qqbot] identify failed', err);
+              this.#emitError(err);
+              this.#requestReconnect('identify failed');
             }
           },
           11: () => {
-            // OpCode 11 Heartbeat ACK 消息，心跳发送成功
-            console.info('[ws-qqbot] heartbeat transmission');
-            // 重制次数
-            this.#counter.reStart();
+            this.#heartbeatAcknowledged = true;
+            this.updateConnectionStatus({ heartbeatAcknowledged: true });
+            console.debug('[ws-qqbot] heartbeat acknowledged');
           },
           12: ({ d }) => {
             console.debug('[ws-qqbot] platform data', d);
           }
         };
 
-        // 连接
-        this.#ws = new WebSocket(this.#gatewayUrl);
-        this.#ws.on('open', () => {
-          console.info('[ws-qqbot] open');
-        });
-        // 监听消息
-        this.#ws.on('message', msg => {
-          const message = normalizeGatewayMessage(JSON.parse(msg.toString('utf8')));
-
-          if (process.env.NTQQ_WS === 'dev') {
-            console.info('message', message);
-          }
-          // 根据 opcode 进行处理
-          if (map[message.op]) {
-            map[message.op](message);
-          }
-        });
-        // 关闭
-        this.#ws.on('close', err => {
-          this.#isConnected = false;
-          if (this.#IntervalId) {
-            clearInterval(this.#IntervalId);
-            this.#IntervalId = null;
-          }
-          void reconnect();
-          console.info('[ws-qqbot] close', err);
-        });
+        if (map[message.op]) {
+          map[message.op](message);
+        }
+      } catch (err) {
+        console.error('[ws-qqbot] invalid gateway message', err);
+        this.#emitError(err);
       }
-    };
+    });
 
-    start();
+    ws.on('close', (code, reason) => {
+      if (this.#ws !== ws) {
+        return;
+      }
+
+      this.#ws = null;
+      this.#isConnected = false;
+      this.#clearHeartbeat();
+      this.updateConnectionStatus({ state: 'offline', heartbeatAcknowledged: false });
+      console.info(`[ws-qqbot] close ${code}${reason.length ? `: ${reason.toString('utf8')}` : ''}`);
+      this.#scheduleReconnect('connection closed');
+    });
+
+    ws.on('error', err => {
+      if (this.#ws !== ws) {
+        return;
+      }
+
+      console.error('[ws-qqbot] error', err);
+      this.updateConnectionStatus({ state: 'offline', lastError: err.message });
+      this.#emitError(err);
+      this.#requestReconnect('connection error');
+    });
   }
 }

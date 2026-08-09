@@ -2,6 +2,8 @@ import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 export const platform = 'onebot';
 export const platformFullName = '@alemonjs/onebot';
 
+export type OneBotVersion = 11 | 12;
+
 export type Options = {
   url: string;
   token?: string;
@@ -18,6 +20,10 @@ export type Options = {
    * @default false
    */
   hideUnsupported?: boolean | number;
+  /** OneBot 12 is an experimental WebSocket-only implementation. */
+  version?: OneBotVersion;
+  /** Default v12 bot for active sends: `<platform>:<user_id>`. */
+  default_bot?: string;
 };
 export const getOneBotConfig = (): Options => {
   const value = getConfigValue() || {};
@@ -25,6 +31,19 @@ export const getOneBotConfig = (): Options => {
   const bagValue = value[platformFullName] || {};
 
   return { ...commonValue, ...bagValue } as Options;
+};
+
+/** Fail early instead of silently starting a bot with an ambiguous protocol. */
+export const validateOneBotConfig = (config: Options): asserts config is Options & { version: OneBotVersion } => {
+  const version = config.version ?? 11;
+
+  if (version !== 11 && version !== 12) {
+    throw new Error(`[OneBot] 配置 onebot.version 必须是 11 或 12，当前值为 ${String(version)}`);
+  }
+  if (config.default_bot && !/^[^:\s]+:[^:\s]+$/.test(config.default_bot)) {
+    throw new Error('[OneBot] 配置 onebot.default_bot 必须为 <platform>:<user_id>，例如 qq:123456');
+  }
+  config.version = version;
 };
 
 export const getMaster = (UserId: string) => {

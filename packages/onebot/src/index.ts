@@ -2,16 +2,19 @@ import type { DataEnums, MessageMediaItem, User } from 'alemonjs';
 import { cbpPlatform, createResult, definePlatform, ResultCode, FormatEvent } from 'alemonjs';
 import { getBufferByURL } from 'alemonjs/utils';
 import { readFileSync } from 'fs';
-import { platform, getOneBotConfig, getMaster } from './config';
+import { platform, getOneBotConfig, getMaster, validateOneBotConfig } from './config';
 import { OneBotClient } from './sdk/wss';
+import { setConnectionStatusProvider } from './sdk/status';
 import { BotMe } from './db';
 import { dataEnumToText, markdownToText } from './format';
 export { platform } from './config';
-export { OneBotAPI as API } from './sdk/api';
+export { OneBotClient as API } from './sdk/wss';
+export type { OneBotConnectionStatus, OneBotBotStatus } from './sdk/api';
 export * from './hook';
 
 const main = () => {
   const config = getOneBotConfig();
+  validateOneBotConfig(config);
   const client = new OneBotClient({
     // url
     url: config?.url ?? '',
@@ -20,8 +23,11 @@ const main = () => {
     // 是否开启反向连接，正向连接失效
     reverse_enable: config?.reverse_enable ?? false,
     // 反向连接端口
-    reverse_port: config?.reverse_port ?? 17158
+    reverse_port: config?.reverse_port ?? 17158,
+    version: config.version,
+    default_bot: config.default_bot
   });
+  setConnectionStatusProvider(() => client.getConnectionStatus());
 
   void client.connect();
 
@@ -49,6 +55,35 @@ const main = () => {
   const isAtBot = (message: any[], botId: string) => {
     return message.some(item => item.type === 'at' && String(item.data?.qq ?? '') === String(botId));
   };
+
+  const getV12Text = (message: any[] = []) =>
+    message
+      .filter(item => item.type === 'text')
+      .map(item => String(item.data?.text ?? ''))
+      .join('')
+      .trim();
+
+  const getV12Bot = (event: any) => {
+    const self = event.self || {};
+    return {
+      key: `${String(self.platform ?? 'onebot')}:${String(self.user_id ?? '')}`,
+      self: { platform: String(self.platform ?? 'onebot'), user_id: String(self.user_id ?? '') }
+    };
+  };
+
+  const extractV12Media = (message: any[] = []): MessageMediaItem[] =>
+    message
+      .filter(item => ['image', 'voice', 'audio', 'video', 'file'].includes(item.type))
+      .map(
+        item =>
+          ({
+            Type: item.type === 'voice' ? 'audio' : item.type,
+            Url: item.data?.url,
+            FileId: item.data?.file_id,
+            FileName: item.data?.name ?? item.data?.file_name,
+            FileSize: item.data?.file_size ? Number(item.data.file_size) : undefined
+          }) as MessageMediaItem
+      );
 
   /**
    * 从 OneBot 消息段中提取媒体信息
@@ -99,6 +134,76 @@ const main = () => {
   client.on('META', event => {
     if (event?.self_id) {
       BotMe.id = String(event.self_id);
+    }
+  });
+
+  // OneBot 12 keeps generic fields standard and preserves implementation extensions in `value`.
+  client.on('V12_EVENT', event => {
+    const { key: BotId, self } = getV12Bot(event);
+    const detail = `${event.type}.${event.detail_type}`;
+    const message = event.message ?? [];
+    const UserId = String(event.user_id ?? event.sender?.user_id ?? '');
+    const UserAvatar = UserId ? createUserAvatar(UserId) : '';
+    const [isMaster, UserKey] = getMaster(UserId);
+    const groupId = String(event.group_id ?? '');
+    const ReplyId = message.find(item => item.type === 'reply')?.data?.message_id;
+
+    if (detail === 'message.group') {
+      const IsAtMe = message.some(item => item.type === 'mention' && String(item.data?.user_id) === self.user_id);
+      cbp.send(
+        FormatEvent.create('message.create')
+          .addPlatform({ Platform: platform, value: event, BotId, IsAtMe, IsPrivate: false })
+          .addGuild({ GuildId: groupId, SpaceId: groupId })
+          .addChannel({ ChannelId: groupId })
+          .addUser({ UserId, UserKey, UserName: event.sender?.nickname ?? event.sender?.user_name ?? '', UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event.message_id ?? ''), ReplyId })
+          .addText({ MessageText: getV12Text(message) })
+          .addMedia({ MessageMedia: extractV12Media(message) })
+          .addOpen({ OpenId: UserId })
+          .add({ tag: 'onebot.v12.message.group' }).value
+      );
+    } else if (detail === 'message.private') {
+      cbp.send(
+        FormatEvent.create('private.message.create')
+          .addPlatform({ Platform: platform, value: event, BotId, IsAtMe: false, IsPrivate: true })
+          .addUser({ UserId, UserKey, UserName: event.sender?.nickname ?? event.sender?.user_name ?? '', UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: String(event.message_id ?? ''), ReplyId })
+          .addText({ MessageText: getV12Text(message) })
+          .addMedia({ MessageMedia: extractV12Media(message) })
+          .addOpen({ OpenId: UserId })
+          .add({ tag: 'onebot.v12.message.private' }).value
+      );
+    } else if (detail === 'notice.friend_increase') {
+      cbp.send(
+        FormatEvent.create('private.friend.add')
+          .addPlatform({ Platform: platform, value: event, BotId })
+          .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: '' })
+          .add({ tag: 'onebot.v12.notice.friend_increase' }).value
+      );
+    } else if (detail === 'notice.friend_decrease') {
+      cbp.send(
+        FormatEvent.create('private.friend.remove')
+          .addPlatform({ Platform: platform, value: event, BotId })
+          .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: '' })
+          .add({ tag: 'onebot.v12.notice.friend_decrease' }).value
+      );
+    } else if (detail === 'notice.group_member_increase' || detail === 'notice.group_member_decrease') {
+      cbp.send(
+        FormatEvent.create(detail.endsWith('increase') ? 'member.add' : 'member.remove')
+          .addPlatform({ Platform: platform, value: event, BotId })
+          .addGuild({ GuildId: groupId, SpaceId: groupId })
+          .addChannel({ ChannelId: groupId })
+          .addUser({ UserId, UserKey, UserAvatar, IsMaster: isMaster, IsBot: false })
+          .addMessage({ MessageId: '' })
+          .add({ tag: `onebot.v12.${detail}` }).value
+      );
+    } else if (detail === 'notice.group_message_delete' || detail === 'notice.private_message_delete') {
+      const isGroup = detail === 'notice.group_message_delete';
+      let formatted = FormatEvent.create(isGroup ? 'message.delete' : 'private.message.delete').addPlatform({ Platform: platform, value: event, BotId });
+      if (isGroup) formatted = formatted.addGuild({ GuildId: groupId, SpaceId: groupId }).addChannel({ ChannelId: groupId });
+      cbp.send(formatted.addMessage({ MessageId: String(event.message_id ?? '') }).add({ tag: `onebot.v12.${detail}` }).value);
     }
   });
 
@@ -426,7 +531,7 @@ const main = () => {
               return {
                 type: 'at',
                 data: {
-                  qq: Number(item.value)
+                  qq: String(item.value)
                 }
               };
             }
@@ -653,18 +758,63 @@ const main = () => {
     return message;
   };
 
+  const uploadV12File = async (value: any, name?: string) => {
+    let params: Record<string, any>;
+    if (Buffer.isBuffer(value)) {
+      params = { type: 'data', data: value.toString('base64'), name };
+    } else {
+      const input = String(value ?? '');
+      if (/^https?:\/\//.test(input)) params = { type: 'url', url: input, name };
+      else if (input.startsWith('file://')) params = { type: 'path', path: input.slice(7), name };
+      else if (input.startsWith('base64://') || input.startsWith('buffer://')) params = { type: 'data', data: input.slice(input.indexOf('://') + 3), name };
+      else params = { type: 'data', data: input, name };
+    }
+    const result = await client.sendV12Action('upload_file', params);
+    const fileId = result?.file_id ?? result?.id;
+    if (!fileId) throw new Error('[OneBot] upload_file 未返回 file_id');
+    return String(fileId);
+  };
+
+  const DataToV12Message = async (val: DataEnums[] = []) => {
+    const message = await Promise.all(
+      val.map(async item => {
+        if (item.type === 'Text') return { type: 'text', data: { text: String(item.value ?? '') } };
+        if (item.type === 'Mention') {
+          if (item.value === 'everyone' || item.value === 'all' || item.value === '') return { type: 'mention_all', data: {} };
+          return { type: 'mention', data: { user_id: String(item.value) } };
+        }
+        const mediaTypes: Record<string, string> = {
+          Image: 'image',
+          ImageFile: 'image',
+          ImageURL: 'image',
+          Audio: 'voice',
+          Video: 'video',
+          Attachment: 'file'
+        };
+        const segmentType = mediaTypes[item.type];
+        if (segmentType) {
+          const name = (item as any).options?.filename;
+          return { type: segmentType, data: { file_id: await uploadV12File(item.value, name) } };
+        }
+        const text = dataEnumToText(item, getOneBotConfig().hideUnsupported)?.trim();
+        return { type: 'text', data: { text: text ?? '' } };
+      })
+    );
+    return message;
+  };
+
   /**
    *
    * @param ChannelId
    * @param val
    * @returns
    */
-  const sendGroup = async (ChannelId: number, val: DataEnums[]) => {
+  const sendGroup = async (ChannelId: string, val: DataEnums[], self?: { platform: string; user_id: string }) => {
     if (!val || val.length <= 0) {
       return [];
     }
     try {
-      const message = await DataToMessage(val);
+      const message = client.isV12 ? await DataToV12Message(val) : await DataToMessage(val);
       const effectiveMessage = message.filter(m => !(m.type === 'text' && !m.data?.text));
 
       if (effectiveMessage.length <= 0) {
@@ -675,10 +825,9 @@ const main = () => {
         return [];
       }
 
-      const res = await client.sendGroupMessage({
-        group_id: ChannelId,
-        message: effectiveMessage
-      });
+      const res = client.isV12
+        ? await client.sendV12Action('send_message', { detail_type: 'group', group_id: ChannelId, message: effectiveMessage }, self)
+        : await client.sendGroupMessage({ group_id: ChannelId, message: effectiveMessage });
 
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', res)];
     } catch (error) {
@@ -692,12 +841,12 @@ const main = () => {
    * @param val
    * @returns
    */
-  const sendPrivate = async (UserId: number, val: DataEnums[]) => {
+  const sendPrivate = async (UserId: string, val: DataEnums[], self?: { platform: string; user_id: string }) => {
     if (!val || val.length <= 0) {
       return [];
     }
     try {
-      const message = await DataToMessage(val);
+      const message = client.isV12 ? await DataToV12Message(val) : await DataToMessage(val);
       const effectiveMessage = message.filter(m => !(m.type === 'text' && !m.data?.text));
 
       if (effectiveMessage.length <= 0) {
@@ -708,10 +857,9 @@ const main = () => {
         return [];
       }
 
-      const res = await client.sendPrivateMessage({
-        user_id: UserId,
-        message: effectiveMessage
-      });
+      const res = client.isV12
+        ? await client.sendV12Action('send_message', { detail_type: 'private', user_id: UserId, message: effectiveMessage }, self)
+        : await client.sendPrivateMessage({ user_id: UserId, message: effectiveMessage });
 
       return [createResult(ResultCode.Ok, 'client.groupOpenMessages', res)];
     } catch (error) {
@@ -723,10 +871,10 @@ const main = () => {
     active: {
       send: {
         channel: (SpaceId: string, val: DataEnums[]) => {
-          return sendGroup(Number(SpaceId), val);
+          return sendGroup(String(SpaceId), val);
         },
         user: (OpenId: string, val: DataEnums[]) => {
-          return sendPrivate(Number(OpenId), val);
+          return sendPrivate(String(OpenId), val);
         }
       }
     },
@@ -736,20 +884,25 @@ const main = () => {
           name: string;
           UserId?: string;
           ChannelId?: string;
+          BotId?: string;
         },
         val: DataEnums[]
       ) => {
         if (!val || val.length <= 0) {
           return [];
         }
+        const BotId = event.BotId ?? (event as any).value?.BotId;
+        const self =
+          typeof BotId === 'string' && BotId.includes(':')
+            ? (() => {
+                const [platform, user_id] = BotId.split(':', 2);
+                return { platform, user_id };
+              })()
+            : undefined;
         if (event['name'] === 'private.message.create') {
-          const UserId = Number(event.UserId);
-
-          return sendPrivate(UserId, val);
+          return sendPrivate(String(event.UserId ?? ''), val, self);
         } else if (event['name'] === 'message.create') {
-          const GroupId = Number(event.ChannelId);
-
-          return sendGroup(GroupId, val);
+          return sendGroup(String(event.ChannelId ?? ''), val, self);
         }
 
         return Promise.all([]);
@@ -762,14 +915,14 @@ const main = () => {
           const Mentions: User[] = [];
 
           for (const item of e.message) {
-            if (item.type === 'at') {
+            if (item.type === 'at' || item.type === 'mention') {
               let isBot = false;
-              const UserId = String(item.data.qq);
+              const UserId = String(item.data.qq ?? item.data.user_id);
 
               if (UserId === 'all') {
                 continue;
               }
-              if (UserId === BotMe.id) {
+              if (UserId === BotMe.id || e.self?.user_id === UserId) {
                 isBot = true;
               }
               const [isMaster, UserKey] = getMaster(UserId);
@@ -792,7 +945,8 @@ const main = () => {
         return new Promise<User[]>(resolve => resolve([]));
       },
       delete(messageId: string) {
-        return client.deleteMsg({ message_id: Number(messageId) });
+        if (client.isV12) return client.deleteV12Message(messageId);
+        return client.deleteMsg({ message_id: String(messageId) });
       },
       file: {
         channel: client.uploadGroupFile.bind(client),
@@ -808,7 +962,7 @@ const main = () => {
   const onactions = async (data, consume) => {
     switch (data.action) {
       case 'me.info': {
-        const res = await client.getLoginInfo();
+        const res = await (client.isV12 ? client.getSelfInfo() : client.getLoginInfo());
         const UserId = String(res?.user_id);
         const [isMaster, UserKey] = getMaster(UserId);
         const user: User = {
@@ -860,7 +1014,7 @@ const main = () => {
       case 'message.pin': {
         const messageId = data.payload.MessageId;
         const res = await client
-          .setEssenceMsg({ message_id: Number(messageId) })
+          .setEssenceMsg({ message_id: String(messageId) })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -869,7 +1023,7 @@ const main = () => {
       case 'message.unpin': {
         const messageId = data.payload.MessageId;
         const res = await client
-          .deleteEssenceMsg({ message_id: Number(messageId) })
+          .deleteEssenceMsg({ message_id: String(messageId) })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -923,8 +1077,10 @@ const main = () => {
       case 'member.info': {
         const guildId = data.payload.params?.guildId ?? data.payload.GuildId;
         const userId = data.payload.params?.userId ?? data.payload.UserId;
-        const res = await client
-          .getGroupMemberInfo({ group_id: Number(guildId), user_id: Number(userId) })
+        const res = await client[client.isV12 ? 'getV12GroupMemberInfo' : 'getGroupMemberInfo'](
+          client.isV12 ? String(guildId) : { group_id: String(guildId), user_id: String(userId) },
+          client.isV12 ? String(userId) : undefined
+        )
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -932,8 +1088,7 @@ const main = () => {
       }
       case 'member.list': {
         const guildId = data.payload.GuildId;
-        const res = await client
-          .getGroupMemberList({ group_id: Number(guildId) })
+        const res = await client[client.isV12 ? 'getV12GroupMemberList' : 'getGroupMemberList'](client.isV12 ? String(guildId) : { group_id: String(guildId) })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -943,7 +1098,7 @@ const main = () => {
         const guildId = data.payload.GuildId;
         const userId = data.payload.UserId;
         const res = await client
-          .setGroupKick({ group_id: Number(guildId), user_id: Number(userId) })
+          .setGroupKick({ group_id: String(guildId), user_id: String(userId) })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -954,7 +1109,7 @@ const main = () => {
         const userId = data.payload.UserId;
         const duration = data.payload.params?.duration ?? 0;
         const res = await client
-          .setGroupBan({ group_id: Number(guildId), user_id: Number(userId), duration: Number(duration) })
+          .setGroupBan({ group_id: String(guildId), user_id: String(userId), duration: Number(duration) })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -964,7 +1119,7 @@ const main = () => {
         const guildId = data.payload.GuildId;
         const userId = data.payload.UserId;
         const res = await client
-          .setGroupBan({ group_id: Number(guildId), user_id: Number(userId), duration: 0 })
+          .setGroupBan({ group_id: String(guildId), user_id: String(userId), duration: 0 })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -973,16 +1128,14 @@ const main = () => {
       // ─── 服务器/群 ───
       case 'guild.info': {
         const guildId = data.payload.GuildId;
-        const res = await client
-          .getGroupInfo({ group_id: Number(guildId) })
+        const res = await client[client.isV12 ? 'getV12GroupInfo' : 'getGroupInfo'](client.isV12 ? String(guildId) : { group_id: String(guildId) })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         return consume([res]);
       }
       case 'guild.list': {
-        const res = await client
-          .getGroupList()
+        const res = await (client.isV12 ? client.getV12GroupList() : client.getGroupList())
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -990,16 +1143,14 @@ const main = () => {
       }
       // ─── me ───
       case 'me.friends': {
-        const res = await client
-          .getFriendList()
+        const res = await (client.isV12 ? client.getV12FriendList() : client.getFriendList())
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         return consume([res]);
       }
       case 'me.guilds': {
-        const res = await client
-          .getGroupList()
+        const res = await (client.isV12 ? client.getV12GroupList() : client.getGroupList())
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1008,8 +1159,7 @@ const main = () => {
       // ─── 消息获取 ───
       case 'message.get': {
         const messageId = data.payload.MessageId;
-        const res = await client
-          .getMsg({ message_id: Number(messageId) })
+        const res = await (client.isV12 ? client.getV12Message(String(messageId)) : client.getMsg({ message_id: String(messageId) }))
           .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1020,7 +1170,7 @@ const main = () => {
         const guildId = data.payload.GuildId;
         const name = data.payload.params?.name;
         const res = await client
-          .setGroupName({ group_id: Number(guildId), group_name: name ?? '' })
+          .setGroupName({ group_id: String(guildId), group_name: name ?? '' })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1030,7 +1180,7 @@ const main = () => {
         const guildId = data.payload.GuildId;
         const isDismiss = data.payload.params?.isDismiss ?? false;
         const res = await client
-          .setGroupLeave({ group_id: Number(guildId), is_dismiss: isDismiss })
+          .setGroupLeave({ group_id: String(guildId), is_dismiss: isDismiss })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1040,7 +1190,7 @@ const main = () => {
         const guildId = data.payload.GuildId;
         const enable = data.payload.params?.enable ?? true;
         const res = await client
-          .setGroupWholeBan({ group_id: Number(guildId), enable })
+          .setGroupWholeBan({ group_id: String(guildId), enable })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1052,7 +1202,7 @@ const main = () => {
         const userId = data.payload.UserId;
         const duration = data.payload.params?.duration ?? 0;
         const res = await client
-          .setGroupBan({ group_id: Number(guildId), user_id: Number(userId), duration: Number(duration) })
+          .setGroupBan({ group_id: String(guildId), user_id: String(userId), duration: Number(duration) })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1063,7 +1213,7 @@ const main = () => {
         const userId = data.payload.UserId;
         const enable = data.payload.params?.enable ?? true;
         const res = await client
-          .setGroupAdmin({ group_id: Number(guildId), user_id: Number(userId), enable })
+          .setGroupAdmin({ group_id: String(guildId), user_id: String(userId), enable })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1074,7 +1224,7 @@ const main = () => {
         const userId = data.payload.UserId;
         const card = data.payload.params?.card ?? '';
         const res = await client
-          .setGroupCard({ group_id: Number(guildId), user_id: Number(userId), card })
+          .setGroupCard({ group_id: String(guildId), user_id: String(userId), card })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1086,7 +1236,7 @@ const main = () => {
         const title = data.payload.params?.title ?? '';
         const duration = data.payload.params?.duration ?? -1;
         const res = await client
-          .setGroupSpecialTitle({ group_id: Number(guildId), user_id: Number(userId), special_title: title, duration })
+          .setGroupSpecialTitle({ group_id: String(guildId), user_id: String(userId), special_title: title, duration })
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1114,8 +1264,7 @@ const main = () => {
       // ─── 用户信息 ───
       case 'user.info': {
         const userId = data.payload.UserId;
-        const res = await client
-          .getStrangerInfo({ user_id: Number(userId) })
+        const res = await (client.isV12 ? client.getUserInfo(String(userId)) : client.getStrangerInfo({ user_id: String(userId) }))
           .then(r => createResult(ResultCode.Ok, data.action, r?.data ?? r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1126,7 +1275,7 @@ const main = () => {
         const guildId = data.payload.GuildId;
         const keyword = data.payload.params?.keyword ?? '';
         const res = await client
-          .getGroupMemberList({ group_id: Number(guildId) })
+          .getGroupMemberList({ group_id: String(guildId) })
           .then(r => {
             const list = r?.data ?? r;
             const filtered = Array.isArray(list) ? list.filter((m: any) => (m.card ?? '').includes(keyword) || (m.nickname ?? '').includes(keyword)) : [];

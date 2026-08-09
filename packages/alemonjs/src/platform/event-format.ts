@@ -1,4 +1,18 @@
-import { Events, EventKeys, EventBuilder, ReservedEventKeys, User, Guild, Channel, Message, MessageText, MessageMedia, MessageOpen, Platform } from '../types';
+import {
+  Events,
+  EventKeys,
+  EventBuilder,
+  ReservedEventKeys,
+  User,
+  Guild,
+  Channel,
+  Message,
+  MessageText,
+  MessageMedia,
+  MessageOpen,
+  Platform,
+  Interaction
+} from '../types';
 
 /**
  * 链式构建事件对象，根据事件名约束可用方法
@@ -108,6 +122,16 @@ export class FormatEvent<T extends EventKeys = EventKeys> {
   addOpen(params: MessageOpen): this {
     Object.assign(this.#data, {
       OpenId: params.OpenId
+    });
+
+    return this;
+  }
+
+  addInteraction(params: Interaction): this {
+    Object.assign(this.#data, {
+      InteractionId: params.InteractionId,
+      ...(params.InteractionData !== undefined && { InteractionData: params.InteractionData }),
+      ...(params.Target !== undefined && { Target: params.Target })
     });
 
     return this;

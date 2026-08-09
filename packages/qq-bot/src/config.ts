@@ -27,6 +27,10 @@ export type Options = {
    * @default false
    */
   hideUnsupported?: boolean | number;
+  /** Multi-bot mode. Keys are BotId/AppId; each child overrides common options. */
+  bots?: Record<string, Omit<sdkOptions, 'app_id'> & { app_id?: string }>;
+  /** Required for proactive actions without BotId when more than one bot is configured. */
+  default_bot?: string;
 } & sdkOptions;
 
 export const getQQBotConfig = (): Options => {
@@ -35,6 +39,36 @@ export const getQQBotConfig = (): Options => {
   const bagValue = value[platformFullName] || {};
 
   return { ...commonValue, ...bagValue } as Options;
+};
+
+/** Converts legacy single-bot configuration into the same representation as multi-bot mode. */
+export const getQQBotBots = (): { bots: Map<string, sdkOptions>; defaultBot?: string } => {
+  const config = getQQBotConfig();
+  const {
+    bots: configuredBots,
+    default_bot,
+    master_id: _masterId,
+    master_key: _masterKey,
+    markdownToText: _markdown,
+    hideUnsupported: _hide,
+    ...common
+  } = config;
+  const bots = new Map<string, sdkOptions>();
+
+  if (configuredBots && Object.keys(configuredBots).length) {
+    for (const [botId, value] of Object.entries(configuredBots)) {
+      if (value.app_id && value.app_id !== botId) throw new Error(`qq-bot bots.${botId}.app_id must match its map key`);
+      if (!value.secret) throw new Error(`qq-bot bots.${botId}.secret is required`);
+      bots.set(botId, { ...common, ...value, app_id: botId, secret: value.secret });
+    }
+  } else if (config.app_id && config.secret) {
+    bots.set(config.app_id, common as sdkOptions);
+  }
+
+  if (bots.size > 1 && !default_bot) throw new Error('qq-bot.default_bot is required when multiple bots are configured');
+  if (default_bot && !bots.has(default_bot)) throw new Error(`qq-bot.default_bot ${default_bot} is not configured`);
+
+  return { bots, defaultBot: default_bot || (bots.size === 1 ? bots.keys().next().value : undefined) };
 };
 export const getIdentity = (UserId: string) => {
   const isMasterUser = UserId ? isMaster(UserId, platform) : false;
