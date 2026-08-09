@@ -85,7 +85,9 @@ export const register = (
 
   const getMediaItems = (attachments?: Array<{ url?: string; content_type?: string; filename?: string; size?: number }>): MessageMediaItem[] => {
     return (attachments || []).flatMap(attachment => {
-      if (!attachment?.url) return [];
+      if (!attachment?.url) {
+        return [];
+      }
       const mimeType = attachment.content_type || '';
       const Type: MessageMediaItem['Type'] = mimeType.startsWith('image/')
         ? 'image'
@@ -108,7 +110,9 @@ export const register = (
   };
 
   const normalizeTarget = (target?: ActionTarget): ActionTarget | undefined => {
-    if (!target?.targetId || !target.scope) return undefined;
+    if (!target?.targetId || !target.scope) {
+      return undefined;
+    }
 
     return target;
   };
@@ -122,49 +126,96 @@ export const register = (
 
   const prepareMedia = async (target: ActionTarget, params: any) => {
     const sources = [params?.url, params?.data, params?.filePath, params?.fileId].filter(value => value !== undefined && value !== '').length;
-    if (sources !== 1) throw new Error('Provide exactly one media source: url, data, filePath, or fileId');
-    if (params.fileId) return { fileId: String(params.fileId), reused: true };
+
+    if (sources !== 1) {
+      throw new Error('Provide exactly one media source: url, data, filePath, or fileId');
+    }
+    if (params.fileId) {
+      return { fileId: String(params.fileId), reused: true };
+    }
 
     let data = params.data as string | undefined;
     let buffer: Buffer | undefined;
+    let filePath: string | undefined;
+    let fileSize: number | undefined;
+    let hashes: Awaited<ReturnType<typeof client.getMediaFileHashes>> | undefined;
     let name = params.name as string | undefined;
     let hashSource: string | Buffer = String(params.url || '');
+
     if (params.filePath) {
       const metadata = await stat(String(params.filePath));
-      if (!metadata.isFile()) throw new Error('media filePath must point to a regular file');
-      if (metadata.size > MAX_MEDIA_SIZE) throw new Error('QQ media files must not exceed 100 MiB');
-      buffer = await readFile(String(params.filePath));
-      data = `base64://${buffer.toString('base64')}`;
-      hashSource = buffer;
-      name ||= basename(String(params.filePath));
+
+      if (!metadata.isFile()) {
+        throw new Error('media filePath must point to a regular file');
+      }
+      if (metadata.size > MAX_MEDIA_SIZE) {
+        throw new Error('QQ media files must not exceed 100 MiB');
+      }
+      filePath = String(params.filePath);
+      fileSize = metadata.size;
+      hashes = await client.getMediaFileHashes(filePath);
+      hashSource = hashes.sha256;
+      name ||= basename(filePath);
+      // QQ's direct endpoint still needs base64 for small local files. Large
+      // files remain on disk and the chunked uploader streams each part.
+      if (fileSize < 5 * 1024 * 1024) {
+        buffer = await readFile(filePath);
+        data = `base64://${buffer.toString('base64')}`;
+      }
     } else if (data) {
       hashSource = data;
       const value = data.replace(/^base64:\/\//, '');
+
       buffer = Buffer.from(value, 'base64');
-      if (buffer.length > MAX_MEDIA_SIZE) throw new Error('QQ media files must not exceed 100 MiB');
+      if (buffer.length > MAX_MEDIA_SIZE) {
+        throw new Error('QQ media files must not exceed 100 MiB');
+      }
     }
     const key = [botId, target.scope, target.targetId, params.type, createHash('sha256').update(hashSource).digest('hex')].join(':');
     const cached = mediaCache.get(key);
+
     if (cached && (!cached.expiresAt || cached.expiresAt > Date.now())) {
       return { fileId: cached.fileId, expiresAt: cached.expiresAt, reused: true };
     }
-    return { key, url: params.url, data, buffer, name, reused: false };
+
+    return { key, url: params.url, data, buffer, filePath, fileSize, hashes, name, reused: false };
   };
 
   const uploadMedia = async (target: ActionTarget, params: any) => {
-    if (!validateTargetBot(target)) throw new Error(`BotId ${target.BotId} is not active`);
-    if (target.scope !== 'group' && target.scope !== 'c2c') throw new Error('QQ media upload only supports group and c2c targets');
+    if (!validateTargetBot(target)) {
+      throw new Error(`BotId ${target.BotId} is not active`);
+    }
+    if (target.scope !== 'group' && target.scope !== 'c2c') {
+      throw new Error('QQ media upload only supports group and c2c targets');
+    }
     const prepared = await prepareMedia(target, params);
-    if (prepared.fileId) return prepared;
+
+    if (prepared.fileId) {
+      return prepared;
+    }
     const fileType = mediaType(params.type);
     const value =
-      prepared.buffer && prepared.buffer.length >= 5 * 1024 * 1024
-        ? await client.postChunkedRichMedia({ scope: target.scope, targetId: target.targetId, fileType, data: prepared.buffer, name: prepared.name })
-        : target.scope === 'group'
-          ? await client.postRichMediaByGroup(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false })
-          : await client.postRichMediaByUser(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false });
+      prepared.filePath && prepared.fileSize && prepared.fileSize >= 5 * 1024 * 1024
+        ? await client.postChunkedRichMedia({
+            scope: target.scope,
+            targetId: target.targetId,
+            fileType,
+            filePath: prepared.filePath,
+            size: prepared.fileSize,
+            hashes: prepared.hashes,
+            name: prepared.name
+          })
+        : prepared.buffer && prepared.buffer.length >= 5 * 1024 * 1024
+          ? await client.postChunkedRichMedia({ scope: target.scope, targetId: target.targetId, fileType, data: prepared.buffer, name: prepared.name })
+          : target.scope === 'group'
+            ? await client.postRichMediaByGroup(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false })
+            : await client.postRichMediaByUser(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false });
     const expiresAt = value.ttl ? Date.now() + value.ttl * 1000 : undefined;
-    if (prepared.key) mediaCache.set(prepared.key, { fileId: value.file_info, expiresAt });
+
+    if (prepared.key) {
+      mediaCache.set(prepared.key, { fileId: value.file_info, expiresAt });
+    }
+
     return { fileId: value.file_info, expiresAt, reused: false };
   };
 
@@ -839,7 +890,9 @@ export const register = (
     active: {
       send: {
         target: async (target: ActionTarget, val: DataEnums[], replyId?: string) => {
-          if (!validateTargetBot(target)) return [createResult(ResultCode.FailParams, `BotId ${target.BotId} is not active`, null)];
+          if (!validateTargetBot(target)) {
+            return [createResult(ResultCode.FailParams, `BotId ${target.BotId} is not active`, null)];
+          }
           if (target.scope === 'group') {
             return GROUP_AT_MESSAGE_CREATE(client, { ChannelId: target.targetId, MessageId: replyId }, val);
           }
@@ -1047,8 +1100,10 @@ export const register = (
         consume(res);
       } else if (data.action === 'message.send.target') {
         const target = normalizeTarget(data.payload.target);
+
         if (!target) {
           consume([createResult(ResultCode.FailParams, 'message.send.target 缺少 target', null)]);
+
           return;
         }
         const res = await api.active.send.target(target, data.payload.params?.format || [], data.payload.params?.replyId);
@@ -1059,8 +1114,10 @@ export const register = (
         const messageId = data.payload.MessageId;
         const params = data.payload.params ?? {};
         const target = normalizeTarget(data.payload.target);
+
         if (target && !validateTargetBot(target)) {
           consume([createResult(ResultCode.FailParams, `BotId ${target.BotId} is not active`, null)]);
+
           return;
         }
         const scope = target?.scope ?? params.scope ?? params.messageType;
@@ -1348,25 +1405,32 @@ export const register = (
         consume([res]);
       } else if (data.action === 'media.upload') {
         const target = normalizeTarget(data.payload.target);
+
         if (!target) {
           consume([createResult(ResultCode.Warn, 'QQ media.upload requires target', null)]);
+
           return;
         }
         const res = await uploadMedia(target, data.payload.params || {})
           .then(value => createResult(ResultCode.Ok, data.action, value))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
+
         consume([res]);
       } else if (data.action === 'media.send') {
         const target = normalizeTarget(data.payload.target);
+
         if (!target) {
           consume([createResult(ResultCode.FailParams, 'media.send 缺少 target', null)]);
+
           return;
         }
         if (!validateTargetBot(target)) {
           consume([createResult(ResultCode.FailParams, `BotId ${target.BotId} is not active`, null)]);
+
           return;
         }
         const params = data.payload.params || {};
+
         if (params.fileId) {
           const send =
             target.scope === 'group'
@@ -1374,29 +1438,38 @@ export const register = (
               : target.scope === 'c2c'
                 ? client.usersOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
                 : null;
+
           if (!send) {
             consume([createResult(ResultCode.Warn, 'QQ media.send only supports group and c2c targets', null)]);
+
             return;
           }
           const res = await send
             .then(value => createResult(ResultCode.Ok, data.action, { id: value.id }))
             .catch(err => createResult(ResultCode.Fail, data.action, err));
+
           consume([res]);
+
           return;
         }
         const upload = await uploadMedia(target, params)
           .then(value => value.fileId)
           .catch(error => {
             consume([createResult(ResultCode.Fail, data.action, error)]);
+
             return null;
           });
-        if (!upload) return;
+
+        if (!upload) {
+          return;
+        }
         await onactions(
           { action: 'media.send', payload: { target, params: { ...params, fileId: upload, url: undefined, data: undefined, filePath: undefined } } },
           consume
         );
       } else if (data.action === 'connection.status') {
         const status = client.getConnectionStatus();
+
         consume([
           createResult(ResultCode.Ok, data.action, {
             Platform: platform,

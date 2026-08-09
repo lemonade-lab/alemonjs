@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { existsSync, rmSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { WebSocketServer } from 'ws';
 
@@ -167,6 +167,27 @@ try {
     )
   );
   assert.equal(streamRoutedBot, 'bot-b', 'stream updates must remain bound to the Bot that opened them');
+  const largeMediaPath = resolve(process.cwd(), '.data', 'qq-bot', 'large-media-fixture.bin');
+  mkdirSync(dirname(largeMediaPath), { recursive: true });
+  writeFileSync(largeMediaPath, Buffer.alloc(5 * 1024 * 1024, 1));
+  let chunkedMedia;
+  botB.postChunkedRichMedia = async params => {
+    chunkedMedia = params;
+    return { file_uuid: 'file', file_info: 'file-info', ttl: 60 };
+  };
+  await new Promise(resolve =>
+    actionHandler(
+      {
+        action: 'media.upload',
+        payload: { target: { scope: 'group', targetId: 'group', BotId: 'bot-b' }, params: { type: 'file', filePath: largeMediaPath } }
+      },
+      () => resolve()
+    )
+  );
+  assert.equal(chunkedMedia.filePath, largeMediaPath, 'large local media must retain its path for streamed upload');
+  assert.equal(chunkedMedia.data, undefined, 'large local media must not be copied into a Buffer');
+  assert.equal(chunkedMedia.size, 5 * 1024 * 1024);
+  rmSync(largeMediaPath, { force: true });
   registry.disconnect();
   console.log('QQ Bot WebSocket resume fixture passed');
 } catch (error) {
