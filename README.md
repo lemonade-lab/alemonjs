@@ -152,12 +152,13 @@ export default () => {
 
 | Package                                                                  | Description |
 | ------------------------------------------------------------------------ | ----------- |
-| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)     | QQ 机器人   |
+| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)     | QQBot  |
 | [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)   | Discord     |
-| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)     | OneBot      |
 | [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)         | KOOK        |
 | [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram) | Telegram    |
 | [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)     | Bubble      |
+| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)     | OneBot      |
+| [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)     | Wechat      |
 
 ### Extensions
 
@@ -175,6 +176,8 @@ export default () => {
 | [`jsxp`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/jsxp)   | 截图工具               |
 | [`alemondesk`](https://github.com/lemonade-lab/alemondesk)                | 桌面端项目             |
 | [`alemongo`](https://github.com/lemonade-lab/alemongo)                    | 服务端项目             |
+| [`alemonapp`](https://github.com/lemonade-lab/alemonapp)                    | 手机端项目             |
+| [`alemonx`](https://github.com/lemonade-lab/alemonx)                    | Agent开发运维             |
 
 ## Monorepo
 
