@@ -55,7 +55,7 @@
       }
     ],
     "config-source": {
-      "readme": "https://github.com/lemonade-lab/alemonjs/blob/main/packages/qq-bot/README.md",
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/qq-bot/README.md",
       "official": "https://bot.q.qq.com/wiki/develop/api-v2/",
       "platform": "https://q.qq.com/"
     },

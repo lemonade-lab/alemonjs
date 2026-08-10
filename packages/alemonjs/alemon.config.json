@@ -1,0 +1,101 @@
+{
+  "alemonjs": {
+    "config-source": {
+      // 配置来源声明
+      // 带说明配置的 md 内容请求地址
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/qq-bot/README.md",
+      // 官方配置解释地址
+      "official": "https://bot.q.qq.com/wiki/develop/api-v2/",
+      // 官方配置获取方式
+      "platform": "https://q.qq.com/"
+    },
+    "config": [
+      // 配置项
+      {
+        "name": "token", // 项名
+        "type": "string", // 数据类型，支持 string、number、boolean、object、array<string>、array<number>
+        "required": true, // 是否必填
+        "description": "机器人访问令牌" // 配置说明
+      },
+      {
+        "name": "port",
+        "type": "number",
+        "required": false,
+        "default": 3001,
+        "rules": [
+          // 校验规则
+          {
+            "pattern": "^[0-9]+$", // 校验正则
+            "message": "端口必须为数字" // 不匹配正则反馈
+          }
+        ],
+        "description": "服务端口"
+      },
+      {
+        "name": "request_config",
+        "type": "object",
+        "required": false,
+        "default": {},
+        "description": "请求配置",
+        "config": [
+          // object 具体值
+          {
+            "name": "timeout",
+            "type": "number",
+            "required": false,
+            "default": 20000,
+            "description": "请求超时（毫秒）"
+          },
+          {
+            "name": "proxy",
+            "type": "object",
+            "config": []
+          }
+        ]
+      },
+      {
+        "name": "master_key",
+        "type": "array<number>",
+        "required": false,
+        "default": [],
+        "rules": [
+          {
+            "pattern": "^[0-9]+$",
+            "message": "必须为数字"
+          }
+        ],
+        "description": "请求配置"
+      }
+    ],
+    "desktop": {
+      // 适用于 桌面的声明
+      "logo": "antd.RobotOutlined", // 展示图标，支持 antd，或相对路径
+      "platform": [
+        // 平台声明，当自身是平台连接包时，可在连接项中注册
+        {
+          "name": "example", // --login
+          "value": "@alemonjs/example" // --plplatform
+        }
+      ],
+      "command": [
+        // 注册命令输入框
+        {
+          "name": "打开 Example", // 命令说明
+          "command": "open.example" // 命令
+        }
+      ],
+      "sidebars": [
+        // 注册侧边栏
+        {
+          "name": "Example", // 侧边栏说明
+          "command": "open.example" // 侧边栏 命令
+        }
+      ]
+    },
+    "web": {
+      // 注册 Webview
+      "root": "dist", // 资源根地址，即 ./dist/index.html
+      "serverPort": true // 是否强制必须开启 serverPort 才允许打开 webview，常用于内部必须有 serverPort 才能正常访问和使用的情况
+    }
+  }
+}
