@@ -73,8 +73,8 @@
       "platform": [
         // 平台声明，当自身是平台连接包时，可在连接项中注册
         {
-          "name": "example", // --login
-          "value": "@alemonjs/example" // --plplatform
+          "name": "example", // --login 和对应 login: "example"
+          "value": "@alemonjs/example" // --platform platform: "@alemonjs/example"
         }
       ],
       "command": [
