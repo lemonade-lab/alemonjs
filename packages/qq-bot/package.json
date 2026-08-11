@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "2.1.32",
-  "description": "阿柠檬qq-bot平台连接",
+  "version": "2.1.33",
+  "description": "QQ官方平台",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

@@ -21,20 +21,20 @@ QQ 开放平台（QQ Bot）适配器，用于连接 [QQ 开放平台](https://q.
 
 ## 目录
 
-| 章节 | 说明 |
-| --- | --- |
-| [简介](#简介) | 适配器能力概览 |
-| [安装](#安装) | 安装命令 |
-| [快速开始](#快速开始) | 最小可运行示例（Router + defineChildren） |
-| [配置](#配置) | 完整配置项与连接模式 |
-| [调用方式](#调用方式) | 四种 API 调用方式 |
-| [API 总览](#api-overview) | 全部 API 索引（点击跳转详解） |
-| [QQ-Bot 消息类型](#qq-bot-消息类型) | Format 与平台消息类型映射 |
-| [API 详解](#api-详解) | 各 API 参数说明与示例 |
-| [SDK 方法速查](#sdk-方法速查) | `QQBotAPI` 全部 SDK 方法 |
-| [事件支持](#事件支持) | QQ 事件 → 标准事件映射表 |
-| [事件数据结构](#事件数据结构) | 收到的消息数据结构与数据使用方法 |
-| [常见问题](#常见问题) | FAQ |
+| 章节                                | 说明                                      |
+| ----------------------------------- | ----------------------------------------- |
+| [简介](#简介)                       | 适配器能力概览                            |
+| [安装](#安装)                       | 安装命令                                  |
+| [快速开始](#快速开始)               | 最小可运行示例（Router + defineChildren） |
+| [配置](#配置)                       | 完整配置项与连接模式                      |
+| [调用方式](#调用方式)               | 四种 API 调用方式                         |
+| [API 总览](#api-overview)           | 全部 API 索引（点击跳转详解）             |
+| [QQ-Bot 消息类型](#qq-bot-消息类型) | Format 与平台消息类型映射                 |
+| [API 详解](#api-详解)               | 各 API 参数说明与示例                     |
+| [SDK 方法速查](#sdk-方法速查)       | `QQBotAPI` 全部 SDK 方法                  |
+| [事件支持](#事件支持)               | QQ 事件 → 标准事件映射表                  |
+| [事件数据结构](#事件数据结构)       | 收到的消息数据结构与数据使用方法          |
+| [常见问题](#常见问题)               | FAQ                                       |
 
 ---
 
@@ -178,33 +178,33 @@ qq-bot:
 
 ### 配置项说明
 
-| 配置项 | 类型 | 默认值 | 必填 | 说明 |
-| --- | --- | --- | --- | --- |
-| `app_id` | string | - | ✅ | 应用编号（AppID），开放平台创建机器人后获得 |
-| `secret` | string | - | ✅ | 应用密钥（AppSecret）；Webhook 模式同时作为 [ed25519 签名](https://bot.q.qq.com/wiki/develop/api-v2/dev-prepare/interface-framework/sign.html) 的种子 |
-| `master_key` | string[] | `[]` | - | 主人 UserKey 列表，使用 `isMaster` 判断 |
-| `master_id` | string[] | `[]` | - | 主人 UserId 列表（如 QQ 号 / openid），使用 `isMaster` 判断 |
-| `route` | string | `/webhook` | - | Webhook 回调路由，配置后启用 Webhook 模式 |
-| `port` | string | `17157` | - | Webhook 本地监听端口 |
-| `ws` | string | - | - | 已存在的 Webhook 服务地址，配置后作为 WS 客户端连接（`QQBotClient`） |
-| `gatewayURL` | string | - | - | 直连 WebSocket 网关地址，配置后不再自动请求 `/gateway` |
-| `base_url_gateway` | string | - | - | 网关域名代理（用于接入官方之外的服务端） |
-| `base_url_app_access_token` | string | - | - | 获取 access_token 的域名代理 |
-| `is_private` | boolean | `false` | - | 是否私域机器人；私域自动订阅 `GUILD_MESSAGES`、`FORUMS_EVENT`，公域订阅 `PUBLIC_GUILD_MESSAGES` |
-| `sandbox` | boolean | `false` | - | 沙盒环境，使用 `https://sandbox.api.sgroup.qq.com` |
-| `shard` | number[] | `[0, 1]` | - | WebSocket 分片 |
-| `intents` | string[] | 自动组装 | - | 自定义事件订阅，覆盖默认组装逻辑（见 [intents.ts](src/sdk/intents.ts)） |
-| `markdownToText` | boolean | `false` | - | Markdown 降级为纯文本发送 |
-| `hideUnsupported` | boolean \| number | `false` | - | 隐藏不支持消息类型（1~4 级，见上） |
+| 配置项                      | 类型              | 默认值     | 必填 | 说明                                                                                                                                                  |
+| --------------------------- | ----------------- | ---------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app_id`                    | string            | -          | ✅   | 应用编号（AppID），开放平台创建机器人后获得                                                                                                           |
+| `secret`                    | string            | -          | ✅   | 应用密钥（AppSecret）；Webhook 模式同时作为 [ed25519 签名](https://bot.q.qq.com/wiki/develop/api-v2/dev-prepare/interface-framework/sign.html) 的种子 |
+| `master_key`                | string[]          | `[]`       | -    | 主人 UserKey 列表，使用 `isMaster` 判断                                                                                                               |
+| `master_id`                 | string[]          | `[]`       | -    | 主人 UserId 列表（如 QQ 号 / openid），使用 `isMaster` 判断                                                                                           |
+| `route`                     | string            | `/webhook` | -    | Webhook 回调路由，配置后启用 Webhook 模式                                                                                                             |
+| `port`                      | string            | `17157`    | -    | Webhook 本地监听端口                                                                                                                                  |
+| `ws`                        | string            | -          | -    | 已存在的 Webhook 服务地址，配置后作为 WS 客户端连接（`QQBotClient`）                                                                                  |
+| `gatewayURL`                | string            | -          | -    | 直连 WebSocket 网关地址，配置后不再自动请求 `/gateway`                                                                                                |
+| `base_url_gateway`          | string            | -          | -    | 网关域名代理（用于接入官方之外的服务端）                                                                                                              |
+| `base_url_app_access_token` | string            | -          | -    | 获取 access_token 的域名代理                                                                                                                          |
+| `is_private`                | boolean           | `false`    | -    | 是否私域机器人；私域自动订阅 `GUILD_MESSAGES`、`FORUMS_EVENT`，公域订阅 `PUBLIC_GUILD_MESSAGES`                                                       |
+| `sandbox`                   | boolean           | `false`    | -    | 沙盒环境，使用 `https://sandbox.api.sgroup.qq.com`                                                                                                    |
+| `shard`                     | number[]          | `[0, 1]`   | -    | WebSocket 分片                                                                                                                                        |
+| `intents`                   | string[]          | 自动组装   | -    | 自定义事件订阅，覆盖默认组装逻辑（见 [intents.ts](src/sdk/intents.ts)）                                                                               |
+| `markdownToText`            | boolean           | `false`    | -    | Markdown 降级为纯文本发送                                                                                                                             |
+| `hideUnsupported`           | boolean \| number | `false`    | -    | 隐藏不支持消息类型（1~4 级，见上）                                                                                                                    |
 
 ### 连接模式
 
-| 模式 | 触发条件 | 说明 |
-| --- | --- | --- |
-| WebSocket（默认） | 不配置 `route`/`port`/`ws` | 直连官方 `wss://api.sgroup.qq.com` 网关，自动鉴权、心跳、重连（最多 5 次） |
-| Webhook | 配置 `route` 或 `port` | 本地 Koa 服务接收官方回调，ed25519 验签；需公网 ip/域名 |
-| WS 客户端 | 配置 `ws` | 作为客户端连接已存在的 Webhook 服务（不启动本地服务） |
-| 自定义网关 | 配置 `gatewayURL` / `base_url_gateway` | 用于连接自建网关或域名代理 |
+| 模式              | 触发条件                               | 说明                                                                       |
+| ----------------- | -------------------------------------- | -------------------------------------------------------------------------- |
+| WebSocket（默认） | 不配置 `route`/`port`/`ws`             | 直连官方 `wss://api.sgroup.qq.com` 网关，自动鉴权、心跳、重连（最多 5 次） |
+| Webhook           | 配置 `route` 或 `port`                 | 本地 Koa 服务接收官方回调，ed25519 验签；需公网 ip/域名                    |
+| WS 客户端         | 配置 `ws`                              | 作为客户端连接已存在的 Webhook 服务（不启动本地服务）                      |
+| 自定义网关        | 配置 `gatewayURL` / `base_url_gateway` | 用于连接自建网关或域名代理                                                 |
 
 ---
 
@@ -239,10 +239,7 @@ export default async () => {
   const [message] = useMessage();
 
   // 按钮组：一行两个按钮（command 类型，点击自动在输入框插入指令）
-  const bt = Format.createButtonGroup()
-    .addRow()
-    .addButton('确认', '/confirm')
-    .addButton('取消', '/cancel');
+  const bt = Format.createButtonGroup().addRow().addButton('确认', '/confirm').addButton('取消', '/cancel');
 
   await message.send({
     format: Format.create().addText('请确认操作').addButtonGroup(bt)
@@ -339,95 +336,95 @@ await MessageDirect.create().sendToUser({
 
 ### 消息
 
-| API | 说明 |
-| --- | --- |
-| [message.send](#api-message-send) | 回复 / 发送消息，自动按事件场景选择发送通道 |
-| [message.send.channel](#api-message-send-channel) | 主动向频道（子频道/群）发送消息 |
-| [message.send.user](#api-message-send-user) | 主动向用户（C2C/频道私信）发送消息 |
-| [message.delete](#api-message-delete) | 撤回消息（群/频道/单聊/私信按场景分流） |
-| [message.get](#api-message-get) | 获取频道指定消息 |
-| [message.pin / message.unpin](#api-message-pin) | 添加 / 移除频道精华消息 |
-| [mention.get](#api-mention-get) | 获取消息中 @ 提及的用户 |
-| [message.input.notify](#api-message-input-notify) | 发送“正在输入”状态通知（仅单聊） |
+| API                                               | 说明                                        |
+| ------------------------------------------------- | ------------------------------------------- |
+| [message.send](#api-message-send)                 | 回复 / 发送消息，自动按事件场景选择发送通道 |
+| [message.send.channel](#api-message-send-channel) | 主动向频道（子频道/群）发送消息             |
+| [message.send.user](#api-message-send-user)       | 主动向用户（C2C/频道私信）发送消息          |
+| [message.delete](#api-message-delete)             | 撤回消息（群/频道/单聊/私信按场景分流）     |
+| [message.get](#api-message-get)                   | 获取频道指定消息                            |
+| [message.pin / message.unpin](#api-message-pin)   | 添加 / 移除频道精华消息                     |
+| [mention.get](#api-mention-get)                   | 获取消息中 @ 提及的用户                     |
+| [message.input.notify](#api-message-input-notify) | 发送“正在输入”状态通知（仅单聊）            |
 
 ### 群管理
 
-| API | 说明 |
-| --- | --- |
-| [group.info](#api-group-info) | 获取群基本信息 |
-| [group.botState](#api-group-bot-state) | 获取机器人群内状态 |
-| [group.member.info](#api-group-member-info) | 获取群成员详情 |
-| [group.joinRequest.list](#api-group-join-request-list) | 拉取入群申请列表 |
+| API                                                          | 说明                        |
+| ------------------------------------------------------------ | --------------------------- |
+| [group.info](#api-group-info)                                | 获取群基本信息              |
+| [group.botState](#api-group-bot-state)                       | 获取机器人群内状态          |
+| [group.member.info](#api-group-member-info)                  | 获取群成员详情              |
+| [group.joinRequest.list](#api-group-join-request-list)       | 拉取入群申请列表            |
 | [group.joinRequest.approve](#api-group-join-request-approve) | 审批入群申请（通过 / 拒绝） |
-| [group.mute.setting](#api-group-mute-setting) | 查询群禁言状态 |
-| [group.mute.set](#api-group-mute-set) | 设置群成员禁言 |
-| [group.strategy.list](#api-group-strategy) | 入群自动审批策略列表 |
-| [group.strategy.create](#api-group-strategy) | 创建入群自动审批策略 |
-| [group.strategy.update](#api-group-strategy) | 修改入群自动审批策略 |
-| [group.strategy.delete](#api-group-strategy) | 删除入群自动审批策略 |
-| [group.strategy.execute](#api-group-strategy) | 执行策略全量扫描 |
-| [group.strategy.whitelist](#api-group-strategy) | 修改策略白名单 |
+| [group.mute.setting](#api-group-mute-setting)                | 查询群禁言状态              |
+| [group.mute.set](#api-group-mute-set)                        | 设置群成员禁言              |
+| [group.strategy.list](#api-group-strategy)                   | 入群自动审批策略列表        |
+| [group.strategy.create](#api-group-strategy)                 | 创建入群自动审批策略        |
+| [group.strategy.update](#api-group-strategy)                 | 修改入群自动审批策略        |
+| [group.strategy.delete](#api-group-strategy)                 | 删除入群自动审批策略        |
+| [group.strategy.execute](#api-group-strategy)                | 执行策略全量扫描            |
+| [group.strategy.whitelist](#api-group-strategy)              | 修改策略白名单              |
 
 ### 频道（Guild）
 
-| API | 说明 |
-| --- | --- |
-| [channel.info](#api-channel-info) | 获取子频道详情 |
-| [channel.list](#api-channel-list) | 获取频道（服务器）子频道列表 |
-| [channel.create](#api-channel-create) | 创建子频道 |
-| [channel.update](#api-channel-update) | 修改子频道 |
-| [channel.delete](#api-channel-delete) | 删除子频道 |
-| [channel.announce](#api-channel-announce) | 创建 / 删除频道公告 |
+| API                                       | 说明                         |
+| ----------------------------------------- | ---------------------------- |
+| [channel.info](#api-channel-info)         | 获取子频道详情               |
+| [channel.list](#api-channel-list)         | 获取频道（服务器）子频道列表 |
+| [channel.create](#api-channel-create)     | 创建子频道                   |
+| [channel.update](#api-channel-update)     | 修改子频道                   |
+| [channel.delete](#api-channel-delete)     | 删除子频道                   |
+| [channel.announce](#api-channel-announce) | 创建 / 删除频道公告          |
 
 ### 成员
 
-| API | 说明 |
-| --- | --- |
-| [member.info](#api-member-info) | 获取频道成员详情 |
-| [member.list](#api-member-list) | 获取频道成员列表 |
-| [member.kick](#api-member-kick) | 移出频道成员 |
+| API                                          | 说明                                     |
+| -------------------------------------------- | ---------------------------------------- |
+| [member.info](#api-member-info)              | 获取频道成员详情                         |
+| [member.list](#api-member-list)              | 获取频道成员列表                         |
+| [member.kick](#api-member-kick)              | 移出频道成员                             |
 | [member.ban / member.unban](#api-member-ban) | 禁言 / 解除禁言（QQ 频道以禁言代替封禁） |
-| [member.mute](#api-member-mute) | 频道成员禁言（指定时长） |
+| [member.mute](#api-member-mute)              | 频道成员禁言（指定时长）                 |
 
 ### 服务器（Guild）
 
-| API | 说明 |
-| --- | --- |
-| [guild.info](#api-guild-info) | 获取频道（服务器）详情 |
+| API                           | 说明                     |
+| ----------------------------- | ------------------------ |
+| [guild.info](#api-guild-info) | 获取频道（服务器）详情   |
 | [guild.list](#api-guild-list) | 获取机器人加入的频道列表 |
-| [guild.mute](#api-guild-mute) | 全员禁言 |
+| [guild.mute](#api-guild-mute) | 全员禁言                 |
 
 ### 角色
 
-| API | 说明 |
-| --- | --- |
-| [role.list](#api-role-list) | 获取频道身份组列表 |
-| [role.create](#api-role-create) | 创建身份组 |
-| [role.update](#api-role-update) | 修改身份组 |
-| [role.delete](#api-role-delete) | 删除身份组 |
+| API                                           | 说明                  |
+| --------------------------------------------- | --------------------- |
+| [role.list](#api-role-list)                   | 获取频道身份组列表    |
+| [role.create](#api-role-create)               | 创建身份组            |
+| [role.update](#api-role-update)               | 修改身份组            |
+| [role.delete](#api-role-delete)               | 删除身份组            |
 | [role.assign / role.remove](#api-role-assign) | 分配 / 移除成员身份组 |
 
 ### 媒体 / 文件 / 上传
 
-| API | 说明 |
-| --- | --- |
-| [media.send.user](#api-media-send-user) | 向用户发送富媒体（图片/视频/音频/文件） |
-| [media.upload.prepare](#api-media-upload-prepare) | 分片上传准备 |
-| [media.upload.part.finish](#api-media-upload-part-finish) | 分片完成上报 |
-| [media.upload.chunked](#api-media-upload-chunked) | 分片上传全流程（prepare→直传→finish→合并） |
-| [file.send.channel / file.send.user](#api-file-send) | 向群 / 用户发送文件 |
-| [stream.message.send](#api-stream-message-send) | 单聊流式消息 |
+| API                                                       | 说明                                       |
+| --------------------------------------------------------- | ------------------------------------------ |
+| [media.send.user](#api-media-send-user)                   | 向用户发送富媒体（图片/视频/音频/文件）    |
+| [media.upload.prepare](#api-media-upload-prepare)         | 分片上传准备                               |
+| [media.upload.part.finish](#api-media-upload-part-finish) | 分片完成上报                               |
+| [media.upload.chunked](#api-media-upload-chunked)         | 分片上传全流程（prepare→直传→finish→合并） |
+| [file.send.channel / file.send.user](#api-file-send)      | 向群 / 用户发送文件                        |
+| [stream.message.send](#api-stream-message-send)           | 单聊流式消息                               |
 
 ### 表情 / 权限 / 交互 / 其他
 
-| API | 说明 |
-| --- | --- |
-| [reaction.add / reaction.remove](#api-reaction-add) | 添加 / 删除表情表态 |
-| [reaction.list](#api-reaction-list) | 表情表态用户列表 |
-| [permission.get / permission.set](#api-permission) | 子频道用户权限查询 / 设置 |
-| [interaction.response](#api-interaction-response) | 互动事件回应（解除按钮 loading） |
-| [me.info](#api-me-info) | 获取机器人自身信息 |
-| [me.guilds](#api-me-guilds) | 获取机器人频道列表 |
+| API                                                 | 说明                             |
+| --------------------------------------------------- | -------------------------------- |
+| [reaction.add / reaction.remove](#api-reaction-add) | 添加 / 删除表情表态              |
+| [reaction.list](#api-reaction-list)                 | 表情表态用户列表                 |
+| [permission.get / permission.set](#api-permission)  | 子频道用户权限查询 / 设置        |
+| [interaction.response](#api-interaction-response)   | 互动事件回应（解除按钮 loading） |
+| [me.info](#api-me-info)                             | 获取机器人自身信息               |
+| [me.guilds](#api-me-guilds)                         | 获取机器人频道列表               |
 
 ---
 
@@ -437,19 +434,19 @@ QQ-Bot 平台支持的消息类型与 `Format` / `DataEnums` 的对应关系，�
 
 ### Format → QQ-Bot 类型映射
 
-| Format 构建器 | DataEnums 类型 | QQ-Bot 落地 | 说明 |
-| --- | --- | --- | --- |
-| `Format.create().addText(text)` | `Text` | 纯文本 `msg_type: 0` | 最常用 |
-| `addMention(userId)` | `Mention` | `<@user_id>` / `<@everyone>` | 群聊/单聊有效，频道无 @ 语法 |
-| `Format.createMarkdown().addLink()` 等 | `Markdown` | Markdown 消息 `msg_type: 2` | 需要平台 MD 权限，否则可降级 |
-| `addMarkdownOriginal('**raw**')` | `MarkdownOriginal` | Markdown 原始字符串 `msg_type: 2` | 平台侧直接渲染 raw 文本 |
-| `addImage(url)` / `addImage(buffer)` | `Image` / `ImageFile` / `ImageURL` | 富媒体图片 `msg_type: 7` | 群/单聊先上传富媒体（file_type 1）；频道走 multipart |
-| `addAudio(url)` | `Audio` | 富媒体语音 `msg_type: 7` | 群/单聊支持（file_type 3）；频道不支持降级 |
-| `addVideo(url)` | `Video` | 富媒体视频 `msg_type: 7` | 群/单聊支持（file_type 2）；频道降级 |
-| `addAttachment(url, options?)` | `Attachment` | 富媒体文件 `msg_type: 7` | 群/单聊支持（file_type 4）；上传失败时降级 |
-| `Format.createButtonGroup().addButton(...)` | `BT.group` | 按钮（keyboard）`msg_type: 2` | 群/单聊最多 5 行 × 每行 5 个 |
-| -（直接传 `DataEnums`） | `ButtonTemplate` | 平台按钮模板 `keyboard.id` | value 为平台侧模板 ID |
-| -（直接传 `DataEnums`） | `Ark.list` / `Ark.Card` / `Ark.BigCard` | Ark 卡片 `msg_type: 3` | QQ-Bot 特有，`Format` 无内置构建器 |
+| Format 构建器                               | DataEnums 类型                          | QQ-Bot 落地                       | 说明                                                 |
+| ------------------------------------------- | --------------------------------------- | --------------------------------- | ---------------------------------------------------- |
+| `Format.create().addText(text)`             | `Text`                                  | 纯文本 `msg_type: 0`              | 最常用                                               |
+| `addMention(userId)`                        | `Mention`                               | `<@user_id>` / `<@everyone>`      | 群聊/单聊有效，频道无 @ 语法                         |
+| `Format.createMarkdown().addLink()` 等      | `Markdown`                              | Markdown 消息 `msg_type: 2`       | 需要平台 MD 权限，否则可降级                         |
+| `addMarkdownOriginal('**raw**')`            | `MarkdownOriginal`                      | Markdown 原始字符串 `msg_type: 2` | 平台侧直接渲染 raw 文本                              |
+| `addImage(url)` / `addImage(buffer)`        | `Image` / `ImageFile` / `ImageURL`      | 富媒体图片 `msg_type: 7`          | 群/单聊先上传富媒体（file_type 1）；频道走 multipart |
+| `addAudio(url)`                             | `Audio`                                 | 富媒体语音 `msg_type: 7`          | 群/单聊支持（file_type 3）；频道不支持降级           |
+| `addVideo(url)`                             | `Video`                                 | 富媒体视频 `msg_type: 7`          | 群/单聊支持（file_type 2）；频道降级                 |
+| `addAttachment(url, options?)`              | `Attachment`                            | 富媒体文件 `msg_type: 7`          | 群/单聊支持（file_type 4）；上传失败时降级           |
+| `Format.createButtonGroup().addButton(...)` | `BT.group`                              | 按钮（keyboard）`msg_type: 2`     | 群/单聊最多 5 行 × 每行 5 个                         |
+| -（直接传 `DataEnums`）                     | `ButtonTemplate`                        | 平台按钮模板 `keyboard.id`        | value 为平台侧模板 ID                                |
+| -（直接传 `DataEnums`）                     | `Ark.list` / `Ark.Card` / `Ark.BigCard` | Ark 卡片 `msg_type: 3`            | QQ-Bot 特有，`Format` 无内置构建器                   |
 
 ### 文本与 @
 
@@ -563,12 +560,12 @@ export default async () => {
 
 `render_data.style` 对应关系，通过 `options.style` 设置（样式名或数字均可）：
 
-| 样式名 | 样式编号 | 说明 |
-| --- | --- | --- |
-| `'gray'` | `0` | 灰色线框（默认） |
-| `'blue'` | `1` | 蓝色线框 |
-| `'red'` | `3` | 红框 |
-| `'blue-fill'` | `4` | 蓝底白字 |
+| 样式名        | 样式编号 | 说明             |
+| ------------- | -------- | ---------------- |
+| `'gray'`      | `0`      | 灰色线框（默认） |
+| `'blue'`      | `1`      | 蓝色线框         |
+| `'red'`       | `3`      | 红框             |
+| `'blue-fill'` | `4`      | 蓝底白字         |
 
 ```ts
 await message.send({
@@ -619,20 +616,20 @@ await message.send({
 
 #### options 说明
 
-| 选项 | 类型 | 说明 |
-| --- | --- | --- |
-| `type` | `'command'` \| `'link'` \| `'call'` | 指令按钮（默认，点击在输入框插入指令）/ 跳转链接 / 回调按钮 |
-| `data` | string | 按钮携带的数据（`type=command` 为指令文本，`type=link` 为跳转 URL） |
-| `autoEnter` | boolean | 指令按钮点击后自动发送 |
-| `style` | `'gray'` \| `'blue'` \| `'red'` \| `'blue-fill'` | 按钮样式（见上表） |
-| `modal` | `{ content?, confirmText?, cancelText? }` | 点击确认弹窗，确认后继续执行 |
-| `permission` | `{ type?, userIds?, roleIds? }` | 操作权限：`type` 0 指定用户 / 1 仅管理 / 2 全部（默认）/ 3 指定身份组 |
-| `toolTip` | string | 无权限点击时的提示 |
-| `reply` | boolean | 指令按钮带引用回复本消息 |
-| `anchor` | number | `1` 点击后唤起选图器（仅单聊场景客户端支持） |
-| `clickLimit` | number | 可操作点击次数限制（默认不限） |
-| `atBotShowChannelList` | boolean | 指令按钮点击后弹出子频道选择器 |
-| `rawData` | object | 透传的原始按钮数据（可覆盖 `render_data` / `action` 任意字段） |
+| 选项                   | 类型                                             | 说明                                                                  |
+| ---------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
+| `type`                 | `'command'` \| `'link'` \| `'call'`              | 指令按钮（默认，点击在输入框插入指令）/ 跳转链接 / 回调按钮           |
+| `data`                 | string                                           | 按钮携带的数据（`type=command` 为指令文本，`type=link` 为跳转 URL）   |
+| `autoEnter`            | boolean                                          | 指令按钮点击后自动发送                                                |
+| `style`                | `'gray'` \| `'blue'` \| `'red'` \| `'blue-fill'` | 按钮样式（见上表）                                                    |
+| `modal`                | `{ content?, confirmText?, cancelText? }`        | 点击确认弹窗，确认后继续执行                                          |
+| `permission`           | `{ type?, userIds?, roleIds? }`                  | 操作权限：`type` 0 指定用户 / 1 仅管理 / 2 全部（默认）/ 3 指定身份组 |
+| `toolTip`              | string                                           | 无权限点击时的提示                                                    |
+| `reply`                | boolean                                          | 指令按钮带引用回复本消息                                              |
+| `anchor`               | number                                           | `1` 点击后唤起选图器（仅单聊场景客户端支持）                          |
+| `clickLimit`           | number                                           | 可操作点击次数限制（默认不限）                                        |
+| `atBotShowChannelList` | boolean                                          | 指令按钮点击后弹出子频道选择器                                        |
+| `rawData`              | object                                           | 透传的原始按钮数据（可覆盖 `render_data` / `action` 任意字段）        |
 
 > 兼容旧写法：`data` 传对象 `{ click, confirm, cancel }` 也会转换为确认弹窗（`content=click`、`confirm_text=confirm`、`cancel_text=cancel`）。
 
@@ -667,11 +664,11 @@ export default async () => {
 };
 ```
 
-| 类型 | 对应模板 | 说明 |
-| --- | --- | --- |
-| `Ark.list` | 模板 23 | 列表（`[tip, content]`） |
-| `Ark.Card` | 模板 24 | 图文卡片（标题/封面/链接/描述） |
-| `Ark.BigCard` | 模板 37 | 大卡片 |
+| 类型          | 对应模板 | 说明                            |
+| ------------- | -------- | ------------------------------- |
+| `Ark.list`    | 模板 23  | 列表（`[tip, content]`）        |
+| `Ark.Card`    | 模板 24  | 图文卡片（标题/封面/链接/描述） |
+| `Ark.BigCard` | 模板 37  | 大卡片                          |
 
 > 模板详情参考官方文档 `server-inter/message/type/template/template_23.md`、`template_24.md`、`template_37.md`。
 
@@ -679,12 +676,12 @@ export default async () => {
 
 群聊与单聊支持图片、视频、语音、文件富媒体消息（`msg_type: 7`，先上传获取 `file_info`）。适配器按类型自动选择 `file_type` 并上传：
 
-| 类型 | `file_type` | 格式 | 软限制 | 群聊 | 单聊 | 频道 |
-| --- | --- | --- | --- | --- | --- | --- |
-| 图片 `Image` / `ImageFile` / `ImageURL` | 1 | png、jpg | 20 MB | ✅ | ✅ | ✅（multipart） |
-| 视频 `Video` | 2 | mp4 | 30 MB | ✅ | ✅ | ❌ 降级 |
-| 语音 `Audio` | 3 | silk | 20 MB | ✅ | ✅ | ❌ 降级 |
-| 文件 `Attachment` | 4 | 不限 | 200 MB | ✅ | ✅ | ❌ 降级 |
+| 类型                                    | `file_type` | 格式     | 软限制 | 群聊 | 单聊 | 频道            |
+| --------------------------------------- | ----------- | -------- | ------ | ---- | ---- | --------------- |
+| 图片 `Image` / `ImageFile` / `ImageURL` | 1           | png、jpg | 20 MB  | ✅   | ✅   | ✅（multipart） |
+| 视频 `Video`                            | 2           | mp4      | 30 MB  | ✅   | ✅   | ❌ 降级         |
+| 语音 `Audio`                            | 3           | silk     | 20 MB  | ✅   | ✅   | ❌ 降级         |
+| 文件 `Attachment`                       | 4           | 不限     | 200 MB | ✅   | ✅   | ❌ 降级         |
 
 ```ts
 import { useMessage, Format } from 'alemonjs';
@@ -704,6 +701,7 @@ export default async () => {
 ```
 
 > 说明：
+>
 > - 富媒体消息（`msg_type: 7`）无法携带原生 Markdown/按钮，适配器会将 MD/按钮降级为文本合入 `content`，并移除已作为富媒体发送的占位符
 > - 值支持 `https://` / `http://`（自动拉取转 base64）、`file://` 本地路径、`base64://`、Buffer
 > - 超过软限制时降级为文件类型，超过 200 MB 硬限制返回错误
@@ -750,9 +748,7 @@ export default async () => {
   });
   // 文本 + 按钮
   await message.send({
-    format: Format.create().addText('请选择').addButtonGroup(
-      Format.createButtonGroup().addRow().addButton('确认', '/confirm')
-    )
+    format: Format.create().addText('请选择').addButtonGroup(Format.createButtonGroup().addRow().addButton('确认', '/confirm'))
   });
 };
 ```
@@ -786,10 +782,10 @@ const results = await sendAction({
 
 #### message.send.channel — 主动发送到频道 / 群
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `ChannelId` | string | 群 openid 或频道子频道 id |
-| `params.format` | DataEnums[] | 消息内容 |
+| 参数            | 类型        | 说明                      |
+| --------------- | ----------- | ------------------------- |
+| `ChannelId`     | string      | 群 openid 或频道子频道 id |
+| `params.format` | DataEnums[] | 消息内容                  |
 
 ```ts
 // 推荐：MessageDirect
@@ -809,10 +805,10 @@ await sendAction({
 
 #### message.send.user — 主动发送到用户
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `UserId` | string | C2C 用户 openid 或频道私信 guild_id |
-| `params.format` | DataEnums[] | 消息内容 |
+| 参数            | 类型        | 说明                                |
+| --------------- | ----------- | ----------------------------------- |
+| `UserId`        | string      | C2C 用户 openid 或频道私信 guild_id |
+| `params.format` | DataEnums[] | 消息内容                            |
 
 ```ts
 // 推荐：MessageDirect
@@ -834,10 +830,10 @@ await sendAction({
 
 按事件上下文（`SpaceId` / `OpenId`）自动分流到 群撤回 / 频道撤回 / 单聊撤回 / 私信撤回。
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `MessageId` | string | 要撤回的消息 ID |
-| `event` | object | 当前事件对象（`SpaceId`（`GROUP:`/`GUILD:`）、`OpenId`（`C2C:`/`DIRECT:`）、`ChannelId` 从中读取并自动分流） |
+| 参数        | 类型   | 说明                                                                                                         |
+| ----------- | ------ | ------------------------------------------------------------------------------------------------------------ |
+| `MessageId` | string | 要撤回的消息 ID                                                                                              |
+| `event`     | object | 当前事件对象（`SpaceId`（`GROUP:`/`GUILD:`）、`OpenId`（`C2C:`/`DIRECT:`）、`ChannelId` 从中读取并自动分流） |
 
 ```ts
 const [e] = useEvent();
@@ -854,10 +850,10 @@ await sendAction({
 
 #### message.get — 获取频道消息
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
+| 参数        | 类型   | 说明      |
+| ----------- | ------ | --------- |
 | `ChannelId` | string | 子频道 id |
-| `MessageId` | string | 消息 ID |
+| `MessageId` | string | 消息 ID   |
 
 ```ts
 await sendAction({ action: 'message.get', payload: { ChannelId: 'CHANNEL_ID', MessageId: 'MSG_ID' } });
@@ -890,11 +886,11 @@ const results = await sendAction({ action: 'mention.get', payload: { event: e.cu
 
 展示“正在输入”状态，仅单聊支持；与流式消息是不同能力。
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `UserId` | string | 用户 openid |
-| `params.input_type` | number | 输入状态类型，当前固定 `1`（正在输入） |
-| `params.input_second` | number | 展示时长（秒），如 `60` |
+| 参数                  | 类型   | 说明                                   |
+| --------------------- | ------ | -------------------------------------- |
+| `UserId`              | string | 用户 openid                            |
+| `params.input_type`   | number | 输入状态类型，当前固定 `1`（正在输入） |
+| `params.input_second` | number | 展示时长（秒），如 `60`                |
 
 ```ts
 await sendAction({
@@ -952,10 +948,10 @@ await sendAction({ action: 'group.member.info', payload: { params: { groupOpenId
 
 #### group.joinRequest.list — 拉取入群申请列表
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `params.cursor` | string | 分页游标，首次不传或传空 |
-| `params.limit` | number | 单页数量，默认 20，最大 100 |
+| 参数            | 类型   | 说明                        |
+| --------------- | ------ | --------------------------- |
+| `params.cursor` | string | 分页游标，首次不传或传空    |
+| `params.limit`  | number | 单页数量，默认 20，最大 100 |
 
 ```ts
 const results = await sendAction({
@@ -971,14 +967,14 @@ const results = await sendAction({
 
 #### group.joinRequest.approve — 审批入群申请
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `event` | object | 来源事件（推荐）：群 openid / 申请人 openid 自动推断，无需显式传 |
-| `ChannelId` / `UserId` | string | 可选，显式指定群 openid / 申请人 openid（优先级高于 event 推断） |
-| `params.op` | string | `approve` 通过 / `decline` 拒绝 |
-| `params.joinRequestId` | string | 申请 ID（申请事件 `GROUP_JOIN_REQUEST` 中携带） |
-| `params.rejectReason` | string | 拒绝理由（`op=decline` 时） |
-| `params.addToMemberBlacklist` | boolean | 同时加入群黑名单（`op=decline` 时） |
+| 参数                          | 类型    | 说明                                                             |
+| ----------------------------- | ------- | ---------------------------------------------------------------- |
+| `event`                       | object  | 来源事件（推荐）：群 openid / 申请人 openid 自动推断，无需显式传 |
+| `ChannelId` / `UserId`        | string  | 可选，显式指定群 openid / 申请人 openid（优先级高于 event 推断） |
+| `params.op`                   | string  | `approve` 通过 / `decline` 拒绝                                  |
+| `params.joinRequestId`        | string  | 申请 ID（申请事件 `GROUP_JOIN_REQUEST` 中携带）                  |
+| `params.rejectReason`         | string  | 拒绝理由（`op=decline` 时）                                      |
+| `params.addToMemberBlacklist` | boolean | 同时加入群黑名单（`op=decline` 时）                              |
 
 ```ts
 // 通过（推荐：透传事件，自动推断群 openid / 申请人 openid）
@@ -1018,8 +1014,8 @@ const results = await sendAction({ action: 'group.mute.setting', payload: { even
 
 #### group.mute.set — 设置群成员禁言
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
+| 参数             | 类型                 | 说明                           |
+| ---------------- | -------------------- | ------------------------------ |
 | `params.members` | SetMemberMuteState[] | 禁言操作列表，单次不超过 10 个 |
 
 `SetMemberMuteState`：`{ op: 'add' | 'update' | 'del', member_openid, mute_expire_at? }`（`mute_expire_at` 为 RFC3339 时间，`op=del` 可传空串立即解除）。
@@ -1039,7 +1035,7 @@ await sendAction({
 
 <a id="api-group-strategy"></a>
 
-#### group.strategy.* — 入群自动审批策略
+#### group.strategy.\* — 入群自动审批策略
 
 一个机器人最多创建 20 个策略，策略仅在机器人拥有对应群管理员身份时生效。
 
@@ -1051,13 +1047,13 @@ await sendAction({ action: 'group.strategy.list', payload: { params: { cursor: '
 
 **group.strategy.create — 创建策略**
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `params.groupOpenIds` | string[] | 关联群 openid 列表，与 `groupIds` 二选一 |
-| `params.groupIds` | string[] | 关联 QQ 群号列表（字符串，避免 JS 精度问题），与 `groupOpenIds` 二选一 |
-| `params.isEnable` | string | `on` 启用 / `off` 关闭，默认 `on` |
-| `params.expireAt` | string | 过期时间（RFC3339），不传默认一年后 |
-| `params.remark` | string | 备注，最多 255 字 |
+| 参数                  | 类型     | 说明                                                                   |
+| --------------------- | -------- | ---------------------------------------------------------------------- |
+| `params.groupOpenIds` | string[] | 关联群 openid 列表，与 `groupIds` 二选一                               |
+| `params.groupIds`     | string[] | 关联 QQ 群号列表（字符串，避免 JS 精度问题），与 `groupOpenIds` 二选一 |
+| `params.isEnable`     | string   | `on` 启用 / `off` 关闭，默认 `on`                                      |
+| `params.expireAt`     | string   | 过期时间（RFC3339），不传默认一年后                                    |
+| `params.remark`       | string   | 备注，最多 255 字                                                      |
 
 ```ts
 await sendAction({
@@ -1068,11 +1064,11 @@ await sendAction({
 
 **group.strategy.update — 修改策略**
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `StrategyId` | string | 策略 ID |
-| `params.isEnable` / `params.expireAt` / `params.remark` | - | 同创建 |
-| `params.groupAction` | object | `{ op: 'add'\|'del', groupOpenIds?, groupIds? }` 关联群增删 |
+| 参数                                                    | 类型   | 说明                                                        |
+| ------------------------------------------------------- | ------ | ----------------------------------------------------------- |
+| `StrategyId`                                            | string | 策略 ID                                                     |
+| `params.isEnable` / `params.expireAt` / `params.remark` | -      | 同创建                                                      |
+| `params.groupAction`                                    | object | `{ op: 'add'\|'del', groupOpenIds?, groupIds? }` 关联群增删 |
 
 **group.strategy.delete — 删除策略**
 
@@ -1090,10 +1086,10 @@ await sendAction({ action: 'group.strategy.execute', payload: { StrategyId: 'STR
 
 **group.strategy.whitelist — 修改白名单**
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `StrategyId` | string | 策略 ID |
-| `params.op` | string | `add` 新增 / `del` 删除 |
+| 参数                    | 类型     | 说明                                                   |
+| ----------------------- | -------- | ------------------------------------------------------ |
+| `StrategyId`            | string   | 策略 ID                                                |
+| `params.op`             | string   | `add` 新增 / `del` 删除                                |
 | `params.whitelistUsers` | string[] | QQ 号码列表（字符串），单次最多 10000 个，总上限 10 万 |
 
 ```ts
@@ -1133,12 +1129,12 @@ await sendAction({ action: 'channel.list', payload: { GuildId: 'GUILD_ID' } });
 
 #### channel.create — 创建子频道
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `GuildId` | string | 频道（服务器）id |
-| `params.name` | string | 子频道名称 |
-| `params.type` | number | 子频道类型 |
-| `params.parentId` | string | 父分组 id |
+| 参数              | 类型   | 说明             |
+| ----------------- | ------ | ---------------- |
+| `GuildId`         | string | 频道（服务器）id |
+| `params.name`     | string | 子频道名称       |
+| `params.type`     | number | 子频道类型       |
+| `params.parentId` | string | 父分组 id        |
 
 ```ts
 await sendAction({ action: 'channel.create', payload: { GuildId: 'GUILD_ID', params: { name: '游戏区', type: 0 } } });
@@ -1164,12 +1160,12 @@ await sendAction({ action: 'channel.delete', payload: { ChannelId: 'CHANNEL_ID' 
 
 #### channel.announce — 频道公告
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `GuildId` | string | 频道 id |
-| `params.messageId` | string | 公告消息 id |
-| `params.channelId` | string | 子频道 id（消息 id 存在时必传） |
-| `params.remove` | boolean | `true` 删除公告（`messageId='all'` 清空） |
+| 参数               | 类型    | 说明                                      |
+| ------------------ | ------- | ----------------------------------------- |
+| `GuildId`          | string  | 频道 id                                   |
+| `params.messageId` | string  | 公告消息 id                               |
+| `params.channelId` | string  | 子频道 id（消息 id 存在时必传）           |
+| `params.remove`    | boolean | `true` 删除公告（`messageId='all'` 清空） |
 
 ```ts
 // 创建公告
@@ -1341,12 +1337,12 @@ await sendAction({ action: 'role.remove', payload: { GuildId: 'GUILD_ID', UserId
 
 #### media.send.user — 发送富媒体到用户
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `UserId` | string | 用户 openid |
+| 参数          | 类型   | 说明                                 |
+| ------------- | ------ | ------------------------------------ |
+| `UserId`      | string | 用户 openid                          |
 | `params.type` | string | `image` / `video` / `audio` / `file` |
-| `params.url` | string | 文件 URL |
-| `params.data` | string | base64 文件数据 |
+| `params.url`  | string | 文件 URL                             |
+| `params.data` | string | base64 文件数据                      |
 
 ```ts
 await sendAction({
@@ -1361,10 +1357,10 @@ await sendAction({
 
 #### media.upload.prepare — 分片上传准备
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `UserId` / `GroupId` | string | 用户 openid 或群 openid（二选一，优先 UserId） |
-| `params` | UploadPrepareData | `{ file_type, file_name, file_size, md5, sha1, md5_10m }` |
+| 参数                 | 类型              | 说明                                                      |
+| -------------------- | ----------------- | --------------------------------------------------------- |
+| `UserId` / `GroupId` | string            | 用户 openid 或群 openid（二选一，优先 UserId）            |
+| `params`             | UploadPrepareData | `{ file_type, file_name, file_size, md5, sha1, md5_10m }` |
 
 ```ts
 await sendAction({
@@ -1379,10 +1375,10 @@ await sendAction({
 
 #### media.upload.part.finish — 分片完成上报
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `UserId` / `GroupId` | string | 用户 / 群 openid |
-| `params` | UploadPartFinishData | `{ upload_id, part_index, block_size, md5 }` |
+| 参数                 | 类型                 | 说明                                         |
+| -------------------- | -------------------- | -------------------------------------------- |
+| `UserId` / `GroupId` | string               | 用户 / 群 openid                             |
+| `params`             | UploadPartFinishData | `{ upload_id, part_index, block_size, md5 }` |
 
 <a id="api-media-upload-chunked"></a>
 
@@ -1390,13 +1386,13 @@ await sendAction({
 
 自动编排完整流程：`upload_prepare` 拿 `upload_id` 与每片 `presigned_url` → 分片字节 PUT 直传 COS → 每片成功上报 `upload_part_finish` → 全部完成后合并得到 `file_info`。
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `UserId` / `GroupId` | string | 用户 / 群 openid |
-| `params.file` 或 `params.file_path` | string \| Buffer | 本地文件路径或文件内容 |
-| `params.file_type` | number | 1 图片 / 2 视频 / 3 语音 / 4 文件 |
-| `params.file_name` | string | 文件名（可选） |
-| `params.srv_send_msg` | boolean | 是否合并后直接发送（可选） |
+| 参数                                | 类型             | 说明                              |
+| ----------------------------------- | ---------------- | --------------------------------- |
+| `UserId` / `GroupId`                | string           | 用户 / 群 openid                  |
+| `params.file` 或 `params.file_path` | string \| Buffer | 本地文件路径或文件内容            |
+| `params.file_type`                  | number           | 1 图片 / 2 视频 / 3 语音 / 4 文件 |
+| `params.file_name`                  | string           | 文件名（可选）                    |
+| `params.srv_send_msg`               | boolean          | 是否合并后直接发送（可选）        |
 
 ```ts
 await sendAction({
@@ -1430,17 +1426,17 @@ await sendAction({
 
 持续更新同一条回复：首次请求创建，后续请求带 `stream_msg_id` 更新，最后一包 `input_state: 10` 结束。
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `UserId` | string | 用户 openid（仅单聊） |
-| `params.input_mode` | string | `append` 追加（默认）/ `replace` 替换（传全量正文） |
-| `params.input_state` | number | `1` 生成中 / `10` 生成结束 |
-| `params.content_type` | string | `text` / `markdown` |
-| `params.content_raw` | string | 当前展示内容 |
-| `params.msg_id` / `params.event_id` | string | 被动回复标识，二选一 |
-| `params.msg_seq` | number | 去重序号，同一条内保持一致 |
-| `params.index` | number | 分片序号，从 0 递增 |
-| `params.stream_msg_id` | string | 首次响应返回的 `id`，后续请求携带 |
+| 参数                                | 类型   | 说明                                                |
+| ----------------------------------- | ------ | --------------------------------------------------- |
+| `UserId`                            | string | 用户 openid（仅单聊）                               |
+| `params.input_mode`                 | string | `append` 追加（默认）/ `replace` 替换（传全量正文） |
+| `params.input_state`                | number | `1` 生成中 / `10` 生成结束                          |
+| `params.content_type`               | string | `text` / `markdown`                                 |
+| `params.content_raw`                | string | 当前展示内容                                        |
+| `params.msg_id` / `params.event_id` | string | 被动回复标识，二选一                                |
+| `params.msg_seq`                    | number | 去重序号，同一条内保持一致                          |
+| `params.index`                      | number | 分片序号，从 0 递增                                 |
+| `params.stream_msg_id`              | string | 首次响应返回的 `id`，后续请求携带                   |
 
 ```ts
 // 首次
@@ -1451,12 +1447,26 @@ await sendAction({
 // 后续
 await sendAction({
   action: 'stream.message.send',
-  payload: { UserId: 'USER_OPENID', params: { input_mode: 'replace', input_state: 1, content_type: 'text', content_raw: '正在分析，已找到资料...', msg_seq: 1, index: 1, stream_msg_id: 'STREAM_MSG_ID' } }
+  payload: {
+    UserId: 'USER_OPENID',
+    params: {
+      input_mode: 'replace',
+      input_state: 1,
+      content_type: 'text',
+      content_raw: '正在分析，已找到资料...',
+      msg_seq: 1,
+      index: 1,
+      stream_msg_id: 'STREAM_MSG_ID'
+    }
+  }
 });
 // 结束
 await sendAction({
   action: 'stream.message.send',
-  payload: { UserId: 'USER_OPENID', params: { input_mode: 'replace', input_state: 10, content_type: 'text', content_raw: '结论：...', msg_seq: 1, index: 2, stream_msg_id: 'STREAM_MSG_ID' } }
+  payload: {
+    UserId: 'USER_OPENID',
+    params: { input_mode: 'replace', input_state: 10, content_type: 'text', content_raw: '结论：...', msg_seq: 1, index: 2, stream_msg_id: 'STREAM_MSG_ID' }
+  }
 });
 ```
 
@@ -1470,11 +1480,11 @@ await sendAction({
 
 #### reaction.add / reaction.remove — 表情表态
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
+| 参数        | 类型   | 说明      |
+| ----------- | ------ | --------- |
 | `ChannelId` | string | 子频道 id |
-| `MessageId` | string | 消息 ID |
-| `EmojiId` | string | 表情 id |
+| `MessageId` | string | 消息 ID   |
+| `EmojiId`   | string | 表情 id   |
 
 ```ts
 await sendAction({ action: 'reaction.add', payload: { ChannelId: 'CHANNEL_ID', MessageId: 'MSG_ID', EmojiId: '106' } });
@@ -1565,34 +1575,34 @@ export default async () => {
 };
 ```
 
-| 分类 | SDK 方法 | 说明 |
-| --- | --- | --- |
-| 鉴权 | `getAuthentication` / `gateway` | 获取 access_token / 网关地址 |
-| 单聊 | `usersOpenMessages` | 发送单聊消息（msg_type 0/2/3/6/7） |
-| 单聊 | `userMessageDelete` | 撤回单聊消息 |
-| 单聊 | `postRichMediaByUser` | 发送单聊富媒体（超 10MB 自动分片） |
-| 单聊 | `streamMessages` | 流式消息 |
-| 群聊 | `groupOpenMessages` | 发送群聊消息 |
-| 群聊 | `groupMessageDelete` | 撤回群消息 |
-| 群聊 | `postRichMediaByGroup` | 发送群聊富媒体 |
-| 群管理 | `groupsInfo` / `groupsBotState` / `groupsMembersMessage` | 群信息 / 状态 / 成员 |
-| 群管理 | `groupsJoinRequestList` / `groupsApprovalJoinRequest` | 入群申请列表 / 审批 |
-| 群管理 | `groupsRestrictChatSetting` / `groupsRestrictChatSettingPost` | 禁言查询 / 设置 |
-| 群管理 | `groupsJoinApprovalStrategies` / `groupsJoinApprovalStrategyCreate` / `groupsJoinApprovalStrategyPatch` / `groupsJoinApprovalStrategyDelete` / `groupsJoinApprovalStrategyExecute` / `groupsJoinApprovalStrategyWhitelistUsers` | 入群自动审批策略 |
-| 分片上传 | `usersUploadPrepare` / `groupUploadPrepare` / `usersUploadPartFinish` / `groupUploadPartFinish` / `uploadPartDirect` | 分片上传各环节 |
-| 频道 | `guilds` / `guildsChannels` / `channels` / `guildsChannelsCreate` / `guildsChannelsUpdate` / `guildsChannelsdelete` | 频道与子频道管理 |
-| 频道消息 | `channelsMessages` / `channelsMessagesById` / `channelsMessagesDelete` / `dmsMessages` / `dmsMessageDelete` | 频道消息收发 |
-| 成员 | `guildsMembers` / `guildsMembersMessage` / `guildsMembersDelete` / `guildsRolesMembers` | 成员管理 |
-| 禁言 | `guildsMuteAll` / `guildsMute` / `guildsMemberMute` | 全员 / 批量 / 成员禁言 |
-| 角色 | `guildsRoles` / `guildsRolesPost` / `guildsRolesPatch` / `guildsRolesDelete` / `guildsRolesMembersPut` / `guildsRolesMembersDelete` | 身份组管理 |
-| 权限 | `channelsPermissions` / `channelsPermissionsPut` | 子频道权限 |
-| 表情 | `channelsMessagesReactionsPut` / `channelsMessagesReactionsDelete` / `channelsMessagesReactionsUsers` | 表情表态 |
-| 公告 | `guildsAnnounces` / `guildsAnnouncesDelete` | 频道公告 |
-| 精华 | `channelsPinsPut` / `channelsPinsDelete` / `channelsPins` | 精华消息 |
-| 日程 | `channelsSchedules` / `channelsSchedulesSchedule` / `channelsSchedulesPost` / `channelsSchedulesSchedulePatch` / `channelsSchedulesScheduleDelete` | 频道日程 |
-| 音频 | `channelsAudioPost` / `channelsMicPut` / `channelsMicDelete` | 音频控制 / 上下麦 |
-| 帖子 | `channelsThreads` / `channelsThreadsThread` / `channelsThreadsPut` / `channelsThreadsDelete` | 论坛帖子 |
-| 其他 | `usersMe` / `usersMeGuilds` / `usersMeDms` / `interactionResponse` | 机器人信息 / 私信会话 / 互动回应 |
+| 分类     | SDK 方法                                                                                                                                                                                                                        | 说明                               |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| 鉴权     | `getAuthentication` / `gateway`                                                                                                                                                                                                 | 获取 access_token / 网关地址       |
+| 单聊     | `usersOpenMessages`                                                                                                                                                                                                             | 发送单聊消息（msg_type 0/2/3/6/7） |
+| 单聊     | `userMessageDelete`                                                                                                                                                                                                             | 撤回单聊消息                       |
+| 单聊     | `postRichMediaByUser`                                                                                                                                                                                                           | 发送单聊富媒体（超 10MB 自动分片） |
+| 单聊     | `streamMessages`                                                                                                                                                                                                                | 流式消息                           |
+| 群聊     | `groupOpenMessages`                                                                                                                                                                                                             | 发送群聊消息                       |
+| 群聊     | `groupMessageDelete`                                                                                                                                                                                                            | 撤回群消息                         |
+| 群聊     | `postRichMediaByGroup`                                                                                                                                                                                                          | 发送群聊富媒体                     |
+| 群管理   | `groupsInfo` / `groupsBotState` / `groupsMembersMessage`                                                                                                                                                                        | 群信息 / 状态 / 成员               |
+| 群管理   | `groupsJoinRequestList` / `groupsApprovalJoinRequest`                                                                                                                                                                           | 入群申请列表 / 审批                |
+| 群管理   | `groupsRestrictChatSetting` / `groupsRestrictChatSettingPost`                                                                                                                                                                   | 禁言查询 / 设置                    |
+| 群管理   | `groupsJoinApprovalStrategies` / `groupsJoinApprovalStrategyCreate` / `groupsJoinApprovalStrategyPatch` / `groupsJoinApprovalStrategyDelete` / `groupsJoinApprovalStrategyExecute` / `groupsJoinApprovalStrategyWhitelistUsers` | 入群自动审批策略                   |
+| 分片上传 | `usersUploadPrepare` / `groupUploadPrepare` / `usersUploadPartFinish` / `groupUploadPartFinish` / `uploadPartDirect`                                                                                                            | 分片上传各环节                     |
+| 频道     | `guilds` / `guildsChannels` / `channels` / `guildsChannelsCreate` / `guildsChannelsUpdate` / `guildsChannelsdelete`                                                                                                             | 频道与子频道管理                   |
+| 频道消息 | `channelsMessages` / `channelsMessagesById` / `channelsMessagesDelete` / `dmsMessages` / `dmsMessageDelete`                                                                                                                     | 频道消息收发                       |
+| 成员     | `guildsMembers` / `guildsMembersMessage` / `guildsMembersDelete` / `guildsRolesMembers`                                                                                                                                         | 成员管理                           |
+| 禁言     | `guildsMuteAll` / `guildsMute` / `guildsMemberMute`                                                                                                                                                                             | 全员 / 批量 / 成员禁言             |
+| 角色     | `guildsRoles` / `guildsRolesPost` / `guildsRolesPatch` / `guildsRolesDelete` / `guildsRolesMembersPut` / `guildsRolesMembersDelete`                                                                                             | 身份组管理                         |
+| 权限     | `channelsPermissions` / `channelsPermissionsPut`                                                                                                                                                                                | 子频道权限                         |
+| 表情     | `channelsMessagesReactionsPut` / `channelsMessagesReactionsDelete` / `channelsMessagesReactionsUsers`                                                                                                                           | 表情表态                           |
+| 公告     | `guildsAnnounces` / `guildsAnnouncesDelete`                                                                                                                                                                                     | 频道公告                           |
+| 精华     | `channelsPinsPut` / `channelsPinsDelete` / `channelsPins`                                                                                                                                                                       | 精华消息                           |
+| 日程     | `channelsSchedules` / `channelsSchedulesSchedule` / `channelsSchedulesPost` / `channelsSchedulesSchedulePatch` / `channelsSchedulesScheduleDelete`                                                                              | 频道日程                           |
+| 音频     | `channelsAudioPost` / `channelsMicPut` / `channelsMicDelete`                                                                                                                                                                    | 音频控制 / 上下麦                  |
+| 帖子     | `channelsThreads` / `channelsThreadsThread` / `channelsThreadsPut` / `channelsThreadsDelete`                                                                                                                                    | 论坛帖子                           |
+| 其他     | `usersMe` / `usersMeGuilds` / `usersMeDms` / `interactionResponse`                                                                                                                                                              | 机器人信息 / 私信会话 / 互动回应   |
 
 ---
 
@@ -1602,34 +1612,34 @@ export default async () => {
 
 各事件对应的数据结构与读取方法见 [事件数据结构](#事件数据结构)，快捷跳转：
 
-| 分类 | 跳转 |
-| --- | --- |
-| 消息事件（群 / 单聊 / 频道 / 私信） | [原始数据结构](#event-data-message) |
-| 互动按钮 | [互动按钮事件](#event-data-interaction) |
-| 入群申请 / 成员 / 好友 | [群管理·成员·好友事件](#event-data-group) |
-| 频道事件 | [频道事件](#event-data-guild) |
-| 字段读取 / @ 提及 / 按场景回复 | [数据使用方法](#event-data-usage) |
+| 分类                                | 跳转                                      |
+| ----------------------------------- | ----------------------------------------- |
+| 消息事件（群 / 单聊 / 频道 / 私信） | [原始数据结构](#event-data-message)       |
+| 互动按钮                            | [互动按钮事件](#event-data-interaction)   |
+| 入群申请 / 成员 / 好友              | [群管理·成员·好友事件](#event-data-group) |
+| 频道事件                            | [频道事件](#event-data-guild)             |
+| 字段读取 / @ 提及 / 按场景回复      | [数据使用方法](#event-data-usage)         |
 
-| QQ 事件 | 标准事件 | 场景 |
-| --- | --- | --- |
-| `GROUP_MESSAGE_CREATE` / `GROUP_AT_MESSAGE_CREATE` | `message.create` | 群消息 / 群 @ |
-| `AT_MESSAGE_CREATE` / `MESSAGE_CREATE` | `message.create` | 频道 @ / 私域全量消息 |
-| `C2C_MESSAGE_CREATE` | `private.message.create` | 单聊 |
-| `DIRECT_MESSAGE_CREATE` | `private.message.create` | 频道私信 |
-| `INTERACTION_CREATE` | `interaction.create` / `private.interaction.create` | 互动按钮（群/单聊/频道） |
-| `MESSAGE_DELETE` / `PUBLIC_MESSAGE_DELETE` | `message.delete` | 频道消息撤回 |
-| `DIRECT_MESSAGE_DELETE` | `private.message.delete` | 私信撤回 |
-| `GROUP_MEMBER_ADD` / `GROUP_MEMBER_REMOVE` | `member.add` / `member.remove` | 群成员变动 |
-| `GUILD_MEMBER_ADD` / `GUILD_MEMBER_REMOVE` / `GUILD_MEMBER_UPDATE` | `member.add` / `member.remove` / `member.update` | 频道成员变动 |
-| `GROUP_ADD_ROBOT` / `GROUP_DEL_ROBOT` | `guild.join` / `guild.exit` | 机器人入群 / 退群 |
-| `GUILD_CREATE` / `GUILD_DELETE` / `GUILD_UPDATE` | `guild.join` / `guild.exit` / `guild.update` | 机器人加入/退出/频道更新 |
-| `CHANNEL_CREATE` / `CHANNEL_DELETE` / `CHANNEL_UPDATE` | `channel.create` / `channel.delete` / `channel.update` | 子频道变动 |
-| `MESSAGE_REACTION_ADD` / `MESSAGE_REACTION_REMOVE` | `message.reaction.add` / `message.reaction.remove` | 表情表态 |
-| `FRIEND_ADD` / `FRIEND_DEL` | `private.friend.add` / `private.friend.remove` | 好友添加 / 删除 |
-| `GROUP_JOIN_REQUEST` | `notice.create` | 用户申请加群（需群管理员） |
-| `GROUP_MSG_RECEIVE` / `GROUP_MSG_REJECT` / `MESSAGE_AUDIT_PASS` / `MESSAGE_AUDIT_REJECT` | `notice.create` | 群推送开关 / 消息审核 |
-| `C2C_MSG_RECEIVE` / `C2C_MSG_REJECT` | `private.notice.create` | 单聊推送开关 |
-| `ERROR` | - | 连接 / 事件处理错误 |
+| QQ 事件                                                                                  | 标准事件                                               | 场景                       |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------- |
+| `GROUP_MESSAGE_CREATE` / `GROUP_AT_MESSAGE_CREATE`                                       | `message.create`                                       | 群消息 / 群 @              |
+| `AT_MESSAGE_CREATE` / `MESSAGE_CREATE`                                                   | `message.create`                                       | 频道 @ / 私域全量消息      |
+| `C2C_MESSAGE_CREATE`                                                                     | `private.message.create`                               | 单聊                       |
+| `DIRECT_MESSAGE_CREATE`                                                                  | `private.message.create`                               | 频道私信                   |
+| `INTERACTION_CREATE`                                                                     | `interaction.create` / `private.interaction.create`    | 互动按钮（群/单聊/频道）   |
+| `MESSAGE_DELETE` / `PUBLIC_MESSAGE_DELETE`                                               | `message.delete`                                       | 频道消息撤回               |
+| `DIRECT_MESSAGE_DELETE`                                                                  | `private.message.delete`                               | 私信撤回                   |
+| `GROUP_MEMBER_ADD` / `GROUP_MEMBER_REMOVE`                                               | `member.add` / `member.remove`                         | 群成员变动                 |
+| `GUILD_MEMBER_ADD` / `GUILD_MEMBER_REMOVE` / `GUILD_MEMBER_UPDATE`                       | `member.add` / `member.remove` / `member.update`       | 频道成员变动               |
+| `GROUP_ADD_ROBOT` / `GROUP_DEL_ROBOT`                                                    | `guild.join` / `guild.exit`                            | 机器人入群 / 退群          |
+| `GUILD_CREATE` / `GUILD_DELETE` / `GUILD_UPDATE`                                         | `guild.join` / `guild.exit` / `guild.update`           | 机器人加入/退出/频道更新   |
+| `CHANNEL_CREATE` / `CHANNEL_DELETE` / `CHANNEL_UPDATE`                                   | `channel.create` / `channel.delete` / `channel.update` | 子频道变动                 |
+| `MESSAGE_REACTION_ADD` / `MESSAGE_REACTION_REMOVE`                                       | `message.reaction.add` / `message.reaction.remove`     | 表情表态                   |
+| `FRIEND_ADD` / `FRIEND_DEL`                                                              | `private.friend.add` / `private.friend.remove`         | 好友添加 / 删除            |
+| `GROUP_JOIN_REQUEST`                                                                     | `notice.create`                                        | 用户申请加群（需群管理员） |
+| `GROUP_MSG_RECEIVE` / `GROUP_MSG_REJECT` / `MESSAGE_AUDIT_PASS` / `MESSAGE_AUDIT_REJECT` | `notice.create`                                        | 群推送开关 / 消息审核      |
+| `C2C_MSG_RECEIVE` / `C2C_MSG_REJECT`                                                     | `private.notice.create`                                | 单聊推送开关               |
+| `ERROR`                                                                                  | -                                                      | 连接 / 事件处理错误        |
 
 示例：监听入群申请事件
 
@@ -1657,17 +1667,17 @@ export default async () => {
   // value 为原始 QQ 事件：携带 group_openid / join_request_id / member_openid / username 等
   const value = event.value;
 
-      // notice.create 下通过 _tag 区分具体事件
-      if (event.current._tag === 'GROUP_JOIN_REQUEST') {
-        // 结合 group.joinRequest.approve 审批（透传事件，群 openid / 申请人 openid 自动推断）
-        await sendAction({
-          action: 'group.joinRequest.approve',
-          payload: {
-            event: event.current,
-            params: { op: 'approve', joinRequestId: value.join_request_id }
-          }
-        });
+  // notice.create 下通过 _tag 区分具体事件
+  if (event.current._tag === 'GROUP_JOIN_REQUEST') {
+    // 结合 group.joinRequest.approve 审批（透传事件，群 openid / 申请人 openid 自动推断）
+    await sendAction({
+      action: 'group.joinRequest.approve',
+      payload: {
+        event: event.current,
+        params: { op: 'approve', joinRequestId: value.join_request_id }
       }
+    });
+  }
 };
 ```
 
@@ -1679,34 +1689,34 @@ export default async () => {
 
 ### 统一标准字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `name` | string | 标准事件名：`message.create`、`private.message.create`、`interaction.create`、`member.add`、`notice.create` 等 |
-| `value` | object | **原始 QQ 事件**（WebSocket 推送的 `d` 数据），各场景结构见下 |
-| `_tag` | string | 来源 QQ 事件名，如 `GROUP_AT_MESSAGE_CREATE`、`GROUP_JOIN_REQUEST`（`.add({ tag })` 存储为 `_tag`） |
-| `Platform` | string | `'qq-bot'` |
-| `BotId` | string | 机器人 app_id |
-| `GuildId` | string | 群 openid 或频道 id（群场景即群 openid） |
-| `SpaceId` | string | 空间标识：`GROUP:{group_openid}` / `GUILD:{channel_id}` |
-| `ChannelId` | string | 群 openid 或子频道 id |
-| `UserId` / `UserKey` | string | 发送者 ID 与框架生成的用户 Key |
-| `UserName` / `UserAvatar` | string | 昵称 / 头像 URL |
-| `IsMaster` / `IsBot` | boolean | 是否主人 / 是否机器人 |
-| `MessageId` | string | 消息 ID（入群申请为拼接 ID） |
-| `MessageText` | string | 消息文本（已去除 @ 占位符） |
-| `OpenId` | string | 回复标识：`C2C:{user_openid}` / `DIRECT:{guild_id}` |
-| `IsAtMe` / `IsPrivate` | boolean | 是否 @ 机器人 / 是否私聊 |
-| `Timestamp` | number | 框架自动注入的事件创建时间 |
+| 字段                      | 类型    | 说明                                                                                                           |
+| ------------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| `name`                    | string  | 标准事件名：`message.create`、`private.message.create`、`interaction.create`、`member.add`、`notice.create` 等 |
+| `value`                   | object  | **原始 QQ 事件**（WebSocket 推送的 `d` 数据），各场景结构见下                                                  |
+| `_tag`                    | string  | 来源 QQ 事件名，如 `GROUP_AT_MESSAGE_CREATE`、`GROUP_JOIN_REQUEST`（`.add({ tag })` 存储为 `_tag`）            |
+| `Platform`                | string  | `'qq-bot'`                                                                                                     |
+| `BotId`                   | string  | 机器人 app_id                                                                                                  |
+| `GuildId`                 | string  | 群 openid 或频道 id（群场景即群 openid）                                                                       |
+| `SpaceId`                 | string  | 空间标识：`GROUP:{group_openid}` / `GUILD:{channel_id}`                                                        |
+| `ChannelId`               | string  | 群 openid 或子频道 id                                                                                          |
+| `UserId` / `UserKey`      | string  | 发送者 ID 与框架生成的用户 Key                                                                                 |
+| `UserName` / `UserAvatar` | string  | 昵称 / 头像 URL                                                                                                |
+| `IsMaster` / `IsBot`      | boolean | 是否主人 / 是否机器人                                                                                          |
+| `MessageId`               | string  | 消息 ID（入群申请为拼接 ID）                                                                                   |
+| `MessageText`             | string  | 消息文本（已去除 @ 占位符）                                                                                    |
+| `OpenId`                  | string  | 回复标识：`C2C:{user_openid}` / `DIRECT:{guild_id}`                                                            |
+| `IsAtMe` / `IsPrivate`    | boolean | 是否 @ 机器人 / 是否私聊                                                                                       |
+| `Timestamp`               | number  | 框架自动注入的事件创建时间                                                                                     |
 
 ### 场景标识规则
 
-| 场景 | `SpaceId` | `OpenId` | `_tag` 示例 |
-| --- | --- | --- | --- |
-| 群聊 | `GROUP:{group_openid}` | `C2C:{member_openid}` | `GROUP_MESSAGE_CREATE` / `GROUP_AT_MESSAGE_CREATE` |
-| 单聊（C2C） | 无 | `C2C:{user_openid}` | `C2C_MESSAGE_CREATE` |
-| 频道 | `GUILD:{channel_id}` | `DIRECT:{guild_id}` | `AT_MESSAGE_CREATE` / `MESSAGE_CREATE` |
-| 频道私信 | 无 | `DIRECT:{guild_id}` | `DIRECT_MESSAGE_CREATE` |
-| 互动按钮（群） | `GROUP:{group_openid}` | `C2C:{group_member_openid}` | `INTERACTION_CREATE_GROUP` |
+| 场景           | `SpaceId`              | `OpenId`                    | `_tag` 示例                                        |
+| -------------- | ---------------------- | --------------------------- | -------------------------------------------------- |
+| 群聊           | `GROUP:{group_openid}` | `C2C:{member_openid}`       | `GROUP_MESSAGE_CREATE` / `GROUP_AT_MESSAGE_CREATE` |
+| 单聊（C2C）    | 无                     | `C2C:{user_openid}`         | `C2C_MESSAGE_CREATE`                               |
+| 频道           | `GUILD:{channel_id}`   | `DIRECT:{guild_id}`         | `AT_MESSAGE_CREATE` / `MESSAGE_CREATE`             |
+| 频道私信       | 无                     | `DIRECT:{guild_id}`         | `DIRECT_MESSAGE_CREATE`                            |
+| 互动按钮（群） | `GROUP:{group_openid}` | `C2C:{group_member_openid}` | `INTERACTION_CREATE_GROUP`                         |
 
 <a id="event-data-message"></a>
 
@@ -1788,11 +1798,11 @@ export default async () => {
 
 点击按钮触发，`data.resolved.button_data` 即按钮构造时传入的 `data`。分三种场景（`scene` 字段区分）：
 
-| `scene` | 标准事件 | 关键字段 |
-| --- | --- | --- |
-| `'group'` | `interaction.create`（`_tag: INTERACTION_CREATE_GROUP`） | `group_openid`、`group_member_openid`、`data.resolved.button_data` |
-| `'c2c'` | `private.interaction.create`（`_tag: INTERACTION_CREATE_C2C`） | `user_openid`、`data.resolved.button_data` |
-| `'guild'` | `interaction.create`（`_tag: INTERACTION_CREATE_GUILD`） | `guild_id`、`channel_id`、`data.resolved.user_id`、`data.resolved.message_id`、`data.resolved.button_data` |
+| `scene`   | 标准事件                                                       | 关键字段                                                                                                   |
+| --------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `'group'` | `interaction.create`（`_tag: INTERACTION_CREATE_GROUP`）       | `group_openid`、`group_member_openid`、`data.resolved.button_data`                                         |
+| `'c2c'`   | `private.interaction.create`（`_tag: INTERACTION_CREATE_C2C`） | `user_openid`、`data.resolved.button_data`                                                                 |
+| `'guild'` | `interaction.create`（`_tag: INTERACTION_CREATE_GUILD`）       | `guild_id`、`channel_id`、`data.resolved.user_id`、`data.resolved.message_id`、`data.resolved.button_data` |
 
 ```jsonc
 {
@@ -1816,14 +1826,14 @@ export default async () => {
 
 ### 群管理 / 成员 / 好友事件
 
-| 事件 | 标准事件 | 原始数据关键字段 |
-| --- | --- | --- |
-| `GROUP_JOIN_REQUEST`（用户申请加群） | `notice.create` | `group_openid`、`join_request_id`、`member_openid`、`username`、`apply_at`、`apply_source`、`verify_info`、`auto_approved` |
-| `GROUP_MEMBER_ADD` / `GROUP_MEMBER_REMOVE`（成员进/退群） | `member.add` / `member.remove` | `group_openid`、`member_openid`、`op_member_openid`、`username` |
-| `GROUP_ADD_ROBOT` / `GROUP_DEL_ROBOT`（机器人进/退群） | `guild.join` / `guild.exit` | `group_openid`、`op_member_openid`、`timestamp` |
-| `FRIEND_ADD` / `FRIEND_DEL`（好友添加/删除） | `private.friend.add` / `private.friend.remove` | `openid`、`timestamp` |
-| `GROUP_MSG_RECEIVE` / `GROUP_MSG_REJECT`（群推送开关） | `notice.create` | `group_openid`、`op_member_openid`、`timestamp` |
-| `MESSAGE_AUDIT_PASS` / `MESSAGE_AUDIT_REJECT`（群消息审核） | `notice.create` | `group_openid`、`message_id`、`audit_time` |
+| 事件                                                        | 标准事件                                       | 原始数据关键字段                                                                                                           |
+| ----------------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `GROUP_JOIN_REQUEST`（用户申请加群）                        | `notice.create`                                | `group_openid`、`join_request_id`、`member_openid`、`username`、`apply_at`、`apply_source`、`verify_info`、`auto_approved` |
+| `GROUP_MEMBER_ADD` / `GROUP_MEMBER_REMOVE`（成员进/退群）   | `member.add` / `member.remove`                 | `group_openid`、`member_openid`、`op_member_openid`、`username`                                                            |
+| `GROUP_ADD_ROBOT` / `GROUP_DEL_ROBOT`（机器人进/退群）      | `guild.join` / `guild.exit`                    | `group_openid`、`op_member_openid`、`timestamp`                                                                            |
+| `FRIEND_ADD` / `FRIEND_DEL`（好友添加/删除）                | `private.friend.add` / `private.friend.remove` | `openid`、`timestamp`                                                                                                      |
+| `GROUP_MSG_RECEIVE` / `GROUP_MSG_REJECT`（群推送开关）      | `notice.create`                                | `group_openid`、`op_member_openid`、`timestamp`                                                                            |
+| `MESSAGE_AUDIT_PASS` / `MESSAGE_AUDIT_REJECT`（群消息审核） | `notice.create`                                | `group_openid`、`message_id`、`audit_time`                                                                                 |
 
 入群申请 `GROUP_JOIN_REQUEST` 完整字段：
 
@@ -1848,14 +1858,14 @@ export default async () => {
 
 ### 频道事件
 
-| 事件 | 标准事件 | 原始数据关键字段 |
-| --- | --- | --- |
-| `GUILD_CREATE`（机器人加入频道） | `guild.join` | `id`、`name`、`op_user_id`、`owner_id`、`member_count`、`max_members` |
-| `GUILD_DELETE`（机器人退出频道） | `guild.exit` | `id`、`op_user_id` |
-| `GUILD_UPDATE`（频道信息更新） | `guild.update` | `id`、`name` |
-| `GUILD_MEMBER_ADD` / `GUILD_MEMBER_REMOVE` / `GUILD_MEMBER_UPDATE` | `member.add` / `member.remove` / `member.update` | `guild_id`、`user{id, username, avatar, bot}`、`nick`、`roles`、`joined_at` |
-| `CHANNEL_CREATE` / `CHANNEL_DELETE` / `CHANNEL_UPDATE` | `channel.create` / `channel.delete` / `channel.update` | `guild_id`、`id`、`name`、`type`、`parent_id` |
-| `MESSAGE_REACTION_ADD` / `MESSAGE_REACTION_REMOVE` | `message.reaction.add` / `message.reaction.remove` | `guild_id`、`channel_id`、`target{id}`、`emoji{id, type}`、`user_id` |
+| 事件                                                               | 标准事件                                               | 原始数据关键字段                                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `GUILD_CREATE`（机器人加入频道）                                   | `guild.join`                                           | `id`、`name`、`op_user_id`、`owner_id`、`member_count`、`max_members`       |
+| `GUILD_DELETE`（机器人退出频道）                                   | `guild.exit`                                           | `id`、`op_user_id`                                                          |
+| `GUILD_UPDATE`（频道信息更新）                                     | `guild.update`                                         | `id`、`name`                                                                |
+| `GUILD_MEMBER_ADD` / `GUILD_MEMBER_REMOVE` / `GUILD_MEMBER_UPDATE` | `member.add` / `member.remove` / `member.update`       | `guild_id`、`user{id, username, avatar, bot}`、`nick`、`roles`、`joined_at` |
+| `CHANNEL_CREATE` / `CHANNEL_DELETE` / `CHANNEL_UPDATE`             | `channel.create` / `channel.delete` / `channel.update` | `guild_id`、`id`、`name`、`type`、`parent_id`                               |
+| `MESSAGE_REACTION_ADD` / `MESSAGE_REACTION_REMOVE`                 | `message.reaction.add` / `message.reaction.remove`     | `guild_id`、`channel_id`、`target{id}`、`emoji{id, type}`、`user_id`        |
 
 <a id="event-data-usage"></a>
 

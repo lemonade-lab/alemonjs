@@ -638,7 +638,11 @@ export class QQBotAPI {
    * @param member_openid 成员 OpenID
    * @param data 审批参数
    */
-  groupsApprovalJoinRequest(group_openid: string, member_openid: string, data: { op: 'approve' | 'decline'; join_request_id?: string; reject_reason?: string; add_to_member_blacklist?: boolean }) {
+  groupsApprovalJoinRequest(
+    group_openid: string,
+    member_openid: string,
+    data: { op: 'approve' | 'decline'; join_request_id?: string; reject_reason?: string; add_to_member_blacklist?: boolean }
+  ) {
     return this.groupService({
       url: `/v2/groups/${group_openid}/approval_join_request/${member_openid}`,
       method: 'post',

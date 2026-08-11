@@ -324,7 +324,14 @@ export const register = (
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid ?? '', SpaceId: `GROUP:${event.group_openid ?? ''}` })
         .addChannel({ ChannelId: event.group_openid ?? '' })
-        .addUser({ UserId: UserId, UserKey, UserName: event?.username ?? '', UserAvatar: createUserAvatarURL(UserId), IsMaster: isMaster, IsBot: event.bot ?? false })
+        .addUser({
+          UserId: UserId,
+          UserKey,
+          UserName: event?.username ?? '',
+          UserAvatar: createUserAvatarURL(UserId),
+          IsMaster: isMaster,
+          IsBot: event.bot ?? false
+        })
         .addMessage({ MessageId: `group_join_request_${event.group_openid}_${event.join_request_id}` })
         .add({ tag: 'GROUP_JOIN_REQUEST' }).value
     );
@@ -1099,7 +1106,8 @@ export const register = (
         // 消息发送
         const event = data.payload.event;
         const paramFormat = data.payload.params.format;
-        const options = data.payload.params?.forceVerifyImageResource !== undefined ? { forceVerifyImageResource: data.payload.params.forceVerifyImageResource } : undefined;
+        const options =
+          data.payload.params?.forceVerifyImageResource !== undefined ? { forceVerifyImageResource: data.payload.params.forceVerifyImageResource } : undefined;
         // 消费
         const res = await api.use.send(event, paramFormat, options);
 
@@ -1635,9 +1643,7 @@ export const register = (
         // ─── 分片上传 ───
         const userId = getUserId();
         const groupId = getGroupOpenId();
-        const res = await (userId
-          ? client.usersUploadPrepare(userId, data.payload.params)
-          : client.groupUploadPrepare(groupId, data.payload.params))
+        const res = await (userId ? client.usersUploadPrepare(userId, data.payload.params) : client.groupUploadPrepare(groupId, data.payload.params))
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err?.response?.data ?? err?.message ?? err));
 
@@ -1645,9 +1651,7 @@ export const register = (
       } else if (data.action === 'media.upload.part.finish') {
         const userId = getUserId();
         const groupId = getGroupOpenId();
-        const res = await (userId
-          ? client.usersUploadPartFinish(userId, data.payload.params)
-          : client.groupUploadPartFinish(groupId, data.payload.params))
+        const res = await (userId ? client.usersUploadPartFinish(userId, data.payload.params) : client.groupUploadPartFinish(groupId, data.payload.params))
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err?.response?.data ?? err?.message ?? err));
 

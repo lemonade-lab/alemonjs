@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/discord",
   "version": "2.1.25",
-  "description": "discord platform connection",
+  "description": "DC官方平台",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

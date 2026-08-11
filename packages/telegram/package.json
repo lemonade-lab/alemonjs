@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/telegram",
   "version": "2.1.15",
-  "description": "telegram platform connection",
+  "description": "TG官方平台",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

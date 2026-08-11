@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/onebot",
   "version": "2.1.21",
-  "description": "OneBot v11（默认）/ v12（实验性 WebSocket）",
+  "description": "OneBot v11/v12",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
