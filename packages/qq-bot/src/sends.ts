@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { QQBotAPI } from './sdk/api';
 import { FileType } from './sdk/typing';
-import { DataButtonRow, ClientAPIMessageResult, createResult, DataMarkDown, DataMention, ResultCode, type DataEnums } from 'alemonjs';
+import { DataButtonRow, DataButtonGroup, ClientAPIMessageResult, createResult, DataMarkDown, DataMention, ResultCode, logger, type DataEnums } from 'alemonjs';
 import axios from 'axios';
 import { dataEnumToText, markdownToText, buttonsToText } from './format';
 import { getQQBotConfig } from './config';
@@ -14,6 +14,35 @@ type Client = typeof QQBotAPI.prototype;
 /** QQ Bot 平台按钮限制：最多 5 行，每行最多 5 个按钮 */
 const MAX_BUTTON_ROWS = 5;
 const MAX_BUTTONS_PER_ROW = 5;
+
+/**
+ * QQ-Bot 按钮样式（render_data.style）：
+ * 0 灰色线框 / 1 蓝色线框 / 3 红框 / 4 蓝底白字
+ */
+const BUTTON_STYLE_MAP: Record<string, number> = {
+  gray: 0,
+  blue: 1,
+  red: 3,
+  'blue-fill': 4
+};
+
+/** 解析按钮样式：支持样式名与数字（含数字字符串），默认灰框 0 */
+const resolveButtonStyle = (style?: string | number): number => {
+  if (typeof style === 'number') {
+    return style;
+  }
+  if (typeof style === 'string') {
+    if (BUTTON_STYLE_MAP[style] !== undefined) {
+      return BUTTON_STYLE_MAP[style];
+    }
+    // 兼容数字字符串透传
+    if (style.trim() !== '' && !Number.isNaN(Number(style))) {
+      return Number(style);
+    }
+  }
+
+  return 0;
+};
 
 const createButtonsData = (rows: DataButtonRow[], startId = 0) => {
   let id = startId;
@@ -34,26 +63,52 @@ const createButtonsData = (rows: DataButtonRow[], startId = 0) => {
         // 透传的原始数据
         const rowData = options?.rawData ?? {};
 
+        // 点击确认弹窗：优先 options.modal，兼容 data 对象写法 { click, confirm, cancel }
+        const data = options?.data as string | { click: string; confirm: string; cancel: string } | undefined;
+        const modal =
+          options?.modal ??
+          (typeof data === 'object' && data
+            ? {
+                content: data.click,
+                confirmText: data.confirm,
+                cancelText: data.cancel
+              }
+            : undefined);
+
+        const action: Record<string, any> = {
+          type: typeMap[typing],
+          permission: {
+            type: typeof options.permission?.type === 'undefined' ? 2 : options?.permission?.type,
+            specify_user_ids: options?.permission?.userIds,
+            specify_role_ids: options?.permission?.roleIds
+          },
+          unsupport_tips: options?.toolTip ?? '',
+          // 弹窗时 data 置空，确认后按弹窗配置继续
+          data: typeof data === 'string' ? data : '',
+          at_bot_show_channel_list: options?.atBotShowChannelList ?? false,
+          enter: options?.autoEnter ?? false,
+          reply: options?.reply ?? false,
+          anchor: options?.anchor ?? 0,
+          click_limit: options?.clickLimit
+        };
+
+        // 按钮点击后弹出确认框（action.modal）
+        if (modal) {
+          action.modal = {
+            content: modal.content ?? '是否确认操作?',
+            confirm_text: modal.confirmText ?? '是',
+            cancel_text: modal.cancelText ?? '否'
+          };
+        }
+
         return {
           id: String(id),
           render_data: {
             label: value,
             visited_label: value,
-            // 不设置为蓝，默认为灰
-            style: options.style !== 'blue' ? 0 : 1
+            style: resolveButtonStyle(options?.style)
           },
-          action: {
-            type: typeMap[typing],
-            permission: {
-              type: typeof options.permission?.type === 'undefined' ? 2 : options?.permission?.type,
-              specify_user_ids: options?.permission?.userIds,
-              specify_role_ids: options?.permission?.roleIds
-            },
-            unsupport_tips: options?.toolTip ?? '',
-            data: options?.data ?? '',
-            at_bot_show_channel_list: false,
-            enter: options?.autoEnter ?? false
-          },
+          action,
           ...rowData
         };
       })
@@ -297,12 +352,25 @@ const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null =
 
   const params: Record<string, any> = {};
 
+  // 小按钮 / 键盘级配置（BT.group.options）
+  let keyboardExtra: DataButtonGroup['options'] | undefined;
+
   for (const item of items) {
     if (item.type === 'ButtonTemplate') {
       if (item?.value) {
         params['keyboard'] = { id: item.value };
       }
     } else if (item.type === 'BT.group' && typeof item?.value !== 'string') {
+      // 键盘级全局配置：小按钮样式 / 原始字段透传
+      // （item 类型为 DataEnums 联合，此处按 DataButtonGroup 读取 options）
+      const groupOptions = (item as DataButtonGroup)?.options ?? {};
+
+      if (groupOptions.smallButton || groupOptions.rawData) {
+        keyboardExtra = {
+          smallButton: keyboardExtra?.smallButton || groupOptions.smallButton,
+          rawData: groupOptions.rawData
+        };
+      }
       // 追加模式：合并多个 BT.group 的行，并裁剪到 5×5
       if (params['keyboard']?.content?.rows) {
         const existingRows = params['keyboard'].content.rows;
@@ -340,6 +408,16 @@ const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null =
     }
   }
 
+  // 小按钮样式 / 键盘级原始字段透传（keyboard.content.style）
+  if (keyboardExtra && params['keyboard']?.content) {
+    if (keyboardExtra.smallButton) {
+      params['keyboard'].content.style = { font_size: 'small' };
+    }
+    if (keyboardExtra.rawData) {
+      Object.assign(params['keyboard'].content, keyboardExtra.rawData);
+    }
+  }
+
   // 清理内部辅助字段，避免发送到 API
   if (params['keyboard']?.content?.nextId !== undefined) {
     delete params['keyboard'].content.nextId;
@@ -371,59 +449,94 @@ const buildArkParams = (val: DataEnums[]): Record<string, any> | null => {
   return params;
 };
 
-/** 过滤图片数据 */
+/**
+ * 富媒体类型 → QQ file_type 映射
+ * 1 图片 / 2 视频 / 3 语音 / 4 文件
+ */
+const MEDIA_FILE_TYPE: Record<string, FileType> = {
+  Image: 1,
+  ImageFile: 1,
+  ImageURL: 1,
+  Video: 2,
+  Audio: 3,
+  Attachment: 4
+};
+
+/** 过滤富媒体数据（图片/视频/音频/文件） */
+const filterMedia = (val: DataEnums[]) => {
+  return val.filter(item => MEDIA_FILE_TYPE[item.type] !== undefined);
+};
+
+/** 过滤图片数据（仅图片，频道路径使用） */
 const filterImages = (val: DataEnums[]) => {
   return val.filter(item => item.type === 'Image' || item.type === 'ImageFile' || item.type === 'ImageURL');
 };
 
 // ==================== Open API 发送（群组/私聊） ====================
 
-/** 通过富媒体上传获取 file_info。群/C2C 的图片、语音、视频、文件走同一工作流。 */
-const resolveRichMediaUrl = async (items: DataEnums[], uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>): Promise<string> => {
-  for (const item of items) {
-    let fileData: string;
-    let fileInfo: string;
-    const fileType: FileType = item.type === 'Video' ? 2 : item.type === 'Audio' ? 3 : item.type === 'Attachment' ? 4 : 1;
+/** 将媒体数据解析为 base64（支持 URL / file:// / base64:// / buffer:// / Buffer / 裸 base64） */
+const resolveFileData = async (item: any): Promise<string | undefined> => {
+  if (item.type === 'ImageURL') {
+    return await axios.get(item.value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
+  }
+  if (item.type === 'ImageFile') {
+    return readFileSync(item.value, 'base64');
+  }
 
-    if (item.type === 'ImageURL') {
-      // 如果是图片链接，需要axios获取图片数据并转换为base64
-      fileData = await axios.get(item.value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
-    } else if (item.type === 'Image' || item.type === 'Audio' || item.type === 'Video' || item.type === 'Attachment') {
-      if (typeof item.value === 'string' && (item.value.startsWith('https://') || item.value.startsWith('http://'))) {
-        // 如果是图片链接，需要axios获取图片数据并转换为base64
-        fileData = await axios.get(item.value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
-      } else if (typeof item.value === 'string' && item.value.startsWith('file://')) {
-        // 如果是file协议的本地文件路径，读取文件并转换为base64
-        const localFilePath = item.value.replace('file://', '');
+  const value = item.value;
 
-        fileData = readFileSync(localFilePath, 'base64');
-      } else if (typeof item.value === 'string' && item.value.startsWith('base64://')) {
-        // 如果是base64协议的字符串，直接提取base64数据
-        fileData = item.value.replace('base64://', '');
-      } else if (Buffer.isBuffer(item.value)) {
-        // 如果已经是Buffer数据，直接转换为base64字符串
-        fileData = item.value.toString('base64');
-      } else if (typeof item.value === 'string' && item.value.startsWith('buffer://')) {
-        fileData = item.value.replace('buffer://', '');
-      } else if (typeof item.value === 'string') {
-        // 兆底：视为裸 base64 字符串
-        fileData = item.value;
-      }
-    } else if (item.type === 'ImageFile') {
-      fileData = readFileSync(item.value, 'base64');
+  if (typeof value === 'string') {
+    if (value.startsWith('https://') || value.startsWith('http://')) {
+      // URL 资源：拉取后转 base64
+      return await axios.get(value, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data, 'binary').toString('base64'));
     }
+    if (value.startsWith('buffer://')) {
+      return value.replace('buffer://', '');
+    }
+    if (value.startsWith('file://')) {
+      return readFileSync(value.replace('file://', ''), 'base64');
+    }
+    if (value.startsWith('base64://')) {
+      return value.replace('base64://', '');
+    }
+
+    return value; // 兜底：裸 base64
+  }
+  if (Buffer.isBuffer(value)) {
+    return value.toString('base64');
+  }
+
+  return undefined;
+};
+
+/**
+ * 通过富媒体上传获取 file_info（图片/视频/音频/文件）
+ * 按 MEDIA_FILE_TYPE 自动选择 file_type，超出 10MB 的文件自动走分片上传
+ */
+const resolveMediaUrl = async (media: DataEnums[], uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>): Promise<string> => {
+  for (const item of media) {
+    const fileData = await resolveFileData(item);
 
     if (fileData) {
-      fileInfo = await uploadMedia({ file_type: fileType, file_data: fileData }).then(res => res?.file_info);
-    }
+      const fileInfo = await uploadMedia({ file_type: MEDIA_FILE_TYPE[item.type] ?? 1, file_data: fileData }).then(res => res?.file_info);
 
-    if (fileInfo) {
-      return fileInfo;
+      if (fileInfo) {
+        return fileInfo;
+      }
     }
   }
 
   return undefined;
 };
+
+/** 移除富媒体占位符（dataEnumToText 降级产生的 [视频]/[音频]/[附件]） */
+const stripMediaPlaceholders = (text: string): string =>
+  text
+    .replace(/\[附件[^\]]*\]/g, '')
+    .replace(/\[音频\]/g, '')
+    .replace(/\[视频\]/g, '')
+    .replace(/\n{2,}/g, '\n')
+    .trim();
 
 /** 当 markdownToText 选项开启时，将 Markdown 和按钮降级为纯文本并追加到 content */
 const flattenMdToText = (content: string, val: DataEnums[]): string => {
@@ -455,41 +568,26 @@ const sendOpenApiMessage = async (
   baseParams: Record<string, any>,
   uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>,
   sendMessage: (data: any) => Promise<any>,
-  label: string
+  label: string,
+  options?: { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
   const config = getQQBotConfig();
   const mdToText = config.markdownToText === true;
 
-  // 图片
-  const images = filterImages(val);
-  const richMedia = val.filter(item => item.type === 'Audio' || item.type === 'Video' || item.type === 'Attachment');
+  // 富媒体：图片 / 视频 / 音频 / 文件（群聊、单聊支持）
+  const media = filterMedia(val);
 
-  if (images.length > 0) {
-    const url = await resolveRichMediaUrl(images, uploadMedia);
-
-    if (!url) {
-      return [createResult(ResultCode.Fail, '图片上传失败', null)];
-    }
-    // 图片消息(msg_type:7)无法携带原生 markdown 模板，始终将 MD/Buttons 降级为文本合入 content
-    const imgContent = flattenMdToText(content, val);
-    const res = await sendMessage({
-      content: imgContent,
-      media: { file_info: url },
-      msg_type: 7,
-      ...baseParams
-    });
-
-    return [createResult(ResultCode.Ok, label, { id: res.id })];
-  }
-
-  if (richMedia.length > 0) {
-    const fileInfo = await resolveRichMediaUrl(richMedia, uploadMedia);
+  if (media.length > 0) {
+    const fileInfo = await resolveMediaUrl(media, uploadMedia);
 
     if (!fileInfo) {
-      return [createResult(ResultCode.Fail, '富媒体上传失败', null)];
+      return [createResult(ResultCode.Fail, '媒体上传失败', null)];
     }
+    // 富媒体消息(msg_type:7)无法携带原生 markdown 模板，始终将 MD/Buttons 降级为文本合入 content
+    // 并移除已作为富媒体发送的占位符（[视频]/[音频]/[附件]）
+    const mediaContent = stripMediaPlaceholders(flattenMdToText(content, val));
     const res = await sendMessage({
-      content: flattenMdToText(content, val),
+      content: mediaContent,
       media: { file_info: fileInfo },
       msg_type: 7,
       ...baseParams
@@ -526,7 +624,7 @@ const sendOpenApiMessage = async (
     if (mdParams.markdown?.content && content) {
       mdParams.markdown.content = content + '\n' + mdParams.markdown.content;
     }
-    const res = await sendMessage({ content, msg_type: 2, ...mdParams, ...baseParams });
+    const res = await sendMessage({ content, msg_type: 2, ...mdParams, ...baseParams, force_verify_image_resource: options?.forceVerifyImageResource });
 
     return [createResult(ResultCode.Ok, label, { id: res.id })];
   }
@@ -670,7 +768,8 @@ const sendGuildMessage = async (
 export const GROUP_AT_MESSAGE_CREATE = async (
   client: Client,
   event: { ChannelId: string; MessageId?: string; _tag?: string },
-  val: DataEnums[]
+  val: DataEnums[],
+  options?: { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
   const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_GROUP');
   const content = extractContent(val, 'group');
@@ -682,7 +781,8 @@ export const GROUP_AT_MESSAGE_CREATE = async (
       baseParams,
       data => client.postRichMediaByGroup(event.ChannelId, data),
       data => client.groupOpenMessages(event.ChannelId, data),
-      'client.groupOpenMessages'
+      'client.groupOpenMessages',
+      options
     );
   } catch (err) {
     return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)];
@@ -695,7 +795,8 @@ export const GROUP_AT_MESSAGE_CREATE = async (
 export const C2C_MESSAGE_CREATE = async (
   client: Client,
   event: { UserId: string; MessageId?: string; _tag?: string },
-  val: DataEnums[]
+  val: DataEnums[],
+  options?: { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
   const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_C2C');
   const content = extractContent(val, 'group');
@@ -707,7 +808,8 @@ export const C2C_MESSAGE_CREATE = async (
       baseParams,
       data => client.postRichMediaByUser(event.UserId, data),
       data => client.usersOpenMessages(event.UserId, data),
-      'client.usersOpenMessages'
+      'client.usersOpenMessages',
+      options
     );
   } catch (err) {
     return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)];

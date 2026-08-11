@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios';
-import { ApiRequestData, FileType } from './typing.js';
+import { ApiRequestData, FileType, GroupAction, SetMemberMuteState, StreamMessageData, UploadPartFinishData, UploadPrepareData } from './typing.js';
 import { QQBotConfig } from './config.js';
 import FormData from 'form-data';
 import { createPicFrom } from 'alemonjs/utils';
@@ -7,10 +7,13 @@ import { createAxiosInstance } from './instance.js';
 import { randomUUID } from 'node:crypto';
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
+import { chunkedUpload, CHUNK_THRESHOLD, fileDataToBuffer } from '../upload.js';
 
-export const BOTS_API_RUL = 'https://bots.qq.com';
+/** 获取访问凭证域名（统一为 api.bot.qq.com，同接口调用域名） */
+export const BOTS_API_RUL = 'https://api.bot.qq.com';
 export const API_URL_SANDBOX = 'https://sandbox.api.sgroup.qq.com';
-export const API_URL = 'https://api.sgroup.qq.com';
+/** 接口调用域名 */
+export const API_URL = 'https://api.bot.qq.com';
 
 export type QQBotConnectionState = 'idle' | 'connecting' | 'ready' | 'reconnecting' | 'offline' | 'stopped';
 export type QQBotConnectionStatus = {
@@ -367,8 +370,15 @@ export class QQBotAPI {
       file_type: FileType;
       url?: string;
       file_data?: any;
+      upload_id?: string;
+      file_name?: string;
     }
-  ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
+  ): Promise<{ file_uuid: string; file_info: string; ttl: number; id?: string; raw_url?: string }> {
+    // 大文件（> 10002432 字节）自动切换为分片上传
+    const fileBuffer = fileDataToBuffer(data.file_data);
+    if (!data.upload_id && fileBuffer && fileBuffer.byteLength > CHUNK_THRESHOLD) {
+      return chunkedUpload(this, 'user', openid, fileBuffer, { file_type: data.file_type, file_name: data.file_name, srv_send_msg: data.srv_send_msg });
+    }
     return this.groupService({
       url: `/v2/users/${openid}/files`,
       method: 'post',
@@ -391,8 +401,15 @@ export class QQBotAPI {
       file_type: FileType;
       url?: string;
       file_data?: any;
+      upload_id?: string;
+      file_name?: string;
     }
-  ): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
+  ): Promise<{ file_uuid: string; file_info: string; ttl: number; id?: string; raw_url?: string }> {
+    // 大文件（> 10002432 字节）自动切换为分片上传
+    const fileBuffer = fileDataToBuffer(data.file_data);
+    if (!data.upload_id && fileBuffer && fileBuffer.byteLength > CHUNK_THRESHOLD) {
+      return chunkedUpload(this, 'group', openid, fileBuffer, { file_type: data.file_type, file_name: data.file_name, srv_send_msg: data.srv_send_msg });
+    }
     return this.groupService({
       url: `/v2/groups/${openid}/files`,
       method: 'post',
@@ -546,15 +563,260 @@ export class QQBotAPI {
   }
 
   /**
-   *
-   * @param group_openid
-   * @param message_id
-   * @returns
+   * 群聊-撤回消息
+   * @param group_openid 群 OpenID
+   * @param message_id 消息 ID
    */
-  grouMessageDelte(group_openid: string, message_id: string) {
+  groupMessageDelete(group_openid: string, message_id: string) {
     return this.groupService({
       url: `/v2/groups/${group_openid}/messages/${message_id}`,
       method: 'delete'
+    });
+  }
+
+  /**
+   * @deprecated 方法名拼写错误，请使用 groupMessageDelete 代替
+   * @param group_openid 群 OpenID
+   * @param message_id 消息 ID
+   */
+  grouMessageDelte(group_openid: string, message_id: string) {
+    return this.groupMessageDelete(group_openid, message_id);
+  }
+
+  // ─── 群管理 ───
+
+  /**
+   * 获取群基本信息
+   * @param group_openid 群 OpenID
+   */
+  groupsInfo(group_openid: string) {
+    return this.groupService({
+      url: `/v2/groups/${group_openid}/info`,
+      method: 'get'
+    });
+  }
+
+  /**
+   * 获取机器人群内状态
+   * @param group_openid 群 OpenID
+   */
+  groupsBotState(group_openid: string) {
+    return this.groupService({
+      url: `/v2/groups/${group_openid}/bot_state`,
+      method: 'get'
+    });
+  }
+
+  /**
+   * 获取群成员详情
+   * @param group_openid 群 OpenID
+   * @param member_openid 群成员的 openid
+   */
+  groupsMembersMessage(group_openid: string, member_openid: string) {
+    return this.groupService({
+      url: `/v2/groups/${group_openid}/members/${member_openid}`,
+      method: 'get'
+    });
+  }
+
+  /**
+   * 拉取入群申请列表
+   * @param group_openid 群 OpenID
+   * @param params 分页参数
+   */
+  groupsJoinRequestList(group_openid: string, params?: { cursor?: string; limit?: number }) {
+    return this.groupService({
+      url: `/v2/groups/${group_openid}/join_request_list`,
+      method: 'get',
+      params
+    });
+  }
+
+  /**
+   * 审批入群申请
+   * @param group_openid 群 OpenID
+   * @param member_openid 成员 OpenID
+   * @param data 审批参数
+   */
+  groupsApprovalJoinRequest(group_openid: string, member_openid: string, data: { op: 'approve' | 'decline'; join_request_id?: string; reject_reason?: string; add_to_member_blacklist?: boolean }) {
+    return this.groupService({
+      url: `/v2/groups/${group_openid}/approval_join_request/${member_openid}`,
+      method: 'post',
+      data
+    });
+  }
+
+  /**
+   * 查询群禁言状态
+   * @param group_openid 群 OpenID
+   */
+  groupsRestrictChatSetting(group_openid: string) {
+    return this.groupService({
+      url: `/v2/groups/${group_openid}/restrict_chat_setting`,
+      method: 'get'
+    });
+  }
+
+  /**
+   * 设置群成员禁言
+   * @param group_openid 群 OpenID
+   * @param data 禁言设置
+   */
+  groupsRestrictChatSettingPost(group_openid: string, data: { members?: SetMemberMuteState[] }) {
+    return this.groupService({
+      url: `/v2/groups/${group_openid}/restrict_chat_setting`,
+      method: 'post',
+      data
+    });
+  }
+
+  /**
+   * 查询入群自动审批策略列表
+   * @param params 分页参数
+   */
+  groupsJoinApprovalStrategies(params?: { cursor?: string; limit?: number }) {
+    return this.groupService({
+      url: '/v2/groups/join_approval_strategy',
+      method: 'get',
+      params
+    });
+  }
+
+  /**
+   * 创建入群自动审批策略
+   * @param data 策略参数
+   */
+  groupsJoinApprovalStrategyCreate(data: { group_openids?: string[]; group_ids?: string[]; is_enable?: 'on' | 'off'; expire_at?: string; remark?: string }) {
+    return this.groupService({
+      url: '/v2/groups/join_approval_strategy',
+      method: 'post',
+      data
+    });
+  }
+
+  /**
+   * 修改入群自动审批策略
+   * @param strategy_id 策略 ID
+   * @param data 修改参数
+   */
+  groupsJoinApprovalStrategyPatch(strategy_id: string, data: { is_enable?: 'on' | 'off'; expire_at?: string; group_action?: GroupAction; remark?: string }) {
+    return this.groupService({
+      url: `/v2/groups/join_approval_strategy/${strategy_id}`,
+      method: 'patch',
+      data
+    });
+  }
+
+  /**
+   * 删除入群自动审批策略
+   * @param strategy_id 策略 ID
+   */
+  groupsJoinApprovalStrategyDelete(strategy_id: string) {
+    return this.groupService({
+      url: `/v2/groups/join_approval_strategy/${strategy_id}`,
+      method: 'delete'
+    });
+  }
+
+  /**
+   * 执行入群自动审批策略
+   * @param strategy_id 策略 ID
+   */
+  groupsJoinApprovalStrategyExecute(strategy_id: string) {
+    return this.groupService({
+      url: `/v2/groups/join_approval_strategy/${strategy_id}/execute`,
+      method: 'post'
+    });
+  }
+
+  /**
+   * 修改入群自动审批策略白名单
+   * @param strategy_id 策略 ID
+   * @param data 白名单参数
+   */
+  groupsJoinApprovalStrategyWhitelistUsers(strategy_id: string, data: { op: 'add' | 'del'; whitelist_users: string[] }) {
+    return this.groupService({
+      url: `/v2/groups/join_approval_strategy/${strategy_id}/whitelist_users`,
+      method: 'post',
+      data
+    });
+  }
+
+  // ─── 分片上传 / 流式消息 ───
+
+  /**
+   * 单聊-分片上传准备
+   * @param userId 用户 OpenID
+   * @param data 上传准备参数
+   */
+  usersUploadPrepare(userId: string, data: UploadPrepareData) {
+    return this.groupService({
+      url: `/v2/users/${userId}/upload_prepare`,
+      method: 'post',
+      data
+    });
+  }
+
+  /**
+   * 群聊-分片上传准备
+   * @param groupId 群 OpenID
+   * @param data 上传准备参数
+   */
+  groupUploadPrepare(groupId: string, data: UploadPrepareData) {
+    return this.groupService({
+      url: `/v2/groups/${groupId}/upload_prepare`,
+      method: 'post',
+      data
+    });
+  }
+
+  /**
+   * 单聊-分片完成
+   * @param userId 用户 OpenID
+   * @param data 分片完成参数
+   */
+  usersUploadPartFinish(userId: string, data: UploadPartFinishData) {
+    return this.groupService({
+      url: `/v2/users/${userId}/upload_part_finish`,
+      method: 'post',
+      data
+    });
+  }
+
+  /**
+   * 群聊-分片完成
+   * @param groupId 群 OpenID
+   * @param data 分片完成参数
+   */
+  groupUploadPartFinish(groupId: string, data: UploadPartFinishData) {
+    return this.groupService({
+      url: `/v2/groups/${groupId}/upload_part_finish`,
+      method: 'post',
+      data
+    });
+  }
+
+  /**
+   * 分片字节直传（COS 预签名地址）
+   * 注意：不能用 groupService，预签名地址已自带鉴权，
+   * 额外携带 QQ 鉴权头会导致 COS 签名校验失败
+   * @param presignedUrl 预签名上传地址
+   * @param part 分片内容
+   */
+  uploadPartDirect(presignedUrl: string, part: Buffer) {
+    return axios.put(presignedUrl, part);
+  }
+
+  /**
+   * 单聊-流式消息
+   * @param userId 用户 OpenID
+   * @param data 流式消息参数
+   */
+  streamMessages(userId: string, data: StreamMessageData) {
+    return this.groupService({
+      url: `/v2/users/${userId}/stream_messages`,
+      method: 'post',
+      data
     });
   }
 

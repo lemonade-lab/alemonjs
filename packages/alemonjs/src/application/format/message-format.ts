@@ -35,6 +35,7 @@ import {
 export class FormatButtonGroup {
   #rows: DataButtonRow[] = [];
   #currentRow: DataButton[] | null = null;
+  #options: DataButtonGroup['options'] | undefined;
 
   /**
    * 获取按钮组数据
@@ -44,8 +45,31 @@ export class FormatButtonGroup {
 
     return {
       type: 'BT.group',
-      value: this.#rows
+      value: this.#rows,
+      ...(this.#options ? { options: this.#options } : {})
     };
+  }
+
+  /**
+   * 小按钮样式：整个键盘使用小号按钮（QQ-Bot keyboard.content.style）
+   */
+  smallButton(): this {
+    this.#options = {
+      ...this.#options,
+      smallButton: true
+    };
+
+    return this;
+  }
+
+  /**
+   * 键盘级配置（QQ-Bot 专用）
+   * @param options smallButton 小按钮 / rawData 键盘级原始字段透传
+   */
+  setOptions(options?: DataButtonGroup['options']): this {
+    this.#options = options;
+
+    return this;
   }
 
   /**

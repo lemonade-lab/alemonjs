@@ -25,6 +25,11 @@ DIRECT_MESSAGE (1 << 12)
   - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
 
 
+GROUP_MEMBER_EVENT (1 << 24)
+  - GROUP_MEMBER_ADD        // 当成员加入群聊时
+  - GROUP_MEMBER_REMOVE     // 当成员退出群聊时
+
+
 GROUP_AND_C2C_EVENT (1 << 25)
   - C2C_MESSAGE_CREATE      // 用户单聊发消息给机器人时候
   - FRIEND_ADD              // 用户添加使用机器人
@@ -36,6 +41,7 @@ GROUP_AND_C2C_EVENT (1 << 25)
   - GROUP_DEL_ROBOT         // 机器人被移出群聊
   - GROUP_MSG_REJECT        // 群管理员主动在机器人资料页操作关闭通知
   - GROUP_MSG_RECEIVE       // 群管理员主动在机器人资料页操作开启通知
+  - GROUP_JOIN_REQUEST      // 用户申请加群，机器人是群管理员时触发
 
 INTERACTION (1 << 26)
   - INTERACTION_CREATE     // 互动事件创建时
@@ -74,6 +80,7 @@ export const AvailableIntentsEventsEnum = [
   'GUILD_MESSAGES',
   'GUILD_MESSAGE_REACTIONS',
   'DIRECT_MESSAGE',
+  'GROUP_MEMBER_EVENT',
   'INTERACTION',
   'MESSAGE_AUDIT',
   'FORUMS_EVENT',
@@ -96,6 +103,7 @@ const intentsMap = {
   GUILD_MESSAGES: 1 << 9, // 消息事件，仅 *私域*
   GUILD_MESSAGE_REACTIONS: 1 << 10, // 消息表情表态
   DIRECT_MESSAGE: 1 << 12, // 私信消息
+  GROUP_MEMBER_EVENT: 1 << 24, // 群成员事件
   INTERACTION: 1 << 26, // 互动事件
   // INTERACTION_CREATE: 1 << 26,
   MESSAGE_AUDIT: 1 << 27, // 消息审核

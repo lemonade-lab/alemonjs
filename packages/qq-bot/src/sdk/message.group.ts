@@ -14,6 +14,7 @@ import { FRIEND_DEL_TYPE } from '../message/group/FRIEND_DEL';
 import { ERROR_TYPE } from '../message/ERROR';
 import { GROUP_MEMBER_REMOVE } from '../message/group/GROUP_MEMBER_REMOVE';
 import { GROUP_MEMBER_ADD } from '../message/group/GROUP_MEMBER_ADD';
+import { GROUP_JOIN_REQUEST_TYPE } from '../message/group/GROUP_JOIN_REQUEST';
 
 export type QQBotGroupEventMap = {
   C2C_MESSAGE_CREATE: C2C_MESSAGE_CREATE_TYPE;
@@ -32,4 +33,5 @@ export type QQBotGroupEventMap = {
   ERROR: ERROR_TYPE;
   GROUP_MEMBER_ADD: GROUP_MEMBER_ADD;
   GROUP_MEMBER_REMOVE: GROUP_MEMBER_REMOVE;
+  GROUP_JOIN_REQUEST: GROUP_JOIN_REQUEST_TYPE;
 };

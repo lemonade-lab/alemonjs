@@ -28,14 +28,15 @@ export const start = () => {
     'FORUMS_EVENT'
   ] as IntentsEnum[];
 
-  const isGroupIntents = ['GROUP_AND_C2C_EVENT'] as IntentsEnum[];
+  // 群/C2C 事件，不分公私域
+  const isGroupIntents = ['GROUP_AND_C2C_EVENT', 'GROUP_MEMBER_EVENT'] as IntentsEnum[];
 
   const pubIntents = ['INTERACTION'] as IntentsEnum[];
 
   const intents = [] as IntentsEnum[];
 
   if (config?.is_private) {
-    intents.push(...isPrivateIntents, ...pubIntents);
+    intents.push(...isPrivateIntents, ...isGroupIntents, ...pubIntents);
   } else {
     intents.push(...notPrivateIntents, ...isGroupIntents, ...pubIntents);
   }

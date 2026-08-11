@@ -31,6 +31,7 @@ import { C2C_MSG_RECEIVE_TYPE } from './message/group/C2C_MSG_RECEIVE';
 import { C2C_MSG_REJECT_TYPE } from './message/group/C2C_MSG_REJECT';
 import { MESSAGE_AUDIT_PASS_TYPE } from './message/group/MESSAGE_AUDIT_PASS';
 import { MESSAGE_AUDIT_REJECT_TYPE } from './message/group/MESSAGE_AUDIT_REJECT';
+import { GROUP_JOIN_REQUEST_TYPE } from './message/group/GROUP_JOIN_REQUEST';
 
 type MAP = {
   'message.create': GROUP_AT_MESSAGE_CREATE_TYPE | GROUP_MESSAGE_CREATE_TYPE | AT_MESSAGE_CREATE_TYPE | MESSAGE_CREATE_TYPE;
@@ -53,7 +54,7 @@ type MAP = {
   'member.ban': undefined;
   'member.unban': undefined;
   'member.update': GUILD_MEMBER_UPDATE_TYPE;
-  'notice.create': GROUP_MSG_RECEIVE_TYPE | GROUP_MSG_REJECT_TYPE | MESSAGE_AUDIT_PASS_TYPE | MESSAGE_AUDIT_REJECT_TYPE;
+  'notice.create': GROUP_MSG_RECEIVE_TYPE | GROUP_MSG_REJECT_TYPE | MESSAGE_AUDIT_PASS_TYPE | MESSAGE_AUDIT_REJECT_TYPE | GROUP_JOIN_REQUEST_TYPE;
   'private.message.update': undefined;
   'private.message.delete': DIRECT_MESSAGE_DELETE_TYPE;
   'private.friend.add': FRIEND_ADD_TYPE;

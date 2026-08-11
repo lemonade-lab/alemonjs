@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { type AxiosRequestConfig } from 'axios';
+import { logger } from 'alemonjs';
 
 const filterHeaders = (headers = {}) => {
   if (!headers) {
