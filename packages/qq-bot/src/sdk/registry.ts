@@ -53,8 +53,8 @@ export class QQBotRegistry {
     const state = bots.some(item => item.state === 'ready')
       ? 'ready'
       : bots.some(item => item.state === 'connecting' || item.state === 'reconnecting')
-        ? 'connecting'
-        : bots[0]?.state || 'idle';
+      ? 'connecting'
+      : bots[0]?.state || 'idle';
 
     return { Platform: 'qq-bot', state, bots };
   }

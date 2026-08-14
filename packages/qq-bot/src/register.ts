@@ -93,10 +93,10 @@ export const register = (
       const Type: MessageMediaItem['Type'] = mimeType.startsWith('image/')
         ? 'image'
         : mimeType.startsWith('audio/')
-          ? 'audio'
-          : mimeType.startsWith('video/')
-            ? 'video'
-            : 'file';
+        ? 'audio'
+        : mimeType.startsWith('video/')
+        ? 'video'
+        : 'file';
 
       return [
         {
@@ -207,10 +207,10 @@ export const register = (
             name: prepared.name
           })
         : prepared.buffer && prepared.buffer.length >= 5 * 1024 * 1024
-          ? await client.postChunkedRichMedia({ scope: target.scope, targetId: target.targetId, fileType, data: prepared.buffer, name: prepared.name })
-          : target.scope === 'group'
-            ? await client.postRichMediaByGroup(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false })
-            : await client.postRichMediaByUser(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false });
+        ? await client.postChunkedRichMedia({ scope: target.scope, targetId: target.targetId, fileType, data: prepared.buffer, name: prepared.name })
+        : target.scope === 'group'
+        ? await client.postRichMediaByGroup(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false })
+        : await client.postRichMediaByUser(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false });
     const expiresAt = value.ttl ? Date.now() + value.ttl * 1000 : undefined;
 
     if (prepared.key) {
@@ -1160,10 +1160,10 @@ export const register = (
           scope === 'group'
             ? client.grouMessageDelte(String(target?.targetId ?? params.groupId ?? data.payload.GroupId ?? data.payload.ChannelId), messageId)
             : scope === 'user' || scope === 'c2c'
-              ? client.userMessageDelete(String(target?.targetId ?? params.userId ?? data.payload.UserId), messageId)
-              : scope === 'direct'
-                ? client.dmsMessageDelete(String(target?.targetId ?? params.guildId ?? data.payload.GuildId ?? data.payload.ChannelId), messageId)
-                : client.channelsMessagesDelete(target?.targetId ?? data.payload.ChannelId, messageId);
+            ? client.userMessageDelete(String(target?.targetId ?? params.userId ?? data.payload.UserId), messageId)
+            : scope === 'direct'
+            ? client.dmsMessageDelete(String(target?.targetId ?? params.guildId ?? data.payload.GuildId ?? data.payload.ChannelId), messageId)
+            : client.channelsMessagesDelete(target?.targetId ?? data.payload.ChannelId, messageId);
         const res = await request.then(r => createResult(ResultCode.Ok, data.action, r)).catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
@@ -1598,8 +1598,8 @@ export const register = (
             target.scope === 'group'
               ? client.groupOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
               : target.scope === 'c2c'
-                ? client.usersOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
-                : null;
+              ? client.usersOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
+              : null;
 
           if (!send) {
             consume([createResult(ResultCode.Warn, 'QQ media.send only supports group and c2c targets', null)]);

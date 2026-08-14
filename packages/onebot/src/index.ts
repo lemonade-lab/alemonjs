@@ -82,7 +82,7 @@ const main = () => {
             FileId: item.data?.file_id,
             FileName: item.data?.name ?? item.data?.file_name,
             FileSize: item.data?.file_size ? Number(item.data.file_size) : undefined
-          }) as MessageMediaItem
+          } as MessageMediaItem)
       );
 
   /**

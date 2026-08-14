@@ -406,14 +406,14 @@ await MessageDirect.create().sendToUser({
 
 ### 媒体 / 文件 / 上传
 
-| API                                                       | 说明                                       |
-| --------------------------------------------------------- | ------------------------------------------ |
-| [media.send.user](#api-media-send-user)                   | 向用户发送富媒体（图片/视频/音频/文件）    |
-| [media.upload.prepare](#api-media-upload-prepare)         | 分片上传准备                               |
-| [media.upload.part.finish](#api-media-upload-part-finish) | 分片完成上报                               |
-| [media.upload.chunked](#api-media-upload-chunked)         | 分片上传全流程（prepare→直传→finish→合并） |
-| [file.send.channel / file.send.user](#api-file-send)      | 向群 / 用户发送文件                        |
-| [stream.message.send](#api-stream-message-send)           | 单聊流式消息                               |
+| API                                                       | 说明                                          |
+| --------------------------------------------------------- | --------------------------------------------- |
+| [media.send.user](#api-media-send-user)                   | 向用户发送富媒体（图片/视频/音频/文件）       |
+| [media.upload.prepare](#api-media-upload-prepare)         | 分片上传准备                                  |
+| [media.upload.part.finish](#api-media-upload-part-finish) | 分片完成上报                                  |
+| [media.upload.chunked](#api-media-upload-chunked)         | 分片上传全流程（prepare→ 直传 →finish→ 合并） |
+| [file.send.channel / file.send.user](#api-file-send)      | 向群 / 用户发送文件                           |
+| [stream.message.send](#api-stream-message-send)           | 单聊流式消息                                  |
 
 ### 表情 / 权限 / 交互 / 其他
 

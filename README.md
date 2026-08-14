@@ -177,7 +177,7 @@ export default () => {
 | [`alemondesk`](https://github.com/lemonade-lab/alemondesk)                | 桌面端项目             |
 | [`alemongo`](https://github.com/lemonade-lab/alemongo)                    | 服务端项目             |
 | [`alemonapp`](https://github.com/lemonade-lab/alemonapp)                  | 手机端项目             |
-| [`alemonx`](https://github.com/lemonade-lab/alemonx)                      | Agent开发运维          |
+| [`alemonx`](https://github.com/lemonade-lab/alemonx)                      | Agent 开发运维         |
 
 ## Monorepo
 

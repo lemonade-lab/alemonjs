@@ -3,7 +3,7 @@ import { WebSocket } from 'ws';
 import * as flattedJSON from 'flatted';
 import { dirname, join } from 'path';
 import { existsSync, readFileSync, watch, mkdirSync, writeFile } from 'fs';
-import _ from 'lodash';
+import { debounce } from 'lodash-es';
 import { readFile } from 'fs/promises';
 import type { ParsedMessage } from '../../../common/cbp/typings.js';
 import { ResultCode } from '../../../common/index.js';
@@ -42,7 +42,7 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
   });
 
   const commandsPath = join(testonePath, 'commands.json');
-  const onCommands = _.debounce(() => {
+  const onCommands = debounce(() => {
     if (!existsSync(commandsPath)) {
       return;
     }
@@ -67,7 +67,7 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
   }, 1000);
 
   const usersPath = join(testonePath, 'users.json');
-  const onUsers = _.debounce(() => {
+  const onUsers = debounce(() => {
     if (!existsSync(usersPath)) {
       return;
     }
@@ -92,7 +92,7 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
   }, 1000);
 
   const channelsPath = join(testonePath, 'channels.json');
-  const onChannels = _.debounce(() => {
+  const onChannels = debounce(() => {
     if (!existsSync(channelsPath)) {
       return;
     }
@@ -118,7 +118,7 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
 
   const userPath = join(testonePath, 'user.json');
 
-  const onUser = _.debounce(() => {
+  const onUser = debounce(() => {
     if (!existsSync(userPath)) {
       return;
     }
@@ -144,7 +144,7 @@ export const createTestOneController = (ws: WebSocket, _request: IncomingMessage
 
   const botPath = join(testonePath, 'bot.json');
 
-  const onBot = _.debounce(() => {
+  const onBot = debounce(() => {
     if (!existsSync(botPath)) {
       return;
     }

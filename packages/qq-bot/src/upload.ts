@@ -73,7 +73,7 @@ export const chunkedUpload = async (
   const md5 = createHash('md5').update(buffer).digest('hex');
   const sha1 = createHash('sha1').update(buffer).digest('hex');
   const md5_10m = createHash('md5').update(buffer.subarray(0, CHUNK_THRESHOLD)).digest('hex');
-  const file_name = options.file_name ?? (typeof file === 'string' ? (file.split(/[\\/]/).pop() ?? 'file') : 'file');
+  const file_name = options.file_name ?? (typeof file === 'string' ? file.split(/[\\/]/).pop() ?? 'file' : 'file');
 
   // 1. 准备上传任务
   const prepareData: UploadPrepareData = {
