@@ -2,13 +2,15 @@ import { getConfigValue } from 'alemonjs';
 
 export type SqlDialect = 'pgsql' | 'mysql' | 'sqlite';
 
+export const name = '@alemonjs/db'
+
 /**
  * 获取 db 配置（新格式）
  */
 export const getDbConfig = () => {
   const value = getConfigValue() || {};
 
-  return value?.db || {};
+  return value?.db || value[name] || {}
 };
 
 /**
@@ -23,8 +25,9 @@ export const getDialect = (): string | undefined => {
  */
 export const getSqlConfig = () => {
   const value = getConfigValue() || {};
+  const dbValue = getDbConfig();
 
-  return value?.db?.sql || value?.sql || {};
+  return dbValue?.sql || value?.sql || {};
 };
 
 /**
@@ -32,8 +35,9 @@ export const getSqlConfig = () => {
  */
 export const getMysqlConfig = () => {
   const value = getConfigValue() || {};
+  const dbValue = getDbConfig();
 
-  return value?.db?.mysql || value?.mysql || {};
+  return dbValue?.mysql || value?.mysql || {};
 };
 
 /**
@@ -41,8 +45,9 @@ export const getMysqlConfig = () => {
  */
 export const getPgsqlConfig = () => {
   const value = getConfigValue() || {};
+  const dbValue = getDbConfig();
 
-  return value?.db?.pgsql || value?.db?.pg || value?.db?.postgres || value?.db?.postgresql || value?.pgsql || value?.pg || value?.postgres || value?.postgresql || {};
+  return dbValue?.pgsql || dbValue?.pg || dbValue?.postgres || dbValue?.postgresql || value?.pgsql || value?.pg || value?.postgres || value?.postgresql || {};
 };
 
 /**
@@ -50,8 +55,9 @@ export const getPgsqlConfig = () => {
  */
 export const getRedisConfig = () => {
   const value = getConfigValue() || {};
+  const dbValue = getDbConfig();
 
-  return value?.db?.redis || value?.redis || {};
+  return dbValue?.redis || value?.redis || {};
 };
 
 /**
@@ -59,8 +65,9 @@ export const getRedisConfig = () => {
  */
 export const getSqliteConfig = () => {
   const value = getConfigValue() || {};
+  const dbValue = getDbConfig();
 
-  return value?.db?.sqlite || value?.sqlite || {};
+  return dbValue?.sqlite || value?.sqlite || {};
 };
 
 /**
@@ -68,6 +75,7 @@ export const getSqliteConfig = () => {
  */
 export const getMongoConfig = () => {
   const value = getConfigValue() || {};
+  const dbValue = getDbConfig();
 
-  return value?.db?.mongo || value?.mongo || {};
+  return dbValue?.mongo || value?.mongo || {};
 };
