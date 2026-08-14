@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "数据库连接",
   "author": "lemonade",
   "license": "MIT",
@@ -18,171 +18,164 @@
   "alemonjs": {
     "config": [
       {
-        "name": "db",
+        "name": "redis",
         "type": "object",
-        "description": "数据库配置",
+        "description": "Redis 配置",
         "config": [
           {
-            "name": "redis",
-            "type": "object",
-            "description": "Redis 配置",
-            "config": [
-              {
-                "name": "host",
-                "type": "string",
-                "required": false,
-                "default": "127.0.0.1",
-                "description": "Redis 主机地址"
-              },
-              {
-                "name": "port",
-                "type": "number",
-                "required": false,
-                "default": 6379,
-                "rules": [
-                  {
-                    "pattern": "^[0-9]+$",
-                    "message": "端口必须为数字"
-                  }
-                ],
-                "description": "Redis 端口"
-              },
-              {
-                "name": "password",
-                "type": "string",
-                "required": false,
-                "default": "",
-                "description": "Redis 密码"
-              },
-              {
-                "name": "db",
-                "type": "number",
-                "required": false,
-                "default": 0,
-                "rules": [
-                  {
-                    "pattern": "^[0-9]+$",
-                    "message": "数据库索引必须为数字"
-                  }
-                ],
-                "description": "Redis 数据库索引"
-              }
-            ]
+            "name": "host",
+            "type": "string",
+            "required": false,
+            "default": "127.0.0.1",
+            "description": "Redis 主机地址"
           },
           {
-            "name": "dialect",
-            "type": "string",
-            "description": "选择SQL数据库",
+            "name": "port",
+            "type": "number",
+            "required": false,
+            "default": 6379,
             "rules": [
               {
-                "pattern": "^(pgsql|mysql|sqlite)$",
-                "message": "dialect 必须为 pgsql、mysql 或 sqlite"
+                "pattern": "^[0-9]+$",
+                "message": "端口必须为数字"
               }
-            ]
+            ],
+            "description": "Redis 端口"
           },
           {
-            "name": "pgsql",
-            "type": "object",
-            "description": "PostgreSQL 配置",
-            "config": [
-              {
-                "name": "host",
-                "type": "string",
-                "required": false,
-                "default": "127.0.0.1",
-                "description": "数据库主机地址"
-              },
-              {
-                "name": "port",
-                "type": "number",
-                "required": false,
-                "default": 5432,
-                "rules": [
-                  {
-                    "pattern": "^[0-9]+$",
-                    "message": "端口必须为数字"
-                  }
-                ],
-                "description": "数据库端口"
-              },
-              {
-                "name": "user",
-                "type": "string",
-                "required": true,
-                "description": "数据库用户名"
-              },
-              {
-                "name": "password",
-                "type": "string",
-                "required": true,
-                "description": "数据库密码"
-              },
-              {
-                "name": "database",
-                "type": "string",
-                "required": true,
-                "description": "数据库名称"
-              }
-            ]
+            "name": "password",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "description": "Redis 密码"
           },
           {
-            "name": "mysql",
-            "type": "object",
-            "description": "MySQL 配置",
-            "config": [
+            "name": "db",
+            "type": "number",
+            "required": false,
+            "default": 0,
+            "rules": [
               {
-                "name": "host",
-                "type": "string",
-                "required": false,
-                "default": "127.0.0.1",
-                "description": "数据库主机地址"
-              },
-              {
-                "name": "port",
-                "type": "number",
-                "required": false,
-                "default": 3306,
-                "rules": [
-                  {
-                    "pattern": "^[0-9]+$",
-                    "message": "端口必须为数字"
-                  }
-                ],
-                "description": "数据库端口"
-              },
-              {
-                "name": "user",
-                "type": "string",
-                "required": true,
-                "description": "数据库用户名"
-              },
-              {
-                "name": "password",
-                "type": "string",
-                "required": true,
-                "description": "数据库密码"
-              },
-              {
-                "name": "database",
-                "type": "string",
-                "required": true,
-                "description": "数据库名称"
+                "pattern": "^[0-9]+$",
+                "message": "数据库索引必须为数字"
               }
-            ]
+            ],
+            "description": "Redis 数据库索引"
+          }
+        ]
+      },
+      {
+        "name": "dialect",
+        "type": "string",
+        "description": "选择SQL数据库",
+        "rules": [
+          {
+            "pattern": "^(pgsql|mysql|sqlite)$",
+            "message": "dialect 必须为 pgsql、mysql 或 sqlite"
+          }
+        ]
+      },
+      {
+        "name": "pgsql",
+        "type": "object",
+        "description": "PostgreSQL 配置",
+        "config": [
+          {
+            "name": "host",
+            "type": "string",
+            "required": false,
+            "default": "127.0.0.1",
+            "description": "数据库主机地址"
           },
           {
-            "name": "sqlite",
-            "type": "object",
-            "description": "SQLite 配置",
-            "config": [
+            "name": "port",
+            "type": "number",
+            "required": false,
+            "default": 5432,
+            "rules": [
               {
-                "name": "storage",
-                "type": "string",
-                "required": false,
-                "default": "./data/alemonapp.db",
-                "description": "SQLite 数据库文件存储路径"
+                "pattern": "^[0-9]+$",
+                "message": "端口必须为数字"
               }
-            ]
+            ],
+            "description": "数据库端口"
+          },
+          {
+            "name": "user",
+            "type": "string",
+            "required": true,
+            "description": "数据库用户名"
+          },
+          {
+            "name": "password",
+            "type": "string",
+            "required": true,
+            "description": "数据库密码"
+          },
+          {
+            "name": "database",
+            "type": "string",
+            "required": true,
+            "description": "数据库名称"
+          }
+        ]
+      },
+      {
+        "name": "mysql",
+        "type": "object",
+        "description": "MySQL 配置",
+        "config": [
+          {
+            "name": "host",
+            "type": "string",
+            "required": false,
+            "default": "127.0.0.1",
+            "description": "数据库主机地址"
+          },
+          {
+            "name": "port",
+            "type": "number",
+            "required": false,
+            "default": 3306,
+            "rules": [
+              {
+                "pattern": "^[0-9]+$",
+                "message": "端口必须为数字"
+              }
+            ],
+            "description": "数据库端口"
+          },
+          {
+            "name": "user",
+            "type": "string",
+            "required": true,
+            "description": "数据库用户名"
+          },
+          {
+            "name": "password",
+            "type": "string",
+            "required": true,
+            "description": "数据库密码"
+          },
+          {
+            "name": "database",
+            "type": "string",
+            "required": true,
+            "description": "数据库名称"
+          }
+        ]
+      },
+      {
+        "name": "sqlite",
+        "type": "object",
+        "description": "SQLite 配置",
+        "config": [
+          {
+            "name": "storage",
+            "type": "string",
+            "required": false,
+            "default": "./data/alemonapp.db",
+            "description": "SQLite 数据库文件存储路径"
           }
         ]
       }
