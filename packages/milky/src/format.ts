@@ -64,7 +64,11 @@ export const milkySegmentsToMedia = (segments: MilkySegment[] = []): MessageMedi
  */
 export const findReplyId = (segments: MilkySegment[] = []): string | undefined => {
   const reply = segments.find(item => item.type === 'reply');
-  if (!reply) return undefined;
+
+  if (!reply) {
+    return undefined;
+  }
+
   return String(reply.data?.message_seq ?? '');
 };
 
@@ -72,16 +76,16 @@ export const findReplyId = (segments: MilkySegment[] = []): string | undefined =
  * 判断群消息是否 at 了机器人。
  */
 export const isMilkyAtBot = (segments: MilkySegment[] = [], selfId: string) => {
-  return segments.some(
-    item => item.type === 'mention' && String(item.data?.user_id ?? '') === String(selfId)
-  );
+  return segments.some(item => item.type === 'mention' && String(item.data?.user_id ?? '') === String(selfId));
 };
 
 /**
  * 规范化文件 URI，支持 file:// http(s):// base64:// 与 Buffer。
  */
 export const fixUri = (uri: any): string => {
-  if (!uri) return uri;
+  if (!uri) {
+    return uri;
+  }
 
   if (Buffer.isBuffer(uri)) {
     return `base64://${uri.toString('base64')}`;
@@ -91,16 +95,20 @@ export const fixUri = (uri: any): string => {
     return `base64://${Buffer.from(uri.data).toString('base64')}`;
   }
 
-  if (typeof uri !== 'string') return String(uri);
+  if (typeof uri !== 'string') {
+    return String(uri);
+  }
 
   let res = uri;
 
   if (res.startsWith('base64://')) {
     const data = res.substring(9);
     const pad = data.length % 4;
+
     if (pad > 0) {
       res += '='.repeat(4 - pad);
     }
+
     return res;
   }
 
@@ -130,6 +138,7 @@ export const markdownToText = (items: DataMarkDown['value'] = []): string => {
           return item.value;
         case 'MD.link': {
           const v = item.value as unknown as { text: string; url?: string };
+
           return v.url ? `${v.text}( ${v.url} )` : v.text;
         }
         case 'MD.image':
@@ -140,6 +149,7 @@ export const markdownToText = (items: DataMarkDown['value'] = []): string => {
               if (typeof li.value === 'object') {
                 return `${li.value.index}. ${li.value.text ?? ''}`;
               }
+
               return `· ${li.value}`;
             })
             .join('\n');
@@ -150,7 +160,10 @@ export const markdownToText = (items: DataMarkDown['value'] = []): string => {
         case 'MD.newline':
           return '\n';
         case 'MD.mention':
-          if (item.value === 'everyone') return '@全体成员';
+          if (item.value === 'everyone') {
+            return '@全体成员';
+          }
+
           return `@${item.value ?? ''}`;
         case 'MD.button':
           return `[${item.value}]`;
@@ -167,117 +180,111 @@ export const markdownToText = (items: DataMarkDown['value'] = []): string => {
  * Milky 原生支持 text / mention / mention_all / face / reply /
  * image / record / video / forward / light_app。
  */
-export const dataEnumToMilkyMessage = async (val: DataEnums[] = []): Promise<MilkySegment[]> => {
-  const message = (
-    await Promise.all(
-      val.map(async item => {
-        if (item.type === 'Text') {
-          return {
-            type: 'text',
-            data: { text: String(item.value ?? '') }
-          } as MilkySegment;
+export const dataEnumToMilkyMessage = (val: DataEnums[] = []) => {
+  const message = val
+    .map(item => {
+      if (item.type === 'Text') {
+        return {
+          type: 'text',
+          data: { text: String(item.value ?? '') }
+        } as MilkySegment;
+      }
+
+      if (item.type === 'Mention') {
+        if (item.value === 'everyone' || item.value === 'all' || item.value === '' || (typeof item.value !== 'string' && typeof item.value !== 'number')) {
+          return { type: 'mention_all', data: {} } as MilkySegment;
         }
 
-        if (item.type === 'Mention') {
-          if (
-            item.value === 'everyone' ||
-            item.value === 'all' ||
-            item.value === '' ||
-            (typeof item.value !== 'string' && typeof item.value !== 'number')
-          ) {
-            return { type: 'mention_all', data: {} } as MilkySegment;
+        if (item.options?.belong === 'everyone') {
+          return { type: 'mention_all', data: {} } as MilkySegment;
+        }
+
+        return {
+          type: 'mention',
+          data: { user_id: Number(item.value) }
+        } as MilkySegment;
+      }
+
+      if (item.type === 'Image') {
+        return {
+          type: 'image',
+          data: { uri: fixUri(item.value), sub_type: 'normal' }
+        } as MilkySegment;
+      }
+
+      if (item.type === 'ImageURL') {
+        return {
+          type: 'image',
+          data: { uri: item.value, sub_type: 'normal' }
+        } as MilkySegment;
+      }
+
+      if (item.type === 'ImageFile') {
+        const db = readFileSync(item.value);
+
+        return {
+          type: 'image',
+          data: { uri: `base64://${db.toString('base64')}`, sub_type: 'normal' }
+        } as MilkySegment;
+      }
+
+      if (item.type === 'Audio') {
+        return {
+          type: 'record',
+          data: { uri: fixUri(item.value) }
+        } as MilkySegment;
+      }
+
+      if (item.type === 'Video') {
+        return {
+          type: 'video',
+          data: {
+            uri: fixUri(item.value),
+            thumb_uri: (item as any).options?.thumb ? fixUri((item as any).options.thumb) : undefined
           }
+        } as MilkySegment;
+      }
 
-          if (item.options?.belong === 'everyone') {
-            return { type: 'mention_all', data: {} } as MilkySegment;
-          }
+      if (item.type === 'Attachment') {
+        const filename = (item as any).options?.filename;
 
-          return {
-            type: 'mention',
-            data: { user_id: Number(item.value) }
-          } as MilkySegment;
-        }
+        return {
+          type: 'text',
+          data: { text: filename ? `[附件: ${filename}]` : '[附件]' }
+        } as MilkySegment;
+      }
 
-        if (item.type === 'Image') {
-          return {
-            type: 'image',
-            data: { uri: fixUri(item.value), sub_type: 'normal' }
-          } as MilkySegment;
-        }
+      // 降级处理：将 Link、Markdown、Button、Select、Embed 等转为纯文本
+      let text = '';
 
-        if (item.type === 'ImageURL') {
-          return {
-            type: 'image',
-            data: { uri: item.value, sub_type: 'normal' }
-          } as MilkySegment;
-        }
+      if (item.type === 'Link') {
+        const link = (item as any).options?.link;
 
-        if (item.type === 'ImageFile') {
-          const db = readFileSync(item.value);
-          return {
-            type: 'image',
-            data: { uri: `base64://${db.toString('base64')}`, sub_type: 'normal' }
-          } as MilkySegment;
-        }
+        text = link ? `${item.value}( ${link} )` : String(item.value);
+      } else if (item.type === 'Markdown') {
+        text = markdownToText((item as any).value);
+      } else if (item.type === 'MarkdownOriginal') {
+        text = String(item.value ?? '');
+      } else if (item.type === 'ButtonGroup' || item.type === 'BT.group') {
+        text = ((item as any).value || []).map((row: any) => (row.value || []).map((btn: any) => `[${btn.value}]`).join(' ')).join('\n');
+      } else if (item.type === 'Select') {
+        text = ((item as any).value || [])
+          .map((opt: any) => opt?.label ?? opt?.value ?? '')
+          .filter(Boolean)
+          .join(' / ');
+      } else if (item.type === 'Embed') {
+        const v = (item as any).value || {};
 
-        if (item.type === 'Audio') {
-          return {
-            type: 'record',
-            data: { uri: fixUri(item.value) }
-          } as MilkySegment;
-        }
+        text = v.description || v.title || '';
+      }
 
-        if (item.type === 'Video') {
-          return {
-            type: 'video',
-            data: {
-              uri: fixUri(item.value),
-              thumb_uri: (item as any).options?.thumb ? fixUri((item as any).options.thumb) : undefined
-            }
-          } as MilkySegment;
-        }
+      if (text.trim()) {
+        return { type: 'text', data: { text: text.trim() } } as MilkySegment;
+      }
 
-        if (item.type === 'Attachment') {
-          const filename = (item as any).options?.filename;
-          return {
-            type: 'text',
-            data: { text: filename ? `[附件: ${filename}]` : '[附件]' }
-          } as MilkySegment;
-        }
-
-        // 降级处理：将 Link、Markdown、Button、Select、Embed 等转为纯文本
-        let text = '';
-
-        if (item.type === 'Link') {
-          const link = (item as any).options?.link;
-          text = link ? `${item.value}( ${link} )` : String(item.value);
-        } else if (item.type === 'Markdown') {
-          text = markdownToText((item as any).value);
-        } else if (item.type === 'MarkdownOriginal') {
-          text = String(item.value ?? '');
-        } else if (item.type === 'ButtonGroup' || item.type === 'BT.group') {
-          text = ((item as any).value || [])
-            .map((row: any) => (row.value || []).map((btn: any) => `[${btn.value}]`).join(' '))
-            .join('\n');
-        } else if (item.type === 'Select') {
-          text = ((item as any).value || [])
-            .map((opt: any) => opt?.label ?? opt?.value ?? '')
-            .filter(Boolean)
-            .join(' / ');
-        } else if (item.type === 'Embed') {
-          const v = (item as any).value || {};
-          text = v.description || v.title || '';
-        }
-
-        if (text.trim()) {
-          return { type: 'text', data: { text: text.trim() } } as MilkySegment;
-        }
-
-        return null;
-      })
-    )
-  ).flat();
+      return null;
+    })
+    .flat();
 
   return message.filter((item): item is MilkySegment => Boolean(item));
 };
-

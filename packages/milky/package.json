@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/milky",
-  "version": "2.1.0",
-  "description": "Milky QQ 机器人应用接口标准",
+  "version": "2.1.0-rc.0",
+  "description": "milky",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",

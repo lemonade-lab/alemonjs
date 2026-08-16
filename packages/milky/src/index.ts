@@ -4,15 +4,8 @@ import { platform, getMilkyConfig, getMaster, validateMilkyConfig } from './conf
 import { MilkyClient } from './sdk/client';
 import { setConnectionStatusProvider } from './sdk/status';
 import { BotMe } from './db';
-import {
-  dataEnumToMilkyMessage,
-  findReplyId,
-  fixUri,
-  isMilkyAtBot,
-  milkySegmentsToMedia,
-  milkySegmentsToText
-} from './format';
-import type { MilkyEvent, MilkySegment } from './sdk/types';
+import { dataEnumToMilkyMessage, findReplyId, fixUri, isMilkyAtBot, milkySegmentsToMedia, milkySegmentsToText } from './format';
+import type { MilkySegment } from './sdk/types';
 export { platform } from './config';
 export { MilkyClient as API } from './sdk/client';
 export type { MilkyConnectionStatus, MilkyApiResponse } from './sdk/api';
@@ -34,6 +27,7 @@ const main = () => {
     webhook_path: config.webhook_path,
     webhook_port: config.webhook_port
   });
+
   setConnectionStatusProvider(() => client.getConnectionStatus());
 
   void client.connect();
@@ -471,13 +465,12 @@ const main = () => {
     }
 
     try {
-      const message = await dataEnumToMilkyMessage(val);
-      const effectiveMessage = message.filter(
-        item => !(item.type === 'text' && !item.data?.text)
-      );
+      const message = dataEnumToMilkyMessage(val);
+      const effectiveMessage = message.filter(item => !(item.type === 'text' && !item.data?.text));
 
       if (effectiveMessage.length <= 0) {
         logger.info('[milky] 消息内容转换后为空，跳过发送');
+
         return [];
       }
 
@@ -501,13 +494,12 @@ const main = () => {
     }
 
     try {
-      const message = await dataEnumToMilkyMessage(val);
-      const effectiveMessage = message.filter(
-        item => !(item.type === 'text' && !item.data?.text)
-      );
+      const message = dataEnumToMilkyMessage(val);
+      const effectiveMessage = message.filter(item => !(item.type === 'text' && !item.data?.text));
 
       if (effectiveMessage.length <= 0) {
         logger.info('[milky] 消息内容转换后为空，跳过发送');
+
         return [];
       }
 
@@ -565,10 +557,7 @@ const main = () => {
 
           for (const item of segments) {
             if (item.type === 'mention' || item.type === 'mention_all') {
-              const UserId =
-                item.type === 'mention_all'
-                  ? 'all'
-                  : String(item.data?.user_id ?? '');
+              const UserId = item.type === 'mention_all' ? 'all' : String(item.data?.user_id ?? '');
 
               if (item.type === 'mention_all' || UserId === 'all') {
                 continue;
@@ -625,30 +614,26 @@ const main = () => {
         }
       },
       forward: {
-        channel: async (ChannelId: string, params: any[]) => {
-          const messages = await Promise.all(
-            params.map(async i => ({
-              user_id: Number(i.user_id ?? BotMe.id ?? 80000000),
-              sender_name: i.nickname ?? '机器人',
-              time: Number(i.time ?? Math.floor(Date.now() / 1000)),
-              segments: await dataEnumToMilkyMessage(i.content)
-            }))
-          );
+        channel: (ChannelId: string, params: any[]) => {
+          const messages = params.map(i => ({
+            user_id: Number(i.user_id ?? BotMe.id ?? 80000000),
+            sender_name: i.nickname ?? '机器人',
+            time: Number(i.time ?? Math.floor(Date.now() / 1000)),
+            segments: dataEnumToMilkyMessage(i.content)
+          }));
 
           return client.sendGroupMessage({
             group_id: Number(ChannelId),
             message: [{ type: 'forward', data: { messages } }] as MilkySegment[]
           });
         },
-        user: async (UserId: string, params: any[]) => {
-          const messages = await Promise.all(
-            params.map(async i => ({
-              user_id: Number(i.user_id ?? BotMe.id ?? 80000000),
-              sender_name: i.nickname ?? '机器人',
-              time: Number(i.time ?? Math.floor(Date.now() / 1000)),
-              segments: await dataEnumToMilkyMessage(i.content)
-            }))
-          );
+        user: (UserId: string, params: any[]) => {
+          const messages = params.map(i => ({
+            user_id: Number(i.user_id ?? BotMe.id ?? 80000000),
+            sender_name: i.nickname ?? '机器人',
+            time: Number(i.time ?? Math.floor(Date.now() / 1000)),
+            segments: dataEnumToMilkyMessage(i.content)
+          }));
 
           return client.sendPrivateMessage({
             user_id: Number(UserId),
@@ -712,18 +697,11 @@ const main = () => {
         const sourceEvent = data.payload.event;
         const raw = sourceEvent?.value ?? sourceEvent;
         const scene = raw?.data?.message_scene;
-        const ChannelId =
-          data.payload.ChannelId ??
-          (scene === 'group' ? raw?.data?.peer_id : undefined);
-        const UserId =
-          data.payload.UserId ??
-          (scene !== 'group' ? raw?.data?.peer_id : undefined);
+        const ChannelId = data.payload.ChannelId ?? (scene === 'group' ? raw?.data?.peer_id : undefined);
+        const UserId = data.payload.UserId ?? (scene !== 'group' ? raw?.data?.peer_id : undefined);
         const MessageId = data.payload.MessageId;
 
-        const res =
-          ChannelId !== undefined
-            ? await api.use.delete.channel(ChannelId, MessageId)
-            : await api.use.delete.user(UserId, MessageId);
+        const res = ChannelId !== undefined ? await api.use.delete.channel(ChannelId, MessageId) : await api.use.delete.user(UserId, MessageId);
 
         return consume([createResult(ResultCode.Ok, data.action, res)]);
       }
@@ -901,12 +879,7 @@ const main = () => {
           .getGroupMemberList({ group_id: Number(guildId) })
           .then(r => {
             const list = r?.data?.members ?? r?.data ?? r;
-            const filtered = Array.isArray(list)
-              ? list.filter(
-                  (m: any) =>
-                    (m.card ?? '').includes(keyword) || (m.nickname ?? '').includes(keyword)
-                )
-              : [];
+            const filtered = Array.isArray(list) ? list.filter((m: any) => (m.card ?? '').includes(keyword) || (m.nickname ?? '').includes(keyword)) : [];
 
             return createResult(ResultCode.Ok, data.action, filtered);
           })
@@ -1031,10 +1004,8 @@ const main = () => {
       case 'request.guild': {
         const params = data.payload.params;
         const raw = data.payload.event?.value ?? data.payload.event;
-        const notificationType =
-          params.subType === 'invite' ? 'invited_join_request' : 'join_request';
-        const groupId =
-          params.guildId ?? params.group_id ?? raw?.data?.group_id ?? 0;
+        const notificationType = params.subType === 'invite' ? 'invited_join_request' : 'join_request';
+        const groupId = params.guildId ?? params.group_id ?? raw?.data?.group_id ?? 0;
         const res = await (params.approve
           ? client.acceptGroupRequest({
               notification_seq: Number(params.flag),
@@ -1069,9 +1040,7 @@ const main = () => {
       }
 
       case 'connection.status': {
-        return consume([
-          createResult(ResultCode.Ok, data.action, client.getConnectionStatus())
-        ]);
+        return consume([createResult(ResultCode.Ok, data.action, client.getConnectionStatus())]);
       }
 
       default: {
@@ -1095,6 +1064,7 @@ const main = () => {
       for (const k of keys) {
         if (target === null || target === undefined || !(k in target)) {
           consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
+
           return;
         }
 
@@ -1104,6 +1074,7 @@ const main = () => {
 
       if (typeof target !== 'function') {
         consume([createResult(ResultCode.Fail, '目标不是可调用方法', null)]);
+
         return;
       }
 

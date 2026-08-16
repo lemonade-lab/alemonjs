@@ -50,10 +50,18 @@ export class MilkyAPI {
   }
 
   configure(options: MilkyApiOptions = {}) {
-    if (options.baseUrl !== undefined) this.#baseUrl = options.baseUrl;
-    if (options.apiBaseUrl !== undefined) this.#apiBaseUrl = options.apiBaseUrl;
-    if (options.accessToken !== undefined) this.#accessToken = options.accessToken;
-    if (options.timeoutMs !== undefined) this.#timeoutMs = options.timeoutMs;
+    if (options.baseUrl !== undefined) {
+      this.#baseUrl = options.baseUrl;
+    }
+    if (options.apiBaseUrl !== undefined) {
+      this.#apiBaseUrl = options.apiBaseUrl;
+    }
+    if (options.accessToken !== undefined) {
+      this.#accessToken = options.accessToken;
+    }
+    if (options.timeoutMs !== undefined) {
+      this.#timeoutMs = options.timeoutMs;
+    }
     this.#connectionStatus = {
       ...this.#connectionStatus,
       baseUrl: this.#baseUrl,
@@ -84,6 +92,7 @@ export class MilkyAPI {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
     };
+
     if (this.#accessToken) {
       headers.Authorization = `Bearer ${this.#accessToken}`;
     }
@@ -100,6 +109,7 @@ export class MilkyAPI {
       });
 
       let data: any = null;
+
       try {
         data = await res.json();
       } catch (err: any) {
@@ -280,12 +290,7 @@ export class MilkyAPI {
     });
   }
 
-  getHistoryMessages(params: {
-    message_scene: 'friend' | 'group' | 'temp';
-    peer_id: string | number;
-    start_message_seq?: string | number;
-    limit?: number;
-  }) {
+  getHistoryMessages(params: { message_scene: 'friend' | 'group' | 'temp'; peer_id: string | number; start_message_seq?: string | number; limit?: number }) {
     return this.callApi('get_history_messages', {
       message_scene: params.message_scene,
       peer_id: Number(params.peer_id),
@@ -479,8 +484,7 @@ export class MilkyAPI {
 
   getGroupNotifications(params?: { start_notification_seq?: string | number; is_filtered?: boolean; limit?: number }) {
     return this.callApi('get_group_notifications', {
-      start_notification_seq:
-        params?.start_notification_seq !== undefined ? Number(params.start_notification_seq) : undefined,
+      start_notification_seq: params?.start_notification_seq !== undefined ? Number(params.start_notification_seq) : undefined,
       is_filtered: params?.is_filtered ?? false,
       limit: params?.limit ?? 20
     });
@@ -540,12 +544,7 @@ export class MilkyAPI {
     });
   }
 
-  uploadGroupFile(params: {
-    group_id: string | number;
-    parent_folder_id?: string;
-    file_uri: string;
-    file_name: string;
-  }) {
+  uploadGroupFile(params: { group_id: string | number; parent_folder_id?: string; file_uri: string; file_name: string }) {
     return this.callApi('upload_group_file', {
       group_id: Number(params.group_id),
       parent_folder_id: params.parent_folder_id ?? '/',
@@ -554,12 +553,7 @@ export class MilkyAPI {
     });
   }
 
-  getPrivateFileDownloadUrl(params: {
-    user_id: string | number;
-    file_id: string;
-    file_hash: string;
-    is_self_send?: boolean;
-  }) {
+  getPrivateFileDownloadUrl(params: { user_id: string | number; file_id: string; file_hash: string; is_self_send?: boolean }) {
     return this.callApi('get_private_file_download_url', {
       user_id: Number(params.user_id),
       file_id: params.file_id,
@@ -582,12 +576,7 @@ export class MilkyAPI {
     });
   }
 
-  moveGroupFile(params: {
-    group_id: string | number;
-    file_id: string;
-    parent_folder_id?: string;
-    target_folder_id?: string;
-  }) {
+  moveGroupFile(params: { group_id: string | number; file_id: string; parent_folder_id?: string; target_folder_id?: string }) {
     return this.callApi('move_group_file', {
       group_id: Number(params.group_id),
       file_id: params.file_id,
@@ -596,12 +585,7 @@ export class MilkyAPI {
     });
   }
 
-  renameGroupFile(params: {
-    group_id: string | number;
-    file_id: string;
-    parent_folder_id?: string;
-    new_file_name: string;
-  }) {
+  renameGroupFile(params: { group_id: string | number; file_id: string; parent_folder_id?: string; new_file_name: string }) {
     return this.callApi('rename_group_file', {
       group_id: Number(params.group_id),
       file_id: params.file_id,

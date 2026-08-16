@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import http from 'http';
 import { logger } from 'alemonjs';
-import { MilkyAPI, type MilkyTransport } from './api';
+import { MilkyAPI } from './api';
 import type { MilkyEventMap } from './typing';
 import type { MilkyEvent } from './types';
 
@@ -66,15 +66,17 @@ export class MilkyClient extends MilkyAPI {
   }
 
   static buildBaseUrl(options: MilkyClientOptions) {
-    const prefix = options.prefix
-      ? `/${String(options.prefix).replace(/^\/+|\/+$/g, '')}`
-      : '';
+    const prefix = options.prefix ? `/${String(options.prefix).replace(/^\/+|\/+$/g, '')}` : '';
     const host = options.host;
 
     if (/^https?:\/\//.test(host)) {
       const url = new URL(host);
-      if (!url.port && options.port) url.port = String(options.port);
+
+      if (!url.port && options.port) {
+        url.port = String(options.port);
+      }
       const path = url.pathname.replace(/\/+$/, '');
+
       return `${url.protocol}//${url.host}${path}${prefix}`;
     }
 
@@ -87,9 +89,11 @@ export class MilkyClient extends MilkyAPI {
 
   #buildEventUrl(kind: 'ws' | 'http') {
     const url = new URL(`${this.apiBaseUrl.replace(/\/api$/, '')}/event`);
+
     if (kind === 'ws') {
       url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
     }
+
     return url;
   }
 
@@ -99,18 +103,25 @@ export class MilkyClient extends MilkyAPI {
 
   on<T extends keyof MilkyEventMap>(key: T, val: (event: MilkyEventMap[T]) => any) {
     this.#events[key] = val;
+
     return this;
   }
 
   #isAuthorized(request: http.IncomingMessage) {
     const token = this.#options.access_token;
-    if (!token) return true;
+
+    if (!token) {
+      return true;
+    }
     const authorization = request.headers.authorization;
+
     return authorization === `Bearer ${token}` || authorization === token;
   }
 
   #clearHeartbeat() {
-    if (this.#heartbeatTimer) clearInterval(this.#heartbeatTimer);
+    if (this.#heartbeatTimer) {
+      clearInterval(this.#heartbeatTimer);
+    }
     this.#heartbeatTimer = null;
   }
 
@@ -133,15 +144,21 @@ export class MilkyClient extends MilkyAPI {
 
   #getReconnectDelay() {
     const base = this.#options.reconnect_interval ?? defaultReconnect;
+
     return Math.min(base * 2 ** Math.min(this.#reconnectAttempts, 5), 30_000);
   }
 
   #scheduleReconnect(reason: string) {
-    if (this.#options.connection === 'webhook' || this.#closedByUser) return;
-    if (this.#reconnectTimer) return;
+    if (this.#options.connection === 'webhook' || this.#closedByUser) {
+      return;
+    }
+    if (this.#reconnectTimer) {
+      return;
+    }
 
     this.#reconnectAttempts++;
     const delay = this.#getReconnectDelay();
+
     logger.info(`[Milky] ${reason}，${delay}ms 后重新连接（第 ${this.#reconnectAttempts} 次）`);
     this.#reconnectTimer = setTimeout(() => {
       this.#reconnectTimer = null;
@@ -152,31 +169,40 @@ export class MilkyClient extends MilkyAPI {
   async #onConnect() {
     try {
       const loginInfo = await this.getLoginInfo();
+
       if (loginInfo.retcode !== 0 || !loginInfo.data) {
         const reason = loginInfo.error || loginInfo.wording || 'unknown error';
+
         this.updateConnectionStatus({ state: 'failed', reason: `获取登录信息失败: ${reason}` });
         logger.error(`[Milky] 获取登录信息失败: ${reason}`);
         if (this.#options.connection !== 'webhook') {
           this.#ws?.close(1000, 'login failed');
         }
-        if (this.#options.connection !== 'webhook') this.#scheduleReconnect('初始化失败');
+        if (this.#options.connection !== 'webhook') {
+          this.#scheduleReconnect('初始化失败');
+        }
+
         return;
       }
 
       const selfId = String(loginInfo.data.uin ?? loginInfo.data.user_id ?? '');
+
       this.updateConnectionStatus({ state: 'ready', selfId });
       logger.mark(`[Milky] ${loginInfo.data.nickname ?? 'Bot'}(${selfId}) 已连接`);
       this.#emit('READY', { self_id: selfId, info: loginInfo.data } as MilkyEventMap['READY']);
     } catch (error: any) {
       this.updateConnectionStatus({ state: 'failed', reason: error?.message ?? String(error) });
       logger.error(`[Milky] 初始化失败: ${error?.stack ?? error?.message ?? error}`);
-      if (this.#options.connection !== 'webhook') this.#scheduleReconnect('初始化失败');
+      if (this.#options.connection !== 'webhook') {
+        this.#scheduleReconnect('初始化失败');
+      }
     }
   }
 
   #handleEvent(event: MilkyEvent) {
     if (!event?.event_type) {
       logger.debug(`[Milky] 收到未知数据: ${JSON.stringify(event)}`);
+
       return;
     }
 
@@ -185,17 +211,19 @@ export class MilkyClient extends MilkyAPI {
   }
 
   #connectWs() {
-    if (this.#ws && this.#ws.readyState === WebSocket.OPEN) return;
+    if (this.#ws && this.#ws.readyState === WebSocket.OPEN) {
+      return;
+    }
 
     const url = this.#buildEventUrl('ws');
+
     if (this.#options.access_token) {
       url.searchParams.set('access_token', this.#options.access_token);
     }
 
-    const headers = this.#options.access_token
-      ? { Authorization: `Bearer ${this.#options.access_token}` }
-      : undefined;
+    const headers = this.#options.access_token ? { Authorization: `Bearer ${this.#options.access_token}` } : undefined;
     const ws = new WebSocket(url, { headers });
+
     this.#ws = ws;
     this.updateConnectionStatus({ state: 'connecting', transport: 'ws' });
 
@@ -210,6 +238,7 @@ export class MilkyClient extends MilkyAPI {
       this.#startHeartbeat(ws);
       try {
         const event = JSON.parse(data.toString());
+
         this.#handleEvent(event);
       } catch (error: any) {
         logger.error(`[Milky] WebSocket 消息解析失败: ${error?.message ?? error}`);
@@ -217,7 +246,9 @@ export class MilkyClient extends MilkyAPI {
     });
 
     ws.on('close', (code, reason) => {
-      if (this.#ws !== ws) return;
+      if (this.#ws !== ws) {
+        return;
+      }
       this.#clearHeartbeat();
       this.#ws = null;
       this.updateConnectionStatus({ state: 'offline', reason: `WebSocket 已断开 (${code})` });
@@ -226,7 +257,9 @@ export class MilkyClient extends MilkyAPI {
     });
 
     ws.on('error', (error: Error) => {
-      if (this.#ws !== ws) return;
+      if (this.#ws !== ws) {
+        return;
+      }
       logger.error(`[Milky] WebSocket 错误: ${error.message}`);
       this.updateConnectionStatus({ state: 'offline', reason: error.message });
       this.#scheduleReconnect('WebSocket 发生错误');
@@ -235,6 +268,7 @@ export class MilkyClient extends MilkyAPI {
 
   #connectSse() {
     const url = this.#buildEventUrl('http');
+
     if (this.#options.access_token) {
       url.searchParams.set('access_token', this.#options.access_token);
     }
@@ -242,6 +276,7 @@ export class MilkyClient extends MilkyAPI {
     const headers: Record<string, string> = {
       Accept: 'text/event-stream'
     };
+
     if (this.#options.access_token) {
       headers.Authorization = `Bearer ${this.#options.access_token}`;
     }
@@ -251,6 +286,7 @@ export class MilkyClient extends MilkyAPI {
         this.updateConnectionStatus({ state: 'failed', reason: `SSE HTTP ${res.statusCode}` });
         req.destroy();
         this.#scheduleReconnect('SSE 连接失败');
+
         return;
       }
 
@@ -260,6 +296,7 @@ export class MilkyClient extends MilkyAPI {
       void this.#onConnect();
 
       let buffer = '';
+
       res.setEncoding('utf8');
 
       res.on('data', (chunk: string) => {
@@ -267,6 +304,7 @@ export class MilkyClient extends MilkyAPI {
 
         // SSE 事件以空行分隔，这里只处理 data: 行。
         const events = buffer.split(/\r?\n\r?\n/);
+
         buffer = events.pop() ?? '';
 
         for (const block of events) {
@@ -275,10 +313,13 @@ export class MilkyClient extends MilkyAPI {
             .filter(line => line.startsWith('data:'))
             .map(line => line.slice(5).trimStart());
 
-          if (dataLines.length <= 0) continue;
+          if (dataLines.length <= 0) {
+            continue;
+          }
 
           try {
             const event = JSON.parse(dataLines.join('\n'));
+
             this.#handleEvent(event);
           } catch (error: any) {
             logger.error(`[Milky] SSE 消息解析失败: ${error?.message ?? error}`);
@@ -287,7 +328,9 @@ export class MilkyClient extends MilkyAPI {
       });
 
       res.on('close', () => {
-        if (this.#sseRequest !== req) return;
+        if (this.#sseRequest !== req) {
+          return;
+        }
         this.#sseRequest = null;
         this.updateConnectionStatus({ state: 'offline', reason: 'SSE 已断开' });
         logger.warn('[Milky] SSE 已断开');
@@ -311,7 +354,9 @@ export class MilkyClient extends MilkyAPI {
   }
 
   #startWebhook() {
-    if (this.#server) return;
+    if (this.#server) {
+      return;
+    }
 
     const server = http.createServer((req, res) => {
       const path = (req.url ?? '/').split('?')[0];
@@ -319,6 +364,7 @@ export class MilkyClient extends MilkyAPI {
       if (req.method !== 'POST' || path !== this.#options.webhook_path) {
         res.statusCode = 404;
         res.end('not found');
+
         return;
       }
 
@@ -326,10 +372,12 @@ export class MilkyClient extends MilkyAPI {
         logger.warn('[Milky] 已拒绝未认证的 WebHook 请求');
         res.statusCode = 401;
         res.end('unauthorized');
+
         return;
       }
 
       let body = '';
+
       req.on('data', chunk => {
         body += chunk;
       });
@@ -337,6 +385,7 @@ export class MilkyClient extends MilkyAPI {
       req.on('end', () => {
         try {
           const event = JSON.parse(body || '{}');
+
           this.#handleEvent(event);
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
@@ -357,6 +406,7 @@ export class MilkyClient extends MilkyAPI {
     server.listen(this.#options.webhook_port ?? 17159, () => {
       const address = server.address();
       const port = typeof address === 'object' && address ? address.port : this.#options.webhook_port;
+
       logger.info(`[Milky] WebHook 已监听: http://127.0.0.1:${port}${this.#options.webhook_path}`);
       this.updateConnectionStatus({ state: 'connecting', transport: 'webhook' });
       void this.#onConnect();
