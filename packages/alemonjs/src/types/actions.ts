@@ -1,6 +1,5 @@
 import { DataEnums } from './message';
 import { PaginationParams } from './standard';
-import { ConnectionStatus } from './connection';
 
 /** Platform-neutral destination. IDs are opaque platform identifiers. */
 export type ActionTargetScope = 'group' | 'c2c' | 'channel' | 'direct';

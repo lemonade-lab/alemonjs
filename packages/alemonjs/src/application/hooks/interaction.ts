@@ -1,4 +1,5 @@
-import { ActionTarget, EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import { ActionTarget } from '../../types';
+import { EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
 
 /** Acknowledge a platform interaction using the identifier supplied by the event. */
 export const useInteraction = <T extends EventKeys>(event?: Events[T]) => {

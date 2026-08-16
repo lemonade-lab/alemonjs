@@ -1,4 +1,5 @@
-import { ActionTarget, EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import { ActionTarget } from '../../types';
+import { EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
 
 /**
  * 媒体管理（图片/音频/视频/文件）
@@ -25,7 +26,9 @@ export const useMedia = <T extends EventKeys>(event?: Events[T]) => {
    * @param params.name 文件名
    */
   const upload = async (params: MediaParams & { target?: MediaTarget }): Promise<Result> => {
-    if (!validateSource(params)) return createResult(ResultCode.FailParams, 'Provide exactly one media source', null);
+    if (!validateSource(params)) {
+      return createResult(ResultCode.FailParams, 'Provide exactly one media source', null);
+    }
     try {
       const results = await sendAction({
         action: 'media.upload',
@@ -88,7 +91,9 @@ export const useMedia = <T extends EventKeys>(event?: Events[T]) => {
     if (!params.target?.targetId) {
       return createResult(ResultCode.FailParams, 'Missing targetId', null);
     }
-    if (!validateSource(params)) return createResult(ResultCode.FailParams, 'Provide exactly one media source', null);
+    if (!validateSource(params)) {
+      return createResult(ResultCode.FailParams, 'Provide exactly one media source', null);
+    }
     try {
       const results = await sendAction({
         action: 'media.send',

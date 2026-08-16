@@ -4,9 +4,8 @@ export default defineConfig({
     OutputOptions: {
       dir: 'bin'
     },
-    typescript: {
-      removeComments: true,
-      declaration: true
+    tsdown: {
+      dts: true
     }
   }
 });

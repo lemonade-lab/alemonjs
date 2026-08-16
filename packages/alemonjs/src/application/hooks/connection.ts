@@ -1,4 +1,5 @@
-import { ConnectionStatus, Result, ResultCode, createResult, sendAction } from './common';
+import { ConnectionStatus } from '../../types';
+import { Result, ResultCode, createResult, sendAction } from './common';
 
 /** Read the current transport state without coupling applications to a platform SDK. */
 export const useConnection = () => {
