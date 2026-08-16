@@ -1,0 +1,167 @@
+{
+  "name": "@alemonjs/milky",
+  "version": "2.1.0",
+  "description": "Milky QQ 机器人应用接口标准",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "lvy build"
+  },
+  "types": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.js"
+    },
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "keywords": [
+    "alemonjs",
+    "milky"
+  ],
+  "dependencies": {
+    "ws": "^8.18.1"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.14"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/milky/README.md",
+      "official": "https://milky.ntqqrev.org/",
+      "platform": "https://milky.ntqqrev.org/"
+    },
+    "config": [
+      {
+        "name": "host",
+        "type": "string",
+        "required": false,
+        "default": "127.0.0.1",
+        "description": "Milky 协议端地址，可带 http:// 或 https://"
+      },
+      {
+        "name": "port",
+        "type": "number",
+        "required": false,
+        "default": 8080,
+        "rules": [
+          {
+            "pattern": "^[0-9]+$",
+            "message": "端口必须为数字"
+          },
+          {
+            "pattern": "^(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5][0-9]{4}|[1-9][0-9]{0,3}|0)$",
+            "message": "端口范围必须在0~65535之间"
+          }
+        ],
+        "description": "协议端 HTTP 端口"
+      },
+      {
+        "name": "prefix",
+        "type": "string",
+        "required": false,
+        "default": "",
+        "description": "路径前缀"
+      },
+      {
+        "name": "connection",
+        "type": "string",
+        "required": false,
+        "default": "ws",
+        "rules": [
+          {
+            "pattern": "^(ws|sse|webhook)$",
+            "message": "连接方式必须为 ws、sse 或 webhook"
+          }
+        ],
+        "description": "事件推送方式：ws / sse / webhook"
+      },
+      {
+        "name": "access_token",
+        "type": "string",
+        "required": false,
+        "description": "access_token"
+      },
+      {
+        "name": "http_timeout",
+        "type": "number",
+        "required": false,
+        "default": 15,
+        "description": "HTTP API 超时时间（秒）"
+      },
+      {
+        "name": "heartbeat",
+        "type": "number",
+        "required": false,
+        "default": 30,
+        "description": "WebSocket 心跳间隔（秒）"
+      },
+      {
+        "name": "reconnect_interval",
+        "type": "number",
+        "required": false,
+        "default": 10,
+        "description": "断线重连基础间隔（秒）"
+      },
+      {
+        "name": "webhook_path",
+        "type": "string",
+        "required": false,
+        "default": "/milky",
+        "description": "WebHook 接收路径"
+      },
+      {
+        "name": "webhook_port",
+        "type": "number",
+        "required": false,
+        "default": 17159,
+        "rules": [
+          {
+            "pattern": "^[0-9]+$",
+            "message": "端口必须为数字"
+          },
+          {
+            "pattern": "^(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5][0-9]{4}|[1-9][0-9]{0,3}|0)$",
+            "message": "端口范围必须在0~65535之间"
+          }
+        ],
+        "description": "WebHook 服务监听端口"
+      }
+    ],
+    "desktop": {
+      "platform": [
+        {
+          "name": "milky"
+        }
+      ],
+      "logo": "antd.RobotOutlined",
+      "command": [
+        {
+          "name": "milky",
+          "icon": "antd.RobotOutlined",
+          "command": "open.milky"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "milky",
+          "icon": "antd.RobotOutlined",
+          "command": "open.milky"
+        }
+      ]
+    }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
+  }
+}
