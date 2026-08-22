@@ -3,7 +3,7 @@
   "displayName": "ALemonJS-React-UI",
   "publisher": "lemonade-x",
   "description": "阿柠檬统一色块",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "lib/react-ui.js",
   "module": "lib/react-ui.mjs",
   "types": "lib/index.d.ts",
@@ -46,5 +46,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ningmengchongshui/alemonjs.git"
+  },
+  "dependencies": {
+    "antd": "^5.29.3"
   }
 }

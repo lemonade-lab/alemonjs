@@ -1,39 +1,16 @@
-import { useState } from 'react';
+import React from 'react';
+import { Collapse as AntdCollapse } from 'antd';
+import type { CollapseProps as AntdCollapseProps } from 'antd/es/collapse/Collapse';
 
-export type CollapseItemProps = {
-  label: string | React.ReactNode;
-  children: React.ReactNode;
-  isOpen: boolean;
-  onClick: () => void;
-};
+export type CollapseProps = AntdCollapseProps;
 
-const CollapseItem = ({ label, children, isOpen, onClick }: CollapseItemProps) => (
-  <div className=''>
-    <div onClick={onClick}>{label}</div>
-    {isOpen && <div>{children}</div>}
-  </div>
-);
+/**
+ * 默认保留旧组件的手风琴行为；传入 `accordion={false}` 可启用 antd 的多面板展开。
+ */
+const CollapseBase = React.forwardRef<HTMLDivElement, CollapseProps>(({ accordion = true, ...props }, ref) => (
+  <AntdCollapse ref={ref} accordion={accordion} {...props} />
+));
 
-export type CollapseProps = {
-  items: {
-    key: string | number;
-    label: string | React.ReactNode;
-    children: React.ReactNode;
-  }[];
-};
+CollapseBase.displayName = 'Collapse';
 
-export const Collapse = ({ items }: CollapseProps) => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const handleClick = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-  return (
-    <div className='flex flex-col '>
-      {items.map((item, index) => (
-        <CollapseItem key={item.key} label={item.label} isOpen={openIndex === index} onClick={() => handleClick(index)}>
-          {item.children}
-        </CollapseItem>
-      ))}
-    </div>
-  );
-};
+export const Collapse = Object.assign(CollapseBase, { Panel: AntdCollapse.Panel });
