@@ -406,13 +406,14 @@ const setTestOnePlatformClient = (ws: WebSocket) => {
  * @param port
  * @param listeningListener
  */
-export const cbpServer = (port: number, listeningListener?: () => void) => {
+export const cbpServer = (port: number, listeningListener?: (port: number) => void, autoPort = false) => {
   if (global.chatbotServer) {
     delete global.chatbotServer;
   }
 
   // 重连计数
   let count = 0;
+  let currentPort = port;
 
   /**
    * 获取重连时间
@@ -453,7 +454,7 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
           allowMethods: ['GET', 'POST', 'PUT', 'DELETE'] // 允许的 HTTP 方法
         })
       );
-      const server = app.listen(port, listeningListener);
+      const server = app.listen(currentPort, () => listeningListener?.(currentPort));
 
       // 创建 WebSocketServer 并监听同一个端口
       global.chatbotServer = new WebSocketServer({ server });
@@ -535,11 +536,15 @@ export const cbpServer = (port: number, listeningListener?: () => void) => {
         if (err.code === 'EADDRINUSE') {
           logger.error({
             code: ResultCode.FailInternal,
-            message: `端口 ${port} 已被占用，请检查是否有其他服务在运行`,
+            message: autoPort ? `端口 ${currentPort} 已被占用，尝试使用端口 ${currentPort + 1}` : `端口 ${currentPort} 已被占用，请检查是否有其他服务在运行`,
             data: err.message
           });
 
-          const reCreateTime = getReConnectTime();
+          const reCreateTime = autoPort ? 0 : getReConnectTime();
+
+          if (autoPort) {
+            currentPort++;
+          }
 
           // 清理所有客户端连接，开始重新创建服务器
           setTimeout(() => {

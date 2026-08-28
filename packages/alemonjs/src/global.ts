@@ -147,6 +147,8 @@ declare global {
       login?: string;
       platform?: string;
       port?: string;
+      serverPort?: string;
+      autoPort?: string;
       input?: string;
       __ALEMON_PLATFORM_ENTRY?: string;
       __ALEMON_DIRECT_SOCK?: string;

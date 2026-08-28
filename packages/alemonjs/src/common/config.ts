@@ -7,6 +7,7 @@ import { ResultCode } from './variable.js';
 
 type ConfigValue = {
   [key: string]: any;
+  autoPort?: boolean;
   apps?: string[] | { [key: string]: boolean };
   master_key?: { [key: string]: boolean } | string[];
   master_id?: { [key: string]: boolean } | string[];

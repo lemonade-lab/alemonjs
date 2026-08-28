@@ -7,6 +7,10 @@ type ServerOptions = {
    * @description 应用服务器端口
    */
   serverPort?: number;
+  /**
+   * @description 端口被占用时是否自动尝试下一个端口
+   */
+  autoPort?: boolean;
 };
 
 type ClientOptions = {

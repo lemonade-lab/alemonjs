@@ -33,11 +33,11 @@ const startPlatform = (options: StartOptions) => {
 /**
  * 启动客户端
  */
-const startClient = (options: StartOptions) => {
+const startClient = (options: StartOptions, port?: number) => {
   process.env.input = createOptionsByKey(options, 'input', '');
   process.env.output = createOptionsByKey(options, 'output', '');
   process.env.is_full_receive = String(createOptionsByKey(options, 'is_full_receive', true));
-  process.env.port = String(createOptionsByKey(options, 'port', '') || '');
+  process.env.port = String(port ?? (createOptionsByKey(options, 'port', '') || ''));
   process.env.url = createOptionsByKey(options, 'url', '');
 
   startModuleAdapter();
@@ -55,6 +55,7 @@ export const start = (options: StartOptions | string = {}) => {
 
   const port = createOptionsByKey(options, 'port', '');
   const serverPort = createOptionsByKey(options, 'serverPort', '');
+  const autoPort = createOptionsByKey(options, 'autoPort', false);
   const platform = createOptionsByKey(options, 'platform', '');
   const login = createOptionsByKey(options, 'login', '');
 
@@ -74,19 +75,27 @@ export const start = (options: StartOptions | string = {}) => {
   }
 
   process.env.port = port ? String(port) : '';
-  process.env.serverPort = serverPort;
+  process.env.serverPort = serverPort ? String(serverPort) : '';
+  process.env.autoPort = String(autoPort);
 
   if (port) {
-    cbpServer(port, () => {
-      const httpURL = `http://127.0.0.1:${port}`;
-      const wsURL = `ws://127.0.0.1:${port}`;
+    const autoPortEnabled = autoPort === true || autoPort === 'true' || autoPort === 1 || autoPort === '1';
 
-      logger.info(`[CBP-Server] ${httpURL}`);
-      logger.info(`[CBP-Server] ${wsURL}]`);
+    cbpServer(
+      port,
+      actualPort => {
+        process.env.port = String(actualPort);
+        const httpURL = `http://127.0.0.1:${actualPort}`;
+        const wsURL = `ws://127.0.0.1:${actualPort}`;
 
-      startClient(options);
-      startPlatform(options);
-    });
+        logger.info(`[CBP-Server] ${httpURL}`);
+        logger.info(`[CBP-Server] ${wsURL}]`);
+
+        startClient(options, actualPort);
+        startPlatform(options);
+      },
+      autoPortEnabled
+    );
   } else {
     const sockPath = generateSocketPath();
 
