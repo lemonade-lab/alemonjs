@@ -331,9 +331,15 @@ const extractContent = (val: DataEnums[], mode: MentionMode): string => {
   return [nativeText, fallbackText].filter(Boolean).join('\n');
 };
 
+/**
+ * notice 事件中平台支持以 event_id 被动回复的 tag
+ * （群聊：GROUP_ADD_ROBOT / GROUP_MSG_RECEIVE；单聊：C2C_MSG_RECEIVE / FRIEND_ADD）
+ */
+const NOTICE_EVENT_REPLY_TAGS = new Set(['GROUP_ADD_ROBOT', 'GROUP_MSG_RECEIVE', 'C2C_MSG_RECEIVE', 'FRIEND_ADD']);
+
 /** 构建 baseParams（event_id 或 msg_id） */
 const buildBaseParams = (tag: string | undefined, messageId: string | undefined, interactionTag: string): Record<string, any> => {
-  if (tag === interactionTag) {
+  if ((tag && NOTICE_EVENT_REPLY_TAGS.has(tag)) || tag === interactionTag) {
     return { event_id: messageId };
   }
 

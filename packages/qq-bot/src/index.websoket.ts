@@ -1,14 +1,65 @@
+import { logger } from 'alemonjs';
 import { getQQBotBots, getQQBotConfig } from './config';
 import { IntentsEnum } from './sdk/intents';
+import { qrLogin, saveBotCredentials } from './sdk/qr-auth';
 import { QQBotRegistry } from './sdk/registry';
 
 let activeRegistry: QQBotRegistry | undefined;
 
 export const getQQBotRegistry = () => activeRegistry;
-export const start = () => {
+
+/** 是否已有可用的机器人凭证（顶层 app_id+secret 或 bots 配置） */
+const hasConfiguredCredentials = () => {
   const config = getQQBotConfig();
+
+  if (config?.bots && Object.keys(config.bots).length > 0) {
+    return true;
+  }
+
+  return Boolean(config?.app_id && config?.secret);
+};
+
+export const start = () => {
+  void bootstrap();
+};
+
+/**
+ * 未配置 app_id/secret 时进入扫码登录：
+ * 引导用户扫码授权，凭证写入配置文件（保留原有注释与格式）后继续连接；
+ * 扫码未完成则跳过连接，等待用户重启或手动配置
+ */
+const bootstrap = async () => {
+  if (!hasConfiguredCredentials()) {
+    logger.info('[qq-bot] 未检测到 app_id/secret 配置，进入扫码登录流程');
+
+    const result = await qrLogin();
+
+    if (!result) {
+      logger.warn('[qq-bot] 扫码登录未完成，已跳过 qq-bot 连接；可重启重试，或手动在配置文件中填写 app_id/secret');
+
+      return;
+    }
+
+    if (!saveBotCredentials(result.appId, result.clientSecret)) {
+      logger.warn(`[qq-bot] 凭证写入配置失败（AppID=${result.appId}），已跳过连接；请手动补全配置`);
+
+      return;
+    }
+
+    logger.info(`[qq-bot] 扫码登录成功，凭证已写入配置文件（AppID=${result.appId}）`);
+  }
+
+  try {
+    connectAll();
+  } catch (err) {
+    logger.error(`[qq-bot] 启动连接失败：${err?.message ?? err}`);
+  }
+};
+
+const connectAll = () => {
   const { bots, defaultBot } = getQQBotBots();
   const registry = new QQBotRegistry(defaultBot);
+
   activeRegistry = registry;
 
   const notPrivateIntents = [
@@ -35,7 +86,7 @@ export const start = () => {
 
   const intents = [] as IntentsEnum[];
 
-  if (config?.is_private) {
+  if (getQQBotConfig()?.is_private) {
     intents.push(...isPrivateIntents, ...isGroupIntents, ...pubIntents);
   } else {
     intents.push(...notPrivateIntents, ...isGroupIntents, ...pubIntents);

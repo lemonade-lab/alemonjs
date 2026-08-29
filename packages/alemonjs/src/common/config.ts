@@ -1,5 +1,5 @@
 import { readFileSync, existsSync, watch, writeFileSync, mkdirSync, FSWatcher } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, isAbsolute, join } from 'path';
 import YAML from 'yaml';
 import type { Package } from '../types/index.js';
 import { logger } from './logger.js';
@@ -43,7 +43,7 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
   #package: Package | null = null;
 
   constructor(dir: string) {
-    this.#resolvedDir = join(process.cwd(), dir);
+    this.#resolvedDir = isAbsolute(dir) ? dir : join(process.cwd(), dir);
   }
 
   #invalidateMergedCache() {
@@ -156,6 +156,26 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
     } as T;
 
     return this.#mergedValue;
+  }
+
+  /**
+   * 配置文件绝对路径（供外部做保注释的直接文件读写）
+   */
+  get path(): string | null {
+    return this.#resolvedDir;
+  }
+
+  /**
+   * 重新读取配置文件并应用。
+   * 外部绕过 saveValue 直接改写文件（如保留注释的增量写入）后调用，同步内存值
+   */
+  reload() {
+    if (!existsSync(this.#resolvedDir)) {
+      return;
+    }
+
+    this.#applyValue(this.#readConfig());
+    this.#ensureWatcher();
   }
 
   saveValue(value: T) {

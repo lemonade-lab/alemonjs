@@ -16,6 +16,36 @@ export type QQBotRegistration = {
   onApi: (data: any, consume: (result: any[]) => void) => Promise<void>;
 };
 
+/**
+ * notice 事件中平台支持以 event_id 被动回复的 tag
+ * （QQ 官方「发送消息」文档：群聊支持 GROUP_ADD_ROBOT / GROUP_MSG_RECEIVE，
+ * 单聊支持 C2C_MSG_RECEIVE / FRIEND_ADD；event_id 取网关信封 payload.id）
+ */
+const GROUP_EVENT_REPLY_TAGS = new Set(['GROUP_ADD_ROBOT', 'GROUP_MSG_RECEIVE']);
+const C2C_EVENT_REPLY_TAGS = new Set(['C2C_MSG_RECEIVE', 'FRIEND_ADD']);
+
+/**
+ * notice / member 类事件 tag：事件不含平台认可的被动回复 msg_id（MessageId 为合成值或缺省），
+ * 消息发送统一降级为群主动消息（仅携带 ChannelId，不透传 MessageId）。
+ * 事件回复 tag 也在其中：缺失 event_id 时同样落到主动消息
+ */
+const GROUP_NOTICE_TAGS = new Set([
+  'GROUP_ADD_ROBOT',
+  'GROUP_DEL_ROBOT',
+  'GROUP_MEMBER_ADD',
+  'GROUP_MEMBER_REMOVE',
+  'GROUP_JOIN_REQUEST',
+  'GROUP_MSG_RECEIVE',
+  'GROUP_MSG_REJECT',
+  'MESSAGE_AUDIT_PASS',
+  'MESSAGE_AUDIT_REJECT'
+]);
+
+/**
+ * 好友 / C2C notice 类事件 tag：同上，降级为私聊主动消息（仅携带 UserId）
+ */
+const C2C_NOTICE_TAGS = new Set(['C2C_MSG_RECEIVE', 'C2C_MSG_REJECT', 'FRIEND_ADD', 'FRIEND_DEL']);
+
 export const register = (
   client: QQBotClients,
   options?: {
@@ -240,6 +270,7 @@ export const register = (
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
         .addUser(createUserMeta(event.op_member_openid, { UserAvatar: createUserAvatarURL(event.op_member_openid) }))
+        .addMessage({ MessageId: event.id })
         .add({ tag: 'GROUP_ADD_ROBOT' }).value
     );
   });
@@ -793,6 +824,7 @@ export const register = (
       FormatEvent.create('private.friend.add')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addUser(createUserMeta(event.openid ?? ''))
+        .addMessage({ MessageId: event.id })
         .add({ tag: 'FRIEND_ADD' }).value
     );
   });
@@ -836,7 +868,7 @@ export const register = (
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
         .addChannel({ ChannelId: event.group_openid })
         .addUser(createUserMeta(event.op_member_openid))
-        .addMessage({ MessageId: `group_msg_receive_${event.group_openid}_${event.timestamp}` })
+        .addMessage({ MessageId: event.id })
         .add({ tag: 'GROUP_MSG_RECEIVE' }).value
     );
   });
@@ -888,7 +920,7 @@ export const register = (
       FormatEvent.create('private.notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addUser(createUserMeta(event.openid ?? ''))
-        .addMessage({ MessageId: `c2c_msg_receive_${event.openid}_${event.timestamp}` })
+        .addMessage({ MessageId: event.id })
         .add({ tag: 'C2C_MSG_RECEIVE' }).value
     );
   });
@@ -1042,7 +1074,26 @@ export const register = (
           return await AT_MESSAGE_CREATE(client, event, val);
         }
 
-        return [];
+        // notice 事件中平台支持事件回复的 tag：透传事件对象走 event_id 被动回复链路；
+        // 缺失 event_id 时落到下方主动消息降级
+        if (GROUP_EVENT_REPLY_TAGS.has(tag) && event.MessageId) {
+          return await GROUP_AT_MESSAGE_CREATE(client, event, val, options);
+        }
+        if (C2C_EVENT_REPLY_TAGS.has(tag) && event.MessageId) {
+          return await C2C_MESSAGE_CREATE(client, event, val, options);
+        }
+
+        // 其余 notice / member 事件：无被动回复 msg_id，降级为主动消息。
+        // 构造仅含目标 ID 的新事件，避免合成 MessageId 被平台当作无效 msg_id 拒绝
+        if (GROUP_NOTICE_TAGS.has(tag) && event.ChannelId) {
+          return await GROUP_AT_MESSAGE_CREATE(client, { ChannelId: event.ChannelId }, val, options);
+        }
+        if (C2C_NOTICE_TAGS.has(tag) && event.UserId) {
+          return await C2C_MESSAGE_CREATE(client, { UserId: event.UserId }, val, options);
+        }
+
+        // 未覆盖的 tag 显式失败，调用方通过 code 感知，而非静默空数组
+        return [createResult(ResultCode.Fail, `message.send: unsupported event tag "${tag}"`, null)];
       },
       mention: event => {
         const value = event.value || {};

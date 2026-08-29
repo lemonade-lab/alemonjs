@@ -8,7 +8,9 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "lvy build",
-    "test:ws": "yarn build && node tests/websocket.integration.mjs"
+    "test:ws": "yarn build && node tests/websocket.integration.mjs",
+    "test:send": "yarn build && node tests/use-send.notice.mjs",
+    "test:qr": "yarn build && node tests/qr-auth.mjs"
   },
   "dependencies": {
     "@noble/curves": "^1.7.0",
@@ -24,7 +26,8 @@
     "public-ip": "^6.0.1",
     "qrcode": "^1.5.3",
     "uuid": "^14.0.1",
-    "ws": "^8.13.0"
+    "ws": "^8.13.0",
+    "yaml": "^2.5.1"
   },
   "peerDependencies": {
     "alemonjs": "^2.1.0-alpha.15"

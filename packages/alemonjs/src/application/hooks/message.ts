@@ -1,3 +1,4 @@
+import { logger } from '../../common/logger.js';
 import {
   DataEnums,
   EventKeys,
@@ -65,6 +66,16 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
       const results = Array.isArray(result) ? result : [result];
 
       recordEventSendResults(results, valueEvent);
+
+      // 结果不含 Ok（适配器未处理当前事件返回空数组，或平台发送失败）时打 WARN，
+      // 调用方应以返回值 code 判断成败，而非 try/catch
+      if (results.length === 0 || results.every(item => item?.code !== ResultCode.Ok)) {
+        const tag = (valueEvent as any)?._tag ?? 'unknown';
+        const codes = results.length > 0 ? results.map(item => item?.code).join(', ') : 'empty';
+        const message = results[0]?.message ?? '';
+
+        logger.warn(`[send] 消息发送未成功 (tag: ${tag}, code: ${codes}) ${message}`);
+      }
 
       return results;
     } catch (error) {
