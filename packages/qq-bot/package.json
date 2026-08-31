@@ -47,13 +47,13 @@
       {
         "name": "app_id",
         "type": "string",
-        "required": true,
+        "required": false,
         "description": "app_id"
       },
       {
         "name": "secret",
         "type": "string",
-        "required": true,
+        "required": false,
         "description": "secret"
       }
     ],

@@ -18,6 +18,7 @@ const configPath = join(configDir, 'alemon.config.yaml');
 process.env.CFG_PATH = configPath;
 
 const { qrLogin, decryptSecret, saveBotCredentials, buildConnectUrl } = await import('../lib/sdk/qr-auth.js');
+const { QQBotRegistry } = await import('../lib/sdk/registry.js');
 const { getConfigValue } = await import('alemonjs');
 
 /** 与平台相同的加密结构：Base64(IV(12) + 密文 + AuthTag(16)) */
@@ -29,6 +30,35 @@ const encryptSecret = (plain, keyBase64) => {
 
   return Buffer.concat([iv, ciphertext, cipher.getAuthTag()]).toString('base64');
 };
+
+// 0. A client that connects after QR emission can recover the retained challenge via connection.status.
+{
+  let actionHandler = null;
+  const registry = new QQBotRegistry(
+    undefined,
+    {
+      send() {},
+      onactions(handler) {
+        actionHandler = handler;
+      },
+      onapis() {}
+    },
+    () => ({
+      state: 'awaiting_qrcode',
+      type: 'qrcode',
+      loginId: 'TASK_STATUS',
+      qrcode: { url: 'https://example.test/qr', imageBase64: 'PNG', format: 'png' },
+      updatedAt: 1
+    })
+  );
+  assert.ok(registry);
+  let results = null;
+  await actionHandler({ action: 'connection.status', payload: {} }, value => {
+    results = value;
+  });
+  assert.equal(results[0].data.login.loginId, 'TASK_STATUS');
+  assert.equal(results[0].data.login.qrcode.url, 'https://example.test/qr');
+}
 
 // 1. 解密往返
 {
@@ -85,8 +115,8 @@ const encryptSecret = (plain, keyBase64) => {
   });
 
   assert.deepEqual(
-    { appId: result.appId, clientSecret: result.clientSecret, userOpenid: result.userOpenid },
-    { appId: '1234567890', clientSecret: 'SECRET_Y', userOpenid: 'OPENID_X' }
+    { loginId: result.loginId, appId: result.appId, clientSecret: result.clientSecret, userOpenid: result.userOpenid },
+    { loginId: 'TASK_1', appId: '1234567890', clientSecret: 'SECRET_Y', userOpenid: 'OPENID_X' }
   );
   assert.ok(capturedQR && capturedQR.length > 0, 'onQRCode 应收到二维码图片');
   assert.ok(capturedQRPath, 'onQRCode 应收到二维码图片路径');

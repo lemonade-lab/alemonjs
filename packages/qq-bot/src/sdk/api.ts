@@ -55,6 +55,7 @@ export class QQBotAPI {
 
   #streams = new Map<string, QQBotStream>();
   #onStreamClosed?: (streamId: string) => void;
+  #onConnectionStatusChanged?: (status: QQBotConnectionStatus, previous: QQBotConnectionStatus) => void;
   #connectionStatus: QQBotConnectionStatus = {
     state: 'idle',
     transport: null,
@@ -73,7 +74,15 @@ export class QQBotAPI {
   }
 
   protected updateConnectionStatus(patch: Partial<QQBotConnectionStatus>) {
-    this.#connectionStatus = { ...this.#connectionStatus, ...patch };
+    const previous = this.#connectionStatus;
+
+    this.#connectionStatus = { ...previous, ...patch };
+    this.#onConnectionStatusChanged?.({ ...this.#connectionStatus }, { ...previous });
+  }
+
+  /** Subscribe to transport lifecycle changes without coupling consumers to a concrete QQ transport. */
+  setConnectionStatusListener(listener?: (status: QQBotConnectionStatus, previous: QQBotConnectionStatus) => void) {
+    this.#onConnectionStatusChanged = listener;
   }
 
   /** Internal transport hook used by the multi-bot registry to discard stale routes. */
@@ -83,7 +92,9 @@ export class QQBotAPI {
 
   /** C2C-only input indicator. This is intentionally a QQ extension, not a core action. */
   sendTyping(params: { BotId?: string; userOpenId: string; msgId?: string; durationSec?: number }) {
-    if (!params.userOpenId) throw new Error('userOpenId is required');
+    if (!params.userOpenId) {
+      throw new Error('userOpenId is required');
+    }
 
     return this.groupService({
       url: `/v2/users/${params.userOpenId}/input_notify`,
@@ -96,7 +107,9 @@ export class QQBotAPI {
   }
 
   streamOpen(params: { BotId?: string; userOpenId: string; msgId: string; eventId?: string }) {
-    if (!params.userOpenId || !params.msgId) throw new Error('C2C streaming requires userOpenId and msgId');
+    if (!params.userOpenId || !params.msgId) {
+      throw new Error('C2C streaming requires userOpenId and msgId');
+    }
     const streamId = randomUUID();
     const stream: QQBotStream = {
       userOpenId: params.userOpenId,
@@ -116,21 +129,31 @@ export class QQBotAPI {
 
   async streamUpdate(streamId: string, fullText: string) {
     const stream = this.#streams.get(streamId);
-    if (!stream) throw new Error('Unknown or expired streamId');
+
+    if (!stream) {
+      throw new Error('Unknown or expired streamId');
+    }
     stream.latest = fullText;
     if (!stream.sendTask) {
       stream.sendTask = (async () => {
         let result: unknown;
+
         while (stream.latest !== undefined && this.#streams.get(streamId) === stream) {
           const content = stream.latest;
+
           stream.latest = undefined;
           // QQ accepts at most a practical update rate.  500ms is the default,
           // and the API contract never permits callers below 300ms.
           const wait = Math.max(0, 500 - (Date.now() - stream.lastSentAt));
-          if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+
+          if (wait) {
+            await new Promise(resolve => setTimeout(resolve, wait));
+          }
           // The stream may have timed out or its gateway may have stopped
           // while the rate limiter was waiting. Never emit a trailing packet.
-          if (this.#streams.get(streamId) !== stream) break;
+          if (this.#streams.get(streamId) !== stream) {
+            break;
+          }
           stream.lastSentAt = Date.now();
           const response: { id?: string } = await this.groupService({
             url: `/v2/users/${stream.userOpenId}/stream_messages`,
@@ -147,13 +170,19 @@ export class QQBotAPI {
               ...(stream.streamMessageId && { stream_msg_id: stream.streamMessageId })
             }
           });
-          if (response?.id && !stream.streamMessageId) stream.streamMessageId = response.id;
+
+          if (response?.id && !stream.streamMessageId) {
+            stream.streamMessageId = response.id;
+          }
           stream.lastSentText = content;
           result = response;
         }
+
         return result;
       })().finally(() => {
-        if (this.#streams.get(streamId) === stream) stream.sendTask = undefined;
+        if (this.#streams.get(streamId) === stream) {
+          stream.sendTask = undefined;
+        }
       });
     }
 
@@ -162,9 +191,13 @@ export class QQBotAPI {
 
   async streamComplete(streamId: string) {
     const stream = this.#streams.get(streamId);
-    if (!stream) throw new Error('Unknown or expired streamId');
+
+    if (!stream) {
+      throw new Error('Unknown or expired streamId');
+    }
     try {
       await stream.sendTask;
+
       return await this.groupService({
         url: `/v2/users/${stream.userOpenId}/stream_messages`,
         method: 'post',
@@ -187,13 +220,20 @@ export class QQBotAPI {
 
   streamCancel(streamId: string) {
     const stream = this.#streams.get(streamId);
-    if (stream?.timer) clearTimeout(stream.timer);
-    if (this.#streams.delete(streamId)) this.#onStreamClosed?.(streamId);
+
+    if (stream?.timer) {
+      clearTimeout(stream.timer);
+    }
+    if (this.#streams.delete(streamId)) {
+      this.#onStreamClosed?.(streamId);
+    }
   }
 
   /** Called by transports during shutdown so C2C streams cannot leak timers. */
   protected cancelStreams() {
-    for (const streamId of this.#streams.keys()) this.streamCancel(streamId);
+    for (const streamId of this.#streams.keys()) {
+      this.streamCancel(streamId);
+    }
   }
 
   // /\[🔗[^\]]+\]\([^)]+\)|@everyone/.test(content)
@@ -376,9 +416,11 @@ export class QQBotAPI {
   ): Promise<{ file_uuid: string; file_info: string; ttl: number; id?: string; raw_url?: string }> {
     // 大文件（> 10002432 字节）自动切换为分片上传
     const fileBuffer = fileDataToBuffer(data.file_data);
+
     if (!data.upload_id && fileBuffer && fileBuffer.byteLength > CHUNK_THRESHOLD) {
       return chunkedUpload(this, 'user', openid, fileBuffer, { file_type: data.file_type, file_name: data.file_name, srv_send_msg: data.srv_send_msg });
     }
+
     return this.groupService({
       url: `/v2/users/${openid}/files`,
       method: 'post',
@@ -407,9 +449,11 @@ export class QQBotAPI {
   ): Promise<{ file_uuid: string; file_info: string; ttl: number; id?: string; raw_url?: string }> {
     // 大文件（> 10002432 字节）自动切换为分片上传
     const fileBuffer = fileDataToBuffer(data.file_data);
+
     if (!data.upload_id && fileBuffer && fileBuffer.byteLength > CHUNK_THRESHOLD) {
       return chunkedUpload(this, 'group', openid, fileBuffer, { file_type: data.file_type, file_name: data.file_name, srv_send_msg: data.srv_send_msg });
     }
+
     return this.groupService({
       url: `/v2/groups/${openid}/files`,
       method: 'post',
@@ -431,11 +475,13 @@ export class QQBotAPI {
 
     for await (const chunk of createReadStream(filePath)) {
       const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+
       sha256.update(data);
       md5.update(data);
       sha1.update(data);
       if (firstBytes < firstLimit) {
         const length = Math.min(data.length, firstLimit - firstBytes);
+
         md5_10m.update(data.subarray(0, length));
         firstBytes += length;
       }
@@ -466,10 +512,16 @@ export class QQBotAPI {
   }): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
     const hasBuffer = Buffer.isBuffer(params.data);
     const hasFile = Boolean(params.filePath);
-    if (hasBuffer === hasFile) throw new Error('Chunked media requires exactly one of data or filePath');
-    const total = hasBuffer ? params.data!.length : Number(params.size);
-    if (!Number.isSafeInteger(total) || total < 1) throw new Error('Chunked media requires a valid file size');
-    const hashes = params.hashes || (hasBuffer ? this.#getMediaBufferHashes(params.data!) : await this.getMediaFileHashes(params.filePath!));
+
+    if (hasBuffer === hasFile) {
+      throw new Error('Chunked media requires exactly one of data or filePath');
+    }
+    const total = hasBuffer ? params.data.length : Number(params.size);
+
+    if (!Number.isSafeInteger(total) || total < 1) {
+      throw new Error('Chunked media requires a valid file size');
+    }
+    const hashes = params.hashes || (hasBuffer ? this.#getMediaBufferHashes(params.data) : await this.getMediaFileHashes(params.filePath));
     const prefix = params.scope === 'group' ? `/v2/groups/${params.targetId}` : `/v2/users/${params.targetId}`;
     const prepared: {
       upload_id: string;
@@ -488,14 +540,19 @@ export class QQBotAPI {
       }
     });
     let uploaded = 0;
+
     for (const part of prepared.parts || []) {
       const offset = (part.index - 1) * prepared.block_size;
       const length = Math.min(prepared.block_size, total - offset);
-      if (length <= 0) throw new Error(`QQ returned invalid upload part index: ${part.index}`);
-      const body = hasBuffer ? params.data!.subarray(offset, offset + length) : undefined;
-      const partMd5 = body ? createHash('md5').update(body).digest('hex') : await this.#getFilePartHash(params.filePath!, offset, length);
+
+      if (length <= 0) {
+        throw new Error(`QQ returned invalid upload part index: ${part.index}`);
+      }
+      const body = hasBuffer ? params.data.subarray(offset, offset + length) : undefined;
+      const partMd5 = body ? createHash('md5').update(body).digest('hex') : await this.#getFilePartHash(params.filePath, offset, length);
+
       await this.#retry(() =>
-        axios.put(part.presigned_url, body || createReadStream(params.filePath!, { start: offset, end: offset + length - 1 }), {
+        axios.put(part.presigned_url, body || createReadStream(params.filePath, { start: offset, end: offset + length - 1 }), {
           timeout: 300_000,
           maxBodyLength: Infinity,
           maxContentLength: Infinity,
@@ -512,6 +569,7 @@ export class QQBotAPI {
       uploaded += length;
       params.onProgress?.(uploaded, total);
     }
+
     return this.#retry(() =>
       this.groupService({
         url: `${prefix}/complete_upload`,
@@ -532,18 +590,25 @@ export class QQBotAPI {
 
   async #getFilePartHash(filePath: string, start: number, length: number) {
     const md5 = createHash('md5');
-    for await (const chunk of createReadStream(filePath, { start, end: start + length - 1 })) md5.update(chunk);
+
+    for await (const chunk of createReadStream(filePath, { start, end: start + length - 1 })) {
+      md5.update(chunk);
+    }
+
     return md5.digest('hex');
   }
 
   async #retry<T>(operation: () => Promise<T>, attempts = 3): Promise<T> {
     let lastError: unknown;
+
     for (let attempt = 0; attempt < attempts; attempt++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error;
-        if (attempt + 1 < attempts) await new Promise(resolve => setTimeout(resolve, 250 * 2 ** attempt));
+        if (attempt + 1 < attempts) {
+          await new Promise(resolve => setTimeout(resolve, 250 * 2 ** attempt));
+        }
       }
     }
     throw lastError;

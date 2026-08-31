@@ -1,4 +1,4 @@
-import { logger } from 'alemonjs';
+import { cbpPlatform, logger, type ConnectionLoginStatus } from 'alemonjs';
 import { getQQBotBots, getQQBotConfig } from './config';
 import { IntentsEnum } from './sdk/intents';
 import { qrLogin, saveBotCredentials } from './sdk/qr-auth';
@@ -29,38 +29,93 @@ export const start = () => {
  * 扫码未完成则跳过连接，等待用户重启或手动配置
  */
 const bootstrap = async () => {
+  // Keep one CBP instance for both the pre-credential QR challenge and the later gateway lifecycle.
+  // This makes the login events available through fork IPC, direct sockets and external WebSocket mode.
+  const cbp = cbpPlatform();
+  let loginStatus: ConnectionLoginStatus = {
+    state: hasConfiguredCredentials() ? 'not_required' : 'awaiting_qrcode',
+    updatedAt: Date.now()
+  };
+  const { defaultBot } = getQQBotBots();
+  const registry = new QQBotRegistry(defaultBot, cbp, () => loginStatus);
+
+  // Register the status action before QR generation so a late WS client can recover the active challenge.
+  activeRegistry = registry;
+
   if (!hasConfiguredCredentials()) {
     logger.info('[qq-bot] 未检测到 app_id/secret 配置，进入扫码登录流程');
 
-    const result = await qrLogin();
+    const result = await qrLogin({
+      onQRCode: (qrBuffer, url, _qrImagePath, loginId, refresh) => {
+        loginStatus = {
+          state: 'awaiting_qrcode',
+          type: 'qrcode',
+          loginId,
+          qrcode: {
+            url,
+            imageBase64: qrBuffer.toString('base64'),
+            format: 'png',
+            refreshed: refresh > 0
+          },
+          updatedAt: Date.now()
+        };
+        cbp.send({
+          name: 'login.qrcode',
+          value: '',
+          Platform: 'qq-bot',
+          LoginId: loginId,
+          LoginType: 'qrcode',
+          QRCode: {
+            url,
+            imageBase64: qrBuffer.toString('base64'),
+            format: 'png',
+            refreshed: refresh > 0
+          }
+        });
+      }
+    });
 
     if (!result) {
+      loginStatus = { state: 'failed', type: 'qrcode', updatedAt: Date.now(), lastError: '二维码登录未完成' };
       logger.warn('[qq-bot] 扫码登录未完成，已跳过 qq-bot 连接；可重启重试，或手动在配置文件中填写 app_id/secret');
 
       return;
     }
 
     if (!saveBotCredentials(result.appId, result.clientSecret)) {
+      loginStatus = { state: 'failed', type: 'qrcode', loginId: result.loginId, updatedAt: Date.now(), lastError: '凭证写入失败' };
       logger.warn(`[qq-bot] 凭证写入配置失败（AppID=${result.appId}），已跳过连接；请手动补全配置`);
 
       return;
     }
 
+    loginStatus = {
+      state: 'authorized',
+      type: 'qrcode',
+      loginId: result.loginId,
+      updatedAt: Date.now()
+    };
+    cbp.send({
+      name: 'login.success',
+      value: '',
+      Platform: 'qq-bot',
+      LoginId: result.loginId,
+      LoginType: 'qrcode',
+      BotId: result.appId,
+      UserId: result.userOpenid
+    });
     logger.info(`[qq-bot] 扫码登录成功，凭证已写入配置文件（AppID=${result.appId}）`);
   }
 
   try {
-    connectAll();
+    connectAll(registry);
   } catch (err) {
     logger.error(`[qq-bot] 启动连接失败：${err?.message ?? err}`);
   }
 };
 
-const connectAll = () => {
-  const { bots, defaultBot } = getQQBotBots();
-  const registry = new QQBotRegistry(defaultBot);
-
-  activeRegistry = registry;
+const connectAll = (registry: QQBotRegistry) => {
+  const { bots } = getQQBotBots();
 
   const notPrivateIntents = [
     'GUILDS', // base

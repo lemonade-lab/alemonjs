@@ -67,6 +67,7 @@ export const buildConnectUrl = (taskId: string): string => {
 };
 
 export type QRLoginResult = {
+  loginId: string;
   appId: string;
   clientSecret: string;
   userOpenid: string;
@@ -82,7 +83,7 @@ export type QRLoginOptions = {
   /** 注入门户请求（测试用） */
   request?: PortalRequest;
   /** 二维码生成回调（默认同时终端出码并保存图片到运行目录） */
-  onQRCode?: (qrBuffer: Buffer, url: string, qrImagePath?: string) => void | Promise<void>;
+  onQRCode?: (qrBuffer: Buffer, url: string, qrImagePath: string | undefined, loginId: string, refresh: number) => void | Promise<void>;
   /** 状态变化回调 */
   onStatus?: (message: string) => void | Promise<void>;
 };
@@ -120,42 +121,21 @@ export const qrLogin = async (options: QRLoginOptions = {}): Promise<QRLoginResu
 
       const url = buildConnectUrl(taskId);
 
-      // 终端出码 + 保存图片到运行目录，两种方式并用；图片固定文件名，二维码刷新时覆盖
-      let ascii: string | null = null;
-
-      try {
-        ascii = await QRCode.toString(url, { type: 'terminal', small: true });
-      } catch {
-        ascii = null;
-      }
-
       let qrImagePath: string | null = null;
+      let qrBuffer: Buffer | null = null;
 
       try {
-        const qrBuffer = await QRCode.toBuffer(url, { type: 'png', width: 320, margin: 2 });
-
+        qrBuffer = await QRCode.toBuffer(url, { type: 'png', width: 320, margin: 2 });
         qrImagePath = join(process.cwd(), 'qqbot-login-qr.png');
         writeFileSync(qrImagePath, qrBuffer);
-
-        if (onQRCode) {
-          await onQRCode(qrBuffer, url, qrImagePath);
-        }
       } catch (err) {
         logger.warn(`[qq-bot] 二维码图片保存失败：${err?.message ?? err}`);
       }
 
-      const output: string[] = [];
-
-      if (ascii) {
-        output.push(ascii, '');
+      // The external lifecycle notification must not depend on an adapter-local file being writable.
+      if (qrBuffer && onQRCode) {
+        await onQRCode(qrBuffer, url, qrImagePath ?? undefined, taskId, refresh);
       }
-      output.push('请使用手机 QQ 扫描二维码完成机器人授权绑定', `授权链接：${url}`);
-
-      if (qrImagePath) {
-        output.push(`二维码图片：${qrImagePath}`);
-      }
-
-      logger.info(`\n${output.join('\n')}`);
 
       await onStatus?.('请使用手机 QQ 扫描二维码并确认授权');
       logger.warn('[qq-bot] 注意：扫码授权完成后平台将重置机器人密钥，旧密钥会立即失效；若该机器人已在其他实例中运行，请更新其配置');
@@ -187,6 +167,7 @@ export const qrLogin = async (options: QRLoginOptions = {}): Promise<QRLoginResu
           logger.info(`[qq-bot] 扫码登录成功：AppID=${data.bot_appid}`);
 
           return {
+            loginId: taskId,
             appId: String(data.bot_appid ?? ''),
             clientSecret,
             userOpenid: String(data.user_openid ?? '')
