@@ -1,0 +1,84 @@
+{
+  "name": "@alemonjs/wechat",
+  "version": "2.1.0-rc.0",
+  "description": "微信（Wechaty）",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib",
+  "scripts": {
+    "build": "lvy build"
+  },
+  "dependencies": {
+    "file-box": "^1.4.15",
+    "@juzi/wechaty": "^1.0.165"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./package": "./package.json",
+    "./desktop": "./lib/desktop.js"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/wechat/README.md",
+      "official": "https://wechaty.js.org/docs/",
+      "platform": "https://wechaty.js.org/"
+    },
+    "config": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": false,
+        "description": "Wechaty 实例名称"
+      },
+      {
+        "name": "qrcode_url",
+        "type": "string",
+        "required": false,
+        "description": "二维码渲染 URL 前缀，默认使用 wechaty.js.org/qrcode/"
+      }
+    ],
+    "desktop": {
+      "platform": [
+        {
+          "name": "wechat"
+        }
+      ],
+      "logo": "antd.WechatOutlined",
+      "command": [
+        {
+          "name": "wechat",
+          "icon": "antd.WechatOutlined",
+          "command": "open.wechat"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "wechat",
+          "icon": "antd.WechatOutlined",
+          "command": "open.wechat"
+        }
+      ]
+    }
+  },
+  "keywords": [
+    "alemonjs"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
+  },
+  "gitHead": "c6aa5616afe091a37610dad22fbb2d2618d943b8"
+}
