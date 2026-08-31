@@ -35,10 +35,32 @@ const activate = context => {
         const db = data.data;
         const config = getConfig();
         const value = config.value ?? {};
-
-        value['wechat'] = {
-          master_key: db.master_key?.split(',') ?? null
+        const current = value.wechat ?? {};
+        const name = typeof db.name === 'string' ? db.name.trim() : '';
+        const qrcodeURL = typeof db.qrcode_url === 'string' ? db.qrcode_url.trim() : '';
+        const wechat = {
+          ...current,
+          master_key:
+            typeof db.master_key === 'string'
+              ? db.master_key
+                  .split(',')
+                  .map(item => item.trim())
+                  .filter(Boolean)
+              : []
         };
+
+        if (name) {
+          wechat.name = name;
+        } else {
+          delete wechat.name;
+        }
+        if (qrcodeURL) {
+          wechat.qrcode_url = qrcodeURL;
+        } else {
+          delete wechat.qrcode_url;
+        }
+
+        value['wechat'] = wechat;
         config.saveValue(value);
         context.notification('wechat 配置保存成功～');
       } else if (data.type === 'wechat.init') {

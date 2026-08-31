@@ -7,6 +7,12 @@
   "type": "module",
   "main": "lib/index.js",
   "types": "lib",
+  "files": [
+    "lib",
+    "dist",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
     "build": "lvy build"
   },

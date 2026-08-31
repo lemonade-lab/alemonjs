@@ -1,8 +1,8 @@
 import KoaRouter from 'koa-router';
 import fs, { existsSync } from 'fs';
 import path, { join, dirname } from 'path';
+import { fileURLToPath } from 'node:url';
 import mime from 'mime-types';
-import { renderHelloHtml } from './hello.html';
 import { formatPath, getModuelFile, safePath, isValidPackageName } from './utils';
 import { collectMiddlewares, runMiddlewares } from './middleware';
 import module from 'module';
@@ -27,6 +27,26 @@ const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 const router = new KoaRouter({
   prefix: '/'
 });
+
+const coreFrontendRoot = join(dirname(fileURLToPath(import.meta.url)), '../../../../../dist');
+
+const serveCoreFrontend = (ctx: KoaRouter.RouterContext, resourcePath = 'index.html') => {
+  const filePath = safePath(coreFrontendRoot, resourcePath);
+
+  if (!filePath || !existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    return false;
+  }
+
+  const contentType = mime.contentType(path.extname(filePath));
+
+  if (contentType) {
+    ctx.set('Content-Type', contentType);
+  }
+  ctx.status = 200;
+  ctx.body = fs.createReadStream(filePath);
+
+  return true;
+};
 
 const resolvePackageRoot = (startDir: string) => {
   let currentDir = startDir;
@@ -404,9 +424,26 @@ const serveStaticResource = async (ctx: KoaRouter.RouterContext, appName: string
 };
 
 router.get('/', ctx => {
-  ctx.status = 200;
-  ctx.set('Content-Type', 'text/html; charset=utf-8');
-  ctx.body = renderHelloHtml(listRuntimeApps());
+  if (serveCoreFrontend(ctx)) {
+    return;
+  }
+
+  ctx.status = 503;
+  ctx.body = {
+    code: 503,
+    message: '前端尚未构建',
+    data: null
+  };
+});
+
+router.get('assets/{*path}', ctx => {
+  const resourcePath = `assets/${String(ctx.params?.path ?? '')}`;
+
+  if (serveCoreFrontend(ctx, resourcePath)) {
+    return;
+  }
+
+  ctx.status = 404;
 });
 
 router.get('api/online', ctx => {
