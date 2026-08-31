@@ -11,12 +11,12 @@
     "delete": "npx pm2 delete pm2.config.cjs"
   },
   "devDependencies": {
-    "@alemonjs/bubble": "^2.1.11",
-    "@alemonjs/db": "^0.0.17",
-    "@alemonjs/discord": "^2.1.23",
-    "@alemonjs/onebot": "^2.1.16",
-    "@alemonjs/qq-bot": "^2.1.23",
-    "alemonjs": "2.1.84",
+    "@alemonjs/bubble": "^2.1.13",
+    "@alemonjs/db": "^0.0.20",
+    "@alemonjs/discord": "^2.1.25",
+    "@alemonjs/onebot": "^2.1.21",
+    "@alemonjs/qq-bot": "^2.1.33",
+    "alemonjs": "2.1.97",
     "jsxp": "1.4.0",
     "pm2": "^5"
   }

@@ -12,14 +12,7 @@ export default defineConfig({
     filter: /\.(png|jpg|jpeg|gif|svg|webp|ico|yaml|txt|ttf|md)$/
   },
   build: {
-    typescript: {
-      // 仅打包src目
-      include: ['src/**/*.ts', 'src/**/*.tsx'],
-      // 输出目录
-      outDir: 'lib',
-      removeComments: true,
-      // 生成声明文件
-      declaration: true
-    }
+    // 是否生成声明文件
+    dts: false
   }
 });
