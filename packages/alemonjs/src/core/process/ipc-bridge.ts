@@ -4,6 +4,25 @@ import { fullClient } from '../cbp/processor/config.js';
 import * as flattedJSON from 'flatted';
 import { sanitizeForSerialization } from '../../common/index.js';
 import { isNormalizedActionRequest, isNormalizedApiRequest, normalizeInboundMessage, toLegacyActionData, toLegacyApiData } from '../../common/cbp/normalize.js';
+import { publishCBPFileEvent } from '../cbp/file-transport.js';
+
+/**
+ * Publish CBP traffic to the process that owns AlemonJS, when it was started
+ * through child_process.fork().  This is deliberately independent from the
+ * internal platform/client IPC channel: a supervising process can observe
+ * login challenges without opening another WebSocket server.
+ */
+export const notifyParentCBPEvent = (data: unknown) => {
+  if (typeof process.send !== 'function') {
+    return;
+  }
+
+  try {
+    process.send({ type: 'cbp.event', protocolVersion: 'v1', data });
+  } catch {
+    // A disconnected or shutting-down parent must not break platform traffic.
+  }
+};
 
 // 子进程引用
 let platformChild: ChildProcess | null = null;
@@ -39,6 +58,10 @@ export const getClientChild = () => clientChild;
 export const forwardFromPlatform = (data: any) => {
   // 清理不可序列化的值，防止跨进程传输报错
   const safeData = sanitizeForSerialization(data);
+
+  // 外部主控进程（例如由 Go 驱动的 Node launcher）可直接监听此消息。
+  notifyParentCBPEvent(safeData);
+  publishCBPFileEvent(safeData);
 
   // 转发到客户端子进程（IPC 极速通道）
   if (clientChild?.connected) {

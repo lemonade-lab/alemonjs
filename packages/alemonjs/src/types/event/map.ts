@@ -17,6 +17,7 @@ import { PrivateEventMessageCreate, PrivateEventMessageDelete, PrivateEventMessa
 import { PrivateEventRequestFriendAdd, PrivateEventRequestFriendRemove, PrivateEventRequestGuildAdd } from './request';
 
 import { AutoFields } from './base/auto';
+import { PlatformConnectionReadyEvent, PlatformLoginQRCodeEvent, PlatformLoginSuccessEvent } from '../connection';
 
 /**
  * 原始事件定义（平台适配器构造的类型）
@@ -50,6 +51,9 @@ type RawEvents = {
   'private.friend.remove': PrivateEventRequestFriendRemove;
   'private.guild.add': PrivateEventRequestGuildAdd;
   'private.notice.create': PrivateEventNoticeCreate;
+  'login.qrcode': PlatformLoginQRCodeEvent;
+  'login.success': PlatformLoginSuccessEvent;
+  'connection.ready': PlatformConnectionReadyEvent;
 };
 
 /**

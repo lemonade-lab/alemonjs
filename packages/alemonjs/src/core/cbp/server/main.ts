@@ -6,7 +6,8 @@ import MessageRouter from '../routers/router';
 import { DEVICE_ID_HEADER, FULL_RECEIVE_HEADER, ResultCode, USER_AGENT_HEADER, USER_AGENT_HEADER_VALUE_MAP } from '../../../common/index.js';
 import { childrenBind, childrenClient, clientBindCount, bindChannelToClient, unbindClient, fullClient, platformClient } from '../processor/config';
 import { createTestOneController } from './testone';
-import { getClientChild } from '../../process/ipc-bridge.js';
+import { forwardFromClient, getClientChild, notifyParentCBPEvent } from '../../process/ipc-bridge.js';
+import { publishCBPFileEvent } from '../file-transport.js';
 import {
   getNormalizedDeviceId,
   getNormalizedEventRouteId,
@@ -19,6 +20,31 @@ import {
 
 const stringifyForSocket = (payload: unknown) => {
   return flattedJSON.stringify(payload);
+};
+
+/**
+ * Forward a request from an external CBP client (for example a Go control process).
+ * In WebSocket-platform mode this targets the platform socket; in fork mode it crosses
+ * the main-process IPC bridge to the platform child.
+ */
+const forwardExternalRequestToPlatform = (message: string) => {
+  if (platformClient.size > 0) {
+    platformClient.forEach((platformWs, platformId) => {
+      if (platformWs.readyState === WebSocket.OPEN) {
+        platformWs.send(message);
+      } else {
+        platformClient.delete(platformId);
+      }
+    });
+
+    return;
+  }
+
+  try {
+    forwardFromClient(flattedJSON.parse(message));
+  } catch {
+    // Invalid client payloads are ignored; the request side will time out as before.
+  }
 };
 
 const normalizeTestOneOutboundMessage = (message: string) => {
@@ -104,6 +130,16 @@ const routeMessageToDevice = (DeviceId: string, message: string) => {
 
 // 处理事件
 const handleEvent = (message: string, ID: string) => {
+  // WebSocket 平台模式没有经过 fork IPC；仍需让管理 AlemonJS 的父进程观察到事件。
+  try {
+    const event = flattedJSON.parse(String(message));
+
+    notifyParentCBPEvent(event);
+    publishCBPFileEvent(event);
+  } catch {
+    // Keep the existing websocket routing fallback for malformed payloads.
+  }
+
   // 尝试通过 IPC 桥转发到客户端子进程（fork 模式下 WebSocket Map 为空）
   const clientChild = getClientChild();
 
@@ -227,17 +263,7 @@ const setChildrenClient = (originId: string, ws: WebSocket) => {
       return;
     }
 
-    if (platformClient.size > 0) {
-      platformClient.forEach((platformWs, platformId) => {
-        // 检查平台客户端状态
-        if (platformWs.readyState === WebSocket.OPEN) {
-          platformWs.send(message);
-        } else {
-          // 如果连接已关闭，删除该平台客户端
-          platformClient.delete(platformId);
-        }
-      });
-    }
+    forwardExternalRequestToPlatform(message.toString());
   });
   // 处理关闭事件
   ws.on('close', () => {
@@ -272,17 +298,7 @@ const setFullClient = (originId: string, ws: WebSocket) => {
       return;
     }
 
-    if (platformClient.size > 0) {
-      platformClient.forEach((platformWs, platformId) => {
-        // 检查平台客户端状态
-        if (platformWs.readyState === WebSocket.OPEN) {
-          platformWs.send(message);
-        } else {
-          // 如果连接已关闭，删除该平台客户端
-          platformClient.delete(platformId);
-        }
-      });
-    }
+    forwardExternalRequestToPlatform(message.toString());
   });
   // 处理关闭事件
   ws.on('close', () => {

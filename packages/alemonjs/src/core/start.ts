@@ -5,6 +5,31 @@ import type { StartOptions } from '../types';
 import { startPlatformAdapterWithFallback } from './process/platform.js';
 import { startModuleAdapter } from './process/module.js';
 import { generateSocketPath } from '../common/direct-channel.js';
+import { publishCBPFileReady } from './cbp/file-transport.js';
+
+type CBPReadyNotice = {
+  type: 'cbp.ready';
+  protocolVersion: 'v1';
+  transport: 'ws' | 'direct';
+  port?: number;
+  wsURL?: string;
+  socketPath?: string;
+};
+
+/** Notify a fork parent that CBP is usable, without requiring it to host WS. */
+const notifyParentCBPReady = (notice: CBPReadyNotice) => {
+  publishCBPFileReady(notice);
+
+  if (typeof process.send !== 'function') {
+    return;
+  }
+
+  try {
+    process.send(notice);
+  } catch {
+    // Parent disconnects are not a startup failure.
+  }
+};
 
 // 得到最恰当的参数
 const createOptionsByKey = (options: StartOptions, key: string, defaultValue: any) => {
@@ -90,6 +115,7 @@ export const start = (options: StartOptions | string = {}) => {
 
         logger.info(`[CBP-Server] ${httpURL}`);
         logger.info(`[CBP-Server] ${wsURL}]`);
+        notifyParentCBPReady({ type: 'cbp.ready', protocolVersion: 'v1', transport: 'ws', port: actualPort, wsURL });
 
         startClient(options, actualPort);
         startPlatform(options);
@@ -101,6 +127,7 @@ export const start = (options: StartOptions | string = {}) => {
 
     process.env.__ALEMON_DIRECT_SOCK = sockPath;
     logger.info('[Direct-IPC] 平台↔客户端直连');
+    notifyParentCBPReady({ type: 'cbp.ready', protocolVersion: 'v1', transport: 'direct', socketPath: sockPath });
 
     startClient(options);
     startPlatform(options);

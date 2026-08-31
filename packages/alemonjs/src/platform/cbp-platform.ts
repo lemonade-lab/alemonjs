@@ -1,5 +1,6 @@
 import * as flattedJSON from 'flatted';
 import { WebSocket } from 'ws';
+import QRCode from 'qrcode';
 import { Result, ResultCode, createWSConnector, deviceId, sanitizeForSerialization } from '../common/index.js';
 import type { ActionReplyFunc, ApiReplyFunc } from '../common/cbp/typings.js';
 import type { Actions, Apis, EventsEnum } from '../types/index.js';
@@ -19,6 +20,38 @@ const notifyTransportReady = (transport: 'ipc' | 'direct' | 'ws') => {
   if (typeof process.send === 'function') {
     process.send({ type: 'transport_ready', protocolVersion: 'v2', transport });
   }
+};
+
+/**
+ * Login UX belongs to CBP, not to an individual platform adapter.  Adapters
+ * only emit login.qrcode; CBP presents the same terminal fallback everywhere.
+ */
+const printLoginQRCode = async (data: EventsEnum) => {
+  if (data.name !== 'login.qrcode') {
+    return;
+  }
+
+  const { Platform, LoginId, QRCode: challenge } = data;
+  let terminalQRCode = '';
+
+  try {
+    terminalQRCode = await QRCode.toString(challenge.url, { type: 'terminal', small: true });
+  } catch {
+    // The URL below remains usable in terminals that cannot render Unicode QR.
+  }
+
+  const output = [
+    `[CBP][${Platform}] ${challenge.refreshed ? '二维码已刷新，请重新扫描' : '请扫描二维码完成登录'}`,
+    terminalQRCode,
+    `登录标识：${LoginId}`,
+    `二维码链接：${challenge.url}`
+  ].filter(Boolean);
+
+  logger.info(`\n${output.join('\n')}`);
+};
+
+const publishPlatformEvent = (data: EventsEnum) => {
+  void printLoginQRCode(data);
 };
 
 const dispatchLegacyActionHandlers = (actionReplys: ActionReplyFunc[], replyAction: (data: Actions, payload: Result[]) => void, input: unknown) => {
@@ -60,6 +93,7 @@ const cbpPlatformDirect = (sockPath: string, open: () => void) => {
   const pendingQueue: unknown[] = [];
 
   const send = (data: EventsEnum) => {
+    publishPlatformEvent(data);
     data.DeviceId = deviceId;
     data.CreateAt = Date.now();
     const envelope = createEventEnvelope(data as unknown as Record<string, unknown>);
@@ -127,6 +161,7 @@ const cbpPlatformIPC = (open: () => void, existingActionReplys?: ActionReplyFunc
   const apiReplys: ApiReplyFunc[] = existingApiReplys ?? [];
 
   const send = (data: EventsEnum) => {
+    publishPlatformEvent(data);
     if (typeof process.send === 'function') {
       data.DeviceId = deviceId;
       data.CreateAt = Date.now();
@@ -232,6 +267,7 @@ export const cbpPlatform = (
   const currentURL = createCurrentURL() || `ws://localhost:${process.env.port || 17117}`;
 
   const send = (data: EventsEnum) => {
+    publishPlatformEvent(data);
     if (global.chatbotPlatform?.readyState === WebSocket.OPEN) {
       data.DeviceId = deviceId;
       data.CreateAt = Date.now();
