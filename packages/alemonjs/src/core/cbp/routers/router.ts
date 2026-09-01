@@ -17,7 +17,10 @@ router.get('api/online', ctx => {
   ctx.body = {
     code: 200,
     message: 'service online',
-    data: null
+    data: {
+      port: process.env._port ? Number(process.env._port) : null,
+      serverPort: process.env._serverPort ? Number(process.env._serverPort) : null
+    }
   };
 });
 

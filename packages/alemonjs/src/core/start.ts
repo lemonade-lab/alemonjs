@@ -76,7 +76,7 @@ export const start = (options: StartOptions | string = {}) => {
     options = { input: options };
   }
 
-  global.__options = options;
+  global.__options = { ...options };
 
   const port = createOptionsByKey(options, 'port', '');
   const serverPort = createOptionsByKey(options, 'serverPort', '');
@@ -102,6 +102,10 @@ export const start = (options: StartOptions | string = {}) => {
   process.env.port = port ? String(port) : '';
   process.env.serverPort = serverPort ? String(serverPort) : '';
   process.env.autoPort = String(autoPort);
+  process.env._port = port ? String(port) : '';
+  process.env._serverPort = serverPort ? String(serverPort) : '';
+  global.__options._port = port ? Number(port) : undefined;
+  global.__options._serverPort = serverPort ? Number(serverPort) : undefined;
 
   if (port) {
     const autoPortEnabled = autoPort === true || autoPort === 'true' || autoPort === 1 || autoPort === '1';
@@ -110,6 +114,8 @@ export const start = (options: StartOptions | string = {}) => {
       port,
       actualPort => {
         process.env.port = String(actualPort);
+        process.env._port = String(actualPort);
+        global.__options._port = actualPort;
         const httpURL = `http://127.0.0.1:${actualPort}`;
         const wsURL = `ws://127.0.0.1:${actualPort}`;
 

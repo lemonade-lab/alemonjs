@@ -298,6 +298,19 @@ const handleMessage = (manager: ChildProcessManager, message: unknown) => {
     return;
   }
 
+  if (data?.type === 'server_ready') {
+    const actualPort = Number(data.port);
+
+    if (Number.isInteger(actualPort) && actualPort > 0) {
+      process.env._serverPort = String(actualPort);
+      if (global.__options) {
+        global.__options._serverPort = actualPort;
+      }
+    }
+
+    return;
+  }
+
   if (data?.type === 'boot_error') {
     moduleState = {
       ...moduleState,

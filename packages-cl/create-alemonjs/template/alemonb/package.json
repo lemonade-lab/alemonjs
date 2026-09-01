@@ -16,7 +16,7 @@
     "@alemonjs/discord": "^2.1.25",
     "@alemonjs/onebot": "^2.1.21",
     "@alemonjs/qq-bot": "^2.1.34",
-    "alemonjs": "2.1.98",
+    "alemonjs": "2.1.100",
     "jsxp": "1.4.0",
     "pm2": "^5"
   }

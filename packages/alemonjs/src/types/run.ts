@@ -11,6 +11,14 @@ type ServerOptions = {
    * @description 端口被占用时是否自动尝试下一个端口
    */
   autoPort?: boolean;
+  /**
+   * @description 运行时实际协议端口（内部字段，不写入配置文件）
+   */
+  _port?: number;
+  /**
+   * @description 运行时实际应用服务器端口（内部字段，不写入配置文件）
+   */
+  _serverPort?: number;
 };
 
 type ClientOptions = {

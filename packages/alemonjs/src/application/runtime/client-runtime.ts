@@ -42,8 +42,12 @@ const mainServer = () => {
   if (!port) {
     return;
   }
-  createServer(port, () => {
-    const httpURL = `http://127.0.0.1:${port}`;
+  createServer(port, actualPort => {
+    process.env._serverPort = String(actualPort);
+    if (typeof process.send === 'function') {
+      process.send({ type: 'server_ready', port: actualPort, protocolVersion: 'v2' });
+    }
+    const httpURL = `http://127.0.0.1:${actualPort}`;
 
     logger.info(`应用服务器: ${httpURL}`);
   });

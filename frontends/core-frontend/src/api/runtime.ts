@@ -16,6 +16,11 @@ export type RuntimeApp = {
   error?: { message?: string };
 };
 
+export type RuntimeEndpoint = {
+  port: number | null;
+  serverPort: number | null;
+};
+
 export class RuntimeAPIError extends Error {
   constructor(message: string, readonly status?: number) {
     super(message);
@@ -70,7 +75,7 @@ const request = async <T>(path: string, signal?: AbortSignal): Promise<T> => {
 };
 
 export const getRuntimeOverview = async (signal?: AbortSignal) => {
-  const [online, apps] = await Promise.all([request<null>('/api/online', signal), request<RuntimeApp[]>('/api/runtime/apps', signal)]);
+  const [endpoint, apps] = await Promise.all([request<RuntimeEndpoint | null>('/api/online', signal), request<RuntimeApp[]>('/api/runtime/apps', signal)]);
 
-  return { online: online === null, apps: Array.isArray(apps) ? apps : [] };
+  return { online: true, endpoint, apps: Array.isArray(apps) ? apps : [] };
 };
