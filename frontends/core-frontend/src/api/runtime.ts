@@ -1,6 +1,20 @@
 const API_BASE = String(import.meta.env.VITE_ALEMONJS_API_BASE ?? '').replace(/\/$/, '');
 const REQUEST_TIMEOUT = 8_000;
 
+const resolveAPIUrl = (path: string) => {
+  if (API_BASE) {
+    return `${API_BASE}/${path.replace(/^\/+/, '')}`;
+  }
+
+  // Keep the proxy path when the frontend is mounted below a path prefix.
+  const currentURL = new URL(window.location.href);
+  if (!currentURL.pathname.endsWith('/')) {
+    currentURL.pathname += '/';
+  }
+
+  return new URL(path.replace(/^\/+/, ''), currentURL).toString();
+};
+
 type APIEnvelope<T> = {
   code: number;
   message: string;
@@ -36,7 +50,7 @@ const request = async <T>(path: string, signal?: AbortSignal): Promise<T> => {
   signal?.addEventListener('abort', cancel, { once: true });
 
   try {
-    const response = await fetch(`${API_BASE}${path}`, {
+    const response = await fetch(resolveAPIUrl(path), {
       headers: { Accept: 'application/json' },
       signal: controller.signal
     });
@@ -44,7 +58,7 @@ const request = async <T>(path: string, signal?: AbortSignal): Promise<T> => {
     const text = await response.text();
 
     if (!contentType.includes('application/json')) {
-      throw new RuntimeAPIError('核心服务未返回 JSON；请确认当前页面连接的是 serverPort 服务。', response.status);
+      throw new RuntimeAPIError(`核心服务未返回 JSON（HTTP ${response.status}）；请确认代理已转发当前路径的 API。`, response.status);
     }
 
     let body: APIEnvelope<T>;
@@ -75,7 +89,7 @@ const request = async <T>(path: string, signal?: AbortSignal): Promise<T> => {
 };
 
 export const getRuntimeOverview = async (signal?: AbortSignal) => {
-  const [endpoint, apps] = await Promise.all([request<RuntimeEndpoint | null>('/api/online', signal), request<RuntimeApp[]>('/api/runtime/apps', signal)]);
+  const [endpoint, apps] = await Promise.all([request<RuntimeEndpoint | null>('api/online', signal), request<RuntimeApp[]>('api/runtime/apps', signal)]);
 
   return { online: true, endpoint, apps: Array.isArray(apps) ? apps : [] };
 };
