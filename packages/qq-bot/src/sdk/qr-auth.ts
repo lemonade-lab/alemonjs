@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { createDecipheriv, randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
 import { getConfig, logger } from 'alemonjs';
 import QRCode from 'qrcode';
 import YAML from 'yaml';
@@ -82,8 +82,8 @@ export type QRLoginOptions = {
   pollInterval?: number;
   /** 注入门户请求（测试用） */
   request?: PortalRequest;
-  /** 二维码生成回调（默认同时终端出码并保存图片到运行目录） */
-  onQRCode?: (qrBuffer: Buffer, url: string, qrImagePath: string | undefined, loginId: string, refresh: number) => void | Promise<void>;
+  /** 二维码生成回调；图片由回调方或 CBP 统一处理，不在适配器运行目录落盘 */
+  onQRCode?: (qrBuffer: Buffer, url: string, loginId: string, refresh: number) => void | Promise<void>;
   /** 状态变化回调 */
   onStatus?: (message: string) => void | Promise<void>;
 };
@@ -92,7 +92,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * 扫码登录流程：
- * 创建绑定任务 → 终端出码并保存二维码图片到运行目录 → 轮询授权结果 → 解密 AppSecret。
+ * 创建绑定任务 → 生成二维码并通过回调交给 CBP/UI → 轮询授权结果 → 解密 AppSecret。
  * 成功返回 { appId, clientSecret, userOpenid }；超时/失败/刷新次数用尽返回 null
  */
 export const qrLogin = async (options: QRLoginOptions = {}): Promise<QRLoginResult | null> => {
@@ -121,20 +121,17 @@ export const qrLogin = async (options: QRLoginOptions = {}): Promise<QRLoginResu
 
       const url = buildConnectUrl(taskId);
 
-      let qrImagePath: string | null = null;
       let qrBuffer: Buffer | null = null;
 
       try {
         qrBuffer = await QRCode.toBuffer(url, { type: 'png', width: 320, margin: 2 });
-        qrImagePath = join(process.cwd(), 'qqbot-login-qr.png');
-        writeFileSync(qrImagePath, qrBuffer);
       } catch (err) {
-        logger.warn(`[qq-bot] 二维码图片保存失败：${err?.message ?? err}`);
+        logger.warn(`[qq-bot] 二维码生成失败：${err?.message ?? err}`);
       }
 
       // The external lifecycle notification must not depend on an adapter-local file being writable.
       if (qrBuffer && onQRCode) {
-        await onQRCode(qrBuffer, url, qrImagePath ?? undefined, taskId, refresh);
+        await onQRCode(qrBuffer, url, taskId, refresh);
       }
 
       await onStatus?.('请使用手机 QQ 扫描二维码并确认授权');

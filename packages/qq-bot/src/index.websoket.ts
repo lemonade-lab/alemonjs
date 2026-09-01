@@ -46,7 +46,7 @@ const bootstrap = async () => {
     logger.info('[qq-bot] 未检测到 app_id/secret 配置，进入扫码登录流程');
 
     const result = await qrLogin({
-      onQRCode: (qrBuffer, url, _qrImagePath, loginId, refresh) => {
+      onQRCode: (qrBuffer, url, loginId, refresh) => {
         loginStatus = {
           state: 'awaiting_qrcode',
           type: 'qrcode',

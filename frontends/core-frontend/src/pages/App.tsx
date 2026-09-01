@@ -10,6 +10,16 @@ const statusText: Record<RuntimeApp['status'], string> = {
   disposed: '已停止'
 };
 
+const resolveAppURL = (path: string) => {
+  const baseURL = new URL(document.baseURI);
+
+  if (!baseURL.pathname.endsWith('/')) {
+    baseURL.pathname += '/';
+  }
+
+  return new URL(path.replace(/^\/+/, ''), baseURL).toString();
+};
+
 export default function App() {
   const [apps, setApps] = useState<RuntimeApp[]>([]);
   const [error, setError] = useState('');
@@ -77,7 +87,7 @@ export default function App() {
 
         <ul className='mt-6 space-y-3'>
           {apps.map(app => {
-            const href = app.kind === 'main' ? '/app/' : `/apps/${encodeURIComponent(app.name)}/`;
+            const href = resolveAppURL(app.kind === 'main' ? 'app/' : `apps/${encodeURIComponent(app.name)}/`);
 
             return (
               <li key={app.name} className='flex flex-col gap-4 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between'>

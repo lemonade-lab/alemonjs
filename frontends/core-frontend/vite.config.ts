@@ -5,6 +5,8 @@ import theme from '@alemonjs/react-ui/theme.json';
 const NODE_ENV = process.env.NODE_ENV === 'development';
 const SERVER_URL = process.env.VITE_ALEMONJS_SERVER_URL;
 export default defineConfig({
+  // Keep assets usable when the UI is mounted behind a reverse-proxy path.
+  base: './',
   define: {
     'process.env.ALEMONJS_CSS_VARIABLES': NODE_ENV ? JSON.stringify(theme) : '{}'
   },

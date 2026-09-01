@@ -78,7 +78,6 @@ const encryptSecret = (plain, keyBase64) => {
 {
   let pollCount = 0;
   let capturedQR = null;
-  let capturedQRPath = null;
   const statuses = [];
   const keys = [];
 
@@ -105,9 +104,8 @@ const encryptSecret = (plain, keyBase64) => {
   const result = await qrLogin({
     pollInterval: 5,
     request,
-    onQRCode: (buffer, url, qrImagePath) => {
+    onQRCode: buffer => {
       capturedQR = buffer;
-      capturedQRPath = qrImagePath;
     },
     onStatus: message => {
       statuses.push(message);
@@ -119,12 +117,8 @@ const encryptSecret = (plain, keyBase64) => {
     { loginId: 'TASK_1', appId: '1234567890', clientSecret: 'SECRET_Y', userOpenid: 'OPENID_X' }
   );
   assert.ok(capturedQR && capturedQR.length > 0, 'onQRCode 应收到二维码图片');
-  assert.ok(capturedQRPath, 'onQRCode 应收到二维码图片路径');
-  assert.ok(existsSync(capturedQRPath), '二维码图片应保存到运行目录');
-  assert.ok(readFileSync(capturedQRPath).subarray(0, 4).toString('hex') === '89504e47', '保存的图片应为 PNG');
+  assert.ok(capturedQR.subarray(0, 4).toString('hex') === '89504e47', '回调收到的图片应为 PNG');
   assert.ok(statuses.some(message => message.includes('扫码授权成功')));
-
-  rmSync(capturedQRPath);
 }
 
 // 4. 过期刷新：第一个二维码过期后第二个任务完成
@@ -229,6 +223,5 @@ const encryptSecret = (plain, keyBase64) => {
 }
 
 rmSync(configDir, { recursive: true, force: true });
-rmSync(join(process.cwd(), 'qqbot-login-qr.png'), { force: true });
 console.log('扫码登录流程验证通过（解密 / 流程 / 配置保注释写入）');
 process.exit(0);
