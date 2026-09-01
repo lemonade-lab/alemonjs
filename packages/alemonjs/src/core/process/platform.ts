@@ -1,7 +1,7 @@
 import childProcess from 'child_process';
 import { getConfigValue, ResultCode } from '../../common/index.js';
 import module from 'module';
-import { setPlatformChild, forwardFromPlatform } from './ipc-bridge';
+import { setPlatformChild, forwardFromPlatform, observeFromPlatform } from './ipc-bridge';
 import type { AdapterProtocolVersion, AdapterTransportMode, ProcessAdapterState } from './types';
 
 const initRequire = () => {};
@@ -357,6 +357,14 @@ const handleMessage = (manager: ChildProcessManager, message: unknown) => {
 
   if (data?.type === 'ipc:data') {
     forwardFromPlatform(data.data);
+    return;
+  }
+
+  // Direct-IPC bypasses this bridge for application traffic. The platform
+  // child sends this observer-only copy so file transport and fork parents
+  // can still receive lifecycle events without delivering them twice.
+  if (data?.type === 'cbp.event') {
+    observeFromPlatform(data.data);
   }
 };
 

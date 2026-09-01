@@ -98,6 +98,13 @@ const cbpPlatformDirect = (sockPath: string, open: () => void) => {
     data.CreateAt = Date.now();
     const envelope = createEventEnvelope(data as unknown as Record<string, unknown>);
 
+    // Direct-IPC bypasses the core bridge. Keep one observer-only copy on
+    // fork IPC so supervisors and the optional file transport see lifecycle
+    // events, while the module process still receives only the direct copy.
+    if (typeof process.send === 'function') {
+      process.send({ type: 'cbp.event', protocolVersion: 'v1', data: sanitizeForSerialization(envelope) });
+    }
+
     if (channel) {
       channel.send(envelope);
     } else {

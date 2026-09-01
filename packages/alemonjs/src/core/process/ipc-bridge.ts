@@ -53,6 +53,17 @@ export const getPlatformChild = () => platformChild;
 export const getClientChild = () => clientChild;
 
 /**
+ * Mirror platform traffic for an external supervisor without forwarding it to
+ * the module process. Direct-IPC has already delivered the event to that
+ * process, so forwarding it again would duplicate application handling.
+ */
+export const observeFromPlatform = (data: unknown) => {
+  const safeData = sanitizeForSerialization(data);
+  notifyParentCBPEvent(safeData);
+  publishCBPFileEvent(safeData);
+};
+
+/**
  * 将消息从平台子进程转发到客户端子进程（同时转发到 WebSocket 前端客户端）
  */
 export const forwardFromPlatform = (data: any) => {
@@ -60,8 +71,7 @@ export const forwardFromPlatform = (data: any) => {
   const safeData = sanitizeForSerialization(data);
 
   // 外部主控进程（例如由 Go 驱动的 Node launcher）可直接监听此消息。
-  notifyParentCBPEvent(safeData);
-  publishCBPFileEvent(safeData);
+  observeFromPlatform(safeData);
 
   // 转发到客户端子进程（IPC 极速通道）
   if (clientChild?.connected) {
