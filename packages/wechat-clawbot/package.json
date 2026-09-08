@@ -1,0 +1,128 @@
+{
+  "name": "@alemonjs/wechat-clawbot",
+  "version": "1.0.2",
+  "description": "微信个人号（iLink ClawBot）适配器",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib",
+  "files": [
+    "lib",
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "lvy build"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.3"
+  },
+  "peerDependencies": {
+    "alemonjs": ">=2.1.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.js"
+    },
+    "./package": "./package.json"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/wechat-clawbot/README.md",
+      "official": "https://ilinkai.weixin.qq.com",
+      "platform": "https://weixin.qq.com/"
+    },
+    "config": [
+      {
+        "name": "base_url",
+        "type": "string",
+        "required": false,
+        "description": "iLink API 基础 URL，默认 https://ilinkai.weixin.qq.com"
+      },
+      {
+        "name": "cdn_base_url",
+        "type": "string",
+        "required": false,
+        "description": "CDN 基础 URL，默认 https://novac2c.cdn.weixin.qq.com/c2c"
+      },
+      {
+        "name": "storage_dir",
+        "type": "string",
+        "required": false,
+        "description": "凭据与上下文存储目录，默认 ~/.alemonjs-wechat"
+      },
+      {
+        "name": "log_level",
+        "type": "string",
+        "required": false,
+        "description": "日志级别：debug / info / warn / error"
+      },
+      {
+        "name": "qr_poll_interval",
+        "type": "number",
+        "required": false,
+        "description": "扫码登录轮询间隔（毫秒），默认 2000"
+      },
+      {
+        "name": "api_timeout",
+        "type": "number",
+        "required": false,
+        "description": "API 请求超时（毫秒），默认 15000"
+      },
+      {
+        "name": "long_poll_timeout",
+        "type": "number",
+        "required": false,
+        "description": "长轮询超时（毫秒），默认 35000"
+      },
+      {
+        "name": "auto_relogin",
+        "type": "boolean",
+        "required": false,
+        "description": "会话过期后是否自动重新登录，默认 true"
+      }
+    ],
+    "desktop": {
+      "platform": [
+        {
+          "name": "wechat-clawbot"
+        }
+      ],
+      "logo": "antd.WechatOutlined",
+      "command": [
+        {
+          "name": "wechat-clawbot",
+          "icon": "antd.WechatOutlined",
+          "command": "open.wechat-clawbot"
+        }
+      ],
+      "sidebars": [
+        {
+          "name": "wechat-clawbot",
+          "icon": "antd.WechatOutlined",
+          "command": "open.wechat-clawbot"
+        }
+      ]
+    }
+  },
+  "keywords": [
+    "alemonjs",
+    "wechat",
+    "clawbot",
+    "platform",
+    "adapter"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
+  }
+}
