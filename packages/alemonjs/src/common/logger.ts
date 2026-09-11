@@ -1,7 +1,42 @@
 import { mkdirSync } from 'node:fs';
 import log4js from 'log4js';
+import type { LoggerUtils } from '../types/logger/index.js';
 
-const createLogger = () => {
+const LOG_LEVELS = new Set(['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'mark', 'off']);
+
+const getLogLevel = () => {
+  const configuredLevel = process.env.LOG_LEVEL?.toLowerCase();
+
+  if (configuredLevel && LOG_LEVELS.has(configuredLevel)) {
+    return configuredLevel;
+  }
+
+  return process.env.NODE_ENV === 'development' ? 'trace' : 'info';
+};
+
+const getBackupCount = () => {
+  const configuredCount = Number.parseInt(process.env.LOG_BACKUPS ?? '', 10);
+
+  return Number.isSafeInteger(configuredCount) && configuredCount >= 0 ? configuredCount : 15;
+};
+
+const serializeLogArgument = (argument: unknown) => {
+  if (argument instanceof Error) {
+    return {
+      name: argument.name,
+      message: argument.message,
+      stack: argument.stack
+    };
+  }
+
+  return argument;
+};
+
+const bindLoggerMethod = (method: (...args: any[]) => void) => {
+  return (...args: any[]) => method(...args.map(serializeLogArgument));
+};
+
+const createLogger = (): LoggerUtils => {
   if (process.env.BROWSER_ENV === 'browser') {
     return {
       trace: console.trace.bind(console),
@@ -14,11 +49,10 @@ const createLogger = () => {
     };
   }
 
+  const writeToFile = process.env.LOG_FILE !== 'false';
   const logDir = process.env?.LOG_PATH ?? `./logs/${process.env.LOG_NAME ?? ''}`;
-
-  mkdirSync(logDir, { recursive: true });
-
-  const level = process.env.NODE_ENV === 'development' ? 'trace' : 'info';
+  const level = getLogLevel();
+  const backups = getBackupCount();
   const hideTime = process.env.LOGGER_TIME === 'false';
   const hideLevel = process.env.LOGGER_LEVEL === 'false';
   let pattern = '';
@@ -33,42 +67,48 @@ const createLogger = () => {
     pattern = '[%d{yyyy-MM-dd hh:mm:ss}][%p] %m';
   }
 
-  log4js.configure({
-    appenders: {
-      console: {
-        type: 'console',
-        layout: {
-          type: 'pattern',
-          pattern
-        }
-      },
-      command: {
-        type: 'dateFile',
-        filename: `${logDir}/command`,
-        pattern: 'yyyy-MM-dd.log',
-        numBackups: 15,
-        alwaysIncludePattern: true,
-        layout: {
-          type: 'pattern',
-          pattern
-        }
-      },
-      error: {
-        type: 'dateFile',
-        filename: `${logDir}/error`,
-        pattern: 'yyyy-MM-dd.log',
-        numBackups: 15,
-        alwaysIncludePattern: true,
-        layout: {
-          type: 'pattern',
-          pattern
-        }
+  const appenders: Record<string, unknown> = {
+    console: {
+      type: 'console',
+      layout: {
+        type: 'pattern',
+        pattern
       }
-    },
+    }
+  };
+
+  if (writeToFile) {
+    mkdirSync(logDir, { recursive: true });
+    appenders.command = {
+      type: 'dateFile',
+      filename: `${logDir}/command`,
+      pattern: 'yyyy-MM-dd.log',
+      numBackups: backups,
+      alwaysIncludePattern: true,
+      layout: {
+        type: 'pattern',
+        pattern
+      }
+    };
+    appenders.error = {
+      type: 'dateFile',
+      filename: `${logDir}/error`,
+      pattern: 'yyyy-MM-dd.log',
+      numBackups: backups,
+      alwaysIncludePattern: true,
+      layout: {
+        type: 'pattern',
+        pattern
+      }
+    };
+  }
+
+  log4js.configure({
+    appenders,
     categories: {
       default: { appenders: ['console'], level },
-      command: { appenders: ['console', 'command'], level: 'info' },
-      error: { appenders: ['console', 'command', 'error'], level: 'warn' }
+      command: { appenders: writeToFile ? ['console', 'command'] : ['console'], level },
+      error: { appenders: writeToFile ? ['console', 'command', 'error'] : ['console'], level }
     }
   });
 
@@ -76,26 +116,40 @@ const createLogger = () => {
   const commandLogger = log4js.getLogger('command');
   const errorLogger = log4js.getLogger('error');
 
+  if (writeToFile) {
+    // dateFile appenders create their output lazily. Emit an initialization entry
+    // so each Node process has a command log file as soon as logging is configured.
+    commandLogger.info('[logger] initialized');
+  }
+
   return {
-    trace: defaultLogger.trace.bind(defaultLogger),
-    debug: defaultLogger.debug.bind(defaultLogger),
-    info: commandLogger.info.bind(commandLogger),
-    mark: commandLogger.mark.bind(commandLogger),
-    warn: errorLogger.warn.bind(errorLogger),
-    error: errorLogger.error.bind(errorLogger),
-    fatal: errorLogger.fatal.bind(errorLogger)
+    trace: bindLoggerMethod(defaultLogger.trace.bind(defaultLogger)),
+    debug: bindLoggerMethod(defaultLogger.debug.bind(defaultLogger)),
+    info: bindLoggerMethod(commandLogger.info.bind(commandLogger)),
+    mark: bindLoggerMethod(commandLogger.mark.bind(commandLogger)),
+    warn: bindLoggerMethod(errorLogger.warn.bind(errorLogger)),
+    error: bindLoggerMethod(errorLogger.error.bind(errorLogger)),
+    fatal: bindLoggerMethod(errorLogger.fatal.bind(errorLogger))
   };
 };
 
+let shutdownPromise: Promise<void> | undefined;
+
+/** Flush pending log4js writes before a process exits. */
+export const shutdownLogger = () => {
+  shutdownPromise ??= new Promise(resolve => {
+    log4js.shutdown(() => resolve());
+  });
+
+  return shutdownPromise;
+};
+
 export class Logger {
-  #logger = null;
+  #logger: LoggerUtils;
 
   constructor() {
-    this.#logger = createLogger();
-
-    if (!global.logger) {
-      global.logger = this.#logger;
-    }
+    this.#logger = global.logger ?? createLogger();
+    global.logger ??= this.#logger;
   }
 
   get value() {

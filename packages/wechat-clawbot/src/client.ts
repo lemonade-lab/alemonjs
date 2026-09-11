@@ -37,7 +37,7 @@ export interface Logger {
   error: (...args: any[]) => void;
 }
 
-export const createLogger = (level: string = 'info'): Logger => {
+export const createLogger = (level = 'info'): Logger => {
   const levels: Record<string, number> = { debug: 0, info: 1, warn: 2, error: 3 };
   const currentLevel = levels[level] || 1;
 
@@ -84,15 +84,17 @@ export class WeChatClient {
     this.wechatUIN = Buffer.from(String(Math.floor(Math.random() * 4294967296))).toString('base64');
   }
 
-  private buildHeaders(tokenRequired: boolean = false): Record<string, string> {
+  private buildHeaders(tokenRequired = false): Record<string, string> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       AuthorizationType: 'ilink_bot_token',
       'X-WECHAT-UIN': this.wechatUIN
     };
+
     if (tokenRequired && this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
     }
+
     return headers;
   }
 
@@ -108,6 +110,7 @@ export class WeChatClient {
 
     if (options.params) {
       const urlObj = new URL(url);
+
       for (const [key, value] of Object.entries(options.params)) {
         urlObj.searchParams.set(key, String(value));
       }
@@ -130,9 +133,11 @@ export class WeChatClient {
     if (json && typeof json === 'object') {
       const ret = parseInt(json.ret ?? json.base_info?.ret ?? json.base_response?.ret ?? 0);
       const errcode = parseInt(json.errcode ?? json.base_info?.errcode ?? json.base_response?.errcode ?? 0);
+
       if (ret !== 0 || errcode !== 0) {
         const errmsg = json.errmsg || json.base_info?.errmsg || json.base_response?.errmsg || 'none';
         const error = new Error(`iLink API Error: ret=${ret}, errcode=${errcode}, errmsg=${errmsg}`);
+
         // Attach structured fields so the poll loop can react precisely
         // (e.g. errcode=-14 usually means the sync buf expired, not the token)
         (error as any).ret = ret;
@@ -213,6 +218,7 @@ export class WeChatClient {
     this.logger.debug('CDN upload:', { rawSize: fileBuffer.length, encryptedSize: encrypted.length, fileKey });
 
     let url: string;
+
     if (uploadFullUrl) {
       url = uploadFullUrl;
     } else if (uploadParam) {
@@ -230,6 +236,7 @@ export class WeChatClient {
 
     if (!response.ok) {
       const text = await response.text();
+
       throw new Error(`CDN upload failed: ${response.status} ${text}`);
     }
 
@@ -267,7 +274,9 @@ export class WeChatClient {
   }
 
   async startPolling(): Promise<void> {
-    if (this.isRunning) return;
+    if (this.isRunning) {
+      return;
+    }
     this.isRunning = true;
     let failures = 0;
     let bufResets = 0;
@@ -300,13 +309,16 @@ export class WeChatClient {
         }
 
         const msgs = result.msgs || [];
+
         if (msgs.length > 0) {
           this.logger.info(`Received ${msgs.length} message(s)`);
         }
 
         // Dispatch concurrently — a slow handler must never stall the poll loop
         for (const msg of msgs) {
-          if (!this.isRunning) break;
+          if (!this.isRunning) {
+            break;
+          }
           void this.emitMessage(msg).catch(err => {
             this.logger.error('Error processing message:', err);
           });
@@ -335,6 +347,7 @@ export class WeChatClient {
 
           this.logger.error('Session expired (token invalid):', message);
           this.emitSessionExpired();
+
           return;
         }
 
@@ -351,6 +364,7 @@ export class WeChatClient {
 
         failures++;
         const backoff = Math.min(initialBackoff * 2 ** (failures - 1), maxBackoff);
+
         this.logger.warn(`Polling error (attempt ${failures}), retrying in ${backoff / 1000}s:`, message);
         this.emitError(error);
         await sleep(backoff);
@@ -390,21 +404,26 @@ export class TokenStorage {
   async load(): Promise<Credentials | undefined> {
     try {
       const raw = await readFile(this.filePath(), 'utf8');
+
       return JSON.parse(raw) as Credentials;
     } catch (err: any) {
-      if (err.code === 'ENOENT') return undefined;
+      if (err.code === 'ENOENT') {
+        return undefined;
+      }
       throw err;
     }
   }
 
   async save(credentials: Credentials): Promise<void> {
     const { mkdir, writeFile } = await import('node:fs/promises');
+
     await this.ensureDir();
     await writeFile(this.filePath(), JSON.stringify(credentials, null, 2) + '\n', { mode: 0o600 });
   }
 
   async delete(): Promise<void> {
     const { rm } = await import('node:fs/promises');
+
     try {
       await rm(this.filePath(), { force: true });
     } catch {
@@ -418,6 +437,7 @@ export class TokenStorage {
 
   private async ensureDir(): Promise<void> {
     const { mkdir } = await import('node:fs/promises');
+
     await mkdir(this.dir, { recursive: true, mode: 0o700 });
   }
 }
@@ -434,6 +454,7 @@ export class ContextStorage {
     try {
       const filePath = this.filePath(botId);
       const raw = await readFile(filePath, 'utf8');
+
       return JSON.parse(raw);
     } catch {
       return { syncBuf: '', contextToken: '' };
@@ -441,20 +462,24 @@ export class ContextStorage {
   }
 
   async save(botId: string, data: { syncBuf?: string; contextToken?: string }): Promise<void> {
-    const { mkdir, writeFile } = await import('node:fs/promises');
+    const { writeFile } = await import('node:fs/promises');
+
     await this.ensureDir();
     const existing = await this.load(botId);
     const updated = { ...existing, ...data };
+
     await writeFile(this.filePath(botId), JSON.stringify(updated, null, 2) + '\n', { mode: 0o600 });
   }
 
   private filePath(botId: string): string {
     const safeId = botId.replace(/[^a-zA-Z0-9_-]/g, '_');
+
     return path.join(this.dir, `context_${safeId}.json`);
   }
 
   private async ensureDir(): Promise<void> {
     const { mkdir } = await import('node:fs/promises');
+
     await mkdir(this.dir, { recursive: true, mode: 0o700 });
   }
 }

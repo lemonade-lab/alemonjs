@@ -1,4 +1,4 @@
-import { logger } from './common/logger.js';
+import { logger, shutdownLogger } from './common/logger.js';
 
 let runtimeStarted = false;
 let stopping = false;
@@ -22,14 +22,15 @@ const notifyParent = (message: Record<string, unknown>) => {
   }
 };
 
-const shutdown = (reason: string) => {
+const shutdown = async (reason: string) => {
   if (stopping) {
     return;
   }
 
   stopping = true;
   logger.info?.(`[platform-bootstrap][${reason}] 收到信号，正在关闭...`);
-  setImmediate(() => process.exit(0));
+  await shutdownLogger();
+  process.exit(0);
 };
 
 const startRuntime = async () => {
@@ -66,7 +67,8 @@ const startRuntime = async () => {
     });
     logger.error?.('[platform-bootstrap] 启动失败', error);
     process.exitCode = 1;
-    setImmediate(() => process.exit(1));
+    await shutdownLogger();
+    process.exit(1);
   }
 };
 
@@ -77,10 +79,11 @@ process.on('uncaughtException', (error: Error) => {
   logger.error?.('[platform-bootstrap][uncaughtException]', error);
 });
 ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
-  process?.on?.(sig, () => shutdown(sig));
+  process?.on?.(sig, () => void shutdown(sig));
 });
-process?.on?.('exit', code => {
+process?.once?.('beforeExit', code => {
   logger.info?.(`[platform-bootstrap][exit] 进程退出，code=${code}`);
+  void shutdownLogger();
 });
 process.on('message', msg => {
   try {

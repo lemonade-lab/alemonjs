@@ -1,4 +1,4 @@
-import { logger } from '../common/logger.js';
+import { logger, shutdownLogger } from '../common/logger.js';
 
 type Options = {
   /**
@@ -21,15 +21,27 @@ export const definePlatform = (options: Options) => {
 
   // 开始注册子进程交互
   const mainProcess = () => {
+    let stopping = false;
+    const shutdown = async (reason: string) => {
+      if (stopping) {
+        return;
+      }
+
+      stopping = true;
+      logger.info?.(`[${platformName}][${reason}] 收到信号，正在关闭...`);
+      await shutdownLogger();
+      process.exit(0);
+    };
+
     ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
       process?.on?.(sig, () => {
-        logger.info?.(`[${platformName}][${sig}] 收到信号，正在关闭...`);
-        setImmediate(() => process.exit(0));
+        void shutdown(sig);
       });
     });
 
-    process?.on?.('exit', code => {
+    process?.once?.('beforeExit', code => {
       logger.info?.(`[${platformName}][exit] 进程退出，code=${code}`);
+      void shutdownLogger();
     });
 
     // 监听主进程消息
@@ -40,7 +52,7 @@ export const definePlatform = (options: Options) => {
         if (data?.type === 'start') {
           options.main();
         } else if (data?.type === 'stop') {
-          process.exit(0);
+          void shutdown('stop');
         }
       } catch {}
     });

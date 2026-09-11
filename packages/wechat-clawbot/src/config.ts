@@ -28,6 +28,7 @@ export const DEFAULT_CONFIG: Required<WechatConfig> = {
 
 export const getWechatConfig = (): Required<WechatConfig> => {
   const value = getConfigValue() || {};
+
   return { ...DEFAULT_CONFIG, ...(value[platform] || {}) };
 };
 
@@ -37,6 +38,7 @@ export const getIdentity = (UserId: string): [boolean, string] => {
     Platform: platform,
     UserId
   });
+
   return [isMasterUser, UserKey];
 };
 

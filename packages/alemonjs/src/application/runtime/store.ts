@@ -20,7 +20,8 @@ import { disposeExpose } from '../../application/expose.js';
 import type KoaRouter from 'koa-router';
 import { dispatchRuntimeStatusChange } from './lifecycle-callbacks.js';
 import { clearActiveContextsByApp } from './context-registry.js';
-export { Logger, logger } from '../../common/logger.js';
+import { logger, shutdownLogger } from '../../common/logger.js';
+export { Logger, logger, shutdownLogger } from '../../common/logger.js';
 
 export type RuntimeAppStatus = 'discovered' | 'loading' | 'ready' | 'failed' | 'disposed';
 
@@ -836,12 +837,23 @@ export const ProcessorEventUserAutoClearMap = new Map();
 export const core = new Core().value;
 
 // 监听退出
+let stopping = false;
+const shutdown = async (reason: string) => {
+  if (stopping) {
+    return;
+  }
+
+  stopping = true;
+  logger.info?.(`[alemonjs][${reason}] 收到信号，正在关闭...`);
+  await shutdownLogger();
+  process.exit(0);
+};
+
 ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
-  process?.on?.(sig, () => {
-    setImmediate(() => process.exit(0));
-  });
+  process?.on?.(sig, () => void shutdown(sig));
 });
 
-process?.on?.('exit', code => {
+process?.once?.('beforeExit', code => {
   logger.info?.(`[alemonjs][exit] 进程退出，code=${code}`);
+  void shutdownLogger();
 });

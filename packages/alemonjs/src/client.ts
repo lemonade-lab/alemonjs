@@ -1,4 +1,4 @@
-import { logger } from './common/logger.js';
+import { logger, shutdownLogger } from './common/logger.js';
 
 let runtimeModulePromise: Promise<typeof import('./application/runtime/client-runtime.js')> | null = null;
 let runtimeStarted = false;
@@ -47,6 +47,7 @@ const shutdown = async (reason: string) => {
     logger.error?.('[client-bootstrap] 关闭失败', error);
   }
 
+  await shutdownLogger();
   process.exit(0);
 };
 
@@ -74,7 +75,8 @@ const startRuntime = async () => {
     });
     logger.error?.('[client-bootstrap] 启动失败', error);
     process.exitCode = 1;
-    setImmediate(() => process.exit(1));
+    await shutdownLogger();
+    process.exit(1);
   }
 };
 
@@ -87,8 +89,9 @@ process.on('uncaughtException', (error: Error) => {
 ['SIGINT', 'SIGTERM', 'SIGQUIT', 'disconnect'].forEach(sig => {
   process?.on?.(sig, () => void shutdown(sig));
 });
-process?.on?.('exit', code => {
+process?.once?.('beforeExit', code => {
   logger.info?.(`[client-bootstrap][exit] 进程退出，code=${code}`);
+  void shutdownLogger();
 });
 process.on('message', msg => {
   try {

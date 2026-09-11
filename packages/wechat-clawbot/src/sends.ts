@@ -15,17 +15,21 @@ export const getFileBuffer = async (file: string | Buffer): Promise<{ buffer: Bu
       const response = await fetch(file);
       const buffer = Buffer.from(await response.arrayBuffer());
       const fileName = path.basename(new URL(file).pathname) || 'file';
+
       return { buffer, fileName };
     } else if (file.startsWith('base64://')) {
       const base64Data = file.replace(/^base64:\/\//, '');
       const buffer = Buffer.from(base64Data, 'base64');
+
       return { buffer, fileName: 'base64_file' };
     } else if (file.startsWith('file://')) {
       const filePath = file.replace(/^file:\/\//, '');
       const buffer = await readFile(filePath);
+
       return { buffer, fileName: path.basename(filePath) };
     } else {
       const buffer = await readFile(file);
+
       return { buffer, fileName: path.basename(file) };
     }
   }
@@ -38,6 +42,7 @@ export const detectMediaType = (fileName: string, buffer: Buffer): { mediaType: 
   let itemType = 4;
 
   const ext = path.extname(fileName).toLowerCase();
+
   if (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'].includes(ext)) {
     mediaType = 1;
     itemType = 2;
@@ -51,6 +56,7 @@ export const detectMediaType = (fileName: string, buffer: Buffer): { mediaType: 
 
   if (buffer.length > 4) {
     const header = buffer.subarray(0, 4).toString('hex');
+
     if (
       header.startsWith('ffd8ff') ||
       header.startsWith('89504e47') ||
@@ -121,7 +127,9 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
   const itemList: any[] = [];
 
   for (const item of val) {
-    if (!item) continue;
+    if (!item) {
+      continue;
+    }
 
     switch (item.type) {
       case 'Text':
@@ -135,6 +143,7 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
           itemList.push({ type: 1, text_item: { text: item.value } });
         } else if (Array.isArray(item.value)) {
           const mdText = markdownToText(item.value);
+
           if (mdText) {
             itemList.push({ type: 1, text_item: { text: mdText } });
           }
@@ -152,6 +161,7 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
       case 'ImageURL':
         try {
           const result = await uploadMedia(client, item.value, toUserId, logger);
+
           itemList.push({
             type: result.itemType,
             image_item: {
@@ -168,6 +178,7 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
       case 'Audio':
         try {
           const result = await uploadMedia(client, item.value, toUserId, logger);
+
           itemList.push({
             type: result.itemType,
             voice_item: {
@@ -183,6 +194,7 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
       case 'Video':
         try {
           const result = await uploadMedia(client, item.value, toUserId, logger);
+
           itemList.push({
             type: result.itemType,
             video_item: {
@@ -199,6 +211,7 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
       case 'Attachment':
         try {
           const result = await uploadMedia(client, item.value, toUserId, logger);
+
           itemList.push({
             type: result.itemType,
             file_item: {
@@ -228,6 +241,7 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
       case 'MD.list':
       case 'MD.code':
         const mdText = markdownToText([item]);
+
         if (mdText) {
           itemList.push({ type: 1, text_item: { text: mdText } });
         }
@@ -247,6 +261,7 @@ export const SEND_MESSAGE = async (client: WeChatClient, userId: string, val: an
 
   if (!contextToken) {
     logger.error('No context token available for user:', userId);
+
     return [createResult(ResultCode.Fail, 'No context token available', null)];
   }
 
@@ -276,6 +291,7 @@ export const SEND_MESSAGE = async (client: WeChatClient, userId: string, val: an
     return [createResult(ResultCode.Ok, 'Message sent', null)];
   } catch (error) {
     logger.error('Failed to send message:', error);
+
     return [createResult(ResultCode.Fail, 'Failed to send message', error)];
   }
 };

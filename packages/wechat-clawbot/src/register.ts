@@ -29,16 +29,19 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
 
   const getMessageText = (itemList: any[]): string => {
     let text = '';
+
     for (const item of itemList || []) {
       if (item.type === 1) {
         text += item.text_item?.text || '';
       }
     }
+
     return text.trim();
   };
 
   const extractMediaFromMessage = (itemList: any[]): any[] => {
     const media = [];
+
     for (const item of itemList || []) {
       if (item.type === 2) {
         media.push({
@@ -74,6 +77,7 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
         });
       }
     }
+
     return media;
   };
 
@@ -149,6 +153,7 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
       client.setCredentials(storedCredentials);
 
       const savedContext = await contextStorage.load(botId);
+
       if (savedContext.syncBuf) {
         client.syncBuf = savedContext.syncBuf;
       }
@@ -168,6 +173,7 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
 
       // QR rendering belongs to CBP (terminal fallback + UI image); the adapter only emits login.qrcode.
       let imageBase64: string | undefined;
+
       try {
         imageBase64 = (await QRCode.toBuffer(qrcodeUrl, { type: 'png', width: 320, margin: 2 })).toString('base64');
       } catch {
@@ -265,6 +271,7 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
           UserAvatar: createUserAvatar(UserId),
           UserKey
         };
+
         return consume([createResult(ResultCode.Ok, 'Request completed', user)]);
       }
 
@@ -279,9 +286,11 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
           const val = data.payload.params.format;
 
           const res = await SEND_MESSAGE(client, userId, val, logger);
+
           return consume(res);
         } catch (error) {
           logger.error('Failed to send message:', error);
+
           return consume([createResult(ResultCode.Fail, 'Failed to send message', error)]);
         }
       }
@@ -300,11 +309,13 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
   cbp.onapis(async (data: any, consume: any) => {
     const key = data.payload?.key;
     const params = data.payload?.params;
+
     logger.debug('API call:', key);
 
     try {
       const keys = key.split('.');
       let target: any = client;
+
       for (const k of keys) {
         if (target === null || target === undefined || !(k in target)) {
           return consume([createResult(ResultCode.Fail, 'Unknown API', null)]);
@@ -317,9 +328,11 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
       }
 
       const res = await target.call(client, ...params);
+
       return consume([createResult(ResultCode.Ok, 'Request completed', res)]);
     } catch (error) {
       logger.error('API call failed:', error);
+
       return consume([createResult(ResultCode.Fail, 'Request failed', error)]);
     }
   });

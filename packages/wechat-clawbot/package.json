@@ -1,7 +1,7 @@
 {
   "name": "@alemonjs/wechat-clawbot",
   "version": "1.0.2",
-  "description": "微信个人号（iLink ClawBot）适配器",
+  "description": "Claw微信号",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
