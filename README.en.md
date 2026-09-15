@@ -175,8 +175,8 @@ Supports text, images, button groups, markdown, mentions, links, attachments, au
 | [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)                 | Wechaty       |
 | [`@alemonjs/wechat-clawbot`](https://www.npmjs.com/package/@alemonjs/wechat-clawbot) | WechatClawBot |
 | [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                   | WeComBot         |
-| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | Douyin desktop IM |
-| [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)           | Douyin Open Platform IM bot |
+| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | Douyin Desktop |
+| [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)           | Douyin Bot |
 
 ### Extensions
 

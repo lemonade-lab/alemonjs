@@ -162,18 +162,18 @@ export default () => {
 
 | Package                                                                              | Description    |
 | ------------------------------------------------------------------------------------ | -------------- |
-| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)                 | QQBot          |
-| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)               | Discord        |
+| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)                 | QQ 机器人      |
+| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)               | Discord(DC)    |
 | [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)                     | KOOK           |
-| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram)             | Telegram       |
+| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram)             | Telegram(TG)   |
 | [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)                 | Bubble         |
 | [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)                 | OneBot         |
 | [`@alemonjs/milky`](https://www.npmjs.com/package/@alemonjs/milky)                   | Milky          |
 | [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)                 | 个人微信       |
 | [`@alemonjs/wechat-clawbot`](https://www.npmjs.com/package/@alemonjs/wechat-clawbot) | 微信机器人     |
 | [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                   | 企业微信机器人 |
-| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | 抖音桌面 IM    |
-| [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)           | 抖音 IM 机器人 |
+| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | 抖音桌面       |
+| [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)           | 抖音机器人     |
 
 ### Extensions
 
