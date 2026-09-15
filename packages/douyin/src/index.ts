@@ -1,220 +1,186 @@
-import { createHash, timingSafeEqual } from 'crypto';
-import { createServer } from 'http';
+import WebSocket from 'ws';
 import { cbpPlatform, createResult, definePlatform, FormatEvent, logger, ResultCode } from 'alemonjs';
 import { getDouyinConfig, getMaster, platform } from './config.js';
-import { dataToDouyinContent } from './format.js';
+import { dataToBridgeMessage } from './format.js';
+import { parseGateway } from './gateway.js';
 
 export { platform } from './config.js';
 export type { Options } from './config.js';
-export { dataToDouyinContent } from './format.js';
+export { dataToBridgeMessage } from './format.js';
 
-const maxWebhookBodyBytes = 1024 * 1024;
-
-const readBody = (req: any): Promise<Buffer> => {
-  return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    let size = 0;
-
-    req.on('data', (chunk: Buffer) => {
-      size += chunk.length;
-      if (size > maxWebhookBodyBytes) {
-        reject(new Error('request body too large'));
-        req.destroy();
-
-        return;
-      }
-      chunks.push(Buffer.from(chunk));
-    });
-    req.on('end', () => resolve(Buffer.concat(chunks)));
-    req.on('error', reject);
-  });
+type BridgeMedia = { type?: string; id?: string; url?: string; name?: string; size?: number; mime_type?: string };
+type BridgeMessage = {
+  message_id?: string;
+  conversation_id?: string;
+  conversation_short_id?: string;
+  conversation_type?: 'private' | 'group';
+  sender?: { id?: string; nickname?: string; avatar?: string; is_bot?: boolean };
+  text?: string;
+  media?: BridgeMedia[];
+  is_at_me?: boolean;
+  raw?: unknown;
 };
+type PendingResult = (result: any) => void;
+const mediaTypes = new Set(['image', 'audio', 'video', 'file', 'sticker', 'animation']);
+const maxGatewayFrameBytes = 1024 * 1024;
 
-const signatureIsValid = (secret: string, raw: Buffer, signature: string | undefined) => {
-  if (!signature) {
-    return false;
+const asJson = (value: WebSocket.RawData) => {
+  try {
+    return JSON.parse(Buffer.isBuffer(value) ? value.toString('utf8') : String(value));
+  } catch {
+    return undefined;
   }
-  const expected = createHash('sha1').update(secret).update(raw).digest('hex');
-  const actual = String(signature).toLowerCase();
-
-  return actual.length === expected.length && timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
 };
-
-const parseContent = (value: unknown) => {
-  if (typeof value === 'string') {
-    return JSON.parse(value);
-  }
-
-  return value && typeof value === 'object' ? value : {};
-};
-
-const isDouyinFailure = (result: any) => Number(result?.err_no ?? result?.error_code ?? result?.extra?.error_code ?? 0) !== 0;
 
 const main = () => {
   const config = getDouyinConfig();
 
-  if (!config.client_key || !config.client_secret) {
-    throw new Error('[douyin] douyin.client_key 和 douyin.client_secret 为必填配置');
+  if (!config.gateway || !config.bot_id) {
+    throw new Error('[douyin] douyin.gateway 和 douyin.bot_id 为必填配置');
   }
+  const gateway = parseGateway(config.gateway, config.token);
+
   const cbp = cbpPlatform(`ws://127.0.0.1:${process.env.port || 17117}`);
-  const base = config.api_base_url || 'https://open.douyin.com';
-  const seen = new Map<string, number>();
-  let tokenCache: { value: string; expiresAt: number } | undefined;
-  const getClientToken = async () => {
-    if (tokenCache && tokenCache.expiresAt > Date.now() + 60_000) {
-      return tokenCache.value;
+  const pending = new Map<string, PendingResult>();
+  const reconnectInterval = Math.max(1000, Number(config.reconnect_interval ?? 5000));
+  let socket: WebSocket | undefined;
+  let stopped = false;
+  let requestId = 0;
+  const failPending = (message: string) => {
+    for (const resolve of pending.values()) {
+      resolve({ ok: false, error: message });
     }
-    const response = await fetch(`${base}/oauth/client_token/`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ client_key: config.client_key, client_secret: config.client_secret, grant_type: 'client_credential' })
-    });
-    const data: any = await response.json();
-    const value = data?.data?.access_token ?? data?.access_token;
-
-    if (!response.ok || !value) {
-      throw new Error(data?.message ?? data?.err_msg ?? '获取抖音 client token 失败');
-    }
-    tokenCache = { value, expiresAt: Date.now() + Number(data?.data?.expires_in ?? data?.expires_in ?? 7200) * 1000 };
-
-    return value;
+    pending.clear();
   };
-  const emitMessage = (event: any) => {
-    const content: any = parseContent(event.content);
-    const UserId = String(event.from_user_id ?? content.open_id ?? '');
 
-    if (!UserId) {
+  const emitMessage = (message: BridgeMessage) => {
+    const sender = message.sender;
+    const UserId = String(sender?.id ?? '');
+    const ChannelId = String(message.conversation_id ?? message.conversation_short_id ?? '');
+
+    if (!UserId || !ChannelId || sender?.is_bot) {
       return;
     }
     const [IsMaster, UserKey] = getMaster(UserId);
-    const isGroup = event.event === 'im_group_receive_msg' || Boolean(content.im_group_id);
-    const ChannelId = String(content.im_group_id ?? content.conversation_short_id ?? '');
-    const MessageText = String(content.text?.content ?? content.content ?? content.text ?? '');
+    const isGroup = message.conversation_type === 'group';
+    const replyContext = {
+      message_id: message.message_id,
+      conversation_id: message.conversation_id,
+      conversation_short_id: message.conversation_short_id,
+      conversation_type: message.conversation_type
+    };
     const builder = FormatEvent.create(isGroup ? 'message.create' : 'private.message.create')
-      .addPlatform({ Platform: platform, value: event, BotId: config.client_key, IsPrivate: !isGroup, IsAtMe: false })
-      .addUser({
-        UserId,
-        UserKey,
-        UserName: content.user_infos?.find((item: any) => String(item.open_id) === UserId)?.nick_name,
-        UserAvatar: content.user_infos?.find((item: any) => String(item.open_id) === UserId)?.avatar,
-        IsMaster,
-        IsBot: false
-      })
-      .addMessage({ MessageId: String(content.server_message_id ?? event.log_id ?? '') })
-      .addText({ MessageText })
-      .addOpen({ OpenId: isGroup ? ChannelId : UserId });
+      .addPlatform({ Platform: platform, value: replyContext, BotId: config.bot_id, IsPrivate: !isGroup, IsAtMe: Boolean(message.is_at_me) })
+      .addUser({ UserId, UserKey, UserName: sender?.nickname, UserAvatar: sender?.avatar, IsMaster, IsBot: false })
+      .addMessage({ MessageId: String(message.message_id ?? '') })
+      .addText({ MessageText: String(message.text ?? '') })
+      .addOpen({ OpenId: ChannelId });
 
     if (isGroup) {
-      builder.addGuild({ GuildId: ChannelId, SpaceId: ChannelId }).addChannel({ ChannelId });
+      (builder as any).addGuild({ GuildId: ChannelId, SpaceId: ChannelId }).addChannel({ ChannelId });
     }
-    const mediaType = content.message_type === 'user_local_image' ? 'image' : content.message_type === 'user_local_video' ? 'video' : undefined;
+    const media = (message.media ?? [])
+      .filter(item => item.type && mediaTypes.has(item.type))
+      .map(item => ({
+        Type: item.type as any,
+        FileId: item.id ?? item.url,
+        FileName: item.name,
+        FileSize: item.size,
+        MimeType: item.mime_type,
+        Url: item.url
+      }));
 
-    if (mediaType) {
-      builder.addMedia({ MessageMedia: [{ Type: mediaType as any, FileId: content.server_message_id }] });
+    if (media.length) {
+      (builder as any).addMedia({ MessageMedia: media });
     }
-    cbp.send(builder.add({ tag: `douyin.${event.event}` }).value as any);
+    cbp.send(builder.add({ tag: 'douyin.message' }).value as any);
   };
 
-  const callback = {
-    host: config.callback?.host ?? '127.0.0.1',
-    port: Number(config.callback?.port ?? 18080),
-    path: config.callback?.path ?? '/callbacks/douyin'
-  };
-  const onCallback = async (req: any, res: any) => {
-    const requestPath = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`).pathname;
-
-    if (req.method !== 'POST' || requestPath !== callback.path) {
-      res.writeHead(404).end();
-
+  const connect = () => {
+    if (stopped) {
       return;
     }
-    try {
-      const raw = await readBody(req);
+    socket = new WebSocket(gateway, { headers: config.token ? { authorization: `Bearer ${config.token}` } : undefined, maxPayload: maxGatewayFrameBytes });
+    socket.on('open', () => socket?.send(JSON.stringify({ type: 'hello', bot_id: config.bot_id })));
+    socket.on('message', raw => {
+      const packet = asJson(raw);
 
-      if (!signatureIsValid(config.client_secret, raw, req.headers['x-douyin-signature'] as string | undefined)) {
-        res.writeHead(401).end('invalid signature');
-
+      if (!packet || typeof packet !== 'object') {
         return;
       }
-      const event = JSON.parse(raw.toString('utf8'));
-
-      if (event.client_key && event.client_key !== config.client_key) {
-        res.writeHead(403).end('unexpected client_key');
-
-        return;
+      if (packet.type === 'message') {
+        emitMessage(packet.message ?? {});
       }
-
-      if (event.event === 'verify_webhook') {
-        res.writeHead(200, { 'content-type': 'text/plain; charset=utf-8' }).end(JSON.stringify({ challenge: event?.content?.challenge }));
-
-        return;
+      if (packet.type === 'ack' && packet.request_id && pending.has(packet.request_id)) {
+        pending.get(packet.request_id)?.(packet);
+        pending.delete(packet.request_id);
       }
-      const msgId = String(req.headers['msg-id'] ?? event.log_id ?? '');
-      const duplicate = msgId && seen.has(msgId);
-
-      if (msgId) {
-        seen.set(msgId, Date.now());
+    });
+    socket.on('error', error => logger.error({ code: ResultCode.FailInternal, message: `[douyin] 桌面 IM 网关连接失败: ${error.message}`, data: error }));
+    socket.on('close', () => {
+      failPending('抖音桌面 IM 网关连接已关闭');
+      if (!stopped) {
+        setTimeout(connect, reconnectInterval);
       }
-      for (const [id, at] of seen) {
-        if (at < Date.now() - 10 * 60_000) {
-          seen.delete(id);
-        }
-      }
-      res.writeHead(200, { 'content-type': 'application/json' }).end('{}');
-      if (!duplicate && ['im_receive_msg', 'im_group_receive_msg'].includes(event.event)) {
-        emitMessage(event);
-      }
-    } catch (_error) {
-      res.writeHead(400).end('invalid request');
-    }
+    });
   };
-  const server = createServer((req, res) => void onCallback(req, res));
 
-  server.on('error', error => {
-    logger.error({ code: ResultCode.FailInternal, message: `[douyin] Webhook 服务启动失败: ${error.message}`, data: error });
-  });
-  server.listen(callback.port, callback.host);
+  connect();
 
-  const onAction = async (data: any, consume: any) => {
+  cbp.onactions((data: any, consume: any) => {
     if (data.action !== 'message.send') {
       return;
     }
-    try {
-      const payload = data.payload || {};
-      const rawEvent = payload.event?.value;
-      const rawContent: any = parseContent(rawEvent?.content);
-      const target = String(rawEvent?.from_user_id ?? '');
-      const content = dataToDouyinContent(payload.params?.format ?? [], config.hideUnsupported);
+    const payload = data.payload || {};
+    const event = payload.event?.value as BridgeMessage | undefined;
+    const conversationId = String(event?.conversation_id ?? event?.conversation_short_id ?? '');
+    const message = dataToBridgeMessage(payload.params?.format ?? [], config.hideUnsupported);
 
-      if (rawEvent?.event !== 'im_receive_msg' || !target || !rawContent.server_message_id || !rawContent.conversation_short_id || !content.text.content) {
-        return consume([createResult(ResultCode.FailParams, '抖音回复必须来自 im_receive_msg 事件，并包含会话上下文和非空文本', null)]);
-      }
-      const token = await getClientToken();
-      const response = await fetch(`${base}/im/send/msg/`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'access-token': token },
-        body: JSON.stringify({
-          content,
-          to_user_id: target,
-          msg_id: rawContent.server_message_id,
-          conversation_id: rawContent.conversation_short_id,
-          scene: rawEvent.event
-        })
-      });
-      const result: any = await response.json();
-
-      if (!response.ok || isDouyinFailure(result)) {
-        throw new Error(result?.err_msg ?? result?.message ?? '发送抖音私信失败');
-      }
-      consume([createResult(ResultCode.Ok, data.action, result)]);
-    } catch (error: any) {
-      consume([createResult(ResultCode.Fail, error?.message ?? error, null)]);
+    if (!conversationId || (!message.text && !message.segments.length)) {
+      return consume([createResult(ResultCode.FailParams, '抖音发送需要入站会话上下文和非空消息', null)]);
     }
+    if (socket?.readyState !== WebSocket.OPEN) {
+      return consume([createResult(ResultCode.Fail, '抖音桌面 IM 网关未连接', null)]);
+    }
+    const id = `${Date.now()}-${++requestId}`;
+    const timer = setTimeout(() => {
+      pending.delete(id);
+      consume([createResult(ResultCode.Fail, '抖音桌面 IM 网关发送超时', null)]);
+    }, 15_000);
+
+    pending.set(id, (ack: any) => {
+      clearTimeout(timer);
+      consume([createResult(ack.ok === false ? ResultCode.Fail : ResultCode.Ok, ack.error ?? data.action, ack)]);
+    });
+    const frame = JSON.stringify({
+      type: 'send',
+      request_id: id,
+      target: { conversation_id: conversationId, conversation_short_id: event?.conversation_short_id, conversation_type: event?.conversation_type },
+      message
+    });
+
+    if (Buffer.byteLength(frame) > maxGatewayFrameBytes) {
+      pending.delete(id);
+      clearTimeout(timer);
+
+      return consume([createResult(ResultCode.FailParams, '抖音桌面 IM 网关消息超过 1 MiB 限制', null)]);
+    }
+    try {
+      socket.send(frame);
+    } catch (error: any) {
+      pending.delete(id);
+      clearTimeout(timer);
+      consume([createResult(ResultCode.Fail, error?.message ?? '抖音桌面 IM 网关发送失败', null)]);
+    }
+  });
+
+  const stop = () => {
+    stopped = true;
+    socket?.close();
   };
 
-  cbp.onactions((data: any, consume: any) => void onAction(data, consume));
-  process.once('SIGTERM', () => server.close());
-  process.once('SIGINT', () => server.close());
+  process.once('SIGTERM', stop);
+  process.once('SIGINT', stop);
 };
 
 export default definePlatform({ main, name: platform });

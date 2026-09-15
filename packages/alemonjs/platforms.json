@@ -12,6 +12,10 @@
     "login": "douyin"
   },
   {
+    "name": "@alemonjs/douyinbot",
+    "login": "douyinbot"
+  },
+  {
     "name": "@alemonjs/kook",
     "login": "kook"
   },

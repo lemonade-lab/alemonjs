@@ -1,0 +1,1 @@
+{ "compilerOptions": { "strict": false }, "include": ["src/**/*"], "extends": "lvyjs/tsconfig.json" }

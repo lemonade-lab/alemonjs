@@ -1,7 +1,7 @@
 {
-  "name": "@alemonjs/douyin",
-  "version": "2.1.0-rc.1",
-  "description": "抖音桌面端IM",
+  "name": "@alemonjs/douyinbot",
+  "version": "2.1.0-rc.0",
+  "description": "抖音开放平台 IM 机器人",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
@@ -10,9 +10,6 @@
   "scripts": {
     "build": "lvy build",
     "test": "yarn build && node --test tests/*.test.mjs"
-  },
-  "dependencies": {
-    "ws": "^8.18.1"
   },
   "peerDependencies": {
     "alemonjs": "^2.1.0-alpha.15"
@@ -26,15 +23,14 @@
   },
   "alemonjs": {
     "config-source": {
-      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/douyin/README.md",
-      "official": "https://www.douyin.com/",
-      "platform": "https://github.com/dmmdekkd/karin-plugin-adapter-douyin"
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/douyinbot/README.md",
+      "official": "https://developer.open-douyin.com/docs/resource/zh-CN/dop/develop/webhooks/summarize",
+      "platform": "https://developer.open-douyin.com/"
     }
   },
   "keywords": [
     "alemonjs",
-    "douyin",
-    "im"
+    "douyinbot"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

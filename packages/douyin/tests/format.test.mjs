@@ -1,20 +1,33 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { dataToDouyinContent } from '../lib/format.js';
+import { dataToBridgeMessage } from '../lib/format.js';
+import { parseGateway } from '../lib/gateway.js';
 
-test('serializes portable framework segments as a text IM payload', () => {
+test('serializes text and link to bridge message', () => {
   assert.deepEqual(
-    dataToDouyinContent([
+    dataToBridgeMessage([
       { type: 'Text', value: '你好' },
       { type: 'Link', value: '文档', options: { link: 'https://example.com' } }
-    ]),
-    {
-      msg_type: 1,
-      text: { content: '你好文档 (https://example.com)' }
-    }
+    ]).text,
+    '你好文档 (https://example.com)'
   );
 });
 
-test('omits unsupported segments when requested', () => {
-  assert.equal(dataToDouyinContent([{ type: 'Attachment', value: 'ignored' }], true).text.content, '');
+test('hides unsupported segments when requested', () => {
+  assert.equal(dataToBridgeMessage([{ type: 'Embed', value: 'ignored' }], true).text, '');
+});
+
+test('keeps media instructions for the bridge without forcing a text placeholder', () => {
+  assert.deepEqual(dataToBridgeMessage([{ type: 'ImageURL', value: 'https://example.com/image.png' }]), {
+    text: '',
+    segments: [{ type: 'image', url: 'https://example.com/image.png' }]
+  });
+});
+
+test('only permits authenticated encrypted remote gateways', () => {
+  assert.throws(() => parseGateway('ws://bridge.example.com', 'secret'), /wss/);
+  assert.throws(() => parseGateway('wss://bridge.example.com'), /token/);
+  assert.throws(() => parseGateway('wss://user:secret@bridge.example.com', 'secret'), /URL/);
+  assert.equal(parseGateway('wss://bridge.example.com', 'secret').protocol, 'wss:');
+  assert.equal(parseGateway('ws://127.0.0.1:17880').hostname, '127.0.0.1');
 });
