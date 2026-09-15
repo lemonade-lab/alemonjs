@@ -315,9 +315,17 @@ const main = () => {
 
       if (event.payload?.roomId) {
         let msg = event.payload.text;
+        let IsAtMe = false;
 
         try {
           msg = await event.mentionText();
+        } catch (e) {
+          console.log(e);
+        }
+        try {
+          const mentions = await event.mentionList();
+
+          IsAtMe = mentions.some(contact => String(contact.id) === botId);
         } catch (e) {
           console.log(e);
         }
@@ -340,6 +348,8 @@ const main = () => {
           UserAvatar: UserAvatar,
           IsMaster: masterKeys.includes(UserKey) || isMaster(UserId, platform),
           IsBot: false,
+          IsAtMe,
+          IsPrivate: false,
           // message
           MessageId: MessageId,
           MessageText: msg ?? '',
@@ -371,6 +381,8 @@ const main = () => {
           UserAvatar: UserAvatar,
           IsMaster: masterKeys.includes(UserKey) || isMaster(UserId, platform),
           IsBot: false,
+          IsAtMe: false,
+          IsPrivate: true,
           // message
           MessageId: MessageId,
           MessageText: txt ?? '',

@@ -1,9 +1,10 @@
-import { GuildInfo, Result, ResultCode, User, createResult, sendAction } from './common';
+import { EventKeys, Events, GuildInfo, Result, ResultCode, User, createResult, getEventOrThrow, sendAction } from './common';
 
 /**
  * 获取我相关的数据
+ * @param event 事件上下文；不传时使用当前事件上下文
  */
-export const useMe = () => {
+export const useMe = <T extends EventKeys>(event?: Events[T]) => {
   /**
    * 个人信息
    * @returns
@@ -29,16 +30,19 @@ export const useMe = () => {
   };
 
   /**
-   * @deprecated 试验性功能，暂不可用
-   * @param action
-   * @returns
+   * 当前消息是否 @ 了机器人。
+   *
+   * 平台适配器会在标准化事件时填充 `IsAtMe`；未提供该能力的平台或非消息事件返回 `false`。
    */
-  const isMentionMe = () => {
-    try {
-      return createResult(ResultCode.Warn, 'No bot information found', false);
-    } catch {
-      return createResult(ResultCode.Fail, 'Failed to get bot information', false);
-    }
+  const isAtMe = (targetEvent?: Events[T]): boolean => {
+    return Boolean(getEventOrThrow<T>(targetEvent ?? event).IsAtMe);
+  };
+
+  /**
+   * @deprecated 请使用 isAtMe。该方法保留原有 Result 返回结构。
+   */
+  const isMentionMe = (targetEvent?: Events[T]): Result<boolean> => {
+    return createResult(ResultCode.Ok, 'Successfully checked whether the bot was mentioned', isAtMe(targetEvent));
   };
 
   /**
@@ -110,6 +114,7 @@ export const useMe = () => {
 
   const control = {
     info,
+    isAtMe,
     isMentionMe,
     guilds,
     threads,

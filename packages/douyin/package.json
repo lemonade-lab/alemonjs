@@ -1,0 +1,39 @@
+{
+  "name": "@alemonjs/douyin",
+  "version": "2.1.0-rc.0",
+  "description": "抖音IM",
+  "author": "lemonade",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib",
+  "scripts": {
+    "build": "lvy build",
+    "test": "yarn build && node --test tests/*.test.mjs"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0-alpha.15"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./package": "./package.json"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/douyin/README.md",
+      "official": "https://developer.open-douyin.com/docs/resource/zh-CN/dop/develop/webhooks/summarize",
+      "platform": "https://developer.open-douyin.com/"
+    }
+  },
+  "keywords": [
+    "alemonjs",
+    "douyin"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}

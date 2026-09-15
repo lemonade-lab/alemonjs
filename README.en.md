@@ -118,6 +118,16 @@ export default defineChildren({
 | `useHistory` / `useMedia` / `useRequest` | History, media, and request handling |
 | `useClient` / `useMe` / `useEvent` | Client access, current bot state, and event context |
 
+Use `useMe().isAtMe()` to check whether the current message mentioned the bot:
+
+```ts
+const [me] = useMe();
+
+if (me.isAtMe()) {
+  // Handle a message that mentioned the bot.
+}
+```
+
 ### Message Formatting
 
 ```ts

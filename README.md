@@ -118,6 +118,16 @@ export default defineChildren({
 | `useHistory` / `useMedia` / `useRequest` | 历史消息、媒体、请求处理              |
 | `useClient` / `useMe` / `useEvent`       | 客户端、当前机器人、事件上下文        |
 
+`useMe().isAtMe()` 可用于判断当前消息是否 @ 了机器人：
+
+```ts
+const [me] = useMe();
+
+if (me.isAtMe()) {
+  // 处理 @ 机器人的消息
+}
+```
+
 ### Message Formatting
 
 ```ts

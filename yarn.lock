@@ -4311,6 +4311,15 @@
   resolved "https://registry.npmjs.org/@vue/shared/-/shared-3.5.32.tgz#dd8ba0d709bf3f758c324a81c8897bad5e1540cf"
   integrity sha512-ksNyrmRQzWJJ8n3cRDuSF7zNNontuJg1YHnmWRJd2AMu8Ij2bqwiiri2lH5rHtYPZjj4STkNcgcmiQqlOjiYGg==
 
+"@wecom/aibot-node-sdk@^1.0.7":
+  version "1.0.7"
+  resolved "https://registry.npmmirror.com/@wecom/aibot-node-sdk/-/aibot-node-sdk-1.0.7.tgz#be98b177d5b7ff7af16edb8be2c1c3783d605f59"
+  integrity sha512-51w+sTqunry6GD3HFvmuh0gArMSJDFE418vyvR1wMJHj1N6DaFuGD3HuaY2fazZs3mb9FWeQFX3+vU5t0Qhwmw==
+  dependencies:
+    axios "^1.6.7"
+    eventemitter3 "^5.0.1"
+    ws "^8.16.0"
+
 "@yarnpkg/lockfile@1.1.0":
   version "1.1.0"
   resolved "https://registry.npmmirror.com/@yarnpkg/lockfile/-/lockfile-1.1.0.tgz#e77a97fbd345b76d83245edcd17d393b1b41fb31"
@@ -4841,6 +4850,16 @@ axios@^1.14.0, axios@^1.4.0:
   dependencies:
     follow-redirects "^1.15.11"
     form-data "^4.0.5"
+    proxy-from-env "^2.1.0"
+
+axios@^1.6.7:
+  version "1.20.0"
+  resolved "https://registry.npmmirror.com/axios/-/axios-1.20.0.tgz#515513445aa60e71d04b6521ca6210829ccb4786"
+  integrity sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==
+  dependencies:
+    follow-redirects "^1.16.0"
+    form-data "^4.0.6"
+    https-proxy-agent "^5.0.1"
     proxy-from-env "^2.1.0"
 
 babel-jest@^29.7.0:
@@ -6765,6 +6784,11 @@ eventemitter3@^4.0.4:
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
+eventemitter3@^5.0.1:
+  version "5.0.4"
+  resolved "https://registry.npmmirror.com/eventemitter3/-/eventemitter3-5.0.4.tgz#a86d66170433712dde814707ac52b5271ceb1feb"
+  integrity sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==
+
 events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
@@ -7085,7 +7109,7 @@ form-data-encoder@^2.1.2:
   resolved "https://registry.npmjs.org/form-data-encoder/-/form-data-encoder-2.1.4.tgz#261ea35d2a70d48d30ec7a9603130fa5515e9cd5"
   integrity sha512-yDYSgNMraqvnxiEXO4hi88+YZxaHC6QKzb5N84iRCTDeRO7ZALpir/lVmf/uXUhnwUr2O4HU8s/n6x+yNjQkHw==
 
-form-data@4.0.6:
+form-data@4.0.6, form-data@^4.0.6:
   version "4.0.6"
   resolved "https://registry.npmmirror.com/form-data/-/form-data-4.0.6.tgz#28e864e1b786dbebb68db1f452f9635278665827"
   integrity sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==
@@ -14879,7 +14903,7 @@ ws@^8.13.0, ws@^8.18.0, ws@^8.18.1:
   resolved "https://registry.npmjs.org/ws/-/ws-8.20.0.tgz#4cd9532358eba60bc863aad1623dfb045a4d4af8"
   integrity sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==
 
-ws@^8.5.0:
+ws@^8.16.0, ws@^8.5.0:
   version "8.21.3"
   resolved "https://registry.npmmirror.com/ws/-/ws-8.21.3.tgz#660b4faddb6a3e575c86e078126919961f4de4fc"
   integrity sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw==
