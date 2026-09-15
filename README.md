@@ -160,15 +160,19 @@ export default () => {
 
 ### Platform Adapters
 
-| Package                                                                  | Description |
-| ------------------------------------------------------------------------ | ----------- |
-| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)     | QQBot       |
-| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)   | Discord     |
-| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)         | KOOK        |
-| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram) | Telegram    |
-| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)     | Bubble      |
-| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)     | OneBot      |
-| [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)     | Wechat      |
+| Package                                                                              | Description |
+| ------------------------------------------------------------------------------------ | ----------- |
+| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)                 | QQBot       |
+| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)               | Discord     |
+| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)                     | KOOK        |
+| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram)             | Telegram    |
+| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)                 | Bubble      |
+| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)                 | OneBot      |
+| [`@alemonjs/milky`](https://www.npmjs.com/package/@alemonjs/milky)                   | Milky       |
+| [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)                 | 微信        |
+| [`@alemonjs/wechat-clawbot`](https://www.npmjs.com/package/@alemonjs/wechat-clawbot) | 个人微信    |
+| [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                   | 企业微信    |
+| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | 抖音 IM     |
 
 ### Extensions
 

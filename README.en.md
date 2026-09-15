@@ -108,15 +108,15 @@ export default defineChildren({
 
 ### Hook System
 
-| Hook | Purpose |
-| --- | --- |
-| `useMessage` | Send text, image, button, and markdown messages |
-| `useMention` | Read and filter mentions |
-| `useSubscribe` | Handle cross-stage subscriptions and replies |
-| `useChannel` / `useGuild` / `useMember` | Channel, guild, and member operations |
-| `usePermission` / `useRole` / `useUser` | Permission, role, and user access |
-| `useHistory` / `useMedia` / `useRequest` | History, media, and request handling |
-| `useClient` / `useMe` / `useEvent` | Client access, current bot state, and event context |
+| Hook                                     | Purpose                                             |
+| ---------------------------------------- | --------------------------------------------------- |
+| `useMessage`                             | Send text, image, button, and markdown messages     |
+| `useMention`                             | Read and filter mentions                            |
+| `useSubscribe`                           | Handle cross-stage subscriptions and replies        |
+| `useChannel` / `useGuild` / `useMember`  | Channel, guild, and member operations               |
+| `usePermission` / `useRole` / `useUser`  | Permission, role, and user access                   |
+| `useHistory` / `useMedia` / `useRequest` | History, media, and request handling                |
+| `useClient` / `useMe` / `useEvent`       | Client access, current bot state, and event context |
 
 Use `useMe().isAtMe()` to check whether the current message mentioned the bot:
 
@@ -162,31 +162,37 @@ Supports text, images, button groups, markdown, mentions, links, attachments, au
 
 ### Platform Adapters
 
-| Package | Description |
-| --- | --- |
-| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot) | QQ bot adapter |
-| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord) | Discord adapter |
-| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot) | OneBot adapter |
-| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook) | KOOK adapter |
-| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram) | Telegram adapter |
-| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble) | Bubble adapter |
+| Package                                                                              | Description   |
+| ------------------------------------------------------------------------------------ | ------------- |
+| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)                 | QQ bot        |
+| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)               | Discord       |
+| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)                 | OneBot        |
+| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)                     | KOOK          |
+| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram)             | Telegram      |
+| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)                 | Bubble        |
+| [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                   | WeCom AI bot  |
+| [`@alemonjs/milky`](https://www.npmjs.com/package/@alemonjs/milky)                   | Milky         |
+| [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)                 | Wechaty       |
+| [`@alemonjs/wechat-clawbot`](https://www.npmjs.com/package/@alemonjs/wechat-clawbot) | WechatClawBot |
+| [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                   | WeCom         |
+| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | Douyin IM     |
 
 ### Extensions
 
-| Package | Description |
-| --- | --- |
-| [`@alemonjs/db`](https://www.npmjs.com/package/@alemonjs/db) | Database integration |
+| Package                                                                | Description                   |
+| ---------------------------------------------------------------------- | ----------------------------- |
+| [`@alemonjs/db`](https://www.npmjs.com/package/@alemonjs/db)           | Database integration          |
 | [`@alemonjs/process`](https://www.npmjs.com/package/@alemonjs/process) | Desktop process communication |
-| [`create-alemonjs`](https://www.npmjs.com/package/create-alemonjs) | Project scaffold |
+| [`create-alemonjs`](https://www.npmjs.com/package/create-alemonjs)     | Project scaffold              |
 
 ## Ecosystem
 
-| Project | Description |
-| --- | --- |
+| Project                                                                   | Description                  |
+| ------------------------------------------------------------------------- | ---------------------------- |
 | [`lvyjs`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/lvyjs) | Node.js tooling and bundling |
-| [`jsxp`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/jsxp) | Screenshot tooling |
-| [`alemondesk`](https://github.com/lemonade-lab/alemondesk) | Desktop product |
-| [`alemongo`](https://github.com/lemonade-lab/alemongo) | Server product |
+| [`jsxp`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/jsxp)   | Screenshot tooling           |
+| [`alemondesk`](https://github.com/lemonade-lab/alemondesk)                | Desktop product              |
+| [`alemongo`](https://github.com/lemonade-lab/alemongo)                    | Server product               |
 
 ## Monorepo Layout
 

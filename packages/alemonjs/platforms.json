@@ -1,0 +1,46 @@
+[
+  {
+    "name": "@alemonjs/bubble",
+    "login": "bubble"
+  },
+  {
+    "name": "@alemonjs/discord",
+    "login": "discord"
+  },
+  {
+    "name": "@alemonjs/douyin",
+    "login": "douyin"
+  },
+  {
+    "name": "@alemonjs/kook",
+    "login": "kook"
+  },
+  {
+    "name": "@alemonjs/milky",
+    "login": "milky"
+  },
+  {
+    "name": "@alemonjs/onebot",
+    "login": "onebot"
+  },
+  {
+    "name": "@alemonjs/qq-bot",
+    "login": "qq-bot"
+  },
+  {
+    "name": "@alemonjs/telegram",
+    "login": "telegram"
+  },
+  {
+    "name": "@alemonjs/wechat",
+    "login": "wechat"
+  },
+  {
+    "name": "@alemonjs/wechat-clawbot",
+    "login": "wechat-clawbot"
+  },
+  {
+    "name": "@alemonjs/wecom",
+    "login": "wecom"
+  }
+]
