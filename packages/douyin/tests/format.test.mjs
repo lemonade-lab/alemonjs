@@ -24,6 +24,13 @@ test('keeps media instructions for the bridge without forcing a text placeholder
   });
 });
 
+test('preserves the user ID for a native mention when it is available', () => {
+  assert.deepEqual(dataToBridgeMessage([{ type: 'Mention', value: '小明', options: { payload: { UserId: '123456' } } }]), {
+    text: '@小明',
+    segments: [{ type: 'mention', text: '@小明', user_id: '123456' }]
+  });
+});
+
 test('only permits authenticated encrypted remote gateways', () => {
   assert.throws(() => parseGateway('ws://bridge.example.com', 'secret'), /wss/);
   assert.throws(() => parseGateway('wss://bridge.example.com'), /token/);

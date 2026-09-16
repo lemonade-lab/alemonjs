@@ -1,23 +1,38 @@
 {
   "name": "@alemonjs/douyin",
-  "version": "2.1.0-rc.1",
+  "version": "2.1.0-rc.2",
   "description": "抖音桌面端IM",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib",
+  "files": [
+    "lib",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "build": "lvy build",
     "test": "yarn build && node --test tests/*.test.mjs"
   },
   "dependencies": {
+    "protobufjs": "^7.5.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "ws": "^8.18.1"
   },
   "peerDependencies": {
     "alemonjs": "^2.1.0-alpha.15"
   },
   "exports": {
+    "./sdk": {
+      "types": "./lib/sdk/index.d.ts",
+      "import": "./lib/sdk/index.js"
+    },
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"

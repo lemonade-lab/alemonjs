@@ -1,19 +1,24 @@
-import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
+import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs/common';
 
 export const platform = 'douyin';
 export const platformFullName = '@alemonjs/douyin';
 
 /**
- * The bridge owns the user's already-authorized desktop session. It must never
- * expose that session through the CBP socket or through event payloads.
+ * Direct SDK mode owns persisted sessions; an explicit gateway owns its own
+ * authorization. Neither mode may expose credentials through CBP events.
  */
 export type Options = {
   /** Local or private WebSocket bridge which speaks the protocol in README.md. */
-  gateway: string;
+  gateway?: string;
   /** Optional bearer token shared with the bridge. */
   token?: string;
   /** The logged-in Douyin account ID, used as the bot ID in Alemon events. */
-  bot_id: string;
+  bot_id?: string;
+  /** Direct SDK account storage; no gateway required. */
+  accounts_dir?: string;
+  disabled_accounts?: string[];
+  /** Start QR login if no saved accounts exist. Default true. */
+  login_qrcode?: boolean;
   reconnect_interval?: number;
   master_key?: string[];
   master_id?: string[];

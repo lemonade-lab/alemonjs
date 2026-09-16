@@ -1,6 +1,13 @@
 import type { DataEnums } from 'alemonjs';
 
-export type BridgeSegment = { type: string; text?: string; url?: string; name?: string };
+export type BridgeSegment = {
+  type: string;
+  text?: string;
+  /** Numeric Douyin UID when a mention can be represented as a real mention. */
+  user_id?: string;
+  url?: string;
+  name?: string;
+};
 
 /** Preserve framework segments for a trusted local bridge while offering a portable text fallback. */
 export const dataToBridgeMessage = (format: DataEnums[] = [], hideUnsupported?: boolean | number) => {
@@ -23,10 +30,12 @@ export const dataToBridgeMessage = (format: DataEnums[] = [], hideUnsupported?: 
       continue;
     }
     if (item.type === 'Mention') {
-      const value = `@${item.value}`;
+      const payload = item.options?.payload as { UserId?: string } | undefined;
+      const userId = payload?.UserId;
+      const value = `@${item.value ?? userId ?? '未知用户'}`;
 
       text += value;
-      segments.push({ type: 'mention', text: value });
+      segments.push({ type: 'mention', text: value, ...(userId ? { user_id: String(userId) } : {}) });
       continue;
     }
     if (item.type === 'Link') {
