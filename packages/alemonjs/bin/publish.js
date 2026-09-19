@@ -364,9 +364,21 @@ export async function publish(release, options = {}) {
 
   ensureGitRepo();
 
-  const releaseBranch = options.branch || 'release';
-  const remoteVersion = getLatestReleaseVersion();
-  if (remoteVersion) {
+  const sourceBranch = getCommandOutput('git branch --show-current');
+  if (!sourceBranch) {
+    throw new Error('当前处于 detached HEAD，请先切换到源码分支再发布');
+  }
+  const shouldTag = sourceBranch === 'main' || sourceBranch === 'master';
+  const releaseBranch = options.branch || (shouldTag ? 'release' : `release-${sourceBranch}`);
+  runCommand('git', ['check-ref-format', '--branch', releaseBranch]);
+  if (releaseBranch === sourceBranch) {
+    throw new Error('发布目标分支不能与源码分支相同');
+  }
+  console.log(`源码分支: ${sourceBranch}`);
+  const remoteVersion = shouldTag ? getLatestReleaseVersion() : '';
+  if (!shouldTag) {
+    console.log('非主分支：以本地版本为基线，不读取或创建 git tag');
+  } else if (remoteVersion) {
     console.log(`最新 git tag: v${remoteVersion}`);
   } else {
     console.log('最新 git tag: 无，将按首次发布处理');
@@ -381,7 +393,7 @@ export async function publish(release, options = {}) {
   const gitTagName = `v${targetVersion}`;
   console.log(`目标版本: ${targetVersion}`);
   console.log(`发布分支: ${releaseBranch}`);
-  console.log(`git 标签: ${gitTagName}`);
+  console.log(`git 标签: ${shouldTag ? gitTagName : '不创建'}`);
 
   if (targetVersion !== localVersion) {
     updateVersion(pkgPath, pkg, targetVersion);
@@ -434,12 +446,14 @@ export async function publish(release, options = {}) {
       console.log('release 分支无文件变化，跳过提交');
     } else {
       runCommand('git', ['-C', worktreeDir, 'commit', '-m', `release: ${gitTagName}`]);
-      runCommand('git', ['-C', worktreeDir, 'push', 'origin', `HEAD:${releaseBranch}`]);
-      console.log(`已推送到分支: ${releaseBranch}`);
     }
+    runCommand('git', ['-C', worktreeDir, 'push', 'origin', `HEAD:refs/heads/${releaseBranch}`]);
+    console.log(`已推送到分支: ${releaseBranch}`);
 
-    runCommand('git', ['-C', worktreeDir, 'tag', '-f', gitTagName]);
-    runCommand('git', ['-C', worktreeDir, 'push', 'origin', gitTagName, '--force']);
+    if (shouldTag) {
+      runCommand('git', ['-C', worktreeDir, 'tag', '-f', gitTagName]);
+      runCommand('git', ['-C', worktreeDir, 'push', 'origin', `refs/tags/${gitTagName}`, '--force']);
+    }
     console.log(`发布完成: ${packageName}@${targetVersion}`);
   } catch (error) {
     if (targetVersion !== localVersion) {
@@ -454,7 +468,7 @@ export async function publish(release, options = {}) {
     cleanupWorktree(worktreeDir);
   }
 
-  if (options.gitChecks !== false && isGitRepo()) {
+  if (options.gitChecks !== false && targetVersion !== localVersion && isGitRepo()) {
     runCommand('git', ['add', 'package.json']);
     runCommand('git', ['commit', '-m', `release: ${gitTagName}`]);
     console.log(`已记录源码版本变更: ${gitTagName}`);

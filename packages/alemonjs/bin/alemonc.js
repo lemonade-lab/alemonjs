@@ -84,9 +84,9 @@ program
 
 program
   .command('publish [release]')
-  .description('智能发布当前包到 git release 仓库，支持 patch/minor/major 或直接指定版本号')
+  .description('按当前源码分支发布构建产物，主分支打 tag，其他分支只更新产物分支')
   .option('--preid <preid>', '预发布标识，仅允许 alpha/beta/rc/next', 'beta')
-  .option('--branch <branch>', '发布目标分支，默认 release')
+  .option('--branch <branch>', '覆盖产物目标分支，默认主分支为 release，其他为 release-源码分支名；不改变打 tag 规则')
   .option('--dry-run', '只执行检查和打包，不真正发布')
   .option('--skip-build', '跳过构建')
   .option('--no-git-checks', '跳过 git 干净工作区检查及发布后自动提交源码版本')

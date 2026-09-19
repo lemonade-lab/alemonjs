@@ -110,24 +110,45 @@ alemonc publish v1.0.33-rc.0
 alemonc publish --dry-run
 ```
 
-行为说明：
+源码分支与产物分支：
 
-- 默认会查询 git tag 历史作为版本基线
+| 当前源码分支      | 默认产物分支            | git tag                |
+| ----------------- | ----------------------- | ---------------------- |
+| `main` / `master` | `release`               | 创建并推送 `v<版本号>` |
+| `develop`         | `release-develop`       | 不创建、不推送         |
+| `feature/login`   | `release-feature/login` | 不创建、不推送         |
+
+命令始终构建当前检出的源码分支，保留分支名中的 `/`。detached HEAD 状态下需先切换到源码分支。
+`--branch <branch>` 可以覆盖产物目标分支，但不能与当前源码分支相同；是否打 tag 仍由源码分支决定。
+
+```sh
+# 在 develop 分支：发布到 release-develop，保持本地版本，不打 tag
+alemonc publish
+# 在 develop 分支：递增本地版本，发布到 release-develop，不打 tag
+alemonc publish prepatch --preid beta
+# 在 main 分支：发布到 release，并创建版本 tag
+alemonc publish patch
+```
+
+版本与打包行为：
+
+- 只有主分支（`main` / `master`）查询 git tag 历史作为版本基线；其他分支只使用本地 `package.json.version`
 - 版本格式严格为：
   - 正式版：`v1.0.33`
   - 预发布版：`v1.0.33-alpha.0`、`v1.0.33-beta.0`、`v1.0.33-rc.0`、`v1.0.33-next.0`
 - `package.json.version` 保存为不带 `v` 的形式，如 `1.0.33`、`1.0.33-beta.0`
 - 不传参数时：
-  - 如果本地版本高于最新 tag，直接发布本地版本
-  - 否则自动按最新 tag `patch +1`
+  - 主分支：没有 tag 或本地版本高于最新 tag 时，直接发布本地版本；否则按最新 tag `patch +1`
+  - 其他分支：直接发布本地版本，不自动递增，可重复发布更新产物
 - 传 `patch/minor/major/prepatch/preminor/premajor/prerelease` 时会自动递增
 - 传具体版本号时可写 `v1.0.33` 或 `1.0.33`
 - `--preid` 仅允许 `alpha`、`beta`、`rc`、`next`
 - 默认先执行 `npm run build`
 - 默认发布内容是 `lib/`、`package.json`、`README.md`
 - 如果项目配置了 `.npmignore` 或 `package.json.files`，则切换为 npm 文件选择规则
-- 最终把产物提交到 git `release` 分支，并推送对应 tag
-- 默认要求 git 工作区干净，发布成功后会自动提交源码中的 `package.json` 版本变更
+- 最终把产物提交并推送到对应的产物分支；仅主分支创建并推送 tag
+- 默认要求 git 工作区干净，发布成功后仅在版本变化时自动提交当前源码分支中的 `package.json`
+- `--dry-run` 执行构建和文件选择，不推送分支或创建 tag，并恢复本地版本号
 
 ---
 
