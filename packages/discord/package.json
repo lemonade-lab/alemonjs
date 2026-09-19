@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/discord",
-  "version": "2.1.25",
+  "version": "2.1.26",
   "description": "DC官方平台",
   "author": "lemonade",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "@types/qrcode": "^1.5.5"
   },
   "peerDependencies": {
-    "alemonjs": "^2.1.0-alpha.15"
+    "alemonjs": "^2.1.108"
   },
   "alemonjs": {
     "config-source": {

@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import { getKOOKConfig, getMaster } from './config.js';
 import { getBufferByURL } from 'alemonjs/utils';
 import { platform } from './config.js';
-import { dataEnumToKMarkdown } from './format';
+import { formatKookContent } from './format';
 
 export * from './hook.js';
 
@@ -352,74 +352,6 @@ const main = () => {
   });
 
   /**
-   * 将 DataEnums 中的 Mention/Text 转为 KOOK KMarkdown 格式文本
-   */
-  const formatKookContent = (val: DataEnums[]): string => {
-    // 已原生支持的类型
-    const nativeItems = val.filter(item => item.type === 'Mention' || item.type === 'Text' || item.type === 'Link');
-    // 未原生支持的类型（排除图片类，图片单独处理）
-    const unsupportedItems = val.filter(
-      item =>
-        item.type !== 'Mention' &&
-        item.type !== 'Text' &&
-        item.type !== 'Link' &&
-        item.type !== 'Image' &&
-        item.type !== 'ImageURL' &&
-        item.type !== 'ImageFile'
-    );
-
-    const nativeText = nativeItems
-      .map(item => {
-        if (item.type === 'Link') {
-          return `[${item.value}](${item?.options?.link ?? item.value})`;
-        } else if (item.type === 'Mention') {
-          if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
-            return '(met)all(met)';
-          }
-          if (item.options?.belong === 'user') {
-            return `(met)${item.value}(met)`;
-          } else if (item.options?.belong === 'channel') {
-            return `(chn)${item.value}(chn)`;
-          }
-
-          return '';
-        } else if (item.type === 'Text') {
-          if (item.options?.style === 'block') {
-            return `\`${item.value}\``;
-          } else if (item.options?.style === 'italic') {
-            return `*${item.value}*`;
-          } else if (item.options?.style === 'bold') {
-            return `**${item.value}**`;
-          } else if (item.options?.style === 'strikethrough') {
-            return `~~${item.value}~~`;
-          } else if (item.options?.style === 'boldItalic') {
-            return `***${item.value}***`;
-          }
-
-          return item.value;
-        }
-
-        return '';
-      })
-      .join('');
-
-    // 降级处理：将 Markdown、Ark、Button 等不支持的类型转为 KMarkdown
-    const hide = getKOOKConfig().hideUnsupported;
-    const fallbackText =
-      unsupportedItems.length > 0
-        ? unsupportedItems
-            .map(item => dataEnumToKMarkdown(item, hide))
-            .filter(Boolean)
-            .join('')
-        : '';
-
-    return [nativeText, fallbackText]
-      .filter(Boolean)
-      .join('')
-      .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
-  };
-
-  /**
    * 解析 Image/ImageURL/ImageFile 为 Buffer
    */
   const resolveImageBuffer = async (val: DataEnums[]): Promise<Buffer | null> => {
@@ -479,7 +411,7 @@ const main = () => {
     if (!val || val.length <= 0) {
       return [];
     }
-    const content = formatKookContent(val);
+    const content = formatKookContent(val, getKOOKConfig().hideUnsupported);
 
     try {
       const imageUrl = await uploadAndGetImageUrl(val);
@@ -543,7 +475,7 @@ const main = () => {
     if (!val || val.length <= 0) {
       return [];
     }
-    const content = formatKookContent(val);
+    const content = formatKookContent(val, getKOOKConfig().hideUnsupported);
 
     try {
       const imageUrl = await uploadAndGetImageUrl(val);
@@ -739,9 +671,8 @@ const main = () => {
         consume([res]);
       } else if (data.action === 'message.edit') {
         const messageId = data.payload.MessageId;
-        // 简单取文本内容
         const format = data.payload.params?.format;
-        const content = format?.map(i => i.value).join('') ?? '';
+        const content = formatKookContent(format ?? [], getKOOKConfig().hideUnsupported);
         const res = await client
           .messageUpdate({ msg_id: messageId, content })
           .then(r => createResult(ResultCode.Ok, data.action, r))

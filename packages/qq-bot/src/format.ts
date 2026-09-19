@@ -1,4 +1,38 @@
+import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 import type { DataEnums, DataMarkDown } from 'alemonjs';
+
+/** 群聊、私聊和频道共用有序正文；提及等原生文本由发送上下文提供。 */
+export const formatQQContent = (items: DataEnums[], renderNative: (item: DataEnums) => string, plain = false, hideUnsupported?: boolean | number): string => {
+  return items
+    .map(item => {
+      if (item.type === 'Markdown') {
+        return plain ? markdownToText(item.value, hideUnsupported) : createMarkdownText(item.value);
+      }
+      if (item.type === 'MarkdownOriginal') {
+        const text = plain ? markdownRawToText(item.value, hideUnsupported) : item.value;
+        return text ? `\n\n${text}\n\n` : '';
+      }
+      if (item.type === 'BT.group') {
+        if (!plain || Number(hideUnsupported) >= 4) return '';
+        const text = item.value
+          .map(row =>
+            row.value
+              .map(button => {
+                if (Number(hideUnsupported) >= 3) return '';
+                if (Number(hideUnsupported) >= 2) return button.options?.data || button.value;
+                return hideUnsupported ? button.value : `[${button.value}]`;
+              })
+              .filter(Boolean)
+              .join(' ')
+          )
+          .filter(Boolean)
+          .join('\n');
+        return text ? `\n\n${text}\n\n` : '';
+      }
+      return renderNative(item);
+    })
+    .join('');
+};
 
 /**
  * 将结构化 Markdown 子元素数组转为可读纯文本
@@ -8,8 +42,9 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
     return '';
   }
 
-  return items
-    .map(item => {
+  return joinMarkdownParts(
+    items,
+    items.map(item => {
       switch (item.type) {
         case 'MD.text':
           return item.value;
@@ -23,10 +58,14 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
         case 'MD.strikethrough':
           return item.value;
         case 'MD.link': {
-          const v = item.value as unknown as { text: string; url: string };
+          const v = item.value as unknown as { text: string; url?: string };
 
           if (Number(hideUnsupported) >= 3) {
             return '';
+          }
+
+          if (!v.url) {
+            return v.text;
           }
 
           return Number(hideUnsupported) >= 2 ? v.url : `${v.text}( ${v.url} )`;
@@ -46,7 +85,7 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
               .join('\n') + '\n'
           );
         case 'MD.blockquote':
-          return `> ${item.value}\n`;
+          return renderMarkdownBlockquote(item.value, children => markdownToText(children, hideUnsupported));
         case 'MD.divider':
           return hideUnsupported ? '' : '————————\n';
         case 'MD.newline':
@@ -74,7 +113,7 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
           return String((item as any)?.value ?? '');
       }
     })
-    .join('');
+  );
 };
 
 /**
@@ -157,4 +196,79 @@ export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean | numb
     default:
       return '';
   }
+};
+
+const mdFormatters: Record<string, (value: any, options?: any) => string> = {
+  'MD.title': value => `# ${value} `,
+  'MD.subtitle': value => `## ${value} `,
+  'MD.text': value => `${value} `,
+  'MD.bold': value => `**${value}** `,
+  'MD.divider': () => '\n***\n',
+  'MD.italic': value => `__${value}__ `,
+  'MD.italicStar': value => `*${value}* `,
+  'MD.strikethrough': value => `~~${value}~~ `,
+  'MD.blockquote': value => renderMarkdownBlockquote(value, createMarkdownText),
+  'MD.newline': () => '\n',
+  'MD.link': value => {
+    if (!value?.text && !value?.url) {
+      return '';
+    }
+    if (!value?.text || !value?.url) {
+      return `<${value?.url ?? value?.text}> `;
+    }
+
+    return `[🔗${value?.text}](${value?.url}) `;
+  },
+  'MD.image': (value, options) => `\n![text #${options?.width || 208}px #${options?.height || 320}px](${value})\n`,
+  'MD.mention': (value, options) => {
+    const { belong } = options || {};
+
+    if (belong === 'channel') {
+      return '';
+    }
+    if (value === 'everyone') {
+      return '<qqbot-at-everyone />';
+    }
+    if (belong === 'user') {
+      return `<qqbot-at-user id="${value}" />`;
+    }
+
+    return `<qqbot-at-user id="${value}" />`;
+  },
+  'MD.content': value => `${value}`,
+  'MD.button': (title, options) => {
+    // 得到要发送的文本
+    const { data, autoEnter } = options || {};
+
+    if (autoEnter) {
+      return `<qqbot-cmd-enter text="${data}" show="${title}" />`;
+    }
+
+    return `<qqbot-cmd-input text="${data}" show="${title}" />`;
+  }
+};
+
+export const createMarkdownText = (data: DataMarkDown['value']): string => {
+  return joinMarkdownParts(
+    data,
+    data.map(mdItem => {
+      if (mdFormatters[mdItem.type]) {
+        return mdFormatters[mdItem.type]((mdItem as any)?.value, (mdItem as any)?.options);
+      }
+      if (mdItem.type === 'MD.list' && typeof mdItem.value !== 'string') {
+        const listStr = mdItem.value.map(listItem => {
+          return typeof listItem.value === 'object' ? `\n${listItem.value.index}. ${listItem.value.text}` : `\n- ${listItem.value}`;
+        });
+
+        return `${listStr.join('')}\n`;
+      }
+      if (mdItem.type === 'MD.code') {
+        const language = mdItem?.options?.language || '';
+
+        return `\n\`\`\`${language}\n${mdItem.value}\n\`\`\`\n`;
+      }
+
+      return String(mdItem['value'] || '');
+    })
+  );
 };

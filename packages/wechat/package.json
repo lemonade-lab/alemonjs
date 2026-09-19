@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/wechat",
-  "version": "2.1.0-rc.1",
+  "version": "2.1.0-rc.2",
   "description": "微信（Wechaty）",
   "author": "lemonade",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "@juzi/wechaty": "^1.0.165"
   },
   "peerDependencies": {
-    "alemonjs": "^2.1.0-alpha.15"
+    "alemonjs": "^2.1.108"
   },
   "exports": {
     ".": {

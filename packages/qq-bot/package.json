@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "2.1.35",
+  "version": "2.1.36",
   "description": "QQ官方平台",
   "author": "lemonade",
   "license": "MIT",
@@ -30,7 +30,7 @@
     "yaml": "^2.5.1"
   },
   "peerDependencies": {
-    "alemonjs": "^2.1.0-alpha.15"
+    "alemonjs": "^2.1.108"
   },
   "types": "lib",
   "exports": {

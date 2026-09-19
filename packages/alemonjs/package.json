@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.1.107",
+  "version": "2.1.108",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -12,6 +12,11 @@
   "types": "lib",
   "exports": {
     "./package": "./package.json",
+    "./markdown": {
+      "types": "./lib/application/format/markdown-render.d.ts",
+      "import": "./lib/application/format/markdown-render.js",
+      "require": "./lib/application/format/markdown-render.js"
+    },
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts",

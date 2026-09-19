@@ -1,9 +1,9 @@
 import { readFileSync } from 'fs';
 import { QQBotAPI } from './sdk/api';
 import { FileType } from './sdk/typing';
-import { DataButtonRow, DataButtonGroup, ClientAPIMessageResult, createResult, DataMarkDown, DataMention, ResultCode, logger, type DataEnums } from 'alemonjs';
+import { DataButtonRow, DataButtonGroup, ClientAPIMessageResult, createResult, DataMention, ResultCode, logger, type DataEnums } from 'alemonjs';
 import axios from 'axios';
-import { dataEnumToText, markdownToText, buttonsToText } from './format';
+import { dataEnumToText, createMarkdownText, formatQQContent } from './format';
 import { getQQBotConfig } from './config';
 import type { DataArkBigCard, DataArkCard, DataArkList } from './types';
 
@@ -168,80 +168,6 @@ const createArkListData = (value: DataArkList['value']) => {
       }
     ]
   };
-};
-
-const mdFormatters: Record<string, (value: any, options?: any) => string> = {
-  'MD.title': value => `# ${value} `,
-  'MD.subtitle': value => `## ${value} `,
-  'MD.text': value => `${value} `,
-  'MD.bold': value => `**${value}** `,
-  'MD.divider': () => '\n***\n',
-  'MD.italic': value => `__${value}__ `,
-  'MD.italicStar': value => `*${value}* `,
-  'MD.strikethrough': value => `~~${value}~~ `,
-  'MD.blockquote': value => `\n> ${value} `,
-  'MD.newline': () => '\n',
-  'MD.link': value => {
-    if (!value?.text && !value?.url) {
-      return '';
-    }
-    if (!value?.text || !value?.url) {
-      return `<${value?.url ?? value?.text}> `;
-    }
-
-    return `[🔗${value?.text}](${value?.url}) `;
-  },
-  'MD.image': (value, options) => `\n![text #${options?.width || 208}px #${options?.height || 320}px](${value})\n`,
-  'MD.mention': (value, options) => {
-    const { belong } = options || {};
-
-    if (belong === 'channel') {
-      return '';
-    }
-    if (belong === 'user') {
-      return `<qqbot-at-user id="${value}" />`;
-    }
-    if (value === 'everyone') {
-      return '<qqbot-at-everyone />';
-    }
-
-    return `<qqbot-at-user id="${value}" />`;
-  },
-  'MD.content': value => `${value}`,
-  'MD.button': (title, options) => {
-    // 得到要发送的文本
-    const { data, autoEnter } = options || {};
-
-    if (autoEnter) {
-      return `<qqbot-cmd-enter text="${data}" show="${title}" />`;
-    }
-
-    return `<qqbot-cmd-input text="${data}" show="${title}" />`;
-  }
-};
-
-const createMarkdownText = (data: DataMarkDown['value']): string => {
-  return data
-    .map(mdItem => {
-      if (mdFormatters[mdItem.type]) {
-        return mdFormatters[mdItem.type]((mdItem as any)?.value, (mdItem as any)?.options);
-      }
-      if (mdItem.type === 'MD.list' && typeof mdItem.value !== 'string') {
-        const listStr = mdItem.value.map(listItem => {
-          return typeof listItem.value === 'object' ? `\n${listItem.value.index}. ${listItem.value.text}` : `\n- ${listItem.value}`;
-        });
-
-        return `${listStr.join('')}\n`;
-      }
-      if (mdItem.type === 'MD.code') {
-        const language = mdItem?.options?.language || '';
-
-        return `\n\`\`\`${language}\n${mdItem.value}\n\`\`\`\n`;
-      }
-
-      return String(mdItem['value'] || '');
-    })
-    .join('');
 };
 
 // ==================== 公共提取器 ====================
@@ -541,31 +467,7 @@ const stripMediaPlaceholders = (text: string): string =>
     .replace(/\[附件[^\]]*\]/g, '')
     .replace(/\[音频\]/g, '')
     .replace(/\[视频\]/g, '')
-    .replace(/\n{2,}/g, '\n')
     .trim();
-
-/** 当 markdownToText 选项开启时，将 Markdown 和按钮降级为纯文本并追加到 content */
-const flattenMdToText = (content: string, val: DataEnums[]): string => {
-  const mdItems = val.filter(item => item.type === 'Markdown');
-  const btnItems = val.filter(item => item.type === 'BT.group');
-  const parts: string[] = [content];
-
-  for (const item of mdItems) {
-    if (item.type === 'Markdown' && typeof item.value !== 'string') {
-      parts.push(markdownToText(item.value));
-    }
-  }
-  for (const item of btnItems) {
-    if (item.type === 'BT.group' && typeof item.value !== 'string') {
-      parts.push(buttonsToText(item.value as any));
-    }
-  }
-
-  return parts
-    .filter(Boolean)
-    .join('\n')
-    .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
-};
 
 /** Open API 通用发送逻辑（群组 / C2C） */
 const sendOpenApiMessage = async (
@@ -591,7 +493,7 @@ const sendOpenApiMessage = async (
     }
     // 富媒体消息(msg_type:7)无法携带原生 markdown 模板，始终将 MD/Buttons 降级为文本合入 content
     // 并移除已作为富媒体发送的占位符（[视频]/[音频]/[附件]）
-    const mediaContent = stripMediaPlaceholders(flattenMdToText(content, val));
+    const mediaContent = stripMediaPlaceholders(formatQQContent(val, item => extractContent([item], 'group'), true, config.hideUnsupported));
     const res = await sendMessage({
       content: mediaContent,
       media: { file_info: fileInfo },
@@ -611,7 +513,7 @@ const sendOpenApiMessage = async (
 
   // markdownToText 模式：跳过原生 MD，全部降级为纯文本
   if (mdToText) {
-    const textContent = flattenMdToText(content, val);
+    const textContent = formatQQContent(val, item => extractContent([item], 'group'), true, config.hideUnsupported);
 
     if (textContent) {
       const res = await sendMessage({ content: textContent, msg_type: 0, ...baseParams });
@@ -627,8 +529,8 @@ const sendOpenApiMessage = async (
 
   if (mdParams) {
     // 规则 2：Text 合并进 Markdown — 将 content 合入 markdown.content 使其在消息体中可见
-    if (mdParams.markdown?.content && content) {
-      mdParams.markdown.content = content + '\n' + mdParams.markdown.content;
+    if (mdParams.markdown?.content) {
+      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], 'group'));
     }
     const res = await sendMessage({ content, msg_type: 2, ...mdParams, ...baseParams, force_verify_image_resource: options?.forceVerifyImageResource });
 
@@ -697,7 +599,8 @@ const sendGuildMessage = async (
   val: DataEnums[],
   baseParams: Record<string, any>,
   sendMessage: (data: any, buffer?: Buffer) => Promise<any>,
-  label: string
+  label: string,
+  mode: MentionMode
 ): Promise<ClientAPIMessageResult[]> => {
   const config = getQQBotConfig();
   const mdToText = config.markdownToText === true;
@@ -708,7 +611,7 @@ const sendGuildMessage = async (
   if (images.length > 0) {
     const imageBuffer = await resolveImageBuffer(images);
     // 图片消息无法携带原生 markdown，始终将 MD/Buttons 降级为文本合入 content
-    const imgContent = flattenMdToText(content, val);
+    const imgContent = formatQQContent(val, item => extractContent([item], mode), true, config.hideUnsupported);
     const res = await sendMessage({ content: imgContent, ...baseParams }, imageBuffer);
 
     return [createResult(ResultCode.Ok, label, { id: res?.id })];
@@ -723,7 +626,7 @@ const sendGuildMessage = async (
 
   // markdownToText 模式：跳过原生 MD，全部降级为纯文本
   if (mdToText) {
-    const textContent = flattenMdToText(content, val);
+    const textContent = formatQQContent(val, item => extractContent([item], mode), true, config.hideUnsupported);
 
     if (textContent) {
       const res = await sendMessage({ content: textContent, ...baseParams });
@@ -739,8 +642,8 @@ const sendGuildMessage = async (
 
   if (mdParams) {
     // 规则 2：Text 合并进 Markdown — 将 content 合入 markdown.content 使其在消息体中可见
-    if (mdParams.markdown?.content && content) {
-      mdParams.markdown.content = content + '\n' + mdParams.markdown.content;
+    if (mdParams.markdown?.content) {
+      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], mode));
     }
     const res = await sendMessage({ content: '', ...mdParams, ...baseParams });
 
@@ -834,7 +737,7 @@ export const DIRECT_MESSAGE_CREATE = async (
   const content = extractContent(val, 'guild-direct');
 
   try {
-    return await sendGuildMessage(content, val, baseParams, (data, buf) => client.dmsMessages(event.UserId, data, buf), 'client.dmsMessage');
+    return await sendGuildMessage(content, val, baseParams, (data, buf) => client.dmsMessages(event.UserId, data, buf), 'client.dmsMessage', 'guild-direct');
   } catch (err) {
     return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)];
   }
@@ -852,7 +755,14 @@ export const MESSAGE_CREATE = async (
   const content = extractContent(val, 'guild-public');
 
   try {
-    return await sendGuildMessage(content, val, baseParams, (data, buf) => client.channelsMessages(event.ChannelId, data, buf), 'client.channelsMessagesPost');
+    return await sendGuildMessage(
+      content,
+      val,
+      baseParams,
+      (data, buf) => client.channelsMessages(event.ChannelId, data, buf),
+      'client.channelsMessagesPost',
+      'guild-public'
+    );
   } catch (err) {
     return [createResult(ResultCode.Fail, err?.response?.data ?? err?.message ?? err, null)];
   }

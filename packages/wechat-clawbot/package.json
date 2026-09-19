@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/wechat-clawbot",
-  "version": "1.0.2",
+  "version": "2.1.0-rc.0",
   "description": "Claw微信号",
   "author": "lemonade",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "qrcode": "^1.5.3"
   },
   "peerDependencies": {
-    "alemonjs": ">=2.1.0"
+    "alemonjs": "^2.1.108"
   },
   "exports": {
     ".": {

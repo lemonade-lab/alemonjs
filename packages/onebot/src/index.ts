@@ -705,7 +705,7 @@ const main = () => {
           const hide = getOneBotConfig().hideUnsupported;
 
           // Level 2: Markdown 中的 MD.mention 转为原生 at 段
-          if (Number(hide) >= 2 && item.type === 'Markdown' && typeof (item as any).value !== 'string') {
+          if (Number(hide) >= 2 && Number(hide) < 4 && item.type === 'Markdown' && typeof (item as any).value !== 'string') {
             const mdItems = (item as any).value;
             const segments: any[] = [];
             let currentText = '';

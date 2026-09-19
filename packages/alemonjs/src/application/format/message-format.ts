@@ -16,6 +16,7 @@ import {
   DataMarkdownLink,
   DataMarkdownImage,
   DataMarkdownList,
+  DataMarkdownListItem,
   DataMarkdownBlockquote,
   DataMarkdownDivider,
   DataMarkdownNewline,
@@ -291,22 +292,23 @@ export class FormatMarkDown {
   /**
    * 添加列表
    */
-  addList(...items: any[]): this {
+  addList(...items: (DataMarkdownListItem | DataMarkdownListItem['value'])[]): this {
     this.#data.push({
       type: 'MD.list',
-      value: items
+      value: items.map(item => (typeof item === 'object' && 'type' in item ? item : { type: 'MD.listItem', value: item }))
     } as DataMarkdownList);
 
     return this;
   }
 
   /**
-   * 添加引用
+   * 添加完整引用块。支持旧字符串、Markdown 构建器或子节点数组。
+   * 后续添加的节点位于引用外；字符串保持原有平台解释方式。
    */
-  addBlockquote(text: string): this {
+  addBlockquote(content: string | FormatMarkDown | DataMarkDown['value']): this {
     this.#data.push({
       type: 'MD.blockquote',
-      value: text
+      value: content instanceof FormatMarkDown ? [...content.value.value] : Array.isArray(content) ? [...content] : content
     } as DataMarkdownBlockquote);
 
     return this;

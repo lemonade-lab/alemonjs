@@ -1,3 +1,4 @@
+import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 import type { DataEnums, DataMarkDown, MessageMediaItem } from 'alemonjs';
 import { readFileSync } from 'fs';
 import type { MilkySegment } from './sdk/types';
@@ -123,8 +124,9 @@ export const fixUri = (uri: any): string => {
  * 将结构化 Markdown 子元素数组转为可读纯文本。
  */
 export const markdownToText = (items: DataMarkDown['value'] = []): string => {
-  return items
-    .map(item => {
+  return joinMarkdownParts(
+    items,
+    items.map(item => {
       switch (item.type) {
         case 'MD.text':
         case 'MD.title':
@@ -154,7 +156,7 @@ export const markdownToText = (items: DataMarkDown['value'] = []): string => {
             })
             .join('\n');
         case 'MD.blockquote':
-          return `> ${item.value}\n`;
+          return renderMarkdownBlockquote(item.value, children => markdownToText(children));
         case 'MD.divider':
           return '————————\n';
         case 'MD.newline':
@@ -171,7 +173,7 @@ export const markdownToText = (items: DataMarkDown['value'] = []): string => {
           return String((item as any)?.value ?? '');
       }
     })
-    .join('');
+  );
 };
 
 /**

@@ -1,7 +1,7 @@
 import { DataButtonRow, DataSelect, DataEmbed, createResult, DataEnums, ResultCode } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { DCClient } from './sdk/wss';
-import { markdownToDiscordText, markdownRawToDiscordText, dataEnumToDiscordText } from './format';
+import { formatDiscordContent } from './format';
 import { getDiscordConfig } from './config';
 
 type Client = typeof DCClient.prototype;
@@ -114,34 +114,6 @@ const resolveImageBuffer = async (item: DataEnums): Promise<Buffer | null> => {
   return null;
 };
 
-/** 将 Text / Mention / Link 项转为 Discord 文本 */
-const formatTextItem = (item: DataEnums): string => {
-  if (item.type === 'Link') {
-    return `[${item.value}](${item?.options?.link ?? item.value})`;
-  }
-  if (item.type === 'Mention') {
-    if (item.options?.belong === 'everyone' || item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
-      return '<@everyone>';
-    }
-    if (item.options?.belong === 'user') {
-      return `<@${item.value}>`;
-    }
-    if (item.options?.belong === 'channel') {
-      return `<#${item.value}>`;
-    }
-
-    return '';
-  }
-  if (item.type === 'Text') {
-    const wrapMap: Record<string, string> = { block: '`', italic: '*', bold: '**', boldItalic: '***', strikethrough: '~~' };
-    const wrap = wrapMap[item.options?.style];
-
-    return wrap ? `${wrap}${item.value}${wrap}` : item.value;
-  }
-
-  return '';
-};
-
 export const sendchannel = async (client: Client, param: { channel_id: string }, val: DataEnums[]) => {
   try {
     if (!val || val.length <= 0) {
@@ -156,9 +128,6 @@ export const sendchannel = async (client: Client, param: { channel_id: string },
     const buttons: DataEnums[] = [];
     const selects: DataSelect[] = [];
     const embeds: DataEmbed[] = [];
-    const textParts: string[] = [];
-    const mdParts: string[] = [];
-    const fallbackParts: string[] = [];
 
     for (const item of val) {
       switch (item.type) {
@@ -177,31 +146,10 @@ export const sendchannel = async (client: Client, param: { channel_id: string },
         case 'Embed':
           embeds.push(item);
           break;
-        case 'Markdown':
-          mdParts.push(markdownToDiscordText(item.value as any, hide));
-          break;
-        case 'MarkdownOriginal':
-          mdParts.push(markdownRawToDiscordText(String(item.value), hide));
-          break;
-        case 'Mention':
-        case 'Text':
-        case 'Link':
-          textParts.push(formatTextItem(item));
-          break;
-        default: {
-          const t = dataEnumToDiscordText(item, hide);
-
-          if (t) {
-            fallbackParts.push(t);
-          }
-        }
       }
     }
 
-    const finalContent = [textParts.join(''), mdParts.join(''), fallbackParts.join('\n')]
-      .filter(Boolean)
-      .join('\n')
-      .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
+    const finalContent = formatDiscordContent(val, hide);
 
     if (hide && !finalContent && images.length <= 0 && buttons.length <= 0 && selects.length <= 0 && embeds.length <= 0) {
       logger.info('[discord] hideUnsupported: 消息内容转换后为空，跳过发送');

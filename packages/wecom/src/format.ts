@@ -1,31 +1,34 @@
+import { markdownToPlainText } from 'alemonjs/markdown';
 import type { DataEnums } from 'alemonjs';
 
 /** Converts framework content into the two message forms natively accepted by WeCom AI bots. */
 export const dataToWecomMessage = (format: DataEnums[] = [], hideUnsupported?: boolean | number) => {
-  const markdown: string[] = [];
-  const text: string[] = [];
+  const parts: string[] = [];
+  let hasMarkdown = false;
 
   for (const item of format) {
     if (item.type === 'Text') {
-      text.push(String(item.value));
+      parts.push(String(item.value));
     } else if (item.type === 'MarkdownOriginal') {
-      markdown.push(String(item.value));
+      hasMarkdown = true;
+      parts.push(String(item.value));
     } else if (item.type === 'Markdown') {
-      markdown.push((item.value as any[]).map(part => String(part.value ?? '')).join(''));
+      hasMarkdown = true;
+      parts.push(markdownToPlainText(item.value, hideUnsupported));
     } else if (item.type === 'Link') {
       const url = (item as any).options?.link ?? item.value;
 
-      text.push(`${item.value} (${url})`);
+      parts.push(`${item.value} (${url})`);
     } else if (item.type === 'Mention') {
-      text.push(item.value === 'all' || item.value === 'everyone' ? '@所有人' : `@${item.value}`);
+      parts.push(item.value === 'all' || item.value === 'everyone' ? '@所有人' : `@${item.value}`);
     } else if (!hideUnsupported) {
-      text.push(`[${item.type}]`);
+      parts.push(`[${item.type}]`);
     }
   }
 
-  const content = [...markdown, ...text].filter(Boolean).join(markdown.length ? '\n' : '');
+  const content = parts.filter(Boolean).join(hasMarkdown ? '\n' : '');
 
-  return markdown.length ? { msgtype: 'markdown', markdown: { content } } : { msgtype: 'text', text: { content } };
+  return hasMarkdown ? { msgtype: 'markdown', markdown: { content } } : { msgtype: 'text', text: { content } };
 };
 
 /**

@@ -91,7 +91,8 @@ export type DataMarkdownList = {
 
 export type DataMarkdownBlockquote = {
   type: 'MD.blockquote';
-  value: string;
+  /** 兼容旧字符串；节点数组表示引用内部的结构化内容。 */
+  value: string | DataMarkDown['value'];
 };
 
 export type DataMarkdownDivider = {

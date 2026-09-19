@@ -1,3 +1,4 @@
+import { markdownToPlainText } from 'alemonjs/markdown';
 import type { DataEnums } from 'alemonjs';
 
 export type BridgeSegment = {
@@ -23,7 +24,7 @@ export const dataToBridgeMessage = (format: DataEnums[] = [], hideUnsupported?: 
       continue;
     }
     if (item.type === 'Markdown') {
-      const value = (item.value as any[]).map(part => String(part.value ?? '')).join('');
+      const value = markdownToPlainText(item.value, hideUnsupported);
 
       text += value;
       segments.push({ type: 'text', text: value });

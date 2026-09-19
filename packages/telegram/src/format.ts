@@ -1,3 +1,4 @@
+import { joinMarkdownParts, renderMarkdownBlockquote, markdownToPlainText } from 'alemonjs/markdown';
 import type { DataEnums, DataMarkDown } from 'alemonjs';
 
 /**
@@ -9,8 +10,9 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
     return '';
   }
 
-  return items
-    .map(item => {
+  return joinMarkdownParts(
+    items,
+    items.map(item => {
       switch (item.type) {
         case 'MD.text':
           return item.value;
@@ -26,10 +28,14 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
         case 'MD.strikethrough':
           return `<s>${item.value}</s>`;
         case 'MD.link': {
-          const v = item.value as unknown as { text: string; url: string };
+          const v = item.value as unknown as { text: string; url?: string };
 
           if (Number(hideUnsupported) >= 3) {
             return '';
+          }
+
+          if (!v.url) {
+            return v.text;
           }
 
           return Number(hideUnsupported) >= 2 ? v.url : `<a href="${v.url}">${v.text}</a>`;
@@ -49,7 +55,7 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
               .join('\n') + '\n'
           );
         case 'MD.blockquote':
-          return `> ${item.value}\n`;
+          return renderMarkdownBlockquote(item.value, children => markdownToTelegramText(children, hideUnsupported));
         case 'MD.divider':
           return hideUnsupported ? '' : '————————\n';
         case 'MD.newline':
@@ -80,7 +86,7 @@ export const markdownToTelegramText = (items: DataMarkDown['value'], hideUnsuppo
           return String((item as any)?.value ?? '');
       }
     })
-    .join('');
+  );
 };
 
 /**
@@ -126,7 +132,8 @@ export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean | numb
 
   switch (item.type) {
     case 'Markdown':
-      return markdownToTelegramText((item as any).value, hideUnsupported);
+      // 发送接口未启用 parse_mode，不能将 HTML 标记作为消息正文发送。
+      return markdownToPlainText(item.value, hideUnsupported);
 
     case 'MarkdownOriginal':
       return markdownRawToText(String(item.value), hideUnsupported);
@@ -147,4 +154,27 @@ export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean | numb
     default:
       return '';
   }
+};
+
+/** 普通回复、主动发送与图片 caption 共用纯文本转换，保持消息段顺序。 */
+export const formatTelegramContent = (format: DataEnums[], hideUnsupported?: boolean | number): string => {
+  return format
+    .map(item => {
+      switch (item.type) {
+        case 'Text':
+          return item.value;
+        case 'Link':
+          return `${item.value}( ${item.options?.link ?? item.value} )`;
+        case 'Mention':
+          return !item.value || item.value === 'everyone' || item.value === 'all' ? '@全体成员' : `@${item.value}`;
+        case 'Image':
+        case 'ImageFile':
+        case 'ImageURL':
+          return '';
+        default:
+          return dataEnumToText(item, hideUnsupported);
+      }
+    })
+    .join('')
+    .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
 };

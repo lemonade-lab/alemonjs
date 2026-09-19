@@ -441,3 +441,44 @@ test('partial mixed-message failure returns preceding success and skips remainin
   );
   assert.equal(client.calls.filter(call => call[0] === 'text').length, 1);
 });
+
+test('structured quotes support every leaf on reply and proactive send paths', async () => {
+  for (const action of ['message.send', 'message.send.user', 'message.send.channel', 'message.send.target']) {
+    const { adapter, client } = setup();
+    const payload =
+      action === 'message.send.channel'
+        ? { ChannelId: '987' }
+        : action === 'message.send.target'
+        ? { target: { scope: 'c2c', targetId: '200' } }
+        : { UserId: '200' };
+    const [response] = await adapter.handle(action, {
+      ...payload,
+      params: {
+        format: [
+          {
+            type: 'Markdown',
+            value: [
+              {
+                type: 'MD.blockquote',
+                value: [
+                  { type: 'MD.bold', value: 'BOLD' },
+                  { type: 'MD.link', value: { text: 'LINK' } },
+                  { type: 'MD.mention', value: '200' },
+                  { type: 'MD.image', value: 'https://example.com/image.png' },
+                  { type: 'MD.button', value: 'BUTTON', options: { data: '/command' } },
+                  { type: 'MD.blockquote', value: 'NESTED\n\nPARAGRAPH' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+    assert.equal(response.code, ResultCode.Ok, JSON.stringify(response));
+    const text = client.calls.find(call => call[0] === 'text')[2];
+    for (const label of ['BOLD', 'LINK', '@200', '[图片]', 'BUTTON', '> > NESTED', '> > PARAGRAPH']) {
+      assert.ok(text.includes(label), `${action} lost ${label}: ${text}`);
+    }
+    assert.doesNotMatch(text, /\[object Object\]|undefined/);
+  }
+});

@@ -4,7 +4,7 @@ import { getBufferByURL } from 'alemonjs/utils';
 import TelegramClient from 'node-telegram-bot-api';
 import { platform, getTGConfig, getMaster } from './config';
 import { readFileSync } from 'fs';
-import { dataEnumToText } from './format';
+import { formatTelegramContent } from './format';
 export { platform } from './config';
 export { type Options } from './config';
 export const API = TelegramClient;
@@ -419,45 +419,8 @@ const main = () => {
         if (!val || val.length <= 0) {
           return [];
         }
-        // 原生支持的文本类型
-        const nativeText = val
-          .filter(item => item.type === 'Link' || item.type === 'Mention' || item.type === 'Text')
-          .map(item => {
-            if (item.type === 'Link') {
-              const url = (item as any).options?.link ?? item.value;
-
-              return `${item.value}( ${url} )`;
-            }
-            if (item.type === 'Mention') {
-              if (item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
-                return '@全体成员';
-              }
-
-              return `@${item.value}`;
-            }
-
-            return item.value;
-          })
-          .join('');
-        // 降级处理：将 Markdown、Ark、Button 等不支持的类型转为文本
-        const unsupportedItems = val.filter(
-          item =>
-            item.type !== 'Link' &&
-            item.type !== 'Mention' &&
-            item.type !== 'Text' &&
-            item.type !== 'Image' &&
-            item.type !== 'ImageFile' &&
-            item.type !== 'ImageURL'
-        );
         const hide = getTGConfig().hideUnsupported;
-        const fallbackText = unsupportedItems
-          .map(item => dataEnumToText(item, hide))
-          .filter(Boolean)
-          .join('');
-        const content = [nativeText, fallbackText]
-          .filter(Boolean)
-          .join('')
-          .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
+        const content = formatTelegramContent(val, hide);
         const e = event?.value;
 
         // hideUnsupported 模式：检查转换后内容是否为空
@@ -537,7 +500,7 @@ const main = () => {
         // Telegram中channel就是chat_id
         const chatId = data.payload.ChannelId;
         const format = data.payload.params?.format ?? [];
-        const content = format.map(i => i.value).join('');
+        const content = formatTelegramContent(format, getTGConfig().hideUnsupported);
 
         if (!content) {
           consume([createResult(ResultCode.Fail, '消息内容为空', null)]);
@@ -553,7 +516,7 @@ const main = () => {
       } else if (data.action === 'message.send.user') {
         const userId = data.payload.UserId;
         const format = data.payload.params?.format ?? [];
-        const content = format.map(i => i.value).join('');
+        const content = formatTelegramContent(format, getTGConfig().hideUnsupported);
 
         if (!content) {
           consume([createResult(ResultCode.Fail, '消息内容为空', null)]);
@@ -734,7 +697,7 @@ const main = () => {
       } else if (data.action === 'message.edit') {
         // ─── 消息编辑 ───
         const format = data.payload.params?.format;
-        const content = format?.map(i => i.value).join('') ?? '';
+        const content = formatTelegramContent(format ?? [], getTGConfig().hideUnsupported);
         const chatId = data.payload.ChannelId ?? data.payload.GuildId;
         const messageId = data.payload.MessageId;
         const res = await client

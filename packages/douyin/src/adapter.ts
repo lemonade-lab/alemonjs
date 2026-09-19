@@ -1,3 +1,4 @@
+import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 import { FormatEvent, type ConnectionStatus } from 'alemonjs/platform';
 import { ResultCode } from 'alemonjs/common';
 import { getMaster, platform } from './config.js';
@@ -56,8 +57,12 @@ const markdownText = (nodes: Payload[]): string => {
     throw new ParamsError('Markdown 内容必须是数组');
   }
 
-  return nodes
-    .map(node => {
+  return joinMarkdownParts(
+    nodes.map(node => ({ type: node.type })),
+    nodes.map(node => {
+      if (node.type === 'MD.blockquote') {
+        return renderMarkdownBlockquote(node.value, markdownText);
+      }
       if (node.type === 'MD.newline') {
         return '\n';
       }
@@ -65,7 +70,16 @@ const markdownText = (nodes: Payload[]): string => {
         return '\n---\n';
       }
       if (node.type === 'MD.link') {
-        return `${node.value?.text ?? ''} (${required(node.value?.url, 'Markdown 链接')})`;
+        return node.value?.url ? `${node.value?.text ?? ''} (${required(node.value.url, 'Markdown 链接')})` : String(node.value?.text ?? '');
+      }
+      if (node.type === 'MD.mention') {
+        return node.value === 'everyone' ? '@所有人' : `@${node.value ?? ''}`;
+      }
+      if (node.type === 'MD.image') {
+        return '[图片]';
+      }
+      if (node.type === 'MD.button') {
+        return String(node.value ?? '');
       }
       if (node.type === 'MD.list') {
         if (!Array.isArray(node.value)) {
@@ -86,7 +100,7 @@ const markdownText = (nodes: Payload[]): string => {
       }
       throw new ParamsError(`不支持 Markdown 节点 ${String(node.type)}`);
     })
-    .join('');
+  );
 };
 
 /** CBP-facing adapter. Construction is inert; accounts and event sink are injectable. */

@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/kook",
-  "version": "2.1.13",
+  "version": "2.1.14",
   "description": "KOOK官方平台",
   "author": "lemonade",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "./desktop": "./lib/desktop.js"
   },
   "peerDependencies": {
-    "alemonjs": "^2.1.0-alpha.15"
+    "alemonjs": "^2.1.108"
   },
   "alemonjs": {
     "config-source": {

@@ -1,10 +1,12 @@
+import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 export const markdownToText = (md: any[]): string => {
   if (!Array.isArray(md)) {
     return String(md || '');
   }
 
-  return md
-    .map(item => {
+  return joinMarkdownParts(
+    md,
+    md.map(item => {
       if (!item) {
         return '';
       }
@@ -21,11 +23,12 @@ export const markdownToText = (md: any[]): string => {
         case 'MD.divider':
           return '\n---\n';
         case 'MD.italic':
+        case 'MD.italicStar':
           return `*${item.value}* `;
         case 'MD.strikethrough':
           return `~~${item.value}~~ `;
         case 'MD.blockquote':
-          return `\n> ${item.value} `;
+          return renderMarkdownBlockquote(item.value, children => markdownToText(children));
         case 'MD.newline':
           return '\n';
         case 'MD.link':
@@ -67,7 +70,7 @@ export const markdownToText = (md: any[]): string => {
           return String(item.value || '');
       }
     })
-    .join('');
+  );
 };
 
 export const dataEnumToText = (item: any, hide?: boolean): string => {

@@ -232,6 +232,7 @@ export const formatToItemList = async (val: any[], toUserId: string, client: WeC
       case 'MD.bold':
       case 'MD.divider':
       case 'MD.italic':
+      case 'MD.italicStar':
       case 'MD.strikethrough':
       case 'MD.blockquote':
       case 'MD.newline':

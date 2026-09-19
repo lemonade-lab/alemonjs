@@ -1,3 +1,4 @@
+import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 import type { DataEnums, DataMarkDown } from 'alemonjs';
 
 /**
@@ -9,8 +10,9 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
     return '';
   }
 
-  return items
-    .map(item => {
+  return joinMarkdownParts(
+    items,
+    items.map(item => {
       switch (item.type) {
         case 'MD.text':
           return item.value;
@@ -26,10 +28,14 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
         case 'MD.strikethrough':
           return `~~${item.value}~~`;
         case 'MD.link': {
-          const v = item.value as unknown as { text: string; url: string };
+          const v = item.value as unknown as { text: string; url?: string };
 
           if (Number(hideUnsupported) >= 3) {
             return '';
+          }
+
+          if (!v.url) {
+            return v.text;
           }
 
           return Number(hideUnsupported) >= 2 ? v.url : `[${v.text}](${v.url})`;
@@ -49,7 +55,7 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
               .join('\n') + '\n'
           );
         case 'MD.blockquote':
-          return `> ${item.value}\n`;
+          return renderMarkdownBlockquote(item.value, children => markdownToDiscordText(children, hideUnsupported));
         case 'MD.divider':
           return '---\n';
         case 'MD.newline':
@@ -80,7 +86,7 @@ export const markdownToDiscordText = (items: DataMarkDown['value'], hideUnsuppor
           return String((item as any)?.value ?? '');
       }
     })
-    .join('');
+  );
 };
 
 /**
@@ -127,4 +133,63 @@ export const dataEnumToDiscordText = (item: DataEnums, hideUnsupported?: boolean
     default:
       return '';
   }
+};
+
+/** 将 Text / Mention / Link 项转为 Discord 文本 */
+const formatTextItem = (item: DataEnums): string => {
+  if (item.type === 'Link') {
+    return `[${item.value}](${item?.options?.link ?? item.value})`;
+  }
+  if (item.type === 'Mention') {
+    if (item.options?.belong === 'everyone' || item.value === 'everyone' || item.value === 'all' || item.value === '' || typeof item.value !== 'string') {
+      return '<@everyone>';
+    }
+    if (item.options?.belong === 'user') {
+      return `<@${item.value}>`;
+    }
+    if (item.options?.belong === 'channel') {
+      return `<#${item.value}>`;
+    }
+
+    return '';
+  }
+  if (item.type === 'Text') {
+    const wrapMap: Record<string, string> = { block: '`', italic: '*', bold: '**', boldItalic: '***', strikethrough: '~~' };
+    const wrap = wrapMap[item.options?.style];
+
+    return wrap ? `${wrap}${item.value}${wrap}` : item.value;
+  }
+
+  return '';
+};
+
+/** 发送与编辑共用正文渲染，图片及交互组件由发送层单独处理。 */
+export const formatDiscordContent = (format: DataEnums[], hideUnsupported?: boolean | number): string => {
+  return format
+    .map(item => {
+      switch (item.type) {
+        case 'Markdown':
+          return markdownToDiscordText(item.value, hideUnsupported);
+        case 'MarkdownOriginal': {
+          const text = markdownRawToDiscordText(item.value, hideUnsupported);
+          return text ? `\n\n${text}\n\n` : '';
+        }
+        case 'Text':
+        case 'Mention':
+        case 'Link':
+          return formatTextItem(item);
+        case 'Image':
+        case 'ImageURL':
+        case 'ImageFile':
+        case 'BT.group':
+        case 'ButtonGroup':
+        case 'Select':
+        case 'Embed':
+          return '';
+        default:
+          return dataEnumToDiscordText(item, hideUnsupported);
+      }
+    })
+    .join('')
+    .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
 };

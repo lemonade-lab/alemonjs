@@ -1,3 +1,4 @@
+import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 import type { DataEnums, DataMarkDown } from 'alemonjs';
 
 const mardownMap = {
@@ -9,10 +10,14 @@ const mardownMap = {
   'MD.italicStar': (item: any) => `*${item.value}*`,
   'MD.strikethrough': (item: any) => `~~${item.value}~~`,
   'MD.link': (item: any, hideUnsupported?: boolean | number) => {
-    const v = item.value as unknown as { text: string; url: string };
+    const v = item.value as unknown as { text: string; url?: string };
 
     if (Number(hideUnsupported) >= 3) {
       return '';
+    }
+
+    if (!v.url) {
+      return v.text;
     }
 
     return Number(hideUnsupported) >= 2 ? v.url : `[${v.text}](${v.url})`;
@@ -28,7 +33,9 @@ const mardownMap = {
         return `- ${li.value}`;
       })
       .join('\n') + '\n',
-  'MD.blockquote': (item: any) => `> ${item.value}\n`,
+  'MD.blockquote': (item: any, hideUnsupported?: boolean | number) => {
+    return renderMarkdownBlockquote(item.value, children => markdownToKMarkdown(children, hideUnsupported));
+  },
   'MD.divider': (_: any, hideUnsupported?: boolean | number) => (hideUnsupported ? '' : '\n---\n'),
   'MD.newline': () => '\n',
   'MD.code': (item: any) => {
@@ -39,6 +46,9 @@ const mardownMap = {
   'MD.mention': (item: any) => {
     if (item.value === 'everyone') {
       return '(met)all(met)';
+    }
+    if (item.value) {
+      return item.options?.belong === 'channel' ? `(chn)${item.value}(chn)` : `(met)${item.value}(met)`;
     }
 
     return '';
@@ -65,7 +75,10 @@ export const markdownToKMarkdown = (items: DataMarkDown['value'], hideUnsupporte
     return '';
   }
 
-  return items.map(item => (mardownMap[item.type] ? mardownMap[item.type](item, hideUnsupported) : '')).join('');
+  return joinMarkdownParts(
+    items,
+    items.map(item => (mardownMap[item.type] ? mardownMap[item.type](item, hideUnsupported) : ''))
+  );
 };
 
 /**
@@ -120,4 +133,40 @@ export const dataEnumToKMarkdown = (item: DataEnums, hideUnsupported?: boolean |
     default:
       return '';
   }
+};
+
+/** 发送与编辑共用 KMarkdown 正文转换，保留输入顺序。 */
+export const formatKookContent = (format: DataEnums[], hideUnsupported?: boolean | number): string => {
+  return format
+    .map(item => {
+      if (item.type === 'Link') {
+        return `[${item.value}](${item.options?.link ?? item.value})`;
+      }
+      if (item.type === 'Mention') {
+        if (!item.value || item.value === 'everyone' || item.value === 'all') {
+          return '(met)all(met)';
+        }
+        if (item.options?.belong === 'user') {
+          return `(met)${item.value}(met)`;
+        }
+        if (item.options?.belong === 'channel') {
+          return `(chn)${item.value}(chn)`;
+        }
+
+        return '';
+      }
+      if (item.type === 'Text') {
+        const wrapMap: Record<string, string> = { block: '`', italic: '*', bold: '**', boldItalic: '***', strikethrough: '~~' };
+        const wrap = wrapMap[item.options?.style];
+
+        return wrap ? `${wrap}${item.value}${wrap}` : item.value;
+      }
+      if (item.type === 'Image' || item.type === 'ImageURL' || item.type === 'ImageFile') {
+        return '';
+      }
+
+      return dataEnumToKMarkdown(item, hideUnsupported);
+    })
+    .join('')
+    .replace(/^[^\S\n\r]+|[^\S\n\r]+$/g, '');
 };

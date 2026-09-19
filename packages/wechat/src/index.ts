@@ -14,6 +14,7 @@ import { FileBox } from 'file-box';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { randomUUID } from 'node:crypto';
 import { getPublicPath } from './static';
+import { formatWechatText } from './format';
 
 const client = new Proxy(
   {},
@@ -63,10 +64,7 @@ const main = () => {
   });
 
   const sendFormat = async (conversation: { say: (message: unknown) => Promise<unknown> }, format: DataEnums[] = []) => {
-    const text = format
-      .filter(item => item.type === 'Text' || item.type === 'Mention')
-      .map(item => String(item.value))
-      .join('');
+    const text = formatWechatText(format);
     const images = format.filter(item => item.type === 'ImageFile' || item.type === 'ImageURL');
     const results: unknown[] = [];
 

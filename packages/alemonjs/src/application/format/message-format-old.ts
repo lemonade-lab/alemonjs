@@ -243,8 +243,8 @@ Markdown.listItem = (indexOrText: number | string, text?: string): DataMarkdownL
 /**
  * @deprecated 废弃，推荐使用 Format.createMarkdown().addBlockquote(...)
  */
-Markdown.blockquote = (text: string): DataMarkdownBlockquote => {
-  return Format.createMarkdown().addBlockquote(text).value.value[0] as DataMarkdownBlockquote;
+Markdown.blockquote = (content: string | FormatMarkDown | DataMarkDown['value']): DataMarkdownBlockquote => {
+  return Format.createMarkdown().addBlockquote(content).value.value[0] as DataMarkdownBlockquote;
 };
 
 /**

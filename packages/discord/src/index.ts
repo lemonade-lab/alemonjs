@@ -3,7 +3,8 @@ import { DCClient } from './sdk/wss';
 import { MESSAGE_CREATE_TYPE } from './sdk/message/MESSAGE_CREATE';
 import type { User, DataEnums } from 'alemonjs';
 import { ResultCode, cbpPlatform, createResult, definePlatform, FormatEvent } from 'alemonjs';
-import { getMaster, platform } from './config';
+import { getMaster, platform, getDiscordConfig } from './config';
+import { formatDiscordContent } from './format';
 
 // pf
 export { platform } from './config';
@@ -486,7 +487,7 @@ const main = () => {
         consume([res]);
       } else if (data.action === 'message.edit') {
         const format = data.payload.params?.format;
-        const content = format?.map(i => i.value).join('') ?? '';
+        const content = formatDiscordContent(format ?? [], getDiscordConfig().hideUnsupported);
         const res = await client
           .editMessage(data.payload.ChannelId, data.payload.MessageId, { content })
           .then(r => createResult(ResultCode.Ok, data.action, r))

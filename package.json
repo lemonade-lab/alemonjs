@@ -8,6 +8,7 @@
   "scripts": {
     "build": "lerna run build",
     "test": "jest",
+    "test:markdown": "yarn workspace alemonjs build && node --import tsx --test packages/alemonjs/tests/markdown.test.mjs packages/alemonjs/tests/markdown-send.test.mjs",
     "lint": "eslint packages --ext .ts,.tsx,.js --max-warnings=0",
     "lint:fix": "eslint packages --ext .ts,.tsx,.js --fix --max-warnings=0",
     "fix:code": "eslint packages --ext .ts,.tsx,.js --fix --quiet",

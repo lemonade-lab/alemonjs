@@ -1,3 +1,4 @@
+import { markdownToPlainText } from 'alemonjs/markdown';
 import type { DataEnums } from 'alemonjs';
 
 /** The IM send endpoint accepts a structured content object. Start with the portable text form. */
@@ -8,7 +9,7 @@ export const dataToDouyinContent = (format: DataEnums[] = [], hideUnsupported?: 
         return String(item.value);
       }
       if (item.type === 'Markdown') {
-        return (item.value as any[]).map(part => String(part.value ?? '')).join('');
+        return markdownToPlainText(item.value, hideUnsupported);
       }
       if (item.type === 'Link') {
         return `${item.value} (${(item as any).options?.link ?? item.value})`;

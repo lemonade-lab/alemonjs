@@ -10,6 +10,7 @@ export type { Context, ContextAction, ContextConfiguration, ContextHandler, Cont
 export * from './schedule.js';
 export * from './format/message-api.js';
 export * from './format/message-format.js';
+export * from './format/markdown-render.js';
 export * from './format/message-format-old.js';
 export * from './router/main.js';
 export { validateRouteArgsForCommand } from './router/validator.js';

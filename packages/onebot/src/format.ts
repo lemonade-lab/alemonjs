@@ -1,3 +1,4 @@
+import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 import type { DataEnums, DataMarkDown } from 'alemonjs';
 
 /**
@@ -8,8 +9,9 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
     return '';
   }
 
-  return items
-    .map(item => {
+  return joinMarkdownParts(
+    items,
+    items.map(item => {
       switch (item.type) {
         case 'MD.text':
           return item.value;
@@ -23,10 +25,14 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
         case 'MD.strikethrough':
           return item.value;
         case 'MD.link': {
-          const v = item.value as unknown as { text: string; url: string };
+          const v = item.value as unknown as { text: string; url?: string };
 
           if (Number(hideUnsupported) >= 3) {
             return '';
+          }
+
+          if (!v.url) {
+            return v.text;
           }
 
           return Number(hideUnsupported) >= 2 ? v.url : `${v.text}( ${v.url} )`;
@@ -46,7 +52,7 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
               .join('\n') + '\n'
           );
         case 'MD.blockquote':
-          return `> ${item.value}\n`;
+          return renderMarkdownBlockquote(item.value, children => markdownToText(children, hideUnsupported));
         case 'MD.divider':
           return hideUnsupported ? '' : '————————\n';
         case 'MD.newline':
@@ -74,7 +80,7 @@ export const markdownToText = (items: DataMarkDown['value'], hideUnsupported?: b
           return String((item as any)?.value ?? '');
       }
     })
-    .join('');
+  );
 };
 
 /**
