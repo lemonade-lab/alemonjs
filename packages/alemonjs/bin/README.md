@@ -10,6 +10,18 @@ npx alemonc -h
 
 ---
 
+### 分支管理
+
+```sh
+alemonc branch soul-path-v1
+```
+
+使用当天本地日期，从当前 HEAD 创建并切换到 `dev-YYYYMMDD-<name>` 分支。
+例如在 2026 年 4 月 6 日执行上述命令，会得到 `dev-20260406-soul-path-v1`。
+底层执行 `git checkout -b <生成的分支名>`；分支已存在或名称不合法时会报错，不覆盖已有分支。
+
+---
+
 ### 配置管理
 
 编辑 `alemon.config.yaml`
@@ -115,16 +127,18 @@ alemonc publish --dry-run
 | 当前源码分支      | 默认产物分支            | git tag                |
 | ----------------- | ----------------------- | ---------------------- |
 | `main` / `master` | `release`               | 创建并推送 `v<版本号>` |
-| `develop`         | `release-develop`       | 不创建、不推送         |
-| `feature/login`   | `release-feature/login` | 不创建、不推送         |
+| `develop`         | `develop-release`       | 不创建、不推送         |
+| `feature/login`   | `feature-login-release` | 不创建、不推送         |
 
-命令始终构建当前检出的源码分支，保留分支名中的 `/`。detached HEAD 状态下需先切换到源码分支。
+`codex/soul-path-v1` 对应 `codex-soul-path-v1-release`，不打 tag。
+
+命令始终构建当前检出的源码分支，非主分支的产物分支名将源码分支名中的所有 `/` 替换为 `-`，再追加 `-release`。detached HEAD 状态下需先切换到源码分支。
 `--branch <branch>` 可以覆盖产物目标分支，但不能与当前源码分支相同；是否打 tag 仍由源码分支决定。
 
 ```sh
-# 在 develop 分支：发布到 release-develop，保持本地版本，不打 tag
+# 在 develop 分支：发布到 develop-release，保持本地版本，不打 tag
 alemonc publish
-# 在 develop 分支：递增本地版本，发布到 release-develop，不打 tag
+# 在 develop 分支：递增本地版本，发布到 develop-release，不打 tag
 alemonc publish prepatch --preid beta
 # 在 main 分支：发布到 release，并创建版本 tag
 alemonc publish patch
@@ -146,6 +160,7 @@ alemonc publish patch
 - 默认先执行 `npm run build`
 - 默认发布内容是 `lib/`、`package.json`、`README.md`
 - 如果项目配置了 `.npmignore` 或 `package.json.files`，则切换为 npm 文件选择规则
+- 获取 npm 文件清单时禁用生命周期脚本（如 `prepack`、`prepare`、`postpack`），避免重复构建和日志干扰；产物生成请放在 `build` 脚本中
 - 最终把产物提交并推送到对应的产物分支；仅主分支创建并推送 tag
 - 默认要求 git 工作区干净，发布成功后仅在版本变化时自动提交当前源码分支中的 `package.json`
 - `--dry-run` 执行构建和文件选择，不推送分支或创建 tag，并恢复本地版本号

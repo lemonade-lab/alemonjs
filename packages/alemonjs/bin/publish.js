@@ -190,7 +190,8 @@ function updateVersion(pkgPath, pkg, version) {
 }
 
 function getPackResult(cwd = process.cwd()) {
-  const output = execSync('npm pack --json --dry-run', {
+  // 构建已单独执行，这里只读取文件清单，避免生命周期脚本的日志混入 JSON。
+  const output = execSync('npm pack --json --dry-run --ignore-scripts', {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'ignore'],
@@ -369,7 +370,7 @@ export async function publish(release, options = {}) {
     throw new Error('当前处于 detached HEAD，请先切换到源码分支再发布');
   }
   const shouldTag = sourceBranch === 'main' || sourceBranch === 'master';
-  const releaseBranch = options.branch || (shouldTag ? 'release' : `release-${sourceBranch}`);
+  const releaseBranch = options.branch || (shouldTag ? 'release' : `${sourceBranch.replaceAll('/', '-')}-release`);
   runCommand('git', ['check-ref-format', '--branch', releaseBranch]);
   if (releaseBranch === sourceBranch) {
     throw new Error('发布目标分支不能与源码分支相同');

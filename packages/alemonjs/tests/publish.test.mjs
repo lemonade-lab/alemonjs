@@ -57,15 +57,20 @@ for (const branch of ['main', 'master']) {
   });
 }
 
-for (const branch of ['develop', 'feature/login']) {
+for (const [branch, target] of [
+  ['develop', 'develop-release'],
+  ['feature/login', 'feature-login-release'],
+  ['codex/soul-path-v1', 'codex-soul-path-v1-release'],
+  ['feature/team/login', 'feature-team-login-release']
+]) {
   test(`${branch} publishes repeatedly without tags or a version bump`, t => {
     const f = fixture(t, branch);
     f.git('tag', 'v9.0.0');
     f.git('push', 'origin', 'refs/tags/v9.0.0');
     const oldTag = f.remoteGit('rev-parse', 'refs/tags/v9.0.0');
     f.succeed();
-    assert.equal(JSON.parse(f.remoteGit('show', `refs/heads/release-${branch}:package.json`)).version, '1.0.0');
-    assert.equal(f.remoteGit('ls-tree', '--name-only', `release-${branch}`), 'lib\npackage.json');
+    assert.equal(JSON.parse(f.remoteGit('show', `refs/heads/${target}:package.json`)).version, '1.0.0');
+    assert.equal(f.remoteGit('ls-tree', '--name-only', target), 'lib\npackage.json');
     f.succeed();
     assert.equal(f.git('tag', '--list'), 'v9.0.0');
     assert.equal(f.remoteGit('tag', '--list'), 'v9.0.0');
@@ -97,6 +102,22 @@ test('dry-run restores the version and creates no branches or tags', t => {
   assert.equal(f.git('branch', '--format=%(refname:short)'), 'develop');
   assert.equal(f.git('tag', '--list'), '');
   assert.equal(f.remoteGit('for-each-ref'), '');
+});
+
+test('npm file selection does not run lifecycle scripts or parse their logs as JSON', t => {
+  const f = fixture(t, 'develop');
+  const pkgPath = path.join(f.cwd, 'package.json');
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  pkg.files = ['lib'];
+  pkg.scripts = { prepack: 'node prepack.cjs' };
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+  fs.writeFileSync(path.join(f.cwd, 'prepack.cjs'), 'console.log("yarn run v1.22.22"); require("node:fs").writeFileSync("lifecycle-ran", "yes");\n');
+  f.git('add', '.');
+  f.git('commit', '-m', 'add pack lifecycle');
+  f.succeed();
+  assert.equal(fs.existsSync(path.join(f.cwd, 'lifecycle-ran')), false);
+  assert.equal(f.remoteGit('ls-tree', '--name-only', 'develop-release'), 'lib\npackage.json');
+  assert.equal(f.remoteGit('tag', '--list'), '');
 });
 
 test('rejects detached HEAD and publishing over the source branch before changing files', t => {
