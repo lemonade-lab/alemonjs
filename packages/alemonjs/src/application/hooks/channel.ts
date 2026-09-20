@@ -1,11 +1,15 @@
-import { ChannelInfo, EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import type { ActionContext } from '../../types';
+import { ChannelInfo, EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
+import { resolveActionContext, resolveActionTarget } from './action-context';
 
 /**
  * 频道管理
  * @param event 事件上下文
  */
-export const useChannel = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContext) => {
+  const valueEvent = resolveActionContext(event as ActionContext | undefined);
+  const target = (channelId?: string) =>
+    resolveActionTarget(valueEvent) ?? (channelId ? { scope: 'channel' as const, targetId: channelId, BotId: valueEvent.BotId } : undefined);
 
   /**
    * 获取频道信息
@@ -20,7 +24,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'channel.info',
-        payload: { ChannelId: cid }
+        payload: { event: valueEvent, ChannelId: cid, ...(target(cid) && { target: target(cid) }) }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -47,7 +51,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'channel.list',
-        payload: { GuildId: gid }
+        payload: { event: valueEvent, GuildId: gid }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -73,7 +77,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'channel.create',
-        payload: { GuildId: gid, params: { name: params.name, type: params.type, parentId: params.parentId } }
+        payload: { event: valueEvent, GuildId: gid, params: { name: params.name, type: params.type, parentId: params.parentId } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -95,7 +99,12 @@ export const useChannel = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'channel.update',
-        payload: { ChannelId: params.channelId, params: { name: params.name, topic: params.topic, position: params.position } }
+        payload: {
+          event: valueEvent,
+          ChannelId: params.channelId,
+          ...(target(params.channelId) && { target: target(params.channelId) }),
+          params: { name: params.name, topic: params.topic, position: params.position }
+        }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -115,7 +124,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'channel.delete',
-        payload: { ChannelId: params.channelId }
+        payload: { event: valueEvent, ChannelId: params.channelId, ...(target(params.channelId) && { target: target(params.channelId) }) }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 

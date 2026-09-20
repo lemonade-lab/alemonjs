@@ -51,6 +51,10 @@ export type MessageMediaItem = {
    * MIME类型
    */
   MimeType?: string;
+  Width?: number;
+  Height?: number;
+  AudioUrl?: string;
+  Transcript?: string;
 };
 
 /**

@@ -122,7 +122,9 @@ const connectAll = (registry: QQBotRegistry) => {
     'GUILD_MEMBERS', // base
     'GUILD_MESSAGE_REACTIONS',
     'DIRECT_MESSAGE',
-    'PUBLIC_GUILD_MESSAGES'
+    'PUBLIC_GUILD_MESSAGES',
+    'MESSAGE_AUDIT',
+    'AUDIO_ACTION'
   ] as IntentsEnum[];
 
   const isPrivateIntents = [
@@ -131,7 +133,9 @@ const connectAll = (registry: QQBotRegistry) => {
     'GUILD_MESSAGES',
     'GUILD_MESSAGE_REACTIONS',
     'DIRECT_MESSAGE',
-    'FORUMS_EVENT'
+    'FORUMS_EVENT',
+    'MESSAGE_AUDIT',
+    'AUDIO_ACTION'
   ] as IntentsEnum[];
 
   // 群/C2C 事件，不分公私域

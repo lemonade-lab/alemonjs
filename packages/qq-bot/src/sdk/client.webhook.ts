@@ -23,6 +23,9 @@ const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unk
     return message;
   }
 
+  if ((message as T & { t?: string }).t === 'INTERACTION_CREATE') {
+    message.d.event_id = message.id;
+  }
   if (message.d.id === undefined || message.d.id === null || message.d.id === '') {
     message.d.id = message.id;
   }
@@ -47,7 +50,7 @@ export class QQBotClient extends QQBotAPI {
    * @param opstion
    */
   constructor(opstion: Options) {
-    super(opstion);
+    super({ ...opstion });
   }
 
   /**
@@ -123,14 +126,14 @@ export class QQBotClient extends QQBotAPI {
           let rawData = '';
 
           ctx.req.on('data', chunk => (rawData += chunk));
-          ctx.req.on('end', () => (ctx.request.rawBody = rawData));
+          ctx.req.on('end', () => ((ctx.request as typeof ctx.request & { rawBody: string }).rawBody = rawData));
           await next();
         });
         // 启动服务
         router.post(route, ctx => {
           const sign = ctx.req.headers['x-signature-ed25519'];
           const timestamp = ctx.req.headers['x-signature-timestamp'];
-          const rawBody = ctx.request.rawBody;
+          const rawBody = (ctx.request as typeof ctx.request & { rawBody: string }).rawBody;
           const isValid = ntqqWebhook.validSign(timestamp, rawBody, String(sign));
 
           if (!isValid) {
@@ -139,7 +142,7 @@ export class QQBotClient extends QQBotAPI {
 
             return;
           }
-          const body = normalizeGatewayMessage(ctx.request.body as Data);
+          const body = normalizeGatewayMessage((ctx.request as typeof ctx.request & { body: Data }).body);
 
           if (+body.op === 13) {
             ctx.status = 200;

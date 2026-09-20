@@ -31,6 +31,11 @@ export const useMention = <T extends EventKeys>(
     if (res) {
       return;
     }
+    if ('MessageMentions' in valueEvent && valueEvent.MessageMentions !== undefined) {
+      res = valueEvent.MessageMentions;
+
+      return;
+    }
     // 获取提及数据
     const results = await sendAction({
       action: 'mention.get',

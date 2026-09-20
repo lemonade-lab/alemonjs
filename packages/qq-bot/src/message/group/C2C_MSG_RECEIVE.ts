@@ -7,5 +7,5 @@ export type C2C_MSG_RECEIVE_TYPE = {
    */
   id?: string;
   openid: string;
-  timestamp: string;
+  timestamp: number | string;
 };

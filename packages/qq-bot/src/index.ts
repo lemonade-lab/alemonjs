@@ -1,11 +1,15 @@
 import { definePlatform } from 'alemonjs';
 import { start as startWebhook } from './index.webhook';
 import { start as startWebsocket } from './index.websoket';
-import { platform, getQQBotConfig } from './config';
+import { getQQBotConfig } from './config';
 // 平台
 export { platform } from './config';
 // hook
 export * from './hook';
+export type * from './sdk/non-channel-types';
+export type * from './sdk/typing';
+export type { QQBotGroupEventMap } from './sdk/message.group';
+export type { QQBotPublicEventMap } from './sdk/message.public';
 // api
 export { QQBotAPI as API } from './sdk/api';
 // main

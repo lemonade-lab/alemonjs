@@ -1,11 +1,13 @@
-import { EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import type { ActionContext } from '../../types';
+import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
+import { resolveActionContext } from './action-context';
 
 /**
  * 频道公告管理
  * @param event 事件上下文
  */
-export const useAnnounce = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const useAnnounce = <T extends EventKeys>(event?: Events[T] | ActionContext) => {
+  const valueEvent = resolveActionContext(event as ActionContext | undefined);
 
   /**
    * 设置公告
@@ -22,7 +24,7 @@ export const useAnnounce = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'channel.announce',
-        payload: { GuildId: gid, params: { messageId: params.messageId, channelId: params.channelId } }
+        payload: { event: valueEvent, GuildId: gid, params: { messageId: params.messageId, channelId: params.channelId } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -46,7 +48,7 @@ export const useAnnounce = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'channel.announce',
-        payload: { GuildId: gid, params: { messageId: params?.messageId || 'all', remove: true } }
+        payload: { event: valueEvent, GuildId: gid, params: { messageId: params?.messageId || 'all', remove: true } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 

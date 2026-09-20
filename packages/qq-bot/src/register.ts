@@ -1,4 +1,6 @@
-import type { ActionTarget, DataEnums, MessageMediaItem, User } from 'alemonjs';
+import { handleFrameworkAction } from './framework-actions';
+import { normalizeFrameworkEvent, normalizeMessageUser } from './framework-events';
+import type { ActionTarget, DataEnums, MessageMediaItem, MediaReceipt, BotInfo, User } from 'alemonjs';
 import { cbpPlatform, createResult, ResultCode, FormatEvent, logger } from 'alemonjs';
 import { createHash } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
@@ -52,12 +54,11 @@ export const register = (
     botId?: string;
     cbp?: ReturnType<typeof cbpPlatform>;
     bindActions?: boolean;
+    autoInteractionAck?: boolean;
   }
 ): QQBotRegistration => {
-  // QQ's rich-media API accepts at most 100 MiB.  Keeping the guard here
-  // makes every legacy and scoped media action fail before buffering a file
-  // that can never be uploaded.
-  const MAX_MEDIA_SIZE = 100 * 1024 * 1024;
+  // Official upload_prepare documents a 200 MB hard limit (larger media may become files).
+  const MAX_MEDIA_SIZE = 200 * 1024 * 1024;
   const config = getQQBotConfig();
 
   // Nested multi-bot config has no top-level app_id. The registry owns the
@@ -70,6 +71,7 @@ export const register = (
   const port = process.env?.port || config?.port || 17117;
   const url = `ws://127.0.0.1:${port}`;
   const cbp = options?.cbp ?? cbpPlatform(url);
+  const emit = (event: Parameters<typeof normalizeFrameworkEvent>[0], acknowledged = false) => cbp.send(normalizeFrameworkEvent(event, acknowledged));
 
   /**
    * group
@@ -84,9 +86,9 @@ export const register = (
 
   const getGroupMessageMeta = (event: GROUP_MESSAGE_CREATE_TYPE) => {
     const author = event?.author;
-    const UserId = author?.id ?? '';
+    const UserId = author?.member_openid || author?.id || '';
     const memberOpenId = author?.member_openid ?? '';
-    const groupId = event?.group_id ?? event?.group_openid ?? '';
+    const groupId = event?.group_openid || event?.group_id || '';
     const messageId = event?.id ?? '';
     const [isMaster, UserKey] = UserId ? getMaster(UserId) : [false, ''];
 
@@ -102,13 +104,22 @@ export const register = (
     };
   };
 
-  const getGroupAuditMeta = (event: { audit_id?: string; audit_time?: string; group_openid?: string; message_id?: string }) => {
-    const groupId = event?.group_openid ?? '';
+  const getAuditMeta = (event: {
+    audit_id?: string;
+    audit_time?: string;
+    group_openid?: string;
+    guild_id?: string;
+    channel_id?: string;
+    message_id?: string;
+  }) => {
+    const guildId = event?.guild_id ?? event?.group_openid ?? '';
+    const channelId = event?.channel_id ?? event?.group_openid ?? '';
     const messageId = event?.message_id ?? event?.audit_id ?? '';
     const auditTime = event?.audit_time ?? '';
 
     return {
-      groupId,
+      guildId,
+      channelId,
       messageId,
       auditTime
     };
@@ -122,7 +133,7 @@ export const register = (
       const mimeType = attachment.content_type || '';
       const Type: MessageMediaItem['Type'] = mimeType.startsWith('image/')
         ? 'image'
-        : mimeType.startsWith('audio/')
+        : mimeType === 'voice' || mimeType.startsWith('audio/')
         ? 'audio'
         : mimeType.startsWith('video/')
         ? 'video'
@@ -152,7 +163,7 @@ export const register = (
     return !target.BotId || target.BotId === botId;
   };
 
-  const mediaCache = new Map<string, { fileId: string; expiresAt?: number }>();
+  const mediaCache = new Map<string, MediaReceipt>();
   const mediaType = (type: string) => (type === 'image' ? 1 : type === 'video' ? 2 : type === 'audio' ? 3 : 4);
 
   const prepareMedia = async (target: ActionTarget, params: any) => {
@@ -180,7 +191,7 @@ export const register = (
         throw new Error('media filePath must point to a regular file');
       }
       if (metadata.size > MAX_MEDIA_SIZE) {
-        throw new Error('QQ media files must not exceed 100 MiB');
+        throw new Error('QQ media files must not exceed 200 MiB');
       }
       filePath = String(params.filePath);
       fileSize = metadata.size;
@@ -199,17 +210,17 @@ export const register = (
 
       buffer = Buffer.from(value, 'base64');
       if (buffer.length > MAX_MEDIA_SIZE) {
-        throw new Error('QQ media files must not exceed 100 MiB');
+        throw new Error('QQ media files must not exceed 200 MiB');
       }
     }
-    const key = [botId, target.scope, target.targetId, params.type, createHash('sha256').update(hashSource).digest('hex')].join(':');
+    const key = JSON.stringify([botId, target.scope, target.targetId, params.type, name ?? '', createHash('sha256').update(hashSource).digest('hex')]);
     const cached = mediaCache.get(key);
 
-    if (cached && (!cached.expiresAt || cached.expiresAt > Date.now())) {
-      return { fileId: cached.fileId, expiresAt: cached.expiresAt, reused: true };
+    if (!params.send && cached && cached.expiresAt && cached.expiresAt > Date.now()) {
+      return { ...cached, reused: true };
     }
 
-    return { key, url: params.url, data, buffer, filePath, fileSize, hashes, name, reused: false };
+    return { fileId: undefined, key, url: params.url, data, buffer, filePath, fileSize, hashes, name, reused: false };
   };
 
   const uploadMedia = async (target: ActionTarget, params: any) => {
@@ -222,6 +233,13 @@ export const register = (
     const prepared = await prepareMedia(target, params);
 
     if (prepared.fileId) {
+      if (params.send) {
+        const sent =
+          target.scope === 'group'
+            ? await client.groupOpenMessages(target.targetId, { msg_type: 7, media: { file_info: prepared.fileId } })
+            : await client.usersOpenMessages(target.targetId, { msg_type: 7, media: { file_info: prepared.fileId } });
+        return { ...prepared, messageId: sent.id };
+      }
       return prepared;
     }
     const fileType = mediaType(params.type);
@@ -239,15 +257,43 @@ export const register = (
         : prepared.buffer && prepared.buffer.length >= 5 * 1024 * 1024
         ? await client.postChunkedRichMedia({ scope: target.scope, targetId: target.targetId, fileType, data: prepared.buffer, name: prepared.name })
         : target.scope === 'group'
-        ? await client.postRichMediaByGroup(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false })
-        : await client.postRichMediaByUser(target.targetId, { file_type: fileType, url: prepared.url, file_data: prepared.data, srv_send_msg: false });
+        ? await client.postRichMediaByGroup(target.targetId, {
+            file_type: fileType,
+            url: prepared.url,
+            file_data: prepared.data,
+            file_name: prepared.name,
+            srv_send_msg: params.send ?? false
+          })
+        : await client.postRichMediaByUser(target.targetId, {
+            file_type: fileType,
+            url: prepared.url,
+            file_data: prepared.data,
+            file_name: prepared.name,
+            srv_send_msg: params.send ?? false
+          });
+    let messageId = 'id' in value ? value.id : undefined;
+    if (params.send && !messageId && ((prepared.fileSize ?? 0) >= 5 * 1024 * 1024 || (prepared.buffer?.length ?? 0) >= 5 * 1024 * 1024)) {
+      const sent =
+        target.scope === 'group'
+          ? await client.groupOpenMessages(target.targetId, { msg_type: 7, media: { file_info: value.file_info } })
+          : await client.usersOpenMessages(target.targetId, { msg_type: 7, media: { file_info: value.file_info } });
+      messageId = sent.id;
+    }
     const expiresAt = value.ttl ? Date.now() + value.ttl * 1000 : undefined;
 
-    if (prepared.key) {
-      mediaCache.set(prepared.key, { fileId: value.file_info, expiresAt });
+    if (prepared.key && expiresAt) {
+      mediaCache.set(prepared.key, { fileId: value.file_info, uuid: value.file_uuid, ttl: value.ttl, url: value.raw_url, expiresAt });
     }
 
-    return { fileId: value.file_info, expiresAt, reused: false };
+    return {
+      fileId: value.file_info,
+      uuid: value.file_uuid,
+      ttl: value.ttl,
+      messageId,
+      url: 'raw_url' in value ? value.raw_url : undefined,
+      expiresAt,
+      reused: false
+    };
   };
 
   const createUserMeta = (UserId: string, extra: Partial<User> = {}): User => {
@@ -264,7 +310,7 @@ export const register = (
 
   client.on('GROUP_ADD_ROBOT', event => {
     // 机器人加入群组
-    cbp.send(
+    emit(
       FormatEvent.create('guild.join')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
@@ -277,7 +323,7 @@ export const register = (
 
   client.on('GROUP_DEL_ROBOT', event => {
     // 机器人离开群组
-    cbp.send(
+    emit(
       FormatEvent.create('guild.exit')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
@@ -297,7 +343,7 @@ export const register = (
     const meta = getGroupMessageMeta(event);
 
     // 定义消息
-    cbp.send(
+    emit(
       FormatEvent.create('message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
         .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
@@ -319,10 +365,10 @@ export const register = (
   });
 
   client.on('GROUP_MEMBER_ADD', event => {
-    const UserId = event.op_member_openid ?? event.member_openid ?? '';
+    const UserId = event.member_openid || event.op_member_openid || '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    cbp.send(
+    emit(
       FormatEvent.create('member.add')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid ?? '', SpaceId: `GROUP:${event.group_openid ?? ''}` })
@@ -332,10 +378,10 @@ export const register = (
     );
   });
   client.on('GROUP_MEMBER_REMOVE', event => {
-    const UserId = event.op_member_openid ?? event.member_openid ?? '';
+    const UserId = event.member_openid || event.op_member_openid || '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    cbp.send(
+    emit(
       FormatEvent.create('member.remove')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid ?? '', SpaceId: `GROUP:${event.group_openid ?? ''}` })
@@ -350,7 +396,7 @@ export const register = (
     const UserId = event.member_openid ?? '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    cbp.send(
+    emit(
       FormatEvent.create('notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid ?? '', SpaceId: `GROUP:${event.group_openid ?? ''}` })
@@ -378,7 +424,7 @@ export const register = (
     const meta = getGroupMessageMeta(event);
 
     // 定义消
-    cbp.send(
+    emit(
       FormatEvent.create('message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: true, IsPrivate: false })
         .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
@@ -400,16 +446,16 @@ export const register = (
   });
 
   client.on('C2C_MESSAGE_CREATE', event => {
-    const UserId = event.author.id;
+    const UserId = event.author.user_openid || event.author.id;
     const [isMaster, UserKey] = getMaster(UserId);
-    const UserAvatar = createUserAvatarURL(event.author.id);
+    const UserAvatar = createUserAvatarURL(UserId);
 
     // 定义消
-    cbp.send(
+    emit(
       FormatEvent.create('private.message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
         .addUser({
-          UserId: event.author.id,
+          UserId,
           UserKey,
           UserAvatar: UserAvatar,
           UserName: event?.author?.username,
@@ -419,7 +465,7 @@ export const register = (
         .addMessage({ MessageId: event.id })
         .addText({ MessageText: event.content?.trim() })
         .addMedia({ MessageMedia: getMediaItems(event.attachments) })
-        .addOpen({ OpenId: `C2C:${event.author.user_openid}` })
+        .addOpen({ OpenId: `C2C:${UserId}` })
         .add({ tag: 'C2C_MESSAGE_CREATE' }).value
     );
   });
@@ -443,7 +489,7 @@ export const register = (
     const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
-    cbp.send(
+    emit(
       FormatEvent.create('private.message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: true })
         .addUser({
@@ -478,7 +524,7 @@ export const register = (
     const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
-    cbp.send(
+    emit(
       FormatEvent.create('message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: true, IsPrivate: false })
         .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
@@ -532,10 +578,6 @@ export const register = (
       return;
     }
 
-    // 撤回消息
-    if (new RegExp(/DELETE$/).test(event.eventType)) {
-      return;
-    }
     const UserId = event.author.id;
     const msg = getMessageContent(event);
     const UserAvatar = event?.author?.avatar;
@@ -543,7 +585,7 @@ export const register = (
     const [isMaster, UserKey] = getMaster(UserId);
 
     // 定义消
-    cbp.send(
+    emit(
       FormatEvent.create('message.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
         .addGuild({ GuildId: event.guild_id, SpaceId: `GUILD:${event.channel_id}` })
@@ -565,11 +607,15 @@ export const register = (
   });
 
   client.on('INTERACTION_CREATE', async event => {
-    // 立即回应互动事件，解除客户端按钮 loading；指令按钮需 3 秒内响应
-    try {
-      await client.interactionResponse('group', event.id, 0);
-    } catch (err) {
-      createResult(ResultCode.Fail, 'interactionResponse failed', err?.response?.data ?? err?.message ?? err);
+    let acknowledged = false;
+    // 只有按钮和快捷菜单需要 ACK。其他互动仍完整转发给开发者。
+    if ((options?.autoInteractionAck ?? config.autoInteractionAck ?? true) && (event.type === 11 || event.type === 12)) {
+      try {
+        await client.interactionResponse('group', event.id, 0);
+        acknowledged = true;
+      } catch (err) {
+        logger.warn('interactionResponse failed', err?.response?.data ?? err?.message ?? err);
+      }
     }
 
     if (event.scene === 'group') {
@@ -579,7 +625,7 @@ export const register = (
 
       const [isMaster, UserKey] = getMaster(UserId);
 
-      const MessageText = event.data.resolved.button_data?.trim() || '';
+      const MessageText = event.data?.resolved?.button_data?.trim() || '';
 
       const e = FormatEvent.create('interaction.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
@@ -593,17 +639,17 @@ export const register = (
           IsMaster: isMaster,
           IsBot: false
         })
-        .addMessage({ MessageId: event.id })
+        .addMessage({ MessageId: event.event_id || event.id })
         .addText({ MessageText: MessageText })
         .addInteraction({
           InteractionId: event.id,
-          InteractionData: JSON.stringify(event.data.resolved),
+          InteractionData: JSON.stringify(event.data?.resolved ?? {}),
           Target: { scope: 'group', targetId: event.group_openid, BotId: botId }
         })
         .addOpen({ OpenId: `C2C:${event.group_member_openid}` })
         .add({ tag: 'INTERACTION_CREATE_GROUP' }).value;
 
-      cbp.send(e);
+      emit(e, acknowledged);
     } else if (event.scene === 'c2c') {
       const UserAvatar = createUserAvatarURL(event.user_openid);
 
@@ -611,7 +657,7 @@ export const register = (
 
       const [isMaster, UserKey] = getMaster(UserId);
 
-      const MessageText = event.data.resolved.button_data?.trim() || '';
+      const MessageText = event.data?.resolved?.button_data?.trim() || '';
 
       // 处理消息
       const e = FormatEvent.create('private.interaction.create')
@@ -624,24 +670,24 @@ export const register = (
           IsMaster: isMaster,
           IsBot: false
         })
-        .addMessage({ MessageId: event.id })
+        .addMessage({ MessageId: event.event_id || event.id })
         .addText({ MessageText: MessageText })
         .addInteraction({
           InteractionId: event.id,
-          InteractionData: JSON.stringify(event.data.resolved),
+          InteractionData: JSON.stringify(event.data?.resolved ?? {}),
           Target: { scope: 'c2c', targetId: event.user_openid, BotId: botId }
         })
         .addOpen({ OpenId: `C2C:${event.user_openid}` })
         .add({ tag: 'INTERACTION_CREATE_C2C' }).value;
 
-      cbp.send(e);
+      emit(e, acknowledged);
     } else if (event.scene === 'guild') {
       const UserAvatar = createUserAvatarURL(event.data.resolved.user_id);
       const UserId = event.data.resolved.user_id;
 
       const [isMaster, UserKey] = getMaster(UserId);
 
-      const MessageText = event.data.resolved.button_data?.trim() || '';
+      const MessageText = event.data?.resolved?.button_data?.trim() || '';
       // 处理消息
       const e = FormatEvent.create('interaction.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
@@ -652,13 +698,13 @@ export const register = (
         .addText({ MessageText: MessageText })
         .addInteraction({
           InteractionId: event.id,
-          InteractionData: JSON.stringify(event.data.resolved),
+          InteractionData: JSON.stringify(event.data?.resolved ?? {}),
           Target: { scope: 'channel', targetId: event.channel_id, BotId: botId }
         })
         .addOpen({ OpenId: `DIRECT:${event.guild_id}` })
         .add({ tag: 'INTERACTION_CREATE_GUILD' }).value;
 
-      cbp.send(e);
+      emit(e, acknowledged);
     } else {
       logger.warn({
         code: ResultCode.Fail,
@@ -670,9 +716,9 @@ export const register = (
 
   // 频道消息删除（私域）
   client.on('MESSAGE_DELETE', event => {
-    const msg = event?.message ?? event;
+    const msg = event.message;
 
-    cbp.send(
+    emit(
       FormatEvent.create('message.delete')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: msg?.guild_id ?? '', SpaceId: `GUILD:${msg?.channel_id ?? ''}` })
@@ -686,7 +732,7 @@ export const register = (
   client.on('PUBLIC_MESSAGE_DELETE', event => {
     const msg = event.message;
 
-    cbp.send(
+    emit(
       FormatEvent.create('message.delete')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: msg.guild_id ?? '', SpaceId: `GUILD:${msg.channel_id ?? ''}` })
@@ -700,7 +746,7 @@ export const register = (
   client.on('DIRECT_MESSAGE_DELETE', event => {
     const msg = event.message;
 
-    cbp.send(
+    emit(
       FormatEvent.create('private.message.delete')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addMessage({ MessageId: msg.id ?? '' })
@@ -710,7 +756,7 @@ export const register = (
 
   // 表情表态 - 添加
   client.on('MESSAGE_REACTION_ADD', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('message.reaction.add')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.channel_id ?? ''}` })
@@ -722,7 +768,7 @@ export const register = (
 
   // 表情表态 - 移除
   client.on('MESSAGE_REACTION_REMOVE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('message.reaction.remove')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.channel_id ?? ''}` })
@@ -734,7 +780,7 @@ export const register = (
 
   // 子频道创建
   client.on('CHANNEL_CREATE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('channel.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
@@ -745,7 +791,7 @@ export const register = (
 
   // 子频道删除
   client.on('CHANNEL_DELETE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('channel.delete')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
@@ -756,7 +802,7 @@ export const register = (
 
   // 服务器创建（机器人加入频道）
   client.on('GUILD_CREATE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('guild.join')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
@@ -767,7 +813,7 @@ export const register = (
 
   // 服务器删除（机器人退出频道）
   client.on('GUILD_DELETE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('guild.exit')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
@@ -781,7 +827,7 @@ export const register = (
     const UserId = event.user?.id ?? '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    cbp.send(
+    emit(
       FormatEvent.create('member.add')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
@@ -795,7 +841,7 @@ export const register = (
     const UserId = event.user?.id ?? '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    cbp.send(
+    emit(
       FormatEvent.create('member.remove')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
@@ -809,7 +855,7 @@ export const register = (
     const UserId = event.user?.id ?? '';
     const [isMaster, UserKey] = getMaster(UserId);
 
-    cbp.send(
+    emit(
       FormatEvent.create('member.update')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
@@ -820,7 +866,7 @@ export const register = (
 
   // 好友添加
   client.on('FRIEND_ADD', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('private.friend.add')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addUser(createUserMeta(event.openid ?? ''))
@@ -831,7 +877,7 @@ export const register = (
 
   // 好友删除
   client.on('FRIEND_DEL', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('private.friend.remove')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addUser(createUserMeta(event.openid ?? ''))
@@ -841,7 +887,7 @@ export const register = (
 
   // 子频道更新
   client.on('CHANNEL_UPDATE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('channel.update')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.guild_id ?? '', SpaceId: `GUILD:${event.guild_id ?? ''}` })
@@ -852,7 +898,7 @@ export const register = (
 
   // 频道信息更新
   client.on('GUILD_UPDATE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('guild.update')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.id ?? '', SpaceId: `GUILD:${event.id ?? ''}` })
@@ -862,7 +908,7 @@ export const register = (
 
   // 群消息推送开启
   client.on('GROUP_MSG_RECEIVE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
@@ -875,7 +921,7 @@ export const register = (
 
   // 群消息推送关闭
   client.on('GROUP_MSG_REJECT', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
@@ -888,13 +934,13 @@ export const register = (
 
   // 群消息审核通过
   client.on('MESSAGE_AUDIT_PASS', event => {
-    const meta = getGroupAuditMeta(event);
+    const meta = getAuditMeta(event);
 
-    cbp.send(
+    emit(
       FormatEvent.create('notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
-        .addChannel({ ChannelId: meta.groupId })
+        .addGuild({ GuildId: meta.guildId, SpaceId: `${event.guild_id ? 'GUILD' : 'GROUP'}:${meta.channelId}` })
+        .addChannel({ ChannelId: meta.channelId })
         .addMessage({ MessageId: meta.messageId })
         .add({ tag: 'MESSAGE_AUDIT_PASS' }).value
     );
@@ -902,21 +948,71 @@ export const register = (
 
   // 群消息审核不通过
   client.on('MESSAGE_AUDIT_REJECT', event => {
-    const meta = getGroupAuditMeta(event);
+    const meta = getAuditMeta(event);
 
-    cbp.send(
+    emit(
       FormatEvent.create('notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
-        .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
-        .addChannel({ ChannelId: meta.groupId })
+        .addGuild({ GuildId: meta.guildId, SpaceId: `${event.guild_id ? 'GUILD' : 'GROUP'}:${meta.channelId}` })
+        .addChannel({ ChannelId: meta.channelId })
         .addMessage({ MessageId: meta.messageId })
         .add({ tag: 'MESSAGE_AUDIT_REJECT' }).value
     );
   });
 
+  // 网关就绪也作为通知交给应用层，保留原始 READY payload 以便多机器人启动诊断。
+  client.on('READY', event => {
+    emit(
+      FormatEvent.create('notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addUser({ UserId: event.user?.id ?? '', UserName: event.user?.name ?? '', UserKey: '', IsMaster: false, IsBot: true })
+        .add({ tag: 'READY' }).value
+    );
+  });
+
+  // 论坛和音频事件没有更细的跨平台标准语义，统一投递为通知事件；
+  // 完整 QQ payload 始终保留在 event.value，开发者可用 useValue(event) 获得有类型的数据。
+  const emitGuildNotice = (tag: string, event: { guild_id?: string; channel_id?: string; author_id?: string }, authorId?: string) => {
+    const guildId = event.guild_id ?? '';
+    const channelId = event.channel_id ?? '';
+
+    emit(
+      FormatEvent.create('notice.create')
+        .addPlatform({ Platform: platform, value: event, BotId: botId })
+        .addGuild({ GuildId: guildId, SpaceId: `GUILD:${channelId}` })
+        .addChannel({ ChannelId: channelId })
+        .addUser(createUserMeta(authorId ?? event.author_id ?? ''))
+        .add({ tag }).value
+    );
+  };
+
+  for (const tag of [
+    'FORUM_THREAD_CREATE',
+    'FORUM_THREAD_UPDATE',
+    'FORUM_THREAD_DELETE',
+    'FORUM_POST_CREATE',
+    'FORUM_POST_DELETE',
+    'FORUM_REPLY_CREATE',
+    'FORUM_REPLY_DELETE',
+    'FORUM_PUBLISH_AUDIT_RESULT',
+    'AUDIO_START',
+    'AUDIO_FINISH',
+    'AUDIO_ON_MIC',
+    'AUDIO_OFF_MIC',
+    'AUDIO_OR_LIVE_CHANNEL_MEMBER_ENTER',
+    'AUDIO_OR_LIVE_CHANNEL_MEMBER_EXIT'
+  ] as const) {
+    client.on(tag, event =>
+      // Forum payloads already expose author_id. Audio/live membership events
+      // expose user_id instead, so only use it as a fallback. Do not clone the
+      // event: application code must receive the exact QQ raw payload in value.
+      emitGuildNotice(tag, event, ('author_id' in event ? event.author_id : undefined) ?? ('user_id' in event ? event.user_id : undefined))
+    );
+  }
+
   // C2C消息推送开启
   client.on('C2C_MSG_RECEIVE', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('private.notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addUser(createUserMeta(event.openid ?? ''))
@@ -927,13 +1023,32 @@ export const register = (
 
   // C2C消息推送关闭
   client.on('C2C_MSG_REJECT', event => {
-    cbp.send(
+    emit(
       FormatEvent.create('private.notice.create')
         .addPlatform({ Platform: platform, value: event, BotId: botId })
         .addUser(createUserMeta(event.openid ?? ''))
         .addMessage({ MessageId: `c2c_msg_reject_${event.openid}_${event.timestamp}` })
         .add({ tag: 'C2C_MSG_REJECT' }).value
     );
+  });
+
+  client.on('SUBSCRIBE_MESSAGE_STATUS', event => {
+    if (event.group_openid) {
+      emit(
+        FormatEvent.create('notice.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsPrivate: false })
+          .addGuild({ GuildId: event.group_openid, SpaceId: `GROUP:${event.group_openid}` })
+          .addChannel({ ChannelId: event.group_openid })
+          .add({ tag: 'SUBSCRIBE_MESSAGE_STATUS' }).value
+      );
+    } else {
+      emit(
+        FormatEvent.create('private.notice.create')
+          .addPlatform({ Platform: platform, value: event, BotId: botId, IsPrivate: true })
+          .addUser(createUserMeta(event.openid || ''))
+          .add({ tag: 'SUBSCRIBE_MESSAGE_STATUS' }).value
+      );
+    }
   });
 
   client.on('ERROR', console.error);
@@ -1101,18 +1216,8 @@ export const register = (
 
         if (value.mentions) {
           const mentions = (event.value['mentions'] || []) as NonNullable<AT_MESSAGE_CREATE_TYPE['mentions'] | GROUP_MESSAGE_CREATE_TYPE['mentions']>;
-          const MessageMention: User[] = mentions.map(item => {
-            const UserId = item.id;
-            const [isMaster, UserKey] = getMaster(UserId);
-
-            return {
-              UserId: item.id,
-              IsMaster: isMaster,
-              UserName: item.username,
-              IsBot: item.bot ?? false,
-              UserKey: UserKey
-            };
-          });
+          const scope = event.SpaceId?.startsWith('GROUP:') ? 'group' : event.IsPrivate ? 'c2c' : 'channel';
+          const MessageMention: User[] = mentions.map(item => normalizeMessageUser(item, scope));
 
           return new Promise<User[]>(resolve => resolve(MessageMention));
         } else {
@@ -1126,6 +1231,11 @@ export const register = (
     // 来源事件上下文：调用方透传 payload.event（与 message.send 一致）后，
     // 未显式传 ChannelId/UserId/GuildId 时自动从事件推断，减少参数提交
     const event = data.payload.event ?? {};
+    const requestedBot = data.payload.params?.target?.BotId ?? data.payload.target?.BotId ?? data.payload.BotId ?? event.BotId;
+    if (requestedBot && requestedBot !== botId) {
+      consume([createResult(ResultCode.FailParams, 'BotId does not match this adapter', null)]);
+      return;
+    }
     // 群 openid 取值：事件转发时 group_openid 落在 ChannelId
     const getGroupOpenId = () => data.payload.ChannelId ?? data.payload.params?.groupOpenId ?? data.payload.GuildId ?? event.ChannelId ?? event.GuildId ?? '';
     // 群成员 openid 取值
@@ -1136,6 +1246,34 @@ export const register = (
     const getChannelId = () => data.payload.ChannelId ?? event.ChannelId ?? '';
 
     try {
+      if (data.action === 'media.send.user' || data.action === 'media.send.channel') {
+        const scope = data.payload.target?.scope;
+        if (
+          (data.action === 'media.send.user' && (!scope || scope === 'group' || scope === 'c2c')) ||
+          (data.action === 'media.send.channel' && scope === 'group')
+        ) {
+          await onactions(
+            {
+              action: 'media.send',
+              payload: {
+                ...data.payload,
+                target: {
+                  scope: data.action === 'media.send.user' ? 'c2c' : 'group',
+                  targetId: data.action === 'media.send.user' ? getUserId() : getChannelId(),
+                  BotId: data.payload.BotId ?? data.payload.target?.BotId ?? event.BotId
+                }
+              }
+            },
+            consume
+          );
+          return;
+        }
+      }
+      const handled = await handleFrameworkAction(client, data, botId);
+      if (handled) {
+        consume(handled);
+        return;
+      }
       // 新增action，用于获取机器人本身的信息
       if (data.action === 'me.info') {
         // TODO 当前api似乎仅适用于guilds模式
@@ -1143,10 +1281,14 @@ export const register = (
         const UserId = res.id;
         const [isMaster, UserKey] = getMaster(UserId);
 
-        const botInfo: User = {
+        const botInfo: BotInfo = {
           UserId: res?.id,
           UserName: res?.username,
-          UserAvatar: createUserAvatarURL(res?.id),
+          UserAvatar: res?.avatar || createUserAvatarURL(res?.id),
+          UnionId: res?.union_openid,
+          AccountId: res?.union_user_account,
+          ShareUrl: res?.share_url,
+          WelcomeMessage: res?.welcome_msg,
           IsBot: true,
           IsMaster: isMaster,
           UserKey: UserKey
@@ -1231,9 +1373,7 @@ export const register = (
         const res = await client
           .interactionResponse(mode, interactionId, params.code)
           .then(r => createResult(ResultCode.Ok, data.action, r))
-          .catch(err => createResult(ResultCode.Fail, data.action, err));
-
-        consume([res]);
+          .catch(err => createResult(ResultCode.Fail, data.action, err?.response?.data ?? err?.message ?? err));
 
         consume([res]);
       } else if (data.action === 'message.pin') {
@@ -1249,6 +1389,86 @@ export const register = (
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
+        consume([res]);
+      } else if (data.action === 'schedule.list') {
+        const res = await client
+          .channelsSchedules(getChannelId(), data.payload.params)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'schedule.get') {
+        const res = await client
+          .channelsSchedulesSchedule(getChannelId(), data.payload.ScheduleId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'schedule.create') {
+        const res = await client
+          .channelsSchedulesPost(getChannelId(), { schedule: data.payload.params.schedule })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'schedule.update') {
+        const res = await client
+          .channelsSchedulesSchedulePatch(getChannelId(), data.payload.ScheduleId, { schedule: data.payload.params.schedule })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'schedule.delete') {
+        const res = await client
+          .channelsSchedulesScheduleDelete(getChannelId(), data.payload.ScheduleId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'forum.list') {
+        const res = await client
+          .channelsThreads(getChannelId())
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'forum.get') {
+        const res = await client
+          .channelsThreadsThread(getChannelId(), data.payload.ThreadId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'forum.create') {
+        const params = data.payload.params;
+        const res = await client
+          .channelsThreadsPut(getChannelId(), { title: params.title, content: params.content, format: params.format })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'forum.delete') {
+        const res = await client
+          .channelsThreadsDelete(getChannelId(), data.payload.ThreadId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'audio.control') {
+        const params = data.payload.params;
+        const res = await client
+          .channelsAudioPost(getChannelId(), { status: params.status, audio_url: params.audioUrl, text: params.text })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'audio.join') {
+        const res = await client
+          .channelsMicPut(getChannelId())
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'audio.leave') {
+        const res = await client
+          .channelsMicDelete(getChannelId())
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'audio.online') {
+        const res = await client
+          .channelsChannelOnlineNums(getChannelId())
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
         consume([res]);
       } else if (data.action === 'reaction.add') {
         // ─── 表情回应 ───
@@ -1555,16 +1775,15 @@ export const register = (
 
         consume([res]);
       } else if (data.action === 'role.assign') {
-        // QQ Bot角色分配需要channel_id, 这里传空字符串使用默认
         const res = await client
-          .guildsRolesMembersPut(getGuildId(), '', getUserId(), data.payload.RoleId)
+          .guildsRolesMembersPut(getGuildId(), getChannelId(), getUserId(), data.payload.RoleId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
       } else if (data.action === 'role.remove') {
         const res = await client
-          .guildsRolesMembersDelete(getGuildId(), '', getUserId(), data.payload.RoleId)
+          .guildsRolesMembersDelete(getGuildId(), getChannelId(), getUserId(), data.payload.RoleId)
           .then(r => createResult(ResultCode.Ok, data.action, r))
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
@@ -1645,27 +1864,21 @@ export const register = (
         const params = data.payload.params || {};
 
         if (params.fileId) {
-          const send =
-            target.scope === 'group'
-              ? client.groupOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
-              : target.scope === 'c2c'
-              ? client.usersOpenMessages(target.targetId, { msg_type: 7, content: params.content || '', media: { file_info: params.fileId } })
-              : null;
-
-          if (!send) {
-            consume([createResult(ResultCode.Warn, 'QQ media.send only supports group and c2c targets', null)]);
-
-            return;
-          }
-          const res = await send
-            .then(value => createResult(ResultCode.Ok, data.action, { id: value.id }))
-            .catch(err => createResult(ResultCode.Fail, data.action, err));
-
-          consume([res]);
-
+          const results = await handleFrameworkAction(
+            client,
+            {
+              action: 'message.send',
+              payload: {
+                ...data.payload,
+                params: { ...params, content: { text: params.content, media: { fileId: params.fileId } } }
+              }
+            },
+            botId
+          );
+          consume(results ?? [createResult(ResultCode.FailParams, 'Unsupported media target', null)]);
           return;
         }
-        const upload = await uploadMedia(target, params)
+        const upload = await uploadMedia(target, { ...params, send: false })
           .then(value => value.fileId)
           .catch(error => {
             consume([createResult(ResultCode.Fail, data.action, error)]);
@@ -1677,7 +1890,10 @@ export const register = (
           return;
         }
         await onactions(
-          { action: 'media.send', payload: { target, params: { ...params, fileId: upload, url: undefined, data: undefined, filePath: undefined } } },
+          {
+            action: 'media.send',
+            payload: { ...data.payload, target, params: { ...params, fileId: upload, url: undefined, data: undefined, filePath: undefined } }
+          },
           consume
         );
       } else if (data.action === 'connection.status') {
@@ -1759,6 +1975,19 @@ export const register = (
           .catch(err => createResult(ResultCode.Fail, data.action, err));
 
         consume([res]);
+      } else if (data.action === 'permission.role.get') {
+        const res = await client
+          .channelsRolePermissions(getChannelId(), data.payload.RoleId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'permission.role.set') {
+        const params = data.payload.params ?? {};
+        const res = await client
+          .channelsRolePermissionsPut(getChannelId(), data.payload.RoleId, params.allow ?? '0', params.deny ?? '0')
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
       } else if (data.action === 'reaction.list') {
         // ─── 表情回应列表 ───
         const res = await client
@@ -1787,11 +2016,52 @@ export const register = (
 
           consume([res]);
         }
+      } else if (data.action === 'channel.message-rate.get') {
+        const res = await client
+          .guildsMessageSetting(getGuildId())
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'channel.api-permission.list') {
+        const res = await client
+          .guildApiPermission(getGuildId())
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'channel.api-permission.request') {
+        const params = data.payload.params;
+        const res = await client
+          .guildsApiPermissionDemand(getGuildId(), {
+            channel_id: getChannelId(),
+            api_identify: { path: params.path, method: params.method },
+            desc: params.description
+          })
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'channel.direct-session.open') {
+        const res = await client
+          .usersMeDms(data.payload.UserId, getGuildId())
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'channel.legacy-announcement.set') {
+        const res = await client
+          .channelsAnnounces(getChannelId(), data.payload.MessageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
+      } else if (data.action === 'channel.legacy-announcement.remove') {
+        const res = await client
+          .channelsAnnouncesDelete(getChannelId(), data.payload.MessageId)
+          .then(r => createResult(ResultCode.Ok, data.action, r))
+          .catch(err => createResult(ResultCode.Fail, data.action, err));
+        consume([res]);
       } else {
         consume([createResult(ResultCode.Fail, '未知请求，请尝试升级版本', null)]);
       }
     } catch (error) {
-      consume([createResult(ResultCode.Fail, '请求失败', error)]);
+      consume([createResult(ResultCode.Fail, '请求失败', error?.response?.data ?? error?.message ?? error)]);
     }
   };
 
@@ -1826,7 +2096,7 @@ export const register = (
 
       consume([createResult(ResultCode.Ok, '请求完成', res)]);
     } catch (error) {
-      consume([createResult(ResultCode.Fail, '请求失败', error)]);
+      consume([createResult(ResultCode.Fail, '请求失败', error?.response?.data ?? error?.message ?? error)]);
     }
   };
 

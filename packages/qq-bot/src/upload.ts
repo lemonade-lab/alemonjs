@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
-import { readFileSync } from 'fs';
+import { readFileSync, statSync } from 'fs';
 import type { QQBotAPI } from './sdk/api';
-import { FileType, UploadPartFinishData, UploadPrepareData } from './sdk/typing';
+import { FileType } from './sdk/typing';
 
 /**
  * 分片上传辅助
@@ -31,8 +31,10 @@ export const fileDataToBuffer = (fileData: any): Buffer | null => {
     if (fileData.indexOf('base64://') === 0) {
       return Buffer.from(fileData.replace('base64://', ''), 'base64');
     }
+
     return Buffer.from(fileData, 'base64');
   }
+
   return null;
 };
 
@@ -45,9 +47,9 @@ export const computeFileDigests = (filePath: string) => {
   const md5 = createHash('md5').update(buffer).digest('hex');
   const sha1 = createHash('sha1').update(buffer).digest('hex');
   // 文件前 10002432 字节（约 10MB）的 MD5
-  const md5_10m = createHash('md5').update(buffer.subarray(0, CHUNK_THRESHOLD)).digest('hex');
+  const md5Head = createHash('md5').update(buffer.subarray(0, CHUNK_THRESHOLD)).digest('hex');
 
-  return { buffer, md5, sha1, md5_10m };
+  return { buffer, md5, sha1, md5_10m: md5Head };
 };
 
 /**
@@ -58,7 +60,7 @@ export const computeFileDigests = (filePath: string) => {
  * @param file 本地文件路径或文件内容
  * @param options 上传选项
  */
-export const chunkedUpload = async (
+export const chunkedUpload = (
   client: QQBotAPI,
   scope: 'user' | 'group',
   openId: string,
@@ -69,42 +71,12 @@ export const chunkedUpload = async (
     srv_send_msg?: boolean;
   }
 ) => {
-  const buffer = typeof file === 'string' ? readFileSync(file) : file;
-  const md5 = createHash('md5').update(buffer).digest('hex');
-  const sha1 = createHash('sha1').update(buffer).digest('hex');
-  const md5_10m = createHash('md5').update(buffer.subarray(0, CHUNK_THRESHOLD)).digest('hex');
-  const file_name = options.file_name ?? (typeof file === 'string' ? file.split(/[\\/]/).pop() ?? 'file' : 'file');
-
-  // 1. 准备上传任务
-  const prepareData: UploadPrepareData = {
-    file_type: options.file_type,
-    file_name,
-    file_size: String(buffer.byteLength),
-    md5,
-    sha1,
-    md5_10m
-  };
-  const prepare = await (scope === 'user' ? client.usersUploadPrepare(openId, prepareData) : client.groupUploadPrepare(openId, prepareData));
-
-  // 2-3. 逐片 COS 直传 + 完成上报
-  const blockSize = Number(prepare.block_size);
-  for (const part of prepare.parts) {
-    const start = part.index * blockSize;
-    const chunk = Buffer.from(buffer.subarray(start, start + Number(part.block_size)));
-    const partMd5 = createHash('md5').update(chunk).digest('hex');
-
-    await client.uploadPartDirect(part.presigned_url, chunk);
-
-    const finishData: UploadPartFinishData = {
-      upload_id: prepare.upload_id,
-      part_index: part.index,
-      block_size: part.block_size,
-      md5: partMd5
-    };
-    await (scope === 'user' ? client.usersUploadPartFinish(openId, finishData) : client.groupUploadPartFinish(openId, finishData));
-  }
-
-  // 4. 合并得到 file_info
-  const merge = { file_type: options.file_type, upload_id: prepare.upload_id, file_name, srv_send_msg: options.srv_send_msg };
-  return scope === 'user' ? client.postRichMediaByUser(openId, merge) : client.postRichMediaByGroup(openId, merge);
+  return client.postChunkedRichMedia({
+    scope: scope === 'user' ? 'c2c' : 'group',
+    targetId: openId,
+    fileType: options.file_type,
+    ...(typeof file === 'string' ? { filePath: file, size: statSync(file).size } : { data: file }),
+    name: options.file_name ?? (typeof file === 'string' ? file.split(/[\\/]/).pop() : undefined),
+    send: options.srv_send_msg
+  });
 };

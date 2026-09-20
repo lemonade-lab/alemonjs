@@ -1,11 +1,14 @@
-import { EventKeys, Events, MemberInfo, PaginationParams, PaginatedResult, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import type { ActionContext, MessagingActionMap } from '../../types';
+import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
+import { MemberInfo, PaginationParams, PaginatedResult, Result, ResultCode, createResult, sendAction } from './common';
 
 /**
  * 成员管理
  * @param event 事件上下文
  */
-export const useMember = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const useMember = (event?: ActionContext) => {
+  const valueEvent = resolveActionContext(event);
+  const call = createActionCaller(valueEvent);
 
   const getGuildId = (guildId?: string) => guildId || (valueEvent as any).GuildId;
 
@@ -20,6 +23,8 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
         action: 'member.info',
         payload: {
           event: valueEvent,
+          BotId: valueEvent.BotId,
+          target: resolveActionTarget(valueEvent),
           params: {
             userId: params.userId,
             guildId: getGuildId(params.guildId)
@@ -32,7 +37,7 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
         return createResult(ResultCode.Ok, 'Successfully retrieved member information', result.data ?? null);
       }
 
-      return createResult(ResultCode.Warn, 'No member information found', null);
+      return results[0] || createResult(ResultCode.Warn, 'No member information found', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get member information', null);
     }
@@ -52,7 +57,7 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'member.list',
-        payload: { GuildId: guildId, params: params?.pagination }
+        payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), GuildId: guildId, params: params?.pagination }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -60,7 +65,7 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
         return createResult(ResultCode.Ok, 'Successfully retrieved member list', result.data ?? { Items: [] });
       }
 
-      return createResult(ResultCode.Warn, 'No member list found', { Items: [] });
+      return results[0] || createResult(ResultCode.Warn, 'No member list found', { Items: [] });
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get member list', { Items: [] });
     }
@@ -78,11 +83,11 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'member.kick',
-        payload: { GuildId: gid, UserId: params.userId }
+        payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), GuildId: gid, UserId: params.userId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Kick not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, 'Kick not supported or failed', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to kick member', null);
     }
@@ -100,11 +105,18 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'member.ban',
-        payload: { GuildId: gid, UserId: params.userId, params: { reason: params.reason, duration: params.duration } }
+        payload: {
+          event: valueEvent,
+          BotId: valueEvent.BotId,
+          target: resolveActionTarget(valueEvent),
+          GuildId: gid,
+          UserId: params.userId,
+          params: { reason: params.reason, duration: params.duration }
+        }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Ban not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, 'Ban not supported or failed', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to ban member', null);
     }
@@ -122,11 +134,11 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'member.unban',
-        payload: { GuildId: gid, UserId: params.userId }
+        payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), GuildId: gid, UserId: params.userId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Unban not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, 'Unban not supported or failed', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to unban member', null);
     }
@@ -152,17 +164,27 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'member.search',
-        payload: { GuildId: gid, params: { keyword: params.keyword, limit: params.limit } }
+        payload: {
+          event: valueEvent,
+          BotId: valueEvent.BotId,
+          target: resolveActionTarget(valueEvent),
+          GuildId: gid,
+          params: { keyword: params.keyword, limit: params.limit }
+        }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Member search not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, 'Member search not supported or failed', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to search members', null);
     }
   };
 
   const member = {
+    kickMany: (params: MessagingActionMap['member.kick.batch'][0]) => call('member.kick.batch', params),
+    blacklist: (params: MessagingActionMap['member.blacklist.list'][0] = {}) => call('member.blacklist.list', params),
+    updateBlacklist: (params: MessagingActionMap['member.blacklist.update'][0]) => call('member.blacklist.update', params),
+    muteMany: (params: MessagingActionMap['member.mute.batch'][0]) => call('member.mute.batch', params),
     info,
     information,
     list,
@@ -186,11 +208,18 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'member.mute',
-          payload: { GuildId: gid, UserId: params.userId, params: { duration: params.duration } }
+          payload: {
+            event: valueEvent,
+            BotId: valueEvent.BotId,
+            target: resolveActionTarget(valueEvent),
+            GuildId: gid,
+            UserId: params.userId,
+            params: { duration: params.duration }
+          }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Mute not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Mute not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to mute member', null);
       }
@@ -211,11 +240,18 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'member.admin',
-          payload: { GuildId: gid, UserId: params.userId, params: { enable: params.enable } }
+          payload: {
+            event: valueEvent,
+            BotId: valueEvent.BotId,
+            target: resolveActionTarget(valueEvent),
+            GuildId: gid,
+            UserId: params.userId,
+            params: { enable: params.enable }
+          }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Admin set not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Admin set not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to set admin', null);
       }
@@ -236,11 +272,18 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'member.card',
-          payload: { GuildId: gid, UserId: params.userId, params: { card: params.card } }
+          payload: {
+            event: valueEvent,
+            BotId: valueEvent.BotId,
+            target: resolveActionTarget(valueEvent),
+            GuildId: gid,
+            UserId: params.userId,
+            params: { card: params.card }
+          }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Card set not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Card set not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to set member card', null);
       }
@@ -262,11 +305,18 @@ export const useMember = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'member.title',
-          payload: { GuildId: gid, UserId: params.userId, params: { title: params.title, duration: params.duration ?? -1 } }
+          payload: {
+            event: valueEvent,
+            BotId: valueEvent.BotId,
+            target: resolveActionTarget(valueEvent),
+            GuildId: gid,
+            UserId: params.userId,
+            params: { title: params.title, duration: params.duration ?? -1 }
+          }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Title set not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Title set not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to set member title', null);
       }

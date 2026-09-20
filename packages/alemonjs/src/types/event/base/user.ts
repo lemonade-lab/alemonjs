@@ -1,5 +1,14 @@
 // 用户
 export type User = {
+  /** Original platform user ID, retained when the current scope uses a different ID. */
+  SourceUserId?: string;
+  /** User ID supplied for a direct conversation. */
+  DirectUserId?: string;
+  /** User ID supplied for membership in the current group. */
+  MemberId?: string;
+  UnionId?: string;
+  AccountId?: string;
+  Role?: string;
   /**
    * 用户编号
    */

@@ -32,3 +32,5 @@ export * from './actions';
 export * from './connection';
 export * from './apis';
 export * from './run';
+
+export * from './messaging';

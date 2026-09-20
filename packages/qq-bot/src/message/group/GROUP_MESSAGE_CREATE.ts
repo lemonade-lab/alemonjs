@@ -1,37 +1,13 @@
+import type { QQBotMessageContent, QQBotMessageUser } from '../../sdk/non-channel-types';
 /**
  * 群消息事件
  */
-export interface GROUP_MESSAGE_CREATE_TYPE {
-  attachments?: {
-    id?: string;
-    url?: string;
-    content_type?: string;
-    filename?: string;
-    size?: number;
-  }[];
-  author: {
-    bot?: boolean;
-    id: string;
-    member_openid: string;
-    union_openid: string;
-    username: string;
-  };
+export interface GROUP_MESSAGE_CREATE_TYPE extends QQBotMessageContent {
+  author: QQBotMessageUser;
   content: string;
   group_openid: string;
-  group_id: string;
+  group_id?: string;
   id: string;
-  mentions?: {
-    bot?: boolean;
-    id: string;
-    is_you?: boolean;
-    member_openid?: string;
-    scope?: string;
-    username: string;
-  }[];
+  mentions?: (QQBotMessageUser & { is_you?: boolean; scope?: string })[];
   timestamp: string;
-  message_scene: {
-    ext: string[];
-    source: string;
-  };
-  message_type: number;
 }

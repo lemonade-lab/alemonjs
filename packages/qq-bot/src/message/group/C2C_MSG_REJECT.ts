@@ -3,5 +3,5 @@
  */
 export type C2C_MSG_REJECT_TYPE = {
   openid: string;
-  timestamp: string;
+  timestamp: number | string;
 };

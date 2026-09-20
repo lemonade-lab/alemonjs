@@ -31,6 +31,7 @@ GROUP_MEMBER_EVENT (1 << 24)
 
 
 GROUP_AND_C2C_EVENT (1 << 25)
+  - SUBSCRIBE_MESSAGE_STATUS // 订阅模板授权状态变化
   - C2C_MESSAGE_CREATE      // 用户单聊发消息给机器人时候
   - FRIEND_ADD              // 用户添加使用机器人
   - FRIEND_DEL              // 用户删除机器人

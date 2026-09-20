@@ -1,11 +1,13 @@
-import { EventKeys, Events, Result, ResultCode, RoleInfo, createResult, getEventOrThrow, sendAction } from './common';
+import type { ActionContext } from '../../types';
+import { EventKeys, Events, Result, ResultCode, RoleInfo, createResult, sendAction } from './common';
+import { resolveActionContext } from './action-context';
 
 /**
  * 角色管理
  * @param event 事件上下文
  */
-export const useRole = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) => {
+  const valueEvent = resolveActionContext(event as ActionContext | undefined);
 
   const getGuildId = (guildId?: string) => guildId || (valueEvent as any).GuildId;
 
@@ -21,7 +23,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'role.list',
-        payload: { GuildId: gid }
+        payload: { event: valueEvent, GuildId: gid }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -47,7 +49,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'role.create',
-        payload: { GuildId: gid, params: { name: params.name, color: params.color, permissions: params.permissions } }
+        payload: { event: valueEvent, GuildId: gid, params: { name: params.name, color: params.color, permissions: params.permissions } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -69,7 +71,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'role.update',
-        payload: { GuildId: gid, RoleId: params.roleId, params: { name: params.name, color: params.color, permissions: params.permissions } }
+        payload: { event: valueEvent, GuildId: gid, RoleId: params.roleId, params: { name: params.name, color: params.color, permissions: params.permissions } }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -91,7 +93,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'role.delete',
-        payload: { GuildId: gid, RoleId: params.roleId }
+        payload: { event: valueEvent, GuildId: gid, RoleId: params.roleId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -104,7 +106,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
   /**
    * 为成员分配角色
    */
-  const assign = async (params: { userId: string; roleId: string; guildId?: string }): Promise<Result> => {
+  const assign = async (params: { userId: string; roleId: string; guildId?: string; channelId?: string }): Promise<Result> => {
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.userId || !params.roleId) {
@@ -113,7 +115,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'role.assign',
-        payload: { GuildId: gid, UserId: params.userId, RoleId: params.roleId }
+        payload: { event: valueEvent, GuildId: gid, ChannelId: params.channelId ?? valueEvent.ChannelId, UserId: params.userId, RoleId: params.roleId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -126,7 +128,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
   /**
    * 移除成员角色
    */
-  const revoke = async (params: { userId: string; roleId: string; guildId?: string }): Promise<Result> => {
+  const revoke = async (params: { userId: string; roleId: string; guildId?: string; channelId?: string }): Promise<Result> => {
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.userId || !params.roleId) {
@@ -135,7 +137,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'role.remove',
-        payload: { GuildId: gid, UserId: params.userId, RoleId: params.roleId }
+        payload: { event: valueEvent, GuildId: gid, ChannelId: params.channelId ?? valueEvent.ChannelId, UserId: params.userId, RoleId: params.roleId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 

@@ -4,6 +4,8 @@ export const platform = 'qq-bot';
 export const platformFullName = '@alemonjs/qq-bot';
 
 export type Options = {
+  /** 按钮/快捷菜单自动 ACK。设为 false 后由应用 useInteraction().ack() 回应。 */
+  autoInteractionAck?: boolean;
   /**
    * 主人-用户KEY
    */

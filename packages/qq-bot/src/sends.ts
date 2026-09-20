@@ -1,3 +1,4 @@
+import type { MessageDelivery } from 'alemonjs';
 import { readFileSync } from 'fs';
 import { QQBotAPI } from './sdk/api';
 import { FileType } from './sdk/typing';
@@ -477,8 +478,27 @@ const sendOpenApiMessage = async (
   uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>,
   sendMessage: (data: any) => Promise<any>,
   label: string,
-  options?: { forceVerifyImageResource?: boolean }
+  options?: MessageDelivery & { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
+  if ((options?.wakeup && (options.replyId || options.eventId)) || (options?.replyId && options?.eventId)) {
+    return [createResult(ResultCode.FailParams, 'wakeup, replyId and eventId are mutually exclusive', null)];
+  }
+  if (options?.wakeup || options?.replyId || options?.eventId) {
+    baseParams = {};
+    if (options.wakeup) {
+      baseParams.is_wakeup = true;
+    } else if (options.eventId) {
+      baseParams.event_id = options.eventId;
+    } else {
+      baseParams.msg_id = options.replyId;
+    }
+  }
+  if (options?.sequence !== undefined) {
+    baseParams.msg_seq = options.sequence;
+  }
+  if (options?.referenceId) {
+    baseParams.message_reference = { message_id: options.referenceId };
+  }
   const config = getQQBotConfig();
   const mdToText = config.markdownToText === true;
 
@@ -501,7 +521,13 @@ const sendOpenApiMessage = async (
       ...baseParams
     });
 
-    return [createResult(ResultCode.Ok, label, { id: res.id })];
+    return [
+      createResult(ResultCode.Ok, label, {
+        id: res.id,
+        ...(res.timestamp !== undefined && { timestamp: res.timestamp }),
+        ...(res.ext_info?.ref_idx !== undefined && { referenceId: res.ext_info.ref_idx })
+      })
+    ];
   }
 
   // hideUnsupported 模式：检查转换后内容是否为空
@@ -518,7 +544,13 @@ const sendOpenApiMessage = async (
     if (textContent) {
       const res = await sendMessage({ content: textContent, msg_type: 0, ...baseParams });
 
-      return [createResult(ResultCode.Ok, label, { id: res.id })];
+      return [
+        createResult(ResultCode.Ok, label, {
+          id: res.id,
+          ...(res.timestamp !== undefined && { timestamp: res.timestamp }),
+          ...(res.ext_info?.ref_idx !== undefined && { referenceId: res.ext_info.ref_idx })
+        })
+      ];
     }
 
     return [];
@@ -532,9 +564,18 @@ const sendOpenApiMessage = async (
     if (mdParams.markdown?.content) {
       mdParams.markdown.content = formatQQContent(val, item => extractContent([item], 'group'));
     }
-    const res = await sendMessage({ content, msg_type: 2, ...mdParams, ...baseParams, force_verify_image_resource: options?.forceVerifyImageResource });
+    if (mdParams.markdown && options?.forceVerifyImageResource !== undefined) {
+      mdParams.markdown.force_verify_image_resource = options.forceVerifyImageResource;
+    }
+    const res = await sendMessage({ msg_type: 2, ...mdParams, ...baseParams });
 
-    return [createResult(ResultCode.Ok, label, { id: res.id })];
+    return [
+      createResult(ResultCode.Ok, label, {
+        id: res.id,
+        ...(res.timestamp !== undefined && { timestamp: res.timestamp }),
+        ...(res.ext_info?.ref_idx !== undefined && { referenceId: res.ext_info.ref_idx })
+      })
+    ];
   }
 
   // Ark
@@ -543,14 +584,26 @@ const sendOpenApiMessage = async (
   if (arkParams) {
     const res = await sendMessage({ content, msg_type: 3, ...arkParams, ...baseParams });
 
-    return [createResult(ResultCode.Ok, label, { id: res.id })];
+    return [
+      createResult(ResultCode.Ok, label, {
+        id: res.id,
+        ...(res.timestamp !== undefined && { timestamp: res.timestamp }),
+        ...(res.ext_info?.ref_idx !== undefined && { referenceId: res.ext_info.ref_idx })
+      })
+    ];
   }
 
   // 纯文本
   if (content) {
     const res = await sendMessage({ content, msg_type: 0, ...baseParams });
 
-    return [createResult(ResultCode.Ok, label, { id: res.id })];
+    return [
+      createResult(ResultCode.Ok, label, {
+        id: res.id,
+        ...(res.timestamp !== undefined && { timestamp: res.timestamp }),
+        ...(res.ext_info?.ref_idx !== undefined && { referenceId: res.ext_info.ref_idx })
+      })
+    ];
   }
 
   return [];
@@ -647,7 +700,13 @@ const sendGuildMessage = async (
     }
     const res = await sendMessage({ content: '', ...mdParams, ...baseParams });
 
-    return [createResult(ResultCode.Ok, label, { id: res.id })];
+    return [
+      createResult(ResultCode.Ok, label, {
+        id: res.id,
+        ...(res.timestamp !== undefined && { timestamp: res.timestamp }),
+        ...(res.ext_info?.ref_idx !== undefined && { referenceId: res.ext_info.ref_idx })
+      })
+    ];
   }
 
   // Ark
@@ -656,7 +715,13 @@ const sendGuildMessage = async (
   if (arkParams) {
     const res = await sendMessage({ content, ...arkParams, ...baseParams });
 
-    return [createResult(ResultCode.Ok, label, { id: res.id })];
+    return [
+      createResult(ResultCode.Ok, label, {
+        id: res.id,
+        ...(res.timestamp !== undefined && { timestamp: res.timestamp }),
+        ...(res.ext_info?.ref_idx !== undefined && { referenceId: res.ext_info.ref_idx })
+      })
+    ];
   }
 
   // 纯文本
@@ -678,7 +743,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (
   client: Client,
   event: { ChannelId: string; MessageId?: string; _tag?: string },
   val: DataEnums[],
-  options?: { forceVerifyImageResource?: boolean }
+  options?: MessageDelivery & { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
   const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_GROUP');
   const content = extractContent(val, 'group');
@@ -705,7 +770,7 @@ export const C2C_MESSAGE_CREATE = async (
   client: Client,
   event: { UserId: string; MessageId?: string; _tag?: string },
   val: DataEnums[],
-  options?: { forceVerifyImageResource?: boolean }
+  options?: MessageDelivery & { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
   const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_C2C');
   const content = extractContent(val, 'group');

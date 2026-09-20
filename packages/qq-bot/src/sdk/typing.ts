@@ -7,6 +7,7 @@ export type MessageType = 0 | 1 | 2 | 3 | 4 | 6 | 7;
 export type FileType = 1 | 2 | 3 | 4;
 
 export interface ButtonType {
+  group_id?: string;
   // 编号
   id: string;
   render_data: {
@@ -30,7 +31,12 @@ export interface ButtonType {
       // 2 所有人可操作
       // 3 指定身份组可操作（仅频道可用）
       type: number;
+      specify_user_ids?: string[];
+      specify_role_ids?: string[];
     };
+    anchor?: number;
+    click_limit?: number;
+    modal?: { content?: string; confirm_text?: string; cancel_text?: string };
     // 默认 false
     reply?: boolean;
     // 自动发送
@@ -52,6 +58,8 @@ export interface KeyboardType {
 }
 
 export interface MarkdownType {
+  template_id?: number;
+  force_verify_image_resource?: boolean;
   /** markdown 模版id，申请模版后获得 */
   custom_template_id?: string;
   /** 原生 markdown 文本内容（内邀使用） */
@@ -75,7 +83,7 @@ export interface ApiRequestData {
   msg_id?: string;
   msg_seq?: number;
   /**
-   * 互动召回消息，true 时不校验 msg_id/event_id 有效期
+   * 互动召回消息，与 msg_id/event_id 互斥
    */
   is_wakeup?: boolean;
   /**

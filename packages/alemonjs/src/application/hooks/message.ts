@@ -1,3 +1,5 @@
+import type { ActionContext, OutgoingMessage, MessageDelivery, MessagingActionMap, MessageReceipt } from '../../types';
+import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
 import { logger } from '../../common/logger.js';
 import {
   DataEnums,
@@ -7,7 +9,7 @@ import {
   Result,
   ResultCode,
   createResult,
-  getEventOrThrow,
+  getCurrentEvent,
   markEventSendAttempt,
   markEventSendFailure,
   recordEventSendResults,
@@ -19,16 +21,15 @@ import {
  * @param event
  * @returns
  */
-export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContext) => {
+  const valueEvent = resolveActionContext(event) as Events[T];
+  const call = createActionCaller(valueEvent);
+  const traceEvent = (event ?? getCurrentEvent() ?? valueEvent) as Events[T];
 
   /**
    * 消息参数类型
    */
-  type MessageParams = {
-    format: Format | DataEnums[];
-    replyId?: string;
-  };
+  type MessageParams = MessageDelivery & { format?: Format | DataEnums[]; content?: OutgoingMessage };
 
   /**
    * 将 format 参数解析为 DataEnums[]
@@ -46,18 +47,21 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
    * @param val
    * @returns
    */
-  const sendRaw = async (val: DataEnums[], replyId?: string): Promise<Result[]> => {
+  const sendRaw = async (val: DataEnums[], replyId?: string, options?: MessageDelivery): Promise<Result<MessageReceipt>[]> => {
     if (!val || val.length === 0) {
       return [createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)];
     }
-    markEventSendAttempt(valueEvent);
+    markEventSendAttempt(traceEvent);
 
     try {
       const result = await sendAction({
         action: 'message.send',
         payload: {
           event: valueEvent,
+          BotId: options?.target?.BotId ?? valueEvent.BotId,
+          target: options?.target ?? resolveActionTarget(valueEvent),
           params: {
+            ...options,
             format: val,
             replyId
           }
@@ -65,7 +69,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
       });
       const results = Array.isArray(result) ? result : [result];
 
-      recordEventSendResults(results, valueEvent);
+      recordEventSendResults(results, traceEvent);
 
       // 结果不含 Ok（适配器未处理当前事件返回空数组，或平台发送失败）时打 WARN，
       // 调用方应以返回值 code 判断成败，而非 try/catch
@@ -79,22 +83,42 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
 
       return results;
     } catch (error) {
-      markEventSendFailure(error, valueEvent);
+      markEventSendFailure(error, traceEvent);
       throw error;
     }
   };
 
   const lightweight = {
+    typing: (params: MessagingActionMap['message.typing'][0] = {}) => call('message.typing', params),
+    stream: (params: MessagingActionMap['message.stream'][0]) => call('message.stream', params),
     /**
      * 发送消息
      * @param params 消息参数或 DataEnums 数组
      */
-    send(params?: MessageParams | DataEnums[]) {
+    send(params?: MessageParams | DataEnums[]): Promise<Result<MessageReceipt>[]> {
       if (Array.isArray(params)) {
         return sendRaw(params.length > 0 ? params : []);
       }
 
-      return sendRaw(resolveFormat(params), params?.replyId ?? valueEvent.MessageId);
+      if (params?.content) {
+        markEventSendAttempt(traceEvent);
+
+        return sendAction({
+          action: 'message.send',
+          payload: { event: valueEvent, BotId: params.target?.BotId ?? valueEvent.BotId, target: params.target ?? resolveActionTarget(valueEvent), params }
+        })
+          .then(results => {
+            recordEventSendResults(results, traceEvent);
+
+            return results;
+          })
+          .catch(error => {
+            markEventSendFailure(error, traceEvent);
+            throw error;
+          });
+      }
+
+      return sendRaw(params ? resolveFormat(params) : [], params?.replyId, params);
     },
 
     /**
@@ -110,11 +134,17 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'message.delete',
-          payload: { MessageId: targetId, ChannelId: (valueEvent as any).ChannelId, event: valueEvent }
+          payload: {
+            MessageId: targetId,
+            ChannelId: (valueEvent as any).ChannelId,
+            event: valueEvent,
+            BotId: valueEvent.BotId,
+            target: resolveActionTarget(valueEvent)
+          }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Delete not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Delete not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to delete message', null);
       }
@@ -135,11 +165,18 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
         const val = params.format instanceof Format ? params.format.value : params.format;
         const results = await sendAction({
           action: 'message.edit',
-          payload: { ChannelId: channelId, MessageId: targetId, params: { format: val }, event: valueEvent }
+          payload: {
+            event: valueEvent,
+            BotId: valueEvent.BotId,
+            target: resolveActionTarget(valueEvent),
+            ChannelId: channelId,
+            MessageId: targetId,
+            params: { format: val }
+          }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Edit not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Edit not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to edit message', null);
       }
@@ -159,11 +196,11 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'message.pin',
-          payload: { ChannelId: channelId, MessageId: targetId }
+          payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), ChannelId: channelId, MessageId: targetId }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Pin not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Pin not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to pin message', null);
       }
@@ -183,11 +220,11 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'message.unpin',
-          payload: { ChannelId: channelId, MessageId: targetId }
+          payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), ChannelId: channelId, MessageId: targetId }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Unpin not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Unpin not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to unpin message', null);
       }
@@ -206,11 +243,11 @@ export const useMessage = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'message.get',
-          payload: { MessageId: targetId }
+          payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), MessageId: targetId }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Get message not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Get message not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to get message', null);
       }

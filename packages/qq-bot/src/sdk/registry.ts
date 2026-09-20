@@ -94,7 +94,7 @@ export class QQBotRegistry {
   #requestedBotId(data: any) {
     const payload = data?.payload || {};
 
-    return payload.target?.BotId || payload.BotId || payload.event?.BotId || payload.event?.Platform?.BotId;
+    return payload.params?.target?.BotId ?? payload.target?.BotId ?? payload.BotId ?? payload.event?.BotId ?? payload.event?.Platform?.BotId;
   }
 
   #select(data: any): { entry?: RegisteredBot; error?: string } {
@@ -117,7 +117,7 @@ export class QQBotRegistry {
 
   async #onAction(data: any, consume: (result: any[]) => void) {
     if (data?.action === 'connection.status') {
-      const botId = data?.payload?.BotId;
+      const botId = this.#requestedBotId(data);
       const status = this.getConnectionStatus(botId);
 
       if (botId && !status.bots.length) {

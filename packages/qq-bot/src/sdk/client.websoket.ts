@@ -10,6 +10,9 @@ const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unk
     return message;
   }
 
+  if ((message as T & { t?: string }).t === 'INTERACTION_CREATE') {
+    message.d.event_id = message.id;
+  }
   if (message.d.id === undefined || message.d.id === null || message.d.id === '') {
     message.d.id = message.id;
   }
@@ -63,7 +66,7 @@ export class QQBotClients extends QQBotAPI {
    * @param option
    */
   constructor(option: Options) {
-    super(option);
+    super({ ...option });
     this.#sessionStore = option.sessionStore || new FileSessionStore();
   }
 

@@ -1,3 +1,4 @@
+import type { MessagingActions, MessagingActionMap, MessageDelivery, OutgoingMessage } from './messaging';
 import { DataEnums } from './message';
 import { PaginationParams } from './standard';
 
@@ -65,7 +66,22 @@ export type HistoryActionName = 'history.list';
 
 export type PermissionActionName = 'permission.get' | 'permission.set';
 
+/** Content features available on platforms that support scheduled events. */
+export type ScheduleActionName = 'schedule.list' | 'schedule.get' | 'schedule.create' | 'schedule.update' | 'schedule.delete';
+/** Forum/thread content features. */
+export type ForumActionName = 'forum.list' | 'forum.get' | 'forum.create' | 'forum.delete';
+/** Voice/audio channel features. */
+export type AudioActionName = 'audio.control' | 'audio.join' | 'audio.leave' | 'audio.online';
+export type ChannelSettingsActionName =
+  | 'channel.message-rate.get'
+  | 'channel.api-permission.list'
+  | 'channel.api-permission.request'
+  | 'channel.direct-session.open'
+  | 'channel.legacy-announcement.set'
+  | 'channel.legacy-announcement.remove';
+
 export type StandardActionName =
+  | keyof MessagingActionMap
   | MessageActionName
   | MentionActionName
   | ReactionActionName
@@ -81,7 +97,11 @@ export type StandardActionName =
   | InteractionActionName
   | ConnectionActionName
   | HistoryActionName
-  | PermissionActionName;
+  | PermissionActionName
+  | ScheduleActionName
+  | ForumActionName
+  | AudioActionName
+  | ChannelSettingsActionName;
 
 export type ActionMessageSend = {
   // 发送消息
@@ -91,8 +111,9 @@ export type ActionMessageSend = {
     // 事件
     event: any;
     // 参数
-    params: {
+    params: MessageDelivery & {
       format?: DataEnums[];
+      content?: OutgoingMessage;
     };
   };
 };
@@ -854,6 +875,7 @@ export type Actions = // 消息
     | ActionMemberSearch
     // 频道公告
     | ActionChannelAnnounce
+    | MessagingActions
     // 兜底
     | {
         action: string;

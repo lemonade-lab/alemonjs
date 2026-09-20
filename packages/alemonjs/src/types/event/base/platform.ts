@@ -1,4 +1,5 @@
-export type Platform = {
+import type { StandardEventDetails } from '../../messaging';
+export type Platform = StandardEventDetails & {
   /**
    * 平台
    */

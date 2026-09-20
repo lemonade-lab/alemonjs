@@ -1,0 +1,856 @@
+{
+  "fetchedAt": "2026-09-20T04:22:20.936008+00:00",
+  "api": [
+    {
+      "endpoint": "GET /gateway",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/gateway.get.html"
+    },
+    {
+      "endpoint": "PUT /interactions/{interaction_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/interactions_interaction_id.put.html"
+    },
+    {
+      "endpoint": "GET /users/@me",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/users_me.get.html"
+    },
+    {
+      "endpoint": "POST /v2/generate_url_link",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_generate_url_link.post.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_id}/upload_part_finish",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_id_upload_part_finish.post.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_id}/upload_prepare",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_id_upload_prepare.post.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_openid}/approval_join_request/{member_openid}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_approval_join_request_member_openid.post.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_openid}/batch_remove_members",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_batch_remove_members.post.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/{group_openid}/bot_state",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_bot_state.get.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_openid}/files",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_files.post.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/{group_openid}/info",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_info.get.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/{group_openid}/join_request_list",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_join_request_list.get.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/{group_openid}/member_blacklist",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_member_blacklist.get.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_openid}/member_blacklist",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_member_blacklist.post.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/{group_openid}/members",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_members.get.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/{group_openid}/members/{member_openid}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_members_member_openid.get.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_openid}/messages",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_messages.post.html"
+    },
+    {
+      "endpoint": "DELETE /v2/groups/{group_openid}/messages/{message_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_messages_message_id.delete.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/{group_openid}/restrict_chat_setting",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_restrict_chat_setting.get.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/{group_openid}/restrict_chat_setting",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_restrict_chat_setting.post.html"
+    },
+    {
+      "endpoint": "GET /v2/groups/join_approval_strategy",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy.get.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/join_approval_strategy",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy.post.html"
+    },
+    {
+      "endpoint": "DELETE /v2/groups/join_approval_strategy/{strategy_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id.delete.html"
+    },
+    {
+      "endpoint": "PATCH /v2/groups/join_approval_strategy/{strategy_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id.patch.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/join_approval_strategy/{strategy_id}/execute",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id_execute.post.html"
+    },
+    {
+      "endpoint": "POST /v2/groups/join_approval_strategy/{strategy_id}/whitelist_users",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id_whitelist_users.post.html"
+    },
+    {
+      "endpoint": "GET /v2/menu",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_menu.get.html"
+    },
+    {
+      "endpoint": "PUT /v2/menu",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_menu.put.html"
+    },
+    {
+      "endpoint": "GET /v2/panels",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels.get.html"
+    },
+    {
+      "endpoint": "POST /v2/panels",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels.post.html"
+    },
+    {
+      "endpoint": "DELETE /v2/panels/{panel_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id.delete.html"
+    },
+    {
+      "endpoint": "GET /v2/panels/{panel_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id.get.html"
+    },
+    {
+      "endpoint": "PUT /v2/panels/{panel_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id.put.html"
+    },
+    {
+      "endpoint": "PUT /v2/panels/{panel_id}/target",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id_target.put.html"
+    },
+    {
+      "endpoint": "POST /v2/users/{user_id}/upload_part_finish",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_id_upload_part_finish.post.html"
+    },
+    {
+      "endpoint": "POST /v2/users/{user_id}/upload_prepare",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_id_upload_prepare.post.html"
+    },
+    {
+      "endpoint": "POST /v2/users/{user_openid}/files",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_files.post.html"
+    },
+    {
+      "endpoint": "POST /v2/users/{user_openid}/messages",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_messages.post.html"
+    },
+    {
+      "endpoint": "DELETE /v2/users/{user_openid}/messages/{message_id}",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_messages_message_id.delete.html"
+    },
+    {
+      "endpoint": "POST /v2/users/{user_openid}/stream_messages",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_stream_messages.post.html"
+    }
+  ],
+  "events": {
+    "C2C_MESSAGE_CREATE": [
+      {
+        "id": "ROBOT1.0_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "author": {
+          "id": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+          "user_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+          "union_openid": "",
+          "username": "",
+          "bot": false
+        },
+        "content": "你好，今天有什么推荐的活动吗？",
+        "message_type": 0,
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_xxxxxxxxxxxxxxx=="]
+        },
+        "timestamp": "2026-07-21T10:00:00+08:00"
+      },
+      {
+        "id": "ROBOT1.0_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+        "author": {
+          "id": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+          "user_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+          "union_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+          "username": "",
+          "bot": false
+        },
+        "content": "[卡片消息] 小程序\n摘要: [每日打卡]快来完成今日学习打卡",
+        "message_type": 3,
+        "ark_data": {
+          "ark_type": "miniapp",
+          "ark_name": "小程序",
+          "prompt": "[每日打卡]快来完成今日学习打卡",
+          "fields": {
+            "title": "快来完成今日学习打卡",
+            "source": "学习助手",
+            "tag": "微信小程序",
+            "preview": "https://pubminishare-30161.picsz.qpic.cn/preview_a1b2c3d4",
+            "source_logo": "https://miniapp.gtimg.cn/generated-icon/app_a1b2c3d4.png",
+            "tag_icon": "https://miniapp.gtimg.cn/public/miniwx.png"
+          }
+        },
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_yyyyyyyyyyyyyyy=="]
+        },
+        "timestamp": "2026-07-21T10:01:00+08:00"
+      },
+      {
+        "id": "ROBOT1.0_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+        "author": {
+          "id": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+          "user_openid": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+          "union_openid": "",
+          "username": "",
+          "bot": false
+        },
+        "content": "这个建议很有帮助，谢谢你！",
+        "message_type": 103,
+        "msg_elements": [
+          {
+            "msg_idx": "REFIDX_aaaaaaaaaaaaaaa==",
+            "message_type": 103,
+            "content": "每天坚持阅读半小时，一个月后你会发现自己的变化"
+          }
+        ],
+        "message_scene": {
+          "source": "default",
+          "ext": ["ref_msg_idx=REFIDX_aaaaaaaaaaaaaaa==", "msg_idx=REFIDX_zzzzzzzzzzzzzzz=="]
+        },
+        "timestamp": "2026-07-21T10:02:00+08:00"
+      }
+    ],
+    "C2C_MSG_RECEIVE": [
+      {
+        "openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "timestamp": 1784570617
+      }
+    ],
+    "C2C_MSG_REJECT": [
+      {
+        "openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "timestamp": 1784570599
+      }
+    ],
+    "FRIEND_ADD": [
+      {
+        "openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "timestamp": 1784570523,
+        "scene": 1001,
+        "scene_param": "",
+        "author": {
+          "union_openid": "DB85A74E07BA08B5B44CD9ED332FCBD2"
+        }
+      },
+      {
+        "openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "timestamp": 1784570600,
+        "scene": 2003,
+        "scene_param": "callback_abc123",
+        "author": {
+          "union_openid": "DB85A74E07BA08B5B44CD9ED332FCBD2"
+        }
+      }
+    ],
+    "FRIEND_DEL": [
+      {
+        "openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "timestamp": 1784570524
+      }
+    ],
+    "GROUP_ADD_ROBOT": [
+      {
+        "group_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "op_member_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "timestamp": 1784570534
+      }
+    ],
+    "GROUP_AT_MESSAGE_CREATE": [
+      {
+        "id": "ROBOT1.0_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "author": {
+          "id": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+          "member_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+          "member_role": "member",
+          "username": "小明",
+          "bot": false
+        },
+        "content": " /今日天气 ",
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "message_type": 0,
+        "timestamp": "2026-07-21T10:00:00+08:00",
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_xxxxxxxxxxxxxxx==", "auth_token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]
+        }
+      },
+      {
+        "id": "ROBOT1.0_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+        "author": {
+          "id": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+          "member_openid": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+          "member_role": "member",
+          "username": "小红",
+          "bot": false
+        },
+        "content": " 看看这张风景照 ",
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "message_type": 0,
+        "timestamp": "2026-07-21T10:05:00+08:00",
+        "attachments": [
+          {
+            "content_type": "image/jpeg",
+            "filename": "photo.jpg",
+            "url": "https://multimedia.nt.qq.com.cn/download?appid=xxx&fileid=xxx&rkey=xxx&spec=0",
+            "width": 1920,
+            "height": 1080,
+            "size": 256000
+          }
+        ],
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_yyyyyyyyyyyyyyy==", "auth_token=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"]
+        }
+      },
+      {
+        "id": "ROBOT1.0_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+        "author": {
+          "id": "D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1",
+          "member_openid": "D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1",
+          "member_role": "owner",
+          "username": "小华",
+          "bot": false
+        },
+        "content": " ",
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "message_type": 103,
+        "timestamp": "2026-07-21T10:10:00+08:00",
+        "msg_elements": [
+          {
+            "content": "=== 消息 1 ===\n[消息内容] 今天的学习计划已完成\n\n=== 消息 2 ===\n[消息内容] 很棒！继续保持，明天继续加油\n\n=== 消息 3 ===\n[消息内容] 好的，一起进步！"
+          }
+        ],
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_zzzzzzzzzzzzzzz==", "auth_token=zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz", "ref_msg_idx=TMP_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"]
+        }
+      }
+    ],
+    "GROUP_DEL_ROBOT": [
+      {
+        "group_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "op_member_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "timestamp": 1784570535
+      }
+    ],
+    "GROUP_JOIN_REQUEST": [
+      {
+        "group_openid": "30584554AA2BF4E72BD3B8F27A70339D",
+        "join_request_id": "AVKiFWpdy0-q0rfCkpQFbWB9GvX7QPIe9hlsbVeO6TiurrZw1DHP0sXGnbUR4Xm79tKNpfl4zZynxeibVwwUD6h96RqiFB-4V6p5FKGXfqInOuQQSf5WwXr8lyIsn6yeaMwEI1KSuTTMBMNe6WN8bDtKg2REXTcF",
+        "member_openid": "FE003FAF76C4817251FDC128A16753BB",
+        "username": "痞孓小光光╮hw灰",
+        "apply_at": "2026-08-05T16:21:40+08:00",
+        "apply_source": "self_apply",
+        "verify_info": {
+          "method": "verify_message",
+          "verify_message": "就快乐了"
+        }
+      },
+      {
+        "group_openid": "30584554AA2BF4E72BD3B8F27A70339D",
+        "join_request_id": "AZj4L11PQ3oFrs2xf0wyfPmJ-3ONzbTr9MZRnXCSfoGce4KkWIgaTDwtkLXJVBaPx61VW9dzQz041oPt8o-JbBSyIerWVziQp1LaxYQCoyEx8rhffLwfBp5OW1-WL5C5HNji3M9lwDfZO4h_zNT4r0lywGojY4CX",
+        "member_openid": "DE538D0B23260BFEC30EA4A17C3A71B1",
+        "username": "吓唬",
+        "apply_at": "2026-08-05T16:36:32+08:00",
+        "apply_source": "invited",
+        "invited_by": "FE003FAF76C4817251FDC128A16753BB"
+      },
+      {
+        "group_openid": "30584554AA2BF4E72BD3B8F27A70339D",
+        "join_request_id": "AZ22mGUrkPeeNy6Fzz_raGskCnpnbdy7pIq6pME7XUgS72LOXTH4TxgzGlv3FmAGmNQAelRYYhBZYKgJUEoSgu21rSJVSdKOznbSu6FdXqXvZ10SkpI5fyE_876Va8KSbuLFbWdKa8Rh9nc_hzvZYKZT0_X1W0o4",
+        "member_openid": "FE003FAF76C4817251FDC128A16753BB",
+        "username": "痞孓小光光╮hw灰",
+        "apply_at": "2026-08-05T17:32:52+08:00",
+        "apply_source": "self_apply",
+        "verify_info": {
+          "method": "verify_message",
+          "verify_message": "健健康康"
+        },
+        "auto_approved": {
+          "strategy_id": "st_7c0b77d442"
+        }
+      }
+    ],
+    "GROUP_MEMBER_ADD": [
+      {
+        "timestamp": 1784276757,
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "member_openid": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+        "user_openid": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6"
+      }
+    ],
+    "GROUP_MEMBER_REMOVE": [
+      {
+        "timestamp": 1784276759,
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "member_openid": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+        "user_openid": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6"
+      }
+    ],
+    "GROUP_MESSAGE_CREATE": [
+      {
+        "id": "ROBOT1.0_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "author": {
+          "id": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+          "member_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+          "member_role": "member",
+          "username": "小明",
+          "bot": false
+        },
+        "content": "大家早上好呀",
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "message_type": 0,
+        "timestamp": "2026-07-21T08:00:00+08:00",
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_xxxxxxxxxxxxxxx==", "auth_token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]
+        }
+      },
+      {
+        "id": "ROBOT1.0_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+        "author": {
+          "id": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+          "member_openid": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6",
+          "member_role": "owner",
+          "username": "小红",
+          "bot": false
+        },
+        "content": "分享一张今天的风景照",
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "message_type": 0,
+        "timestamp": "2026-07-21T09:30:00+08:00",
+        "attachments": [
+          {
+            "content_type": "image/jpeg",
+            "filename": "photo.jpg",
+            "url": "https://multimedia.nt.qq.com.cn/download?appid=xxx&fileid=xxx&rkey=xxx&spec=0",
+            "width": 1920,
+            "height": 1080,
+            "size": 256000
+          }
+        ],
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_yyyyyyyyyyyyyyy==", "auth_token=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"]
+        }
+      },
+      {
+        "id": "ROBOT1.0_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+        "author": {
+          "id": "D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1",
+          "member_openid": "D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1",
+          "member_role": "admin",
+          "username": "小华",
+          "bot": false
+        },
+        "content": " ",
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "message_type": 103,
+        "timestamp": "2026-07-21T10:10:00+08:00",
+        "msg_elements": [
+          {
+            "content": "=== 消息 1 ===\n[消息内容] 今天的学习计划已完成\n\n=== 消息 2 ===\n[消息内容] 很棒！继续保持，明天继续加油\n\n=== 消息 3 ===\n[消息内容] 好的，一起进步！"
+          }
+        ],
+        "message_scene": {
+          "source": "default",
+          "ext": ["msg_idx=REFIDX_zzzzzzzzzzzzzzz==", "auth_token=zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz", "ref_msg_idx=TMP_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"]
+        }
+      }
+    ],
+    "GROUP_MSG_RECEIVE": [
+      {
+        "timestamp": 1784276800,
+        "group_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "op_member_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+      }
+    ],
+    "GROUP_MSG_REJECT": [
+      {
+        "timestamp": 1784276810,
+        "group_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "op_member_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+      }
+    ],
+    "INTERACTION_CREATE": [
+      {
+        "application_id": "1904842048",
+        "chat_type": 2,
+        "data": {
+          "resolved": {
+            "button_data": "confirm:once",
+            "button_id": "allow-once"
+          },
+          "type": 11
+        },
+        "id": "1b13d569-4610-4ab9-bc51-feecc5def6d4",
+        "scene": "c2c",
+        "timestamp": "2026-07-20T21:53:54+08:00",
+        "type": 11,
+        "user_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "version": 1
+      },
+      {
+        "application_id": "101984245",
+        "chat_type": 1,
+        "data": {
+          "resolved": {
+            "button_data": "eyJjb21tYW5kIjogInNhbXBsZSJ9"
+          },
+          "type": 11
+        },
+        "group_member_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "group_openid": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5",
+        "id": "06915133-7aef-46ed-94f7-c50939e285ae",
+        "scene": "group",
+        "timestamp": "2026-07-20T21:53:54+08:00",
+        "type": 11,
+        "version": 1
+      },
+      {
+        "application_id": "102057050",
+        "data": {
+          "resolved": {
+            "authorize_data": {
+              "opt_scene": "setting",
+              "scope": "c2c_push"
+            }
+          }
+        },
+        "id": "c30c003e-9454-4450-8e5e-665267c088c4",
+        "scene": "c2c",
+        "timestamp": "2026-07-20T21:54:38+08:00",
+        "type": 18,
+        "user_openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "version": 1
+      }
+    ],
+    "SUBSCRIBE_MESSAGE_STATUS": [
+      {
+        "openid": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4",
+        "result": [
+          {
+            "template_id": 10001,
+            "custom_template_id": "tpl_abc123",
+            "op": 1,
+            "subscribe_id": "sub_def456",
+            "subscribe_ts": 1784276820,
+            "update_ts": 1784276820
+          },
+          {
+            "template_id": 10002,
+            "custom_template_id": "tpl_xyz789",
+            "op": 2,
+            "subscribe_id": "sub_ghi012",
+            "subscribe_ts": 1784276815,
+            "update_ts": 1784276820
+          }
+        ]
+      }
+    ]
+  },
+  "catalog": [
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/channels_channel_id.delete.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/channels_channel_id.get.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/channels_channel_id.patch.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/gateway.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/guilds_guild_id.get.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/guilds_guild_id_channels.get.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/guilds_guild_id_channels.post.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/interactions_interaction_id.put.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/users_me.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/users_me_guilds.get.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_generate_url_link.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_id_upload_part_finish.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_id_upload_prepare.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_approval_join_request_member_openid.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_batch_remove_members.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_bot_state.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_files.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_info.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_join_request_list.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_member_blacklist.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_member_blacklist.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_members.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_members_member_openid.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_messages.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_messages_message_id.delete.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_restrict_chat_setting.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_group_openid_restrict_chat_setting.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id.delete.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id.patch.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id_execute.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_groups_join_approval_strategy_strategy_id_whitelist_users.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_menu.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_menu.put.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id.delete.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id.get.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id.put.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels_panel_id_target.put.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_id_upload_part_finish.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_id_upload_prepare.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_files.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_messages.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_messages_message_id.delete.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_stream_messages.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/c2c_message_create.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/c2c_msg_receive.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/c2c_msg_reject.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/channel_create.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/channel_delete.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/channel_update.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/friend_add.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/friend_del.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_add_robot.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_at_message_create.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_del_robot.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_join_request.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_member_add.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_member_remove.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_message_create.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_msg_receive.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/group_msg_reject.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/guild_create.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/guild_delete.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/guild_update.html",
+      "scope": "channel"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/interaction_create.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/event/subscribe_message_status.html",
+      "scope": "included"
+    }
+  ]
+}

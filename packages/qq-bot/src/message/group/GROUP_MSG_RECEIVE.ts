@@ -8,5 +8,5 @@ export type GROUP_MSG_RECEIVE_TYPE = {
   id?: string;
   group_openid: string;
   op_member_openid: string;
-  timestamp: string;
+  timestamp: number | string;
 };

@@ -1,3 +1,14 @@
+import type {
+  QQBotMenu,
+  QQBotPanel,
+  QQBotPanelCreate,
+  QQBotPanelRecord,
+  QQBotPanelScope,
+  QQBotPage,
+  QQBotGroupMember,
+  QQBotBlacklistUser,
+  QQBotMessageResult
+} from './non-channel-types.js';
 import axios, { type AxiosRequestConfig } from 'axios';
 import { ApiRequestData, FileType, GroupAction, SetMemberMuteState, StreamMessageData, UploadPartFinishData, UploadPrepareData } from './typing.js';
 import { QQBotConfig } from './config.js';
@@ -36,8 +47,8 @@ export type QQBotMediaHashes = {
 
 type QQBotStream = {
   userOpenId: string;
-  msgId: string;
-  eventId: string;
+  msgId?: string;
+  eventId?: string;
   msgSeq: number;
   index: number;
   streamMessageId?: string;
@@ -46,6 +57,8 @@ type QQBotStream = {
   timer?: NodeJS.Timeout;
   latest?: string;
   sendTask?: Promise<unknown>;
+  completeTask?: Promise<unknown>;
+  closing?: boolean;
 };
 
 export class QQBotAPI {
@@ -54,6 +67,7 @@ export class QQBotAPI {
   #msgMap = new Map<string, number>();
 
   #streams = new Map<string, QQBotStream>();
+  #interactionAcks = new Map<string, { code: number; task: Promise<unknown>; settled: boolean; expiresAt: number }>();
   #onStreamClosed?: (streamId: string) => void;
   #onConnectionStatusChanged?: (status: QQBotConnectionStatus, previous: QQBotConnectionStatus) => void;
   #connectionStatus: QQBotConnectionStatus = {
@@ -90,32 +104,33 @@ export class QQBotAPI {
     this.#onStreamClosed = listener;
   }
 
-  /** C2C-only input indicator. This is intentionally a QQ extension, not a core action. */
+  /** C2C input indicator; uses the same message protocol as the framework typing action. */
   sendTyping(params: { BotId?: string; userOpenId: string; msgId?: string; durationSec?: number }) {
     if (!params.userOpenId) {
       throw new Error('userOpenId is required');
     }
 
     return this.groupService({
-      url: `/v2/users/${params.userOpenId}/input_notify`,
+      url: `/v2/users/${params.userOpenId}/messages`,
       method: 'post',
       data: {
         ...(params.msgId && { msg_id: params.msgId }),
-        input_second: Math.max(1, Math.min(Number(params.durationSec) || 30, 60))
+        msg_type: 6,
+        input_notify: { input_type: 1, input_second: Math.max(1, Math.min(Number(params.durationSec) || 30, 60)) }
       }
     });
   }
 
-  streamOpen(params: { BotId?: string; userOpenId: string; msgId: string; eventId?: string }) {
-    if (!params.userOpenId || !params.msgId) {
-      throw new Error('C2C streaming requires userOpenId and msgId');
+  streamOpen(params: { BotId?: string; userOpenId: string; msgId?: string; eventId?: string }) {
+    if (!params.userOpenId || Boolean(params.msgId) === Boolean(params.eventId)) {
+      throw new Error('C2C streaming requires userOpenId and exactly one of msgId or eventId');
     }
     const streamId = randomUUID();
     const stream: QQBotStream = {
       userOpenId: params.userOpenId,
       msgId: params.msgId,
-      eventId: params.eventId || params.msgId,
-      msgSeq: this.getMessageSeq(params.msgId),
+      eventId: params.eventId,
+      msgSeq: this.getMessageSeq(params.msgId || params.eventId),
       index: 0,
       lastSentAt: 0,
       lastSentText: ''
@@ -133,8 +148,11 @@ export class QQBotAPI {
     if (!stream) {
       throw new Error('Unknown or expired streamId');
     }
+    if (stream.closing) {
+      throw new Error('Stream is completing');
+    }
     stream.latest = fullText;
-    if (!stream.sendTask) {
+    if (stream.sendTask === undefined) {
       stream.sendTask = (async () => {
         let result: unknown;
 
@@ -142,8 +160,7 @@ export class QQBotAPI {
           const content = stream.latest;
 
           stream.latest = undefined;
-          // QQ accepts at most a practical update rate.  500ms is the default,
-          // and the API contract never permits callers below 300ms.
+          // Coalesce frequent updates with the existing 500ms pacing interval.
           const wait = Math.max(0, 500 - (Date.now() - stream.lastSentAt));
 
           if (wait) {
@@ -159,17 +176,21 @@ export class QQBotAPI {
             url: `/v2/users/${stream.userOpenId}/stream_messages`,
             method: 'post',
             data: {
-              msg_id: stream.msgId,
-              event_id: stream.eventId,
+              ...(stream.msgId ? { msg_id: stream.msgId } : { event_id: stream.eventId }),
               msg_seq: stream.msgSeq,
-              index: stream.index++,
+              index: stream.index,
               input_mode: 'replace',
               input_state: 1,
               content_type: 'markdown',
               content_raw: content,
               ...(stream.streamMessageId && { stream_msg_id: stream.streamMessageId })
             }
+          }).catch(error => {
+            stream.latest ??= content;
+            throw error;
           });
+
+          stream.index++;
 
           if (response?.id && !stream.streamMessageId) {
             stream.streamMessageId = response.id;
@@ -186,7 +207,7 @@ export class QQBotAPI {
       });
     }
 
-    return stream.sendTask;
+    return await stream.sendTask;
   }
 
   async streamComplete(streamId: string) {
@@ -195,27 +216,43 @@ export class QQBotAPI {
     if (!stream) {
       throw new Error('Unknown or expired streamId');
     }
-    try {
-      await stream.sendTask;
-
-      return await this.groupService({
-        url: `/v2/users/${stream.userOpenId}/stream_messages`,
-        method: 'post',
-        data: {
-          msg_id: stream.msgId,
-          event_id: stream.eventId,
-          msg_seq: stream.msgSeq,
-          index: stream.index++,
-          input_mode: 'replace',
-          input_state: 10,
-          content_type: 'markdown',
-          content_raw: stream.latest ?? stream.lastSentText,
-          ...(stream.streamMessageId && { stream_msg_id: stream.streamMessageId })
-        }
-      });
-    } finally {
-      this.streamCancel(streamId);
+    if (stream.completeTask !== undefined) {
+      return await stream.completeTask;
     }
+    stream.closing = true;
+    stream.completeTask = (async () => {
+      try {
+        await stream.sendTask;
+        if (this.#streams.get(streamId) !== stream) {
+          throw new Error('Unknown or expired streamId');
+        }
+        const response = await this.groupService({
+          url: `/v2/users/${stream.userOpenId}/stream_messages`,
+          method: 'post',
+          data: {
+            ...(stream.msgId ? { msg_id: stream.msgId } : { event_id: stream.eventId }),
+            msg_seq: stream.msgSeq,
+            index: stream.index,
+            input_mode: 'replace',
+            input_state: 10,
+            content_type: 'markdown',
+            content_raw: stream.latest ?? stream.lastSentText,
+            ...(stream.streamMessageId && { stream_msg_id: stream.streamMessageId })
+          }
+        });
+
+        this.streamCancel(streamId);
+
+        return response;
+      } catch (error) {
+        // Retain the session and index so a caller can retry a failed completion.
+        stream.closing = false;
+        stream.completeTask = undefined;
+        throw error;
+      }
+    })();
+
+    return await stream.completeTask;
   }
 
   streamCancel(streamId: string) {
@@ -333,7 +370,7 @@ export class QQBotAPI {
    * @returns
    *   0 文本  1 图文 2 md 3 ark 4 embed
    */
-  usersOpenMessages(openid: string, data: ApiRequestData): Promise<{ id: string; timestamp: number }> {
+  usersOpenMessages(openid: string, data: ApiRequestData): Promise<QQBotMessageResult> {
     const db = {
       ...(data.event_id
         ? { event_id: data.event_id }
@@ -378,7 +415,7 @@ export class QQBotAPI {
    * @param data
    * @returns
    */
-  groupOpenMessages(group_openid: string, data: ApiRequestData): Promise<{ id: string; timestamp: number }> {
+  groupOpenMessages(group_openid: string, data: ApiRequestData): Promise<QQBotMessageResult> {
     const db = {
       ...(data.event_id
         ? { event_id: data.event_id }
@@ -508,8 +545,9 @@ export class QQBotAPI {
     size?: number;
     hashes?: QQBotMediaHashes;
     name?: string;
+    send?: boolean;
     onProgress?: (uploaded: number, total: number) => void;
-  }): Promise<{ file_uuid: string; file_info: string; ttl: number }> {
+  }): Promise<{ file_uuid: string; file_info: string; ttl: number; id?: string; raw_url?: string }> {
     const hasBuffer = Buffer.isBuffer(params.data);
     const hasFile = Boolean(params.filePath);
 
@@ -525,25 +563,48 @@ export class QQBotAPI {
     const prefix = params.scope === 'group' ? `/v2/groups/${params.targetId}` : `/v2/users/${params.targetId}`;
     const prepared: {
       upload_id: string;
-      block_size: number;
-      parts: Array<{ index: number; presigned_url: string }>;
+      block_size: string;
+      parts: Array<{ index: number; presigned_url: string; block_size: string }>;
     } = await this.groupService({
       url: `${prefix}/upload_prepare`,
       method: 'post',
       data: {
         file_type: params.fileType,
         file_name: params.name || 'file',
-        file_size: total,
+        file_size: String(total),
         md5: hashes.md5,
         sha1: hashes.sha1,
         md5_10m: hashes.md5_10m
       }
     });
+    const blockSize = Number(prepared.block_size);
+
+    if (!Number.isSafeInteger(blockSize) || blockSize <= 0 || !Array.isArray(prepared.parts) || prepared.parts.length !== Math.ceil(total / blockSize)) {
+      throw new Error('QQ returned an invalid upload partition');
+    }
+    const indexes = new Set<number>();
+
+    // Validate all offsets before uploading any bytes or merging an incomplete file.
+    for (const part of prepared.parts) {
+      const length = Number(part.block_size);
+
+      if (
+        !Number.isSafeInteger(part.index) ||
+        part.index < 0 ||
+        indexes.has(part.index) ||
+        !Number.isSafeInteger(length) ||
+        length <= 0 ||
+        length !== Math.min(blockSize, total - part.index * blockSize)
+      ) {
+        throw new Error(`QQ returned invalid upload part index/size: ${part.index}`);
+      }
+      indexes.add(part.index);
+    }
     let uploaded = 0;
 
     for (const part of prepared.parts || []) {
-      const offset = (part.index - 1) * prepared.block_size;
-      const length = Math.min(prepared.block_size, total - offset);
+      const offset = part.index * blockSize;
+      const length = Number(part.block_size);
 
       if (length <= 0) {
         throw new Error(`QQ returned invalid upload part index: ${part.index}`);
@@ -563,7 +624,7 @@ export class QQBotAPI {
         this.groupService({
           url: `${prefix}/upload_part_finish`,
           method: 'post',
-          data: { upload_id: prepared.upload_id, part_index: part.index, block_size: length, md5: partMd5 }
+          data: { upload_id: prepared.upload_id, part_index: part.index, block_size: String(length), md5: partMd5 }
         })
       );
       uploaded += length;
@@ -572,9 +633,9 @@ export class QQBotAPI {
 
     return this.#retry(() =>
       this.groupService({
-        url: `${prefix}/complete_upload`,
+        url: `${prefix}/files`,
         method: 'post',
-        data: { upload_id: prepared.upload_id }
+        data: { upload_id: prepared.upload_id, file_type: params.fileType, file_name: params.name || 'file', srv_send_msg: params.send ?? false }
       })
     );
   }
@@ -646,6 +707,62 @@ export class QQBotAPI {
    */
   grouMessageDelte(group_openid: string, message_id: string) {
     return this.groupMessageDelete(group_openid, message_id);
+  }
+
+  /** 生成添加机器人好友的分享链接。 */
+  generateUrlLink(data: { callback_data?: string } = {}): Promise<{ data: { url: string } }> {
+    return this.groupService({ url: '/v2/generate_url_link', method: 'post', data });
+  }
+
+  menuGet(): Promise<{ version: number; menu?: QQBotMenu }> {
+    return this.groupService({ url: '/v2/menu', method: 'get' });
+  }
+
+  menuPut(data: { menu?: QQBotMenu }): Promise<{ version: number }> {
+    return this.groupService({ url: '/v2/menu', method: 'put', data });
+  }
+
+  panelsList(params: QQBotPage & { scope: QQBotPanelScope }): Promise<{ records: QQBotPanelRecord[]; next_cursor: string; is_end: boolean }> {
+    return this.groupService({ url: '/v2/panels', method: 'get', params });
+  }
+
+  panelsCreate(data: QQBotPanelCreate): Promise<{ panel_id: string }> {
+    return this.groupService({ url: '/v2/panels', method: 'post', data });
+  }
+
+  panelsGet(panel_id: string): Promise<QQBotPanelRecord> {
+    return this.groupService({ url: `/v2/panels/${panel_id}`, method: 'get' });
+  }
+
+  panelsPut(panel_id: string, data: { panel: QQBotPanel }): Promise<{ version: number }> {
+    return this.groupService({ url: `/v2/panels/${panel_id}`, method: 'put', data });
+  }
+
+  panelsDelete(panel_id: string) {
+    return this.groupService({ url: `/v2/panels/${panel_id}`, method: 'delete' });
+  }
+
+  panelsTargetPut(panel_id: string, data: { op: 'add' | 'del'; user_openids?: string[]; group_openids?: string[] }) {
+    return this.groupService({ url: `/v2/panels/${panel_id}/target`, method: 'put', data });
+  }
+
+  groupsMembers(group_openid: string, params?: { cursor?: string }): Promise<{ members: QQBotGroupMember[]; next_cursor: string }> {
+    return this.groupService({ url: `/v2/groups/${group_openid}/members`, method: 'get', params });
+  }
+
+  groupsBatchRemoveMembers(
+    group_openid: string,
+    data: { member_openids: string[]; add_to_member_blacklist?: boolean }
+  ): Promise<{ remove_members_result: string; add_to_member_blacklist_fail_openids: string[] }> {
+    return this.groupService({ url: `/v2/groups/${group_openid}/batch_remove_members`, method: 'post', data });
+  }
+
+  groupsMemberBlacklist(group_openid: string, params?: QQBotPage): Promise<{ users: QQBotBlacklistUser[]; next_cursor: string }> {
+    return this.groupService({ url: `/v2/groups/${group_openid}/member_blacklist`, method: 'get', params });
+  }
+
+  groupsMemberBlacklistPost(group_openid: string, data: { op: 'add' | 'del'; member_openids: string[] }): Promise<{ fail_openids: string[] }> {
+    return this.groupService({ url: `/v2/groups/${group_openid}/member_blacklist`, method: 'post', data });
   }
 
   // ─── 群管理 ───
@@ -1409,6 +1526,23 @@ export class QQBotAPI {
     });
   }
 
+  /** 获取子频道身份组权限。 */
+  channelsRolePermissions(channel_id: string, role_id: string) {
+    return this.guildServer({
+      method: 'GET',
+      url: `/channels/${channel_id}/roles/${role_id}/permissions`
+    });
+  }
+
+  /** 修改子频道身份组权限。 */
+  channelsRolePermissionsPut(channel_id: string, role_id: string, add: string, remove: string) {
+    return this.guildServer({
+      method: 'PUT',
+      url: `/channels/${channel_id}/roles/${role_id}/permissions`,
+      data: { add, remove }
+    });
+  }
+
   /**
    * *******
    * 消息api
@@ -1444,11 +1578,31 @@ export class QQBotAPI {
    * @param source_guild_id 源频道 id
    * @returns
    */
-  usersMeDms() {
+  usersMeDms(recipient_id: string, source_guild_id: string) {
     return this.guildServer({
       method: 'POST',
-      url: '/users/@me/dms'
+      url: '/users/@me/dms',
+      data: { recipient_id, source_guild_id }
     });
+  }
+
+  /** 申请频道接口权限，并向指定子频道发送授权链接。 */
+  guildsApiPermissionDemand(guild_id: string, data: { channel_id: string; api_identify: { path: string; method: string }; desc?: string }) {
+    return this.guildServer({
+      method: 'POST',
+      url: `/guilds/${guild_id}/api_permission/demand`,
+      data
+    });
+  }
+
+  /** @deprecated 2022-03-15 后不保证兼容；请优先使用 channelsPinsPut。 */
+  channelsAnnounces(channel_id: string, message_id: string) {
+    return this.guildServer({ method: 'POST', url: `/channels/${channel_id}/announces`, data: { message_id } });
+  }
+
+  /** @deprecated 2022-03-15 后不保证兼容；请优先使用 channelsPinsDelete。 */
+  channelsAnnouncesDelete(channel_id: string, message_id: string) {
+    return this.guildServer({ method: 'DELETE', url: `/channels/${channel_id}/announces/${message_id}` });
   }
 
   /**
@@ -1626,10 +1780,11 @@ export class QQBotAPI {
    * @returns 返回 Schedule 对象数组(详见https://bot.q.qq.com/wiki/develop/api-v2/server-inter/channel/content/schedule/model.html#schedule)
    */
 
-  channelsSchedules(channel_id: string) {
+  channelsSchedules(channel_id: string, params?: { since?: string }) {
     return this.guildServer({
       method: 'GET',
-      url: `/channels/${channel_id}/schedules`
+      url: `/channels/${channel_id}/schedules`,
+      params
     });
   }
 
@@ -1953,13 +2108,63 @@ export class QQBotAPI {
    * @param code
    * @returns
    */
-  interactionResponse(_mode: 'group' | 'guild', interaction_id: string, code?: number) {
-    return this.groupService({
-      method: 'PUT',
-      url: `/interactions/${interaction_id}`,
-      data: {
-        code: code || 0
+  interactionResponse(_mode: 'group' | 'guild', interactionId: string, code = 0) {
+    if (!interactionId || !Number.isInteger(code) || code < 0 || code > 5) {
+      return Promise.reject(new Error('Invalid interaction ID or acknowledgement code'));
+    }
+    const now = Date.now();
+
+    for (const [id, entry] of this.#interactionAcks) {
+      if (entry.settled && entry.expiresAt <= now) {
+        this.#interactionAcks.delete(id);
       }
-    });
+    }
+    const existing = this.#interactionAcks.get(interactionId);
+
+    if (existing) {
+      return existing.code === code ? existing.task : Promise.reject(new Error('Interaction already acknowledged with a different code'));
+    }
+    // Bounded, per-client history. In-flight calls remain shared; failures are retryable.
+    if (this.#interactionAcks.size >= 1024) {
+      for (const [id, entry] of this.#interactionAcks) {
+        if (entry.settled) {
+          this.#interactionAcks.delete(id);
+          break;
+        }
+      }
+    }
+    const entry = { code, task: undefined as Promise<unknown>, settled: false, expiresAt: now + 5 * 60 * 1000 };
+
+    entry.task = Promise.resolve()
+      .then(() =>
+        this.groupService({
+          method: 'PUT',
+          url: `/interactions/${interactionId}`,
+          data: { code }
+        })
+      )
+      .then(
+        response => {
+          entry.settled = true;
+          entry.expiresAt = Date.now() + 5 * 60 * 1000;
+          for (const [id, previous] of this.#interactionAcks) {
+            if (this.#interactionAcks.size <= 1024) {
+              break;
+            }
+            if (previous.settled) {
+              this.#interactionAcks.delete(id);
+            }
+          }
+
+          return response;
+        },
+        error => {
+          this.#interactionAcks.delete(interactionId);
+          throw error;
+        }
+      );
+    this.#interactionAcks.set(interactionId, entry);
+
+    return entry.task;
   }
 }

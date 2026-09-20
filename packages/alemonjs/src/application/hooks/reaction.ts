@@ -1,20 +1,24 @@
-import { EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import type { ActionContext } from '../../types';
+import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
+import { resolveActionContext, resolveActionTarget } from './action-context';
 
 /**
  * 表情回应管理
  * @param event 事件上下文
  */
-export const useReaction = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const useReaction = <T extends EventKeys>(event?: Events[T] | ActionContext) => {
+  const valueEvent = resolveActionContext(event as ActionContext | undefined);
+  const target = (channelId?: string) =>
+    resolveActionTarget(valueEvent) ?? (channelId ? { scope: 'channel' as const, targetId: channelId, BotId: valueEvent.BotId } : undefined);
 
   /**
    * 添加表情回应
    * @param emojiId 表情 ID 或 Unicode
    * @param messageId 消息 ID（不传则使用触发消息）
    */
-  const add = async (params: { emojiId: string; messageId?: string }): Promise<Result> => {
+  const add = async (params: { emojiId: string; messageId?: string; channelId?: string }): Promise<Result> => {
     const mid = params.messageId || valueEvent.MessageId;
-    const cid = (valueEvent as any).ChannelId;
+    const cid = params.channelId || valueEvent.ChannelId;
 
     if (!mid || !cid || !params.emojiId) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
@@ -22,7 +26,7 @@ export const useReaction = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'reaction.add',
-        payload: { ChannelId: cid, MessageId: mid, EmojiId: params.emojiId }
+        payload: { event: valueEvent, ChannelId: cid, MessageId: mid, EmojiId: params.emojiId, ...(target(cid) && { target: target(cid) }) }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -37,9 +41,9 @@ export const useReaction = <T extends EventKeys>(event?: Events[T]) => {
    * @param emojiId 表情 ID 或 Unicode
    * @param messageId 消息 ID（不传则使用触发消息）
    */
-  const remove = async (params: { emojiId: string; messageId?: string }): Promise<Result> => {
+  const remove = async (params: { emojiId: string; messageId?: string; channelId?: string }): Promise<Result> => {
     const mid = params.messageId || valueEvent.MessageId;
-    const cid = (valueEvent as any).ChannelId;
+    const cid = params.channelId || valueEvent.ChannelId;
 
     if (!mid || !cid || !params.emojiId) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
@@ -47,7 +51,7 @@ export const useReaction = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'reaction.remove',
-        payload: { ChannelId: cid, MessageId: mid, EmojiId: params.emojiId }
+        payload: { event: valueEvent, ChannelId: cid, MessageId: mid, EmojiId: params.emojiId, ...(target(cid) && { target: target(cid) }) }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -63,9 +67,9 @@ export const useReaction = <T extends EventKeys>(event?: Events[T]) => {
    * @param messageId 消息 ID（不传则使用触发消息）
    * @param limit 返回数量限制
    */
-  const list = async (params: { emojiId: string; messageId?: string; limit?: number }): Promise<Result> => {
+  const list = async (params: { emojiId: string; messageId?: string; limit?: number; channelId?: string }): Promise<Result> => {
     const mid = params.messageId || valueEvent.MessageId;
-    const cid = (valueEvent as any).ChannelId;
+    const cid = params.channelId || valueEvent.ChannelId;
 
     if (!mid || !cid || !params.emojiId) {
       return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
@@ -73,7 +77,14 @@ export const useReaction = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'reaction.list',
-        payload: { ChannelId: cid, MessageId: mid, EmojiId: params.emojiId, params: { limit: params.limit } }
+        payload: {
+          event: valueEvent,
+          ChannelId: cid,
+          MessageId: mid,
+          EmojiId: params.emojiId,
+          ...(target(cid) && { target: target(cid) }),
+          params: { limit: params.limit }
+        }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 

@@ -7,4 +7,6 @@ export type MESSAGE_AUDIT_REJECT_TYPE = {
   create_time?: string;
   group_openid?: string;
   message_id?: string;
+  channel_id?: string;
+  guild_id?: string;
 };

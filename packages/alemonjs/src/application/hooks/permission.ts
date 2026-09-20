@@ -1,11 +1,15 @@
-import { EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import type { ActionContext } from '../../types';
+import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
+import { resolveActionContext, resolveActionTarget } from './action-context';
 
 /**
  * 频道权限管理
  * @param event 事件上下文
  */
-export const usePermission = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const usePermission = <T extends EventKeys>(event?: Events[T] | ActionContext) => {
+  const valueEvent = resolveActionContext(event as ActionContext | undefined);
+  const target = (channelId?: string) =>
+    resolveActionTarget(valueEvent) ?? (channelId ? { scope: 'channel' as const, targetId: channelId, BotId: valueEvent.BotId } : undefined);
 
   /**
    * 获取用户在频道中的权限
@@ -21,7 +25,7 @@ export const usePermission = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'permission.get',
-        payload: { ChannelId: cid, UserId: params.userId }
+        payload: { event: valueEvent, ChannelId: cid, UserId: params.userId, ...(target(cid) && { target: target(cid) }) }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -47,7 +51,13 @@ export const usePermission = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'permission.set',
-        payload: { ChannelId: cid, UserId: params.userId, params: { allow: params.allow, deny: params.deny } }
+        payload: {
+          event: valueEvent,
+          ChannelId: cid,
+          UserId: params.userId,
+          ...(target(cid) && { target: target(cid) }),
+          params: { allow: params.allow, deny: params.deny }
+        }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -57,9 +67,29 @@ export const usePermission = <T extends EventKeys>(event?: Events[T]) => {
     }
   };
 
+  const getRole = async (params: { roleId: string; channelId?: string }): Promise<Result> => {
+    const cid = params.channelId || (valueEvent as any).ChannelId;
+
+    return action('permission.role.get', { event: valueEvent, ChannelId: cid, RoleId: params.roleId, ...(target(cid) && { target: target(cid) }) });
+  };
+
+  const setRole = async (params: { roleId: string; allow?: string; deny?: string; channelId?: string }): Promise<Result> => {
+    const cid = params.channelId || (valueEvent as any).ChannelId;
+
+    return action('permission.role.set', { event: valueEvent, ChannelId: cid, RoleId: params.roleId, ...(target(cid) && { target: target(cid) }), params });
+  };
+
+  const action = async (name: string, payload: object): Promise<Result> => {
+    const results = await sendAction({ action: name, payload });
+
+    return results.find(item => item.code === ResultCode.Ok) || createResult(ResultCode.Fail, results[0]?.message || `${name} failed`, null);
+  };
+
   const permission = {
     get,
-    set
+    set,
+    getRole,
+    setRole
   };
 
   return [permission] as const;

@@ -1,3 +1,4 @@
+import type { SUBSCRIBE_MESSAGE_STATUS_TYPE } from '../message/group/SUBSCRIBE_MESSAGE_STATUS';
 import { C2C_MESSAGE_CREATE_TYPE } from '../message/group/C2C_MESSAGE_CREATE';
 import { C2C_MSG_REJECT_TYPE } from '../message/group/C2C_MSG_REJECT';
 import { C2C_MSG_RECEIVE_TYPE } from '../message/group/C2C_MSG_RECEIVE';
@@ -17,6 +18,7 @@ import { GROUP_MEMBER_ADD } from '../message/group/GROUP_MEMBER_ADD';
 import { GROUP_JOIN_REQUEST_TYPE } from '../message/group/GROUP_JOIN_REQUEST';
 
 export type QQBotGroupEventMap = {
+  SUBSCRIBE_MESSAGE_STATUS: SUBSCRIBE_MESSAGE_STATUS_TYPE;
   C2C_MESSAGE_CREATE: C2C_MESSAGE_CREATE_TYPE;
   C2C_MSG_REJECT: C2C_MSG_REJECT_TYPE;
   C2C_MSG_RECEIVE: C2C_MSG_RECEIVE_TYPE;

@@ -41,6 +41,9 @@ export type ConnectionStatus = {
  * diagnostic fields without pretending that a QR challenge has a message.
  */
 type PlatformLifecycleEventBase = {
+  BotId?: string;
+  IsAtMe?: boolean;
+  IsPrivate?: boolean;
   /** Kept for compatibility with generic event hooks; lifecycle events carry no message body. */
   value: string;
   GuildId?: string;

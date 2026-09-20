@@ -1,4 +1,7 @@
-import { createEventValue, EventKeys, Events, useClient as createUseClient } from 'alemonjs';
+import type { SUBSCRIBE_MESSAGE_STATUS_TYPE } from './message/group/SUBSCRIBE_MESSAGE_STATUS';
+import type { GROUP_MEMBER_ADD } from './message/group/GROUP_MEMBER_ADD';
+import type { GROUP_MEMBER_REMOVE } from './message/group/GROUP_MEMBER_REMOVE';
+import { EventKeys, Events, useClient as createUseClient } from 'alemonjs';
 import { GROUP_AT_MESSAGE_CREATE_TYPE } from './message/group/GROUP_AT_MESSAGE_CREATE';
 import { GROUP_MESSAGE_CREATE_TYPE } from './message/group/GROUP_MESSAGE_CREATE';
 import { QQBotAPI as API } from './sdk/api';
@@ -32,6 +35,10 @@ import { C2C_MSG_REJECT_TYPE } from './message/group/C2C_MSG_REJECT';
 import { MESSAGE_AUDIT_PASS_TYPE } from './message/group/MESSAGE_AUDIT_PASS';
 import { MESSAGE_AUDIT_REJECT_TYPE } from './message/group/MESSAGE_AUDIT_REJECT';
 import { GROUP_JOIN_REQUEST_TYPE } from './message/group/GROUP_JOIN_REQUEST';
+import { GUILD_AUDIT_TYPE } from './message/GUILD_AUDIT';
+import { FORUM_EVENT_TYPE } from './message/FORUM_EVENT';
+import { AUDIO_EVENT_TYPE, AUDIO_OR_LIVE_CHANNEL_MEMBER_EVENT_TYPE } from './message/AUDIO_EVENT';
+import { READY_TYPE } from './message/READY';
 
 type MAP = {
   'message.create': GROUP_AT_MESSAGE_CREATE_TYPE | GROUP_MESSAGE_CREATE_TYPE | AT_MESSAGE_CREATE_TYPE | MESSAGE_CREATE_TYPE;
@@ -49,27 +56,36 @@ type MAP = {
   'guild.join': GUILD_CREATE_TYPE | GROUP_ADD_ROBOT_TYPE;
   'guild.exit': GUILD_DELETE_TYPE | GROUP_DEL_ROBOT_TYPE;
   'guild.update': GUILD_UPDATE_TYPE;
-  'member.add': GUILD_MEMBER_ADD_TYPE;
-  'member.remove': GUILD_MEMBER_REMOVE_TYPE;
+  'member.add': GUILD_MEMBER_ADD_TYPE | GROUP_MEMBER_ADD;
+  'member.remove': GUILD_MEMBER_REMOVE_TYPE | GROUP_MEMBER_REMOVE;
   'member.ban': undefined;
   'member.unban': undefined;
   'member.update': GUILD_MEMBER_UPDATE_TYPE;
-  'notice.create': GROUP_MSG_RECEIVE_TYPE | GROUP_MSG_REJECT_TYPE | MESSAGE_AUDIT_PASS_TYPE | MESSAGE_AUDIT_REJECT_TYPE | GROUP_JOIN_REQUEST_TYPE;
+  'notice.create':
+    | SUBSCRIBE_MESSAGE_STATUS_TYPE
+    | GROUP_MSG_RECEIVE_TYPE
+    | GROUP_MSG_REJECT_TYPE
+    | MESSAGE_AUDIT_PASS_TYPE
+    | MESSAGE_AUDIT_REJECT_TYPE
+    | GUILD_AUDIT_TYPE
+    | GROUP_JOIN_REQUEST_TYPE
+    | FORUM_EVENT_TYPE
+    | AUDIO_EVENT_TYPE
+    | AUDIO_OR_LIVE_CHANNEL_MEMBER_EVENT_TYPE
+    | READY_TYPE;
   'private.message.update': undefined;
   'private.message.delete': DIRECT_MESSAGE_DELETE_TYPE;
   'private.friend.add': FRIEND_ADD_TYPE;
   'private.friend.remove': FRIEND_DEL_TYPE;
   'private.guild.add': undefined;
-  'private.notice.create': C2C_MSG_RECEIVE_TYPE | C2C_MSG_REJECT_TYPE;
+  'private.notice.create': C2C_MSG_RECEIVE_TYPE | C2C_MSG_REJECT_TYPE | SUBSCRIBE_MESSAGE_STATUS_TYPE;
 };
 
-/**
- *
- * @param event
- * @returns
- */
+type EventValues = MAP & { [K in Exclude<EventKeys, keyof MAP>]: unknown };
+
+/** 保留完整官方事件数据，不需要 useClient。 */
 export const useValue = <T extends EventKeys>(event: Events[T]) => {
-  const value = createEventValue<T, MAP>(event);
+  const value = event.value as unknown as EventValues[T];
 
   return [value] as const;
 };
@@ -81,7 +97,7 @@ export const useValue = <T extends EventKeys>(event: Events[T]) => {
  */
 export const useClient = <T extends EventKeys>(event: Events[T]) => {
   const [client] = createUseClient(event, API);
-  const value = createEventValue<T, MAP>(event);
+  const value = event.value as unknown as EventValues[T];
 
   return [client, value] as const;
 };
@@ -92,7 +108,7 @@ export const useClient = <T extends EventKeys>(event: Events[T]) => {
  * @returns
  */
 export const useMode = <T extends EventKeys>(event: Events[T]) => {
-  const tag = event._tag;
+  const tag = '_tag' in event ? event._tag : undefined;
   let currentMode = 'group';
 
   // 群at

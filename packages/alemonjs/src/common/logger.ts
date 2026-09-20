@@ -67,7 +67,7 @@ const createLogger = (): LoggerUtils => {
     pattern = '[%d{yyyy-MM-dd hh:mm:ss}][%p] %m';
   }
 
-  const appenders: Record<string, unknown> = {
+  const appenders: log4js.Configuration['appenders'] = {
     console: {
       type: 'console',
       layout: {

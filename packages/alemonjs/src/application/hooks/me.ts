@@ -1,29 +1,33 @@
+import type { ActionContext, BotInfo } from '../../types';
+import { createActionCaller, resolveActionContext } from './action-context';
 import { EventKeys, Events, GuildInfo, Result, ResultCode, User, createResult, getEventOrThrow, sendAction } from './common';
 
 /**
  * 获取我相关的数据
  * @param event 事件上下文；不传时使用当前事件上下文
  */
-export const useMe = <T extends EventKeys>(event?: Events[T]) => {
+export const useMe = <T extends EventKeys>(event?: Events[T] | ActionContext) => {
+  const context = resolveActionContext(event);
+  const call = createActionCaller(context);
   /**
    * 个人信息
    * @returns
    */
-  const info = async (): Promise<Result<User | null>> => {
+  const info = async (): Promise<Result<BotInfo | null>> => {
     try {
       const results = await sendAction({
         action: 'me.info',
-        payload: {}
+        payload: { event: context, BotId: context.BotId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        const data: User | null = result?.data ?? null;
+        const data: BotInfo | null = result?.data ?? null;
 
         return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
       }
 
-      return createResult(ResultCode.Warn, 'No bot information found', null);
+      return results[0] || createResult(ResultCode.Warn, 'No bot information found', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get bot information', null);
     }
@@ -35,7 +39,7 @@ export const useMe = <T extends EventKeys>(event?: Events[T]) => {
    * 平台适配器会在标准化事件时填充 `IsAtMe`；未提供该能力的平台或非消息事件返回 `false`。
    */
   const isAtMe = (targetEvent?: Events[T]): boolean => {
-    return Boolean(getEventOrThrow<T>(targetEvent ?? event).IsAtMe);
+    return Boolean(getEventOrThrow<T>((targetEvent ?? event) as Events[T]).IsAtMe);
   };
 
   /**
@@ -52,7 +56,7 @@ export const useMe = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'me.guilds',
-        payload: {}
+        payload: { event: context, BotId: context.BotId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -60,7 +64,7 @@ export const useMe = <T extends EventKeys>(event?: Events[T]) => {
         return createResult(ResultCode.Ok, 'Successfully retrieved guild list', result.data ?? []);
       }
 
-      return createResult(ResultCode.Warn, 'No guild list found', []);
+      return results[0] || createResult(ResultCode.Warn, 'No guild list found', []);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get guild list', []);
     }
@@ -73,7 +77,7 @@ export const useMe = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'me.threads',
-        payload: {}
+        payload: { event: context, BotId: context.BotId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -83,7 +87,7 @@ export const useMe = <T extends EventKeys>(event?: Events[T]) => {
         return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
       }
 
-      return createResult(ResultCode.Warn, 'No bot information found', null);
+      return results[0] || createResult(ResultCode.Warn, 'No bot information found', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get bot information', null);
     }
@@ -96,7 +100,7 @@ export const useMe = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'me.friends',
-        payload: {}
+        payload: { event: context, BotId: context.BotId }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -106,13 +110,14 @@ export const useMe = <T extends EventKeys>(event?: Events[T]) => {
         return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
       }
 
-      return createResult(ResultCode.Warn, 'No bot information found', null);
+      return results[0] || createResult(ResultCode.Warn, 'No bot information found', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get bot information', null);
     }
   };
 
   const control = {
+    share: (params: { data?: string } = {}) => call('me.share', params),
     info,
     isAtMe,
     isMentionMe,

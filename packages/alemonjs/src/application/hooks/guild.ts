@@ -1,11 +1,14 @@
-import { EventKeys, Events, GuildInfo, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
+import type { ActionContext, MessagingActionMap } from '../../types';
+import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
+import { GuildInfo, Result, ResultCode, createResult, sendAction } from './common';
 
 /**
  * 服务器/公会管理
  * @param event 事件上下文
  */
-export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
-  const valueEvent = getEventOrThrow(event);
+export const useGuild = (event?: ActionContext) => {
+  const valueEvent = resolveActionContext(event);
+  const call = createActionCaller(valueEvent);
 
   /**
    * 获取服务器信息
@@ -20,7 +23,7 @@ export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'guild.info',
-        payload: { GuildId: gid }
+        payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), GuildId: gid }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -28,7 +31,7 @@ export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
         return createResult(ResultCode.Ok, 'Successfully retrieved guild info', result.data ?? null);
       }
 
-      return createResult(ResultCode.Warn, 'No guild info found', null);
+      return results[0] || createResult(ResultCode.Warn, 'No guild info found', null);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get guild info', null);
     }
@@ -41,7 +44,7 @@ export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
     try {
       const results = await sendAction({
         action: 'guild.list',
-        payload: {}
+        payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent) }
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
@@ -49,13 +52,15 @@ export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
         return createResult(ResultCode.Ok, 'Successfully retrieved guild list', result.data ?? []);
       }
 
-      return createResult(ResultCode.Warn, 'No guild list found', []);
+      return results[0] || createResult(ResultCode.Warn, 'No guild list found', []);
     } catch {
       return createResult(ResultCode.Fail, 'Failed to get guild list', []);
     }
   };
 
   const guild = {
+    botInfo: (params: MessagingActionMap['guild.bot.info'][0] = {}) => call('guild.bot.info', params),
+    muteState: (params: MessagingActionMap['guild.mute.get'][0] = {}) => call('guild.mute.get', params),
     info,
     list,
 
@@ -73,11 +78,11 @@ export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'guild.update',
-          payload: { GuildId: gid, params: { name: params.name } }
+          payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), GuildId: gid, params: { name: params.name } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Update not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Update not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to update guild', null);
       }
@@ -97,11 +102,17 @@ export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'guild.leave',
-          payload: { GuildId: gid, params: { isDismiss: params?.isDismiss } }
+          payload: {
+            event: valueEvent,
+            BotId: valueEvent.BotId,
+            target: resolveActionTarget(valueEvent),
+            GuildId: gid,
+            params: { isDismiss: params?.isDismiss }
+          }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Leave not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Leave not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to leave guild', null);
       }
@@ -121,11 +132,11 @@ export const useGuild = <T extends EventKeys>(event?: Events[T]) => {
       try {
         const results = await sendAction({
           action: 'guild.mute',
-          payload: { GuildId: gid, params: { enable: params.enable } }
+          payload: { event: valueEvent, BotId: valueEvent.BotId, target: resolveActionTarget(valueEvent), GuildId: gid, params: { enable: params.enable } }
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || createResult(ResultCode.Warn, 'Mute not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, 'Mute not supported or failed', null);
       } catch {
         return createResult(ResultCode.Fail, 'Failed to mute guild', null);
       }

@@ -1,5 +1,7 @@
 import { User } from './event/base/user';
 
+export type BotInfo = User & { ShareUrl?: string; WelcomeMessage?: string };
+
 /**
  * 服务器/公会信息
  * 适用于: Discord Guild, QQ 频道/群, Kook 服务器, Telegram 群组, OneBot 群
@@ -17,6 +19,8 @@ export type GuildInfo = {
   MemberCount?: number;
   /** 服务器描述 */
   Description?: string;
+  Category?: string;
+  Tags?: string[];
 };
 
 /**
@@ -58,6 +62,8 @@ export type MemberInfo = User & {
   Roles?: string[];
   /** 加入服务器的时间戳 (ms) */
   JoinedAt?: number;
+  Role?: string;
+  UnionId?: string;
 };
 
 /**
@@ -100,6 +106,7 @@ export type ReactionInfo = {
 export type PaginationParams = {
   /** 每页数量 */
   Limit?: number;
+  Cursor?: string;
   /** 在此 ID/游标 之后 */
   After?: string;
   /** 在此 ID/游标 之前 */

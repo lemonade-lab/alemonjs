@@ -1,5 +1,6 @@
 export * from './announce';
 export * from './channel';
+export * from './channel-content';
 export * from './connection';
 export * from './client';
 export * from './guild';
@@ -18,3 +19,6 @@ export * from './route';
 export * from './user';
 export * from './subscribe';
 export * from './event';
+
+export * from './menu';
+export * from './panel';
