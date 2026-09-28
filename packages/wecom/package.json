@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/wecom",
-  "version": "2.1.0-rc.1",
+  "version": "2.1.1",
   "description": "企业微信",
   "author": "lemonade",
   "license": "MIT",
@@ -13,9 +13,6 @@
   },
   "dependencies": {
     "@wecom/aibot-node-sdk": "^1.0.7"
-  },
-  "peerDependencies": {
-    "alemonjs": "^2.1.108"
   },
   "exports": {
     ".": {

@@ -32,9 +32,6 @@
     "ws": "^8.13.0",
     "yaml": "^2.5.1"
   },
-  "peerDependencies": {
-    "alemonjs": "^2.1.0"
-  },
   "types": "lib",
   "exports": {
     ".": {

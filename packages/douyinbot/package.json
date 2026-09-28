@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/douyinbot",
-  "version": "2.1.0-rc.1",
+  "version": "2.1.1",
   "description": "抖音开放平台 IM 机器人",
   "author": "lemonade",
   "license": "MIT",
@@ -10,9 +10,6 @@
   "scripts": {
     "build": "lvy build",
     "test": "yarn build && node --test tests/*.test.mjs"
-  },
-  "peerDependencies": {
-    "alemonjs": "^2.1.108"
   },
   "exports": {
     ".": {

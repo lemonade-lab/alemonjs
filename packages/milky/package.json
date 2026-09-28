@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/milky",
-  "version": "2.1.0-rc.1",
+  "version": "2.1.1",
   "description": "milky",
   "author": "lemonade",
   "license": "MIT",
@@ -25,9 +25,6 @@
   ],
   "dependencies": {
     "ws": "^8.18.1"
-  },
-  "peerDependencies": {
-    "alemonjs": "^2.1.108"
   },
   "alemonjs": {
     "config-source": {

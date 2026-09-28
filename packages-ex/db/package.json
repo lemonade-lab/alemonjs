@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/db",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "数据库连接",
   "author": "lemonade",
   "license": "MIT",
@@ -206,22 +206,6 @@
     "ioredis": "^5.4.1",
     "sequelize": "^6.33.0",
     "dayjs": "^1.11.13"
-  },
-  "peerDependencies": {
-    "mysql2": "^3.6.2",
-    "pg": "^8.11.5",
-    "sqlite3": "^5.1.7"
-  },
-  "peerDependenciesMeta": {
-    "mysql2": {
-      "optional": true
-    },
-    "pg": {
-      "optional": true
-    },
-    "sqlite3": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",

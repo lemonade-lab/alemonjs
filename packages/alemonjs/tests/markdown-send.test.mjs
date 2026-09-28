@@ -99,7 +99,7 @@ test('all adapter manifests require the core release containing the markdown ent
   for (const name of readdirSync(packages)) {
     if (name === 'alemonjs') continue;
     const manifest = JSON.parse(readFileSync(new URL(`${name}/package.json`, packages), 'utf8'));
-    assert.equal(manifest.peerDependencies.alemonjs, '^2.1.108', name);
+    assert.equal(manifest.peerDependencies?.alemonjs, '^2.1.108', name);
   }
   const fixture = join(directory, 'exports');
   const installed = join(fixture, 'node_modules', 'alemonjs');

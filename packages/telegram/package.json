@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/telegram",
-  "version": "2.1.16",
+  "version": "2.1.17",
   "description": "TG官方平台",
   "author": "lemonade",
   "license": "MIT",
@@ -14,9 +14,6 @@
     "@types/node-telegram-bot-api": "^0.64.9",
     "grammy": "^1.30.0",
     "node-telegram-bot-api": "^0.66.0"
-  },
-  "peerDependencies": {
-    "alemonjs": "^2.1.108"
   },
   "exports": {
     ".": {
