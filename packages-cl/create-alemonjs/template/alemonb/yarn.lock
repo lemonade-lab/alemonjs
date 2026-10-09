@@ -2,43 +2,43 @@
 # yarn lockfile v1
 
 
-"@alemonjs/bubble@^2.1.11":
-  version "2.1.11"
-  resolved "https://registry.npmmirror.com/@alemonjs/bubble/-/bubble-2.1.11.tgz#529d3396b34900fafe9dbe9b74c1dbf2ef538ff0"
-  integrity sha512-EyZNTjpNxFsHM4IMP4r0ofNX6mIF5rUf9R8iOyMH21kKjDODAAs43Mrmt5prR3FiRisHeeY0WFrl3t7lzSqJ3Q==
+"@alemonjs/bubble@^2.1.15":
+  version "2.1.15"
+  resolved "https://registry.npmmirror.com/@alemonjs/bubble/-/bubble-2.1.15.tgz#5e514499021460b18a8917691aa12d9af6bc132c"
+  integrity sha512-c8NXsPbBKNJuxUYiGPkP2jeI+2XNSu0LyZLYIueVed9XMVu84HgqrOzUbKFJjojZI4ClAMPd+b453bmqVufWWw==
   dependencies:
     http-proxy-agent "^7.0.2"
     https-proxy-agent "^7"
 
-"@alemonjs/db@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.npmmirror.com/@alemonjs/db/-/db-0.0.17.tgz#0718fc4b89fe4e2069394486550fbb542b1bbe66"
-  integrity sha512-VkH+5oAB5azxG4cn0+H9nup2nZSEUgpayFqMb+4/D95HPWub3ck+uWzftZqlpysSE6EkMLSBf1uPIiVh0Mbcmg==
+"@alemonjs/db@^0.0.21":
+  version "0.0.21"
+  resolved "https://registry.npmmirror.com/@alemonjs/db/-/db-0.0.21.tgz#f2f183486f470620833b0dd4ae6f19910571246f"
+  integrity sha512-2hlHS2c1+23We++9hNFuZvccSWtDwAePlX8ZdjjZZ77xwnLcMmpKG2/Q1LmZ1OAIUe/HFPRJBqjja10rrjEqvw==
   dependencies:
     dayjs "^1.11.13"
     ioredis "^5.4.1"
     sequelize "^6.33.0"
 
-"@alemonjs/discord@^2.1.23":
-  version "2.1.23"
-  resolved "https://registry.npmmirror.com/@alemonjs/discord/-/discord-2.1.23.tgz#5ba6b4c93f6e5871f26ad77c3daa35e80ab20d51"
-  integrity sha512-tmudnR5ZpRV7AQX9AK67cp59qcATnzN9g+dW01vTDKe8/4MNxOiK0bGA4JF4OaRnSsY6vlMSgXnE+3TK/FP0Wg==
+"@alemonjs/discord@^2.1.27":
+  version "2.1.27"
+  resolved "https://registry.npmmirror.com/@alemonjs/discord/-/discord-2.1.27.tgz#905f3f176ee9251338ea409bfce834ce47f255ac"
+  integrity sha512-D9e3hk+3TyRz8xZpQFBjVg5/FKAVo+WogfWU87ZFm1c1HrhfeHfZC/be7PVeJzz5D2Rt9/QyvxYTA4utdBP/tQ==
   dependencies:
     http-proxy-agent "^7.0.2"
     https-proxy-agent "^7"
 
-"@alemonjs/onebot@^2.1.16":
-  version "2.1.16"
-  resolved "https://registry.npmmirror.com/@alemonjs/onebot/-/onebot-2.1.16.tgz#288a6efa762904bfd5bc56600436f4588915edeb"
-  integrity sha512-Dt7OvNmLfBDECotnX+crJvjSxGeESc9bjXWMzU6NF+5vzqYqisMCFkfACLIc7OmFjYxnYjFYmT1X89feIZA9Og==
+"@alemonjs/onebot@^2.1.23":
+  version "2.1.23"
+  resolved "https://registry.npmmirror.com/@alemonjs/onebot/-/onebot-2.1.23.tgz#d7adef8ceea627b36c587a842aa83ddb49817705"
+  integrity sha512-Cu/nF67IbP3lXQbEjMc/SWA1MYtOl8JRRefbVuBY6Iu6kHtxTXBQMnlt6ylq1oHS+Hm7zUHHphSatHnG4vm1wQ==
   dependencies:
     dayjs "^1.11.13"
     ws "^8.18.1"
 
-"@alemonjs/qq-bot@^2.1.22":
-  version "2.1.22"
-  resolved "https://registry.npmmirror.com/@alemonjs/qq-bot/-/qq-bot-2.1.22.tgz#02b60c843c1484aaf60e5be63b9126682a4ff96e"
-  integrity sha512-QNcUA4muvdxOg53IIrsBDYeJvU4Y6deJz0HAsf3zDkZ47hfvBifFvg6HbH3wdsJ0qHcCxEOH71rXt8EOOXo92w==
+"@alemonjs/qq-bot@^2.1.37":
+  version "2.1.37"
+  resolved "https://registry.npmmirror.com/@alemonjs/qq-bot/-/qq-bot-2.1.37.tgz#eb64461ec8abbf2aaf1486a64656ef88f0eddc13"
+  integrity sha512-mxC8eALtfF8VmcqAdlaRdUULLtBpXmWTg2Dy+DMeThEXfYXiPI+MljCVyO56ztb6vq1bWu4ugjG0zX+ETHYbHg==
   dependencies:
     "@noble/curves" "^1.7.0"
     axios "^1.4.0"
@@ -52,8 +52,9 @@
     mime-types "^2.1.35"
     public-ip "^6.0.1"
     qrcode "^1.5.3"
-    uuid "^11.0.3"
+    uuid "^14.0.1"
     ws "^8.13.0"
+    yaml "^2.5.1"
 
 "@borewit/text-codec@^0.2.1":
   version "0.2.2"
@@ -282,27 +283,26 @@ aggregate-error@^4.0.1:
     clean-stack "^4.0.0"
     indent-string "^5.0.0"
 
-alemonjs@2.1.82:
-  version "2.1.82"
-  resolved "https://registry.npmmirror.com/alemonjs/-/alemonjs-2.1.82.tgz#80ae7ff8d9ff2f687fb185279e3d185f52cdbacc"
-  integrity sha512-9xngz0HMpwjvUbsqK+vRKHQKDyZOJR3BGiMBy2n8zsTTIMpP2wuCt3t5hspFHxWcpTDDkwQjzvg6x5zJhdPjQQ==
+alemonjs@2.1.109:
+  version "2.1.109"
+  resolved "https://registry.npmmirror.com/alemonjs/-/alemonjs-2.1.109.tgz#1de7c218ad0d2a88ee985d4af32db8b03d442333"
+  integrity sha512-jolGbiaz4cFgbILOyjDaP2M8a3YZBYlKdiiXaJkLvC1U7LK3C/pdL7daOUvsngV292QyKa/bw1ecWS51twy1Hg==
   dependencies:
     "@koa/cors" "^5.0.0"
     axios "^1.14.0"
-    chalk "^5.6.2"
     commander "^13.1.0"
     cron "^4.4.0"
+    cross-spawn "^7.0.6"
     file-type "21.0.0"
     flatted "^3.3.3"
     https-proxy-agent "^9.0.0"
     koa "^3.0.1"
     koa-router "^14.0.0"
-    koa-static "^5.0.0"
+    lodash-es "^4.18.1"
     log4js "^6.9.1"
     mime-types "^3.0.1"
     public-ip "^7.0.1"
     qrcode "^1.5.4"
-    uuid "11.1.0"
     ws "^8.18.0"
     yaml "^2.5.1"
 
@@ -540,11 +540,6 @@ chalk@3.0.0, chalk@~3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chalk@^5.6.2:
-  version "5.6.2"
-  resolved "https://registry.npmmirror.com/chalk/-/chalk-5.6.2.tgz#b1238b6e23ea337af71c7f8a295db5af0c158aea"
-  integrity sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==
-
 charm@~0.1.1:
   version "0.1.2"
   resolved "https://registry.npmmirror.com/charm/-/charm-0.1.2.tgz#06c21eed1a1b06aeb67553cdc53e23274bac2296"
@@ -714,6 +709,15 @@ croner@~4.1.92:
   version "4.1.97"
   resolved "https://registry.npmmirror.com/croner/-/croner-4.1.97.tgz#6e373dc7bb3026fab2deb0d82685feef20796766"
   integrity sha512-/f6gpQuxDaqXu+1kwQYSckUglPaOrHdbIlBAu0YuW8/Cdb45XwXYNUBXg3r/9Mo6n540Kn/smKcZWko5x99KrQ==
+
+cross-spawn@^7.0.6:
+  version "7.0.6"
+  resolved "https://registry.npmmirror.com/cross-spawn/-/cross-spawn-7.0.6.tgz#8a58fe78f00dcd70c370451759dfbfaf03e8ee9f"
+  integrity sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==
+  dependencies:
+    path-key "^3.1.0"
+    shebang-command "^2.0.0"
+    which "^2.0.1"
 
 csstype@^3.2.2:
   version "3.2.3"
@@ -1507,6 +1511,11 @@ is-regexp@^3.0.0:
   resolved "https://registry.npmmirror.com/is-regexp/-/is-regexp-3.1.0.tgz#0235eab9cda5b83f96ac4a263d8c32c9d5ad7422"
   integrity sha512-rbku49cWloU5bSMI+zaRaXdQHXnthP6DZ/vLnfdSKyL4zUzuWnomtOEiZZOd+ioQ+avFo/qau3KPTc7Fjy1uPA==
 
+isexe@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmmirror.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
+  integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
+
 js-git@^0.7.8:
   version "0.7.8"
   resolved "https://registry.npmmirror.com/js-git/-/js-git-0.7.8.tgz#52fa655ab61877d6f1079efc6534b554f31e5444"
@@ -1710,7 +1719,7 @@ locate-path@^5.0.0:
   dependencies:
     p-locate "^4.1.0"
 
-lodash-es@^4.17.21:
+lodash-es@^4.17.21, lodash-es@^4.18.1:
   version "4.18.1"
   resolved "https://registry.npmmirror.com/lodash-es/-/lodash-es-4.18.1.tgz#b962eeb80d9d983a900bf342961fb7418ca10b1d"
   integrity sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==
@@ -1980,6 +1989,11 @@ path-is-absolute@1.0.1:
   version "1.0.1"
   resolved "https://registry.npmmirror.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
   integrity sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==
+
+path-key@^3.1.0:
+  version "3.1.1"
+  resolved "https://registry.npmmirror.com/path-key/-/path-key-3.1.1.tgz#581f6ade658cbba65a0d3380de7753295054f375"
+  integrity sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==
 
 path-parse@^1.0.7:
   version "1.0.7"
@@ -2449,6 +2463,18 @@ setprototypeof@1.2.0, setprototypeof@~1.2.0:
   resolved "https://registry.npmmirror.com/setprototypeof/-/setprototypeof-1.2.0.tgz#66c9a24a73f9fc28cbe66b09fed3d33dcaf1b424"
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
 
+shebang-command@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmmirror.com/shebang-command/-/shebang-command-2.0.0.tgz#ccd0af4f8835fbdc265b82461aaf0c36663f34ea"
+  integrity sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==
+  dependencies:
+    shebang-regex "^3.0.0"
+
+shebang-regex@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmmirror.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
+  integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
+
 shimmer@^1.2.0:
   version "1.2.1"
   resolved "https://registry.npmmirror.com/shimmer/-/shimmer-1.2.1.tgz#610859f7de327b587efebf501fb43117f9aff337"
@@ -2781,15 +2807,10 @@ unpipe@~1.0.0:
   resolved "https://registry.npmmirror.com/unpipe/-/unpipe-1.0.0.tgz#b2bf4ee8514aae6165b4817829d21b2ef49904ec"
   integrity sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==
 
-uuid@11.1.0:
-  version "11.1.0"
-  resolved "https://registry.npmmirror.com/uuid/-/uuid-11.1.0.tgz#9549028be1753bb934fc96e2bca09bb4105ae912"
-  integrity sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==
-
-uuid@^11.0.3:
-  version "11.1.1"
-  resolved "https://registry.npmmirror.com/uuid/-/uuid-11.1.1.tgz#f6d81d2e1c65d00762e5e29b16c5d2d995e208ad"
-  integrity sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==
+uuid@^14.0.1:
+  version "14.0.2"
+  resolved "https://registry.npmmirror.com/uuid/-/uuid-14.0.2.tgz#d5ae03e4db0881c87271f8b0b9bd7312d02c799a"
+  integrity sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==
 
 uuid@^8.3.2:
   version "8.3.2"
@@ -2825,6 +2846,13 @@ which-module@^2.0.0:
   version "2.0.1"
   resolved "https://registry.npmmirror.com/which-module/-/which-module-2.0.1.tgz#776b1fe35d90aebe99e8ac15eb24093389a4a409"
   integrity sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==
+
+which@^2.0.1:
+  version "2.0.2"
+  resolved "https://registry.npmmirror.com/which/-/which-2.0.2.tgz#7c6a8dd0a636a0327e10b59c9286eee93f3f51b1"
+  integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
+  dependencies:
+    isexe "^2.0.0"
 
 wkx@^0.5.0:
   version "0.5.0"
