@@ -1,8 +1,9 @@
-@import url('@src/assets/root.css');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import '@src/assets/root.css';
+@import '@src/assets/image.css';
+@import 'tailwindcss';
 
-body {
-  @apply m-0 p-0 flex flex-col;
+@layer base {
+  body {
+    @apply m-0 p-0 flex flex-col;
+  }
 }

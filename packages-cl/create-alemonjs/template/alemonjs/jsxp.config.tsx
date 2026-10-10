@@ -4,7 +4,7 @@ import Word from '@src/image/component/help';
 export default defineConfig({
   routes: {
     '/': {
-      component: <Word data={'ALemonJS 跨平台开发框架'} />
+      component: <Word name={'ALemonJS 跨平台开发框架'} />
     }
   }
 });

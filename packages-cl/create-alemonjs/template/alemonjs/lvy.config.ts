@@ -1,18 +1,25 @@
 import { defineConfig } from 'lvyjs';
+import tailwindcss from 'lvyjs-plugin-tailwindcss';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
-  watch: ['src/**/*.{ts,tsx,js,jsx,json,html}'],
+  env: process.env,
+  plugins: [
+    // 处理 TailwindCSS
+    tailwindcss()
+  ],
+  watch: [
+    'src/**/*.{ts,tsx,js,jsx,json,html}'
+  ],
   alias: {
     entries: [{ find: '@src', replacement: join(__dirname, 'src') }]
   },
   assets: {
-    // 支持图片、字体、文本等静态资源
-    filter: /\.(png|jpg|jpeg|gif|svg|webp|ico|yaml|txt|ttf|md)$/
+    // 过滤得到指定格式的文件识别之为静态资源
+    filter: /\.(png|jpg|jpeg|gif|svg|webp|ico|yaml|txt|ttf)$/
   },
   build: {
-    // 是否生成声明文件
-    dts: false
+    // dts: true
   }
 });

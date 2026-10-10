@@ -1,9 +1,17 @@
 {
   "compilerOptions": {
     "paths": {
-      "@src/*": ["./src/*"]
+      "@src/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["src/**/*", "jsxp.config.tsx"],
+  "include": [
+    "src/**/*",
+    "app.ts",
+    "app.jsxp.ts",
+    "jsxp.config.tsx",
+    "lvy.config.ts"
+  ],
   "extends": "lvyjs/tsconfig.json"
 }
