@@ -18,7 +18,7 @@
 </p>
 
 ALemonJS 是一个面向跨平台聊天机器人的 Node.js 框架。  
-它把事件处理、声明式路由、Hook、消息格式化与多通道通信协议整合在一起，让同一套业务代码可以运行在 QQ、Discord、KOOK、Telegram、OneBot 等平台。
+它把事件处理、声明式路由、Hook、消息格式化与多通道通信协议整合在一起，让同一套业务代码可以接入 QQ、Discord、KOOK、Telegram、OneBot、飞书、Slack、Teams 等平台。
 
 ## Why ALemonJS
 
@@ -175,9 +175,56 @@ export default () => {
 | [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | 抖音桌面       |
 | [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)           | 抖音机器人     |
 
-更多社交接入（微信公众号、微信客服、ICQQ、钉钉、黑盒语音、飞书、LINE、Slack、Teams、WhatsApp、Zulip、Matrix、Google Chat、Messenger、Instagram、Mattermost、Twitch、IRCv3）各自独立接入，配置与能力边界见 `packages/` 下对应平台的 README。
+### Social Platform Adapters
 
-各包原生 API 清单、框架动作对应和未完成项见 [社交适配包 API 核对进度](docs/social-api-progress.md)。
+以下 18 个适配包独立安装、配置和运行，要求 Node.js 22.22+。包名链接指向接入说明，API 对照列出原生入口、框架动作和能力边界。
+
+| Package                                                           | Platform                    | API 对照                               |
+| ----------------------------------------------------------------- | --------------------------- | -------------------------------------- |
+| [`@alemonjs/dingtalk`](packages/dingtalk/README.md)               | 钉钉                        | [API](packages/dingtalk/API.md)        |
+| [`@alemonjs/feishu`](packages/feishu/README.md)                   | 飞书 / Lark                 | [API](packages/feishu/API.md)          |
+| [`@alemonjs/google-chat`](packages/google-chat/README.md)         | Google Chat                 | [API](packages/google-chat/API.md)     |
+| [`@alemonjs/heybox`](packages/heybox/README.md)                   | 黑盒语音                    | [API](packages/heybox/API.md)          |
+| [`@alemonjs/icqq`](packages/icqq/README.md)                       | ICQQ                        | [API](packages/icqq/API.md)            |
+| [`@alemonjs/instagram`](packages/instagram/README.md)             | Instagram Messaging         | [API](packages/instagram/API.md)       |
+| [`@alemonjs/irc`](packages/irc/README.md)                         | IRCv3                       | [API](packages/irc/API.md)             |
+| [`@alemonjs/line`](packages/line/README.md)                       | LINE                        | [API](packages/line/API.md)            |
+| [`@alemonjs/matrix`](packages/matrix/README.md)                   | Matrix                      | [API](packages/matrix/API.md)          |
+| [`@alemonjs/mattermost`](packages/mattermost/README.md)           | Mattermost                  | [API](packages/mattermost/API.md)      |
+| [`@alemonjs/messenger`](packages/messenger/README.md)             | Facebook Messenger          | [API](packages/messenger/API.md)       |
+| [`@alemonjs/slack`](packages/slack/README.md)                     | Slack                       | [API](packages/slack/API.md)           |
+| [`@alemonjs/teams`](packages/teams/README.md)                     | Microsoft Teams             | [API](packages/teams/API.md)           |
+| [`@alemonjs/twitch`](packages/twitch/README.md)                   | Twitch                      | [API](packages/twitch/API.md)          |
+| [`@alemonjs/wechat-kf`](packages/wechat-kf/README.md)             | 微信客服                    | [API](packages/wechat-kf/API.md)       |
+| [`@alemonjs/wechat-official`](packages/wechat-official/README.md) | 微信公众号                  | [API](packages/wechat-official/API.md) |
+| [`@alemonjs/whatsapp`](packages/whatsapp/README.md)               | WhatsApp Business Cloud API | [API](packages/whatsapp/API.md)        |
+| [`@alemonjs/zulip`](packages/zulip/README.md)                     | Zulip                       | [API](packages/zulip/API.md)           |
+
+### API Coverage
+
+适配器将已实现的能力映射为统一事件和框架动作，并通过 `useClient` 的 `client.api` 通道提供原生方法调用。实际可用动作可通过 `connection.status` 的 `capabilities` 查询；消息格式、媒体类型、发送目标和权限仍遵循各平台规则。
+
+每个社交适配包提供 `API.md` 和 `api-inventory.json`，分别记录框架动作对应、未映射项，以及当前 SDK / 驱动的原生方法清单。SDK 方法可调用、动作已注册和业务能力完整支持是不同的状态；方法数量和动作数量不能直接作为平台 API 覆盖率。
+
+当前已补齐钉钉机器人服务的 29 个具名 API，以及飞书媒体上传、媒体 key 复用发送和表情移除。其余端点契约、缺失类型及框架映射仍在逐包完善，详情见 [社交适配包 API 核对进度](docs/social-api-progress.md)。
+
+仓库内可运行以下命令验证这 18 个适配包：
+
+```bash
+# 检查 API 对照表与当前框架、驱动源码是否一致
+yarn audit:social
+
+# 构建核心，并运行对照表检查、API 类型契约检查和离线测试
+yarn test:social
+
+# 构建适配包及其依赖
+yarn build:social
+
+# 逐包运行 ESLint
+yarn lint:social
+```
+
+离线测试与构建通过不代表真实账号登录、权限审核或线上消息投递已经验证。
 
 ### Extensions
 
