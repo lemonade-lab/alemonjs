@@ -160,71 +160,38 @@ export default () => {
 
 ### Platform Adapters
 
-| Package                                                                              | Description    |
-| ------------------------------------------------------------------------------------ | -------------- |
-| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)                 | QQ 机器人      |
-| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)               | Discord(DC)    |
-| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)                     | KOOK           |
-| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram)             | Telegram(TG)   |
-| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)                 | Bubble         |
-| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)                 | OneBot         |
-| [`@alemonjs/milky`](https://www.npmjs.com/package/@alemonjs/milky)                   | Milky          |
-| [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)                 | 个人微信       |
-| [`@alemonjs/wechat-clawbot`](https://www.npmjs.com/package/@alemonjs/wechat-clawbot) | 微信机器人     |
-| [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                   | 企业微信机器人 |
-| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | 抖音桌面       |
-| [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)           | 抖音机器人     |
-
-### Social Platform Adapters
-
-以下 18 个适配包独立安装、配置和运行，要求 Node.js 22.22+。包名链接指向接入说明，API 对照列出原生入口、框架动作和能力边界。
-
-| Package                                                           | Platform                    | API 对照                               |
-| ----------------------------------------------------------------- | --------------------------- | -------------------------------------- |
-| [`@alemonjs/dingtalk`](packages/dingtalk/README.md)               | 钉钉                        | [API](packages/dingtalk/API.md)        |
-| [`@alemonjs/feishu`](packages/feishu/README.md)                   | 飞书 / Lark                 | [API](packages/feishu/API.md)          |
-| [`@alemonjs/google-chat`](packages/google-chat/README.md)         | Google Chat                 | [API](packages/google-chat/API.md)     |
-| [`@alemonjs/heybox`](packages/heybox/README.md)                   | 黑盒语音                    | [API](packages/heybox/API.md)          |
-| [`@alemonjs/icqq`](packages/icqq/README.md)                       | ICQQ                        | [API](packages/icqq/API.md)            |
-| [`@alemonjs/instagram`](packages/instagram/README.md)             | Instagram Messaging         | [API](packages/instagram/API.md)       |
-| [`@alemonjs/irc`](packages/irc/README.md)                         | IRCv3                       | [API](packages/irc/API.md)             |
-| [`@alemonjs/line`](packages/line/README.md)                       | LINE                        | [API](packages/line/API.md)            |
-| [`@alemonjs/matrix`](packages/matrix/README.md)                   | Matrix                      | [API](packages/matrix/API.md)          |
-| [`@alemonjs/mattermost`](packages/mattermost/README.md)           | Mattermost                  | [API](packages/mattermost/API.md)      |
-| [`@alemonjs/messenger`](packages/messenger/README.md)             | Facebook Messenger          | [API](packages/messenger/API.md)       |
-| [`@alemonjs/slack`](packages/slack/README.md)                     | Slack                       | [API](packages/slack/API.md)           |
-| [`@alemonjs/teams`](packages/teams/README.md)                     | Microsoft Teams             | [API](packages/teams/API.md)           |
-| [`@alemonjs/twitch`](packages/twitch/README.md)                   | Twitch                      | [API](packages/twitch/API.md)          |
-| [`@alemonjs/wechat-kf`](packages/wechat-kf/README.md)             | 微信客服                    | [API](packages/wechat-kf/API.md)       |
-| [`@alemonjs/wechat-official`](packages/wechat-official/README.md) | 微信公众号                  | [API](packages/wechat-official/API.md) |
-| [`@alemonjs/whatsapp`](packages/whatsapp/README.md)               | WhatsApp Business Cloud API | [API](packages/whatsapp/API.md)        |
-| [`@alemonjs/zulip`](packages/zulip/README.md)                     | Zulip                       | [API](packages/zulip/API.md)           |
-
-### API Coverage
-
-适配器将已实现的能力映射为统一事件和框架动作，并通过 `useClient` 的 `client.api` 通道提供原生方法调用。实际可用动作可通过 `connection.status` 的 `capabilities` 查询；消息格式、媒体类型、发送目标和权限仍遵循各平台规则。
-
-每个社交适配包提供 `API.md` 和 `api-inventory.json`，分别记录框架动作对应、未映射项，以及当前 SDK / 驱动的原生方法清单。SDK 方法可调用、动作已注册和业务能力完整支持是不同的状态；方法数量和动作数量不能直接作为平台 API 覆盖率。
-
-当前已补齐钉钉机器人服务的 29 个具名 API，以及飞书媒体上传、媒体 key 复用发送和表情移除。其余端点契约、缺失类型及框架映射仍在逐包完善，详情见 [社交适配包 API 核对进度](docs/social-api-progress.md)。
-
-仓库内可运行以下命令验证这 18 个适配包：
-
-```bash
-# 检查 API 对照表与当前框架、驱动源码是否一致
-yarn audit:social
-
-# 构建核心，并运行对照表检查、API 类型契约检查和离线测试
-yarn test:social
-
-# 构建适配包及其依赖
-yarn build:social
-
-# 逐包运行 ESLint
-yarn lint:social
-```
-
-离线测试与构建通过不代表真实账号登录、权限审核或线上消息投递已经验证。
+| Package                                                                                | Description                 |
+| -------------------------------------------------------------------------------------- | --------------------------- |
+| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)                   | QQ 机器人                   |
+| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)                 | Discord(DC)                 |
+| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)                       | KOOK                        |
+| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram)               | Telegram(TG)                |
+| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)                   | Bubble                      |
+| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)                   | OneBot                      |
+| [`@alemonjs/milky`](https://www.npmjs.com/package/@alemonjs/milky)                     | Milky                       |
+| [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)                   | 个人微信                    |
+| [`@alemonjs/wechat-clawbot`](https://www.npmjs.com/package/@alemonjs/wechat-clawbot)   | 微信机器人                  |
+| [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                     | 企业微信机器人              |
+| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                   | 抖音桌面                    |
+| [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)             | 抖音机器人                  |
+| [`@alemonjs/dingtalk`](https://www.npmjs.com/package/@alemonjs/dingtalk)               | 钉钉                        |
+| [`@alemonjs/feishu`](https://www.npmjs.com/package/@alemonjs/feishu)                   | 飞书 / Lark                 |
+| [`@alemonjs/google-chat`](https://www.npmjs.com/package/@alemonjs/google-chat)         | Google Chat                 |
+| [`@alemonjs/heybox`](https://www.npmjs.com/package/@alemonjs/heybox)                   | 黑盒语音                    |
+| [`@alemonjs/icqq`](https://www.npmjs.com/package/@alemonjs/icqq)                       | ICQQ                        |
+| [`@alemonjs/instagram`](https://www.npmjs.com/package/@alemonjs/instagram)             | Instagram Messaging         |
+| [`@alemonjs/irc`](https://www.npmjs.com/package/@alemonjs/irc)                         | IRCv3                       |
+| [`@alemonjs/line`](https://www.npmjs.com/package/@alemonjs/line)                       | LINE                        |
+| [`@alemonjs/matrix`](https://www.npmjs.com/package/@alemonjs/matrix)                   | Matrix                      |
+| [`@alemonjs/mattermost`](https://www.npmjs.com/package/@alemonjs/mattermost)           | Mattermost                  |
+| [`@alemonjs/messenger`](https://www.npmjs.com/package/@alemonjs/messenger)             | Facebook Messenger          |
+| [`@alemonjs/slack`](https://www.npmjs.com/package/@alemonjs/slack)                     | Slack                       |
+| [`@alemonjs/teams`](https://www.npmjs.com/package/@alemonjs/teams)                     | Microsoft Teams             |
+| [`@alemonjs/twitch`](https://www.npmjs.com/package/@alemonjs/twitch)                   | Twitch                      |
+| [`@alemonjs/wechat-kf`](https://www.npmjs.com/package/@alemonjs/wechat-kf)             | 微信客服                    |
+| [`@alemonjs/wechat-official`](https://www.npmjs.com/package/@alemonjs/wechat-official) | 微信公众号                  |
+| [`@alemonjs/whatsapp`](https://www.npmjs.com/package/@alemonjs/whatsapp)               | WhatsApp Business Cloud API |
+| [`@alemonjs/zulip`](https://www.npmjs.com/package/@alemonjs/zulip)                     | Zulip                       |
 
 ### Extensions
 
