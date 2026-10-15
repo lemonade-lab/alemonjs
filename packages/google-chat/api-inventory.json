@@ -1,0 +1,714 @@
+{
+  "platform": "google-chat",
+  "scope": "Public callable surface of the exported API type in the installed SDK, not the complete vendor API or IPC compatibility",
+  "dependencies": {
+    "@googleapis/chat": "51.2.0",
+    "google-auth-library": "11.2.0"
+  },
+  "unresolvedTypes": [],
+  "httpOperations": [],
+  "methods": [
+    {
+      "path": "customEmojis.create",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 3465
+    },
+    {
+      "path": "customEmojis.delete",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 3523
+    },
+    {
+      "path": "customEmojis.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 3590
+    },
+    {
+      "path": "customEmojis.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 3658
+    },
+    {
+      "path": "media.download",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 3758
+    },
+    {
+      "path": "media.upload",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 3834
+    },
+    {
+      "path": "spaces.completeImport",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 3937
+    },
+    {
+      "path": "spaces.create",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4051
+    },
+    {
+      "path": "spaces.delete",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4116
+    },
+    {
+      "path": "spaces.findDirectMessage",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4200
+    },
+    {
+      "path": "spaces.findGroupChats",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4270
+    },
+    {
+      "path": "spaces.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4359
+    },
+    {
+      "path": "spaces.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4428
+    },
+    {
+      "path": "spaces.members.create",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4929
+    },
+    {
+      "path": "spaces.members.delete",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5004
+    },
+    {
+      "path": "spaces.members.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5080
+    },
+    {
+      "path": "spaces.members.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5161
+    },
+    {
+      "path": "spaces.members.patch",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5252
+    },
+    {
+      "path": "spaces.messagePins.create",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5411
+    },
+    {
+      "path": "spaces.messagePins.delete",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5472
+    },
+    {
+      "path": "spaces.messagePins.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5542
+    },
+    {
+      "path": "spaces.messages.attachments.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6485
+    },
+    {
+      "path": "spaces.messages.create",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5715
+    },
+    {
+      "path": "spaces.messages.delete",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5779
+    },
+    {
+      "path": "spaces.messages.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5873
+    },
+    {
+      "path": "spaces.messages.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 5951
+    },
+    {
+      "path": "spaces.messages.patch",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6081
+    },
+    {
+      "path": "spaces.messages.reactions.create",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6572
+    },
+    {
+      "path": "spaces.messages.reactions.delete",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6634
+    },
+    {
+      "path": "spaces.messages.reactions.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6706
+    },
+    {
+      "path": "spaces.messages.search",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6158
+    },
+    {
+      "path": "spaces.messages.update",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6288
+    },
+    {
+      "path": "spaces.patch",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4545
+    },
+    {
+      "path": "spaces.search",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4621
+    },
+    {
+      "path": "spaces.setup",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 4711
+    },
+    {
+      "path": "spaces.spaceEvents.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6841
+    },
+    {
+      "path": "spaces.spaceEvents.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 6925
+    },
+    {
+      "path": "users.availability.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7026
+    },
+    {
+      "path": "users.availability.markAsActive",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7098
+    },
+    {
+      "path": "users.availability.markAsAway",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7167
+    },
+    {
+      "path": "users.availability.markAsDoNotDisturb",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7239
+    },
+    {
+      "path": "users.availability.patch",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7315
+    },
+    {
+      "path": "users.sections.create",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7444
+    },
+    {
+      "path": "users.sections.delete",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7502
+    },
+    {
+      "path": "users.sections.items.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7843
+    },
+    {
+      "path": "users.sections.items.move",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7911
+    },
+    {
+      "path": "users.sections.list",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7570
+    },
+    {
+      "path": "users.sections.patch",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7646
+    },
+    {
+      "path": "users.sections.position",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 7715
+    },
+    {
+      "path": "users.spaces.getSpaceReadState",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 8009
+    },
+    {
+      "path": "users.spaces.spaceNotificationSetting.get",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 8167
+    },
+    {
+      "path": "users.spaces.spaceNotificationSetting.patch",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 8241
+    },
+    {
+      "path": "users.spaces.threads.getThreadReadState",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 8329
+    },
+    {
+      "path": "users.spaces.updateSpaceReadState",
+      "parameters": [
+        ["params", "options"],
+        ["params", "options"],
+        ["params", "options", "callback"],
+        ["params", "options", "callback"],
+        ["params", "callback"],
+        ["callback"]
+      ],
+      "declaration": "node_modules/@googleapis/chat/build/v1.d.ts",
+      "line": 8081
+    }
+  ]
+}

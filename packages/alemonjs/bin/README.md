@@ -161,6 +161,7 @@ alemonc publish patch
 - 默认发布内容是 `lib/`、`package.json`、`README.md`
 - 如果项目配置了 `.npmignore` 或 `package.json.files`，则切换为 npm 文件选择规则
 - 获取 npm 文件清单时禁用生命周期脚本（如 `prepack`、`prepare`、`postpack`），避免重复构建和日志干扰；产物生成请放在 `build` 脚本中
+- 推送前清理产物目录中的 `package.json`：移除 `private`、`workspaces`、`devDependencies`、`packageManager`，以及 `build`、`prepublish`、`prepare`、`prepublishOnly`、`prepack`、`postpack`、`publish`、`postpublish` 脚本；清理后没有脚本则移除 `scripts`。保留运行时依赖、入口、安装脚本及其他元数据，源码中的对应字段不变
 - 最终把产物提交并推送到对应的产物分支；仅主分支创建并推送 tag
 - 默认要求 git 工作区干净，发布成功后仅在版本变化时自动提交当前源码分支中的 `package.json`
 - `--dry-run` 执行构建和文件选择，不推送分支或创建 tag，并恢复本地版本号

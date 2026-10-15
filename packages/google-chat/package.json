@@ -1,0 +1,62 @@
+{
+  "name": "@alemonjs/google-chat",
+  "version": "2.1.0",
+  "description": "google-chat social adapter for AlemonJS",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./driver": {
+      "types": "./lib/driver.d.ts",
+      "import": "./lib/driver.js"
+    },
+    "./package": "./package.json"
+  },
+  "scripts": {
+    "build": "lvy build"
+  },
+  "dependencies": {
+    "@googleapis/chat": "51.2.0",
+    "google-auth-library": "11.2.0"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/google-chat/README.md",
+      "official": "https://developers.google.com/workspace/chat/verify-requests-from-chat"
+    },
+    "config": [
+      {
+        "name": "audience",
+        "type": "string",
+        "required": true,
+        "description": "audience"
+      },
+      {
+        "name": "service_account_email",
+        "type": "string",
+        "required": true,
+        "description": "service_account_email"
+      },
+      {
+        "name": "key_file",
+        "type": "string",
+        "required": false,
+        "description": "key_file"
+      }
+    ]
+  }
+}

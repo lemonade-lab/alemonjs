@@ -1,0 +1,90 @@
+{
+  "platform": "heybox",
+  "scope": "Public callable surface of the exported API type in the installed SDK, not the complete vendor API or IPC compatibility",
+  "dependencies": {
+    "ws": "^8.18.1"
+  },
+  "unresolvedTypes": [],
+  "httpOperations": [
+    {
+      "path": "${path}${path.includes('?') ? '&' : '?'}${common}",
+      "method": "dynamic: method",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 22
+    },
+    {
+      "path": "v2/room/joined?offset=0&limit=50",
+      "method": "GET",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 162
+    },
+    {
+      "path": "v2/room/view?room_id=${encodeURIComponent(p.GuildId)}",
+      "method": "GET",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 163
+    },
+    {
+      "path": "v2/room/users?room_id=${encodeURIComponent(p.GuildId)}&heybox_id=${encodeURIComponent(c.bot_id ?? '')}&offset=0&limit=${p.params?.limit ?? 50}",
+      "method": "GET",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 164
+    },
+    {
+      "path": "v2/room/kick_out",
+      "method": "POST",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 165
+    },
+    {
+      "path": "v2/room_role/roles?room_id=${encodeURIComponent(p.GuildId)}",
+      "method": "GET",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 166
+    },
+    {
+      "path": "v2/room_role/grant",
+      "method": "POST",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 167
+    },
+    {
+      "path": "v2/room_role/revoke",
+      "method": "POST",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 168
+    },
+    {
+      "path": "v2/channel_msg/update",
+      "method": "POST",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 169
+    },
+    {
+      "path": "v2/channel_msg/delete",
+      "method": "POST",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 177
+    },
+    {
+      "path": "v2/channel_msg/emoji/reply",
+      "method": "POST",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 178
+    },
+    {
+      "path": "v2/channel_msg/emoji/reply",
+      "method": "POST",
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 185
+    }
+  ],
+  "methods": [
+    {
+      "path": "request",
+      "parameters": [["path", "method", "body"]],
+      "declaration": "packages/heybox/src/driver.ts",
+      "line": 195
+    }
+  ]
+}

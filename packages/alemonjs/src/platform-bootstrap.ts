@@ -2,6 +2,7 @@ import { logger, shutdownLogger } from './common/logger.js';
 
 let runtimeStarted = false;
 let stopping = false;
+let runtimeCleanup: (() => unknown | Promise<unknown>) | undefined;
 
 const normalizeError = (error: unknown) => {
   if (error instanceof Error) {
@@ -29,6 +30,24 @@ const shutdown = async (reason: string) => {
 
   stopping = true;
   logger.info?.(`[platform-bootstrap][${reason}] 收到信号，正在关闭...`);
+  if (runtimeCleanup) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+      await Promise.race([
+        Promise.resolve().then(runtimeCleanup),
+        new Promise<void>(resolve => {
+          timer = setTimeout(resolve, 5000);
+        })
+      ]);
+    } catch {
+      logger.error?.('[platform-bootstrap] 平台清理失败');
+    } finally {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    }
+  }
   await shutdownLogger();
   process.exit(0);
 };
@@ -56,7 +75,11 @@ const startRuntime = async () => {
       throw new Error('Platform entry must export a callable default or main function');
     }
 
-    await run();
+    const runtime = await run();
+
+    if (typeof runtime?.stop === 'function') {
+      runtimeCleanup = () => runtime.stop();
+    }
     notifyParent({ type: 'app_ready', protocolVersion: 'v2' });
   } catch (error) {
     notifyParent({
@@ -92,7 +115,7 @@ process.on('message', msg => {
     if (data?.type === 'start') {
       void startRuntime();
     } else if (data?.type === 'stop') {
-      shutdown('stop');
+      void shutdown('stop');
     }
   } catch {}
 });

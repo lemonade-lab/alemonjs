@@ -1,0 +1,57 @@
+{
+  "name": "@alemonjs/mattermost",
+  "version": "2.1.0",
+  "description": "mattermost social adapter for AlemonJS",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./driver": {
+      "types": "./lib/driver.d.ts",
+      "import": "./lib/driver.js"
+    },
+    "./package": "./package.json"
+  },
+  "scripts": {
+    "build": "lvy build"
+  },
+  "dependencies": {
+    "@mattermost/client": "11.9.0",
+    "ws": "^8.18.1",
+    "@mattermost/types": "11.9.0"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/mattermost/README.md",
+      "official": "https://github.com/mattermost/mattermost/tree/master/webapp/platform/client"
+    },
+    "config": [
+      {
+        "name": "base_url",
+        "type": "string",
+        "required": true,
+        "description": "base_url"
+      },
+      {
+        "name": "token",
+        "type": "string",
+        "required": true,
+        "description": "token"
+      }
+    ]
+  }
+}

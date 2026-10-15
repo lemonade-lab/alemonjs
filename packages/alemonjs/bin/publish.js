@@ -10,6 +10,8 @@ const PRERELEASE_IDS = new Set(['alpha', 'beta', 'rc', 'next']);
 const SEMVER_RE = /^\d+\.\d+\.\d+(?:-(alpha|beta|rc|next)\.\d+)?$/;
 const TAG_RE = /^v\d+\.\d+\.\d+(?:-(alpha|beta|rc|next)\.\d+)?$/;
 const DEFAULT_PUBLISH_FILES = ['lib', 'package.json', 'README.md'];
+const SOURCE_PACKAGE_FIELDS = ['private', 'workspaces', 'devDependencies', 'packageManager'];
+const SOURCE_PACKAGE_SCRIPTS = ['build', 'prepublish', 'prepare', 'prepublishOnly', 'prepack', 'postpack', 'publish', 'postpublish'];
 
 function readPackageJson() {
   const pkgPath = join(process.cwd(), 'package.json');
@@ -191,12 +193,25 @@ function updateVersion(pkgPath, pkg, version) {
 
 function getPackResult(cwd = process.cwd()) {
   // 构建已单独执行，这里只读取文件清单，避免生命周期脚本的日志混入 JSON。
-  const output = execSync('npm pack --json --dry-run --ignore-scripts', {
-    cwd,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-    maxBuffer: 20 * 1024 * 1024
-  }).trim();
+  const pkgPath = join(cwd, 'package.json');
+  const original = fs.readFileSync(pkgPath);
+  const pkg = JSON.parse(original.toString('utf8'));
+  // 部分 npm 版本的 prepare 不遵守 --ignore-scripts，读取清单期间临时屏蔽。
+  let output;
+  try {
+    if (pkg.scripts) {
+      delete pkg.scripts;
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+    }
+    output = execSync('npm pack --json --dry-run --ignore-scripts', {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      maxBuffer: 20 * 1024 * 1024
+    }).trim();
+  } finally {
+    fs.writeFileSync(pkgPath, original);
+  }
 
   const result = JSON.parse(output);
   if (!Array.isArray(result) || result.length === 0 || !Array.isArray(result[0]?.files)) {
@@ -254,6 +269,27 @@ function copyPublishFiles(files) {
   }
 
   return publishDir;
+}
+
+function preparePublishPackage(publishDir) {
+  const pkgPath = join(publishDir, 'package.json');
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+
+  for (const field of SOURCE_PACKAGE_FIELDS) {
+    delete pkg[field];
+  }
+
+  // 产物已构建完成，不应在安装或再次发包时触发源码构建。
+  if (pkg.scripts) {
+    for (const script of SOURCE_PACKAGE_SCRIPTS) {
+      delete pkg.scripts[script];
+    }
+    if (Object.keys(pkg.scripts).length === 0) {
+      delete pkg.scripts;
+    }
+  }
+
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 }
 
 function removeDirContents(dirPath) {
@@ -423,6 +459,7 @@ export async function publish(release, options = {}) {
     }
 
     publishDir = copyPublishFiles(publishFiles);
+    preparePublishPackage(publishDir);
 
     console.log(`发布规则: ${useNpmRules ? 'npm' : 'default'}`);
     console.log(`发布文件数: ${publishFiles.length}`);

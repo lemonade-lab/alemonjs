@@ -175,6 +175,10 @@ export default () => {
 | [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                 | 抖音桌面       |
 | [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)           | 抖音机器人     |
 
+更多社交接入（微信公众号、微信客服、ICQQ、钉钉、黑盒语音、飞书、LINE、Slack、Teams、WhatsApp、Zulip、Matrix、Google Chat、Messenger、Instagram、Mattermost、Twitch、IRCv3）各自独立接入，配置与能力边界见 `packages/` 下对应平台的 README。
+
+各包原生 API 清单、框架动作对应和未完成项见 [社交适配包 API 核对进度](docs/social-api-progress.md)。
+
 ### Extensions
 
 | Package                                                                | Description        |

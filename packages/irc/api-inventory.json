@@ -1,0 +1,329 @@
+{
+  "platform": "irc",
+  "scope": "Public callable surface of the exported API type in the installed SDK, not the complete vendor API or IPC compatibility",
+  "dependencies": {
+    "irc-framework": "4.14.0"
+  },
+  "unresolvedTypes": ["<API>"],
+  "httpOperations": [],
+  "methods": [
+    {
+      "path": "action",
+      "parameters": [["target", "message"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addCommandHandlerListeners",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addInvite",
+      "parameters": [["channel", "mask"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addMonitor",
+      "parameters": [["target"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "ban",
+      "parameters": [["channel", "mask"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "banlist",
+      "parameters": [["channel", "cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "caseCompare",
+      "parameters": [["string1", "string2"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "caseLower",
+      "parameters": [["string"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "caseUpper",
+      "parameters": [["string"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "changeNick",
+      "parameters": [["nick"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "channel",
+      "parameters": [["channel_name", "key"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "clearMonitor",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "clearTopic",
+      "parameters": [["channel"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "connect",
+      "parameters": [["options"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createStructure",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "ctcpRequest",
+      "parameters": [["target", "type /*", "paramN */"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "ctcpResponse",
+      "parameters": [["target", "type /*", "paramN */"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "debugOut",
+      "parameters": [["out"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "invite",
+      "parameters": [["channel", "nick"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "inviteList",
+      "parameters": [["channel", "cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "join",
+      "parameters": [["channel", "key"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "list",
+      "parameters": [["/* paramN */"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "match",
+      "parameters": [["match_regex", "cb", "message_type"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "matchAction",
+      "parameters": [["match_regex", "cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "matchMessage",
+      "parameters": [["match_regex", "cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "matchNotice",
+      "parameters": [["match_regex", "cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "mode",
+      "parameters": [["channel", "mode", "extra_args"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "monitorlist",
+      "parameters": [["cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "notice",
+      "parameters": [["target", "message", "tags"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "part",
+      "parameters": [["channel", "message"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "ping",
+      "parameters": [["message"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "processNextWhoQueue",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "proxyIrcEvents",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "queryMonitor",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "quit",
+      "parameters": [["message"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "raw",
+      "parameters": [["input"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "rawString",
+      "parameters": [["input"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "registerToNetwork",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "removeInvite",
+      "parameters": [["channel", "mask"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "removeMonitor",
+      "parameters": [["target"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "requestCap",
+      "parameters": [["cap"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "resetPingTimeoutTimer",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "say",
+      "parameters": [["target", "message", "tags"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendMessage",
+      "parameters": [["commandName", "target", "message", "tags"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setTopic",
+      "parameters": [["channel", "newTopic"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "startPeriodicPing",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "startPingTimeoutTimer",
+      "parameters": [[]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "tagmsg",
+      "parameters": [["target", "tags = {}"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "unban",
+      "parameters": [["channel", "mask"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "use",
+      "parameters": [["middleware_fn"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "who",
+      "parameters": [["target", "cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "whois",
+      "parameters": [["target", "_cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "whowas",
+      "parameters": [["target", "_cb"]],
+      "declaration": "node_modules/irc-framework/src/index.js",
+      "types": "unresolved upstream JavaScript"
+    }
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "platform": "dingtalk",
+  "scope": "Public callable surface of the exported API type in the installed SDK, not the complete vendor API or IPC compatibility",
+  "dependencies": {
+    "dingtalk-stream": "2.1.6-beta.1"
+  },
+  "unresolvedTypes": [],
+  "httpOperations": [
+    {
+      "path": "oauth2/accessToken",
+      "method": "POST",
+      "declaration": "packages/dingtalk/src/driver.ts",
+      "line": 21
+    },
+    {
+      "path": "${url.pathname}${url.search}",
+      "method": "POST",
+      "declaration": "packages/dingtalk/src/driver.ts",
+      "line": 91
+    }
+  ],
+  "methods": [
+    {
+      "path": "request",
+      "parameters": [["path", "body", "method"]],
+      "declaration": "packages/dingtalk/src/driver.ts",
+      "line": 8
+    },
+    {
+      "path": "robot.addOrgRobotInstanceToGroup",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 385
+    },
+    {
+      "path": "robot.batchOTOQuery",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 386
+    },
+    {
+      "path": "robot.batchRecallGroup",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 387
+    },
+    {
+      "path": "robot.batchRecallOTO",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 388
+    },
+    {
+      "path": "robot.batchRecallPrivateChat",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 389
+    },
+    {
+      "path": "robot.batchSendOTO",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 390
+    },
+    {
+      "path": "robot.clearRobotPlugin",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 391
+    },
+    {
+      "path": "robot.deleteCustomRobot",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 392
+    },
+    {
+      "path": "robot.executeRobotAiSkill",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 393
+    },
+    {
+      "path": "robot.getBotListInGroup",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 394
+    },
+    {
+      "path": "robot.manageSingleChatRobotStatus",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 395
+    },
+    {
+      "path": "robot.orgGroupQuery",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 396
+    },
+    {
+      "path": "robot.orgGroupRecall",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 397
+    },
+    {
+      "path": "robot.orgGroupSend",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 398
+    },
+    {
+      "path": "robot.privateChatQuery",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 399
+    },
+    {
+      "path": "robot.privateChatSend",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 400
+    },
+    {
+      "path": "robot.queryBotInstanceInGroupInfo",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 401
+    },
+    {
+      "path": "robot.queryRobotDingReadStatus",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 402
+    },
+    {
+      "path": "robot.queryRobotInstanceInGroupInfo",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 403
+    },
+    {
+      "path": "robot.queryRobotPlugin",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 404
+    },
+    {
+      "path": "robot.robotMessageFileDownload",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 405
+    },
+    {
+      "path": "robot.robotRecallDing",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 406
+    },
+    {
+      "path": "robot.robotRecallEmotion",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 407
+    },
+    {
+      "path": "robot.robotReplyEmotion",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 408
+    },
+    {
+      "path": "robot.robotSendDing",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 409
+    },
+    {
+      "path": "robot.sendRobotDingMessage",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 410
+    },
+    {
+      "path": "robot.setRobotPlugin",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 411
+    },
+    {
+      "path": "robot.updateCustomRobotOutgoing",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 412
+    },
+    {
+      "path": "robot.updateInstalledRobot",
+      "parameters": [["params"]],
+      "declaration": "packages/dingtalk/src/api.ts",
+      "line": 413
+    },
+    {
+      "path": "stream.connect",
+      "parameters": [[]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 95
+    },
+    {
+      "path": "stream.disconnect",
+      "parameters": [[]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 96
+    },
+    {
+      "path": "stream.getAccessToken",
+      "parameters": [[]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 90
+    },
+    {
+      "path": "stream.getConfig",
+      "parameters": [[]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 73
+    },
+    {
+      "path": "stream.getEndpoint",
+      "parameters": [[]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 91
+    },
+    {
+      "path": "stream.heartbeat",
+      "parameters": [[]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 97
+    },
+    {
+      "path": "stream.onCallback",
+      "parameters": [["message"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 101
+    },
+    {
+      "path": "stream.onDownStream",
+      "parameters": [["data"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 98
+    },
+    {
+      "path": "stream.onEvent",
+      "parameters": [["message"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 100
+    },
+    {
+      "path": "stream.onSystem",
+      "parameters": [["downstream"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 99
+    },
+    {
+      "path": "stream.printDebug",
+      "parameters": [["msg"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 87
+    },
+    {
+      "path": "stream.registerAllEventListener",
+      "parameters": [["onEventReceived"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 88
+    },
+    {
+      "path": "stream.registerCallbackListener",
+      "parameters": [["eventId", "callback"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 89
+    },
+    {
+      "path": "stream.send",
+      "parameters": [["messageId", "value"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 102
+    },
+    {
+      "path": "stream.sendGraphAPIResponse",
+      "parameters": [["messageId", "value"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 116
+    },
+    {
+      "path": "stream.socketCallBackResponse",
+      "parameters": [["messageId", "result"]],
+      "declaration": "node_modules/dingtalk-stream/dist/client.d.ts",
+      "line": 115
+    }
+  ]
+}

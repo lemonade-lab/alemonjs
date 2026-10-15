@@ -41,7 +41,7 @@ function fixture(t, branch) {
   };
   const remoteGit = (...args) => git('--git-dir', remote, ...args);
   const version = () => JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8')).version;
-  return { cwd, git, remoteGit, publish, succeed, version };
+  return { cwd, env, git, remoteGit, publish, succeed, version };
 }
 
 for (const branch of ['main', 'master']) {
@@ -131,4 +131,82 @@ test('rejects detached HEAD and publishing over the source branch before changin
   assert.match(detached.stderr, /detached HEAD/);
   assert.equal(f.version(), '1.0.0');
   assert.equal(f.git('status', '--porcelain'), '');
+});
+
+for (const selection of ['default', 'files', 'npmignore']) {
+  test(`${selection} publication cleans only the artifact package manifest`, t => {
+    const f = fixture(t, 'develop');
+    const pkgPath = path.join(f.cwd, 'package.json');
+    const pkg = {
+      name: 'publish-fixture',
+      version: '1.0.0',
+      private: true,
+      workspaces: ['packages/*'],
+      devDependencies: { typescript: '^5.0.0' },
+      packageManager: 'yarn@1.22.22',
+      scripts: Object.fromEntries(
+        ['build', 'prepublish', 'prepare', 'prepublishOnly', 'prepack', 'postpack', 'publish', 'postpublish', 'install', 'postinstall', 'start'].map(script => [
+          script,
+          `echo ${script}`
+        ])
+      ),
+      type: 'module',
+      main: './lib/index.js',
+      exports: { '.': './lib/index.js' },
+      dependencies: { example: '^1.0.0' },
+      peerDependencies: { peer: '^1.0.0' },
+      optionalDependencies: { optional: '^1.0.0' },
+      engines: { node: '>=20' },
+      publishConfig: { access: 'public' }
+    };
+    if (selection === 'files') pkg.files = ['lib'];
+    if (selection === 'npmignore') fs.writeFileSync(path.join(f.cwd, '.npmignore'), 'source.js\n');
+    const original = JSON.stringify(pkg, null, 2) + '\n';
+    fs.writeFileSync(pkgPath, original);
+    f.git('add', '.');
+    f.git('commit', '-m', 'configure source manifest');
+
+    f.succeed('patch', { dryRun: true });
+    assert.equal(fs.readFileSync(pkgPath, 'utf8'), original);
+    assert.equal(f.remoteGit('for-each-ref'), '');
+
+    f.succeed('patch');
+    const expected = { ...pkg, version: '1.0.1', scripts: { install: 'echo install', postinstall: 'echo postinstall', start: 'echo start' } };
+    for (const field of ['private', 'workspaces', 'devDependencies', 'packageManager']) delete expected[field];
+    assert.deepEqual(JSON.parse(f.remoteGit('show', 'refs/heads/develop-release:package.json')), expected);
+    assert.deepEqual(JSON.parse(fs.readFileSync(pkgPath, 'utf8')), { ...pkg, version: '1.0.1' });
+    assert.equal(f.git('status', '--porcelain'), '');
+  });
+}
+
+test('publication omits scripts when only build lifecycle scripts remain', t => {
+  const f = fixture(t, 'develop');
+  const pkgPath = path.join(f.cwd, 'package.json');
+  const pkg = { name: 'publish-fixture', version: '1.0.0', scripts: { build: 'echo build', prepare: 'echo prepare' } };
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+  f.git('add', '.');
+  f.git('commit', '-m', 'configure build scripts');
+  f.succeed();
+  assert.deepEqual(JSON.parse(f.remoteGit('show', 'refs/heads/develop-release:package.json')), { name: pkg.name, version: pkg.version });
+  assert.deepEqual(JSON.parse(fs.readFileSync(pkgPath, 'utf8')), pkg);
+});
+
+test('failed npm file selection restores the source manifest and its scripts', t => {
+  const f = fixture(t, 'develop');
+  const pkgPath = path.join(f.cwd, 'package.json');
+  const pkg = { name: 'publish-fixture', version: '1.0.0', files: ['lib'], scripts: { prepare: 'echo prepare' } };
+  const original = JSON.stringify(pkg, null, 2) + '\n';
+  fs.writeFileSync(pkgPath, original);
+  f.git('add', '.');
+  f.git('commit', '-m', 'configure invalid package');
+  const binDir = path.join(f.cwd, '.test-bin');
+  fs.mkdirSync(binDir);
+  fs.writeFileSync(path.join(binDir, 'npm'), '#!/bin/sh\nif [ "$1" = "--version" ]; then echo 10; exit 0; fi\nexit 1\n', { mode: 0o755 });
+  f.env.PATH = `${binDir}${path.delimiter}${f.env.PATH}`;
+  const result = f.publish(undefined, { gitChecks: false });
+  fs.rmSync(binDir, { recursive: true });
+  assert.notEqual(result.status, 0);
+  assert.equal(fs.readFileSync(pkgPath, 'utf8'), original);
+  assert.equal(f.git('status', '--porcelain'), '');
+  assert.equal(f.remoteGit('for-each-ref'), '');
 });

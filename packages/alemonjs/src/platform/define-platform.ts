@@ -22,6 +22,7 @@ export const definePlatform = (options: Options) => {
   // 开始注册子进程交互
   const mainProcess = () => {
     let stopping = false;
+    let runtimeCleanup: (() => unknown | Promise<unknown>) | undefined;
     const shutdown = async (reason: string) => {
       if (stopping) {
         return;
@@ -29,6 +30,24 @@ export const definePlatform = (options: Options) => {
 
       stopping = true;
       logger.info?.(`[${platformName}][${reason}] 收到信号，正在关闭...`);
+      if (runtimeCleanup) {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+
+        try {
+          await Promise.race([
+            Promise.resolve().then(runtimeCleanup),
+            new Promise<void>(resolve => {
+              timer = setTimeout(resolve, 5000);
+            })
+          ]);
+        } catch {
+          logger.error?.(`[${platformName}] 平台清理失败`);
+        } finally {
+          if (timer) {
+            clearTimeout(timer);
+          }
+        }
+      }
       await shutdownLogger();
       process.exit(0);
     };
@@ -50,7 +69,15 @@ export const definePlatform = (options: Options) => {
         const data = typeof msg === 'string' ? JSON.parse(msg) : msg;
 
         if (data?.type === 'start') {
-          options.main();
+          Promise.resolve(options.main())
+            .then(runtime => {
+              if (typeof runtime?.stop === 'function') {
+                runtimeCleanup = () => runtime.stop();
+              }
+            })
+            .catch(() => {
+              logger.error?.(`[${platformName}] 平台启动失败`);
+            });
         } else if (data?.type === 'stop') {
           void shutdown('stop');
         }

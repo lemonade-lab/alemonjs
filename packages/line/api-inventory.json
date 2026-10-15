@@ -1,0 +1,851 @@
+{
+  "platform": "line",
+  "scope": "Public callable surface of the exported API type in the installed SDK, not the complete vendor API or IPC compatibility",
+  "dependencies": {
+    "@line/bot-sdk": "11.3.0"
+  },
+  "unresolvedTypes": [],
+  "httpOperations": [],
+  "methods": [
+    {
+      "path": "broadcast",
+      "parameters": [["broadcastRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 109
+    },
+    {
+      "path": "broadcastWithHttpInfo",
+      "parameters": [["broadcastRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 119
+    },
+    {
+      "path": "cancelDefaultRichMenu",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 127
+    },
+    {
+      "path": "cancelDefaultRichMenuWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 135
+    },
+    {
+      "path": "closeCoupon",
+      "parameters": [["couponId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 144
+    },
+    {
+      "path": "closeCouponWithHttpInfo",
+      "parameters": [["couponId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 153
+    },
+    {
+      "path": "createCoupon",
+      "parameters": [["couponCreateRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 162
+    },
+    {
+      "path": "createCouponWithHttpInfo",
+      "parameters": [["couponCreateRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 171
+    },
+    {
+      "path": "createRichMenu",
+      "parameters": [["richMenuRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 180
+    },
+    {
+      "path": "createRichMenuAlias",
+      "parameters": [["createRichMenuAliasRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 198
+    },
+    {
+      "path": "createRichMenuAliasWithHttpInfo",
+      "parameters": [["createRichMenuAliasRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 207
+    },
+    {
+      "path": "createRichMenuWithHttpInfo",
+      "parameters": [["richMenuRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 189
+    },
+    {
+      "path": "deleteRichMenu",
+      "parameters": [["richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 216
+    },
+    {
+      "path": "deleteRichMenuAlias",
+      "parameters": [["richMenuAliasId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 234
+    },
+    {
+      "path": "deleteRichMenuAliasWithHttpInfo",
+      "parameters": [["richMenuAliasId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 243
+    },
+    {
+      "path": "deleteRichMenuWithHttpInfo",
+      "parameters": [["richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 225
+    },
+    {
+      "path": "getAggregationUnitNameList",
+      "parameters": [["limit", "start"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 253
+    },
+    {
+      "path": "getAggregationUnitNameListWithHttpInfo",
+      "parameters": [["limit", "start"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 263
+    },
+    {
+      "path": "getAggregationUnitUsage",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 271
+    },
+    {
+      "path": "getAggregationUnitUsageWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 279
+    },
+    {
+      "path": "getBotInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 287
+    },
+    {
+      "path": "getBotInfoWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 295
+    },
+    {
+      "path": "getCouponDetail",
+      "parameters": [["couponId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 304
+    },
+    {
+      "path": "getCouponDetailWithHttpInfo",
+      "parameters": [["couponId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 313
+    },
+    {
+      "path": "getDefaultRichMenuId",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 321
+    },
+    {
+      "path": "getDefaultRichMenuIdWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 329
+    },
+    {
+      "path": "getFollowers",
+      "parameters": [["start", "limit"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 339
+    },
+    {
+      "path": "getFollowersWithHttpInfo",
+      "parameters": [["start", "limit"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 349
+    },
+    {
+      "path": "getGroupMemberCount",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 358
+    },
+    {
+      "path": "getGroupMemberCountWithHttpInfo",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 367
+    },
+    {
+      "path": "getGroupMemberProfile",
+      "parameters": [["groupId", "userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 377
+    },
+    {
+      "path": "getGroupMemberProfileWithHttpInfo",
+      "parameters": [["groupId", "userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 387
+    },
+    {
+      "path": "getGroupMembersIds",
+      "parameters": [["groupId", "start"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 397
+    },
+    {
+      "path": "getGroupMembersIdsWithHttpInfo",
+      "parameters": [["groupId", "start"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 407
+    },
+    {
+      "path": "getGroupSummary",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 416
+    },
+    {
+      "path": "getGroupSummaryWithHttpInfo",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 425
+    },
+    {
+      "path": "getJoinedMembershipUsers",
+      "parameters": [["membershipId", "start", "limit"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 436
+    },
+    {
+      "path": "getJoinedMembershipUsersWithHttpInfo",
+      "parameters": [["membershipId", "start", "limit"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 447
+    },
+    {
+      "path": "getMembershipList",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 455
+    },
+    {
+      "path": "getMembershipListWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 463
+    },
+    {
+      "path": "getMembershipSubscription",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 472
+    },
+    {
+      "path": "getMembershipSubscriptionWithHttpInfo",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 481
+    },
+    {
+      "path": "getMessageQuota",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 489
+    },
+    {
+      "path": "getMessageQuotaConsumption",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 505
+    },
+    {
+      "path": "getMessageQuotaConsumptionWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 513
+    },
+    {
+      "path": "getMessageQuotaWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 497
+    },
+    {
+      "path": "getNarrowcastProgress",
+      "parameters": [["requestId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 522
+    },
+    {
+      "path": "getNarrowcastProgressWithHttpInfo",
+      "parameters": [["requestId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 531
+    },
+    {
+      "path": "getNumberOfSentBroadcastMessages",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 540
+    },
+    {
+      "path": "getNumberOfSentBroadcastMessagesWithHttpInfo",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 549
+    },
+    {
+      "path": "getNumberOfSentMulticastMessages",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 558
+    },
+    {
+      "path": "getNumberOfSentMulticastMessagesWithHttpInfo",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 567
+    },
+    {
+      "path": "getNumberOfSentPushMessages",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 576
+    },
+    {
+      "path": "getNumberOfSentPushMessagesWithHttpInfo",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 585
+    },
+    {
+      "path": "getNumberOfSentReplyMessages",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 594
+    },
+    {
+      "path": "getNumberOfSentReplyMessagesWithHttpInfo",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 603
+    },
+    {
+      "path": "getPNPMessageStatistics",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 612
+    },
+    {
+      "path": "getPNPMessageStatisticsWithHttpInfo",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 621
+    },
+    {
+      "path": "getPNPTemplatedMessageStatistics",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 630
+    },
+    {
+      "path": "getPNPTemplatedMessageStatisticsWithHttpInfo",
+      "parameters": [["date"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 639
+    },
+    {
+      "path": "getProfile",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 648
+    },
+    {
+      "path": "getProfileWithHttpInfo",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 657
+    },
+    {
+      "path": "getRichMenu",
+      "parameters": [["richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 666
+    },
+    {
+      "path": "getRichMenuAlias",
+      "parameters": [["richMenuAliasId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 684
+    },
+    {
+      "path": "getRichMenuAliasList",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 701
+    },
+    {
+      "path": "getRichMenuAliasListWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 709
+    },
+    {
+      "path": "getRichMenuAliasWithHttpInfo",
+      "parameters": [["richMenuAliasId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 693
+    },
+    {
+      "path": "getRichMenuBatchProgress",
+      "parameters": [["requestId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 718
+    },
+    {
+      "path": "getRichMenuBatchProgressWithHttpInfo",
+      "parameters": [["requestId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 727
+    },
+    {
+      "path": "getRichMenuIdOfUser",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 736
+    },
+    {
+      "path": "getRichMenuIdOfUserWithHttpInfo",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 745
+    },
+    {
+      "path": "getRichMenuList",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 753
+    },
+    {
+      "path": "getRichMenuListWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 761
+    },
+    {
+      "path": "getRichMenuWithHttpInfo",
+      "parameters": [["richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 675
+    },
+    {
+      "path": "getRoomMemberCount",
+      "parameters": [["roomId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 770
+    },
+    {
+      "path": "getRoomMemberCountWithHttpInfo",
+      "parameters": [["roomId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 779
+    },
+    {
+      "path": "getRoomMemberProfile",
+      "parameters": [["roomId", "userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 789
+    },
+    {
+      "path": "getRoomMemberProfileWithHttpInfo",
+      "parameters": [["roomId", "userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 799
+    },
+    {
+      "path": "getRoomMembersIds",
+      "parameters": [["roomId", "start"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 809
+    },
+    {
+      "path": "getRoomMembersIdsWithHttpInfo",
+      "parameters": [["roomId", "start"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 819
+    },
+    {
+      "path": "getWebhookEndpoint",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 827
+    },
+    {
+      "path": "getWebhookEndpointWithHttpInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 835
+    },
+    {
+      "path": "issueLinkToken",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 844
+    },
+    {
+      "path": "issueLinkTokenWithHttpInfo",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 853
+    },
+    {
+      "path": "leaveGroup",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 862
+    },
+    {
+      "path": "leaveGroupWithHttpInfo",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 871
+    },
+    {
+      "path": "leaveRoom",
+      "parameters": [["roomId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 880
+    },
+    {
+      "path": "leaveRoomWithHttpInfo",
+      "parameters": [["roomId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 889
+    },
+    {
+      "path": "linkRichMenuIdToUser",
+      "parameters": [["userId", "richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 899
+    },
+    {
+      "path": "linkRichMenuIdToUsers",
+      "parameters": [["richMenuBulkLinkRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 918
+    },
+    {
+      "path": "linkRichMenuIdToUsersWithHttpInfo",
+      "parameters": [["richMenuBulkLinkRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 927
+    },
+    {
+      "path": "linkRichMenuIdToUserWithHttpInfo",
+      "parameters": [["userId", "richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 909
+    },
+    {
+      "path": "listCoupon",
+      "parameters": [["status", "start", "limit"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 938
+    },
+    {
+      "path": "listCouponWithHttpInfo",
+      "parameters": [["status", "start", "limit"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 949
+    },
+    {
+      "path": "markMessagesAsRead",
+      "parameters": [["markMessagesAsReadRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 958
+    },
+    {
+      "path": "markMessagesAsReadByToken",
+      "parameters": [["markMessagesAsReadByTokenRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 976
+    },
+    {
+      "path": "markMessagesAsReadByTokenWithHttpInfo",
+      "parameters": [["markMessagesAsReadByTokenRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 985
+    },
+    {
+      "path": "markMessagesAsReadWithHttpInfo",
+      "parameters": [["markMessagesAsReadRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 967
+    },
+    {
+      "path": "multicast",
+      "parameters": [["multicastRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 995
+    },
+    {
+      "path": "multicastWithHttpInfo",
+      "parameters": [["multicastRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1005
+    },
+    {
+      "path": "narrowcast",
+      "parameters": [["narrowcastRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1015
+    },
+    {
+      "path": "narrowcastWithHttpInfo",
+      "parameters": [["narrowcastRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1025
+    },
+    {
+      "path": "pushMessage",
+      "parameters": [["pushMessageRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1035
+    },
+    {
+      "path": "pushMessagesByPhone",
+      "parameters": [["pnpMessagesRequest", "xLineDeliveryTag"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1055
+    },
+    {
+      "path": "pushMessagesByPhoneWithHttpInfo",
+      "parameters": [["pnpMessagesRequest", "xLineDeliveryTag"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1065
+    },
+    {
+      "path": "pushMessageWithHttpInfo",
+      "parameters": [["pushMessageRequest", "xLineRetryKey"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1045
+    },
+    {
+      "path": "pushTemplatedMessagesByPhone",
+      "parameters": [["pnpTemplatedMessageRequest", "xLineDeliveryTag"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1075
+    },
+    {
+      "path": "pushTemplatedMessagesByPhoneWithHttpInfo",
+      "parameters": [["pnpTemplatedMessageRequest", "xLineDeliveryTag"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1085
+    },
+    {
+      "path": "replyMessage",
+      "parameters": [["replyMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1094
+    },
+    {
+      "path": "replyMessageWithHttpInfo",
+      "parameters": [["replyMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1103
+    },
+    {
+      "path": "richMenuBatch",
+      "parameters": [["richMenuBatchRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1112
+    },
+    {
+      "path": "richMenuBatchWithHttpInfo",
+      "parameters": [["richMenuBatchRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1121
+    },
+    {
+      "path": "setDefaultRichMenu",
+      "parameters": [["richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1130
+    },
+    {
+      "path": "setDefaultRichMenuWithHttpInfo",
+      "parameters": [["richMenuId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1139
+    },
+    {
+      "path": "setWebhookEndpoint",
+      "parameters": [["setWebhookEndpointRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1148
+    },
+    {
+      "path": "setWebhookEndpointWithHttpInfo",
+      "parameters": [["setWebhookEndpointRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1157
+    },
+    {
+      "path": "showLoadingAnimation",
+      "parameters": [["showLoadingAnimationRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1166
+    },
+    {
+      "path": "showLoadingAnimationWithHttpInfo",
+      "parameters": [["showLoadingAnimationRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1175
+    },
+    {
+      "path": "testWebhookEndpoint",
+      "parameters": [["testWebhookEndpointRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1184
+    },
+    {
+      "path": "testWebhookEndpointWithHttpInfo",
+      "parameters": [["testWebhookEndpointRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1193
+    },
+    {
+      "path": "unlinkRichMenuIdFromUser",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1202
+    },
+    {
+      "path": "unlinkRichMenuIdFromUsers",
+      "parameters": [["richMenuBulkUnlinkRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1220
+    },
+    {
+      "path": "unlinkRichMenuIdFromUsersWithHttpInfo",
+      "parameters": [["richMenuBulkUnlinkRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1229
+    },
+    {
+      "path": "unlinkRichMenuIdFromUserWithHttpInfo",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1211
+    },
+    {
+      "path": "updateRichMenuAlias",
+      "parameters": [["richMenuAliasId", "updateRichMenuAliasRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1239
+    },
+    {
+      "path": "updateRichMenuAliasWithHttpInfo",
+      "parameters": [["richMenuAliasId", "updateRichMenuAliasRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1249
+    },
+    {
+      "path": "validateBroadcast",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1258
+    },
+    {
+      "path": "validateBroadcastWithHttpInfo",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1267
+    },
+    {
+      "path": "validateMulticast",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1276
+    },
+    {
+      "path": "validateMulticastWithHttpInfo",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1285
+    },
+    {
+      "path": "validateNarrowcast",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1294
+    },
+    {
+      "path": "validateNarrowcastWithHttpInfo",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1303
+    },
+    {
+      "path": "validatePush",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1312
+    },
+    {
+      "path": "validatePushWithHttpInfo",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1321
+    },
+    {
+      "path": "validateReply",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1330
+    },
+    {
+      "path": "validateReplyWithHttpInfo",
+      "parameters": [["validateMessageRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1339
+    },
+    {
+      "path": "validateRichMenuBatchRequest",
+      "parameters": [["richMenuBatchRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1348
+    },
+    {
+      "path": "validateRichMenuBatchRequestWithHttpInfo",
+      "parameters": [["richMenuBatchRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1357
+    },
+    {
+      "path": "validateRichMenuObject",
+      "parameters": [["richMenuRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1366
+    },
+    {
+      "path": "validateRichMenuObjectWithHttpInfo",
+      "parameters": [["richMenuRequest"]],
+      "declaration": "node_modules/@line/bot-sdk/dist/messaging-api/api/messagingApiClient.d.ts",
+      "line": 1375
+    }
+  ]
+}

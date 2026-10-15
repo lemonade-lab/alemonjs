@@ -1,0 +1,56 @@
+{
+  "name": "@alemonjs/slack",
+  "version": "2.1.0",
+  "description": "slack social adapter for AlemonJS",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./driver": {
+      "types": "./lib/driver.d.ts",
+      "import": "./lib/driver.js"
+    },
+    "./package": "./package.json"
+  },
+  "scripts": {
+    "build": "lvy build"
+  },
+  "dependencies": {
+    "@slack/bolt": "5.1.0",
+    "undici": "^7.0.0"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/slack/README.md",
+      "official": "https://github.com/slackapi/bolt-js"
+    },
+    "config": [
+      {
+        "name": "bot_token",
+        "type": "string",
+        "required": true,
+        "description": "bot_token"
+      },
+      {
+        "name": "app_token",
+        "type": "string",
+        "required": true,
+        "description": "app_token"
+      }
+    ]
+  }
+}

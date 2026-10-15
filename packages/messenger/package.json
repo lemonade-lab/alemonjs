@@ -1,0 +1,70 @@
+{
+  "name": "@alemonjs/messenger",
+  "version": "2.1.0",
+  "description": "messenger social adapter for AlemonJS",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./driver": {
+      "types": "./lib/driver.d.ts",
+      "import": "./lib/driver.js"
+    },
+    "./package": "./package.json"
+  },
+  "scripts": {
+    "build": "lvy build"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/messenger/README.md",
+      "official": "https://www.postman.com/meta/messenger-platform-api/documentation/iyp204x/messenger-platform-api"
+    },
+    "config": [
+      {
+        "name": "account_id",
+        "type": "string",
+        "required": true,
+        "description": "account_id"
+      },
+      {
+        "name": "access_token",
+        "type": "string",
+        "required": true,
+        "description": "access_token"
+      },
+      {
+        "name": "app_secret",
+        "type": "string",
+        "required": true,
+        "description": "app_secret"
+      },
+      {
+        "name": "verify_token",
+        "type": "string",
+        "required": true,
+        "description": "verify_token"
+      },
+      {
+        "name": "api_version",
+        "type": "string",
+        "required": true,
+        "description": "api_version"
+      }
+    ]
+  }
+}

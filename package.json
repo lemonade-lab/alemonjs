@@ -19,7 +19,12 @@
     "push": "yarn build && lerna publish from-package --yes",
     "push:patch": "lerna version patch --yes && yarn push",
     "push:minor": "lerna version minor --yes && yarn push",
-    "push:major": "lerna version major --yes && yarn push"
+    "push:major": "lerna version major --yes && yarn push",
+    "test:social": "yarn workspace alemonjs build && yarn audit:social && yarn test:social:types && node --import tsx --import ./tests/platforms/setup.mjs --test tests/platforms/*.test.mjs",
+    "audit:social": "node scripts/audit-social-apis.mjs",
+    "test:social:types": "node ./node_modules/typescript/bin/tsc --noEmit --strict false --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 tests/platforms/api-types.ts",
+    "build:social": "yarn workspace alemonjs build && lerna run build --scope @alemonjs/slack --scope @alemonjs/feishu --scope @alemonjs/line --scope @alemonjs/dingtalk --scope @alemonjs/matrix --scope @alemonjs/zulip --scope @alemonjs/mattermost --scope @alemonjs/twitch --scope @alemonjs/irc --scope @alemonjs/teams --scope @alemonjs/google-chat --scope @alemonjs/wechat-official --scope @alemonjs/wechat-kf --scope @alemonjs/heybox --scope @alemonjs/icqq --scope @alemonjs/whatsapp --scope @alemonjs/messenger --scope @alemonjs/instagram --include-dependencies",
+    "lint:social": "node scripts/lint-social.mjs"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.7",
@@ -32,10 +37,11 @@
     "husky": "^9.0.11",
     "jest": "^29.7.0",
     "lerna": "^10.0.0",
-    "lvyjs": "0.3.0-alpha.4",
+    "lvyjs": "0.3.1",
     "prettier": "^2.8.8",
     "ts-jest": "^29.2.5",
     "tsx": "^4.19.1",
+    "typescript": "5.9.3",
     "typescript-eslint": "^8.19.1",
     "ws": "^8.18.1"
   },

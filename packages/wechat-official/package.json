@@ -1,0 +1,64 @@
+{
+  "name": "@alemonjs/wechat-official",
+  "version": "2.1.0",
+  "description": "wechat-official social adapter for AlemonJS",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./driver": {
+      "types": "./lib/driver.d.ts",
+      "import": "./lib/driver.js"
+    },
+    "./package": "./package.json"
+  },
+  "scripts": {
+    "build": "lvy build"
+  },
+  "dependencies": {
+    "wechat": "2.1.0",
+    "wechat-api": "1.35.1",
+    "wechat-crypto": "0.0.2",
+    "fast-xml-parser": "5.11.2"
+  },
+  "peerDependencies": {
+    "alemonjs": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "alemonjs": {
+    "config-source": {
+      "readme": "https://raw.githubusercontent.com/lemonade-lab/alemonjs/main/packages/wechat-official/README.md",
+      "official": "https://github.com/node-webot/wechat-api"
+    },
+    "config": [
+      {
+        "name": "app_id",
+        "type": "string",
+        "required": true,
+        "description": "app_id"
+      },
+      {
+        "name": "app_secret",
+        "type": "string",
+        "required": true,
+        "description": "app_secret"
+      },
+      {
+        "name": "token",
+        "type": "string",
+        "required": true,
+        "description": "token"
+      }
+    ]
+  }
+}

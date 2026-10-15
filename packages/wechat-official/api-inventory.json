@@ -1,0 +1,1544 @@
+{
+  "platform": "wechat-official",
+  "scope": "Public callable surface of the exported API type in the installed SDK, not the complete vendor API or IPC compatibility",
+  "dependencies": {
+    "wechat": "2.1.0",
+    "wechat-api": "1.35.1",
+    "wechat-crypto": "0.0.2",
+    "fast-xml-parser": "5.11.2"
+  },
+  "unresolvedTypes": ["<API>"],
+  "httpOperations": [],
+  "methods": [
+    {
+      "path": "activateMembercard",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "activateMembercardUserForm",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addBeaconGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addConsumer",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addExpressTemplate",
+      "parameters": [["express", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addGroupBeacons",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addKfAccount",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addLocations",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addLotteryInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addPoi",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "addTemplate",
+      "parameters": [["templateIdShort", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "applyBeacons",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "applyBeaconsStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "authorizeDevices",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "batchgetSubmerchant",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "batchGetUsers",
+      "parameters": [["openids", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "bindBeaconLocation",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "bindBeaconWithPages",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "bindDevice",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "checkCustomizedCodes",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "checkInBoardingPass",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "checkShakeAccountStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "clearQuota",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "closeKfSession",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "closeOrder",
+      "parameters": [["orderId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "compelBindDevice",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "compelUnbindDevice",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "consumeCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createCard",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createCardQRCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createCustomMenu",
+      "parameters": [["menu", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createDeviceQRCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createGoods",
+      "parameters": [["goods", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createGoodsGroup",
+      "parameters": [["groupName", "productList", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createKfSession",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createLimitQRCode",
+      "parameters": [["sceneId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createMenu",
+      "parameters": [["menu", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createPage",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createQRCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createShelf",
+      "parameters": [["shelf", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createTag",
+      "parameters": [["name", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "createTmpQRCode",
+      "parameters": [["sceneId", "expire", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "decryptCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteBeaconGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteCard",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteExpressTemplate",
+      "parameters": [["templateId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteGoods",
+      "parameters": [["productId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteGoodsGroup",
+      "parameters": [["groupId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteGroupBeacons",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteKfAccount",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteMass",
+      "parameters": [["messageId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deletePage",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteShelf",
+      "parameters": [["shelfId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deleteTag",
+      "parameters": [["id", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "deliverNotify",
+      "parameters": [["data", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "delPoi",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "delPrivateTemplate",
+      "parameters": [["templateId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "editTag",
+      "parameters": [["id", "name", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getAccessToken",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getAllExpressTemplates",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getAllGroups",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getAllPrivateTemplate",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getAllShelves",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getApplyProtocol",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getArticleSummary",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getArticleTotal",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getBeacons",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getBindDevice",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getCard",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getCardDataInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getCardExt",
+      "parameters": [["param", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getCards",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getColors",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getCustomServiceList",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getDepositCodesCount",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getDeviceQRCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getDeviceStatistics",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getDeviceStatisticsList",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getDeviceStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getExpressTemplateById",
+      "parameters": [["templateId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getFollowers",
+      "parameters": [["nextOpenid", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getGoods",
+      "parameters": [["productId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getGoodsByStatus",
+      "parameters": [["status", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getGroupById",
+      "parameters": [["groupId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getGroups",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getIndustry",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getInterfaceSummary",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getInterfaceSummaryHour",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getIp",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getJsConfig",
+      "parameters": [["param", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getKfSession",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getKfSessionList",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getKfSessionWaitCase",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getLatestTicket",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getLatestToken",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getLocations",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMassMessageStatus",
+      "parameters": [["messageId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMaterial",
+      "parameters": [["mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMaterialCount",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMaterials",
+      "parameters": [["type", "offset", "count", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMedia",
+      "parameters": [["mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMembercard",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMemberCardUserInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMenu",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getMenuConfig",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getOnlineCustomServiceList",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getOpenID",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getOrderById",
+      "parameters": [["orderId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getOrdersByStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getPages",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getPageStatistics",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getPageStatisticsList",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getPoi",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getPois",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getProperties",
+      "parameters": [["catId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getRecords",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getRedirectUrl",
+      "parameters": [["url", "encryptCode", "cardId"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getShakehbConfig",
+      "parameters": [["openid", "lotteryId", "key"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getShakeInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getShelfById",
+      "parameters": [["shelfId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getSKUs",
+      "parameters": [["catId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getSubCats",
+      "parameters": [["catId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getSubmerchant",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getTags",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getTagUsers",
+      "parameters": [["tagId", "openid", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getTicket",
+      "parameters": [["type", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getTotalCardDataInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUpstreamMsg",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUpstreamMsgDist",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUpstreamMsgDistMonth",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUpstreamMsgDistWeek",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUpstreamMsgHour",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUpstreamMsgMonth",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUpstreamMsgWeek",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUser",
+      "parameters": [["options", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUserCumulate",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUserRead",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUserReadHour",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUserShare",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUserShareHour",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUserSummary",
+      "parameters": [["begin", "end", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getUserTags",
+      "parameters": [["openid", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getWhichGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "getWXCategory",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "importCustomizedCodes",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "listBeaconGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "massSend",
+      "parameters": [["opts", "receivers", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "massSendImage",
+      "parameters": [["mediaId", "receivers", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "massSendMPVideo",
+      "parameters": [["data", "receivers", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "massSendNews",
+      "parameters": [["mediaId", "receivers", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "massSendText",
+      "parameters": [["content", "receivers", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "massSendVideo",
+      "parameters": [["mediaId", "receivers", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "massSendVoice",
+      "parameters": [["mediaId", "receivers", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "membersBatchtagging",
+      "parameters": [["tagId", "openList", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "membersBatchuntagging",
+      "parameters": [["tagId", "openList", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "moveUserToGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "orderQuery",
+      "parameters": [["query", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "preRequest",
+      "parameters": [["method", "args", "retryed"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "previewImage",
+      "parameters": [["openid", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "previewNews",
+      "parameters": [["openid", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "previewText",
+      "parameters": [["openid", "content", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "previewVideo",
+      "parameters": [["openid", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "previewVoice",
+      "parameters": [["openid", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "queryGroupBeacons",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "registerShakeAccount",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "registerTicketHandle",
+      "parameters": [["getTicketToken", "saveTicketToken"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "removeCustomMenu",
+      "parameters": [["menu_id", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "removeGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "removeMaterial",
+      "parameters": [["mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "removeMenu",
+      "parameters": [["callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "request",
+      "parameters": [["url", "opts", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "searchBeaconPageRelation",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "semantic",
+      "parameters": [["uid", "opts", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendCard",
+      "parameters": [["openid", "card", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendCardFromCs",
+      "parameters": [["openid", "cs_account", "card", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendImage",
+      "parameters": [["openid", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendImageFromCs",
+      "parameters": [["openid", "cs_account", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendMpNews",
+      "parameters": [["openid", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendMpNewsFromCs",
+      "parameters": [["openid", "cs_account", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendMusic",
+      "parameters": [["openid", "music", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendMusicFromCs",
+      "parameters": [["openid", "cs_account", "music", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendNews",
+      "parameters": [["openid", "articles", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendNewsFromCs",
+      "parameters": [["openid", "cs_account", "articles", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendTemplate",
+      "parameters": [["openid", "templateId", "dest", "data", "callback", "callback2"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendText",
+      "parameters": [["openid", "text", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendTextFromCs",
+      "parameters": [["openid", "cs_account", "text", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendVideo",
+      "parameters": [["openid", "mediaId", "thumbMediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendVideoFromCs",
+      "parameters": [["openid", "cs_account", "mediaId", "thumbMediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendVoice",
+      "parameters": [["openid", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "sendVoiceFromCs",
+      "parameters": [["openid", "cs_account", "mediaId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setEndpoint",
+      "parameters": [["domain"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setExpressForOrder",
+      "parameters": [["orderId", "deliveryCompany", "deliveryTrackNo", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setIndustry",
+      "parameters": [["industryIds", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setKfAccountAvatar",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setLotterySwitch",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setOpts",
+      "parameters": [["opts"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setPrizeBucket",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "setTestWhitelist",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "shorturl",
+      "parameters": [["longUrl", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "showQRCodeURL",
+      "parameters": [["ticket"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "submitSubmerchant",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "testCustomMenu",
+      "parameters": [["user_id", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "transferMessage",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "transferStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "unavailableCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "unbindDevice",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateBeacon",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateBeaconGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateCard",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateCardStock",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateExpressTemplate",
+      "parameters": [["template", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateFeedback",
+      "parameters": [["openid", "feedbackId", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateGoods",
+      "parameters": [["goods", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateGoodsForGroup",
+      "parameters": [["groupId", "addProductList", "delProductList", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateGoodsGroup",
+      "parameters": [["groupId", "groupName", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateGoodsStatus",
+      "parameters": [["productId", "status", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateGroup",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateKfAccount",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateLuckyMonkeyBalance",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateMeetingTicket",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateMembercard",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateMemberCardUserInfo",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateMovieTicket",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateNewsMaterial",
+      "parameters": [["news", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updatePage",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updatePoi",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateRemark",
+      "parameters": [["openid", "remark", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateShelf",
+      "parameters": [["shelf", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateStock",
+      "parameters": [["number", "productId", "sku", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "updateSubmerchant",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadImage",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadImageMaterial",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadImageStream",
+      "parameters": [["req", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadLogo",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadMaterial",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadMedia",
+      "parameters": [["filepath", "type", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadMediaStream",
+      "parameters": [["req", "type", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadMPVideo",
+      "parameters": [["opts", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadNews",
+      "parameters": [["news", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadNewsMaterial",
+      "parameters": [["news", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadPageIcon",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadPicture",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadThumb",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadThumbMaterial",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadThumbStream",
+      "parameters": [["req", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadVideo",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadVideoMaterial",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadVideoStream",
+      "parameters": [["req", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadVoice",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadVoiceMaterial",
+      "parameters": [["filepath", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "uploadVoiceStream",
+      "parameters": [["req", "callback"]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    },
+    {
+      "path": "verifyDeviceQRCode",
+      "parameters": [[]],
+      "declaration": "node_modules/wechat-api/index.js",
+      "types": "unresolved upstream JavaScript"
+    }
+  ]
+}

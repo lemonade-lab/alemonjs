@@ -1,0 +1,3846 @@
+{
+  "platform": "mattermost",
+  "scope": "Public callable surface of the exported API type in the installed SDK, not the complete vendor API or IPC compatibility",
+  "dependencies": {
+    "@mattermost/client": "11.9.0",
+    "ws": "^8.18.1",
+    "@mattermost/types": "11.9.0"
+  },
+  "unresolvedTypes": [],
+  "httpOperations": [],
+  "methods": [
+    {
+      "path": "acceptInviteRemoteCluster",
+      "parameters": [["remoteClusterAcceptInvite"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 418
+    },
+    {
+      "path": "acknowledgePost",
+      "parameters": [["postId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 504
+    },
+    {
+      "path": "addCommand",
+      "parameters": [["command"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 553
+    },
+    {
+      "path": "addDataRetentionPolicyChannels",
+      "parameters": [["id", "channels"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 607
+    },
+    {
+      "path": "addDataRetentionPolicyTeams",
+      "parameters": [["id", "teams"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 605
+    },
+    {
+      "path": "addPostReminder",
+      "parameters": [["userId", "postId", "timestamp"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 481
+    },
+    {
+      "path": "addReaction",
+      "parameters": [["userId", "postId", "emojiName"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 487
+    },
+    {
+      "path": "addToChannel",
+      "parameters": [["userId", "channelId", "postRootId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 359
+    },
+    {
+      "path": "addToChannels",
+      "parameters": [["userIds", "channelId", "postRootId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 358
+    },
+    {
+      "path": "addToTeam",
+      "parameters": [["teamId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 304
+    },
+    {
+      "path": "addToTeamFromInvite",
+      "parameters": [["token", "inviteId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 305
+    },
+    {
+      "path": "addUsersToGroup",
+      "parameters": [["groupId", "userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 725
+    },
+    {
+      "path": "addUsersToTeam",
+      "parameters": [["teamId", "userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 306
+    },
+    {
+      "path": "addUsersToTeamGracefully",
+      "parameters": [["teamId", "userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 307
+    },
+    {
+      "path": "applyIPFilters",
+      "parameters": [["filters"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 797
+    },
+    {
+      "path": "archiveGroup",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 745
+    },
+    {
+      "path": "assignBot",
+      "parameters": [["botUserId", "newOwnerId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 756
+    },
+    {
+      "path": "assignChannelsToAccessControlPolicy",
+      "parameters": [["policyId", "channelIds", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 816
+    },
+    {
+      "path": "assignTeamsToAccessControlPolicy",
+      "parameters": [["policyId", "teamIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 818
+    },
+    {
+      "path": "authorizeOAuthApp",
+      "parameters": [["responseType", "clientId", "redirectUri", "state", "scope", "resource", "codeChallenge", "codeChallengeMethod"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 271
+    },
+    {
+      "path": "autocompleteChannels",
+      "parameters": [["teamId", "name"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 371
+    },
+    {
+      "path": "autocompleteChannelsForSearch",
+      "parameters": [["teamId", "name"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 372
+    },
+    {
+      "path": "autocompleteCustomEmoji",
+      "parameters": [["name"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 591
+    },
+    {
+      "path": "autocompleteUsers",
+      "parameters": [["name", "teamId", "channelId", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 240
+    },
+    {
+      "path": "burnPostNow",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 453
+    },
+    {
+      "path": "cancelJob",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 615
+    },
+    {
+      "path": "canUserDirectMessage",
+      "parameters": [["userId", "otherUserId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 235
+    },
+    {
+      "path": "channelMembersMinusGroupMembers",
+      "parameters": [["channelID", "groupIDs", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 777
+    },
+    {
+      "path": "checkAccessControlExpression",
+      "parameters": [["expression", "channelId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 829
+    },
+    {
+      "path": "checkIfTeamExists",
+      "parameters": [["teamName"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 288
+    },
+    {
+      "path": "checkUserMfa",
+      "parameters": [["loginId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 254
+    },
+    {
+      "path": "completeSetup",
+      "parameters": [["completeOnboardingRequest"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 783
+    },
+    {
+      "path": "convertGroupMessageToPrivateChannel",
+      "parameters": [["channelId", "teamId", "displayName", "name"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 799
+    },
+    {
+      "path": "createAccessControlSyncJob",
+      "parameters": [["jobData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 825
+    },
+    {
+      "path": "createBot",
+      "parameters": [["bot"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 748
+    },
+    {
+      "path": "createChannel",
+      "parameters": [["channel"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 332
+    },
+    {
+      "path": "createChannelBookmark",
+      "parameters": [["channelId", "channelBookmark", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 382
+    },
+    {
+      "path": "createChannelCategory",
+      "parameters": [["userId", "teamId", "category"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 387
+    },
+    {
+      "path": "createComplianceReport",
+      "parameters": [["job"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 651
+    },
+    {
+      "path": "createCustomEmoji",
+      "parameters": [["emoji", "imageData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 582
+    },
+    {
+      "path": "createCustomProfileAttributeField",
+      "parameters": [["patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 432
+    },
+    {
+      "path": "createDataRetentionPolicy",
+      "parameters": [["policy"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 603
+    },
+    {
+      "path": "createDirectChannel",
+      "parameters": [["userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 333
+    },
+    {
+      "path": "createGroupChannel",
+      "parameters": [["userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 334
+    },
+    {
+      "path": "createGroupTeamsAndChannels",
+      "parameters": [["userID"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 747
+    },
+    {
+      "path": "createGroupWithUserIds",
+      "parameters": [["group"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 724
+    },
+    {
+      "path": "createIncomingWebhook",
+      "parameters": [["hook"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 537
+    },
+    {
+      "path": "createJob",
+      "parameters": [["job"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 612
+    },
+    {
+      "path": "createOAuthApp",
+      "parameters": [["app"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 559
+    },
+    {
+      "path": "createOutgoingOAuthConnection",
+      "parameters": [["teamId", "connection"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 568
+    },
+    {
+      "path": "createOutgoingWebhook",
+      "parameters": [["hook"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 542
+    },
+    {
+      "path": "createPost",
+      "parameters": [["post"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 446
+    },
+    {
+      "path": "createPostEphemeral",
+      "parameters": [["userID", "post"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 447
+    },
+    {
+      "path": "createPropertyField",
+      "parameters": [["groupName", "objectType", "field"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 442
+    },
+    {
+      "path": "createRecap",
+      "parameters": [["request"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 616
+    },
+    {
+      "path": "createRemoteCluster",
+      "parameters": [["remoteCluster"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 411
+    },
+    {
+      "path": "createScheduledPost",
+      "parameters": [["schedulePost", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 800
+    },
+    {
+      "path": "createScheme",
+      "parameters": [["scheme"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 696
+    },
+    {
+      "path": "createTeam",
+      "parameters": [["team"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 281
+    },
+    {
+      "path": "createTermsOfService",
+      "parameters": [["text"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 206
+    },
+    {
+      "path": "createUser",
+      "parameters": [["user", "token", "inviteId", "redirect"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 186
+    },
+    {
+      "path": "createUserAccessToken",
+      "parameters": [["userId", "description", "expiresAt"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 273
+    },
+    {
+      "path": "cwsAvailabilityCheck",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 758
+    },
+    {
+      "path": "deauthorizeOAuthApp",
+      "parameters": [["clientId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 272
+    },
+    {
+      "path": "deleteAccessControlPolicy",
+      "parameters": [["id", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 809
+    },
+    {
+      "path": "deleteBrandImage",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 655
+    },
+    {
+      "path": "deleteChannel",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 335
+    },
+    {
+      "path": "deleteChannelBookmark",
+      "parameters": [["channelId", "channelBookmarkId", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 383
+    },
+    {
+      "path": "deleteChannelCategory",
+      "parameters": [["userId", "teamId", "categoryId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 393
+    },
+    {
+      "path": "deleteCommand",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 558
+    },
+    {
+      "path": "deleteCustomEmoji",
+      "parameters": [["emojiId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 587
+    },
+    {
+      "path": "deleteCustomProfileAttributeField",
+      "parameters": [["fieldId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 434
+    },
+    {
+      "path": "deleteDataRetentionCustomPolicy",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 595
+    },
+    {
+      "path": "deleteDraft",
+      "parameters": [["channelId", "rootId", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 794
+    },
+    {
+      "path": "deleteIdpSamlCertificate",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 682
+    },
+    {
+      "path": "deleteOAuthApp",
+      "parameters": [["appId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 572
+    },
+    {
+      "path": "deleteOutgoingOAuthConnection",
+      "parameters": [["connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 574
+    },
+    {
+      "path": "deletePost",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 451
+    },
+    {
+      "path": "deletePreferences",
+      "parameters": [["userId", "preferences"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 509
+    },
+    {
+      "path": "deletePrivateLdapCertificate",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 681
+    },
+    {
+      "path": "deletePrivateSamlCertificate",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 679
+    },
+    {
+      "path": "deletePropertyField",
+      "parameters": [["groupName", "objectType", "fieldId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 444
+    },
+    {
+      "path": "deletePublicLdapCertificate",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 680
+    },
+    {
+      "path": "deletePublicSamlCertificate",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 678
+    },
+    {
+      "path": "deleteRecap",
+      "parameters": [["recapId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 624
+    },
+    {
+      "path": "deleteRemoteCluster",
+      "parameters": [["remoteId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 417
+    },
+    {
+      "path": "deleteScheduledPost",
+      "parameters": [["userId", "schedulePostId", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 805
+    },
+    {
+      "path": "deleteScheme",
+      "parameters": [["schemeId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 698
+    },
+    {
+      "path": "deleteTeam",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 282
+    },
+    {
+      "path": "demoteUserToGuest",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 192
+    },
+    {
+      "path": "disableBot",
+      "parameters": [["botUserId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 754
+    },
+    {
+      "path": "disablePlugin",
+      "parameters": [["pluginId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 713
+    },
+    {
+      "path": "disableUserAccessToken",
+      "parameters": [["tokenId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 278
+    },
+    {
+      "path": "doPostAction",
+      "parameters": [["postId", "actionId", "selectedOption"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 494
+    },
+    {
+      "path": "doPostActionWithCookie",
+      "parameters": [["postId", "actionId", "actionCookie", "selectedOption"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 495
+    },
+    {
+      "path": "doPostActionWithQuery",
+      "parameters": [["postId", "actionId", "query"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 496
+    },
+    {
+      "path": "editCommand",
+      "parameters": [["command"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 554
+    },
+    {
+      "path": "editOAuthApp",
+      "parameters": [["app"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 560
+    },
+    {
+      "path": "editOutgoingOAuthConnection",
+      "parameters": [["teamId", "connection"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 569
+    },
+    {
+      "path": "enableBot",
+      "parameters": [["botUserId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 755
+    },
+    {
+      "path": "enablePlugin",
+      "parameters": [["pluginId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 712
+    },
+    {
+      "path": "enableUserAccessToken",
+      "parameters": [["tokenId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 279
+    },
+    {
+      "path": "executeAppCall",
+      "parameters": [["call", "trackAsSubmit"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 728
+    },
+    {
+      "path": "executeCommand",
+      "parameters": [["command", "commandArgs"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 552
+    },
+    {
+      "path": "expressionToVisualFormat",
+      "parameters": [["expression", "channelId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 840
+    },
+    {
+      "path": "flagPost",
+      "parameters": [["postId", "reason", "comment"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 850
+    },
+    {
+      "path": "generateFlaggedPostReport",
+      "parameters": [["postId", "comment", "action", "signal"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 861
+    },
+    {
+      "path": "generateInviteRemoteCluster",
+      "parameters": [["remoteId", "remoteCluster"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 419
+    },
+    {
+      "path": "generateMfaSecret",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 257
+    },
+    {
+      "path": "getAbsoluteUrl",
+      "parameters": [["baseUrl"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 83
+    },
+    {
+      "path": "getAccessControlFields",
+      "parameters": [["after", "limit", "channelId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 828
+    },
+    {
+      "path": "getAccessControlPolicies",
+      "parameters": [["after", "limit"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 810
+    },
+    {
+      "path": "getAccessControlPolicy",
+      "parameters": [["id", "channelId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 807
+    },
+    {
+      "path": "getAdminContentFlaggingConfig",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 859
+    },
+    {
+      "path": "getAgents",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 632
+    },
+    {
+      "path": "getAgentsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 149
+    },
+    {
+      "path": "getAgentsStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 633
+    },
+    {
+      "path": "getAIRewrittenMessage",
+      "parameters": [["agentId", "message", "action", "customPrompt", "rootId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 789
+    },
+    {
+      "path": "getAllChannels",
+      "parameters": [
+        [
+          "page",
+          "perPage",
+          "notAssociatedToGroup",
+          "excludeDefaultChannels",
+          "includeTotalCount",
+          "includeDeleted",
+          "excludePolicyConstrained",
+          "accessControlPolicyEnforced",
+          "excludeAccessControlPolicyEnforced"
+        ],
+        [
+          "page",
+          "perPage",
+          "notAssociatedToGroup",
+          "excludeDefaultChannels",
+          "includeTotalCount",
+          "includeDeleted",
+          "excludePolicyConstrained",
+          "accessControlPolicyEnforced",
+          "excludeAccessControlPolicyEnforced"
+        ]
+      ],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 330
+    },
+    {
+      "path": "getAllChannelsMembers",
+      "parameters": [["userId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 351
+    },
+    {
+      "path": "getAllGroupsAssociatedToChannel",
+      "parameters": [["channelID", "filterAllowReference", "includeMemberCount"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 742
+    },
+    {
+      "path": "getAllGroupsAssociatedToChannelsInTeam",
+      "parameters": [["teamID", "filterAllowReference"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 739
+    },
+    {
+      "path": "getAllGroupsAssociatedToTeam",
+      "parameters": [["teamID", "filterAllowReference", "includeMemberCount"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 738
+    },
+    {
+      "path": "getAllTeamsChannels",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 347
+    },
+    {
+      "path": "getAnalytics",
+      "parameters": [["name", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 690
+    },
+    {
+      "path": "getAncillaryPermissions",
+      "parameters": [["subsectionPermissions"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 782
+    },
+    {
+      "path": "getAppliedSchemaMigrations",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 784
+    },
+    {
+      "path": "getAppsBindings",
+      "parameters": [["channelID", "teamID"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 729
+    },
+    {
+      "path": "getAppsBotIDs",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 563
+    },
+    {
+      "path": "getAppsOAuthAppIDs",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 562
+    },
+    {
+      "path": "getAppsProxyRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 100
+    },
+    {
+      "path": "getArchivedChannels",
+      "parameters": [["teamId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 348
+    },
+    {
+      "path": "getAudits",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 627
+    },
+    {
+      "path": "getAuthorizedOAuthApps",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 270
+    },
+    {
+      "path": "getAutocompleteCommandsList",
+      "parameters": [["teamId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 550
+    },
+    {
+      "path": "getBaseRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 99
+    },
+    {
+      "path": "getBot",
+      "parameters": [["botUserId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 750
+    },
+    {
+      "path": "getBotRoute",
+      "parameters": [["botUserId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 156
+    },
+    {
+      "path": "getBots",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 751
+    },
+    {
+      "path": "getBotsIncludeDeleted",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 752
+    },
+    {
+      "path": "getBotsOrphaned",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 753
+    },
+    {
+      "path": "getBotsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 155
+    },
+    {
+      "path": "getBrandImageUrl",
+      "parameters": [["timestamp"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 144
+    },
+    {
+      "path": "getBrandRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 143
+    },
+    {
+      "path": "getCallsChannelState",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 785
+    },
+    {
+      "path": "getChannel",
+      "parameters": [["channelId", "asContentReviewer", "flaggedPostId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 343
+    },
+    {
+      "path": "getChannelAccessControlAttributes",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 844
+    },
+    {
+      "path": "getChannelBookmarkRoute",
+      "parameters": [["channelId", "bookmarkId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 115
+    },
+    {
+      "path": "getChannelBookmarks",
+      "parameters": [["channelId", "bookmarksSince"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 381
+    },
+    {
+      "path": "getChannelBookmarksRoute",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 114
+    },
+    {
+      "path": "getChannelByName",
+      "parameters": [["teamId", "channelName", "includeDeleted"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 344
+    },
+    {
+      "path": "getChannelByNameAndTeamName",
+      "parameters": [["teamName", "channelName", "includeDeleted"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 345
+    },
+    {
+      "path": "getChannelCategories",
+      "parameters": [["userId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 386
+    },
+    {
+      "path": "getChannelCategoriesRoute",
+      "parameters": [["userId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 116
+    },
+    {
+      "path": "getChannelCategory",
+      "parameters": [["userId", "teamId", "categoryId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 391
+    },
+    {
+      "path": "getChannelCategoryOrder",
+      "parameters": [["userId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 389
+    },
+    {
+      "path": "getChannelMember",
+      "parameters": [["channelId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 356
+    },
+    {
+      "path": "getChannelMemberCountsByGroup",
+      "parameters": [["channelId", "includeTimezones"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 366
+    },
+    {
+      "path": "getChannelMemberRoute",
+      "parameters": [["channelId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 112
+    },
+    {
+      "path": "getChannelMembers",
+      "parameters": [["channelId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 354
+    },
+    {
+      "path": "getChannelMembersByIds",
+      "parameters": [["channelId", "userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 357
+    },
+    {
+      "path": "getChannelMembersRoute",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 111
+    },
+    {
+      "path": "getChannelModerations",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 364
+    },
+    {
+      "path": "getChannelRoute",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 110
+    },
+    {
+      "path": "getChannels",
+      "parameters": [["teamId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 346
+    },
+    {
+      "path": "getChannelSchemeRoute",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 113
+    },
+    {
+      "path": "getChannelsForAccessControlPolicy",
+      "parameters": [["policyId", "after", "limit", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 812
+    },
+    {
+      "path": "getChannelsMemberCount",
+      "parameters": [["channelIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 363
+    },
+    {
+      "path": "getChannelsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 109
+    },
+    {
+      "path": "getChannelStats",
+      "parameters": [["channelId", "includeFileCount"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 362
+    },
+    {
+      "path": "getChannelTimezones",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 355
+    },
+    {
+      "path": "getChildPolicies",
+      "parameters": [["parentId", "after", "limit"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 811
+    },
+    {
+      "path": "getClientConfig",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 527
+    },
+    {
+      "path": "getClientLicenseOld",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 528
+    },
+    {
+      "path": "getClientMetricsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 171
+    },
+    {
+      "path": "getCloudCustomer",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 761
+    },
+    {
+      "path": "getCloudLimits",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 772
+    },
+    {
+      "path": "getCloudPreviewModalData",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 769
+    },
+    {
+      "path": "getCloudProducts",
+      "parameters": [["includeLegacyProducts"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 757
+    },
+    {
+      "path": "getCloudRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 160
+    },
+    {
+      "path": "getClusterStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 656
+    },
+    {
+      "path": "getCommandAutocompleteSuggestionsList",
+      "parameters": [["userInput", "teamId", "commandArgs"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 549
+    },
+    {
+      "path": "getCommandsList",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 548
+    },
+    {
+      "path": "getCommandsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 127
+    },
+    {
+      "path": "getComplianceReport",
+      "parameters": [["reportId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 652
+    },
+    {
+      "path": "getComplianceReports",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 653
+    },
+    {
+      "path": "getConfig",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 628
+    },
+    {
+      "path": "getContentFlaggingConfig",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 849
+    },
+    {
+      "path": "getContentFlaggingRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 172
+    },
+    {
+      "path": "getCSRFFromCookie",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 173
+    },
+    {
+      "path": "getCurrentIP",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 796
+    },
+    {
+      "path": "getCustomEmoji",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 583
+    },
+    {
+      "path": "getCustomEmojiByName",
+      "parameters": [["name"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 584
+    },
+    {
+      "path": "getCustomEmojiImageUrl",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 589
+    },
+    {
+      "path": "getCustomEmojis",
+      "parameters": [["page", "perPage", "sort"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 586
+    },
+    {
+      "path": "getCustomEmojisByNames",
+      "parameters": [["names"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 585
+    },
+    {
+      "path": "getCustomProfileAttributeFieldRoute",
+      "parameters": [["propertyFieldId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 122
+    },
+    {
+      "path": "getCustomProfileAttributeFields",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 431
+    },
+    {
+      "path": "getCustomProfileAttributeFieldsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 121
+    },
+    {
+      "path": "getCustomProfileAttributeValuesRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 123
+    },
+    {
+      "path": "getCustomTeamCommands",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 551
+    },
+    {
+      "path": "getDataRetentionCustomPolicies",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 593
+    },
+    {
+      "path": "getDataRetentionCustomPolicy",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 594
+    },
+    {
+      "path": "getDataRetentionCustomPolicyChannels",
+      "parameters": [["id", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 599
+    },
+    {
+      "path": "getDataRetentionCustomPolicyTeams",
+      "parameters": [["id", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 598
+    },
+    {
+      "path": "getDataRetentionPolicy",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 592
+    },
+    {
+      "path": "getDataRetentionRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 145
+    },
+    {
+      "path": "getDefaultProfilePictureUrl",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 239
+    },
+    {
+      "path": "getDraftsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 167
+    },
+    {
+      "path": "getEmojiRoute",
+      "parameters": [["emojiId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 142
+    },
+    {
+      "path": "getEmojisRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 141
+    },
+    {
+      "path": "getEnvironmentConfig",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 638
+    },
+    {
+      "path": "getFileInfosForPost",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 477
+    },
+    {
+      "path": "getFilePreviewUrl",
+      "parameters": [["fileId", "timestamp"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 499
+    },
+    {
+      "path": "getFilePublicLink",
+      "parameters": [["fileId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 501
+    },
+    {
+      "path": "getFileRoute",
+      "parameters": [["fileId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 129
+    },
+    {
+      "path": "getFilesRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 128
+    },
+    {
+      "path": "getFilesUsage",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 774
+    },
+    {
+      "path": "getFileThumbnailUrl",
+      "parameters": [["fileId", "timestamp"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 498
+    },
+    {
+      "path": "getFileUrl",
+      "parameters": [["fileId", "timestamp"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 497
+    },
+    {
+      "path": "getFilteredUsersStats",
+      "parameters": [["options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 312
+    },
+    {
+      "path": "getFirstAdminSetupComplete",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 534
+    },
+    {
+      "path": "getFirstAdminVisitMarketplaceStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 533
+    },
+    {
+      "path": "getFlaggedPost",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 855
+    },
+    {
+      "path": "getFlaggedPostReportUrl",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 860
+    },
+    {
+      "path": "getFlaggedPosts",
+      "parameters": [["userId", "channelId", "teamId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 478
+    },
+    {
+      "path": "getGroup",
+      "parameters": [["groupID", "includeMemberCount"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 717
+    },
+    {
+      "path": "getGroupMessageMembersCommonTeams",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 798
+    },
+    {
+      "path": "getGroupRoute",
+      "parameters": [["groupID"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 158
+    },
+    {
+      "path": "getGroups",
+      "parameters": [["opts"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 719
+    },
+    {
+      "path": "getGroupsAssociatedToChannel",
+      "parameters": [["channelID", "q", "page", "perPage", "filterAllowReference"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 734
+    },
+    {
+      "path": "getGroupsAssociatedToTeam",
+      "parameters": [["teamID", "q", "page", "perPage", "filterAllowReference"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 730
+    },
+    {
+      "path": "getGroupsByNames",
+      "parameters": [["names"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 721
+    },
+    {
+      "path": "getGroupsByUserId",
+      "parameters": [["userID"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 720
+    },
+    {
+      "path": "getGroupsNotAssociatedToChannel",
+      "parameters": [["channelID", "q", "page", "perPage", "filterParentTeamPermitted", "source", "onlySyncableSources"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 723
+    },
+    {
+      "path": "getGroupsNotAssociatedToTeam",
+      "parameters": [["teamID", "q", "page", "perPage", "source", "onlySyncableSources"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 722
+    },
+    {
+      "path": "getGroupsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 157
+    },
+    {
+      "path": "getGroupStats",
+      "parameters": [["groupID"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 718
+    },
+    {
+      "path": "getGroupSyncables",
+      "parameters": [["groupID", "syncableType"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 716
+    },
+    {
+      "path": "getHostedCustomerRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 161
+    },
+    {
+      "path": "getIncomingHookRoute",
+      "parameters": [["hookId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 132
+    },
+    {
+      "path": "getIncomingHooksRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 131
+    },
+    {
+      "path": "getIncomingWebhook",
+      "parameters": [["hookId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 538
+    },
+    {
+      "path": "getIncomingWebhooks",
+      "parameters": [["teamId", "page", "perPage", "includeTotalCount"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 539
+    },
+    {
+      "path": "getInProductNotices",
+      "parameters": [["teamId", "client", "clientVersion"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 780
+    },
+    {
+      "path": "getInstallation",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 768
+    },
+    {
+      "path": "getInvoicePdfUrl",
+      "parameters": [["invoiceId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 771
+    },
+    {
+      "path": "getInvoices",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 770
+    },
+    {
+      "path": "getIPFilters",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 795
+    },
+    {
+      "path": "getJob",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 609
+    },
+    {
+      "path": "getJobs",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 610
+    },
+    {
+      "path": "getJobsByType",
+      "parameters": [["type", "page", "perPage", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 611
+    },
+    {
+      "path": "getJobsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 146
+    },
+    {
+      "path": "getKnownUsers",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 198
+    },
+    {
+      "path": "getLdapGroups",
+      "parameters": [["page", "perPage", "opts"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 664
+    },
+    {
+      "path": "getLicenseLoadMetric",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 529
+    },
+    {
+      "path": "getLimitsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 169
+    },
+    {
+      "path": "getLLMServices",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 637
+    },
+    {
+      "path": "getLLMServicesRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 150
+    },
+    {
+      "path": "getLogs",
+      "parameters": [["logFilter"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 625
+    },
+    {
+      "path": "getManagedCategories",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 394
+    },
+    {
+      "path": "getMarketplaceApps",
+      "parameters": [["filter"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 708
+    },
+    {
+      "path": "getMarketplacePlugins",
+      "parameters": [["filter", "localOnly"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 706
+    },
+    {
+      "path": "getMe",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 231
+    },
+    {
+      "path": "getMyChannelMember",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 352
+    },
+    {
+      "path": "getMyChannelMembers",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 353
+    },
+    {
+      "path": "getMyChannels",
+      "parameters": [["teamId", "includeDeleted"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 350
+    },
+    {
+      "path": "getMyPreferences",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 507
+    },
+    {
+      "path": "getMyTeamMembers",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 298
+    },
+    {
+      "path": "getMyTeams",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 296
+    },
+    {
+      "path": "getMyTeamUnreads",
+      "parameters": [["includeCollapsedThreads"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 299
+    },
+    {
+      "path": "getNoticesRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 159
+    },
+    {
+      "path": "getOAuthApp",
+      "parameters": [["appId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 564
+    },
+    {
+      "path": "getOAuthAppInfo",
+      "parameters": [["appId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 571
+    },
+    {
+      "path": "getOAuthAppRoute",
+      "parameters": [["appId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 138
+    },
+    {
+      "path": "getOAuthApps",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 561
+    },
+    {
+      "path": "getOAuthAppsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 137
+    },
+    {
+      "path": "getOAuthRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 136
+    },
+    {
+      "path": "getOptions",
+      "parameters": [["options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 174
+    },
+    {
+      "path": "getOutgoingHookRoute",
+      "parameters": [["hookId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 134
+    },
+    {
+      "path": "getOutgoingHooksRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 133
+    },
+    {
+      "path": "getOutgoingOAuthConnection",
+      "parameters": [["teamId", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 567
+    },
+    {
+      "path": "getOutgoingOAuthConnectionRoute",
+      "parameters": [["connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 140
+    },
+    {
+      "path": "getOutgoingOAuthConnections",
+      "parameters": [["teamId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 565
+    },
+    {
+      "path": "getOutgoingOAuthConnectionsForAudience",
+      "parameters": [["teamId", "audience", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 566
+    },
+    {
+      "path": "getOutgoingOAuthConnectionsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 139
+    },
+    {
+      "path": "getOutgoingWebhook",
+      "parameters": [["hookId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 543
+    },
+    {
+      "path": "getOutgoingWebhooks",
+      "parameters": [["channelId", "teamId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 544
+    },
+    {
+      "path": "getPaginatedPostThread",
+      "parameters": [["postId", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 455
+    },
+    {
+      "path": "getPermissionsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 163
+    },
+    {
+      "path": "getPinnedPosts",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 479
+    },
+    {
+      "path": "getPlainLogs",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 626
+    },
+    {
+      "path": "getPluginRoute",
+      "parameters": [["pluginId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 151
+    },
+    {
+      "path": "getPlugins",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 704
+    },
+    {
+      "path": "getPluginsMarketplaceRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 152
+    },
+    {
+      "path": "getPluginsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 148
+    },
+    {
+      "path": "getPluginStatuses",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 709
+    },
+    {
+      "path": "getPost",
+      "parameters": [["postId", "includeDeleted", "retainContent"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 449
+    },
+    {
+      "path": "getPostContentFlaggingFields",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 853
+    },
+    {
+      "path": "getPostContentFlaggingValues",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 854
+    },
+    {
+      "path": "getPostEditHistory",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 486
+    },
+    {
+      "path": "getPostInfo",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 484
+    },
+    {
+      "path": "getPostRoute",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 125
+    },
+    {
+      "path": "getPosts",
+      "parameters": [["channelId", "page", "perPage", "fetchThreads", "collapsedThreads", "collapsedThreadsExtended"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 456
+    },
+    {
+      "path": "getPostsAfter",
+      "parameters": [["channelId", "postId", "page", "perPage", "fetchThreads", "collapsedThreads", "collapsedThreadsExtended"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 460
+    },
+    {
+      "path": "getPostsBefore",
+      "parameters": [["channelId", "postId", "page", "perPage", "fetchThreads", "collapsedThreads", "collapsedThreadsExtended"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 459
+    },
+    {
+      "path": "getPostsByIds",
+      "parameters": [["postIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 485
+    },
+    {
+      "path": "getPostsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 124
+    },
+    {
+      "path": "getPostsSince",
+      "parameters": [["channelId", "since", "fetchThreads", "collapsedThreads", "collapsedThreadsExtended"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 458
+    },
+    {
+      "path": "getPostsUnread",
+      "parameters": [["channelId", "userId", "limitAfter", "limitBefore", "fetchThreads", "collapsedThreads", "collapsedThreadsExtended"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 457
+    },
+    {
+      "path": "getPostsUsage",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 773
+    },
+    {
+      "path": "getPostThread",
+      "parameters": [["postId", "fetchThreads", "collapsedThreads", "collapsedThreadsExtended"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 454
+    },
+    {
+      "path": "getPreferencesRoute",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 130
+    },
+    {
+      "path": "getPrevTrialLicense",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 689
+    },
+    {
+      "path": "getProfilePictureUrl",
+      "parameters": [["userId", "lastPictureUpdate"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 238
+    },
+    {
+      "path": "getProfiles",
+      "parameters": [["page", "perPage", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 217
+    },
+    {
+      "path": "getProfilesByIds",
+      "parameters": [["userIds", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 218
+    },
+    {
+      "path": "getProfilesByUsernames",
+      "parameters": [["usernames"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 219
+    },
+    {
+      "path": "getProfilesInChannel",
+      "parameters": [["channelId", "page", "perPage", "sort", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 223
+    },
+    {
+      "path": "getProfilesInGroup",
+      "parameters": [["groupId", "page", "perPage", "sort"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 229
+    },
+    {
+      "path": "getProfilesInGroupChannels",
+      "parameters": [["channelsIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 226
+    },
+    {
+      "path": "getProfilesInTeam",
+      "parameters": [["teamId", "page", "perPage", "sort", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 220
+    },
+    {
+      "path": "getProfilesMatchingChannelPolicy",
+      "parameters": [["teamId", "channelId", "groupConstrained", "perPage", "cursorId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 228
+    },
+    {
+      "path": "getProfilesMatchingTeamPolicy",
+      "parameters": [["teamId", "perPage", "cursorId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 824
+    },
+    {
+      "path": "getProfilesNotInChannel",
+      "parameters": [["teamId", "channelId", "groupConstrained", "page", "perPage", "cursorId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 227
+    },
+    {
+      "path": "getProfilesNotInGroup",
+      "parameters": [["groupId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 230
+    },
+    {
+      "path": "getProfilesNotInTeam",
+      "parameters": [["teamId", "groupConstrained", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 221
+    },
+    {
+      "path": "getProfilesWithoutTeam",
+      "parameters": [["page", "perPage", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 222
+    },
+    {
+      "path": "getPropertyFieldRoute",
+      "parameters": [["groupName", "objectType", "fieldId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 120
+    },
+    {
+      "path": "getPropertyFields",
+      "parameters": [["groupName", "objectType", "targetType", "targetId", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 437
+    },
+    {
+      "path": "getPropertyFieldsRoute",
+      "parameters": [["groupName", "objectType"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 119
+    },
+    {
+      "path": "getPropertyValues",
+      "parameters": [["groupName", "objectType", "targetId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 395
+    },
+    {
+      "path": "getReactionsForPost",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 489
+    },
+    {
+      "path": "getReactionsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 126
+    },
+    {
+      "path": "getRecap",
+      "parameters": [["recapId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 618
+    },
+    {
+      "path": "getRecaps",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 617
+    },
+    {
+      "path": "getRecapsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 147
+    },
+    {
+      "path": "getRecommendedChannelsForUser",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 349
+    },
+    {
+      "path": "getRemoteCluster",
+      "parameters": [["remoteId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 410
+    },
+    {
+      "path": "getRemoteClusterInfo",
+      "parameters": [["remoteId", "includeDeleted"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 428
+    },
+    {
+      "path": "getRemoteClusterRoute",
+      "parameters": [["remoteId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 118
+    },
+    {
+      "path": "getRemoteClusters",
+      "parameters": [["options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 405
+    },
+    {
+      "path": "getRemoteClustersRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 117
+    },
+    {
+      "path": "getRemoteMarketplacePlugins",
+      "parameters": [["filter"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 705
+    },
+    {
+      "path": "getReportsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 168
+    },
+    {
+      "path": "getRole",
+      "parameters": [["roleId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 691
+    },
+    {
+      "path": "getRoleByName",
+      "parameters": [["roleName"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 692
+    },
+    {
+      "path": "getRolesByNames",
+      "parameters": [["rolesNames"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 693
+    },
+    {
+      "path": "getRolesRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 153
+    },
+    {
+      "path": "getSamlCertificateStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 670
+    },
+    {
+      "path": "getSamlMetadataFromIdp",
+      "parameters": [["samlMetadataURL"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 778
+    },
+    {
+      "path": "getScheduledPosts",
+      "parameters": [["teamId", "includeDirectChannels"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 801
+    },
+    {
+      "path": "getScheme",
+      "parameters": [["schemeId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 697
+    },
+    {
+      "path": "getSchemeChannels",
+      "parameters": [["schemeId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 701
+    },
+    {
+      "path": "getSchemes",
+      "parameters": [["scope", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 695
+    },
+    {
+      "path": "getSchemesRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 154
+    },
+    {
+      "path": "getSchemeTeams",
+      "parameters": [["schemeId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 700
+    },
+    {
+      "path": "getServerLimits",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 280
+    },
+    {
+      "path": "getServerLimitsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 170
+    },
+    {
+      "path": "getServerVersion",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 97
+    },
+    {
+      "path": "getSessions",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 243
+    },
+    {
+      "path": "getSharedChannelRemoteInfos",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 427
+    },
+    {
+      "path": "getSharedChannelRemotes",
+      "parameters": [["remoteId", "filters"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 420
+    },
+    {
+      "path": "getSharedChannelsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 135
+    },
+    {
+      "path": "getStatus",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 260
+    },
+    {
+      "path": "getStatusesByIds",
+      "parameters": [["userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 259
+    },
+    {
+      "path": "getSubscription",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 767
+    },
+    {
+      "path": "getSystemEmojiImageUrl",
+      "parameters": [["filename"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 588
+    },
+    {
+      "path": "getSystemPropertyValues",
+      "parameters": [["groupName"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 396
+    },
+    {
+      "path": "getSystemRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 166
+    },
+    {
+      "path": "getTeam",
+      "parameters": [["teamId", "asContentReviewer", "flaggedPostId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 294
+    },
+    {
+      "path": "getTeamAccessControlPolicy",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 820
+    },
+    {
+      "path": "getTeamByName",
+      "parameters": [["teamName"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 295
+    },
+    {
+      "path": "getTeamContentFlaggingStatus",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 846
+    },
+    {
+      "path": "getTeamIconUrl",
+      "parameters": [["teamId", "lastTeamIconUpdate"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 326
+    },
+    {
+      "path": "getTeamInviteInfo",
+      "parameters": [["inviteId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 314
+    },
+    {
+      "path": "getTeamMember",
+      "parameters": [["teamId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 302
+    },
+    {
+      "path": "getTeamMemberRoute",
+      "parameters": [["teamId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 108
+    },
+    {
+      "path": "getTeamMembers",
+      "parameters": [["teamId", "page", "perPage", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 300
+    },
+    {
+      "path": "getTeamMembersByIds",
+      "parameters": [["teamId", "userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 303
+    },
+    {
+      "path": "getTeamMembersForUser",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 301
+    },
+    {
+      "path": "getTeamMembersRoute",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 107
+    },
+    {
+      "path": "getTeamNameRoute",
+      "parameters": [["teamName"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 106
+    },
+    {
+      "path": "getTeamRoute",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 104
+    },
+    {
+      "path": "getTeams",
+      "parameters": [["page", "perPage", "includeTotalCount", "excludePolicyConstrained", "forDirectory"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 291
+    },
+    {
+      "path": "getTeamSchemeRoute",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 105
+    },
+    {
+      "path": "getTeamsForUser",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 297
+    },
+    {
+      "path": "getTeamsRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 103
+    },
+    {
+      "path": "getTeamStats",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 310
+    },
+    {
+      "path": "getTeamsUsage",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 775
+    },
+    {
+      "path": "getTermsOfService",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 205
+    },
+    {
+      "path": "getToken",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 86
+    },
+    {
+      "path": "getTotalUsersStats",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 311
+    },
+    {
+      "path": "getTranslations",
+      "parameters": [["url"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 535
+    },
+    {
+      "path": "getUrl",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 82
+    },
+    {
+      "path": "getUrlVersion",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 98
+    },
+    {
+      "path": "getUsageRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 162
+    },
+    {
+      "path": "getUser",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 232
+    },
+    {
+      "path": "getUserAccessToken",
+      "parameters": [["tokenId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 274
+    },
+    {
+      "path": "getUserAccessTokens",
+      "parameters": [["page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 276
+    },
+    {
+      "path": "getUserAccessTokensForUser",
+      "parameters": [["userId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 275
+    },
+    {
+      "path": "getUserAudits",
+      "parameters": [["userId", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 247
+    },
+    {
+      "path": "getUserByEmail",
+      "parameters": [["email"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 234
+    },
+    {
+      "path": "getUserByUsername",
+      "parameters": [["username"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 233
+    },
+    {
+      "path": "getUserCountForReporting",
+      "parameters": [["filter"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 249
+    },
+    {
+      "path": "getUserCustomProfileAttributesValues",
+      "parameters": [["userID"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 445
+    },
+    {
+      "path": "getUserDrafts",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 793
+    },
+    {
+      "path": "getUserLoginType",
+      "parameters": [["loginId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 212
+    },
+    {
+      "path": "getUserPreferences",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 508
+    },
+    {
+      "path": "getUserRoute",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 102
+    },
+    {
+      "path": "getUsersForReporting",
+      "parameters": [["filter"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 248
+    },
+    {
+      "path": "getUsersRoute",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 101
+    },
+    {
+      "path": "getUserThread",
+      "parameters": [["userId", "teamId", "threadId", "extended"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 472
+    },
+    {
+      "path": "getUserThreadRoute",
+      "parameters": [["userId", "teamId", "threadId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 165
+    },
+    {
+      "path": "getUserThreads",
+      "parameters": [["userId", "teamId", "__2"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 461
+    },
+    {
+      "path": "getUserThreadsRoute",
+      "parameters": [["userID", "teamID"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 164
+    },
+    {
+      "path": "getWebappPlugins",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 711
+    },
+    {
+      "path": "getWebSocketUrl",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 536
+    },
+    {
+      "path": "installMarketplacePlugin",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 707
+    },
+    {
+      "path": "installPluginFromUrl",
+      "parameters": [["pluginDownloadUrl", "force"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 703
+    },
+    {
+      "path": "invalidateAllEmailInvites",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 313
+    },
+    {
+      "path": "invalidateCaches",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 649
+    },
+    {
+      "path": "isAllowedToUpgradeToEnterprise",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 522
+    },
+    {
+      "path": "joinTeam",
+      "parameters": [["inviteId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 308
+    },
+    {
+      "path": "keepFlaggedPost",
+      "parameters": [["postId", "comment"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 852
+    },
+    {
+      "path": "linkGroupSyncable",
+      "parameters": [["groupID", "syncableID", "syncableType", "patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 714
+    },
+    {
+      "path": "linkLdapGroup",
+      "parameters": [["key"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 668
+    },
+    {
+      "path": "logClientError",
+      "parameters": [["message", "level"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 524
+    },
+    {
+      "path": "login",
+      "parameters": [["loginId", "password", "token", "ldapOnly"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 208
+    },
+    {
+      "path": "loginById",
+      "parameters": [["id", "password", "token"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 210
+    },
+    {
+      "path": "loginWithDesktopToken",
+      "parameters": [["token"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 209
+    },
+    {
+      "path": "loginWithMagicLink",
+      "parameters": [["token"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 211
+    },
+    {
+      "path": "logout",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 216
+    },
+    {
+      "path": "lookupInteractiveDialog",
+      "parameters": [["data"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 576
+    },
+    {
+      "path": "markAllInTeamAsRead",
+      "parameters": [["userId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 369
+    },
+    {
+      "path": "markAllMessagesAsRead",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 370
+    },
+    {
+      "path": "markPostAsUnread",
+      "parameters": [["userId", "postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 480
+    },
+    {
+      "path": "markRecapAsRead",
+      "parameters": [["recapId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 619
+    },
+    {
+      "path": "markRecapsAsViewed",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 620
+    },
+    {
+      "path": "markThreadAsUnreadForUser",
+      "parameters": [["userId", "teamId", "threadId", "postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 475
+    },
+    {
+      "path": "moveThread",
+      "parameters": [["postId", "channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 265
+    },
+    {
+      "path": "notifyAdmin",
+      "parameters": [["req"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 764
+    },
+    {
+      "path": "patchBot",
+      "parameters": [["botUserId", "botPatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 749
+    },
+    {
+      "path": "patchChannel",
+      "parameters": [["channelId", "channelPatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 339
+    },
+    {
+      "path": "patchChannelModerations",
+      "parameters": [["channelId", "channelModerationsPatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 365
+    },
+    {
+      "path": "patchConfig",
+      "parameters": [["patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 630
+    },
+    {
+      "path": "patchCustomProfileAttributeField",
+      "parameters": [["fieldId", "patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 433
+    },
+    {
+      "path": "patchGroup",
+      "parameters": [["groupID", "patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 744
+    },
+    {
+      "path": "patchGroupSyncable",
+      "parameters": [["groupID", "syncableID", "syncableType", "patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 743
+    },
+    {
+      "path": "patchMe",
+      "parameters": [["userPatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 187
+    },
+    {
+      "path": "patchPost",
+      "parameters": [["postPatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 450
+    },
+    {
+      "path": "patchPropertyField",
+      "parameters": [["groupName", "objectType", "fieldId", "patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 443
+    },
+    {
+      "path": "patchPropertyValues",
+      "parameters": [["groupName", "objectType", "targetId", "items"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 401
+    },
+    {
+      "path": "patchRemoteCluster",
+      "parameters": [["remoteId", "patch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 416
+    },
+    {
+      "path": "patchRole",
+      "parameters": [["roleId", "rolePatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 694
+    },
+    {
+      "path": "patchScheme",
+      "parameters": [["schemeId", "schemePatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 699
+    },
+    {
+      "path": "patchSystemPropertyValues",
+      "parameters": [["groupName", "items"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 397
+    },
+    {
+      "path": "patchTeam",
+      "parameters": [["team"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 285
+    },
+    {
+      "path": "patchUser",
+      "parameters": [["userPatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 188
+    },
+    {
+      "path": "ping",
+      "parameters": [["getServerStatus", "deviceId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 510
+    },
+    {
+      "path": "pinPost",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 482
+    },
+    {
+      "path": "previewLicense",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 686
+    },
+    {
+      "path": "promoteGuestToUser",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 191
+    },
+    {
+      "path": "purgeElasticsearchIndexes",
+      "parameters": [["indexes"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 684
+    },
+    {
+      "path": "readMultipleChannels",
+      "parameters": [["channelIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 368
+    },
+    {
+      "path": "recycleDatabase",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 650
+    },
+    {
+      "path": "regenCommandToken",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 555
+    },
+    {
+      "path": "regenerateRecap",
+      "parameters": [["recapId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 623
+    },
+    {
+      "path": "regenerateTeamInviteId",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 286
+    },
+    {
+      "path": "regenOAuthAppSecret",
+      "parameters": [["appId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 573
+    },
+    {
+      "path": "regenOutgoingHookToken",
+      "parameters": [["id"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 547
+    },
+    {
+      "path": "reloadConfig",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 631
+    },
+    {
+      "path": "removeAuditLogCertificate",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 677
+    },
+    {
+      "path": "removeDataRetentionPolicyChannels",
+      "parameters": [["id", "channels"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 608
+    },
+    {
+      "path": "removeDataRetentionPolicyTeams",
+      "parameters": [["id", "teams"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 606
+    },
+    {
+      "path": "removeFlaggedPost",
+      "parameters": [["postId", "comment"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 851
+    },
+    {
+      "path": "removeFromChannel",
+      "parameters": [["userId", "channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 360
+    },
+    {
+      "path": "removeFromTeam",
+      "parameters": [["teamId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 309
+    },
+    {
+      "path": "removeHeader",
+      "parameters": [["header"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 91
+    },
+    {
+      "path": "removeIncomingWebhook",
+      "parameters": [["hookId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 540
+    },
+    {
+      "path": "removeLicense",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 688
+    },
+    {
+      "path": "removeOutgoingWebhook",
+      "parameters": [["hookId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 545
+    },
+    {
+      "path": "removePlugin",
+      "parameters": [["pluginId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 710
+    },
+    {
+      "path": "removeReaction",
+      "parameters": [["userId", "postId", "emojiName"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 488
+    },
+    {
+      "path": "removeRecentCustomStatus",
+      "parameters": [["customStatus"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 264
+    },
+    {
+      "path": "removeTeamIcon",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 328
+    },
+    {
+      "path": "removeUsersFromGroup",
+      "parameters": [["groupId", "userIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 726
+    },
+    {
+      "path": "requestTrialLicense",
+      "parameters": [["body"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 687
+    },
+    {
+      "path": "resetFailedAttempts",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 197
+    },
+    {
+      "path": "resetUserPassword",
+      "parameters": [["token", "newPassword"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 196
+    },
+    {
+      "path": "restartServer",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 523
+    },
+    {
+      "path": "restoreGroup",
+      "parameters": [["groupId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 746
+    },
+    {
+      "path": "restorePostVersion",
+      "parameters": [["postId", "restoreVersionId", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 806
+    },
+    {
+      "path": "revealBurnOnReadPost",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 452
+    },
+    {
+      "path": "revokeAllSessionsForUser",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 245
+    },
+    {
+      "path": "revokeSession",
+      "parameters": [["userId", "sessionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 244
+    },
+    {
+      "path": "revokeSessionsForAllUsers",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 246
+    },
+    {
+      "path": "revokeUserAccessToken",
+      "parameters": [["tokenId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 277
+    },
+    {
+      "path": "saveContentFlaggingConfig",
+      "parameters": [["config"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 858
+    },
+    {
+      "path": "savePreferences",
+      "parameters": [["userId", "preferences"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 506
+    },
+    {
+      "path": "searchAccessControlPolicies",
+      "parameters": [["term", "type", "after", "limit", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 813
+    },
+    {
+      "path": "searchAllChannels",
+      "parameters": [
+        ["term", "opts"],
+        ["term", "opts"]
+      ],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 374
+    },
+    {
+      "path": "searchChannels",
+      "parameters": [["teamId", "term"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 373
+    },
+    {
+      "path": "searchChildAccessControlPolicyChannels",
+      "parameters": [["policyId", "term", "opts", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 815
+    },
+    {
+      "path": "searchContentFlaggingReviewers",
+      "parameters": [["term", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 856
+    },
+    {
+      "path": "searchCustomEmoji",
+      "parameters": [["term", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 590
+    },
+    {
+      "path": "searchDataRetentionCustomPolicyChannels",
+      "parameters": [["policyId", "term", "opts"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 596
+    },
+    {
+      "path": "searchDataRetentionCustomPolicyTeams",
+      "parameters": [["policyId", "term", "opts"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 597
+    },
+    {
+      "path": "searchFiles",
+      "parameters": [["teamId", "terms", "isOrSearch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 493
+    },
+    {
+      "path": "searchFilesWithParams",
+      "parameters": [["teamId", "params"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 492
+    },
+    {
+      "path": "searchGroupChannels",
+      "parameters": [["term"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 379
+    },
+    {
+      "path": "searchGroups",
+      "parameters": [["params"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 727
+    },
+    {
+      "path": "searchPermissionPolicies",
+      "parameters": [["term", "after", "limit"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 814
+    },
+    {
+      "path": "searchPosts",
+      "parameters": [["teamId", "terms", "isOrSearch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 491
+    },
+    {
+      "path": "searchPostsWithParams",
+      "parameters": [["teamId", "params"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 490
+    },
+    {
+      "path": "searchTeams",
+      "parameters": [
+        ["term", "opts"],
+        ["term", "opts"]
+      ],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 292
+    },
+    {
+      "path": "searchUsers",
+      "parameters": [["term", "options"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 258
+    },
+    {
+      "path": "sendEmailGuestInvitesToChannels",
+      "parameters": [["teamId", "channelIds", "emails", "message"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 322
+    },
+    {
+      "path": "sendEmailGuestInvitesToChannelsGracefully",
+      "parameters": [["teamId", "channelIds", "emails", "message", "guestMagicLink"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 325
+    },
+    {
+      "path": "sendEmailInvitesToTeam",
+      "parameters": [["teamId", "emails"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 321
+    },
+    {
+      "path": "sendEmailInvitesToTeamAndChannelsGracefully",
+      "parameters": [["teamId", "channelIds", "emails", "message"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 324
+    },
+    {
+      "path": "sendEmailInvitesToTeamGracefully",
+      "parameters": [["teamId", "emails"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 323
+    },
+    {
+      "path": "sendPasswordResetEmail",
+      "parameters": [["email"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 199
+    },
+    {
+      "path": "sendTestNotificaiton",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 639
+    },
+    {
+      "path": "sendVerificationEmail",
+      "parameters": [["email"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 207
+    },
+    {
+      "path": "setAcceptLanguage",
+      "parameters": [["locale"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 89
+    },
+    {
+      "path": "setContentFlaggingReviewer",
+      "parameters": [["postId", "reviewerId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 857
+    },
+    {
+      "path": "setCSRF",
+      "parameters": [["csrfToken"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 88
+    },
+    {
+      "path": "setDefaultProfileImage",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 202
+    },
+    {
+      "path": "setDiagnosticId",
+      "parameters": [["diagnosticId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 96
+    },
+    {
+      "path": "setEnableLogging",
+      "parameters": [["enable"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 92
+    },
+    {
+      "path": "setFirstAdminVisitMarketplaceStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 532
+    },
+    {
+      "path": "setHeader",
+      "parameters": [["header", "value"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 90
+    },
+    {
+      "path": "setIncludeCookies",
+      "parameters": [["include"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 93
+    },
+    {
+      "path": "setMyChannelAutotranslation",
+      "parameters": [["channelId", "enabled"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 340
+    },
+    {
+      "path": "setSamlIdpCertificateFromMetadata",
+      "parameters": [["certData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 779
+    },
+    {
+      "path": "setTeamIcon",
+      "parameters": [["teamId", "imageData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 327
+    },
+    {
+      "path": "setToken",
+      "parameters": [["token"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 87
+    },
+    {
+      "path": "setUrl",
+      "parameters": [["url"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 84
+    },
+    {
+      "path": "setUserAgent",
+      "parameters": [["userAgent"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 85
+    },
+    {
+      "path": "setUserId",
+      "parameters": [["userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 94
+    },
+    {
+      "path": "setUserRoles",
+      "parameters": [["roles"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 95
+    },
+    {
+      "path": "sharedChannelRemoteInvite",
+      "parameters": [["remoteId", "channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 429
+    },
+    {
+      "path": "sharedChannelRemoteUninvite",
+      "parameters": [["remoteId", "channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 430
+    },
+    {
+      "path": "simulateAccessControlPolicyForUsers",
+      "parameters": [["params"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 839
+    },
+    {
+      "path": "startUsersBatchExport",
+      "parameters": [["filter"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 250
+    },
+    {
+      "path": "submitInteractiveDialog",
+      "parameters": [["data"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 575
+    },
+    {
+      "path": "switchEmailToLdap",
+      "parameters": [["email", "emailPassword", "ldapId", "ldapPassword", "mfaCode"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 268
+    },
+    {
+      "path": "switchEmailToOAuth",
+      "parameters": [["service", "email", "password", "mfaCode"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 266
+    },
+    {
+      "path": "switchLdapToEmail",
+      "parameters": [["ldapPassword", "email", "emailPassword", "mfaCode"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 269
+    },
+    {
+      "path": "switchOAuthToEmail",
+      "parameters": [["currentService", "email", "password"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 267
+    },
+    {
+      "path": "syncLdap",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 663
+    },
+    {
+      "path": "teamMembersMinusGroupMembers",
+      "parameters": [["teamID", "groupIDs", "page", "perPage"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 776
+    },
+    {
+      "path": "testAccessControlExpression",
+      "parameters": [["expression", "term", "after", "limit", "channelId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 830
+    },
+    {
+      "path": "testElasticsearch",
+      "parameters": [["config"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 683
+    },
+    {
+      "path": "testEmail",
+      "parameters": [["config"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 640
+    },
+    {
+      "path": "testFileStoreConnection",
+      "parameters": [["config"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 648
+    },
+    {
+      "path": "testLdap",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 657
+    },
+    {
+      "path": "testLdapAttributes",
+      "parameters": [["settings"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 661
+    },
+    {
+      "path": "testLdapConnection",
+      "parameters": [["settings"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 658
+    },
+    {
+      "path": "testLdapDiagnostics",
+      "parameters": [["settings", "testType"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 659
+    },
+    {
+      "path": "testLdapFilters",
+      "parameters": [["settings"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 660
+    },
+    {
+      "path": "testLdapGroupAttributes",
+      "parameters": [["settings"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 662
+    },
+    {
+      "path": "testS3Connection",
+      "parameters": [["config"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 647
+    },
+    {
+      "path": "testSiteURL",
+      "parameters": [["siteURL"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 641
+    },
+    {
+      "path": "unacknowledgePost",
+      "parameters": [["postId", "userId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 505
+    },
+    {
+      "path": "unarchiveChannel",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 336
+    },
+    {
+      "path": "unarchiveTeam",
+      "parameters": [["teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 283
+    },
+    {
+      "path": "unassignChannelsFromAccessControlPolicy",
+      "parameters": [["policyId", "channelIds", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 817
+    },
+    {
+      "path": "unassignTeamsFromAccessControlPolicy",
+      "parameters": [["policyId", "teamIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 819
+    },
+    {
+      "path": "unlinkGroupSyncable",
+      "parameters": [["groupID", "syncableID", "syncableType"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 715
+    },
+    {
+      "path": "unlinkLdapGroup",
+      "parameters": [["key"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 669
+    },
+    {
+      "path": "unpinPost",
+      "parameters": [["postId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 483
+    },
+    {
+      "path": "unsetCustomStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 263
+    },
+    {
+      "path": "updateAccessControlPoliciesActive",
+      "parameters": [["states", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 845
+    },
+    {
+      "path": "updateChannel",
+      "parameters": [["channel"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 337
+    },
+    {
+      "path": "updateChannelBookmark",
+      "parameters": [["channelId", "channelBookmarkId", "patch", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 384
+    },
+    {
+      "path": "updateChannelBookmarkSortOrder",
+      "parameters": [["channelId", "channelBookmarkId", "newOrder", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 385
+    },
+    {
+      "path": "updateChannelCategories",
+      "parameters": [["userId", "teamId", "categories"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 388
+    },
+    {
+      "path": "updateChannelCategory",
+      "parameters": [["userId", "teamId", "category"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 392
+    },
+    {
+      "path": "updateChannelCategoryOrder",
+      "parameters": [["userId", "teamId", "categoryOrder"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 390
+    },
+    {
+      "path": "updateChannelMemberRoles",
+      "parameters": [["channelId", "userId", "roles"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 361
+    },
+    {
+      "path": "updateChannelMemberSchemeRoles",
+      "parameters": [["channelId", "userId", "isSchemeUser", "isSchemeAdmin"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 380
+    },
+    {
+      "path": "updateChannelNotifyProps",
+      "parameters": [["props"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 341
+    },
+    {
+      "path": "updateChannelPrivacy",
+      "parameters": [["channelId", "privacy"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 338
+    },
+    {
+      "path": "updateChannelScheme",
+      "parameters": [["channelId", "schemeId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 342
+    },
+    {
+      "path": "updateCloudCustomer",
+      "parameters": [["customerPatch"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 762
+    },
+    {
+      "path": "updateCloudCustomerAddress",
+      "parameters": [["address"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 763
+    },
+    {
+      "path": "updateConfig",
+      "parameters": [["config"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 629
+    },
+    {
+      "path": "updateCustomProfileAttributeValues",
+      "parameters": [["attributeValues"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 435
+    },
+    {
+      "path": "updateCustomStatus",
+      "parameters": [["customStatus"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 262
+    },
+    {
+      "path": "updateDataRetentionPolicy",
+      "parameters": [["id", "policy"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 604
+    },
+    {
+      "path": "updateIncomingWebhook",
+      "parameters": [["hook"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 541
+    },
+    {
+      "path": "updateMyTermsOfServiceStatus",
+      "parameters": [["termsOfServiceId", "accepted"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 204
+    },
+    {
+      "path": "updateNoticesAsViewed",
+      "parameters": [["noticeIds"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 781
+    },
+    {
+      "path": "updateOrCreateAccessControlPolicy",
+      "parameters": [["policy", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 808
+    },
+    {
+      "path": "updateOutgoingWebhook",
+      "parameters": [["hook"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 546
+    },
+    {
+      "path": "updatePost",
+      "parameters": [["post"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 448
+    },
+    {
+      "path": "updateScheduledPost",
+      "parameters": [["schedulePost", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 804
+    },
+    {
+      "path": "updateStatus",
+      "parameters": [["status"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 261
+    },
+    {
+      "path": "updateTeam",
+      "parameters": [["team"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 284
+    },
+    {
+      "path": "updateTeamMemberRoles",
+      "parameters": [["teamId", "userId", "roles"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 320
+    },
+    {
+      "path": "updateTeamMemberSchemeRoles",
+      "parameters": [["teamId", "userId", "isSchemeUser", "isSchemeAdmin"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 329
+    },
+    {
+      "path": "updateTeamScheme",
+      "parameters": [["teamId", "schemeId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 287
+    },
+    {
+      "path": "updateThreadFollowForUser",
+      "parameters": [["userId", "teamId", "threadId", "state"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 476
+    },
+    {
+      "path": "updateThreadReadForUser",
+      "parameters": [["userId", "teamId", "threadId", "timestamp"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 474
+    },
+    {
+      "path": "updateThreadsReadForUser",
+      "parameters": [["userId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 473
+    },
+    {
+      "path": "updateUser",
+      "parameters": [["user"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 189
+    },
+    {
+      "path": "updateUserActive",
+      "parameters": [["userId", "active"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 200
+    },
+    {
+      "path": "updateUserAuth",
+      "parameters": [["userId", "userAuth"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 190
+    },
+    {
+      "path": "updateUserCustomProfileAttributesValues",
+      "parameters": [["userID", "attributeValues"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 436
+    },
+    {
+      "path": "updateUserMfa",
+      "parameters": [["userId", "activate", "code"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 194
+    },
+    {
+      "path": "updateUserPassword",
+      "parameters": [["userId", "currentPassword", "newPassword"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 195
+    },
+    {
+      "path": "updateUserRoles",
+      "parameters": [["userId", "roles"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 193
+    },
+    {
+      "path": "upgradeToEnterprise",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 517
+    },
+    {
+      "path": "upgradeToEnterpriseStatus",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 518
+    },
+    {
+      "path": "uploadAuditLogCertificate",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 676
+    },
+    {
+      "path": "uploadBrandImage",
+      "parameters": [["imageData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 654
+    },
+    {
+      "path": "uploadFile",
+      "parameters": [["fileFormData", "isBookmark"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 500
+    },
+    {
+      "path": "uploadIdpSamlCertificate",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 675
+    },
+    {
+      "path": "uploadLicense",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 685
+    },
+    {
+      "path": "uploadPlugin",
+      "parameters": [["fileData", "force"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 702
+    },
+    {
+      "path": "uploadPrivateLdapCertificate",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 674
+    },
+    {
+      "path": "uploadPrivateSamlCertificate",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 672
+    },
+    {
+      "path": "uploadProfileImage",
+      "parameters": [["userId", "imageData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 201
+    },
+    {
+      "path": "uploadPublicLdapCertificate",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 673
+    },
+    {
+      "path": "uploadPublicSamlCertificate",
+      "parameters": [["fileData"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 671
+    },
+    {
+      "path": "upsertDraft",
+      "parameters": [["draft", "connectionId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 792
+    },
+    {
+      "path": "validateBusinessEmail",
+      "parameters": [["email"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 765
+    },
+    {
+      "path": "validateExpressionAgainstRequester",
+      "parameters": [["expression", "channelId", "teamId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 841
+    },
+    {
+      "path": "validateOutgoingOAuthConnection",
+      "parameters": [["teamId", "connection"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 570
+    },
+    {
+      "path": "validateWorkspaceBusinessEmail",
+      "parameters": [[]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 766
+    },
+    {
+      "path": "verifyUserEmail",
+      "parameters": [["token"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 203
+    },
+    {
+      "path": "viewMyChannel",
+      "parameters": [["channelId"]],
+      "declaration": "node_modules/@mattermost/client/lib/client4.d.ts",
+      "line": 367
+    }
+  ]
+}
