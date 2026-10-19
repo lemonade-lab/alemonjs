@@ -1,4 +1,0 @@
-find . -name ".DS_Store" -type f -delete
-find . -name ".cache" -type f -delete
-npm run format
-npm run check-format

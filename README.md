@@ -1,230 +1,78 @@
-# ALemonJS
+# [ALemonJS](https://alemonjs.com)
 
-<p align="center">
-  <a href="https://alemonjs.com">Website</a>
-  ·
-  <a href="./README.en.md">English</a>
-  ·
-  <a href="https://www.npmjs.com/package/alemonjs">npm</a>
-</p>
+专用于开发聊天机器人的 Node.js 框架，它提供了完整的事件驱动架构来处理各种聊天平台的消息和交互。
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/alemonjs">
-    <img src="https://img.shields.io/npm/v/alemonjs.svg" alt="npm version">
-  </a>
-  <a href="https://github.com/lemonade-lab/alemonjs/blob/main/LICENSE">
-    <img src="https://img.shields.io/npm/l/alemonjs.svg" alt="license">
-  </a>
-</p>
+官网文档 https://alemonjs.com
 
-ALemonJS 是一个面向跨平台聊天机器人的 Node.js 框架。  
-它把事件处理、声明式路由、Hook、消息格式化与多通道通信协议整合在一起，让同一套业务代码可以接入 QQ、Discord、KOOK、Telegram、OneBot、飞书、Slack、Teams 等平台。
+## Markdown 引用
 
-## Why ALemonJS
+`addBlockquote()` 表示一个完整的引用块，可接收字符串、`FormatMarkDown` 构建器或 Markdown 子节点数组：
 
-- 跨平台优先：统一事件模型与消息能力，减少平台差异带来的业务分叉
-- 架构完整：内置应用层、运行时核心、平台适配层，适合从小型机器人到多模块项目
-- 通信灵活：支持 Direct Channel、IPC Bridge、WebSocket 三种通信路径
-- 路由与生命周期清晰：支持声明式路由、模块生命周期、按需加载与插件化组织
-- 面向工程：monorepo 管理、平台包拆分、桌面与服务端生态并行发展
+```ts
+import { Format } from 'alemonjs';
 
-## Quick Start
+const md = Format.createMarkdown()
+  .addText('引用前的正文')
+  .addBlockquote('第一段\n\n第二段')
+  .addBlockquote(Format.createMarkdown().addText('参考 ').addLink('文档', 'https://alemonjs.com').addBlockquote('嵌套引用'))
+  .addText('引用后的正文');
+
+const format = Format.create().addMarkdown(md);
+// await message.send({ format });
+```
+
+- 引用内部支持多行、空段落和嵌套节点。平台负责渲染内部样式，并隔离前后正文，无需调用方补换行。
+- 原有 `addBlockquote(string)` 和旧版 `Markdown.blockquote(string)` 保持可用，字符串仍沿用目标平台原有的解释方式，不新增转义。
+- 构建器或数组输入会复制顶层节点数组，后续追加节点不会进入已经创建的引用；节点对象本身不深拷贝。
+- 不支持原生引用的平台使用带 `>` 标记的文本降级。引用属于内容排版，回复某条消息仍使用 `replyId`。
+- 数据中的 `MD.blockquote.value` 现在允许字符串或节点数组。自定义适配器需要递归处理数组；可从 `alemonjs/markdown` 导入无运行时初始化副作用的 `renderMarkdownBlockquote(value, renderChildren)`。新版平台适配器需搭配包含此导出入口的新版核心使用。
+
+核心最低版本为 `2.1.108`，配套平台包声明 `alemonjs: ^2.1.108`。升级平台包时需要一起升级核心。
+
+标题、列表、代码和引用等块级节点自动隔离前后正文；相邻行内节点仍直接拼接。引用子节点全部被隐藏时不发送空引用，显式 `addBlockquote('')` 或 `addBlockquote([])` 则保留。
+
+仓库根目录运行 `yarn test:markdown` 可检查构建接口、各平台引用转换、QQ/Bubble 最终发送载荷和包导出入口。QQ 的原生、文本降级及媒体降级路径均保持输入顺序。
+
+### 平台兼容范围
+
+所有平台均接受旧字符串引用和新的子节点数组；平台不支持的样式、图片或交互会按各自规则降级。
+
+| 平台           | 引用处理                                     | 已接入的路径                                  |
+| -------------- | -------------------------------------------- | --------------------------------------------- |
+| QQ Bot         | 原生 Markdown；可配置纯文本降级              | 普通消息、主动发送、媒体消息降级              |
+| Discord        | Markdown，递归转换子节点                     | 普通消息、主动发送、消息编辑                  |
+| KOOK           | KMarkdown，递归转换子节点                    | 普通消息、主动发送、消息编辑                  |
+| Bubble         | 原生 Markdown 及文本降级                     | 频道、私聊共用发送逻辑                        |
+| Telegram       | 带引用标记的纯文本；发送接口未开启 HTML 解析 | 普通消息、图片说明、主动发送、消息编辑        |
+| OneBot         | 带引用标记的纯文本                           | 普通消息、主动发送；引用内 mention 保留为文本 |
+| Milky          | 带引用标记的纯文本                           | 普通消息、主动发送、转发节点转换              |
+| Wechaty        | 带引用标记的纯文本                           | 普通消息、主动发送                            |
+| WeChat ClawBot | 可读文本，递归转换子节点                     | 私聊回复、主动私聊；平台未提供群发送路径      |
+| 企业微信       | Markdown 消息中的可读引用内容                | 上下文回复、主动发送                          |
+| 抖音           | 可读文本；图片和按钮在引用内降级             | SDK 普通/主动/目标发送、网关桥接              |
+| 抖音机器人     | 可读文本                                     | IM 消息发送                                   |
+
+引用内可以使用 `.addList('条目', { index: 2, text: '有序条目' })`，旧 `MD.listItem` 节点仍可直接传入；链接省略 URL 时保留显示文字。降级转换的 `hideUnsupported` 选项会递归应用于引用内部。
+
+以上为代码路径和离线转换测试覆盖范围，不代表已完成各平台账号实发验证。自定义适配器也需要处理递归节点。
+
+## 可选的 CBP 文件通知
+
+为不使用父子 IPC、也不连接 WebSocket 的本地进程提供登录状态通知。默认关闭；仅在启动 AlemonJS 的环境中显式设置后生效：
 
 ```bash
-npm create alemonjs@latest
-cd alemonjs
-yarn install
-yarn dev
+ALEMON_CBP_FILE_TRANSPORT=1
+ALEMON_CBP_FILE_DIR=/var/run/alemon/cbp # 可选，默认 .alemon/cbp
 ```
 
-官网文档：<https://alemonjs.com>
+启用后目录中会有：
 
-## Architecture
+- `status.json`：原子更新的当前 CBP、登录和连接快照；晚启动的消费者先读取它。
+- `events.jsonl`：只包含 `login.qrcode`、`login.success`、`connection.ready` 的短事件缓冲。
+- `qrcode/<LoginId>.png`：当前二维码；二维码刷新或登录完成后自动清理旧文件。
 
-```text
-┌──────────────────────────────────────────────────────────────┐
-│                        Application Layer                     │
-│   Hooks · Router · Format · Response · Middleware           │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                               │ CBP (Cross-platform Protocol)
-                               │
-┌──────────────────────────────┴───────────────────────────────┐
-│                         ALemonJS Core                        │
-│   Event Processor · Runtime Store · Module Loader           │
-│   Direct Channel · IPC Bridge · WebSocket                  │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-┌──────────────────────────────┴───────────────────────────────┐
-│                       Platform Adapters                      │
-│   Discord · QQ Bot · OneBot · KOOK · Telegram · Bubble     │
-└──────────────────────────────────────────────────────────────┘
-```
+事件文件默认最多保留 200 条且不超过 1 MiB。可用 `ALEMON_CBP_FILE_MAX_EVENTS`（最大 1000）和 `ALEMON_CBP_FILE_MAX_BYTES`（最大 10 MiB）调整上限。二维码 base64 不会写入事件或快照，消费者使用 `QRCode.imagePath` 或 `QRCode.url`。
 
-## Core Capabilities
+## 应用单元测试
 
-### Event-Driven Runtime
-
-- 基于 `selects + handler` 的事件处理模型
-- 覆盖消息、交互、成员、请求等多类事件
-- 支持 middleware、subscribe、response、router 的组合处理
-
-### Declarative Router
-
-- 支持前缀匹配、精确匹配、嵌套路由与懒加载
-- 适合命令型机器人、菜单型交互和模块化业务组织
-
-```ts
-import { defineChildren, Router } from 'alemonjs';
-
-const router = Router.create({
-  events: ['message.create', 'private.message.create']
-});
-
-const app = router.group(
-  {
-    routeText: {
-      prefixes: ['/', '#', '＃', '!', '！'],
-      stripPrefix: true,
-      allowBare: true
-    },
-    keyPolicy: {
-      maxWords: 2
-    }
-  },
-  () => import('@src/response/mw')
-);
-
-app.use(['帮助'], () => import('@src/response/help'));
-
-export default defineChildren({
-  async register() {
-    return {
-      responseRouter: app.define
-    };
-  }
-});
-```
-
-### Hook System
-
-| Hook                                     | 用途                                  |
-| ---------------------------------------- | ------------------------------------- |
-| `useMessage`                             | 发送文本、图片、按钮、Markdown 等消息 |
-| `useMention`                             | 获取 @ 提及用户                       |
-| `useSubscribe`                           | 处理跨阶段订阅与等待回复              |
-| `useChannel` / `useGuild` / `useMember`  | 频道、群组、成员相关操作              |
-| `usePermission` / `useRole` / `useUser`  | 权限、角色、用户能力                  |
-| `useHistory` / `useMedia` / `useRequest` | 历史消息、媒体、请求处理              |
-| `useClient` / `useMe` / `useEvent`       | 客户端、当前机器人、事件上下文        |
-
-`useMe().isAtMe()` 可用于判断当前消息是否 @ 了机器人：
-
-```ts
-const [me] = useMe();
-
-if (me.isAtMe()) {
-  // 处理 @ 机器人的消息
-}
-```
-
-### Message Formatting
-
-```ts
-import { Format, useEvent, useMessage } from 'alemonjs';
-
-export default () => {
-  const [event, next] = useEvent({
-    selects: ['message.create', 'private.message.create']
-  });
-
-  if (!event.match.selects) {
-    next();
-    return;
-  }
-
-  const [message] = useMessage();
-  const format = Format.create();
-
-  format.addText('Hello!');
-  format.addImage('https://alemonjs.com/me.png');
-  format.addButtonGroup(Format.createButtonGroup().addRow().addButton('确认', { action: 'confirm' }));
-
-  message.send({ format });
-};
-```
-
-支持文本、图片、按钮组、Markdown、@提及、链接、附件、音视频等消息结构。
-
-## Packages
-
-### Platform Adapters
-
-| Package                                                                                | Description                 |
-| -------------------------------------------------------------------------------------- | --------------------------- |
-| [`@alemonjs/qq-bot`](https://www.npmjs.com/package/@alemonjs/qq-bot)                   | QQ 机器人                   |
-| [`@alemonjs/discord`](https://www.npmjs.com/package/@alemonjs/discord)                 | Discord(DC)                 |
-| [`@alemonjs/kook`](https://www.npmjs.com/package/@alemonjs/kook)                       | KOOK                        |
-| [`@alemonjs/telegram`](https://www.npmjs.com/package/@alemonjs/telegram)               | Telegram(TG)                |
-| [`@alemonjs/bubble`](https://www.npmjs.com/package/@alemonjs/bubble)                   | Bubble                      |
-| [`@alemonjs/onebot`](https://www.npmjs.com/package/@alemonjs/onebot)                   | OneBot                      |
-| [`@alemonjs/milky`](https://www.npmjs.com/package/@alemonjs/milky)                     | Milky                       |
-| [`@alemonjs/wechat`](https://www.npmjs.com/package/@alemonjs/wechat)                   | 个人微信                    |
-| [`@alemonjs/wechat-clawbot`](https://www.npmjs.com/package/@alemonjs/wechat-clawbot)   | 微信机器人                  |
-| [`@alemonjs/wecom`](https://www.npmjs.com/package/@alemonjs/wecom)                     | 企业微信机器人              |
-| [`@alemonjs/douyin`](https://www.npmjs.com/package/@alemonjs/douyin)                   | 抖音桌面                    |
-| [`@alemonjs/douyinbot`](https://www.npmjs.com/package/@alemonjs/douyinbot)             | 抖音机器人                  |
-| [`@alemonjs/dingtalk`](https://www.npmjs.com/package/@alemonjs/dingtalk)               | 钉钉                        |
-| [`@alemonjs/feishu`](https://www.npmjs.com/package/@alemonjs/feishu)                   | 飞书 / Lark                 |
-| [`@alemonjs/google-chat`](https://www.npmjs.com/package/@alemonjs/google-chat)         | Google Chat                 |
-| [`@alemonjs/heybox`](https://www.npmjs.com/package/@alemonjs/heybox)                   | 黑盒语音                    |
-| [`@alemonjs/icqq`](https://www.npmjs.com/package/@alemonjs/icqq)                       | ICQQ                        |
-| [`@alemonjs/instagram`](https://www.npmjs.com/package/@alemonjs/instagram)             | Instagram Messaging         |
-| [`@alemonjs/irc`](https://www.npmjs.com/package/@alemonjs/irc)                         | IRCv3                       |
-| [`@alemonjs/line`](https://www.npmjs.com/package/@alemonjs/line)                       | LINE                        |
-| [`@alemonjs/matrix`](https://www.npmjs.com/package/@alemonjs/matrix)                   | Matrix                      |
-| [`@alemonjs/mattermost`](https://www.npmjs.com/package/@alemonjs/mattermost)           | Mattermost                  |
-| [`@alemonjs/messenger`](https://www.npmjs.com/package/@alemonjs/messenger)             | Facebook Messenger          |
-| [`@alemonjs/slack`](https://www.npmjs.com/package/@alemonjs/slack)                     | Slack                       |
-| [`@alemonjs/teams`](https://www.npmjs.com/package/@alemonjs/teams)                     | Microsoft Teams             |
-| [`@alemonjs/twitch`](https://www.npmjs.com/package/@alemonjs/twitch)                   | Twitch                      |
-| [`@alemonjs/wechat-kf`](https://www.npmjs.com/package/@alemonjs/wechat-kf)             | 微信客服                    |
-| [`@alemonjs/wechat-official`](https://www.npmjs.com/package/@alemonjs/wechat-official) | 微信公众号                  |
-| [`@alemonjs/whatsapp`](https://www.npmjs.com/package/@alemonjs/whatsapp)               | WhatsApp Business Cloud API |
-| [`@alemonjs/zulip`](https://www.npmjs.com/package/@alemonjs/zulip)                     | Zulip                       |
-
-### Extensions
-
-| Package                                                                | Description        |
-| ---------------------------------------------------------------------- | ------------------ |
-| [`@alemonjs/db`](https://www.npmjs.com/package/@alemonjs/db)           | 数据库模块         |
-| [`@alemonjs/process`](https://www.npmjs.com/package/@alemonjs/process) | 桌面端进程通信模块 |
-| [`create-alemonjs`](https://www.npmjs.com/package/create-alemonjs)     | 项目脚手架         |
-
-## Ecosystem
-
-| Project                                                                   | Description            |
-| ------------------------------------------------------------------------- | ---------------------- |
-| [`lvyjs`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/lvyjs) | Node.js 开发与打包工具 |
-| [`jsxp`](https://github.com/lemonade-lab/lvyjs/tree/main/packages/jsxp)   | 截图工具               |
-| [`alemondesk`](https://github.com/lemonade-lab/alemondesk)                | 桌面端项目             |
-| [`alemongo`](https://github.com/lemonade-lab/alemongo)                    | 服务端项目             |
-| [`alemonapp`](https://github.com/lemonade-lab/alemonapp)                  | 手机端项目             |
-| [`alemonx`](https://github.com/lemonade-lab/alemonx)                      | Agent 开发运维         |
-
-## Monorepo
-
-```text
-packages/      核心包与平台适配器
-packages-ex/   扩展能力
-packages-cl/   脚手架
-frontends/     前端与桌面相关界面
-```
-
-## Contributing
-
-欢迎提交 issue、讨论与 PR。
-
-<a href="https://github.com/lemonade-lab/docs/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=lemonade-lab/alemonjs" alt="contributors" />
-</a>
+从 `alemonjs/testing` 导入 `createTestApp`，可离线执行处理器或挂载真实路由与 Context，模拟平台动作，检查消息内容、目标、按钮和发送结果。详见 [应用测试指南](./docs/testing.md)。

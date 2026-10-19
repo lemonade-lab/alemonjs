@@ -1,0 +1,117 @@
+import { ConversationOptions } from "../application/conversation.js";
+import { RateLimitOptions } from "../application/rate-limit.js";
+import { TypingOptions } from "../application/typing.js";
+//#region src/types/run.d.ts
+type ServerOptions = {
+  /**
+   * @description 协议端口
+   */
+  port?: number;
+  /**
+   * @description 应用服务器端口
+   */
+  serverPort?: number;
+  /**
+   * @description 端口被占用时是否自动尝试下一个端口
+   */
+  autoPort?: boolean;
+  /**
+   * @description 运行时实际协议端口（内部字段，不写入配置文件）
+   */
+  _port?: number;
+  /**
+   * @description 运行时实际应用服务器端口（内部字段，不写入配置文件）
+   */
+  _serverPort?: number;
+};
+type ClientOptions = {
+  /**
+   * @description 连接到 CBP 服务器的 URL
+   */
+  url?: string;
+};
+type AppOptions = {
+  /**
+   * @description 入口文件路径
+   */
+  input?: string;
+  /**
+   * @description 平台名称
+   */
+  platform?: string;
+  /**
+   * @description 登录名
+   */
+  login?: string;
+  /**
+   * @description 是否全量接收
+   */
+  is_full_receive?: boolean;
+};
+type MasterOptions = {
+  master_key?: {
+    [key: string]: boolean;
+  };
+  master_id?: {
+    [key: string]: boolean;
+  };
+};
+type BotOptions = {
+  bot_key?: {
+    [key: string]: boolean;
+  };
+  bot_id?: {
+    [key: string]: boolean;
+  };
+};
+type MessageOptions = {
+  disabled_text_regular?: string;
+  disabled_selects?: {
+    [key: string]: boolean;
+  };
+  disabled_user_id?: {
+    [key: string]: boolean;
+  };
+  disabled_user_key?: {
+    [key: string]: boolean;
+  };
+  redirect_text_regular?: string;
+  redirect_text_target?: string;
+  mapping_text?: {
+    regular?: string;
+    target?: string;
+  }[];
+};
+type ProcessorOptions = {
+  processor?: {
+    repeated_event_time?: number;
+    repeated_user_time?: number;
+    /** Opt-in observed message history, quote index and prompt context. */
+    conversation?: ConversationOptions;
+    rateLimit?: RateLimitOptions;
+    /** Automatic QQ C2C input notifications; explicit tasks can use withTyping. */
+    autoTyping?: Omit<TypingOptions, 'signal' | 'onError'>;
+  };
+};
+type AppsOptions = {
+  apps?: {
+    [key: string]: boolean;
+  };
+};
+type CBPOptions = {
+  cbp?: {
+    timeout?: number;
+    reconnectInterval?: string;
+    heartbeatInterval?: string;
+    healthCheckInterval?: string;
+    headers?: {
+      'user-agent': string;
+      'x-device-id': string;
+      'x-full-receive': '0' | '1';
+      [key: string]: string;
+    };
+  };
+};
+type StartOptions = ServerOptions & ClientOptions & AppOptions & MasterOptions & BotOptions & MessageOptions & ProcessorOptions & AppsOptions & CBPOptions;
+//#endregion
+export { StartOptions };

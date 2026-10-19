@@ -1,62 +1,91 @@
 {
-  "name": "@alemonjs/core",
-  "version": "2.0.0",
-  "description": "alemonjs",
+  "name": "alemonjs",
+  "version": "2.1.112",
+  "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
   "type": "module",
-  "scripts": {
-    "build": "lerna run build",
-    "test": "jest",
-    "test:markdown": "yarn workspace alemonjs build && node --import tsx --test packages/alemonjs/tests/markdown.test.mjs packages/alemonjs/tests/markdown-send.test.mjs",
-    "lint": "eslint packages --ext .ts,.tsx,.js --max-warnings=0",
-    "lint:fix": "eslint packages --ext .ts,.tsx,.js --fix --max-warnings=0",
-    "fix:code": "eslint packages --ext .ts,.tsx,.js --fix --quiet",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "check-format": "git diff --exit-code",
-    "prepare": "husky",
-    "push": "yarn build && lerna publish from-package --yes",
-    "push:patch": "lerna version patch --yes && yarn push",
-    "push:minor": "lerna version minor --yes && yarn push",
-    "push:major": "lerna version major --yes && yarn push",
-    "test:social": "yarn workspace alemonjs build && yarn audit:social && yarn test:social:types && node --import tsx --import ./tests/platforms/setup.mjs --test tests/platforms/*.test.mjs",
-    "audit:social": "node scripts/audit-social-apis.mjs",
-    "test:social:types": "node ./node_modules/typescript/bin/tsc --noEmit --strict false --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 tests/platforms/api-types.ts",
-    "build:social": "yarn workspace alemonjs build && lerna run build --scope @alemonjs/slack --scope @alemonjs/feishu --scope @alemonjs/line --scope @alemonjs/dingtalk --scope @alemonjs/matrix --scope @alemonjs/zulip --scope @alemonjs/mattermost --scope @alemonjs/twitch --scope @alemonjs/irc --scope @alemonjs/teams --scope @alemonjs/google-chat --scope @alemonjs/wechat-official --scope @alemonjs/wechat-kf --scope @alemonjs/heybox --scope @alemonjs/icqq --scope @alemonjs/whatsapp --scope @alemonjs/messenger --scope @alemonjs/instagram --include-dependencies",
-    "lint:social": "node scripts/lint-social.mjs",
-    "test:conversation": "yarn workspace alemonjs build && node packages/alemonjs/tests/conversation.contract.mjs",
-    "test:testing": "yarn workspace alemonjs build && yarn test:testing:types && node --import tsx --test packages/alemonjs/tests/testing.test.mjs packages-cl/create-alemonjs/template/alemonjs/test/hello.test.ts",
-    "test:testing:types": "node node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 packages/alemonjs/tests/testing.types.ts"
+  "main": "lib/index.js",
+  "types": "lib",
+  "exports": {
+    "./package": "./package.json",
+    "./markdown": {
+      "types": "./lib/application/format/markdown-render.d.ts",
+      "import": "./lib/application/format/markdown-render.js",
+      "require": "./lib/application/format/markdown-render.js"
+    },
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/index.d.ts",
+      "require": "./dist/index.js"
+    },
+    "./utils": {
+      "import": "./lib/utils.js",
+      "types": "./lib/utils.d.ts",
+      "require": "./lib/utils.js"
+    },
+    "./platform": {
+      "import": "./lib/platform/index.js",
+      "types": "./lib/platform/index.d.ts",
+      "require": "./lib/platform/index.js"
+    },
+    "./common": {
+      "import": "./lib/common/index.js",
+      "types": "./lib/common/index.d.ts",
+      "require": "./lib/common/index.js"
+    },
+    "./core": {
+      "import": "./lib/core/index.js",
+      "types": "./lib/core/index.d.ts",
+      "require": "./lib/core/index.js"
+    },
+    "./application": {
+      "import": "./lib/application/index.js",
+      "types": "./lib/application/index.d.ts",
+      "require": "./lib/application/index.js"
+    },
+    "./env": {
+      "types": "./lib/global.d.ts"
+    },
+    "./testing": {
+      "types": "./lib/testing/index.d.ts",
+      "import": "./lib/testing/index.js"
+    }
   },
-  "devDependencies": {
-    "@babel/preset-env": "^7.25.7",
-    "@babel/preset-typescript": "^7.25.7",
-    "@eslint/js": "^9.18.0",
-    "@types/node": "^18",
-    "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^16",
-    "husky": "^9.0.11",
-    "jest": "^29.7.0",
-    "lerna": "^10.0.0",
-    "lvyjs": "0.3.1",
-    "prettier": "^2.8.8",
-    "ts-jest": "^29.2.5",
-    "tsx": "^4.19.1",
-    "typescript": "5.9.3",
-    "typescript-eslint": "^8.19.1",
-    "ws": "^8.18.1"
-  },
-  "private": true,
-  "workspaces": [
-    "frontends/*",
-    "packages/*",
-    "packages-cl/*",
-    "packages-ex/*"
-  ],
-  "packageManager": "yarn@1.22.22",
   "dependencies": {
-    "vite": "^7.1.12"
-  }
+    "@koa/cors": "^5.0.0",
+    "axios": "^1.14.0",
+    "commander": "^13.1.0",
+    "cron": "^4.4.0",
+    "cross-spawn": "^7.0.6",
+    "file-type": "21.0.0",
+    "flatted": "^3.3.3",
+    "https-proxy-agent": "^9.0.0",
+    "koa": "^3.0.1",
+    "koa-router": "^14.0.0",
+    "lodash-es": "^4.18.1",
+    "log4js": "^6.9.1",
+    "mime-types": "^3.0.1",
+    "public-ip": "^7.0.1",
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.0",
+    "yaml": "^2.5.1"
+  },
+  "bin": {
+    "alemonjs": "./bin/alemonjs.js",
+    "alemonc": "./bin/alemonc.js"
+  },
+  "keywords": [
+    "alemonjs"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "bugs": "https://github.com/lemonade-lab/alemonjs/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lemonade-lab/alemonjs.git"
+  },
+  "gitHead": "c6aa5616afe091a37610dad22fbb2d2618d943b8"
 }
