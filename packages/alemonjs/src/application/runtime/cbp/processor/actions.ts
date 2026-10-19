@@ -1,3 +1,5 @@
+import { translate } from '../../../../common/i18n.js';
+import { runtimeScope, runtimeExecution, trackRuntimeTask } from '../../../../common/runtime-scope.js';
 import * as flattedJSON from 'flatted';
 import { ResultCode, createResult, Result, deviceId, generateUniqueId, sanitizeForSerialization, timeoutTime } from '../../../../common/index.js';
 import type { Actions } from '../../../../types/index.js';
@@ -16,7 +18,7 @@ const setupActionResolve = (requestId: string, resolve: (value: Result[] | Promi
     }
     actionRequestResolves.delete(requestId);
     actionRequestTimeouts.delete(requestId);
-    resolve([createResult(ResultCode.Fail, '行为超时', null)]);
+    resolve([createResult(ResultCode.Fail, translate('result.action.timed.out'), null)]);
   }, timeoutTime);
 
   actionRequestTimeouts.set(requestId, timeout);
@@ -28,6 +30,15 @@ const setupActionResolve = (requestId: string, resolve: (value: Result[] | Promi
  * @param data
  */
 export const sendAction = (data: Actions): Promise<Result[]> => {
+  const scope = runtimeScope.getStore();
+
+  if (scope) {
+    if (scope.disposed || runtimeExecution.getStore()?.closed) {
+      return trackRuntimeTask(Promise.reject(new Error('Test execution is closed')), false);
+    }
+
+    return trackRuntimeTask(scope.action(data), false);
+  }
   const requestId = generateUniqueId();
 
   return new Promise(resolve => {
@@ -59,7 +70,7 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
 
     // WebSocket 模式（原有逻辑）
     if (!global.chatbotClient?.send) {
-      resolve([createResult(ResultCode.Fail, 'Chatbot client is not available', null)]);
+      resolve([createResult(ResultCode.Fail, translate('result.chatbot.client.is.not.available'), null)]);
 
       return;
     }

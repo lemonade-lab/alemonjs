@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext } from '../../types';
 import { ChannelInfo, EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
 import { resolveActionContext, resolveActionTarget } from './action-context';
@@ -19,7 +20,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
     const cid = params?.channelId || (valueEvent as any).ChannelId;
 
     if (!cid) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid'), null);
     }
     try {
       const results = await sendAction({
@@ -29,12 +30,12 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved channel info', result.data ?? null);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.channel.info'), result.data ?? null);
       }
 
-      return createResult(ResultCode.Warn, 'No channel info found', null);
+      return createResult(ResultCode.Warn, translate('result.no.channel.info.found'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get channel info', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.channel.info'), null);
     }
   };
 
@@ -46,7 +47,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
     const gid = params?.guildId || (valueEvent as any).GuildId;
 
     if (!gid) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId', []);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid'), []);
     }
     try {
       const results = await sendAction({
@@ -56,12 +57,12 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved channel list', result.data ?? []);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.channel.list'), result.data ?? []);
       }
 
-      return createResult(ResultCode.Warn, 'No channel list found', []);
+      return createResult(ResultCode.Warn, translate('result.no.channel.list.found'), []);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get channel list', []);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.channel.list'), []);
     }
   };
 
@@ -72,7 +73,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
     const gid = params.guildId || (valueEvent as any).GuildId;
 
     if (!gid) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid'), null);
     }
     try {
       const results = await sendAction({
@@ -82,10 +83,10 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
       const result = results.find(item => item.code === ResultCode.Ok);
 
       return result
-        ? createResult(ResultCode.Ok, 'Channel created', result.data ?? null)
-        : createResult(ResultCode.Warn, 'Create not supported or failed', null);
+        ? createResult(ResultCode.Ok, translate('result.channel.created'), result.data ?? null)
+        : createResult(ResultCode.Warn, translate('result.create.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to create channel', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.create.channel'), null);
     }
   };
 
@@ -94,7 +95,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
    */
   const update = async (params: { channelId: string; name?: string; topic?: string; position?: number }): Promise<Result> => {
     if (!params.channelId) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid'), null);
     }
     try {
       const results = await sendAction({
@@ -108,9 +109,9 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Update not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.update.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to update channel', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.update.channel'), null);
     }
   };
 
@@ -119,7 +120,7 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
    */
   const remove = async (params: { channelId: string }): Promise<Result> => {
     if (!params.channelId) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid'), null);
     }
     try {
       const results = await sendAction({
@@ -128,9 +129,9 @@ export const useChannel = <T extends EventKeys>(event?: Events[T] | ActionContex
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Delete not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.delete.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to delete channel', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.delete.channel'), null);
     }
   };
 

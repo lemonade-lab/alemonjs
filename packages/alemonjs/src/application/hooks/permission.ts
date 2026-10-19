@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext } from '../../types';
 import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
 import { resolveActionContext, resolveActionTarget } from './action-context';
@@ -20,7 +21,7 @@ export const usePermission = <T extends EventKeys>(event?: Events[T] | ActionCon
     const cid = params.channelId || (valueEvent as any).ChannelId;
 
     if (!cid || !params.userId) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId or UserId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid.or.userid'), null);
     }
     try {
       const results = await sendAction({
@@ -29,9 +30,9 @@ export const usePermission = <T extends EventKeys>(event?: Events[T] | ActionCon
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Permission get not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.permission.get.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get permission', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.permission'), null);
     }
   };
 
@@ -46,7 +47,7 @@ export const usePermission = <T extends EventKeys>(event?: Events[T] | ActionCon
     const cid = params.channelId || (valueEvent as any).ChannelId;
 
     if (!cid || !params.userId) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId or UserId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid.or.userid'), null);
     }
     try {
       const results = await sendAction({
@@ -61,9 +62,9 @@ export const usePermission = <T extends EventKeys>(event?: Events[T] | ActionCon
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Permission set not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.permission.set.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to set permission', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.set.permission'), null);
     }
   };
 
@@ -82,7 +83,10 @@ export const usePermission = <T extends EventKeys>(event?: Events[T] | ActionCon
   const action = async (name: string, payload: object): Promise<Result> => {
     const results = await sendAction({ action: name, payload });
 
-    return results.find(item => item.code === ResultCode.Ok) || createResult(ResultCode.Fail, results[0]?.message || `${name} failed`, null);
+    return (
+      results.find(item => item.code === ResultCode.Ok) ||
+      createResult(ResultCode.Fail, results[0]?.message || translate('action.failed', { action: name }), null)
+    );
   };
 
   const permission = {

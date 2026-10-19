@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import { defineRouter } from '../define-router';
 import { useMessage } from '../hooks';
 import { Format } from '../format/message-format';
@@ -112,10 +113,10 @@ function formatArgReference(arg: { name?: string }, displayIndex: number) {
   const name = typeof arg.name === 'string' ? arg.name.trim() : '';
 
   if (name) {
-    return `参数「${name}」`;
+    return translate('arg.named', { name });
   }
 
-  return `第${displayIndex}个参数`;
+  return translate('arg.indexed', { index: displayIndex });
 }
 
 function formatArgRuleHint(arg: { name: string; description?: string; rules?: any[] }, displayIndex: number) {
@@ -125,33 +126,33 @@ function formatArgRuleHint(arg: { name: string; description?: string; rules?: an
   const requiredRule = rules.find(rule => rule.required);
 
   if (requiredRule) {
-    parts.push('必填');
+    parts.push(translate('hint.required'));
   } else {
-    parts.push('可选');
+    parts.push(translate('hint.optional'));
   }
 
   if (typeRule?.type === 'number') {
-    parts.push('数字');
+    parts.push(translate('hint.number'));
   } else if (typeRule?.type === 'enum') {
-    parts.push(`枚举: ${(typeRule.enum ?? []).join(' / ')}`);
+    parts.push(translate('hint.enum', { values: (typeRule.enum ?? []).join(' / ') }));
   } else if (typeRule?.type === 'range') {
-    parts.push('区间');
+    parts.push(translate('hint.range'));
   } else if (typeRule?.type === 'rest') {
-    parts.push('剩余文本');
+    parts.push(translate('hint.rest'));
   } else {
-    parts.push('文本');
+    parts.push(translate('hint.text'));
   }
 
   if (typeof typeRule?.min === 'number') {
-    parts.push(`最小 ${typeRule.min}`);
+    parts.push(translate('hint.min', { min: typeRule.min }));
   }
   if (typeof typeRule?.max === 'number') {
-    parts.push(`最大 ${typeRule.max}`);
+    parts.push(translate('hint.max', { max: typeRule.max }));
   }
 
-  const suffix = arg.description ? `，${arg.description}` : '';
+  const suffix = arg.description ? `${translate('hint.separator')}${arg.description}` : '';
 
-  return `${formatArgReference(arg, displayIndex)}：${parts.join('，')}${suffix}`;
+  return `${formatArgReference(arg, displayIndex)}${translate('hint.labelSeparator')}${parts.join(translate('hint.separator'))}${suffix}`;
 }
 
 function buildSchemaHints(schema?: { args?: Array<{ name: string; description?: string; rules?: any[] }> }) {
@@ -173,10 +174,10 @@ function buildFallbackReply(params: { suggestedKey?: string; description?: strin
   const commandText = quoteCommand(params.suggestedKey);
 
   if (commandText) {
-    lines.push(`我猜你想用的是 ${commandText}。`);
-    lines.push(`可以直接输入：${commandText}`);
+    lines.push(translate('fallback.suggest', { command: commandText }));
+    lines.push(translate('fallback.input', { command: commandText }));
   } else {
-    lines.push('我还没完全认出你这条指令。');
+    lines.push(translate('fallback.unknown'));
   }
 
   if (params.description) {
@@ -184,7 +185,7 @@ function buildFallbackReply(params: { suggestedKey?: string; description?: strin
   }
 
   if (params.usage && params.usage !== params.suggestedKey) {
-    lines.push(`如果你想继续，可以这样写：\`${params.usage}\``);
+    lines.push(translate('fallback.usage', { usage: params.usage }));
   }
 
   return lines;
@@ -195,23 +196,23 @@ function buildValidationReply(params: { error?: string; commandKey?: string; des
   const commandText = quoteCommand(params.commandKey);
 
   if (commandText) {
-    lines.push(`我已经识别到你想用的是 ${commandText}。`);
+    lines.push(translate('reply.recognized', { command: commandText }));
   }
 
-  lines.push(params.error || '这条指令的参数还不完整。');
+  lines.push(params.error || translate('reply.incomplete'));
 
   if (params.description) {
     lines.push(params.description);
   }
 
   if (params.usage) {
-    lines.push(`你可以这样输入：\`${params.usage}\``);
+    lines.push(translate('reply.usage', { usage: params.usage }));
   } else if (commandText) {
-    lines.push(`请继续补全 ${commandText} 所需的参数。`);
+    lines.push(translate('reply.complete', { command: commandText }));
   }
 
   if (params.schemaHints && params.schemaHints.length > 0) {
-    lines.push('参数说明：');
+    lines.push(translate('reply.arguments'));
     lines.push(...params.schemaHints);
   }
 
@@ -882,7 +883,7 @@ export class Router<P extends string = string, E extends string = string> {
     const description = formatRouteDescription(routeEntry?.config.description);
     const schemaHints = buildSchemaHints(routeEntry?.config.schema);
     const replyLines = buildValidationReply({
-      error: validation?.valid === false ? validation.error : '参数校验失败',
+      error: validation?.valid === false ? validation.error : translate('validation.failed'),
       commandKey: result.commandKey,
       description,
       usage: validation?.valid === false ? validation.usage : undefined,

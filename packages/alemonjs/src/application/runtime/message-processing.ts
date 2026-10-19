@@ -1,3 +1,4 @@
+import { scopedResource, runtimeNow } from '../../common/runtime-scope.js';
 import type { ConversationOptions, ConversationEvent } from '../conversation.js';
 import { createConversationService } from '../conversation.js';
 import type { RateLimitOptions } from '../rate-limit.js';
@@ -13,23 +14,30 @@ type ProcessingOptions = {
   rateLimit?: RateLimitOptions;
   autoTyping?: Omit<TypingOptions, 'signal' | 'onError'>;
 };
-let conversationOptions: ConversationOptions | undefined;
-let conversation: ReturnType<typeof createConversationService> | undefined;
-let limitOptions: RateLimitOptions | undefined;
-let limiter: ReturnType<typeof createRateLimiter> | undefined;
+const processingKey = Symbol('message-processing');
+const createProcessing = () => ({
+  conversationOptions: undefined as ConversationOptions | undefined,
+  conversation: undefined as ReturnType<typeof createConversationService> | undefined,
+  limitOptions: undefined as RateLimitOptions | undefined,
+  limiter: undefined as ReturnType<typeof createRateLimiter> | undefined
+});
+const defaultProcessing = createProcessing();
+const processing = () => scopedResource(processingKey, createProcessing, defaultProcessing);
 
 /** Capture before response filters so observed non-triggering group messages
  * remain available. Called only after duplicate-message and deny-list checks. */
 export const captureMessageContext = async (event: ConversationEvent, options: ProcessingOptions) => {
-  if (options.conversation !== conversationOptions) {
-    const next = options.conversation ? createConversationService(options.conversation) : undefined;
+  const state = processing();
 
-    conversationOptions = options.conversation;
-    conversation = next;
+  if (options.conversation !== state.conversationOptions) {
+    const next = options.conversation ? createConversationService(options.conversation, runtimeNow) : undefined;
+
+    state.conversationOptions = options.conversation;
+    state.conversation = next;
   }
-  if (conversation) {
+  if (state.conversation) {
     try {
-      await conversation.capture(event);
+      await state.conversation.capture(event);
     } catch {
       logger.warn('[conversation] Context storage unavailable; continuing without captured history');
     }
@@ -37,14 +45,16 @@ export const captureMessageContext = async (event: ConversationEvent, options: P
 };
 
 export const checkMessageRateLimit = (event: ConversationEvent, options: ProcessingOptions) => {
-  if (options.rateLimit !== limitOptions) {
-    const next = options.rateLimit ? createRateLimiter(options.rateLimit) : undefined;
+  const state = processing();
 
-    limitOptions = options.rateLimit;
-    limiter = next;
+  if (options.rateLimit !== state.limitOptions) {
+    const next = options.rateLimit ? createRateLimiter(options.rateLimit, runtimeNow) : undefined;
+
+    state.limitOptions = options.rateLimit;
+    state.limiter = next;
   }
 
-  return limiter?.check(event) ?? { allowed: true as const };
+  return state.limiter?.check(event) ?? { allowed: true as const };
 };
 
 export const startMessageTyping = (event: Events[EventKeys], options: ProcessingOptions) => {

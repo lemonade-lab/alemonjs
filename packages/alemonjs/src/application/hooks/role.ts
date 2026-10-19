@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext } from '../../types';
 import { EventKeys, Events, Result, ResultCode, RoleInfo, createResult, sendAction } from './common';
 import { resolveActionContext } from './action-context';
@@ -18,7 +19,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
     const gid = getGuildId(params?.guildId);
 
     if (!gid) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId', []);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid'), []);
     }
     try {
       const results = await sendAction({
@@ -28,12 +29,12 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved role list', result.data ?? []);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.role.list'), result.data ?? []);
       }
 
-      return createResult(ResultCode.Warn, 'No role list found', []);
+      return createResult(ResultCode.Warn, translate('result.no.role.list.found'), []);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get role list', []);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.role.list'), []);
     }
   };
 
@@ -44,7 +45,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
     const gid = getGuildId(params.guildId);
 
     if (!gid) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid'), null);
     }
     try {
       const results = await sendAction({
@@ -53,9 +54,11 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result ? createResult(ResultCode.Ok, 'Role created', result.data ?? null) : createResult(ResultCode.Warn, 'Create not supported or failed', null);
+      return result
+        ? createResult(ResultCode.Ok, translate('result.role.created'), result.data ?? null)
+        : createResult(ResultCode.Warn, translate('result.create.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to create role', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.create.role'), null);
     }
   };
 
@@ -66,7 +69,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.roleId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId or RoleId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.roleid'), null);
     }
     try {
       const results = await sendAction({
@@ -75,9 +78,9 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Update not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.update.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to update role', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.update.role'), null);
     }
   };
 
@@ -88,7 +91,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.roleId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId or RoleId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.roleid'), null);
     }
     try {
       const results = await sendAction({
@@ -97,9 +100,9 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Delete not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.delete.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to delete role', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.delete.role'), null);
     }
   };
 
@@ -110,7 +113,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.userId || !params.roleId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId, UserId or RoleId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.userid.or.roleid'), null);
     }
     try {
       const results = await sendAction({
@@ -119,9 +122,9 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Assign not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.assign.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to assign role', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.assign.role'), null);
     }
   };
 
@@ -132,7 +135,7 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.userId || !params.roleId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId, UserId or RoleId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.userid.or.roleid'), null);
     }
     try {
       const results = await sendAction({
@@ -141,9 +144,9 @@ export const useRole = <T extends EventKeys>(event?: Events[T] | ActionContext) 
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Remove not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.remove.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to remove role', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.remove.role'), null);
     }
   };
 

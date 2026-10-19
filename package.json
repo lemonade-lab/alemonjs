@@ -25,7 +25,9 @@
     "test:social:types": "node ./node_modules/typescript/bin/tsc --noEmit --strict false --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 tests/platforms/api-types.ts",
     "build:social": "yarn workspace alemonjs build && lerna run build --scope @alemonjs/slack --scope @alemonjs/feishu --scope @alemonjs/line --scope @alemonjs/dingtalk --scope @alemonjs/matrix --scope @alemonjs/zulip --scope @alemonjs/mattermost --scope @alemonjs/twitch --scope @alemonjs/irc --scope @alemonjs/teams --scope @alemonjs/google-chat --scope @alemonjs/wechat-official --scope @alemonjs/wechat-kf --scope @alemonjs/heybox --scope @alemonjs/icqq --scope @alemonjs/whatsapp --scope @alemonjs/messenger --scope @alemonjs/instagram --include-dependencies",
     "lint:social": "node scripts/lint-social.mjs",
-    "test:conversation": "yarn workspace alemonjs build && node packages/alemonjs/tests/conversation.contract.mjs"
+    "test:conversation": "yarn workspace alemonjs build && node packages/alemonjs/tests/conversation.contract.mjs",
+    "test:testing": "yarn workspace alemonjs build && yarn test:testing:types && node --import tsx --test packages/alemonjs/tests/testing.test.mjs packages-cl/create-alemonjs/template/alemonjs/test/hello.test.ts",
+    "test:testing:types": "node node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 packages/alemonjs/tests/testing.types.ts"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.7",

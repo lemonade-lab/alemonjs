@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import { EventKeys, Events, Result, ResultCode, createResult, getEventOrThrow, sendAction } from './common';
 
 /**
@@ -18,7 +19,7 @@ export const useHistory = <T extends EventKeys>(event?: Events[T]) => {
     const cid = params?.channelId || (valueEvent as any).ChannelId;
 
     if (!cid) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid'), null);
     }
     try {
       const results = await sendAction({
@@ -27,9 +28,9 @@ export const useHistory = <T extends EventKeys>(event?: Events[T]) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'History list not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.history.list.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get message history', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.message.history'), null);
     }
   };
 

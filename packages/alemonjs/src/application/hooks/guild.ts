@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext, MessagingActionMap } from '../../types';
 import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
 import { GuildInfo, Result, ResultCode, createResult, sendAction } from './common';
@@ -18,7 +19,7 @@ export const useGuild = (event?: ActionContext) => {
     const gid = params?.guildId || (valueEvent as any).GuildId;
 
     if (!gid) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid'), null);
     }
     try {
       const results = await sendAction({
@@ -28,12 +29,12 @@ export const useGuild = (event?: ActionContext) => {
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved guild info', result.data ?? null);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.guild.info'), result.data ?? null);
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No guild info found', null);
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.guild.info.found'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get guild info', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.guild.info'), null);
     }
   };
 
@@ -49,12 +50,12 @@ export const useGuild = (event?: ActionContext) => {
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved guild list', result.data ?? []);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.guild.list'), result.data ?? []);
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No guild list found', []);
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.guild.list.found'), []);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get guild list', []);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.guild.list'), []);
     }
   };
 
@@ -73,7 +74,7 @@ export const useGuild = (event?: ActionContext) => {
       const gid = params.guildId || (valueEvent as any).GuildId;
 
       if (!gid) {
-        return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.guildid'), null);
       }
       try {
         const results = await sendAction({
@@ -82,9 +83,9 @@ export const useGuild = (event?: ActionContext) => {
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Update not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.update.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to update guild', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.update.guild'), null);
       }
     },
 
@@ -97,7 +98,7 @@ export const useGuild = (event?: ActionContext) => {
       const gid = params?.guildId || (valueEvent as any).GuildId;
 
       if (!gid) {
-        return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.guildid'), null);
       }
       try {
         const results = await sendAction({
@@ -112,9 +113,9 @@ export const useGuild = (event?: ActionContext) => {
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Leave not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.leave.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to leave guild', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.leave.guild'), null);
       }
     },
 
@@ -127,7 +128,7 @@ export const useGuild = (event?: ActionContext) => {
       const gid = params.guildId || (valueEvent as any).GuildId;
 
       if (!gid) {
-        return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.guildid'), null);
       }
       try {
         const results = await sendAction({
@@ -136,9 +137,9 @@ export const useGuild = (event?: ActionContext) => {
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Mute not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.mute.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to mute guild', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.mute.guild'), null);
       }
     }
   };

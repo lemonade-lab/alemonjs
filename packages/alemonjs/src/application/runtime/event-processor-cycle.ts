@@ -1,3 +1,4 @@
+import { trackRuntimeTask } from '../../common/runtime-scope.js';
 /**
  * @fileoverview 消息处理快
  * 登录模块向核心模块发送数据
@@ -28,7 +29,7 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
 
       return;
     }
-    void expendSubscribeUnmount(valueEvent, select, nextEnd);
+    void trackRuntimeTask(expendSubscribeUnmount(valueEvent, select, nextEnd));
   };
   // event
   const nextEvent: Next = (cn, ...cns) => {
@@ -37,7 +38,7 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
 
       return;
     }
-    void expendEvent(valueEvent, select, nextUnMount);
+    void trackRuntimeTask(expendEvent(valueEvent, select, nextUnMount));
   };
   // response content runs after legacy mount subscriptions and before routes.
   const nextResponseContent: Next = (cn, ...cns) => {
@@ -46,7 +47,7 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
 
       return;
     }
-    void expendContext(valueEvent, select, nextEvent, 'response');
+    void trackRuntimeTask(expendContext(valueEvent, select, nextEvent, 'response'));
   };
   // mount
   const nextMount: Next = (cn, ...cns) => {
@@ -55,7 +56,7 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
 
       return;
     }
-    void expendSubscribeMount(valueEvent, select, nextResponseContent);
+    void trackRuntimeTask(expendSubscribeMount(valueEvent, select, nextResponseContent));
   };
   // middleware content runs before middleware routers and middleware files.
   const nextMiddlewareContent: Next = (cn, ...cns) => {
@@ -64,7 +65,7 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
 
       return;
     }
-    void expendContext(valueEvent, select, nextMount, 'middleware');
+    void trackRuntimeTask(expendContext(valueEvent, select, nextMount, 'middleware'));
   };
   // middleware
   const nextCreate: Next = (cn, ...cns) => {
@@ -73,9 +74,9 @@ export const expendCycle = <T extends EventKeys>(valueEvent: Events[T], select: 
 
       return;
     }
-    void expendMiddleware(valueEvent, select, nextMiddlewareContent);
+    void trackRuntimeTask(expendMiddleware(valueEvent, select, nextMiddlewareContent));
   };
 
   // create
-  void expendSubscribeCreate(valueEvent, select, nextCreate);
+  void trackRuntimeTask(expendSubscribeCreate(valueEvent, select, nextCreate));
 };

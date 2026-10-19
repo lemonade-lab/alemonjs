@@ -1,3 +1,5 @@
+import type { Language } from './i18n.js';
+import { runtimeScope, scopedResource } from './runtime-scope.js';
 import type { ConversationOptions } from '../application/conversation.js';
 import type { RateLimitOptions } from '../application/rate-limit.js';
 import type { TypingOptions } from '../application/typing.js';
@@ -10,6 +12,8 @@ import { ResultCode } from './variable.js';
 
 type ConfigValue = {
   [key: string]: any;
+  /** Framework messages: Chinese by default; changes apply without restarting. */
+  language?: Language;
   autoPort?: boolean;
   apps?: string[] | { [key: string]: boolean };
   master_key?: { [key: string]: boolean } | string[];
@@ -50,8 +54,9 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
   #initValue: T = {} as T;
   #package: Package | null = null;
 
-  constructor(dir: string) {
-    this.#resolvedDir = isAbsolute(dir) ? dir : join(process.cwd(), dir);
+  constructor(dir: string, memoryValue?: T) {
+    this.#resolvedDir = memoryValue ? null : isAbsolute(dir) ? dir : join(process.cwd(), dir);
+    this.#value = memoryValue ?? null;
   }
 
   #invalidateMergedCache() {
@@ -160,7 +165,7 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
 
     this.#mergedValue = {
       ...(this.#value || {}),
-      ...(global?.__options || {})
+      ...(runtimeScope.getStore() ? {} : global?.__options || {})
     } as T;
 
     return this.#mergedValue;
@@ -178,7 +183,7 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
    * 外部绕过 saveValue 直接改写文件（如保留注释的增量写入）后调用，同步内存值
    */
   reload() {
-    if (!existsSync(this.#resolvedDir)) {
+    if (!this.#resolvedDir || !existsSync(this.#resolvedDir)) {
       return;
     }
 
@@ -188,6 +193,8 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
 
   saveValue(value: T) {
     if (!this.#resolvedDir) {
+      this.#applyValue(value);
+
       return;
     }
 
@@ -297,7 +304,12 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
   }
 }
 
+const configScopeKey = Symbol('config');
+
 export const getConfig = <T extends ConfigValue = ConfigValue>(): ConfigCore<T> => {
+  if (runtimeScope.getStore()) {
+    return scopedResource(configScopeKey, () => new ConfigCore<T>('', {} as T), undefined);
+  }
   if (global?.__config) {
     return global.__config as ConfigCore<T>;
   }

@@ -1,3 +1,4 @@
+import { scopedMap } from '../../common/runtime-scope.js';
 import type { EventKeys } from '../../types/index.js';
 
 export type ContextRegistryEntry = {
@@ -8,8 +9,8 @@ export type ContextRegistryEntry = {
   onRemove?: () => void;
 };
 
-export const activeContexts = new Map<string, ContextRegistryEntry>();
-const activeContextKeysByEvent = new Map<EventKeys, Set<string>>();
+export const activeContexts = scopedMap<string, ContextRegistryEntry>();
+const activeContextKeysByEvent = scopedMap<EventKeys, Set<string>>();
 
 export const putActiveContext = (context: ContextRegistryEntry) => {
   const previous = activeContexts.get(context.key);

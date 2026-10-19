@@ -1,3 +1,4 @@
+import { translate } from '../../../../common/i18n.js';
 import KoaRouter from 'koa-router';
 import fs, { existsSync } from 'fs';
 import path, { join, dirname } from 'path';
@@ -138,7 +139,7 @@ const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, cap
     ctx.status = 404;
     ctx.body = {
       code: 404,
-      message: '应用未注册或未启用',
+      message: translate('http.appUnavailable'),
       data: null
     };
 
@@ -149,7 +150,7 @@ const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, cap
     ctx.status = 503;
     ctx.body = {
       code: 503,
-      message: '应用正在初始化',
+      message: translate('http.appLoading'),
       data: {
         app: appName,
         status: runtimeApp.status
@@ -163,7 +164,7 @@ const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, cap
     ctx.status = 500;
     ctx.body = {
       code: 500,
-      message: '应用生命周期失败',
+      message: translate('http.appFailed'),
       data: {
         app: appName,
         status: runtimeApp.status,
@@ -178,7 +179,7 @@ const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, cap
     ctx.status = 410;
     ctx.body = {
       code: 410,
-      message: '应用已卸载或已结束服务',
+      message: translate('http.appDisposed'),
       data: {
         app: appName,
         status: runtimeApp.status,
@@ -193,7 +194,7 @@ const denyRuntimeAppAccess = (ctx: KoaRouter.RouterContext, appName: string, cap
     ctx.status = 404;
     ctx.body = {
       code: 404,
-      message: '应用未提供对应服务能力',
+      message: translate('http.capabilityUnavailable'),
       data: null
     };
 
@@ -285,7 +286,7 @@ const dispatchAppKoaRouters = async (ctx: KoaRouter.RouterContext, appName: stri
         ctx.status = 500;
         ctx.body = {
           code: 500,
-          message: '处理 Koa Router 请求时发生错误。',
+          message: translate('http.routerFailed'),
           error: error instanceof Error ? error.message : String(error)
         };
 
@@ -364,7 +365,7 @@ const serveStaticResource = async (ctx: KoaRouter.RouterContext, appName: string
     ctx.status = 500;
     ctx.body = {
       code: 500,
-      message: '加载 package.json 时发生错误。',
+      message: translate('http.packageFailed'),
       error: err instanceof Error ? err.message : String(err)
     };
 
@@ -378,7 +379,7 @@ const serveStaticResource = async (ctx: KoaRouter.RouterContext, appName: string
     ctx.status = 403;
     ctx.body = {
       code: 403,
-      message: '非法路径',
+      message: translate('http.invalidPath'),
       data: null
     };
 
@@ -415,7 +416,7 @@ const serveStaticResource = async (ctx: KoaRouter.RouterContext, appName: string
     ctx.status = 500;
     ctx.body = {
       code: 500,
-      message: appName === 'main' ? '加载资源时发生服务器错误。' : `加载子应用 '${appName}' 资源时发生服务器错误。`,
+      message: appName === 'main' ? translate('http.resourceFailed') : translate('http.appResourceFailed', { app: appName }),
       error: err instanceof Error ? err.message : String(err)
     };
 
@@ -431,7 +432,7 @@ router.get('/', ctx => {
   ctx.status = 503;
   ctx.body = {
     code: 503,
-    message: '前端尚未构建',
+    message: translate('http.frontendMissing'),
     data: null
   };
 });
@@ -450,7 +451,7 @@ router.get('api/online', ctx => {
   ctx.status = 200;
   ctx.body = {
     code: 200,
-    message: 'service online',
+    message: translate('http.online'),
     data: {
       port: process.env._port ? Number(process.env._port) : null,
       serverPort: process.env._serverPort ? Number(process.env._serverPort) : null
@@ -471,7 +472,7 @@ router.get('api/runtime/apps', ctx => {
   ctx.status = 200;
   ctx.body = {
     code: 200,
-    message: 'runtime apps',
+    message: translate('http.apps'),
     data
   };
 });
@@ -484,7 +485,7 @@ router.get('api/runtime/apps/:app', ctx => {
     ctx.status = 404;
     ctx.body = {
       code: 404,
-      message: '应用未注册',
+      message: translate('http.appMissing'),
       data: null
     };
 
@@ -494,7 +495,7 @@ router.get('api/runtime/apps/:app', ctx => {
   ctx.status = 200;
   ctx.body = {
     code: 200,
-    message: 'runtime app',
+    message: translate('http.app'),
     data: toRuntimeAppSnapshot(runtimeApp)
   };
 });
@@ -526,7 +527,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
     ctx.status = 400;
     ctx.body = {
       code: 400,
-      message: '没有主要入口文件',
+      message: translate('http.entryMissing'),
       data: null
     };
 
@@ -549,7 +550,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
       ctx.status = 400;
       ctx.body = {
         code: 400,
-        message: '未找到主要入口文件',
+        message: translate('http.entryNotFound'),
         data: 'existsSync input'
       };
 
@@ -565,7 +566,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
         ctx.status = 403;
         ctx.body = {
           code: 403,
-          message: '非法路径',
+          message: translate('http.invalidPath'),
           data: null
         };
 
@@ -576,7 +577,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
         ctx.status = 404;
         ctx.body = {
           code: 404,
-          message: `API '${ctx.path}' 未找到。`,
+          message: translate('http.apiNotFound', { path: ctx.path }),
           data: 'route path is file not directory'
         };
 
@@ -589,7 +590,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
         ctx.status = 404;
         ctx.body = {
           code: 404,
-          message: `API '${ctx.path}' 未找到。`,
+          message: translate('http.apiNotFound', { path: ctx.path }),
           data: 'existsSync modulePath'
         };
 
@@ -625,7 +626,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
       ctx.status = 500;
       ctx.body = {
         code: 500,
-        message: '处理 API 请求时发生错误。',
+        message: translate('http.apiFailed'),
         error: err instanceof Error ? err.message : String(err)
       };
     }
@@ -669,7 +670,7 @@ const handleMainAppRequest = async (ctx: KoaRouter.RouterContext) => {
   ctx.status = 404;
   ctx.body = {
     code: 404,
-    message: '资源中未找到。',
+    message: translate('http.resourceNotFound'),
     data: null
   };
 };
@@ -685,7 +686,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
     ctx.status = 400;
     ctx.body = {
       code: 400,
-      message: '无效的应用名称',
+      message: translate('http.invalidApp'),
       data: null
     };
 
@@ -715,7 +716,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
         ctx.status = 403;
         ctx.body = {
           code: 403,
-          message: '非法路径',
+          message: translate('http.invalidPath'),
           data: null
         };
 
@@ -726,7 +727,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
         ctx.status = 404;
         ctx.body = {
           code: 404,
-          message: `API 'route/${ctx.path}' 未找到。`,
+          message: translate('http.routeNotFound', { path: ctx.path }),
           data: 'route path is file not directory'
         };
 
@@ -739,7 +740,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
         ctx.status = 404;
         ctx.body = {
           code: 404,
-          message: `API '${ctx.path}' 未找到。`,
+          message: translate('http.apiNotFound', { path: ctx.path }),
           data: 'existsSync modulePath'
         };
 
@@ -780,7 +781,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
       ctx.status = 500;
       ctx.body = {
         code: 500,
-        message: '处理 API 请求时发生错误。',
+        message: translate('http.apiFailed'),
         error: err instanceof Error ? err.message : String(err)
       };
     }
@@ -824,7 +825,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
   ctx.status = 404;
   ctx.body = {
     code: 404,
-    message: `资源 '${resourcePath}' 在子应用 '${appName}' 中未找到。`,
+    message: translate('http.appResourceNotFound', { resource: resourcePath, app: appName }),
     data: null
   };
 };

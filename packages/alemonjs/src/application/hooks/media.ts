@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext, MessagingActionMap, MediaReceipt, MessageDelivery } from '../../types';
 import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
 import { ActionTarget } from '../../types';
@@ -41,10 +42,10 @@ export const useMedia = (event?: ActionContext) => {
    */
   const upload = async (params: UploadParams): Promise<Result<MediaReceipt>> => {
     if (['replyId', 'eventId', 'referenceId', 'sequence', 'wakeup', 'content'].some(key => key in params)) {
-      return createResult(ResultCode.FailParams, 'Use media.send for message delivery options', null);
+      return createResult(ResultCode.FailParams, translate('result.use.media.send.for.message.delivery.options'), null);
     }
     if (!validateSource(params)) {
-      return createResult(ResultCode.FailParams, 'Provide exactly one media source', null);
+      return createResult(ResultCode.FailParams, translate('result.provide.exactly.one.media.source'), null);
     }
     try {
       const results = await sendAction({
@@ -53,9 +54,9 @@ export const useMedia = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Media upload not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.media.upload.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to upload media', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.upload.media'), null);
     }
   };
 
@@ -69,11 +70,11 @@ export const useMedia = (event?: ActionContext) => {
     const target = contextTarget && { ...contextTarget, targetId: cid, BotId: params.BotId ?? contextTarget.BotId ?? valueEvent.BotId };
 
     if (!validateSource(params) || (params.target && (params.target.targetId !== cid || !['group', 'channel'].includes(params.target.scope)))) {
-      return createResult(ResultCode.FailParams, 'Invalid media source or conflicting channel target', null);
+      return createResult(ResultCode.FailParams, translate('result.invalid.media.source.or.conflicting.channel.target'), null);
     }
 
     if (!cid) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid'), null);
     }
     try {
       const results = await sendAction({
@@ -82,9 +83,9 @@ export const useMedia = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Media send not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.media.send.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to send media to channel', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.send.media.to.channel'), null);
     }
   };
 
@@ -94,7 +95,7 @@ export const useMedia = (event?: ActionContext) => {
    */
   const sendUser = async (params: MediaParams & { userId: string; BotId?: string }): Promise<Result> => {
     if (!validateSource(params) || (params.target && (params.target.targetId !== params.userId || !['c2c', 'direct'].includes(params.target.scope)))) {
-      return createResult(ResultCode.FailParams, 'Invalid media source or conflicting user target', null);
+      return createResult(ResultCode.FailParams, translate('result.invalid.media.source.or.conflicting.user.target'), null);
     }
     const target: ActionTarget = {
       scope: params.target?.scope ?? 'c2c',
@@ -103,7 +104,7 @@ export const useMedia = (event?: ActionContext) => {
     };
 
     if (!params.userId) {
-      return createResult(ResultCode.FailParams, 'Missing UserId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.userid'), null);
     }
     try {
       const results = await sendAction({
@@ -112,9 +113,9 @@ export const useMedia = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Media send not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.media.send.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to send media to user', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.send.media.to.user'), null);
     }
   };
 
@@ -123,10 +124,10 @@ export const useMedia = (event?: ActionContext) => {
     const target = params.target ?? resolveActionTarget(valueEvent);
 
     if (!target?.targetId) {
-      return createResult(ResultCode.FailParams, 'Missing targetId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.targetid'), null);
     }
     if (!validateSource(params)) {
-      return createResult(ResultCode.FailParams, 'Provide exactly one media source', null);
+      return createResult(ResultCode.FailParams, translate('result.provide.exactly.one.media.source'), null);
     }
     try {
       const results = await sendAction({
@@ -135,9 +136,9 @@ export const useMedia = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Media send not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.media.send.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to send media', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.send.media'), null);
     }
   };
 

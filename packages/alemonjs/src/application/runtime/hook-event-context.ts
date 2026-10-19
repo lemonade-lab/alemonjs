@@ -1,3 +1,4 @@
+import { runtimeExecution, trackRuntimeTask } from '../../common/runtime-scope.js';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { performance } from 'node:perf_hooks';
 import { getConfigValue } from '../../common/config.js';
@@ -85,6 +86,7 @@ const createEventTrace = <T extends EventKeys>(select: T): EventTrace<T> => {
       }
 
       trace.ended = true;
+      runtimeExecution.getStore()?.reasons.push(reason);
       for (const cleanup of trace.cleanups) {
         try {
           cleanup();
@@ -113,15 +115,17 @@ const createEventTrace = <T extends EventKeys>(select: T): EventTrace<T> => {
           logger.info(createLogText(event, trace.select, reason, duration));
         }
       }
-      void dispatchEventFinished({
-        event,
-        name: trace.select,
-        reason,
-        duration,
-        hasSendAttempted: event._sendAttempted === true || event._has_send_attempt === true,
-        hasSendSucceeded: event._sendSucceeded === true || event._has_send_success === true,
-        lastSendError: event._lastSendError ?? event._last_send_error ?? null
-      });
+      void trackRuntimeTask(
+        dispatchEventFinished({
+          event,
+          name: trace.select,
+          reason,
+          duration,
+          hasSendAttempted: event._sendAttempted === true || event._has_send_attempt === true,
+          hasSendSucceeded: event._sendSucceeded === true || event._has_send_success === true,
+          lastSendError: event._lastSendError ?? event._last_send_error ?? null
+        })
+      );
     }
   };
 

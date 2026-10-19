@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext } from '../../types';
 import { createActionCaller, resolveActionContext } from './action-context';
 import { ConnectionStatus } from '../../types';
@@ -15,9 +16,9 @@ export const useConnection = (context?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Connection status is not supported', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.connection.status.is.not.supported'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get connection status', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.connection.status'), null);
     }
   };
 

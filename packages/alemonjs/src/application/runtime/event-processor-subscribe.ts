@@ -1,3 +1,4 @@
+import { trackRuntimeTask } from '../../common/runtime-scope.js';
 /**
  * @fileoverview 观察者
  * @module processor
@@ -118,30 +119,32 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
       });
 
       if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
-        void (result as PromiseLike<unknown>).then(
-          () => {
-            if (!isContinue) {
-              finishCurrentTrace('consumed');
-            }
-          },
-          async error => {
-            finishCurrentTrace('error');
-            const shouldContinue =
-              typeof item.data.appName === 'string'
-                ? await dispatchEventError({
-                    event: valueEvent,
-                    error,
-                    appName: item.data.appName,
-                    phase: 'subscribe'
-                  })
-                : false;
+        void trackRuntimeTask(
+          Promise.resolve(result).then(
+            () => {
+              if (!isContinue) {
+                finishCurrentTrace('consumed');
+              }
+            },
+            async error => {
+              finishCurrentTrace('error');
+              const shouldContinue =
+                typeof item.data.appName === 'string'
+                  ? await dispatchEventError({
+                      event: valueEvent,
+                      error,
+                      appName: item.data.appName,
+                      phase: 'subscribe'
+                    })
+                  : false;
 
-            showErrorModule(error);
+              showErrorModule(error);
 
-            if (shouldContinue) {
-              nextObserver(true);
+              if (shouldContinue) {
+                nextObserver(true);
+              }
             }
-          }
+          )
         );
 
         return;
@@ -152,23 +155,25 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
       }
     } catch (error) {
       finishCurrentTrace('error');
-      void (async () => {
-        const shouldContinue =
-          typeof item.data.appName === 'string'
-            ? await dispatchEventError({
-                event: valueEvent,
-                error,
-                appName: item.data.appName,
-                phase: 'subscribe'
-              })
-            : false;
+      void trackRuntimeTask(
+        (async () => {
+          const shouldContinue =
+            typeof item.data.appName === 'string'
+              ? await dispatchEventError({
+                  event: valueEvent,
+                  error,
+                  appName: item.data.appName,
+                  phase: 'subscribe'
+                })
+              : false;
 
-        showErrorModule(error);
+          showErrorModule(error);
 
-        if (shouldContinue) {
-          nextObserver(true);
-        }
-      })();
+          if (shouldContinue) {
+            nextObserver(true);
+          }
+        })()
+      );
     }
   };
 

@@ -1,3 +1,4 @@
+import { recordRuntimeError } from './runtime-scope.js';
 import { createHash as cryptoCreateHash } from 'node:crypto';
 import { readdirSync, Dirent, existsSync } from 'fs';
 import { join } from 'path';
@@ -97,6 +98,7 @@ export const getRecursiveDirFiles = (
 };
 
 export const showErrorModule = (e: Error) => {
+  recordRuntimeError(e);
   if (!e) {
     return;
   }

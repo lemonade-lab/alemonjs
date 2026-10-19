@@ -1,3 +1,4 @@
+import { runtimeScope, scopedResource, scopedMap } from '../../common/runtime-scope.js';
 /**
  * 全部挂在全局变量上，
  * 要求一个nodejs中，
@@ -51,26 +52,29 @@ export type RuntimeAppRecord = {
   createdAt: number;
   updatedAt: number;
 };
-export class Core {
-  constructor() {
-    if (!global.alemonjsCore) {
-      global.alemonjsCore = {
-        storeState: {},
-        storeStateSubscribe: {},
-        storeSubscribeList: {
-          create: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>(),
-          mount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>(),
-          unmount: new Map<EventKeys, SinglyLinkedList<SubscribeValue>>()
-        },
-        storeChildrenApp: {},
-        runtimeApps: {},
-        runtimeAppKoaRouters: {}
-      };
-    }
+const createCore = (): typeof global.alemonjsCore => ({
+  storeState: {},
+  storeStateSubscribe: {},
+  storeSubscribeList: { create: new Map(), mount: new Map(), unmount: new Map() },
+  storeChildrenApp: {},
+  runtimeApps: {},
+  runtimeAppKoaRouters: {}
+});
+const coreScopeKey = Symbol('core');
+
+export const getRuntimeCore = () => {
+  if (runtimeScope.getStore()) {
+    return scopedResource(coreScopeKey, createCore, undefined);
   }
 
+  return (global.alemonjsCore ??= createCore());
+};
+export class Core {
+  constructor() {
+    getRuntimeCore();
+  }
   get value() {
-    return global.alemonjsCore;
+    return getRuntimeCore();
   }
 }
 
@@ -145,19 +149,19 @@ const sameRuntimeAppError = (left?: RuntimeAppError, right?: RuntimeAppError) =>
 };
 
 const getRuntimeAppStore = (): Record<string, RuntimeAppRecord> => {
-  if (!global.alemonjsCore.runtimeApps) {
-    global.alemonjsCore.runtimeApps = {};
+  if (!getRuntimeCore().runtimeApps) {
+    getRuntimeCore().runtimeApps = {};
   }
 
-  return global.alemonjsCore.runtimeApps;
+  return getRuntimeCore().runtimeApps;
 };
 
 const getRuntimeAppKoaRouterStore = (): Record<string, KoaRouter[]> => {
-  if (!global.alemonjsCore.runtimeAppKoaRouters) {
-    global.alemonjsCore.runtimeAppKoaRouters = {};
+  if (!getRuntimeCore().runtimeAppKoaRouters) {
+    getRuntimeCore().runtimeAppKoaRouters = {};
   }
 
-  return global.alemonjsCore.runtimeAppKoaRouters;
+  return getRuntimeCore().runtimeAppKoaRouters;
 };
 
 export const registerRuntimeApp = (
@@ -356,15 +360,15 @@ export class Response {
   #cacheVersion = -1;
 
   get value() {
-    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+    if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
-      return alemonjsCore.storeChildrenApp[key].response;
+    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+      return getRuntimeCore().storeChildrenApp[key].response;
     });
 
     this.#cache = data.flat();
-    this.#cacheVersion = _storeVersion;
+    this.#cacheVersion = runtimeScope.getStore() ? -1 : _storeVersion;
 
     return this.#cache;
   }
@@ -378,10 +382,10 @@ export class ResponseMiddleware {
     if (typeof name !== 'string' || typeof stateKey !== 'string') {
       return [];
     }
-    if (!alemonjsCore.storeChildrenApp[name]) {
+    if (!getRuntimeCore().storeChildrenApp[name]) {
       return [];
     }
-    const app = alemonjsCore.storeChildrenApp[name];
+    const app = getRuntimeCore().storeChildrenApp[name];
 
     if (!app.middlewareResponse) {
       return [];
@@ -492,21 +496,21 @@ export class MiddlewareTree {
   #cacheVersion = -1;
 
   get value(): FileTreeNode {
-    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+    if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
 
     const root = createTreeNode();
 
-    for (const appKey of Object.keys(alemonjsCore.storeChildrenApp)) {
-      const app = alemonjsCore.storeChildrenApp[appKey];
+    for (const appKey of Object.keys(getRuntimeCore().storeChildrenApp)) {
+      const app = getRuntimeCore().storeChildrenApp[appKey];
       const subTree = buildFileTree(app.middleware ?? [], undefined);
 
       mergeFileTree(root, subTree);
     }
 
     this.#cache = root;
-    this.#cacheVersion = _storeVersion;
+    this.#cacheVersion = runtimeScope.getStore() ? -1 : _storeVersion;
 
     return this.#cache;
   }
@@ -520,21 +524,21 @@ export class ResponseTree {
   #cacheVersion = -1;
 
   get value(): FileTreeNode {
-    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+    if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
 
     const root = createTreeNode();
 
-    for (const appKey of Object.keys(alemonjsCore.storeChildrenApp)) {
-      const app = alemonjsCore.storeChildrenApp[appKey];
+    for (const appKey of Object.keys(getRuntimeCore().storeChildrenApp)) {
+      const app = getRuntimeCore().storeChildrenApp[appKey];
       const subTree = buildFileTree(app.response ?? [], app.middlewareResponse);
 
       mergeFileTree(root, subTree);
     }
 
     this.#cache = root;
-    this.#cacheVersion = _storeVersion;
+    this.#cacheVersion = runtimeScope.getStore() ? -1 : _storeVersion;
 
     return this.#cache;
   }
@@ -545,26 +549,26 @@ export class ResponseRouter {
   #cacheVersion = -1;
 
   get value() {
-    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+    if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
-      if (!alemonjsCore.storeChildrenApp[key].register) {
+    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+      if (!getRuntimeCore().storeChildrenApp[key].register) {
         return [];
       }
-      if (alemonjsCore.storeChildrenApp[key].register?.responseRouter) {
-        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.responseRouter?.current ?? []);
+      if (getRuntimeCore().storeChildrenApp[key].register?.responseRouter) {
+        return attachRouteAppName(key, getRuntimeCore().storeChildrenApp[key].register?.responseRouter?.current ?? []);
       }
 
-      if (alemonjsCore.storeChildrenApp[key].register?.response) {
-        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.response?.current ?? []);
+      if (getRuntimeCore().storeChildrenApp[key].register?.response) {
+        return attachRouteAppName(key, getRuntimeCore().storeChildrenApp[key].register?.response?.current ?? []);
       }
 
       return [];
     });
 
     this.#cache = data.flat();
-    this.#cacheVersion = _storeVersion;
+    this.#cacheVersion = runtimeScope.getStore() ? -1 : _storeVersion;
 
     return this.#cache;
   }
@@ -575,25 +579,25 @@ export class MiddlewareRouter {
   #cacheVersion = -1;
 
   get value() {
-    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+    if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
-      if (!alemonjsCore.storeChildrenApp[key].register) {
+    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+      if (!getRuntimeCore().storeChildrenApp[key].register) {
         return [];
       }
-      if (alemonjsCore.storeChildrenApp[key].register?.middlewareRouter) {
-        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.middlewareRouter?.current ?? []);
+      if (getRuntimeCore().storeChildrenApp[key].register?.middlewareRouter) {
+        return attachRouteAppName(key, getRuntimeCore().storeChildrenApp[key].register?.middlewareRouter?.current ?? []);
       }
-      if (alemonjsCore.storeChildrenApp[key].register?.middleware) {
-        return attachRouteAppName(key, alemonjsCore.storeChildrenApp[key].register?.middleware?.current ?? []);
+      if (getRuntimeCore().storeChildrenApp[key].register?.middleware) {
+        return attachRouteAppName(key, getRuntimeCore().storeChildrenApp[key].register?.middleware?.current ?? []);
       }
 
       return [];
     });
 
     this.#cache = data.flat();
-    this.#cacheVersion = _storeVersion;
+    this.#cacheVersion = runtimeScope.getStore() ? -1 : _storeVersion;
 
     return this.#cache;
   }
@@ -604,15 +608,15 @@ export class Middleware {
   #cacheVersion = -1;
 
   get value() {
-    if (this.#cacheVersion === _storeVersion && this.#cache !== null) {
+    if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(alemonjsCore.storeChildrenApp).map(key => {
-      return alemonjsCore.storeChildrenApp[key].middleware;
+    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+      return getRuntimeCore().storeChildrenApp[key].middleware;
     });
 
     this.#cache = data.flat();
-    this.#cacheVersion = _storeVersion;
+    this.#cacheVersion = runtimeScope.getStore() ? -1 : _storeVersion;
 
     return this.#cache;
   }
@@ -625,13 +629,13 @@ export class SubscribeList<T extends EventKeys> {
     this.#select = select;
     this.#choice = choice;
     // 如果不存在，则初始化
-    if (!alemonjsCore.storeSubscribeList[this.#choice].has(this.#select)) {
-      alemonjsCore.storeSubscribeList[this.#choice].set(this.#select, new SinglyLinkedList());
+    if (!getRuntimeCore().storeSubscribeList[this.#choice].has(this.#select)) {
+      getRuntimeCore().storeSubscribeList[this.#choice].set(this.#select, new SinglyLinkedList());
     }
   }
 
   get value() {
-    return alemonjsCore.storeSubscribeList[this.#choice].get(this.#select);
+    return getRuntimeCore().storeSubscribeList[this.#choice].get(this.#select);
   }
 }
 
@@ -639,32 +643,32 @@ export class SubscribeList<T extends EventKeys> {
  * 纯函数版 SubscribeList 访问 — 避免每次创建类实例的 GC 开销
  */
 export const getSubscribeList = <T extends EventKeys>(choice: EventCycleEnum, select: T): SinglyLinkedList<SubscribeValue> => {
-  if (!alemonjsCore.storeSubscribeList[choice].has(select)) {
-    alemonjsCore.storeSubscribeList[choice].set(select, new SinglyLinkedList());
+  if (!getRuntimeCore().storeSubscribeList[choice].has(select)) {
+    getRuntimeCore().storeSubscribeList[choice].set(select, new SinglyLinkedList());
   }
 
-  return alemonjsCore.storeSubscribeList[choice].get(select);
+  return getRuntimeCore().storeSubscribeList[choice].get(select);
 };
 
 export class StateSubscribe {
   #name: string = null;
   constructor(name: string) {
     this.#name = name;
-    if (!alemonjsCore.storeStateSubscribe[name]) {
-      alemonjsCore.storeStateSubscribe[name] = [];
+    if (!getRuntimeCore().storeStateSubscribe[name]) {
+      getRuntimeCore().storeStateSubscribe[name] = [];
     }
   }
 
   on(callback: (value: boolean) => void) {
-    alemonjsCore.storeStateSubscribe[this.#name].push(callback);
+    getRuntimeCore().storeStateSubscribe[this.#name].push(callback);
   }
 
   un(callback: (value: boolean) => void) {
-    alemonjsCore.storeStateSubscribe[this.#name] = alemonjsCore.storeStateSubscribe[this.#name].filter(cb => cb !== callback);
+    getRuntimeCore().storeStateSubscribe[this.#name] = getRuntimeCore().storeStateSubscribe[this.#name].filter(cb => cb !== callback);
   }
 
   get value() {
-    return alemonjsCore.storeStateSubscribe[this.#name];
+    return getRuntimeCore().storeStateSubscribe[this.#name];
   }
 }
 
@@ -680,8 +684,8 @@ class StateProxy {
       set(target, prop: string, value: boolean) {
         target[prop] = value;
         // 通知所有订阅者
-        if (alemonjsCore.storeStateSubscribe[prop]) {
-          for (const callback of alemonjsCore.storeStateSubscribe[prop]) {
+        if (getRuntimeCore().storeStateSubscribe[prop]) {
+          for (const callback of getRuntimeCore().storeStateSubscribe[prop]) {
             callback(value);
           }
         }
@@ -705,20 +709,20 @@ export class State {
   constructor(name: string, defaultValue = true) {
     this.#name = name;
     // 不存在，需要初始化
-    if (!alemonjsCore.storeState) {
+    if (!getRuntimeCore().storeState) {
       // 初始化全局状态
-      alemonjsCore.storeState = new StateProxy().create();
+      getRuntimeCore().storeState = new StateProxy().create();
     }
     // 如果不存在则设置默认值
-    if (!(name in alemonjsCore.storeState)) {
-      alemonjsCore.storeState[name] = defaultValue;
+    if (!(name in getRuntimeCore().storeState)) {
+      getRuntimeCore().storeState[name] = defaultValue;
     }
   }
   get value() {
-    return alemonjsCore.storeState[this.#name];
+    return getRuntimeCore().storeState[this.#name];
   }
   set value(value: boolean) {
-    alemonjsCore.storeState[this.#name] = value;
+    getRuntimeCore().storeState[this.#name] = value;
   }
 }
 
@@ -785,7 +789,7 @@ export class ChildrenApp {
    * 挂载
    */
   on() {
-    alemonjsCore.storeChildrenApp[this.#name] = {
+    getRuntimeCore().storeChildrenApp[this.#name] = {
       name: this.#name,
       middleware: this.#middleware,
       middlewareResponse: this.#middlewareResponse,
@@ -805,7 +809,7 @@ export class ChildrenApp {
     // 清理该应用还未结束的交互上下文
     clearActiveContextsByApp(this.#name);
     // 清理
-    Reflect.deleteProperty(alemonjsCore.storeChildrenApp, this.#name);
+    Reflect.deleteProperty(getRuntimeCore().storeChildrenApp, this.#name);
     bumpStoreVersion();
   }
 
@@ -813,28 +817,35 @@ export class ChildrenApp {
    * 获取
    */
   get value() {
-    if (!alemonjsCore.storeChildrenApp[this.#name]) {
+    if (!getRuntimeCore().storeChildrenApp[this.#name]) {
       this.on();
     }
 
-    return alemonjsCore.storeChildrenApp[this.#name];
+    return getRuntimeCore().storeChildrenApp[this.#name];
   }
 }
 
 export const getChildrenApp = (name: string) => {
-  return alemonjsCore.storeChildrenApp[name] ?? null;
+  return getRuntimeCore().storeChildrenApp[name] ?? null;
 };
 
 export const listChildrenApps = () => {
-  return Object.values(alemonjsCore.storeChildrenApp);
+  return Object.values(getRuntimeCore().storeChildrenApp);
 };
 
-export const ProcessorEventAutoClearMap = new Map();
+export const ProcessorEventAutoClearMap = scopedMap();
 
-export const ProcessorEventUserAutoClearMap = new Map();
+export const ProcessorEventUserAutoClearMap = scopedMap();
 
 // 初始化核心数据
-export const core = new Core().value;
+export const core = new Proxy(new Core().value, {
+  get(_target, property) {
+    return Reflect.get(getRuntimeCore(), property);
+  },
+  set(_target, property, value) {
+    return Reflect.set(getRuntimeCore(), property, value);
+  }
+});
 
 // 监听退出
 let stopping = false;

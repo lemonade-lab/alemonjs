@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import { Result, ResultCode, User, createResult, sendAction } from './common';
 
 /**
@@ -10,7 +11,7 @@ export const useUser = () => {
    */
   const info = async (params: { userId: string }): Promise<Result<User | null>> => {
     if (!params.userId) {
-      return createResult(ResultCode.FailParams, 'Missing UserId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.userid'), null);
     }
     try {
       const results = await sendAction({
@@ -20,12 +21,12 @@ export const useUser = () => {
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved user info', result.data ?? null);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.user.info'), result.data ?? null);
       }
 
-      return createResult(ResultCode.Warn, 'No user info found', null);
+      return createResult(ResultCode.Warn, translate('result.no.user.info.found'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get user info', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.user.info'), null);
     }
   };
 

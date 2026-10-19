@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext, ActionTarget, MessagingActionMap } from '../../types';
 import { createResult, ResultCode, sendAction, getCurrentEvent, type Result } from './common';
 
@@ -41,7 +42,9 @@ export const createActionCaller = (context?: ActionContext) => {
       const target = explicit ? { ...explicit, BotId: explicit.BotId ?? event.BotId } : resolveActionTarget(event);
       const results = await sendAction({ action, payload: { params, event, target, BotId: target?.BotId ?? event.BotId } });
 
-      return results.find(result => result.code === ResultCode.Ok) ?? results[0] ?? createResult(ResultCode.Warn, `${action} is not supported`, null);
+      return (
+        results.find(result => result.code === ResultCode.Ok) ?? results[0] ?? createResult(ResultCode.Warn, translate('action.unsupported', { action }), null)
+      );
     } catch (error) {
       return createResult(ResultCode.Fail, action, error) as Result<MessagingActionMap[K][1]>;
     }

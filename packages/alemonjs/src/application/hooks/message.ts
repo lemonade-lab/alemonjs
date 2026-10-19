@@ -1,3 +1,5 @@
+import { translate } from '../../common/i18n.js';
+import { runtimeScope, trackRuntimeTask } from '../../common/runtime-scope.js';
 import { runWithTyping, type TypingOptions } from '../typing.js';
 import type { ActionContext, OutgoingMessage, MessageDelivery, MessagingActionMap, MessageReceipt } from '../../types';
 import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
@@ -50,7 +52,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
    */
   const sendRaw = async (val: DataEnums[], replyId?: string, options?: MessageDelivery): Promise<Result<MessageReceipt>[]> => {
     if (!val || val.length === 0) {
-      return [createResult(ResultCode.FailParams, 'Invalid val: val must be a non-empty array', null)];
+      return [createResult(ResultCode.FailParams, translate('result.invalid.val.val.must.be.a.non.empty.array'), null)];
     }
     markEventSendAttempt(traceEvent);
 
@@ -132,7 +134,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
       const targetId = params?.messageId || valueEvent.MessageId;
 
       if (!targetId) {
-        return createResult(ResultCode.FailParams, 'Missing MessageId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.messageid'), null);
       }
       try {
         const results = await sendAction({
@@ -147,9 +149,9 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Delete not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.delete.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to delete message', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.delete.message'), null);
       }
     },
 
@@ -162,7 +164,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
       const channelId = (valueEvent as any).ChannelId;
 
       if (!targetId || !channelId) {
-        return createResult(ResultCode.FailParams, 'Missing MessageId or ChannelId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.messageid.or.channelid'), null);
       }
       try {
         const val = params.format instanceof Format ? params.format.value : params.format;
@@ -179,9 +181,9 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Edit not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.edit.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to edit message', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.edit.message'), null);
       }
     },
 
@@ -194,7 +196,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
       const channelId = (valueEvent as any).ChannelId;
 
       if (!targetId || !channelId) {
-        return createResult(ResultCode.FailParams, 'Missing MessageId or ChannelId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.messageid.or.channelid'), null);
       }
       try {
         const results = await sendAction({
@@ -203,9 +205,9 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Pin not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.pin.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to pin message', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.pin.message'), null);
       }
     },
 
@@ -218,7 +220,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
       const channelId = (valueEvent as any).ChannelId;
 
       if (!targetId || !channelId) {
-        return createResult(ResultCode.FailParams, 'Missing MessageId or ChannelId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.messageid.or.channelid'), null);
       }
       try {
         const results = await sendAction({
@@ -227,9 +229,9 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Unpin not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.unpin.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to unpin message', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.unpin.message'), null);
       }
     },
 
@@ -241,7 +243,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
       const targetId = params?.messageId || valueEvent.MessageId;
 
       if (!targetId) {
-        return createResult(ResultCode.FailParams, 'Missing MessageId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.messageid'), null);
       }
       try {
         const results = await sendAction({
@@ -250,12 +252,20 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Get message not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.get.message.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to get message', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.get.message'), null);
       }
     }
   };
+
+  if (runtimeScope.getStore()) {
+    for (const key of Object.keys(lightweight)) {
+      const original = lightweight[key];
+
+      lightweight[key] = (...args: unknown[]) => trackRuntimeTask(original(...args), false);
+    }
+  }
 
   return [lightweight] as const;
 };

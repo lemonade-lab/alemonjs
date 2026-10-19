@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext } from '../../types';
 import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
 import { resolveActionContext } from './action-context';
@@ -19,7 +20,7 @@ export const useAnnounce = <T extends EventKeys>(event?: Events[T] | ActionConte
     const gid = params.guildId || (valueEvent as any).GuildId;
 
     if (!gid || !params.messageId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId or MessageId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.messageid'), null);
     }
     try {
       const results = await sendAction({
@@ -28,9 +29,9 @@ export const useAnnounce = <T extends EventKeys>(event?: Events[T] | ActionConte
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Announce set not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.announce.set.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to set announcement', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.set.announcement'), null);
     }
   };
 
@@ -43,7 +44,7 @@ export const useAnnounce = <T extends EventKeys>(event?: Events[T] | ActionConte
     const gid = params?.guildId || (valueEvent as any).GuildId;
 
     if (!gid) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid'), null);
     }
     try {
       const results = await sendAction({
@@ -52,9 +53,9 @@ export const useAnnounce = <T extends EventKeys>(event?: Events[T] | ActionConte
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Announce remove not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.announce.remove.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to remove announcement', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.remove.announcement'), null);
     }
   };
 

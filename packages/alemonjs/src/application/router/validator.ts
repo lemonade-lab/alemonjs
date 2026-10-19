@@ -1,3 +1,5 @@
+import { translate } from '../../common/i18n.js';
+
 export type RouteRangeValue = {
   start: number;
   end: number;
@@ -133,10 +135,10 @@ function formatArgReference(argName: string | undefined, displayIndex: number) {
   const name = String(argName ?? '').trim();
 
   if (name) {
-    return `参数「${name}」`;
+    return translate('arg.named', { name });
   }
 
-  return `第${displayIndex}个参数`;
+  return translate('arg.indexed', { index: displayIndex });
 }
 
 function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRuleValidatorContext, usage?: string): RouteValidationResult {
@@ -149,7 +151,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (!rule.pattern.test(normalizedValue)) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}格式不正确`,
+        error: rule.message ?? translate('validation.pattern', { arg: messagePrefix }),
         usage
       };
     }
@@ -182,7 +184,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (Number.isNaN(value)) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}必须是数字`,
+        error: rule.message ?? translate('validation.number', { arg: messagePrefix }),
         usage
       };
     }
@@ -190,7 +192,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (typeof rule.min === 'number' && value < rule.min) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}不能小于${rule.min}`,
+        error: rule.message ?? translate('validation.min', { arg: messagePrefix, min: rule.min }),
         usage
       };
     }
@@ -198,7 +200,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (typeof rule.max === 'number' && value > rule.max) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}不能大于${rule.max}`,
+        error: rule.message ?? translate('validation.max', { arg: messagePrefix, max: rule.max }),
         usage
       };
     }
@@ -227,7 +229,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (!enumValues.includes(normalizedValue)) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}只能是 ${enumValues.join(' / ')}`,
+        error: rule.message ?? translate('validation.enum', { arg: messagePrefix, values: enumValues.join(' / ') }),
         usage
       };
     }
@@ -256,7 +258,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (!value) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}必须是区间，例如 1-10`,
+        error: rule.message ?? translate('validation.range', { arg: messagePrefix }),
         usage
       };
     }
@@ -264,7 +266,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (value.start > value.end) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}的起点不能大于终点`,
+        error: rule.message ?? translate('validation.rangeOrder', { arg: messagePrefix }),
         usage
       };
     }
@@ -272,7 +274,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (typeof rule.min === 'number' && (value.start < rule.min || value.end < rule.min)) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}不能小于${rule.min}`,
+        error: rule.message ?? translate('validation.min', { arg: messagePrefix, min: rule.min }),
         usage
       };
     }
@@ -280,7 +282,7 @@ function validateTypedRule(rawValue: string, rule: RouteRule, context: RouteRule
     if (typeof rule.max === 'number' && (value.start > rule.max || value.end > rule.max)) {
       return {
         valid: false,
-        error: rule.message ?? `${messagePrefix}不能大于${rule.max}`,
+        error: rule.message ?? translate('validation.max', { arg: messagePrefix, max: rule.max }),
         usage
       };
     }
@@ -385,7 +387,9 @@ export function validateRouteArgsForCommand(commandPath: string | undefined, raw
       valid: false,
       error:
         schema?.messages?.tooFewArgs ??
-        (missingRequiredArg ? `${formatArgReference(missingRequiredArg.arg.name, missingRequiredArg.displayIndex)}是必填的` : `至少需要 ${minArgs} 个参数`),
+        (missingRequiredArg
+          ? translate('validation.required', { arg: formatArgReference(missingRequiredArg.arg.name, missingRequiredArg.displayIndex) })
+          : translate('validation.tooFew', { count: minArgs })),
       usage
     };
   }
@@ -393,7 +397,7 @@ export function validateRouteArgsForCommand(commandPath: string | undefined, raw
   if (typeof maxArgs === 'number' && rawArgs.length > maxArgs) {
     return {
       valid: false,
-      error: schema?.messages?.tooManyArgs ?? `最多需要 ${maxArgs} 个参数`,
+      error: schema?.messages?.tooManyArgs ?? translate('validation.tooMany', { count: maxArgs }),
       usage
     };
   }
@@ -414,7 +418,7 @@ export function validateRouteArgsForCommand(commandPath: string | undefined, raw
         if (requiredRule) {
           return {
             valid: false,
-            error: requiredRule.message ?? `${formatArgReference(arg.name, displayIndex)}是必填的`,
+            error: requiredRule.message ?? translate('validation.required', { arg: formatArgReference(arg.name, displayIndex) }),
             usage
           };
         }
@@ -456,7 +460,7 @@ export function validateRouteArgsForCommand(commandPath: string | undefined, raw
       if (requiredRule) {
         return {
           valid: false,
-          error: requiredRule.message ?? `${formatArgReference(arg.name, displayIndex)}是必填的`,
+          error: requiredRule.message ?? translate('validation.required', { arg: formatArgReference(arg.name, displayIndex) }),
           usage
         };
       }

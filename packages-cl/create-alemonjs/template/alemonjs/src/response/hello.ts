@@ -10,7 +10,7 @@ export default async () => {
     // 没有找到用户
     logger.warn('没有找到@用户');
     format.addText('没有找到@用户');
-    message.send({
+    await message.send({
       format
     });
     return;
@@ -20,7 +20,7 @@ export default async () => {
   format.addText(`hello, ${user.UserName || user.UserId}!`);
 
   // 发送消息
-  message.send({
+  await message.send({
     format
   });
 };

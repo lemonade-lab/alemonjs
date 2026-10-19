@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import { ActionTarget, ActionContext } from '../../types';
 import { resolveActionContext, resolveActionTarget } from './action-context';
 import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
@@ -12,7 +13,7 @@ export const useInteraction = <T extends EventKeys>(event?: Events[T] | ActionCo
     const target = params?.target || eventTarget;
 
     if (!interactionId) {
-      return createResult(ResultCode.FailParams, 'Missing InteractionId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.interactionid'), null);
     }
 
     try {
@@ -28,9 +29,9 @@ export const useInteraction = <T extends EventKeys>(event?: Events[T] | ActionCo
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Interaction acknowledgement is not supported', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.interaction.acknowledgement.is.not.supported'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to acknowledge interaction', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.acknowledge.interaction'), null);
     }
   };
 

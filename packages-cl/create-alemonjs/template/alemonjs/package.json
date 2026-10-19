@@ -13,7 +13,8 @@
     "review": "npx alemonc start",
     "start": "npx pm2 startOrRestart pm2.config.cjs",
     "stop": "npx pm2 stop pm2.config.cjs",
-    "delete": "npx pm2 delete pm2.config.cjs"
+    "delete": "npx pm2 delete pm2.config.cjs",
+    "test": "node --import tsx --test test/*.test.ts"
   },
   "exports": {
     ".": "./lib/index.js",
@@ -26,13 +27,14 @@
     "@alemonjs/onebot": "^2.1.23",
     "@alemonjs/qq-bot": "^2.1.37",
     "@types/node": "^26.6.5",
-    "alemonjs": "2.1.109",
+    "alemonjs": "^2.1.112",
     "cssnano": "7",
     "jsxp": "1.4.0",
     "lvyjs": "^0.3.1",
     "lvyjs-plugin-postcss": "^0.1.0",
     "lvyjs-plugin-tailwindcss": "^0.1.1",
-    "pm2": "^5"
+    "pm2": "^5",
+    "tsx": "^4.23.12"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

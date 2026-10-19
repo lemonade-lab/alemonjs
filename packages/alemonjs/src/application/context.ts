@@ -1,3 +1,4 @@
+import { scopedMap, runtimeNow, runtimeExecution } from '../common/runtime-scope.js';
 import type { EventKeys, Events } from '../types/index.js';
 import { showErrorModule } from '../common/utils.js';
 import { finishCurrentTrace, getCurrentAppName, getCurrentEvent, withEventContext } from './runtime/hook-event-context.js';
@@ -84,7 +85,7 @@ type ActiveContext = ContextRegistryEntry & {
   controller: AbortController;
 };
 
-const contextQueues = new Map<ScopeKey, Promise<void>>();
+const contextQueues = scopedMap<ScopeKey, Promise<void>>();
 let contextSequence = 0;
 const contextDefinitionSymbol = Symbol('alemonjs.contextDefinition');
 const contextDefinitionSymbolForContent = Symbol('alemonjs.contextDefinitionForContent');
@@ -156,7 +157,7 @@ const getScopeKey = (appName: string, definition: ContextDefinition, event: Reco
   return JSON.stringify([appName, definition.name, values]);
 };
 
-const isExpired = (context: ActiveContext, now = Date.now()) => context.expiresAt !== undefined && context.expiresAt <= now;
+const isExpired = (context: ActiveContext, now = runtimeNow()) => context.expiresAt !== undefined && context.expiresAt <= now;
 
 /**
  * Creates the context configuration consumed by defineChildren().register().
@@ -348,7 +349,7 @@ const dispatchContext = <T>(action: ContextDispatchAction<T>, event?: Events[Eve
     throw new Error(`Context is already active: ${action.type}`);
   }
 
-  const now = Date.now();
+  const now = runtimeNow();
   const id = `${now.toString(36)}-${Math.random().toString(36).slice(2)}`;
   const payload = clonePayload(action.payload);
   const expiresAt = definition.expiresIn ? now + definition.expiresIn : undefined;
@@ -395,7 +396,7 @@ const dispatchContext = <T>(action: ContextDispatchAction<T>, event?: Events[Eve
  * it was explicitly passed on to the normal router.
  */
 export const expendContext = async <T extends EventKeys>(event: Events[T], select: T, next: () => void, phase: ContextPhase) => {
-  const now = Date.now();
+  const now = runtimeNow();
   let current: ActiveContext | undefined;
 
   for (const key of getActiveContextKeys(select)) {
@@ -437,6 +438,11 @@ export const expendContext = async <T extends EventKeys>(event: Events[T], selec
     return false;
   }
 
+  const execution = runtimeExecution.getStore();
+
+  if (execution) {
+    execution.contextClaimed = true;
+  }
   const key = current.key;
   const previous = contextQueues.get(key) ?? Promise.resolve();
   const run: Promise<void> = previous

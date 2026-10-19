@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext } from '../../types';
 import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
 import { resolveActionContext, resolveActionTarget } from './action-context';
@@ -21,7 +22,7 @@ export const useReaction = <T extends EventKeys>(event?: Events[T] | ActionConte
     const cid = params.channelId || valueEvent.ChannelId;
 
     if (!mid || !cid || !params.emojiId) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid.messageid.or.emojiid'), null);
     }
     try {
       const results = await sendAction({
@@ -30,9 +31,9 @@ export const useReaction = <T extends EventKeys>(event?: Events[T] | ActionConte
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Reaction add not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.reaction.add.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to add reaction', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.add.reaction'), null);
     }
   };
 
@@ -46,7 +47,7 @@ export const useReaction = <T extends EventKeys>(event?: Events[T] | ActionConte
     const cid = params.channelId || valueEvent.ChannelId;
 
     if (!mid || !cid || !params.emojiId) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid.messageid.or.emojiid'), null);
     }
     try {
       const results = await sendAction({
@@ -55,9 +56,9 @@ export const useReaction = <T extends EventKeys>(event?: Events[T] | ActionConte
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Reaction remove not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.reaction.remove.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to remove reaction', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.remove.reaction'), null);
     }
   };
 
@@ -72,7 +73,7 @@ export const useReaction = <T extends EventKeys>(event?: Events[T] | ActionConte
     const cid = params.channelId || valueEvent.ChannelId;
 
     if (!mid || !cid || !params.emojiId) {
-      return createResult(ResultCode.FailParams, 'Missing ChannelId, MessageId or EmojiId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.channelid.messageid.or.emojiid'), null);
     }
     try {
       const results = await sendAction({
@@ -88,9 +89,9 @@ export const useReaction = <T extends EventKeys>(event?: Events[T] | ActionConte
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || createResult(ResultCode.Warn, 'Reaction list not supported or failed', null);
+      return result || createResult(ResultCode.Warn, translate('result.reaction.list.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to list reactions', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.list.reactions'), null);
     }
   };
 

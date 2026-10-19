@@ -1,3 +1,5 @@
+import { translate } from '../../../../common/i18n.js';
+import { runtimeScope, runtimeExecution, trackRuntimeTask } from '../../../../common/runtime-scope.js';
 import { ResultCode, createResult, Result, deviceId, generateUniqueId, sanitizeForSerialization, timeoutTime } from '../../../../common/index.js';
 import { apiRequestTimeouts, apiRequestResolves } from './request-registry.js';
 import type { Apis } from '../../../../types/index.js';
@@ -16,7 +18,7 @@ const setupApiResolve = (requestId: string, resolve: (value: Result[] | PromiseL
     }
     apiRequestResolves.delete(requestId);
     apiRequestTimeouts.delete(requestId);
-    resolve([createResult(ResultCode.Fail, '接口超时', null)]);
+    resolve([createResult(ResultCode.Fail, translate('result.api.request.timed.out'), null)]);
   }, timeoutTime);
 
   apiRequestTimeouts.set(requestId, timeout);
@@ -28,6 +30,15 @@ const setupApiResolve = (requestId: string, resolve: (value: Result[] | PromiseL
  * @param data
  */
 export const sendAPI = (data: Apis): Promise<Result[]> => {
+  const scope = runtimeScope.getStore();
+
+  if (scope) {
+    if (scope.disposed || runtimeExecution.getStore()?.closed) {
+      return trackRuntimeTask(Promise.reject(new Error('Test execution is closed')), false);
+    }
+
+    return trackRuntimeTask(scope.api(data), false);
+  }
   const requestId = generateUniqueId();
 
   return new Promise(resolve => {
@@ -59,7 +70,7 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
 
     // WebSocket 模式（原有逻辑）
     if (!global.chatbotClient?.send) {
-      resolve([createResult(ResultCode.Fail, 'Chatbot client is not available', null)]);
+      resolve([createResult(ResultCode.Fail, translate('result.chatbot.client.is.not.available'), null)]);
 
       return;
     }

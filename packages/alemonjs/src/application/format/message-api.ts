@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import { DataEnums, OnDataFormatFunc } from '../../types/index.js';
 import { ResultCode } from '../../common/variable.js';
 import { sendAction } from '../runtime/cbp/processor/actions.js';
@@ -234,5 +235,5 @@ export const getMessageIntent = async (): Promise<Result<IntentResult>> => {
     payload: {}
   });
 
-  return createResult(ResultCode.Ok, '获取成功', results[0]?.data ?? null);
+  return createResult(ResultCode.Ok, translate('result.retrieved.successfully'), results[0]?.data ?? null);
 };

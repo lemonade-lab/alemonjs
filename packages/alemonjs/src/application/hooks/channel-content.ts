@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext } from '../../types';
 import { EventKeys, Events, Result, ResultCode, createResult, sendAction } from './common';
 import { resolveActionContext } from './action-context';
@@ -18,7 +19,7 @@ const action = async <T>(name: string, payload: object): Promise<Result<T>> => {
 
   return result
     ? createResult(ResultCode.Ok, result.message, result.data as T)
-    : createResult(ResultCode.Fail, results[0]?.message || `${name} failed`, null as T);
+    : createResult(ResultCode.Fail, results[0]?.message || translate('action.failed', { action: name }), null as T);
 };
 
 /** Cross-platform scheduled channel content. */

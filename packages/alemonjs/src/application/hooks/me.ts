@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext, BotInfo } from '../../types';
 import { createActionCaller, resolveActionContext } from './action-context';
 import { EventKeys, Events, GuildInfo, Result, ResultCode, User, createResult, getEventOrThrow, sendAction } from './common';
@@ -24,12 +25,12 @@ export const useMe = <T extends EventKeys>(event?: Events[T] | ActionContext) =>
       if (result) {
         const data: BotInfo | null = result?.data ?? null;
 
-        return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.bot.information'), data);
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No bot information found', null);
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.bot.information.found'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get bot information', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.bot.information'), null);
     }
   };
 
@@ -46,7 +47,7 @@ export const useMe = <T extends EventKeys>(event?: Events[T] | ActionContext) =>
    * @deprecated 请使用 isAtMe。该方法保留原有 Result 返回结构。
    */
   const isMentionMe = (targetEvent?: Events[T]): Result<boolean> => {
-    return createResult(ResultCode.Ok, 'Successfully checked whether the bot was mentioned', isAtMe(targetEvent));
+    return createResult(ResultCode.Ok, translate('result.successfully.checked.whether.the.bot.was.mentioned'), isAtMe(targetEvent));
   };
 
   /**
@@ -61,12 +62,12 @@ export const useMe = <T extends EventKeys>(event?: Events[T] | ActionContext) =>
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved guild list', result.data ?? []);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.guild.list'), result.data ?? []);
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No guild list found', []);
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.guild.list.found'), []);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get guild list', []);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.guild.list'), []);
     }
   };
 
@@ -84,12 +85,12 @@ export const useMe = <T extends EventKeys>(event?: Events[T] | ActionContext) =>
       if (result) {
         const data: User | null = result?.data ?? null;
 
-        return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.bot.information'), data);
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No bot information found', null);
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.bot.information.found'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get bot information', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.bot.information'), null);
     }
   };
 
@@ -107,12 +108,12 @@ export const useMe = <T extends EventKeys>(event?: Events[T] | ActionContext) =>
       if (result) {
         const data: User | null = result?.data ?? null;
 
-        return createResult(ResultCode.Ok, 'Successfully retrieved bot information', data);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.bot.information'), data);
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No bot information found', null);
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.bot.information.found'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get bot information', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.bot.information'), null);
     }
   };
 

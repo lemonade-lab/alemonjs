@@ -1,3 +1,15 @@
+import {
+  recordRuntimeError,
+  scopedMap,
+  runtimeNow,
+  runtimeScope,
+  runtimeExecution,
+  trackRuntimeTask,
+  runtimeSetTimeout as setTimeout,
+  runtimeSetInterval as setInterval,
+  runtimeClearTimeout as clearTimeout,
+  runtimeClearInterval as clearInterval
+} from '../../common/runtime-scope.js';
 import { ScheduleId, ScheduleItem, ScheduleMap, ScheduleStatus, ScheduleCallback, CronExpression } from '../../types/schedule';
 import { ResultCode } from '../../common/variable';
 import { CronJob } from 'cron';
@@ -5,14 +17,14 @@ import { CronJob } from 'cron';
 /**
  * 全局定时任务存储
  */
-const scheduleMap: ScheduleMap = new Map();
+const scheduleMap: ScheduleMap = scopedMap();
 
 // ============ 应用目录注册 (用于 stack-based 自动推断) ============
 
 /**
  * appName -> mainDir 映射
  */
-const appDirMap = new Map<string, string>();
+const appDirMap = scopedMap<string, string>();
 
 /**
  * 注册应用目录，loadChild 加载时调用
@@ -55,6 +67,11 @@ const extractCallerPaths = (): string[] => {
  * 遍历栈帧，找到第一个属于已注册应用目录的文件路径
  */
 const resolveAppName = (): string => {
+  const execution = runtimeExecution.getStore();
+
+  if (execution?.appName) {
+    return execution.appName;
+  }
   const callerPaths = extractCallerPaths();
 
   for (const filePath of callerPaths) {
@@ -72,7 +89,7 @@ const resolveAppName = (): string => {
  * 生成唯一 ID
  */
 const generateId = (): ScheduleId => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2, 15);
+  return runtimeNow().toString(36) + Math.random().toString(36).substring(2, 15);
 };
 
 /**
@@ -83,7 +100,7 @@ const safeInvoke = (callback: ScheduleCallback, id: ScheduleId, type: string) =>
     const result = callback();
 
     if (result instanceof Promise) {
-      result.catch(err => {
+      trackRuntimeTask(result).catch(err => {
         logger.error({
           code: ResultCode.Fail,
           message: `Schedule ${type} error [${id}]: ${err?.message ?? err}`,
@@ -92,6 +109,7 @@ const safeInvoke = (callback: ScheduleCallback, id: ScheduleId, type: string) =>
       });
     }
   } catch (err: any) {
+    recordRuntimeError(err);
     logger.error({
       code: ResultCode.Fail,
       message: `Schedule ${type} error [${id}]: ${err?.message ?? err}`,
@@ -124,7 +142,7 @@ export const scheduleInterval = (callback: ScheduleCallback, ms: number, appName
     ms,
     _timer: timer,
     appName: resolvedApp,
-    createdAt: Date.now()
+    createdAt: runtimeNow()
   };
 
   scheduleMap.set(id, item);
@@ -163,7 +181,7 @@ export const scheduleTimeout = (callback: ScheduleCallback, ms: number, appName?
     ms,
     _timer: timer,
     appName: resolvedApp,
-    createdAt: Date.now()
+    createdAt: runtimeNow()
   };
 
   scheduleMap.set(id, item);
@@ -175,6 +193,9 @@ export const scheduleTimeout = (callback: ScheduleCallback, ms: number, appName?
  * 注册 cron 定时任务 (基于 cron 库的 CronJob)
  */
 export const scheduleCron = (expression: CronExpression, callback: ScheduleCallback, appName?: string): ScheduleId => {
+  if (runtimeScope.getStore()?.timers) {
+    throw new Error('Cron schedules require a real clock; use createTestApp({ clock: false })');
+  }
   const resolvedApp = appName ?? resolveAppName();
   const id = generateId();
 
@@ -194,7 +215,7 @@ export const scheduleCron = (expression: CronExpression, callback: ScheduleCallb
     cron: expression,
     _timer: job,
     appName: resolvedApp,
-    createdAt: Date.now()
+    createdAt: runtimeNow()
   };
 
   scheduleMap.set(id, item);

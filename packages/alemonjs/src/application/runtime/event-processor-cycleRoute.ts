@@ -1,3 +1,4 @@
+import { trackRuntimeTask } from '../../common/runtime-scope.js';
 import { Next, Events, EventKeys, ResponseRoute } from '../../types/index.js';
 import { EventMessageText } from '../../common/variable.js';
 import { showErrorModule } from '../../common/index.js';
@@ -95,7 +96,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
   // 开始处理 handler
   const processChildren = (nodes: ResponseRoute[], pendingTail: HandlerNode | null, next: () => Promise<void> | void) => {
     if (!nodes || nodes.length === 0) {
-      void next();
+      void trackRuntimeTask(next());
 
       return;
     }
@@ -105,7 +106,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
     const nextNode = async () => {
       idx++;
       if (idx > nodes.length) {
-        void next();
+        void trackRuntimeTask(next());
 
         return;
       }
@@ -117,14 +118,14 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         if (Array.isArray(node?.platform)) {
           // 不包含
           if (!node?.platform.includes(valueEvent.Platform)) {
-            void nextNode();
+            void trackRuntimeTask(nextNode());
 
             return;
           }
         }
         // string
         if (node.platform !== valueEvent.Platform) {
-          void nextNode();
+          void trackRuntimeTask(nextNode());
 
           return;
         }
@@ -135,7 +136,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         const selects = Array.isArray(node.selects) ? node.selects : [node.selects];
 
         if (!selects.includes(select)) {
-          void nextNode();
+          void trackRuntimeTask(nextNode());
 
           return;
         }
@@ -148,7 +149,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         // 精确匹配（最快，O(1) 字符串比较）
         if (node.exact !== undefined) {
           if (text !== node.exact) {
-            void nextNode();
+            void trackRuntimeTask(nextNode());
 
             return;
           }
@@ -157,7 +158,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         // 前缀匹配（快，O(n) startsWith）
         if (node.prefix !== undefined) {
           if (!text.startsWith(node.prefix)) {
-            void nextNode();
+            void trackRuntimeTask(nextNode());
 
             return;
           }
@@ -166,7 +167,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         // 正则匹配（使用缓存，避免每条消息重编译）
         if (node.regular) {
           if (!getCachedRegExp(node.regular).test(text)) {
-            void nextNode();
+            void trackRuntimeTask(nextNode());
 
             return;
           }
@@ -175,7 +176,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
 
       // 无 handler，继续下一个节点
       if (!node.handler) {
-        void nextNode();
+        void trackRuntimeTask(nextNode());
 
         return;
       }
@@ -186,7 +187,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
       // 有 children → 不执行 handler，只挂链表，递归下去
       if (node.children && node.children.length > 0) {
         processChildren(node.children, currentNode, () => {
-          void nextNode();
+          void trackRuntimeTask(nextNode());
         });
 
         return;
@@ -202,7 +203,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
 
           if (!result.matched) {
             // handler 的 select 不匹配 → 整条路径无效
-            void nextNode();
+            void trackRuntimeTask(nextNode());
 
             return;
           }
@@ -218,7 +219,7 @@ export const createRouteProcessChildren = <T extends EventKeys>(
 
               return;
             }
-            void nextNode();
+            void trackRuntimeTask(nextNode());
           },
           {
             appName: node.appName,
@@ -240,12 +241,12 @@ export const createRouteProcessChildren = <T extends EventKeys>(
 
         if (shouldContinue) {
           // 异常时显式允许继续，才推进后续节点
-          void nextNode();
+          void trackRuntimeTask(nextNode());
         }
       }
     };
 
-    void nextNode();
+    void trackRuntimeTask(nextNode());
   };
 
   return (nodes: ResponseRoute[], _pending: any[], next: () => Promise<void> | void) => {

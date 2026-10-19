@@ -72,3 +72,7 @@ ALEMON_CBP_FILE_DIR=/var/run/alemon/cbp # 可选，默认 .alemon/cbp
 - `qrcode/<LoginId>.png`：当前二维码；二维码刷新或登录完成后自动清理旧文件。
 
 事件文件默认最多保留 200 条且不超过 1 MiB。可用 `ALEMON_CBP_FILE_MAX_EVENTS`（最大 1000）和 `ALEMON_CBP_FILE_MAX_BYTES`（最大 10 MiB）调整上限。二维码 base64 不会写入事件或快照，消费者使用 `QRCode.imagePath` 或 `QRCode.url`。
+
+## 应用单元测试
+
+从 `alemonjs/testing` 导入 `createTestApp`，可离线执行处理器或挂载真实路由与 Context，模拟平台动作，检查消息内容、目标、按钮和发送结果。详见 [应用测试指南](./docs/testing.md)。

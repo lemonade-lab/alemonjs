@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import { EventKeys, Events, Options, Result, ResultCode, User, createResult, getEventOrThrow, sendAction } from './common';
 
 /**
@@ -95,7 +96,7 @@ export const useMention = <T extends EventKeys>(
 
       const data = res.filter(item => match(item, options));
 
-      const result = createResult(ResultCode.Ok, 'Successfully retrieved mention data', data);
+      const result = createResult(ResultCode.Ok, translate('result.successfully.retrieved.mention.data'), data);
 
       return {
         ...result,

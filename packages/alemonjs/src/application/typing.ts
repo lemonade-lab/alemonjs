@@ -1,3 +1,11 @@
+import {
+  runtimeScope,
+  trackRuntimeTask,
+  runtimeSetTimeout as setTimeout,
+  runtimeSetInterval as setInterval,
+  runtimeClearTimeout as clearTimeout,
+  runtimeClearInterval as clearInterval
+} from '../common/runtime-scope.js';
 export type TypingOptions = {
   duration?: number;
   intervalMs?: number;
@@ -29,29 +37,35 @@ export const startTypingIndicator = (send: (duration: number) => Promise<unknown
   let sending = false;
   let interval: ReturnType<typeof setInterval> | undefined;
   let deadline: ReturnType<typeof setTimeout> | undefined;
+  const scope = runtimeScope.getStore();
   const stop = () => {
+    scope?.cleanups.delete(stop);
     stopped = true;
     clearInterval(interval);
     clearTimeout(deadline);
     options.signal?.removeEventListener('abort', stop);
   };
+
+  scope?.cleanups.add(stop);
   const tick = () => {
     if (stopped || sending) {
       return;
     }
     sending = true;
-    void Promise.resolve()
-      .then(() => (stopped ? undefined : send(duration)))
-      .catch(async error => {
-        try {
-          await options.onError?.(error);
-        } catch {
-          // Diagnostics must not turn a failed input indicator into an unhandled rejection.
-        }
-      })
-      .finally(() => {
-        sending = false;
-      });
+    void trackRuntimeTask(
+      Promise.resolve()
+        .then(() => (stopped ? undefined : send(duration)))
+        .catch(async error => {
+          try {
+            await options.onError?.(error);
+          } catch {
+            // Diagnostics must not turn a failed input indicator into an unhandled rejection.
+          }
+        })
+        .finally(() => {
+          sending = false;
+        })
+    );
   };
 
   if (options.signal?.aborted) {

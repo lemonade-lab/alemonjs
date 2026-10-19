@@ -1,10 +1,11 @@
+import { scopedMap, trackRuntimeTask } from '../../common/runtime-scope.js';
 import { Next, Events, Current, EventKeys, FileTreeNode, StoreResponseItem, OnResponseValue } from '../../types/index.js';
 import { showErrorModule, getCachedRegExp } from '../../common/utils.js';
 import { EventMessageText } from '../../common/variable.js';
 import { dispatchEventError } from './event-error';
 
 // 模块缓存，避免每次事件处理都重新 import
-const moduleCache = new Map<string, any>();
+const moduleCache = scopedMap<string, any>();
 
 /**
  * 同步 select 预过滤 — 模块已缓存时 O(1) 跳过不匹配文件
@@ -152,7 +153,7 @@ export const createNextStep = <T extends EventKeys>(
       return;
     }
     // 检查所有
-    void calli();
+    void trackRuntimeTask(calli());
   };
 
   /**
@@ -233,10 +234,10 @@ export const createFileTreeStep = <T extends EventKeys>(
   const processNode = (node: FileTreeNode, done: Next) => {
     if (node.middleware?.path) {
       // 本层有中间件 → 加载并检查
-      void checkMiddleware(node, done);
+      void trackRuntimeTask(checkMiddleware(node, done));
     } else {
       // 无中间件 → 直接处理内容
-      void processContent(node, done);
+      void trackRuntimeTask(processContent(node, done));
     }
   };
 
@@ -247,7 +248,7 @@ export const createFileTreeStep = <T extends EventKeys>(
   const checkMiddleware = async (node: FileTreeNode, done: Next) => {
     // select 预过滤 — 中间件已缓存且不匹配时同步跳过
     if (shouldSkipFile(node.middleware, select, valueEvent)) {
-      void processContent(node, done);
+      void trackRuntimeTask(processContent(node, done));
 
       return;
     }
@@ -261,7 +262,7 @@ export const createFileTreeStep = <T extends EventKeys>(
       node.middleware,
       () => {
         // 中间件模块不匹配（select/regex/state 不对）→ 视为透明，继续处理子树
-        void processContent(node, done);
+        void trackRuntimeTask(processContent(node, done));
       },
       app => {
         matched = true;
@@ -275,7 +276,7 @@ export const createFileTreeStep = <T extends EventKeys>(
     if (matched) {
       if (mwCurrents.length === 0) {
         // 中间件匹配但无 current → 直接通过
-        void processContent(node, done);
+        void trackRuntimeTask(processContent(node, done));
 
         return;
       }
@@ -300,7 +301,7 @@ export const createFileTreeStep = <T extends EventKeys>(
             return;
           }
           // 所有中间件 current 通过 → 继续处理子树
-          void processContent(node, done);
+          void trackRuntimeTask(processContent(node, done));
         },
         {
           appName: node.middleware?.appName,
@@ -350,36 +351,38 @@ export const createFileTreeStep = <T extends EventKeys>(
       return;
     }
 
-    void callHandlerFile(
-      valueEvent,
-      select,
-      file,
-      () => {
-        // 文件不匹配 → 下一个文件
-        processFiles(node, idx + 1, filesDone, treeDone);
-      },
-      app => {
-        const fileCurrents = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
+    void trackRuntimeTask(
+      callHandlerFile(
+        valueEvent,
+        select,
+        file,
+        () => {
+          // 文件不匹配 → 下一个文件
+          processFiles(node, idx + 1, filesDone, treeDone);
+        },
+        app => {
+          const fileCurrents = Array.isArray(app.default.current) ? app.default.current : [app.default.current];
 
-        // 只有文件自身的 handler — 中间件已在树层级门控过
-        callHandler(
-          fileCurrents,
-          (cn, ...cns) => {
-            if (cn) {
-              // handler 调用了 next(true) → 冒泡到上层周期
-              treeDone(true, ...cns);
-            } else {
-              // handler 调用了 next() → 继续处理下一个文件
-              processFiles(node, idx + 1, filesDone, treeDone);
+          // 只有文件自身的 handler — 中间件已在树层级门控过
+          callHandler(
+            fileCurrents,
+            (cn, ...cns) => {
+              if (cn) {
+                // handler 调用了 next(true) → 冒泡到上层周期
+                treeDone(true, ...cns);
+              } else {
+                // handler 调用了 next() → 继续处理下一个文件
+                processFiles(node, idx + 1, filesDone, treeDone);
+              }
+            },
+            {
+              appName: file.appName,
+              phase
             }
-          },
-          {
-            appName: file.appName,
-            phase
-          }
-        );
-      },
-      phase
+          );
+        },
+        phase
+      )
     );
   };
 

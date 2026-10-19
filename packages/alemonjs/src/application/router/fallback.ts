@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import { parseMessageText } from './parser';
 
 export type FallbackHint = {
@@ -142,6 +143,6 @@ export function checkFallbackHint(messageText: string | undefined, routeKeys: st
   return {
     matched: true,
     suggestedKey: bestMatch.key,
-    message: `你输入的内容更接近指令 \`${bestMatch.key}\`，请改用这个指令。`
+    message: translate('fallback.closest', { command: bestMatch.key })
   };
 }

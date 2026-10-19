@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext, MessagingActionMap } from '../../types';
 import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
 import { MemberInfo, PaginationParams, PaginatedResult, Result, ResultCode, createResult, sendAction } from './common';
@@ -34,12 +35,12 @@ export const useMember = (event?: ActionContext) => {
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved member information', result.data ?? null);
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.member.information'), result.data ?? null);
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No member information found', null);
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.member.information.found'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get member information', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.member.information'), null);
     }
   };
 
@@ -52,7 +53,7 @@ export const useMember = (event?: ActionContext) => {
     const guildId = getGuildId(params?.guildId);
 
     if (!guildId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId', { Items: [] });
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid'), { Items: [] });
     }
     try {
       const results = await sendAction({
@@ -62,12 +63,12 @@ export const useMember = (event?: ActionContext) => {
       const result = results.find(item => item.code === ResultCode.Ok);
 
       if (result) {
-        return createResult(ResultCode.Ok, 'Successfully retrieved member list', result.data ?? { Items: [] });
+        return createResult(ResultCode.Ok, translate('result.successfully.retrieved.member.list'), result.data ?? { Items: [] });
       }
 
-      return results[0] || createResult(ResultCode.Warn, 'No member list found', { Items: [] });
+      return results[0] || createResult(ResultCode.Warn, translate('result.no.member.list.found'), { Items: [] });
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to get member list', { Items: [] });
+      return createResult(ResultCode.Fail, translate('result.failed.to.get.member.list'), { Items: [] });
     }
   };
 
@@ -78,7 +79,7 @@ export const useMember = (event?: ActionContext) => {
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.userId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.userid'), null);
     }
     try {
       const results = await sendAction({
@@ -87,9 +88,9 @@ export const useMember = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Kick not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.kick.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to kick member', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.kick.member'), null);
     }
   };
 
@@ -100,7 +101,7 @@ export const useMember = (event?: ActionContext) => {
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.userId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.userid'), null);
     }
     try {
       const results = await sendAction({
@@ -116,9 +117,9 @@ export const useMember = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Ban not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.ban.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to ban member', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.ban.member'), null);
     }
   };
 
@@ -129,7 +130,7 @@ export const useMember = (event?: ActionContext) => {
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.userId) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.userid'), null);
     }
     try {
       const results = await sendAction({
@@ -138,9 +139,9 @@ export const useMember = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Unban not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.unban.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to unban member', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.unban.member'), null);
     }
   };
 
@@ -159,7 +160,7 @@ export const useMember = (event?: ActionContext) => {
     const gid = getGuildId(params.guildId);
 
     if (!gid || !params.keyword) {
-      return createResult(ResultCode.FailParams, 'Missing GuildId or keyword', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.keyword'), null);
     }
     try {
       const results = await sendAction({
@@ -174,9 +175,9 @@ export const useMember = (event?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Member search not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.member.search.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to search members', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.search.members'), null);
     }
   };
 
@@ -203,7 +204,7 @@ export const useMember = (event?: ActionContext) => {
       const gid = getGuildId(params.guildId);
 
       if (!gid || !params.userId) {
-        return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.userid'), null);
       }
       try {
         const results = await sendAction({
@@ -219,9 +220,9 @@ export const useMember = (event?: ActionContext) => {
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Mute not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.mute.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to mute member', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.mute.member'), null);
       }
     },
 
@@ -235,7 +236,7 @@ export const useMember = (event?: ActionContext) => {
       const gid = getGuildId(params.guildId);
 
       if (!gid || !params.userId) {
-        return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.userid'), null);
       }
       try {
         const results = await sendAction({
@@ -251,9 +252,9 @@ export const useMember = (event?: ActionContext) => {
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Admin set not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.admin.set.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to set admin', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.set.admin'), null);
       }
     },
 
@@ -267,7 +268,7 @@ export const useMember = (event?: ActionContext) => {
       const gid = getGuildId(params.guildId);
 
       if (!gid || !params.userId) {
-        return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.userid'), null);
       }
       try {
         const results = await sendAction({
@@ -283,9 +284,9 @@ export const useMember = (event?: ActionContext) => {
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Card set not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.card.set.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to set member card', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.set.member.card'), null);
       }
     },
 
@@ -300,7 +301,7 @@ export const useMember = (event?: ActionContext) => {
       const gid = getGuildId(params.guildId);
 
       if (!gid || !params.userId) {
-        return createResult(ResultCode.FailParams, 'Missing GuildId or UserId', null);
+        return createResult(ResultCode.FailParams, translate('result.missing.guildid.or.userid'), null);
       }
       try {
         const results = await sendAction({
@@ -316,9 +317,9 @@ export const useMember = (event?: ActionContext) => {
         });
         const result = results.find(item => item.code === ResultCode.Ok);
 
-        return result || results[0] || createResult(ResultCode.Warn, 'Title set not supported or failed', null);
+        return result || results[0] || createResult(ResultCode.Warn, translate('result.title.set.not.supported.or.failed'), null);
       } catch {
-        return createResult(ResultCode.Fail, 'Failed to set member title', null);
+        return createResult(ResultCode.Fail, translate('result.failed.to.set.member.title'), null);
       }
     }
   };

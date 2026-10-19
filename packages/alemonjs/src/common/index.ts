@@ -1,3 +1,4 @@
+export * from './i18n.js';
 export * from './config.js';
 export {
   processorRepeatedEventTime,

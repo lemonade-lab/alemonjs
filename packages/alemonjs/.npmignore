@@ -7,3 +7,6 @@ node_modules
 !/index.js
 !/README_CONFIG.md
 !/dist
+!/docs
+/docs/*
+!/docs/testing.md

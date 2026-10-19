@@ -1,3 +1,4 @@
+import { trackRuntimeTask, runtimeScope, runtimeNow } from '../../common/runtime-scope.js';
 import { conversationIdentity } from '../conversation.js';
 import { captureMessageContext, checkMessageRateLimit, startMessageTyping } from './message-processing.js';
 import { getConfigValue } from '../../common/config.js';
@@ -28,7 +29,7 @@ const filter = ({ Now, store, INTERVAL }, MessageId: string) => {
 
     if (Now - time < INTERVAL) {
       // 1s内重复消息
-      store.set(MessageId, Date.now());
+      store.set(MessageId, runtimeNow());
 
       return true;
     }
@@ -45,7 +46,7 @@ const filter = ({ Now, store, INTERVAL }, MessageId: string) => {
       }
     }
   }
-  store.set(MessageId, Date.now());
+  store.set(MessageId, runtimeNow());
 };
 
 /**
@@ -74,7 +75,7 @@ const cleanupStore = ({ Now, store, INTERVAL }): boolean => {
  * 清理所有消息
  */
 const cleanupStoreAll = (): boolean => {
-  const Now = Date.now();
+  const Now = runtimeNow();
   const value = getConfigValue();
   const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
   const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
@@ -100,10 +101,16 @@ const callback = () => {
   // 长度控制在37个以内
   const time = length > processorRepeatedClearSize ? processorRepeatedClearTimeMin : processorRepeatedClearTimeMax;
 
-  setTimeout(callback, time);
+  setTimeout(callback, time).unref?.();
 };
 
-setTimeout(callback, processorRepeatedClearTimeMin);
+let cleanupStarted = false;
+const startProcessorCleanup = () => {
+  if (!cleanupStarted && !runtimeScope.getStore()) {
+    cleanupStarted = true;
+    setTimeout(callback, processorRepeatedClearTimeMin).unref?.();
+  }
+};
 
 /**
  * 消息处理器
@@ -113,177 +120,180 @@ setTimeout(callback, processorRepeatedClearTimeMin);
  * @returns
  */
 export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
-  void withProcessorTrace(name, event, async () => {
-    try {
-      event['name'] = name;
-      event['IsPrivate'] = event['IsPrivate'] ?? name.startsWith('private.');
-      event['IsAtMe'] = event['IsAtMe'] ?? false;
+  startProcessorCleanup();
+  void trackRuntimeTask(
+    withProcessorTrace(name, event, async () => {
+      try {
+        event['name'] = name;
+        event['IsPrivate'] = event['IsPrivate'] ?? name.startsWith('private.');
+        event['IsAtMe'] = event['IsAtMe'] ?? false;
 
-      await dispatchEventStart({
-        event,
-        name
-      });
-      // 禁用规则设置
-      const value = getConfigValue();
-      const disabledTextRegular = value?.disabled_text_regular;
+        await dispatchEventStart({
+          event,
+          name
+        });
+        // 禁用规则设置
+        const value = getConfigValue();
+        const disabledTextRegular = value?.disabled_text_regular;
 
-      // 检查文本禁用规则
-      if (disabledTextRegular && event['MessageText']) {
-        if (getCachedRegExp(disabledTextRegular).test(event['MessageText'])) {
+        // 检查文本禁用规则
+        if (disabledTextRegular && event['MessageText']) {
+          if (getCachedRegExp(disabledTextRegular).test(event['MessageText'])) {
+            finishCurrentTrace('filtered');
+
+            return;
+          }
+        }
+
+        const disabledSelects = value?.disabled_selects ?? {};
+
+        // 检查事件禁用规则
+        if (disabledSelects[name]) {
           finishCurrentTrace('filtered');
 
           return;
         }
-      }
 
-      const disabledSelects = value?.disabled_selects ?? {};
+        const disabledUserId = value?.disabled_user_id;
 
-      // 检查事件禁用规则
-      if (disabledSelects[name]) {
-        finishCurrentTrace('filtered');
+        // 检查用户禁用规则
+        if (event['UserId'] && matchIn(disabledUserId, event['UserId'])) {
+          finishCurrentTrace('filtered');
 
-        return;
-      }
-
-      const disabledUserId = value?.disabled_user_id;
-
-      // 检查用户禁用规则
-      if (event['UserId'] && matchIn(disabledUserId, event['UserId'])) {
-        finishCurrentTrace('filtered');
-
-        return;
-      }
-
-      const disabledUserKey = value?.disabled_user_key;
-
-      // 检查用户禁用规则
-      if (event['UserKey'] && matchIn(disabledUserKey, event['UserKey'])) {
-        finishCurrentTrace('filtered');
-
-        return;
-      }
-
-      const redirectRegular = value?.redirect_regular ?? value?.redirect_text_regular;
-      const redirectTarget = value?.redirect_target ?? value?.redirect_text_target;
-
-      // 检查文本重定向规则
-      if (redirectRegular && redirectTarget && event['MessageText']) {
-        const cachedReg = getCachedRegExp(redirectRegular);
-
-        if (cachedReg.test(event['MessageText'])) {
-          event['MessageText'] = event['MessageText'].replace(cachedReg, redirectTarget);
+          return;
         }
-      }
 
-      const mappingText = value?.mapping_text ?? [];
+        const disabledUserKey = value?.disabled_user_key;
 
-      // 检查文本映射规则
-      if (event['MessageText'] && typeof event['MessageText'] === 'string') {
-        // 消息前后空格
-        event['MessageText'] = event['MessageText'].trim();
-        //
-        for (const mapping of mappingText) {
-          const { regular, target } = mapping ?? {};
+        // 检查用户禁用规则
+        if (event['UserKey'] && matchIn(disabledUserKey, event['UserKey'])) {
+          finishCurrentTrace('filtered');
 
-          if (!regular) {
-            continue;
-          }
-          const cachedReg = getCachedRegExp(regular);
+          return;
+        }
+
+        const redirectRegular = value?.redirect_regular ?? value?.redirect_text_regular;
+        const redirectTarget = value?.redirect_target ?? value?.redirect_text_target;
+
+        // 检查文本重定向规则
+        if (redirectRegular && redirectTarget && event['MessageText']) {
+          const cachedReg = getCachedRegExp(redirectRegular);
 
           if (cachedReg.test(event['MessageText'])) {
-            event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+            event['MessageText'] = event['MessageText'].replace(cachedReg, redirectTarget);
           }
         }
-      } else {
-        // 当 MessageText 为空时，兜底为一个空字符串，避免后续正则判断出错
-        // 也避免开发者忘记了，增加健壮性
-        event['MessageText'] = '';
-      }
 
-      const masterId = value?.master_id;
-      const masterKey = value?.master_key;
+        const mappingText = value?.mapping_text ?? [];
 
-      // 检查是否是 master
-      if (event['UserId'] && matchIn(masterId, event['UserId'])) {
-        event['IsMaster'] = true;
-      } else if (event['UserKey'] && matchIn(masterKey, event['UserKey'])) {
-        event['IsMaster'] = true;
-      }
+        // 检查文本映射规则
+        if (event['MessageText'] && typeof event['MessageText'] === 'string') {
+          // 消息前后空格
+          event['MessageText'] = event['MessageText'].trim();
+          //
+          for (const mapping of mappingText) {
+            const { regular, target } = mapping ?? {};
 
-      const botId = value?.bot_id;
-      const botKey = value?.bot_key;
+            if (!regular) {
+              continue;
+            }
+            const cachedReg = getCachedRegExp(regular);
 
-      // 检查是否是 bot
-      if (event['UserId'] && matchIn(botId, event['UserId'])) {
-        event['IsBot'] = true;
-      } else if (event['UserKey'] && matchIn(botKey, event['UserKey'])) {
-        event['IsBot'] = true;
-      }
-
-      const Now = Date.now();
-      const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
-
-      if (event['MessageId']) {
-        // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
-        const MessageId = fastHash(JSON.stringify([event.Platform, event.BotId, conversationIdentity(event), event['MessageId']]));
-
-        // 重复消息
-        if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
-          finishCurrentTrace('filtered');
-
-          return;
-        }
-      }
-
-      const isMessage = name === 'message.create' || name === 'private.message.create';
-
-      if (isMessage) {
-        await captureMessageContext(event, value?.processor ?? {});
-      }
-
-      const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
-
-      if (event['UserId'] && !(isMessage && value?.processor?.rateLimit?.sender)) {
-        // FNV-1a 快速哈希
-        const UserId = fastHash(JSON.stringify([event.Platform, event.BotId, event['UserId']]));
-
-        // 频繁操作
-        if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
-          finishCurrentTrace('filtered');
-
-          return;
-        }
-      }
-
-      if (isMessage) {
-        const decision = checkMessageRateLimit(event, value?.processor ?? {});
-
-        if (decision.allowed === false) {
-          try {
-            await value?.processor?.rateLimit?.onLimit?.(event, decision);
-          } catch {
-            logger.warn('[rate-limit] onLimit callback failed');
+            if (cachedReg.test(event['MessageText'])) {
+              event['MessageText'] = event['MessageText'].replace(cachedReg, target);
+            }
           }
-          finishCurrentTrace('filtered');
-
-          return;
+        } else {
+          // 当 MessageText 为空时，兜底为一个空字符串，避免后续正则判断出错
+          // 也避免开发者忘记了，增加健壮性
+          event['MessageText'] = '';
         }
-      }
 
-      if (data) {
-        // 直接赋值 — 避免 defineProperty 破坏 V8 Hidden Class 优化
-        event['value'] = data;
-      }
+        const masterId = value?.master_id;
+        const masterKey = value?.master_key;
 
-      if (isMessage) {
-        startMessageTyping(event, value?.processor ?? {});
+        // 检查是否是 master
+        if (event['UserId'] && matchIn(masterId, event['UserId'])) {
+          event['IsMaster'] = true;
+        } else if (event['UserKey'] && matchIn(masterKey, event['UserKey'])) {
+          event['IsMaster'] = true;
+        }
+
+        const botId = value?.bot_id;
+        const botKey = value?.bot_key;
+
+        // 检查是否是 bot
+        if (event['UserId'] && matchIn(botId, event['UserId'])) {
+          event['IsBot'] = true;
+        } else if (event['UserKey'] && matchIn(botKey, event['UserKey'])) {
+          event['IsBot'] = true;
+        }
+
+        const Now = runtimeNow();
+        const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
+
+        if (event['MessageId']) {
+          // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
+          const MessageId = fastHash(JSON.stringify([event.Platform, event.BotId, conversationIdentity(event), event['MessageId']]));
+
+          // 重复消息
+          if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
+            finishCurrentTrace('filtered');
+
+            return;
+          }
+        }
+
+        const isMessage = name === 'message.create' || name === 'private.message.create';
+
+        if (isMessage) {
+          await captureMessageContext(event, value?.processor ?? {});
+        }
+
+        const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
+
+        if (event['UserId'] && !(isMessage && value?.processor?.rateLimit?.sender)) {
+          // FNV-1a 快速哈希
+          const UserId = fastHash(JSON.stringify([event.Platform, event.BotId, event['UserId']]));
+
+          // 频繁操作
+          if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
+            finishCurrentTrace('filtered');
+
+            return;
+          }
+        }
+
+        if (isMessage) {
+          const decision = checkMessageRateLimit(event, value?.processor ?? {});
+
+          if (decision.allowed === false) {
+            try {
+              await value?.processor?.rateLimit?.onLimit?.(event, decision);
+            } catch {
+              logger.warn('[rate-limit] onLimit callback failed');
+            }
+            finishCurrentTrace('filtered');
+
+            return;
+          }
+        }
+
+        if (data) {
+          // 直接赋值 — 避免 defineProperty 破坏 V8 Hidden Class 优化
+          event['value'] = data;
+        }
+
+        if (isMessage) {
+          startMessageTyping(event, value?.processor ?? {});
+        }
+        expendCycle(event, name, value);
+      } catch (error) {
+        finishCurrentTrace('error');
+        throw error;
       }
-      expendCycle(event, name, value);
-    } catch (error) {
-      finishCurrentTrace('error');
-      throw error;
-    }
-  });
+    })
+  );
 };
 
 /**

@@ -1,3 +1,4 @@
+import { scopedMap, scopedSet } from '../common/runtime-scope.js';
 /**
  * Expose — 插件间协议通信系统
  *
@@ -17,16 +18,16 @@ interface ProviderEntry {
 }
 
 /** 按 protocol 分组的存储: Map<protocol, Map<appName, ProviderEntry>> */
-const storeExpose = new Map<string, Map<string, ProviderEntry>>();
+const storeExpose = scopedMap<string, Map<string, ProviderEntry>>();
 
 /** watch 回调列表 */
 type WatchCallback = (event: ExposeWatchEvent) => void;
 
 /** 按 protocol 存放的 watcher */
-const protocolWatchers = new Map<string, Set<WatchCallback>>();
+const protocolWatchers = scopedMap<string, Set<WatchCallback>>();
 
 /** 全局 watcher（不指定 protocol 的） */
-const globalWatchers = new Set<WatchCallback>();
+const globalWatchers = scopedSet<WatchCallback>();
 
 // ═══════════════════════════════════════════════════
 // 触发 watcher

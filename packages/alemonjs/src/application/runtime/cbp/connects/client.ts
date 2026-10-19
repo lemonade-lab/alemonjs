@@ -1,3 +1,4 @@
+import { translate } from '../../../../common/i18n.js';
 import * as flattedJSON from 'flatted';
 import { onProcessor } from '../../event-processor.js';
 import { FULL_RECEIVE_HEADER, ResultCode, createResult, createWSConnector } from '../../../../common/index.js';
@@ -38,7 +39,7 @@ const handleInboundMessage = (message: unknown) => {
       if (Array.isArray(normalized.results)) {
         resolve(normalized.results);
       } else {
-        resolve([createResult(ResultCode.Fail, '接口处理错误', null)]);
+        resolve([createResult(ResultCode.Fail, translate('result.api.processing.failed'), null)]);
       }
     }
   } else if (normalized.kind === 'action.res') {
@@ -56,7 +57,7 @@ const handleInboundMessage = (message: unknown) => {
       if (Array.isArray(normalized.results)) {
         resolve(normalized.results);
       } else {
-        resolve([createResult(ResultCode.Fail, '消费处理错误', null)]);
+        resolve([createResult(ResultCode.Fail, translate('result.action.processing.failed'), null)]);
       }
     }
   } else if (normalized.kind === 'event') {

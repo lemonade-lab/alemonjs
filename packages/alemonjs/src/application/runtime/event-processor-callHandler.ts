@@ -1,3 +1,4 @@
+import { trackRuntimeTask } from '../../common/runtime-scope.js';
 import { showErrorModule } from '../../common/index.js';
 import { finishCurrentTrace, withEventContext } from './hook-event-context';
 import { dispatchEventError } from './event-error';
@@ -74,10 +75,10 @@ export const createCallHandler = valueEvent => {
       }
 
       ++index;
-      void start();
+      void trackRuntimeTask(start());
     };
 
-    void start();
+    void trackRuntimeTask(start());
   };
 
   return callHandler;

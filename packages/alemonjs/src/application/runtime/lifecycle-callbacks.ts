@@ -1,3 +1,5 @@
+import { getRuntimeCore } from './store.js';
+
 import { showErrorModule } from '../../common/utils.js';
 import type { EventFinishedContext, EventStartContext, HttpErrorContext, StoreChildrenApp, RuntimeStatusChangeContext } from '../../types/index.js';
 
@@ -6,11 +8,11 @@ const swallowLifecycleError = (error: unknown) => {
 };
 
 const getChildrenApps = (): StoreChildrenApp[] => {
-  return Object.values(global.alemonjsCore?.storeChildrenApp ?? {});
+  return Object.values(getRuntimeCore()?.storeChildrenApp ?? {});
 };
 
 const getChildrenApp = (name: string): StoreChildrenApp | null => {
-  return global.alemonjsCore?.storeChildrenApp?.[name] ?? null;
+  return getRuntimeCore()?.storeChildrenApp?.[name] ?? null;
 };
 
 export const dispatchEventStart = async (context: EventStartContext) => {

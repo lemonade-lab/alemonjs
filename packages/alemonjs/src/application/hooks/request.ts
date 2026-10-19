@@ -1,3 +1,4 @@
+import { translate } from '../../common/i18n.js';
 import type { ActionContext, MessagingActionMap } from '../../types';
 import { createActionCaller, resolveActionContext } from './action-context';
 import { Result, ResultCode, createResult, sendAction } from './common';
@@ -16,7 +17,7 @@ export const useRequest = (context?: ActionContext) => {
    */
   const friend = async (params: { flag: string; approve: boolean; remark?: string }): Promise<Result> => {
     if (!params.flag) {
-      return createResult(ResultCode.FailParams, 'Missing flag', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.flag'), null);
     }
     try {
       const results = await sendAction({
@@ -25,9 +26,9 @@ export const useRequest = (context?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Friend request handling not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.friend.request.handling.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to handle friend request', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.handle.friend.request'), null);
     }
   };
 
@@ -40,7 +41,7 @@ export const useRequest = (context?: ActionContext) => {
    */
   const guild = async (params: { flag: string; subType: string; approve: boolean; reason?: string }): Promise<Result> => {
     if (!params.flag || !params.subType) {
-      return createResult(ResultCode.FailParams, 'Missing flag or subType', null);
+      return createResult(ResultCode.FailParams, translate('result.missing.flag.or.subtype'), null);
     }
     try {
       const results = await sendAction({
@@ -49,9 +50,9 @@ export const useRequest = (context?: ActionContext) => {
       });
       const result = results.find(item => item.code === ResultCode.Ok);
 
-      return result || results[0] || createResult(ResultCode.Warn, 'Guild request handling not supported or failed', null);
+      return result || results[0] || createResult(ResultCode.Warn, translate('result.guild.request.handling.not.supported.or.failed'), null);
     } catch {
-      return createResult(ResultCode.Fail, 'Failed to handle guild request', null);
+      return createResult(ResultCode.Fail, translate('result.failed.to.handle.guild.request'), null);
     }
   };
 
