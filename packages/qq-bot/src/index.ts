@@ -24,3 +24,6 @@ const main = () => {
 };
 
 export default definePlatform({ main });
+
+export { sanitizeQQText } from './text-sanitizer.js';
+export type { QQTextSanitizerOptions } from './text-sanitizer.js';

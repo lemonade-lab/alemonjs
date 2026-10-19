@@ -1,3 +1,5 @@
+import { conversationIdentity } from '../conversation.js';
+import { captureMessageContext, checkMessageRateLimit, startMessageTyping } from './message-processing.js';
 import { getConfigValue } from '../../common/config.js';
 import {
   processorRepeatedClearSize,
@@ -113,6 +115,10 @@ setTimeout(callback, processorRepeatedClearTimeMin);
 export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data?: any) => {
   void withProcessorTrace(name, event, async () => {
     try {
+      event['name'] = name;
+      event['IsPrivate'] = event['IsPrivate'] ?? name.startsWith('private.');
+      event['IsAtMe'] = event['IsAtMe'] ?? false;
+
       await dispatchEventStart({
         event,
         name
@@ -219,7 +225,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
       if (event['MessageId']) {
         // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
-        const MessageId = fastHash(event['MessageId']);
+        const MessageId = fastHash(JSON.stringify([event.Platform, event.BotId, conversationIdentity(event), event['MessageId']]));
 
         // 重复消息
         if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
@@ -229,14 +235,35 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
         }
       }
 
+      const isMessage = name === 'message.create' || name === 'private.message.create';
+
+      if (isMessage) {
+        await captureMessageContext(event, value?.processor ?? {});
+      }
+
       const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
 
-      if (event['UserId']) {
+      if (event['UserId'] && !(isMessage && value?.processor?.rateLimit?.sender)) {
         // FNV-1a 快速哈希
-        const UserId = fastHash(event['UserId']);
+        const UserId = fastHash(JSON.stringify([event.Platform, event.BotId, event['UserId']]));
 
         // 频繁操作
         if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
+          finishCurrentTrace('filtered');
+
+          return;
+        }
+      }
+
+      if (isMessage) {
+        const decision = checkMessageRateLimit(event, value?.processor ?? {});
+
+        if (decision.allowed === false) {
+          try {
+            await value?.processor?.rateLimit?.onLimit?.(event, decision);
+          } catch {
+            logger.warn('[rate-limit] onLimit callback failed');
+          }
           finishCurrentTrace('filtered');
 
           return;
@@ -248,10 +275,9 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
         event['value'] = data;
       }
 
-      event['name'] = name;
-      event['IsPrivate'] = event['IsPrivate'] ?? name.startsWith('private.');
-      event['IsAtMe'] = event['IsAtMe'] ?? false;
-
+      if (isMessage) {
+        startMessageTyping(event, value?.processor ?? {});
+      }
       expendCycle(event, name, value);
     } catch (error) {
       finishCurrentTrace('error');

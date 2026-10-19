@@ -1,3 +1,6 @@
+import type { ConversationOptions } from '../application/conversation.js';
+import type { RateLimitOptions } from '../application/rate-limit.js';
+import type { TypingOptions } from '../application/typing.js';
 import { readFileSync, existsSync, watch, writeFileSync, mkdirSync, FSWatcher } from 'fs';
 import { dirname, isAbsolute, join } from 'path';
 import YAML from 'yaml';
@@ -25,6 +28,11 @@ type ConfigValue = {
   processor?: {
     repeated_event_time?: number;
     repeated_user_time?: number;
+    /** Opt-in observed message history, quote index and prompt context. */
+    conversation?: ConversationOptions;
+    rateLimit?: RateLimitOptions;
+    /** Automatic QQ C2C input notifications; explicit tasks can use withTyping. */
+    autoTyping?: Omit<TypingOptions, 'signal' | 'onError'>;
   };
 };
 

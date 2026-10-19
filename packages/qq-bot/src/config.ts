@@ -1,9 +1,12 @@
+import type { QQTextSanitizerOptions } from './text-sanitizer.js';
 import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
 import { Options as sdkOptions } from './sdk/typing';
 export const platform = 'qq-bot';
 export const platformFullName = '@alemonjs/qq-bot';
 
 export type Options = {
+  /** Opt-in QQ markup normalization; raw content remains available. */
+  textSanitizer?: QQTextSanitizerOptions;
   /** 按钮/快捷菜单自动 ACK。设为 false 后由应用 useInteraction().ack() 回应。 */
   autoInteractionAck?: boolean;
   /**

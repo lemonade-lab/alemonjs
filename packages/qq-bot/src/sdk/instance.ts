@@ -1,112 +1,33 @@
-import { AxiosInstance } from 'axios';
-import { type AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { logger } from 'alemonjs';
 
-const filterHeaders = (headers = {}) => {
-  if (!headers) {
-    return headers;
+/** Log an allowlist of diagnostics. Axios config/request objects may contain
+ * credentials, signed URLs, message bodies, buffers and circular references. */
+const loggerError = (err: any) => {
+  const config = err?.config;
+  let path: string | undefined;
+
+  try {
+    // Never log URL credentials, query parameters or fragments.
+    path = new URL(config?.url ?? '', config?.baseURL || 'http://localhost').pathname;
+  } catch {
+    path = undefined;
   }
-  const filtered = {};
-  const sensitiveKeys = [/^authorization$/i, /^cookie$/i, /^set-cookie$/i, /token/i, /key/i, /jwt/i, /^session[-_]id$/i, /^uid$/i, /^user[-_]id$/i];
+  const headers = err?.response?.headers;
+  const data = err?.response?.data;
+  const scalarCode = (value: unknown) => (typeof value === 'number' || (typeof value === 'string' && /^[\w-]{1,64}$/.test(value)) ? value : undefined);
 
-  for (const key in headers) {
-    if (/^_/.test(key)) {
-      continue; // 跳过 _ 开头
-    }
-    // 去掉 Symbol 类型的 key
-    if (typeof key === 'symbol') {
-      continue;
-    }
-    // 去掉函数
-    if (typeof headers[key] === 'function') {
-      continue;
-    }
-    // 如果是敏感字段全部替换为 ******
-    if (sensitiveKeys.some(re => re.test(key))) {
-      filtered[key] = '******';
-    } else {
-      filtered[key] = headers[key];
-    }
-  }
-
-  return filtered;
-};
-
-const filterConfig = (config = {}) => {
-  if (!config) {
-    return config;
-  }
-  const filtered = {};
-
-  for (const key in config) {
-    if (/^_/.test(key)) {
-      continue; // 跳过 _ 开头
-    }
-    // 去掉 Symbol 类型的 key
-    if (typeof key === 'symbol') {
-      continue;
-    }
-    // 去掉函数
-    if (typeof config[key] === 'function') {
-      continue;
-    }
-    filtered[key] = config[key];
-  }
-
-  return filtered;
-};
-
-const filterRequest = (request = {}) => {
-  if (!request) {
-    return request;
-  }
-  const filtered = {};
-
-  for (const key in request) {
-    if (/^_/.test(key)) {
-      continue; // 跳过 _ 开头
-    }
-    // 去掉 Symbol 类型的 key
-    if (typeof key === 'symbol') {
-      continue;
-    }
-    // 去掉函数
-    if (typeof request[key] === 'function') {
-      continue;
-    }
-    filtered[key] = request[key];
-  }
-
-  return filtered;
-};
-
-// 处理axios错误
-const loggerError = err => {
-  // 错误时的请求头
-  logger.error('[axios] error', {
-    config: {
-      headers: filterHeaders(err?.config?.headers),
-      params: err?.config?.params,
-      data: err?.config?.data
-    },
-    response: {
-      status: err?.response?.status,
-      statusText: err?.response?.statusText,
-      headers: filterHeaders(err?.response?.headers),
-      config: filterConfig(err?.response?.config),
-      request: filterRequest(err?.response?.request),
-      data: err?.response?.data
-    },
-    message: err?.message
+  logger.error('[qq-bot] HTTP request failed', {
+    method: typeof config?.method === 'string' ? config.method.toUpperCase() : undefined,
+    path,
+    status: err?.response?.status,
+    code: scalarCode(data?.code ?? data?.err_code),
+    transportCode: scalarCode(err?.code),
+    traceId: headers?.['x-tps-trace-id'] ?? headers?.['x-trace-id']
   });
 };
 
-/**
- * 基础请求
- * @param service
- * @param options
- * @returns
- */
+/** Preserve native platform failure payloads for existing SDK and Action callers. */
 export const createAxiosInstance = async (service: AxiosInstance, options: AxiosRequestConfig): Promise<any> => {
   try {
     const res = await service(options);
@@ -114,7 +35,6 @@ export const createAxiosInstance = async (service: AxiosInstance, options: Axios
     return res?.data ?? {};
   } catch (err) {
     loggerError(err);
-    // 丢出错误中携带的响应数据
     throw err?.response?.data ?? err;
   }
 };

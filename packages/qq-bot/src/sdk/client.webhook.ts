@@ -109,7 +109,15 @@ export class QQBotClient extends QQBotAPI {
       if (!ws) {
         void this.#setTimeoutBotConfig();
         this.#app = new Koa();
-        this.#app.use(bodyParser());
+        this.#app.use(
+          bodyParser({
+            enableTypes: ['json'],
+            onerror: (_error, ctx) => {
+              ctx.status = 400;
+              ctx.body = { msg: 'invalid json' };
+            }
+          })
+        );
         const router = new Router();
         const port = this.config.get('port');
         const secret = this.config.get('secret');
@@ -122,29 +130,34 @@ export class QQBotClient extends QQBotAPI {
           secret: cfg.secret
         });
 
-        this.#app.use(async (ctx, next) => {
-          let rawData = '';
-
-          ctx.req.on('data', chunk => (rawData += chunk));
-          ctx.req.on('end', () => ((ctx.request as typeof ctx.request & { rawBody: string }).rawBody = rawData));
-          await next();
-        });
         // 启动服务
         router.post(route, ctx => {
-          const sign = ctx.req.headers['x-signature-ed25519'];
-          const timestamp = ctx.req.headers['x-signature-timestamp'];
-          const rawBody = (ctx.request as typeof ctx.request & { rawBody: string }).rawBody;
-          const isValid = ntqqWebhook.validSign(timestamp, rawBody, String(sign));
+          // koa-bodyparser retains the original JSON text. The request stream
+          // has already ended here; listening again cannot recover its bytes.
+          const request = ctx.request as typeof ctx.request & { body: Data; rawBody?: string };
+          const body = request.body;
 
-          if (!isValid) {
+          if (!body || typeof body !== 'object' || Array.isArray(body) || !Number.isInteger(body.op)) {
+            ctx.status = 400;
+            ctx.body = { msg: 'invalid payload' };
+
+            return;
+          }
+          // Callback URL validation precedes signed event delivery, as in the
+          // official SDK. Only op:13 may omit signature headers.
+          if (body.op !== 13 && !ntqqWebhook.validSign(ctx.get('x-signature-timestamp'), request.rawBody, ctx.get('x-signature-ed25519'))) {
             ctx.status = 400;
             ctx.body = { msg: 'invalid signature' };
 
             return;
           }
-          const body = normalizeGatewayMessage((ctx.request as typeof ctx.request & { body: Data }).body);
+          if (body.op === 13) {
+            if (typeof body.d?.plain_token !== 'string' || !body.d.plain_token || typeof body.d?.event_ts !== 'string' || !body.d.event_ts) {
+              ctx.status = 400;
+              ctx.body = { msg: 'invalid validation' };
 
-          if (+body.op === 13) {
+              return;
+            }
             ctx.status = 200;
             ctx.body = {
               // 返回明文 token
@@ -152,12 +165,17 @@ export class QQBotClient extends QQBotAPI {
               // 生成签名
               signature: ntqqWebhook.getSign(body.d.event_ts, body.d.plain_token)
             };
-          } else if (+body.op === 0) {
+          } else if (body.op === 0) {
+            if (typeof body.t !== 'string' || !body.t || !body.d || typeof body.d !== 'object' || Array.isArray(body.d)) {
+              ctx.status = 400;
+              ctx.body = { msg: 'invalid dispatch' };
+
+              return;
+            }
+            normalizeGatewayMessage(body);
             ctx.status = 204;
             // 根据事件类型，处理事件
-            for (const event of this.#events[body.t] || []) {
-              event(body.d);
-            }
+            this.#dispatch(body);
             const accessToken = this.config.get('access_token');
 
             // 也可以分法到客户端。 发送失败需要处理 或清理调
@@ -197,9 +215,7 @@ export class QQBotClient extends QQBotAPI {
             try {
               const body = normalizeGatewayMessage(JSON.parse(message.toString()) as Data);
 
-              for (const event of this.#events[body.t] || []) {
-                event(body.d);
-              }
+              this.#dispatch(body);
             } catch (e) {
               this.#error(e);
             }
@@ -228,9 +244,7 @@ export class QQBotClient extends QQBotAPI {
               if (accessToken) {
                 this.config.set('access_token', accessToken);
               }
-              for (const event of this.#events[body.t] || []) {
-                event(body.d);
-              }
+              this.#dispatch(body);
             } catch (e) {
               this.#error(e);
             }
@@ -259,15 +273,25 @@ export class QQBotClient extends QQBotAPI {
     }
   }
 
+  /** Acknowledge receipt without waiting for application work. Each listener
+   * owns its failure path so a rejection cannot escape the transport. */
+  #dispatch(body: Data) {
+    for (const event of this.#events[body.t] || []) {
+      void Promise.resolve()
+        .then(() => event(body.d))
+        .catch(error => this.#error(error));
+    }
+  }
+
   /**
    *
    * @param error
    */
   #error(error) {
-    if (this.#events['ERROR']) {
-      for (const event of this.#events['ERROR'] || []) {
-        event(error);
-      }
+    for (const event of this.#events['ERROR'] || []) {
+      void Promise.resolve()
+        .then(() => event(error))
+        .catch(failure => console.error('[qq-bot] ERROR listener failed', failure instanceof Error ? failure.name : 'UnknownError'));
     }
   }
 }

@@ -9,6 +9,10 @@ AlemonJS 的 QQ 开放平台适配器，用于连接官方机器人接口，将 
 - 提供群管理、媒体上传和单聊流式消息能力；具体能力以平台权限为准。
 - 支持 WebSocket、Webhook 连接，以及 WebSocket 多机器人配置。
 
+官方 Node SDK 的对照结果、已落实修复和后续框架改进见 [SDK 对照与改进](./SDK_REVIEW.md)。
+
+三层限流、QQ 文本清洗、引用索引、群历史、LLM 上下文和 C2C 自动 typing 的配置与用法见 [消息处理与会话上下文](../alemonjs/docs/message-context.md)。
+
 ## 配置
 
 ### 基础配置

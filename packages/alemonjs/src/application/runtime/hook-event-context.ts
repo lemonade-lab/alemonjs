@@ -10,6 +10,7 @@ type EventTrace<T extends EventKeys = EventKeys> = {
   select: T;
   startTime: number;
   ended: boolean;
+  cleanups: Set<() => void>;
   finish: (reason: EventTraceReason) => void;
 };
 
@@ -77,29 +78,40 @@ const createEventTrace = <T extends EventKeys>(select: T): EventTrace<T> => {
     select,
     startTime: performance.now(),
     ended: false,
+    cleanups: new Set(),
     finish(reason) {
       if (trace.ended) {
         return;
       }
 
       trace.ended = true;
+      for (const cleanup of trace.cleanups) {
+        try {
+          cleanup();
+        } catch {
+          // Cleanup failure must not prevent other resources from being released.
+        }
+      }
+      trace.cleanups.clear();
 
       const store = eventStore.getStore();
       const event = store?.event as Events[T];
       const duration = Number((performance.now() - trace.startTime).toFixed(2));
 
-      if (!event || !shouldShowLog(event)) {
+      if (!event) {
         return;
       }
 
-      if (process.env.NODE_ENV === 'development') {
-        logger.debug({
-          code: ResultCode.Ok,
-          message: 'event processor finished',
-          data: createLogData(event, trace.select, reason, duration)
-        });
-      } else {
-        logger.info(createLogText(event, trace.select, reason, duration));
+      if (shouldShowLog(event)) {
+        if (process.env.NODE_ENV === 'development') {
+          logger.debug({
+            code: ResultCode.Ok,
+            message: 'event processor finished',
+            data: createLogData(event, trace.select, reason, duration)
+          });
+        } else {
+          logger.info(createLogText(event, trace.select, reason, duration));
+        }
       }
       void dispatchEventFinished({
         event,
@@ -271,4 +283,18 @@ export const recordEventSendResults = <T extends EventKeys>(results: Result[], e
   if (firstError) {
     markEventSendFailure(firstError, event);
   }
+};
+
+/** Register synchronous resource cleanup independently of log visibility. */
+export const onCurrentEventFinished = (cleanup: () => void): boolean => {
+  const trace = eventStore.getStore()?.trace;
+
+  if (!trace || trace.ended) {
+    cleanup();
+
+    return false;
+  }
+  trace.cleanups.add(cleanup);
+
+  return true;
 };

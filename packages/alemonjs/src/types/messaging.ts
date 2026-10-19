@@ -170,6 +170,8 @@ export type ReceivedMessage = {
   }[];
 };
 export type StandardEventDetails = {
+  /** Protocol text before optional adapter sanitization. */
+  RawMessageText?: string;
   Target?: ActionTarget;
   Notice?:
     | { type: 'join-request'; request: JoinRequestInfo }

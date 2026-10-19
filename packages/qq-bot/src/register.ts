@@ -1,3 +1,4 @@
+import { sanitizeQQText } from './text-sanitizer.js';
 import { handleFrameworkAction } from './framework-actions';
 import { normalizeFrameworkEvent, normalizeMessageUser } from './framework-events';
 import type { ActionTarget, DataEnums, MessageMediaItem, MediaReceipt, BotInfo, User } from 'alemonjs';
@@ -71,7 +72,19 @@ export const register = (
   const port = process.env?.port || config?.port || 17117;
   const url = `ws://127.0.0.1:${port}`;
   const cbp = options?.cbp ?? cbpPlatform(url);
-  const emit = (event: Parameters<typeof normalizeFrameworkEvent>[0], acknowledged = false) => cbp.send(normalizeFrameworkEvent(event, acknowledged));
+  const emit = (event: Parameters<typeof normalizeFrameworkEvent>[0], acknowledged = false) => {
+    const normalized = normalizeFrameworkEvent(event, acknowledged);
+
+    if (
+      config.textSanitizer &&
+      (normalized.name === 'message.create' || normalized.name === 'private.message.create') &&
+      typeof normalized.value?.content === 'string'
+    ) {
+      normalized.RawMessageText = normalized.value.content;
+      normalized.MessageText = sanitizeQQText(normalized.value.content, botId, config.textSanitizer);
+    }
+    cbp.send(normalized);
+  };
 
   /**
    * group

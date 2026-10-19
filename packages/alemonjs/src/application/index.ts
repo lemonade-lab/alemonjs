@@ -68,6 +68,7 @@ export {
   getCurrentAppName,
   getCurrentPhase,
   finishCurrentTrace,
+  onCurrentEventFinished,
   markEventSendAttempt,
   markEventSendSuccess,
   markEventSendFailure,
@@ -87,3 +88,7 @@ export {
   scheduleList
 } from './runtime/schedule-store.js';
 export { cbpClient } from './runtime/cbp/index.js';
+
+export * from './conversation.js';
+export * from './rate-limit.js';
+export * from './typing.js';

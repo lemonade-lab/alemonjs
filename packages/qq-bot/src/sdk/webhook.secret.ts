@@ -13,14 +13,24 @@ export class WebhookAPI {
    * @param sign
    * @returns
    */
-  validSign(ts, body, sign) {
-    const { publicKey } = this.getKey();
-    const sig = Buffer.isBuffer(sign) ? sign : Buffer.from(sign, 'hex');
-    const httpBody = Buffer.from(body);
-    const msg = Buffer.from(ts + httpBody);
+  validSign(ts: unknown, body: unknown, sign: unknown): boolean {
+    if (typeof ts !== 'string' || !ts || (typeof body !== 'string' && !Buffer.isBuffer(body))) {
+      return false;
+    }
+    if (!Buffer.isBuffer(sign) && (typeof sign !== 'string' || !/^[a-f\d]{128}$/i.test(sign))) {
+      return false;
+    }
+    try {
+      const { publicKey } = this.getKey();
+      const sig = Buffer.isBuffer(sign) ? sign : Buffer.from(sign, 'hex');
+      const msg = Buffer.concat([Buffer.from(ts), Buffer.isBuffer(body) ? body : Buffer.from(body)]);
 
-    return ed25519.verify(sig, msg, publicKey);
+      return ed25519.verify(sig, msg, publicKey);
+    } catch {
+      return false;
+    }
   }
+
   /**
    *   生成签名
    * @param eventTs

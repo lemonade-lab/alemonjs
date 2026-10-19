@@ -1,3 +1,4 @@
+import { runWithTyping, type TypingOptions } from '../typing.js';
 import type { ActionContext, OutgoingMessage, MessageDelivery, MessagingActionMap, MessageReceipt } from '../../types';
 import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
 import { logger } from '../../common/logger.js';
@@ -89,6 +90,8 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
   };
 
   const lightweight = {
+    /** Keep input notifications alive for an explicitly awaited business task. */
+    withTyping: <R>(task: () => Promise<R>, options?: TypingOptions) => runWithTyping(duration => call('message.typing', { duration }), task, options),
     typing: (params: MessagingActionMap['message.typing'][0] = {}) => call('message.typing', params),
     stream: (params: MessagingActionMap['message.stream'][0]) => call('message.stream', params),
     /**
