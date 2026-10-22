@@ -1,3 +1,4 @@
+import type { MediaImage, MediaResource, MediaUsage, MediaSourceInput, MediaResourcePage, MediaCapabilities } from './media-resource';
 import type { ActionTarget } from './actions';
 import type { PaginationParams, PaginatedResult } from './standard';
 
@@ -187,6 +188,11 @@ export type StandardEventDetails = {
 
 /** Semantic actions used by hooks; adapters translate wire formats. */
 export type MessagingActionMap = {
+  'media.resource.resolve': [{ image: MediaImage; usage: MediaUsage; target?: ActionTarget }, MediaResource];
+  'media.resource.upload': [{ type: 'image'; source: MediaSourceInput; usage: MediaUsage; target?: ActionTarget }, MediaResource];
+  'media.resource.list': [{ usage: MediaUsage; cursor?: string }, MediaResourcePage];
+  'media.resource.delete': [{ resource: MediaResource }, unknown];
+  'media.resource.capabilities': [Record<string, never>, MediaCapabilities];
   'menu.get': [Record<string, never>, { menu?: Menu; version: number }];
   'menu.set': [{ menu: Menu }, { version: number }];
   'panel.list': [{ scope: NonChannelConversationScope; pagination?: PaginationParams }, PaginatedResult<PanelInfo>];

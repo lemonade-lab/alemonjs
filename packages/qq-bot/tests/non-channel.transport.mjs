@@ -63,7 +63,7 @@ const wsClient = new QQBotClients({
 attach(wsClient);
 wsClient.gateway = async () => ({ url: `ws://127.0.0.1:${gateway.address().port}` });
 wsClient.connect();
-await wait(() => events.length >= 2);
+await wait(() => events.some(event => event.name === 'private.interaction.create') && events.some(event => event._tag === 'SUBSCRIBE_MESSAGE_STATUS'));
 const wsInteraction = events.find(event => event.name === 'private.interaction.create');
 assert.equal(wsInteraction.MessageId, 'envelope');
 assert.equal(wsInteraction.InteractionId, 'interaction');
@@ -91,12 +91,15 @@ const post = async body => {
     body: raw
   });
 };
+const webhookStart = events.length;
 assert.equal((await post(packet)).status, 204);
-await wait(() => events.length >= 3);
-assert.equal(events[2].MessageId, 'envelope');
-assert.equal(events[2].InteractionId, 'interaction');
+await wait(() => events.slice(webhookStart).some(event => event.name === 'private.interaction.create'));
+const webhookInteraction = events.slice(webhookStart).find(event => event.name === 'private.interaction.create');
+assert.equal(webhookInteraction.MessageId, 'envelope');
+assert.equal(webhookInteraction.InteractionId, 'interaction');
 assert.equal((await post({ op: 0, t: 'SUBSCRIBE_MESSAGE_STATUS', id: 'sub', d: { group_openid: 'group', result: [] } })).status, 204);
-assert.equal(events.at(-1).name, 'notice.create');
+await wait(() => events.slice(webhookStart).some(event => event._tag === 'SUBSCRIBE_MESSAGE_STATUS' && event.GuildId === 'group'));
+assert.equal(events.slice(webhookStart).find(event => event._tag === 'SUBSCRIBE_MESSAGE_STATUS' && event.GuildId === 'group').name, 'notice.create');
 
 // Real application helper -> AlemonJS sendAction envelope -> adapter -> result.
 webhook.menuGet = async () => ({ version: 42, menu: { items: [] } });

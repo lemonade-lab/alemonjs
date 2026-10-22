@@ -251,8 +251,10 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
         }
 
         const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
+        // 平台权限和生命周期事件不是用户刷屏，不能丢弃或占用用户操作窗口。
+        const isUserInput = isMessage || name === 'interaction.create' || name === 'private.interaction.create';
 
-        if (event['UserId'] && !(isMessage && value?.processor?.rateLimit?.sender)) {
+        if (isUserInput && event['UserId'] && !(isMessage && value?.processor?.rateLimit?.sender)) {
           // FNV-1a 快速哈希
           const UserId = fastHash(JSON.stringify([event.Platform, event.BotId, event['UserId']]));
 

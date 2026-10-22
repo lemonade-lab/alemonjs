@@ -92,3 +92,5 @@ export { cbpClient } from './runtime/cbp/index.js';
 export * from './conversation.js';
 export * from './rate-limit.js';
 export * from './typing.js';
+
+export { Media } from './media.js';

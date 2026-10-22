@@ -185,10 +185,10 @@ const formatMention = (item: DataMention, mode: MentionMode): string => {
 
   if (mode === 'guild-public') {
     if (isEmptyMention) {
-      return '@everyone';
+      return '<qqbot-at-everyone />';
     }
     if (item.options?.belong === 'user') {
-      return `<@!${value}>`;
+      return `<qqbot-at-user id="${value}" />`;
     }
     if (item.options?.belong === 'channel') {
       return `<#${value}>`;
@@ -202,7 +202,7 @@ const formatMention = (item: DataMention, mode: MentionMode): string => {
     return '';
   }
   if (item.options?.belong === 'user') {
-    return `<@${value}>`;
+    return `<qqbot-at-user id="${value}" />`;
   }
 
   return '';
@@ -448,6 +448,9 @@ const resolveFileData = async (item: any): Promise<string | undefined> => {
  */
 const resolveMediaUrl = async (media: DataEnums[], uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>): Promise<string> => {
   for (const item of media) {
+    if (item.type === 'Image' && item.media?.kind === 'media-resource') {
+      return item.media.reference;
+    }
     const fileData = await resolveFileData(item);
 
     if (fileData) {

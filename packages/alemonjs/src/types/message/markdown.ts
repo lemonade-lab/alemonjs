@@ -72,6 +72,8 @@ export type DataMarkdownLink = {
 };
 export type DataMarkdownImage = {
   type: 'MD.image';
+  /** Structured input resolved before sending. Legacy value remains a string. */
+  media?: import('../media-resource').MediaImage;
   value: string;
   options?: {
     width?: number;

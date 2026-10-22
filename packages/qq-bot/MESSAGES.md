@@ -288,3 +288,30 @@ export default async () => {
 
 - `markdownToText: true`：Markdown 与按钮全部转为纯文本发送，适合没有 MD 权限的机器人
 - `hideUnsupported: 1~4`：按级别隐藏不支持的占位符（`[视频]`、`[音频]` 等），转换后内容为空则跳过发送
+
+### 提及用户与全体成员
+
+沿用框架构造器，适配器生成 QQ 文本交互标签：
+
+```ts
+const [message] = useMessage(event);
+
+// 文字子频道全体提及：需要机器人拥有相应权限。
+await message.send({
+  format: Format.create().addMention('everyone').addText('公告')
+});
+
+// Markdown 中同样使用标准提及节点。
+await message.send({
+  format: Format.create().addMarkdown(Format.createMarkdown().addMention('everyone').addText('公告'))
+});
+
+// 群聊或文字子频道提及指定用户。
+await message.send({
+  format: Format.create().addMention('USER_ID', { belong: 'user' }).addText('通知')
+});
+```
+
+频道全体提及输出 `<qqbot-at-everyone />`，群聊及频道用户提及输出 `<qqbot-at-user id="USER_ID" />`，替换即将弃用的旧协议。原生 Markdown 的全体提及渲染原已支持，此次补齐普通频道文本及混合消息路径。Markdown 降级时，其提及节点显示为可读文本 `@全体成员`。
+
+全体提及仅在文字子频道可用，不表示 QQ 群聊或 C2C 新增了 @全体能力；手写 Markdown 的平台标签仍按原文传递，权限与支持范围由 QQ 校验。参见 [官方文本交互说明](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/trans/text-chain.html#使用-能力)。

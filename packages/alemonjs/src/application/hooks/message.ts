@@ -1,7 +1,9 @@
+import { prepareMessageMedia, MediaPreparationError, hasStructuredMedia } from '../media.js';
+import type { MediaSendResult, MediaResource } from '../../types/media-resource.js';
 import { translate } from '../../common/i18n.js';
 import { runtimeScope, trackRuntimeTask } from '../../common/runtime-scope.js';
 import { runWithTyping, type TypingOptions } from '../typing.js';
-import type { ActionContext, OutgoingMessage, MessageDelivery, MessagingActionMap, MessageReceipt } from '../../types';
+import type { ActionContext, OutgoingMessage, MessageDelivery, MessagingActionMap } from '../../types';
 import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
 import { logger } from '../../common/logger.js';
 import {
@@ -50,13 +52,19 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
    * @param val
    * @returns
    */
-  const sendRaw = async (val: DataEnums[], replyId?: string, options?: MessageDelivery): Promise<Result<MessageReceipt>[]> => {
+  const sendRaw = async (val: DataEnums[], replyId?: string, options?: MessageDelivery): Promise<MediaSendResult[]> => {
     if (!val || val.length === 0) {
       return [createResult(ResultCode.FailParams, translate('result.invalid.val.val.must.be.a.non.empty.array'), null)];
     }
     markEventSendAttempt(traceEvent);
+    let resources: MediaResource[] = [];
 
     try {
+      const prepared = hasStructuredMedia(val)
+        ? await prepareMessageMedia(val, valueEvent, options?.target ?? resolveActionTarget(valueEvent))
+        : { format: val, resources: [] };
+
+      resources = prepared.resources;
       const result = await sendAction({
         action: 'message.send',
         payload: {
@@ -65,13 +73,18 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
           target: options?.target ?? resolveActionTarget(valueEvent),
           params: {
             ...options,
-            format: val,
+            format: prepared.format,
             replyId
           }
         }
       });
-      const results = Array.isArray(result) ? result : [result];
+      const results: MediaSendResult[] = (Array.isArray(result) ? result : [result]).map(item =>
+        prepared.resources.length ? { ...item, media: { stage: 'send', resources: prepared.resources } } : item
+      );
 
+      if (!results.length && resources.length) {
+        results.push({ ...createResult(ResultCode.Fail, 'Adapter did not return a message receipt', null), media: { stage: 'send', resources } });
+      }
       recordEventSendResults(results, traceEvent);
 
       // 结果不含 Ok（适配器未处理当前事件返回空数组，或平台发送失败）时打 WARN，
@@ -87,6 +100,14 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
       return results;
     } catch (error) {
       markEventSendFailure(error, traceEvent);
+      if (error instanceof MediaPreparationError) {
+        return [{ ...createResult(ResultCode.Fail, error.message, null), media: { stage: 'prepare', resources: error.resources, failure: error.failure } }];
+      }
+      if (resources.length) {
+        return [
+          { ...createResult(ResultCode.Fail, 'Media was prepared but message sending failed', null), media: { stage: 'send', resources, failure: error } }
+        ];
+      }
       throw error;
     }
   };
@@ -100,7 +121,7 @@ export const useMessage = <T extends EventKeys>(event?: Events[T] | ActionContex
      * 发送消息
      * @param params 消息参数或 DataEnums 数组
      */
-    send(params?: MessageParams | DataEnums[]): Promise<Result<MessageReceipt>[]> {
+    send(params?: MessageParams | DataEnums[]): Promise<MediaSendResult[]> {
       if (Array.isArray(params)) {
         return sendRaw(params.length > 0 ? params : []);
       }

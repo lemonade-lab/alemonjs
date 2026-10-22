@@ -34,3 +34,5 @@ export * from './apis';
 export * from './run';
 
 export * from './messaging';
+
+export * from './media-resource';

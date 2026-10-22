@@ -1110,3 +1110,10 @@ export default async () => {
 | 音频     | `channelsAudioPost` / `channelsMicPut` / `channelsMicDelete`                                                                                                                                                                    | 音频控制 / 上下麦                  |
 | 帖子     | `channelsThreads` / `channelsThreadsThread` / `channelsThreadsPut` / `channelsThreadsDelete`                                                                                                                                    | 论坛帖子                           |
 | 其他     | `usersMe` / `usersMeGuilds` / `usersMeDms` / `interactionResponse`                                                                                                                                                              | 机器人信息 / 私信会话 / 互动回应   |
+
+## Markdown 图片素材
+
+新增 `media.resource.resolve / upload / list / delete / capabilities` 标准 Action。
+QQ 适配器对接 `/v2/media-images/prepare`、预签名 URL 的 PUT、`/v2/media-images/complete`、`GET /v2/media-images` 和 `DELETE /v2/media-images/{image_id}/delete`。
+这些接口与普通媒体 `/files`、分片上传的 prepare/complete 分开处理。
+通用 Hook 与模型用法见[图片来源与平台资源](../alemonjs/docs/media.md)；专项测试为 `yarn workspace @alemonjs/qq-bot test:materials`。

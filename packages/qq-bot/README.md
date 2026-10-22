@@ -13,6 +13,8 @@ AlemonJS 的 QQ 开放平台适配器，用于连接官方机器人接口，将 
 
 三层限流、QQ 文本清洗、引用索引、群历史、LLM 上下文和 C2C 自动 typing 的配置与用法见 [消息处理与会话上下文](../alemonjs/docs/message-context.md)。
 
+Markdown 图片支持使用 `Media.image(source)` 自动准备 QQ 素材，也可通过媒体 Hook 提前上传、查询与删除，见[图片来源与平台资源](../alemonjs/docs/media.md)。
+
 ## 配置
 
 ### 基础配置

@@ -1,3 +1,5 @@
+import { Media, validateMediaSource } from '../media.js';
+import type { MediaSourceInput, MediaUsage, MediaResource } from '../../types/media-resource.js';
 import { translate } from '../../common/i18n.js';
 import type { ActionContext, MessagingActionMap, MediaReceipt, MessageDelivery } from '../../types';
 import { createActionCaller, resolveActionContext, resolveActionTarget } from './action-context';
@@ -40,7 +42,30 @@ export const useMedia = (event?: ActionContext) => {
    * @param params.data base64 数据
    * @param params.name 文件名
    */
-  const upload = async (params: UploadParams): Promise<Result<MediaReceipt>> => {
+  type ResourceParams = MediaSourceInput & { type: 'image'; usage: MediaUsage; target?: MediaTarget };
+  function upload(params: ResourceParams): Promise<Result<MediaResource>>;
+  function upload(params: UploadParams): Promise<Result<MediaReceipt>>;
+  async function upload(params: UploadParams | ResourceParams): Promise<Result<MediaReceipt | MediaResource>> {
+    if ('usage' in params) {
+      if (['send', 'fileId', 'replyId', 'eventId', 'referenceId', 'sequence', 'wakeup', 'content'].some(key => key in params)) {
+        return createResult(ResultCode.FailParams, 'Resource uploads prepare an image; delivery parameters belong to message.send', null);
+      }
+      const { url, filePath, data, name } = params;
+      const source = {
+        ...(url !== undefined && { url }),
+        ...(filePath !== undefined && { filePath }),
+        ...(data !== undefined && { data }),
+        name
+      } as MediaSourceInput;
+
+      try {
+        validateMediaSource(source);
+      } catch (error) {
+        return createResult(ResultCode.FailParams, error.message, null);
+      }
+
+      return call('media.resource.upload', { type: params.type, usage: params.usage, source, target: params.target });
+    }
     if (['replyId', 'eventId', 'referenceId', 'sequence', 'wakeup', 'content'].some(key => key in params)) {
       return createResult(ResultCode.FailParams, translate('result.use.media.send.for.message.delivery.options'), null);
     }
@@ -58,7 +83,7 @@ export const useMedia = (event?: ActionContext) => {
     } catch {
       return createResult(ResultCode.Fail, translate('result.failed.to.upload.media'), null);
     }
-  };
+  }
 
   /**
    * 发送媒体到频道
@@ -143,6 +168,10 @@ export const useMedia = (event?: ActionContext) => {
   };
 
   const media = {
+    create: Media.image,
+    list: (params: MessagingActionMap['media.resource.list'][0]) => call('media.resource.list', params),
+    delete: (resource: MediaResource) => call('media.resource.delete', { resource }),
+    capabilities: () => call('media.resource.capabilities', {}),
     prepare: (params: MessagingActionMap['media.prepare'][0]) => call('media.prepare', params),
     finishPart: (params: MessagingActionMap['media.part.finish'][0]) => call('media.part.finish', params),
     complete: (params: MessagingActionMap['media.complete'][0]) => call('media.complete', params),

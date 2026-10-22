@@ -268,6 +268,31 @@ test('duplicate/rate limits and thrown handlers are observable without sleeps', 
   await assert.rejects(app.dispatch(app.events.groupMessage({ text: 'boom' })), /broken feature/);
 });
 
+test('platform events bypass sender throttling without consuming the user input window; event deduplication remains', async t => {
+  const app = withApp(t, { config: { processor: { repeated_user_time: 1000 } } });
+  const router = Router.create();
+  const seen = [];
+  router.res({ events: ['message.create', 'guild.join', 'notice.create', 'guild.exit', 'member.remove'] }, () => event => {
+    seen.push(event.name);
+  });
+  await app.mount({ responseRouter: router.define });
+  const user = { Platform: 'qq-bot', BotId: 'bot', UserId: 'same-user', Target: { scope: 'group', targetId: 'group', BotId: 'bot' } };
+  await app.dispatch(app.events.event('guild.join', { ...user, MessageId: 'join' }));
+  await app.dispatch(app.events.groupMessage({ text: 'first', platform: 'qq-bot', botId: 'bot', userId: 'same-user', groupId: 'group' }));
+  const permission = app.events.event('notice.create', { ...user, MessageId: 'permission', Notice: { type: 'message-permission', enabled: false } });
+  await app.dispatch(permission);
+  await app.dispatch(app.events.event('member.remove', { ...user, MemberId: 'same-user' }));
+  await app.dispatch(app.events.event('guild.exit', user));
+  assert.deepEqual(seen, ['guild.join', 'message.create', 'notice.create', 'member.remove', 'guild.exit']);
+  const duplicate = await app.dispatch(permission);
+  assert.deepEqual(duplicate.reasons, ['filtered']);
+  const spam = await app.dispatch(app.events.groupMessage({ text: 'second', platform: 'qq-bot', botId: 'bot', userId: 'same-user', groupId: 'group' }));
+  assert.deepEqual(spam.reasons, ['filtered']);
+  await app.clock.advance(1000);
+  await app.dispatch(app.events.groupMessage({ text: 'third', platform: 'qq-bot', botId: 'bot', userId: 'same-user', groupId: 'group' }));
+  assert.equal(seen.filter(name => name === 'message.create').length, 2);
+});
+
 test('production app registry survives test cache reads and disposal', async t => {
   const production = new ChildrenApp('production-sentinel');
   production.on();

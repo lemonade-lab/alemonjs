@@ -27,7 +27,9 @@
     "lint:social": "node scripts/lint-social.mjs",
     "test:conversation": "yarn workspace alemonjs build && node packages/alemonjs/tests/conversation.contract.mjs",
     "test:testing": "yarn workspace alemonjs build && yarn test:testing:types && node --import tsx --test packages/alemonjs/tests/testing.test.mjs packages-cl/create-alemonjs/template/alemonjs/test/hello.test.ts",
-    "test:testing:types": "node node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 packages/alemonjs/tests/testing.types.ts"
+    "test:testing:types": "node node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 packages/alemonjs/tests/testing.types.ts",
+    "test:media": "yarn workspace alemonjs build && yarn test:media:types && node --test packages/alemonjs/tests/media-model.test.mjs && yarn workspace @alemonjs/qq-bot test:materials",
+    "test:media:types": "node node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 packages/alemonjs/tests/media-model.types.ts"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.7",

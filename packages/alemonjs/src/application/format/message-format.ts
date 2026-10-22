@@ -1,3 +1,4 @@
+import type { MediaImage } from '../../types/media-resource.js';
 import {
   DataMention,
   DataText,
@@ -279,10 +280,11 @@ export class FormatMarkDown {
   /**
    * 添加图片
    */
-  addImage(url: string, options?: { width?: number; height?: number }): this {
+  addImage(url: string | MediaImage, options?: { width?: number; height?: number }): this {
     this.#data.push({
       type: 'MD.image',
-      value: url,
+      value: typeof url === 'string' ? url : '',
+      ...(typeof url === 'object' && { media: structuredClone(url) }),
       options
     } as DataMarkdownImage);
 
@@ -521,10 +523,11 @@ export class Format {
   /**
    * 添加图片 (Buffer 或带协议字符串)
    */
-  addImage(val: Buffer | string): this {
+  addImage(val: Buffer | string | MediaImage): this {
     this.#data.push({
       type: 'Image',
-      value: typeof val === 'string' ? val : `base64://${val.toString('base64')}`
+      value: typeof val === 'string' ? val : Buffer.isBuffer(val) ? `base64://${val.toString('base64')}` : '',
+      ...(typeof val === 'object' && !Buffer.isBuffer(val) && { media: structuredClone(val) })
     });
 
     return this;

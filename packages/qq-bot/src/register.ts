@@ -1,3 +1,5 @@
+import { QQImageMaterials } from './materials.js';
+import type { MediaResource } from 'alemonjs';
 import { sanitizeQQText } from './text-sanitizer.js';
 import { handleFrameworkAction } from './framework-actions';
 import { normalizeFrameworkEvent, normalizeMessageUser } from './framework-events';
@@ -1240,6 +1242,23 @@ export const register = (
     }
   };
 
+  const materials = new QQImageMaterials(client, botId);
+  const assertResource = (resource: MediaResource, usage: string, target?: ActionTarget) => {
+    if (
+      resource.kind !== 'media-resource' ||
+      resource.type !== 'image' ||
+      resource.owner?.platform !== platform ||
+      resource.owner.botId !== botId ||
+      resource.usage !== usage ||
+      !resource.id ||
+      !resource.reference
+    ) {
+      throw new Error('Image resource does not belong to this bot or usage');
+    }
+    if (resource.target && (!target || resource.target.scope !== target.scope || resource.target.targetId !== target.targetId)) {
+      throw new Error('Image resource belongs to another conversation');
+    }
+  };
   const onactions = async (data, consume) => {
     // 来源事件上下文：调用方透传 payload.event（与 message.send 一致）后，
     // 未显式传 ChannelId/UserId/GuildId 时自动从事件推断，减少参数提交
@@ -1281,6 +1300,74 @@ export const register = (
           );
           return;
         }
+      }
+      if (data.action.startsWith('media.resource.')) {
+        const params = data.payload.params ?? {};
+        const target = normalizeTarget(params.target ?? data.payload.target);
+        let result: unknown;
+
+        if (data.action === 'media.resource.capabilities') {
+          result = {
+            usages: {
+              message: { upload: true, list: false, delete: false },
+              markdown: { upload: true, list: true, delete: true, maxBytes: 10 * 1024 * 1024, maxItems: 100 }
+            }
+          };
+        } else if (data.action === 'media.resource.list') {
+          if (params.usage !== 'markdown') throw new Error('QQ resource listing is only available for Markdown images');
+          result = await materials.list(params.cursor);
+        } else if (data.action === 'media.resource.delete') {
+          assertResource(params.resource, 'markdown');
+          result = await materials.delete(params.resource);
+        } else if (data.action === 'media.resource.upload' || data.action === 'media.resource.resolve') {
+          if (!['message', 'markdown'].includes(params.usage)) throw new Error('Invalid image resource usage');
+          if (data.action === 'media.resource.resolve' && params.usage === 'markdown' && config.markdownToText) {
+            throw new Error('Markdown images cannot be embedded when markdownToText is enabled');
+          }
+          const image = params.image;
+          if (image?.kind === 'media-resource') {
+            assertResource(image, params.usage, target);
+            result = image;
+          } else {
+            if (image && (image.kind !== 'media-source' || image.type !== 'image')) throw new Error('Expected an image source');
+            if (!image && params.type !== 'image') throw new Error('Expected image upload type');
+            const source = image ? image.source : params.source;
+            if (params.usage === 'markdown') {
+              result = await materials.upload(source);
+            } else {
+              if (!target) throw new Error('A target is required for message image resources');
+              const uploaded = await uploadMedia(target, { ...source, type: 'image', send: false });
+              result = {
+                kind: 'media-resource',
+                type: 'image',
+                id: uploaded.fileId,
+                reference: uploaded.fileId,
+                owner: { platform, botId },
+                usage: 'message',
+                target: { ...target, BotId: botId },
+                name: source.name,
+                expiration: { mode: 'fixed', expiresAt: 'expiresAt' in uploaded ? uploaded.expiresAt : undefined }
+              };
+            }
+          }
+        } else {
+          throw new Error('Unsupported media resource operation');
+        }
+        consume([createResult(ResultCode.Ok, data.action, result)]);
+        return;
+      }
+      if (data.action === 'message.send' && data.payload.params?.format) {
+        const target = normalizeTarget(data.payload.target);
+        const validate = (items: any[]) => {
+          for (const item of items) {
+            if (item.media) {
+              if (item.type !== 'Image') throw new Error('Structured media must be prepared through useMessage before sending');
+              assertResource(item.media, 'message', target);
+            }
+            if ((item.type === 'Markdown' || item.type === 'MD.blockquote') && Array.isArray(item.value)) validate(item.value);
+          }
+        };
+        validate(data.payload.params.format);
       }
       const handled = await handleFrameworkAction(client, data, botId);
       if (handled) {
