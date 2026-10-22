@@ -1,12 +1,20 @@
 import { joinMarkdownParts, renderMarkdownBlockquote } from 'alemonjs/markdown';
 import type { DataEnums, DataMarkDown } from 'alemonjs';
 
+export type QQMarkdownContext = 'group' | 'c2c' | 'guild';
+
 /** 群聊、私聊和频道共用有序正文；提及等原生文本由发送上下文提供。 */
-export const formatQQContent = (items: DataEnums[], renderNative: (item: DataEnums) => string, plain = false, hideUnsupported?: boolean | number): string => {
+export const formatQQContent = (
+  items: DataEnums[],
+  renderNative: (item: DataEnums) => string,
+  plain = false,
+  hideUnsupported?: boolean | number,
+  context: QQMarkdownContext = 'group'
+): string => {
   return items
     .map(item => {
       if (item.type === 'Markdown') {
-        return plain ? markdownToText(item.value, hideUnsupported) : createMarkdownText(item.value);
+        return plain ? markdownToText(item.value, hideUnsupported) : createMarkdownText(item.value, context);
       }
       if (item.type === 'MarkdownOriginal') {
         const text = plain ? markdownRawToText(item.value, hideUnsupported) : item.value;
@@ -198,7 +206,9 @@ export const dataEnumToText = (item: DataEnums, hideUnsupported?: boolean | numb
   }
 };
 
-const mdFormatters: Record<string, (value: any, options?: any) => string> = {
+const escapeAttribute = (value: string): string => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const mdFormatters: Record<string, (value: any, options?: any, context?: QQMarkdownContext) => string> = {
   'MD.title': value => `# ${value} `,
   'MD.subtitle': value => `## ${value} `,
   'MD.text': value => `${value} `,
@@ -207,7 +217,7 @@ const mdFormatters: Record<string, (value: any, options?: any) => string> = {
   'MD.italic': value => `__${value}__ `,
   'MD.italicStar': value => `*${value}* `,
   'MD.strikethrough': value => `~~${value}~~ `,
-  'MD.blockquote': value => renderMarkdownBlockquote(value, createMarkdownText),
+  'MD.blockquote': (value, _options, context) => renderMarkdownBlockquote(value, children => createMarkdownText(children, context)),
   'MD.newline': () => '\n',
   'MD.link': value => {
     if (!value?.text && !value?.url) {
@@ -236,24 +246,28 @@ const mdFormatters: Record<string, (value: any, options?: any) => string> = {
     return `<qqbot-at-user id="${value}" />`;
   },
   'MD.content': value => `${value}`,
-  'MD.button': (title, options) => {
-    // 得到要发送的文本
+  'MD.button': (title, options, context) => {
     const { data, autoEnter } = options || {};
+    const text = String(data ?? title ?? '');
 
-    if (autoEnter) {
-      return `<qqbot-cmd-enter text="${data}" show="${title}" />`;
+    // enter 仅支持 C2C，且只允许 text；其他场景保留为输入指令。
+    if (autoEnter && context === 'c2c') {
+      return `<qqbot-cmd-enter text="${escapeAttribute(text)}" />`;
     }
 
-    return `<qqbot-cmd-input text="${data}" show="${title}" />`;
+    // 预留平台长度余量；先截断再转义，避免截断实体或 emoji 的代理对。
+    const inputText = text.slice(0, 80).replace(/[\uD800-\uDBFF]$/u, '');
+
+    return `<qqbot-cmd-input text="${escapeAttribute(inputText)}" show="${escapeAttribute(String(title ?? ''))}" />`;
   }
 };
 
-export const createMarkdownText = (data: DataMarkDown['value']): string => {
+export const createMarkdownText = (data: DataMarkDown['value'], context: QQMarkdownContext = 'group'): string => {
   return joinMarkdownParts(
     data,
     data.map(mdItem => {
       if (mdFormatters[mdItem.type]) {
-        return mdFormatters[mdItem.type]((mdItem as any)?.value, (mdItem as any)?.options);
+        return mdFormatters[mdItem.type]((mdItem as any)?.value, (mdItem as any)?.options, context);
       }
       if (mdItem.type === 'MD.list' && typeof mdItem.value !== 'string') {
         const listStr = mdItem.value.map(listItem => {

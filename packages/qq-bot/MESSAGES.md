@@ -38,6 +38,8 @@ export default async () => {
 
 ### Markdown（需平台权限）
 
+Markdown 内联按钮的 `autoEnter: true` 仅在 C2C 私聊生成 `<qqbot-cmd-enter text="指令" />`，不携带 `show` 等额外属性；群聊与频道自动使用 `<qqbot-cmd-input text="指令" show="标题" />`，点击后填入输入框。`qqbot-cmd-input` 的 `text` 超过 80 个 UTF-16 单元时自动保留前 80 个以内的内容（不拆开 emoji 代理对），在属性转义前截断；不追加省略号。此限制不影响按钮键盘的 `action.enter`。手写 `MarkdownOriginal` / `MD.content` 标签由开发者自行保证符合当前会话的平台限制。
+
 使用 `Format.createMarkdown()` 链式构建：
 
 ```ts

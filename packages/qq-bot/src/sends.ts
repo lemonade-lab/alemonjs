@@ -4,7 +4,7 @@ import { QQBotAPI } from './sdk/api';
 import { FileType } from './sdk/typing';
 import { DataButtonRow, DataButtonGroup, ClientAPIMessageResult, createResult, DataMention, ResultCode, logger, type DataEnums } from 'alemonjs';
 import axios from 'axios';
-import { dataEnumToText, createMarkdownText, formatQQContent } from './format';
+import { dataEnumToText, createMarkdownText, formatQQContent, type QQMarkdownContext } from './format';
 import { getQQBotConfig } from './config';
 import type { DataArkBigCard, DataArkCard, DataArkList } from './types';
 
@@ -274,7 +274,7 @@ const buildBaseParams = (tag: string | undefined, messageId: string | undefined,
 };
 
 /** 构建 Markdown 和按钮参数 */
-const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null => {
+const buildMdAndButtonsParams = (val: DataEnums[], context: QQMarkdownContext = 'group'): Record<string, any> | null => {
   const items = (val as any[]).filter(
     item => item.type === 'Markdown' || item.type === 'MarkdownOriginal' || item.type === 'BT.group' || item.type === 'ButtonTemplate'
   );
@@ -322,7 +322,7 @@ const buildMdAndButtonsParams = (val: DataEnums[]): Record<string, any> | null =
         params['keyboard'] = { content: result };
       }
     } else if (item.type === 'Markdown' && typeof item?.value !== 'string') {
-      const content = createMarkdownText(item.value);
+      const content = createMarkdownText(item.value, context);
 
       if (content) {
         // 应该是追加模式，所以如果已经存在 markdown 内容，则追加到 content 后面
@@ -481,6 +481,7 @@ const sendOpenApiMessage = async (
   uploadMedia: (data: { file_type: FileType; file_data: string }) => Promise<any>,
   sendMessage: (data: any) => Promise<any>,
   label: string,
+  context: 'group' | 'c2c',
   options?: MessageDelivery & { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
   if ((options?.wakeup && (options.replyId || options.eventId)) || (options?.replyId && options?.eventId)) {
@@ -534,7 +535,7 @@ const sendOpenApiMessage = async (
   }
 
   // hideUnsupported 模式：检查转换后内容是否为空
-  if (config.hideUnsupported === true && !content && !buildMdAndButtonsParams(val) && !buildArkParams(val)) {
+  if (config.hideUnsupported === true && !content && !buildMdAndButtonsParams(val, context) && !buildArkParams(val)) {
     logger.info('[qq-bot] hideUnsupported: 消息内容转换后为空，跳过发送');
 
     return [];
@@ -560,12 +561,12 @@ const sendOpenApiMessage = async (
   }
 
   // Markdown & 按钮
-  const mdParams = buildMdAndButtonsParams(val);
+  const mdParams = buildMdAndButtonsParams(val, context);
 
   if (mdParams) {
     // 规则 2：Text 合并进 Markdown — 将 content 合入 markdown.content 使其在消息体中可见
     if (mdParams.markdown?.content) {
-      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], 'group'));
+      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], 'group'), false, undefined, context);
     }
     if (mdParams.markdown && options?.forceVerifyImageResource !== undefined) {
       mdParams.markdown.force_verify_image_resource = options.forceVerifyImageResource;
@@ -674,7 +675,7 @@ const sendGuildMessage = async (
   }
 
   // hideUnsupported 模式：检查转换后内容是否为空
-  if (config.hideUnsupported && !content && !buildMdAndButtonsParams(val) && !buildArkParams(val)) {
+  if (config.hideUnsupported && !content && !buildMdAndButtonsParams(val, 'guild') && !buildArkParams(val)) {
     logger.info('[qq-bot] hideUnsupported: 消息内容转换后为空，跳过发送');
 
     return [];
@@ -694,12 +695,12 @@ const sendGuildMessage = async (
   }
 
   // Markdown & 按钮
-  const mdParams = buildMdAndButtonsParams(val);
+  const mdParams = buildMdAndButtonsParams(val, 'guild');
 
   if (mdParams) {
     // 规则 2：Text 合并进 Markdown — 将 content 合入 markdown.content 使其在消息体中可见
     if (mdParams.markdown?.content) {
-      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], mode));
+      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], mode), false, undefined, 'guild');
     }
     const res = await sendMessage({ content: '', ...mdParams, ...baseParams });
 
@@ -759,6 +760,7 @@ export const GROUP_AT_MESSAGE_CREATE = async (
       data => client.postRichMediaByGroup(event.ChannelId, data),
       data => client.groupOpenMessages(event.ChannelId, data),
       'client.groupOpenMessages',
+      'group',
       options
     );
   } catch (err) {
@@ -786,6 +788,7 @@ export const C2C_MESSAGE_CREATE = async (
       data => client.postRichMediaByUser(event.UserId, data),
       data => client.usersOpenMessages(event.UserId, data),
       'client.usersOpenMessages',
+      'c2c',
       options
     );
   } catch (err) {
