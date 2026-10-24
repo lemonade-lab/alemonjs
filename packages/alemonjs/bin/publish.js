@@ -1,20 +1,19 @@
 #!/usr/bin/env node
 import fs from 'fs';
-import { join } from 'path';
+import { join, relative } from 'path';
 import os from 'os';
 import { execSync } from 'child_process';
 import spawn from 'cross-spawn';
 
+const SEMVER_RE = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const RELEASE_TYPES = new Set(['patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease']);
-const PRERELEASE_IDS = new Set(['alpha', 'beta', 'rc', 'next']);
-const SEMVER_RE = /^\d+\.\d+\.\d+(?:-(alpha|beta|rc|next)\.\d+)?$/;
-const TAG_RE = /^v\d+\.\d+\.\d+(?:-(alpha|beta|rc|next)\.\d+)?$/;
+const VERSION_RE = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
 const DEFAULT_PUBLISH_FILES = ['lib', 'package.json', 'README.md'];
 const SOURCE_PACKAGE_FIELDS = ['private', 'workspaces', 'devDependencies', 'packageManager'];
-const SOURCE_PACKAGE_SCRIPTS = ['build', 'prepublish', 'prepare', 'prepublishOnly', 'prepack', 'postpack', 'publish', 'postpublish'];
+const SOURCE_PACKAGE_SCRIPTS = ['bundle', 'build', 'prepublish', 'prepare', 'prepublishOnly', 'prepack', 'postpack', 'publish', 'postpublish'];
 
-function readPackageJson() {
-  const pkgPath = join(process.cwd(), 'package.json');
+function readPackageJson(cwd) {
+  const pkgPath = join(cwd, 'package.json');
 
   if (!fs.existsSync(pkgPath)) {
     throw new Error('未找到 package.json');
@@ -57,7 +56,7 @@ function hasCommand(command) {
     stdio: 'ignore'
   });
 
-  return !result.error;
+  return !result.error && result.status === 0;
 }
 
 function isGitRepo() {
@@ -68,122 +67,68 @@ function isGitRepo() {
   }
 }
 
-function ensureCleanGit() {
-  const status = getCommandOutput('git status --porcelain');
-  if (status) {
-    throw new Error('工作区存在未提交改动，请先提交或使用 --no-git-checks 跳过检查');
-  }
-}
-
 function normalizeVersionInput(version) {
   return String(version).trim().replace(/^v/, '');
 }
 
-function validatePreid(preid) {
-  const value = String(preid || 'beta').trim();
-  if (!PRERELEASE_IDS.has(value)) {
-    throw new Error(`非法预发布标识: ${value}，仅允许 alpha、beta、rc、next`);
-  }
-
-  return value;
-}
-
-function parseVersion(version) {
-  const matched = normalizeVersionInput(version).match(/^(\d+)\.(\d+)\.(\d+)(?:-((alpha|beta|rc|next)\.(\d+)))?$/);
-  if (!matched) {
-    throw new Error(`非法版本号: ${version}`);
-  }
-
-  return {
-    major: Number(matched[1]),
-    minor: Number(matched[2]),
-    patch: Number(matched[3]),
-    prerelease: matched[4] ?? null,
-    prereleaseId: matched[5] ?? null,
-    prereleaseNum: matched[6] ? Number(matched[6]) : null
-  };
+function validVersion(version) {
+  const match = VERSION_RE.exec(version);
+  return Boolean(match && (!match[4] || match[4].split('.').every(id => !/^0\d+$/.test(id))));
 }
 
 function compareVersions(a, b) {
-  const av = parseVersion(a);
-  const bv = parseVersion(b);
-
-  for (const key of ['major', 'minor', 'patch']) {
-    if (av[key] > bv[key]) return 1;
-    if (av[key] < bv[key]) return -1;
+  const av = VERSION_RE.exec(a);
+  const bv = VERSION_RE.exec(b);
+  for (let i = 1; i <= 3; i++) {
+    if (BigInt(av[i]) !== BigInt(bv[i])) return BigInt(av[i]) > BigInt(bv[i]) ? 1 : -1;
   }
-
-  if (av.prerelease === bv.prerelease) return 0;
-  if (av.prerelease === null) return 1;
-  if (bv.prerelease === null) return -1;
-
-  return av.prerelease.localeCompare(bv.prerelease);
+  if (!av[4] || !bv[4]) return av[4] === bv[4] ? 0 : av[4] ? -1 : 1;
+  const ap = av[4].split('.');
+  const bp = bv[4].split('.');
+  for (let i = 0; i < Math.max(ap.length, bp.length); i++) {
+    if (ap[i] === bp[i]) continue;
+    if (ap[i] === undefined) return -1;
+    if (bp[i] === undefined) return 1;
+    const an = /^\d+$/.test(ap[i]);
+    const bn = /^\d+$/.test(bp[i]);
+    if (an && bn) return BigInt(ap[i]) > BigInt(bp[i]) ? 1 : -1;
+    if (an !== bn) return an ? -1 : 1;
+    return ap[i] > bp[i] ? 1 : -1;
+  }
+  return 0;
 }
 
-function incrementVersion(baseVersion, releaseType, preid = 'beta') {
-  const parsed = parseVersion(baseVersion);
-  const safePreid = validatePreid(preid);
-
-  if (releaseType === 'patch') {
-    return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}`;
+function resolveTargetVersion(versions, release, preid = 'beta') {
+  if (!/^[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*$/.test(preid) || preid.split('.').some(id => /^0\d+$/.test(id))) {
+    throw new Error(`非法预发布标识: ${preid}`);
   }
-
-  if (releaseType === 'minor') {
-    return `${parsed.major}.${parsed.minor + 1}.0`;
+  const latestVersion = versions.find(version => SEMVER_RE.test(version));
+  if (release !== undefined && !RELEASE_TYPES.has(release)) {
+    const version = normalizeVersionInput(release);
+    if (!validVersion(version)) throw new Error(`非法版本号或发布类型: ${release}`);
+    return version;
   }
-
-  if (releaseType === 'major') {
-    return `${parsed.major + 1}.0.0`;
-  }
-
-  if (releaseType === 'prepatch') {
-    return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-${safePreid}.0`;
-  }
-
-  if (releaseType === 'preminor') {
-    return `${parsed.major}.${parsed.minor + 1}.0-${safePreid}.0`;
-  }
-
-  if (releaseType === 'premajor') {
-    return `${parsed.major + 1}.0.0-${safePreid}.0`;
-  }
-
-  if (releaseType === 'prerelease') {
-    if (parsed.prerelease && parsed.prereleaseId === safePreid && parsed.prereleaseNum !== null) {
-      return `${parsed.major}.${parsed.minor}.${parsed.patch}-${safePreid}.${parsed.prereleaseNum + 1}`;
+  const type = release || 'patch';
+  const [major, minor, patch] = (latestVersion || '0.0.0').split('.').map(BigInt);
+  if (type === 'prerelease') {
+    const previous = versions.find(version => {
+      const prerelease = VERSION_RE.exec(version)[4];
+      return (
+        prerelease?.startsWith(`${preid}.`) &&
+        /^\d+$/.test(prerelease.slice(preid.length + 1)) &&
+        (!latestVersion || compareVersions(version, latestVersion) > 0)
+      );
+    });
+    if (previous) {
+      const match = VERSION_RE.exec(previous);
+      return `${match[1]}.${match[2]}.${match[3]}-${preid}.${BigInt(match[4].slice(preid.length + 1)) + 1n}`;
     }
-
-    return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}-${safePreid}.0`;
   }
-
-  throw new Error(`不支持的发布类型: ${releaseType}`);
-}
-
-function resolveTargetVersion(localVersion, remoteVersion, release, preid) {
-  if (!release) {
-    if (!remoteVersion) {
-      return localVersion;
-    }
-
-    if (compareVersions(localVersion, remoteVersion) > 0) {
-      return localVersion;
-    }
-
-    return incrementVersion(remoteVersion, 'patch', preid);
-  }
-
-  if (RELEASE_TYPES.has(release)) {
-    const base = remoteVersion && compareVersions(remoteVersion, localVersion) > 0 ? remoteVersion : localVersion;
-    return incrementVersion(base, release, preid);
-  }
-
-  const normalizedRelease = normalizeVersionInput(release);
-
-  if (SEMVER_RE.test(normalizedRelease)) {
-    return normalizedRelease;
-  }
-
-  throw new Error(`无法识别的发布参数: ${release}`);
+  let core;
+  if (type === 'major' || type === 'premajor') core = `${major + 1n}.0.0`;
+  else if (type === 'minor' || type === 'preminor') core = `${major}.${minor + 1n}.0`;
+  else core = `${major}.${minor}.${patch + 1n}`;
+  return type.startsWith('pre') ? `${core}-${preid}.0` : core;
 }
 
 function updateVersion(pkgPath, pkg, version) {
@@ -221,20 +166,20 @@ function getPackResult(cwd = process.cwd()) {
   return result[0];
 }
 
-function hasNpmPublishRules(pkg) {
-  if (fs.existsSync(join(process.cwd(), '.npmignore'))) {
+function hasNpmPublishRules(pkg, cwd) {
+  if (fs.existsSync(join(cwd, '.npmignore'))) {
     return true;
   }
 
   return Array.isArray(pkg.files) && pkg.files.length > 0;
 }
 
-function getDefaultPublishFiles() {
-  return DEFAULT_PUBLISH_FILES.filter(file => fs.existsSync(join(process.cwd(), file)));
+function getDefaultPublishFiles(cwd) {
+  return DEFAULT_PUBLISH_FILES.filter(file => fs.existsSync(join(cwd, file)));
 }
 
-function warnDefaultPublishState(pkg, publishFiles) {
-  const hasLibDir = fs.existsSync(join(process.cwd(), 'lib'));
+function warnDefaultPublishState(pkg, publishFiles, cwd) {
+  const hasLibDir = fs.existsSync(join(cwd, 'lib'));
   const mainField = typeof pkg.main === 'string' ? pkg.main : '';
 
   if (!hasLibDir && mainField.startsWith('./lib/')) {
@@ -246,12 +191,10 @@ function warnDefaultPublishState(pkg, publishFiles) {
   }
 }
 
-function copyPublishFiles(files) {
-  const publishDir = fs.mkdtempSync(join(os.tmpdir(), 'alemon-publish-'));
-
+function copyPublishFiles(files, cwd, publishDir) {
   for (const item of files) {
     const relativePath = typeof item === 'string' ? item : item.path;
-    const sourcePath = join(process.cwd(), relativePath);
+    const sourcePath = join(cwd, relativePath);
     const targetPath = join(publishDir, relativePath);
 
     if (!fs.existsSync(sourcePath)) {
@@ -271,19 +214,24 @@ function copyPublishFiles(files) {
   return publishDir;
 }
 
-function preparePublishPackage(publishDir) {
-  const pkgPath = join(publishDir, 'package.json');
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-
-  for (const field of SOURCE_PACKAGE_FIELDS) {
-    delete pkg[field];
+function resolveBuildScript(pkg) {
+  const configured = pkg.alemonjs?.build;
+  if (configured !== undefined) {
+    if (typeof configured !== 'string' || !configured.trim() || typeof pkg.scripts?.[configured] !== 'string' || !pkg.scripts[configured].trim()) {
+      throw new Error('alemonjs.build 必须指定 scripts 中存在的非空脚本名称');
+    }
+    return configured;
   }
+  return pkg.scripts?.bundle ? 'bundle' : pkg.scripts?.build ? 'build' : null;
+}
+
+function preparePublishPackage(publishDir, buildScript) {
+  const pkgPath = join(publishDir, 'package.json');
+  const pkg = Object.fromEntries(Object.entries(JSON.parse(fs.readFileSync(pkgPath, 'utf8'))).filter(([field]) => !SOURCE_PACKAGE_FIELDS.includes(field)));
 
   // 产物已构建完成，不应在安装或再次发包时触发源码构建。
   if (pkg.scripts) {
-    for (const script of SOURCE_PACKAGE_SCRIPTS) {
-      delete pkg.scripts[script];
-    }
+    pkg.scripts = Object.fromEntries(Object.entries(pkg.scripts).filter(([script]) => !SOURCE_PACKAGE_SCRIPTS.includes(script) && script !== buildScript));
     if (Object.keys(pkg.scripts).length === 0) {
       delete pkg.scripts;
     }
@@ -314,201 +262,145 @@ function ensureGitRepo() {
   }
 }
 
-function getLatestReleaseVersion() {
-  const tags = getCommandOutput('git tag --list --sort=-v:refname');
-  if (!tags) {
-    return '';
-  }
-
-  for (const tag of tags.split('\n')) {
-    const value = tag.trim();
-    if (TAG_RE.test(value)) {
-      return value.slice(1);
-    }
-  }
-
-  return '';
+function gitOutput(args, cwd = process.cwd()) {
+  const result = spawn.sync('git', args, { cwd, encoding: 'utf8' });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(`git ${args.join(' ')} 失败: ${result.stderr}`);
+  return result.stdout.trim();
 }
 
-function remoteBranchExists(branch) {
-  const result = spawn.sync('git', ['ls-remote', '--exit-code', '--heads', 'origin', branch], {
-    cwd: process.cwd(),
-    stdio: 'ignore'
-  });
-
-  return result.status === 0;
-}
-
-function localBranchExists(branch) {
-  const result = spawn.sync('git', ['show-ref', '--verify', '--quiet', `refs/heads/${branch}`], {
-    cwd: process.cwd(),
-    stdio: 'ignore'
-  });
-
-  return result.status === 0;
-}
-
-function createReleaseWorktree(branch) {
-  const worktreeDir = fs.mkdtempSync(join(os.tmpdir(), 'alemon-worktree-'));
-
-  if (remoteBranchExists(branch)) {
-    runCommand('git', ['fetch', 'origin', branch]);
-    runCommand('git', ['worktree', 'add', '-B', branch, worktreeDir, `origin/${branch}`]);
-  } else if (localBranchExists(branch)) {
-    runCommand('git', ['worktree', 'add', worktreeDir, branch]);
-  } else {
-    runCommand('git', ['worktree', 'add', '-b', branch, worktreeDir]);
-  }
-
-  return worktreeDir;
+function getReleaseVersions(remoteRefs) {
+  const tags = [...gitOutput(['tag', '--list']).split('\n'), ...remoteRefs.split('\n').map(line => line.split('\t')[1]?.replace(/^refs\/tags\//, ''))];
+  return [...new Set(tags.filter(tag => tag?.startsWith('v') && validVersion(tag.slice(1))).map(tag => tag.slice(1)))].sort((a, b) => compareVersions(b, a));
 }
 
 function cleanupWorktree(worktreeDir) {
-  if (!worktreeDir) {
-    return;
+  if (!worktreeDir) return;
+  const result = spawn.sync('git', ['worktree', 'remove', '--force', worktreeDir], { stdio: 'ignore' });
+  if (result.status !== 0 && fs.existsSync(worktreeDir)) {
+    console.warn(`未能清理临时 worktree，请手动检查: ${worktreeDir}`);
   }
+}
 
-  spawn.sync('git', ['worktree', 'remove', '--force', worktreeDir], {
-    cwd: process.cwd(),
-    stdio: 'ignore'
-  });
-  fs.rmSync(worktreeDir, { recursive: true, force: true });
+function installBuildDependencies(buildRoot, buildCwd, env) {
+  // 子包有自己的锁文件时使用子包，否则在仓库根目录安装 workspace 依赖。
+  const locks = ['package-lock.json', 'npm-shrinkwrap.json', 'yarn.lock', 'pnpm-lock.yaml'];
+  const cwd = locks.some(file => fs.existsSync(join(buildCwd, file))) ? buildCwd : buildRoot;
+  const { pkg } = readPackageJson(cwd);
+  const manager =
+    pkg.packageManager?.split('@')[0] || (fs.existsSync(join(cwd, 'pnpm-lock.yaml')) ? 'pnpm' : fs.existsSync(join(cwd, 'yarn.lock')) ? 'yarn' : 'npm');
+  let args;
+  if (manager === 'npm') {
+    args = [locks.slice(0, 2).some(file => fs.existsSync(join(cwd, file))) ? 'ci' : 'install', '--include=dev'];
+  } else if (manager === 'yarn') {
+    const version = pkg.packageManager?.split('@')[1] || '1';
+    args = Number(version.split('.')[0]) >= 2 ? ['install', '--immutable'] : ['install', '--frozen-lockfile', '--production=false'];
+  } else if (manager === 'pnpm') {
+    args = ['install', '--frozen-lockfile', '--prod=false'];
+  } else {
+    throw new Error(`不支持的包管理器: ${manager}`);
+  }
+  console.log(`隔离空间安装依赖: ${manager} ${args.join(' ')}`);
+  runCommand(manager, args, { cwd, env });
+  return manager;
 }
 
 export async function publish(release, options = {}) {
-  if (!hasCommand('git')) {
-    throw new Error('未找到 git，请先安装 git');
-  }
-
-  if (!hasCommand('npm')) {
-    throw new Error('未找到 npm，请先安装 Node.js/npm');
-  }
-
-  const { pkgPath, pkg } = readPackageJson();
-  const packageName = pkg.name;
-  const localVersion = normalizeVersionInput(String(pkg.version || '').trim());
-
-  if (!packageName) {
-    throw new Error('package.json 缺少 name');
-  }
-
-  if (!SEMVER_RE.test(localVersion)) {
-    throw new Error(`当前 package.json 版本号非法: ${localVersion}`);
-  }
-
-  console.log(`发布包: ${packageName}`);
-  console.log(`本地版本: ${localVersion}`);
-
+  if (!hasCommand('git')) throw new Error('未找到 git，请先安装 git');
+  if (!hasCommand('npm')) throw new Error('未找到 npm，请先安装 Node.js/npm');
+  // 在创建 worktree 或访问远端之前验证参数。
+  resolveTargetVersion([], release, options.preid);
   ensureGitRepo();
 
-  const sourceBranch = getCommandOutput('git branch --show-current');
-  if (!sourceBranch) {
-    throw new Error('当前处于 detached HEAD，请先切换到源码分支再发布');
-  }
-  const shouldTag = sourceBranch === 'main' || sourceBranch === 'master';
-  const releaseBranch = options.branch || (shouldTag ? 'release' : `${sourceBranch.replaceAll('/', '-')}-release`);
+  const sourceBranch = gitOutput(['branch', '--show-current']);
+  const sourceCommit = gitOutput(['rev-parse', 'HEAD']);
+  if (!sourceBranch) throw new Error('当前处于 detached HEAD，请先切换到源码分支再发布');
+  const sourceRoot = fs.realpathSync(gitOutput(['rev-parse', '--show-toplevel']));
+  const packageRelativePath = relative(sourceRoot, fs.realpathSync(process.cwd()));
+  const releaseBranch = options.branch || (['main', 'master'].includes(sourceBranch) ? 'release' : `${sourceBranch.replaceAll('/', '-')}-release`);
   runCommand('git', ['check-ref-format', '--branch', releaseBranch]);
-  if (releaseBranch === sourceBranch) {
-    throw new Error('发布目标分支不能与源码分支相同');
-  }
+  if (releaseBranch === sourceBranch) throw new Error('发布目标分支不能与源码分支相同');
+  const shouldTag = releaseBranch === 'release' || releaseBranch.endsWith('-release');
   console.log(`源码分支: ${sourceBranch}`);
-  const remoteVersion = shouldTag ? getLatestReleaseVersion() : '';
-  if (!shouldTag) {
-    console.log('非主分支：以本地版本为基线，不读取或创建 git tag');
-  } else if (remoteVersion) {
-    console.log(`最新 git tag: v${remoteVersion}`);
-  } else {
-    console.log('最新 git tag: 无，将按首次发布处理');
-  }
+  console.log(`源码 commit: ${sourceCommit}`);
+  console.log('发布仅使用该 commit；未提交、暂存和未跟踪内容不会参与构建');
 
-  if (options.gitChecks !== false && isGitRepo()) {
-    ensureCleanGit();
-  }
-
-  const preid = validatePreid(options.preid);
-  const targetVersion = resolveTargetVersion(localVersion, remoteVersion, release, preid);
+  const remoteRefs = gitOutput(['ls-remote', '--refs', 'origin']);
+  const versions = getReleaseVersions(remoteRefs);
+  const latestVersion = versions.find(version => SEMVER_RE.test(version));
+  const targetVersion = resolveTargetVersion(versions, release, options.preid);
   const gitTagName = `v${targetVersion}`;
+  if (shouldTag && (remoteRefs.split('\n').some(line => line.endsWith(`\trefs/tags/${gitTagName}`)) || gitOutput(['tag', '--list', gitTagName]))) {
+    throw new Error(`标签 ${gitTagName} 已存在，请选择新的版本`);
+  }
+  console.log(`最新正式标签: ${latestVersion ? `v${latestVersion}` : '无'}`);
   console.log(`目标版本: ${targetVersion}`);
   console.log(`发布分支: ${releaseBranch}`);
   console.log(`git 标签: ${shouldTag ? gitTagName : '不创建'}`);
 
-  if (targetVersion !== localVersion) {
-    updateVersion(pkgPath, pkg, targetVersion);
-    console.log(`已更新 package.json 版本: ${localVersion} -> ${targetVersion}`);
-  }
-
-  let publishDir = null;
-  let worktreeDir = null;
+  const tempRoot = fs.mkdtempSync(join(os.tmpdir(), 'alemon-publish-'));
+  const buildRoot = join(tempRoot, 'source');
+  const artifactRoot = join(tempRoot, 'artifact');
+  const publishDir = join(tempRoot, 'package');
+  fs.mkdirSync(publishDir);
   try {
-    if (!options.skipBuild) {
-      if (pkg.scripts?.build) {
-        console.log('执行构建...');
-        runCommand('npm', ['run', 'build']);
-      } else {
-        console.log('未定义 build 脚本，跳过构建');
-      }
+    runCommand('git', ['worktree', 'add', '--detach', buildRoot, sourceCommit]);
+    const buildCwd = join(buildRoot, packageRelativePath);
+    const { pkgPath, pkg } = readPackageJson(buildCwd);
+    if (!pkg.name) throw new Error('package.json 缺少 name');
+    console.log(`发布包: ${pkg.name}`);
+    console.log(`隔离构建目录: ${buildCwd}`);
+    const env = { ...process.env, ALEMON_PUBLISH_SOURCE_BRANCH: sourceBranch, ALEMON_PUBLISH_SOURCE_COMMIT: sourceCommit };
+    const buildScript = resolveBuildScript(pkg);
+    let buildManager;
+    if (!options.skipBuild && buildScript) {
+      buildManager = installBuildDependencies(buildRoot, buildCwd, env);
+    }
+    updateVersion(pkgPath, pkg, targetVersion);
+    if (!options.skipBuild && buildScript) {
+      console.log(`执行打包脚本: ${buildScript}`);
+      runCommand(buildManager, ['run', buildScript], { cwd: buildCwd, env });
     } else {
-      console.log('已跳过构建');
+      console.log(options.skipBuild ? '已跳过构建，仅使用 commit 中已有的产物' : '未定义 bundle 或 build 脚本，跳过构建');
     }
-
-    const useNpmRules = hasNpmPublishRules(pkg);
-    const publishFiles = useNpmRules ? getPackResult().files : getDefaultPublishFiles();
-
-    if (!useNpmRules) {
-      warnDefaultPublishState(pkg, publishFiles);
-    }
-
-    publishDir = copyPublishFiles(publishFiles);
-    preparePublishPackage(publishDir);
-
+    const useNpmRules = hasNpmPublishRules(pkg, buildCwd);
+    const publishFiles = useNpmRules ? getPackResult(buildCwd).files : getDefaultPublishFiles(buildCwd);
+    if (!useNpmRules) warnDefaultPublishState(pkg, publishFiles, buildCwd);
+    copyPublishFiles(publishFiles, buildCwd, publishDir);
+    preparePublishPackage(publishDir, buildScript);
+    const artifactPkgPath = join(publishDir, 'package.json');
+    const artifactPkg = JSON.parse(fs.readFileSync(artifactPkgPath, 'utf8'));
+    artifactPkg.version = targetVersion;
+    artifactPkg.gitHead = sourceCommit;
+    fs.writeFileSync(artifactPkgPath, JSON.stringify(artifactPkg, null, 2) + '\n');
     console.log(`发布规则: ${useNpmRules ? 'npm' : 'default'}`);
     console.log(`发布文件数: ${publishFiles.length}`);
-
     if (options.dryRun) {
-      if (targetVersion !== localVersion) {
-        updateVersion(pkgPath, pkg, localVersion);
-        console.log(`已回滚 package.json 版本到 ${localVersion}`);
-      }
       console.log('dry-run 模式，不会真正推送到 git');
       return;
     }
 
-    console.log('准备 release worktree...');
-    worktreeDir = createReleaseWorktree(releaseBranch);
-    removeDirContents(worktreeDir);
-    copyDirContents(publishDir, worktreeDir);
-
-    runCommand('git', ['-C', worktreeDir, 'add', '-A']);
-    const hasChanges = spawn.sync('git', ['-C', worktreeDir, 'diff', '--cached', '--quiet']).status !== 0;
-    if (!hasChanges) {
-      console.log('release 分支无文件变化，跳过提交');
-    } else {
-      runCommand('git', ['-C', worktreeDir, 'commit', '-m', `release: ${gitTagName}`]);
+    let base = sourceCommit;
+    if (remoteRefs.split('\n').some(line => line.endsWith(`\trefs/heads/${releaseBranch}`))) {
+      runCommand('git', ['fetch', '--no-tags', 'origin', `refs/heads/${releaseBranch}`]);
+      base = gitOutput(['rev-parse', 'FETCH_HEAD']);
     }
-    runCommand('git', ['-C', worktreeDir, 'push', 'origin', `HEAD:refs/heads/${releaseBranch}`]);
-    console.log(`已推送到分支: ${releaseBranch}`);
-
-    if (shouldTag) {
-      runCommand('git', ['-C', worktreeDir, 'tag', '-f', gitTagName]);
-      runCommand('git', ['-C', worktreeDir, 'push', 'origin', `refs/tags/${gitTagName}`, '--force']);
+    runCommand('git', ['worktree', 'add', '--detach', artifactRoot, base]);
+    removeDirContents(artifactRoot);
+    copyDirContents(publishDir, artifactRoot);
+    runCommand('git', ['add', '-A'], { cwd: artifactRoot });
+    if (gitOutput(['diff', '--cached', '--name-only'], artifactRoot)) {
+      runCommand('git', ['commit', '-m', `release: ${gitTagName}\n\nSource-Branch: ${sourceBranch}\nSource-Commit: ${sourceCommit}`], { cwd: artifactRoot });
     }
-    console.log(`发布完成: ${packageName}@${targetVersion}`);
-  } catch (error) {
-    if (targetVersion !== localVersion) {
-      updateVersion(pkgPath, pkg, localVersion);
-      console.log(`已回滚 package.json 版本到 ${localVersion}`);
-    }
-    throw error;
+    const refs = [`HEAD:refs/heads/${releaseBranch}`];
+    if (shouldTag) refs.push(`HEAD:refs/tags/${gitTagName}`);
+    // 原子推送分支和标签，禁止覆盖已有标签或强推发布历史。
+    runCommand('git', ['push', '--atomic', 'origin', ...refs], { cwd: artifactRoot });
+    console.log(`发布完成: ${pkg.name}@${targetVersion}（${sourceBranch}@${sourceCommit}）`);
   } finally {
-    if (publishDir) {
-      fs.rmSync(publishDir, { recursive: true, force: true });
-    }
-    cleanupWorktree(worktreeDir);
-  }
-
-  if (options.gitChecks !== false && targetVersion !== localVersion && isGitRepo()) {
-    runCommand('git', ['add', 'package.json']);
-    runCommand('git', ['commit', '-m', `release: ${gitTagName}`]);
-    console.log(`已记录源码版本变更: ${gitTagName}`);
+    cleanupWorktree(artifactRoot);
+    cleanupWorktree(buildRoot);
+    fs.rmSync(publishDir, { recursive: true, force: true });
+    if (fs.readdirSync(tempRoot).length === 0) fs.rmdirSync(tempRoot);
   }
 }

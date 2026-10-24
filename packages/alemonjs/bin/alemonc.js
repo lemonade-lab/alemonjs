@@ -97,12 +97,12 @@ program
 
 program
   .command('publish [release]')
-  .description('按当前源码分支发布构建产物，主分支打 tag，其他分支只更新产物分支')
-  .option('--preid <preid>', '预发布标识，仅允许 alpha/beta/rc/next', 'beta')
-  .option('--branch <branch>', '覆盖产物目标分支，默认主分支为 release，其他为源码分支名（/ 替换为 -）加 -release；不改变打 tag 规则')
+  .description('隔离构建当前 commit，目标分支符合 release 或 *-release 规则时打标签；支持版本号及 patch/minor/major/prepatch/preminor/premajor/prerelease')
+  .option('--branch <branch>', '覆盖产物目标分支，默认主分支为 release，其他为源码分支名（/ 替换为 -）加 -release；目标符合 release 或 *-release 规则时打标签')
+  .option('--preid <preid>', '预发布标识，如 alpha/beta/rc/next', 'beta')
   .option('--dry-run', '只执行检查和打包，不真正发布')
   .option('--skip-build', '跳过构建')
-  .option('--no-git-checks', '跳过 git 干净工作区检查及发布后自动提交源码版本')
+  .option('--no-git-checks', '兼容旧参数；隔离构建不检查或修改原工作区')
   .action(async (release, options) => {
     try {
       await publish(release, options);
