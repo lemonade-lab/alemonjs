@@ -1,89 +1,34 @@
-# AGENTS.md
+# Agent 项目指南
 
-## 项目说明
+## 项目与安装
 
-这是一个 alemonjs（聊天平台机器人开发框架）项目，基于 Node.js 开发的文字消息游戏项目，游戏主题为修仙。
+这是 ALemonJS 通用机器人开发模板，使用 Node.js、TypeScript、Yarn Classic 和 lvyjs。不要假设项目包含修仙游戏、MySQL、Redis 或数据库迁移脚本。
 
-## 工作原则
+完整的 Node.js 安装与脚手架使用步骤见 [安装指南（适用于 Agent）](https://github.com/lemonade-lab/alemonjs/blob/main/docs/agent-install.md)。如果当前目录已包含本项目，不要再次运行 `npm create alemonjs`。
 
-- 在开始修改前，先查看 `package.json`、相关源码目录`src`和已有实现方式。
-- 优先做最小改动，只修改完成当前任务所必需的文件。
-- 优先复用现有模块、工具函数和数据结构，不要随意新增依赖。
-- 不要无故重构、重命名或移动文件。
-- 不要修改与当前任务无关的代码。
-- 修改代码时，保持现有项目结构、编码风格和运行方式一致。
+1. 先读 `package.json`、`README.md`、`alemon.config.yaml` 和相关源码。
+2. 准备 Node.js 22 系列、npm 和 Yarn Classic 1.22.22，执行 `yarn install`。
+3. 执行 `yarn test` 和 `yarn build`，分别验证测试和构建。
+4. 需要本地调试时执行 `yarn dev --port 17117`；这是持续运行的进程，用 Ctrl+C 停止。
 
-## 使用的技术
+`test/hello.test.ts` 使用 `alemonjs/testing`，无需账号；要求 AlemonJS 2.1.112 或更新版本。不要安装全局 TypeScript/ESLint 来替代本项目不存在的检查脚本；以实际 `package.json` 为准。
 
-- ts、mysql、redis
+## 真实目录与入口
 
-## 开发结束根据当前环境尝试进行检查
+- `app.ts`：开发启动入口，加载 `src/index.ts`。
+- `src/index.ts`：应用注册与路由。
+- `src/response/`：消息处理器。
+- `src/image/`、`src/assets/`：图片组件和静态资源。
+- `test/`：应用测试。
+- `alemon.config.yaml`：框架与平台配置，初始只有语言设置。
+- `lvy.config.ts`：开发与构建配置。
+- `index.js`：运行入口；构建包入口为 `lib/index.js`。
 
-- ts check
+## 工作与验证原则
 
-```ts
-npm install -g @typescript/native-preview
-tsgo
-```
-
-- lint check
-
-```bash
-npm install -g eslint
-eslint src --ext .ts,.tsx,.js --fix --max-warnings=0
-```
-
-如果由于环境、依赖、权限或上下文限制无法执行，请明确说明原因，不要假装已经完成验证。
-
-## 游戏项目约束
-
-- 不要随意修改核心游戏循环。
-- 不要破坏现有存档、配置、事件数据格式。
-- 修改技能、怪物、关卡、数值配置时，必须保持与现有数据结构兼容。
-- 修改资源引用时，必须同步检查相关路径和引用关系是否正确。
-
-## 数据与验证
-
-- 新功能如果涉及数据库或已有数据结构，需基于 `scripts/*.sql` 中已有设计进行理解和扩展。
-- 涉及数值、产出、成长、冷却、掉落、收益、周期等内容的需求，完成修改后需要进行必要的数值计算，并验证数值周期是否合理。
-- 不要在没有依据的情况下臆造数值模型、收益公式或业务规则。
-- 想新增一个功能或修改气泡的数据展示逻辑后，都应该把气泡长怎么样子发出来进行二次确认
-
-## 数据迁移
-
-- 如果功能升级涉及旧数据库表的字段新增、删除或修改，必须同时提供对应的迁移 SQL 文件。
-- 新增的迁移 SQL 文件应放在 `scripts/` 目录，并保持命名清晰、有顺序。
-
-## 严禁使用的代码
-
-- 编写新功能时，禁止使用 `require`。
-- 禁止使用动态 `import()` 进行运行时加载，除非明确属于路由懒加载场景。
-- 保持现有模块系统一致，不要混用不符合当前项目约定的模块写法。
-
-## 禁止事项
-
-- 不要臆造不存在的命令、文件、配置或脚本。
-- 不要假设未经代码、SQL 或现有逻辑验证的业务规则。
-- 不要顺手修复与当前任务无关的问题。
-- 不要擅自新增大型配置、部署文件或工程化改造。
-- 不要在未确认影响范围前直接修改数据库结构或核心数值逻辑。
-
-## 项目目录说明
-
-- `src/`：项目源码目录
-- `src/assets`：静态资源目录
-- `src/constants`：常量定义
-- `src/db`：数据库模型
-- `src/model`：业务模型层
-- `src/response`：指令气泡展示层
-- `src/response-apps`：指令功能逻辑层
-- `src/types`：TypeScript 类型定义
-- `src/task`： 定时任务
-- `src/utils`：工具函数
-- `scripts/`：SQL 文件存储目录
-- `lvy.config.ts`：基于 tsx 和 rollup 的开发工具配置，修改代码时需要符合其中的构建与运行约定
-
-## 技能读取
-
-- 遇到框架相关内容设计时，可读取仓库 https://github.com/lemonade-lab/alemonjs-dev-skill 获得开发技能
-
+- 复用已有模块和消息处理方式，只修改任务需要的文件。
+- 保持 ESM 模块写法；不要假设不存在的目录、脚本、配置或业务规则。
+- 修改处理器后优先运行相关测试；测试实例通过 `t.after(() => app.dispose())` 清理。
+- 接入真实平台时读取对应适配器文档，使用用户提供的账号配置，不输出凭据。
+- 区分依赖安装成功、测试通过、构建完成、开发进程启动和真实平台收发验证。
+- 无法执行检查时说明原因；完成报告列出执行结果以及是否有后台进程仍在运行。

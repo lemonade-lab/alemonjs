@@ -30,8 +30,10 @@ It combines an event-driven runtime, declarative routing, hooks, rich message fo
 
 ## Quick Start
 
+See the [installation guide for agents (Chinese)](./docs/agent-install.md) for Node.js and Yarn setup. After preparing the environment, run in the parent directory of your new project:
+
 ```bash
-npm create alemonjs@latest
+npm create alemonjs@latest --yes
 cd alemonjs
 yarn install
 yarn dev

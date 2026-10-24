@@ -30,8 +30,10 @@ ALemonJS 是一个面向跨平台聊天机器人的 Node.js 框架。
 
 ## Quick Start
 
+安装 Node.js、Yarn 及 Agent 自动安装步骤见 [安装指南](./docs/agent-install.md)。先完成环境准备，再在项目父目录执行：
+
 ```bash
-npm create alemonjs@latest
+npm create alemonjs@latest --yes
 cd alemonjs
 yarn install
 yarn dev

@@ -1,5 +1,11 @@
 # 机器人
 
+## 环境准备
+
+使用 Node.js 22 系列和 Yarn Classic 1.22.22。Node.js 安装、创建项目和故障排查见 [安装指南（适用于 Agent）](https://github.com/lemonade-lab/alemonjs/blob/main/docs/agent-install.md)。Agent 请同时阅读本项目的 [AGENTS.md](./AGENTS.md)。
+
+在本项目目录先运行 `yarn install`，再运行 `yarn test`、`yarn build`。
+
 ## 开发
 
 推荐使用 vscode `ALemonTestOne` 插件进行本地开发并测试
