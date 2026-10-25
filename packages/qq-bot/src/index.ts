@@ -27,3 +27,6 @@ export default definePlatform({ main });
 
 export { sanitizeQQText } from './text-sanitizer.js';
 export type { QQTextSanitizerOptions } from './text-sanitizer.js';
+
+export { QQMarkdown } from './markdown.js';
+export type { QQMarkdownMathOptions, QQMarkdownTask } from './markdown.js';

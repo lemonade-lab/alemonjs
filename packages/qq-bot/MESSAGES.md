@@ -67,6 +67,22 @@ export default async () => {
 
 > 未开通 MD 权限时发送会失败，可在配置中开启 `markdownToText: true` 强制降级为纯文本。
 
+### QQ 专用 Markdown 扩展
+
+任务列表、LaTeX 和相关文字效果属于 QQ 特殊 Markdown，不扩展通用 `Format` API。使用平台专用入口，通过已有的原始内容方法接入：
+
+```ts
+import { QQMarkdown } from '@alemonjs/qq-bot/markdown';
+
+const md = Format.createMarkdown()
+  .addContent(QQMarkdown.taskList({ text: '已完成', checked: true }))
+  .addContent(QQMarkdown.math(String.raw`\frac{a}{b}`, { block: true }))
+  .addContent(QQMarkdown.color('提示', 'red'));
+await message.send({ format: Format.create().addMarkdown(md) });
+```
+
+详见 [QQ 专用扩展说明](./MARKDOWN_EXTENSIONS.md)。仅用于支持该语法的 QQ Markdown 会话；跨平台与纯文本内容由业务自行选择，不提供自动降级承诺。
+
 ### 按钮（BT.group）
 
 使用 `Format.createButtonGroup()`，平台限制：最多 **5 行**，每行最多 **5 个**按钮，超出自动裁剪。
