@@ -2,12 +2,14 @@ import callerPath from 'caller-path';
 import { readFileSync, realpathSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getConfigValue, type ConfigValue } from './config.js';
+import { getConfig, type ConfigCore, type ConfigValue } from './config.js';
 import { logger } from './logger.js';
+import { isDeepStrictEqual } from 'node:util';
+import { cloneDeep } from 'lodash-es';
 
 // caller-path 按 receiver 查找调用方，ESM 普通函数链可能被跳过。
 // 以公共入口截断栈，校验直接调用文件，避免读到外层应用的配置。
-function directCallerPath(): string | undefined {
+function directCallerPath(entry: (...args: never[]) => unknown): string | undefined {
   const prepareStackTrace = Error.prepareStackTrace;
 
   try {
@@ -20,7 +22,7 @@ function directCallerPath(): string | undefined {
     };
     const error = new Error();
 
-    Error.captureStackTrace(error, getAppConfig);
+    Error.captureStackTrace(error, entry);
     void error.stack;
 
     return filename;
@@ -35,22 +37,17 @@ function isWithin(root: string, target: string): boolean {
   return path !== '..' && !path.startsWith(`..${sep}`) && !isAbsolute(path);
 }
 
-/**
- * 按调用文件所属 package.json 的 name 读取应用配置，查找不越过 cwd。
- * 包含 cwd 自身；无 name 的清单继续向上查找。识别失败只警告并返回空对象。
- * 每次读取当前配置；返回对象与框架配置共享引用，不应直接修改。
- */
-export function getAppConfig<T extends ConfigValue = ConfigValue>(): Partial<T> {
-  const empty = (reason: string): Partial<T> => {
+function resolveAppName(entry: (...args: never[]) => unknown): string | undefined {
+  const empty = (reason: string): undefined => {
     logger.warn(`[getAppConfig] ${reason}`);
 
-    return {};
+    return undefined;
   };
   let caller: string | undefined;
 
   try {
     const detectedCaller = callerPath();
-    const directCaller = directCallerPath();
+    const directCaller = directCallerPath(entry);
 
     caller = directCaller ?? detectedCaller;
   } catch {
@@ -99,18 +96,8 @@ export function getAppConfig<T extends ConfigValue = ConfigValue>(): Partial<T> 
         if (typeof pkg.name !== 'string' || !pkg.name.trim()) {
           return empty(`package.json 的 name 无效，返回空配置：${manifest}`);
         }
-        const values = getConfigValue();
-        const value = Object.prototype.hasOwnProperty.call(values, pkg.name) ? values[pkg.name] : undefined;
 
-        // 应用配置是可选的，不存在时正常返回空对象。
-        if (value === undefined) {
-          return {};
-        }
-        if (!value || typeof value !== 'object' || Array.isArray(value)) {
-          return empty(`应用 ${pkg.name} 的配置不是对象，返回空配置。`);
-        }
-
-        return value as Partial<T>;
+        return pkg.name;
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -124,4 +111,105 @@ export function getAppConfig<T extends ConfigValue = ConfigValue>(): Partial<T> 
     }
     directory = dirname(directory);
   }
+}
+
+/** 当前应用在框架配置中的视图。dispose 仅取消本视图注册的监听。 */
+export class AppConfig<T extends ConfigValue = ConfigValue> {
+  readonly name: string | undefined;
+  #config: ConfigCore | undefined;
+  #listeners = new Set<() => void>();
+
+  constructor(name: string | undefined, config?: ConfigCore) {
+    this.name = name;
+    this.#config = config;
+  }
+
+  #read(values: ConfigValue): Partial<T> {
+    if (!this.name || !Object.prototype.hasOwnProperty.call(values, this.name)) {
+      return {};
+    }
+    const value = values[this.name];
+
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      logger.warn(`[getAppConfig] 应用 ${this.name} 的配置不是对象，返回空配置。`);
+
+      return {};
+    }
+
+    return value as Partial<T>;
+  }
+
+  get value(): Partial<T> {
+    return this.#read(this.#config?.value ?? {});
+  }
+
+  get path(): string | null {
+    return this.#config?.path ?? null;
+  }
+
+  /** 替换当前应用的配置，保留框架其他配置。识别失败时只警告，不写入。 */
+  saveValue(value: Partial<T>): void {
+    if (!this.name || !this.#config) {
+      logger.warn('[getAppConfig] 未识别应用，跳过保存配置。');
+
+      return;
+    }
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      logger.warn(`[getAppConfig] 应用 ${this.name} 的配置必须是对象，跳过保存。`);
+
+      return;
+    }
+    this.#config.saveValue({ ...this.#config.value, [this.name]: value });
+  }
+
+  reload(): void {
+    this.#config?.reload();
+  }
+
+  /** 复用框架的配置文件监听，仅在当前应用配置变化时通知。 */
+  onWatch(listener: (value: Partial<T>) => void): () => void {
+    if (!this.#config) {
+      return () => {};
+    }
+    let previous = cloneDeep(this.value);
+    const stop = this.#config.onWatch(values => {
+      const value = this.#read(values);
+
+      if (isDeepStrictEqual(previous, value)) {
+        return;
+      }
+      previous = cloneDeep(value);
+      listener(value);
+    });
+    const unsubscribe = () => {
+      stop();
+      this.#listeners.delete(unsubscribe);
+    };
+
+    this.#listeners.add(unsubscribe);
+
+    return unsubscribe;
+  }
+
+  dispose(): void {
+    for (const unsubscribe of this.#listeners) {
+      unsubscribe();
+    }
+  }
+}
+
+function appConfigFor<T extends ConfigValue>(entry: (...args: never[]) => unknown): AppConfig<T> {
+  const name = resolveAppName(entry);
+
+  return new AppConfig<T>(name, name ? getConfig() : undefined);
+}
+
+/** 自动识别调用应用，返回配置管理对象。查找包含 cwd，绝不越过 cwd。 */
+export function getAppConfig<T extends ConfigValue = ConfigValue>(): AppConfig<T> {
+  return appConfigFor<T>(getAppConfig);
+}
+
+/** 自动识别调用应用，直接读取配置值；识别失败只警告并返回空对象。 */
+export function getAppConfigValue<T extends ConfigValue = ConfigValue>(): Partial<T> {
+  return appConfigFor<T>(getAppConfigValue).value;
 }

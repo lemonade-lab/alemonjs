@@ -1,23 +1,25 @@
 import assert from 'node:assert/strict';
 import test, { after } from 'node:test';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { setTimeout as delay } from 'node:timers/promises';
 import { createTestApp } from 'alemonjs/testing';
-import { getAppConfig, shutdownLogger, logger } from 'alemonjs';
+import { getAppConfig, getAppConfigValue, getConfig, shutdownLogger, logger } from 'alemonjs';
 
 const root = mkdtempSync(join(tmpdir(), 'alemon-app-config-'));
 const originalCwd = process.cwd();
+mkdirSync(join(root, 'logs'));
 process.chdir(root);
 const entry = new URL('../lib/index.js', import.meta.url).href;
-after(() => {
+after(async () => {
+  await shutdownLogger();
   process.chdir(originalCwd);
   rmSync(root, { recursive: true, force: true });
-  shutdownLogger();
 });
 
-async function fixture(name, manifests) {
+async function fixture(name, manifests, method = 'getAppConfigValue') {
   const directory = join(root, name);
   for (const [file, value] of Object.entries(manifests)) {
     const target = join(directory, file);
@@ -28,8 +30,8 @@ async function fixture(name, manifests) {
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(
     file,
-    `import { getAppConfig } from ${JSON.stringify(entry)};
-export const read = () => getAppConfig();`
+    `import { ${method} } from ${JSON.stringify(entry)};
+export const read = () => ${method}();`
   );
   return (await import(pathToFileURL(file).href)).read;
 }
@@ -141,4 +143,102 @@ test('manifest symlinks cannot read beyond cwd', async t => {
   } finally {
     process.chdir(root);
   }
+});
+
+test('manager stays bound to its configuration scope and preserves other apps on save', async t => {
+  const manage = await fixture('managed', { 'package.json': { name: 'managed' } }, 'getAppConfig');
+  const app = appFor(t, { managed: { enabled: true }, other: { keep: 1 }, language: 'en-US' });
+  const manager = app.run(manage);
+  assert.equal(typeof getAppConfigValue, 'function');
+  assert.equal(manager.name, 'managed');
+  assert.deepEqual(manager.value, { enabled: true });
+  manager.saveValue({ enabled: false });
+  assert.deepEqual(
+    app.run(() => getConfig().value),
+    {
+      managed: { enabled: false },
+      other: { keep: 1 },
+      language: 'en-US'
+    }
+  );
+  app.configure({ managed: { updated: true } });
+  assert.deepEqual(manager.value, { updated: true });
+  assert.equal(manager.path, null);
+  manager.dispose();
+});
+
+test('unresolved manager is usable without creating or overwriting framework config', async t => {
+  const manage = await fixture('unresolved-manager', {}, 'getAppConfig');
+  const app = appFor(t, { other: { keep: true } });
+  const warn = t.mock.method(logger, 'warn', () => {});
+  const manager = app.run(manage);
+  assert.equal(manager.name, undefined);
+  assert.deepEqual(manager.value, {});
+  manager.saveValue({ ignored: true });
+  manager.reload();
+  manager.onWatch(() => assert.fail('unresolved listener'))();
+  manager.dispose();
+  assert.equal(warn.mock.callCount(), 2);
+  assert.deepEqual(
+    app.run(() => getConfig().value),
+    { other: { keep: true } }
+  );
+});
+
+test('file persistence, reload and app-only subscriptions preserve other listeners', async t => {
+  const manage = await fixture('watched', { 'package.json': { name: 'watched' } }, 'getAppConfig');
+  const previousConfig = global.__config;
+  const previousPath = process.env.CFG_PATH;
+  const file = join(root, 'watch-config.json');
+  process.env.CFG_PATH = file;
+  delete global.__config;
+  const framework = getConfig();
+  t.after(() => {
+    framework.dispose();
+    global.__config = previousConfig;
+    if (previousPath === undefined) delete process.env.CFG_PATH;
+    else process.env.CFG_PATH = previousPath;
+  });
+  framework.saveValue({ watched: { count: 0 }, other: { keep: true } });
+  const manager = manage();
+  const events = [];
+  const peerEvents = [];
+  const stop = manager.onWatch(value => events.push(value.count));
+  const peer = manage();
+  peer.onWatch(value => peerEvents.push(value.count));
+  async function change(write) {
+    // Allow the native file watcher to become active before the first write.
+    await delay(100);
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        unsubscribe();
+        reject(new Error('configuration watch timed out'));
+      }, 3000);
+      const unsubscribe = framework.onWatch(() => {
+        clearTimeout(timer);
+        unsubscribe();
+        resolve();
+      });
+      write();
+    });
+  }
+  await change(() => framework.saveValue({ watched: { count: 0 }, other: { keep: false } }));
+  assert.deepEqual(events, []);
+  await change(() => manager.saveValue({ count: 1 }));
+  assert.deepEqual(events, [1]);
+  assert.deepEqual(framework.value.other, { keep: false });
+  assert.match(readFileSync(file, 'utf8'), /count: 1/);
+  stop();
+  await change(() => manager.saveValue({ count: 2 }));
+  assert.deepEqual(events, [1]);
+  manager.onWatch(value => events.push(value.count));
+  manager.dispose();
+  await change(() => manager.saveValue({ count: 3 }));
+  assert.deepEqual(events, [1]);
+  assert.deepEqual(peerEvents, [1, 2, 3]);
+  peer.dispose();
+  writeFileSync(file, JSON.stringify({ watched: { count: 4 }, other: { keep: false } }));
+  manager.reload();
+  assert.deepEqual(manager.value, { count: 4 });
+  assert.equal(manager.path, file);
 });
