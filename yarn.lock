@@ -16495,3 +16495,22 @@ zwitch@^2.0.0:
   version "2.0.4"
   resolved "https://registry.npmjs.org/zwitch/-/zwitch-2.0.4.tgz#c827d4b0acb76fc3e685a4c6ec2902d51070e9d7"
   integrity sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==
+
+caller-callsite@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/caller-callsite/-/caller-callsite-5.0.0.tgz#e95f38263a0aa0c74ed339bc417ef5281647bdd5"
+  integrity sha512-l3+xZHsuNlFjchy1nl1kpQwi7PhKHgtQ7MOx5ijHwlouAjnwRNjq3AlxH8SGuWiF5XAhb/mSH+c90LIDFjJKtA==
+  dependencies:
+    callsites "^4.0.0"
+
+caller-path@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/caller-path/-/caller-path-4.0.0.tgz#6509f6ba633c9db306bb6de9e86295383aa1e1af"
+  integrity sha512-18JFq7TTe4+cDKsyZETRk/IS9Xka3dRcU9VWm1C6XlkAjKPSR2bskpDSUHVQw7gvef34bi1gltzmCxToUw1oQw==
+  dependencies:
+    caller-callsite "^5.0.0"
+
+callsites@^4.0.0:
+  version "4.2.0"
+  resolved "https://registry.npmjs.org/callsites/-/callsites-4.2.0.tgz#98761d5be3ce092e4b9c92f7fb8c8eb9b83cadc8"
+  integrity sha512-kfzR4zzQtAE9PC7CzZsjl3aBNbXWuXiSeOCdLcPpBfGW8YuCqQHcRPFDbr/BPVmd3EEPVpuFzLyuT/cUhPr4OQ==

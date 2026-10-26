@@ -1,5 +1,6 @@
 export * from './i18n.js';
 export * from './config.js';
+export * from './app-config.js';
 export {
   processorRepeatedEventTime,
   processorRepeatedUserTime,
