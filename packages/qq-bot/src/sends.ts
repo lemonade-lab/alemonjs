@@ -173,7 +173,7 @@ const createArkListData = (value: DataArkList['value']) => {
 
 // ==================== 公共提取器 ====================
 
-type MentionMode = 'group' | 'guild-direct' | 'guild-public';
+type MentionMode = 'group' | 'group-media' | 'c2c' | 'guild-direct' | 'guild-public';
 
 const formatMention = (item: DataMention, mode: MentionMode): string => {
   if (mode === 'guild-direct') {
@@ -197,9 +197,9 @@ const formatMention = (item: DataMention, mode: MentionMode): string => {
     return '';
   }
 
-  // group / c2c
+  // 群聊支持 @全体成员；C2C 不生成群专用标签。
   if (isEmptyMention) {
-    return '';
+    return mode === 'group' ? '<qqbot-at-everyone />' : '';
   }
   if (item.options?.belong === 'user') {
     return `<qqbot-at-user id="${value}" />`;
@@ -517,7 +517,9 @@ const sendOpenApiMessage = async (
     }
     // 富媒体消息(msg_type:7)无法携带原生 markdown 模板，始终将 MD/Buttons 降级为文本合入 content
     // 并移除已作为富媒体发送的占位符（[视频]/[音频]/[附件]）
-    const mediaContent = stripMediaPlaceholders(formatQQContent(val, item => extractContent([item], 'group'), true, config.hideUnsupported));
+    const mediaContent = stripMediaPlaceholders(
+      formatQQContent(val, item => extractContent([item], context === 'group' ? 'group-media' : context), true, config.hideUnsupported)
+    );
     const res = await sendMessage({
       content: mediaContent,
       media: { file_info: fileInfo },
@@ -543,7 +545,7 @@ const sendOpenApiMessage = async (
 
   // markdownToText 模式：跳过原生 MD，全部降级为纯文本
   if (mdToText) {
-    const textContent = formatQQContent(val, item => extractContent([item], 'group'), true, config.hideUnsupported);
+    const textContent = formatQQContent(val, item => extractContent([item], context), true, config.hideUnsupported);
 
     if (textContent) {
       const res = await sendMessage({ content: textContent, msg_type: 0, ...baseParams });
@@ -566,7 +568,7 @@ const sendOpenApiMessage = async (
   if (mdParams) {
     // 规则 2：Text 合并进 Markdown — 将 content 合入 markdown.content 使其在消息体中可见
     if (mdParams.markdown?.content) {
-      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], 'group'), false, undefined, context);
+      mdParams.markdown.content = formatQQContent(val, item => extractContent([item], context), false, undefined, context);
     }
     if (mdParams.markdown && options?.forceVerifyImageResource !== undefined) {
       mdParams.markdown.force_verify_image_resource = options.forceVerifyImageResource;
@@ -778,7 +780,7 @@ export const C2C_MESSAGE_CREATE = async (
   options?: MessageDelivery & { forceVerifyImageResource?: boolean }
 ): Promise<ClientAPIMessageResult[]> => {
   const baseParams = buildBaseParams(event._tag, event.MessageId, 'INTERACTION_CREATE_C2C');
-  const content = extractContent(val, 'group');
+  const content = extractContent(val, 'c2c');
 
   try {
     return await sendOpenApiMessage(

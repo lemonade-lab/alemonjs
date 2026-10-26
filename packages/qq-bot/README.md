@@ -79,7 +79,7 @@ qq-bot:
 | `base_url_gateway`          | string           | —               | 网关域名代理                                                                              |
 | `base_url_app_access_token` | string           | —               | 获取 access_token 的域名代理                                                              |
 | `is_private`                | boolean          | `false`         | 私域机器人，影响默认事件订阅                                                              |
-| `sandbox`                   | boolean          | `false`         | 使用沙盒 API 环境                                                                         |
+| `sandbox`                   | boolean          | `false`         | 显式使用旧版沙盒域名；默认正式环境使用 api.bot.qq.com                                     |
 | `shard`                     | number[]         | `[0, 1]`        | WebSocket 分片                                                                            |
 | `intents`                   | string[]         | 自动组装        | 自定义事件订阅，覆盖默认值，见 [intents.ts](./src/sdk/intents.ts)；通常省略，不要填空数组 |
 | `autoInteractionAck`        | boolean          | `true`          | 自动确认按钮、快捷菜单事件；关闭后由应用调用 `useInteraction().ack()`                     |

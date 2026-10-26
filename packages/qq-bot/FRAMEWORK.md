@@ -26,7 +26,17 @@
 
 调用均经过语义化 Action，例如 `menu.set`、`member.blacklist.update`、`request.policy.create`；没有平台 SDK 方法名透传入口。鉴权与连接维护由适配器内部完成。
 
-框架会在请求离开应用前执行官方限制：菜单最多 10 项、子菜单 1–5 项且只支持一层；菜单和面板链接必须是 `https`。面板最多 20 项，`specific` 受众必须与 `group` 或 `c2c` scope 匹配，每次修改受众最多 20 个 ID。频道 scope 不属于本文范围，类型和运行时都会拒绝。
+框架会在请求离开应用前执行官方限制：菜单最多 10 项、子菜单 1–5 项且只支持一层；菜单和面板链接必须是 `https`。面板最多 20 项，`specific` 受众必须与 `group` 或 `c2c` scope 匹配，每次修改受众最多 20 个 ID。面板支持 `group`、`c2c`、`channel`、`direct`，其中 `direct` 由 QQ 适配器转换为原生 `dm`；`channel`、`direct` 仅支持 `audience: 'all'`，不能指定用户或群。菜单名称及面板名称/描述按 ASCII 占 1、中文等非 ASCII 字符占 2 校验；面板备注最多 255 个 Unicode 字符。
+
+```ts
+const [panels] = usePanel({ Platform: 'qq-bot', BotId: 'APP_ID' });
+await panels.create({
+  scope: 'direct', // QQ 原生 dm（频道私信）
+  audience: 'all',
+  panel: { items: [{ type: 'command', name: '帮助' }] }
+});
+await panels.list({ scope: 'channel' });
+```
 
 ## 上下文与多机器人
 

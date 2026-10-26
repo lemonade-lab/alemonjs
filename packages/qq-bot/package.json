@@ -1,6 +1,6 @@
 {
   "name": "@alemonjs/qq-bot",
-  "version": "2.1.41",
+  "version": "2.1.42",
   "description": "QQ官方平台",
   "author": "lemonade",
   "license": "MIT",
@@ -12,14 +12,15 @@
     "test:send": "yarn build && node tests/use-send.notice.mjs",
     "test:channel": "yarn --cwd ../alemonjs build && yarn build && node tests/channel.contract.mjs",
     "test:qr": "yarn build && node tests/qr-auth.mjs",
-    "test:non-channel": "yarn build && node tests/markdown-buttons.contract.mjs && node tests/markdown-extension.contract.mjs && node tests/non-channel.contract.mjs && node tests/framework.contract.mjs && node tests/non-channel.transport.mjs && node tests/media-upload.contract.mjs && node tests/routing.contract.mjs && node tests/lifecycle.contract.mjs && node tests/http-diagnostics.contract.mjs && node tests/webhook-ingress.contract.mjs && node tests/text-sanitizer.contract.mjs && tsc -p tests/tsconfig.non-channel.json",
+    "test:non-channel": "yarn build && node tests/markdown-buttons.contract.mjs && node tests/markdown-extension.contract.mjs && node tests/non-channel.contract.mjs && node tests/framework.contract.mjs && node tests/changelog.contract.mjs && node tests/everyone.contract.mjs && node tests/non-channel.transport.mjs && node tests/media-upload.contract.mjs && node tests/routing.contract.mjs && node tests/lifecycle.contract.mjs && node tests/http-diagnostics.contract.mjs && node tests/webhook-ingress.contract.mjs && node tests/text-sanitizer.contract.mjs && tsc -p tests/tsconfig.non-channel.json",
     "docs:snapshot": "python3 scripts/snapshot-official.py",
     "test:http": "yarn build && node tests/http-diagnostics.contract.mjs && node tests/webhook-ingress.contract.mjs",
     "test:text": "yarn build && node tests/text-sanitizer.contract.mjs",
     "test:materials": "yarn build && node tests/materials.contract.mjs",
     "test:mention": "yarn build && node tests/everyone.contract.mjs",
     "test:buttons": "yarn build && node tests/markdown-buttons.contract.mjs",
-    "test:markdown-extension": "yarn build && node tests/markdown-extension.contract.mjs && node ../../node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 tests/markdown-extension.types.ts"
+    "test:markdown-extension": "yarn build && node tests/markdown-extension.contract.mjs && node ../../node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 tests/markdown-extension.types.ts",
+    "test:changelog": "yarn --cwd ../alemonjs build && yarn build && node tests/changelog.contract.mjs && node tests/everyone.contract.mjs"
   },
   "dependencies": {
     "@noble/curves": "^1.7.0",

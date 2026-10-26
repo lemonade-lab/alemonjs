@@ -25,12 +25,23 @@ const nonEmptyIds = (ids: unknown, maximum: number, name: string): string[] => {
 
   return ids;
 };
-const textLength = (value: string) => Buffer.byteLength(value, 'utf8');
+// QQ 菜单名称和面板名称/描述按展示字符计：ASCII 占 1，中文等非 ASCII 字符占 2。
+const textLength = (value: string) => Array.from(value).reduce((length, character) => length + (character.codePointAt(0) <= 0x7f ? 1 : 2), 0);
+const panelScope = (scope: string): 'group' | 'c2c' | 'channel' | 'dm' => {
+  if (scope === 'direct') {
+    return 'dm';
+  }
+  if (scope === 'group' || scope === 'c2c' || scope === 'channel') {
+    return scope;
+  }
+
+  throw new Error('QQ panel scope must be group, c2c, channel or direct');
+};
 const menuItem = (item: MenuItem, child = false): any => {
   const maximum = child ? 14 : 10;
 
   if (!item.name || textLength(item.name) > maximum) {
-    throw new Error(`Menu item name must be at most ${maximum} bytes`);
+    throw new Error(`Menu item name must be at most ${maximum} weighted characters`);
   }
   if (child && item.type === 'menu') {
     throw new Error('Menu sub-items cannot contain another menu');
@@ -52,8 +63,8 @@ const menuItem = (item: MenuItem, child = false): any => {
   };
 };
 const validatePanel = (panel: CommandPanel) => {
-  if (panel.items.length > 20 || (panel.remark && textLength(panel.remark) > 255)) {
-    throw new Error('Panel supports at most 20 items and a 255-byte remark');
+  if (panel.items.length > 20 || (panel.remark && Array.from(panel.remark).length > 255)) {
+    throw new Error('Panel supports at most 20 items and a 255-character remark');
   }
   for (const item of panel.items) {
     if (!item.name || textLength(item.name) > 14 || (item.description && textLength(item.description) > 30)) {
@@ -65,8 +76,15 @@ const validatePanel = (panel: CommandPanel) => {
   }
 };
 const validatePanelAudience = (scope: string, audience: string | undefined, userIds?: string[], guildIds?: string[]) => {
-  if (!['group', 'c2c'].includes(scope)) {
-    throw new Error('QQ panel scope must be group or c2c');
+  if (audience !== undefined && audience !== 'all' && audience !== 'specific') {
+    throw new Error('QQ panel audience must be all or specific');
+  }
+  if (scope === 'channel' || scope === 'dm') {
+    if ((audience !== undefined && audience !== 'all') || userIds?.length || guildIds?.length) {
+      throw new Error('QQ channel/direct panels only support audience: all without audience IDs');
+    }
+
+    return;
   }
   if (Boolean(userIds?.length) && Boolean(guildIds?.length)) {
     throw new Error('A panel audience cannot mix users and groups');
@@ -122,13 +140,13 @@ const panelBody = (panel: CommandPanel) => ({
   version: panel.version
 });
 const fromPanel = (r: any) => {
-  if (!['group', 'c2c'].includes(r.scope)) {
-    throw new Error(`QQ panel scope ${r.scope || 'unknown'} is outside the non-channel framework surface`);
+  if (!['group', 'c2c', 'channel', 'dm'].includes(r.scope)) {
+    throw new Error(`QQ panel scope ${r.scope || 'unknown'} is not supported`);
   }
 
   return {
     id: r.panel_id,
-    scope: r.scope as 'group' | 'c2c',
+    scope: r.scope === 'dm' ? 'direct' : r.scope,
     audience: r.target_type,
     userIds: r.user_openids,
     guildIds: r.group_openids,
@@ -313,19 +331,18 @@ export const handleFrameworkAction = async (client: QQBotAPI, data: { action: st
       return client.menuPut({ menu: { items: p.menu.items.map(menuItem) } });
     },
     'panel.list': async () => {
-      if (!['group', 'c2c'].includes(p.scope)) {
-        throw new Error('QQ panel scope must be group or c2c');
-      }
-      const r = await client.panelsList({ scope: p.scope, ...pagination(p.pagination) });
+      const r = await client.panelsList({ scope: panelScope(p.scope), ...pagination(p.pagination) });
 
       return page(r.records.map(fromPanel), r);
     },
     'panel.create': async () => {
       validatePanel(p.panel);
-      validatePanelAudience(p.scope, p.audience, p.userIds, p.guildIds);
+      const scope = panelScope(p.scope);
+
+      validatePanelAudience(scope, p.audience, p.userIds, p.guildIds);
       const r = await client.panelsCreate({
-        scope: p.scope,
-        target_type: p.audience,
+        scope,
+        target_type: p.audience ?? 'all',
         user_openids: p.userIds,
         group_openids: p.guildIds,
         panel: panelBody(p.panel)

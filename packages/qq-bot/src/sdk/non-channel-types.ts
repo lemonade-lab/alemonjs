@@ -14,8 +14,8 @@ export type QQBotPanel = {
   remark?: string;
   version?: number;
 };
-/** 本次仅开放非频道场景。 */
-export type QQBotPanelScope = 'c2c' | 'group';
+/** QQ 原生面板场景；框架 direct 对应 dm。 */
+export type QQBotPanelScope = 'c2c' | 'group' | 'channel' | 'dm';
 export type QQBotPanelCreate = {
   scope: QQBotPanelScope;
   target_type?: 'all' | 'specific';

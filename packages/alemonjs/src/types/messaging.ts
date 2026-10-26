@@ -24,15 +24,17 @@ export type MenuItem = {
   | { type: 'menu'; items: ({ name: string } & ({ type: 'message'; text: string } | { type: 'link'; url: string }))[] }
 );
 export type Menu = { items: MenuItem[] };
-/** Conversation scopes covered by the non-channel QQ Bot framework surface. */
+/** 群聊和单聊范围，保留既有类型兼容性。 */
 export type NonChannelConversationScope = 'group' | 'c2c';
+/** 通用指令面板场景；频道私信使用 direct，由适配器转换平台字段。 */
+export type CommandPanelScope = NonChannelConversationScope | 'channel' | 'direct';
 export type CommandPanel = {
   items: { name: string; description?: string; type: 'command' | 'link'; adminOnly?: boolean; url?: string }[];
   remark?: string;
   version?: number;
 };
 export type PanelCreateParams = {
-  scope: NonChannelConversationScope;
+  scope: CommandPanelScope;
   audience?: 'all' | 'specific';
   userIds?: string[];
   guildIds?: string[];
@@ -195,7 +197,7 @@ export type MessagingActionMap = {
   'media.resource.capabilities': [Record<string, never>, MediaCapabilities];
   'menu.get': [Record<string, never>, { menu?: Menu; version: number }];
   'menu.set': [{ menu: Menu }, { version: number }];
-  'panel.list': [{ scope: NonChannelConversationScope; pagination?: PaginationParams }, PaginatedResult<PanelInfo>];
+  'panel.list': [{ scope: CommandPanelScope; pagination?: PaginationParams }, PaginatedResult<PanelInfo>];
   'panel.create': [PanelCreateParams, { id: string }];
   'panel.get': [{ id: string }, PanelInfo];
   'panel.update': [{ id: string; panel: CommandPanel }, { version: number }];

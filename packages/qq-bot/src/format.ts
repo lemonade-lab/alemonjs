@@ -230,14 +230,14 @@ const mdFormatters: Record<string, (value: any, options?: any, context?: QQMarkd
     return `[🔗${value?.text}](${value?.url}) `;
   },
   'MD.image': (value, options) => `\n![text #${options?.width || 208}px #${options?.height || 320}px](${value})\n`,
-  'MD.mention': (value, options) => {
+  'MD.mention': (value, options, context) => {
     const { belong } = options || {};
 
     if (belong === 'channel') {
       return '';
     }
     if (value === 'everyone') {
-      return '<qqbot-at-everyone />';
+      return context === 'c2c' ? '' : '<qqbot-at-everyone />';
     }
     if (belong === 'user') {
       return `<qqbot-at-user id="${value}" />`;

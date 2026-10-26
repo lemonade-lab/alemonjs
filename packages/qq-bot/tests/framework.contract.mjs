@@ -389,7 +389,8 @@ const panelService = client.groupService;
 client.groupService = async request =>
   request.url === '/v2/panels/channel-panel' ? { ...panel, panel_id: 'channel-panel', scope: 'channel' } : panelService(request);
 const channelPanel = await panels.get('channel-panel');
-assert.equal(channelPanel.code, ResultCode.Fail);
+assert.equal(channelPanel.code, ResultCode.Ok);
+assert.equal(channelPanel.data.scope, 'channel');
 client.groupService = panelService;
 await useMessage({ ...group, _tag: 'GROUP_AT_MESSAGE_CREATE', MessageId: 'original' })[0].send({
   target: { scope: 'group', targetId: 'other' },

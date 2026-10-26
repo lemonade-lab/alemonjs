@@ -13,8 +13,11 @@ const created = await panel.create({ scope: 'group', audience: 'specific', guild
 await panel.get(created.data.id);
 // @ts-expect-error scope is required
 panel.list({ pagination: { Limit: 10 } });
-// @ts-expect-error channel is intentionally excluded from the non-channel panel surface
 panel.list({ scope: 'channel' });
+panel.list({ scope: 'direct' });
+await panel.create({ scope: 'direct', audience: 'all', panel: { items: [{ name: '帮助', type: 'command' }] } });
+// @ts-expect-error QQ wire scope dm must not leak into generic panel hooks
+panel.list({ scope: 'dm' });
 // @ts-expect-error menu items must contain semantic content, not QQ wire fields
 menu.set({ items: [{ type: 'message', name: 'help', send_message: '/help' }] });
 const [members] = useMember(context);

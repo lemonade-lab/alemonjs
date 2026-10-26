@@ -314,7 +314,7 @@ export default async () => {
 ```ts
 const [message] = useMessage(event);
 
-// 文字子频道全体提及：需要机器人拥有相应权限。
+// 群聊或文字子频道全体提及：需要机器人拥有相应权限。
 await message.send({
   format: Format.create().addMention('everyone').addText('公告')
 });
@@ -330,6 +330,6 @@ await message.send({
 });
 ```
 
-频道全体提及输出 `<qqbot-at-everyone />`，群聊及频道用户提及输出 `<qqbot-at-user id="USER_ID" />`，替换即将弃用的旧协议。原生 Markdown 的全体提及渲染原已支持，此次补齐普通频道文本及混合消息路径。Markdown 降级时，其提及节点显示为可读文本 `@全体成员`。
+群聊及频道全体提及输出 `<qqbot-at-everyone />`，群聊及频道用户提及输出 `<qqbot-at-user id="USER_ID" />`，替换即将弃用的旧协议。普通文本、原生 Markdown 和混合正文均支持；C2C 不生成群专用的全体提及标签。Markdown 降级时，其提及节点显示为可读文本 `@全体成员`。
 
-全体提及仅在文字子频道可用，不表示 QQ 群聊或 C2C 新增了 @全体能力；手写 Markdown 的平台标签仍按原文传递，权限与支持范围由 QQ 校验。参见 [官方文本交互说明](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/trans/text-chain.html#使用-能力)。
+依据 [2026-10-26 官方更新记录](https://bot.q.qq.com/wiki/develop/api-v2/changelog.html)，群聊文本及 Markdown 支持全体提及，机器人必须为群管理员，每群每天仅可发送 1 次；权限和次数由 QQ 平台校验，适配器不做本地配额推算或自动重试。C2C 不支持群全体提及；手写 Markdown 标签仍按原文传递。参见 [官方文本交互说明](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/trans/text-chain.html#使用-能力)。
