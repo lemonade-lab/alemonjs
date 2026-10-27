@@ -1,3 +1,4 @@
+import { withAppContext } from '../app-context.js';
 import { dirname, join } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { createEventName, showErrorModule } from '../../../common/utils.js';
@@ -125,7 +126,9 @@ const detectWebCapability = (startDir: string) => {
  * @param appName
  * @throws {Error} - 如果 mainPath 无效，抛出错误。
  */
-export const loadChildren = async (mainPath: string, appName: string) => {
+export const loadChildren = (mainPath: string, appName: string) => withAppContext(appName, () => loadChildrenInContext(mainPath, appName));
+
+const loadChildrenInContext = async (mainPath: string, appName: string) => {
   if (!mainPath || typeof mainPath !== 'string') {
     logger.error({
       code: ResultCode.FailParams,
@@ -220,6 +223,7 @@ export const loadChildren = async (mainPath: string, appName: string) => {
 
     const registerMounted = async () => {
       const res = await app?.register();
+
       validateContextRegistration(res);
       const hasEventCapability = Boolean(
         res && (res?.response || res?.middleware || res?.responseRouter || res?.middlewareRouter || res?.middlewareContent || res?.responseContent)

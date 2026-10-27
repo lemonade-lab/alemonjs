@@ -1,109 +1,346 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { randomUUID } from 'node:crypto';
 import { scopedMap, scopedSet } from '../common/runtime-scope.js';
-/**
- * Expose — 插件间协议通信系统
- *
- * provide/consume + watch + notify
- */
+import { currentAppContext } from './runtime/app-context.js';
+import { getCurrentAppName } from './runtime/hook-event-context.js';
+import { assertExposeSchema, validateExposeValue, snapshotExposeValue, freezeExposeSnapshot } from './expose-schema.js';
+import type {
+  ExposeActionMeta,
+  ExposeProvideConfig,
+  ExposeListItem,
+  ExposeWatchEvent,
+  ExposeSchemaItem,
+  ExposeActionDescription,
+  ExposeCallContext,
+  ExposeCallOptions,
+  ExposeCallResult,
+  ExposeErrorCode
+} from '../types/expose/index.js';
 
-import { ExposeActionMeta, ExposeProvideConfig, ExposeListItem, ExposeWatchEvent, ExposeSchemaItem } from '../types';
-
-// ═══════════════════════════════════════════════════
-// 全局注册中心
-// ═══════════════════════════════════════════════════
-
-/** 单个 provider 的存储 */
 interface ProviderEntry {
   appName: string;
+  active: boolean;
   config: ExposeProvideConfig;
+  calls: Set<AbortController>;
+}
+type WatchCallback = (event: ExposeWatchEvent) => unknown;
+interface Watcher {
+  callback: WatchCallback;
+  owner?: string;
+  protocol?: string;
+}
+const storeExpose = scopedMap<string, Map<string, ProviderEntry>>();
+const watchers = scopedSet<Watcher>();
+
+type AppScope = ReturnType<typeof currentAppContext>;
+const callContext = new AsyncLocalStorage<{ context: ExposeCallContext; scope: AppScope } | undefined>();
+const watchOwner = new AsyncLocalStorage<{ appName?: string; scope: AppScope }>();
+
+function currentCallerApp(): string | undefined {
+  const observer = watchOwner.getStore();
+
+  const call = getExposeContext();
+
+  if (call) {
+    return call.provider;
+  }
+  if (!observer) {
+    return getCurrentAppName();
+  }
+
+  return observer.scope === currentAppContext() ? observer.appName : getCurrentAppName();
 }
 
-/** 按 protocol 分组的存储: Map<protocol, Map<appName, ProviderEntry>> */
-const storeExpose = scopedMap<string, Map<string, ProviderEntry>>();
+export class ExposeError extends Error {
+  constructor(public readonly code: ExposeErrorCode, message: string) {
+    super(message);
+    this.name = 'ExposeError';
+  }
+}
 
-/** watch 回调列表 */
-type WatchCallback = (event: ExposeWatchEvent) => void;
+/** Expose 上下文与聊天事件的 next 独立，不伪造平台事件或玩家授权。 */
+export function getExposeContext(): ExposeCallContext | undefined {
+  const call = callContext.getStore();
 
-/** 按 protocol 存放的 watcher */
-const protocolWatchers = scopedMap<string, Set<WatchCallback>>();
+  if (!call) {
+    return undefined;
+  }
 
-/** 全局 watcher（不指定 protocol 的） */
-const globalWatchers = scopedSet<WatchCallback>();
-
-// ═══════════════════════════════════════════════════
-// 触发 watcher
-// ═══════════════════════════════════════════════════
+  return call.scope === currentAppContext() ? call.context : undefined;
+}
 
 function emitWatch(event: ExposeWatchEvent) {
-  // 触发 protocol-specific watcher
-  const watchers = protocolWatchers.get(event.protocol);
-
-  if (watchers) {
-    for (const cb of watchers) {
-      try {
-        cb(event);
-      } catch {
-        // watcher 出错不影响调用链
-      }
+  for (const watcher of watchers) {
+    if (watcher.protocol && watcher.protocol !== event.protocol) {
+      continue;
     }
-  }
-  // 触发全局 watcher
-  for (const cb of globalWatchers) {
     try {
-      cb(event);
+      // 异步监听器拒绝也不能变成未处理异常。
+      const result = callContext.run(undefined, () => watchOwner.run({ appName: watcher.owner, scope: currentAppContext() }, () => watcher.callback(event)));
+
+      Promise.resolve(result).catch(() => undefined);
     } catch {
-      // watcher 出错不影响调用链
+      // 观察者不改变动作结果。
     }
   }
 }
 
-// ═══════════════════════════════════════════════════
-// Expose — 插件间协议通信
-// ═══════════════════════════════════════════════════
+function resolveEntry(protocol: string, appName: string, expected?: ProviderEntry): ProviderEntry {
+  const providers = storeExpose.get(protocol);
+  const entry = providers?.get(appName);
 
-/**
- * 插件间协议通信
- *
- * @example
- * ```ts
- * // provider 端（通过 defineChildren 的 register 返回）
- * register() {
- *   return {
- *     expose: [
- *       { name: 'help-image', description: '...', actions: { ... } }
- *     ]
- *   }
- * }
- *
- * // consumer 端
- * const items = Expose.list('help-image');
- * items[0].invoke('read');
- *
- * // AI 端
- * Expose.schema();
- * Expose.invoke('help-image', 'plugin-a', 'read');
- * ```
- */
-/**
- * 框架侧批量注册 expose 协议
- */
+  if ((expected && entry !== expected) || (entry && !entry.active)) {
+    throw new ExposeError('STALE_PROVIDER', '[expose] provider handle is no longer active');
+  }
+  if (!providers) {
+    throw new ExposeError('PROTOCOL_NOT_FOUND', `[expose] protocol "${protocol}" not found`);
+  }
+  if (!entry) {
+    throw new ExposeError('PROVIDER_NOT_FOUND', `[expose] provider "${appName}" not found in protocol "${protocol}"`);
+  }
+
+  return entry;
+}
+
+function describeActions(config: ExposeProvideConfig): Record<string, ExposeActionDescription> {
+  const actions: Record<string, ExposeActionDescription> = Object.create(null);
+
+  for (const [name, meta] of Object.entries(config.actions)) {
+    const { description, params, returns, inputSchema, outputSchema, effect } = meta;
+
+    actions[name] = structuredClone({
+      description,
+      ...(params ? { params } : {}),
+      ...(returns ? { returns } : {}),
+      ...(inputSchema ? { inputSchema } : {}),
+      ...(outputSchema ? { outputSchema } : {}),
+      ...(effect ? { effect } : {})
+    });
+  }
+
+  return actions;
+}
+
+function retire(entry: ProviderEntry) {
+  entry.active = false;
+  for (const controller of entry.calls) {
+    controller.abort(new ExposeError('STALE_PROVIDER', '[expose] provider was unloaded or replaced'));
+  }
+  entry.calls.clear();
+}
+
+/** 批量验证完成后再注册；外部修改原始契约不会修改运行中的接口。 */
 export function registerExpose(appName: string, configs: ExposeProvideConfig[]) {
-  for (const config of configs) {
+  const prepared = configs.map(config => {
+    if (typeof config.name !== 'string' || !config.name || typeof config.description !== 'string' || !config.actions || typeof config.actions !== 'object') {
+      throw new Error('Invalid Expose provider');
+    }
+    const actions: Record<string, ExposeActionMeta> = Object.create(null);
+
+    for (const [name, original] of Object.entries(config.actions)) {
+      if (!original) {
+        throw new Error('Invalid Expose action');
+      }
+      const { handler, authorize, ...metadata } = original;
+      const action = { ...structuredClone(metadata), handler, ...(authorize !== undefined ? { authorize } : {}) };
+
+      if (!name || !action || typeof action.handler !== 'function' || typeof action.description !== 'string') {
+        throw new Error('Invalid Expose action');
+      }
+      if ((action.inputSchema !== undefined) !== (action.outputSchema !== undefined)) {
+        throw new Error('Expose requires both inputSchema and outputSchema');
+      }
+      if (action.inputSchema !== undefined) {
+        assertExposeSchema(action.inputSchema);
+      }
+      if (action.outputSchema !== undefined) {
+        assertExposeSchema(action.outputSchema);
+      }
+      if (action.authorize !== undefined && typeof action.authorize !== 'function') {
+        throw new Error('Invalid Expose authorization hook');
+      }
+      if (action.effect !== undefined && !['read', 'write', 'unknown'].includes(action.effect)) {
+        throw new Error('Invalid Expose effect');
+      }
+      actions[name] = action;
+    }
+
+    return { ...config, actions };
+  });
+
+  // 整批先失效，防止一个协议的取消回调调用同批其他旧协议。
+  for (const config of prepared) {
+    const previous = storeExpose.get(config.name)?.get(appName);
+
+    if (previous) {
+      previous.active = false;
+    }
+  }
+  for (const config of prepared) {
     const protocol = config.name;
 
     if (!storeExpose.has(protocol)) {
       storeExpose.set(protocol, new Map());
     }
-
     const providers = storeExpose.get(protocol);
+    const previous = providers.get(appName);
 
-    if (providers.has(appName)) {
-      console.warn(`[expose] ${appName} already provided "${protocol}", overwriting.`);
+    if (previous) {
+      retire(previous);
     }
-
-    providers.set(appName, { appName, config });
+    providers.set(appName, { appName, active: true, config, calls: new Set() });
   }
 }
 
+function snapshotValue(value: unknown, code: 'INVALID_INPUT' | 'INVALID_OUTPUT'): unknown {
+  try {
+    return snapshotExposeValue(value);
+  } catch {
+    throw new ExposeError(code, '[expose] value must be plain JSON data without accessors');
+  }
+}
+
+const signalAborted = Object.getOwnPropertyDescriptor(AbortSignal.prototype, 'aborted').get;
+
+function normalizeCallOptions(value: unknown): ExposeCallOptions {
+  const invalid = () => new ExposeError('INVALID_OPTIONS', '[expose] invalid call options');
+
+  if (!value || typeof value !== 'object' || (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null)) {
+    throw invalid();
+  }
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+
+  for (const key of Reflect.ownKeys(descriptors)) {
+    if (typeof key !== 'string' || !['signal', 'timeoutMs'].includes(key) || !Object.prototype.hasOwnProperty.call(descriptors[key], 'value')) {
+      throw invalid();
+    }
+  }
+  const timeoutMs = descriptors.timeoutMs?.value;
+  const signal = descriptors.signal?.value;
+
+  if (timeoutMs !== undefined && (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0 || timeoutMs > 2_147_483_647)) {
+    throw invalid();
+  }
+  if (signal !== undefined) {
+    try {
+      signalAborted.call(signal);
+    } catch {
+      throw invalid();
+    }
+  }
+
+  return { timeoutMs, signal };
+}
+
+interface Execution {
+  context: ExposeCallContext;
+  controller: AbortController;
+  started: boolean;
+}
+function execution(protocol: string, provider: string, action: string): Execution {
+  const parent = getExposeContext();
+  const controller = new AbortController();
+
+  return {
+    started: false,
+    controller,
+    context: Object.freeze({
+      callId: randomUUID(),
+      ...(parent ? { parentCallId: parent.callId } : {}),
+      callerApp: currentCallerApp(),
+      protocol,
+      provider,
+      action,
+      signal: controller.signal
+    })
+  };
+}
+
+/** 两种调用路径都使用此执行器；旧 invoke 保留同步返回行为。 */
+function execute(run: Execution, input: unknown, strict: boolean, expected?: ProviderEntry): any {
+  const { context, controller } = run;
+  const { protocol, provider, action } = context;
+  const entry = resolveEntry(protocol, provider, expected);
+  const meta = Object.prototype.hasOwnProperty.call(entry.config.actions, action) ? entry.config.actions[action] : undefined;
+
+  if (!meta) {
+    throw new ExposeError('ACTION_NOT_FOUND', `[expose] action "${action}" not found in "${protocol}" of "${provider}"`);
+  }
+  if (strict && (!meta.inputSchema || !meta.outputSchema)) {
+    throw new ExposeError('CONTRACT_REQUIRED', '[expose] action has no structured contract');
+  }
+  const value = meta.inputSchema ? snapshotValue(input, 'INVALID_INPUT') : input;
+
+  if (meta.inputSchema && validateExposeValue(meta.inputSchema, value)) {
+    throw new ExposeError('INVALID_INPUT', '[expose] input does not match schema');
+  }
+  // 校验、授权和 handler 始终使用同一份稳定快照。
+
+  entry.calls.add(controller);
+  const cleanup = () => {
+    entry.calls.delete(controller);
+    controller.signal.removeEventListener('abort', cleanup);
+  };
+
+  controller.signal.addEventListener('abort', cleanup, { once: true });
+  const checkActive = () => {
+    if (controller.signal.aborted) {
+      throw controller.signal.reason;
+    }
+    resolveEntry(protocol, provider, entry);
+  };
+  const complete = (result: unknown) => {
+    checkActive();
+    const data = meta.outputSchema ? snapshotValue(result, 'INVALID_OUTPUT') : result;
+
+    if (meta.outputSchema && validateExposeValue(meta.outputSchema, data)) {
+      throw new ExposeError('INVALID_OUTPUT', '[expose] output does not match schema');
+    }
+
+    if (meta.effect ? meta.effect !== 'read' : action !== 'read') {
+      emitWatch({ name: provider, protocol, action, value });
+    }
+
+    return data;
+  };
+  const perform = (allowed: boolean) => {
+    checkActive();
+    if (allowed !== true) {
+      throw new ExposeError('FORBIDDEN', '[expose] invocation was not authorized');
+    }
+    run.started = true;
+    const result = meta.handler(value, context);
+
+    return result && typeof result.then === 'function' ? Promise.resolve(result).then(complete) : complete(result);
+  };
+
+  try {
+    const result = callContext.run({ context, scope: currentAppContext() }, () => {
+      checkActive();
+      const authorizationInput = meta.authorize && meta.inputSchema ? freezeExposeSnapshot(snapshotValue(value, 'INVALID_INPUT')) : value;
+      const allowed = meta.authorize ? meta.authorize(authorizationInput, context) : true;
+
+      return allowed && typeof (allowed as Promise<boolean>).then === 'function' ? Promise.resolve(allowed).then(perform) : perform(allowed as boolean);
+    });
+
+    if (result && typeof (result as Promise<unknown>).then === 'function') {
+      return Promise.resolve(result).finally(cleanup);
+    }
+    cleanup();
+
+    return result;
+  } catch (error) {
+    cleanup();
+    throw error;
+  }
+}
+
+/**
+ * register() { return { expose: Expose.create().provide({...}) }; }
+ * const client = Expose.create(); client.list(); client.schema();
+ * client.invoke(protocol, provider, action, value); // 兼容已有插件
+ * await client.call(protocol, provider, action, value); // 结构化工具调用
+ */
 export class Expose {
   #configs: ExposeProvideConfig[] = [];
 
@@ -111,232 +348,184 @@ export class Expose {
     return new Expose();
   }
 
-  /**
-   * 注册协议 — 链式调用
-   */
   provide(config: ExposeProvideConfig) {
     this.#configs.push(config);
 
     return this;
   }
 
-  /**
-   * 获取已注册的配置（框架侧使用）
-   */
+  /** 保留具体 handler 的输入输出类型；不从任意工具名称断言结果类型。 */
+  static action<Input, Output>(action: ExposeActionMeta<Input, Output>): ExposeActionMeta<Input, Output> {
+    return action;
+  }
+
   getConfigs() {
     return this.#configs;
   }
 
-  // ═══════════════════════════════════════════════
-  // 消费端
-  // ═══════════════════════════════════════════════
-
-  /**
-   * 列出提供者
-   */
   list(protocol?: string): ExposeListItem[] {
-    const result: ExposeListItem[] = [];
+    const items: ExposeListItem[] = [];
 
-    if (protocol) {
-      const providers = storeExpose.get(protocol);
-
-      if (!providers) {
-        return result;
-      }
-
-      for (const [, entry] of providers) {
-        result.push(createListItem(entry, protocol));
-      }
-    } else {
-      for (const [proto, providers] of storeExpose) {
-        for (const [, entry] of providers) {
-          result.push(createListItem(entry, proto));
-        }
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * 直接调用 — AI 友好
-   */
-  invoke(protocol: string, appName: string, action: string, value?: any): any {
-    const providers = storeExpose.get(protocol);
-
-    if (!providers) {
-      throw new Error(`[expose] protocol "${protocol}" not found`);
-    }
-
-    const entry = providers.get(appName);
-
-    if (!entry) {
-      throw new Error(`[expose] provider "${appName}" not found in protocol "${protocol}"`);
-    }
-
-    const actionMeta = entry.config.actions[action];
-
-    if (!actionMeta) {
-      throw new Error(`[expose] action "${action}" not found in "${protocol}" of "${appName}"`);
-    }
-
-    const result = actionMeta.handler(value);
-
-    // 非 read 操作自动触发 watch
-    if (action !== 'read') {
-      emitWatch({
-        name: appName,
-        protocol,
-        action,
-        value
-      });
-    }
-
-    return result;
-  }
-
-  /**
-   * 全量元信息 — AI 发现用
-   */
-  schema(): ExposeSchemaItem[] {
-    const result: ExposeSchemaItem[] = [];
-
-    for (const [protocol, providers] of storeExpose) {
-      // 取第一个 provider 的 config 作为协议描述（所有同协议 provider 应共享同一 actions 定义）
-      const firstEntry = providers.values().next().value;
-
-      if (!firstEntry) {
+    for (const [name, providers] of storeExpose) {
+      if (protocol !== undefined && name !== protocol) {
         continue;
       }
-
-      const actions: ExposeSchemaItem['actions'] = {};
-
-      for (const [actionName, meta] of Object.entries<ExposeActionMeta>(firstEntry.config.actions)) {
-        actions[actionName] = {
-          description: meta.description,
-          ...(meta.params ? { params: meta.params } : {}),
-          ...(meta.returns ? { returns: meta.returns } : {})
-        };
-      }
-
-      result.push({
-        protocol,
-        description: firstEntry.config.description,
-        providers: Array.from(providers.keys()).map(name => ({ name })),
-        actions,
-        invoke: 'Expose.invoke(protocol, appName, action, value?)'
-      });
-    }
-
-    return result;
-  }
-
-  /**
-   * 监听变更
-   */
-  watch(protocolOrCallback: string | WatchCallback, callback?: WatchCallback): () => void {
-    if (typeof protocolOrCallback === 'function') {
-      // 全局监听
-      const cb = protocolOrCallback;
-
-      globalWatchers.add(cb);
-
-      return () => {
-        globalWatchers.delete(cb);
-      };
-    }
-
-    // 协议监听
-    const protocol = protocolOrCallback;
-
-    if (!callback) {
-      throw new Error('[expose] watch(protocol, callback) requires a callback');
-    }
-
-    if (!protocolWatchers.has(protocol)) {
-      protocolWatchers.set(protocol, new Set());
-    }
-
-    protocolWatchers.get(protocol).add(callback);
-
-    return () => {
-      const set = protocolWatchers.get(protocol);
-
-      if (set) {
-        set.delete(callback);
-        if (set.size === 0) {
-          protocolWatchers.delete(protocol);
-        }
-      }
-    };
-  }
-}
-
-// ═══════════════════════════════════════════════════
-// 工具函数
-// ═══════════════════════════════════════════════════
-
-function createListItem(entry: ProviderEntry, protocol: string): ExposeListItem {
-  const actions: ExposeListItem['actions'] = {};
-
-  for (const [actionName, meta] of Object.entries<ExposeActionMeta>(entry.config.actions)) {
-    actions[actionName] = {
-      description: meta.description,
-      ...(meta.params ? { params: meta.params } : {}),
-      ...(meta.returns ? { returns: meta.returns } : {})
-    };
-  }
-
-  return {
-    name: entry.appName,
-    protocol,
-    description: entry.config.description,
-    actions,
-    invoke(action: string, value?: any) {
-      const actionMeta = entry.config.actions[action];
-
-      if (!actionMeta) {
-        throw new Error(`[expose] action "${action}" not found in "${protocol}" of "${entry.appName}"`);
-      }
-
-      const result = actionMeta.handler(value);
-
-      if (action !== 'read') {
-        emitWatch({
+      for (const entry of providers.values()) {
+        items.push({
           name: entry.appName,
-          protocol,
-          action,
-          value
+          protocol: name,
+          description: entry.config.description,
+          ...(entry.config.version ? { version: entry.config.version } : {}),
+          actions: describeActions(entry.config),
+          invoke: (action, value) => execute(execution(name, entry.appName, action), value, false, entry)
         });
       }
-
-      return result;
     }
-  };
+
+    return items;
+  }
+
+  invoke(protocol: string, appName: string, action: string, value?: any): any {
+    return execute(execution(protocol, appName, action), value, false);
+  }
+
+  /** 不自动重试；超时或取消发生在 handler 开始后，业务结果只能标记为 unknown。 */
+  async call(protocol: string, provider: string, action: string, input: unknown, options: ExposeCallOptions = {}): Promise<ExposeCallResult> {
+    const run = execution(protocol, provider, action);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let externalSignal: AbortSignal | undefined;
+    let listening = false;
+    const abort = () => run.controller.abort(new ExposeError('ABORTED', '[expose] call was cancelled'));
+    let rejectAbort: (() => void) | undefined;
+
+    try {
+      const normalized = normalizeCallOptions(options);
+
+      externalSignal = normalized.signal;
+      if (externalSignal && signalAborted.call(externalSignal)) {
+        abort();
+      } else {
+        if (externalSignal) {
+          EventTarget.prototype.addEventListener.call(externalSignal, 'abort', abort, { once: true });
+          listening = true;
+        }
+      }
+      if (run.controller.signal.aborted) {
+        throw run.controller.signal.reason;
+      }
+      if (normalized.timeoutMs !== undefined) {
+        timer = setTimeout(() => {
+          run.controller.abort(new ExposeError('TIMEOUT', '[expose] call deadline exceeded'));
+        }, normalized.timeoutMs);
+      }
+      const cancelled = new Promise<never>((_, reject) => {
+        rejectAbort = () => reject(run.controller.signal.reason);
+        run.controller.signal.addEventListener('abort', rejectAbort, { once: true });
+      });
+      // 将同步异常也纳入 race，确保取消监听创建后的拒绝始终有人处理。
+      const operation = new Promise<unknown>((resolve, reject) => {
+        try {
+          resolve(execute(run, input, true));
+        } catch (error) {
+          reject(error);
+        }
+      });
+      const data = await Promise.race([operation, cancelled]);
+
+      return { ok: true, callId: run.context.callId, data };
+    } catch (error) {
+      const code = error instanceof ExposeError ? error.code : 'HANDLER_FAILED';
+
+      return {
+        ok: false,
+        callId: run.context.callId,
+        error: {
+          code,
+          message: error instanceof ExposeError ? error.message : '[expose] action failed',
+          outcome: run.started ? 'unknown' : 'not_started'
+        }
+      };
+    } finally {
+      if (timer !== undefined) {
+        clearTimeout(timer);
+      }
+      if (listening) {
+        EventTarget.prototype.removeEventListener.call(externalSignal, 'abort', abort);
+      }
+      if (rejectAbort) {
+        run.controller.signal.removeEventListener('abort', rejectAbort);
+      }
+    }
+  }
+
+  schema(): ExposeSchemaItem[] {
+    return this.list().map(item => ({
+      protocol: item.protocol,
+      description: item.description,
+      ...(item.version ? { version: item.version } : {}),
+      providers: [{ name: item.name }],
+      actions: item.actions,
+      invoke: 'Expose.create().invoke(protocol, appName, action, value?)'
+    }));
+  }
+
+  watch(protocolOrCallback: string | WatchCallback, callback?: WatchCallback): () => void {
+    const cb = typeof protocolOrCallback === 'function' ? protocolOrCallback : callback;
+
+    if (!cb) {
+      throw new Error('[expose] watch(protocol, callback) requires a callback');
+    }
+    const watcher: Watcher = {
+      callback: cb,
+      owner: currentCallerApp(),
+      ...(typeof protocolOrCallback === 'string' ? { protocol: protocolOrCallback } : {})
+    };
+
+    watchers.add(watcher);
+
+    return () => {
+      watchers.delete(watcher);
+    };
+  }
 }
 
-// ═══════════════════════════════════════════════════
-// 辅助函数
-// ═══════════════════════════════════════════════════
-
-/**
- * 清理指定插件的所有 expose 注册
- * 在 ChildrenApp.un() 时调用
- */
 export function disposeExpose(appName: string) {
+  for (const providers of storeExpose.values()) {
+    const entry = providers.get(appName);
+
+    if (entry) {
+      entry.active = false;
+    }
+  }
   for (const [protocol, providers] of storeExpose) {
+    const entry = providers.get(appName);
+
+    if (entry) {
+      retire(entry);
+    }
     providers.delete(appName);
-    if (providers.size === 0) {
+    if (!providers.size) {
       storeExpose.delete(protocol);
     }
   }
+  for (const watcher of watchers) {
+    if (watcher.owner === appName) {
+      watchers.delete(watcher);
+    }
+  }
 }
 
-/**
- * 清理全部（测试用）
- */
 export function clearAllExpose() {
+  for (const providers of storeExpose.values()) {
+    for (const entry of providers.values()) {
+      entry.active = false;
+    }
+  }
+  for (const providers of storeExpose.values()) {
+    for (const entry of providers.values()) {
+      retire(entry);
+    }
+  }
   storeExpose.clear();
-  protocolWatchers.clear();
-  globalWatchers.clear();
+  watchers.clear();
 }

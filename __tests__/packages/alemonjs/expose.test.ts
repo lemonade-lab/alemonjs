@@ -1,3 +1,4 @@
+import { describe, beforeEach, it, expect } from '@jest/globals';
 import { Expose, registerExpose, disposeExpose, clearAllExpose } from '../../../packages/alemonjs/src/application/expose';
 
 const expose = Expose.create();
@@ -264,7 +265,7 @@ describe('Expose 协议通信系统', () => {
       expect(s.actions.read.description).toBe('获取帮助图');
       expect(s.actions.read.returns).toEqual({ url: 'string' });
       expect(s.actions.write.params).toEqual({ data: 'Buffer' });
-      expect(s.invoke).toContain('Expose.invoke');
+      expect(s.invoke).toContain('Expose.create().invoke');
     });
   });
 

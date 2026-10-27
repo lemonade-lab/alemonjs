@@ -1,3 +1,4 @@
+import { withAppContext } from '../application/runtime/app-context.js';
 import { runtimeScope, runtimeExecution, type RuntimeScope, type RuntimeExecution } from '../common/runtime-scope.js';
 import { getConfig, type ConfigValue } from '../common/config.js';
 import { createResult } from '../common/utils.js';
@@ -232,7 +233,9 @@ export function createTestApp(options: TestAppOptions = {}) {
           let value: Awaited<T>;
 
           try {
-            value = await (event ? withEventContext(event, next, () => runner(next), { appName, phase: 'response' }) : runner(next));
+            value = await (event
+              ? withEventContext(event, next, () => runner(next), { appName, phase: 'response' })
+              : withAppContext(appName, () => runner(next)));
           } catch (error) {
             execution.errors.push(error);
           }

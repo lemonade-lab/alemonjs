@@ -1,3 +1,4 @@
+import { currentAppContext, withAppContext } from './app-context.js';
 import { runtimeExecution, trackRuntimeTask } from '../../common/runtime-scope.js';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { performance } from 'node:perf_hooks';
@@ -146,15 +147,17 @@ export const withEventContext = <T extends EventKeys, R>(
 ): R => {
   const current = eventStore.getStore();
 
-  return eventStore.run(
-    {
-      event,
-      next,
-      trace: current?.trace as EventTrace<T> | undefined,
-      appName: options?.appName ?? current?.appName,
-      phase: options?.phase ?? current?.phase
-    },
-    runner
+  return withAppContext(options?.appName ?? current?.appName, () =>
+    eventStore.run(
+      {
+        event,
+        next,
+        trace: current?.trace as EventTrace<T> | undefined,
+        appName: options?.appName ?? current?.appName,
+        phase: options?.phase ?? current?.phase
+      },
+      runner
+    )
   );
 };
 
@@ -192,7 +195,9 @@ export const getCurrentNext = (): ((...args: boolean[]) => void) | undefined => 
  * 读取当前异步调用链中的 appName。
  */
 export const getCurrentAppName = (): string | undefined => {
-  return eventStore.getStore()?.appName;
+  const app = currentAppContext();
+
+  return app ? app.name : eventStore.getStore()?.appName;
 };
 
 /**
