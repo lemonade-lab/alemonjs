@@ -171,6 +171,15 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
     return this.#mergedValue;
   }
 
+  /** 原始配置值，不包含启动参数覆盖；供适配器恢复持久化凭据。 */
+  get storedValue(): T {
+    if (!this.#value) {
+      this.#init();
+    }
+
+    return (this.#value || {}) as T;
+  }
+
   /**
    * 配置文件绝对路径（供外部做保注释的直接文件读写）
    */

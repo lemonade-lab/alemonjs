@@ -1,5 +1,5 @@
 import type { QQTextSanitizerOptions } from './text-sanitizer.js';
-import { createUserHashKey, getConfigValue, isMaster } from 'alemonjs';
+import { createUserHashKey, getConfig, getConfigValue, isMaster } from 'alemonjs';
 import { Options as sdkOptions } from './sdk/typing';
 export const platform = 'qq-bot';
 export const platformFullName = '@alemonjs/qq-bot';
@@ -43,7 +43,21 @@ export const getQQBotConfig = (): Options => {
   const commonValue = value[platform] || {};
   const bagValue = value[platformFullName] || {};
 
-  return { ...commonValue, ...bagValue } as Options;
+  const config = { ...commonValue, ...bagValue } as Options;
+
+  // 启动参数可能以空平台节覆盖整个文件节。只有未提供账号时恢复完整凭据对，
+  // 避免将显式指定的其他账号与已保存的密钥拼接。
+  if (!config.app_id && !config.secret && !Object.keys(config.bots || {}).length) {
+    const stored = getConfig().storedValue;
+    const saved = { ...stored?.[platform], ...stored?.[platformFullName] };
+
+    if (saved.app_id && saved.secret) {
+      config.app_id = saved.app_id;
+      config.secret = saved.secret;
+    }
+  }
+
+  return config;
 };
 
 /** Converts legacy single-bot configuration into the same representation as multi-bot mode. */

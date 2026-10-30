@@ -344,6 +344,6 @@ export const register = (client: WeChatClient, logger: Logger, credentials?: Cre
       initBot(stored).catch(console.error);
     })
     .catch(() => {
-      initBot().catch(console.error);
+      logger.error('无法读取已保存的微信凭据，请检查 storage_dir 中 credentials.json 的格式和访问权限；已停止登录，避免重复扫码');
     });
 };

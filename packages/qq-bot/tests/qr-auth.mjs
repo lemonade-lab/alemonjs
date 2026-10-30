@@ -222,6 +222,21 @@ const encryptSecret = (plain, keyBase64) => {
   assert.equal(parsed['qq-bot'].secret, 'SEC_3');
 }
 
+// 启动时的空平台配置不能遮住已保存的账号；显式账号不能混用旧密钥。
+{
+  const { getConfig } = await import('alemonjs');
+  const { getQQBotConfig } = await import('../lib/config.js');
+  global.__options = { 'qq-bot': {} };
+  getConfig().reload();
+  assert.equal(getQQBotConfig().app_id, 'APP_3');
+  assert.equal(getQQBotConfig().secret, 'SEC_3');
+  global.__options = { 'qq-bot': { app_id: 'OTHER' } };
+  getConfig().reload();
+  assert.equal(getQQBotConfig().app_id, 'OTHER');
+  assert.equal(getQQBotConfig().secret, undefined);
+  delete global.__options;
+}
+
 rmSync(configDir, { recursive: true, force: true });
 console.log('扫码登录流程验证通过（解密 / 流程 / 配置保注释写入）');
 process.exit(0);
