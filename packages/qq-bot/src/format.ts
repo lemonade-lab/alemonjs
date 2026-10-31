@@ -18,16 +18,24 @@ export const formatQQContent = (
       }
       if (item.type === 'MarkdownOriginal') {
         const text = plain ? markdownRawToText(item.value, hideUnsupported) : item.value;
+
         return text ? `\n\n${text}\n\n` : '';
       }
       if (item.type === 'BT.group') {
-        if (!plain || Number(hideUnsupported) >= 4) return '';
+        if (!plain || Number(hideUnsupported) >= 4) {
+          return '';
+        }
         const text = item.value
           .map(row =>
             row.value
               .map(button => {
-                if (Number(hideUnsupported) >= 3) return '';
-                if (Number(hideUnsupported) >= 2) return button.options?.data || button.value;
+                if (Number(hideUnsupported) >= 3) {
+                  return '';
+                }
+                if (Number(hideUnsupported) >= 2) {
+                  return button.options?.data || button.value;
+                }
+
                 return hideUnsupported ? button.value : `[${button.value}]`;
               })
               .filter(Boolean)
@@ -35,8 +43,10 @@ export const formatQQContent = (
           )
           .filter(Boolean)
           .join('\n');
+
         return text ? `\n\n${text}\n\n` : '';
       }
+
       return renderNative(item);
     })
     .join('');
@@ -258,7 +268,14 @@ const mdFormatters: Record<string, (value: any, options?: any, context?: QQMarkd
     // 预留平台长度余量；先截断再转义，避免截断实体或 emoji 的代理对。
     const inputText = text.slice(0, 80).replace(/[\uD800-\uDBFF]$/u, '');
 
-    return `<qqbot-cmd-input text="${escapeAttribute(inputText)}" show="${escapeAttribute(String(title ?? ''))}" />`;
+    const showText = escapeAttribute(inputText);
+
+    // 不能为空
+    if (!showText) {
+      return '';
+    }
+
+    return `<qqbot-cmd-input text="${showText}" show="${escapeAttribute(String(title ?? ''))}" />`;
   }
 };
 
