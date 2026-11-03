@@ -26,6 +26,9 @@ type EventContext<T extends EventKeys = EventKeys> = {
 
 const eventStore = new AsyncLocalStorage<EventContext>();
 
+/** Internal background boundary: never carry a message, next callback or event trace. */
+export const withoutEventContext = <R>(runner: () => R): R => eventStore.run(undefined, runner);
+
 const shouldShowLog = <T extends EventKeys>(event: Events[T]) => {
   const value = getConfigValue() ?? {};
 

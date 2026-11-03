@@ -29,6 +29,7 @@
     "test:expose": "yarn workspace alemonjs build && yarn test:expose:types && node --test packages/alemonjs/tests/expose.test.mjs && yarn test:expose:legacy",
     "test:expose:legacy": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --config packages/alemonjs/tests/expose.jest.config.mjs",
     "test:expose:types": "node node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 packages/alemonjs/tests/expose.types.ts",
+    "test:background": "yarn workspace alemonjs build && node --test packages/alemonjs/tests/background.test.mjs && node packages/alemonjs/tests/background-package.mjs",
     "test:conversation": "yarn workspace alemonjs build && node packages/alemonjs/tests/conversation.contract.mjs",
     "test:testing": "yarn workspace alemonjs build && yarn test:testing:types && node --import tsx --test packages/alemonjs/tests/testing.test.mjs packages-cl/create-alemonjs/template/alemonjs/test/hello.test.ts",
     "test:testing:types": "node node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ES2022 packages/alemonjs/tests/testing.types.ts",

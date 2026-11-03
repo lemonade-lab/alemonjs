@@ -36,7 +36,7 @@ type AppScope = ReturnType<typeof currentAppContext>;
 const callContext = new AsyncLocalStorage<{ context: ExposeCallContext; scope: AppScope } | undefined>();
 const watchOwner = new AsyncLocalStorage<{ appName?: string; scope: AppScope }>();
 
-function currentCallerApp(): string | undefined {
+export function currentCallerApp(): string | undefined {
   const observer = watchOwner.getStore();
 
   const call = getExposeContext();

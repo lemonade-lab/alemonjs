@@ -1,6 +1,6 @@
 {
   "name": "alemonjs",
-  "version": "2.1.119",
+  "version": "2.1.120",
   "description": "bot script",
   "author": "lemonade",
   "license": "MIT",
@@ -20,7 +20,7 @@
     ".": {
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts",
-      "require": "./dist/index.js"
+      "require": "./lib/index.js"
     },
     "./utils": {
       "import": "./lib/utils.js",
@@ -52,7 +52,8 @@
     },
     "./testing": {
       "types": "./lib/testing/index.d.ts",
-      "import": "./lib/testing/index.js"
+      "import": "./lib/testing/index.js",
+      "require": "./lib/testing/index.js"
     }
   },
   "dependencies": {

@@ -94,3 +94,5 @@ export * from './rate-limit.js';
 export * from './typing.js';
 
 export { Media } from './media.js';
+
+export { createBackgroundRunner } from './background.js';

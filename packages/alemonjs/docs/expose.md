@@ -105,3 +105,32 @@ Expose 不创建或切换聊天事件上下文，也不会自动执行 Router �
 **兼容范围是旧调用形式和同步／异步返回方式，不是所有可观察行为保持不变。** 旧 `provide` / `invoke` 继续可用。消费者升级时必须检查三处行为变更：`schema()` 每个 provider 独立成项；异步 watch 改在成功后触发；卸载或替换后旧列表句柄失效。没有全量路由自动暴露。
 
 运行 `yarn test:expose` 验证构建、发布类型、真实测试实例中的协议行为及旧版兼容断言；旧 Jest 套件使用专用 ESM 配置，未修改全仓默认配置。玩家授权代理、业务幂等／确认凭据、AI 工具转换器、远程调用、流式任务和全量审计事件不在本轮框架实现范围内。
+
+## 无玩家事件的后台回调
+
+需要在消息处理或生命周期中创建后台任务时，使用 `createBackgroundRunner(callback)` 捕获当前插件身份。调用返回的函数时，会清除玩家事件、`next`、事件 trace 和父 Expose 调用；异步等待后仍保持该边界。不能传入自选插件名；没有插件上下文时拒绝创建。运行实例销毁后拒绝执行。
+
+```ts
+import { createBackgroundRunner, Expose } from 'alemonjs';
+
+// 在所属插件的生命周期或处理器中创建一次。
+const execute = createBackgroundRunner((authorization: string, operationId: string, dueAt: number) =>
+  Expose.create().call('agent.scheduled-action.v1', 'example-provider', 'execute', {
+    authorization,
+    operationId,
+    dueAt
+  })
+);
+```
+
+这只提供上下文隔离，不授予玩家权限、不持久化预约、不自动重试。提供方必须实现并验证自己的限定授权，不能把后台调用当成玩家实时消息。普通消息动作继续使用原有事件授权，不能为支持后台任务而取消这些校验。示例协议由应用约定，不是框架内置业务。
+
+### 后台能力发布验收
+
+`createBackgroundRunner` 属于本地 `2.1.120` 待发布变更；不能据此认为注册表或已部署环境已有该版本。先运行 `yarn test:background`：重新构建框架，执行事件隔离/身份/销毁测试，再将实际 npm 包安装到临时消费者，验证 ESM 导出与 TypeScript 声明。此命令不会发布注册表或替换业务项目依赖。
+
+发布前应使用应用仓库的 `node tools/test-packaged-agent-play.mjs` 验证实际包的预约、聊天、结算与异常恢复。正式发布及安装后，从应用所在目录检查实际导出的 `createBackgroundRunner` 为函数；不要只根据版本文本判断。此前本地新构建曾与旧注册表包同为 2.1.119，但能力不同。
+
+2.1.120 的 CommonJS 根入口与 ESM 入口共同指向 `lib/index.js`，`alemonjs/testing` 同样提供 require 条件。使用支持同步 require(ESM) 的 Node.js 22.13+；仓库安装指南使用 Node.js 22 系列。此方式不会创建第二份插件注册表或异步上下文。Node.js 禁用 require(ESM) 或较旧运行时不在该接入方案的支持范围内；模块依赖不能加入顶层 await。
+
+`background-package.mjs` 对真实 npm 包分别执行 ESM 与 CommonJS 后台场景，检查全部可执行公共子路径的导出对象一致，并编译 ESM `.ts` 和 CommonJS `.cts` 消费者。当前实际验收 Node.js 为 22.22.3，不据此宣称测试了所有 Node.js 版本。同步加载约束参见 [Node.js 模块文档](https://nodejs.org/download/release/v22.14.0/docs/api/modules.html#loading-ecmascript-modules-using-require)。
