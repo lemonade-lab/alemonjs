@@ -2,3 +2,10 @@
 
 # Framework messages: zh-CN (default) / en-US
 language: zh-CN
+
+# 模块名唯一，order 越小越先完成初始化
+apps: {}
+# apps:
+#   your-module:
+#     enabled: true
+#     order: 10

@@ -37,3 +37,5 @@ export * from './cbp/heartbeat.js';
 export * from './cbp/ws-connector.js';
 export * from './cbp/normalize.js';
 export * from './cbp/typings.js';
+
+export * from './apps-config.js';

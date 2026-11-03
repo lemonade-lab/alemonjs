@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { getConfig, getConfigValue } from 'alemonjs';
+import { getConfig, getConfigValue, normalizeAppsConfig } from 'alemonjs';
 import { Context } from './context-pro';
 
 // 当前目录
@@ -44,7 +44,7 @@ export const activate = (context: typeof Context.prototype) => {
         if (!config) {
           config = {};
         }
-        const d = Array.isArray(config.apps) ? config.apps : [];
+        const d = normalizeAppsConfig(config.apps).filter(app => app.enabled).map(app => app.name);
 
         // 发送消息
         webView.postMessage({
@@ -60,16 +60,12 @@ export const activate = (context: typeof Context.prototype) => {
         }
         const name = data.data;
 
-        if (Array.isArray(value.apps)) {
-          if (!value.apps.includes(name)) {
-            value.apps.push(name);
-            config.saveValue(value);
-          }
-        } else {
-          // 确保为数组
-          value.apps = [name];
-          config.saveValue(value);
-        }
+        if (typeof name !== 'string' || !name.trim()) return;
+        const apps = normalizeAppsConfig(value.apps);
+        const existing = apps.find(app => app.name === name.trim());
+        if (existing) existing.enabled = true;
+        else apps.push({ name: name.trim(), enabled: true, order: apps.at(-1)?.order ?? 0 });
+        config.saveValue({ ...value, apps: Object.fromEntries(apps.map(({ name, enabled, order }) => [name, { enabled, order }])) });
       } else if (data.type === 'process.disable.apps') {
         const config = getConfig();
         let value = config.value;
@@ -79,17 +75,10 @@ export const activate = (context: typeof Context.prototype) => {
         }
         const name = data.data;
 
-        if (Array.isArray(value.apps)) {
-          // 存在则删除
-          if (value.apps.includes(name)) {
-            value.apps = value.apps.filter((item: string) => item !== name);
-            config.saveValue(value);
-          }
-        } else {
-          // 确保为空数组
-          value.apps = [];
-          config.saveValue(value);
-        }
+        const apps = normalizeAppsConfig(value.apps);
+        const existing = apps.find(app => app.name === name);
+        if (existing) existing.enabled = false;
+        config.saveValue({ ...value, apps: Object.fromEntries(apps.map(({ name, enabled, order }) => [name, { enabled, order }])) });
       }
     } catch (e) {
       console.error(e);

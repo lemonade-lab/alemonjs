@@ -1,3 +1,4 @@
+import { loadConfiguredApps } from '../../../common/apps-config.js';
 import { getConfig } from '../../../common/config.js';
 import { loadChildren, loadChildrenFile } from './loadChild.js';
 import { dirname, join } from 'path';
@@ -11,31 +12,11 @@ const initRequire = () => {};
 initRequire.resolve = () => '';
 const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
-const loadApps = () => {
-  const cfg = getConfig();
-  const apps = Array.isArray(cfg.value?.apps)
-    ? cfg.value.apps.filter(Boolean)
-    : Object.entries(cfg.value?.apps ?? {})
-        .filter(([, enabled]) => Boolean(enabled))
-        .map(([name]) => name);
-
-  // 去重
-  const uniqueApps = Array.from(new Set(apps));
-
-  return Promise.all(
-    uniqueApps.map(async app => {
-      registerRuntimeApp({
-        name: app,
-        kind: 'plugin',
-        enabled: true,
-        status: 'discovered',
-        rootDir: '',
-        mainPath: ''
-      });
-      await loadChildrenFile(app);
-    })
-  );
-};
+const loadApps = () =>
+  loadConfiguredApps(getConfig().value?.apps, async app => {
+    registerRuntimeApp({ name: app, kind: 'plugin', enabled: true, status: 'discovered', rootDir: '', mainPath: '' });
+    await loadChildrenFile(app);
+  });
 
 /**
  * @description 运行本地模块

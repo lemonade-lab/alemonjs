@@ -1,3 +1,4 @@
+import type { AppsConfig } from './apps-config.js';
 import type { Language } from './i18n.js';
 import { runtimeScope, scopedResource } from './runtime-scope.js';
 import type { ConversationOptions } from '../application/conversation.js';
@@ -15,7 +16,7 @@ type ConfigValue = {
   /** Framework messages: Chinese by default; changes apply without restarting. */
   language?: Language;
   autoPort?: boolean;
-  apps?: string[] | { [key: string]: boolean };
+  apps?: AppsConfig;
   master_key?: { [key: string]: boolean } | string[];
   master_id?: { [key: string]: boolean } | string[];
   bot_key?: { [key: string]: boolean } | string[];

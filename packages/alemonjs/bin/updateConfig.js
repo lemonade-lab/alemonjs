@@ -2,6 +2,7 @@
 import { join } from 'path';
 import fs from 'fs';
 import YAML from 'yaml';
+import { normalizeAppsConfig } from '../lib/common/apps-config.js';
 const configPath = join(process.cwd(), 'alemon.config.yaml');
 
 /**
@@ -16,6 +17,28 @@ export function updateConfig(action, key, value = []) {
   if (fs.existsSync(configPath)) {
     const data = fs.readFileSync(configPath, 'utf8');
     config = YAML.parse(data) ?? {};
+  }
+  if (key === 'apps' && (action === 'add' || action === 'remove')) {
+    const entries = normalizeAppsConfig(config.apps);
+    const apps = Object.fromEntries(entries.map(({ name, enabled, order }) => [name, { enabled, order }]));
+    for (const name of value) {
+      if (!name.trim()) continue;
+      if (action === 'remove') {
+        delete apps[name];
+      } else if (Object.hasOwn(apps, name)) {
+        apps[name].enabled = true;
+      } else {
+        Object.defineProperty(apps, name, {
+          value: { enabled: true, order: entries.at(-1)?.order ?? 0 },
+          enumerable: true,
+          configurable: true,
+          writable: true
+        });
+      }
+    }
+    config.apps = apps;
+    fs.writeFileSync(configPath, YAML.stringify(config));
+    return;
   }
   const keys = key.split('.');
   let current = config;
