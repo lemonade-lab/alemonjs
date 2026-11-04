@@ -53,19 +53,21 @@ const mainServer = () => {
   });
 };
 
-const main = () => {
-  const login = process.env.login ?? '';
-  const platform = process.env.platform ?? '';
-  const url = process.env.url ?? '';
-  const port = process.env.port ?? defaultPort;
-  const isFullReceive = process.env.is_full_receive === 'true' || process.env.is_full_receive === '1';
+const main = (): Promise<void> => {
+  return new Promise(resolve => {
+    const login = process.env.login ?? '';
+    const platform = process.env.platform ?? '';
+    const url = process.env.url ?? '';
+    const port = process.env.port ?? defaultPort;
+    const isFullReceive = process.env.is_full_receive === 'true' || process.env.is_full_receive === '1';
 
-  if (!login && !platform && url) {
-    logger.info(`[Connecting to CBP server at ${url}]`);
-    cbpClient(url);
-  } else {
-    cbpClient(`http://127.0.0.1:${port}`, { isFullReceive });
-  }
+    if (!login && !platform && url) {
+      logger.info(`[Connecting to CBP server at ${url}]`);
+      cbpClient(url, { open: resolve });
+    } else {
+      cbpClient(`http://127.0.0.1:${port}`, { isFullReceive, open: resolve });
+    }
+  });
 };
 
 export const startClientRuntime = async () => {
@@ -75,7 +77,11 @@ export const startClientRuntime = async () => {
 
   runtimeStarted = true;
   runtimeDisposed = false;
-  main();
+  // open 在 transport_ready 发出后触发，避免业务初始化阻塞通讯层握手。
+  await main();
+  if (runtimeDisposed) {
+    return;
+  }
   mainServer();
   await loadModels();
 
