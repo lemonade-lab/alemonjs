@@ -12,6 +12,8 @@ export type RouteContext = {
 };
 export type RouteTextRule = {
   prefixes?: readonly string[];
+  /** 前缀后是否要求水平空白；默认 false，要求直接拼接。 */
+  space?: boolean;
   stripPrefix?: boolean;
   allowBare?: boolean;
 };
@@ -55,6 +57,7 @@ export type RouteResConfig<P extends string = string, E extends string = string>
   events?: readonly E[];
   platforms?: readonly P[];
   regular?: RegExp;
+  routeText?: RouteTextConfig<P>;
 };
 
 export type RouteDefinition<P extends string = string, E extends string = string> = string | RouteHandlerConfig<P, E>;

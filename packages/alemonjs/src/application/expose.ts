@@ -375,6 +375,8 @@ export class Expose {
           name: entry.appName,
           protocol: name,
           description: entry.config.description,
+          ...(typeof entry.config.displayName === 'string' && entry.config.displayName.trim() ? { displayName: entry.config.displayName.trim() } : {}),
+          ...(typeof entry.config.entryCommand === 'string' && entry.config.entryCommand.trim() ? { entryCommand: entry.config.entryCommand.trim() } : {}),
           ...(entry.config.version ? { version: entry.config.version } : {}),
           actions: describeActions(entry.config),
           invoke: (action, value) => execute(execution(name, entry.appName, action), value, false, entry)

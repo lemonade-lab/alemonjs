@@ -1,3 +1,7 @@
+import { withEventContext, getCurrentNext } from '../runtime/hook-event-context.js';
+import type { Events, EventKeys } from '../../types/index.js';
+import { EventMessageText } from '../../common/variable.js';
+import { forcedRouteText, formatPolicyCommand } from '../command-policy.js';
 import { translate } from '../../common/i18n.js';
 import { defineRouter } from '../define-router';
 import { useMessage } from '../hooks';
@@ -26,6 +30,7 @@ import { validateRouteArgsForCommand } from './validator';
 
 export type RouterOptions<P extends string = string, E extends string = string> = {
   regular?: RegExp;
+  routeText?: RouteTextConfig<P>;
   events?: readonly E[];
   platforms?: readonly P[];
 };
@@ -92,12 +97,13 @@ function normalizeRouteConfig<P extends string, E extends string>(config: RouteD
 
 function normalizeResConfig<P extends string, E extends string>(
   config: RouteResConfig<P, E>,
-  defaults: Pick<RouterOptions<P, E>, 'events' | 'platforms' | 'regular'>
+  defaults: Pick<RouterOptions<P, E>, 'events' | 'platforms' | 'regular' | 'routeText'>
 ): RouteResConfig<P, E> {
   return {
     events: defaults.events ?? config.events,
     platforms: defaults.platforms ?? config.platforms,
-    regular: defaults.regular ?? config.regular
+    regular: defaults.regular ?? config.regular,
+    routeText: config.routeText ?? defaults.routeText
   };
 }
 
@@ -230,6 +236,8 @@ function getEventPlatform(event: Record<string, unknown>) {
 }
 
 function getPlatformRouteTextRule<P extends string>(routeText: RouteTextConfig<P> | undefined, platform: string | undefined) {
+  const forced = forcedRouteText();
+  if (forced) return forced;
   if (!routeText) {
     return undefined;
   }
@@ -239,6 +247,7 @@ function getPlatformRouteTextRule<P extends string>(routeText: RouteTextConfig<P
 
     return {
       prefixes: platformRule.prefixes ?? routeText.prefixes,
+      space: platformRule.space ?? routeText.space ?? false,
       stripPrefix: platformRule.stripPrefix ?? routeText.stripPrefix,
       allowBare: platformRule.allowBare ?? routeText.allowBare
     };
@@ -246,6 +255,7 @@ function getPlatformRouteTextRule<P extends string>(routeText: RouteTextConfig<P
 
   return {
     prefixes: routeText.prefixes,
+    space: routeText.space ?? false,
     stripPrefix: routeText.stripPrefix,
     allowBare: routeText.allowBare
   };
@@ -262,13 +272,25 @@ function normalizeScopedRouteText(messageText: string | undefined, routeText?: R
     return rawText;
   }
 
-  const prefix = routeText.prefixes.find(item => rawText.startsWith(item));
+  const prefix = [...routeText.prefixes].sort((a, b) => b.length - a.length).find(item => rawText.startsWith(item));
 
   if (!prefix) {
     if (routeText.allowBare) {
       return rawText;
     }
 
+    return null;
+  }
+
+  const remainder = rawText.slice(prefix.length);
+  const separator = remainder.match(/^[ \t]+/);
+
+  if (routeText.space ? !separator : /^\s/.test(remainder)) {
+    return null;
+  }
+  const command = separator ? remainder.slice(separator[0].length) : remainder;
+
+  if (!command || /^\s/.test(command)) {
     return null;
   }
 
@@ -473,6 +495,7 @@ export class Router<P extends string = string, E extends string = string> {
   constructor(options: RouterOptions<P, E> = {}) {
     this.defaults = {
       regular: options.regular,
+      routeText: options.routeText,
       events: options.events,
       platforms: options.platforms
     };
@@ -483,7 +506,7 @@ export class Router<P extends string = string, E extends string = string> {
   }
 
   group(options: GroupOptions<P, E>, ...middlewares: RouteImporter[]) {
-    const mergedOptions = mergeConditions({ events: this.defaults.events, platforms: this.defaults.platforms }, options);
+    const mergedOptions = mergeConditions({ events: this.defaults.events, platforms: this.defaults.platforms, routeText: this.defaults.routeText }, options);
     const scopeId = this.createScope(mergedOptions);
 
     return new RouteGroup(this, middlewares, mergedOptions, scopeId);
@@ -492,7 +515,7 @@ export class Router<P extends string = string, E extends string = string> {
   use(config: RouteDefinitions<P, E>, ...importers: RouteImporter[]) {
     const scopeId = this.ensureDefaultScope();
 
-    return this.register(config, importers, { events: this.defaults.events, platforms: this.defaults.platforms }, scopeId);
+    return this.register(config, importers, { events: this.defaults.events, platforms: this.defaults.platforms, routeText: this.defaults.routeText }, scopeId);
   }
 
   res(config: RouteResConfig<P, E>, ...importers: RouteImporter[]) {
@@ -598,9 +621,24 @@ export class Router<P extends string = string, E extends string = string> {
   }
 
   match(event: { name?: string; MessageText?: string; platform?: string }, scopeId?: string): AppMatchResult {
+    if (!scopeId) {
+      for (const id of this.getApplicableScopeIds(event)) {
+        const result = this.match(event, id);
+        if (result.matched) return result;
+      }
+      return { matched: false };
+    }
     const eventName = String(event.name ?? '');
-    const scope = scopeId ? this.scopes.get(scopeId) : undefined;
-    const lookup = getLookupCandidates(event, scope?.options.keyPolicy);
+    const scope = this.scopes.get(scopeId);
+    if (!scope) return { matched: false };
+    const platform = getEventPlatform(event);
+    if (scope.options.events?.length && !scope.options.events.includes(eventName as E)) return { matched: false };
+    if (scope.options.platforms?.length && platform && !scope.options.platforms.includes(platform as P)) return { matched: false };
+    const rule = getPlatformRouteTextRule(scope.options.routeText, platform);
+    const text = normalizeScopedRouteText(event.MessageText, rule);
+    if (text === null) return { matched: false };
+    const lookupEvent = { ...event, MessageText: text, __route: undefined };
+    const lookup = getLookupCandidates(lookupEvent, scope?.options.keyPolicy);
 
     if (!eventName || !lookup) {
       return { matched: false };
@@ -674,14 +712,21 @@ export class Router<P extends string = string, E extends string = string> {
   }
 
   async dispatchInScope(event: Record<string, unknown>, scopeId: string | undefined, depth = 0): Promise<AppDispatchResult> {
-    const scope = scopeId ? this.scopes.get(scopeId) : undefined;
-    const maxRedispatchDepth = scope?.options.redispatch?.maxDepth ?? 3;
+    return this.dispatchResolved(event, scopeId, depth);
+  }
 
-    if (depth > maxRedispatchDepth) {
+  private async dispatchResolved(
+    event: Record<string, unknown>,
+    scopeId: string | undefined,
+    depth: number,
+    inheritedRemaining?: number
+  ): Promise<AppDispatchResult> {
+    const match = this.match(event, scopeId);
+    if (!match.matched) {
       return {
         matched: false,
-        stopped: true,
-        reason: 'redispatch_limit',
+        stopped: false,
+        reason: 'unmatched',
         eventName: String(event.name ?? ''),
         rawArgs: [],
         parsedArgs: [],
@@ -690,13 +735,14 @@ export class Router<P extends string = string, E extends string = string> {
       };
     }
 
-    const match = this.match(event, scopeId);
-
-    if (!match.matched) {
+    const configuredLimit = this.scopes.get(match.route.scopeId)?.options.redispatch?.maxDepth ?? 3;
+    // The first route sets the chain budget; later routes may only tighten it.
+    const remaining = inheritedRemaining === undefined ? configuredLimit - depth : Math.min(inheritedRemaining, configuredLimit);
+    if (remaining < 0) {
       return {
         matched: false,
-        stopped: false,
-        reason: 'unmatched',
+        stopped: true,
+        reason: 'redispatch_limit',
         eventName: String(event.name ?? ''),
         rawArgs: [],
         parsedArgs: [],
@@ -746,7 +792,7 @@ export class Router<P extends string = string, E extends string = string> {
       params
     });
 
-    const executed = await this.runImporters(match.route.importers, event, depth);
+    const executed = await this.runImporters(match.route.importers, event, depth, remaining);
 
     return {
       matched: true,
@@ -767,30 +813,7 @@ export class Router<P extends string = string, E extends string = string> {
   }
 
   async handleScopeEvent(scopeId: string, event: Record<string, unknown>, next: () => void | Promise<void>) {
-    const scope = this.scopes.get(scopeId);
     const previousRoute = event.__route;
-    const platform = getEventPlatform(event);
-    const routeTextRule = getPlatformRouteTextRule(scope?.options.routeText, platform);
-    const scopedText = normalizeScopedRouteText(typeof event.MessageText === 'string' ? event.MessageText : undefined, routeTextRule);
-
-    if (routeTextRule && !scopedText) {
-      await next();
-
-      return;
-    }
-
-    if (scopedText) {
-      attachRouteContext(event, {
-        key: '',
-        text: scopedText,
-        sourceText: typeof event.MessageText === 'string' ? event.MessageText : undefined,
-        rewrittenText: scopedText,
-        rawArgs: [],
-        parsedArgs: [],
-        params: {}
-      });
-    }
-
     const result = await this.dispatchInScope(event, scopeId);
 
     if (!result.matched && result.reason === 'unmatched') {
@@ -838,7 +861,10 @@ export class Router<P extends string = string, E extends string = string> {
         return routeEntry ? applicableScopeIds.includes(routeEntry.scopeId) : false;
       });
     const routeKeys = routeMetas.map(route => route.path);
-    const fallback = checkFallbackHint(typeof event.MessageText === 'string' ? event.MessageText : undefined, routeKeys, fallbackOptions);
+    const rawText = typeof event.MessageText === 'string' ? event.MessageText : undefined;
+    const fallbackRule = getPlatformRouteTextRule(this.scopes.get(applicableScopeIds[0])?.options.routeText, getEventPlatform(event));
+    const fallbackText = normalizeScopedRouteText(rawText, fallbackRule);
+    const fallback = checkFallbackHint(fallbackText ?? undefined, routeKeys, fallbackOptions);
 
     if (!fallback.matched) {
       await next();
@@ -851,9 +877,9 @@ export class Router<P extends string = string, E extends string = string> {
     const format = Format.create();
     const suggestedRoute = fallback.suggestedKey ? routeMetas.find(route => route.path === fallback.suggestedKey) : undefined;
     const replyLines = buildFallbackReply({
-      suggestedKey: fallback.suggestedKey,
+      suggestedKey: formatPolicyCommand(fallback.suggestedKey),
       description: formatRouteDescription(suggestedRoute?.description),
-      usage: suggestedRoute?.path
+      usage: formatPolicyCommand(suggestedRoute?.path)
     });
 
     replyLines.forEach((line, index) => {
@@ -884,9 +910,9 @@ export class Router<P extends string = string, E extends string = string> {
     const schemaHints = buildSchemaHints(routeEntry?.config.schema);
     const replyLines = buildValidationReply({
       error: validation?.valid === false ? validation.error : translate('validation.failed'),
-      commandKey: result.commandKey,
+      commandKey: formatPolicyCommand(result.commandKey),
       description,
-      usage: validation?.valid === false ? validation.usage : undefined,
+      usage: formatPolicyCommand(validation?.valid === false ? validation.usage : undefined),
       schemaHints
     });
 
@@ -914,8 +940,59 @@ export class Router<P extends string = string, E extends string = string> {
       .map(importer => {
         const base = {
           selects: eventNames,
-          regular,
-          handler: async () => unwrapImportedValue(await importer())
+          regular: undefined,
+          handler: async () => async (event: Record<string, unknown>, next: (...args: boolean[]) => void) => {
+            const hasText = (EventMessageText as readonly string[]).includes(String(event.name ?? ''));
+            const rule = getPlatformRouteTextRule(item.config.routeText, getEventPlatform(event));
+            const text = hasText
+              ? rule
+                ? normalizeScopedRouteText(typeof event.MessageText === 'string' ? event.MessageText : undefined, rule)
+                : String(event.MessageText ?? '')
+              : undefined;
+            if (hasText && (text === null || (regular && !new RegExp(regular.source, regular.flags).test(text!)))) {
+              next();
+              return;
+            }
+            // Import only after route conditions pass; preserve selected handler arrays.
+            const imported = await importer();
+            const handlers = toExecutableList(imported, String(event.name ?? ''));
+            if (!handlers.length) {
+              next();
+              return;
+            }
+            const previous = event.__route;
+            const restore = () => {
+              if (previous === undefined) delete event.__route;
+              else event.__route = previous;
+            };
+            if (hasText && rule)
+              attachRouteContext(event, {
+                key: '',
+                text: text!,
+                sourceText: event.MessageText as string,
+                rewrittenText: text!,
+                rawArgs: [],
+                parsedArgs: [],
+                params: {}
+              });
+            let forwarded = false;
+            const forward = (...args: boolean[]) => {
+              if (forwarded) return;
+              forwarded = true;
+              restore();
+              next(...args);
+            };
+            try {
+              for (const handler of handlers) {
+                const result = await withEventContext(event as Events[EventKeys], forward, () => handler(event, forward));
+                if (forwarded || result !== true) return result;
+              }
+              return true;
+            } finally {
+              // Forwarding hands ownership to the downstream route.
+              if (!forwarded) restore();
+            }
+          }
         };
 
         if (!platforms?.length) {
@@ -981,7 +1058,8 @@ export class Router<P extends string = string, E extends string = string> {
 
     this.defaultScopeId = this.createScope({
       events: this.defaults.events,
-      platforms: this.defaults.platforms
+      platforms: this.defaults.platforms,
+      routeText: this.defaults.routeText
     });
 
     return this.defaultScopeId;
@@ -1035,72 +1113,48 @@ export class Router<P extends string = string, E extends string = string> {
       });
   }
 
-  private runImporters(importers: RouteImporter[], event: Record<string, unknown>, depth: number) {
-    const visit = async (index: number): Promise<{ stopped: boolean; reason: AppDispatchResult['reason'] }> => {
-      if (index >= importers.length) {
-        return { stopped: false, reason: 'handler_completed' };
-      }
-
+  private runImporters(importers: RouteImporter[], event: Record<string, unknown>, depth: number, remaining: number) {
+    type Outcome = { stopped: boolean; reason: AppDispatchResult['reason'] };
+    const visit = async (index: number): Promise<Outcome> => {
+      if (index >= importers.length) return { stopped: false, reason: 'handler_completed' };
       const beforeMessageText = String(event.MessageText ?? '');
       const imported = await importers[index]();
       const executableList = toExecutableList(imported, typeof event.name === 'string' ? event.name : undefined);
-
-      if (executableList.length === 0) {
-        return { stopped: true, reason: 'unsupported_handler' };
-      }
-
-      let downstreamRequested = false;
-      let downstreamResult: { stopped: boolean; reason: AppDispatchResult['reason'] } | null = null;
-
-      const next = async () => {
-        downstreamRequested = true;
-        downstreamResult = await visit(index + 1);
+      if (!executableList.length) return { stopped: true, reason: 'unsupported_handler' };
+      let downstream: Promise<Outcome> | undefined;
+      const next = () => {
+        downstream ??= visit(index + 1);
+        return downstream.then(() => undefined);
       };
-
+      const outerNext = getCurrentNext();
+      let passedToOuter = false;
+      const hookNext = (...args: boolean[]) => {
+        if (String(event.MessageText ?? '') !== beforeMessageText) return next();
+        if (!passedToOuter) {
+          passedToOuter = true;
+          outerNext?.(...args);
+        }
+      };
       for (const executable of executableList) {
-        const result = await executable(event, next);
-
-        if (downstreamRequested) {
-          if (downstreamResult) {
-            return downstreamResult;
+        const result = await withEventContext(event as Events[EventKeys], hookNext, () => executable(event, next));
+        if (passedToOuter) return { stopped: false, reason: 'handler_completed' };
+        if (downstream) {
+          const outcome = await downstream;
+          const afterMessageText = String(event.MessageText ?? '');
+          if (index === importers.length - 1 && afterMessageText && afterMessageText !== beforeMessageText) {
+            if (remaining <= 0) return { stopped: true, reason: 'redispatch_limit' };
+            // A rewritten message must be parsed afresh, never through the old route text.
+            delete event.__route;
+            const result = await this.dispatchResolved(event, undefined, depth + 1, remaining - 1);
+            return { stopped: result.stopped, reason: result.reason };
           }
-
-          break;
+          return outcome;
         }
-
-        if (result === false) {
-          return { stopped: true, reason: 'handler_returned_false' };
-        }
-
-        if (result === true) {
-          continue;
-        }
-
-        return { stopped: true, reason: 'handler_completed' };
+        if (result === false) return { stopped: true, reason: 'handler_returned_false' };
+        if (result !== true) return { stopped: true, reason: 'handler_completed' };
       }
-
-      if (downstreamRequested) {
-        if (downstreamResult) {
-          return downstreamResult;
-        }
-
-        const afterMessageText = String(event.MessageText ?? '');
-
-        if (index === importers.length - 1 && afterMessageText && afterMessageText !== beforeMessageText) {
-          const redispatched = await this.dispatch(event, depth + 1);
-
-          return {
-            stopped: redispatched.stopped,
-            reason: redispatched.reason
-          };
-        }
-
-        return { stopped: false, reason: 'handler_completed' };
-      }
-
-      return await visit(index + 1);
+      return visit(index + 1);
     };
-
     return visit(0);
   }
 }

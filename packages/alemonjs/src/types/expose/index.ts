@@ -34,6 +34,9 @@ export interface ExposeActionMeta<Input = any, Output = any> {
 }
 
 export interface ExposeProvideConfig {
+  /** 插件为用户声明的扩展名称和可选入门指令。 */
+  displayName?: string;
+  entryCommand?: string;
   name: string;
   description: string;
   version?: string;
@@ -43,6 +46,9 @@ export interface ExposeProvideConfig {
 export type ExposeActionDescription = Pick<ExposeActionMeta, 'description' | 'params' | 'returns' | 'inputSchema' | 'outputSchema' | 'effect'>;
 
 export interface ExposeListItem {
+  /** 插件为用户声明的扩展名称和可选入门指令。 */
+  displayName?: string;
+  entryCommand?: string;
   name: string;
   protocol: string;
   description: string;

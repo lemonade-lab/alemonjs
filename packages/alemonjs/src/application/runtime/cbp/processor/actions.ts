@@ -1,3 +1,4 @@
+import { transformCommandButtons } from '../../../command-policy.js';
 import { translate } from '../../../../common/i18n.js';
 import { runtimeScope, runtimeExecution, trackRuntimeTask } from '../../../../common/runtime-scope.js';
 import * as flattedJSON from 'flatted';
@@ -30,6 +31,10 @@ const setupActionResolve = (requestId: string, resolve: (value: Result[] | Promi
  * @param data
  */
 export const sendAction = (data: Actions): Promise<Result[]> => {
+  const payload = data.payload as any;
+  if (payload?.params?.format) {
+    data = { ...data, payload: { ...payload, params: { ...payload.params, format: transformCommandButtons(payload.params.format) } } } as Actions;
+  }
   const scope = runtimeScope.getStore();
 
   if (scope) {

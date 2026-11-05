@@ -8,6 +8,8 @@
   "scripts": {
     "build": "lerna run build",
     "test": "jest",
+    "test:command-policy": "yarn workspace alemonjs build && node --test packages/alemonjs/tests/command-policy.test.mjs packages/alemonjs/tests/router-control-flow.test.mjs",
+    "test:router-space": "yarn workspace alemonjs build && node --test packages/alemonjs/tests/router-space.test.mjs",
     "test:app-config": "yarn workspace alemonjs build && node --test packages/alemonjs/tests/app-config.test.mjs",
     "test:markdown": "yarn workspace alemonjs build && node --import tsx --test packages/alemonjs/tests/markdown.test.mjs packages/alemonjs/tests/markdown-send.test.mjs",
     "lint": "eslint packages --ext .ts,.tsx,.js --max-warnings=0",

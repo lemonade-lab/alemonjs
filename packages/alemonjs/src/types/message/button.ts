@@ -9,6 +9,8 @@ export type DataButton = {
     autoEnter?: boolean;
     // 数据
     data?: string;
+    /** Target application; false preserves command data verbatim. */
+    commandTarget?: string | false;
     // 按钮类型，默认 command
     type?: 'command' | 'link' | 'call';
     // 是否自动确认，默认 false - 即自动提交

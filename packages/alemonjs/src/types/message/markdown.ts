@@ -28,6 +28,8 @@ export type DataMarkdownButton = {
     autoEnter?: boolean;
     // 数据
     data?: string;
+    /** Target application; false preserves command data verbatim. */
+    commandTarget?: string | false;
     // isLink?: boolean
     type?: 'command' | 'link' | 'call';
   };
