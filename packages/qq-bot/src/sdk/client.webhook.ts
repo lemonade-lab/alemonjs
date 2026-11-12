@@ -1,5 +1,6 @@
 import { QQBotAPI } from './api.js';
 import { QQBotEventMap } from './message.js';
+import { isControlEvent, isDispatch, isDispatchObject, normalizeDispatch, type RawDispatchListener } from './dispatch.js';
 import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
 import { WebhookAPI } from './webhook.secret.js';
@@ -18,25 +19,11 @@ type Data = {
   t: string;
 };
 
-const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unknown> }>(message: T): T => {
-  if (!message?.id || !message?.d || typeof message.d !== 'object' || Array.isArray(message.d)) {
-    return message;
-  }
-
-  if ((message as T & { t?: string }).t === 'INTERACTION_CREATE') {
-    message.d.event_id = message.id;
-  }
-  if (message.d.id === undefined || message.d.id === null || message.d.id === '') {
-    message.d.id = message.id;
-  }
-
-  return message;
-};
-
 export class QQBotClient extends QQBotAPI {
   #events: {
     [K in keyof QQBotEventMap]?: ((event: QQBotEventMap[K]) => any)[];
-  } = {};
+  } = Object.create(null);
+  #rawEvents: RawDispatchListener[] = [];
   #app: Koa<Koa.DefaultState, Koa.DefaultContext> | null = null;
   #count = 0;
   #client: {
@@ -63,6 +50,12 @@ export class QQBotClient extends QQBotAPI {
       this.#events[key] = [];
     }
     this.#events[key].push(val);
+
+    return this;
+  }
+
+  onUnhandledDispatch(listener: RawDispatchListener) {
+    this.#rawEvents.push(listener);
 
     return this;
   }
@@ -166,25 +159,22 @@ export class QQBotClient extends QQBotAPI {
               signature: ntqqWebhook.getSign(body.d.event_ts, body.d.plain_token)
             };
           } else if (body.op === 0) {
-            if (typeof body.t !== 'string' || !body.t || !body.d || typeof body.d !== 'object' || Array.isArray(body.d)) {
+            if (!isDispatch(body) || (this.#events[body.t]?.length && !isDispatchObject(body.d))) {
               ctx.status = 400;
               ctx.body = { msg: 'invalid dispatch' };
 
               return;
             }
-            normalizeGatewayMessage(body);
             ctx.status = 204;
             // 根据事件类型，处理事件
             this.#dispatch(body);
+            const relay = this.#events[body.t]?.length ? normalizeDispatch(body) : body;
             const accessToken = this.config.get('access_token');
 
             // 也可以分法到客户端。 发送失败需要处理 或清理调
             for (const client of this.#client) {
               try {
-                if (accessToken) {
-                  body['access_token'] = accessToken;
-                }
-                client.ws.send(JSON.stringify(body));
+                client.ws.send(JSON.stringify(accessToken ? { ...relay, access_token: accessToken } : relay));
               } catch (e) {
                 this.#error(e);
               }
@@ -213,7 +203,7 @@ export class QQBotClient extends QQBotAPI {
           ws.on('message', (message: string) => {
             // 拿到消息
             try {
-              const body = normalizeGatewayMessage(JSON.parse(message.toString()) as Data);
+              const body = JSON.parse(message.toString());
 
               this.#dispatch(body);
             } catch (e) {
@@ -238,8 +228,8 @@ export class QQBotClient extends QQBotAPI {
           this.#ws.on('message', data => {
             try {
               // 拿到消息
-              const body = normalizeGatewayMessage(JSON.parse(data.toString()) as Data);
-              const accessToken = body['access_token'];
+              const body = JSON.parse(data.toString());
+              const accessToken = body?.access_token;
 
               if (accessToken) {
                 this.config.set('access_token', accessToken);
@@ -275,11 +265,25 @@ export class QQBotClient extends QQBotAPI {
 
   /** Acknowledge receipt without waiting for application work. Each listener
    * owns its failure path so a rejection cannot escape the transport. */
-  #dispatch(body: Data) {
-    for (const event of this.#events[body.t] || []) {
-      void Promise.resolve()
-        .then(() => event(body.d))
-        .catch(error => this.#error(error));
+  #dispatch(body: unknown) {
+    if (!isDispatch(body)) return;
+
+    const listeners = this.#events[body.t];
+
+    if (listeners?.length) {
+      const { d } = normalizeDispatch(body);
+
+      for (const listener of listeners) {
+        void Promise.resolve()
+          .then(() => listener(d))
+          .catch(error => this.#error(error));
+      }
+    } else if (!isControlEvent(body.t)) {
+      for (const listener of this.#rawEvents) {
+        void Promise.resolve()
+          .then(() => listener(body))
+          .catch(error => this.#error(error));
+      }
     }
   }
 

@@ -8,7 +8,9 @@ import { QQBotClient } from '../lib/sdk/client.webhook.js';
 import { QQBotClients } from '../lib/sdk/client.websoket.js';
 import { WebhookAPI } from '../lib/sdk/webhook.secret.js';
 import { register } from '../lib/register.js';
-import { useMenu } from 'alemonjs';
+import { Router, useEvent, useMenu } from 'alemonjs';
+import { createTestApp } from 'alemonjs/testing';
+import { createEventEnvelope, normalizeInboundMessage } from '../../alemonjs/lib/common/cbp/normalize.js';
 import { setDirectSend } from '../../alemonjs/lib/application/runtime/cbp/processor/transport.js';
 import { actionRequestResolves, actionRequestTimeouts } from '../../alemonjs/lib/application/runtime/cbp/processor/request-registry.js';
 
@@ -39,6 +41,22 @@ const packet = {
   d: { id: 'interaction', scene: 'c2c', user_openid: 'user', type: 11, data: { resolved: { button_id: 'b', button_data: 'click' } } }
 };
 
+const unknownPacket = {
+  op: 0,
+  t: 'ACCOUNT_TEST_EVENT',
+  id: 'test-event-envelope',
+  s: 4,
+  d: { preview: { enabled: true } }
+};
+const expectedRaw = (botId = 'test') => ({
+  name: 'platform.raw',
+  Platform: 'qq-bot',
+  BotId: botId,
+  RawEventType: unknownPacket.t,
+  EventId: unknownPacket.id,
+  value: unknownPacket.d
+});
+
 // Official WebSocket dispatch, using a local gateway with real framing.
 const gateway = new WebSocketServer({ port: 0 });
 await new Promise(resolve => gateway.once('listening', resolve));
@@ -50,7 +68,9 @@ gateway.on('connection', ws => {
     if (msg.op === 2) {
       ws.send(JSON.stringify({ op: 0, t: 'READY', s: 1, d: { session_id: 'test-session' } }));
       ws.send(JSON.stringify(packet));
-      ws.send(JSON.stringify({ op: 0, t: 'SUBSCRIBE_MESSAGE_STATUS', id: 'subscription', s: 3, d: { openid: 'user', result: [] } }));
+      ws.send(JSON.stringify({ op: 0, t: 'RESUMED', s: 3, d: {} }));
+      ws.send(JSON.stringify(unknownPacket));
+      ws.send(JSON.stringify({ op: 0, t: 'SUBSCRIBE_MESSAGE_STATUS', id: 'subscription', s: 5, d: { openid: 'user', result: [] } }));
     }
   });
 });
@@ -68,6 +88,10 @@ const wsInteraction = events.find(event => event.name === 'private.interaction.c
 assert.equal(wsInteraction.MessageId, 'envelope');
 assert.equal(wsInteraction.InteractionId, 'interaction');
 assert(events.some(event => event._tag === 'SUBSCRIBE_MESSAGE_STATUS'));
+assert.deepEqual(
+  events.filter(event => event.name === 'platform.raw'),
+  [expectedRaw()]
+);
 wsClient.disconnect();
 for (const socket of gateway.clients) socket.terminate();
 await new Promise(resolve => gateway.close(resolve));
@@ -101,6 +125,46 @@ assert.equal((await post({ op: 0, t: 'SUBSCRIBE_MESSAGE_STATUS', id: 'sub', d: {
 await wait(() => events.slice(webhookStart).some(event => event._tag === 'SUBSCRIBE_MESSAGE_STATUS' && event.GuildId === 'group'));
 assert.equal(events.slice(webhookStart).find(event => event._tag === 'SUBSCRIBE_MESSAGE_STATUS' && event.GuildId === 'group').name, 'notice.create');
 
+const proxy = new QQBotClient({ app_id: 'proxy', secret, ws: `ws://127.0.0.1:${port}` });
+register(proxy, { botId: 'proxy', cbp: { send: event => events.push(event), onactions() {}, onapis() {} } });
+proxy.connect();
+await wait(() => proxy.getConnectionStatus().state === 'ready');
+const rawStart = events.length;
+assert.equal((await post(unknownPacket)).status, 204);
+await wait(() => events.slice(rawStart).filter(event => event.name === 'platform.raw').length === 2);
+assert.deepEqual(events.slice(rawStart), [expectedRaw(), expectedRaw('proxy')]);
+
+// Route the CBP event through the framework and read it from the application hook.
+const normalized = normalizeInboundMessage(JSON.parse(JSON.stringify(createEventEnvelope(events[rawStart]))));
+const app = createTestApp();
+const received = [];
+const router = Router.create({ events: ['platform.raw'] });
+router.res({ events: ['platform.raw'] }, async () => async () => {
+  const [{ current }] = useEvent({ selects: 'platform.raw' });
+  received.push([current.Platform, current.BotId, current.RawEventType, current.EventId, current.value]);
+});
+await app.mount({ responseRouter: router.define });
+await app.dispatch(normalized.event);
+assert.deepEqual(received, [['qq-bot', 'test', unknownPacket.t, unknownPacket.id, unknownPacket.d]]);
+await app.dispose();
+
+const withoutSignature = await fetch(`http://127.0.0.1:${port}/webhook`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify(unknownPacket)
+});
+assert.equal(withoutSignature.status, 400);
+assert.equal((await post({ op: 0, t: unknownPacket.t })).status, 400);
+assert.equal(events.length, rawStart + 2);
+
+const listPacket = { op: 0, t: 'ACCOUNT_TEST_LIST', d: [1, { enabled: true }] };
+assert.equal((await post(listPacket)).status, 204);
+await wait(() => events.filter(event => event.RawEventType === listPacket.t).length === 2);
+for (const event of events.filter(event => event.RawEventType === listPacket.t)) {
+  assert.equal(event.EventId, undefined);
+  assert.deepEqual(event.value, listPacket.d);
+}
+
 // Real application helper -> AlemonJS sendAction envelope -> adapter -> result.
 webhook.menuGet = async () => ({ version: 42, menu: { items: [] } });
 setDirectSend(envelope => {
@@ -119,5 +183,5 @@ assert.equal(result.data.version, 42);
 const wrongBot = await useMenu({ BotId: 'other' })[0].get();
 assert.equal(wrongBot.code, 4001);
 setDirectSend(null);
-console.log('Verified signed Webhook, WebSocket, subscription delivery, envelope IDs and no-useClient Action round trip.');
+console.log('Verified WebSocket, signed Webhook and proxy raw dispatch, application routing, known events and no-useClient Action round trip.');
 process.exit(0);

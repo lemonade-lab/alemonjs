@@ -1066,6 +1066,17 @@ export const register = (
     }
   });
 
+  client.onUnhandledDispatch?.(({ t, d, id }) => {
+    cbp.send({
+      name: 'platform.raw',
+      Platform: platform,
+      BotId: botId,
+      RawEventType: t,
+      ...(typeof id === 'string' && id && { EventId: id }),
+      value: d
+    });
+  });
+
   client.on('ERROR', console.error);
 
   const api = {

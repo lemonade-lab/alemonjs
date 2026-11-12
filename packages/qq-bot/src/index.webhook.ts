@@ -12,7 +12,6 @@ export const start = () => {
     ...cfgConfig
   });
 
-  // 连接
-  client.connect();
   register(client as any);
+  client.connect();
 };

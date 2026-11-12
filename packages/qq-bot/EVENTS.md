@@ -38,6 +38,36 @@
 | `C2C_MSG_RECEIVE` / `C2C_MSG_REJECT`                                                     | `private.notice.create`                                | 单聊推送开关               |
 | `ERROR`                                                                                  | -                                                      | 连接 / 事件处理错误        |
 
+### 监听尚未映射的 QQ 事件
+
+QQ 推送的新事件、灰度事件和仅对部分机器人开放的测试事件，可以通过 `platform.raw` 接收。支持 WebSocket 网关、签名 Webhook 和 Webhook 的 WebSocket 转发。事件能否送达仍取决于 QQ 的账号权限、订阅和投递配置。
+
+`current.RawEventType` 是 QQ 的原始事件名（`t`），`value` 是原始数据（`d`，类型为 `unknown`），`current.EventId` 是 QQ 提供的信封 ID（可能缺省），`current.BotId` 标识接收事件的机器人。应用可以按原始事件名和 BotId 筛选，再校验自己需要的数据字段。已映射的 QQ 事件沿用表中的标准事件名。
+
+```ts
+import { Router, defineChildren, useEvent } from 'alemonjs';
+
+const router = Router.create({ events: ['platform.raw'] });
+
+router.res({ events: ['platform.raw'] }, async () => () => {
+  const [{ current, value }, next] = useEvent({ selects: 'platform.raw' });
+
+  if (current.Platform !== 'qq-bot' || current.RawEventType !== 'YOUR_TEST_EVENT') {
+    return next();
+  }
+
+  if (value && typeof value === 'object' && 'status' in value && typeof value.status === 'string') {
+    console.info(current.BotId, value.status);
+  }
+});
+
+export default defineChildren({
+  register() {
+    return { responseRouter: router.define };
+  }
+});
+```
+
 示例：监听入群申请事件
 
 ```ts

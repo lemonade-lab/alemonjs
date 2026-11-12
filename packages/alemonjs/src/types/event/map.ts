@@ -16,14 +16,25 @@ import { PrivateEventMessageCreate, PrivateEventMessageDelete, PrivateEventMessa
 
 import { PrivateEventRequestFriendAdd, PrivateEventRequestFriendRemove, PrivateEventRequestGuildAdd } from './request';
 
+import type { Expansion } from './base/expansion';
+import type { Platform } from './base/platform';
 import { AutoFields } from './base/auto';
 import { PlatformConnectionReadyEvent, PlatformLoginQRCodeEvent, PlatformLoginSuccessEvent } from '../connection';
+
+/** 平台收到但尚未映射为框架标准事件的事件。 */
+export type RawPlatformEvent = Omit<Platform, 'value'> &
+  Expansion & {
+    name: 'platform.raw';
+    RawEventType: string;
+    value: unknown;
+  };
 
 /**
  * 原始事件定义（平台适配器构造的类型）
  * 不含框架自动注入字段
  */
 type RawEvents = {
+  'platform.raw': RawPlatformEvent;
   'message.create': PublicEventMessageCreate;
   'private.message.create': PrivateEventMessageCreate;
   'interaction.create': PublicEventInteractionCreate;

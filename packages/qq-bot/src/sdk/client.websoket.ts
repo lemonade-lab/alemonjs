@@ -2,23 +2,9 @@ import WebSocket from 'ws';
 import { QQBotAPI } from './api.js';
 import { getIntentsMask } from './intents.js';
 import { QQBotEventMap } from './message.js';
+import { isControlEvent, isDispatch, normalizeDispatch, type RawDispatch, type RawDispatchListener } from './dispatch.js';
 import { Options } from './typing.js';
 import { FileSessionStore, SessionStore } from './session.js';
-
-const normalizeGatewayMessage = <T extends { id?: string; d?: Record<string, unknown> }>(message: T): T => {
-  if (!message?.id || !message?.d || typeof message.d !== 'object' || Array.isArray(message.d)) {
-    return message;
-  }
-
-  if ((message as T & { t?: string }).t === 'INTERACTION_CREATE') {
-    message.d.event_id = message.id;
-  }
-  if (message.d.id === undefined || message.d.id === null || message.d.id === '') {
-    message.d.id = message.id;
-  }
-
-  return message;
-};
 
 /**
  * QQ 机器人网关连接。
@@ -59,7 +45,8 @@ export class QQBotClients extends QQBotAPI {
 
   #events: {
     [K in keyof QQBotEventMap]?: ((event: QQBotEventMap[K]) => any)[];
-  } = {};
+  } = Object.create(null);
+  #rawEvents: RawDispatchListener[] = [];
 
   /**
    * 设置配置
@@ -312,6 +299,12 @@ export class QQBotClients extends QQBotAPI {
     return this;
   }
 
+  onUnhandledDispatch(listener: RawDispatchListener) {
+    this.#rawEvents.push(listener);
+
+    return this;
+  }
+
   #emitError(err: unknown) {
     for (const event of this.#events.ERROR || []) {
       try {
@@ -322,12 +315,26 @@ export class QQBotClients extends QQBotAPI {
     }
   }
 
-  #handleDispatch(t: keyof QQBotEventMap, d: unknown) {
-    for (const event of this.#events[t] || []) {
-      try {
-        event(d as never);
-      } catch (err) {
-        this.#emitError(err);
+  #handleDispatch(message: RawDispatch) {
+    const listeners = this.#events[message.t as keyof QQBotEventMap];
+
+    if (listeners?.length) {
+      const { d } = normalizeDispatch(message);
+
+      for (const listener of listeners) {
+        try {
+          listener(d as never);
+        } catch (err) {
+          this.#emitError(err);
+        }
+      }
+    } else if (!isControlEvent(message.t)) {
+      for (const listener of this.#rawEvents) {
+        try {
+          void Promise.resolve(listener(message)).catch(error => this.#emitError(error));
+        } catch (error) {
+          this.#emitError(error);
+        }
       }
     }
   }
@@ -397,14 +404,16 @@ export class QQBotClients extends QQBotAPI {
       }
 
       try {
-        const message = normalizeGatewayMessage(JSON.parse(msg.toString('utf8')));
+        const message = JSON.parse(msg.toString('utf8'));
 
         if (process.env.NTQQ_WS === 'dev') {
           console.info('message', message);
         }
 
         const map = {
-          0: ({ t, d, s }) => {
+          0: packet => {
+            const { t, d, s } = packet;
+
             if (typeof s === 'number') {
               this.#sequence = s;
             }
@@ -412,7 +421,7 @@ export class QQBotClients extends QQBotAPI {
               this.#sessionId = String(d.session_id);
             }
             this.#persistSession();
-            this.#handleDispatch(t, d);
+            if (isDispatch(packet)) this.#handleDispatch(packet);
             if (t === 'READY' || t === 'RESUMED') {
               this.#reconnectAttempts = 0;
               this.updateConnectionStatus({
