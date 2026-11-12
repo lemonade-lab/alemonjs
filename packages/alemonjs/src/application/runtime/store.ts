@@ -69,6 +69,30 @@ export const getRuntimeCore = () => {
 
   return (global.alemonjsCore ??= createCore());
 };
+const appOrder = scopedMap<string, number>();
+const configuredAppOrder = scopedMap<string, number>();
+
+export const setConfiguredAppOrder = (names: readonly string[]) => {
+  configuredAppOrder.clear();
+  names.forEach((name, index) => configuredAppOrder.set(name, index));
+  bumpStoreVersion();
+};
+
+const configuredAppRank = (name: string) => (name === 'main' ? -1 : configuredAppOrder.get(name) ?? Number.MAX_SAFE_INTEGER);
+
+const orderedChildrenNames = () =>
+  Object.keys(getRuntimeCore().storeChildrenApp).sort(
+    (left, right) => configuredAppRank(left) - configuredAppRank(right) || (appOrder.get(left) ?? -1) - (appOrder.get(right) ?? -1)
+  );
+
+export const isRuntimeAppEventReady = (name: string) => {
+  const app = getRuntimeApp(name);
+
+  return !app || app.status === 'ready';
+};
+
+const eventChildrenNames = () => orderedChildrenNames().filter(isRuntimeAppEventReady);
+
 export class Core {
   constructor() {
     getRuntimeCore();
@@ -190,6 +214,10 @@ export const registerRuntimeApp = (
     updatedAt: now
   };
 
+  if (getRuntimeCore().storeChildrenApp[record.name] && ((current?.status ?? 'ready') === 'ready') !== (record.status === 'ready')) {
+    bumpStoreVersion();
+  }
+
   if (current?.status !== record.status && process.env.NODE_ENV === 'development') {
     logRuntimeAppStatus('debug', runtimeApps[record.name]);
   }
@@ -215,6 +243,9 @@ export const updateRuntimeAppStatus = (name: string, status: RuntimeAppStatus, e
   current.status = status;
   current.updatedAt = Date.now();
   current.error = normalizedError;
+  if ((previousStatus === 'ready') !== (status === 'ready')) {
+    bumpStoreVersion();
+  }
 
   const level = status === 'failed' ? 'warn' : status === 'disposed' ? 'info' : 'debug';
 
@@ -363,7 +394,7 @@ export class Response {
     if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+    const data = eventChildrenNames().map(key => {
       return getRuntimeCore().storeChildrenApp[key].response;
     });
 
@@ -382,7 +413,7 @@ export class ResponseMiddleware {
     if (typeof name !== 'string' || typeof stateKey !== 'string') {
       return [];
     }
-    if (!getRuntimeCore().storeChildrenApp[name]) {
+    if (!isRuntimeAppEventReady(name) || !getRuntimeCore().storeChildrenApp[name]) {
       return [];
     }
     const app = getRuntimeCore().storeChildrenApp[name];
@@ -502,7 +533,7 @@ export class MiddlewareTree {
 
     const root = createTreeNode();
 
-    for (const appKey of Object.keys(getRuntimeCore().storeChildrenApp)) {
+    for (const appKey of eventChildrenNames()) {
       const app = getRuntimeCore().storeChildrenApp[appKey];
       const subTree = buildFileTree(app.middleware ?? [], undefined);
 
@@ -530,7 +561,7 @@ export class ResponseTree {
 
     const root = createTreeNode();
 
-    for (const appKey of Object.keys(getRuntimeCore().storeChildrenApp)) {
+    for (const appKey of eventChildrenNames()) {
       const app = getRuntimeCore().storeChildrenApp[appKey];
       const subTree = buildFileTree(app.response ?? [], app.middlewareResponse);
 
@@ -552,7 +583,7 @@ export class ResponseRouter {
     if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+    const data = eventChildrenNames().map(key => {
       if (!getRuntimeCore().storeChildrenApp[key].register) {
         return [];
       }
@@ -582,7 +613,7 @@ export class MiddlewareRouter {
     if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+    const data = eventChildrenNames().map(key => {
       if (!getRuntimeCore().storeChildrenApp[key].register) {
         return [];
       }
@@ -611,7 +642,7 @@ export class Middleware {
     if (!runtimeScope.getStore() && this.#cacheVersion === _storeVersion && this.#cache !== null) {
       return this.#cache;
     }
-    const data = Object.keys(getRuntimeCore().storeChildrenApp).map(key => {
+    const data = eventChildrenNames().map(key => {
       return getRuntimeCore().storeChildrenApp[key].middleware;
     });
 
@@ -789,6 +820,9 @@ export class ChildrenApp {
    * 挂载
    */
   on() {
+    if (!appOrder.has(this.#name)) {
+      appOrder.set(this.#name, appOrder.size);
+    }
     getRuntimeCore().storeChildrenApp[this.#name] = {
       name: this.#name,
       middleware: this.#middleware,
@@ -808,6 +842,11 @@ export class ChildrenApp {
     disposeExpose(this.#name);
     // 清理该应用还未结束的交互上下文
     clearActiveContextsByApp(this.#name);
+    for (const subscriptions of Object.values(getRuntimeCore().storeSubscribeList)) {
+      for (const list of subscriptions.values()) {
+        list.removeWhere(item => item.appName === this.#name);
+      }
+    }
     // 清理
     Reflect.deleteProperty(getRuntimeCore().storeChildrenApp, this.#name);
     bumpStoreVersion();
@@ -830,7 +869,7 @@ export const getChildrenApp = (name: string) => {
 };
 
 export const listChildrenApps = () => {
-  return Object.values(getRuntimeCore().storeChildrenApp);
+  return orderedChildrenNames().map(name => getRuntimeCore().storeChildrenApp[name]);
 };
 
 export const ProcessorEventAutoClearMap = scopedMap();

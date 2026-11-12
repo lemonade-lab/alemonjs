@@ -6,7 +6,7 @@ import { trackRuntimeTask } from '../../common/runtime-scope.js';
  */
 import { Next, Events, EventCycleEnum, EventKeys } from '../../types/index.js';
 import { showErrorModule } from '../../common/index.js';
-import { getSubscribeList } from './store';
+import { getSubscribeList, isRuntimeAppEventReady } from './store';
 import { SubscribeStatus } from './subscribe-status.js';
 import { finishCurrentTrace, withEventContext } from './hook-event-context';
 import { dispatchEventError } from './event-error';
@@ -51,6 +51,12 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
     if (item.data.status === SubscribeStatus.paused) {
       subListValue.removeCurrent(); // 移除当前节点
       // 下一个节点
+      nextObserver();
+
+      return;
+    }
+
+    if (item.data.appName && !isRuntimeAppEventReady(item.data.appName)) {
       nextObserver();
 
       return;

@@ -265,17 +265,14 @@ const mdFormatters: Record<string, (value: any, options?: any, context?: QQMarkd
       return `<qqbot-cmd-enter text="${escapeAttribute(text)}" />`;
     }
 
-    // 预留平台长度余量；先截断再转义，避免截断实体或 emoji 的代理对。
+    // 预留平台长度余量；先截断再编码，避免截断百分号转义序列或 emoji 的代理对。
     const inputText = text.slice(0, 80).replace(/[\uD800-\uDBFF]$/u, '');
 
-    const showText = escapeAttribute(inputText);
-
-    // 不能为空
-    if (!showText) {
+    if (!inputText) {
       return '';
     }
 
-    return `<qqbot-cmd-input text="${showText}" show="${escapeAttribute(String(title ?? ''))}" />`;
+    return `<qqbot-cmd-input text="${encodeURIComponent(inputText)}" show="${encodeURIComponent(String(title ?? ''))}" />`;
   }
 };
 

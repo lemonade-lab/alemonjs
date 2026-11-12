@@ -53,7 +53,7 @@ export {
   core
 } from './runtime/store.js';
 export type { RuntimeAppStatus, RuntimeAppCapability, RuntimeAppError, RuntimeAppRecord } from './runtime/store.js';
-export { loadChildren, loadChildrenFile } from './runtime/load-modules/loadChild.js';
+export { loadChildren, loadChildrenFile, loadAppPackage, unloadAppPackage, reloadAppPackage } from './runtime/load-modules/loadChild.js';
 export { run, loadModels } from './runtime/load-modules/load.js';
 export { onProcessor, OnProcessor } from './runtime/event-processor.js';
 export { expendCycle } from './runtime/event-processor-cycle.js';

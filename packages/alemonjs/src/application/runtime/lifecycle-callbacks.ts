@@ -1,5 +1,5 @@
 import { withAppContext } from './app-context.js';
-import { getRuntimeCore } from './store.js';
+import { getRuntimeCore, isRuntimeAppEventReady, listChildrenApps } from './store.js';
 
 import { showErrorModule } from '../../common/utils.js';
 import type { EventFinishedContext, EventStartContext, HttpErrorContext, StoreChildrenApp, RuntimeStatusChangeContext } from '../../types/index.js';
@@ -9,7 +9,7 @@ const swallowLifecycleError = (error: unknown) => {
 };
 
 const getChildrenApps = (): StoreChildrenApp[] => {
-  return Object.values(getRuntimeCore()?.storeChildrenApp ?? {});
+  return listChildrenApps();
 };
 
 const getChildrenApp = (name: string): StoreChildrenApp | null => {
@@ -20,6 +20,9 @@ export const dispatchEventStart = async (context: EventStartContext) => {
   const apps = getChildrenApps();
 
   for (const app of apps) {
+    if (!isRuntimeAppEventReady(app.name)) {
+      continue;
+    }
     try {
       await withAppContext(app.name, () => app.cycle?.onEventStart?.(context));
     } catch (error) {
@@ -32,6 +35,9 @@ export const dispatchEventFinished = async (context: EventFinishedContext) => {
   const apps = getChildrenApps();
 
   for (const app of apps) {
+    if (!isRuntimeAppEventReady(app.name)) {
+      continue;
+    }
     try {
       await withAppContext(app.name, () => app.cycle?.onEventFinished?.(context));
     } catch (error) {
@@ -85,22 +91,13 @@ export const dispatchAppReady = async (appName: string, store: { response: any[]
   await withAppContext(appName, () => handler(store));
 };
 
-export const dispatchAppDispose = async (appName: string, error?: unknown) => {
-  const app = getChildrenApp(appName);
-
-  if (!app?.cycle) {
-    return;
-  }
-
-  try {
-    if (app.cycle.onDispose) {
-      await withAppContext(appName, () => app.cycle.onDispose(error));
+export const dispatchAppDispose = async (appName: string, error?: unknown, cycle = getChildrenApp(appName)?.cycle) => {
+  for (const handler of [cycle?.onDispose, cycle?.unMounted]) {
+    try {
+      await withAppContext(appName, () => handler?.call(cycle, error));
+    } catch (disposeError) {
+      swallowLifecycleError(disposeError);
     }
-    if (app.cycle.unMounted) {
-      await withAppContext(appName, () => app.cycle.unMounted(error));
-    }
-  } catch (disposeError) {
-    swallowLifecycleError(disposeError);
   }
 };
 

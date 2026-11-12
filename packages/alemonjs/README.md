@@ -27,6 +27,22 @@ apps:
 
 旧版 `模块名: true/false` 和名称数组仍可读取，后续新增配置统一使用上述模块映射。禁用模块保留序号，桌面管理入口启用、禁用时不会丢失其他模块配置。无效条目警告并跳过，字符串 `"false"` 不会被当作启用。`alemonc add/remove apps` 同步使用模块映射，保留已有模块的序号；精确调整序号请编辑 YAML。
 
+## 应用包热插拔与热更新
+
+在机器人应用进程内调用下列 API，参数是已安装的应用包名，支持 `@scope/name`。
+
+```ts
+import { loadAppPackage, reloadAppPackage, unloadAppPackage } from 'alemonjs';
+
+await loadAppPackage('@example/business');
+await reloadAppPackage('@example/business'); // 构建产物写入磁盘后调用
+await unloadAppPackage('@example/business');
+```
+
+这些操作即时生效，重启后仍按 `apps` 配置加载。每次热插拔或重载都会按当前 `apps.order` 更新事件处理顺序。启动时禁用的包也可以手动加载，并按配置插入对应位置。同序号按配置声明顺序，主应用排在最前，未配置的包排在配置项之后并保持首次挂载顺序。同一包的操作按调用顺序执行，重复加载已就绪的包会返回当前应用。卸载会移除框架登记的响应、中间件、HTTP 路由、定时任务、事件订阅、交互上下文和 Expose 注册，并等待 `onDispose` 和旧版 `unMounted` 完成。应用自行创建的连接、原生定时器等资源应在 `onDispose` 中关闭。
+
+热更新和卸载后的重新挂载要求支持 `module.registerHooks` 的 Node.js（22.15+）及 ESM 应用包。更新会重新加载包内代码，外部依赖沿用进程已有的模块实例。重载期间该应用会短暂停服，已开始执行的请求可以继续。新版在 `onReady` 完成后才开始接收新事件。若新版本初始化失败，API 会抛出错误，应用进入 `failed` 状态；修正文件后可再次加载。调用方负责触发更新，例如在构建成功后由开发工具调用 API。
+
 ## Router DSL 前缀空格
 
 ```ts

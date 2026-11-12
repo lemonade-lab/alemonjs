@@ -1,3 +1,4 @@
+import { getAppGeneration, importAppFile } from '../../load-modules/app-import.js';
 import { translate } from '../../../../common/i18n.js';
 import KoaRouter from 'koa-router';
 import fs, { existsSync } from 'fs';
@@ -6,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import mime from 'mime-types';
 import { formatPath, getModuelFile, safePath, isValidPackageName } from './utils';
 import { collectMiddlewares, runMiddlewares } from './middleware';
-import module from 'module';
 import { ResultCode } from '../../../../common/index.js';
 import {
   RuntimeAppStatus,
@@ -19,11 +19,6 @@ import {
   toRuntimeAppSnapshot
 } from '../../store.js';
 import { dispatchHttpError } from '../../lifecycle-callbacks.js';
-
-const initRequire = () => {};
-
-initRequire.resolve = () => '';
-const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
 const router = new KoaRouter({
   prefix: '/'
@@ -73,7 +68,7 @@ const readWebRootConfig = (packageRoot: string) => {
     return '';
   }
 
-  const pkg = require(packageJsonPath) ?? {};
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8')) ?? {};
   const configuredRoot = pkg?.alemonjs?.web?.root ?? '';
 
   if (typeof configuredRoot === 'string' && configuredRoot.trim()) {
@@ -710,7 +705,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
 
     try {
       const routeBase = join(runtimeApp.rootDir, 'route');
-      const dir = safePath(routeBase, ctx.path?.replace(apiPath, '/api') || '');
+      const dir = safePath(routeBase, 'api' + ctx.path.slice(apiPath.length));
 
       if (!dir) {
         ctx.status = 403;
@@ -747,7 +742,8 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
         return;
       }
 
-      const apiModule = await import(`file://${modulePath}`);
+      const generation = getAppGeneration(appName);
+      const apiModule = await importAppFile(modulePath, generation);
       const handler = apiModule[ctx.method];
 
       if (!handler || typeof handler !== 'function') {
@@ -756,7 +752,7 @@ const handlePluginAppRequest = async (ctx: KoaRouter.RouterContext) => {
         return;
       }
 
-      const middlewares = await collectMiddlewares(modulePath);
+      const middlewares = await collectMiddlewares(modulePath, generation);
 
       await runMiddlewares(middlewares, ctx, handler);
     } catch (err) {

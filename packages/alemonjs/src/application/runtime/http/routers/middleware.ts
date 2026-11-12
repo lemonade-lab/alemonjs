@@ -1,7 +1,8 @@
+import { importAppFile } from '../../load-modules/app-import.js';
 import { existsSync } from 'fs';
 import path, { dirname } from 'path';
 
-export async function collectMiddlewares(routeFile: string): Promise<Array<(ctx: any, next: () => Promise<void>) => Promise<void>>> {
+export async function collectMiddlewares(routeFile: string, generation?: string): Promise<Array<(ctx: any, next: () => Promise<void>) => Promise<void>>> {
   const middlewares: Array<(ctx: any, next: () => Promise<void>) => Promise<void>> = [];
   let dir = dirname(routeFile);
   const suffixes = ['.ts', '.js', '.cjs', '.mjs', '.tsx', '.jsx'];
@@ -11,7 +12,7 @@ export async function collectMiddlewares(routeFile: string): Promise<Array<(ctx:
       const mwPath = path.join(dir, `_middleware${ext}`);
 
       if (existsSync(mwPath)) {
-        const module = await import(`file://${mwPath}`);
+        const module = await importAppFile(mwPath, generation);
         const mw = module?.default ?? {};
 
         if (typeof mw === 'function') {

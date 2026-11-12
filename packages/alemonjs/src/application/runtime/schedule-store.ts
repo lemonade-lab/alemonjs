@@ -1,3 +1,4 @@
+import { currentAppContext } from './app-context.js';
 import {
   recordRuntimeError,
   scopedMap,
@@ -67,10 +68,10 @@ const extractCallerPaths = (): string[] => {
  * 遍历栈帧，找到第一个属于已注册应用目录的文件路径
  */
 const resolveAppName = (): string => {
-  const execution = runtimeExecution.getStore();
+  const appName = currentAppContext()?.name ?? runtimeExecution.getStore()?.appName;
 
-  if (execution?.appName) {
-    return execution.appName;
+  if (appName) {
+    return appName;
   }
   const callerPaths = extractCallerPaths();
 

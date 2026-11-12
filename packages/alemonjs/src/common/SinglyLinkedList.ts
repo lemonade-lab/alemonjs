@@ -80,6 +80,31 @@ export class SinglyLinkedList<T> {
     }
   }
 
+  removeWhere(predicate: (data: T) => boolean): void {
+    let previous: ListNode<T> | null = null;
+    let node = this.head;
+
+    while (node) {
+      if (predicate(node.data)) {
+        if (previous) {
+          previous.next = node.next;
+        } else {
+          this.head = node.next;
+        }
+        if (this.tail === node) {
+          this.tail = previous;
+        }
+        if (this.current === node) {
+          this.current = previous;
+        }
+        this.size--;
+      } else {
+        previous = node;
+      }
+      node = node.next;
+    }
+  }
+
   getSize(): number {
     return this.size;
   }

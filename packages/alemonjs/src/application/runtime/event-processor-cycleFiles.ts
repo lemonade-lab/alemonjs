@@ -1,22 +1,23 @@
-import { scopedMap, trackRuntimeTask } from '../../common/runtime-scope.js';
+import { trackRuntimeTask } from '../../common/runtime-scope.js';
 import { Next, Events, Current, EventKeys, FileTreeNode, StoreResponseItem, OnResponseValue } from '../../types/index.js';
 import { showErrorModule, getCachedRegExp } from '../../common/utils.js';
 import { EventMessageText } from '../../common/variable.js';
 import { dispatchEventError } from './event-error';
+import { getAppGeneration, importAppFile } from './load-modules/app-import.js';
 
 // 模块缓存，避免每次事件处理都重新 import
-const moduleCache = scopedMap<string, any>();
+const moduleCache = new WeakMap<StoreResponseItem, any>();
 
 /**
  * 同步 select 预过滤 — 模块已缓存时 O(1) 跳过不匹配文件
  * @returns true = 确定不匹配（可跳过）, false = 可能匹配或未缓存（需完整检查）
  */
 const shouldSkipFile = <T extends EventKeys>(file: StoreResponseItem, select: T, valueEvent: Events[T]): boolean => {
-  if (!moduleCache.has(file.path)) {
+  if (!moduleCache.has(file)) {
     return false;
   }
 
-  const app = moduleCache.get(file.path);
+  const app = moduleCache.get(file);
 
   if (!app?.default?.current || !app?.default?.select) {
     return true;
@@ -39,24 +40,13 @@ const shouldSkipFile = <T extends EventKeys>(file: StoreResponseItem, select: T,
   return false;
 };
 
-/**
- * 清除模块缓存（用于热更新等场景）
- */
-export const clearModuleCache = (path?: string) => {
-  if (path) {
-    moduleCache.delete(path);
-  } else {
-    moduleCache.clear();
+const loadModule = async (file: StoreResponseItem) => {
+  if (moduleCache.has(file)) {
+    return moduleCache.get(file);
   }
-};
+  const mod = await importAppFile(file.path, getAppGeneration(file.appName));
 
-const loadModule = async (filePath: string) => {
-  if (moduleCache.has(filePath)) {
-    return moduleCache.get(filePath);
-  }
-  const mod = await import(`file://${filePath}`);
-
-  moduleCache.set(filePath, mod);
+  moduleCache.set(file, mod);
 
   return mod;
 };
@@ -73,7 +63,7 @@ const callHandlerFile = async <T extends EventKeys>(
     const app: {
       default: OnResponseValue<Current<EventKeys>, T>;
       regular?: string | RegExp;
-    } = await loadModule(file.path);
+    } = await loadModule(file);
 
     // bad case
     if (!app?.default?.current || !app?.default?.select) {

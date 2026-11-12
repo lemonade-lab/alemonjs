@@ -1,6 +1,4 @@
-import { loadConfiguredApps } from '../../../common/apps-config.js';
-import { getConfig } from '../../../common/config.js';
-import { loadChildren, loadChildrenFile } from './loadChild.js';
+import { loadChildren, loadChildrenFile, refreshAppPackageOrder } from './loadChild.js';
 import { dirname, join } from 'path';
 import { existsSync } from 'fs';
 import { ResultCode } from '../../../common/variable.js';
@@ -12,11 +10,13 @@ const initRequire = () => {};
 initRequire.resolve = () => '';
 const require = module?.createRequire?.(import.meta.url) ?? initRequire;
 
-const loadApps = () =>
-  loadConfiguredApps(getConfig().value?.apps, async app => {
-    registerRuntimeApp({ name: app, kind: 'plugin', enabled: true, status: 'discovered', rootDir: '', mainPath: '' });
-    await loadChildrenFile(app);
-  });
+const loadApps = async () => {
+  for (const app of refreshAppPackageOrder()) {
+    if (app.enabled) {
+      await loadChildrenFile(app.name);
+    }
+  }
+};
 
 /**
  * @description 运行本地模块

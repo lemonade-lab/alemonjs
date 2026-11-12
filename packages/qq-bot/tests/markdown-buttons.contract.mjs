@@ -12,7 +12,7 @@ getConfig().saveValue({});
 const button = Format.createMarkdown().addButton('领取奖励', { data: '/reward', autoEnter: true });
 const quote = Format.createMarkdown().addBlockquote(Format.createMarkdown().addBlockquote(button));
 assert.equal(createMarkdownText(button.value.value, 'c2c'), '<qqbot-cmd-enter text="/reward" />');
-assert.equal(createMarkdownText(button.value.value), '<qqbot-cmd-input text="/reward" show="领取奖励" />');
+assert.equal(createMarkdownText(button.value.value), '<qqbot-cmd-input text="%2Freward" show="%E9%A2%86%E5%8F%96%E5%A5%96%E5%8A%B1" />');
 assert.match(createMarkdownText(quote.value.value, 'c2c'), /qqbot-cmd-enter text="\/reward" \/>/);
 const calls = [];
 const record = kind => async (_id, body) => {
@@ -45,15 +45,18 @@ for (const [send, kind] of [
     assert.equal(calls.at(-1).kind, kind);
     assert.match(body.markdown.content, /前文/);
     assert.match(body.markdown.content, /后文/);
-    assert.match(body.markdown.content, kind === 'c2c' ? /<qqbot-cmd-enter text="\/reward" \/>/ : /<qqbot-cmd-input text="\/reward" show="领取奖励" \/>/);
+    assert.match(
+      body.markdown.content,
+      kind === 'c2c' ? /<qqbot-cmd-enter text="\/reward" \/>/ : /<qqbot-cmd-input text="%2Freward" show="%E9%A2%86%E5%8F%96%E5%A5%96%E5%8A%B1" \/>/
+    );
   }
   const input = Format.createMarkdown().addButton('填入', { data: '/input', autoEnter: false });
   await send(client, event, Format.create().addMarkdown(input).value);
-  assert.equal(calls.at(-1).body.markdown.content, '<qqbot-cmd-input text="/input" show="填入" />');
+  assert.equal(calls.at(-1).body.markdown.content, '<qqbot-cmd-input text="%2Finput" show="%E5%A1%AB%E5%85%A5" />');
 }
 const escaped = Format.createMarkdown().addButton('标题"<&', { data: '/say "a" <b>&', autoEnter: true });
 assert.equal(createMarkdownText(escaped.value.value, 'c2c'), '<qqbot-cmd-enter text="/say &quot;a&quot; &lt;b&gt;&amp;" />');
-assert.equal(createMarkdownText(escaped.value.value, 'group'), '<qqbot-cmd-input text="/say &quot;a&quot; &lt;b&gt;&amp;" show="标题&quot;&lt;&amp;" />');
+assert.equal(createMarkdownText(escaped.value.value, 'group'), '<qqbot-cmd-input text="%2Fsay%20%22a%22%20%3Cb%3E%26" show="%E6%A0%87%E9%A2%98%22%3C%26" />');
 // input 的 80 字符边界、中文、转义及 emoji；enter 不受 input 截断规则影响。
 for (const [text, expected] of [
   ['a'.repeat(79), 'a'.repeat(79)],
@@ -62,17 +65,23 @@ for (const [text, expected] of [
   ['中'.repeat(101), '中'.repeat(80)],
   ['a'.repeat(79) + '😀尾部', 'a'.repeat(79)],
   ['a'.repeat(78) + '😀尾部', 'a'.repeat(78) + '😀'],
-  ['a'.repeat(79) + '&尾部', 'a'.repeat(79) + '&amp;']
+  ['a'.repeat(79) + '&尾部', 'a'.repeat(79) + '&']
 ]) {
   const longButton = Format.createMarkdown().addButton('长指令', { data: text, autoEnter: true });
   for (const context of ['group', 'guild']) {
-    assert.equal(createMarkdownText(longButton.value.value, context), `<qqbot-cmd-input text="${expected}" show="长指令" />`);
+    assert.equal(
+      createMarkdownText(longButton.value.value, context),
+      `<qqbot-cmd-input text="${encodeURIComponent(expected)}" show="%E9%95%BF%E6%8C%87%E4%BB%A4" />`
+    );
   }
   const manualInput = Format.createMarkdown().addButton('长指令', { data: text });
-  assert.equal(createMarkdownText(manualInput.value.value, 'c2c'), `<qqbot-cmd-input text="${expected}" show="长指令" />`);
+  assert.equal(
+    createMarkdownText(manualInput.value.value, 'c2c'),
+    `<qqbot-cmd-input text="${encodeURIComponent(expected)}" show="%E9%95%BF%E6%8C%87%E4%BB%A4" />`
+  );
   assert.equal(createMarkdownText(longButton.value.value, 'c2c'), `<qqbot-cmd-enter text="${text.replace(/&/g, '&amp;')}" />`);
   await GROUP_AT_MESSAGE_CREATE(client, event, Format.create().addMarkdown(Format.createMarkdown().addBlockquote(longButton)).value);
-  assert.ok(calls.at(-1).body.markdown.content.includes(`text="${expected}"`));
+  assert.ok(calls.at(-1).body.markdown.content.includes(`text="${encodeURIComponent(expected)}"`));
 }
 const missingData = Format.createMarkdown().addButton('/help', { autoEnter: true });
 assert.equal(createMarkdownText(missingData.value.value, 'c2c'), '<qqbot-cmd-enter text="/help" />');
