@@ -9,6 +9,7 @@ const SEMVER_RE = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const RELEASE_TYPES = new Set(['patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease']);
 const VERSION_RE = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
 const DEFAULT_PUBLISH_FILES = ['lib', 'package.json', 'README.md'];
+const DEFAULT_PUBLISH_GITIGNORE = ['node_modules/', '__pycache__/'];
 const SOURCE_PACKAGE_FIELDS = ['private', 'workspaces', 'devDependencies', 'packageManager'];
 const SOURCE_PACKAGE_SCRIPTS = ['bundle', 'build', 'prepublish', 'prepare', 'prepublishOnly', 'prepack', 'postpack', 'publish', 'postpublish'];
 
@@ -178,6 +179,12 @@ function getDefaultPublishFiles(cwd) {
   return DEFAULT_PUBLISH_FILES.filter(file => fs.existsSync(join(cwd, file)));
 }
 
+function getPublishGitIgnore(cwd) {
+  const sourcePath = join(cwd, '.gitignore');
+  const sourceRules = fs.lstatSync(sourcePath, { throwIfNoEntry: false })?.isFile() ? fs.readFileSync(sourcePath, 'utf8').replace(/^\uFEFF/, '') : '';
+  return DEFAULT_PUBLISH_GITIGNORE.join('\n') + '\n' + sourceRules;
+}
+
 function warnDefaultPublishState(pkg, publishFiles, cwd) {
   const hasLibDir = fs.existsSync(join(cwd, 'lib'));
   const mainField = typeof pkg.main === 'string' ? pkg.main : '';
@@ -192,8 +199,7 @@ function warnDefaultPublishState(pkg, publishFiles, cwd) {
 }
 
 function copyPublishFiles(files, cwd, publishDir) {
-  for (const item of files) {
-    const relativePath = typeof item === 'string' ? item : item.path;
+  for (const relativePath of files) {
     const sourcePath = join(cwd, relativePath);
     const targetPath = join(publishDir, relativePath);
 
@@ -347,6 +353,7 @@ export async function publish(release, options = {}) {
     runCommand('git', ['worktree', 'add', '--detach', buildRoot, sourceCommit]);
     const buildCwd = join(buildRoot, packageRelativePath);
     const { pkgPath, pkg } = readPackageJson(buildCwd);
+    const publishGitIgnore = getPublishGitIgnore(buildCwd);
     if (!pkg.name) throw new Error('package.json 缺少 name');
     console.log(`发布包: ${pkg.name}`);
     console.log(`隔离构建目录: ${buildCwd}`);
@@ -364,7 +371,8 @@ export async function publish(release, options = {}) {
       console.log(options.skipBuild ? '已跳过构建，仅使用 commit 中已有的产物' : '未定义 bundle 或 build 脚本，跳过构建');
     }
     const useNpmRules = hasNpmPublishRules(pkg, buildCwd);
-    const publishFiles = useNpmRules ? getPackResult(buildCwd).files : getDefaultPublishFiles(buildCwd);
+    const selectedFiles = useNpmRules ? getPackResult(buildCwd).files.map(file => file.path) : getDefaultPublishFiles(buildCwd);
+    const publishFiles = selectedFiles.filter(file => file !== '.gitignore');
     if (!useNpmRules) warnDefaultPublishState(pkg, publishFiles, buildCwd);
     copyPublishFiles(publishFiles, buildCwd, publishDir);
     preparePublishPackage(publishDir, buildScript);
@@ -374,7 +382,7 @@ export async function publish(release, options = {}) {
     artifactPkg.gitHead = sourceCommit;
     fs.writeFileSync(artifactPkgPath, JSON.stringify(artifactPkg, null, 2) + '\n');
     console.log(`发布规则: ${useNpmRules ? 'npm' : 'default'}`);
-    console.log(`发布文件数: ${publishFiles.length}`);
+    console.log(`发布文件数: ${publishFiles.length + 1}`);
     if (options.dryRun) {
       console.log('dry-run 模式，不会真正推送到 git');
       return;
@@ -389,6 +397,9 @@ export async function publish(release, options = {}) {
     removeDirContents(artifactRoot);
     copyDirContents(publishDir, artifactRoot);
     runCommand('git', ['add', '-A'], { cwd: artifactRoot });
+    // 先暂存构建产物，避免源码的 /lib 等规则排除发布所需的文件。
+    fs.writeFileSync(join(artifactRoot, '.gitignore'), publishGitIgnore);
+    runCommand('git', ['add', '-f', '--', '.gitignore'], { cwd: artifactRoot });
     if (gitOutput(['diff', '--cached', '--name-only'], artifactRoot)) {
       runCommand('git', ['commit', '-m', `release: ${gitTagName}\n\nSource-Branch: ${sourceBranch}\nSource-Commit: ${sourceCommit}`], { cwd: artifactRoot });
     }

@@ -116,7 +116,8 @@ test('dirty source and index are untouched; only committed files are published',
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.match(result.stdout, new RegExp(`源码 commit: ${before.head}`));
   assert.equal(f.remoteGit('show', 'develop-release:lib/index.js'), 'export default 1;');
-  assert.equal(f.remoteGit('ls-tree', '-r', '--name-only', 'develop-release'), 'lib/index.js\npackage.json');
+  assert.equal(f.remoteGit('ls-tree', '-r', '--name-only', 'develop-release'), '.gitignore\nlib/index.js\npackage.json');
+  assert.equal(f.remoteGit('show', 'develop-release:.gitignore'), 'node_modules/\n__pycache__/');
   assert.equal(JSON.parse(f.remoteGit('show', 'develop-release:package.json')).gitHead, before.head);
   assert.match(f.remoteGit('log', '-1', '--format=%B', 'develop-release'), new RegExp(`Source-Branch: develop\nSource-Commit: ${before.head}`));
   assertSourceUnchanged(f, before);
@@ -179,6 +180,34 @@ for (const selection of ['default', 'files', 'npmignore']) {
     assertSourceUnchanged(f, before);
   });
 }
+
+test('npm-selected releases retain project ignore rules and stage new artifacts that those rules ignore', t => {
+  const f = fixture(t, 'develop');
+  const branch = 'develop-release';
+  const rules = '/lib/\nlocal-data/\n';
+  const gitignore = path.join(f.cwd, '.gitignore');
+  fs.writeFileSync(gitignore, rules);
+  fs.writeFileSync(path.join(f.cwd, 'package.json'), JSON.stringify({ name: 'publish-fixture', version: '1.0.0', files: ['lib'] }));
+  f.git('add', '.');
+  f.git('commit', '-m', 'configure publish files and ignore rules');
+  f.succeed();
+
+  fs.writeFileSync(path.join(f.cwd, 'lib/added.js'), 'export default 2;\n');
+  f.git('add', '-f', 'lib/added.js');
+  f.git('commit', '-m', 'add artifact');
+  fs.writeFileSync(gitignore, 'uncommitted/\n');
+  const before = snapshot(f);
+  f.succeed();
+  assertSourceUnchanged(f, before);
+  assert.equal(f.remoteGit('show', `${branch}:.gitignore`), `node_modules/\n__pycache__/\n${rules.trimEnd()}`);
+  assert.equal(f.remoteGit('show', `${branch}:lib/added.js`), 'export default 2;');
+
+  f.git('fetch', 'origin', branch);
+  const checkout = path.join(f.cwd, '..', 'release');
+  f.git('worktree', 'add', '--detach', checkout, 'FETCH_HEAD');
+  const ignored = ['node_modules/playwright-core/index.js', 'python/__pycache__/test.pyc', 'local-data/state.json'];
+  assert.equal(f.git('-C', checkout, 'check-ignore', '--', ...ignored), ignored.join('\n'));
+});
 
 test('isolated build installs committed local dependencies and exposes pinned source identity', t => {
   const f = fixture(t, 'develop');
