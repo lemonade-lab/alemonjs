@@ -6,6 +6,7 @@ export type GROUP_DEL_ROBOT_TYPE = {
    * 移除的时间戳
    */
   group_openid: string;
+  union_group_openid?: string;
   /**
    * 移除群的群openid
    */

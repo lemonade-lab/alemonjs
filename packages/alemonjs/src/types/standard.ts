@@ -9,6 +9,8 @@ export type BotInfo = User & { ShareUrl?: string; WelcomeMessage?: string };
 export type GuildInfo = {
   /** 服务器 ID */
   GuildId: string;
+  /** 平台提供的跨应用关联群 ID */
+  UnionGuildId?: string;
   /** 服务器名称 */
   GuildName?: string;
   /** 服务器图标 URL */

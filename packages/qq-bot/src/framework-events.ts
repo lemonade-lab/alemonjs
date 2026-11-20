@@ -10,7 +10,8 @@ export const normalizeMessageUser = (raw: any, scope: 'group' | 'c2c' | 'channel
     UserId,
     UserKey,
     IsMaster,
-    UserName: raw.username,
+    UserName: (scope === 'group' ? raw.member_nickname : undefined) || raw.username,
+    ...(raw.avatar && { UserAvatar: raw.avatar }),
     IsBot: raw.bot ?? false,
     SourceUserId: raw.id,
     DirectUserId: raw.user_openid,
@@ -118,6 +119,9 @@ export const normalizeFrameworkEvent = (event: EventsEnum, acknowledged = false)
   }
   if (raw.group_openid) {
     details.Target = { scope: 'group', targetId: raw.group_openid, BotId: event.BotId };
+    if (raw.union_group_openid) {
+      details.UnionGuildId = raw.union_group_openid;
+    }
   } else if (/^(C2C_|FRIEND_|SUBSCRIBE_MESSAGE_STATUS|INTERACTION_CREATE_C2C)/.test(tag)) {
     const id = raw.openid || raw.user_openid || raw.author?.user_openid || raw.author?.id;
 

@@ -3,7 +3,7 @@ import { createResult, ResultCode, type ActionTarget, type MenuItem, type Comman
 import type { ApiRequestData } from './sdk/typing';
 import type { QQBotAPI } from './sdk/api';
 import { getIdentity } from './config';
-import { normalizeJoinRequest } from './framework-events';
+import { normalizeJoinRequest, normalizeMessageUser } from './framework-events';
 
 const page = (items: unknown[], raw: any) => ({
   Items: items,
@@ -318,6 +318,12 @@ export const handleFrameworkAction = async (client: QQBotAPI, data: { action: st
     };
   };
   const actions: Record<string, () => Promise<unknown>> = {
+    'user.info': async () => {
+      const id = need(userId, 'userId');
+      const profile = await client.usersInfo(id);
+
+      return normalizeMessageUser({ ...profile, user_openid: id }, 'c2c');
+    },
     'menu.get': async () => {
       const r = await client.menuGet();
 
@@ -554,6 +560,7 @@ export const handleFrameworkAction = async (client: QQBotAPI, data: { action: st
 
         return {
           GuildId: r.group_openid,
+          UnionGuildId: r.union_group_openid || undefined,
           GuildName: r.group_name,
           Description: r.group_finger_memo,
           Category: r.group_class_text,

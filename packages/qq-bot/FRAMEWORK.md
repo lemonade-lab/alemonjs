@@ -14,6 +14,7 @@
 | 会话菜单                                       | `useMenu().get / set`                                                                 |
 | 指令面板及关联对象                             | `usePanel().list / create / get / update / delete / updateTargets`                    |
 | 机器人资料、分享链接                           | `useMe().info / share`                                                                |
+| 单聊用户资料                                   | `useUser()[0].info({ userId })`                                                        |
 | 普通消息、Markdown、按钮、卡片、媒体消息、撤回 | `useMessage().send / delete`                                                          |
 | 输入状态、流式消息                             | `useMessage().typing / stream`                                                        |
 | 媒体上传、发送、分片准备/完成/合并             | `useMedia().upload / send / sendUser / sendChannel / prepare / finishPart / complete` |
@@ -25,6 +26,10 @@
 | 频道消息频率、接口权限、私信会话、旧公告       | `useChannelSettings()`                                                                |
 
 调用均经过语义化 Action，例如 `menu.set`、`member.blacklist.update`、`request.policy.create`；没有平台 SDK 方法名透传入口。鉴权与连接维护由适配器内部完成。
+
+查询单聊用户资料时，`userId` 传用户的单聊 OpenID。QQ 要求该用户与机器人已建立好友关系。SDK 的 `usersInfo(userOpenId)` 还返回用户是否允许接收主动消息（`allow_proactive_msg`）。
+
+群资料和相关群事件在 QQ 返回跨应用关联标识时提供 `UnionGuildId`，群管理操作仍使用 `GuildId`。消息优先使用 QQ 下发的头像，群聊优先使用群内昵称。
 
 框架会在请求离开应用前执行官方限制：菜单最多 10 项、子菜单 1–5 项且只支持一层；菜单和面板链接必须是 `https`。面板最多 20 项，`specific` 受众必须与 `group` 或 `c2c` scope 匹配，每次修改受众最多 20 个 ID。面板支持 `group`、`c2c`、`channel`、`direct`，其中 `direct` 由 QQ 适配器转换为原生 `dm`；`channel`、`direct` 仅支持 `audience: 'all'`，不能指定用户或群。菜单名称及面板名称/描述按 ASCII 占 1、中文等非 ASCII 字符占 2 校验；面板备注最多 255 个 Unicode 字符。
 
@@ -174,9 +179,9 @@ yarn workspace @alemonjs/qq-bot test:channel
 
 快照脚本枚举 sitemap 的全部自动生成 API/事件引用，仅排除明确的频道路径；当前共有 69 项，其中 40 个 API、16 种事件纳入合同测试，13 项频道引用列为排除。新增非频道引用会进入测试清单，缺失框架实现时覆盖断言失败。这仍不等于官方 sitemap 之外不存在其他能力。
 
-批量移除或黑名单接口即使 HTTP 成功，也可能返回部分失败。此时框架返回 `ResultCode.Warn`，数据保留 `failedBlacklistIds` 或 `failedUserIds`；单成员 ban/unban 同样遵循该规则。移除及黑名单操作校验每次 1–20 个成员。互动确认仅消费一次结果，并保留平台失败结果及 BotId 路由。
+封禁及带 `blacklist: true` 的批量移除先移除成员，再调用群黑名单接口。移除成功后如果有成员未确认拉黑，框架返回 `ResultCode.Warn`，并在 `failedBlacklistIds` 中返回对应成员 ID。直接操作黑名单时，部分失败的成员 ID 位于 `failedUserIds`。移除及黑名单操作校验每次 1–20 个成员。互动确认仅消费一次结果，并保留平台失败结果及 BotId 路由。
 
-批量禁言同样限制 1–20 个成员。策略创建与策略群变更分别校验群 OpenID/群号二选一及 100 个上限；白名单单次为 1–10000 个 QQ 号码。单聊输入状态持续时间为 1–60 秒，流式发送要求非空文本和从 0 开始的整数 index。
+成员禁言最长 30 天，批量禁言每次 1–20 个成员。入群申请每页最多 50 条，拒绝申请时可附带拒绝理由和拉黑选项。策略创建与策略群变更分别校验群 OpenID/群号二选一及 100 个上限；白名单单次为 1–10000 个 QQ 号码。单聊输入状态持续时间为 1–60 秒，流式发送要求非空文本和从 0 开始的整数 index。
 
 源代码类型检查：
 

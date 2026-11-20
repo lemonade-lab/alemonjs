@@ -46,9 +46,18 @@ export type QQBotBlacklistUser = {
 };
 export type QQBotMessageResult = { id: string; timestamp: string; ext_info?: { ref_idx?: string } };
 
+export type QQBotUserInfo = {
+  username: string;
+  avatar: string;
+  allow_proactive_msg: boolean;
+  union_openid?: string;
+};
+
 export type QQBotMessageUser = {
   id: string;
   username?: string;
+  avatar?: string;
+  member_nickname?: string;
   bot?: boolean;
   union_openid?: string;
   union_user_account?: string;

@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 // This is the entire application-facing import surface under test.
 import {
   useMention,
+  useUser,
   useGuild,
   useMember,
   useRequest,
@@ -89,12 +90,21 @@ client.groupService = async request => {
   if (path === '/v2/panels') return request.method === 'get' ? { records: [panel], next_cursor: 'next', is_end: false } : { panel_id: 'ID' };
   if (path === '/v2/panels/ID') return request.method === 'get' ? panel : { version: 8 };
   if (path === '/v2/generate_url_link') return { data: { url: 'https://example.com/share' } };
-  if (path.endsWith('/info'))
-    return { group_openid: 'ID', group_name: 'Group', group_finger_memo: 'memo', group_class_text: 'class', group_tags: ['tag'], group_member_num: 10 };
+  if (path === '/v2/users/ID/info') return { username: 'QQ User', avatar: 'avatar', union_openid: 'union-user', allow_proactive_msg: false };
+  if (path === '/v2/groups/ID/info')
+    return {
+      group_openid: 'ID',
+      union_group_openid: 'union-group',
+      group_name: 'Group',
+      group_finger_memo: 'memo',
+      group_class_text: 'class',
+      group_tags: ['tag'],
+      group_member_num: 10
+    };
   if (path.endsWith('/bot_state')) return { member_openid: 'bot', member_role: 'admin', allow_proactive_msg: true, recv_msg_setting: 'all' };
   if (path.endsWith('/members')) return { members: [member], next_cursor: 'next' };
   if (path.includes('/members/')) return member;
-  if (path.endsWith('/batch_remove_members')) return { remove_members_result: 'success', add_to_member_blacklist_fail_openids: [] };
+  if (path.endsWith('/batch_remove_members')) return { remove_members_result: 'success' };
   if (path.endsWith('/member_blacklist')) return { users: [{ ...member, banned_at: 'date' }], next_cursor: 'next', fail_openids: [] };
   if (path.endsWith('/restrict_chat_setting'))
     return {
@@ -130,16 +140,17 @@ setDirectSend(envelope => {
     });
   });
 });
-const check = async (hook, run) => {
+const check = async (hook, run, requestCount = 1) => {
   const before = calls.length;
   const result = await run();
   const item = Array.isArray(result) ? result[0] : result;
   assert.equal(item.code, ResultCode.Ok, `${hook}: ${JSON.stringify(item)}`);
-  assert.equal(calls.length, before + 1, `${hook} should issue one HTTP request`);
-  const req = calls.at(-1);
-  const endpoint = `${(req.method ?? 'get').toUpperCase()} ${req.url}`;
-  assert(expected.has(endpoint), `${hook}: ${endpoint} is not in official scope`);
-  routes.push({ hook, action: envelopes.at(-1).payload.action, endpoint, source: expected.get(endpoint) });
+  assert.equal(calls.length, before + requestCount, `${hook} should issue ${requestCount} HTTP request(s)`);
+  for (const req of calls.slice(before)) {
+    const endpoint = `${(req.method ?? 'get').toUpperCase()} ${req.url}`;
+    assert(expected.has(endpoint), `${hook}: ${endpoint} is not in official scope`);
+    routes.push({ hook, action: envelopes.at(-1).payload.action, endpoint, source: expected.get(endpoint) });
+  }
   return item.data;
 };
 const [guild] = useGuild(group),
@@ -147,24 +158,45 @@ const [guild] = useGuild(group),
   [requests] = useRequest(group),
   [menu] = useMenu(group),
   [panels] = usePanel(group);
-assert.equal((await check('useGuild.info', () => guild.info())).GuildName, 'Group');
+const groupInfo = await check('useGuild.info', () => guild.info());
+assert.equal(groupInfo.GuildName, 'Group');
+assert.equal(groupInfo.UnionGuildId, 'union-group');
+const userInfo = await check('useUser.info', () => useUser()[0].info({ userId: 'ID' }));
+assert.equal(userInfo.UserId, 'ID');
+assert.equal(userInfo.DirectUserId, 'ID');
+assert.equal(userInfo.UserName, 'QQ User');
+assert.equal(userInfo.UserAvatar, 'avatar');
+assert.equal(userInfo.UnionId, 'union-user');
 assert.equal((await check('useGuild.botInfo', () => guild.botInfo())).allowsProactiveMessages, true);
 assert.equal((await check('useGuild.muteState', () => guild.muteState())).global.recurring[0].id, 't');
 assert.equal((await check('useMember.info', () => members.info({ userId: 'ID' }))).UserId, 'u');
 assert.equal((await check('useMember.list', () => members.list({ pagination: { Cursor: 'cursor' } }))).NextCursor, 'next');
 assert.equal(calls.at(-1).params.cursor, 'cursor');
-assert.deepEqual((await check('useMember.kickMany', () => members.kickMany({ userIds: ['u'], blacklist: true }))).failedBlacklistIds, []);
-assert.equal(calls.at(-1).data.add_to_member_blacklist, true);
-await check('useMember.ban', () => members.ban({ userId: 'u' }));
-assert.equal(calls.at(-1).data.add_to_member_blacklist, true);
+await check('useMember.kickMany', () => members.kickMany({ userIds: ['u'], blacklist: false }));
+assert.deepEqual(calls.at(-1).data, { member_openids: ['u'] });
+const kicked = await check('useMember.kickMany', () => members.kickMany({ userIds: ['u'], blacklist: true }), 2);
+assert.deepEqual(kicked.failedBlacklistIds, []);
+assert.deepEqual(calls.slice(-2), [
+  { url: '/v2/groups/ID/batch_remove_members', method: 'post', data: { member_openids: ['u'] } },
+  { url: '/v2/groups/ID/member_blacklist', method: 'post', data: { op: 'add', member_openids: ['u'] } }
+]);
+await check('useMember.ban', () => members.ban({ userId: 'u' }), 2);
 assert.equal((await check('useMember.blacklist', () => members.blacklist({ pagination: { Limit: 5, Cursor: 'cursor' } }))).Items[0].userId, 'u');
 await check('useMember.updateBlacklist', () => members.updateBlacklist({ operation: 'remove', userIds: ['u'] }));
 assert.equal(calls.at(-1).data.op, 'del');
-await check('useMember.muteMany', () => members.muteMany({ members: [{ userId: 'u', operation: 'update', expiresAt: 'date' }] }));
-assert.equal(calls.at(-1).data.members[0].mute_expire_at, 'date');
-assert.equal((await check('useRequest.list', () => requests.list())).Items[0].verification.questions[0].answer, 'a');
+const maxMuteSeconds = 30 * 24 * 60 * 60;
+const expiresAt = new Date(Date.now() + maxMuteSeconds * 1000).toISOString();
+await check('useMember.muteMany', () => members.muteMany({ members: [{ userId: 'u', operation: 'update', expiresAt }] }));
+assert.equal(calls.at(-1).data.members[0].mute_expire_at, expiresAt);
+await check('useMember.mute', () => members.mute({ userId: 'u', duration: maxMuteSeconds }));
+await check('useMember.mute', () => members.mute({ userId: 'u', duration: 0 }));
+assert.equal(calls.at(-1).data.members[0].op, 'del');
+assert.equal((await check('useRequest.list', () => requests.list({ pagination: { Limit: 50 } }))).Items[0].verification.questions[0].answer, 'a');
+assert.equal(calls.at(-1).params.limit, 50);
 await check('useRequest.decide', () => requests.decide({ userId: 'ID', requestId: 'r', approve: false, reason: 'reason', blacklist: true }));
 assert.deepEqual(calls.at(-1).data, { op: 'decline', join_request_id: 'r', reject_reason: 'reason', add_to_member_blacklist: true });
+await check('useRequest.decide', () => requests.decide({ userId: 'ID', requestId: 'r', approve: true, reason: 'reason', blacklist: true }));
+assert.deepEqual(calls.at(-1).data, { op: 'approve', join_request_id: 'r' });
 assert.equal((await check('useRequest.policies.list', () => requests.policies.list())).Items[0].enabled, true);
 await check('useRequest.policies.create', () => requests.policies.create({ enabled: true, guildIds: ['ID'], expiresAt: 'date', remark: 'r' }));
 assert.equal(calls.at(-1).data.is_enable, 'on');
@@ -353,6 +385,9 @@ for (const run of [
   () => panels.updateTargets({ id: 'ID', operation: 'add' }),
   () => members.muteMany({ members: [] }),
   () => members.muteMany({ members: Array(21).fill({ userId: 'u', operation: 'add' }) }),
+  () => members.muteMany({ members: [{ userId: 'u', operation: 'update', expiresAt: new Date(Date.now() + 31 * 86400000).toISOString() }] }),
+  () => members.mute({ userId: 'u', duration: maxMuteSeconds + 60 }),
+  () => requests.list({ pagination: { Limit: 51 } }),
   () => useMessage(c2c)[0].typing({ duration: 61 }),
   () => useMessage(c2c)[0].stream({ text: '', index: 0 }),
   () => useMessage(c2c)[0].stream({ text: 'x', index: -1 }),
@@ -409,11 +444,17 @@ await adapter.onAction({ action: 'interaction.ack', payload: { target: c2c.Targe
 assert.equal(ackCount, 1, 'An interaction must be consumed exactly once');
 // HTTP success with per-member failures is a warning, retaining semantic failure details.
 const service = client.groupService;
-client.groupService = async () => ({ remove_members_result: 'success', add_to_member_blacklist_fail_openids: ['u'] });
-const partial = await members.kickMany({ userIds: ['u'], blacklist: true });
+client.groupService = async request => request.url.endsWith('/batch_remove_members') ? { remove_members_result: 'success' } : { fail_openids: ['u'] };
+const partial = await members.kickMany({ userIds: ['u', 'other'], blacklist: true });
 assert.equal(partial.code, ResultCode.Warn);
 assert.deepEqual(partial.data.failedBlacklistIds, ['u']);
-assert.equal((await members.ban({ userId: 'u' })).code, ResultCode.Warn);
+client.groupService = async request => {
+  if (request.url.endsWith('/member_blacklist')) throw new Error('Blacklist permission denied');
+  return { remove_members_result: 'success' };
+};
+const unconfirmedBan = await members.ban({ userId: 'u' });
+assert.equal(unconfirmedBan.code, ResultCode.Warn);
+assert.deepEqual(unconfirmedBan.data, { status: 'success', failedBlacklistIds: ['u'] });
 client.groupService = async () => ({ fail_openids: ['u'] });
 const failedUnban = await members.unban({ userId: 'u' });
 assert.equal(failedUnban.code, ResultCode.Warn);
@@ -464,11 +505,13 @@ assert(events.some(e => e.MessageContent?.card));
 assert(events.some(e => e.MessageContent?.elements));
 await handlers.get('C2C_MESSAGE_CREATE')({
   id: 'm',
-  author: { id: 'u' },
+  author: { id: 'u', username: 'direct nickname', avatar: 'direct avatar' },
   content: '',
   attachments: [{ content_type: 'voice', url: 'audio', voice_wav_url: 'wav', asr_refer_text: 'hello' }],
   message_scene: { ext: ['msg_idx=REF==', 'ref_msg_idx=OTHER=='] }
 });
+assert.equal(events.at(-1).UserName, 'direct nickname');
+assert.equal(events.at(-1).UserAvatar, 'direct avatar');
 assert.equal(events.at(-1).MessageMedia[0].Transcript, 'hello');
 assert.equal(events.at(-1).MessageContent.referenceId, 'REF==');
 await handlers.get('INTERACTION_CREATE')({ id: 'clear', scene: 'c2c', user_openid: 'u', type: 14, data: {} });
@@ -487,12 +530,17 @@ const fullAuthor = {
 await handlers.get('GROUP_MESSAGE_CREATE')({
   id: 'full',
   group_openid: 'g',
-  author: { ...fullAuthor, bot: false },
+  union_group_openid: 'union-group',
+  author: { ...fullAuthor, bot: false, member_nickname: 'group nickname', avatar: 'group avatar' },
   content: '',
   mentions: [fullAuthor],
   msg_elements: [{ author: fullAuthor, msg_idx: 'ref', msg_elements: [{ author: fullAuthor }] }]
 });
 const full = events.at(-1);
+assert.equal(full.UnionGuildId, 'union-group');
+assert.equal(full.Target.targetId, 'g');
+assert.equal(full.UserName, 'group nickname');
+assert.equal(full.UserAvatar, 'group avatar');
 assert.equal(full.IsBot, false);
 assert.equal(full.MessageContent.elements[0].author.IsBot, true);
 assert.equal(full.DirectUserId, 'direct');

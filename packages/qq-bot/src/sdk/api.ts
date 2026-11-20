@@ -7,7 +7,8 @@ import type {
   QQBotPage,
   QQBotGroupMember,
   QQBotBlacklistUser,
-  QQBotMessageResult
+  QQBotMessageResult,
+  QQBotUserInfo
 } from './non-channel-types.js';
 import axios, { type AxiosRequestConfig } from 'axios';
 import { ApiRequestData, FileType, GroupAction, SetMemberMuteState, StreamMessageData, UploadPartFinishData, UploadPrepareData } from './typing.js';
@@ -750,11 +751,33 @@ export class QQBotAPI {
     return this.groupService({ url: `/v2/groups/${group_openid}/members`, method: 'get', params });
   }
 
-  groupsBatchRemoveMembers(
+  async groupsBatchRemoveMembers(
     group_openid: string,
-    data: { member_openids: string[]; add_to_member_blacklist?: boolean }
+    { member_openids, add_to_member_blacklist }: { member_openids: string[]; add_to_member_blacklist?: boolean }
   ): Promise<{ remove_members_result: string; add_to_member_blacklist_fail_openids: string[] }> {
-    return this.groupService({ url: `/v2/groups/${group_openid}/batch_remove_members`, method: 'post', data });
+    const removed = await this.groupService({
+      url: `/v2/groups/${group_openid}/batch_remove_members`,
+      method: 'post',
+      data: { member_openids }
+    });
+    const result = {
+      ...removed,
+      add_to_member_blacklist_fail_openids: add_to_member_blacklist ? member_openids : []
+    };
+
+    if (add_to_member_blacklist && removed.remove_members_result === 'success') {
+      try {
+        const blacklist = await this.groupsMemberBlacklistPost(group_openid, { op: 'add', member_openids });
+
+        if (Array.isArray(blacklist?.fail_openids)) {
+          result.add_to_member_blacklist_fail_openids = blacklist.fail_openids;
+        }
+      } catch {
+        // The members were already removed. Report the unconfirmed blacklist entries without retrying removal.
+      }
+    }
+
+    return result;
   }
 
   groupsMemberBlacklist(group_openid: string, params?: QQBotPage): Promise<{ users: QQBotBlacklistUser[]; next_cursor: string }> {
@@ -766,6 +789,11 @@ export class QQBotAPI {
   }
 
   // ─── 群管理 ───
+
+  /** 获取单聊用户基本信息。 */
+  usersInfo(userOpenId: string): Promise<QQBotUserInfo> {
+    return this.groupService({ url: `/v2/users/${encodeURIComponent(userOpenId)}/info`, method: 'get' });
+  }
 
   /**
    * 获取群基本信息
@@ -806,7 +834,13 @@ export class QQBotAPI {
    * @param group_openid 群 OpenID
    * @param params 分页参数
    */
-  groupsJoinRequestList(group_openid: string, params?: { cursor?: string; limit?: number }) {
+  async groupsJoinRequestList(group_openid: string, params?: { cursor?: string; limit?: number }) {
+    const limit = params?.limit;
+
+    if (limit !== undefined && (!Number.isInteger(limit) || limit < 1 || limit > 50)) {
+      throw new Error('QQ join request page size must be an integer from 1 to 50');
+    }
+
     return this.groupService({
       url: `/v2/groups/${group_openid}/join_request_list`,
       method: 'get',
@@ -828,7 +862,7 @@ export class QQBotAPI {
     return this.groupService({
       url: `/v2/groups/${group_openid}/approval_join_request/${member_openid}`,
       method: 'post',
-      data
+      data: data.op === 'approve' ? { op: data.op, join_request_id: data.join_request_id } : data
     });
   }
 
@@ -848,7 +882,19 @@ export class QQBotAPI {
    * @param group_openid 群 OpenID
    * @param data 禁言设置
    */
-  groupsRestrictChatSettingPost(group_openid: string, data: { members?: SetMemberMuteState[] }) {
+  async groupsRestrictChatSettingPost(group_openid: string, data: { members?: SetMemberMuteState[] }) {
+    const latestExpiration = Date.now() + 30 * 24 * 60 * 60 * 1000;
+
+    for (const member of data.members ?? []) {
+      if (member.op !== 'del' && member.mute_expire_at !== undefined) {
+        const expiration = Date.parse(member.mute_expire_at);
+
+        if (!Number.isFinite(expiration) || expiration > latestExpiration) {
+          throw new Error('QQ member mute expiration must be a valid timestamp no more than 30 days ahead');
+        }
+      }
+    }
+
     return this.groupService({
       url: `/v2/groups/${group_openid}/restrict_chat_setting`,
       method: 'post',

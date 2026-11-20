@@ -6,6 +6,7 @@ export interface GROUP_MESSAGE_CREATE_TYPE extends QQBotMessageContent {
   author: QQBotMessageUser;
   content: string;
   group_openid: string;
+  union_group_openid?: string;
   group_id?: string;
   id: string;
   mentions?: (QQBotMessageUser & { is_you?: boolean; scope?: string })[];

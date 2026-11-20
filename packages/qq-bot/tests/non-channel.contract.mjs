@@ -41,6 +41,7 @@ const body = { msg_type: 0, content: 'text', msg_id: 'reply', msg_seq: 3 };
 const cases = {
   gateway: [],
   usersMe: [],
+  usersInfo: [id],
   usersOpenMessages: [id, body],
   groupOpenMessages: [id, body],
   userMessageDelete: [id, id],
@@ -56,7 +57,7 @@ const cases = {
   groupsBotState: [id],
   groupsMembers: [id, { cursor: 'cursor' }],
   groupsMembersMessage: [id, id],
-  groupsBatchRemoveMembers: [id, { member_openids: ['member'], add_to_member_blacklist: true }],
+  groupsBatchRemoveMembers: [id, { member_openids: ['member'] }],
   groupsMemberBlacklist: [id, { cursor: 'cursor', limit: 20 }],
   groupsMemberBlacklistPost: [id, { op: 'del', member_openids: ['member'] }],
   groupsJoinRequestList: [id, { cursor: 'cursor', limit: 20 }],
