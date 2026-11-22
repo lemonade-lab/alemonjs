@@ -8,45 +8,51 @@ import { platformAdd, platformRemove, platformList } from './platform.js';
 import { login } from './login.js';
 import { publish } from './publish.js';
 import { branch } from './branch.js';
+import { inspectConfig } from './config.js';
 import { Command } from 'commander';
 const program = new Command();
 
 program.name('alemonc').description('CLI to some alemonc actions and scripts').version('1.0.0');
 
+const config = program.command('config').description('检查消息访问配置');
+const configPath = process.env.CFG_PATH || 'alemon.config.yaml';
+config.command('check').option('--file <path>', '配置文件路径', configPath).action(inspectConfig);
+config
+  .command('explain')
+  .option('--file <path>', '配置文件路径', configPath)
+  .requiredOption('--platform <name>', '平台名')
+  .option('--bot-id <id>', '机器人 ID')
+  .option('--channel-id <id>', '子频道目标 ID')
+  .option('--private', '私聊')
+  .option('--app <name>', '仅查询此模块')
+  .option('--mentioned', '消息已 @ 机器人')
+  .option('--interaction', '按钮交互事件')
+  .action(inspectConfig);
+
 program
   .command('add <key> [values...]')
   .description('给key为数据的值添加元素')
-  .action((key, values) => {
-    updateConfig('add', key, values);
-  });
+  .action((key, values) => updateConfig('add', key, values));
 
 program
   .command('remove <key> [values...]')
   .description('给key为数据的值移除元素')
-  .action((key, values) => {
-    updateConfig('remove', key, values);
-  });
+  .action((key, values) => updateConfig('remove', key, values));
 
 program
   .command('set <key> [values...]')
   .description('给某个key设置值')
-  .action((key, values) => {
-    updateConfig('set', key, values);
-  });
+  .action((key, values) => updateConfig('set', key, values));
 
 program
   .command('del <key>')
   .description('删除指定配置')
-  .action(key => {
-    updateConfig('del', key);
-  });
+  .action(key => updateConfig('del', key));
 
 program
   .command('get <key>')
   .description('获取指定配置')
-  .action(key => {
-    updateConfig('get', key);
-  });
+  .action(key => updateConfig('get', key));
 
 program
   .command('run [script]')

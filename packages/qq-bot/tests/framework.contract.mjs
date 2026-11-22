@@ -489,10 +489,11 @@ await handlers.get('GROUP_MESSAGE_CREATE')({
   group_openid: 'g',
   author: { ...fullAuthor, bot: false },
   content: '',
-  mentions: [fullAuthor],
+  mentions: [{ ...fullAuthor, is_you: true }],
   msg_elements: [{ author: fullAuthor, msg_idx: 'ref', msg_elements: [{ author: fullAuthor }] }]
 });
 const full = events.at(-1);
+assert.equal(full.IsAtMe, true);
 assert.equal(full.IsBot, false);
 assert.equal(full.MessageContent.elements[0].author.IsBot, true);
 assert.equal(full.DirectUserId, 'direct');

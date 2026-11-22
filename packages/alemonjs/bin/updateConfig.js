@@ -2,7 +2,6 @@
 import { join } from 'path';
 import fs from 'fs';
 import YAML from 'yaml';
-import { normalizeAppsConfig } from '../lib/common/apps-config.js';
 const configPath = join(process.cwd(), 'alemon.config.yaml');
 
 /**
@@ -12,15 +11,16 @@ const configPath = join(process.cwd(), 'alemon.config.yaml');
  * @param {*} value  配置值
  * @returns
  */
-export function updateConfig(action, key, value = []) {
+export async function updateConfig(action, key, value = []) {
   let config = {};
   if (fs.existsSync(configPath)) {
     const data = fs.readFileSync(configPath, 'utf8');
     config = YAML.parse(data) ?? {};
   }
   if (key === 'apps' && (action === 'add' || action === 'remove')) {
+    const { normalizeAppsConfig } = await import('../lib/common/apps-config.js');
     const entries = normalizeAppsConfig(config.apps);
-    const apps = Object.fromEntries(entries.map(({ name, enabled, order }) => [name, { enabled, order }]));
+    const apps = Object.fromEntries(entries.map(({ name, ...options }) => [name, options]));
     for (const name of value) {
       if (!name.trim()) continue;
       if (action === 'remove') {

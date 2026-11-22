@@ -360,7 +360,13 @@ export const register = (
     // 定义消息
     emit(
       FormatEvent.create('message.create')
-        .addPlatform({ Platform: platform, value: event, BotId: botId, IsAtMe: false, IsPrivate: false })
+        .addPlatform({
+          Platform: platform,
+          value: event,
+          BotId: botId,
+          IsAtMe: event.mentions?.some(mention => mention?.is_you === true) ?? false,
+          IsPrivate: false
+        })
         .addGuild({ GuildId: meta.groupId, SpaceId: `GROUP:${meta.groupId}` })
         .addChannel({ ChannelId: meta.groupId })
         .addUser({

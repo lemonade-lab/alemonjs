@@ -1,4 +1,4 @@
-import { trackRuntimeTask, runtimeScope, runtimeNow } from '../../common/runtime-scope.js';
+import { trackRuntimeTask, runtimeScope, runtimeNow, scopedMap } from '../../common/runtime-scope.js';
 import { conversationIdentity } from '../conversation.js';
 import { captureMessageContext, checkMessageRateLimit, startMessageTyping } from './message-processing.js';
 import { getConfigValue } from '../../common/config.js';
@@ -13,9 +13,12 @@ import {
 import { EventKeys, Events } from '../../types/index.js';
 import { expendCycle } from './event-processor-cycle';
 import { finishCurrentTrace, withProcessorTrace } from './hook-event-context';
-import { ProcessorEventAutoClearMap, ProcessorEventUserAutoClearMap } from './store';
+import { listChildrenApps, ProcessorEventAutoClearMap, ProcessorEventUserAutoClearMap } from './store';
 import { fastHash, getCachedRegExp, matchIn } from '../../common/utils.js';
 import { dispatchEventStart } from './lifecycle-callbacks.js';
+import { blockedBeforeDispatch, mentionReplayTargets, requiresChannelMention, skipConfiguredEvent } from './event-access.js';
+
+const pendingMentions = scopedMap<string, { time: number; apps: ReadonlySet<string>; capture: Promise<void>; replayed?: boolean }>();
 
 /**
  * 过滤掉重复消息
@@ -83,6 +86,10 @@ const cleanupStoreAll = (): boolean => {
   const a = cleanupStore({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap });
   const b = cleanupStore({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap });
 
+  for (const [key, pending] of pendingMentions) {
+    if (Now - pending.time >= EVENT_INTERVAL) pendingMentions.delete(key);
+  }
+
   return a && b;
 };
 
@@ -128,10 +135,13 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
         event['IsPrivate'] = event['IsPrivate'] ?? name.startsWith('private.');
         event['IsAtMe'] = event['IsAtMe'] ?? false;
 
-        await dispatchEventStart({
-          event,
-          name
-        });
+        if (skipConfiguredEvent(name, event)) {
+          blockedBeforeDispatch.add(event);
+          finishCurrentTrace('filtered');
+
+          return;
+        }
+
         // 禁用规则设置
         const value = getConfigValue();
         const disabledTextRegular = value?.disabled_text_regular;
@@ -139,6 +149,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
         // 检查文本禁用规则
         if (disabledTextRegular && event['MessageText']) {
           if (getCachedRegExp(disabledTextRegular).test(event['MessageText'])) {
+            blockedBeforeDispatch.add(event);
             finishCurrentTrace('filtered');
 
             return;
@@ -149,6 +160,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
         // 检查事件禁用规则
         if (disabledSelects[name]) {
+          blockedBeforeDispatch.add(event);
           finishCurrentTrace('filtered');
 
           return;
@@ -158,6 +170,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
         // 检查用户禁用规则
         if (event['UserId'] && matchIn(disabledUserId, event['UserId'])) {
+          blockedBeforeDispatch.add(event);
           finishCurrentTrace('filtered');
 
           return;
@@ -167,6 +180,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
         // 检查用户禁用规则
         if (event['UserKey'] && matchIn(disabledUserKey, event['UserKey'])) {
+          blockedBeforeDispatch.add(event);
           finishCurrentTrace('filtered');
 
           return;
@@ -232,23 +246,34 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
         const Now = runtimeNow();
         const EVENT_INTERVAL = value?.processor?.repeated_event_time ?? processorRepeatedEventTime;
 
+        let messageKey: string | undefined;
         if (event['MessageId']) {
           // FNV-1a 快速哈希 — 比 SHA-256 快 ~30-50x
-          const MessageId = fastHash(JSON.stringify([event.Platform, event.BotId, conversationIdentity(event), event['MessageId']]));
+          messageKey = fastHash(JSON.stringify([event.Platform, event.BotId, conversationIdentity(event), event['MessageId']]));
 
           // 重复消息
-          if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, MessageId)) {
+          if (filter({ Now, INTERVAL: EVENT_INTERVAL, store: ProcessorEventAutoClearMap }, messageKey)) {
+            const pending = name === 'message.create' ? pendingMentions.get(messageKey) : undefined;
+            if (pending?.replayed) blockedBeforeDispatch.add(event);
+            if (event.IsAtMe && pending && !pending.replayed && Now - pending.time < EVENT_INTERVAL) {
+              pending.replayed = true;
+              mentionReplayTargets.set(event, pending.apps);
+              if (data) event['value'] = data;
+              await pending.capture;
+              await dispatchEventStart({ event, name });
+              expendCycle(event, name, value);
+              return;
+            }
             finishCurrentTrace('filtered');
 
             return;
           }
+          pendingMentions.delete(messageKey);
         }
 
         const isMessage = name === 'message.create' || name === 'private.message.create';
 
-        if (isMessage) {
-          await captureMessageContext(event, value?.processor ?? {});
-        }
+        const capture = isMessage ? captureMessageContext(event, value?.processor ?? {}) : undefined;
 
         const USER_INTERVAL = value?.processor?.repeated_user_time ?? processorRepeatedUserTime;
         // 平台权限和生命周期事件不是用户刷屏，不能丢弃或占用用户操作窗口。
@@ -260,6 +285,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
 
           // 频繁操作
           if (filter({ Now, INTERVAL: USER_INTERVAL, store: ProcessorEventUserAutoClearMap }, UserId)) {
+            await capture;
             finishCurrentTrace('filtered');
 
             return;
@@ -270,6 +296,7 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
           const decision = checkMessageRateLimit(event, value?.processor ?? {});
 
           if (decision.allowed === false) {
+            await capture;
             try {
               await value?.processor?.rateLimit?.onLimit?.(event, decision);
             } catch {
@@ -286,6 +313,22 @@ export const onProcessor = <T extends EventKeys>(name: T, event: Events[T], data
           event['value'] = data;
         }
 
+        if (messageKey && capture && name === 'message.create' && !event.IsAtMe) {
+          const apps = new Set(
+            listChildrenApps()
+              .map(app => app.name)
+              .filter(appName => requiresChannelMention(event, appName))
+          );
+          if (apps.size) {
+            if (pendingMentions.size >= processorMaxMapSize) {
+              const oldest = pendingMentions.keys().next().value;
+              if (oldest !== undefined) pendingMentions.delete(oldest);
+            }
+            pendingMentions.set(messageKey, { time: Now, apps, capture });
+          }
+        }
+        await capture;
+        await dispatchEventStart({ event, name });
         if (isMessage) {
           startMessageTyping(event, value?.processor ?? {});
         }

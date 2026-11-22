@@ -134,6 +134,7 @@ await handlers.get('GROUP_MESSAGE_CREATE')({
   attachments: [{ url: 'https://example.com/a', content_type: 'voice' }]
 });
 assert.equal(emitted.at(-1).ChannelId, 'OPENID');
+assert.equal(emitted.at(-1).IsAtMe, false);
 assert.equal(emitted.at(-1).UserId, 'member');
 assert.equal(emitted.at(-1).MessageMedia[0].Type, 'audio');
 await handlers.get('INTERACTION_CREATE')({

@@ -1,5 +1,6 @@
 import { withAppContext } from './app-context.js';
 import { getRuntimeCore, isRuntimeAppEventReady, listChildrenApps } from './store.js';
+import { blockedBeforeDispatch, skipConfiguredEvent } from './event-access.js';
 
 import { showErrorModule } from '../../common/utils.js';
 import type { EventFinishedContext, EventStartContext, HttpErrorContext, StoreChildrenApp, RuntimeStatusChangeContext } from '../../types/index.js';
@@ -20,7 +21,7 @@ export const dispatchEventStart = async (context: EventStartContext) => {
   const apps = getChildrenApps();
 
   for (const app of apps) {
-    if (!isRuntimeAppEventReady(app.name)) {
+    if (!isRuntimeAppEventReady(app.name) || skipConfiguredEvent(context.name, context.event, app.name)) {
       continue;
     }
     try {
@@ -32,10 +33,12 @@ export const dispatchEventStart = async (context: EventStartContext) => {
 };
 
 export const dispatchEventFinished = async (context: EventFinishedContext) => {
+  if (blockedBeforeDispatch.has(context.event)) return;
+
   const apps = getChildrenApps();
 
   for (const app of apps) {
-    if (!isRuntimeAppEventReady(app.name)) {
+    if (!isRuntimeAppEventReady(app.name) || skipConfiguredEvent(context.name, context.event, app.name)) {
       continue;
     }
     try {

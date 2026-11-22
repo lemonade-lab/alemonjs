@@ -1,6 +1,8 @@
+import { type AccessPolicy } from '../common/access-policy.js';
 import type { ConversationOptions } from '../application/conversation.js';
 import type { RateLimitOptions } from '../application/rate-limit.js';
 import type { TypingOptions } from '../application/typing.js';
+import type { AppsConfig } from '../common/apps-config.js';
 type ServerOptions = {
   /**
    * @description 协议端口
@@ -89,6 +91,10 @@ type MessageOptions = {
 
 type ProcessorOptions = {
   processor?: {
+    access?: AccessPolicy;
+    accessDiagnostics?: boolean;
+    channelMentionOnly?: boolean;
+    channelMentionOnlyByChannel?: Record<string, boolean>;
     repeated_event_time?: number;
     repeated_user_time?: number;
     /** Opt-in observed message history, quote index and prompt context. */
@@ -100,9 +106,7 @@ type ProcessorOptions = {
 };
 
 type AppsOptions = {
-  apps?: {
-    [key: string]: boolean;
-  };
+  apps?: AppsConfig;
 };
 
 type CBPOptions = {

@@ -171,7 +171,7 @@ export default async () => {
 }
 ```
 
-> 两个事件结构一致，区别仅在 `_tag` 与 `IsAtMe`：`GROUP_AT_MESSAGE_CREATE` 为群内 @ 机器人触发，`IsAtMe: true`；`GROUP_MESSAGE_CREATE` 为群内任意消息（需订阅全量推送）。
+> `GROUP_AT_MESSAGE_CREATE` 由群内 @ 机器人触发，`IsAtMe: true`。`GROUP_MESSAGE_CREATE` 是全量群消息，只有 `mentions` 中有 `is_you: true` 时才标记为 @ 机器人。
 
 #### 单聊消息（`C2C_MESSAGE_CREATE` → `private.message.create`）
 

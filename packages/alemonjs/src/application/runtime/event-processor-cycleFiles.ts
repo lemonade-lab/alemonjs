@@ -4,6 +4,7 @@ import { showErrorModule, getCachedRegExp } from '../../common/utils.js';
 import { EventMessageText } from '../../common/variable.js';
 import { dispatchEventError } from './event-error';
 import { getAppGeneration, importAppFile } from './load-modules/app-import.js';
+import { skipConfiguredEvent } from './event-access.js';
 
 // 模块缓存，避免每次事件处理都重新 import
 const moduleCache = new WeakMap<StoreResponseItem, any>();
@@ -59,6 +60,12 @@ const callHandlerFile = async <T extends EventKeys>(
   callback: (app: { default: OnResponseValue<Current<EventKeys>, T>; regular?: string | RegExp }) => void,
   phase: 'middleware' | 'response'
 ) => {
+  if (skipConfiguredEvent(select, valueEvent, file.appName)) {
+    nextStep();
+
+    return;
+  }
+
   try {
     const app: {
       default: OnResponseValue<Current<EventKeys>, T>;

@@ -1,3 +1,4 @@
+import { validateAccessConfig, type AccessPolicy } from './access-policy.js';
 import type { AppsConfig } from './apps-config.js';
 import type { Language } from './i18n.js';
 import { runtimeScope, scopedResource } from './runtime-scope.js';
@@ -5,7 +6,7 @@ import type { ConversationOptions } from '../application/conversation.js';
 import type { RateLimitOptions } from '../application/rate-limit.js';
 import type { TypingOptions } from '../application/typing.js';
 import { readFileSync, existsSync, watch, writeFileSync, mkdirSync, FSWatcher } from 'fs';
-import { dirname, isAbsolute, join } from 'path';
+import { basename, dirname, isAbsolute, join } from 'path';
 import YAML from 'yaml';
 import type { Package } from '../types/index.js';
 import { logger } from './logger.js';
@@ -31,6 +32,10 @@ type ConfigValue = {
   redirect_text_target?: string;
   mapping_text?: { regular?: string; target?: string }[];
   processor?: {
+    access?: AccessPolicy;
+    accessDiagnostics?: boolean;
+    channelMentionOnly?: boolean;
+    channelMentionOnlyByChannel?: Record<string, boolean>;
     repeated_event_time?: number;
     repeated_user_time?: number;
     /** Opt-in observed message history, quote index and prompt context. */
@@ -64,7 +69,7 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
     this.#mergedValue = null;
   }
 
-  #readConfig(): T | null {
+  #readConfig(strict = false): T | null {
     if (!this.#resolvedDir) {
       return null;
     }
@@ -72,12 +77,15 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
     try {
       const data = readFileSync(this.#resolvedDir, 'utf-8');
 
-      return YAML.parse(data) as T;
+      const value = YAML.parse(data);
+      validateAccessConfig(value);
+      return (value ?? {}) as T;
     } catch (err) {
+      if (strict) throw err;
       logger.error({
         code: ResultCode.FailInternal,
-        message: 'Config file parse error',
-        data: err
+        message: 'Config reload rejected',
+        data: err instanceof Error ? err.message : String(err)
       });
 
       return null;
@@ -130,7 +138,9 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
       return;
     }
 
-    this.#watcher = watch(this.#resolvedDir, () => {
+    const configFile = basename(this.#resolvedDir);
+    this.#watcher = watch(dirname(this.#resolvedDir), (_event, filename) => {
+      if (filename && filename !== configFile) return;
       const newValue = this.#readConfig();
 
       if (newValue !== null) {
@@ -151,7 +161,7 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
       return;
     }
 
-    this.#applyValue(this.#readConfig());
+    this.#applyValue(this.#readConfig(true));
     this.#ensureWatcher();
   }
 
@@ -202,6 +212,7 @@ class ConfigCore<T extends ConfigValue = ConfigValue> {
   }
 
   saveValue(value: T) {
+    validateAccessConfig(value);
     if (!this.#resolvedDir) {
       this.#applyValue(value);
 

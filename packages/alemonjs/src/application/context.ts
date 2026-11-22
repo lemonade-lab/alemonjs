@@ -3,6 +3,7 @@ import type { EventKeys, Events } from '../types/index.js';
 import { showErrorModule } from '../common/utils.js';
 import { finishCurrentTrace, getCurrentAppName, getCurrentEvent, withEventContext } from './runtime/hook-event-context.js';
 import { dispatchEventError } from './runtime/event-error.js';
+import { skipConfiguredEvent } from './runtime/event-access.js';
 import { getChildrenApp } from './runtime/store.js';
 import { scheduleCancel, scheduleTimeout } from './runtime/schedule-store.js';
 import {
@@ -415,6 +416,9 @@ export const expendContext = async <T extends EventKeys>(event: Events[T], selec
 
     if (!isRegistered(context.appName, context.definition, context.phase)) {
       removeActiveContext(key, context.id);
+      continue;
+    }
+    if (skipConfiguredEvent(select, event, context.appName)) {
       continue;
     }
 

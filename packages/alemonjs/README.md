@@ -80,6 +80,65 @@ router.res({ regular: /^签到$/ }, () => import('./response/sign'));
 
 上述 `res` 接受 `/修仙 签到`，先处理前缀，再用 `签到` 匹配正则。处理器读取的 `MessageText` 仍是原始消息，路由上下文的 `text` 是归一化文本。无文本的非消息事件不受前缀限制；未配置 `routeText` 的 `res` 保持原有行为。`res` 也支持单独设置 `routeText` 和其中的 `byPlatform`。
 
+## 消息访问范围
+
+`processor.access` 设置框架范围，`apps.<模块名>.access` 设置单个应用范围。两层都须通过。规则适用于消息和按钮交互，通知和生命周期事件继续分发。
+
+```yaml
+processor:
+  access:
+    deny:
+      - { platform: onebot, channelId: '999999' }
+apps:
+  xiuxian:
+    enabled: true
+    access:
+      allow:
+        - { platform: onebot, botId: '12345', channelId: '123456' }
+        - { scope: private, platform: onebot, botId: '12345' }
+```
+
+每条规则可匹配 `platform`、`botId`、`channelId` 和 `scope`。同一条规则内的字段均须匹配，每个列表内匹配任意一条即可。`scope` 可用 `channel` 或 `private`。指定 `channelId` 时必须指定平台，ID 请写成字符串。同一平台的多台机器人可以用 `botId` 进一步区分。
+
+每层先检查 `deny`，再检查 `allow`。省略 `allow` 时默认放行，空 `allow: []` 拒绝该层所有消息和按钮交互。通过范围检查后，消息仍需满足配置的 @ 条件。
+
+```sh
+alemonc config check
+alemonc config explain --platform onebot --bot-id 12345 --channel-id 123456 --app xiuxian
+```
+
+`check` 检查 YAML、访问规则和 @ 配置字段。访问规则的错误会给出字段路径，运行时会拒绝无效的热更新并保留此前配置。两个命令都支持 `--file`。`explain` 根据文件模拟框架和模块的访问及 @ 规则决策，可用 `--private`、`--mentioned` 或 `--interaction` 指定事件形态。限流、实际模块加载状态和启动参数覆盖由运行时决定。
+
+设置 `processor.accessDiagnostics: true` 可在运行时记录被拒事件的消息 ID、目标、模块和规则路径，诊断条目省略消息正文。
+
+## 子频道仅 @ 机器人时回复
+
+在 `alemon.config.yaml` 中配置。按以下顺序检查，遇到 `true` 就启用限制。所有字段默认 `false`，显式设为 `false` 和省略字段都会继续检查下一层。
+
+1. 框架级 `processor.channelMentionOnly`
+2. 指定子频道 `processor.channelMentionOnlyByChannel.<子频道 ID>`
+3. 模块级 `apps.<模块名>.channelMentionOnly`
+4. 指定模块的指定子频道 `apps.<模块名>.channelMentionOnlyByChannel.<子频道 ID>`
+
+```yaml
+processor:
+  channelMentionOnlyByChannel:
+    '123456789': true
+    '987654321': false
+apps:
+  xiuxian:
+    enabled: true
+    channelMentionOnly: true
+  assistant:
+    enabled: true
+    channelMentionOnlyByChannel:
+      '111222333': true
+```
+
+框架的子频道包含平台上的群聊和频道消息目标。指定子频道时使用目标 ID，例如 QQ 官方机器人的群 OpenID，Discord 则使用子频道 ID。示例中，`123456789` 对所有应用要求 @，`987654321` 继续检查各模块的配置。在其他子频道，`xiuxian` 始终要求 @，`assistant` 只在 `111222333` 要求 @。主应用可用模块名 `main`。启用后，子频道消息只有被平台标记为 @ 本机器人时才会派给受限应用。私聊和按钮交互照常分发。
+
+如果普通消息已通过入站检查，随后在去重窗口内收到同一消息 ID 的 @ 事件，框架只向此前因 @ 条件被跳过的应用补发一次。补发沿用原消息的入站额度。被框架访问规则或旧版文本、事件类型、用户禁用规则拦下的事件不会进入应用的开始和完成回调。
+
 ## 应用强制前缀与按钮转换
 
 ```yaml

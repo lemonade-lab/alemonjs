@@ -4,6 +4,7 @@ import { EventMessageText } from '../../common/variable.js';
 import { showErrorModule } from '../../common/index.js';
 import { getCachedRegExp } from '../../common/utils.js';
 import { dispatchEventError } from './event-error';
+import { skipConfiguredEvent } from './event-access.js';
 
 // 缓存 AsyncFunction 构造函数 — 避免每次调用创建匿名 async 函数
 const AsyncFunction = (async () => {}).constructor;
@@ -111,6 +112,12 @@ export const createRouteProcessChildren = <T extends EventKeys>(
         return;
       }
       const node = nodes[idx - 1];
+
+      if (skipConfiguredEvent(select, valueEvent, node.appName)) {
+        void trackRuntimeTask(nextNode());
+
+        return;
+      }
 
       // 检查平台，不是这个平台的直接跳过。
       if (node.platform) {

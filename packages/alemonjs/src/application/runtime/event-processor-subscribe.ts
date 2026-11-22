@@ -10,6 +10,7 @@ import { getSubscribeList, isRuntimeAppEventReady } from './store';
 import { SubscribeStatus } from './subscribe-status.js';
 import { finishCurrentTrace, withEventContext } from './hook-event-context';
 import { dispatchEventError } from './event-error';
+import { skipConfiguredEvent } from './event-access.js';
 
 /**
  * 处理订阅
@@ -56,7 +57,7 @@ export const expendSubscribe = <T extends EventKeys>(valueEvent: Events[T], sele
       return;
     }
 
-    if (item.data.appName && !isRuntimeAppEventReady(item.data.appName)) {
+    if ((item.data.appName && !isRuntimeAppEventReady(item.data.appName)) || skipConfiguredEvent(select, valueEvent, item.data.appName)) {
       nextObserver();
 
       return;

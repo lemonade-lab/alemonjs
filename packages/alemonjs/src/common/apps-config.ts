@@ -1,11 +1,19 @@
+import { type AccessPolicy } from './access-policy.js';
 import { validateCommandConfig, type CommandConfig } from './command-config.js';
 import { logger } from './logger.js';
 
-export type AppEntry = { name: string; enabled?: boolean; order?: number; command?: CommandConfig };
-export type AppOptions = { enabled?: boolean; order?: number; command?: CommandConfig };
+export type AppOptions = {
+  enabled?: boolean;
+  order?: number;
+  command?: CommandConfig;
+  access?: AccessPolicy;
+  channelMentionOnly?: boolean;
+  channelMentionOnlyByChannel?: Record<string, boolean>;
+};
+export type AppEntry = AppOptions & { name: string };
 /** 模块名是唯一 key；数组仅用于兼容旧配置。 */
 export type AppsConfig = Record<string, boolean | AppOptions> | string[];
-export type NormalizedAppEntry = Required<Omit<AppEntry, 'command'>> & Pick<AppEntry, 'command'>;
+export type NormalizedAppEntry = AppEntry & Required<Pick<AppEntry, 'enabled' | 'order'>>;
 
 /** 模块映射使用显式序号；兼容旧数组和布尔映射，同序号保持声明顺序。 */
 export function normalizeAppsConfig(input: unknown): NormalizedAppEntry[] {
@@ -60,7 +68,20 @@ export function normalizeAppsConfig(input: unknown): NormalizedAppEntry[] {
     }
     if ('command' in item && item.command !== undefined) validateCommandConfig(item.command, name);
     names.add(name);
-    result.push({ name, enabled, order, ...('command' in item && item.command !== undefined ? { command: item.command as CommandConfig } : {}) });
+    result.push({
+      name,
+      enabled,
+      order,
+      ...('access' in item && item.access !== undefined ? { access: item.access as AccessPolicy } : {}),
+      ...('command' in item && item.command !== undefined ? { command: item.command as CommandConfig } : {}),
+      ...('channelMentionOnly' in item && typeof item.channelMentionOnly === 'boolean' ? { channelMentionOnly: item.channelMentionOnly } : {}),
+      ...('channelMentionOnlyByChannel' in item &&
+      item.channelMentionOnlyByChannel &&
+      typeof item.channelMentionOnlyByChannel === 'object' &&
+      !Array.isArray(item.channelMentionOnlyByChannel)
+        ? { channelMentionOnlyByChannel: item.channelMentionOnlyByChannel as Record<string, boolean> }
+        : {})
+    });
   });
 
   return result.sort((a, b) => a.order - b.order);
