@@ -1,8 +1,8 @@
 import { IntentsEnum } from './intents';
 import type { SessionStore } from './session.js';
 
-//  0 文本  1 图文 2 md 3 ark 4 embed 6 输入状态 7 图片
-export type MessageType = 0 | 1 | 2 | 3 | 4 | 6 | 7;
+//  0 文本  1 图文 2 md 3 ark 4 embed 6 输入状态 7 图片 8 图文卡片
+export type MessageType = 0 | 1 | 2 | 3 | 4 | 6 | 7 | 8;
 //    1 图文 2 视频 3 语言 4 文件
 export type FileType = 1 | 2 | 3 | 4;
 
@@ -68,6 +68,24 @@ export interface MarkdownType {
   params?: Array<{ key: string; values: string[] }>;
 }
 
+/**
+ * 图文卡片对象（msg_type=8），type=tuwen 时 content 必填
+ */
+export interface MessageCardType {
+  /** 卡片类型，当前支持 tuwen：图文卡片 */
+  type?: 'tuwen';
+  content?: {
+    /** 卡片标题，长度 1~50 字符 */
+    title: string;
+    /** 卡片描述，长度 1~200 字符 */
+    description: string;
+    /** 点击卡片后的跳转链接，必须为 https，长度不超过 1024 字符 */
+    url: string;
+    /** 卡片封面图链接，必须为 https，长度不超过 1024 字符 */
+    pic_url: string;
+  };
+}
+
 export interface ApiRequestData {
   content?: string;
   msg_type: MessageType;
@@ -77,6 +95,10 @@ export interface ApiRequestData {
     file_info: string;
   };
   ark?: any;
+  /**
+   * 图文卡片（msg_type=8），与 ark/content/markdown/media 互斥
+   */
+  card?: MessageCardType;
   image?: any;
   message_reference?: any;
   event_id?: any;

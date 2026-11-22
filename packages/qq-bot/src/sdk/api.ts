@@ -363,6 +363,18 @@ export class QQBotAPI {
   }
 
   /**
+   * 获取用户基本信息
+   * @param openid 用户 OpenID
+   * @returns 昵称、头像及是否接收主动推送（union_openid 仅绑定 3 方应用时返回）
+   */
+  usersInfo(openid: string): Promise<{ union_openid?: string; username: string; avatar: string; allow_proactive_msg: boolean }> {
+    return this.groupService({
+      url: `/v2/users/${openid}/info`,
+      method: 'get'
+    });
+  }
+
+  /**
    * 发送私聊消息
    * @param openid
    * @param content
@@ -771,7 +783,16 @@ export class QQBotAPI {
    * 获取群基本信息
    * @param group_openid 群 OpenID
    */
-  groupsInfo(group_openid: string) {
+  groupsInfo(group_openid: string): Promise<{
+    group_openid: string;
+    group_name: string;
+    group_finger_memo: string;
+    group_class_text: string;
+    group_tags: string[];
+    group_member_num: number;
+    /** 跨应用关联群 openid，当绑定了 3 方应用时有效 */
+    union_group_openid?: string;
+  }> {
     return this.groupService({
       url: `/v2/groups/${group_openid}/info`,
       method: 'get'

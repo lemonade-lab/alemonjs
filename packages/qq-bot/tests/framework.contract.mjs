@@ -10,6 +10,7 @@ import {
   useMenu,
   usePanel,
   useMe,
+  useUser,
   useMessage,
   useMedia,
   useConnection,
@@ -89,6 +90,7 @@ client.groupService = async request => {
   if (path === '/v2/panels') return request.method === 'get' ? { records: [panel], next_cursor: 'next', is_end: false } : { panel_id: 'ID' };
   if (path === '/v2/panels/ID') return request.method === 'get' ? panel : { version: 8 };
   if (path === '/v2/generate_url_link') return { data: { url: 'https://example.com/share' } };
+  if (path === '/v2/users/ID/info') return { username: 'user', avatar: 'https://example.com/avatar.png', allow_proactive_msg: true, union_openid: 'union' };
   if (path.endsWith('/info'))
     return { group_openid: 'ID', group_name: 'Group', group_finger_memo: 'memo', group_class_text: 'class', group_tags: ['tag'], group_member_num: 10 };
   if (path.endsWith('/bot_state')) return { member_openid: 'bot', member_role: 'admin', allow_proactive_msg: true, recv_msg_setting: 'all' };
@@ -201,6 +203,10 @@ await check('usePanel.delete', () => panels.delete('ID'));
 await check('usePanel.updateTargets', () => panels.updateTargets({ id: 'ID', operation: 'add', userIds: ['u'], guildIds: ['g'] }));
 assert.equal((await check('useMe.share', () => useMe(group)[0].share({ data: 'campaign' }))).url, 'https://example.com/share');
 await check('useMe.info', () => useMe(group)[0].info());
+const userInfo = await check('useUser.info', () => useUser()[0].info({ userId: 'ID' }));
+assert.equal(userInfo.UserName, 'user');
+assert.equal(userInfo.AllowProactiveMessages, true);
+assert.equal(calls.at(-1).url, '/v2/users/ID/info');
 await check('useConnection.gateway', () => useConnection(group)[0].gateway());
 for (const context of [group, c2c]) {
   const [message] = useMessage(context),
@@ -231,6 +237,17 @@ for (const context of [group, c2c]) {
   assert.equal(calls.at(-1).data.msg_id, undefined);
   assert.equal(calls.at(-1).data.markdown.force_verify_image_resource, true);
   assert.equal(calls.at(-1).data.keyboard.content.rows[0].buttons[0].action.permission.specify_user_ids[0], 'u');
+  await check('useMessage.send(ark)', () => message.send({ content: { card: { templateId: 1, fields: [{ key: '#PII#', value: 'v' }] } } }));
+  assert.equal(calls.at(-1).data.msg_type, 3);
+  assert.equal(calls.at(-1).data.ark.template_id, 1);
+  await check('useMessage.send(imageTextCard)', () =>
+    message.send({ content: { imageTextCard: { title: '标题', description: '描述', url: 'https://example.com/page', picUrl: 'https://example.com/pic.png' } } })
+  );
+  assert.equal(calls.at(-1).data.msg_type, 8);
+  assert.deepEqual(calls.at(-1).data.card, {
+    type: 'tuwen',
+    content: { title: '标题', description: '描述', url: 'https://example.com/page', pic_url: 'https://example.com/pic.png' }
+  });
   await check('useMessage.delete', () => message.delete({ messageId: 'ID' }));
   await check('useMedia.upload', () => media.upload({ type: 'image', url: 'https://example.com/image.png' }));
   const prepared = await check('useMedia.prepare', () =>

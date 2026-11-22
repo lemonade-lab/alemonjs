@@ -99,6 +99,8 @@ export type OutgoingMessage = {
   keyboard?: { templateId?: string; rows?: MessageButton[][] };
   media?: { fileId: string };
   card?: { templateId: number; fields: { key: string; value?: string; objects?: { fields: { key: string; value: string }[] }[] }[] };
+  /** 平台图文卡片（如 QQ msg_type=8），与 card（Ark 模板）互斥 */
+  imageTextCard?: { title: string; description: string; url: string; picUrl: string };
 };
 export type MessageDelivery = {
   target?: ActionTarget;

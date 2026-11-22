@@ -21,6 +21,7 @@ QQ-Bot 平台支持的消息类型与 `Format` / `DataEnums` 的对应关系，�
 | `Format.createButtonGroup().addButton(...)` | `BT.group`                              | 按钮（keyboard）`msg_type: 2`     | 群/单聊最多 5 行 × 每行 5 个                         |
 | -（直接传 `DataEnums`）                     | `ButtonTemplate`                        | 平台按钮模板 `keyboard.id`        | value 为平台侧模板 ID                                |
 | -（直接传 `DataEnums`）                     | `Ark.list` / `Ark.Card` / `Ark.BigCard` | Ark 卡片 `msg_type: 3`            | QQ-Bot 特有，`Format` 无内置构建器                   |
+| -（`content` 结构体）                       | `OutgoingMessage.imageTextCard`         | 官方图文卡片 `msg_type: 8`        | 群/单聊支持，无需申请 Ark 模板                       |
 
 ### 文本与 @
 
@@ -263,6 +264,42 @@ export default async () => {
 | `Ark.BigCard` | 模板 37  | 大卡片                          |
 
 > 模板详情参考官方文档 `server-inter/message/type/template/template_23.md`、`template_24.md`、`template_37.md`。
+
+### 图文卡片（msg_type: 8）
+
+官方图文卡片（“标题 + 描述 + 图片 + 跳转链接”），无需申请 Ark 模板，群聊与单聊均支持。通过 `message.send` 的 `content` 结构体发送：
+
+```ts
+import { useMessage } from 'alemonjs';
+
+export default async () => {
+  const [message] = useMessage();
+
+  await message.send({
+    content: {
+      imageTextCard: {
+        title: 'iPhone 17 Pro 正式发布',
+        description: '全新 A20 芯片 / 钛金属机身 / 支持卫星通信',
+        url: 'https://example.com/page',
+        picUrl: 'https://example.com/cover.png'
+      }
+    }
+  });
+};
+```
+
+字段要求（适配器发送前本地校验）：
+
+| 字段          | 必填 | 说明                                      |
+| ------------- | ---- | ----------------------------------------- |
+| `title`       | ✅   | 卡片标题，1~50 字符                       |
+| `description` | ✅   | 卡片描述，1~200 字符                      |
+| `url`         | ✅   | 点击跳转链接，必须 `https://`，≤1024 字符 |
+| `picUrl`      | ✅   | 封面图链接，必须 `https://`，≤1024 字符   |
+
+> - 图文卡片与 `text`、`markdown`、`media`、`card`（Ark）互斥，一次发送只能选择其中一种正文
+> - 属于被动回复消息，适配器自动携带 `msg_id` / `event_id`
+> - Ark 模板卡片（`card` / `Ark.*`）仍按 `msg_type: 3` 发送，不受影响
 
 ### 富媒体（图片 / 视频 / 音频 / 文件）
 

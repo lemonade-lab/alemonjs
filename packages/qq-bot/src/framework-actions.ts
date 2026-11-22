@@ -184,16 +184,38 @@ const member = (r: any, guildId: string) => {
 };
 
 export const toQQMessage = (content: OutgoingMessage) => {
-  if ([content.markdown, content.media, content.card].filter(Boolean).length > 1) {
-    throw new Error('markdown, media and card are mutually exclusive message bodies');
+  if ([content.markdown, content.media, content.card, content.imageTextCard].filter(Boolean).length > 1) {
+    throw new Error('markdown, media, card and imageTextCard are mutually exclusive message bodies');
   }
   if (content.keyboard?.templateId && content.keyboard.rows) {
     throw new Error('keyboard templateId and rows are mutually exclusive');
   }
+  // 官方图文卡片（msg_type=8）字段均为必填，url/pic_url 必须为 https 且不超过 1024 字符
+  const imageTextCard = (() => {
+    if (!content.imageTextCard) {
+      return undefined;
+    }
+    const { title, description, url, picUrl } = content.imageTextCard;
+
+    if (!title || Array.from(title).length > 50) {
+      throw new Error('imageTextCard title must be 1 to 50 characters');
+    }
+    if (!description || Array.from(description).length > 200) {
+      throw new Error('imageTextCard description must be 1 to 200 characters');
+    }
+    if (!url?.startsWith('https://') || url.length > 1024) {
+      throw new Error('imageTextCard url must be an https link of at most 1024 characters');
+    }
+    if (!picUrl?.startsWith('https://') || picUrl.length > 1024) {
+      throw new Error('imageTextCard picUrl must be an https link of at most 1024 characters');
+    }
+
+    return { type: 'tuwen' as const, content: { title, description, url, pic_url: picUrl } };
+  })();
 
   return {
-    msg_type: content.markdown ? (2 as const) : content.media ? (7 as const) : content.card ? (3 as const) : (0 as const),
-    content: content.markdown ? undefined : content.text,
+    msg_type: content.markdown ? (2 as const) : content.media ? (7 as const) : content.card ? (3 as const) : imageTextCard ? (8 as const) : (0 as const),
+    content: content.markdown || imageTextCard ? undefined : content.text,
     markdown: content.markdown && {
       content: content.markdown.content,
       custom_template_id: content.markdown.templateId,
@@ -206,6 +228,7 @@ export const toQQMessage = (content: OutgoingMessage) => {
       template_id: content.card.templateId,
       kv: content.card.fields.map(field => ({ key: field.key, value: field.value, obj: field.objects?.map(object => ({ obj_kv: object.fields })) }))
     },
+    card: imageTextCard,
     keyboard: content.keyboard && {
       id: content.keyboard.templateId,
       content: content.keyboard.rows && {
@@ -372,6 +395,21 @@ export const handleFrameworkAction = async (client: QQBotAPI, data: { action: st
     },
     'me.share': async () => (await client.generateUrlLink({ callback_data: p.data })).data,
     'connection.gateway': () => client.gateway(),
+    'user.info': async () => {
+      const id = need(userId, 'userId');
+      const r = await client.usersInfo(id);
+      const [IsMaster, UserKey] = getIdentity(id);
+
+      return {
+        UserId: id,
+        UserName: r.username,
+        UserKey,
+        IsMaster,
+        UnionId: r.union_openid,
+        Avatar: r.avatar,
+        AllowProactiveMessages: r.allow_proactive_msg
+      };
+    },
     'guild.bot.info': async () => {
       const r = await client.groupsBotState(requireGroup());
 
@@ -558,7 +596,8 @@ export const handleFrameworkAction = async (client: QQBotAPI, data: { action: st
           Description: r.group_finger_memo,
           Category: r.group_class_text,
           Tags: r.group_tags,
-          MemberCount: r.group_member_num
+          MemberCount: r.group_member_num,
+          UnionId: r.union_group_openid
         };
       },
       'member.info': async () => member(await client.groupsMembersMessage(requireGroup(), need(userId, 'userId')), requireGroup()),

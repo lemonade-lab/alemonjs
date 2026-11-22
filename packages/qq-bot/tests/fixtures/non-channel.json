@@ -150,6 +150,10 @@
       "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_files.post.html"
     },
     {
+      "endpoint": "GET /v2/users/{user_openid}/info",
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_info.get.html"
+    },
+    {
       "endpoint": "POST /v2/users/{user_openid}/messages",
       "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_messages.post.html"
     },
@@ -750,6 +754,10 @@
     },
     {
       "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_files.post.html",
+      "scope": "included"
+    },
+    {
+      "source": "https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_info.get.html",
       "scope": "included"
     },
     {

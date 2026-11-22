@@ -49,6 +49,8 @@ export type QQBotMessageResult = { id: string; timestamp: string; ext_info?: { r
 export type QQBotMessageUser = {
   id: string;
   username?: string;
+  /** 用户在当前群的昵称，未携带时为空 */
+  member_nickname?: string;
   bot?: boolean;
   union_openid?: string;
   union_user_account?: string;

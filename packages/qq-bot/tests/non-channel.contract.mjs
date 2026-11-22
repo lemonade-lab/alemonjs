@@ -41,6 +41,7 @@ const body = { msg_type: 0, content: 'text', msg_id: 'reply', msg_seq: 3 };
 const cases = {
   gateway: [],
   usersMe: [],
+  usersInfo: [id],
   usersOpenMessages: [id, body],
   groupOpenMessages: [id, body],
   userMessageDelete: [id, id],

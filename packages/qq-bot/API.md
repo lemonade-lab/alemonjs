@@ -221,6 +221,7 @@ await MessageDirect.create().sendToUser({
 | [interaction.response](#api-interaction-response)   | 互动事件回应（解除按钮 loading） |
 | [me.info](#api-me-info)                             | 获取机器人自身信息               |
 | [me.guilds](#api-me-guilds)                         | 获取机器人频道列表               |
+| [user.info](#api-user-info)                         | 获取用户基本信息                 |
 
 ---
 
@@ -1057,6 +1058,32 @@ const results = await sendAction({ action: 'me.guilds' });
 ```
 
 > 对应 SDK：`usersMeGuilds`。
+
+<a id="api-user-info"></a>
+
+#### user.info — 获取用户基本信息
+
+获取指定用户的昵称、头像以及是否接收主动推送（2026-11-16 官方新增接口，10 QPS）。也可使用框架 Hook：`useUser()[0].info({ userId })`。
+
+```ts
+import { sendAction } from 'alemonjs';
+
+const results = await sendAction({
+  action: 'user.info',
+  payload: { UserId: 'USER_OPENID' }
+});
+// results[0].data =>
+// {
+//   UserId: 'USER_OPENID',
+//   UserName: '昵称',
+//   UserKey, IsMaster,
+//   UnionId: '跨应用关联用户 openid（绑定 3 方应用时返回）',
+//   Avatar: 'https://thirdqq.qlogo.cn/...',
+//   AllowProactiveMessages: true
+// }
+```
+
+> 对应 SDK：`usersInfo`（`GET /v2/users/{user_openid}/info`）。仅好友关系用户可查询（错误码 40184001）。
 
 ---
 
