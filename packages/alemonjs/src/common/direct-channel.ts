@@ -59,9 +59,21 @@ const createMessageParser = (onMessage: (data: any) => void) => {
 };
 
 export interface DirectChannel {
-  send: (data: any) => void;
+  /** Returns whether the frame was accepted by the local socket. */
+  send: (data: any) => boolean;
   close: () => void;
 }
+
+const sendMessage = (socket: net.Socket | null, data: any): boolean => {
+  if (!socket?.writable || socket.destroyed || socket.connecting) {
+    return false;
+  }
+
+  // write() returning false signals backpressure, not a rejected frame.
+  socket.write(encodeMessage(data));
+
+  return true;
+};
 
 export const createDirectServer = (sockPath: string, onMessage: (data: any) => void): Promise<DirectChannel> => {
   return new Promise((resolve, reject) => {
@@ -93,30 +105,19 @@ export const createDirectServer = (sockPath: string, onMessage: (data: any) => v
     });
 
     const cleanup = () => {
+      process.off('exit', cleanup);
       try {
         server.close();
         connection?.destroy();
-        if (process.platform !== 'win32') {
-          try {
-            fs.unlinkSync(sockPath);
-          } catch {
-            // ignore
-          }
-        }
       } catch {
         // ignore
       }
     };
 
-    process.on('exit', cleanup);
-
     server.listen(sockPath, () => {
+      process.once('exit', cleanup);
       resolve({
-        send: (data: any) => {
-          if (connection && !connection.destroyed) {
-            connection.write(encodeMessage(data));
-          }
-        },
+        send: data => sendMessage(connection, data),
         close: cleanup
       });
     });
@@ -125,40 +126,60 @@ export const createDirectServer = (sockPath: string, onMessage: (data: any) => v
   });
 };
 
-export const createDirectClient = (sockPath: string, onMessage: (data: any) => void, maxRetries = 30, retryDelay = 150): Promise<DirectChannel> => {
-  let attempts = 0;
-
-  const tryConnect = (): Promise<DirectChannel> => {
-    return new Promise<DirectChannel>((resolve, reject) => {
-      const parser = createMessageParser(onMessage);
-
-      const socket = net.createConnection(sockPath, () => {
-        socket.removeListener('error', reject);
-        socket.on('error', () => {
-          // ignore runtime socket errors
-        });
-        resolve({
-          send: (data: any) => {
-            if (!socket.destroyed) {
-              socket.write(encodeMessage(data));
-            }
-          },
-          close: () => {
-            socket.destroy();
-          }
-        });
-      });
-
-      socket.on('data', parser);
-      socket.on('error', reject);
-    }).catch(err => {
-      if (++attempts < maxRetries) {
-        return new Promise<DirectChannel>(r => setTimeout(() => r(tryConnect()), retryDelay));
+export const createDirectClient = (sockPath: string, onMessage: (data: any) => void, maxAttempts = 30, retryDelay = 150): Promise<DirectChannel> => {
+  return new Promise((resolve, reject) => {
+    let connection: net.Socket | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let closed = false;
+    let connectedOnce = false;
+    let startupAttempts = 0;
+    let reconnectDelay = retryDelay;
+    const channel: DirectChannel = {
+      send: data => sendMessage(connection, data),
+      close: () => {
+        closed = true;
+        clearTimeout(retryTimer);
+        connection?.destroy();
+        connection = null;
       }
+    };
 
-      throw err;
-    });
-  };
+    const connect = () => {
+      let connectionError: Error | undefined;
+      const socket = net.createConnection(sockPath);
 
-  return tryConnect();
+      socket.once('connect', () => {
+        reconnectDelay = retryDelay;
+        if (!connectedOnce) {
+          connectedOnce = true;
+          resolve(channel);
+        }
+      });
+      socket.on('data', createMessageParser(onMessage));
+      socket.on('error', error => {
+        connectionError = error;
+      });
+      socket.once('close', () => {
+        connection = null;
+        if (closed) {
+          return;
+        }
+        if (!connectedOnce && ++startupAttempts >= maxAttempts) {
+          reject(connectionError ?? new Error('Direct-IPC closed before connecting'));
+
+          return;
+        }
+        // The module can restart independently. Once connected, keep trying
+        // until a replacement listener is available or the channel is closed.
+        retryTimer = setTimeout(connect, reconnectDelay);
+        if (connectedOnce) {
+          reconnectDelay = Math.min(reconnectDelay * 2, Math.max(retryDelay, 1000));
+        }
+      });
+      // Keep the in-progress socket reachable so close() can cancel a retry.
+      connection = socket;
+    };
+
+    connect();
+  });
 };

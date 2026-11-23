@@ -32,9 +32,11 @@ const setupActionResolve = (requestId: string, resolve: (value: Result[] | Promi
  */
 export const sendAction = (data: Actions): Promise<Result[]> => {
   const payload = data.payload as any;
+
   if (payload?.params?.format) {
     data = { ...data, payload: { ...payload, params: { ...payload.params, format: transformCommandButtons(payload.params.format) } } } as Actions;
   }
+
   const scope = runtimeScope.getStore();
 
   if (scope) {
@@ -59,8 +61,11 @@ export const sendAction = (data: Actions): Promise<Result[]> => {
     const directSend = getDirectSend();
 
     if (directSend) {
-      directSend(safeData);
-      setupActionResolve(requestId, resolve);
+      if (directSend(safeData)) {
+        setupActionResolve(requestId, resolve);
+      } else {
+        resolve([createResult(ResultCode.Fail, translate('result.chatbot.client.is.not.available'), null)]);
+      }
 
       return;
     }

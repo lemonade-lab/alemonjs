@@ -54,8 +54,11 @@ export const sendAPI = (data: Apis): Promise<Result[]> => {
     const directSend = getDirectSend();
 
     if (directSend) {
-      directSend(safeData);
-      setupApiResolve(requestId, resolve);
+      if (directSend(safeData)) {
+        setupApiResolve(requestId, resolve);
+      } else {
+        resolve([createResult(ResultCode.Fail, translate('result.chatbot.client.is.not.available'), null)]);
+      }
 
       return;
     }

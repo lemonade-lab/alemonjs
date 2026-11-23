@@ -325,6 +325,7 @@ setDirectSend(envelope => {
     actionRequestResolves.get(envelope.id)?.([{ code: 2000, data: { id: 'typing' } }]);
     actionRequestResolves.delete(envelope.id);
   });
+  return true;
 });
 const c2c = event('private', { IsPrivate: true, Target: { scope: 'c2c', targetId: 'u', BotId: 'a' } });
 let completeHandler;
